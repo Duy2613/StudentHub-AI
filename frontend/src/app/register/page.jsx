@@ -2,10 +2,9 @@
 
 // app/register/page.jsx
 //
-// Đăng ký 2 bước:
-//   Bước 1: Họ tên + Email + Mật khẩu -> signUpWithEmail()
-//   Bước 2: Nhập mã OTP gửi qua email (nếu bật Confirm Email) -> verifyOtp() -> Điều hướng sang /onboarding.
-//   Hỗ trợ trải nghiệm nhanh Demo Sinh viên & Chuyên gia uy tín.
+// Đăng ký tài khoản 2 bước bảo mật cao:
+//   Bước 1: Họ tên + Email + Mật khẩu -> signUpWithEmail() (Kiểm tra chống trùng lặp Google/Email)
+//   Bước 2: Bắt buộc nhập mã OTP 6 số gửi về email -> verifyOtp() -> Điều hướng sang /onboarding.
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -63,15 +62,9 @@ const RegisterPage = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const data = await signUpWithEmail(email, password, fullName);
+      await signUpWithEmail(email, password, fullName);
 
-      // Nếu Supabase đã tắt Confirm email hoặc người dùng có session ngay:
-      if (data?.session) {
-        await ensureSynced(fullName);
-        router.push("/onboarding");
-        return;
-      }
-
+      // Chuyển sang bước bắt buộc nhập OTP 6 số
       setStep(STEP_OTP);
       setNotice(`Đã gửi mã xác nhận 6 chữ số tới ${email}. Vui lòng kiểm tra hộp thư (kể cả thư mục spam).`);
     } catch (err) {
@@ -101,7 +94,7 @@ const RegisterPage = () => {
     setIsResending(true);
     try {
       await resendSignupOtp(email);
-      setNotice("Đã gửi lại mã xác nhận mới tới email của bạn.");
+      setNotice("Đã gửi lại mã xác nhận 6 số mới tới email của bạn.");
     } catch (err) {
       setError(translateAuthError(err));
     } finally {
@@ -138,7 +131,7 @@ const RegisterPage = () => {
           {step === STEP_FORM ? "Tạo tài khoản" : "Xác nhận email"}
         </h2>
         <p className="mt-3 text-base text-gray-400 font-medium">
-          {step === STEP_FORM ? "Tham gia StudentHub AI" : `Nhập mã xác nhận đã gửi tới ${email}`}
+          {step === STEP_FORM ? "Tham gia StudentHub AI" : `Nhập mã xác nhận 6 số đã gửi tới ${email}`}
         </p>
       </div>
 
@@ -200,7 +193,7 @@ const RegisterPage = () => {
             </div>
           </div>
 
-          {/* Demo Mode Bypass Options */}
+          {/* Demo Mode Options */}
           <div className="mt-6 pt-6 border-t border-white/10 relative z-10 space-y-3">
             <p className="text-xs text-center text-gray-400 font-medium">
               ⚡ Trải nghiệm nhanh không cần đợi email:

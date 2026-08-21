@@ -18,16 +18,16 @@ export function translateAuthError(error) {
   const lower = msg.toLowerCase();
 
   if (lower.includes("error sending confirmation email") || lower.includes("confirmation email")) {
-    return "Hệ thống email Supabase tạm thời bị giới hạn (Rate Limit). Vui lòng tắt 'Confirm Email' trong Supabase Dashboard (Auth > Providers > Email) hoặc bấm nút 'Demo Sinh viên / Chuyên gia' bên dưới để vào ngay.";
+    return "Hệ thống email Supabase tạm thời bị giới hạn gửi thư hoặc template chưa đúng. Vui lòng kiểm tra SMTP/Template trong Supabase Dashboard hoặc đăng nhập bằng Google.";
   }
   if (lower.includes("invalid login credentials") || lower.includes("invalid_credentials")) {
     return "Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.";
   }
   if (lower.includes("email not confirmed") || lower.includes("email_not_confirmed")) {
-    return "Email chưa được xác thực. Vui lòng kiểm tra hộp thư (kể cả thư rác) hoặc tắt Confirm Email trong Supabase Dashboard.";
+    return "Tài khoản chưa được kích hoạt. Vui lòng nhập mã OTP 6 số đã gửi về email của bạn để xác thực.";
   }
   if (lower.includes("user already registered") || lower.includes("already registered")) {
-    return "Email này đã được đăng ký tài khoản. Vui lòng chuyển sang Đăng nhập.";
+    return "Email này đã được đăng ký (hoặc đã đăng nhập bằng Google từ trước). Vui lòng đăng nhập hoặc dùng 'Continue with Google'.";
   }
   if (lower.includes("password should be at least 6") || lower.includes("weak_password")) {
     return "Mật khẩu phải có độ dài tối thiểu 6 ký tự.";
@@ -36,10 +36,10 @@ export function translateAuthError(error) {
     return "Bạn thao tác quá nhanh hoặc gửi quá nhiều yêu cầu. Vui lòng chờ 1-2 phút rồi thử lại.";
   }
   if (lower.includes("token has expired") || lower.includes("otp expired")) {
-    return "Mã xác nhận đã hết hạn. Vui lòng nhấn 'Gửi lại mã'.";
+    return "Mã OTP 6 số đã hết hạn. Vui lòng nhấn 'Gửi lại mã'.";
   }
-  if (lower.includes("invalid token") || lower.includes("token is invalid")) {
-    return "Mã xác nhận không chính xác. Vui lòng kiểm tra lại 6 chữ số trong email.";
+  if (lower.includes("invalid token") || lower.includes("token is invalid") || lower.includes("token has expired")) {
+    return "Mã xác nhận không chính xác. Vui lòng kiểm tra lại 6 chữ số trong email của bạn.";
   }
   if (lower.includes("network") || lower.includes("failed to fetch")) {
     return "Không thể kết nối máy chủ. Vui lòng kiểm tra kết nối mạng của bạn.";
@@ -51,12 +51,15 @@ export function translateAuthError(error) {
 // ---------------- Supabase Auth ----------------
 
 /**
- * Bước 1 của đăng ký: tạo tài khoản, Supabase tự gửi email OTP xác nhận.
+ * Bước 1 của đăng ký: tạo tài khoản, Supabase tự gửi email OTP xác nhận 6 số.
+ * Bảo mật: Chặn ngay nếu email này đã đăng ký trước đó hoặc đã liên kết Google OAuth.
  */
 export async function signUpWithEmail(email, password, fullName) {
-  const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test((email || "").trim());
+  const cleanEmail = email.trim();
+  const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(cleanEmail);
+
   const { data, error } = await supabase.auth.signUp({
-    email: email.trim(),
+    email: cleanEmail,
     password,
     options: {
       data: {
@@ -69,19 +72,35 @@ export async function signUpWithEmail(email, password, fullName) {
       },
     },
   });
+
   if (error) throw new Error(translateAuthError(error));
+
+  // QUAN TRỌNG VỀ BẢO MẬT: Khi email đã tồn tại (hoặc đã đăng nhập bằng Google từ trước),
+  // Supabase sẽ trả về data.user với mảng identities = [] để báo rằng không thể tạo mới
+  if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    throw new Error(
+      "Email này đã tồn tại trong hệ thống (đã đăng nhập bằng Google hoặc đã tạo tài khoản). Vui lòng chọn 'Continue with Google' hoặc chuyển sang Đăng nhập."
+    );
+  }
+
   return data;
 }
 
 /**
- * Bước 2 của đăng ký: xác nhận mã OTP người dùng nhận qua email.
+ * Bước 2 của đăng ký: xác nhận mã OTP 6 số người dùng nhận qua email.
  */
 export async function verifySignupOtp(email, token) {
+  const cleanToken = (token || "").trim();
+  if (cleanToken.length !== 6 || !/^\d+$/.test(cleanToken)) {
+    throw new Error("Mã xác nhận phải gồm đúng 6 chữ số.");
+  }
+
   const { data, error } = await supabase.auth.verifyOtp({
     email: email.trim(),
-    token: token.trim(),
+    token: cleanToken,
     type: "email",
   });
+
   if (error) throw new Error(translateAuthError(error));
   return data;
 }
