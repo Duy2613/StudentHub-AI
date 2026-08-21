@@ -2,15 +2,20 @@
 
 // lib/auth/AuthContext.jsx
 //
-// Quản lý trạng thái xác thực và hồ sơ người dùng (Sinh viên / Chuyên gia uy tín):
-//  - session: phiên đăng nhập Supabase
-//  - profile: hồ sơ đầy đủ kết hợp từ Supabase User Metadata và Backend API
-//  - loginAsDemo: hỗ trợ trải nghiệm demo nhanh (Demo Sinh viên / Demo Chuyên gia)
-//  - updateProfile: cập nhật nhanh avatar, vai trò, thông tin học vấn / chuyên môn
+// Quản lý xác thực và hồ sơ người dùng kết nối trực tiếp ASP.NET Core Backend + Supabase:
+//  - Tự động đọc JWT Token và lấy hồ sơ từ GET /api/auth/me
+//  - Quản lý phiên đăng nhập, vai trò Sinh viên & Chuyên gia uy tín
+//  - Hỗ trợ cập nhật avatar, trường học, chuyên môn tức thì
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { getMe, syncProfile, signOutSupabase, updateUserProfile } from "./authService";
+import {
+  getMeBackend,
+  signOutSupabase,
+  updateUserProfile,
+  getStoredToken,
+  setStoredToken,
+} from "./authService";
 
 const AuthContext = createContext(null);
 
@@ -62,37 +67,47 @@ const DEMO_EXPERT = {
   questionsCount: 2,
 };
 
-function formatProfile(user, backendData = null) {
+function formatProfile(user) {
   if (!user) return null;
 
+  // Đọc thêm từ localStorage nếu có
+  let cached = {};
+  if (typeof window !== "undefined") {
+    try {
+      const s = localStorage.getItem("studenthub_user_profile");
+      if (s) cached = JSON.parse(s);
+    } catch {}
+  }
+
   const meta = user.user_metadata || {};
-  const email = user.email || "";
-  const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(email);
-  const isExpert = meta.role === "expert";
+  const email = user.email || user.Email || cached.email || "";
+  const fullName = user.fullName || user.FullName || meta.full_name || meta.name || cached.fullName || "Người dùng StudentHub";
+  const rawRole = (user.role || user.Role || meta.role || cached.role || "student").toLowerCase();
+  const isExpert = rawRole === "expert";
+  const isEdu = user.universityEmailVerified || user.UniversityEmailVerified || /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(email);
 
   return {
-    id: user.id,
+    id: user.id || user.Id || cached.id || "user-1",
     email: email,
-    fullName: meta.full_name || meta.name || user.name || "Người dùng StudentHub",
-    role: meta.role || "student",
-    avatarId: meta.avatar_id || (isExpert ? "expert-ai" : "student-tech"),
-    avatarUrl: meta.avatar_url || null,
-    university: meta.university || (isEdu ? "Đại học Thành viên (Email Edu)" : "Chưa cập nhật"),
-    major: meta.major || "Khoa học & Kỹ thuật",
-    academicYear: meta.academic_year || "2024-2028",
-    expertTitle: meta.expert_title || "Chuyên gia Tư vấn & Nghiên cứu",
-    expertField: meta.expert_field || "Trí tuệ nhân tạo (AI & Machine Learning)",
-    experienceYears: meta.experience_years || "3+ năm kinh nghiệm",
-    bio: meta.bio || (isExpert ? "Chuyên gia giải đáp học thuật và định hướng nghiên cứu cho sinh viên." : "Sinh viên đam mê học tập, khám phá công nghệ và AI."),
-    trustScore: meta.trust_score || (isExpert ? 98 : isEdu ? 80 : 50),
-    verifiedStudent: meta.verified_student !== undefined ? meta.verified_student : isEdu,
+    fullName: fullName,
+    role: isExpert ? "expert" : "student",
+    avatarId: cached.avatarId || meta.avatar_id || (isExpert ? "expert-ai" : "student-tech"),
+    avatarUrl: cached.avatarUrl || meta.avatar_url || null,
+    university: cached.university || meta.university || (isEdu ? "Đại học Thành viên (Email Edu)" : "Chưa cập nhật"),
+    major: cached.major || meta.major || "Khoa học & Kỹ thuật",
+    academicYear: cached.academicYear || meta.academic_year || "2024-2028",
+    expertTitle: cached.expertTitle || meta.expert_title || "Chuyên gia Tư vấn & Nghiên cứu",
+    expertField: cached.expertField || meta.expert_field || "Trí tuệ nhân tạo (AI & Machine Learning)",
+    experienceYears: cached.experienceYears || meta.experience_years || "3+ năm kinh nghiệm",
+    bio: cached.bio || meta.bio || (isExpert ? "Chuyên gia giải đáp học thuật và định hướng nghiên cứu cho sinh viên." : "Sinh viên đam mê học tập, khám phá công nghệ và AI."),
+    trustScore: user.trustScore || user.TrustScore || cached.trustScore || meta.trust_score || (isExpert ? 98 : isEdu ? 80 : 50),
+    verifiedStudent: user.universityEmailVerified || user.UniversityEmailVerified || meta.verified_student || isEdu,
     verifiedExpert: isExpert || meta.verified_expert === true,
-    onboarded: meta.onboarded === true,
-    badges: meta.badges || (isExpert ? ["⭐ Chuyên Gia Uy Tín", "Cố Vấn Xuất Sắc", "Top Người Giải Đáp"] : ["Sinh Viên Tiên Phong", "Học Giả Tích Cực"]),
-    rating: meta.rating || 4.95,
-    answersCount: meta.answers_count || (isExpert ? 24 : 3),
-    questionsCount: meta.questions_count || (isExpert ? 2 : 8),
-    ...(backendData || {}),
+    onboarded: cached.onboarded === true || meta.onboarded === true,
+    badges: cached.badges || meta.badges || (isExpert ? ["⭐ Chuyên Gia Uy Tín", "Cố Vấn Xuất Sắc", "Top Người Giải Đáp"] : ["Sinh Viên Tiên Phong", "Học Giả Tích Cực"]),
+    rating: cached.rating || meta.rating || 4.95,
+    answersCount: cached.answersCount || meta.answers_count || (isExpert ? 24 : 3),
+    questionsCount: cached.questionsCount || meta.questions_count || (isExpert ? 2 : 8),
   };
 }
 
@@ -101,7 +116,6 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDemoMode, setIsDemoMode] = useState(false);
-  const syncedRef = useRef(false);
 
   // Khởi tạo Auth 1 lần duy nhất khi Mount
   useEffect(() => {
@@ -114,54 +128,50 @@ export function AuthProvider({ children }) {
         try {
           const parsed = JSON.parse(savedDemo);
           if (mounted) {
-            setSession({ user: { id: parsed.id, email: parsed.email, user_metadata: parsed } });
+            setSession({ user: parsed });
             setProfile(parsed);
             setIsDemoMode(true);
             setIsLoading(false);
             return;
           }
-        } catch {
-          // ignore
-        }
+        } catch {}
       }
     }
 
-    // 2. Lấy session hiện tại từ Supabase
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+    // 2. Kiểm tra Backend JWT Token
+    getMeBackend().then((backendUser) => {
       if (!mounted) return;
-      if (currentSession?.user) {
-        setSession(currentSession);
-        setProfile(formatProfile(currentSession.user));
-        // Thử lấy thêm dữ liệu từ backend một cách bất đồng bộ
-        getMe().then((beData) => {
-          if (mounted && beData) {
-            setProfile(formatProfile(currentSession.user, beData));
-          }
-        }).catch(() => {});
-      } else {
-        setSession(null);
-        setProfile(null);
+      if (backendUser) {
+        setSession({ user: backendUser });
+        setProfile(formatProfile(backendUser));
+        setIsLoading(false);
+        return;
       }
-      setIsLoading(false);
+
+      // 3. Kiểm tra Supabase session
+      supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+        if (!mounted) return;
+        if (currentSession?.user) {
+          setSession(currentSession);
+          setProfile(formatProfile(currentSession.user));
+        } else {
+          setSession(null);
+          setProfile(null);
+        }
+        setIsLoading(false);
+      });
+    }).catch(() => {
+      if (mounted) setIsLoading(false);
     });
 
-    // 3. Lắng nghe thay đổi trạng thái Auth
+    // 4. Lắng nghe Supabase OAuth (Google)
     const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
       if (!mounted) return;
       if (newSession?.user) {
         setSession(newSession);
         setProfile(formatProfile(newSession.user));
         setIsDemoMode(false);
-      } else {
-        // Chỉ xóa nếu không đang trong demo mode
-        const hasDemo = typeof window !== "undefined" && localStorage.getItem("studenthub_demo_user");
-        if (!hasDemo) {
-          setSession(null);
-          setProfile(null);
-          syncedRef.current = false;
-        }
       }
-      setIsLoading(false);
     });
 
     return () => {
@@ -170,25 +180,16 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const ensureSynced = useCallback(
-    async (fullName) => {
-      if (syncedRef.current || isDemoMode) return;
-      try {
-        await syncProfile(fullName);
-      } catch (err) {
-        console.warn("[ensureSynced] Backend sync non-blocking:", err.message);
-      }
-      syncedRef.current = true;
-    },
-    [isDemoMode]
-  );
+  const ensureSynced = useCallback(async () => {
+    return { success: true };
+  }, []);
 
   /**
-   * Đăng nhập nhanh chế độ Demo (không cần SMTP)
+   * Đăng nhập nhanh chế độ Demo
    */
   const loginAsDemo = useCallback((role = "student") => {
     const demoData = role === "expert" ? DEMO_EXPERT : DEMO_STUDENT;
-    setSession({ user: { id: demoData.id, email: demoData.email, user_metadata: demoData } });
+    setSession({ user: demoData });
     setProfile(demoData);
     setIsDemoMode(true);
     if (typeof window !== "undefined") {
@@ -201,34 +202,27 @@ export function AuthProvider({ children }) {
    */
   const updateProfile = useCallback(
     async (profileUpdates) => {
-      if (isDemoMode) {
-        const merged = { ...(profile || {}), ...profileUpdates };
-        setProfile(merged);
-        if (typeof window !== "undefined") {
-          localStorage.setItem("studenthub_demo_user", JSON.stringify(merged));
-        }
-        return merged;
+      const merged = { ...(profile || {}), ...profileUpdates };
+      setProfile(merged);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("studenthub_user_profile", JSON.stringify(merged));
       }
-
-      const updatedUser = await updateUserProfile(profileUpdates);
-      if (updatedUser) {
-        const newProf = formatProfile(updatedUser);
-        setProfile(newProf);
-        return newProf;
-      }
+      await updateUserProfile(profileUpdates);
+      return merged;
     },
-    [isDemoMode, profile]
+    [profile]
   );
 
   const signOut = useCallback(async () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("studenthub_demo_user");
+      localStorage.removeItem("studenthub_user_profile");
+      setStoredToken(null);
     }
     setIsDemoMode(false);
     await signOutSupabase().catch(() => {});
     setSession(null);
     setProfile(null);
-    syncedRef.current = false;
   }, []);
 
   return (

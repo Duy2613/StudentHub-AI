@@ -1,14 +1,15 @@
 // lib/auth/authService.js
 //
-// Toàn bộ authentication chuyển sang dùng Supabase Auth theo đúng chỉ đạo
-// từ backend — Frontend không tự hash password, không tự tạo OTP, không
-// tự gửi SMTP, không tự giữ Google Client Secret. Sau khi Supabase xác
-// thực xong, gọi backend /api/auth/sync và /api/auth/me bằng access_token
-// của Supabase, đồng thời quản lý metadata profile an toàn.
+// Kết nối trực tiếp với Backend ASP.NET Core API của StudentHub:
+// - POST /api/auth/register: Đăng ký tài khoản (hashing bằng PasswordHasher, lưu DB)
+// - POST /api/auth/login: Đăng nhập (trả về JWT Token 24h & thông tin User)
+// - GET /api/auth/me: Lấy thông tin user hiện tại qua JWT Bearer Token
+// - GET /api/users: Lấy danh sách cộng đồng sinh viên & chuyên gia
+// - Tích hợp Supabase cho Google OAuth
 
 import { supabase } from "@/lib/supabase/client";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://studenthub-api-8fqp.onrender.com";
 
 // ---------------- Helper Dịch Lỗi Tiếng Việt ----------------
 
@@ -17,103 +18,195 @@ export function translateAuthError(error) {
   const msg = typeof error === "string" ? error : error.message || "";
   const lower = msg.toLowerCase();
 
-  if (lower.includes("error sending confirmation email") || lower.includes("confirmation email")) {
-    return "Hệ thống email Supabase tạm thời bị giới hạn gửi thư hoặc template chưa đúng. Vui lòng kiểm tra SMTP/Template trong Supabase Dashboard hoặc đăng nhập bằng Google.";
+  if (lower.includes("email already exists") || lower.includes("already registered") || lower.includes("user already registered")) {
+    return "Email này đã được sử dụng. Vui lòng chuyển sang Đăng nhập hoặc sử dụng email khác.";
   }
-  if (lower.includes("invalid login credentials") || lower.includes("invalid_credentials")) {
+  if (lower.includes("invalid email or password") || lower.includes("invalid login credentials") || lower.includes("invalid_credentials")) {
     return "Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.";
-  }
-  if (lower.includes("email not confirmed") || lower.includes("email_not_confirmed")) {
-    return "Tài khoản chưa được kích hoạt. Vui lòng nhập mã OTP 6 số đã gửi về email của bạn để xác thực.";
-  }
-  if (lower.includes("user already registered") || lower.includes("already registered")) {
-    return "Email này đã được đăng ký (hoặc đã đăng nhập bằng Google từ trước). Vui lòng đăng nhập hoặc dùng 'Continue with Google'.";
   }
   if (lower.includes("password should be at least 6") || lower.includes("weak_password")) {
     return "Mật khẩu phải có độ dài tối thiểu 6 ký tự.";
   }
-  if (lower.includes("rate limit") || lower.includes("too many requests") || lower.includes("over_email_send_rate_limit")) {
-    return "Bạn thao tác quá nhanh hoặc gửi quá nhiều yêu cầu. Vui lòng chờ 1-2 phút rồi thử lại.";
-  }
-  if (lower.includes("token has expired") || lower.includes("otp expired")) {
-    return "Mã OTP 6 số đã hết hạn. Vui lòng nhấn 'Gửi lại mã'.";
-  }
-  if (lower.includes("invalid token") || lower.includes("token is invalid") || lower.includes("token has expired")) {
-    return "Mã xác nhận không chính xác. Vui lòng kiểm tra lại 6 chữ số trong email của bạn.";
-  }
   if (lower.includes("network") || lower.includes("failed to fetch")) {
-    return "Không thể kết nối máy chủ. Vui lòng kiểm tra kết nối mạng của bạn.";
+    return "Không thể kết nối tới máy chủ. Đang thử kết nối lại...";
   }
 
   return msg || "Đã xảy ra lỗi trong quá trình xác thực. Vui lòng thử lại.";
 }
 
-// ---------------- Supabase Auth ----------------
+// ---------------- Token Helper ----------------
+
+export function getStoredToken() {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("studenthub_jwt_token");
+}
+
+export function setStoredToken(token) {
+  if (typeof window === "undefined") return;
+  if (token) {
+    localStorage.setItem("studenthub_jwt_token", token);
+  } else {
+    localStorage.removeItem("studenthub_jwt_token");
+  }
+}
+
+// ---------------- Backend ASP.NET Core API Auth ----------------
 
 /**
- * Bước 1 của đăng ký: tạo tài khoản, Supabase tự gửi email OTP xác nhận 6 số.
- * Bảo mật: Chặn ngay nếu email này đã đăng ký trước đó hoặc đã liên kết Google OAuth.
+ * Đăng ký tài khoản trực tiếp qua Backend ASP.NET Core: POST /api/auth/register
  */
-export async function signUpWithEmail(email, password, fullName) {
+export async function registerBackend(email, password, fullName) {
   const cleanEmail = email.trim();
-  const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(cleanEmail);
 
-  const { data, error } = await supabase.auth.signUp({
-    email: cleanEmail,
-    password,
-    options: {
-      data: {
-        full_name: fullName,
-        role: "student",
-        avatar_id: "student-tech",
-        trust_score: isEdu ? 80 : 50,
-        verified_student: isEdu,
-        onboarded: false,
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: cleanEmail,
+        password: password,
+        fullName: fullName,
+      }),
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      throw new Error(data?.message || "Đăng ký thất bại.");
+    }
+
+    // Tự động đăng nhập ngay sau khi đăng ký thành công để lấy JWT Token
+    return await loginBackend(cleanEmail, password);
+  } catch (err) {
+    // Nếu backend đang ngủ/lỗi, thử fallback qua Supabase
+    console.warn("[Register API] Thử fallback:", err.message);
+    throw new Error(translateAuthError(err));
+  }
+}
+
+/**
+ * Đăng nhập qua Backend ASP.NET Core: POST /api/auth/login
+ */
+export async function loginBackend(email, password) {
+  const cleanEmail = email.trim();
+
+  const res = await fetch(`${API_BASE}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: cleanEmail,
+      password: password,
+    }),
+  });
+
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    throw new Error(data?.message || "Đăng nhập thất bại.");
+  }
+
+  if (data?.token) {
+    setStoredToken(data.token);
+  }
+
+  return data;
+}
+
+/**
+ * Lấy thông tin user hiện tại: GET /api/auth/me
+ */
+export async function getMeBackend() {
+  const token = getStoredToken();
+  if (!token) return null;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/me`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-    },
-  });
+    });
 
-  if (error) throw new Error(translateAuthError(error));
+    if (!res.ok) {
+      if (res.status === 401) {
+        setStoredToken(null);
+      }
+      return null;
+    }
 
-  // QUAN TRỌNG VỀ BẢO MẬT: Khi email đã tồn tại (hoặc đã đăng nhập bằng Google từ trước),
-  // Supabase sẽ trả về data.user với mảng identities = [] để báo rằng không thể tạo mới
-  if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-    throw new Error(
-      "Email này đã tồn tại trong hệ thống (đã đăng nhập bằng Google hoặc đã tạo tài khoản). Vui lòng chọn 'Continue with Google' hoặc chuyển sang Đăng nhập."
-    );
+    const data = await res.json();
+    return data?.user || data;
+  } catch {
+    return null;
   }
-
-  return data;
 }
 
 /**
- * Bước 2 của đăng ký: xác nhận mã OTP 6 số người dùng nhận qua email.
+ * Lấy danh sách cộng đồng người dùng: GET /api/users
  */
-export async function verifySignupOtp(email, token) {
-  const cleanToken = (token || "").trim();
-  if (cleanToken.length !== 6 || !/^\d+$/.test(cleanToken)) {
-    throw new Error("Mã xác nhận phải gồm đúng 6 chữ số.");
+export async function getUsersBackend() {
+  try {
+    const res = await fetch(`${API_BASE}/api/users`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
   }
-
-  const { data, error } = await supabase.auth.verifyOtp({
-    email: email.trim(),
-    token: cleanToken,
-    type: "email",
-  });
-
-  if (error) throw new Error(translateAuthError(error));
-  return data;
 }
 
-/**
- * Gửi lại email OTP nếu người dùng không nhận được / mã hết hạn.
- */
-export async function resendSignupOtp(email) {
-  const { error } = await supabase.auth.resend({ type: "signup", email: email.trim() });
-  if (error) throw new Error(translateAuthError(error));
+// ---------------- Supabase & Hybrid Auth Fallbacks ----------------
+
+export async function signUpWithEmail(email, password, fullName) {
+  // Ưu tiên đăng ký qua Backend ASP.NET Core API
+  try {
+    return await registerBackend(email, password, fullName);
+  } catch (backendError) {
+    // Nếu backend báo Email already exists, throw ngay
+    if (backendError.message.includes("Email") || backendError.message.includes("tồn tại")) {
+      throw backendError;
+    }
+
+    // Fallback qua Supabase nếu backend chưa khởi động
+    const cleanEmail = email.trim();
+    const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(cleanEmail);
+    const { data, error } = await supabase.auth.signUp({
+      email: cleanEmail,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          role: "student",
+          avatar_id: "student-tech",
+          trust_score: isEdu ? 80 : 50,
+          verified_student: isEdu,
+          onboarded: false,
+        },
+      },
+    });
+    if (error) throw new Error(translateAuthError(error));
+    return data;
+  }
 }
 
 export async function signInWithPassword(email, password) {
+  // Ưu tiên đăng nhập qua Backend ASP.NET Core API
+  try {
+    const backendResult = await loginBackend(email, password);
+    if (backendResult?.user) {
+      return { user: backendResult.user, token: backendResult.token };
+    }
+  } catch (backendErr) {
+    // Nếu là sai mật khẩu từ backend thì throw ngay
+    if (backendErr.message.includes("Invalid") || backendErr.message.includes("không chính xác")) {
+      throw new Error("Email hoặc mật khẩu không chính xác.");
+    }
+  }
+
+  // Fallback qua Supabase
   const { data, error } = await supabase.auth.signInWithPassword({
     email: email.trim(),
     password,
@@ -122,9 +215,6 @@ export async function signInWithPassword(email, password) {
   return data;
 }
 
-/**
- * Redirect toàn trang sang Google qua Supabase OAuth.
- */
 export function signInWithGoogle() {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   return supabase.auth.signInWithOAuth({
@@ -134,89 +224,33 @@ export function signInWithGoogle() {
 }
 
 export async function signOutSupabase() {
-  const { error } = await supabase.auth.signOut();
+  setStoredToken(null);
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("studenthub_user_profile");
+  }
+  const { error } = await supabase.auth.signOut().catch(() => ({}));
   if (error) throw new Error(translateAuthError(error));
 }
 
-/**
- * Cập nhật thông tin User Metadata trong Supabase Auth (role, avatar, bio, trường...)
- */
 export async function updateUserProfile(profileData) {
-  const { data, error } = await supabase.auth.updateUser({
+  if (typeof window !== "undefined") {
+    const cached = localStorage.getItem("studenthub_user_profile");
+    const current = cached ? JSON.parse(cached) : {};
+    const updated = { ...current, ...profileData };
+    localStorage.setItem("studenthub_user_profile", JSON.stringify(updated));
+  }
+
+  const { data } = await supabase.auth.updateUser({
     data: profileData,
-  });
-  if (error) throw new Error(translateAuthError(error));
-  return data.user;
+  }).catch(() => ({ data: { user: null } }));
+
+  return data?.user || profileData;
 }
 
-// ---------------- Backend StudentHub API ----------------
-
-async function authorizedFetch(path, options = {}) {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    throw new Error("Chưa đăng nhập (không có session Supabase).");
-  }
-
-  if (!API_BASE) {
-    console.warn("[API] NEXT_PUBLIC_API_URL chưa được cấu hình, dùng fallback profile.");
-    return null;
-  }
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout
-
-  try {
-    const res = await fetch(`${API_BASE}${path}`, {
-      ...options,
-      signal: controller.signal,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.access_token}`,
-        ...(options.headers || {}),
-      },
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!res.ok) {
-      const body = await res.json().catch(() => null);
-      throw new Error(body?.message || `Lỗi gọi API (HTTP ${res.status})`);
-    }
-
-    return await res.json();
-  } catch (err) {
-    clearTimeout(timeoutId);
-    console.warn(`[API] Lỗi khi gọi ${path}:`, err.message);
-    throw err;
-  }
-}
-
-/**
- * Đồng bộ hồ sơ sang backend với cơ chế graceful fallback.
- */
 export async function syncProfile(fullName) {
-  try {
-    return await authorizedFetch("/api/auth/sync", {
-      method: "POST",
-      body: JSON.stringify(fullName ? { fullName } : {}),
-    });
-  } catch (err) {
-    console.warn("[syncProfile] Không thể đồng bộ backend (đang chạy chế độ client profile):", err.message);
-    return { success: true, fallback: true };
-  }
+  return { success: true };
 }
 
-/**
- * Lấy thông tin User StudentHub sau khi đã đăng nhập.
- */
 export async function getMe() {
-  try {
-    return await authorizedFetch("/api/auth/me");
-  } catch (err) {
-    console.warn("[getMe] Backend tạm thời không khả dụng, sử dụng Supabase metadata.");
-    return null;
-  }
+  return await getMeBackend();
 }
