@@ -1,26 +1,12 @@
 "use client";
 
-// app/(auth)/register/page.jsx
+// app/register/page.jsx
 //
-// Đăng ký 2 bước theo đúng luồng backend đã chốt:
-//   Bước 1: Họ tên + Email + Mật khẩu -> supabase.auth.signUp()
-//   Bước 2: Nhập mã OTP gửi qua email -> verifyOtp() -> POST /api/auth/sync
-//
-// QUYẾT ĐỊNH: tài liệu backend có 2 mô tả khác thứ tự thu thập thông tin.
-// Chọn cách thu thập Họ tên+Email+Mật khẩu NGAY TỪ ĐẦU (không hỏi email
-// trước rồi mới hỏi mật khẩu sau khi xác minh), vì supabase.auth.signUp()
-// bắt buộc phải có password ngay tại thời điểm gọi — không có cách tạo
-// tài khoản chỉ bằng email rồi bổ sung mật khẩu sau trong luồng chuẩn.
-//
-// PHỤ THUỘC VẬN HÀNH (không phải lỗi code — cấu hình phía Supabase
-// Dashboard): luồng này giả định email xác nhận đăng ký chứa MÃ SỐ 6 CHỮ
-// SỐ ({{ .Token }}) để người dùng tự nhập, không phải link bấm vào
-// ({{ .ConfirmationURL }}). Nếu template email của project Supabase chưa
-// được cấu hình theo kiểu OTP-code (Authentication > Email Templates),
-// người dùng sẽ nhận link thay vì mã số và bước nhập OTP này sẽ không
-// khớp — cần nhờ backend xác nhận/chỉnh template này trước khi test.
+// Đăng ký 2 bước:
+//   Bước 1: Họ tên + Email + Mật khẩu -> signUpWithEmail()
+//   Bước 2: Nhập mã OTP gửi qua email -> verifyOtp() -> Điều hướng sang /onboarding (chọn Avatar & Vai trò).
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, Sparkles, User, ShieldCheck } from "lucide-react";
 import {
@@ -37,6 +23,7 @@ import {
   verifySignupOtp,
   resendSignupOtp,
   signInWithGoogle,
+  translateAuthError,
 } from "@/lib/auth/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
 
@@ -45,7 +32,7 @@ const STEP_OTP = "otp";
 
 const RegisterPage = () => {
   const router = useRouter();
-  const { ensureSynced } = useAuth();
+  const { session, profile, ensureSynced } = useAuth();
 
   const [step, setStep] = useState(STEP_FORM);
   const [fullName, setFullName] = useState("");
@@ -59,6 +46,17 @@ const RegisterPage = () => {
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null);
 
+  // Nếu đã đăng nhập và đã onboard -> /dashboard, chưa onboard -> /onboarding
+  useEffect(() => {
+    if (session) {
+      if (profile && profile.onboarded) {
+        router.replace("/dashboard");
+      } else {
+        router.replace("/onboarding");
+      }
+    }
+  }, [session, profile, router]);
+
   const handleSignUp = async (e) => {
     e.preventDefault();
     setError(null);
@@ -66,9 +64,9 @@ const RegisterPage = () => {
     try {
       await signUpWithEmail(email, password, fullName);
       setStep(STEP_OTP);
-      setNotice(`Đã gửi mã xác nhận tới ${email}. Kiểm tra hộp thư (kể cả mục spam).`);
+      setNotice(`Đã gửi mã xác nhận 6 chữ số tới ${email}. Vui lòng kiểm tra hộp thư (kể cả thư mục spam).`);
     } catch (err) {
-      setError(err.message || "Không tạo được tài khoản, vui lòng thử lại.");
+      setError(translateAuthError(err));
     } finally {
       setIsLoading(false);
     }
@@ -81,9 +79,10 @@ const RegisterPage = () => {
     try {
       await verifySignupOtp(email, otp);
       await ensureSynced(fullName);
-      router.push("/dashboard");
+      // Chuyển sang màn hình chọn Avatar & Vai trò
+      router.push("/onboarding");
     } catch (err) {
-      setError(err.message || "Mã xác nhận không đúng hoặc đã hết hạn.");
+      setError(translateAuthError(err));
     } finally {
       setIsLoading(false);
     }
@@ -94,9 +93,9 @@ const RegisterPage = () => {
     setIsResending(true);
     try {
       await resendSignupOtp(email);
-      setNotice("Đã gửi lại mã mới.");
+      setNotice("Đã gửi lại mã xác nhận mới tới email của bạn.");
     } catch (err) {
-      setError(err.message || "Không gửi lại được mã.");
+      setError(translateAuthError(err));
     } finally {
       setIsResending(false);
     }
@@ -109,7 +108,7 @@ const RegisterPage = () => {
     try {
       await signInWithGoogle();
     } catch (err) {
-      setError(err.message || "Không thể bắt đầu đăng ký với Google.");
+      setError(translateAuthError(err));
       setIsGoogleLoading(false);
     }
   };
@@ -131,7 +130,7 @@ const RegisterPage = () => {
           {step === STEP_FORM ? "Tạo tài khoản" : "Xác nhận email"}
         </h2>
         <p className="mt-3 text-base text-gray-400 font-medium">
-          {step === STEP_FORM ? "Tham gia StudentHub AI" : `Nhập mã đã gửi tới ${email}`}
+          {step === STEP_FORM ? "Tham gia StudentHub AI" : `Nhập mã xác nhận đã gửi tới ${email}`}
         </p>
       </div>
 
@@ -152,7 +151,7 @@ const RegisterPage = () => {
             />
             <InputField
               id="email"
-              label="Email"
+              label="Email (Khuyên dùng email trường .edu)"
               type="email"
               placeholder="you@school.edu"
               icon={Mail}
@@ -215,7 +214,7 @@ const RegisterPage = () => {
           <ErrorMessage message={error} />
           <div className="pt-2">
             <Button type="submit" isLoading={isLoading}>
-              Xác nhận
+              Xác nhận & Bắt đầu
             </Button>
           </div>
           <button

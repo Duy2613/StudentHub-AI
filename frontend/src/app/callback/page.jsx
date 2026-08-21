@@ -1,21 +1,14 @@
 "use client";
 
-// app/(auth)/callback/page.jsx
+// app/callback/page.jsx
 //
-// Google redirect về đây sau khi Supabase xử lý OAuth xong. Supabase SDK
-// tự đọc token từ URL (không cần Frontend tự parse), việc cần làm chỉ là
-// đợi AuthContext nhận được session, gọi /api/auth/sync 1 lần, rồi vào
-// /dashboard.
-//
-// LƯU Ý KHI TEST: thời điểm session xuất hiện có thể trễ hơn 1 nhịp so
-// với lúc trang này mount (Supabase cần 1 khoảnh khắc xử lý URL) — có đặt
-// timeout dự phòng bên dưới, nhưng nếu thấy chuyển hướng sai (đá về login
-// dù đăng nhập thành công), thử tăng thời gian timeout lên trước khi nghi
-// ngờ chỗ khác.
+// Google redirect về đây sau khi Supabase xử lý OAuth xong.
+// Đợi AuthContext nhận được session, gọi sync và điều hướng sang /onboarding hoặc /dashboard.
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { Loader2 } from "lucide-react";
 
 export default function AuthCallbackPage() {
   const router = useRouter();
@@ -31,7 +24,7 @@ export default function AuthCallbackPage() {
         if (!handledRef.current) {
           router.replace("/login?error=google_login_failed");
         }
-      }, 3000);
+      }, 3500);
       return () => clearTimeout(timeout);
     }
 
@@ -40,13 +33,19 @@ export default function AuthCallbackPage() {
       session.user?.user_metadata?.full_name || session.user?.user_metadata?.name || "";
 
     ensureSynced(fullName).finally(() => {
-      router.replace("/dashboard");
+      const isOnboarded = session.user?.user_metadata?.onboarded;
+      if (!isOnboarded) {
+        router.replace("/onboarding");
+      } else {
+        router.replace("/dashboard");
+      }
     });
   }, [session, isLoading, ensureSynced, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-space-950 text-gray-300">
-      <p>Đang xử lý đăng nhập...</p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-space-950 text-gray-300">
+      <Loader2 className="w-10 h-10 animate-spin text-indigo-500 mb-4" />
+      <p className="text-base text-gray-400 font-medium">Đang hoàn tất đăng nhập Google...</p>
     </div>
   );
 }

@@ -1,12 +1,13 @@
 "use client";
 
-// app/(auth)/login/page.jsx
+// app/login/page.jsx
 //
-// Đăng nhập bằng Email/Mật khẩu hoặc Google, qua Supabase Auth.
+// Đăng nhập bằng Email/Mật khẩu hoặc Google qua Supabase Auth.
+// Hỗ trợ nút trải nghiệm nhanh Demo Sinh viên & Chuyên gia uy tín.
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Sparkles } from "lucide-react";
+import { Mail, Sparkles, GraduationCap, Star } from "lucide-react";
 import {
   AuthCard,
   InputField,
@@ -15,12 +16,12 @@ import {
   GoogleButton,
   ErrorMessage,
 } from "@/components/auth/AuthUI";
-import { signInWithPassword, signInWithGoogle } from "@/lib/auth/authService";
+import { signInWithPassword, signInWithGoogle, translateAuthError } from "@/lib/auth/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
 
 const LoginPage = () => {
   const router = useRouter();
-  const { ensureSynced } = useAuth();
+  const { session, profile, ensureSynced, loginAsDemo } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,18 +29,33 @@ const LoginPage = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Nếu đã có session thì chuyển hướng
+  useEffect(() => {
+    if (session) {
+      if (profile && !profile.onboarded) {
+        router.replace("/onboarding");
+      } else {
+        router.replace("/dashboard");
+      }
+    }
+  }, [session, profile, router]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
     try {
-      await signInWithPassword(email, password);
-      // fullName để trống vì đây là đăng nhập lại, không phải lần đăng ký
-      // đầu — xem TODO trong authService.js về việc backend xử lý ra sao.
+      const { user } = await signInWithPassword(email, password);
       await ensureSynced();
-      router.push("/dashboard");
+      
+      const isOnboarded = user?.user_metadata?.onboarded;
+      if (!isOnboarded) {
+        router.push("/onboarding");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
-      setError(err.message || "Đăng nhập thất bại, vui lòng thử lại.");
+      setError(translateAuthError(err));
     } finally {
       setIsLoading(false);
     }
@@ -50,9 +66,9 @@ const LoginPage = () => {
     setError(null);
     setIsGoogleLoading(true);
     try {
-      await signInWithGoogle(); // redirect toàn trang sang Google
+      await signInWithGoogle();
     } catch (err) {
-      setError(err.message || "Không thể bắt đầu đăng nhập Google.");
+      setError(translateAuthError(err));
       setIsGoogleLoading(false);
     }
   }, [isGoogleLoading, isLoading]);
@@ -88,7 +104,7 @@ const LoginPage = () => {
         />
         <PasswordInput
           id="password"
-          label="Password"
+          label="Mật khẩu"
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -98,7 +114,7 @@ const LoginPage = () => {
         <ErrorMessage message={error} />
         <div className="pt-2">
           <Button type="submit" isLoading={isLoading} disabled={isGoogleLoading}>
-            Sign In
+            Đăng nhập
           </Button>
         </div>
       </form>
@@ -114,6 +130,35 @@ const LoginPage = () => {
         </div>
         <div className="mt-6">
           <GoogleButton isLoading={isGoogleLoading} isDisabled={isLoading} onClick={handleGoogleLogin} />
+        </div>
+      </div>
+
+      {/* Quick Demo Options */}
+      <div className="mt-6 pt-6 border-t border-white/10 relative z-10 space-y-3">
+        <p className="text-xs text-center text-gray-400 font-medium">
+          ⚡ Trải nghiệm nhanh giao diện (Demo Mode):
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              loginAsDemo("student");
+              router.push("/dashboard");
+            }}
+            className="py-2.5 px-3 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"
+          >
+            <GraduationCap className="w-4 h-4 text-indigo-400" /> Demo Sinh viên
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              loginAsDemo("expert");
+              router.push("/dashboard");
+            }}
+            className="py-2.5 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"
+          >
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> Demo Chuyên gia
+          </button>
         </div>
       </div>
 
