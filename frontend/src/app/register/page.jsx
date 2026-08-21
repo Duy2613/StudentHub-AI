@@ -4,11 +4,12 @@
 //
 // Đăng ký 2 bước:
 //   Bước 1: Họ tên + Email + Mật khẩu -> signUpWithEmail()
-//   Bước 2: Nhập mã OTP gửi qua email -> verifyOtp() -> Điều hướng sang /onboarding (chọn Avatar & Vai trò).
+//   Bước 2: Nhập mã OTP gửi qua email (nếu bật Confirm Email) -> verifyOtp() -> Điều hướng sang /onboarding.
+//   Hỗ trợ trải nghiệm nhanh Demo Sinh viên & Chuyên gia uy tín.
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Sparkles, User, ShieldCheck } from "lucide-react";
+import { Mail, Sparkles, User, ShieldCheck, GraduationCap, Star } from "lucide-react";
 import {
   AuthCard,
   InputField,
@@ -32,7 +33,7 @@ const STEP_OTP = "otp";
 
 const RegisterPage = () => {
   const router = useRouter();
-  const { session, profile, ensureSynced } = useAuth();
+  const { session, profile, ensureSynced, loginAsDemo } = useAuth();
 
   const [step, setStep] = useState(STEP_FORM);
   const [fullName, setFullName] = useState("");
@@ -62,7 +63,15 @@ const RegisterPage = () => {
     setError(null);
     setIsLoading(true);
     try {
-      await signUpWithEmail(email, password, fullName);
+      const data = await signUpWithEmail(email, password, fullName);
+
+      // Nếu Supabase đã tắt Confirm email hoặc người dùng có session ngay:
+      if (data?.session) {
+        await ensureSynced(fullName);
+        router.push("/onboarding");
+        return;
+      }
+
       setStep(STEP_OTP);
       setNotice(`Đã gửi mã xác nhận 6 chữ số tới ${email}. Vui lòng kiểm tra hộp thư (kể cả thư mục spam).`);
     } catch (err) {
@@ -79,7 +88,6 @@ const RegisterPage = () => {
     try {
       await verifySignupOtp(email, otp);
       await ensureSynced(fullName);
-      // Chuyển sang màn hình chọn Avatar & Vai trò
       router.push("/onboarding");
     } catch (err) {
       setError(translateAuthError(err));
@@ -189,6 +197,35 @@ const RegisterPage = () => {
             </div>
             <div className="mt-6">
               <GoogleButton isLoading={isGoogleLoading} isDisabled={isLoading} onClick={handleGoogleSignUp} />
+            </div>
+          </div>
+
+          {/* Demo Mode Bypass Options */}
+          <div className="mt-6 pt-6 border-t border-white/10 relative z-10 space-y-3">
+            <p className="text-xs text-center text-gray-400 font-medium">
+              ⚡ Trải nghiệm nhanh không cần đợi email:
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  loginAsDemo("student");
+                  router.push("/onboarding");
+                }}
+                className="py-2.5 px-3 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"
+              >
+                <GraduationCap className="w-4 h-4 text-indigo-400" /> Demo Sinh viên
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  loginAsDemo("expert");
+                  router.push("/onboarding");
+                }}
+                className="py-2.5 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"
+              >
+                <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> Demo Chuyên gia
+              </button>
             </div>
           </div>
         </>

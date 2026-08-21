@@ -17,11 +17,14 @@ export function translateAuthError(error) {
   const msg = typeof error === "string" ? error : error.message || "";
   const lower = msg.toLowerCase();
 
+  if (lower.includes("error sending confirmation email") || lower.includes("confirmation email")) {
+    return "Hệ thống email Supabase tạm thời bị giới hạn (Rate Limit). Vui lòng tắt 'Confirm Email' trong Supabase Dashboard (Auth > Providers > Email) hoặc bấm nút 'Demo Sinh viên / Chuyên gia' bên dưới để vào ngay.";
+  }
   if (lower.includes("invalid login credentials") || lower.includes("invalid_credentials")) {
     return "Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.";
   }
   if (lower.includes("email not confirmed") || lower.includes("email_not_confirmed")) {
-    return "Email chưa được xác thực. Vui lòng kiểm tra hộp thư (kể cả thư rác) để lấy mã xác nhận.";
+    return "Email chưa được xác thực. Vui lòng kiểm tra hộp thư (kể cả thư rác) hoặc tắt Confirm Email trong Supabase Dashboard.";
   }
   if (lower.includes("user already registered") || lower.includes("already registered")) {
     return "Email này đã được đăng ký tài khoản. Vui lòng chuyển sang Đăng nhập.";
