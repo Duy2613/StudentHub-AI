@@ -29,6 +29,23 @@ const LoginPage = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Kiểm tra lỗi truyền từ OAuth callback hoặc redirect
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlError = params.get("error");
+      if (urlError === "email_registered_use_password") {
+        setError(
+          "Tài khoản này đã được đăng ký bằng Email & Mật khẩu từ trước. Theo chính sách bảo mật, bạn không thể đăng nhập bằng Google cho tài khoản này. Vui lòng nhập Mật khẩu để đăng nhập."
+        );
+      } else if (urlError === "google_login_failed") {
+        setError("Đăng nhập bằng Google không thành công hoặc đã bị hủy. Vui lòng thử lại.");
+      } else if (urlError === "google_registered_use_google") {
+        setError("Tài khoản này đã được đăng ký bằng Google từ trước. Vui lòng nhấn 'Continue with Google' để đăng nhập.");
+      }
+    }
+  }, []);
+
   // Nếu đã có session thì chuyển hướng
   useEffect(() => {
     if (session) {

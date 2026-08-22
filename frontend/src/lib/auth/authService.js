@@ -20,17 +20,26 @@ export function translateAuthError(error) {
   const msg = typeof error === "string" ? error : error.message || "";
   const lower = msg.toLowerCase();
 
+  if (lower.includes("đã được đăng ký thông qua tài khoản google") || lower.includes("tiếp tục với google")) {
+    return msg;
+  }
   if (lower.includes("email already exists") || lower.includes("already registered") || lower.includes("user already registered") || lower.includes("đã tồn tại")) {
-    return "Email này đã được sử dụng. Vui lòng chuyển sang Đăng nhập hoặc sử dụng email khác.";
+    return "Email này đã được sử dụng. Vui lòng chuyển sang Đăng nhập hoặc sử dụng 'Continue with Google'.";
   }
   if (lower.includes("invalid email or password") || lower.includes("invalid login credentials") || lower.includes("invalid_credentials") || lower.includes("không chính xác")) {
-    return "Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.";
+    return "Email hoặc mật khẩu không chính xác. Nếu bạn đã tạo tài khoản bằng Google, vui lòng chọn 'Continue with Google'.";
   }
   if (lower.includes("password should be at least 6") || lower.includes("weak_password") || lower.includes("tối thiểu 6")) {
     return "Mật khẩu phải có độ dài tối thiểu 6 ký tự.";
   }
   if (lower.includes("error sending confirmation email") || lower.includes("rate limit") || lower.includes("over_email_send_rate_limit") || lower.includes("confirmation email")) {
     return "Dịch vụ gửi email xác thực đang quá tải hoặc gặp sự cố. Bạn có thể sử dụng Đăng nhập bằng Google hoặc Đăng nhập nhanh để tiếp tục.";
+  }
+  if (lower.includes("token has expired") || lower.includes("otp expired")) {
+    return "Mã OTP 6 số đã hết hạn. Vui lòng nhấn 'Gửi lại mã'.";
+  }
+  if (lower.includes("invalid token") || lower.includes("token is invalid") || lower.includes("otp invalid")) {
+    return "Mã xác nhận OTP 6 số không chính xác. Vui lòng kiểm tra lại trong hộp thư của bạn.";
   }
   if (lower.includes("network") || lower.includes("failed to fetch")) {
     return "Không thể kết nối tới máy chủ. Đang thử kết nối lại...";
@@ -161,6 +170,8 @@ export async function getUsersBackend() {
 
 /**
  * Bước 1 của đăng ký: tạo tài khoản, gửi email mã OTP 6 số xác nhận.
+ * LOGIC BẢO MẬT CHẶN TRÙNG LẶP:
+ * Nếu email này đã đăng ký qua Google OAuth trước đó -> Chặn hoàn toàn không cho đăng ký bằng mật khẩu.
  */
 export async function signUpWithEmail(email, password, fullName) {
   const cleanEmail = email.trim();
@@ -183,11 +194,17 @@ export async function signUpWithEmail(email, password, fullName) {
 
   if (error) throw new Error(translateAuthError(error));
 
-  // Kiểm tra chống trùng lặp: nếu email đã tồn tại / liên kết Google
-  if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-    throw new Error(
-      "Email này đã tồn tại trong hệ thống (đã đăng nhập bằng Google hoặc đã tạo tài khoản). Vui lòng chọn 'Continue with Google' hoặc chuyển sang Đăng nhập."
-    );
+  // QUY TẮC: Khi email đã tồn tại qua Google OAuth, Supabase trả về identities = []
+  // hoặc chỉ có provider 'google' -> Báo lỗi chặn ngay lập tức.
+  if (data?.user) {
+    const identities = data.user.identities || [];
+    const isGoogleAccount = identities.length === 0 || identities.every((i) => i.provider === "google");
+
+    if (isGoogleAccount) {
+      throw new Error(
+        "Email này đã được đăng ký thông qua tài khoản Google từ trước. Bạn không thể đăng ký bằng Mật khẩu cho email này. Vui lòng sử dụng 'Continue with Google' để đăng nhập."
+      );
+    }
   }
 
   // Tự động đồng bộ tài khoản vào Backend ASP.NET Core DB
@@ -228,14 +245,15 @@ export async function resendSignupOtp(email) {
 }
 
 export async function signInWithPassword(email, password) {
+  const cleanEmail = email.trim();
+
   // Ưu tiên đăng nhập qua Backend ASP.NET Core API
   try {
-    const backendResult = await loginBackend(email, password);
+    const backendResult = await loginBackend(cleanEmail, password);
     if (backendResult?.user) {
       return { user: backendResult.user, token: backendResult.token };
     }
   } catch (backendErr) {
-    // Nếu là sai mật khẩu từ backend thì throw ngay
     if (backendErr.message.includes("Invalid") || backendErr.message.includes("không chính xác")) {
       throw new Error("Email hoặc mật khẩu không chính xác.");
     }
