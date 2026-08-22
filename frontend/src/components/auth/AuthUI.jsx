@@ -28,8 +28,14 @@ export const AmbientBackground = () => (
   </div>
 );
 
-export const InputField = ({ label, id, name, type = "text", icon: Icon, helperText, ...props }) => {
+export const InputField = ({ label, id, name, type = "text", icon: Icon, helperText, onFocus, onBlur, ...props }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const [isInteractive, setIsInteractive] = useState(false);
+
+  const enableInteraction = () => {
+    if (!isInteractive) setIsInteractive(true);
+  };
+
   return (
     <div className="space-y-2 relative group/input">
       <label htmlFor={id} className="block text-sm font-medium text-gray-300 pl-1 transition-colors group-hover/input:text-gray-100">
@@ -50,8 +56,19 @@ export const InputField = ({ label, id, name, type = "text", icon: Icon, helperT
           id={id}
           name={name || id}
           type={type}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          readOnly={!isInteractive}
+          onMouseDown={enableInteraction}
+          onTouchStart={enableInteraction}
+          onKeyDown={enableInteraction}
+          onFocus={(e) => {
+            enableInteraction();
+            setIsFocused(true);
+            if (onFocus) onFocus(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            if (onBlur) onBlur(e);
+          }}
           className={`
             block w-full ${Icon ? "pl-12" : "pl-4"} pr-4 py-3.5 text-sm
             bg-white/5 backdrop-blur-xl border border-white/10
@@ -68,9 +85,15 @@ export const InputField = ({ label, id, name, type = "text", icon: Icon, helperT
   );
 };
 
-export const PasswordInput = ({ id, name, label, ...props }) => {
+export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [isInteractive, setIsInteractive] = useState(false);
+
+  const enableInteraction = () => {
+    if (!isInteractive) setIsInteractive(true);
+  };
+
   return (
     <div className="space-y-2 relative group/input">
       <label htmlFor={id} className="block text-sm font-medium text-gray-300 pl-1 transition-colors group-hover/input:text-gray-100">
@@ -89,8 +112,19 @@ export const PasswordInput = ({ id, name, label, ...props }) => {
           id={id}
           name={name || id}
           type={showPassword ? "text" : "password"}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          readOnly={!isInteractive}
+          onMouseDown={enableInteraction}
+          onTouchStart={enableInteraction}
+          onKeyDown={enableInteraction}
+          onFocus={(e) => {
+            enableInteraction();
+            setIsFocused(true);
+            if (onFocus) onFocus(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            if (onBlur) onBlur(e);
+          }}
           className={`
             block w-full pl-12 pr-12 py-3.5 text-sm
             bg-white/5 backdrop-blur-xl border border-white/10

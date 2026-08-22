@@ -141,7 +141,7 @@ const LoginPage = () => {
         </div>
       </div>
 
-      <form className="space-y-4 relative z-10" onSubmit={handleSubmit}>
+      <form className="space-y-4 relative z-10" onSubmit={handleSubmit} autoComplete="off">
         <InputField
           id="email"
           name="email"
