@@ -1,0 +1,39 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": true,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    {
+      "query": "path:\"00 - 🧠 AI Agent Permanent Context\"",
+      "color": { "a": 1, "rgb": 6514930 }
+    },
+    {
+      "query": "path:\"01 - 🏗️ System Architecture\"",
+      "color": { "a": 1, "rgb": 4110308 }
+    },
+    {
+      "query": "path:\"02 - 🎨 Design & Refero Systems\"",
+      "color": { "a": 1, "rgb": 830180 }
+    },
+    {
+      "query": "path:\"03 - 🚀 Features & Modules\"",
+      "color": { "a": 1, "rgb": 16089355 }
+    },
+    {
+      "query": "path:\"04 - 📋 Roadmap & Tasks\"",
+      "color": { "a": 1, "rgb": 16017420 }
+    }
+  ],
+  "collapse-display": false,
+  "showArrow": true,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1.25,
+  "lineSizeMultiplier": 1,
+  "repulsionStrength": 10,
+  "localPath": "",
+  "localRepulsionStrength": 10
+}

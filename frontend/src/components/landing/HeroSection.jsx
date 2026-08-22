@@ -128,9 +128,12 @@ def dijkstra(graph, start):
       {/* Meteors Effect */}
       <Meteors number={20} />
 
-      {/* Dynamic Glow Background */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[900px] h-[400px] bg-gradient-to-tr from-indigo-600/20 via-purple-600/20 to-cyan-500/10 blur-[130px] rounded-full pointer-events-none -z-10" />
+      {/* OpenHero Cinematic Dynamic Glow & Ambient Mesh Canvas */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[1000px] h-[500px] bg-gradient-to-tr from-indigo-600/25 via-purple-600/20 to-cyan-400/15 blur-[140px] rounded-full pointer-events-none -z-10 animate-blob-slow" />
+      <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-indigo-500/15 blur-[100px] rounded-full pointer-events-none -z-10 animate-blob-medium" />
+      <div className="absolute top-1/2 right-1/4 w-80 h-80 bg-purple-600/15 blur-[120px] rounded-full pointer-events-none -z-10 animate-blob-slow animation-delay-4000" />
       <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none -z-10" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(7,9,14,0.85)_100%)] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Eyebrow Badge with Magic UI AnimatedGradientText */}

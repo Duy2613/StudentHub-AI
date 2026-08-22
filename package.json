@@ -6,6 +6,8 @@
     "dev": "cd frontend && npm run dev",
     "build": "cd frontend && npm run build",
     "start": "cd frontend && npm run start",
-    "lint": "cd frontend && npm run lint"
+    "lint": "cd frontend && npm run lint",
+    "sync-vault": "node ./scripts/sync-vault-context.mjs",
+    "vault": "powershell -ExecutionPolicy Bypass -File ./scripts/register-obsidian-vault.ps1"
   }
 }

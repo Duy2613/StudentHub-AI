@@ -1,0 +1,14 @@
+{
+  "theme": "obsidian",
+  "baseFontSize": 16,
+  "readableLineLength": true,
+  "strictLineBreaks": false,
+  "showLineNumber": true,
+  "autoPairMarkdown": true,
+  "autoPairBrackets": true,
+  "livePreview": true,
+  "defaultViewMode": "live",
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "root",
+  "attachmentFolderPath": "00 - 🧠 AI Agent Permanent Context/attachments"
+}
