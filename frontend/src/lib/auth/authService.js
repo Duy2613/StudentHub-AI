@@ -9,7 +9,9 @@
 
 import { supabase } from "@/lib/supabase/client";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://studenthub-api-8fqp.onrender.com";
+const API_BASE = typeof window !== "undefined"
+  ? "" // Gọi qua Next.js Route Proxy cùng domain để tránh CORS Preflight 405
+  : (process.env.NEXT_PUBLIC_API_URL || "https://studenthub-api-8fqp.onrender.com");
 
 // ---------------- Helper Dịch Lỗi Tiếng Việt ----------------
 
@@ -18,14 +20,17 @@ export function translateAuthError(error) {
   const msg = typeof error === "string" ? error : error.message || "";
   const lower = msg.toLowerCase();
 
-  if (lower.includes("email already exists") || lower.includes("already registered") || lower.includes("user already registered")) {
+  if (lower.includes("email already exists") || lower.includes("already registered") || lower.includes("user already registered") || lower.includes("đã tồn tại")) {
     return "Email này đã được sử dụng. Vui lòng chuyển sang Đăng nhập hoặc sử dụng email khác.";
   }
-  if (lower.includes("invalid email or password") || lower.includes("invalid login credentials") || lower.includes("invalid_credentials")) {
+  if (lower.includes("invalid email or password") || lower.includes("invalid login credentials") || lower.includes("invalid_credentials") || lower.includes("không chính xác")) {
     return "Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.";
   }
-  if (lower.includes("password should be at least 6") || lower.includes("weak_password")) {
+  if (lower.includes("password should be at least 6") || lower.includes("weak_password") || lower.includes("tối thiểu 6")) {
     return "Mật khẩu phải có độ dài tối thiểu 6 ký tự.";
+  }
+  if (lower.includes("error sending confirmation email") || lower.includes("rate limit") || lower.includes("over_email_send_rate_limit") || lower.includes("confirmation email")) {
+    return "Dịch vụ gửi email xác thực đang quá tải hoặc gặp sự cố. Bạn có thể sử dụng Đăng nhập bằng Google hoặc Đăng nhập nhanh để tiếp tục.";
   }
   if (lower.includes("network") || lower.includes("failed to fetch")) {
     return "Không thể kết nối tới máy chủ. Đang thử kết nối lại...";
@@ -58,30 +63,24 @@ export function setStoredToken(token) {
 export async function registerBackend(email, password, fullName) {
   const cleanEmail = email.trim();
 
-  try {
-    const res = await fetch(`${API_BASE}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: cleanEmail,
-        password: password,
-        fullName: fullName,
-      }),
-    });
+  const res = await fetch(`${API_BASE}/api/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: cleanEmail,
+      password: password,
+      fullName: fullName,
+    }),
+  });
 
-    const data = await res.json().catch(() => null);
+  const data = await res.json().catch(() => null);
 
-    if (!res.ok) {
-      throw new Error(data?.message || "Đăng ký thất bại.");
-    }
-
-    // Tự động đăng nhập ngay sau khi đăng ký thành công để lấy JWT Token
-    return await loginBackend(cleanEmail, password);
-  } catch (err) {
-    // Nếu backend đang ngủ/lỗi, thử fallback qua Supabase
-    console.warn("[Register API] Thử fallback:", err.message);
-    throw new Error(translateAuthError(err));
+  if (!res.ok) {
+    throw new Error(data?.message || "Đăng ký thất bại.");
   }
+
+  // Tự động đăng nhập ngay sau khi đăng ký thành công để lấy JWT Token
+  return await loginBackend(cleanEmail, password);
 }
 
 /**
@@ -165,10 +164,19 @@ export async function signUpWithEmail(email, password, fullName) {
   try {
     return await registerBackend(email, password, fullName);
   } catch (backendError) {
-    // Nếu backend báo Email already exists, throw ngay
-    if (backendError.message.includes("Email") || backendError.message.includes("tồn tại")) {
-      throw backendError;
+    const msg = backendError?.message || "";
+    // Nếu backend phản hồi lỗi cụ thể (ví dụ email đã tồn tại, mật khẩu yếu...) -> throw ngay để báo cho user
+    if (
+      msg.includes("Email") || 
+      msg.includes("tồn tại") || 
+      msg.includes("already") ||
+      msg.includes("Mật khẩu") ||
+      msg.includes("Password")
+    ) {
+      throw new Error(translateAuthError(backendError));
     }
+
+    console.warn("[Register Fallback] Đang thử fallback qua Supabase:", msg);
 
     // Fallback qua Supabase nếu backend chưa khởi động
     const cleanEmail = email.trim();
