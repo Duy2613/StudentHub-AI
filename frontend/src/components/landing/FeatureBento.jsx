@@ -27,16 +27,25 @@ export default function FeatureBento() {
   const SUBJECTS = {
     cs: {
       name: "Khoa Học Máy Tính & AI",
+      image: "/images/studio/subject_cs_ai.jpg",
       formula: "T(n) = 2T(n/2) + O(n) \\Rightarrow \\Theta(n \\log n)",
       desc: "Áp dụng định lý thợ (Master Theorem) giải độ phức tạp thuật toán chia để trị.",
     },
+    math: {
+      name: "Toán & Kỹ Thuật Tối Ưu",
+      image: "/images/studio/subject_math_physics.jpg",
+      formula: "\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2} \\quad \\& \\quad \\nabla f(x^*) = 0",
+      desc: "Tính toán tích phân Gauss và tối ưu hóa lồi trong huấn luyện mạng nơ-ron.",
+    },
     econ: {
       name: "Kinh Tế & Tài Chính",
+      image: "/images/studio/subject_econ_finance.jpg",
       formula: "MR = MC \\Rightarrow \\max \\pi(Q) = TR(Q) - TC(Q)",
       desc: "Tối ưu hoá lợi nhuận doanh nghiệp trong thị trường cạnh tranh hoàn hảo.",
     },
     med: {
       name: "Y - Dược & Sinh Học",
+      image: "/images/studio/subject_med_bio.jpg",
       formula: "C_m = \\frac{D}{V_d \\times (1 - e^{-k_e \\tau})}",
       desc: "Tính toán nồng độ thuốc cực đại trạng thái ổn định trong dược động học.",
     },
@@ -88,11 +97,11 @@ export default function FeatureBento() {
                 </p>
               </div>
 
-              {/* Interactive Subject Switcher Preview */}
+              {/* Interactive Subject Switcher Preview with 3D Studio Visual */}
               <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-3">
-                <div className="flex items-center justify-between gap-2 border-b border-white/5 pb-2.5">
-                  <span className="text-xs text-gray-400 font-medium">Chọn chuyên ngành để xem ví dụ suy luận:</span>
-                  <div className="flex gap-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/5 pb-2.5">
+                  <span className="text-xs text-gray-400 font-medium">Chọn chuyên ngành để xem mô phỏng 3D:</span>
+                  <div className="flex flex-wrap gap-1.5">
                     {Object.keys(SUBJECTS).map((key) => (
                       <button
                         key={key}
@@ -103,26 +112,41 @@ export default function FeatureBento() {
                             : "bg-white/5 text-gray-400 hover:text-white"
                         }`}
                       >
-                        {key === "cs" ? "CNTT" : key === "econ" ? "Kinh Tế" : "Y Dược"}
+                        {key === "cs" ? "CNTT & AI" : key === "math" ? "Toán Học" : key === "econ" ? "Kinh Tế" : "Y Dược"}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-space-950/80 border border-indigo-500/20 font-mono">
-                  <div className="text-[11px] text-indigo-400 font-semibold mb-1">
-                    {SUBJECTS[activeSubject].name}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+                  <div className="sm:col-span-1 rounded-xl overflow-hidden border border-white/10 aspect-square relative group/img shadow-md">
+                    <img
+                      src={SUBJECTS[activeSubject].image}
+                      alt={SUBJECTS[activeSubject].name}
+                      className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+                    <span className="absolute bottom-1.5 left-2 text-[10px] font-bold text-white uppercase tracking-wider">
+                      3D Artifact
+                    </span>
                   </div>
-                  <div className="text-xs text-white bg-white/5 p-2 rounded-lg my-1.5 overflow-x-auto text-center border border-white/5 text-gradient-cyan font-bold">
-                    {SUBJECTS[activeSubject].formula}
-                  </div>
-                  <div className="text-xs text-gray-300 font-sans mt-1.5">
-                    {SUBJECTS[activeSubject].desc}
+
+                  <div className="sm:col-span-2 p-3.5 rounded-xl bg-space-950/80 border border-indigo-500/20 font-mono">
+                    <div className="text-[11px] text-indigo-400 font-semibold mb-1">
+                      {SUBJECTS[activeSubject].name}
+                    </div>
+                    <div className="text-xs text-white bg-white/5 p-2 rounded-lg my-1.5 overflow-x-auto text-center border border-white/5 text-gradient-cyan font-bold">
+                      {SUBJECTS[activeSubject].formula}
+                    </div>
+                    <div className="text-xs text-gray-300 font-sans mt-1.5 leading-relaxed">
+                      {SUBJECTS[activeSubject].desc}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
 
           {/* Bento Tile 2: 1-Column Span (Verified Expert Network) */}
           <div className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-space-900/90 via-space-950/90 to-space-900/60 border border-white/10 hover:border-purple-500/30 transition-all duration-300 group overflow-hidden shadow-glass-deep">

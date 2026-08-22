@@ -23,7 +23,9 @@ import { Spotlight } from "@/components/ui/spotlight";
 import { Meteors } from "@/components/ui/meteors";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
+import { WordRotate } from "@/components/ui/word-rotate";
 import { Button } from "@/components/ui/button";
+
 
 
 export default function HeroSection() {
@@ -141,11 +143,20 @@ def dijkstra(graph, start):
           </AnimatedGradientText>
         </div>
 
-        {/* Main Headline & Punchy Subtext */}
+        {/* Main Headline & Punchy Subtext with Kinetic WordRotate */}
         <div className="text-center max-w-4xl mx-auto mb-10">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1] mb-6">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15] mb-6">
             Bứt Phá Điểm Số & Sự Nghiệp Cùng{" "}
-            <span className="text-gradient-primary">Trí Tuệ Nhân Tạo Sinh Viên</span>
+            <br className="hidden sm:inline" />
+            <WordRotate
+              words={[
+                "Trí Tuệ Nhân Tạo Sinh Viên",
+                "Cố Vấn Chuyên Gia 1:1",
+                "Học Thuật Chuẩn Quốc Tế",
+                "Tối Ưu Điểm Số & Sự Nghiệp",
+              ]}
+              className="text-gradient-primary"
+            />
           </h1>
           
           <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
@@ -176,11 +187,32 @@ def dijkstra(graph, start):
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Miễn phí trọn đời
             </span>
             <span className="flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Đăng nhập tức thì với Edu / Google
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Đăng nhập tức thì với Edu / Google / GitHub
             </span>
             <span className="flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> Không cần thẻ tín dụng
             </span>
+          </div>
+        </div>
+
+        {/* Studio-Grade 3D Floating Academic Hologram Banner (Double-Bezel) */}
+        <div className="my-8 max-w-4xl mx-auto p-1.5 rounded-[2rem] bg-white/[0.04] border border-white/10 shadow-glass-deep">
+          <div className="relative rounded-[calc(2rem-0.375rem)] overflow-hidden bg-space-950 border border-white/10 aspect-[16/9] group">
+            <img
+              src="/images/studio/hero_academic_hologram.jpg"
+              alt="StudentHub AI 3D Academic Hologram"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-space-950 via-space-950/20 to-transparent pointer-events-none" />
+            <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 flex items-center justify-between pointer-events-none">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/15 text-xs text-white">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span className="font-semibold">Hệ Sinh Thái Tri Thức 3D Tương Tác</span>
+              </div>
+              <span className="text-[11px] text-gray-400 hidden sm:inline-block font-mono">
+                Model: StudentHub-Copilot-v2.6
+              </span>
+            </div>
           </div>
         </div>
 
@@ -189,6 +221,7 @@ def dijkstra(graph, start):
           <div className="relative rounded-2xl p-[1px] bg-gradient-to-b from-white/20 via-indigo-500/20 to-transparent shadow-glass-deep overflow-hidden">
             <BorderBeam size={300} duration={12} colorFrom="#6366f1" colorTo="#a855f7" />
             <div className="bg-space-900/90 backdrop-blur-2xl rounded-[15px] border border-white/10 overflow-hidden">
+
 
               
               {/* Terminal Window Header */}
