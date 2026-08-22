@@ -87,7 +87,7 @@ function formatProfile(user) {
   const isEdu = user.universityEmailVerified || user.UniversityEmailVerified || /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(email);
 
   return {
-    id: user.id || user.Id || cached.id || "user-1",
+    id: String(user.id || user.Id || cached.id || "user-1"),
     email: email,
     fullName: fullName,
     role: isExpert ? "expert" : "student",
