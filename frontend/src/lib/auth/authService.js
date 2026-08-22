@@ -157,47 +157,74 @@ export async function getUsersBackend() {
   }
 }
 
-// ---------------- Supabase & Hybrid Auth Fallbacks ----------------
+// ---------------- Supabase OTP & Authentication ----------------
 
+/**
+ * Bước 1 của đăng ký: tạo tài khoản, gửi email mã OTP 6 số xác nhận.
+ */
 export async function signUpWithEmail(email, password, fullName) {
-  // Ưu tiên đăng ký qua Backend ASP.NET Core API
-  try {
-    return await registerBackend(email, password, fullName);
-  } catch (backendError) {
-    const msg = backendError?.message || "";
-    // Nếu backend phản hồi lỗi cụ thể (ví dụ email đã tồn tại, mật khẩu yếu...) -> throw ngay để báo cho user
-    if (
-      msg.includes("Email") || 
-      msg.includes("tồn tại") || 
-      msg.includes("already") ||
-      msg.includes("Mật khẩu") ||
-      msg.includes("Password")
-    ) {
-      throw new Error(translateAuthError(backendError));
-    }
+  const cleanEmail = email.trim();
+  const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(cleanEmail);
 
-    console.warn("[Register Fallback] Đang thử fallback qua Supabase:", msg);
-
-    // Fallback qua Supabase nếu backend chưa khởi động
-    const cleanEmail = email.trim();
-    const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(cleanEmail);
-    const { data, error } = await supabase.auth.signUp({
-      email: cleanEmail,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          role: "student",
-          avatar_id: "student-tech",
-          trust_score: isEdu ? 80 : 50,
-          verified_student: isEdu,
-          onboarded: false,
-        },
+  const { data, error } = await supabase.auth.signUp({
+    email: cleanEmail,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+        role: "student",
+        avatar_id: "student-tech",
+        trust_score: isEdu ? 80 : 50,
+        verified_student: isEdu,
+        onboarded: false,
       },
-    });
-    if (error) throw new Error(translateAuthError(error));
-    return data;
+    },
+  });
+
+  if (error) throw new Error(translateAuthError(error));
+
+  // Kiểm tra chống trùng lặp: nếu email đã tồn tại / liên kết Google
+  if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    throw new Error(
+      "Email này đã tồn tại trong hệ thống (đã đăng nhập bằng Google hoặc đã tạo tài khoản). Vui lòng chọn 'Continue with Google' hoặc chuyển sang Đăng nhập."
+    );
   }
+
+  // Tự động đồng bộ tài khoản vào Backend ASP.NET Core DB
+  registerBackend(cleanEmail, password, fullName).catch(() => {});
+
+  return data;
+}
+
+/**
+ * Bước 2 của đăng ký: xác thực mã OTP 6 số nhận qua email.
+ */
+export async function verifySignupOtp(email, token) {
+  const cleanToken = (token || "").trim();
+  if (cleanToken.length !== 6 || !/^\d+$/.test(cleanToken)) {
+    throw new Error("Mã xác nhận phải gồm đúng 6 chữ số.");
+  }
+
+  const { data, error } = await supabase.auth.verifyOtp({
+    email: email.trim(),
+    token: cleanToken,
+    type: "email",
+  });
+
+  if (error) throw new Error(translateAuthError(error));
+  return data;
+}
+
+/**
+ * Gửi lại mã xác nhận OTP 6 số về email.
+ */
+export async function resendSignupOtp(email) {
+  const { data, error } = await supabase.auth.resend({
+    type: "signup",
+    email: email.trim(),
+  });
+  if (error) throw new Error(translateAuthError(error));
+  return data;
 }
 
 export async function signInWithPassword(email, password) {
