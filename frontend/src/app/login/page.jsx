@@ -17,11 +17,13 @@ import {
   CheckboxField,
   Button,
   GoogleButton,
+  GithubButton,
   ErrorMessage,
 } from "@/components/auth/AuthUI";
 import {
   signInWithPassword,
   signInWithGoogle,
+  signInWithGitHub,
   translateAuthError,
   setRememberMePreference,
 } from "@/lib/auth/authService";
@@ -43,8 +45,8 @@ const LoginPage = () => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const urlError = params.get("error");
-      if (urlError === "google_login_failed") {
-        setError("Đăng nhập bằng Google không thành công hoặc đã bị hủy. Vui lòng thử lại.");
+      if (urlError === "google_login_failed" || urlError === "oauth_failed") {
+        setError("Đăng nhập bằng OAuth không thành công hoặc đã bị hủy. Vui lòng thử lại.");
       } else if (urlError === "email_registered_use_password") {
         setError(
           "Tài khoản này đã được đăng ký bằng Email & Mật khẩu từ trước. Theo chính sách bảo mật, bạn không thể đăng nhập bằng OAuth cho tài khoản này. Vui lòng nhập Mật khẩu để đăng nhập."
@@ -87,6 +89,19 @@ const LoginPage = () => {
     }
   }, [isOAuthLoading, isLoading, rememberMe]);
 
+  const handleGitHubLogin = useCallback(async () => {
+    if (isOAuthLoading || isLoading) return;
+    setError(null);
+    setIsOAuthLoading(true);
+    setRememberMePreference(rememberMe);
+    try {
+      await signInWithGitHub();
+    } catch (err) {
+      setError(translateAuthError(err));
+      setIsOAuthLoading(false);
+    }
+  }, [isOAuthLoading, isLoading, rememberMe]);
+
   const isAnyLoading = isLoading || isOAuthLoading;
 
   return (
@@ -106,10 +121,12 @@ const LoginPage = () => {
         </p>
       </div>
 
-      {/* Google OAuth Action */}
-      <div className="relative z-10">
+      {/* Social OAuth Actions (Google & GitHub) */}
+      <div className="grid grid-cols-2 gap-3 relative z-10">
         <GoogleButton isLoading={isOAuthLoading} isDisabled={isLoading} onClick={handleGoogleLogin} />
+        <GithubButton isLoading={isOAuthLoading} isDisabled={isLoading} onClick={handleGitHubLogin} />
       </div>
+
 
       <div className="my-6 relative z-10">
         <div className="relative">
