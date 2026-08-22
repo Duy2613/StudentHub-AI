@@ -14,6 +14,8 @@ import {
   LayoutDashboard
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
+import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
+
 
 export default function LandingHeader() {
   const { session, profile } = useAuth();
@@ -77,35 +79,11 @@ export default function LandingHeader() {
           ))}
         </nav>
 
-        {/* Auth CTA Actions */}
+        {/* Auth CTA Actions with User Dropdown Popover */}
         <div className="hidden md:flex items-center gap-3">
-          {session ? (
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-neon-primary hover:brightness-110 active:scale-95 transition-all"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              <span>Vào Dashboard</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="px-4 py-2 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
-              >
-                Đăng Nhập
-              </Link>
-              <Link
-                href="/register"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 text-white shadow-neon-primary hover:brightness-110 active:scale-95 transition-all"
-              >
-                <span>Bắt Đầu Miễn Phí</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </>
-          )}
+          <UserDropdownMenu />
         </div>
+
 
         {/* Mobile Hamburger Toggle */}
         <button

@@ -35,8 +35,10 @@ import {
 
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
+import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
 import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
 import { AVATAR_LIST } from "@/lib/avatars";
+
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -255,6 +257,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Right User Status & Actions */}
+          {/* Right User Status & Actions */}
           <div className="flex items-center gap-3 sm:gap-4">
             {/* Trust Score Badge */}
             <div
@@ -268,40 +271,12 @@ export default function DashboardPage() {
               <span>{activeProfile.trustScore} Điểm Uy Tín</span>
             </div>
 
-            {/* Profile & Avatar dropdown button */}
-            <div
-              onClick={() => router.push("/profile")}
-              className="flex items-center gap-2.5 p-1.5 pr-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer transition-all hover:border-white/20 group"
-            >
-              <AvatarDisplay
-                avatarId={activeProfile.avatarId}
-                avatarUrl={activeProfile.avatarUrl}
-                role={activeProfile.role}
-                size="sm"
-                showBadge={true}
-              />
-              <div className="hidden sm:block text-left">
-                <p className="text-xs font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-1">
-                  {activeProfile.fullName}
-                </p>
-                <p className="text-[10px] text-gray-400">
-                  {isExpert ? "⭐ Chuyên gia" : "🎓 Sinh viên"}
-                </p>
-              </div>
-            </div>
-
-            {/* Logout */}
-            <button
-              type="button"
-              onClick={signOut}
-              title="Đăng xuất"
-              className="p-2.5 rounded-xl bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-300 border border-white/10 transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+            {/* Profile Avatar Popover Menu */}
+            <UserDropdownMenu />
           </div>
         </div>
       </header>
+
 
       {/* ---------------- MAIN CONTENT ---------------- */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 space-y-8 relative z-10">

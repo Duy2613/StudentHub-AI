@@ -31,8 +31,10 @@ import {
   Award,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
+import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
 import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
 import { motion, AnimatePresence } from "motion/react";
+
 import { BorderBeam } from "@/components/ui/border-beam";
 import { Badge } from "@/components/ui/badge";
 import { Spotlight } from "@/components/ui/spotlight";
@@ -215,8 +217,14 @@ export default function AIMentorPage() {
           >
             <Trash2 className="w-4 h-4" />
           </button>
+
+          <div className="h-4 w-[1px] bg-white/10 mx-1" />
+
+          {/* User Profile Popover */}
+          <UserDropdownMenu />
         </div>
       </header>
+
 
       {/* Main Workspace Area */}
       <div className="flex-1 flex flex-col max-w-5xl w-full mx-auto p-4 sm:p-6 overflow-hidden">
