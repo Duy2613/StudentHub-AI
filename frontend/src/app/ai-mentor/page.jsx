@@ -4,8 +4,9 @@
 // AI Mentor Space: Trợ lý học tập thông minh đa chuyên ngành
 
 import React, { useState, useRef, useEffect } from "react";
-import Link from "next/navigation";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+
 import {
   Sparkles,
   Bot,

@@ -40,12 +40,13 @@ export default function AuthCallbackPage() {
 
     // Kiểm tra xem tài khoản này ban đầu có được tạo bằng Email & Mật khẩu hay không
     const emailIdentity = identities.find((i) => i.provider === "email");
-    const oauthIdentity = identities.find((i) => i.provider === "google");
+    const oauthIdentity = identities.find((i) => i.provider === "google" || i.provider === "github");
 
     const isOriginallyEmail =
       (emailIdentity && !oauthIdentity) ||
       (emailIdentity && oauthIdentity && new Date(emailIdentity.created_at) < new Date(oauthIdentity.created_at)) ||
       (appProvider === "email" && providers.length === 1 && providers[0] === "email");
+
 
     if (isOriginallyEmail) {
       // Đăng ký bằng Email/Mật khẩu từ trước -> Không cho phép đăng nhập qua OAuth
