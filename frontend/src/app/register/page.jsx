@@ -30,6 +30,7 @@ import {
   translateAuthError,
 } from "@/lib/auth/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
+import OtpVerificationOrbit from "@/components/ui/otp-verification-orbit";
 
 const STEP_FORM = "FORM";
 const STEP_OTP = "OTP";
@@ -43,6 +44,8 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
+  const [resendCountdown, setResendCountdown] = useState(0);
+  const [isSuccessVerified, setIsSuccessVerified] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -62,6 +65,14 @@ const RegisterPage = () => {
     }
   }, [session, profile, router]);
 
+  // Countdown timer for OTP resend
+  useEffect(() => {
+    if (resendCountdown > 0) {
+      const timer = setTimeout(() => setResendCountdown((prev) => prev - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCountdown]);
+
   // Bước 1: Gửi thông tin đăng ký & nhận mã OTP qua email
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -73,7 +84,8 @@ const RegisterPage = () => {
 
       // Chuyển sang bước bắt buộc nhập mã OTP 6 số
       setStep(STEP_OTP);
-      setNotice(`Đã gửi mã xác nhận 6 chữ số tới ${email}. Vui lòng kiểm tra hộp thư (kể cả thư mục Spam/Rác).`);
+      setResendCountdown(60);
+      setNotice(`Đã gửi mã xác nhận 6 chữ số tới ${email}. Vui lòng kiểm tra hộp thư.`);
     } catch (err) {
       setError(translateAuthError(err));
     } finally {
@@ -81,15 +93,20 @@ const RegisterPage = () => {
     }
   };
 
-  // Bước 2: Xác thực mã OTP 6 số
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
+  // Bước 2: Xác thực mã OTP 6 số (hỗ trợ cả auto-submit từ OtpVerificationOrbit)
+  const handleVerifyOtp = async (codeToVerify) => {
+    const targetOtp = typeof codeToVerify === "string" ? codeToVerify : otp;
+    if (!targetOtp || targetOtp.length !== 6) return;
+
     setError(null);
     setIsVerifying(true);
     try {
-      await verifySignupOtp(email, otp);
-      // Xác thực thành công -> Vào thẳng màn hình chọn Avatar & Vai trò
-      router.push("/onboarding");
+      await verifySignupOtp(email, targetOtp);
+      setIsSuccessVerified(true);
+      // Hiển thị trạng thái Verified trong 1s trước khi sang Onboarding
+      setTimeout(() => {
+        router.push("/onboarding");
+      }, 1000);
     } catch (err) {
       setError(translateAuthError(err));
     } finally {
@@ -99,11 +116,12 @@ const RegisterPage = () => {
 
   // Gửi lại mã OTP
   const handleResendOtp = async () => {
-    if (isResending) return;
+    if (isResending || resendCountdown > 0) return;
     setError(null);
     setIsResending(true);
     try {
       await resendSignupOtp(email);
+      setResendCountdown(60);
       setNotice("Đã gửi lại mã xác nhận 6 số mới tới email của bạn.");
     } catch (err) {
       setError(translateAuthError(err));
@@ -268,58 +286,54 @@ const RegisterPage = () => {
           </p>
         </>
       ) : (
-        /* BƯỚC 2: NHẬP MÃ OTP */
-        <div className="space-y-6 relative z-10">
+        /* BƯỚC 2: NHẬP MÃ OTP VỚI HIỆU ỨNG SETTIGATION ORBIT V3 */
+        <div className="space-y-4 relative z-10">
           <NoticeMessage message={notice} />
 
-          <form onSubmit={handleVerifyOtp} className="space-y-5">
-            <div className="space-y-2">
-              <label htmlFor="otp" className="block text-sm font-medium text-gray-300 pl-1">
-                Mã xác thực OTP (6 chữ số)
-              </label>
-              <input
-                id="otp"
-                type="text"
-                maxLength={6}
-                autoFocus
-                placeholder="123456"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                required
-                className="w-full text-center tracking-[0.5em] font-mono text-2xl py-3.5 px-4 bg-white/5 backdrop-blur-xl border border-white/15 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 transition-all"
-              />
-              <p className="text-xs text-gray-400 pl-1 text-center">
-                Kiểm tra hộp thư đến hoặc mục thư rác (Spam) của <span className="text-indigo-300">{email}</span>
-              </p>
-            </div>
+          <OtpVerificationOrbit
+            length={6}
+            value={otp}
+            onChange={(val) => {
+              setOtp(val);
+              setError(null);
+            }}
+            onComplete={(fullCode) => {
+              handleVerifyOtp(fullCode);
+            }}
+            isVerifying={isVerifying}
+            isSuccess={isSuccessVerified}
+            isError={Boolean(error)}
+            errorMessage={error}
+            email={email}
+            resendCountdown={resendCountdown}
+            onResend={handleResendOtp}
+            isResending={isResending}
+          />
 
-            <ErrorMessage message={error} />
-
-            <Button type="submit" isLoading={isVerifying} disabled={otp.length !== 6}>
-              Xác thực & Hoàn tất
+          <div className="pt-2">
+            <Button
+              type="button"
+              onClick={() => handleVerifyOtp(otp)}
+              isLoading={isVerifying}
+              disabled={otp.length !== 6 || isSuccessVerified}
+            >
+              {isSuccessVerified ? "Đã xác thực thành công!" : "Xác thực & Vào ứng dụng"}
             </Button>
-          </form>
+          </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-white/10 text-xs">
+          <div className="flex items-center justify-center pt-3 border-t border-white/10 text-xs">
             <button
               type="button"
               onClick={() => {
                 setStep(STEP_FORM);
+                setOtp("");
                 setError(null);
                 setNotice(null);
+                setIsSuccessVerified(false);
               }}
-              className="flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors"
+              className="flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors py-1 px-2 rounded-lg hover:bg-white/5"
             >
-              <ArrowLeft className="w-3.5 h-3.5" /> Đổi email khác
-            </button>
-
-            <button
-              type="button"
-              onClick={handleResendOtp}
-              disabled={isResending}
-              className="flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 disabled:opacity-50 transition-colors font-medium"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isResending ? "animate-spin" : ""}`} /> Gửi lại mã OTP
+              <ArrowLeft className="w-3.5 h-3.5" /> Thay đổi thông tin / Email khác
             </button>
           </div>
         </div>
