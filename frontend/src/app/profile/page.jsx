@@ -184,7 +184,7 @@ export default function ProfilePage() {
             <div className="absolute inset-0 bg-shimmer opacity-20" />
             <div className="absolute top-4 right-4 flex items-center gap-2">
               <span className="px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-xs font-semibold text-gray-300">
-                ID: {profile.id?.slice(0, 8)}...
+                ID: #{String(profile.id || "").length > 8 ? `${String(profile.id).slice(0, 8)}...` : String(profile.id || "1")}
               </span>
             </div>
           </div>
