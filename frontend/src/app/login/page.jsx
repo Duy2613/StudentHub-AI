@@ -54,17 +54,6 @@ const LoginPage = () => {
     }
   }, []);
 
-  // Nếu đã có session thì chuyển hướng
-  useEffect(() => {
-    if (session) {
-      if (profile && !profile.onboarded) {
-        router.replace("/onboarding");
-      } else {
-        router.replace("/dashboard");
-      }
-    }
-  }, [session, profile, router]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -149,8 +138,10 @@ const LoginPage = () => {
       <form className="space-y-4 relative z-10" onSubmit={handleSubmit}>
         <InputField
           id="email"
+          name="email"
           label="Email"
           type="email"
+          autoComplete="username"
           placeholder="you@school.edu"
           icon={Mail}
           value={email}
@@ -160,7 +151,9 @@ const LoginPage = () => {
         />
         <PasswordInput
           id="password"
+          name="password"
           label="Mật khẩu"
+          autoComplete="current-password"
           placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}

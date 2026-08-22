@@ -70,11 +70,12 @@ const DEMO_EXPERT = {
 function formatProfile(user) {
   if (!user) return null;
 
-  // Đọc thêm từ localStorage nếu có
+  // Đọc thêm từ sessionStorage nếu có
   let cached = {};
   if (typeof window !== "undefined") {
     try {
-      const s = localStorage.getItem("studenthub_user_profile");
+      localStorage.removeItem("studenthub_user_profile");
+      const s = sessionStorage.getItem("studenthub_user_profile");
       if (s) cached = JSON.parse(s);
     } catch {}
   }
@@ -124,9 +125,16 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let mounted = true;
 
-    // 1. Kiểm tra demo mode đã lưu
+    // Dọn sạch các khóa cũ trong localStorage nếu có từ trước
     if (typeof window !== "undefined") {
-      const savedDemo = localStorage.getItem("studenthub_demo_user");
+      localStorage.removeItem("studenthub_demo_user");
+      localStorage.removeItem("studenthub_user_profile");
+      localStorage.removeItem("studenthub_jwt_token");
+    }
+
+    // 1. Kiểm tra demo mode đã lưu trong sessionStorage
+    if (typeof window !== "undefined") {
+      const savedDemo = sessionStorage.getItem("studenthub_demo_user");
       if (savedDemo) {
         try {
           const parsed = JSON.parse(savedDemo);
@@ -196,7 +204,8 @@ export function AuthProvider({ children }) {
     setProfile(demoData);
     setIsDemoMode(true);
     if (typeof window !== "undefined") {
-      localStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
+      sessionStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
+      localStorage.removeItem("studenthub_demo_user");
     }
   }, []);
 
@@ -208,7 +217,8 @@ export function AuthProvider({ children }) {
       const merged = { ...(profile || {}), ...profileUpdates };
       setProfile(merged);
       if (typeof window !== "undefined") {
-        localStorage.setItem("studenthub_user_profile", JSON.stringify(merged));
+        sessionStorage.setItem("studenthub_user_profile", JSON.stringify(merged));
+        localStorage.removeItem("studenthub_user_profile");
       }
       await updateUserProfile(profileUpdates);
       return merged;
@@ -218,6 +228,8 @@ export function AuthProvider({ children }) {
 
   const signOut = useCallback(async () => {
     if (typeof window !== "undefined") {
+      sessionStorage.removeItem("studenthub_demo_user");
+      sessionStorage.removeItem("studenthub_user_profile");
       localStorage.removeItem("studenthub_demo_user");
       localStorage.removeItem("studenthub_user_profile");
       setStoredToken(null);
