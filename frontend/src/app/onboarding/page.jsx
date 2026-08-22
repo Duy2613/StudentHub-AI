@@ -45,6 +45,8 @@ import { NumberTicker } from "@/components/ui/number-ticker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spotlight } from "@/components/ui/spotlight";
+import { motion, AnimatePresence } from "motion/react";
+
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -601,20 +603,48 @@ export default function OnboardingPage() {
                       <p className="text-xs text-red-400">{githubError}</p>
                     )}
 
-                    {/* Hiển thị Top 3 Dự án nổi bật kéo từ GitHub */}
+                    {/* Hiển thị Top 3 Dự án nổi bật kéo từ GitHub với Framer Motion Stagger Animation */}
                     {githubData?.topRepos && githubData.topRepos.length > 0 && (
                       <div className="space-y-2 pt-2 border-t border-amber-500/20">
                         <p className="text-xs font-semibold text-amber-200 flex items-center gap-1">
                           <FolderGit2 className="w-3.5 h-3.5" /> 3 Dự án nổi bật nhất trên GitHub:
                         </p>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <motion.div
+                          initial="hidden"
+                          animate="visible"
+                          variants={{
+                            hidden: { opacity: 0 },
+                            visible: {
+                              opacity: 1,
+                              transition: {
+                                staggerChildren: 0.12,
+                              },
+                            },
+                          }}
+                          className="grid grid-cols-1 sm:grid-cols-3 gap-2"
+                        >
                           {githubData.topRepos.map((repo) => (
-                            <a
+                            <motion.a
+                              variants={{
+                                hidden: { opacity: 0, y: 15, scale: 0.95 },
+                                visible: {
+                                  opacity: 1,
+                                  y: 0,
+                                  scale: 1,
+                                  transition: {
+                                    type: "spring",
+                                    stiffness: 260,
+                                    damping: 20,
+                                  },
+                                },
+                              }}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
                               key={repo.id}
                               href={repo.htmlUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="p-3 rounded-xl bg-black/30 border border-white/10 hover:border-amber-400/50 transition-colors flex flex-col justify-between group/repo"
+                              className="p-3 rounded-xl bg-black/40 border border-white/10 hover:border-amber-400/60 transition-colors flex flex-col justify-between group/repo shadow-md"
                             >
                               <div>
                                 <p className="text-xs font-bold text-white group-hover/repo:text-amber-300 flex items-center justify-between">
@@ -629,11 +659,12 @@ export default function OnboardingPage() {
                                 <span>⭐ {repo.stars} stars</span>
                                 <span className="text-gray-400">{repo.language}</span>
                               </div>
-                            </a>
+                            </motion.a>
                           ))}
-                        </div>
+                        </motion.div>
                       </div>
                     )}
+
                   </div>
                 )}
 
