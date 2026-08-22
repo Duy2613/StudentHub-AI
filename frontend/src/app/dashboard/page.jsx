@@ -327,6 +327,76 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* ---------------- PRO VIP TRINITY SUITE ---------------- */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Card 1: AI Mentor Space */}
+          <div
+            onClick={() => router.push("/ai-mentor")}
+            className="group relative rounded-3xl p-6 bg-gradient-to-br from-indigo-950/40 via-space-900 to-space-950 border border-indigo-500/30 hover:border-indigo-400/60 transition-all duration-300 cursor-pointer shadow-glass-deep hover:-translate-y-1 overflow-hidden"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 group-hover:scale-110 transition-transform">
+                <Bot className="w-6 h-6" />
+              </div>
+              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase tracking-wider">
+                Socratic AI 2.0
+              </span>
+            </div>
+            <h3 className="text-lg font-bold text-white mb-1 group-hover:text-indigo-300 transition-colors flex items-center justify-between">
+              <span>AI Mentor Space</span>
+              <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+            </h3>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Trò chuyện giải trình đa bước, phân tích thuật toán, giải toán LaTeX và lộ trình học tập chuyên sâu.
+            </p>
+          </div>
+
+          {/* Card 2: Notion-style Workspace */}
+          <div
+            onClick={() => router.push("/workspace")}
+            className="group relative rounded-3xl p-6 bg-gradient-to-br from-purple-950/40 via-space-900 to-space-950 border border-purple-500/30 hover:border-purple-400/60 transition-all duration-300 cursor-pointer shadow-glass-deep hover:-translate-y-1 overflow-hidden"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/30 group-hover:scale-110 transition-transform">
+                <FileText className="w-6 h-6" />
+              </div>
+              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase tracking-wider">
+                Notion Editor
+              </span>
+            </div>
+            <h3 className="text-lg font-bold text-white mb-1 group-hover:text-purple-300 transition-colors flex items-center justify-between">
+              <span>Study Workspace</span>
+              <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
+            </h3>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Soạn thảo ghi chú học thuật chuẩn Markdown, lưu trữ tài liệu đồ án, nhúng bảng biểu và xuất file PDF.
+            </p>
+          </div>
+
+          {/* Card 3: Interactive Whiteboard */}
+          <div
+            onClick={() => router.push("/whiteboard")}
+            className="group relative rounded-3xl p-6 bg-gradient-to-br from-cyan-950/40 via-space-900 to-space-950 border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-300 cursor-pointer shadow-glass-deep hover:-translate-y-1 overflow-hidden"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 group-hover:scale-110 transition-transform">
+                <Sliders className="w-6 h-6" />
+              </div>
+              <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase tracking-wider">
+                Tldraw Infinite
+              </span>
+            </div>
+            <h3 className="text-lg font-bold text-white mb-1 group-hover:text-cyan-300 transition-colors flex items-center justify-between">
+              <span>Digital Whiteboard</span>
+              <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
+            </h3>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              Bảng vẽ vô tận mô hình hóa sơ đồ kiến trúc, giải bài tập kỹ thuật số và phối hợp học nhóm trực quan.
+            </p>
+          </div>
+        </div>
+
+
         {/* 2. STUDENTHUB AI COPILOT INTERACTIVE ASK BAR */}
         <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 shadow-glass-deep space-y-4">
           <div className="flex items-center justify-between">
