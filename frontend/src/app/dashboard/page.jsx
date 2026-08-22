@@ -57,8 +57,7 @@ export default function DashboardPage() {
     }
   }, [session, profile, isLoading, router]);
 
-
-  if (isLoading || !profile) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-space-950 flex flex-col items-center justify-center text-gray-300">
         <div className="w-12 h-12 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin mb-4" />
@@ -67,7 +66,44 @@ export default function DashboardPage() {
     );
   }
 
-  const isExpert = profile.role === "expert";
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-space-950 flex flex-col items-center justify-center text-gray-300 px-4">
+        <div className="p-8 rounded-3xl bg-space-900/80 border border-white/10 text-center max-w-md w-full">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-4">
+            <Sparkles className="w-6 h-6" />
+          </div>
+          <h2 className="text-xl font-bold text-white mb-2">Yêu cầu đăng nhập</h2>
+          <p className="text-xs text-gray-400 mb-6">
+            Bạn cần đăng nhập để truy cập vào Bảng điều khiển học tập và mạng lưới chuyên gia.
+          </p>
+          <button
+            onClick={() => router.push("/login")}
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-bold shadow-neon-primary hover:brightness-110 transition-all"
+          >
+            Đăng Nhập Ngay
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const activeProfile = profile || {
+    id: session?.user?.id || "usr-1",
+    fullName: session?.user?.user_metadata?.full_name || session?.user?.email?.split("@")[0] || "Thành viên StudentHub",
+    role: session?.user?.user_metadata?.role || "student",
+    avatarId: "student-tech",
+    trustScore: 80,
+    badges: ["🎓 Sinh Viên"],
+    questionsCount: 0,
+    answersCount: 0,
+    university: "Đại học Thành viên",
+    major: "Khoa học & Kỹ thuật",
+    academicYear: "2024 - 2028",
+  };
+
+  const isExpert = activeProfile.role === "expert";
+
 
   // Mock sample experts
   const SAMPLE_EXPERTS = [
@@ -227,7 +263,7 @@ export default function DashboardPage() {
               }`}
             >
               {isExpert ? <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> : <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />}
-              <span>{profile.trustScore} Điểm Uy Tín</span>
+              <span>{activeProfile.trustScore} Điểm Uy Tín</span>
             </div>
 
             {/* Profile & Avatar dropdown button */}
@@ -236,15 +272,15 @@ export default function DashboardPage() {
               className="flex items-center gap-2.5 p-1.5 pr-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer transition-all hover:border-white/20 group"
             >
               <AvatarDisplay
-                avatarId={profile.avatarId}
-                avatarUrl={profile.avatarUrl}
-                role={profile.role}
+                avatarId={activeProfile.avatarId}
+                avatarUrl={activeProfile.avatarUrl}
+                role={activeProfile.role}
                 size="sm"
                 showBadge={true}
               />
               <div className="hidden sm:block text-left">
                 <p className="text-xs font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-1">
-                  {profile.fullName}
+                  {activeProfile.fullName}
                 </p>
                 <p className="text-[10px] text-gray-400">
                   {isExpert ? "⭐ Chuyên gia" : "🎓 Sinh viên"}
@@ -280,9 +316,9 @@ export default function DashboardPage() {
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
             <div className="flex items-center gap-5">
               <AvatarDisplay
-                avatarId={profile.avatarId}
-                avatarUrl={profile.avatarUrl}
-                role={profile.role}
+                avatarId={activeProfile.avatarId}
+                avatarUrl={activeProfile.avatarUrl}
+                role={activeProfile.role}
                 size="lg"
                 showBadge={true}
               />
@@ -297,15 +333,16 @@ export default function DashboardPage() {
                   {isExpert ? "⭐ Chuyên Gia Uy Tín Được Xác Thực" : "🎓 Sinh Viên Xác Thực"}
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black text-white">
-                  Xin chào, {profile.fullName}!
+                  Xin chào, {activeProfile.fullName}!
                 </h2>
                 <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-xl">
                   {isExpert
-                    ? `${profile.expertTitle} • ${profile.expertField} • ${profile.experienceYears}`
-                    : `${profile.university} • ${profile.major} • ${profile.academicYear}`}
+                    ? `${activeProfile.expertTitle || "Chuyên gia Tư vấn"} • ${activeProfile.expertField || "Trí tuệ nhân tạo"} • ${activeProfile.experienceYears || "3+ năm"}`
+                    : `${activeProfile.university || "Đại học Thành viên"} • ${activeProfile.major || "Kỹ thuật"} • ${activeProfile.academicYear || "2024 - 2028"}`}
                 </p>
               </div>
             </div>
+
 
             {/* Quick Banner Actions */}
             <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
@@ -613,7 +650,7 @@ export default function DashboardPage() {
               <div className="p-4 rounded-xl bg-indigo-950/30 border border-indigo-500/30 flex items-center justify-between">
                 <div>
                   <p className="text-xs text-gray-400">Điểm Uy Tín Hiện Tại</p>
-                  <p className="text-2xl font-black text-indigo-300 mt-0.5">{profile.trustScore} pts</p>
+                  <p className="text-2xl font-black text-indigo-300 mt-0.5">{activeProfile.trustScore} pts</p>
                 </div>
                 <div className="text-right">
                   <p className="text-xs text-emerald-400 font-semibold">+30 Điểm Xác thực</p>
@@ -623,17 +660,18 @@ export default function DashboardPage() {
               <ul className="space-y-2 text-xs text-gray-300">
                 <li className="flex items-center justify-between">
                   <span className="text-gray-400">Câu hỏi đã đăng:</span>
-                  <span className="font-semibold text-white">{profile.questionsCount}</span>
+                  <span className="font-semibold text-white">{activeProfile.questionsCount}</span>
                 </li>
                 <li className="flex items-center justify-between">
                   <span className="text-gray-400">Câu trả lời hữu ích:</span>
-                  <span className="font-semibold text-white">{profile.answersCount}</span>
+                  <span className="font-semibold text-white">{activeProfile.answersCount}</span>
                 </li>
                 <li className="flex items-center justify-between">
                   <span className="text-gray-400">Huy hiệu đạt được:</span>
-                  <span className="font-semibold text-indigo-300">{profile.badges?.length || 2}</span>
+                  <span className="font-semibold text-indigo-300">{activeProfile.badges?.length || 2}</span>
                 </li>
               </ul>
+
             </div>
 
             {/* Top Leaderboard */}
