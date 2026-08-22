@@ -8,11 +8,13 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || "https://studenthub-api-8
 
 async function proxyRequest(req, context) {
   try {
-    const { path } = await context.params;
-    const pathStr = Array.isArray(path) ? path.join("/") : path;
+    const params = context?.params ? await context.params : {};
+    const path = params?.path || [];
+    const pathStr = Array.isArray(path) ? path.join("/") : (path || "");
     const url = new URL(req.url);
     const search = url.search || "";
     const targetUrl = `${BACKEND_URL}/api/${pathStr}${search}`;
+
 
     const headers = new Headers();
     // Chuyển tiếp các header quan trọng
