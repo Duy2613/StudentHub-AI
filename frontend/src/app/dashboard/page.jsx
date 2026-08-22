@@ -30,7 +30,9 @@ import {
   ShieldCheck,
   ChevronRight,
   Lightbulb,
+  Sliders,
 } from "lucide-react";
+
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
