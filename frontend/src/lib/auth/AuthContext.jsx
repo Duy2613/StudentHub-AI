@@ -1,22 +1,24 @@
 "use client";
 
-// lib/auth/AuthContext.jsx
+// frontend/src/lib/auth/AuthContext.jsx
 //
-// Quản lý xác thực và hồ sơ người dùng kết nối trực tiếp ASP.NET Core Backend + Supabase:
-//  - Tự động đọc JWT Token và lấy hồ sơ từ GET /api/auth/me
-//  - Quản lý phiên đăng nhập, vai trò Sinh viên & Chuyên gia uy tín
-//  - Hỗ trợ cơ chế "Ghi nhớ đăng nhập" (Remember Me) linh hoạt qua dynamic storage
-//  - Hỗ trợ cập nhật avatar, trường học, chuyên môn tức thì
+// Trình quản lý xác thực & trạng thái người dùng (Auth Context Provider):
+// - Kiến trúc State Machine chống vòng lặp vô hạn (Infinite Loop Prevention)
+// - Bọc 100% try/catch với Diagnostic Logging [AUTH_ERROR] & [AUTH_INFO]
+// - Đồng bộ Bearer Token sang ASP.NET Core Backend tuần tự
+// - Tự động định dạng Profile với đầy đủ thuộc tính an toàn (Zero undefined crash)
 
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase/client";
 import {
   getMeBackend,
   signOutSupabase,
-  updateUserProfile,
+  updateUserProfile as updateUserProfileService,
   syncBackendUser,
   getStoredToken,
   setStoredToken,
+  logAuthError,
+  logAuthInfo,
 } from "./authService";
 
 const AuthContext = createContext(null);
@@ -69,6 +71,9 @@ const DEMO_EXPERT = {
   questionsCount: 2,
 };
 
+/**
+ * Định dạng Profile chuẩn hóa an toàn từ User Object
+ */
 function formatProfile(user) {
   if (!user) return null;
 
@@ -80,7 +85,9 @@ function formatProfile(user) {
         ? localStorage.getItem("studenthub_user_profile") || sessionStorage.getItem("studenthub_user_profile")
         : sessionStorage.getItem("studenthub_user_profile");
       if (s) cached = JSON.parse(s);
-    } catch {}
+    } catch (err) {
+      logAuthError("formatProfile:parseCache", err);
+    }
   }
 
   const meta = user.user_metadata || {};
@@ -124,99 +131,160 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isDemoMode, setIsDemoMode] = useState(false);
 
-  // Khởi tạo Auth khi Mount
+  // Idempotency tracking ref để tránh loop vô hạn
+  const lastSessionTokenRef = useRef(null);
+
+  // Khởi tạo Auth khi Mount (Single execution)
   useEffect(() => {
     let mounted = true;
+    logAuthInfo("AuthProvider", "Bắt đầu khởi tạo Auth State.");
 
-    if (typeof window === "undefined") return;
-
-    const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
-
-    // 1. Kiểm tra demo mode
-    const savedDemo = isRemembered
-      ? localStorage.getItem("studenthub_demo_user") || sessionStorage.getItem("studenthub_demo_user")
-      : sessionStorage.getItem("studenthub_demo_user");
-
-    if (savedDemo) {
+    const initAuth = async () => {
       try {
-        const parsed = JSON.parse(savedDemo);
-        if (mounted) {
-          setSession({ user: parsed });
-          setProfile(parsed);
-          setIsDemoMode(true);
+        if (typeof window === "undefined") return;
+
+        const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
+
+        // 1. Kiểm tra Demo Mode đã lưu
+        const savedDemo = isRemembered
+          ? localStorage.getItem("studenthub_demo_user") || sessionStorage.getItem("studenthub_demo_user")
+          : sessionStorage.getItem("studenthub_demo_user");
+
+        if (savedDemo) {
+          try {
+            const parsed = JSON.parse(savedDemo);
+            if (mounted) {
+              setSession({ user: parsed });
+              setProfile(parsed);
+              setIsDemoMode(true);
+              setIsLoading(false);
+              logAuthInfo("AuthProvider", "Khôi phục phiên Demo Mode.");
+              return;
+            }
+          } catch (e) {
+            logAuthError("AuthProvider:parseDemo", e);
+          }
+        }
+
+        // 2. Kiểm tra Supabase Session trước
+        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+          logAuthError("AuthProvider:getSession", sessionError);
+        }
+
+        if (currentSession?.user && mounted) {
+          lastSessionTokenRef.current = currentSession.access_token;
+          setSession(currentSession);
+          setProfile(formatProfile(currentSession.user));
+          setStoredToken(currentSession.access_token, isRemembered);
           setIsLoading(false);
+          logAuthInfo("AuthProvider", "Đã nạp Supabase Session thành công.");
           return;
         }
-      } catch {}
-    }
 
-    // 2. Kiểm tra Backend JWT Token
-    getMeBackend().then((backendUser) => {
+        // 3. Fallback kiểm tra Backend JWT Token
+        const backendUser = await getMeBackend();
+        if (backendUser && mounted) {
+          setSession({ user: backendUser });
+          setProfile(formatProfile(backendUser));
+          setIsLoading(false);
+          logAuthInfo("AuthProvider", "Đã nạp ASP.NET Core Backend Session thành công.");
+          return;
+        }
+
+        // 4. Không có session nào
+        if (mounted) {
+          setSession(null);
+          setProfile(null);
+          setIsLoading(false);
+          logAuthInfo("AuthProvider", "Khách vãng lai (Chưa đăng nhập).");
+        }
+      } catch (err) {
+        logAuthError("AuthProvider:initAuth", err);
+        if (mounted) setIsLoading(false);
+      }
+    };
+
+    initAuth();
+
+    // 5. Lắng nghe thay đổi Auth State (Google/GitHub OAuth và token refresh)
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
       if (!mounted) return;
-      if (backendUser) {
-        setSession({ user: backendUser });
-        setProfile(formatProfile(backendUser));
-        setIsLoading(false);
+      
+      const newToken = newSession?.access_token || null;
+      // Tránh lặp vô hạn nếu token không thay đổi
+      if (newToken === lastSessionTokenRef.current && !!newSession === !!session) {
         return;
       }
 
-      // 3. Kiểm tra Supabase session
-      supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-        if (!mounted) return;
-        if (currentSession?.user) {
-          setSession(currentSession);
-          setProfile(formatProfile(currentSession.user));
-        } else {
-          setSession(null);
-          setProfile(null);
-        }
-        setIsLoading(false);
-      });
-    }).catch(() => {
-      if (mounted) setIsLoading(false);
-    });
+      lastSessionTokenRef.current = newToken;
+      logAuthInfo("AuthProvider:onAuthStateChange", `Sự kiện: ${_event}`);
 
-    // 4. Lắng nghe Supabase OAuth (Google)
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      if (!mounted) return;
       if (newSession?.user) {
         setSession(newSession);
         setProfile(formatProfile(newSession.user));
+        setIsDemoMode(false);
+        if (newToken) {
+          setStoredToken(newToken);
+          syncBackendUser(newSession.user, newToken).catch(() => {});
+        }
+      } else if (_event === "SIGNED_OUT") {
+        setSession(null);
+        setProfile(null);
         setIsDemoMode(false);
       }
     });
 
     return () => {
       mounted = false;
-      listener.subscription.unsubscribe();
+      listener?.subscription?.unsubscribe();
     };
   }, []);
 
-  const ensureSynced = useCallback(async (fullName) => {
-    if (session?.user) {
-      await syncBackendUser(session.user);
+  /**
+   * Đảm bảo đồng bộ với ASP.NET Core Backend
+   */
+  const ensureSynced = useCallback(async (fullName = "") => {
+    logAuthInfo("ensureSynced", "Bắt đầu gọi đồng bộ sang ASP.NET Core.");
+    try {
+      if (session?.user) {
+        const token = session.access_token || getStoredToken();
+        const payload = {
+          ...session.user,
+          fullName: fullName || session.user.user_metadata?.full_name || session.user.email,
+        };
+        await syncBackendUser(payload, token);
+      }
+      return { success: true };
+    } catch (err) {
+      logAuthError("ensureSynced", err);
+      return { success: false, error: err };
     }
-    return { success: true };
   }, [session]);
 
   /**
-   * Đăng nhập nhanh chế độ Demo
+   * Đăng nhập chế độ Demo
    */
   const loginAsDemo = useCallback((role = "student", rememberMe = false) => {
-    const demoData = role === "expert" ? DEMO_EXPERT : DEMO_STUDENT;
-    setSession({ user: demoData });
-    setProfile(demoData);
-    setIsDemoMode(true);
-    if (typeof window !== "undefined") {
-      if (rememberMe) {
-        localStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
-        sessionStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
-        localStorage.setItem("studenthub_remember_me", "true");
-      } else {
-        sessionStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
-        localStorage.removeItem("studenthub_demo_user");
-        localStorage.removeItem("studenthub_remember_me");
+    logAuthInfo("loginAsDemo", `Kích hoạt Demo Mode cho vai trò: ${role}`);
+    try {
+      const demoData = role === "expert" ? DEMO_EXPERT : DEMO_STUDENT;
+      setSession({ user: demoData });
+      setProfile(demoData);
+      setIsDemoMode(true);
+      if (typeof window !== "undefined") {
+        if (rememberMe) {
+          localStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
+          sessionStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
+          localStorage.setItem("studenthub_remember_me", "true");
+        } else {
+          sessionStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
+          localStorage.removeItem("studenthub_demo_user");
+          localStorage.removeItem("studenthub_remember_me");
+        }
       }
+    } catch (err) {
+      logAuthError("loginAsDemo", err);
     }
   }, []);
 
@@ -225,39 +293,42 @@ export function AuthProvider({ children }) {
    */
   const updateProfile = useCallback(
     async (profileUpdates) => {
-      const merged = { ...(profile || {}), ...profileUpdates };
-      setProfile(merged);
-      if (typeof window !== "undefined") {
-        const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
-        if (isRemembered) {
-          localStorage.setItem("studenthub_user_profile", JSON.stringify(merged));
-          sessionStorage.setItem("studenthub_user_profile", JSON.stringify(merged));
-        } else {
-          sessionStorage.setItem("studenthub_user_profile", JSON.stringify(merged));
-          localStorage.removeItem("studenthub_user_profile");
+      logAuthInfo("updateProfile", "Bắt đầu cập nhật thông tin hồ sơ:", profileUpdates);
+      try {
+        const merged = { ...(profile || {}), ...profileUpdates };
+        setProfile(merged);
+        if (typeof window !== "undefined") {
+          const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
+          const storage = isRemembered ? localStorage : sessionStorage;
+          storage.setItem("studenthub_user_profile", JSON.stringify(merged));
         }
+        await updateUserProfileService(profileUpdates);
+        return merged;
+      } catch (err) {
+        logAuthError("updateProfile", err);
+        return profile;
       }
-      await updateUserProfile(profileUpdates);
-      return merged;
     },
     [profile]
   );
 
+  /**
+   * Đăng xuất toàn bộ phiên
+   */
   const signOut = useCallback(async () => {
-    if (typeof window !== "undefined") {
-      sessionStorage.removeItem("studenthub_demo_user");
-      sessionStorage.removeItem("studenthub_user_profile");
-      sessionStorage.removeItem("studenthub_jwt_token");
-      localStorage.removeItem("studenthub_demo_user");
-      localStorage.removeItem("studenthub_user_profile");
-      localStorage.removeItem("studenthub_jwt_token");
-      localStorage.removeItem("studenthub_remember_me");
-      setStoredToken(null);
+    logAuthInfo("signOut", "Đang đăng xuất...");
+    try {
+      lastSessionTokenRef.current = null;
+      setIsDemoMode(false);
+      await signOutSupabase();
+      setSession(null);
+      setProfile(null);
+      logAuthInfo("signOut", "Đăng xuất thành công.");
+    } catch (err) {
+      logAuthError("signOut", err);
+      setSession(null);
+      setProfile(null);
     }
-    setIsDemoMode(false);
-    await signOutSupabase().catch(() => {});
-    setSession(null);
-    setProfile(null);
   }, []);
 
   return (
