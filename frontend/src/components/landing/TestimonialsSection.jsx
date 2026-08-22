@@ -50,11 +50,11 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Testimonials Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {TESTIMONIALS.map((item, idx) => (
             <div
               key={idx}
-              className="p-6 rounded-3xl bg-space-950/80 border border-white/10 hover:border-white/20 transition-all duration-300 flex flex-col justify-between shadow-glass-deep"
+              className="p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-space-900/90 to-space-950/90 border border-white/10 hover:border-indigo-500/30 transition-all duration-300 flex flex-col justify-between shadow-glass-deep"
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -74,7 +74,7 @@ export default function TestimonialsSection() {
               </div>
 
               <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-                <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${item.avatarGradient} p-[2px] shrink-0`}>
+                <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${item.avatarGradient} p-[2px] shrink-0 shadow-md`}>
                   <div className="w-full h-full bg-space-950 rounded-full flex items-center justify-center font-bold text-white text-xs">
                     {item.avatarInitials}
                   </div>
@@ -88,7 +88,44 @@ export default function TestimonialsSection() {
           ))}
         </div>
 
+        {/* Academic Excellence Banner with 3D Trophy Artifact */}
+        <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-space-950 via-space-900 to-space-950 border border-amber-500/30 shadow-[0_0_40px_rgba(245,158,11,0.08)] flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
+          <div className="flex items-center gap-5 relative z-10">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border border-amber-500/40 shadow-xl shrink-0">
+              <img
+                src="/images/studio/studio_academic_achievement.jpg"
+                alt="Academic Excellence Trophy"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase tracking-wider mb-1">
+                ⭐ Học Bổng & Giải Thưởng NCKH 2026
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-white">
+                Hơn 12,500+ sinh viên đã cải thiện điểm số GPA trên 3.2/4.0
+              </h3>
+              <p className="text-xs text-gray-400 mt-1">
+                Được bảo chứng bởi hội đồng chuyên môn và hơn 50+ trường đại học hàng đầu trên toàn quốc.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6 shrink-0 relative z-10">
+            <div className="text-center">
+              <span className="text-2xl font-black text-amber-300 font-mono">98.4%</span>
+              <p className="text-[10px] text-gray-400 uppercase font-medium">Hài Lòng</p>
+            </div>
+            <div className="h-8 w-[1px] bg-white/10" />
+            <div className="text-center">
+              <span className="text-2xl font-black text-indigo-300 font-mono">3.8x</span>
+              <p className="text-[10px] text-gray-400 uppercase font-medium">Tốc Độ Ôn Tập</p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
   );
 }
+

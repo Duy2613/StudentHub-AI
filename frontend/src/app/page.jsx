@@ -18,8 +18,10 @@ import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
 import LandingHeader from "@/components/landing/LandingHeader";
 import HeroSection from "@/components/landing/HeroSection";
 import TrustSocialProof from "@/components/landing/TrustSocialProof";
+import TrinitySuiteShowcase from "@/components/landing/TrinitySuiteShowcase";
 import FeatureBento from "@/components/landing/FeatureBento";
 import InteractiveComparison from "@/components/landing/InteractiveComparison";
+
 import ExpertShowcase from "@/components/landing/ExpertShowcase";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import PricingAndFAQ from "@/components/landing/PricingAndFAQ";
@@ -83,12 +85,16 @@ export default function HomePage() {
           <TextRevealByWord text="Trợ lý trí tuệ nhân tạo toàn năng kết hợp mạng lưới cố vấn chuyên gia thực chứng, tối ưu hóa điểm số và khai phóng tiềm năng học thuật của sinh viên Việt Nam." />
         </div>
 
+        {/* Studio 3D Visual Trinity Suite Showcase */}
+        <TrinitySuiteShowcase />
+
         <FeatureBento />
         <InteractiveComparison />
         <ExpertShowcase />
         <TestimonialsSection />
         <PricingAndFAQ />
       </main>
+
 
       {/* Footer */}
       <LandingFooter />
