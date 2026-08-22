@@ -30,10 +30,12 @@ import {
   Loader2,
   Share2,
   Lock,
+  FolderGit2,
+  ExternalLink,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
+import { AmbientBackground, NoiseOverlay, GithubIcon } from "@/components/auth/AuthUI";
 import {
   AVATAR_LIST,
   VIETNAM_UNIVERSITIES,
@@ -429,6 +431,56 @@ export default function ProfilePage() {
                   ))}
                 </div>
               </div>
+
+              {/* Box 3: Top 3 Dự án GitHub nổi bật (Chuyên gia) */}
+              {isExpert && profile.topRepos && profile.topRepos.length > 0 && (
+                <div className="md:col-span-2 p-6 rounded-2xl bg-amber-950/20 border border-amber-500/30 backdrop-blur-xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-amber-200 flex items-center gap-2">
+                      <FolderGit2 className="w-5 h-5 text-amber-400" />
+                      3 Dự Án Nổi Bật Trên GitHub ({profile.githubUsername ? `@${profile.githubUsername}` : "GitHub"})
+                    </h3>
+                    {profile.githubUsername && (
+                      <a
+                        href={`https://github.com/${profile.githubUsername}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1 font-semibold"
+                      >
+                        <GithubIcon className="w-3.5 h-3.5" /> Xem trang GitHub
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                    {profile.topRepos.map((repo) => (
+                      <a
+                        key={repo.id || repo.name}
+                        href={repo.htmlUrl || repo.html_url || `https://github.com/${profile.githubUsername}/${repo.name}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="p-4 rounded-xl bg-black/40 border border-amber-500/20 hover:border-amber-400/60 transition-all flex flex-col justify-between group/gh"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-bold text-white group-hover/gh:text-amber-300 transition-colors truncate">
+                              {repo.name}
+                            </h4>
+                            <ExternalLink className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+                          </div>
+                          <p className="text-xs text-gray-400 mt-2 line-clamp-2 leading-relaxed">
+                            {repo.description || "Dự án mã nguồn mở đóng góp cho cộng đồng."}
+                          </p>
+                        </div>
+                        <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs text-amber-300 font-semibold">
+                          <span>⭐ {repo.stars || 0} stars</span>
+                          <span className="text-gray-400">{repo.language || "Mã nguồn"}</span>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

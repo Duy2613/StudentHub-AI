@@ -276,6 +276,17 @@ export function signInWithGoogle() {
   });
 }
 
+export function signInWithGitHub() {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  return supabase.auth.signInWithOAuth({
+    provider: "github",
+    options: {
+      redirectTo: `${origin}/callback`,
+      scopes: "read:user user:email",
+    },
+  });
+}
+
 export async function signOutSupabase() {
   setStoredToken(null);
   if (typeof window !== "undefined") {

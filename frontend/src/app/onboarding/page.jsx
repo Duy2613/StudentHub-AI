@@ -2,8 +2,10 @@
 
 // app/onboarding/page.jsx
 //
-// Màn hình Onboarding: Chọn vai trò (Sinh viên / Chuyên gia uy tín),
-// chọn Avatar cao cấp, thiết lập thông tin ban đầu và cấp Huy hiệu xác thực.
+// Màn hình Onboarding Spec-Driven:
+// - Chọn 1 trong 2 vai trò: "Người dùng tiêu chuẩn" (standard) hoặc "Chuyên gia uy tín" (expert)
+// - Tích hợp GitHub Public API để tự động kéo Avatar, Bio và Top 3 Dự án nổi bật + Tính điểm uy tín
+// - Lưu đồng bộ vào bảng profiles (role, avatar_url, reputation_score) và điều hướng về /dashboard
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -23,6 +25,9 @@ import {
   Star,
   Check,
   Loader2,
+  GitBranch,
+  FolderGit2,
+  ExternalLink,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
@@ -31,8 +36,9 @@ import {
   EXPERT_FIELDS,
   getAvatarById,
 } from "@/lib/avatars";
+import { fetchGitHubExpertData } from "@/lib/github";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
+import { AmbientBackground, NoiseOverlay, GithubIcon } from "@/components/auth/AuthUI";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -45,8 +51,8 @@ export default function OnboardingPage() {
     }
   }, [session, isAuthLoading, router]);
 
-  const [step, setStep] = useState(1); // 1: Chọn Vai trò, 2: Chọn Avatar, 3: Thông tin chi tiết
-  const [role, setRole] = useState("student"); // "student" | "expert"
+  const [step, setStep] = useState(1); // 1: Chọn Vai trò, 2: Chọn Avatar, 3: Thông tin chi tiết & GitHub
+  const [role, setRole] = useState("standard"); // "standard" | "expert"
   const [avatarId, setAvatarId] = useState("student-tech");
   const [customAvatarUrl, setCustomAvatarUrl] = useState("");
   const [isUploading, setIsUploading] = useState(false);
@@ -58,7 +64,11 @@ export default function OnboardingPage() {
   const [major, setMajor] = useState("Công nghệ Thông tin / Kỹ thuật Phần mềm");
   const [academicYear, setAcademicYear] = useState("K65 (2023 - 2027)");
 
-  // Expert Fields
+  // Expert Fields & GitHub Sync
+  const [githubUsername, setGithubUsername] = useState("");
+  const [isSyncingGithub, setIsSyncingGithub] = useState(false);
+  const [githubData, setGithubData] = useState(null);
+  const [githubError, setGithubError] = useState(null);
   const [expertTitle, setExpertTitle] = useState("Kỹ sư AI & Trợ giảng Học thuật");
   const [expertField, setExpertField] = useState(EXPERT_FIELDS[0]);
   const [experienceYears, setExperienceYears] = useState("4+ năm kinh nghiệm");
@@ -67,28 +77,66 @@ export default function OnboardingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  // Khởi tạo thông tin từ profile hiện tại
+  // Khởi tạo thông tin từ session / OAuth metadata
   useEffect(() => {
+    if (session?.user) {
+      const meta = session.user.user_metadata || {};
+      const initialName = meta.full_name || meta.name || meta.user_name || "";
+      if (initialName && !fullName) setFullName(initialName);
+
+      const ghUser = meta.user_name || meta.preferred_username || "";
+      if (ghUser && !githubUsername) setGithubUsername(ghUser);
+
+      if (meta.avatar_url && !customAvatarUrl) {
+        setCustomAvatarUrl(meta.avatar_url);
+      }
+    }
     if (profile) {
-      if (profile.fullName) setFullName(profile.fullName);
+      if (profile.fullName && !fullName) setFullName(profile.fullName);
       if (profile.role) {
-        setRole(profile.role);
+        setRole(profile.role === "expert" ? "expert" : "standard");
         setAvatarId(profile.role === "expert" ? "expert-ai" : "student-tech");
       }
-      if (profile.university && profile.university !== "Chưa cập nhật") {
-        setUniversity(profile.university);
-      }
-      if (profile.bio) setBio(profile.bio);
+      if (profile.bio && !bio) setBio(profile.bio);
     }
-  }, [profile]);
+  }, [session, profile]);
 
-  // Xử lý đổi vai trò -> tự đổi avatar đề xuất
+  // Xử lý đổi vai trò
   const handleRoleSelect = (selectedRole) => {
     setRole(selectedRole);
     if (selectedRole === "expert" && avatarId.startsWith("student")) {
       setAvatarId("expert-ai");
-    } else if (selectedRole === "student" && avatarId.startsWith("expert")) {
+    } else if (selectedRole === "standard" && avatarId.startsWith("expert")) {
       setAvatarId("student-tech");
+    }
+  };
+
+  // Đồng bộ GitHub Public API cho Chuyên gia
+  const handleSyncGitHub = async () => {
+    if (!githubUsername.trim()) {
+      setGithubError("Vui lòng nhập Username GitHub để đồng bộ.");
+      return;
+    }
+
+    setIsSyncingGithub(true);
+    setGithubError(null);
+
+    try {
+      const data = await fetchGitHubExpertData(githubUsername);
+      setGithubData(data);
+      if (data.avatarUrl) {
+        setCustomAvatarUrl(data.avatarUrl);
+      }
+      if (data.bio && !bio) {
+        setBio(data.bio);
+      }
+      if (data.name && !fullName) {
+        setFullName(data.name);
+      }
+    } catch (err) {
+      setGithubError(err.message || "Không thể đồng bộ dữ liệu từ GitHub.");
+    } finally {
+      setIsSyncingGithub(false);
     }
   };
 
@@ -118,26 +166,40 @@ export default function OnboardingPage() {
 
     const email = session?.user?.email || "";
     const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(email);
+    const isExpert = role === "expert";
 
     const finalUniversity = university === "Khác" ? (customUniversity || "Đại học Tự do") : university;
-    const finalBio = bio || (role === "expert" ? "Chuyên gia cố vấn và giải đáp học thuật tại StudentHub AI." : "Sinh viên học tập và phát triển kỹ năng tại StudentHub AI.");
+    const finalBio =
+      bio ||
+      (isExpert
+        ? "Chuyên gia cố vấn và giải đáp học thuật tại StudentHub AI."
+        : "Sinh viên học tập và phát triển kỹ năng tại StudentHub AI.");
+
+    const finalReputationScore = isExpert
+      ? githubData?.reputationScore || 95
+      : isEdu
+      ? 80
+      : 50;
 
     try {
       await updateProfile({
         full_name: fullName || "Thành viên StudentHub",
-        role: role,
+        role: isExpert ? "expert" : "standard",
         avatar_id: avatarId,
         avatar_url: customAvatarUrl || null,
-        university: role === "student" ? finalUniversity : null,
-        major: role === "student" ? major : null,
-        academic_year: role === "student" ? academicYear : null,
-        expert_title: role === "expert" ? expertTitle : null,
-        expert_field: role === "expert" ? expertField : null,
-        experience_years: role === "expert" ? experienceYears : null,
+        reputation_score: finalReputationScore,
+        trust_score: finalReputationScore,
+        university: !isExpert ? finalUniversity : null,
+        major: !isExpert ? major : null,
+        academic_year: !isExpert ? academicYear : null,
+        expert_title: isExpert ? expertTitle : null,
+        expert_field: isExpert ? expertField : null,
+        experience_years: isExpert ? experienceYears : null,
+        github_username: isExpert ? githubUsername.trim() || null : null,
+        top_repos: isExpert ? githubData?.topRepos || [] : [],
         bio: finalBio,
-        trust_score: role === "expert" ? 98 : isEdu ? 80 : 50,
-        verified_student: role === "student" && isEdu,
-        verified_expert: role === "expert",
+        verified_student: !isExpert && isEdu,
+        verified_expert: isExpert,
         onboarded: true,
       });
 
@@ -167,7 +229,7 @@ export default function OnboardingPage() {
             Chào mừng đến với StudentHub AI
           </h1>
           <p className="mt-2 text-sm sm:text-base text-gray-400">
-            Chọn vai trò và tạo dấu ấn cá nhân của bạn trong cộng đồng tri thức
+            Chọn vai trò phù hợp và thiết lập dấu ấn cá nhân của bạn trong cộng đồng tri thức
           </p>
         </div>
 
@@ -176,7 +238,7 @@ export default function OnboardingPage() {
           {[
             { num: 1, label: "Chọn vai trò" },
             { num: 2, label: "Chọn Avatar" },
-            { num: 3, label: "Thông tin hồ sơ" },
+            { num: 3, label: "Hồ sơ & Chuyên môn" },
           ].map((s) => (
             <div key={s.num} className="flex items-center gap-2 sm:gap-3">
               <div
@@ -216,16 +278,16 @@ export default function OnboardingPage() {
               <div className="text-center mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-white">Bạn tham gia StudentHub với vai trò nào?</h2>
                 <p className="text-sm text-gray-400 mt-1">
-                  Mỗi vai trò sẽ có các tính năng, huy hiệu và giao diện phù hợp
+                  Chọn 1 trong 2 thẻ vai trò để được cấp quyền và hệ sinh thái phù hợp
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Thẻ Sinh viên / Người dùng */}
+                {/* Thẻ 1: Người dùng tiêu chuẩn */}
                 <div
-                  onClick={() => handleRoleSelect("student")}
+                  onClick={() => handleRoleSelect("standard")}
                   className={`group cursor-pointer relative p-6 sm:p-8 rounded-2xl border transition-all duration-300 ${
-                    role === "student"
+                    role === "standard"
                       ? "bg-indigo-950/40 border-indigo-500/80 shadow-[0_0_30px_rgba(99,102,241,0.25)] ring-2 ring-indigo-500/50"
                       : "bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20"
                   }`}
@@ -234,38 +296,32 @@ export default function OnboardingPage() {
                     <div className="p-3 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
                       <GraduationCap className="w-8 h-8" />
                     </div>
-                    {role === "student" && (
+                    {role === "standard" && (
                       <span className="px-3 py-1 rounded-full bg-indigo-500/30 text-indigo-300 border border-indigo-400/50 text-xs font-semibold flex items-center gap-1">
                         <CheckCircle2 className="w-3.5 h-3.5" /> Đã chọn
                       </span>
                     )}
                   </div>
                   <h3 className="text-lg sm:text-xl font-bold text-white mb-2">
-                    🎓 Sinh viên / Người học
+                    🎓 Người dùng tiêu chuẩn
                   </h3>
                   <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-                    Hỏi đáp bài tập, trợ giảng AI 24/7, tìm tài liệu môn học và nhận tư vấn định hướng từ các chuyên gia uy tín.
+                    Dành cho sinh viên, người học: hỏi đáp bài tập, trợ giảng AI 24/7, tìm tài liệu học tập và nhận hướng dẫn từ các Chuyên gia uy tín.
                   </p>
                   <ul className="space-y-2 text-xs text-gray-300">
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-indigo-400" /> Trợ lý AI giải thích bài giảng & gợi ý tài liệu
+                      <Check className="w-4 h-4 text-indigo-400" /> Trợ lý AI giải thích bài giảng & ôn thi học phần
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-indigo-400" /> Đặt câu hỏi trực tiếp cho Chuyên gia uy tín
                     </li>
-                    {isEduEmail ? (
-                      <li className="flex items-center gap-2 text-emerald-300 font-medium">
-                        <Check className="w-4 h-4 text-emerald-400" /> Nhận ngay Huy hiệu Verified Student (+30 điểm)
-                      </li>
-                    ) : (
-                      <li className="flex items-center gap-2 text-indigo-300">
-                        <Check className="w-4 h-4 text-indigo-400" /> Nhận điểm uy tín và huy hiệu hoạt động
-                      </li>
-                    )}
+                    <li className="flex items-center gap-2 text-indigo-300 font-medium">
+                      <Check className="w-4 h-4 text-indigo-400" /> Điểm uy tín khởi đầu: 50 pts (80 pts với email Edu)
+                    </li>
                   </ul>
                 </div>
 
-                {/* Thẻ Chuyên gia uy tín */}
+                {/* Thẻ 2: Chuyên gia uy tín */}
                 <div
                   onClick={() => handleRoleSelect("expert")}
                   className={`group cursor-pointer relative p-6 sm:p-8 rounded-2xl border transition-all duration-300 ${
@@ -285,20 +341,20 @@ export default function OnboardingPage() {
                     )}
                   </div>
                   <h3 className="text-lg sm:text-xl font-bold text-amber-200 mb-2 flex items-center gap-2">
-                    🌟 Chuyên gia uy tín / Mentor
+                    🌟 Chuyên gia uy tín
                   </h3>
                   <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-                    Dành cho giảng viên, cựu sinh viên xuất sắc, kỹ sư công nghệ chia sẻ tri thức, giải đáp chuyên sâu và cố vấn thế hệ sinh viên tiếp nối.
+                    Dành cho kỹ sư công nghệ, giảng viên, mentor: kết nối tài khoản GitHub, hiển thị 3 dự án nổi bật nhất và cộng điểm uy tín chuyên môn.
                   </p>
                   <ul className="space-y-2 text-xs text-gray-300">
                     <li className="flex items-center gap-2 text-amber-200 font-medium">
-                      <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> Cấp Huy hiệu Vàng "Chuyên gia uy tín"
+                      <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> Cấp Huy hiệu Vàng "⭐ Chuyên Gia Uy Tín"
+                    </li>
+                    <li className="flex items-center gap-2 text-amber-300">
+                      <Check className="w-4 h-4 text-amber-400" /> Tự động kéo 3 Dự án GitHub & Tính điểm uy tín (90-100 pts)
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-amber-400" /> Nhận câu hỏi ưu tiên và đánh giá năng lực từ sinh viên
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-amber-400" /> Xây dựng thương hiệu cá nhân và hồ sơ chuyên gia uy tín
+                      <Check className="w-4 h-4 text-amber-400" /> Nhận câu hỏi ưu tiên và xây dựng hồ sơ cố vấn học thuật
                     </li>
                   </ul>
                 </div>
@@ -322,7 +378,7 @@ export default function OnboardingPage() {
               <div className="text-center">
                 <h2 className="text-xl sm:text-2xl font-bold text-white">Chọn Avatar Đại diện</h2>
                 <p className="text-sm text-gray-400 mt-1">
-                  Chọn hình ảnh đại diện biểu trưng cho phong cách {role === "expert" ? "Chuyên gia uy tín" : "Sinh viên"} của bạn
+                  Chọn hình ảnh đại diện biểu trưng cho phong cách {role === "expert" ? "Chuyên gia uy tín" : "Người dùng tiêu chuẩn"} của bạn
                 </p>
               </div>
 
@@ -336,20 +392,21 @@ export default function OnboardingPage() {
                   showBadge={true}
                 />
                 <div className="text-center sm:text-left">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-2 border backdrop-blur-md"
+                  <div
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-2 border backdrop-blur-md"
                     style={{
                       background: role === "expert" ? "rgba(245, 158, 11, 0.15)" : "rgba(99, 102, 241, 0.15)",
                       borderColor: role === "expert" ? "rgba(245, 158, 11, 0.4)" : "rgba(99, 102, 241, 0.4)",
                       color: role === "expert" ? "#fde68a" : "#c7d2fe",
                     }}
                   >
-                    {role === "expert" ? "⭐ Chuyên Gia Uy Tín" : "🎓 Sinh Viên Xác Thực"}
+                    {role === "expert" ? "⭐ Chuyên Gia Uy Tín" : "🎓 Người Dùng Tiêu Chuẩn"}
                   </div>
                   <h4 className="text-lg font-bold text-white">
-                    {customAvatarUrl ? "Ảnh đại diện tùy chỉnh" : selectedAvatarData?.name}
+                    {customAvatarUrl ? "Ảnh đại diện tùy chỉnh / GitHub" : selectedAvatarData?.name}
                   </h4>
                   <p className="text-xs text-gray-400 mt-1 max-w-xs">
-                    {customAvatarUrl ? "Hình ảnh tải lên từ thiết bị của bạn" : selectedAvatarData?.description}
+                    {customAvatarUrl ? "Hình ảnh đã đồng bộ từ GitHub hoặc tải lên" : selectedAvatarData?.description}
                   </p>
                 </div>
               </div>
@@ -376,7 +433,7 @@ export default function OnboardingPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
                   {AVATAR_LIST.map((item) => {
                     const isSelected = avatarId === item.id && !customAvatarUrl;
-                    const isItemRole = item.role === role;
+                    const isItemRole = item.role === role || (role === "standard" && item.role === "student");
                     return (
                       <div
                         key={item.id}
@@ -431,13 +488,17 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* ---------------- BƯỚC 3: THÔNG TIN HỒ SƠ ---------------- */}
+          {/* ---------------- BƯỚC 3: THÔNG TIN HỒ SƠ & GITHUB ---------------- */}
           {step === 3 && (
             <div className="space-y-6">
               <div className="text-center mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-white">Hoàn tất Thông tin Hồ sơ</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-white">
+                  {role === "expert" ? "Xác thực Hồ sơ Chuyên gia & GitHub" : "Hoàn tất Thông tin Hồ sơ"}
+                </h2>
                 <p className="text-sm text-gray-400 mt-1">
-                  Thông tin này sẽ hiển thị trên trang Profile cá nhân của bạn
+                  {role === "expert"
+                    ? "Tích hợp GitHub Public API để kéo 3 dự án nổi bật và tính điểm uy tín chuyên gia"
+                    : "Thông tin này sẽ hiển thị trên trang Profile cá nhân của bạn"}
                 </p>
               </div>
 
@@ -457,13 +518,93 @@ export default function OnboardingPage() {
                   />
                 </div>
 
-                {/* Form dành cho Sinh viên */}
-                {role === "student" ? (
+                {/* Phần riêng cho Chuyên gia uy tín: GitHub Public API Integration */}
+                {role === "expert" && (
+                  <div className="p-5 rounded-2xl bg-amber-950/25 border border-amber-500/30 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-amber-300 font-bold text-sm">
+                        <GithubIcon className="w-4 h-4" /> Đồng bộ GitHub Public API (Task 4)
+                      </div>
+                      {githubData && (
+                        <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Điểm uy tín: {githubData.reputationScore} pts
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={githubUsername}
+                        onChange={(e) => setGithubUsername(e.target.value)}
+                        placeholder="Nhập GitHub username (VD: torvalds, octocat)"
+                        className="flex-1 px-4 py-2.5 bg-black/40 border border-amber-500/30 rounded-xl text-white text-sm focus:outline-none focus:border-amber-400"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSyncGitHub}
+                        disabled={isSyncingGithub || !githubUsername.trim()}
+                        className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all disabled:opacity-50"
+                      >
+                        {isSyncingGithub ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" /> Đang kéo...
+                          </>
+                        ) : (
+                          <>
+                            <GitBranch className="w-4 h-4" /> Kéo 3 Dự án
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {githubError && (
+                      <p className="text-xs text-red-400">{githubError}</p>
+                    )}
+
+                    {/* Hiển thị Top 3 Dự án nổi bật kéo từ GitHub */}
+                    {githubData?.topRepos && githubData.topRepos.length > 0 && (
+                      <div className="space-y-2 pt-2 border-t border-amber-500/20">
+                        <p className="text-xs font-semibold text-amber-200 flex items-center gap-1">
+                          <FolderGit2 className="w-3.5 h-3.5" /> 3 Dự án nổi bật nhất trên GitHub:
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                          {githubData.topRepos.map((repo) => (
+                            <a
+                              key={repo.id}
+                              href={repo.htmlUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="p-3 rounded-xl bg-black/30 border border-white/10 hover:border-amber-400/50 transition-colors flex flex-col justify-between group/repo"
+                            >
+                              <div>
+                                <p className="text-xs font-bold text-white group-hover/repo:text-amber-300 flex items-center justify-between">
+                                  <span className="truncate">{repo.name}</span>
+                                  <ExternalLink className="w-3 h-3 text-gray-500 flex-shrink-0" />
+                                </p>
+                                <p className="text-[11px] text-gray-400 mt-1 line-clamp-2">
+                                  {repo.description}
+                                </p>
+                              </div>
+                              <div className="mt-2 flex items-center justify-between text-[10px] text-amber-300 font-semibold">
+                                <span>⭐ {repo.stars} stars</span>
+                                <span className="text-gray-400">{repo.language}</span>
+                              </div>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Form dành cho Người dùng tiêu chuẩn */}
+                {role === "standard" ? (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                          <Building className="w-4 h-4 text-indigo-400" /> Trường Đại học / Cao đẳng
+                          <Building className="w-4 h-4 text-indigo-400" /> Trường Đại học / Tổ chức
                         </label>
                         <select
                           value={university}
@@ -498,7 +639,7 @@ export default function OnboardingPage() {
                           type="text"
                           value={major}
                           onChange={(e) => setMajor(e.target.value)}
-                          placeholder="Khoa học Máy tính, Kinh tế đối ngoại..."
+                          placeholder="Khoa học Máy tính, Kỹ thuật phần mềm..."
                           className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500 focus:bg-white/10"
                         />
                       </div>
@@ -512,13 +653,13 @@ export default function OnboardingPage() {
                         type="text"
                         value={academicYear}
                         onChange={(e) => setAcademicYear(e.target.value)}
-                        placeholder="K65 (2023 - 2027) hoặc Năm 2"
+                        placeholder="K65 (2023 - 2027) hoặc Năm 3"
                         className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500 focus:bg-white/10"
                       />
                     </div>
                   </>
                 ) : (
-                  /* Form dành cho Chuyên gia */
+                  /* Form chi tiết Chuyên gia */
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
@@ -529,7 +670,7 @@ export default function OnboardingPage() {
                           type="text"
                           value={expertTitle}
                           onChange={(e) => setExpertTitle(e.target.value)}
-                          placeholder="Senior AI Engineer, Giảng viên CNTT..."
+                          placeholder="Senior AI Engineer, Tech Lead..."
                           required
                           className="w-full px-4 py-3 bg-white/5 border border-amber-500/30 rounded-xl text-white text-sm focus:outline-none focus:border-amber-400 focus:bg-white/10"
                         />
@@ -537,7 +678,7 @@ export default function OnboardingPage() {
 
                       <div>
                         <label className="block text-sm font-medium text-amber-200 mb-2 flex items-center gap-2">
-                          <Briefcase className="w-4 h-4 text-amber-400" /> Lĩnh vực Chuyên môn
+                          <Briefcase className="w-4 h-4 text-amber-400" /> Lĩnh vực Chuyên sâu
                         </label>
                         <select
                           value={expertField}
@@ -600,10 +741,10 @@ export default function OnboardingPage() {
                   type="button"
                   onClick={handleFinish}
                   disabled={isSubmitting || !fullName.trim()}
-                  className={`px-8 py-3.5 rounded-xl text-white font-bold text-sm flex items-center gap-2 shadow-lg transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`px-8 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-lg transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
                     role === "expert"
                       ? "bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 shadow-amber-500/30 text-black"
-                      : "bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 shadow-indigo-500/30"
+                      : "bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 shadow-indigo-500/30 text-white"
                   }`}
                 >
                   {isSubmitting ? (
