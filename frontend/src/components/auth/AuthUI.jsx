@@ -176,6 +176,16 @@ export const ErrorMessage = ({ message }) => {
   );
 };
 
+export const NoticeMessage = ({ message }) => {
+  if (!message) return null;
+  return (
+    <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3 flex items-start animate-in fade-in slide-in-from-top-1 duration-300">
+      <CheckCircle2 className="h-5 w-5 text-emerald-400 mt-0.5 mr-3 flex-shrink-0" />
+      <p className="text-sm text-emerald-300">{message}</p>
+    </div>
+  );
+};
+
 // Regex CHỈ dùng để hiện gợi ý trực quan trên UI — quyết định thật về việc
 // có cộng điểm uy tín cho email trường hay không PHẢI do Backend tự kiểm
 // tra dựa trên email đã xác minh, Frontend không tự quyết/không gửi cờ này.
