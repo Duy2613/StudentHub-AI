@@ -34,7 +34,7 @@ export function translateAuthError(error) {
     return "Mật khẩu phải có độ dài tối thiểu 6 ký tự.";
   }
   if (lower.includes("error sending confirmation email") || lower.includes("rate limit") || lower.includes("over_email_send_rate_limit") || lower.includes("confirmation email")) {
-    return "Dịch vụ gửi email xác thực đang quá tải hoặc gặp sự cố. Bạn có thể sử dụng Đăng nhập bằng Google/GitHub hoặc Đăng nhập nhanh để tiếp tục.";
+    return "Dịch vụ gửi email xác thực đang quá tải hoặc gặp sự cố. Bạn có thể sử dụng Đăng nhập bằng Google hoặc Đăng nhập nhanh để tiếp tục.";
   }
   if (lower.includes("token has expired") || lower.includes("otp expired")) {
     return "Mã OTP 6 số đã hết hạn. Vui lòng nhấn 'Gửi lại mã'.";
@@ -329,17 +329,6 @@ export function signInWithGoogle() {
   return supabase.auth.signInWithOAuth({
     provider: "google",
     options: { redirectTo: `${origin}/callback` },
-  });
-}
-
-export function signInWithGitHub() {
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
-  return supabase.auth.signInWithOAuth({
-    provider: "github",
-    options: {
-      redirectTo: `${origin}/callback`,
-      scopes: "read:user user:email",
-    },
   });
 }
 

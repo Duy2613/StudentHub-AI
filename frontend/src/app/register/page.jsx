@@ -19,14 +19,12 @@ import {
   ErrorMessage,
   NoticeMessage,
   StudentBenefitBanner,
-  GitHubButton,
 } from "@/components/auth/AuthUI";
 import {
   signUpWithEmail,
   verifySignupOtp,
   resendSignupOtp,
   signInWithGoogle,
-  signInWithGitHub,
   translateAuthError,
 } from "@/lib/auth/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -109,19 +107,6 @@ const RegisterPage = () => {
       setError(translateAuthError(err));
     } finally {
       setIsResending(false);
-    }
-  };
-
-  // Đăng ký nhanh qua GitHub OAuth
-  const handleGitHubSignUp = async () => {
-    if (isGoogleLoading || isLoading) return;
-    setError(null);
-    setIsGoogleLoading(true);
-    try {
-      await signInWithGitHub();
-    } catch (err) {
-      setError(translateAuthError(err));
-      setIsGoogleLoading(false);
     }
   };
 
@@ -221,8 +206,7 @@ const RegisterPage = () => {
                 <span className="px-4 bg-transparent backdrop-blur-xl text-gray-500 font-medium">Hoặc</span>
               </div>
             </div>
-            <div className="mt-6 space-y-3">
-              <GitHubButton isLoading={isGoogleLoading} isDisabled={isLoading} onClick={handleGitHubSignUp} />
+            <div className="mt-6">
               <GoogleButton isLoading={isGoogleLoading} isDisabled={isLoading} onClick={handleGoogleSignUp} />
             </div>
           </div>

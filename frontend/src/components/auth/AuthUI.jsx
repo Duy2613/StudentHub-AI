@@ -227,26 +227,6 @@ export const GithubIcon = ({ className = "w-5 h-5" }) => (
   </svg>
 );
 
-export const GitHubButton = ({ isLoading, isDisabled, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={isLoading || isDisabled}
-    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 backdrop-blur-xl text-sm font-semibold text-white shadow-lg shadow-black/40 hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#0F1117] focus:ring-indigo-500 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
-      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-white/10 hover:border-white/15 text-gray-400" : ""
-    }`}
-  >
-    {isLoading ? (
-      <Loader2 className="h-5 w-5 animate-spin text-white" />
-    ) : (
-      <>
-        <GithubIcon className="h-5 w-5 mr-2.5 text-white" />
-        Đăng nhập với GitHub OAuth
-      </>
-    )}
-  </button>
-);
-
 export const ErrorMessage = ({ message }) => {
   if (!message) return null;
   return (
