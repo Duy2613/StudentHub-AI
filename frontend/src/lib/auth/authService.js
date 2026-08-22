@@ -1,154 +1,260 @@
-// lib/auth/authService.js
+// frontend/src/lib/auth/authService.js
 //
-// Kết nối trực tiếp với Backend ASP.NET Core API của StudentHub & Supabase Auth:
-// - POST /api/auth/register: Đăng ký tài khoản (hashing bằng PasswordHasher, lưu DB)
-// - POST /api/auth/login: Đăng nhập (trả về JWT Token 24h & thông tin User)
-// - POST /api/auth/sync: Đồng bộ tài khoản sau khi đăng nhập OAuth / Email
-// - GET /api/auth/me: Lấy thông tin user hiện tại qua JWT Bearer Token
-// - GET /api/users: Lấy danh sách cộng đồng sinh viên & chuyên gia
-// - Tích hợp Supabase Auth với cơ chế "Remember Me" (Ghi nhớ đăng nhập) linh hoạt
+// Hệ thống dịch vụ xác thực trung tâm (Auth Core Service) kết nối Supabase Auth + ASP.NET Core Backend:
+// - Bọc 100% try/catch toàn diện với chuẩn Diagnostic Logging: [AUTH_ERROR] & [AUTH_INFO]
+// - Interceptor bắt và dịch chính xác toàn bộ mã lỗi Supabase & ASP.NET Core sang tiếng Việt
+// - Cơ chế đồng bộ Bearer Token sang POST /api/auth/sync tuần tự, chống lệch pha (Async Mismatch)
+// - Hỗ trợ "Remember Me" chuyển đổi linh hoạt localStorage / sessionStorage / in-memory
 
 import { supabase } from "@/lib/supabase/client";
 
 const API_BASE = typeof window !== "undefined"
-  ? "" // Gọi qua Next.js Route Proxy cùng domain để tránh CORS Preflight 405
+  ? "" // Sử dụng Next.js Route Proxy cùng origin để triệt tiêu lỗi CORS Preflight
   : (process.env.NEXT_PUBLIC_API_URL || "https://studenthub-api-8fqp.onrender.com");
 
-// ---------------- Helper Dịch Lỗi Tiếng Việt ----------------
+// =========================================================================
+// 1. CHUẨN HÓA LOGGING & INTERCEPTOR DỊCH MÃ LỖI (DIAGNOSTIC LOGGING)
+// =========================================================================
 
-export function translateAuthError(error) {
-  if (!error) return "Đã xảy ra lỗi, vui lòng thử lại.";
-  const msg = typeof error === "string" ? error : error.message || error.error_description || "";
-  const lower = msg.toLowerCase();
-
-  if (lower.includes("đã được đăng ký thông qua tài khoản google") || lower.includes("tiếp tục với google")) {
-    return msg;
-  }
-  if (lower.includes("email already exists") || lower.includes("already registered") || lower.includes("user already registered") || lower.includes("đã tồn tại")) {
-    return "Email này đã được sử dụng. Vui lòng chuyển sang Đăng nhập hoặc sử dụng 'Continue with Google'.";
-  }
-  if (lower.includes("invalid email or password") || lower.includes("invalid login credentials") || lower.includes("invalid_credentials") || lower.includes("không chính xác")) {
-    return "Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.";
-  }
-  if (lower.includes("password should be at least 6") || lower.includes("weak_password") || lower.includes("tối thiểu 6")) {
-    return "Mật khẩu phải có độ dài tối thiểu 6 ký tự.";
-  }
-  if (lower.includes("error sending confirmation email") || lower.includes("rate limit") || lower.includes("over_email_send_rate_limit") || lower.includes("confirmation email")) {
-    return "Dịch vụ gửi email xác thực đang quá tải hoặc gặp sự cố. Bạn có thể sử dụng Đăng nhập bằng Google hoặc Đăng nhập nhanh để tiếp tục.";
-  }
-  if (lower.includes("token has expired") || lower.includes("otp expired")) {
-    return "Mã OTP 6 số đã hết hạn. Vui lòng nhấn 'Gửi lại mã'.";
-  }
-  if (lower.includes("invalid token") || lower.includes("token is invalid") || lower.includes("otp invalid")) {
-    return "Mã xác nhận OTP 6 số không chính xác. Vui lòng kiểm tra lại trong hộp thư của bạn.";
-  }
-  if (lower.includes("network") || lower.includes("failed to fetch") || lower.includes("cold start")) {
-    return "Đang kết nối tới máy chủ Backend (Render Cold Start). Vui lòng thử lại sau giây lát...";
-  }
-
-  return msg || "Đã xảy ra lỗi trong quá trình xác thực. Vui lòng thử lại.";
+export function logAuthError(functionName, error, extraContext = null) {
+  const detail = error?.message || error?.error_description || (typeof error === "string" ? error : JSON.stringify(error));
+  console.error(`[AUTH_ERROR] - [${functionName}] - Chi tiết:`, detail, extraContext ? { extraContext } : "");
 }
 
-// ---------------- Token & Remember Me Helper ----------------
+export function logAuthInfo(functionName, message, data = null) {
+  console.log(`[AUTH_INFO] - [${functionName}] - ${message}`, data ? data : "");
+}
+
+/**
+ * Interceptor dịch mã lỗi Supabase & ASP.NET Core API sang tiếng Việt chuẩn xác
+ */
+export function translateAuthError(error) {
+  if (!error) return "Đã xảy ra lỗi, vui lòng thử lại.";
+  
+  const rawMsg = typeof error === "string" 
+    ? error 
+    : error?.message || error?.error_description || error?.code || "";
+    
+  const lower = rawMsg.toLowerCase();
+
+  // Đã đăng ký qua Google OAuth trước đó
+  if (lower.includes("đã được đăng ký thông qua tài khoản google") || lower.includes("tiếp tục với google")) {
+    return rawMsg;
+  }
+
+  // Lỗi trùng lặp email / tài khoản
+  if (
+    lower.includes("email already exists") ||
+    lower.includes("user already registered") ||
+    lower.includes("already registered") ||
+    lower.includes("user_already_exists") ||
+    lower.includes("identity_already_exists") ||
+    lower.includes("đã tồn tại")
+  ) {
+    return "Email này đã được sử dụng. Vui lòng chuyển sang Đăng nhập hoặc sử dụng 'Continue with Google'.";
+  }
+
+  // Lỗi sai thông tin đăng nhập
+  if (
+    lower.includes("invalid email or password") ||
+    lower.includes("invalid login credentials") ||
+    lower.includes("invalid_credentials") ||
+    lower.includes("wrong password") ||
+    lower.includes("không chính xác")
+  ) {
+    return "Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.";
+  }
+
+  // Lỗi mật khẩu yếu
+  if (
+    lower.includes("password should be at least") ||
+    lower.includes("weak_password") ||
+    lower.includes("tối thiểu 6") ||
+    lower.includes("password is too short")
+  ) {
+    return "Mật khẩu phải có độ dài tối thiểu 6 ký tự.";
+  }
+
+  // Lỗi Email chưa được xác thực
+  if (lower.includes("email not confirmed") || lower.includes("email_not_confirmed")) {
+    return "Email của bạn chưa được xác thực qua mã OTP. Vui lòng hoàn tất bước nhập mã OTP.";
+  }
+
+  // Lỗi gửi email / giới hạn tần suất gửi (Rate Limit)
+  if (
+    lower.includes("error sending confirmation email") ||
+    lower.includes("rate limit") ||
+    lower.includes("over_email_send_rate_limit") ||
+    lower.includes("over_request_rate_limit") ||
+    lower.includes("too many requests")
+  ) {
+    return "Hệ thống đang quá tải yêu cầu gửi mã. Vui lòng thử lại sau 60 giây hoặc sử dụng Đăng nhập Google.";
+  }
+
+  // Lỗi OTP hết hạn hoặc không đúng
+  if (lower.includes("token has expired") || lower.includes("otp expired") || lower.includes("otp_expired")) {
+    return "Mã OTP 6 số đã hết hạn. Vui lòng nhấn 'Gửi lại mã OTP'.";
+  }
+  if (
+    lower.includes("invalid token") ||
+    lower.includes("token is invalid") ||
+    lower.includes("otp invalid") ||
+    lower.includes("token has been revoked")
+  ) {
+    return "Mã xác thực OTP 6 số không chính xác. Vui lòng kiểm tra lại trong hộp thư của bạn.";
+  }
+
+  // Lỗi kết nối máy chủ
+  if (
+    lower.includes("network") ||
+    lower.includes("failed to fetch") ||
+    lower.includes("connection refused") ||
+    lower.includes("cold start") ||
+    lower.includes("timeout")
+  ) {
+    return "Đang kết nối tới máy chủ Backend (Render Cold Start). Vui lòng thử lại sau vài giây...";
+  }
+
+  return rawMsg || "Đã xảy ra lỗi trong quá trình xác thực. Vui lòng thử lại.";
+}
+
+// =========================================================================
+// 2. TOKEN & PREFERENCE STORAGE HELPERS (AN TOÀN CHỐNG CRASH)
+// =========================================================================
 
 export function setRememberMePreference(rememberMe) {
   if (typeof window === "undefined") return;
-  if (rememberMe) {
-    localStorage.setItem("studenthub_remember_me", "true");
-  } else {
-    localStorage.removeItem("studenthub_remember_me");
+  try {
+    if (rememberMe) {
+      localStorage.setItem("studenthub_remember_me", "true");
+    } else {
+      localStorage.removeItem("studenthub_remember_me");
+    }
+  } catch (err) {
+    logAuthError("setRememberMePreference", err);
   }
 }
 
 export function getStoredToken() {
   if (typeof window === "undefined") return null;
-  const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
-  if (isRemembered) {
-    return localStorage.getItem("studenthub_jwt_token") || sessionStorage.getItem("studenthub_jwt_token");
+  try {
+    const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
+    if (isRemembered) {
+      return localStorage.getItem("studenthub_jwt_token") || sessionStorage.getItem("studenthub_jwt_token");
+    }
+    return sessionStorage.getItem("studenthub_jwt_token");
+  } catch (err) {
+    logAuthError("getStoredToken", err);
+    return null;
   }
-  return sessionStorage.getItem("studenthub_jwt_token");
 }
 
 export function setStoredToken(token, rememberMe = false) {
   if (typeof window === "undefined") return;
-  if (token) {
-    if (rememberMe) {
-      localStorage.setItem("studenthub_jwt_token", token);
-      sessionStorage.setItem("studenthub_jwt_token", token);
-      localStorage.setItem("studenthub_remember_me", "true");
+  try {
+    if (token) {
+      if (rememberMe) {
+        localStorage.setItem("studenthub_jwt_token", token);
+        sessionStorage.setItem("studenthub_jwt_token", token);
+        localStorage.setItem("studenthub_remember_me", "true");
+      } else {
+        sessionStorage.setItem("studenthub_jwt_token", token);
+        localStorage.removeItem("studenthub_jwt_token");
+        localStorage.removeItem("studenthub_remember_me");
+      }
     } else {
-      sessionStorage.setItem("studenthub_jwt_token", token);
+      sessionStorage.removeItem("studenthub_jwt_token");
       localStorage.removeItem("studenthub_jwt_token");
       localStorage.removeItem("studenthub_remember_me");
     }
-  } else {
-    sessionStorage.removeItem("studenthub_jwt_token");
-    localStorage.removeItem("studenthub_jwt_token");
-    localStorage.removeItem("studenthub_remember_me");
+  } catch (err) {
+    logAuthError("setStoredToken", err);
   }
 }
 
-// ---------------- Backend ASP.NET Core API Auth ----------------
+// =========================================================================
+// 3. ASP.NET CORE BACKEND API AUTH & SYNC
+// =========================================================================
 
 /**
- * Đăng ký tài khoản trực tiếp qua Backend ASP.NET Core: POST /api/auth/register
- */
-export async function registerBackend(email, password, fullName) {
-  const cleanEmail = email.trim();
-
-  const res = await fetch(`${API_BASE}/api/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: cleanEmail,
-      password: password,
-      fullName: fullName,
-    }),
-  });
-
-  const data = await res.json().catch(() => null);
-
-  if (!res.ok) {
-    throw new Error(data?.message || "Đăng ký thất bại.");
-  }
-
-  // Tự động đăng nhập ngay sau khi đăng ký thành công để lấy JWT Token
-  return await loginBackend(cleanEmail, password, false);
-}
-
-/**
- * Đăng nhập qua Backend ASP.NET Core: POST /api/auth/login
+ * Đăng nhập Backend ASP.NET Core: POST /api/auth/login
  */
 export async function loginBackend(email, password, rememberMe = false) {
-  const cleanEmail = email.trim();
+  const cleanEmail = (email || "").trim();
+  logAuthInfo("loginBackend", `Đang đăng nhập ASP.NET Core cho: ${cleanEmail}`);
 
-  const res = await fetch(`${API_BASE}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: cleanEmail,
-      password: password,
-    }),
-  });
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: cleanEmail,
+        password: password,
+      }),
+    });
 
-  const data = await res.json().catch(() => null);
+    const data = await res.json().catch(() => null);
 
-  if (!res.ok) {
-    throw new Error(data?.message || "Đăng nhập thất bại.");
+    if (!res.ok) {
+      const err = new Error(data?.message || `Đăng nhập Backend thất bại (HTTP ${res.status})`);
+      logAuthError("loginBackend", err);
+      throw err;
+    }
+
+    if (data?.token) {
+      setStoredToken(data.token, rememberMe);
+      logAuthInfo("loginBackend", "Đã lưu JWT Token thành công.");
+    }
+
+    return data;
+  } catch (error) {
+    logAuthError("loginBackend", error);
+    throw error;
   }
-
-  if (data?.token) {
-    setStoredToken(data.token, rememberMe);
-  }
-
-  return data;
 }
 
 /**
- * Đồng bộ người dùng với ASP.NET Core Backend sau khi đăng nhập: POST /api/auth/sync
+ * Đăng ký Backend ASP.NET Core: POST /api/auth/register
  */
-export async function syncBackendUser(userData = {}, token = null) {
-  const activeToken = token || getStoredToken();
+export async function registerBackend(email, password, fullName) {
+  const cleanEmail = (email || "").trim();
+  logAuthInfo("registerBackend", `Đang đăng ký ASP.NET Core cho: ${cleanEmail}`);
+
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: cleanEmail,
+        password: password,
+        fullName: fullName,
+      }),
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      const err = new Error(data?.message || `Đăng ký Backend thất bại (HTTP ${res.status})`);
+      logAuthError("registerBackend", err);
+      throw err;
+    }
+
+    logAuthInfo("registerBackend", "Tạo tài khoản ASP.NET Core thành công.");
+    return data;
+  } catch (error) {
+    logAuthError("registerBackend", error);
+    throw error;
+  }
+}
+
+/**
+ * Đồng bộ người dùng với ASP.NET Core Backend: POST /api/auth/sync
+ * BẮT BUỘC gửi Bearer Token để Backend phân giải và nhận diện
+ */
+export async function syncBackendUser(userData = {}, explicitToken = null) {
+  const activeToken = explicitToken || getStoredToken();
+  logAuthInfo("syncBackendUser", `Đang gọi POST /api/auth/sync cho: ${userData?.email || userData?.id}`);
+
   try {
     const res = await fetch(`${API_BASE}/api/auth/sync`, {
       method: "POST",
@@ -157,25 +263,32 @@ export async function syncBackendUser(userData = {}, token = null) {
         ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
       },
       body: JSON.stringify({
-        id: userData.id,
-        email: userData.email,
-        fullName: userData.fullName || userData.full_name || userData.name,
-        role: userData.role || "student",
-        avatarUrl: userData.avatarUrl || userData.avatar_url,
-        githubUsername: userData.githubUsername || userData.github_username,
-        reputationScore: userData.reputationScore || userData.reputation_score || 50,
+        id: userData.id || userData.Id,
+        email: userData.email || userData.Email,
+        fullName: userData.fullName || userData.full_name || userData.name || userData.FullName,
+        role: userData.role || userData.Role || "student",
+        avatarUrl: userData.avatarUrl || userData.avatar_url || userData.AvatarUrl,
+        githubUsername: userData.githubUsername || userData.github_username || userData.GithubUsername,
+        reputationScore: userData.reputationScore || userData.reputation_score || userData.ReputationScore || 50,
       }),
     });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (err) {
-    console.warn("[Backend Sync Warning]:", err);
+
+    if (!res.ok) {
+      logAuthError("syncBackendUser", new Error(`Sync HTTP ${res.status}: ${res.statusText}`));
+      return null;
+    }
+
+    const data = await res.json().catch(() => null);
+    logAuthInfo("syncBackendUser", "Đồng bộ ASP.NET Core thành công.");
+    return data;
+  } catch (error) {
+    logAuthError("syncBackendUser", error);
     return null;
   }
 }
 
 /**
- * Lấy thông tin user hiện tại: GET /api/auth/me
+ * Lấy thông tin user hiện tại qua JWT Bearer: GET /api/auth/me
  */
 export async function getMeBackend() {
   const token = getStoredToken();
@@ -197,190 +310,285 @@ export async function getMeBackend() {
       return null;
     }
 
-    const data = await res.json();
+    const data = await res.json().catch(() => null);
     return data?.user || data;
-  } catch {
+  } catch (error) {
+    logAuthError("getMeBackend", error);
     return null;
   }
 }
 
-/**
- * Lấy danh sách cộng đồng người dùng: GET /api/users
- */
-export async function getUsersBackend() {
-  try {
-    const res = await fetch(`${API_BASE}/api/users`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-    if (!res.ok) return [];
-    return await res.json();
-  } catch {
-    return [];
-  }
-}
-
-// ---------------- Supabase OTP & Authentication ----------------
+// =========================================================================
+// 4. SUPABASE AUTH INTEGRATION (EMAIL, OTP, GOOGLE, GITHUB)
+// =========================================================================
 
 /**
- * Bước 1 của đăng ký: tạo tài khoản, gửi email mã OTP 6 số xác nhận.
+ * Đăng ký tài khoản: Gửi thông tin và nhận mã OTP 6 số qua email
  */
 export async function signUpWithEmail(email, password, fullName) {
-  const cleanEmail = email.trim();
+  const cleanEmail = (email || "").trim();
   const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(cleanEmail);
+  logAuthInfo("signUpWithEmail", `Bắt đầu đăng ký cho email: ${cleanEmail}`);
 
-  const { data, error } = await supabase.auth.signUp({
-    email: cleanEmail,
-    password,
-    options: {
-      data: {
-        full_name: fullName,
-        role: "student",
-        avatar_id: "student-tech",
-        trust_score: isEdu ? 80 : 50,
-        verified_student: isEdu,
-        onboarded: false,
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email: cleanEmail,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          role: "student",
+          avatar_id: "student-tech",
+          trust_score: isEdu ? 80 : 50,
+          verified_student: isEdu,
+          onboarded: false,
+        },
       },
-    },
-  });
+    });
 
-  if (error) throw new Error(translateAuthError(error));
-
-  if (data?.user) {
-    const identities = data.user.identities || [];
-    const isGoogleAccount = identities.length === 0 || identities.every((i) => i.provider === "google");
-
-    if (isGoogleAccount) {
-      throw new Error(
-        "Email này đã được đăng ký thông qua tài khoản Google từ trước. Bạn không thể đăng ký bằng Mật khẩu cho email này. Vui lòng sử dụng 'Continue with Google' để đăng nhập."
-      );
+    if (error) {
+      logAuthError("signUpWithEmail", error);
+      throw new Error(translateAuthError(error));
     }
+
+    if (data?.user) {
+      const identities = data.user.identities || [];
+      const isGoogleAccount = identities.length > 0 && identities.every((i) => i.provider === "google");
+
+      if (isGoogleAccount) {
+        const err = new Error(
+          "Email này đã được đăng ký thông qua tài khoản Google từ trước. Vui lòng sử dụng 'Continue with Google' để đăng nhập."
+        );
+        logAuthError("signUpWithEmail", err);
+        throw err;
+      }
+    }
+
+    // Tự động đồng bộ trước sang Backend ASP.NET Core DB
+    registerBackend(cleanEmail, password, fullName).catch(() => {});
+
+    logAuthInfo("signUpWithEmail", "Đã gửi mã OTP 6 số thành công.");
+    return data;
+  } catch (error) {
+    logAuthError("signUpWithEmail", error);
+    throw error;
   }
-
-  // Tự động đồng bộ tài khoản vào Backend ASP.NET Core DB
-  registerBackend(cleanEmail, password, fullName).catch(() => {});
-
-  return data;
 }
 
 /**
- * Bước 2 của đăng ký: xác thực mã OTP 6 số nhận qua email.
+ * Xác thực mã OTP 6 số
  */
 export async function verifySignupOtp(email, token) {
   const cleanToken = (token || "").trim();
+  const cleanEmail = (email || "").trim();
+
   if (cleanToken.length !== 6 || !/^\d+$/.test(cleanToken)) {
-    throw new Error("Mã xác nhận phải gồm đúng 6 chữ số.");
+    const err = new Error("Mã xác nhận phải gồm đúng 6 chữ số.");
+    logAuthError("verifySignupOtp", err);
+    throw err;
   }
 
-  const { data, error } = await supabase.auth.verifyOtp({
-    email: email.trim(),
-    token: cleanToken,
-    type: "email",
-  });
+  logAuthInfo("verifySignupOtp", `Đang xác thực OTP cho: ${cleanEmail}`);
 
-  if (error) throw new Error(translateAuthError(error));
-  return data;
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email: cleanEmail,
+      token: cleanToken,
+      type: "email",
+    });
+
+    if (error) {
+      logAuthError("verifySignupOtp", error);
+      throw new Error(translateAuthError(error));
+    }
+
+    if (data?.session?.access_token) {
+      setStoredToken(data.session.access_token, true);
+      await syncBackendUser(data.user, data.session.access_token);
+    }
+
+    logAuthInfo("verifySignupOtp", "Xác thực OTP thành công.");
+    return data;
+  } catch (error) {
+    logAuthError("verifySignupOtp", error);
+    throw error;
+  }
 }
 
 /**
- * Gửi lại mã xác nhận OTP 6 số về email.
+ * Gửi lại mã OTP 6 số
  */
 export async function resendSignupOtp(email) {
-  const { data, error } = await supabase.auth.resend({
-    type: "signup",
-    email: email.trim(),
-  });
-  if (error) throw new Error(translateAuthError(error));
-  return data;
-}
+  const cleanEmail = (email || "").trim();
+  logAuthInfo("resendSignupOtp", `Gửi lại mã OTP cho: ${cleanEmail}`);
 
-export async function signInWithPassword(email, password, rememberMe = false) {
-  const cleanEmail = email.trim();
-  setRememberMePreference(rememberMe);
-
-  // Ưu tiên đăng nhập qua Backend ASP.NET Core API
   try {
-    const backendResult = await loginBackend(cleanEmail, password, rememberMe);
-    if (backendResult?.user) {
-      return { user: backendResult.user, token: backendResult.token };
+    const { data, error } = await supabase.auth.resend({
+      type: "signup",
+      email: cleanEmail,
+    });
+
+    if (error) {
+      logAuthError("resendSignupOtp", error);
+      throw new Error(translateAuthError(error));
     }
-  } catch (backendErr) {
-    if (backendErr.message?.includes("Invalid") || backendErr.message?.includes("không chính xác")) {
-      throw new Error("Email hoặc mật khẩu không chính xác.");
+
+    logAuthInfo("resendSignupOtp", "Đã gửi lại mã OTP thành công.");
+    return data;
+  } catch (error) {
+    logAuthError("resendSignupOtp", error);
+    throw error;
+  }
+}
+
+/**
+ * Đăng nhập bằng Email & Mật khẩu
+ */
+export async function signInWithPassword(email, password, rememberMe = false) {
+  const cleanEmail = (email || "").trim();
+  setRememberMePreference(rememberMe);
+  logAuthInfo("signInWithPassword", `Bắt đầu đăng nhập: ${cleanEmail} (Remember: ${rememberMe})`);
+
+  try {
+    // 1. Thử đăng nhập qua Backend ASP.NET Core
+    try {
+      const backendResult = await loginBackend(cleanEmail, password, rememberMe);
+      if (backendResult?.user && backendResult?.token) {
+        logAuthInfo("signInWithPassword", "Đăng nhập ASP.NET Core thành công.");
+        return { user: backendResult.user, token: backendResult.token };
+      }
+    } catch (backendErr) {
+      logAuthInfo("signInWithPassword", "Chuyển sang đăng nhập Supabase Auth.");
     }
+
+    // 2. Đăng nhập qua Supabase Auth
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: cleanEmail,
+      password,
+    });
+
+    if (error) {
+      logAuthError("signInWithPassword", error);
+      throw new Error(translateAuthError(error));
+    }
+
+    if (data?.session?.access_token) {
+      setStoredToken(data.session.access_token, rememberMe);
+      // Gọi đồng bộ sang ASP.NET Core Backend
+      await syncBackendUser(data.user, data.session.access_token);
+    }
+
+    logAuthInfo("signInWithPassword", "Đăng nhập Supabase thành công.");
+    return data;
+  } catch (error) {
+    logAuthError("signInWithPassword", error);
+    throw error;
   }
+}
 
-  // Fallback qua Supabase
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: cleanEmail,
-    password,
-  });
-  if (error) throw new Error(translateAuthError(error));
+/**
+ * Đăng nhập OAuth Google
+ */
+export async function signInWithGoogle() {
+  logAuthInfo("signInWithGoogle", "Khởi tạo luồng Google OAuth.");
+  try {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${origin}/callback` },
+    });
 
-  if (data?.session?.access_token) {
-    setStoredToken(data.session.access_token, rememberMe);
+    if (error) {
+      logAuthError("signInWithGoogle", error);
+      throw new Error(translateAuthError(error));
+    }
+
+    return data;
+  } catch (error) {
+    logAuthError("signInWithGoogle", error);
+    throw error;
   }
-
-  return data;
 }
 
-export function signInWithGoogle() {
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
-  return supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: { redirectTo: `${origin}/callback` },
-  });
+/**
+ * Đăng nhập OAuth GitHub
+ */
+export async function signInWithGitHub() {
+  logAuthInfo("signInWithGitHub", "Khởi tạo luồng GitHub OAuth.");
+  try {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: `${origin}/callback`,
+        scopes: "read:user user:email repo",
+      },
+    });
+
+    if (error) {
+      logAuthError("signInWithGitHub", error);
+      throw new Error(translateAuthError(error));
+    }
+
+    return data;
+  } catch (error) {
+    logAuthError("signInWithGitHub", error);
+    throw error;
+  }
 }
 
-export function signInWithGitHub() {
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
-  return supabase.auth.signInWithOAuth({
-    provider: "github",
-    options: {
-      redirectTo: `${origin}/callback`,
-      scopes: "read:user user:email repo",
-    },
-  });
-}
-
-
+/**
+ * Đăng xuất an toàn toàn bộ phiên
+ */
 export async function signOutSupabase() {
-  setStoredToken(null);
-  if (typeof window !== "undefined") {
-    sessionStorage.removeItem("studenthub_user_profile");
-    sessionStorage.removeItem("studenthub_demo_user");
-    localStorage.removeItem("studenthub_user_profile");
-    localStorage.removeItem("studenthub_demo_user");
-    localStorage.removeItem("studenthub_remember_me");
+  logAuthInfo("signOutSupabase", "Bắt đầu đăng xuất và xóa phiên.");
+  try {
+    setStoredToken(null);
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("studenthub_user_profile");
+      sessionStorage.removeItem("studenthub_demo_user");
+      sessionStorage.removeItem("studenthub_jwt_token");
+      localStorage.removeItem("studenthub_user_profile");
+      localStorage.removeItem("studenthub_demo_user");
+      localStorage.removeItem("studenthub_jwt_token");
+      localStorage.removeItem("studenthub_remember_me");
+    }
+
+    const { error } = await supabase.auth.signOut().catch(() => ({ error: null }));
+    if (error) {
+      logAuthError("signOutSupabase", error);
+    }
+    logAuthInfo("signOutSupabase", "Đã xóa toàn bộ token và phiên làm việc.");
+  } catch (error) {
+    logAuthError("signOutSupabase", error);
   }
-  const { error } = await supabase.auth.signOut().catch(() => ({}));
-  if (error) throw new Error(translateAuthError(error));
 }
 
+/**
+ * Cập nhật hồ sơ người dùng
+ */
 export async function updateUserProfile(profileData) {
-  if (typeof window !== "undefined") {
-    const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
-    const storage = isRemembered ? localStorage : sessionStorage;
-    const cached = storage.getItem("studenthub_user_profile");
-    const current = cached ? JSON.parse(cached) : {};
-    const updated = { ...current, ...profileData };
-    storage.setItem("studenthub_user_profile", JSON.stringify(updated));
+  logAuthInfo("updateUserProfile", "Cập nhật thông tin hồ sơ:", profileData);
+  try {
+    if (typeof window !== "undefined") {
+      const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
+      const storage = isRemembered ? localStorage : sessionStorage;
+      const cached = storage.getItem("studenthub_user_profile");
+      const current = cached ? JSON.parse(cached) : {};
+      const updated = { ...current, ...profileData };
+      storage.setItem("studenthub_user_profile", JSON.stringify(updated));
+    }
+
+    const { data } = await supabase.auth.updateUser({
+      data: profileData,
+    }).catch(() => ({ data: { user: null } }));
+
+    // Đồng bộ sang ASP.NET Core Backend
+    await syncBackendUser(profileData);
+
+    return data?.user || profileData;
+  } catch (error) {
+    logAuthError("updateUserProfile", error);
+    return profileData;
   }
-
-  const { data } = await supabase.auth.updateUser({
-    data: profileData,
-  }).catch(() => ({ data: { user: null } }));
-
-  // Đồng bộ sang ASP.NET Core Backend
-  syncBackendUser(profileData).catch(() => {});
-
-  return data?.user || profileData;
-}
-
-export async function syncProfile(fullName) {
-  return await syncBackendUser({ fullName });
-}
-
-export async function getMe() {
-  return await getMeBackend();
 }
