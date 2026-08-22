@@ -46,12 +46,17 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all"); // all, questions, experts, resources
 
-  // Redirect if not logged in
+  // Redirect if not logged in or not onboarded
   useEffect(() => {
-    if (!isLoading && !session) {
-      router.replace("/login");
+    if (!isLoading) {
+      if (!session) {
+        router.replace("/login");
+      } else if (profile && !profile.onboarded) {
+        router.replace("/onboarding");
+      }
     }
-  }, [session, isLoading, router]);
+  }, [session, profile, isLoading, router]);
+
 
   if (isLoading || !profile) {
     return (

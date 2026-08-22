@@ -16,6 +16,7 @@ import {
   PasswordInput,
   Button,
   GoogleButton,
+  GithubButton,
   ErrorMessage,
   NoticeMessage,
   StudentBenefitBanner,
@@ -25,6 +26,7 @@ import {
   verifySignupOtp,
   resendSignupOtp,
   signInWithGoogle,
+  signInWithGitHub,
   translateAuthError,
 } from "@/lib/auth/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -45,7 +47,7 @@ const RegisterPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isOAuthLoading, setIsOAuthLoading] = useState(false);
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState(null);
 
@@ -112,16 +114,30 @@ const RegisterPage = () => {
 
   // Đăng ký nhanh qua Google OAuth
   const handleGoogleSignUp = async () => {
-    if (isGoogleLoading || isLoading) return;
+    if (isOAuthLoading || isLoading) return;
     setError(null);
-    setIsGoogleLoading(true);
+    setIsOAuthLoading(true);
     try {
       await signInWithGoogle();
     } catch (err) {
       setError(translateAuthError(err));
-      setIsGoogleLoading(false);
+      setIsOAuthLoading(false);
     }
   };
+
+  // Đăng ký nhanh qua GitHub OAuth
+  const handleGitHubSignUp = async () => {
+    if (isOAuthLoading || isLoading) return;
+    setError(null);
+    setIsOAuthLoading(true);
+    try {
+      await signInWithGitHub();
+    } catch (err) {
+      setError(translateAuthError(err));
+      setIsOAuthLoading(false);
+    }
+  };
+
 
   return (
     <AuthCard>
@@ -162,7 +178,7 @@ const RegisterPage = () => {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              disabled={isLoading || isGoogleLoading}
+              disabled={isLoading || isOAuthLoading}
             />
             <InputField
               id="email"
@@ -175,9 +191,10 @@ const RegisterPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              disabled={isLoading || isGoogleLoading}
+              disabled={isLoading || isOAuthLoading}
             />
             <PasswordInput
+
               id="password"
               name="password"
               label="Mật khẩu"
@@ -187,11 +204,12 @@ const RegisterPage = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              disabled={isLoading || isGoogleLoading}
+              disabled={isLoading || isOAuthLoading}
             />
+
             <ErrorMessage message={error} />
             <div className="pt-2">
-              <Button type="submit" isLoading={isLoading} disabled={isGoogleLoading}>
+              <Button type="submit" isLoading={isLoading} disabled={isOAuthLoading}>
                 Đăng ký & Nhận mã OTP
               </Button>
             </div>
@@ -203,13 +221,15 @@ const RegisterPage = () => {
                 <div className="w-full border-t border-white/10" />
               </div>
               <div className="relative flex justify-center text-xs uppercase tracking-wider">
-                <span className="px-4 bg-transparent backdrop-blur-xl text-gray-500 font-medium">Hoặc</span>
+                <span className="px-4 bg-transparent backdrop-blur-xl text-gray-500 font-medium">Hoặc đăng ký nhanh</span>
               </div>
             </div>
-            <div className="mt-6">
-              <GoogleButton isLoading={isGoogleLoading} isDisabled={isLoading} onClick={handleGoogleSignUp} />
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <GoogleButton isLoading={isOAuthLoading} isDisabled={isLoading} onClick={handleGoogleSignUp} />
+              <GithubButton isLoading={isOAuthLoading} isDisabled={isLoading} onClick={handleGitHubSignUp} />
             </div>
           </div>
+
 
           {/* Demo Mode Options */}
           <div className="mt-6 pt-6 border-t border-white/10 relative z-10 space-y-3">
