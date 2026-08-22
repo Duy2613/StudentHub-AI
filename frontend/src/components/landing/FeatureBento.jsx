@@ -17,6 +17,9 @@ import {
   Share2,
   Workflow
 } from "lucide-react";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { Badge } from "@/components/ui/badge";
+
 
 export default function FeatureBento() {
   const [activeSubject, setActiveSubject] = useState("cs");
@@ -63,6 +66,7 @@ export default function FeatureBento() {
 
           {/* Bento Tile 1: 2-Columns Span (AI Socratic Study Engine) */}
           <div className="md:col-span-2 relative rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-space-900/90 via-space-950/90 to-space-900/60 border border-white/10 hover:border-indigo-500/30 transition-all duration-300 group overflow-hidden shadow-glass-deep">
+            <BorderBeam size={280} duration={12} colorFrom="#6366f1" colorTo="#06b6d4" />
             <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/15 rounded-full blur-[80px] pointer-events-none" />
             
             <div className="flex flex-col h-full justify-between gap-6 relative z-10">
@@ -122,7 +126,9 @@ export default function FeatureBento() {
 
           {/* Bento Tile 2: 1-Column Span (Verified Expert Network) */}
           <div className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-space-900/90 via-space-950/90 to-space-900/60 border border-white/10 hover:border-purple-500/30 transition-all duration-300 group overflow-hidden shadow-glass-deep">
+            <BorderBeam size={200} duration={10} colorFrom="#a855f7" colorTo="#f59e0b" delay={3} />
             <div className="absolute -bottom-20 -right-20 w-48 h-48 bg-purple-500/15 rounded-full blur-[70px] pointer-events-none" />
+
 
             <div className="flex flex-col h-full justify-between gap-6 relative z-10">
               <div>
