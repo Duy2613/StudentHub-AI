@@ -28,7 +28,7 @@ export const AmbientBackground = () => (
   </div>
 );
 
-export const InputField = ({ label, id, type = "text", icon: Icon, helperText, ...props }) => {
+export const InputField = ({ label, id, name, type = "text", icon: Icon, helperText, ...props }) => {
   const [isFocused, setIsFocused] = useState(false);
   return (
     <div className="space-y-2 relative group/input">
@@ -48,6 +48,7 @@ export const InputField = ({ label, id, type = "text", icon: Icon, helperText, .
         )}
         <input
           id={id}
+          name={name || id}
           type={type}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
@@ -67,7 +68,7 @@ export const InputField = ({ label, id, type = "text", icon: Icon, helperText, .
   );
 };
 
-export const PasswordInput = ({ id, label, ...props }) => {
+export const PasswordInput = ({ id, name, label, ...props }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   return (
@@ -86,6 +87,7 @@ export const PasswordInput = ({ id, label, ...props }) => {
         </div>
         <input
           id={id}
+          name={name || id}
           type={showPassword ? "text" : "password"}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}

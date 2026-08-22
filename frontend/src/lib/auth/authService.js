@@ -52,16 +52,21 @@ export function translateAuthError(error) {
 
 export function getStoredToken() {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem("studenthub_jwt_token");
+  // Dọn sạch token cũ trong localStorage nếu có từ trước
+  if (localStorage.getItem("studenthub_jwt_token")) {
+    localStorage.removeItem("studenthub_jwt_token");
+  }
+  return sessionStorage.getItem("studenthub_jwt_token");
 }
 
 export function setStoredToken(token) {
   if (typeof window === "undefined") return;
   if (token) {
-    localStorage.setItem("studenthub_jwt_token", token);
+    sessionStorage.setItem("studenthub_jwt_token", token);
   } else {
-    localStorage.removeItem("studenthub_jwt_token");
+    sessionStorage.removeItem("studenthub_jwt_token");
   }
+  localStorage.removeItem("studenthub_jwt_token");
 }
 
 // ---------------- Backend ASP.NET Core API Auth ----------------
@@ -290,7 +295,10 @@ export function signInWithGitHub() {
 export async function signOutSupabase() {
   setStoredToken(null);
   if (typeof window !== "undefined") {
+    sessionStorage.removeItem("studenthub_user_profile");
+    sessionStorage.removeItem("studenthub_demo_user");
     localStorage.removeItem("studenthub_user_profile");
+    localStorage.removeItem("studenthub_demo_user");
   }
   const { error } = await supabase.auth.signOut().catch(() => ({}));
   if (error) throw new Error(translateAuthError(error));
@@ -298,10 +306,11 @@ export async function signOutSupabase() {
 
 export async function updateUserProfile(profileData) {
   if (typeof window !== "undefined") {
-    const cached = localStorage.getItem("studenthub_user_profile");
+    const cached = sessionStorage.getItem("studenthub_user_profile");
     const current = cached ? JSON.parse(cached) : {};
     const updated = { ...current, ...profileData };
-    localStorage.setItem("studenthub_user_profile", JSON.stringify(updated));
+    sessionStorage.setItem("studenthub_user_profile", JSON.stringify(updated));
+    localStorage.removeItem("studenthub_user_profile");
   }
 
   const { data } = await supabase.auth.updateUser({

@@ -23,5 +23,12 @@ if (!envUrl || !envAnonKey) {
 
 export const supabase = createClient(
   envUrl || "https://placeholder.supabase.co",
-  envAnonKey || "placeholder-anon-key"
+  envAnonKey || "placeholder-anon-key",
+  {
+    auth: {
+      storage: typeof window !== "undefined" ? window.sessionStorage : undefined,
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  }
 );

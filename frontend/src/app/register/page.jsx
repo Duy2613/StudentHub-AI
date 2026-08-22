@@ -168,8 +168,10 @@ const RegisterPage = () => {
           <form className="space-y-5 relative z-10" onSubmit={handleSignUp}>
             <InputField
               id="fullName"
+              name="name"
               label="Họ và tên"
               type="text"
+              autoComplete="name"
               placeholder="Nguyễn Văn A"
               icon={User}
               value={fullName}
@@ -179,8 +181,10 @@ const RegisterPage = () => {
             />
             <InputField
               id="email"
+              name="email"
               label="Email (Khuyên dùng email trường .edu)"
               type="email"
+              autoComplete="email"
               placeholder="you@school.edu"
               icon={Mail}
               value={email}
@@ -190,7 +194,9 @@ const RegisterPage = () => {
             />
             <PasswordInput
               id="password"
+              name="password"
               label="Mật khẩu"
+              autoComplete="new-password"
               placeholder="Tối thiểu 6 ký tự"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
