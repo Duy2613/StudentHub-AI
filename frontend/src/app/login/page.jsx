@@ -5,6 +5,7 @@
 // Đăng nhập StudentHub AI:
 // - Đăng nhập nhanh 1 chạm bằng GitHub OAuth (Khuyên dùng)
 // - Đăng nhập bằng Google OAuth
+// - Hỗ trợ tính năng "Ghi nhớ đăng nhập" (Remember Me): linh hoạt chuyển đổi localStorage / sessionStorage
 // - Trải nghiệm Demo Sinh viên & Chuyên gia uy tín tức thì
 
 import React, { useState, useCallback, useEffect } from "react";
@@ -14,6 +15,7 @@ import {
   AuthCard,
   InputField,
   PasswordInput,
+  CheckboxField,
   Button,
   GitHubButton,
   GoogleButton,
@@ -24,15 +26,17 @@ import {
   signInWithGoogle,
   signInWithGitHub,
   translateAuthError,
+  setRememberMePreference,
 } from "@/lib/auth/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
 
 const LoginPage = () => {
   const router = useRouter();
-  const { session, profile, ensureSynced, loginAsDemo } = useAuth();
+  const { ensureSynced, loginAsDemo } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -59,7 +63,7 @@ const LoginPage = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const { user } = await signInWithPassword(email, password);
+      const { user } = await signInWithPassword(email, password, rememberMe);
       await ensureSynced();
       
       const isOnboarded = user?.user_metadata?.onboarded;
@@ -79,25 +83,27 @@ const LoginPage = () => {
     if (isOAuthLoading || isLoading) return;
     setError(null);
     setIsOAuthLoading(true);
+    setRememberMePreference(rememberMe);
     try {
       await signInWithGitHub();
     } catch (err) {
       setError(translateAuthError(err));
       setIsOAuthLoading(false);
     }
-  }, [isOAuthLoading, isLoading]);
+  }, [isOAuthLoading, isLoading, rememberMe]);
 
   const handleGoogleLogin = useCallback(async () => {
     if (isOAuthLoading || isLoading) return;
     setError(null);
     setIsOAuthLoading(true);
+    setRememberMePreference(rememberMe);
     try {
       await signInWithGoogle();
     } catch (err) {
       setError(translateAuthError(err));
       setIsOAuthLoading(false);
     }
-  }, [isOAuthLoading, isLoading]);
+  }, [isOAuthLoading, isLoading, rememberMe]);
 
   const isAnyLoading = isLoading || isOAuthLoading;
 
@@ -160,6 +166,19 @@ const LoginPage = () => {
           required
           disabled={isAnyLoading}
         />
+
+        {/* Remember Me Checkbox */}
+        <div className="py-0.5">
+          <CheckboxField
+            id="rememberMe"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            label="Ghi nhớ đăng nhập"
+            helperText={rememberMe ? "Lưu lâu dài" : "Xóa khi tắt tab"}
+            disabled={isAnyLoading}
+          />
+        </div>
+
         <ErrorMessage message={error} />
         <div className="pt-2">
           <Button type="submit" isLoading={isLoading} disabled={isOAuthLoading}>
@@ -177,7 +196,7 @@ const LoginPage = () => {
           <button
             type="button"
             onClick={() => {
-              loginAsDemo("student");
+              loginAsDemo("student", rememberMe);
               router.push("/dashboard");
             }}
             className="py-2.5 px-3 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"
@@ -187,7 +206,7 @@ const LoginPage = () => {
           <button
             type="button"
             onClick={() => {
-              loginAsDemo("expert");
+              loginAsDemo("expert", rememberMe);
               router.push("/dashboard");
             }}
             className="py-2.5 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"

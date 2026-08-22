@@ -5,14 +5,16 @@
 // Quản lý xác thực và hồ sơ người dùng kết nối trực tiếp ASP.NET Core Backend + Supabase:
 //  - Tự động đọc JWT Token và lấy hồ sơ từ GET /api/auth/me
 //  - Quản lý phiên đăng nhập, vai trò Sinh viên & Chuyên gia uy tín
+//  - Hỗ trợ cơ chế "Ghi nhớ đăng nhập" (Remember Me) linh hoạt qua dynamic storage
 //  - Hỗ trợ cập nhật avatar, trường học, chuyên môn tức thì
 
-import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import {
   getMeBackend,
   signOutSupabase,
   updateUserProfile,
+  syncBackendUser,
   getStoredToken,
   setStoredToken,
 } from "./authService";
@@ -70,12 +72,13 @@ const DEMO_EXPERT = {
 function formatProfile(user) {
   if (!user) return null;
 
-  // Đọc thêm từ sessionStorage nếu có
   let cached = {};
   if (typeof window !== "undefined") {
     try {
-      localStorage.removeItem("studenthub_user_profile");
-      const s = sessionStorage.getItem("studenthub_user_profile");
+      const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
+      const s = isRemembered
+        ? localStorage.getItem("studenthub_user_profile") || sessionStorage.getItem("studenthub_user_profile")
+        : sessionStorage.getItem("studenthub_user_profile");
       if (s) cached = JSON.parse(s);
     } catch {}
   }
@@ -121,32 +124,30 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isDemoMode, setIsDemoMode] = useState(false);
 
-  // Khởi tạo Auth 1 lần duy nhất khi Mount
+  // Khởi tạo Auth khi Mount
   useEffect(() => {
     let mounted = true;
 
-    // Dọn sạch các khóa cũ trong localStorage nếu có từ trước
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("studenthub_demo_user");
-      localStorage.removeItem("studenthub_user_profile");
-      localStorage.removeItem("studenthub_jwt_token");
-    }
+    if (typeof window === "undefined") return;
 
-    // 1. Kiểm tra demo mode đã lưu trong sessionStorage
-    if (typeof window !== "undefined") {
-      const savedDemo = sessionStorage.getItem("studenthub_demo_user");
-      if (savedDemo) {
-        try {
-          const parsed = JSON.parse(savedDemo);
-          if (mounted) {
-            setSession({ user: parsed });
-            setProfile(parsed);
-            setIsDemoMode(true);
-            setIsLoading(false);
-            return;
-          }
-        } catch {}
-      }
+    const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
+
+    // 1. Kiểm tra demo mode
+    const savedDemo = isRemembered
+      ? localStorage.getItem("studenthub_demo_user") || sessionStorage.getItem("studenthub_demo_user")
+      : sessionStorage.getItem("studenthub_demo_user");
+
+    if (savedDemo) {
+      try {
+        const parsed = JSON.parse(savedDemo);
+        if (mounted) {
+          setSession({ user: parsed });
+          setProfile(parsed);
+          setIsDemoMode(true);
+          setIsLoading(false);
+          return;
+        }
+      } catch {}
     }
 
     // 2. Kiểm tra Backend JWT Token
@@ -175,7 +176,7 @@ export function AuthProvider({ children }) {
       if (mounted) setIsLoading(false);
     });
 
-    // 4. Lắng nghe Supabase OAuth (Google)
+    // 4. Lắng nghe Supabase OAuth (Google / GitHub)
     const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
       if (!mounted) return;
       if (newSession?.user) {
@@ -191,21 +192,31 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const ensureSynced = useCallback(async () => {
+  const ensureSynced = useCallback(async (fullName) => {
+    if (session?.user) {
+      await syncBackendUser(session.user);
+    }
     return { success: true };
-  }, []);
+  }, [session]);
 
   /**
    * Đăng nhập nhanh chế độ Demo
    */
-  const loginAsDemo = useCallback((role = "student") => {
+  const loginAsDemo = useCallback((role = "student", rememberMe = false) => {
     const demoData = role === "expert" ? DEMO_EXPERT : DEMO_STUDENT;
     setSession({ user: demoData });
     setProfile(demoData);
     setIsDemoMode(true);
     if (typeof window !== "undefined") {
-      sessionStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
-      localStorage.removeItem("studenthub_demo_user");
+      if (rememberMe) {
+        localStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
+        sessionStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
+        localStorage.setItem("studenthub_remember_me", "true");
+      } else {
+        sessionStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
+        localStorage.removeItem("studenthub_demo_user");
+        localStorage.removeItem("studenthub_remember_me");
+      }
     }
   }, []);
 
@@ -217,8 +228,14 @@ export function AuthProvider({ children }) {
       const merged = { ...(profile || {}), ...profileUpdates };
       setProfile(merged);
       if (typeof window !== "undefined") {
-        sessionStorage.setItem("studenthub_user_profile", JSON.stringify(merged));
-        localStorage.removeItem("studenthub_user_profile");
+        const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
+        if (isRemembered) {
+          localStorage.setItem("studenthub_user_profile", JSON.stringify(merged));
+          sessionStorage.setItem("studenthub_user_profile", JSON.stringify(merged));
+        } else {
+          sessionStorage.setItem("studenthub_user_profile", JSON.stringify(merged));
+          localStorage.removeItem("studenthub_user_profile");
+        }
       }
       await updateUserProfile(profileUpdates);
       return merged;
@@ -230,8 +247,11 @@ export function AuthProvider({ children }) {
     if (typeof window !== "undefined") {
       sessionStorage.removeItem("studenthub_demo_user");
       sessionStorage.removeItem("studenthub_user_profile");
+      sessionStorage.removeItem("studenthub_jwt_token");
       localStorage.removeItem("studenthub_demo_user");
       localStorage.removeItem("studenthub_user_profile");
+      localStorage.removeItem("studenthub_jwt_token");
+      localStorage.removeItem("studenthub_remember_me");
       setStoredToken(null);
     }
     setIsDemoMode(false);
