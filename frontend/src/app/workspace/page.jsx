@@ -33,8 +33,10 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
+import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
 import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
 import { Spotlight } from "@/components/ui/spotlight";
+
 
 export default function WorkspacePage() {
   const router = useRouter();
@@ -186,8 +188,14 @@ $$\\text{Cosine Similarity}(A, B) = \\frac{A \\cdot B}{\\|A\\| \\|B\\|} = \\frac
           >
             <Download className="w-3.5 h-3.5" /> Xuất Markdown (.md)
           </button>
+
+          <div className="h-4 w-[1px] bg-white/10 mx-1" />
+
+          {/* User Profile Popover */}
+          <UserDropdownMenu />
         </div>
       </header>
+
 
       {/* Editor Body Area */}
       <div className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-8 flex flex-col">
