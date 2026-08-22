@@ -29,13 +29,14 @@ export default function LandingHeader() {
   }, []);
 
   const navLinks = [
+    { label: "AI Mentor", href: "/ai-mentor" },
+    { label: "Workspace", href: "/workspace" },
+    { label: "Whiteboard", href: "/whiteboard" },
     { label: "Tính Năng", href: "#features" },
-    { label: "AI Copilot", href: "#copilot" },
     { label: "Cố Vấn Chuyên Gia", href: "#experts" },
-    { label: "So Sánh", href: "#comparison" },
     { label: "Bảng Giá", href: "#pricing" },
-    { label: "FAQ", href: "#faq" },
   ];
+
 
   return (
     <header 
