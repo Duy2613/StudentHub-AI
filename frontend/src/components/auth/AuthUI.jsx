@@ -113,6 +113,25 @@ export const PasswordInput = ({ id, name, label, ...props }) => {
   );
 };
 
+export const CheckboxField = ({ id, checked, onChange, label, helperText, ...props }) => (
+  <div className="flex items-center justify-between text-xs py-1 select-none">
+    <label htmlFor={id} className="flex items-center gap-2.5 cursor-pointer text-gray-300 hover:text-white transition-colors">
+      <input
+        type="checkbox"
+        id={id}
+        checked={checked}
+        onChange={onChange}
+        className="w-4 h-4 rounded border-white/20 bg-white/5 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 focus:ring-1 cursor-pointer accent-indigo-600 transition-all"
+        {...props}
+      />
+      <span className="font-medium text-gray-300 hover:text-gray-100">{label}</span>
+    </label>
+    {helperText && (
+      <span className="text-gray-500 text-[11px]">{helperText}</span>
+    )}
+  </div>
+);
+
 export const Button = ({ children, isLoading, disabled, ...props }) => (
   <div className="relative group z-20">
     <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 rounded-2xl blur-lg opacity-60 group-hover:opacity-90 group-hover:blur-xl transition-all duration-500 ease-premium"></div>

@@ -1,23 +1,23 @@
 -- ==============================================================================
--- STUDENTHUB AI - SUPABASE PROFILES SCHEMA & TRIGGER DEFINITION
+-- STUDENTHUB AI - SUPABASE PROFILES SCHEMA & IDEMPOTENT MIGRATION SCRIPT
 -- ==============================================================================
--- Bảng profiles lưu trữ thông tin mở rộng của người dùng:
--- - id: UUID khóa chính tham chiếu trực tiếp auth.users
+-- Bảng profiles lưu trữ thông tin hồ sơ mở rộng của người dùng:
+-- - id: UUID khóa chính tham chiếu trực tiếp auth.users(id)
 -- - role: 'standard' (Người dùng tiêu chuẩn) hoặc 'expert' (Chuyên gia uy tín)
--- - avatar_url: Đường dẫn ảnh đại diện
--- - reputation_score: Điểm uy tín được tính toán tự động
+-- - avatar_url: Đường dẫn ảnh đại diện (kéo từ GitHub hoặc tải lên)
+-- - reputation_score: Điểm uy tín được tính toán tự động dựa trên đóng góp
 -- - github_username, top_repos, bio, full_name, onboarded
 -- ==============================================================================
 
--- 1. Tạo hoặc Cập nhật Bảng profiles
+-- 1. Tạo bảng profiles nếu chưa tồn tại
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT,
     full_name TEXT,
-    role TEXT DEFAULT 'standard' CHECK (role IN ('standard', 'expert', 'student')),
+    role TEXT DEFAULT 'standard',
     avatar_id TEXT DEFAULT 'student-tech',
     avatar_url TEXT,
-    reputation_score INTEGER DEFAULT 50 CHECK (reputation_score >= 0 AND reputation_score <= 100),
+    reputation_score INTEGER DEFAULT 50,
     trust_score INTEGER DEFAULT 50,
     github_username TEXT,
     top_repos JSONB DEFAULT '[]'::jsonb,
@@ -35,17 +35,43 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 2. Bật Row Level Security (RLS)
+-- 2. Đảm bảo thêm các cột cần thiết nếu bảng đã tồn tại từ trước (Idempotent DDL)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'role') THEN
+        ALTER TABLE public.profiles ADD COLUMN role TEXT DEFAULT 'standard';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'avatar_url') THEN
+        ALTER TABLE public.profiles ADD COLUMN avatar_url TEXT;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'reputation_score') THEN
+        ALTER TABLE public.profiles ADD COLUMN reputation_score INTEGER DEFAULT 50;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'github_username') THEN
+        ALTER TABLE public.profiles ADD COLUMN github_username TEXT;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'top_repos') THEN
+        ALTER TABLE public.profiles ADD COLUMN top_repos JSONB DEFAULT '[]'::jsonb;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'onboarded') THEN
+        ALTER TABLE public.profiles ADD COLUMN onboarded BOOLEAN DEFAULT FALSE;
+    END IF;
+END $$;
+
+-- 3. Bật Row Level Security (RLS)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- 3. Tạo chính sách RLS an toàn
--- Cho phép mọi người đọc thông tin hồ sơ công khai
+-- 4. Tạo chính sách RLS an toàn và Idempotent
 DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
 CREATE POLICY "Public profiles are viewable by everyone"
 ON public.profiles FOR SELECT
 USING (true);
 
--- Cho phép người dùng chỉnh sửa hồ sơ của chính mình
 DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
 CREATE POLICY "Users can insert their own profile"
 ON public.profiles FOR INSERT
@@ -56,7 +82,7 @@ CREATE POLICY "Users can update their own profile"
 ON public.profiles FOR UPDATE
 USING (auth.uid() = id);
 
--- 4. Trigger tự động tạo profile khi có user mới đăng nhập qua GitHub / OAuth / Email
+-- 5. Trigger tự động tạo profile khi có user mới đăng nhập qua GitHub / OAuth / Email
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 DECLARE
