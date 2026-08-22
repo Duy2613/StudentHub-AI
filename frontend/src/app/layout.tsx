@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth/AuthContext";
+import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -14,21 +15,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "StudentHub AI",
-    description: "StudentHub AI - Helpful Life",
+    title: "StudentHub AI - Hệ Sinh Thái Học Tập & Cố Vấn Học Thuật AI",
+    description: "StudentHub AI - Nền tảng Trí tuệ Nhân tạo & Mạng lưới Cố vấn Học thuật hàng đầu cho sinh viên Việt Nam",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html
-            lang="en"
+            lang="vi"
             className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
         >
-            <body className="min-h-full flex flex-col">
+            <body className="min-h-full flex flex-col bg-space-950 text-gray-100">
                 <AuthProvider>
-                    {children}
+                    <SmoothScrollProvider>
+                        {children}
+                    </SmoothScrollProvider>
                 </AuthProvider>
             </body>
         </html>
     );
-}
+}

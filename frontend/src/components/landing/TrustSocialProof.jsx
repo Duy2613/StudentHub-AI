@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Users, Award, ShieldCheck, Star, Sparkles, School } from "lucide-react";
+import { NumberTicker } from "@/components/ui/number-ticker";
 
 export default function TrustSocialProof() {
   const UNIVERSITIES = [
@@ -16,31 +17,39 @@ export default function TrustSocialProof() {
   const STATS = [
     {
       icon: Users,
-      value: "50,000+",
+      num: 50000,
+      suffix: "+",
       label: "Sinh viên tích cực",
       desc: "Từ hơn 60 trường Đại học & Học viện toàn quốc",
       color: "text-indigo-400",
+      decimalPlaces: 0,
     },
     {
       icon: Award,
-      value: "1,200+",
+      num: 1200,
+      suffix: "+",
       label: "Cố vấn & Chuyên gia",
       desc: "Tiến sĩ, Thạc sĩ, Tech Lead và Giảng viên uy tín",
       color: "text-purple-400",
+      decimalPlaces: 0,
     },
     {
       icon: ShieldCheck,
-      value: "99.4%",
+      num: 99.4,
+      suffix: "%",
       label: "Độ chính xác học thuật",
       desc: "Trích dẫn nguồn chuẩn hoá và đối soát kiến thức",
       color: "text-cyan-400",
+      decimalPlaces: 1,
     },
     {
       icon: Star,
-      value: "4.95 / 5.0",
+      num: 4.95,
+      suffix: " / 5.0",
       label: "Mức độ hài lòng",
       desc: "Hơn 18,000 lượt phản hồi 5 sao từ cộng đồng",
       color: "text-amber-400",
+      decimalPlaces: 2,
     },
   ];
 
@@ -72,7 +81,7 @@ export default function TrustSocialProof() {
           </div>
         </div>
 
-        {/* 4 Core Quantitative Metrics */}
+        {/* 4 Core Quantitative Metrics with Magic UI NumberTicker */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-white/5">
           {STATS.map((stat, idx) => {
             const Icon = stat.icon;
@@ -85,9 +94,10 @@ export default function TrustSocialProof() {
                   <div className={`p-2.5 rounded-xl bg-white/5 border border-white/10 ${stat.color} group-hover:scale-110 transition-transform`}>
                     <Icon className="w-5 h-5" />
                   </div>
-                  <span className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                    {stat.value}
-                  </span>
+                  <div className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-baseline">
+                    <NumberTicker value={stat.num} decimalPlaces={stat.decimalPlaces} />
+                    <span>{stat.suffix}</span>
+                  </div>
                 </div>
                 <div className="text-sm font-bold text-gray-200 mb-1">
                   {stat.label}

@@ -19,6 +19,12 @@ import {
   Zap,
   Play
 } from "lucide-react";
+import { Spotlight } from "@/components/ui/spotlight";
+import { Meteors } from "@/components/ui/meteors";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
+import { Button } from "@/components/ui/button";
+
 
 export default function HeroSection() {
   const [activeTab, setActiveTab] = useState(0);
@@ -111,19 +117,28 @@ def dijkstra(graph, start):
 
   return (
     <section className="relative pt-28 pb-16 md:pt-36 md:pb-24 overflow-hidden">
-      {/* Dynamic Glow Spotlight Background */}
+      {/* Aceternity Spotlight Effect */}
+      <Spotlight
+        className="-top-40 left-0 md:left-60 md:-top-20"
+        fill="rgba(99, 102, 241, 0.4)"
+      />
+      
+      {/* Meteors Effect */}
+      <Meteors number={20} />
+
+      {/* Dynamic Glow Background */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] md:w-[900px] h-[400px] bg-gradient-to-tr from-indigo-600/20 via-purple-600/20 to-cyan-500/10 blur-[130px] rounded-full pointer-events-none -z-10" />
       <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Top Eyebrow Badge */}
+        {/* Top Eyebrow Badge with Magic UI AnimatedGradientText */}
         <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md shadow-neon-primary hover:border-indigo-500/40 transition-colors">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+          <AnimatedGradientText>
+            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse mr-2" />
             <span className="text-xs font-semibold text-gray-200 tracking-wide">
-              THẾ HỆ AI 2026: COPILOT &verified MENTOR NETWORK
+              THẾ HỆ AI 2026: COPILOT & VERIFIED MENTOR NETWORK
             </span>
-          </div>
+          </AnimatedGradientText>
         </div>
 
         {/* Main Headline & Punchy Subtext */}
@@ -169,10 +184,12 @@ def dijkstra(graph, start):
           </div>
         </div>
 
-        {/* Interactive Live AI Copilot Terminal Preview */}
+        {/* Interactive Live AI Copilot Terminal Preview with BorderBeam */}
         <div id="copilot" className="mt-12 max-w-5xl mx-auto">
-          <div className="relative rounded-2xl p-[1px] bg-gradient-to-b from-white/20 via-indigo-500/20 to-transparent shadow-glass-deep">
+          <div className="relative rounded-2xl p-[1px] bg-gradient-to-b from-white/20 via-indigo-500/20 to-transparent shadow-glass-deep overflow-hidden">
+            <BorderBeam size={300} duration={12} colorFrom="#6366f1" colorTo="#a855f7" />
             <div className="bg-space-900/90 backdrop-blur-2xl rounded-[15px] border border-white/10 overflow-hidden">
+
               
               {/* Terminal Window Header */}
               <div className="px-4 py-3 bg-space-950/80 border-b border-white/10 flex flex-wrap items-center justify-between gap-3">

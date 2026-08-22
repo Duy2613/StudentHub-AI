@@ -39,6 +39,12 @@ import {
 import { fetchGitHubExpertData } from "@/lib/github";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { AmbientBackground, NoiseOverlay, GithubIcon } from "@/components/auth/AuthUI";
+import { CardContainer, CardBody, CardItem } from "@/components/ui/3d-card";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Spotlight } from "@/components/ui/spotlight";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -284,81 +290,108 @@ export default function OnboardingPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Thẻ 1: Người dùng tiêu chuẩn */}
-                <div
-                  onClick={() => handleRoleSelect("standard")}
-                  className={`group cursor-pointer relative p-6 sm:p-8 rounded-2xl border transition-all duration-300 ${
-                    role === "standard"
-                      ? "bg-indigo-950/40 border-indigo-500/80 shadow-[0_0_30px_rgba(99,102,241,0.25)] ring-2 ring-indigo-500/50"
-                      : "bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-                      <GraduationCap className="w-8 h-8" />
+                <CardContainer className="w-full" containerClassName="w-full py-0">
+                  <CardBody className="w-full h-auto">
+                    <div
+                      onClick={() => handleRoleSelect("standard")}
+                      className={`group cursor-pointer relative p-6 sm:p-8 rounded-3xl border transition-all duration-300 w-full overflow-hidden ${
+                        role === "standard"
+                          ? "bg-indigo-950/60 border-indigo-500/80 shadow-[0_0_35px_rgba(99,102,241,0.35)]"
+                          : "bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20"
+                      }`}
+                    >
+                      {role === "standard" && (
+                        <BorderBeam size={220} duration={8} colorFrom="#6366f1" colorTo="#38bdf8" />
+                      )}
+                      <CardItem translateZ={30} className="w-full">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="p-3 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                            <GraduationCap className="w-8 h-8" />
+                          </div>
+                          {role === "standard" && (
+                            <Badge variant="default" className="text-xs font-semibold flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Đã chọn
+                            </Badge>
+                          )}
+                        </div>
+                      </CardItem>
+                      <CardItem translateZ={25} className="w-full">
+                        <h3 className="text-lg sm:text-xl font-bold text-white mb-2">
+                          🎓 Người dùng tiêu chuẩn
+                        </h3>
+                        <p className="text-sm text-gray-400 mb-4 leading-relaxed">
+                          Dành cho sinh viên, người học: hỏi đáp bài tập, trợ lý AI Socratic 24/7, tìm tài liệu học tập và nhận hướng dẫn từ các Chuyên gia uy tín.
+                        </p>
+                      </CardItem>
+                      <CardItem translateZ={15} className="w-full">
+                        <ul className="space-y-2 text-xs text-gray-300">
+                          <li className="flex items-center gap-2">
+                            <Check className="w-4 h-4 text-indigo-400" /> Trợ lý AI giải thích bài giảng & ôn thi học phần
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <Check className="w-4 h-4 text-indigo-400" /> Đặt câu hỏi trực tiếp cho Chuyên gia uy tín
+                          </li>
+                          <li className="flex items-center gap-2 text-indigo-300 font-medium">
+                            <Check className="w-4 h-4 text-indigo-400" /> Điểm uy tín khởi đầu: 50 pts (80 pts với email Edu)
+                          </li>
+                        </ul>
+                      </CardItem>
                     </div>
-                    {role === "standard" && (
-                      <span className="px-3 py-1 rounded-full bg-indigo-500/30 text-indigo-300 border border-indigo-400/50 text-xs font-semibold flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Đã chọn
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-white mb-2">
-                    🎓 Người dùng tiêu chuẩn
-                  </h3>
-                  <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-                    Dành cho sinh viên, người học: hỏi đáp bài tập, trợ giảng AI 24/7, tìm tài liệu học tập và nhận hướng dẫn từ các Chuyên gia uy tín.
-                  </p>
-                  <ul className="space-y-2 text-xs text-gray-300">
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-indigo-400" /> Trợ lý AI giải thích bài giảng & ôn thi học phần
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-indigo-400" /> Đặt câu hỏi trực tiếp cho Chuyên gia uy tín
-                    </li>
-                    <li className="flex items-center gap-2 text-indigo-300 font-medium">
-                      <Check className="w-4 h-4 text-indigo-400" /> Điểm uy tín khởi đầu: 50 pts (80 pts với email Edu)
-                    </li>
-                  </ul>
-                </div>
+                  </CardBody>
+                </CardContainer>
 
                 {/* Thẻ 2: Chuyên gia uy tín */}
-                <div
-                  onClick={() => handleRoleSelect("expert")}
-                  className={`group cursor-pointer relative p-6 sm:p-8 rounded-2xl border transition-all duration-300 ${
-                    role === "expert"
-                      ? "bg-amber-950/40 border-amber-500/80 shadow-[0_0_30px_rgba(245,158,11,0.25)] ring-2 ring-amber-500/50"
-                      : "bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                      <Award className="w-8 h-8" />
+                <CardContainer className="w-full" containerClassName="w-full py-0">
+                  <CardBody className="w-full h-auto">
+                    <div
+                      onClick={() => handleRoleSelect("expert")}
+                      className={`group cursor-pointer relative p-6 sm:p-8 rounded-3xl border transition-all duration-300 w-full overflow-hidden ${
+                        role === "expert"
+                          ? "bg-amber-950/60 border-amber-500/80 shadow-[0_0_35px_rgba(245,158,11,0.35)]"
+                          : "bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20"
+                      }`}
+                    >
+                      {role === "expert" && (
+                        <BorderBeam size={220} duration={8} colorFrom="#f59e0b" colorTo="#ef4444" />
+                      )}
+                      <CardItem translateZ={30} className="w-full">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="p-3 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                            <Award className="w-8 h-8" />
+                          </div>
+                          {role === "expert" && (
+                            <Badge variant="expert" className="text-xs font-semibold flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Đã chọn
+                            </Badge>
+                          )}
+                        </div>
+                      </CardItem>
+                      <CardItem translateZ={25} className="w-full">
+                        <h3 className="text-lg sm:text-xl font-bold text-amber-200 mb-2 flex items-center gap-2">
+                          🌟 Chuyên gia uy tín
+                        </h3>
+                        <p className="text-sm text-gray-400 mb-4 leading-relaxed">
+                          Dành cho kỹ sư công nghệ, giảng viên, mentor: kết nối tài khoản GitHub, hiển thị 3 dự án nổi bật nhất và cộng điểm uy tín chuyên môn.
+                        </p>
+                      </CardItem>
+                      <CardItem translateZ={15} className="w-full">
+                        <ul className="space-y-2 text-xs text-gray-300">
+                          <li className="flex items-center gap-2 text-amber-200 font-medium">
+                            <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> Cấp Huy hiệu Vàng "⭐ Chuyên Gia Uy Tín"
+                          </li>
+                          <li className="flex items-center gap-2 text-amber-300">
+                            <Check className="w-4 h-4 text-amber-400" /> Tự động kéo 3 Dự án GitHub & Tính điểm uy tín (90-100 pts)
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <Check className="w-4 h-4 text-amber-400" /> Nhận câu hỏi ưu tiên và xây dựng hồ sơ cố vấn học thuật
+                          </li>
+                        </ul>
+                      </CardItem>
                     </div>
-                    {role === "expert" && (
-                      <span className="px-3 py-1 rounded-full bg-amber-500/30 text-amber-300 border border-amber-400/50 text-xs font-semibold flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Đã chọn
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-amber-200 mb-2 flex items-center gap-2">
-                    🌟 Chuyên gia uy tín
-                  </h3>
-                  <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-                    Dành cho kỹ sư công nghệ, giảng viên, mentor: kết nối tài khoản GitHub, hiển thị 3 dự án nổi bật nhất và cộng điểm uy tín chuyên môn.
-                  </p>
-                  <ul className="space-y-2 text-xs text-gray-300">
-                    <li className="flex items-center gap-2 text-amber-200 font-medium">
-                      <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> Cấp Huy hiệu Vàng "⭐ Chuyên Gia Uy Tín"
-                    </li>
-                    <li className="flex items-center gap-2 text-amber-300">
-                      <Check className="w-4 h-4 text-amber-400" /> Tự động kéo 3 Dự án GitHub & Tính điểm uy tín (90-100 pts)
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-amber-400" /> Nhận câu hỏi ưu tiên và xây dựng hồ sơ cố vấn học thuật
-                    </li>
-                  </ul>
-                </div>
+                  </CardBody>
+                </CardContainer>
               </div>
+
 
               <div className="flex justify-end pt-4">
                 <button
@@ -526,10 +559,16 @@ export default function OnboardingPage() {
                         <GithubIcon className="w-4 h-4" /> Đồng bộ GitHub Public API (Task 4)
                       </div>
                       {githubData && (
-                        <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Điểm uy tín: {githubData.reputationScore} pts
+                        <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Điểm uy tín:</span>
+                          <span className="text-sm font-extrabold text-white">
+                            <NumberTicker value={githubData.reputationScore} />
+                          </span>
+                          <span>pts ⭐</span>
                         </span>
                       )}
+
                     </div>
 
                     <div className="flex gap-2">
