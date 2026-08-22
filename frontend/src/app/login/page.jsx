@@ -3,7 +3,6 @@
 // app/login/page.jsx
 //
 // Đăng nhập StudentHub AI:
-// - Đăng nhập nhanh 1 chạm bằng GitHub OAuth (Khuyên dùng)
 // - Đăng nhập bằng Google OAuth
 // - Hỗ trợ tính năng "Ghi nhớ đăng nhập" (Remember Me): linh hoạt chuyển đổi localStorage / sessionStorage
 // - Trải nghiệm Demo Sinh viên & Chuyên gia uy tín tức thì
@@ -17,14 +16,12 @@ import {
   PasswordInput,
   CheckboxField,
   Button,
-  GitHubButton,
   GoogleButton,
   ErrorMessage,
 } from "@/components/auth/AuthUI";
 import {
   signInWithPassword,
   signInWithGoogle,
-  signInWithGitHub,
   translateAuthError,
   setRememberMePreference,
 } from "@/lib/auth/authService";
@@ -46,9 +43,7 @@ const LoginPage = () => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const urlError = params.get("error");
-      if (urlError === "github_login_failed") {
-        setError("Đăng nhập bằng GitHub không thành công hoặc đã bị hủy. Vui lòng thử lại.");
-      } else if (urlError === "google_login_failed") {
+      if (urlError === "google_login_failed") {
         setError("Đăng nhập bằng Google không thành công hoặc đã bị hủy. Vui lòng thử lại.");
       } else if (urlError === "email_registered_use_password") {
         setError(
@@ -78,19 +73,6 @@ const LoginPage = () => {
       setIsLoading(false);
     }
   };
-
-  const handleGitHubLogin = useCallback(async () => {
-    if (isOAuthLoading || isLoading) return;
-    setError(null);
-    setIsOAuthLoading(true);
-    setRememberMePreference(rememberMe);
-    try {
-      await signInWithGitHub();
-    } catch (err) {
-      setError(translateAuthError(err));
-      setIsOAuthLoading(false);
-    }
-  }, [isOAuthLoading, isLoading, rememberMe]);
 
   const handleGoogleLogin = useCallback(async () => {
     if (isOAuthLoading || isLoading) return;
@@ -124,9 +106,8 @@ const LoginPage = () => {
         </p>
       </div>
 
-      {/* GitHub OAuth Primary Action */}
-      <div className="space-y-3 relative z-10">
-        <GitHubButton isLoading={isOAuthLoading} isDisabled={isLoading} onClick={handleGitHubLogin} />
+      {/* Google OAuth Action */}
+      <div className="relative z-10">
         <GoogleButton isLoading={isOAuthLoading} isDisabled={isLoading} onClick={handleGoogleLogin} />
       </div>
 

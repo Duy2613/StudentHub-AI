@@ -176,7 +176,7 @@ export function AuthProvider({ children }) {
       if (mounted) setIsLoading(false);
     });
 
-    // 4. Lắng nghe Supabase OAuth (Google / GitHub)
+    // 4. Lắng nghe Supabase OAuth (Google)
     const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
       if (!mounted) return;
       if (newSession?.user) {

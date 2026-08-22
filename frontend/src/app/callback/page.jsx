@@ -2,9 +2,9 @@
 
 // app/callback/page.jsx
 //
-// OAuth Callback Handler (GitHub & Google OAuth qua Supabase Auth)
+// OAuth Callback Handler (Google OAuth qua Supabase Auth)
 // Quy trình:
-// 1. Nhận session OAuth sau khi redirect từ GitHub / Google
+// 1. Nhận session OAuth sau khi redirect từ Google
 // 2. Kiểm tra trạng thái Onboarding / Role
 // 3. Điều hướng: nếu chưa chọn Role -> /onboarding, nếu đã hoàn tất -> /dashboard
 
@@ -26,7 +26,7 @@ export default function AuthCallbackPage() {
     if (!session) {
       const timeout = setTimeout(() => {
         if (!handledRef.current) {
-          router.replace("/login?error=github_login_failed");
+          router.replace("/login?error=google_login_failed");
         }
       }, 3500);
       return () => clearTimeout(timeout);
@@ -40,7 +40,7 @@ export default function AuthCallbackPage() {
 
     // Kiểm tra xem tài khoản này ban đầu có được tạo bằng Email & Mật khẩu hay không
     const emailIdentity = identities.find((i) => i.provider === "email");
-    const oauthIdentity = identities.find((i) => i.provider === "github" || i.provider === "google");
+    const oauthIdentity = identities.find((i) => i.provider === "google");
 
     const isOriginallyEmail =
       (emailIdentity && !oauthIdentity) ||
