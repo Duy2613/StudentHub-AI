@@ -19,6 +19,8 @@ import LandingHeader from "@/components/landing/LandingHeader";
 import HeroSection from "@/components/landing/HeroSection";
 import TrustSocialProof from "@/components/landing/TrustSocialProof";
 import TrinitySuiteShowcase from "@/components/landing/TrinitySuiteShowcase";
+import IsometricScrollSection from "@/components/home/IsometricScrollSection";
+import InteractiveSlider from "@/components/home/InteractiveSlider";
 import FeatureBento from "@/components/landing/FeatureBento";
 import InteractiveComparison from "@/components/landing/InteractiveComparison";
 
@@ -75,7 +77,6 @@ export default function HomePage() {
       <LandingHeader />
 
       {/* Main Content Sections */}
-
       <main className="relative z-10">
         <HeroSection />
         <TrustSocialProof />
@@ -88,13 +89,18 @@ export default function HomePage() {
         {/* Studio 3D Visual Trinity Suite Showcase */}
         <TrinitySuiteShowcase />
 
+        {/* 3D Isometric Scrollytelling Section */}
+        <IsometricScrollSection />
+
+        {/* Interactive Career & Academic Level Slider */}
+        <InteractiveSlider />
+
         <FeatureBento />
         <InteractiveComparison />
         <ExpertShowcase />
         <TestimonialsSection />
         <PricingAndFAQ />
       </main>
-
 
       {/* Footer */}
       <LandingFooter />

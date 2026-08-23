@@ -2,9 +2,8 @@
 
 // components/auth/AuthUI.jsx
 //
-// Các thành phần UI dùng chung giữa /login và /register (tách ra từ
-// CodeUIUX.jsx gốc để không phải chép lại 2 lần). Thuần hiển thị, không
-// chứa logic gọi Supabase/backend.
+// Các thành phần UI dùng chung giữa /login và /register (Cyber Glassmorphism & Verification Network).
+// Thuần hiển thị, tương tác mượt mà, hỗ trợ Focus Halo & Student Benefit Program.
 
 import React, { useState } from "react";
 import { Eye, EyeOff, Lock, Loader2, ArrowRight, AlertCircle, GraduationCap, CheckCircle2 } from "lucide-react";
@@ -18,13 +17,82 @@ export const NoiseOverlay = () => (
   ></div>
 );
 
+// Chữ ký thị giác riêng của StudentHub AI: Mạng lưới các node và edge xác thực phát sáng
+const NETWORK_NODES = [
+  { x: 80, y: 90, r: 3, hero: true, delay: 0 },
+  { x: 150, y: 220, r: 2, delay: 0.4 },
+  { x: 60, y: 340, r: 2.5, delay: 0.8 },
+  { x: 140, y: 480, r: 3, hero: true, delay: 1.2 },
+  { x: 200, y: 100, r: 1.5, delay: 1.6 },
+  { x: 720, y: 100, r: 2.5, delay: 0.2 },
+  { x: 650, y: 60, r: 2, delay: 0.6 },
+  { x: 740, y: 260, r: 3, hero: true, delay: 1.0 },
+  { x: 680, y: 400, r: 2, delay: 1.4 },
+  { x: 730, y: 500, r: 2.5, delay: 1.8 },
+  { x: 600, y: 200, r: 1.5, delay: 2.0 },
+  { x: 100, y: 550, r: 1.5, delay: 2.2 },
+];
+
+const NETWORK_EDGES = [
+  [0, 1], [1, 2], [2, 3], [0, 4], [1, 4],
+  [5, 6], [5, 7], [7, 8], [8, 9], [6, 10], [5, 10],
+  [3, 11],
+];
+
+export const VerificationNetwork = () => (
+  <svg
+    className="absolute inset-0 w-full h-full pointer-events-none"
+    viewBox="0 0 800 600"
+    preserveAspectRatio="xMidYMid slice"
+    fill="none"
+    aria-hidden="true"
+  >
+    <defs>
+      <linearGradient id="network-line" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stopColor="#34E7C4" stopOpacity="0.35" />
+        <stop offset="100%" stopColor="#34E7C4" stopOpacity="0" />
+      </linearGradient>
+    </defs>
+    {NETWORK_EDGES.map(([a, b], i) => {
+      const n1 = NETWORK_NODES[a];
+      const n2 = NETWORK_NODES[b];
+      return (
+        <line
+          key={`edge-${i}`}
+          x1={n1.x}
+          y1={n1.y}
+          x2={n2.x}
+          y2={n2.y}
+          stroke="url(#network-line)"
+          strokeWidth="1"
+          className="network-edge"
+          style={{ animationDelay: `${(n1.delay + n2.delay) / 2}s` }}
+        />
+      );
+    })}
+    {NETWORK_NODES.map((n, i) => (
+      <circle
+        key={`node-${i}`}
+        cx={n.x}
+        cy={n.y}
+        r={n.r}
+        fill={n.hero ? "#34E7C4" : "#6EEFDA"}
+        className="network-node"
+        style={{
+          animationDelay: `${n.delay}s`,
+          filter: n.hero ? "drop-shadow(0 0 6px #34E7C4)" : undefined,
+        }}
+      />
+    ))}
+  </svg>
+);
+
 export const AmbientBackground = () => (
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-space-950 via-[#0F1117] to-black opacity-90"></div>
-    <div className="absolute top-[-20%] left-[-20%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-r from-indigo-700/30 to-purple-700/30 blur-[140px] animate-blob-slow mix-blend-screen"></div>
-    <div className="absolute bottom-[-30%] right-[-20%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-r from-blue-700/30 to-cyan-700/30 blur-[140px] animate-blob-medium animation-delay-2000 mix-blend-screen"></div>
-    <div className="absolute top-1/4 left-1/3 w-1 h-1 bg-indigo-400 rounded-full animate-float blur-[0.5px]"></div>
-    <div className="absolute bottom-1/3 right-1/4 w-1.5 h-1.5 bg-purple-400 rounded-full animate-float animation-delay-4000 blur-[0.5px]"></div>
+    <div className="absolute top-[-20%] left-[-20%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-r from-indigo-700/20 to-purple-700/20 blur-[140px] animate-blob-slow mix-blend-screen"></div>
+    <div className="absolute bottom-[-30%] right-[-20%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-r from-blue-700/20 to-teal-700/20 blur-[140px] animate-blob-medium animation-delay-2000 mix-blend-screen"></div>
+    <VerificationNetwork />
   </div>
 );
 
@@ -41,8 +109,9 @@ export const InputField = ({ label, id, name, type = "text", icon: Icon, helperT
       <label htmlFor={id} className="block text-sm font-medium text-gray-300 pl-1 transition-colors group-hover/input:text-gray-100">
         {label}
       </label>
+      {/* Focus Halo Glow */}
       <div
-        className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
+        className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-teal-400 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
           isFocused ? "opacity-100 blur-[2px]" : "opacity-0 blur-0"
         }`}
       ></div>
@@ -99,8 +168,9 @@ export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) =>
       <label htmlFor={id} className="block text-sm font-medium text-gray-300 pl-1 transition-colors group-hover/input:text-gray-100">
         {label}
       </label>
+      {/* Focus Halo Glow */}
       <div
-        className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
+        className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-teal-400 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
           isFocused ? "opacity-100 blur-[2px]" : "opacity-0 blur-0"
         }`}
       ></div>
@@ -168,18 +238,18 @@ export const CheckboxField = ({ id, checked, onChange, label, helperText, ...pro
 
 export const Button = ({ children, isLoading, disabled, ...props }) => (
   <div className="relative group z-20">
-    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 rounded-2xl blur-lg opacity-60 group-hover:opacity-90 group-hover:blur-xl transition-all duration-500 ease-premium"></div>
+    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-500 rounded-2xl blur-lg opacity-60 group-hover:opacity-90 group-hover:blur-xl transition-all duration-500 ease-premium"></div>
     <button
       disabled={isLoading || disabled}
       className={`
         relative w-full flex justify-center items-center py-3.5 px-4
-        bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600
+        bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-500
         rounded-xl text-sm font-bold text-white
         shadow-[inset_0_1px_2px_rgba(255,255,255,0.25)]
         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0F1117] focus:ring-indigo-500
         disabled:opacity-70 disabled:cursor-not-allowed
         transition-all duration-300 ease-premium
-        active:scale-[0.98] group-hover:-translate-y-1
+        active:scale-[0.98] group-hover:-translate-y-1 hover:scale-[1.015]
       `}
       {...props}
     >
@@ -199,7 +269,7 @@ export const GoogleButton = ({ isLoading, isDisabled, onClick }) => (
     type="button"
     onClick={onClick}
     disabled={isLoading || isDisabled}
-    className={`relative w-full inline-flex justify-center items-center py-3 px-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xl text-sm font-medium text-gray-300 shadow-sm hover:bg-white/10 hover:text-white hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#0F1117] focus:ring-indigo-500 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
+    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xl text-sm font-medium text-gray-300 shadow-sm hover:bg-white/10 hover:text-white hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#0F1117] focus:ring-indigo-500 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
       isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-white/5 hover:border-white/10 hover:text-gray-300" : ""
     }`}
   >
@@ -207,7 +277,7 @@ export const GoogleButton = ({ isLoading, isDisabled, onClick }) => (
       <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
     ) : (
       <>
-        <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+        <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
           <g transform="matrix(1, 0, 0, 1, 0, 0)">
             <path d="M 22.56 12.25 C 22.56 11.47 22.49 10.72 22.36 10 L 12 10 L 12 14.26 L 17.92 14.26 C 17.66 15.63 16.88 16.79 15.71 17.57 L 15.71 20.34 L 19.28 20.34 C 21.36 18.42 22.56 15.6 22.56 12.25 Z" fill="#4285F4"></path>
             <path d="M 12 23 C 14.97 23 17.46 22.02 19.28 20.34 L 15.71 17.57 C 14.73 18.23 13.48 18.63 12 18.63 C 9.14 18.63 6.71 16.7 5.84 14.1 L 2.18 14.1 L 2.18 16.94 C 3.99 20.53 7.7 23 12 23 Z" fill="#34A853"></path>
@@ -215,27 +285,7 @@ export const GoogleButton = ({ isLoading, isDisabled, onClick }) => (
             <path d="M 12 5.38 C 13.62 5.38 15.06 5.94 16.21 7.02 L 19.36 3.87 C 17.45 2.09 14.97 1 12 1 C 7.7 1 3.99 3.47 2.18 7.07 L 5.84 9.9 C 6.71 7.3 9.14 5.38 12 5.38 Z" fill="#EA4335"></path>
           </g>
         </svg>
-        Google
-      </>
-    )}
-  </button>
-);
-
-export const GithubButton = ({ isLoading, isDisabled, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={isLoading || isDisabled}
-    className={`relative w-full inline-flex justify-center items-center py-3 px-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xl text-sm font-medium text-gray-300 shadow-sm hover:bg-white/10 hover:text-white hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#0F1117] focus:ring-indigo-500 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
-      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-white/5 hover:border-white/10 hover:text-gray-300" : ""
-    }`}
-  >
-    {isLoading ? (
-      <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
-    ) : (
-      <>
-        <GithubIcon className="h-4 w-4 mr-2 text-gray-200" />
-        GitHub
+        Continue with Google
       </>
     )}
   </button>
@@ -247,6 +297,25 @@ export const GithubIcon = ({ className = "w-5 h-5" }) => (
   </svg>
 );
 
+export const GithubButton = ({ isLoading, isDisabled, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={isLoading || isDisabled}
+    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xl text-sm font-medium text-gray-300 shadow-sm hover:bg-white/10 hover:text-white hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#0F1117] focus:ring-indigo-500 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
+      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-white/5 hover:border-white/10 hover:text-gray-300" : ""
+    }`}
+  >
+    {isLoading ? (
+      <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
+    ) : (
+      <>
+        <GithubIcon className="h-5 w-5 mr-2 text-gray-200" />
+        Continue with GitHub
+      </>
+    )}
+  </button>
+);
 
 export const ErrorMessage = ({ message }) => {
   if (!message) return null;
@@ -268,9 +337,7 @@ export const NoticeMessage = ({ message }) => {
   );
 };
 
-// Regex CHỈ dùng để hiện gợi ý trực quan trên UI — quyết định thật về việc
-// có cộng điểm uy tín cho email trường hay không PHẢI do Backend tự kiểm
-// tra dựa trên email đã xác minh, Frontend không tự quyết/không gửi cờ này.
+// Regex nhận diện email học thuật (.edu, .edu.vn, .ac.uk, v.v.)
 export const ACADEMIC_EMAIL_REGEX = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i;
 export const STUDENT_BONUS_POINTS = 30;
 
@@ -282,7 +349,7 @@ export const StudentBenefitBanner = ({ email }) => {
         isStudent ? "bg-indigo-900/30 border-indigo-500/50 shadow-[0_0_20px_rgba(99,102,241,0.25)]" : "bg-white/5 border-white/10"
       }`}
     >
-      <div className={`absolute -inset-1 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 blur-md transition-opacity duration-500 ${isStudent ? "opacity-100 animate-pulse-slow" : "opacity-0"}`}></div>
+      <div className={`absolute -inset-1 bg-gradient-to-r from-indigo-500/20 to-teal-500/20 blur-md transition-opacity duration-500 ${isStudent ? "opacity-100 animate-pulse-slow" : "opacity-0"}`}></div>
       <div className="relative z-10 flex items-start p-4">
         <div className={`flex-shrink-0 p-2 rounded-lg transition-colors duration-500 ${isStudent ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/50" : "bg-white/10 text-gray-400"}`}>
           <GraduationCap className="h-5 w-5" />
@@ -291,10 +358,10 @@ export const StudentBenefitBanner = ({ email }) => {
           <h3 className={`text-sm font-semibold ${isStudent ? "text-indigo-100" : "text-gray-200"}`}>Student Benefit Program</h3>
           <div className="mt-1 relative h-5">
             <p className={`text-xs absolute top-0 left-0 transition-all duration-500 ${isStudent ? "opacity-0 translate-y-2" : "opacity-100 text-gray-400"} `}>
-              Đăng ký bằng email trường để nhận <span className="text-indigo-300 font-semibold">+{STUDENT_BONUS_POINTS} điểm uy tín</span>.
+              Đăng ký bằng email trường để nhận <span className="text-teal-300 font-semibold">+{STUDENT_BONUS_POINTS} điểm uy tín</span>.
             </p>
             <p className={`text-xs flex items-center font-medium text-emerald-300 absolute top-0 left-0 transition-all duration-500 ${isStudent ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"} `}>
-              <CheckCircle2 className="w-3 h-3 mr-1.5" /> Đã nhận diện email trường!
+              <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Đã nhận diện email trường! (+{STUDENT_BONUS_POINTS} pts)
             </p>
           </div>
         </div>
@@ -307,7 +374,7 @@ export const AuthCard = ({ children }) => (
   <div className="min-h-screen flex items-center justify-center overflow-hidden relative py-12 px-4 sm:px-6 lg:px-8 font-sans bg-space-950 select-none">
     <AmbientBackground />
     <NoiseOverlay />
-    <div className="max-w-[440px] w-full relative z-10 perspective-1000">
+    <div className="max-w-[440px] w-full relative z-10 perspective-1000 animate-card-in">
       <div className="relative bg-white/[0.02] backdrop-blur-2xl py-10 px-8 sm:px-10 shadow-glass-deep border border-white/[0.08] rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-neon-primary hover:border-white/20">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-50"></div>
         {children}
