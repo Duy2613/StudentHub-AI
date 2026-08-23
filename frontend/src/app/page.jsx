@@ -56,11 +56,6 @@ export default function HomePage() {
       href: "/whiteboard",
     },
     {
-      title: "Creative Lab (3D & WebGL)",
-      icon: <Sparkles className="h-full w-full text-amber-400" />,
-      href: "/showcase",
-    },
-    {
       title: "Bảng Điều Khiển",
       icon: <LayoutDashboard className="h-full w-full text-emerald-400" />,
       href: session ? "/dashboard" : "/login",

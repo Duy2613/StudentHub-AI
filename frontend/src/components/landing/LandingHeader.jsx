@@ -34,7 +34,6 @@ export default function LandingHeader() {
     { label: "AI Mentor", href: "/ai-mentor" },
     { label: "Workspace", href: "/workspace" },
     { label: "Whiteboard", href: "/whiteboard" },
-    { label: "Creative Lab", href: "/showcase" },
     { label: "Tính Năng", href: "#features" },
     { label: "Cố Vấn Chuyên Gia", href: "#experts" },
     { label: "Bảng Giá", href: "#pricing" },
