@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumora — Independent Design & Engineering Studio</title>
+  <meta name="description" content="Lumora is an independent studio crafting brands, products, and the systems that connect them — bold ideas, shipped with quiet precision." />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background: #ffffff;
+      --foreground: #111111;
+      --ink: #0a0a0a;
+      --muted: #8d8d8d;
+      --subtle: #b6b6b6;
+      --line: #e6e5e2;
+      --surface: #f1f0ee;
+      --surface-2: #e3e2df;
+      --accent: #b15f2c;
+      --accent-from: #cf8047;
+      --accent-to: #97501f;
+      --hero-from: #ecebe9;
+      --hero-to: #c9c9c9;
+      --radius-pill: 9999px;
+      --radius-card: 2rem;
+      --radius-card-sm: 1.25rem;
+      --radius-control: 0.875rem;
+      --text-watermark: 13rem;
+      --container-shell: 88rem;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: auto; }
+    body { background: var(--background); color: var(--foreground); font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif; overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+    ul { list-style: none; }
+    img { display: block; max-width: 100%; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+    /* Adaptive Rem Grid */
+    @media (max-width: 1920px) { html { font-size: 0.833333vw; } }
+    @media (max-width: 1440px) { html { font-size: 1.111111vw; } }
+    @media (max-width: 1024px) { html { font-size: 1.5625vw; } }
+    @media (max-width: 640px)  { html { font-size: 4.444444vw; } }
+
+    .shell { max-width: var(--container-shell); margin-inline: auto; width: 100%; }
+    .px-shell { padding-inline: 1.25rem; }
+    @media (min-width: 640px) { .px-shell { padding-inline: 2rem; } }
+
+    /* Typography & Utilities */
+    .text-accent { color: var(--accent); }
+    .bg-ink { background-color: var(--ink); color: #fff; }
+    .bg-surface { background-color: var(--surface); }
+    .border-line { border: 1px solid var(--line); }
+    .rounded-card { border-radius: var(--radius-card); }
+    .rounded-card-sm { border-radius: var(--radius-card-sm); }
+    .rounded-pill { border-radius: var(--radius-pill); }
+
+    /* Buttons */
+    .btn-pill-dark {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem;
+      background: var(--ink); color: #ffffff; padding: 0.875rem 1.75rem;
+      border-radius: var(--radius-pill); font-size: 0.875rem; font-weight: 600;
+      transition: transform 0.35s cubic-bezier(.2,.8,.2,1), background-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+    .btn-pill-dark:hover { transform: translateY(-2px) scale(1.02); background: #1a1a1a; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+    .btn-pill-dark:active { transform: translateY(0) scale(0.98); }
+
+    .btn-pill-outline {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem;
+      background: rgba(255,255,255,0.7); color: var(--foreground); padding: 0.875rem 1.75rem;
+      border-radius: var(--radius-pill); font-size: 0.875rem; font-weight: 600;
+      border: 1px solid rgba(17,17,17,0.15); backdrop-filter: blur(8px);
+      transition: transform 0.35s cubic-bezier(.2,.8,.2,1), background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .btn-pill-outline:hover { transform: translateY(-2px) scale(1.02); background: #ffffff; border-color: rgba(17,17,17,0.35); }
+    .btn-pill-outline:active { transform: translateY(0) scale(0.98); }
+
+    /* Skip link */
+    .skip-link {
+      position: fixed; left: 1rem; top: 1rem; z-index: 999;
+      border-radius: var(--radius-control); background: var(--ink);
+      padding: 0.5rem 1rem; font-size: 0.875rem; color: #fff;
+      transform: translateY(-200%); transition: transform 0.2s ease;
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    /* Page Loader */
+    #page-loader {
+      position: fixed; inset: 0; z-index: 120;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2.5rem; background: #0a0a0a; color: #fff;
+      border-radius: 0 0 var(--radius-card) var(--radius-card);
+      transition: transform 0.75s cubic-bezier(.22,1,.36,1);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    #page-loader.exit { transform: translateY(-100%); }
+    .loader-center {
+      display: flex; flex-direction: column; align-items: center; gap: 1.25rem;
+      text-align: center; transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .loader-brand {
+      display: flex; align-items: center; gap: 0.625rem;
+      font-weight: 600; font-size: 1.625rem; letter-spacing: -0.02em;
+    }
+    .loader-slogan { max-width: 26ch; font-size: 0.875rem; color: rgba(255,255,255,0.55); line-height: 1.5; }
+    .loader-progress-box { width: min(22rem, 72vw); display: flex; flex-direction: column; gap: 0.75rem; }
+    .loader-track { height: 2px; width: 100%; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; }
+    .loader-fill { height: 100%; background: #cf8047; width: 0%; transition: width 0.1s ease-out; }
+    .loader-info {
+      display: flex; justify-content: space-between; font-size: 0.75rem;
+      font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.45);
+    }
+    .loader-nums { color: rgba(255,255,255,0.85); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+    /* Header */
+    #site-header {
+      position: absolute; inset-inline: 0; top: 0; z-index: 50;
+      opacity: 0; transform: translateY(-14px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    #site-header.ready { opacity: 1; transform: translateY(0); }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+      padding: 1.25rem 1.25rem;
+    }
+    @media (min-width: 640px) { .header-inner { padding: 1.75rem 2rem; } }
+
+    .brand-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 1.125rem; font-weight: 600; letter-spacing: -0.02em;
+      transition: transform 0.35s cubic-bezier(.32,1.8,.2,1);
+    }
+    .brand-btn:hover { transform: scale(1.04); }
+
+    .primary-nav { display: none; }
+    @media (min-width: 1024px) {
+      .primary-nav { display: flex; align-items: center; gap: 2.25rem; font-size: 0.875rem; font-weight: 500; }
+      .nav-link-btn {
+        display: inline-flex; align-items: center; gap: 0.35rem; color: rgba(17,17,17,0.8);
+        transition: transform 0.3s cubic-bezier(.32,1.8,.2,1), color 0.25s ease;
+      }
+      .nav-link-btn:hover { transform: translateY(-2px); color: #111111; }
+      .nav-link-btn[aria-current="page"] { color: #111111; font-weight: 600; }
+    }
+
+    .header-right { display: flex; align-items: center; gap: 0.75rem; }
+    .clock-chip {
+      display: none; align-items: center; gap: 0.75rem;
+      border: 1px solid rgba(230,229,226,0.85); background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border-radius: var(--radius-control); padding: 0.5rem 0.875rem;
+      font-size: 0.75rem; color: rgba(17,17,17,0.7);
+    }
+    @media (min-width: 768px) { .clock-chip { display: flex; } }
+    .clock-label { color: rgba(17,17,17,0.45); }
+    .clock-time { font-variant-numeric: tabular-nums; font-weight: 500; color: #111; min-width: 4rem; }
+    .clock-date { font-weight: 500; }
+    .clock-dot { color: rgba(17,17,17,0.3); }
+
+    .menu-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      border: 1px solid rgba(230,229,226,0.85); background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border-radius: var(--radius-control); padding: 0.5rem 0.875rem;
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+      transition: background 0.25s ease, transform 0.35s cubic-bezier(.32,1.8,.2,1);
+    }
+    @media (min-width: 640px) { .menu-btn { padding: 0.5rem 1.125rem; } }
+    .menu-btn:hover { background: rgba(255,255,255,0.85); transform: scale(1.05); }
+    .menu-btn-text { display: none; }
+    @media (min-width: 640px) { .menu-btn-text { display: inline; } }
+
+    /* Hero Section */
+    #home {
+      position: relative; isolation: isolate; overflow: hidden;
+      border-radius: 0 0 var(--radius-card) var(--radius-card);
+      background: var(--hero-to); min-height: 100vh;
+    }
+    .liquid-reveal-wrap { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+    .hero-base-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .hero-vignette {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0.45) 100%);
+    }
+    .hero-watermark {
+      pointer-events: none; position: absolute; inset-inline: 0; bottom: 5rem; z-index: 1;
+      text-align: center; user-select: none; font-weight: 700; line-height: 0.85;
+      font-size: clamp(6rem, 16vw, var(--text-watermark));
+      color: rgba(255,255,255,0.45); letter-spacing: -0.04em;
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.8s cubic-bezier(.22,1,.36,1), transform 0.8s cubic-bezier(.22,1,.36,1);
+    }
+    .hero-watermark.revealed { opacity: 0.45; transform: translateY(0); }
+
+    .hero-content-grid {
+      position: relative; z-index: 20; display: flex; flex-direction: column; gap: 3rem;
+      padding: 7rem 1.25rem 5rem;
+    }
+    @media (min-width: 1024px) {
+      .hero-content-grid {
+        display: grid; min-height: 100vh; grid-template-columns: repeat(12, 1fr);
+        align-items: center; gap: 3rem; padding: 9rem 2rem 7rem;
+      }
+    }
+
+    .hero-col-left { display: flex; flex-direction: column; gap: 1.75rem; }
+    @media (min-width: 1024px) { .hero-col-left { grid-column: span 7; } }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.875rem; font-weight: 500; color: rgba(17,17,17,0.7);
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .hero-eyebrow.revealed { opacity: 1; transform: translateY(0); }
+    .eyebrow-dot { width: 0.375rem; height: 0.375rem; background: rgba(17,17,17,0.5); border-radius: 9999px; }
+
+    .hero-heading {
+      font-size: 2.25rem; font-weight: 600; line-height: 1.05; letter-spacing: -0.03em;
+      max-width: 18ch; color: #111111;
+    }
+    @media (min-width: 640px) { .hero-heading { font-size: 3.125rem; } }
+    @media (min-width: 1024px) { .hero-heading { font-size: 3.875rem; } }
+
+    .reveal-line-clip { overflow: hidden; display: block; }
+    .reveal-line-inner {
+      display: block; transform: translateY(100%); opacity: 0;
+      transition: transform 0.9s cubic-bezier(0.215, 0.61, 0.355, 1), opacity 0.9s ease;
+    }
+    .revealed .reveal-line-inner { transform: translateY(0%); opacity: 1; }
+
+    .hero-rating-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .hero-rating-row.revealed { opacity: 1; transform: translateY(0); }
+    .stars-box { display: flex; align-items: center; gap: 0.2rem; color: var(--accent); }
+    .rating-caption { font-size: 0.875rem; font-weight: 500; color: rgba(17,17,17,0.7); }
+
+    .hero-cta-row {
+      display: flex; flex-wrap: wrap; gap: 0.75rem;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .hero-cta-row.revealed { opacity: 1; transform: translateY(0); }
+
+    .hero-col-right {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 2rem;
+    }
+    @media (min-width: 1024px) { .hero-col-right { grid-column: span 5; align-items: flex-end; } }
+
+    .hero-carousel-card {
+      width: 100%; max-width: 26rem; background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.85); border-radius: var(--radius-card-sm);
+      padding: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+      opacity: 0; transform: translateY(16px) scale(0.96);
+      transition: opacity 0.8s cubic-bezier(.22,1,.36,1), transform 0.8s cubic-bezier(.22,1,.36,1);
+    }
+    .hero-carousel-card.revealed { opacity: 1; transform: translateY(0) scale(1); }
+    .card-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .card-badge {
+      display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent);
+      background: rgba(177,95,44,0.12); padding: 0.25rem 0.625rem; border-radius: 9999px;
+    }
+    .card-metric { font-size: 0.8125rem; font-weight: 500; color: rgba(17,17,17,0.5); }
+    .card-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
+    .card-desc { font-size: 0.875rem; color: rgba(17,17,17,0.65); line-height: 1.5; margin-bottom: 1.25rem; }
+    .card-media {
+      width: 100%; height: 10rem; border-radius: 0.75rem; overflow: hidden;
+      position: relative; background: #0a0a0a; margin-bottom: 1rem;
+    }
+    .card-media-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+    .hero-carousel-card:hover .card-media-img { transform: scale(1.05); }
+    .card-footer-controls { display: flex; justify-content: space-between; align-items: center; }
+    .carousel-dots { display: flex; gap: 0.35rem; }
+    .carousel-dot { width: 0.5rem; height: 0.5rem; border-radius: 9999px; background: rgba(17,17,17,0.2); transition: all 0.3s; }
+    .carousel-dot.active { width: 1.25rem; background: var(--ink); }
+
+    /* Partners Band */
+    .partners-band {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 1.75rem;
+      color: rgba(17,17,17,0.45); font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.05em;
+    }
+    .partner-item { display: flex; align-items: center; gap: 0.35rem; transition: color 0.25s ease; }
+    .partner-item:hover { color: #111; }
+
+    /* About Section */
+    #about { padding: 8rem 0 6rem; background: var(--background); }
+    .about-statement {
+      font-size: 1.875rem; font-weight: 500; line-height: 1.35; letter-spacing: -0.02em;
+      color: var(--foreground); max-width: 48rem;
+    }
+    @media (min-width: 640px) { .about-statement { font-size: 2.5rem; } }
+    @media (min-width: 1024px) { .about-statement { font-size: 3.25rem; } }
+    .word-span {
+      display: inline-block; transform: translateY(24px); opacity: 0;
+      transition: transform 0.7s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.7s ease;
+      margin-right: 0.3em;
+    }
+    .revealed .word-span { transform: translateY(0); opacity: 1; }
+
+    /* CreateBand (Pills) */
+    .create-band-section { padding: 2rem 0 6rem; }
+    .create-pills-row {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem;
+    }
+    .create-pill {
+      font-size: 2.25rem; font-weight: 600; padding: 0.75rem 2.25rem;
+      border-radius: var(--radius-pill); border: 1.5px solid var(--line);
+      background: var(--surface); color: var(--foreground);
+      transition: transform 0.35s cubic-bezier(.32,1.8,.2,1), background 0.3s, color 0.3s, border-color 0.3s;
+      user-select: none;
+    }
+    @media (min-width: 640px) { .create-pill { font-size: 3.5rem; padding: 1rem 3.5rem; } }
+    .create-pill:hover {
+      transform: translateY(-6px) scale(1.04);
+      background: var(--ink); color: #ffffff; border-color: var(--ink);
+    }
+    .create-pill.accent {
+      background: var(--accent); color: #ffffff; border-color: var(--accent);
+    }
+    .create-pill.accent:hover { background: #97501f; }
+
+    /* Portfolio Section (#works) */
+    #works { padding: 6rem 0 8rem; background: var(--background); }
+    .section-header { margin-bottom: 3.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .section-tag { font-size: 0.8125rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); }
+    .section-title { font-size: 2.25rem; font-weight: 600; letter-spacing: -0.02em; }
+    @media (min-width: 640px) { .section-title { font-size: 3rem; } }
+
+    .portfolio-grid {
+      display: grid; grid-template-columns: 1fr; gap: 2rem;
+    }
+    @media (min-width: 768px) { .portfolio-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .project-card {
+      background: var(--ink); color: #ffffff; border-radius: var(--radius-card);
+      overflow: hidden; padding: 2rem; display: flex; flex-direction: column;
+      justify-content: space-between; min-height: 28rem; position: relative;
+      transition: transform 0.4s cubic-bezier(.2,.8,.2,1), box-shadow 0.4s ease;
+      cursor: pointer;
+    }
+    .project-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 24px 50px rgba(0,0,0,0.3);
+    }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; z-index: 2; }
+    .project-tag-pill {
+      font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+      background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85);
+      padding: 0.35rem 0.75rem; border-radius: 9999px; backdrop-filter: blur(4px);
+    }
+    .project-media-wrap {
+      flex: 1; width: 100%; border-radius: 1.25rem; overflow: hidden;
+      margin-bottom: 1.5rem; position: relative; background: #151515;
+    }
+    .project-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; }
+    .project-card:hover .project-img { transform: scale(1.06); }
+    .project-bottom-info { display: flex; justify-content: space-between; align-items: flex-end; z-index: 2; }
+    .project-name { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.35rem; letter-spacing: -0.01em; }
+    .project-summary { font-size: 0.875rem; color: rgba(255,255,255,0.6); max-width: 24ch; }
+    .project-arrow-btn {
+      width: 3rem; height: 3rem; border-radius: 9999px; background: rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center; color: #fff;
+      transition: background 0.3s ease, transform 0.35s cubic-bezier(.32,1.8,.2,1);
+    }
+    .project-card:hover .project-arrow-btn { background: var(--accent); transform: scale(1.1) rotate(45deg); }
+
+    /* Services Section (#services) */
+    #services { padding: 6rem 0 8rem; background: var(--surface); border-radius: var(--radius-card); }
+    .services-list { display: flex; flex-direction: column; margin-top: 2.5rem; }
+    .service-row {
+      border-top: 1px solid rgba(17,17,17,0.12); padding: 2.5rem 1.5rem;
+      display: grid; grid-template-columns: 1fr; gap: 1.5rem;
+      transition: background 0.35s ease, padding 0.35s ease;
+      border-radius: var(--radius-card-sm); cursor: pointer;
+    }
+    @media (min-width: 1024px) {
+      .service-row { grid-template-columns: 8rem 1.5fr 2fr 3rem; align-items: center; padding: 2.5rem 2rem; }
+    }
+    .service-row:hover { background: #ffffff; box-shadow: 0 12px 30px rgba(0,0,0,0.04); }
+    .service-num { font-size: 1.125rem; font-weight: 600; color: var(--accent); }
+    .service-title { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; }
+    .service-desc { font-size: 0.9375rem; color: rgba(17,17,17,0.65); line-height: 1.6; }
+    .service-icon-box {
+      width: 2.75rem; height: 2.75rem; border-radius: 9999px; background: rgba(17,17,17,0.06);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.3s, transform 0.35s; justify-self: end;
+    }
+    .service-row:hover .service-icon-box { background: var(--ink); color: #fff; transform: translateX(4px); }
+
+    /* Stats Section */
+    #stats { padding: 6rem 0; }
+    .stats-panel {
+      background: var(--ink); color: #ffffff; border-radius: var(--radius-card);
+      padding: 4rem 2rem; display: grid; grid-template-columns: 1fr; gap: 3rem; text-align: center;
+    }
+    @media (min-width: 640px) { .stats-panel { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .stats-panel { grid-template-columns: repeat(4, 1fr); padding: 5rem 3rem; } }
+    .stat-item { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .stat-number { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.03em; color: #ffffff; }
+    @media (min-width: 1024px) { .stat-number { font-size: 4.25rem; } }
+    .stat-label { font-size: 0.875rem; color: rgba(255,255,255,0.6); max-width: 18ch; }
+
+    /* Footer */
+    #site-footer {
+      background: var(--ink); color: #ffffff; border-radius: var(--radius-card) var(--radius-card) 0 0;
+      padding: 6rem 1.25rem 3rem; margin-top: 4rem; position: relative; overflow: hidden;
+    }
+    @media (min-width: 640px) { #site-footer { padding: 8rem 2rem 3rem; } }
+    .footer-top {
+      display: flex; flex-direction: column; gap: 3rem; margin-bottom: 5rem;
+    }
+    @media (min-width: 1024px) {
+      .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 4rem; }
+    }
+    .footer-cta-title { font-size: 2.25rem; font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+    @media (min-width: 640px) { .footer-cta-title { font-size: 3.25rem; } }
+    .footer-col-title { font-size: 0.8125rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.45); margin-bottom: 1.25rem; }
+    .footer-links { display: flex; flex-direction: column; gap: 0.875rem; font-size: 0.9375rem; color: rgba(255,255,255,0.75); }
+    .footer-link { transition: color 0.2s ease, transform 0.2s ease; display: inline-flex; align-items: center; gap: 0.35rem; }
+    .footer-link:hover { color: #ffffff; transform: translateX(3px); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.12); padding-top: 2.5rem;
+      display: flex; flex-direction: column; gap: 1.5rem; justify-content: space-between;
+      color: rgba(255,255,255,0.45); font-size: 0.8125rem;
+    }
+    @media (min-width: 640px) { .footer-bottom { flex-direction: row; align-items: center; } }
+    .footer-watermark {
+      pointer-events: none; text-align: center; user-select: none; font-weight: 700;
+      font-size: clamp(5rem, 14vw, 12rem); color: rgba(255,255,255,0.04);
+      letter-spacing: -0.04em; margin-top: 3rem; line-height: 0.8;
+    }
+
+    /* NavMenu Full-Screen Overlay */
+    #nav-menu-overlay {
+      position: fixed; inset: 0; z-index: 110; background: #0a0a0a; color: #ffffff;
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 2rem; opacity: 0; pointer-events: none; transform: translateY(-100%);
+      transition: opacity 0.5s cubic-bezier(.22,1,.36,1), transform 0.6s cubic-bezier(.22,1,.36,1);
+    }
+    #nav-menu-overlay.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .nav-menu-header { display: flex; justify-content: space-between; align-items: center; }
+    .close-btn {
+      width: 3rem; height: 3rem; border-radius: 9999px; background: rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center; color: #fff;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .close-btn:hover { background: rgba(255,255,255,0.25); transform: rotate(90deg); }
+    .nav-menu-links { display: flex; flex-direction: column; gap: 1.5rem; padding-block: 3rem; }
+    .nav-menu-item {
+      font-size: clamp(2.25rem, 6vw, 4rem); font-weight: 600; letter-spacing: -0.03em;
+      color: rgba(255,255,255,0.7); transition: color 0.3s, transform 0.35s cubic-bezier(.32,1.8,.2,1);
+      display: inline-flex; align-items: center; gap: 1rem;
+    }
+    .nav-menu-item:hover { color: #ffffff; transform: translateX(1rem); }
+    .nav-menu-footer {
+      display: flex; flex-direction: column; gap: 1rem; border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 1.5rem; font-size: 0.875rem; color: rgba(255,255,255,0.5);
+    }
+    @media (min-width: 640px) { .nav-menu-footer { flex-direction: row; justify-content: space-between; } }
+
+    /* Request Modal */
+    #request-modal {
+      position: fixed; inset: 0; z-index: 115;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center; padding: 1.25rem;
+      opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+    }
+    #request-modal.open { opacity: 1; pointer-events: auto; }
+    .modal-card {
+      background: #0a0a0a; color: #ffffff; border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius-card); width: 100%; max-width: 36rem; padding: 2.5rem;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.6); transform: scale(0.94) translateY(20px);
+      transition: transform 0.4s cubic-bezier(.22,1,.36,1);
+    }
+    #request-modal.open .modal-card { transform: scale(1) translateY(0); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.75rem; }
+    .modal-title { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; }
+    .modal-form { display: flex; flex-direction: column; gap: 1.25rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .form-label { font-size: 0.8125rem; font-weight: 500; color: rgba(255,255,255,0.6); }
+    .form-input, .form-textarea {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--radius-control); padding: 0.75rem 1rem; color: #ffffff;
+      font-size: 0.875rem; font-family: inherit; transition: border-color 0.25s;
+    }
+    .form-input:focus, .form-textarea:focus { border-color: var(--accent); outline: none; }
+    .budget-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .budget-pill {
+      font-size: 0.75rem; font-weight: 500; padding: 0.5rem 0.875rem;
+      border-radius: 9999px; border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7);
+      transition: all 0.2s ease;
+    }
+    .budget-pill.active, .budget-pill:hover {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Skip link -->
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="loader-center" id="loader-center">
+      <div class="loader-brand">
+        <svg width="30" height="30" viewBox="0 0 48 48" fill="#cf8047" aria-hidden="true">
+          <path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/>
+        </svg>
+        <span>Lumora</span>
+      </div>
+      <p class="loader-slogan">Bold ideas, shipped with quiet precision.</p>
+    </div>
+    <div class="loader-progress-box">
+      <div class="loader-track">
+        <div class="loader-fill" id="loader-fill"></div>
+      </div>
+      <div class="loader-info">
+        <span>Loading</span>
+        <span class="loader-nums" id="loader-counter">000</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header id="site-header">
+    <div class="shell header-inner">
+      <!-- Left: Brand -->
+      <button class="brand-btn" id="header-brand-btn" aria-label="Lumora Home">
+        <svg width="22" height="22" viewBox="0 0 48 48" fill="var(--accent)" aria-hidden="true">
+          <path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/>
+        </svg>
+        <span>Lumora</span>
+      </button>
+
+      <!-- Center: Nav -->
+      <nav class="primary-nav" aria-label="Main Navigation">
+        <button class="nav-link-btn" data-target="home" aria-current="page">Home</button>
+        <button class="nav-link-btn" data-target="works">Work</button>
+        <button class="nav-link-btn" data-target="services">
+          Services <span style="font-size:0.75rem; opacity:0.6;">▾</span>
+        </button>
+        <button class="nav-link-btn" data-target="about">Studio</button>
+        <button class="nav-link-btn" data-target="works">Careers</button>
+        <button class="nav-link-btn" id="nav-contact-btn">Contact</button>
+      </nav>
+
+      <!-- Right: Clock & Menu -->
+      <div class="header-right">
+        <div class="clock-chip" aria-label="Studio local time">
+          <span class="clock-label">Local time</span>
+          <span class="clock-time" id="live-clock-time">9:41am</span>
+          <span class="clock-dot">•</span>
+          <span class="clock-date" id="live-clock-date">12 March, 2025</span>
+        </div>
+        <button class="menu-btn" id="open-menu-btn" aria-label="Open Navigation Menu">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <span class="menu-btn-text">Menu</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main">
+    <!-- 1. Hero Section -->
+    <section id="home">
+      <div class="liquid-reveal-wrap" id="liquid-wrap">
+        <!-- Base photo (before/after reveal) -->
+        <img class="hero-base-img" id="hero-base-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2000&q=80" alt="Lumora Studio Architecture" />
+        <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
+      </div>
+
+      <div class="hero-vignette"></div>
+      <div class="hero-watermark" id="hero-watermark">LUMORA</div>
+
+      <div class="shell hero-content-grid px-shell">
+        <!-- Left Column -->
+        <div class="hero-col-left">
+          <div class="hero-eyebrow" id="hero-eyebrow">
+            <span class="eyebrow-dot"></span>
+            <span>Independent Studio</span>
+          </div>
+
+          <h1 class="hero-heading" id="hero-heading">
+            <span class="reveal-line-clip"><span class="reveal-line-inner" style="transition-delay: 250ms;">Bold ideas,</span></span>
+            <span class="reveal-line-clip"><span class="reveal-line-inner" style="transition-delay: 370ms;">shipped with</span></span>
+            <span class="reveal-line-clip"><span class="reveal-line-inner" style="transition-delay: 490ms;">quiet precision</span></span>
+          </h1>
+
+          <div class="hero-rating-row" id="hero-rating">
+            <div class="stars-box" aria-label="5 out of 5 stars">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.9l-5.8 3.05 1.1-6.46-4.69-4.58 6.49-.94L12 2.5z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.9l-5.8 3.05 1.1-6.46-4.69-4.58 6.49-.94L12 2.5z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.9l-5.8 3.05 1.1-6.46-4.69-4.58 6.49-.94L12 2.5z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.9l-5.8 3.05 1.1-6.46-4.69-4.58 6.49-.94L12 2.5z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.9l-5.8 3.05 1.1-6.46-4.69-4.58 6.49-.94L12 2.5z"/></svg>
+            </div>
+            <span class="rating-caption">200+ brands shipped</span>
+          </div>
+
+          <div class="hero-cta-row" id="hero-cta">
+            <button class="btn-pill-dark" id="hero-talk-btn">
+              <span>Let's Talk</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <button class="btn-pill-outline" id="hero-work-btn" data-target="works">
+              <span>View Work</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column (Carousel Card & Partners) -->
+        <div class="hero-col-right">
+          <div class="hero-carousel-card" id="hero-card">
+            <div class="card-top-row">
+              <span class="card-badge" id="carousel-badge">Featured System</span>
+              <span class="card-metric" id="carousel-metric">01 / 03</span>
+            </div>
+            <h3 class="card-title" id="carousel-title">Aetheria OS Design System</h3>
+            <p class="card-desc" id="carousel-desc">Multi-platform design language and spatial token architecture built for autonomous hardware interfaces.</p>
+            <div class="card-media">
+              <img class="card-media-img" id="carousel-img" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80" alt="Design System Preview" />
+            </div>
+            <div class="card-footer-controls">
+              <div class="carousel-dots" id="carousel-dots">
+                <span class="carousel-dot active"></span>
+                <span class="carousel-dot"></span>
+                <span class="carousel-dot"></span>
+              </div>
+              <button class="nav-link-btn" id="next-carousel-btn" style="font-size:0.75rem; font-weight:600;">Next Case →</button>
+            </div>
+          </div>
+
+          <div class="partners-band">
+            <span class="partner-item">STRIPE</span>
+            <span class="partner-item">LINEAR</span>
+            <span class="partner-item">VERCEL</span>
+            <span class="partner-item">RAYCAST</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. About Statement -->
+    <section id="about" class="px-shell">
+      <div class="shell">
+        <p class="about-statement" id="about-statement">
+          We operate at the convergence of relentless aesthetic clarity and uncompromising engineering. We don't build generic software — we architect bespoke digital identities, robust distributed systems, and sensory web experiences that define industry leaders.
+        </p>
+      </div>
+    </section>
+
+    <!-- 3. CreateBand Pills -->
+    <section class="create-band-section px-shell">
+      <div class="shell">
+        <div class="create-pills-row">
+          <div class="create-pill">We</div>
+          <div class="create-pill">Build</div>
+          <div class="create-pill accent">→</div>
+          <div class="create-pill">Better</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Portfolio Section -->
+    <section id="works" class="px-shell">
+      <div class="shell">
+        <div class="section-header">
+          <span class="section-tag">Selected Works</span>
+          <h2 class="section-title">Crafted with intention</h2>
+        </div>
+
+        <div class="portfolio-grid">
+          <!-- Card 1 -->
+          <article class="project-card" data-modal="aetheria">
+            <div class="project-tags">
+              <span class="project-tag-pill">Spatial UI</span>
+              <span class="project-tag-pill">Design Architecture</span>
+              <span class="project-tag-pill">2025</span>
+            </div>
+            <div class="project-media-wrap">
+              <img class="project-img" src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80" alt="Aetheria OS" />
+            </div>
+            <div class="project-bottom-info">
+              <div>
+                <h3 class="project-name">Aetheria OS</h3>
+                <p class="project-summary">Next-gen spatial operating system and unified component architecture.</p>
+              </div>
+              <div class="project-arrow-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="project-card" data-modal="vespera">
+            <div class="project-tags">
+              <span class="project-tag-pill">AI Orchestration</span>
+              <span class="project-tag-pill">WebGL Interface</span>
+              <span class="project-tag-pill">2025</span>
+            </div>
+            <div class="project-media-wrap">
+              <img class="project-img" src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=800&q=80" alt="Vespera AI" />
+            </div>
+            <div class="project-bottom-info">
+              <div>
+                <h3 class="project-name">Vespera AI</h3>
+                <p class="project-summary">Autonomous agent coordination cockpit with realtime telemetry streaming.</p>
+              </div>
+              <div class="project-arrow-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 3 -->
+          <article class="project-card" data-modal="monolith">
+            <div class="project-tags">
+              <span class="project-tag-pill">FinTech</span>
+              <span class="project-tag-pill">Brand Identity</span>
+              <span class="project-tag-pill">Realtime Data</span>
+            </div>
+            <div class="project-media-wrap">
+              <img class="project-img" src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" alt="Monolith Capital" />
+            </div>
+            <div class="project-bottom-info">
+              <div>
+                <h3 class="project-name">Monolith Capital</h3>
+                <p class="project-summary">Algorithmic liquidity infrastructure and sovereign brand experience.</p>
+              </div>
+              <div class="project-arrow-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 4 -->
+          <article class="project-card" data-modal="solari">
+            <div class="project-tags">
+              <span class="project-tag-pill">CleanTech</span>
+              <span class="project-tag-pill">IoT Platform</span>
+              <span class="project-tag-pill">Mobile Suite</span>
+            </div>
+            <div class="project-media-wrap">
+              <img class="project-img" src="https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=800&q=80" alt="Solari Energy" />
+            </div>
+            <div class="project-bottom-info">
+              <div>
+                <h3 class="project-name">Solari Energy</h3>
+                <p class="project-summary">Planetary energy transition telemetry and grid optimization dashboard.</p>
+              </div>
+              <div class="project-arrow-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M8 7h9v9"/></svg>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Services Section -->
+    <section id="services" class="px-shell">
+      <div class="shell">
+        <div class="section-header">
+          <span class="section-tag">Disciplines & Capabilities</span>
+          <h2 class="section-title">Full-spectrum studio</h2>
+        </div>
+
+        <div class="services-list">
+          <div class="service-row">
+            <span class="service-num">01</span>
+            <h3 class="service-title">Design Systems & Architecture</h3>
+            <p class="service-desc">Scalable multi-platform component ecosystems, tokenized palettes, Figma-to-code pipelines, and strict visual governance.</p>
+            <div class="service-icon-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </div>
+          </div>
+
+          <div class="service-row">
+            <span class="service-num">02</span>
+            <h3 class="service-title">Digital Products & Platforms</h3>
+            <p class="service-desc">High-throughput web and mobile applications engineered with extreme performance, micro-interactions, and resilient backends.</p>
+            <div class="service-icon-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </div>
+          </div>
+
+          <div class="service-row">
+            <span class="service-num">03</span>
+            <h3 class="service-title">Brand Identity & Kinetic Motion</h3>
+            <p class="service-desc">Holistic brand narratives, typographic systems, 3D visual identities, and interactive storytelling for category creators.</p>
+            <div class="service-icon-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </div>
+          </div>
+
+          <div class="service-row">
+            <span class="service-num">04</span>
+            <h3 class="service-title">AI & Creative Engineering</h3>
+            <p class="service-desc">Bespoke LLM fine-tuning, WebGL / Three.js 3D web environments, shader development, and intelligent workflow automation.</p>
+            <div class="service-icon-box">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Stats Section -->
+    <section id="stats" class="px-shell">
+      <div class="shell">
+        <div class="stats-panel">
+          <div class="stat-item">
+            <span class="stat-number" data-target="140" data-prefix="$" data-suffix="M+">$0</span>
+            <span class="stat-label">Capital raised by partner startups</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="99.4" data-decimals="1" data-suffix="%">0%</span>
+            <span class="stat-label">On-time milestone delivery record</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="4.9" data-decimals="1" data-suffix="/5">0.0</span>
+            <span class="stat-label">Average enterprise client rating</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" data-target="14" data-suffix="+">0</span>
+            <span class="stat-label">Global design & engineering awards</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 7. Footer -->
+  <footer id="site-footer">
+    <div class="shell">
+      <div class="footer-top">
+        <div>
+          <h2 class="footer-cta-title">Have an ambitious project in mind? Let's build something unforgettable.</h2>
+          <button class="btn-pill-dark" id="footer-talk-btn" style="background:#cf8047; color:#0a0a0a; font-weight:700;">
+            <span>Start a Project</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Navigation</h4>
+          <ul class="footer-links">
+            <li><a href="#home" class="footer-link">Home</a></li>
+            <li><a href="#works" class="footer-link">Works</a></li>
+            <li><a href="#services" class="footer-link">Services</a></li>
+            <li><a href="#about" class="footer-link">Studio</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Locations & Inquiries</h4>
+          <ul class="footer-links">
+            <li><span class="footer-link">San Francisco, CA</span></li>
+            <li><span class="footer-link">Zurich, Switzerland</span></li>
+            <li><span class="footer-link">hello@lumora.studio</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2025–2026 Lumora Studio Inc. All rights reserved.</span>
+        <div style="display:flex; gap:1.5rem;">
+          <a href="#" class="footer-link">Privacy Policy</a>
+          <a href="#" class="footer-link">Terms of Service</a>
+          <a href="#" class="footer-link">Security</a>
+        </div>
+      </div>
+
+      <div class="footer-watermark">LUMORA</div>
+    </div>
+  </footer>
+
+  <!-- NavMenu Full-Screen Overlay -->
+  <div id="nav-menu-overlay" aria-hidden="true" role="dialog" aria-label="Navigation Menu">
+    <div class="nav-menu-header">
+      <div class="loader-brand" style="font-size:1.25rem;">
+        <svg width="24" height="24" viewBox="0 0 48 48" fill="#cf8047"><path d="M24 2c2.2 13.8 7.9 19.6 22 22-14.1 2.4-19.8 8.2-22 22-2.2-13.8-7.9-19.6-22-22 14.1-2.4 19.8-8.2 22-22Z"/></svg>
+        <span>Lumora</span>
+      </div>
+      <button class="close-btn" id="close-menu-btn" aria-label="Close menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M20 4 4 20"/></svg>
+      </button>
+    </div>
+
+    <div class="nav-menu-links">
+      <a href="#home" class="nav-menu-item" data-close="menu">01. Home</a>
+      <a href="#works" class="nav-menu-item" data-close="menu">02. Selected Work</a>
+      <a href="#services" class="nav-menu-item" data-close="menu">03. Disciplines</a>
+      <a href="#about" class="nav-menu-item" data-close="menu">04. Studio Philosophy</a>
+      <a href="#contact" class="nav-menu-item" id="menu-contact-link">05. Start a Project →</a>
+    </div>
+
+    <div class="nav-menu-footer">
+      <span>Independent Design & Engineering Studio</span>
+      <span>San Francisco • Zurich • Tokyo</span>
+    </div>
+  </div>
+
+  <!-- Request Project Modal -->
+  <div id="request-modal" aria-hidden="true" role="dialog" aria-label="Request Project Modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Start a Project</h3>
+        <button class="close-btn" id="close-modal-btn" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4l16 16M20 4 4 20"/></svg>
+        </button>
+      </div>
+
+      <form class="modal-form" id="project-request-form">
+        <div class="form-group">
+          <label class="form-label" for="req-name">Your Name</label>
+          <input class="form-input" type="text" id="req-name" required placeholder="Elena Rostova" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="req-email">Work Email</label>
+          <input class="form-input" type="email" id="req-email" required placeholder="elena@enterprise.io" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Estimated Budget (USD)</label>
+          <div class="budget-pills">
+            <button type="button" class="budget-pill active">$25k – $50k</button>
+            <button type="button" class="budget-pill">$50k – $100k</button>
+            <button type="button" class="budget-pill">$100k+</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="req-details">Project Summary</label>
+          <textarea class="form-textarea" id="req-details" rows="3" placeholder="Tell us about the vision, timeline, and goals..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-pill-dark" style="background:#cf8047; color:#0a0a0a; font-weight:700; width:100%; margin-top:0.5rem;">
+          <span>Submit Request</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CDN Importmap -->
+  <script type="importmap">
+  {
+    "imports": {
+      "lenis": "https://unpkg.com/lenis@1.3.23/dist/lenis.mjs"
+    }
+  }
+  </script>
+
+  <!-- Main JavaScript Engine -->
+  <script type="module">
+    import Lenis from 'lenis';
+
+    // 1. Reset scroll to top
+    window.scrollTo(0, 0);
+
+    // 2. Lenis Smooth Scroll Setup
+    const lenis = new Lenis({ smoothWheel: true });
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // 3. Scroll lock helper
+    let scrollEnabled = true;
+    function stopScroll() {
+      scrollEnabled = false;
+      lenis.stop();
+      document.documentElement.style.position = 'relative';
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.height = '100%';
+    }
+    function startScroll() {
+      scrollEnabled = true;
+      lenis.start();
+      document.documentElement.style.removeProperty('position');
+      document.documentElement.style.removeProperty('overflow');
+      document.documentElement.style.removeProperty('height');
+    }
+
+    // Initial lock for loader
+    stopScroll();
+
+    // 4. Smooth scrollTo helper
+    window.scrollToSection = function(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      lenis.stop();
+      setTimeout(() => {
+        const top = el.getBoundingClientRect().top + window.pageYOffset;
+        window.scrollTo({ top, behavior: 'smooth' });
+        setTimeout(() => {
+          if (scrollEnabled) lenis.start();
+        }, 100);
+      }, 50);
+    };
+
+    // 5. Adaptive Grid Scale-UP (>1920px)
+    function applyAdaptiveGrid() {
+      const FONT_BASE = 16, baseWidth = 1920, coef = 0.6666;
+      const w = window.innerWidth;
+      const widthReduction = ((baseWidth - w) / baseWidth) * 100;
+      const size = FONT_BASE - (FONT_BASE * (widthReduction * coef)) / 100;
+      if (size > FONT_BASE) {
+        document.documentElement.style.fontSize = size + 'px';
+      } else {
+        document.documentElement.style.removeProperty('font-size');
+      }
+    }
+    applyAdaptiveGrid();
+    window.addEventListener('resize', applyAdaptiveGrid);
+
+    // 6. Live Clock Chip
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const meridiem = hours >= 12 ? 'pm' : 'am';
+      hours = hours % 12 || 12;
+      const timeStr = `${hours}:${minutes}${meridiem}`;
+
+      const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      const dateStr = `${now.getDate()} ${months[now.getMonth()]}, ${now.getFullYear()}`;
+
+      const tEl = document.getElementById('live-clock-time');
+      const dEl = document.getElementById('live-clock-date');
+      if (tEl) tEl.textContent = timeStr;
+      if (dEl) dEl.textContent = dateStr;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // 7. Page Loader Logic
+    const loader = document.getElementById('page-loader');
+    const loaderFill = document.getElementById('loader-fill');
+    const loaderCounter = document.getElementById('loader-counter');
+    const loaderCenter = document.getElementById('loader-center');
+
+    const FILL_MS = 1300;
+    const startLoaderTime = performance.now();
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function stepLoader(now) {
+      const elapsed = now - startLoaderTime;
+      const t = Math.min(1, elapsed / FILL_MS);
+      const progress = Math.round(easeInOutCubic(t) * 100);
+
+      if (loaderFill) loaderFill.style.width = progress + '%';
+      if (loaderCounter) loaderCounter.textContent = String(progress).padStart(3, '0');
+
+      if (t < 1) {
+        requestAnimationFrame(stepLoader);
+      } else {
+        // Exit animation
+        setTimeout(() => {
+          if (loaderCenter) {
+            loaderCenter.style.opacity = '0';
+            loaderCenter.style.transform = 'translateY(-12px)';
+          }
+          if (loader) loader.classList.add('exit');
+
+          setTimeout(() => {
+            if (loader) loader.style.display = 'none';
+            startScroll();
+            onIntroReady();
+          }, 700);
+        }, 150);
+      }
+    }
+    requestAnimationFrame(stepLoader);
+
+    // 8. Entrance Reveals Triggered on 'ready'
+    function onIntroReady() {
+      document.getElementById('site-header')?.classList.add('ready');
+      document.getElementById('hero-watermark')?.classList.add('revealed');
+      document.getElementById('hero-eyebrow')?.classList.add('revealed');
+      document.getElementById('hero-heading')?.classList.add('revealed');
+      document.getElementById('hero-rating')?.classList.add('revealed');
+      document.getElementById('hero-cta')?.classList.add('revealed');
+      document.getElementById('hero-card')?.classList.add('revealed');
+    }
+
+    // 9. Hero Liquid Cursor Reveal
+    const liquidWrap = document.getElementById('liquid-wrap');
+    const canvas = document.getElementById('hero-canvas');
+    if (canvas && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const ctx = canvas.getContext('2d');
+      const brushRadius = 143;
+      const decay = 0.016;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      // Offscreen canvas for second image
+      const coverCanvas = document.createElement('canvas');
+      const coverCtx = coverCanvas.getContext('2d');
+
+      // Offscreen brush canvas
+      const brushCanvas = document.createElement('canvas');
+      const brushCtx = brushCanvas.getContext('2d');
+
+      const afterImg = new Image();
+      afterImg.crossOrigin = 'anonymous';
+      afterImg.src = 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=2000&q=80';
+
+      let rect = { width: 0, height: 0, left: 0, top: 0 };
+      let lastPoint = null;
+      const points = [];
+      let idle = 0;
+
+      function resizeLiquid() {
+        if (!liquidWrap) return;
+        const r = liquidWrap.getBoundingClientRect();
+        rect = r;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = r.width * dpr;
+        canvas.height = r.height * dpr;
+        coverCanvas.width = canvas.width;
+        coverCanvas.height = canvas.height;
+
+        const rad = brushRadius * dpr;
+        const diam = Math.ceil(rad * 2);
+        brushCanvas.width = diam;
+        brushCanvas.height = diam;
+
+        // Draw cover image with cover math
+        if (afterImg.complete && afterImg.naturalWidth > 0) {
+          drawCoverImage();
+        }
+      }
+
+      function drawCoverImage() {
+        const cw = coverCanvas.width, ch = coverCanvas.height;
+        const iw = afterImg.naturalWidth, ih = afterImg.naturalHeight;
+        const scale = Math.max(cw / iw, ch / ih);
+        const nw = iw * scale, nh = ih * scale;
+        const ox = (cw - nw) / 2, oy = (ch - nh) / 2;
+        coverCtx.clearRect(0, 0, cw, ch);
+        coverCtx.drawImage(afterImg, ox, oy, nw, nh);
+      }
+
+      afterImg.onload = drawCoverImage;
+      window.addEventListener('resize', resizeLiquid);
+      setTimeout(resizeLiquid, 100);
+
+      window.addEventListener('pointermove', (e) => {
+        if (!rect.width) return;
+        const x = (e.clientX - rect.left) * dpr;
+        const y = (e.clientY - rect.top) * dpr;
+        const rad = brushRadius * dpr;
+
+        if (x < -rad || x > canvas.width + rad || y < -rad || y > canvas.height + rad) {
+          lastPoint = null;
+          return;
+        }
+
+        if (!lastPoint) {
+          lastPoint = { x, y };
+          points.push({ x, y });
+          return;
+        }
+
+        const dist = Math.hypot(x - lastPoint.x, y - lastPoint.y);
+        const step = Math.max(rad * 0.3, 1);
+        const n = Math.min(Math.ceil(dist / step), 60);
+
+        for (let i = 1; i <= n; i++) {
+          const t = i / n;
+          points.push({
+            x: lastPoint.x + (x - lastPoint.x) * t,
+            y: lastPoint.y + (y - lastPoint.y) * t
+          });
+        }
+        lastPoint = { x, y };
+      }, { passive: true });
+
+      function stamp(x, y) {
+        const rad = brushRadius * dpr;
+        const diam = Math.ceil(rad * 2);
+        const c = diam / 2;
+
+        brushCtx.clearRect(0, 0, diam, diam);
+        brushCtx.globalCompositeOperation = 'source-over';
+        const grad = brushCtx.createRadialGradient(c, c, 0, c, c, rad);
+        grad.addColorStop(0, 'rgba(255,255,255,1)');
+        grad.addColorStop(0.55, 'rgba(255,255,255,0.82)');
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        brushCtx.fillStyle = grad;
+        brushCtx.fillRect(0, 0, diam, diam);
+
+        brushCtx.globalCompositeOperation = 'source-in';
+        brushCtx.drawImage(coverCanvas, x - c, y - c, diam, diam, 0, 0, diam, diam);
+
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.drawImage(brushCanvas, x - c, y - c);
+      }
+
+      function tickLiquid() {
+        const drawing = points.length > 0;
+        if (drawing) {
+          idle = 0;
+        } else {
+          idle++;
+        }
+
+        if (idle <= 120) {
+          const fade = drawing ? decay : Math.min(decay + idle * 0.004, 0.5);
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.fillStyle = `rgba(0,0,0,${fade})`;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          if (drawing) {
+            for (let i = 0; i < points.length; i++) {
+              stamp(points[i].x, points[i].y);
+            }
+            points.length = 0;
+          }
+          if (idle === 120) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+        }
+        requestAnimationFrame(tickLiquid);
+      }
+      requestAnimationFrame(tickLiquid);
+    }
+
+    // 10. Word Reveal for About Statement
+    const aboutEl = document.getElementById('about-statement');
+    if (aboutEl) {
+      const words = aboutEl.textContent.trim().split(/\s+/);
+      aboutEl.innerHTML = words.map((w, i) =>
+        `<span class="word-span" style="transition-delay: ${i * 28}ms">${w}</span>`
+      ).join(' ');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            aboutEl.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.25 });
+      observer.observe(aboutEl);
+    }
+
+    // 11. Hero Carousel Switcher
+    const carouselData = [
+      {
+        badge: "Featured System",
+        metric: "01 / 03",
+        title: "Aetheria OS Design System",
+        desc: "Multi-platform design language and spatial token architecture built for autonomous hardware interfaces.",
+        img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        badge: "AI Platform",
+        metric: "02 / 03",
+        title: "Vespera Telemetry Suite",
+        desc: "High-frequency neural monitoring dashboards with WebGL graph visualizers and sub-10ms data streaming.",
+        img: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        badge: "FinTech Hub",
+        metric: "03 / 03",
+        title: "Monolith Capital Grid",
+        desc: "Sovereign institutional liquidity console processing over $2.4B in annual digital asset turnover.",
+        img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80"
+      }
+    ];
+
+    let currentSlide = 0;
+    const badgeEl = document.getElementById('carousel-badge');
+    const metricEl = document.getElementById('carousel-metric');
+    const titleEl = document.getElementById('carousel-title');
+    const descEl = document.getElementById('carousel-desc');
+    const imgEl = document.getElementById('carousel-img');
+    const dots = document.querySelectorAll('.carousel-dot');
+
+    function setSlide(index) {
+      currentSlide = index % carouselData.length;
+      const data = carouselData[currentSlide];
+      if (badgeEl) badgeEl.textContent = data.badge;
+      if (metricEl) metricEl.textContent = data.metric;
+      if (titleEl) titleEl.textContent = data.title;
+      if (descEl) descEl.textContent = data.desc;
+      if (imgEl) imgEl.src = data.img;
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentSlide);
+      });
+    }
+
+    document.getElementById('next-carousel-btn')?.addEventListener('click', () => {
+      setSlide(currentSlide + 1);
+    });
+
+    // 12. Stats Scroll Counter
+    const statItems = document.querySelectorAll('.stat-number');
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseFloat(el.dataset.target);
+          const prefix = el.dataset.prefix || '';
+          const suffix = el.dataset.suffix || '';
+          const decimals = parseInt(el.dataset.decimals || '0');
+          const duration = 1800;
+          const start = performance.now();
+
+          function updateStat(now) {
+            const progress = Math.min(1, (now - start) / duration);
+            const val = (target * (1 - Math.pow(1 - progress, 3))).toFixed(decimals);
+            el.textContent = `${prefix}${val}${suffix}`;
+            if (progress < 1) requestAnimationFrame(updateStat);
+          }
+          requestAnimationFrame(updateStat);
+          statsObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.4 });
+    statItems.forEach(el => statsObserver.observe(el));
+
+    // 13. Nav & Overlay Handlers
+    const navMenu = document.getElementById('nav-menu-overlay');
+    const requestModal = document.getElementById('request-modal');
+
+    document.getElementById('open-menu-btn')?.addEventListener('click', () => {
+      navMenu.classList.add('open');
+      stopScroll();
+    });
+    document.getElementById('close-menu-btn')?.addEventListener('click', () => {
+      navMenu.classList.remove('open');
+      startScroll();
+    });
+
+    document.querySelectorAll('[data-close="menu"]').forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('open');
+        startScroll();
+      });
+    });
+
+    function openModal() {
+      requestModal.classList.add('open');
+      stopScroll();
+    }
+    function closeModal() {
+      requestModal.classList.remove('open');
+      startScroll();
+    }
+
+    document.getElementById('nav-contact-btn')?.addEventListener('click', openModal);
+    document.getElementById('hero-talk-btn')?.addEventListener('click', openModal);
+    document.getElementById('footer-talk-btn')?.addEventListener('click', openModal);
+    document.getElementById('menu-contact-link')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      navMenu.classList.remove('open');
+      setTimeout(openModal, 300);
+    });
+    document.getElementById('close-modal-btn')?.addEventListener('click', closeModal);
+
+    requestModal.addEventListener('click', (e) => {
+      if (e.target === requestModal) closeModal();
+    });
+
+    // Form Submission stub
+    document.getElementById('project-request-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      btn.innerHTML = '<span>Request Received ✓</span>';
+      btn.style.background = '#22c55e';
+      setTimeout(() => {
+        closeModal();
+        setTimeout(() => {
+          btn.innerHTML = '<span>Submit Request</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+          btn.style.background = '#cf8047';
+        }, 500);
+      }, 1200);
+    });
+
+    // Budget selector pills
+    document.querySelectorAll('.budget-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        document.querySelectorAll('.budget-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+      });
+    });
+
+    // Nav anchor buttons
+    document.querySelectorAll('[data-target]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.target;
+        if (target) window.scrollToSection(target);
+      });
+    });
+    document.getElementById('header-brand-btn')?.addEventListener('click', () => {
+      window.scrollToSection('home');
+    });
+
+  </script>
+</body>
+</html>
