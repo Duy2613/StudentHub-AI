@@ -32,7 +32,6 @@ import {
 } from "@/lib/auth/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
 import OtpVerificationOrbit from "@/components/ui/otp-verification-orbit";
-import FloatingForcefieldOrbs from "@/components/ui/floating-forcefield-orbs";
 
 const STEP_FORM = "FORM";
 const STEP_OTP = "OTP";
@@ -162,9 +161,7 @@ const RegisterPage = () => {
   const isStudentEmail = ACADEMIC_EMAIL_REGEX.test(email);
 
   return (
-    <>
-      <FloatingForcefieldOrbs />
-      <AuthCard mode={isStudentEmail ? "emerald-wave" : "cosmic-wave"}>
+    <AuthCard mode={isStudentEmail ? "emerald-wave" : "cosmic-wave"}>
       {/* Header */}
       <div className="mb-8 flex flex-col items-center text-center">
         <div className="relative mb-5 group/icon">
@@ -345,7 +342,6 @@ const RegisterPage = () => {
         </div>
       )}
     </AuthCard>
-    </>
   );
 };
 
