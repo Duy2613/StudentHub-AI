@@ -4,18 +4,18 @@
 ---
 
 ## 1. Trạng Thái Hiện Tại (Current Working Snapshot)
-- **Phiên bản**: StudentHub AI v2.7.
+- **Phiên bản**: StudentHub AI v2.8.
 - **Vừa triển khai**:
-  1. ✅ **Obsidian Installation**: Đã tự động cài đặt Obsidian Desktop qua Winget (`Obsidian.Obsidian v1.13.7`).
-  2. ✅ **Obsidian Vault Setup**: Đã khởi tạo hoàn chỉnh cây tri thức và Graph View tại `docs/vault/`.
-  3. ✅ **Settigation OTP Verification v3**: Đã xây dựng component `OtpVerificationOrbit` và tích hợp vào `/register`.
-  4. ✅ **Refero Styles & OpenHero**: Nâng cấp hiệu ứng Cinematic Mesh Glow cho `HeroSection.jsx`.
-  5. ✅ **Creative Web & 3D Engineering Showcases (v2.7)**:
-     - 🏛️ **Lumora Studio**: Single-file Adaptive Grid, Intro Loader đếm số, Canvas Liquid Cursor Reveal, Lenis smooth scroll.
-     - 🥤 **Soda 3D Beverage Landing**: 3D can tilt tracking, GSAP, berry force field repulsion, flavor switching 720° spin.
-     - 🌊 **Flow Wave**: Three.js Simplex noise particle wave shader, 620vh camera dive, UnrealBloom postprocessing.
-     - ✨ **Cosmic Dust**: 940 amber & ember particles fly-through, warp3d shader, corner flame composite pass.
-     - 🚀 **Showcase Hub & Explorer**: `/showcase` (Next.js) & `public/showcases/index.html`.
+  1. ✅ **Core App Creative FX Infusion (v2.8)**:
+     - 🌌 `CreativeShaderCanvas.jsx`: WebGL / Three.js Simplex Noise wave + Cosmic Dust particles phản hồi con trỏ chuột, tích hợp vào **Hero Trang Chủ**, **Trang Đăng Nhập**, **Trang Đăng Ký**, và **Dashboard**.
+     - 🖌️ `LiquidStudyReveal.jsx`: Canvas Liquid Cursor Reveal bóc tách giữa bài vở truyền thống và giải pháp AI Supercharged.
+     - 🔮 `FloatingForcefieldOrbs.jsx`: Cụm viên nang tri thức 3D tự động dạt ra khi rê chuột (force field physics).
+     - ⏱️ `LiveStudioClock.jsx`: Chip đồng hồ kính mờ thời gian thực trên Navbar trang chủ và Header Dashboard.
+     - 🎨 **Theme Morphing (Soda-inspired)**: Chuyển dịch không gian ánh sáng sang màu ngọc lục bảo khi nhập email trường `.edu`.
+  2. ✅ **Creative Web & 3D Engineering Showcases (v2.7)**:
+     - 🏛️ Lumora Studio, 🥤 Soda 3D, 🌊 Flow Wave, ✨ Cosmic Dust, 🚀 Lab Hub (`/showcase`).
+  3. ✅ **Settigation OTP Verification v3**: `OtpVerificationOrbit.jsx` trên `/register`.
+  4. ✅ **Obsidian Vault**: Hoàn chỉnh cây tri thức tại `docs/vault/`.
 
 ---
 

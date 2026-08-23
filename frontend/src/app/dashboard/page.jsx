@@ -38,7 +38,8 @@ import AvatarDisplay from "@/components/AvatarDisplay";
 import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
 import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
 import { AVATAR_LIST } from "@/lib/avatars";
-
+import LiveStudioClock from "@/components/ui/live-studio-clock";
+import CreativeShaderCanvas from "@/components/ui/creative-shader-canvas";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -257,8 +258,12 @@ export default function DashboardPage() {
           </div>
 
           {/* Right User Status & Actions */}
-          {/* Right User Status & Actions */}
           <div className="flex items-center gap-3 sm:gap-4">
+            {/* Live Studio Clock */}
+            <div className="hidden lg:block">
+              <LiveStudioClock />
+            </div>
+
             {/* Trust Score Badge */}
             <div
               className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold backdrop-blur-md ${
@@ -288,6 +293,8 @@ export default function DashboardPage() {
               : "bg-gradient-to-r from-indigo-950/40 via-space-900 to-space-950 border-indigo-500/30"
           }`}
         >
+          {/* Creative Shader Wave inside Dashboard Banner */}
+          <CreativeShaderCanvas mode={isExpert ? "amber-dust" : "cosmic-wave"} opacity={0.45} />
           <div className="absolute -right-10 -bottom-10 w-64 h-64 rounded-full bg-gradient-to-br from-indigo-500/10 to-purple-500/20 blur-3xl pointer-events-none" />
 
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">

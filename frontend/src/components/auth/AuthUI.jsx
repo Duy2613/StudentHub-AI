@@ -87,9 +87,12 @@ export const VerificationNetwork = () => (
   </svg>
 );
 
-export const AmbientBackground = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-space-950 via-[#0F1117] to-black opacity-90"></div>
+import CreativeShaderCanvas from "@/components/ui/creative-shader-canvas";
+
+export const AmbientBackground = ({ mode = "cosmic-wave" }) => (
+  <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+    <CreativeShaderCanvas mode={mode} opacity={0.65} />
+    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-space-950/60 via-[#0F1117]/80 to-black/90"></div>
     <div className="absolute top-[-20%] left-[-20%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-r from-indigo-700/20 to-purple-700/20 blur-[140px] animate-blob-slow mix-blend-screen"></div>
     <div className="absolute bottom-[-30%] right-[-20%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-r from-blue-700/20 to-teal-700/20 blur-[140px] animate-blob-medium animation-delay-2000 mix-blend-screen"></div>
     <VerificationNetwork />
@@ -370,9 +373,9 @@ export const StudentBenefitBanner = ({ email }) => {
   );
 };
 
-export const AuthCard = ({ children }) => (
+export const AuthCard = ({ children, mode = "cosmic-wave" }) => (
   <div className="min-h-screen flex items-center justify-center overflow-hidden relative py-12 px-4 sm:px-6 lg:px-8 font-sans bg-space-950 select-none">
-    <AmbientBackground />
+    <AmbientBackground mode={mode} />
     <NoiseOverlay />
     <div className="max-w-[440px] w-full relative z-10 perspective-1000 animate-card-in">
       <div className="relative bg-white/[0.02] backdrop-blur-2xl py-10 px-8 sm:px-10 shadow-glass-deep border border-white/[0.08] rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-neon-primary hover:border-white/20">

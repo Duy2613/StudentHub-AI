@@ -29,6 +29,8 @@ import {
 } from "@/lib/auth/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
 
+import FloatingForcefieldOrbs from "@/components/ui/floating-forcefield-orbs";
+
 const LoginPage = () => {
   const router = useRouter();
   const { ensureSynced, loginAsDemo } = useAuth();
@@ -105,7 +107,9 @@ const LoginPage = () => {
   const isAnyLoading = isLoading || isOAuthLoading;
 
   return (
-    <AuthCard>
+    <>
+      <FloatingForcefieldOrbs />
+      <AuthCard>
       <div className="mb-8 flex flex-col items-center text-center">
         <div className="relative mb-5 group/icon">
           <div className="absolute -inset-3 bg-gradient-to-tr from-indigo-600/50 to-purple-600/50 rounded-full blur-xl opacity-50 animate-pulse-slow group-hover/icon:opacity-80 transition-opacity"></div>
@@ -221,6 +225,7 @@ const LoginPage = () => {
         </a>
       </p>
     </AuthCard>
+    </>
   );
 };
 

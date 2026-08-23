@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
+import LiveStudioClock from "@/components/ui/live-studio-clock";
 
 
 export default function LandingHeader() {
@@ -49,9 +50,9 @@ export default function LandingHeader() {
           : "bg-transparent py-5"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center gap-3 group shrink-0">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-cyan-500 p-[1.5px] transition-transform duration-300 group-hover:scale-105">
             <div className="w-full h-full bg-space-950 rounded-[10px] flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 transition-colors" />
@@ -68,20 +69,21 @@ export default function LandingHeader() {
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1 lg:gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md">
+        <nav className="hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-md">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-xs lg:text-sm font-medium text-gray-300 hover:text-white px-3 py-1.5 rounded-full hover:bg-white/5 transition-all duration-200"
+              className="px-3 py-1.5 rounded-full text-xs font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        {/* Auth CTA Actions with User Dropdown Popover */}
+        {/* Live Studio Clock & Auth CTA Actions with User Dropdown Popover */}
         <div className="hidden md:flex items-center gap-3">
+          <LiveStudioClock />
           <UserDropdownMenu />
         </div>
 
