@@ -26,8 +26,9 @@ import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 import { WordRotate } from "@/components/ui/word-rotate";
 import { Button } from "@/components/ui/button";
 import Hero3DCanvas from "@/components/home/Hero3DCanvas";
-
-
+import CreativeShaderCanvas from "@/components/ui/creative-shader-canvas";
+import FloatingForcefieldOrbs from "@/components/ui/floating-forcefield-orbs";
+import LiquidStudyReveal from "@/components/ui/liquid-study-reveal";
 
 export default function HeroSection() {
   const [activeTab, setActiveTab] = useState(0);
@@ -120,6 +121,10 @@ def dijkstra(graph, start):
 
   return (
     <section className="relative pt-28 pb-16 md:pt-36 md:pb-24 overflow-hidden">
+      {/* Live Procedural WebGL Shader Canvas & Cosmic Particles */}
+      <CreativeShaderCanvas mode="cosmic-wave" opacity={0.55} />
+      <FloatingForcefieldOrbs />
+
       {/* Aceternity Spotlight Effect */}
       <Spotlight
         className="-top-40 left-0 md:left-60 md:-top-20"
@@ -136,7 +141,7 @@ def dijkstra(graph, start):
       <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none -z-10" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(7,9,14,0.85)_100%)] pointer-events-none -z-10" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Top Eyebrow Badge with Magic UI AnimatedGradientText */}
         <div className="flex justify-center mb-6">
           <AnimatedGradientText>
@@ -167,8 +172,24 @@ def dijkstra(graph, start):
             Hỏi đáp bài tập, tóm tắt tài liệu học thuật và nhận cố vấn 1:1 từ mạng lưới chuyên gia uy tín. Tăng tốc hiệu suất học tập lên 300%.
           </p>
 
+          {/* Lumora-style Kinetic Pills Row */}
+          <div className="my-6 flex flex-wrap items-center justify-center gap-2 select-none">
+            <span className="px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-xs font-semibold text-slate-300 hover:bg-white/10 hover:scale-105 transition-all cursor-default">
+              📚 Học Thuật
+            </span>
+            <span className="px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-xs font-semibold text-indigo-300 hover:bg-indigo-500/20 hover:scale-105 transition-all cursor-default">
+              🤖 AI Copilot
+            </span>
+            <span className="px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-xs font-bold text-amber-300 hover:scale-110 transition-all cursor-default">
+              ➔
+            </span>
+            <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/40 text-xs font-bold text-emerald-300 hover:scale-105 transition-all cursor-default">
+              🚀 Bứt Phá Điểm Số
+            </span>
+          </div>
+
           {/* CTA Buttons */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/register"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-base font-bold bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 text-white shadow-neon-primary hover:brightness-110 active:scale-95 transition-all"
@@ -204,6 +225,11 @@ def dijkstra(graph, start):
           <div className="relative rounded-[calc(2.5rem-0.375rem)] overflow-hidden bg-space-950/80 border border-white/10">
             <Hero3DCanvas />
           </div>
+        </div>
+
+        {/* Lumora-inspired Liquid Study Reveal Canvas Preview */}
+        <div className="my-12 max-w-5xl mx-auto">
+          <LiquidStudyReveal />
         </div>
 
         {/* Interactive Live AI Copilot Terminal Preview with BorderBeam */}
