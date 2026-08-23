@@ -11,6 +11,8 @@ import { Eye, EyeOff, Lock, Loader2, ArrowRight, AlertCircle, GraduationCap, Che
 import AuthSurroundings from "@/components/auth/AuthSurroundings";
 import { Meteors } from "@/components/ui/meteors";
 import ConstellationWaveCanvas from "@/components/ui/constellation-wave-canvas";
+import CinematicVideoAtmosphere from "@/components/ui/cinematic-video-atmosphere";
+import PageTransitionWrapper from "@/components/ui/page-transition-wrapper";
 
 export const NoiseOverlay = () => (
   <div
@@ -26,12 +28,15 @@ export const AmbientBackground = ({ mode = "cosmic-wave" }) => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
       {/* 1. Interactive 3D Dot Wave & Connected Constellation Polygon Mesh */}
-      <ConstellationWaveCanvas mode={mode} opacity={0.9} density="high" />
+      <ConstellationWaveCanvas mode={mode} opacity={0.95} density="high" />
 
-      {/* 2. Meteors */}
+      {/* 2. Procedural Cinematic Video-Grade Atmosphere */}
+      <CinematicVideoAtmosphere opacity={0.7} />
+
+      {/* 3. Meteors */}
       <Meteors number={16} />
 
-      {/* 3. Multi-Hue Atmospheric Radial Mesh (Pure GPU 60fps CSS) */}
+      {/* 4. Multi-Hue Atmospheric Radial Mesh (Pure GPU 60fps CSS) */}
       <div
         className={`absolute top-[-15%] left-[-15%] w-[60vw] h-[60vw] rounded-full blur-[150px] animate-blob-slow mix-blend-screen transition-all duration-700 ${
           isEmerald
@@ -333,25 +338,27 @@ export const StudentBenefitBanner = ({ email }) => {
 import { BorderBeam } from "@/components/ui/border-beam";
 
 /**
- * AuthCard: Double-bezel concentric enclosure with sweeping BorderBeam wrapped in AuthSurroundings.
+ * AuthCard: Double-bezel concentric enclosure with sweeping BorderBeam, PageTransitionWrapper and AuthSurroundings.
  */
 export const AuthCard = ({ children, mode = "cosmic-wave" }) => (
-  <div className="min-h-screen relative overflow-hidden font-sans bg-space-950 select-none">
-    <AmbientBackground mode={mode} />
-    <NoiseOverlay />
-    <AuthSurroundings>
-      <div className="max-w-[460px] w-full perspective-1000 animate-card-in">
-        {/* Outer Shell: Machine-tooled bezel with BorderBeam laser effect */}
-        <div className="relative p-1.5 rounded-[32px] bg-white/[0.04] border border-white/10 shadow-glass-deep backdrop-blur-3xl transition-all duration-500 hover:border-white/25 hover:shadow-neon-primary overflow-hidden">
-          <BorderBeam size={220} duration={10} colorFrom="#6366f1" colorTo="#34e7c4" />
-          
-          {/* Inner Core: Deep Space Cyber Canvas */}
-          <div className="relative rounded-[calc(32px-0.375rem)] bg-space-950/85 backdrop-blur-2xl py-8 px-6 sm:py-10 sm:px-10 border border-white/[0.06] overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-70" />
-            {children}
+  <PageTransitionWrapper>
+    <div className="min-h-screen relative overflow-hidden font-sans bg-space-950 select-none">
+      <AmbientBackground mode={mode} />
+      <NoiseOverlay />
+      <AuthSurroundings>
+        <div className="max-w-[460px] w-full perspective-1000 animate-card-in">
+          {/* Outer Shell: Machine-tooled bezel with BorderBeam laser effect */}
+          <div className="relative p-1.5 rounded-[32px] bg-white/[0.04] border border-white/10 shadow-glass-deep backdrop-blur-3xl transition-all duration-500 hover:border-white/25 hover:shadow-neon-primary overflow-hidden">
+            <BorderBeam size={220} duration={10} colorFrom="#6366f1" colorTo="#34e7c4" />
+            
+            {/* Inner Core: Deep Space Cyber Canvas */}
+            <div className="relative rounded-[calc(32px-0.375rem)] bg-space-950/85 backdrop-blur-2xl py-8 px-6 sm:py-10 sm:px-10 border border-white/[0.06] overflow-hidden">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-70" />
+              {children}
+            </div>
           </div>
         </div>
-      </div>
-    </AuthSurroundings>
-  </div>
+      </AuthSurroundings>
+    </div>
+  </PageTransitionWrapper>
 );

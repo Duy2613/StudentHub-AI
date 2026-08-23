@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth/AuthContext";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
+import CustomMorphingCursor from "@/components/ui/custom-morphing-cursor";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col bg-space-950 text-gray-100">
+                <CustomMorphingCursor />
                 <AuthProvider>
                     <SmoothScrollProvider>
                         {children}

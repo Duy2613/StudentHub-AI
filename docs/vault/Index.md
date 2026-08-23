@@ -30,6 +30,7 @@ graph TD
     Features --> Whiteboard["Interactive-Whiteboard-Tldraw.md"]
     Features --> Workspaces["Study-Workspaces-Realtime.md"]
     Features --> WebGLSkill["Creative-3D-WebGL-Engine-Skill.md"]
+    Features --> MotionSkill["Cinematic-Motion-Experience-Skill.md"]
 ```
 
 ---
@@ -60,6 +61,7 @@ graph TD
 - [[Student-Benefit-Program|Student Benefit Program]]: Nhận diện email `.edu` và cộng điểm uy tín.
 - [[Creative-Engine-Showcases|Creative Web & 3D Engineering Showcases]]: Bộ sưu tập 4 tác phẩm Lumora, Soda 3D, Flow Wave và Cosmic Dust.
 - [[Creative-3D-WebGL-Engine-Skill|Creative 3D & WebGL Engine Skill]]: Đóng gói toàn bộ kỹ năng Shaders, Canvas và Three.js.
+- [[Cinematic-Motion-Experience-Skill|Cinematic Motion Experience Skill]]: 4 trụ cột Parallax Scrolling, Magnetic Cursor, Page Transitions và Video Atmosphere.
 
 ### 5. [[Sprint-Board|📋 04 - Roadmap & Tasks]]
 - [[Sprint-Board|Sprint Tasks & Tiến Độ]]: Danh sách tính năng đang làm, hoàn tất, backlog.
