@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Lock, Loader2, ArrowRight, AlertCircle, GraduationCap, CheckCircle2 } from "lucide-react";
 import AuthSurroundings from "@/components/auth/AuthSurroundings";
 import { Meteors } from "@/components/ui/meteors";
+import ConstellationWaveCanvas from "@/components/ui/constellation-wave-canvas";
 
 export const NoiseOverlay = () => (
   <div
@@ -20,82 +21,17 @@ export const NoiseOverlay = () => (
   />
 );
 
-// StudentHub AI visual signature: glowing verification nodes & edges
-const NETWORK_NODES = [
-  { x: 80, y: 90, r: 3, hero: true, delay: 0 },
-  { x: 150, y: 220, r: 2, delay: 0.4 },
-  { x: 60, y: 340, r: 2.5, delay: 0.8 },
-  { x: 140, y: 480, r: 3, hero: true, delay: 1.2 },
-  { x: 200, y: 100, r: 1.5, delay: 1.6 },
-  { x: 720, y: 100, r: 2.5, delay: 0.2 },
-  { x: 650, y: 60, r: 2, delay: 0.6 },
-  { x: 740, y: 260, r: 3, hero: true, delay: 1.0 },
-  { x: 680, y: 400, r: 2, delay: 1.4 },
-  { x: 730, y: 500, r: 2.5, delay: 1.8 },
-  { x: 600, y: 200, r: 1.5, delay: 2.0 },
-  { x: 100, y: 550, r: 1.5, delay: 2.2 },
-];
-
-const NETWORK_EDGES = [
-  [0, 1], [1, 2], [2, 3], [0, 4], [1, 4],
-  [5, 6], [5, 7], [7, 8], [8, 9], [6, 10], [5, 10],
-  [3, 11],
-];
-
-export const VerificationNetwork = () => (
-  <svg
-    className="absolute inset-0 w-full h-full pointer-events-none"
-    viewBox="0 0 800 600"
-    preserveAspectRatio="xMidYMid slice"
-    fill="none"
-    aria-hidden="true"
-  >
-    <defs>
-      <linearGradient id="network-line" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stopColor="#34E7C4" stopOpacity="0.35" />
-        <stop offset="100%" stopColor="#34E7C4" stopOpacity="0" />
-      </linearGradient>
-    </defs>
-    {NETWORK_EDGES.map(([a, b], i) => {
-      const n1 = NETWORK_NODES[a];
-      const n2 = NETWORK_NODES[b];
-      return (
-        <line
-          key={`edge-${i}`}
-          x1={n1.x}
-          y1={n1.y}
-          x2={n2.x}
-          y2={n2.y}
-          stroke="url(#network-line)"
-          strokeWidth="1"
-          className="network-edge"
-          style={{ animationDelay: `${(n1.delay + n2.delay) / 2}s` }}
-        />
-      );
-    })}
-    {NETWORK_NODES.map((n, i) => (
-      <circle
-        key={`node-${i}`}
-        cx={n.x}
-        cy={n.y}
-        r={n.r}
-        fill={n.hero ? "#34E7C4" : "#6EEFDA"}
-        className="network-node"
-        style={{
-          animationDelay: `${n.delay}s`,
-          filter: n.hero ? "drop-shadow(0 0 6px #34E7C4)" : undefined,
-        }}
-      />
-    ))}
-  </svg>
-);
-
 export const AmbientBackground = ({ mode = "cosmic-wave" }) => {
   const isEmerald = mode === "emerald-wave";
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+      {/* 1. Interactive 3D Dot Wave & Connected Constellation Polygon Mesh */}
+      <ConstellationWaveCanvas mode={mode} opacity={0.9} density="high" />
+
+      {/* 2. Meteors */}
       <Meteors number={16} />
-      {/* Dynamic Multi-Hue Atmospheric Radial Mesh (Pure GPU 60fps CSS) */}
+
+      {/* 3. Multi-Hue Atmospheric Radial Mesh (Pure GPU 60fps CSS) */}
       <div
         className={`absolute top-[-15%] left-[-15%] w-[60vw] h-[60vw] rounded-full blur-[150px] animate-blob-slow mix-blend-screen transition-all duration-700 ${
           isEmerald
@@ -115,8 +51,7 @@ export const AmbientBackground = ({ mode = "cosmic-wave" }) => {
           isEmerald ? "bg-emerald-950/20" : "bg-indigo-950/20"
         }`}
       />
-      <div className="absolute inset-0 bg-grid-pattern opacity-30" />
-      <VerificationNetwork />
+      <div className="absolute inset-0 bg-grid-pattern opacity-20" />
     </div>
   );
 };

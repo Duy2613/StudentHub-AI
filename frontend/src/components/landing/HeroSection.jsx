@@ -27,6 +27,7 @@ import { Meteors } from "@/components/ui/meteors";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 import { WordRotate } from "@/components/ui/word-rotate";
+import ConstellationWaveCanvas from "@/components/ui/constellation-wave-canvas";
 
 export default function HeroSection() {
   const [activeTab, setActiveTab] = useState(0);
@@ -119,20 +120,23 @@ def dijkstra(graph, start):
 
   return (
     <section className="relative pt-28 pb-16 md:pt-36 md:pb-24 overflow-hidden select-none">
-      {/* Lightweight Aceternity Spotlight Effect */}
+      {/* 1. Interactive 3D Dot Wave & Geometric Constellation Canvas */}
+      <ConstellationWaveCanvas mode="cosmic-wave" density="high" opacity={0.85} />
+
+      {/* 2. Lightweight Aceternity Spotlight Effect */}
       <Spotlight
         className="-top-40 left-0 md:left-60 md:-top-20"
         fill="rgba(99, 102, 241, 0.35)"
       />
       
-      {/* Subtle Meteors Effect */}
+      {/* 3. Subtle Meteors Effect */}
       <Meteors number={16} />
 
-      {/* Pure Hardware-Accelerated Ambient Glow Blobs (0% WebGL Overhead) */}
+      {/* 4. Pure Hardware-Accelerated Ambient Glow Blobs (0% WebGL Overhead) */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] md:w-[900px] h-[450px] bg-gradient-to-tr from-indigo-600/20 via-purple-600/15 to-cyan-400/10 blur-[130px] rounded-full pointer-events-none -z-10 animate-blob-slow" />
       <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-indigo-500/15 blur-[90px] rounded-full pointer-events-none -z-10 animate-blob-medium" />
       <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-purple-600/15 blur-[100px] rounded-full pointer-events-none -z-10 animate-blob-slow animation-delay-4000" />
-      <div className="absolute inset-0 bg-grid-pattern opacity-30 pointer-events-none -z-10" />
+      <div className="absolute inset-0 bg-grid-pattern opacity-25 pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Top Eyebrow Badge */}
