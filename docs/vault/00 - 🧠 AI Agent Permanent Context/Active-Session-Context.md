@@ -4,21 +4,21 @@
 ---
 
 ## 1. Trạng Thái Hiện Tại (Current Working Snapshot)
-- **Phiên bản**: StudentHub AI v2.8.4 (Constellation Wave & Geometric Neural Mesh).
+- **Phiên bản**: StudentHub AI v2.8.5 (Cinematic Auth Animations & Full-Viewport Wave Mesh).
 - **Vừa triển khai & Kiểm thử**:
-  1. ✅ **Hiệu ứng Mạng Lưới Điểm Lượn Sóng & Đa Giác Chòm Sao (v2.8.4)**:
-     - 🌌 `ConstellationWaveCanvas.jsx`: Tích hợp 2 lớp tương tác: Sóng điểm 3D uốn lượn (Undulating 3D Dot Wave) theo hệ hàm sin/cosin và mạng lưới liên kết điểm hình học chòm sao (Geometric Constellation Polygon Triangles) phản hồi chuột với ánh sáng phát quang đa sắc (Cyan, Indigo, Purple, Warm Amber).
-     - 🚀 Áp dụng trực tiếp vào **Hero Section (`HeroSection.jsx`)** và **Giao diện Đăng nhập / Đăng ký (`AuthUI.jsx`)**, loại bỏ hoàn toàn cảm giác nền đen trống trải.
+  1. ✅ **Nâng cấp Hệ thống Animation Đăng Nhập & Đăng Ký (v2.8.5)**:
+     - 💫 `BorderBeam`: Đường viền laser quét động liên tục quanh `AuthCard` theo chu kỳ 10s chuyển sắc từ Indigo sang Mint Cyan.
+     - 🌊 `ConstellationWaveCanvas.jsx`: Mở rộng sóng điểm 3D và mạng lưới chòm sao đa giác ra toàn bộ Viewport (`width x height`), mật độ 90+ nodes, 60+ hạt bụi stardust lấp lánh và sóng 3D rực rỡ 6 sắc màu.
+     - 🎛️ `AuthSurroundings.jsx`: Tích hợp các micro-animations cho thẻ Telemetry (thanh sóng âm AI Socratic nhấp nháy, avatar Cố Vấn 1:1, chip Code Sandbox thời gian thực, khiên Edu SSO phát sáng).
   2. ✅ **Tinh gọn điều hướng (Navigation Clean-up)**:
-     - Đã loại bỏ liên kết "Creative Lab" khỏi Header chính (`LandingHeader.jsx`) và Dock nổi phía dưới (`HomePage.jsx`) theo đúng yêu cầu người dùng, đưa toàn bộ hiệu ứng thị giác chất lượng cao ra ngoài các trang chính.
+     - Đã loại bỏ hoàn toàn mục "Creative Lab" khỏi Header và Dock nổi.
   3. ✅ **Đóng gói Kỹ năng Agent**:
-     - Skill vĩnh viễn `.agents/skills/creative-3d-webgl-engine/SKILL.md` và tài liệu Obsidian Vault.
+     - Skill vĩnh viễn `.agents/skills/creative-3d-webgl-engine/SKILL.md`.
 
 ---
 
 ## 2. Đường Dẫn File Quan Trọng
-- **Canvas Sóng Điểm & Chòm Sao**: `frontend/src/components/ui/constellation-wave-canvas.jsx`
-- **Giao Diện Auth Đa Tầng**: `frontend/src/components/auth/AuthUI.jsx`
-- **Hero Section Tinh Tuyển**: `frontend/src/components/landing/HeroSection.jsx`
-- **Thanh Điều Hướng**: `frontend/src/components/landing/LandingHeader.jsx`
+- **Canvas Sóng Điểm & Chòm Sao Toàn Màn Hình**: `frontend/src/components/ui/constellation-wave-canvas.jsx`
+- **Giao Diện Auth Laser BorderBeam**: `frontend/src/components/auth/AuthUI.jsx`
+- **Thẻ Telemetry Vi Chuyển Động**: `frontend/src/components/auth/AuthSurroundings.jsx`
 - **Vault Hub**: `docs/vault/Index.md`

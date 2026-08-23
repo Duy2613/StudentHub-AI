@@ -330,8 +330,10 @@ export const StudentBenefitBanner = ({ email }) => {
   );
 };
 
+import { BorderBeam } from "@/components/ui/border-beam";
+
 /**
- * AuthCard: Double-bezel concentric enclosure wrapped in AuthSurroundings (Astrolabe Rings, Telemetry Badges, Top Bar).
+ * AuthCard: Double-bezel concentric enclosure with sweeping BorderBeam wrapped in AuthSurroundings.
  */
 export const AuthCard = ({ children, mode = "cosmic-wave" }) => (
   <div className="min-h-screen relative overflow-hidden font-sans bg-space-950 select-none">
@@ -339,11 +341,13 @@ export const AuthCard = ({ children, mode = "cosmic-wave" }) => (
     <NoiseOverlay />
     <AuthSurroundings>
       <div className="max-w-[460px] w-full perspective-1000 animate-card-in">
-        {/* Outer Shell: Machine-tooled bezel */}
-        <div className="relative p-1.5 rounded-[32px] bg-white/[0.04] border border-white/10 shadow-glass-deep backdrop-blur-3xl transition-all duration-500 hover:border-white/20 hover:shadow-neon-primary">
+        {/* Outer Shell: Machine-tooled bezel with BorderBeam laser effect */}
+        <div className="relative p-1.5 rounded-[32px] bg-white/[0.04] border border-white/10 shadow-glass-deep backdrop-blur-3xl transition-all duration-500 hover:border-white/25 hover:shadow-neon-primary overflow-hidden">
+          <BorderBeam size={220} duration={10} colorFrom="#6366f1" colorTo="#34e7c4" />
+          
           {/* Inner Core: Deep Space Cyber Canvas */}
           <div className="relative rounded-[calc(32px-0.375rem)] bg-space-950/85 backdrop-blur-2xl py-8 px-6 sm:py-10 sm:px-10 border border-white/[0.06] overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-60" />
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-70" />
             {children}
           </div>
         </div>
