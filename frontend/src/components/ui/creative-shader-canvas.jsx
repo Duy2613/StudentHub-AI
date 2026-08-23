@@ -4,15 +4,15 @@ import React, { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 /**
- * CreativeShaderCanvas: A high-performance, GPU-accelerated procedural background canvas
- * fusing Flow Wave Simplex Noise wave displacement with Cosmic Dust floating embers.
- * Interacts smoothly with mouse movement (vertex repulsion) and scroll.
+ * CreativeShaderCanvas: Ultra-high performance, GPU-accelerated procedural background canvas.
+ * Fuses Flow Wave Simplex Noise wave displacement with Cosmic Dust floating motes.
+ * Uses 100% true alpha transparency so underlying CSS gradients and meshes shine through.
  */
 export default function CreativeShaderCanvas({
   className = "absolute inset-0 w-full h-full pointer-events-none -z-10",
-  mode = "cosmic-wave", // "cosmic-wave", "emerald-wave", "amber-dust"
-  particleCount = 500,
-  opacity = 0.55,
+  mode = "cosmic-wave", // "cosmic-wave" | "emerald-wave" | "amber-dust"
+  particleCount = 400,
+  opacity = 0.65,
 }) {
   const containerRef = useRef(null);
 
@@ -25,27 +25,32 @@ export default function CreativeShaderCanvas({
       return;
     }
 
+    const w = container.clientWidth || window.innerWidth || 800;
+    const h = container.clientHeight || window.innerHeight || 600;
+
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x05070f, 0, 30);
 
-    const camera = new THREE.PerspectiveCamera(
-      45,
-      container.clientWidth / container.clientHeight,
-      0.1,
-      100
-    );
-    camera.position.set(0, 3, 10);
+    const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+    camera.position.set(0, 2.5, 9);
 
-    const renderer = new THREE.WebGLRenderer({
-      alpha: true,
-      antialias: true,
-      powerPreference: "high-performance",
-    });
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: true,
+        powerPreference: "high-performance",
+      });
+    } catch (e) {
+      console.warn("WebGL not supported or context lost:", e);
+      return;
+    }
+
+    renderer.setClearColor(0x000000, 0); // 100% transparent clear color
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setSize(w, h);
     container.appendChild(renderer.domElement);
 
-    // 1. Simplex Noise GLSL Chunk
+    // 1. Simplex Noise GLSL definition
     const SNOISE = `
     vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
     vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
@@ -72,8 +77,28 @@ export default function CreativeShaderCanvas({
     }
     `;
 
-    // 2. Wave Surface Points (Flow Wave inspired)
-    const waveGeo = new THREE.PlaneGeometry(16, 12, 100, 80);
+    // 2. Color Palette Setup based on mode
+    let colLow, colHigh, dustColA, dustColB;
+    if (mode === "emerald-wave") {
+      colLow = new THREE.Vector3(0.02, 0.20, 0.15); // Rich emerald
+      colHigh = new THREE.Vector3(0.20, 0.95, 0.65); // Bright mint teal
+      dustColA = new THREE.Vector3(0.20, 0.95, 0.65);
+      dustColB = new THREE.Vector3(0.06, 0.71, 0.83);
+    } else if (mode === "amber-dust") {
+      colLow = new THREE.Vector3(0.25, 0.12, 0.02); // Deep amber
+      colHigh = new THREE.Vector3(0.98, 0.75, 0.25); // Radiant gold
+      dustColA = new THREE.Vector3(0.98, 0.75, 0.25);
+      dustColB = new THREE.Vector3(0.95, 0.45, 0.20);
+    } else {
+      // "cosmic-wave" (Default)
+      colLow = new THREE.Vector3(0.18, 0.12, 0.45); // Deep cosmic indigo
+      colHigh = new THREE.Vector3(0.40, 0.55, 1.0); // Vibrant neon blue-purple
+      dustColA = new THREE.Vector3(0.99, 0.77, 0.42); // Stardust amber
+      dustColB = new THREE.Vector3(0.39, 0.65, 0.98); // Cyan
+    }
+
+    // 3. Wave Surface Points (Flow Wave inspired)
+    const waveGeo = new THREE.PlaneGeometry(18, 14, 90, 70);
     const waveMat = new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
@@ -83,18 +108,8 @@ export default function CreativeShaderCanvas({
         uCursor: { value: new THREE.Vector3(0, 0, 0) },
         uActivity: { value: 0 },
         uOpacity: { value: opacity },
-        uColLow: {
-          value:
-            mode === "emerald-wave"
-              ? new THREE.Vector3(0.01, 0.09, 0.05)
-              : new THREE.Vector3(0.12, 0.08, 0.35),
-        },
-        uColHigh: {
-          value:
-            mode === "emerald-wave"
-              ? new THREE.Vector3(0.2, 0.9, 0.6)
-              : new THREE.Vector3(0.4, 0.4, 0.95),
-        },
+        uColLow: { value: colLow },
+        uColHigh: { value: colHigh },
       },
       vertexShader: `
         uniform float uTime;
@@ -107,21 +122,21 @@ export default function CreativeShaderCanvas({
         ${SNOISE}
         void main() {
           vec3 p = position;
-          float n = snoise(vec3(p.x * 0.25, p.y * 0.25, uTime * 0.35)) * 0.8;
-          n += snoise(vec3(p.x * 0.5, p.y * 0.5, uTime * 0.7)) * 0.3;
+          float n = snoise(vec3(p.x * 0.22, p.y * 0.22, uTime * 0.25)) * 0.9;
+          n += snoise(vec3(p.x * 0.45, p.y * 0.45, uTime * 0.5)) * 0.35;
           p.z += n;
 
           vec4 modelPos = modelMatrix * vec4(p, 1.0);
           vec3 toP = modelPos.xyz - uCursor;
           float d = length(toP);
-          float repel = smoothstep(4.0, 0.0, d);
-          modelPos.xyz += normalize(toP + vec3(0.001)) * repel * 1.5 * uActivity;
+          float repel = smoothstep(4.5, 0.0, d);
+          modelPos.xyz += normalize(toP + vec3(0.001)) * repel * 1.8 * uActivity;
 
           vec4 mvPos = viewMatrix * modelPos;
-          vColor = mix(uColLow, uColHigh, clamp((p.z + 1.0) * 0.6, 0.0, 1.0));
-          vFade = smoothstep(12.0, 3.0, length(p.xy));
+          vColor = mix(uColLow, uColHigh, clamp((p.z + 1.2) * 0.5, 0.0, 1.0));
+          vFade = smoothstep(14.0, 3.5, length(p.xy));
 
-          gl_PointSize = (4.0 * (10.0 / -mvPos.z));
+          gl_PointSize = (4.5 * (10.0 / -mvPos.z));
           gl_Position = projectionMatrix * mvPos;
         }
       `,
@@ -140,19 +155,19 @@ export default function CreativeShaderCanvas({
     });
 
     const wavePoints = new THREE.Points(waveGeo, waveMat);
-    wavePoints.rotation.x = -Math.PI / 3.2;
-    wavePoints.position.set(0, -1.8, 0);
+    wavePoints.rotation.x = -Math.PI / 3.4;
+    wavePoints.position.set(0, -1.6, 0);
     scene.add(wavePoints);
 
-    // 3. Cosmic Floating Dust Motes (Cosmic Dust inspired)
+    // 4. Cosmic Floating Dust Motes (Cosmic Dust inspired)
     const count = particleCount;
     const dustPositions = new Float32Array(count * 3);
     const dustSizes = new Float32Array(count);
     for (let i = 0; i < count; i++) {
-      dustPositions[i * 3] = (Math.random() - 0.5) * 20;
-      dustPositions[i * 3 + 1] = (Math.random() - 0.5) * 14;
-      dustPositions[i * 3 + 2] = (Math.random() - 0.5) * 16;
-      dustSizes[i] = 12 + Math.random() * 20;
+      dustPositions[i * 3] = (Math.random() - 0.5) * 22;
+      dustPositions[i * 3 + 1] = (Math.random() - 0.5) * 16;
+      dustPositions[i * 3 + 2] = (Math.random() - 0.5) * 18;
+      dustSizes[i] = 10 + Math.random() * 18;
     }
 
     const dustGeo = new THREE.BufferGeometry();
@@ -165,8 +180,8 @@ export default function CreativeShaderCanvas({
       depthWrite: false,
       uniforms: {
         uTime: { value: 0 },
-        uColorA: { value: new THREE.Vector3(0.99, 0.77, 0.42) }, // Warm Amber
-        uColorB: { value: new THREE.Vector3(0.39, 0.65, 0.98) }, // Cyan / Indigo
+        uColorA: { value: dustColA },
+        uColorB: { value: dustColB },
       },
       vertexShader: `
         attribute float size;
@@ -177,15 +192,15 @@ export default function CreativeShaderCanvas({
         varying float vAlpha;
         void main() {
           vec3 p = position;
-          p.z = mod(p.z + uTime * 0.4 + 8.0, 16.0) - 8.0;
-          p.y += sin(uTime * 0.5 + p.x) * 0.2;
-          p.x += cos(uTime * 0.4 + p.y) * 0.2;
+          p.z = mod(p.z + uTime * 0.35 + 9.0, 18.0) - 9.0;
+          p.y += sin(uTime * 0.4 + p.x * 0.5) * 0.25;
+          p.x += cos(uTime * 0.3 + p.y * 0.5) * 0.25;
 
           vec4 mvPos = modelViewMatrix * vec4(p, 1.0);
-          vAlpha = smoothstep(10.0, 2.0, -mvPos.z) * smoothstep(0.0, 2.0, -mvPos.z);
-          vColor = mix(uColorA, uColorB, step(0.5, fract(p.x * 3.17)));
+          vAlpha = smoothstep(11.0, 2.0, -mvPos.z) * smoothstep(0.0, 2.0, -mvPos.z);
+          vColor = mix(uColorA, uColorB, step(0.5, fract(p.x * 2.7)));
 
-          gl_PointSize = size * (12.0 / -mvPos.z);
+          gl_PointSize = size * (10.0 / -mvPos.z);
           gl_Position = projectionMatrix * mvPos;
         }
       `,
@@ -197,7 +212,7 @@ export default function CreativeShaderCanvas({
           float d = length(p);
           if (d > 0.5) discard;
           float mask = smoothstep(0.5, 0.05, d);
-          gl_FragColor = vec4(vColor, mask * vAlpha * 0.75);
+          gl_FragColor = vec4(vColor, mask * vAlpha * 0.7);
         }
       `,
     });
@@ -205,10 +220,12 @@ export default function CreativeShaderCanvas({
     const dustPoints = new THREE.Points(dustGeo, dustMat);
     scene.add(dustPoints);
 
-    // 4. Mouse Tracking & Parallax
+    // 5. Mouse Tracking & Parallax
     const mouse = { x: 0, y: 0, targetX: 0, targetY: 0, active: false, lastMove: 0 };
     const handleMouseMove = (e) => {
+      if (!container) return;
       const rect = container.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
       mouse.targetX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.targetY = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
       mouse.active = true;
@@ -217,7 +234,7 @@ export default function CreativeShaderCanvas({
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
 
-    // 5. Animation Loop
+    // 6. Animation Loop
     let animationFrameId;
     const startTime = performance.now();
 
@@ -242,22 +259,24 @@ export default function CreativeShaderCanvas({
       dustMat.uniforms.uTime.value = elapsed;
 
       // Camera subtle drift
-      camera.position.x = mouse.x * 0.8;
-      camera.position.y = 3 + mouse.y * 0.5;
-      camera.lookAt(0, -0.5, 0);
+      camera.position.x = mouse.x * 0.6;
+      camera.position.y = 2.5 + mouse.y * 0.4;
+      camera.lookAt(0, -0.4, 0);
 
       renderer.render(scene, camera);
     };
     animate();
 
-    // 6. Resize Handler
+    // 7. Resize Handler
     const handleResize = () => {
-      if (!container) return;
-      const w = container.clientWidth;
-      const h = container.clientHeight;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      if (!container || !renderer) return;
+      const currentW = container.clientWidth || window.innerWidth;
+      const currentH = container.clientHeight || window.innerHeight;
+      if (currentW && currentH) {
+        camera.aspect = currentW / currentH;
+        camera.updateProjectionMatrix();
+        renderer.setSize(currentW, currentH);
+      }
     };
 
     const resizeObserver = new ResizeObserver(handleResize);

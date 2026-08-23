@@ -2,22 +2,25 @@
 
 // components/auth/AuthUI.jsx
 //
-// Các thành phần UI dùng chung giữa /login và /register (Cyber Glassmorphism & Verification Network).
-// Thuần hiển thị, tương tác mượt mà, hỗ trợ Focus Halo & Student Benefit Program.
+// Shared UI components for /login and /register (Cyber Glassmorphism & Verification Network).
+// Awwwards-tier Double-Bezel architecture with hardware-accelerated 60fps ambient glow
+// and AuthSurroundings (Astrolabe Rings, Telemetry Badges, Top Header & Trust Guarantee).
 
 import React, { useState } from "react";
 import { Eye, EyeOff, Lock, Loader2, ArrowRight, AlertCircle, GraduationCap, CheckCircle2 } from "lucide-react";
+import AuthSurroundings from "@/components/auth/AuthSurroundings";
+import { Meteors } from "@/components/ui/meteors";
 
 export const NoiseOverlay = () => (
   <div
-    className="absolute inset-0 z-[2] opacity-[0.04] mix-blend-overlay pointer-events-none"
+    className="absolute inset-0 z-[2] opacity-[0.035] mix-blend-overlay pointer-events-none"
     style={{
       backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
     }}
-  ></div>
+  />
 );
 
-// Chữ ký thị giác riêng của StudentHub AI: Mạng lưới các node và edge xác thực phát sáng
+// StudentHub AI visual signature: glowing verification nodes & edges
 const NETWORK_NODES = [
   { x: 80, y: 90, r: 3, hero: true, delay: 0 },
   { x: 150, y: 220, r: 2, delay: 0.4 },
@@ -87,17 +90,36 @@ export const VerificationNetwork = () => (
   </svg>
 );
 
-import CreativeShaderCanvas from "@/components/ui/creative-shader-canvas";
-
-export const AmbientBackground = ({ mode = "cosmic-wave" }) => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-    <CreativeShaderCanvas mode={mode} opacity={0.65} />
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-space-950/60 via-[#0F1117]/80 to-black/90"></div>
-    <div className="absolute top-[-20%] left-[-20%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-r from-indigo-700/20 to-purple-700/20 blur-[140px] animate-blob-slow mix-blend-screen"></div>
-    <div className="absolute bottom-[-30%] right-[-20%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-r from-blue-700/20 to-teal-700/20 blur-[140px] animate-blob-medium animation-delay-2000 mix-blend-screen"></div>
-    <VerificationNetwork />
-  </div>
-);
+export const AmbientBackground = ({ mode = "cosmic-wave" }) => {
+  const isEmerald = mode === "emerald-wave";
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+      <Meteors number={16} />
+      {/* Dynamic Multi-Hue Atmospheric Radial Mesh (Pure GPU 60fps CSS) */}
+      <div
+        className={`absolute top-[-15%] left-[-15%] w-[60vw] h-[60vw] rounded-full blur-[150px] animate-blob-slow mix-blend-screen transition-all duration-700 ${
+          isEmerald
+            ? "bg-gradient-to-r from-emerald-600/30 to-teal-600/30"
+            : "bg-gradient-to-r from-indigo-600/30 to-purple-600/30"
+        }`}
+      />
+      <div
+        className={`absolute bottom-[-20%] right-[-15%] w-[55vw] h-[55vw] rounded-full blur-[150px] animate-blob-medium animation-delay-2000 mix-blend-screen transition-all duration-700 ${
+          isEmerald
+            ? "bg-gradient-to-r from-teal-600/25 to-cyan-600/25"
+            : "bg-gradient-to-r from-blue-600/25 to-cyan-600/25"
+        }`}
+      />
+      <div
+        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] rounded-full blur-[160px] pointer-events-none transition-all duration-700 ${
+          isEmerald ? "bg-emerald-950/20" : "bg-indigo-950/20"
+        }`}
+      />
+      <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+      <VerificationNetwork />
+    </div>
+  );
+};
 
 export const InputField = ({ label, id, name, type = "text", icon: Icon, helperText, onFocus, onBlur, ...props }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -117,7 +139,7 @@ export const InputField = ({ label, id, name, type = "text", icon: Icon, helperT
         className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-teal-400 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
           isFocused ? "opacity-100 blur-[2px]" : "opacity-0 blur-0"
         }`}
-      ></div>
+      />
       <div className="relative">
         {Icon && (
           <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-indigo-400" : "text-gray-500"}`}>
@@ -176,7 +198,7 @@ export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) =>
         className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-teal-400 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
           isFocused ? "opacity-100 blur-[2px]" : "opacity-0 blur-0"
         }`}
-      ></div>
+      />
       <div className="relative z-10">
         <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-indigo-400" : "text-gray-500"}`}>
           <Lock className="h-5 w-5" />
@@ -241,7 +263,7 @@ export const CheckboxField = ({ id, checked, onChange, label, helperText, ...pro
 
 export const Button = ({ children, isLoading, disabled, ...props }) => (
   <div className="relative group z-20">
-    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-500 rounded-2xl blur-lg opacity-60 group-hover:opacity-90 group-hover:blur-xl transition-all duration-500 ease-premium"></div>
+    <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 via-purple-600 to-teal-500 rounded-2xl blur-lg opacity-60 group-hover:opacity-90 group-hover:blur-xl transition-all duration-500 ease-premium" />
     <button
       disabled={isLoading || disabled}
       className={`
@@ -252,7 +274,7 @@ export const Button = ({ children, isLoading, disabled, ...props }) => (
         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0F1117] focus:ring-indigo-500
         disabled:opacity-70 disabled:cursor-not-allowed
         transition-all duration-300 ease-premium
-        active:scale-[0.98] group-hover:-translate-y-1 hover:scale-[1.015]
+        active:scale-[0.98] group-hover:-translate-y-0.5 hover:brightness-105
       `}
       {...props}
     >
@@ -282,10 +304,10 @@ export const GoogleButton = ({ isLoading, isDisabled, onClick }) => (
       <>
         <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
           <g transform="matrix(1, 0, 0, 1, 0, 0)">
-            <path d="M 22.56 12.25 C 22.56 11.47 22.49 10.72 22.36 10 L 12 10 L 12 14.26 L 17.92 14.26 C 17.66 15.63 16.88 16.79 15.71 17.57 L 15.71 20.34 L 19.28 20.34 C 21.36 18.42 22.56 15.6 22.56 12.25 Z" fill="#4285F4"></path>
-            <path d="M 12 23 C 14.97 23 17.46 22.02 19.28 20.34 L 15.71 17.57 C 14.73 18.23 13.48 18.63 12 18.63 C 9.14 18.63 6.71 16.7 5.84 14.1 L 2.18 14.1 L 2.18 16.94 C 3.99 20.53 7.7 23 12 23 Z" fill="#34A853"></path>
-            <path d="M 5.84 14.1 C 5.62 13.44 5.49 12.74 5.49 12 C 5.49 11.26 5.62 10.56 5.84 9.9 L 5.84 7.07 L 2.18 7.07 C 1.43 8.55 1 10.22 1 12 C 1 13.78 1.43 15.45 2.18 16.94 L 5.84 14.1 Z" fill="#FBBC05"></path>
-            <path d="M 12 5.38 C 13.62 5.38 15.06 5.94 16.21 7.02 L 19.36 3.87 C 17.45 2.09 14.97 1 12 1 C 7.7 1 3.99 3.47 2.18 7.07 L 5.84 9.9 C 6.71 7.3 9.14 5.38 12 5.38 Z" fill="#EA4335"></path>
+            <path d="M 22.56 12.25 C 22.56 11.47 22.49 10.72 22.36 10 L 12 10 L 12 14.26 L 17.92 14.26 C 17.66 15.63 16.88 16.79 15.71 17.57 L 15.71 20.34 L 19.28 20.34 C 21.36 18.42 22.56 15.6 22.56 12.25 Z" fill="#4285F4" />
+            <path d="M 12 23 C 14.97 23 17.46 22.02 19.28 20.34 L 15.71 17.57 C 14.73 18.23 13.48 18.63 12 18.63 C 9.14 18.63 6.71 16.7 5.84 14.1 L 2.18 14.1 L 2.18 16.94 C 3.99 20.53 7.7 23 12 23 Z" fill="#34A853" />
+            <path d="M 5.84 14.1 C 5.62 13.44 5.49 12.74 5.49 12 C 5.49 11.26 5.62 10.56 5.84 9.9 L 5.84 7.07 L 2.18 7.07 C 1.43 8.55 1 10.22 1 12 C 1 13.78 1.43 15.45 2.18 16.94 L 5.84 14.1 Z" fill="#FBBC05" />
+            <path d="M 12 5.38 C 13.62 5.38 15.06 5.94 16.21 7.02 L 19.36 3.87 C 17.45 2.09 14.97 1 12 1 C 7.7 1 3.99 3.47 2.18 7.07 L 5.84 9.9 C 6.71 7.3 9.14 5.38 12 5.38 Z" fill="#EA4335" />
           </g>
         </svg>
         Continue with Google
@@ -352,7 +374,7 @@ export const StudentBenefitBanner = ({ email }) => {
         isStudent ? "bg-indigo-900/30 border-indigo-500/50 shadow-[0_0_20px_rgba(99,102,241,0.25)]" : "bg-white/5 border-white/10"
       }`}
     >
-      <div className={`absolute -inset-1 bg-gradient-to-r from-indigo-500/20 to-teal-500/20 blur-md transition-opacity duration-500 ${isStudent ? "opacity-100 animate-pulse-slow" : "opacity-0"}`}></div>
+      <div className={`absolute -inset-1 bg-gradient-to-r from-indigo-500/20 to-teal-500/20 blur-md transition-opacity duration-500 ${isStudent ? "opacity-100 animate-pulse-slow" : "opacity-0"}`} />
       <div className="relative z-10 flex items-start p-4">
         <div className={`flex-shrink-0 p-2 rounded-lg transition-colors duration-500 ${isStudent ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/50" : "bg-white/10 text-gray-400"}`}>
           <GraduationCap className="h-5 w-5" />
@@ -373,15 +395,24 @@ export const StudentBenefitBanner = ({ email }) => {
   );
 };
 
+/**
+ * AuthCard: Double-bezel concentric enclosure wrapped in AuthSurroundings (Astrolabe Rings, Telemetry Badges, Top Bar).
+ */
 export const AuthCard = ({ children, mode = "cosmic-wave" }) => (
-  <div className="min-h-screen flex items-center justify-center overflow-hidden relative py-12 px-4 sm:px-6 lg:px-8 font-sans bg-space-950 select-none">
+  <div className="min-h-screen relative overflow-hidden font-sans bg-space-950 select-none">
     <AmbientBackground mode={mode} />
     <NoiseOverlay />
-    <div className="max-w-[440px] w-full relative z-10 perspective-1000 animate-card-in">
-      <div className="relative bg-white/[0.02] backdrop-blur-2xl py-10 px-8 sm:px-10 shadow-glass-deep border border-white/[0.08] rounded-[32px] overflow-hidden transition-all duration-500 hover:shadow-neon-primary hover:border-white/20">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-50"></div>
-        {children}
+    <AuthSurroundings>
+      <div className="max-w-[460px] w-full perspective-1000 animate-card-in">
+        {/* Outer Shell: Machine-tooled bezel */}
+        <div className="relative p-1.5 rounded-[32px] bg-white/[0.04] border border-white/10 shadow-glass-deep backdrop-blur-3xl transition-all duration-500 hover:border-white/20 hover:shadow-neon-primary">
+          {/* Inner Core: Deep Space Cyber Canvas */}
+          <div className="relative rounded-[calc(32px-0.375rem)] bg-space-950/85 backdrop-blur-2xl py-8 px-6 sm:py-10 sm:px-10 border border-white/[0.06] overflow-hidden">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-60" />
+            {children}
+          </div>
+        </div>
       </div>
-    </div>
+    </AuthSurroundings>
   </div>
 );

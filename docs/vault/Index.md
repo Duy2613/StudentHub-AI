@@ -29,6 +29,7 @@ graph TD
     Features --> Mentor["AI-Mentor-Copilot.md"]
     Features --> Whiteboard["Interactive-Whiteboard-Tldraw.md"]
     Features --> Workspaces["Study-Workspaces-Realtime.md"]
+    Features --> WebGLSkill["Creative-3D-WebGL-Engine-Skill.md"]
 ```
 
 ---
@@ -58,6 +59,7 @@ graph TD
 - [[Study-Workspaces-Realtime|Không Gian Học Tập Nhóm (Workspaces)]]: Chia sẻ tài liệu, chat thời gian thực.
 - [[Student-Benefit-Program|Student Benefit Program]]: Nhận diện email `.edu` và cộng điểm uy tín.
 - [[Creative-Engine-Showcases|Creative Web & 3D Engineering Showcases]]: Bộ sưu tập 4 tác phẩm Lumora, Soda 3D, Flow Wave và Cosmic Dust.
+- [[Creative-3D-WebGL-Engine-Skill|Creative 3D & WebGL Engine Skill]]: Đóng gói toàn bộ kỹ năng Shaders, Canvas và Three.js.
 
 ### 5. [[Sprint-Board|📋 04 - Roadmap & Tasks]]
 - [[Sprint-Board|Sprint Tasks & Tiến Độ]]: Danh sách tính năng đang làm, hoàn tất, backlog.

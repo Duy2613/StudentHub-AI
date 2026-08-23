@@ -36,10 +36,9 @@ import {
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
+import LiveStudioClock from "@/components/ui/live-studio-clock";
 import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
 import { AVATAR_LIST } from "@/lib/avatars";
-import LiveStudioClock from "@/components/ui/live-studio-clock";
-import CreativeShaderCanvas from "@/components/ui/creative-shader-canvas";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -108,7 +107,6 @@ export default function DashboardPage() {
   };
 
   const isExpert = activeProfile.role === "expert";
-
 
   // Mock sample experts
   const SAMPLE_EXPERTS = [
@@ -259,10 +257,7 @@ export default function DashboardPage() {
 
           {/* Right User Status & Actions */}
           <div className="flex items-center gap-3 sm:gap-4">
-            {/* Live Studio Clock */}
-            <div className="hidden lg:block">
-              <LiveStudioClock />
-            </div>
+            <LiveStudioClock className="hidden sm:inline-flex" />
 
             {/* Trust Score Badge */}
             <div
@@ -282,7 +277,6 @@ export default function DashboardPage() {
         </div>
       </header>
 
-
       {/* ---------------- MAIN CONTENT ---------------- */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-8 space-y-8 relative z-10">
         {/* 1. HERO BANNER CÁ NHÂN HÓA */}
@@ -293,8 +287,6 @@ export default function DashboardPage() {
               : "bg-gradient-to-r from-indigo-950/40 via-space-900 to-space-950 border-indigo-500/30"
           }`}
         >
-          {/* Creative Shader Wave inside Dashboard Banner */}
-          <CreativeShaderCanvas mode={isExpert ? "amber-dust" : "cosmic-wave"} opacity={0.45} />
           <div className="absolute -right-10 -bottom-10 w-64 h-64 rounded-full bg-gradient-to-br from-indigo-500/10 to-purple-500/20 blur-3xl pointer-events-none" />
 
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
@@ -326,7 +318,6 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
-
 
             {/* Quick Banner Actions */}
             <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
@@ -416,7 +407,6 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
-
 
         {/* 2. STUDENTHUB AI COPILOT INTERACTIVE ASK BAR */}
         <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 shadow-glass-deep space-y-4">
@@ -655,7 +645,6 @@ export default function DashboardPage() {
                   <span className="font-semibold text-indigo-300">{activeProfile.badges?.length || 2}</span>
                 </li>
               </ul>
-
             </div>
 
             {/* Top Leaderboard */}

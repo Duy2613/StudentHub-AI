@@ -3,9 +3,10 @@
 // app/login/page.jsx
 //
 // Đăng nhập StudentHub AI:
-// - Đăng nhập bằng Google OAuth
+// - Đăng nhập bằng Google OAuth & GitHub OAuth
 // - Hỗ trợ tính năng "Ghi nhớ đăng nhập" (Remember Me): linh hoạt chuyển đổi localStorage / sessionStorage
 // - Trải nghiệm Demo Sinh viên & Chuyên gia uy tín tức thì
+// - Tích hợp CreativeShaderCanvas & Double-Bezel Cyber Glassmorphism
 
 import React, { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -28,8 +29,6 @@ import {
   setRememberMePreference,
 } from "@/lib/auth/authService";
 import { useAuth } from "@/lib/auth/AuthContext";
-
-import FloatingForcefieldOrbs from "@/components/ui/floating-forcefield-orbs";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -107,12 +106,10 @@ const LoginPage = () => {
   const isAnyLoading = isLoading || isOAuthLoading;
 
   return (
-    <>
-      <FloatingForcefieldOrbs />
-      <AuthCard>
+    <AuthCard mode="cosmic-wave">
       <div className="mb-8 flex flex-col items-center text-center">
         <div className="relative mb-5 group/icon">
-          <div className="absolute -inset-3 bg-gradient-to-tr from-indigo-600/50 to-purple-600/50 rounded-full blur-xl opacity-50 animate-pulse-slow group-hover/icon:opacity-80 transition-opacity"></div>
+          <div className="absolute -inset-3 bg-gradient-to-tr from-indigo-600/50 to-purple-600/50 rounded-full blur-xl opacity-50 animate-pulse-slow group-hover/icon:opacity-80 transition-opacity" />
           <div className="h-14 w-14 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center relative z-10 shadow-lg ring-1 ring-white/20">
             <Sparkles className="h-7 w-7 text-white fill-white/20" />
           </div>
@@ -131,14 +128,13 @@ const LoginPage = () => {
         <GithubButton isLoading={isOAuthLoading} isDisabled={isLoading} onClick={handleGitHubLogin} />
       </div>
 
-
       <div className="my-6 relative z-10">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-white/10" />
           </div>
           <div className="relative flex justify-center text-xs uppercase tracking-wider">
-            <span className="px-4 bg-transparent backdrop-blur-xl text-gray-500 font-medium">Hoặc đăng nhập mật khẩu</span>
+            <span className="px-4 bg-space-950/80 backdrop-blur-xl text-gray-400 font-medium">Hoặc đăng nhập mật khẩu</span>
           </div>
         </div>
       </div>
@@ -225,7 +221,6 @@ const LoginPage = () => {
         </a>
       </p>
     </AuthCard>
-    </>
   );
 };
 

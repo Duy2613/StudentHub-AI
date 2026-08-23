@@ -17,7 +17,6 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
 import LiveStudioClock from "@/components/ui/live-studio-clock";
 
-
 export default function LandingHeader() {
   const { session, profile } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -40,7 +39,6 @@ export default function LandingHeader() {
     { label: "Cố Vấn Chuyên Gia", href: "#experts" },
     { label: "Bảng Giá", href: "#pricing" },
   ];
-
 
   return (
     <header 
@@ -86,7 +84,6 @@ export default function LandingHeader() {
           <LiveStudioClock />
           <UserDropdownMenu />
         </div>
-
 
         {/* Mobile Hamburger Toggle */}
         <button
