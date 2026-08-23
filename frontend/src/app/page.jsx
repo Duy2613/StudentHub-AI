@@ -56,13 +56,18 @@ export default function HomePage() {
       href: "/whiteboard",
     },
     {
+      title: "Creative Lab (3D & WebGL)",
+      icon: <Sparkles className="h-full w-full text-amber-400" />,
+      href: "/showcase",
+    },
+    {
       title: "Bảng Điều Khiển",
       icon: <LayoutDashboard className="h-full w-full text-emerald-400" />,
       href: session ? "/dashboard" : "/login",
     },
     {
       title: "Đổi Avatar & Vai trò",
-      icon: <User className="h-full w-full text-amber-400" />,
+      icon: <User className="h-full w-full text-indigo-400" />,
       href: session ? "/onboarding" : "/register",
     },
   ];
