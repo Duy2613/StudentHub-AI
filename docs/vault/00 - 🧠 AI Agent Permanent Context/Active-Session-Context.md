@@ -4,21 +4,25 @@
 ---
 
 ## 1. Trạng Thái Hiện Tại (Current Working Snapshot)
-- **Phiên bản**: StudentHub AI v2.8.5 (Cinematic Auth Animations & Full-Viewport Wave Mesh).
+- **Phiên bản**: StudentHub AI v2.8.6 (Cinematic Motion Experience Suite & 4 Core Pillars).
 - **Vừa triển khai & Kiểm thử**:
-  1. ✅ **Nâng cấp Hệ thống Animation Đăng Nhập & Đăng Ký (v2.8.5)**:
-     - 💫 `BorderBeam`: Đường viền laser quét động liên tục quanh `AuthCard` theo chu kỳ 10s chuyển sắc từ Indigo sang Mint Cyan.
-     - 🌊 `ConstellationWaveCanvas.jsx`: Mở rộng sóng điểm 3D và mạng lưới chòm sao đa giác ra toàn bộ Viewport (`width x height`), mật độ 90+ nodes, 60+ hạt bụi stardust lấp lánh và sóng 3D rực rỡ 6 sắc màu.
-     - 🎛️ `AuthSurroundings.jsx`: Tích hợp các micro-animations cho thẻ Telemetry (thanh sóng âm AI Socratic nhấp nháy, avatar Cố Vấn 1:1, chip Code Sandbox thời gian thực, khiên Edu SSO phát sáng).
-  2. ✅ **Tinh gọn điều hướng (Navigation Clean-up)**:
-     - Đã loại bỏ hoàn toàn mục "Creative Lab" khỏi Header và Dock nổi.
-  3. ✅ **Đóng gói Kỹ năng Agent**:
-     - Skill vĩnh viễn `.agents/skills/creative-3d-webgl-engine/SKILL.md`.
+  1. ✅ **Đóng gói Kỹ năng Cinematic Motion Experience (v2.8.6)**:
+     - 📦 Skill `.agents/skills/cinematic-motion-experience/SKILL.md` và Vault Doc `docs/vault/03 - 🚀 Features & Modules/Cinematic-Motion-Experience-Skill.md`.
+     - Bao phủ toàn diện 4 trụ cột thiết kế chuyển động: Parallax Scrolling, Morphing Magnetic Cursor, Smooth Page Load Transitions và Cinematic Video Atmosphere.
+  2. ✅ **Xây dựng & Tích hợp Bộ Component Chuyển Động Điện Ảnh**:
+     - 🖱️ `CustomMorphingCursor.jsx`: Con trỏ chuột 2 tầng co giãn, biến hóa khi rê qua các nút tương tác, đổi chế độ blend mode và hiển thị badge động, tự động vô hiệu hóa an toàn trên màn hình cảm ứng di động.
+     - 🎬 `CinematicVideoAtmosphere.jsx`: Không gian video chuyển động thủ tục (Procedural motion loop) với chùm tia sáng anamorphic flare, dải dải cực quang phát quang sinh học và bụi sao lấp lánh (0% hao tốn băng thông MP4, tải tức thì).
+     - ⚡ `PageTransitionWrapper.jsx`: Hiệu ứng chuyển cảnh mượt mà giữa các route với thanh năng lượng laser trên cùng.
+  3. ✅ **Tích hợp đồng bộ**:
+     - Áp dụng trên toàn bộ ứng dụng: Root Layout (`layout.tsx`), Trang Chủ (`page.jsx`), Đăng Nhập (`login/page.jsx`), Đăng Ký (`register/page.jsx`).
 
 ---
 
 ## 2. Đường Dẫn File Quan Trọng
-- **Canvas Sóng Điểm & Chòm Sao Toàn Màn Hình**: `frontend/src/components/ui/constellation-wave-canvas.jsx`
-- **Giao Diện Auth Laser BorderBeam**: `frontend/src/components/auth/AuthUI.jsx`
-- **Thẻ Telemetry Vi Chuyển Động**: `frontend/src/components/auth/AuthSurroundings.jsx`
+- **Skill Chuyển Động Điện Ảnh**: `.agents/skills/cinematic-motion-experience/SKILL.md`
+- **Con Trỏ Nam Châm Biến Hóa**: `frontend/src/components/ui/custom-morphing-cursor.jsx`
+- **Không Gian Video Thủ Tục**: `frontend/src/components/ui/cinematic-video-atmosphere.jsx`
+- **Chuyển Cảnh Mượt Mà**: `frontend/src/components/ui/page-transition-wrapper.jsx`
+- **Giao Diện Auth**: `frontend/src/components/auth/AuthUI.jsx`
+- **Trang Chủ**: `frontend/src/app/page.jsx`
 - **Vault Hub**: `docs/vault/Index.md`

@@ -30,6 +30,8 @@ import PricingAndFAQ from "@/components/landing/PricingAndFAQ";
 import LandingFooter from "@/components/landing/LandingFooter";
 import { TextRevealByWord } from "@/components/ui/text-reveal";
 import { FloatingDock } from "@/components/ui/floating-dock";
+import PageTransitionWrapper from "@/components/ui/page-transition-wrapper";
+import CinematicVideoAtmosphere from "@/components/ui/cinematic-video-atmosphere";
 
 export default function HomePage() {
   const { session, profile, isLoading } = useAuth();
@@ -68,47 +70,50 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-space-950 text-gray-100 relative overflow-x-hidden selection:bg-indigo-500 selection:text-white pb-20">
-      {/* Visual Ambiance & Grain Overlay */}
-      <AmbientBackground />
-      <NoiseOverlay />
+    <PageTransitionWrapper>
+      <div className="min-h-screen bg-space-950 text-gray-100 relative overflow-x-hidden selection:bg-indigo-500 selection:text-white pb-20">
+        {/* Visual Ambiance, Generative Video Atmosphere & Grain Overlay */}
+        <AmbientBackground />
+        <CinematicVideoAtmosphere opacity={0.6} />
+        <NoiseOverlay />
 
-      {/* Main Glass Header */}
-      <LandingHeader />
+        {/* Main Glass Header */}
+        <LandingHeader />
 
-      {/* Main Content Sections */}
-      <main className="relative z-10">
-        <HeroSection />
-        <TrustSocialProof />
-        
-        {/* Kinetic Scroll Text Reveal */}
-        <div className="max-w-5xl mx-auto px-4">
-          <TextRevealByWord text="Trợ lý trí tuệ nhân tạo toàn năng kết hợp mạng lưới cố vấn chuyên gia thực chứng, tối ưu hóa điểm số và khai phóng tiềm năng học thuật của sinh viên Việt Nam." />
+        {/* Main Content Sections */}
+        <main className="relative z-10">
+          <HeroSection />
+          <TrustSocialProof />
+          
+          {/* Kinetic Scroll Text Reveal */}
+          <div className="max-w-5xl mx-auto px-4">
+            <TextRevealByWord text="Trợ lý trí tuệ nhân tạo toàn năng kết hợp mạng lưới cố vấn chuyên gia thực chứng, tối ưu hóa điểm số và khai phóng tiềm năng học thuật của sinh viên Việt Nam." />
+          </div>
+
+          {/* Studio 3D Visual Trinity Suite Showcase */}
+          <TrinitySuiteShowcase />
+
+          {/* 3D Isometric Scrollytelling Section */}
+          <IsometricScrollSection />
+
+          {/* Interactive Career & Academic Level Slider */}
+          <InteractiveSlider />
+
+          <FeatureBento />
+          <InteractiveComparison />
+          <ExpertShowcase />
+          <TestimonialsSection />
+          <PricingAndFAQ />
+        </main>
+
+        {/* Footer */}
+        <LandingFooter />
+
+        {/* Bottom Floating macOS-style Dock */}
+        <div className="fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-auto">
+          <FloatingDock items={dockItems} />
         </div>
-
-        {/* Studio 3D Visual Trinity Suite Showcase */}
-        <TrinitySuiteShowcase />
-
-        {/* 3D Isometric Scrollytelling Section */}
-        <IsometricScrollSection />
-
-        {/* Interactive Career & Academic Level Slider */}
-        <InteractiveSlider />
-
-        <FeatureBento />
-        <InteractiveComparison />
-        <ExpertShowcase />
-        <TestimonialsSection />
-        <PricingAndFAQ />
-      </main>
-
-      {/* Footer */}
-      <LandingFooter />
-
-      {/* Bottom Floating macOS-style Dock */}
-      <div className="fixed bottom-6 inset-x-0 z-50 flex justify-center pointer-events-auto">
-        <FloatingDock items={dockItems} />
       </div>
-    </div>
+    </PageTransitionWrapper>
   );
 }
