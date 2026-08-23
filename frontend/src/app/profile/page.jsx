@@ -42,6 +42,7 @@ import {
   EXPERT_FIELDS,
   getAvatarById,
 } from "@/lib/avatars";
+import { motion } from "motion/react";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -452,14 +453,42 @@ export default function ProfilePage() {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                      hidden: { opacity: 0 },
+                      visible: {
+                        opacity: 1,
+                        transition: {
+                          staggerChildren: 0.12,
+                        },
+                      },
+                    }}
+                    className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1"
+                  >
                     {profile.topRepos.map((repo) => (
-                      <a
+                      <motion.a
+                        variants={{
+                          hidden: { opacity: 0, y: 15, scale: 0.95 },
+                          visible: {
+                            opacity: 1,
+                            y: 0,
+                            scale: 1,
+                            transition: {
+                              type: "spring",
+                              stiffness: 260,
+                              damping: 20,
+                            },
+                          },
+                        }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         key={repo.id || repo.name}
                         href={repo.htmlUrl || repo.html_url || `https://github.com/${profile.githubUsername}/${repo.name}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-4 rounded-xl bg-black/40 border border-amber-500/20 hover:border-amber-400/60 transition-all flex flex-col justify-between group/gh"
+                        className="p-4 rounded-xl bg-black/40 border border-amber-500/20 hover:border-amber-400/60 transition-all flex flex-col justify-between group/gh shadow-lg"
                       >
                         <div>
                           <div className="flex items-center justify-between">
@@ -476,9 +505,9 @@ export default function ProfilePage() {
                           <span>⭐ {repo.stars || 0} stars</span>
                           <span className="text-gray-400">{repo.language || "Mã nguồn"}</span>
                         </div>
-                      </a>
+                      </motion.a>
                     ))}
-                  </div>
+                  </motion.div>
                 </div>
               )}
             </div>

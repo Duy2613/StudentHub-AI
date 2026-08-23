@@ -1,48 +1,87 @@
 @import "tailwindcss";
 
 :root {
-  --background: #07090e;
+  --background: #06060a;
   --foreground: #f3f4f6;
-  --color-space-950: #07090e;
+  --color-space-950: #06060a;
   --color-space-900: #0c0f17;
   --color-space-850: #111522;
   --color-space-800: #171c2d;
   --color-space-700: #222941;
+  --color-trust-teal: #34e7c4;
 }
 
-@theme {
-  --color-space-950: #07090e;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+
+  /* ---- Tailwind CSS v4 Theme Variables & Tokens ---- */
+  --color-space-950: #06060a;
   --color-space-900: #0c0f17;
   --color-space-850: #111522;
   --color-space-800: #171c2d;
   --color-space-700: #222941;
-  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --color-trust-teal: #34e7c4;
+
+  --shadow-glass-deep: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.06);
+  --shadow-neon-primary: 0 0 40px rgba(99, 102, 241, 0.55);
+  --shadow-neon-gold: 0 0 40px rgba(245, 158, 11, 0.55);
+  --shadow-neon-cyan: 0 0 40px rgba(6, 182, 212, 0.55);
+  --shadow-neon-teal: 0 0 40px rgba(52, 231, 196, 0.55);
+
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-blob-slow: blob 20s infinite ease-in-out;
+  --animate-blob-medium: blob 16s infinite ease-in-out;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse-slow 4s ease-in-out infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #06060a;
+    --foreground: #ededed;
+  }
 }
 
 body {
-  background: #07090e;
-  color: #f3f4f6;
+  background: var(--background);
+  color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* Animations */
+/* ---- Keyframes cho hiệu ứng nền & tương tác ---- */
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -40px) scale(1.05);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+}
+
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
-@keyframes pulseSlow {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.05); }
-}
-
-@keyframes blobMotion {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes shimmer {
@@ -50,50 +89,66 @@ body {
   100% { background-position: 200% 0; }
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+/* ---- Mạng lưới node xác thực (Verification Network) ---- */
+.network-node {
+  animation: node-pulse 3.5s ease-in-out infinite;
+  transform-origin: center;
 }
 
-.animate-pulse-slow {
-  animation: pulseSlow 4s ease-in-out infinite;
+.network-edge {
+  animation: edge-glow 3.5s ease-in-out infinite;
 }
 
-.animate-blob-slow {
-  animation: blobMotion 12s ease-in-out infinite;
+@keyframes node-pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
 }
 
-.animate-blob-medium {
-  animation: blobMotion 8s ease-in-out infinite;
+@keyframes edge-glow {
+  0%, 100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
-.animate-shimmer {
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2.5s infinite;
+/* ---- Trình tự xuất hiện của thẻ đăng nhập/đăng ký lúc tải trang ---- */
+.animate-card-in {
+  animation: card-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Glassmorphism & Effects */
-.shadow-glass-deep {
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.05);
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-.shadow-neon-primary {
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.25), 0 0 10px rgba(168, 85, 247, 0.2);
+/* ---- Utility riêng cho Tailwind v4 ---- */
+@utility animation-delay-2000 {
+  animation-delay: 2000ms;
 }
 
-.shadow-neon-gold {
-  box-shadow: 0 0 30px rgba(245, 158, 11, 0.25), 0 0 10px rgba(234, 179, 8, 0.2);
+@utility animation-delay-4000 {
+  animation-delay: 4000ms;
 }
 
-.shadow-neon-cyan {
-  box-shadow: 0 0 30px rgba(6, 182, 212, 0.25), 0 0 10px rgba(59, 130, 246, 0.2);
+@utility perspective-1000 {
+  perspective: 1000px;
 }
 
-.ease-premium {
-  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Custom scrollbar */
+/* ---- Custom Scrollbar ---- */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -112,7 +167,7 @@ body {
   background: #374151;
 }
 
-/* Fix Chrome Autofill - Giữ nguyên màu nền tối & chữ sáng thay vì bị biến thành ô trắng */
+/* ---- Fix Chrome Autofill ---- */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
@@ -124,7 +179,7 @@ input:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Custom patterns & gradients */
+/* ---- Custom Background Patterns & Gradients ---- */
 .bg-grid-pattern {
   background-size: 40px 40px;
   background-image: 
