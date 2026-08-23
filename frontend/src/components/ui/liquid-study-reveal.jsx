@@ -125,6 +125,8 @@ export default function LiquidStudyReveal({
     resize();
     window.addEventListener("resize", resize);
 
+    let animId = null;
+
     const handlePointerMove = (e) => {
       if (!rect.width) return;
       setHintVisible(false);
@@ -140,21 +142,26 @@ export default function LiquidStudyReveal({
       if (!lastPoint) {
         lastPoint = { x, y };
         points.push({ x, y });
-        return;
+      } else {
+        const dist = Math.hypot(x - lastPoint.x, y - lastPoint.y);
+        const step = Math.max(rad * 0.3, 1);
+        const n = Math.min(Math.ceil(dist / step), 50);
+
+        for (let i = 1; i <= n; i++) {
+          const t = i / n;
+          points.push({
+            x: lastPoint.x + (x - lastPoint.x) * t,
+            y: lastPoint.y + (y - lastPoint.y) * t,
+          });
+        }
+        lastPoint = { x, y };
       }
 
-      const dist = Math.hypot(x - lastPoint.x, y - lastPoint.y);
-      const step = Math.max(rad * 0.3, 1);
-      const n = Math.min(Math.ceil(dist / step), 50);
-
-      for (let i = 1; i <= n; i++) {
-        const t = i / n;
-        points.push({
-          x: lastPoint.x + (x - lastPoint.x) * t,
-          y: lastPoint.y + (y - lastPoint.y) * t,
-        });
+      // Wake up the render loop if it's asleep
+      if (idle >= 120 && !animId) {
+        idle = 0;
+        animId = requestAnimationFrame(tick);
       }
-      lastPoint = { x, y };
     };
 
     container.addEventListener("pointermove", handlePointerMove, { passive: true });
@@ -180,7 +187,6 @@ export default function LiquidStudyReveal({
       ctx.drawImage(brushCanvas, x - c, y - c);
     };
 
-    let animId;
     const tick = () => {
       const drawing = points.length > 0;
       if (drawing) {
@@ -204,13 +210,15 @@ export default function LiquidStudyReveal({
         if (idle === 120) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
+        animId = requestAnimationFrame(tick);
+      } else {
+        animId = null; // Stop the loop to save GPU
       }
-      animId = requestAnimationFrame(tick);
     };
     animId = requestAnimationFrame(tick);
 
     return () => {
-      cancelAnimationFrame(animId);
+      if (animId) cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
       container.removeEventListener("pointermove", handlePointerMove);
     };
