@@ -11,7 +11,7 @@ import React, { useRef, useEffect } from "react";
  * - Interactive magnetic mouse links & ripple physics
  */
 export default function GeometricConstellationCanvas({
-  opacity = 0.95,
+  opacity = 1,
   interactive = true,
 }) {
   const canvasRef = useRef(null);
@@ -62,12 +62,12 @@ export default function GeometricConstellationCanvas({
     const initElements = () => {
       // Create Stars
       stars = [];
-      const starCount = Math.floor((width * height) / 12000);
+      const starCount = Math.floor((width * height) / 9000);
       for (let i = 0; i < starCount; i++) {
         stars.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          radius: Math.random() * 1.5 + 0.5,
+          radius: Math.random() * 1.8 + 0.8,
           alpha: Math.random() * 0.7 + 0.3,
           twinkleSpeed: Math.random() * 0.03 + 0.01,
         });
@@ -75,57 +75,57 @@ export default function GeometricConstellationCanvas({
 
       // Create Cluster Nodes
       nodes = [];
-      const clusterCenterX = width * 0.78;
-      const clusterCenterY = height * 0.75;
-      const clusterRadius = Math.min(width, height) * 0.42;
+      const clusterCenterX = width * 0.75;
+      const clusterCenterY = height * 0.72;
+      const clusterRadius = Math.min(width, height) * 0.45;
 
       // Bottom-right dense geodesic cluster
-      const clusterNodeCount = 45;
+      const clusterNodeCount = 55;
       for (let i = 0; i < clusterNodeCount; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const dist = Math.pow(Math.random(), 0.7) * clusterRadius;
+        const dist = Math.pow(Math.random(), 0.65) * clusterRadius;
         nodes.push({
           x: clusterCenterX + Math.cos(angle) * dist,
           y: clusterCenterY + Math.sin(angle) * dist,
           baseX: clusterCenterX + Math.cos(angle) * dist,
           baseY: clusterCenterY + Math.sin(angle) * dist,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
-          radius: Math.random() * 2.5 + 1.8,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: (Math.random() - 0.5) * 0.45,
+          radius: Math.random() * 3 + 2.2,
           pulse: Math.random() * Math.PI,
         });
       }
 
       // Branching constellation nodes spanning across top and center
-      const fieldNodeCount = 35;
+      const fieldNodeCount = 40;
       for (let i = 0; i < fieldNodeCount; i++) {
-        const x = Math.random() * width * 0.8;
-        const y = Math.random() * height * 0.85;
+        const x = Math.random() * width * 0.85;
+        const y = Math.random() * height * 0.9;
         nodes.push({
           x,
           y,
           baseX: x,
           baseY: y,
-          vx: (Math.random() - 0.5) * 0.5,
-          vy: (Math.random() - 0.5) * 0.5,
-          radius: Math.random() * 2.2 + 1.5,
+          vx: (Math.random() - 0.5) * 0.55,
+          vy: (Math.random() - 0.5) * 0.55,
+          radius: Math.random() * 2.5 + 1.8,
           pulse: Math.random() * Math.PI,
         });
       }
 
       // Create Floating Triangles (Polygonal shards)
       triangles = [];
-      const triCount = 14;
+      const triCount = 18;
       for (let i = 0; i < triCount; i++) {
         triangles.push({
-          x: Math.random() * (width * 0.7),
-          y: Math.random() * (height * 0.8),
-          size: Math.random() * 45 + 25,
+          x: Math.random() * (width * 0.75),
+          y: Math.random() * (height * 0.85),
+          size: Math.random() * 55 + 30,
           angle: Math.random() * Math.PI * 2,
-          rotSpeed: (Math.random() - 0.5) * 0.008,
-          vx: (Math.random() - 0.5) * 0.3,
-          vy: (Math.random() - 0.5) * 0.3,
-          alpha: Math.random() * 0.45 + 0.25,
+          rotSpeed: (Math.random() - 0.5) * 0.009,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: (Math.random() - 0.5) * 0.35,
+          alpha: Math.random() * 0.5 + 0.35,
         });
       }
     };
@@ -144,25 +144,25 @@ export default function GeometricConstellationCanvas({
 
       // 1. Draw Deep Cosmic Gradient (Indigo -> Purple -> Radiant Magenta / Rose)
       const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-      bgGrad.addColorStop(0, "#120326");
-      bgGrad.addColorStop(0.35, "#2a084e");
-      bgGrad.addColorStop(0.7, "#6b1178");
-      bgGrad.addColorStop(0.95, "#be185d");
+      bgGrad.addColorStop(0, "#16042f");
+      bgGrad.addColorStop(0.35, "#340a62");
+      bgGrad.addColorStop(0.68, "#7e128e");
+      bgGrad.addColorStop(0.92, "#db2777");
       bgGrad.addColorStop(1, "#f43f5e");
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
       // Ambient radial lighting on lower right
       const radGlow = ctx.createRadialGradient(
-        width * 0.82,
-        height * 0.8,
-        50,
-        width * 0.82,
-        height * 0.8,
-        Math.min(width, height) * 0.75
+        width * 0.8,
+        height * 0.78,
+        60,
+        width * 0.8,
+        height * 0.78,
+        Math.min(width, height) * 0.85
       );
-      radGlow.addColorStop(0, "rgba(244, 63, 94, 0.45)");
-      radGlow.addColorStop(0.5, "rgba(192, 38, 211, 0.25)");
+      radGlow.addColorStop(0, "rgba(244, 63, 94, 0.6)");
+      radGlow.addColorStop(0.45, "rgba(217, 70, 239, 0.35)");
       radGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = radGlow;
       ctx.fillRect(0, 0, width, height);
@@ -170,7 +170,7 @@ export default function GeometricConstellationCanvas({
       // 2. Draw Stars
       for (let s of stars) {
         s.alpha += Math.sin(time * 2 + s.twinkleSpeed * 100) * 0.01;
-        const currentAlpha = Math.max(0.15, Math.min(0.9, s.alpha));
+        const currentAlpha = Math.max(0.2, Math.min(1.0, s.alpha));
         ctx.fillStyle = `rgba(255, 255, 255, ${currentAlpha})`;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
@@ -183,8 +183,8 @@ export default function GeometricConstellationCanvas({
         tri.y += tri.vy;
         tri.angle += tri.rotSpeed;
 
-        if (tri.x < -100) tri.x = width * 0.7 + 50;
-        if (tri.x > width * 0.7 + 100) tri.x = -50;
+        if (tri.x < -100) tri.x = width * 0.75 + 50;
+        if (tri.x > width * 0.75 + 100) tri.x = -50;
         if (tri.y < -100) tri.y = height + 50;
         if (tri.y > height + 100) tri.y = -50;
 
@@ -192,8 +192,8 @@ export default function GeometricConstellationCanvas({
         ctx.translate(tri.x, tri.y);
         ctx.rotate(tri.angle);
 
-        ctx.strokeStyle = `rgba(216, 180, 254, ${tri.alpha})`;
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = `rgba(233, 213, 255, ${tri.alpha})`;
+        ctx.lineWidth = 1.4;
         ctx.beginPath();
 
         const s = tri.size;
@@ -208,10 +208,10 @@ export default function GeometricConstellationCanvas({
         ctx.stroke();
 
         // Little corner nodes
-        ctx.fillStyle = `rgba(255, 255, 255, ${tri.alpha * 1.4})`;
+        ctx.fillStyle = `rgba(255, 255, 255, ${tri.alpha * 1.5})`;
         [p1, p2, p3].forEach((p) => {
           ctx.beginPath();
-          ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
+          ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2);
           ctx.fill();
         });
 
@@ -221,8 +221,8 @@ export default function GeometricConstellationCanvas({
       // 4. Update Node Positions with Soft Float & Mouse Dynamics
       for (let node of nodes) {
         node.pulse += 0.03;
-        node.x += node.vx + Math.sin(node.pulse) * 0.35;
-        node.y += node.vy + Math.cos(node.pulse) * 0.35;
+        node.x += node.vx + Math.sin(node.pulse) * 0.4;
+        node.y += node.vy + Math.cos(node.pulse) * 0.4;
 
         // Keep inside bounds
         if (node.x < 0 || node.x > width) node.vx *= -1;
@@ -233,16 +233,16 @@ export default function GeometricConstellationCanvas({
           const dx = node.x - mouse.x;
           const dy = node.y - mouse.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 180 && dist > 1) {
-            const force = (180 - dist) / 180;
-            node.x += (dx / dist) * force * 3.5;
-            node.y += (dy / dist) * force * 3.5;
+          if (dist < 220 && dist > 1) {
+            const force = (220 - dist) / 220;
+            node.x += (dx / dist) * force * 4.2;
+            node.y += (dy / dist) * force * 4.2;
           }
         }
       }
 
       // 5. Draw Interconnecting Constellation Web Lines
-      const maxConnectDist = Math.min(width, height) * 0.22;
+      const maxConnectDist = Math.min(width, height) * 0.25;
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const n1 = nodes[i];
@@ -252,9 +252,9 @@ export default function GeometricConstellationCanvas({
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < maxConnectDist) {
-            const lineAlpha = (1 - dist / maxConnectDist) * 0.55;
+            const lineAlpha = (1 - dist / maxConnectDist) * 0.65;
             ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha})`;
-            ctx.lineWidth = lineAlpha > 0.35 ? 1.4 : 0.8;
+            ctx.lineWidth = lineAlpha > 0.35 ? 1.6 : 1.0;
             ctx.beginPath();
             ctx.moveTo(n1.x, n1.y);
             ctx.lineTo(n2.x, n2.y);
@@ -269,10 +269,10 @@ export default function GeometricConstellationCanvas({
           const dx = node.x - mouse.x;
           const dy = node.y - mouse.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 200) {
-            const mouseAlpha = (1 - dist / 200) * 0.85;
-            ctx.strokeStyle = `rgba(254, 215, 170, ${mouseAlpha})`;
-            ctx.lineWidth = 1.6;
+          if (dist < 240) {
+            const mouseAlpha = (1 - dist / 240) * 0.9;
+            ctx.strokeStyle = `rgba(254, 240, 138, ${mouseAlpha})`;
+            ctx.lineWidth = 1.8;
             ctx.beginPath();
             ctx.moveTo(mouse.x, mouse.y);
             ctx.lineTo(node.x, node.y);
@@ -283,7 +283,7 @@ export default function GeometricConstellationCanvas({
 
       // 7. Draw Glowing Nodes
       for (let node of nodes) {
-        const glowRadius = node.radius + Math.sin(node.pulse) * 0.8;
+        const glowRadius = node.radius + Math.sin(node.pulse) * 0.9;
 
         // Outer Soft Glow
         const nodeGlow = ctx.createRadialGradient(
@@ -292,15 +292,15 @@ export default function GeometricConstellationCanvas({
           0,
           node.x,
           node.y,
-          glowRadius * 3.5
+          glowRadius * 4
         );
-        nodeGlow.addColorStop(0, "rgba(255, 255, 255, 0.9)");
-        nodeGlow.addColorStop(0.4, "rgba(244, 114, 182, 0.5)");
+        nodeGlow.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+        nodeGlow.addColorStop(0.4, "rgba(244, 114, 182, 0.6)");
         nodeGlow.addColorStop(1, "rgba(244, 114, 182, 0)");
 
         ctx.fillStyle = nodeGlow;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, glowRadius * 3.5, 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, glowRadius * 4, 0, Math.PI * 2);
         ctx.fill();
 
         // Solid White Core
@@ -328,7 +328,7 @@ export default function GeometricConstellationCanvas({
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none -z-10 w-full h-full"
+      className="fixed inset-0 pointer-events-none z-0 w-full h-full"
       style={{ opacity }}
     />
   );

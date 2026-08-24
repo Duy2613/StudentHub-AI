@@ -17,7 +17,7 @@ import { BorderBeam } from "@/components/ui/border-beam";
 
 export const NoiseOverlay = () => (
   <div
-    className="absolute inset-0 z-[2] opacity-[0.03] mix-blend-overlay pointer-events-none"
+    className="fixed inset-0 z-[2] opacity-[0.03] mix-blend-overlay pointer-events-none"
     style={{
       backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
     }}
@@ -26,30 +26,19 @@ export const NoiseOverlay = () => (
 
 export const AmbientBackground = ({ mode = "cosmic-wave" }) => {
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10 w-full h-full">
-      {/* 1. User Uploaded Photographic Purple/Magenta Geometric Constellation Wallpaper */}
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-75 scale-105 transition-transform duration-1000"
-        style={{
-          backgroundImage: `url('/wallpapers/geometric-constellation-purple.png')`,
-        }}
-      />
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 w-full h-full">
+      {/* 1. Interactive Real-time 60fps Geometric Constellation Web & Neural Nodes Canvas */}
+      <GeometricConstellationCanvas opacity={1} interactive={true} />
 
-      {/* 2. Interactive Real-time 60fps Geometric Constellation Web & Neural Nodes Canvas */}
-      <GeometricConstellationCanvas opacity={0.92} interactive={true} />
+      {/* 2. Sparkling Stardust Canvas */}
+      <SparklingStardustCanvas count={70} speed={0.45} />
 
-      {/* 3. Sparkling Stardust Canvas */}
-      <SparklingStardustCanvas count={65} speed={0.4} />
+      {/* 3. Ambient Shooting Meteors */}
+      <Meteors number={14} />
 
-      {/* 4. Ambient Shooting Meteors */}
-      <Meteors number={12} />
-
-      {/* 5. Radiant Prismatic Ambient Glows */}
-      <div className="absolute bottom-[-10%] right-[-10%] w-[55vw] h-[55vw] rounded-full bg-gradient-to-tr from-pink-600/35 to-rose-500/30 blur-[130px] mix-blend-screen" />
-      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-br from-indigo-700/30 to-purple-800/30 blur-[140px] mix-blend-screen" />
-
-      {/* Gentle center focus gradient */}
-      <div className="absolute inset-0 bg-radial from-transparent via-space-950/20 to-space-950/60" />
+      {/* 4. Radiant Prismatic Ambient Glows */}
+      <div className="absolute bottom-[-10%] right-[-10%] w-[55vw] h-[55vw] rounded-full bg-gradient-to-tr from-pink-600/40 to-rose-500/35 blur-[130px] mix-blend-screen pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-br from-indigo-700/35 to-purple-800/35 blur-[140px] mix-blend-screen pointer-events-none" />
     </div>
   );
 };
@@ -75,7 +64,7 @@ export const InputField = ({ label, id, name, type = "text", icon: Icon, helperT
       />
       <div className="relative">
         {Icon && (
-          <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-pink-400" : "text-gray-500"}`}>
+          <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-pink-400" : "text-gray-400"}`}>
             <Icon className="h-5 w-5" />
           </div>
         )}
@@ -98,11 +87,11 @@ export const InputField = ({ label, id, name, type = "text", icon: Icon, helperT
           }}
           className={`
             block w-full ${Icon ? "pl-12" : "pl-4"} pr-4 py-3.5 text-sm
-            bg-space-950/75 backdrop-blur-2xl border border-white/15
+            bg-space-950/80 backdrop-blur-2xl border border-white/20
             rounded-xl shadow-sm placeholder-gray-400 text-gray-100
             transition-all duration-300 ease-premium
-            focus:outline-none focus:bg-space-900/90 focus:border-transparent
-            hover:bg-space-900/60 hover:border-white/25
+            focus:outline-none focus:bg-space-950 focus:border-pink-500/50
+            hover:bg-space-900/80 hover:border-white/30
           `}
           {...props}
         />
@@ -133,7 +122,7 @@ export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) =>
         }`}
       />
       <div className="relative z-10">
-        <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-pink-400" : "text-gray-500"}`}>
+        <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-pink-400" : "text-gray-400"}`}>
           <Lock className="h-5 w-5" />
         </div>
         <input
@@ -155,11 +144,11 @@ export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) =>
           }}
           className={`
             block w-full pl-12 pr-12 py-3.5 text-sm
-            bg-space-950/75 backdrop-blur-2xl border border-white/15
+            bg-space-950/80 backdrop-blur-2xl border border-white/20
             rounded-xl shadow-sm placeholder-gray-400 text-gray-100
             transition-all duration-300 ease-premium
-            focus:outline-none focus:bg-space-900/90 focus:border-transparent
-            hover:bg-space-900/60 hover:border-white/25
+            focus:outline-none focus:bg-space-950 focus:border-pink-500/50
+            hover:bg-space-900/80 hover:border-white/30
           `}
           {...props}
         />
@@ -196,14 +185,14 @@ export const CheckboxField = ({ id, checked, onChange, label, helperText, ...pro
 
 export const Button = ({ children, isLoading, disabled, ...props }) => (
   <div className="relative group z-20">
-    <div className="absolute -inset-1 bg-gradient-to-r from-teal-400 via-purple-600 to-pink-500 rounded-2xl blur-lg opacity-70 group-hover:opacity-100 group-hover:blur-xl transition-all duration-500 ease-premium" />
+    <div className="absolute -inset-1 bg-gradient-to-r from-teal-400 via-purple-600 to-pink-500 rounded-2xl blur-lg opacity-80 group-hover:opacity-100 group-hover:blur-xl transition-all duration-500 ease-premium" />
     <button
       disabled={isLoading || disabled}
       className={`
         relative w-full flex justify-center items-center py-3.5 px-4
         bg-gradient-to-r from-teal-400 via-indigo-600 to-pink-500
         rounded-xl text-sm font-bold text-white
-        shadow-[inset_0_1px_2px_rgba(255,255,255,0.35)]
+        shadow-[inset_0_1px_2px_rgba(255,255,255,0.4)]
         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#06060a] focus:ring-pink-400
         disabled:opacity-70 disabled:cursor-not-allowed
         transition-all duration-300 ease-premium
@@ -227,8 +216,8 @@ export const GoogleButton = ({ isLoading, isDisabled, onClick }) => (
     type="button"
     onClick={onClick}
     disabled={isLoading || isDisabled}
-    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-white/10 border border-white/15 backdrop-blur-2xl text-sm font-medium text-gray-200 shadow-sm hover:bg-white/15 hover:text-white hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-pink-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
-      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-white/10 hover:border-white/15 hover:text-gray-200" : ""
+    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-space-950/70 border border-white/20 backdrop-blur-2xl text-sm font-medium text-gray-200 shadow-sm hover:bg-space-900/80 hover:text-white hover:border-white/35 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-pink-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
+      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-space-950/70 hover:border-white/20 hover:text-gray-200" : ""
     }`}
   >
     {isLoading ? (
@@ -260,8 +249,8 @@ export const GithubButton = ({ isLoading, isDisabled, onClick }) => (
     type="button"
     onClick={onClick}
     disabled={isLoading || isDisabled}
-    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-white/10 border border-white/15 backdrop-blur-2xl text-sm font-medium text-gray-200 shadow-sm hover:bg-white/15 hover:text-white hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-pink-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
-      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-white/10 hover:border-white/15 hover:text-gray-200" : ""
+    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-space-950/70 border border-white/20 backdrop-blur-2xl text-sm font-medium text-gray-200 shadow-sm hover:bg-space-900/80 hover:text-white hover:border-white/35 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-pink-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
+      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-space-950/70 hover:border-white/20 hover:text-gray-200" : ""
     }`}
   >
     {isLoading ? (
@@ -304,7 +293,7 @@ export const StudentBenefitBanner = ({ email }) => {
   return (
     <div
       className={`mb-8 relative overflow-hidden rounded-2xl border transition-all duration-500 ease-premium ${
-        isStudent ? "bg-pink-950/40 border-pink-500/50 shadow-[0_0_25px_rgba(244,63,94,0.3)]" : "bg-white/10 border-white/15"
+        isStudent ? "bg-pink-950/40 border-pink-500/50 shadow-[0_0_25px_rgba(244,63,94,0.3)]" : "bg-space-950/60 border-white/15"
       }`}
     >
       <div className={`absolute -inset-1 bg-gradient-to-r from-pink-500/25 to-purple-500/25 blur-md transition-opacity duration-500 ${isStudent ? "opacity-100 animate-pulse-slow" : "opacity-0"}`} />
@@ -333,7 +322,7 @@ export const StudentBenefitBanner = ({ email }) => {
  */
 export const AuthCard = ({ children, mode = "cosmic-wave" }) => (
   <PageTransitionWrapper>
-    <div className="min-h-screen relative overflow-hidden font-sans bg-[#100322] select-none">
+    <div className="min-h-screen relative overflow-hidden font-sans bg-transparent select-none">
       <AmbientBackground mode={mode} />
       <NoiseOverlay />
       <AuthSurroundings>
@@ -343,7 +332,7 @@ export const AuthCard = ({ children, mode = "cosmic-wave" }) => (
             <BorderBeam size={260} duration={7} colorFrom="#f43f5e" colorTo="#a855f7" />
             
             {/* Inner Core: Deep Space Cyber Canvas */}
-            <div className="relative rounded-[calc(32px-0.375rem)] bg-space-950/85 backdrop-blur-3xl py-8 px-6 sm:py-10 sm:px-10 border border-white/10 overflow-hidden">
+            <div className="relative rounded-[calc(32px-0.375rem)] bg-space-950/90 backdrop-blur-3xl py-8 px-6 sm:py-10 sm:px-10 border border-white/10 overflow-hidden">
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-pink-400/80 to-transparent opacity-90" />
               {children}
             </div>
