@@ -5,7 +5,7 @@
 // Floating HUD Pins: AI Scam Engine (4-Layer), Expert Trust Network (0-100 pts), Community Verification
 // Features: Simplex Noise Particle Waves (#02160c -> #34e7c4), Mouse Raycaster Pointer Repulsion, Hologram Crystal Core
 
-import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Float, Html, MeshDistortMaterial, Sphere } from "@react-three/drei";
 import * as THREE from "three";
@@ -13,10 +13,9 @@ import { ShieldAlert, ShieldCheck, Users, Sparkles, ArrowUpRight, CheckCircle2 }
 
 // Interactive Simplex Noise Particle Wave Field with Mouse Repulsion
 function ParticleWaveField() {
-  const count = 1600;
+  const count = 1200;
   const meshRef = useRef();
   const { mouse, viewport } = useThree();
-  const mousePos = useRef(new THREE.Vector3());
 
   const [positions, initialPositions, colors] = useMemo(() => {
     const pos = new Float32Array(count * 3);
@@ -27,9 +26,9 @@ function ParticleWaveField() {
     const tempColor = new THREE.Color();
 
     for (let i = 0; i < count; i++) {
-      const x = (Math.random() - 0.5) * 18;
-      const z = (Math.random() - 0.5) * 18;
-      const y = (Math.random() - 0.5) * 3.5;
+      const x = (Math.random() - 0.5) * 14;
+      const z = (Math.random() - 0.5) * 14;
+      const y = (Math.random() - 0.5) * 2.8;
 
       pos[i * 3] = x;
       pos[i * 3 + 1] = y;
@@ -39,7 +38,7 @@ function ParticleWaveField() {
       initialPos[i * 3 + 1] = y;
       initialPos[i * 3 + 2] = z;
 
-      const alpha = (x + 9) / 18;
+      const alpha = (x + 7) / 14;
       tempColor.lerpColors(color1, color2, Math.max(0, Math.min(1, alpha)));
       cols[i * 3] = tempColor.r;
       cols[i * 3 + 1] = tempColor.g;
@@ -61,15 +60,15 @@ function ParticleWaveField() {
         const iz = initialPositions[u + 2];
 
         // Wave motion
-        let y = Math.sin(t * 1.2 + ix * 0.45) * 0.35 + Math.cos(t * 0.8 + iz * 0.45) * 0.25;
+        let y = Math.sin(t * 1.2 + ix * 0.45) * 0.3 + Math.cos(t * 0.8 + iz * 0.45) * 0.2;
 
-        // Mouse repulsion physics (pointerRadius = 4.5)
+        // Mouse repulsion physics (pointerRadius = 3.5)
         const dx = ix - mx;
         const dy = y - my;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 4.5) {
-          const force = (4.5 - dist) / 4.5;
-          y += force * 0.8;
+        if (dist < 3.5) {
+          const force = (3.5 - dist) / 3.5;
+          y += force * 0.6;
         }
 
         array[u + 1] = y;
@@ -95,10 +94,10 @@ function ParticleWaveField() {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.065}
+        size={0.06}
         vertexColors
         transparent
-        opacity={0.75}
+        opacity={0.7}
         blending={THREE.AdditiveBlending}
       />
     </points>
@@ -136,7 +135,7 @@ function VerificationHologramCore({ hoverPin, setHoverPin }) {
     <group ref={coreRef}>
       {/* Outer Hologram Shield Octahedron */}
       <mesh>
-        <octahedronGeometry args={[1.7, 0]} />
+        <octahedronGeometry args={[1.5, 0]} />
         <meshPhysicalMaterial
           color="#34e7c4"
           transmission={0.85}
@@ -152,12 +151,12 @@ function VerificationHologramCore({ hoverPin, setHoverPin }) {
 
       {/* Wireframe Shield Matrix */}
       <mesh>
-        <octahedronGeometry args={[1.75, 0]} />
+        <octahedronGeometry args={[1.55, 0]} />
         <meshBasicMaterial color="#34e7c4" wireframe={true} transparent={true} opacity={0.4} />
       </mesh>
 
       {/* Inner Glowing AI Pulse Sphere */}
-      <Sphere ref={innerRef} args={[0.85, 32, 32]}>
+      <Sphere ref={innerRef} args={[0.75, 32, 32]}>
         <MeshDistortMaterial
           color="#064e3b"
           attach="material"
@@ -172,96 +171,82 @@ function VerificationHologramCore({ hoverPin, setHoverPin }) {
 
       {/* Orbital Quantum Rings */}
       <mesh ref={ring1Ref}>
-        <torusGeometry args={[2.4, 0.02, 16, 100]} />
+        <torusGeometry args={[2.1, 0.018, 16, 100]} />
         <meshBasicMaterial color="#34e7c4" transparent opacity={0.65} />
       </mesh>
 
       <mesh ref={ring2Ref}>
-        <torusGeometry args={[2.8, 0.015, 16, 100]} />
+        <torusGeometry args={[2.5, 0.014, 16, 100]} />
         <meshBasicMaterial color="#6366f1" transparent opacity={0.5} />
       </mesh>
 
-      {/* Floating HUD Pin 1: AI Scam Checker */}
-      <Float speed={2.5} rotationIntensity={0.2} floatIntensity={1.5} position={[-2.7, 1.3, 0.4]}>
-        <Html distanceFactor={8} center position={[0, 0, 0]}>
+      {/* Floating HUD Pin 1: AI Scam Checker (Compact) */}
+      <Float speed={2.5} rotationIntensity={0.2} floatIntensity={1.2} position={[-2.1, 1.2, 0.3]}>
+        <Html distanceFactor={9} center position={[0, 0, 0]}>
           <div
             onMouseEnter={() => setHoverPin("checker")}
             onMouseLeave={() => setHoverPin(null)}
-            className="group cursor-pointer p-3 rounded-2xl bg-space-950/90 backdrop-blur-xl border border-teal-500/40 shadow-[0_0_25px_rgba(52,231,196,0.35)] transition-all duration-300 hover:scale-110 hover:border-teal-400 select-none min-w-[200px]"
+            className="group cursor-pointer p-2.5 rounded-2xl bg-space-950/90 backdrop-blur-xl border border-teal-500/40 shadow-[0_0_20px_rgba(52,231,196,0.35)] transition-all duration-300 hover:scale-105 hover:border-teal-400 select-none min-w-[170px]"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-500/30">
-                <ShieldAlert className="w-4 h-4" />
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-xl bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                <ShieldAlert className="w-3.5 h-3.5" />
               </div>
-              <div className="flex-1">
-                <p className="text-xs font-bold text-white flex items-center justify-between">
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-bold text-white flex items-center justify-between">
                   <span>AI Scam Engine</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-teal-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  <ArrowUpRight className="w-3 h-3 text-teal-400" />
                 </p>
-                <p className="text-[10px] text-teal-300 font-medium">Động Cơ Phân Tích 4 Lớp</p>
+                <p className="text-[9px] text-teal-300 font-medium truncate">Động Cơ 4 Lớp (0.1s)</p>
               </div>
-            </div>
-            <div className="mt-2 pt-1.5 border-t border-white/10 flex items-center justify-between text-[9px] text-gray-400">
-              <span className="flex items-center gap-1 text-emerald-400 font-semibold">
-                <CheckCircle2 className="w-2.5 h-2.5" /> Dừng sớm (0.1s)
-              </span>
-              <span>Link, Text & OCR</span>
             </div>
           </div>
         </Html>
       </Float>
 
-      {/* Floating HUD Pin 2: Chuyên Gia Uy Tín */}
-      <Float speed={3.0} rotationIntensity={0.25} floatIntensity={1.8} position={[2.8, 1.0, -0.3]}>
-        <Html distanceFactor={8} center position={[0, 0, 0]}>
+      {/* Floating HUD Pin 2: Chuyên Gia Uy Tín (Compact) */}
+      <Float speed={3.0} rotationIntensity={0.25} floatIntensity={1.4} position={[2.1, 0.9, -0.2]}>
+        <Html distanceFactor={9} center position={[0, 0, 0]}>
           <div
             onMouseEnter={() => setHoverPin("expert")}
             onMouseLeave={() => setHoverPin(null)}
-            className="group cursor-pointer p-3 rounded-2xl bg-space-950/90 backdrop-blur-xl border border-amber-500/40 shadow-[0_0_25px_rgba(245,158,11,0.35)] transition-all duration-300 hover:scale-110 hover:border-amber-400 select-none min-w-[200px]"
+            className="group cursor-pointer p-2.5 rounded-2xl bg-space-950/90 backdrop-blur-xl border border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.35)] transition-all duration-300 hover:scale-105 hover:border-amber-400 select-none min-w-[170px]"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                <Users className="w-4 h-4" />
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <Users className="w-3.5 h-3.5" />
               </div>
-              <div className="flex-1">
-                <p className="text-xs font-bold text-white flex items-center justify-between">
-                  <span>Mạng Lưới Chuyên Gia</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-bold text-white flex items-center justify-between">
+                  <span>Cố Vấn Uy Tín</span>
+                  <ArrowUpRight className="w-3 h-3 text-amber-400" />
                 </p>
-                <p className="text-[10px] text-amber-300 font-medium">Trust Score (0–100 pts)</p>
+                <p className="text-[9px] text-amber-300 font-medium truncate">Trust Score (0–100 pts)</p>
               </div>
-            </div>
-            <div className="mt-2 pt-1.5 border-t border-white/10 flex items-center justify-between text-[9px] text-gray-400">
-              <span className="text-amber-400 font-semibold">+30 pts Email Edu</span>
-              <span>Top 5 Bảng xếp hạng</span>
             </div>
           </div>
         </Html>
       </Float>
 
-      {/* Floating HUD Pin 3: Diễn Đàn Xác Thực */}
-      <Float speed={2.0} rotationIntensity={0.15} floatIntensity={1.2} position={[0, -2.3, 0.7]}>
-        <Html distanceFactor={8} center position={[0, 0, 0]}>
+      {/* Floating HUD Pin 3: Diễn Đàn Xác Thực (Compact) */}
+      <Float speed={2.0} rotationIntensity={0.15} floatIntensity={1.0} position={[0, -1.9, 0.5]}>
+        <Html distanceFactor={9} center position={[0, 0, 0]}>
           <div
             onMouseEnter={() => setHoverPin("forum")}
             onMouseLeave={() => setHoverPin(null)}
-            className="group cursor-pointer p-3 rounded-2xl bg-space-950/90 backdrop-blur-xl border border-indigo-500/40 shadow-[0_0_25px_rgba(99,102,241,0.35)] transition-all duration-300 hover:scale-110 hover:border-indigo-400 select-none min-w-[220px]"
+            className="group cursor-pointer p-2.5 rounded-2xl bg-space-950/90 backdrop-blur-xl border border-indigo-500/40 shadow-[0_0_20px_rgba(99,102,241,0.35)] transition-all duration-300 hover:scale-105 hover:border-indigo-400 select-none min-w-[175px]"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                <ShieldCheck className="w-4 h-4" />
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <ShieldCheck className="w-3.5 h-3.5" />
               </div>
-              <div className="flex-1">
-                <p className="text-xs font-bold text-white flex items-center justify-between">
-                  <span>Diễn Đàn Xác Thực</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-indigo-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-bold text-white flex items-center justify-between">
+                  <span>Diễn Đàn Thực Chứng</span>
+                  <ArrowUpRight className="w-3 h-3 text-indigo-400" />
                 </p>
-                <p className="text-[10px] text-indigo-300 font-medium">Vote Uy Tín • Nhà Trọ • Quán Ăn</p>
+                <p className="text-[9px] text-indigo-300 font-medium truncate">Vote Uy Tín • Nhà Trọ</p>
               </div>
-            </div>
-            <div className="mt-2 pt-1.5 border-t border-white/10 flex items-center justify-between text-[9px] text-gray-400">
-              <span>Đại học toàn quốc</span>
-              <span className="text-indigo-400 font-semibold">Cộng đồng Sinh viên</span>
             </div>
           </div>
         </Html>
@@ -280,22 +265,18 @@ export default function Hero3DCanvas() {
 
   if (!mounted) {
     return (
-      <div className="w-full h-[420px] sm:h-[500px] flex items-center justify-center bg-transparent">
-        <div className="w-14 h-14 rounded-full border-2 border-teal-500/30 border-t-teal-400 animate-spin" />
+      <div className="w-full h-full flex items-center justify-center bg-transparent">
+        <div className="w-10 h-10 rounded-full border-2 border-teal-500/30 border-t-teal-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-[420px] sm:h-[500px] overflow-hidden rounded-3xl">
-      {/* Background ambient lighting */}
-      <div className="absolute inset-0 bg-radial from-teal-900/15 via-transparent to-transparent pointer-events-none" />
-
+    <div className="relative w-full h-full overflow-hidden rounded-3xl">
       <Canvas
-        camera={{ position: [0, 0, 7.2], fov: 45 }}
+        camera={{ position: [0, 0, 6.2], fov: 45 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         dpr={[1, 1.5]}
-        performance={{ min: 0.5 }}
         className="w-full h-full"
       >
         <ambientLight intensity={0.8} />
@@ -306,12 +287,6 @@ export default function Hero3DCanvas() {
         <ParticleWaveField />
         <VerificationHologramCore hoverPin={hoverPin} setHoverPin={setHoverPin} />
       </Canvas>
-
-      {/* Interactive Micro-badge Overlay */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-space-950/80 backdrop-blur-md border border-white/10 text-[11px] text-gray-300 flex items-center gap-2 pointer-events-none shadow-lg">
-        <Sparkles className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
-        <span>Mô phỏng 3D: Di chuột để tương tác sóng hạt & các khối xác thực</span>
-      </div>
     </div>
   );
 }
