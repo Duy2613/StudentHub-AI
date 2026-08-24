@@ -2,13 +2,15 @@
 
 // app/page.jsx
 // Trang chủ (Landing Page) chính thức của StudentHub AI:
-// - Nền tảng Phòng chống Lừa đảo & Mạng lưới Xác thực thông tin dành cho sinh viên Việt Nam
-// - Dự án dự thi "Cuộc thi Sáng tạo trẻ Quốc gia trong lĩnh vực Trí tuệ nhân tạo năm 2026", Bảng C (sinh viên)
-// - Floating Glassmorphic Island Navbar, 3D WebGL Hologram Core, 3 Trụ Cột, Live Scam Demo & 4-Layer Engine
+// - Nghệ thuật chỉ đạo: Editorial Academic × Human Technology × Cinematic Campus
+// - Typography: Instrument Serif / Cormorant Garamond kết hợp Geist Sans
+// - Visual Motif: The Knowledge Orbit System & Backgrounds & Effects Studio
+// - 3 Trụ Cột: AI Scam Checker 4 Lớp, Chuyên gia Uy tín & Diễn đàn Sinh viên
 
 import React from "react";
 import ModernNavbar from "@/components/layout/ModernNavbar";
 import HeroSection from "@/components/landing/HeroSection";
+import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
 import CoreFeaturesSection from "@/components/landing/CoreFeaturesSection";
 import InteractiveScamDemo from "@/components/landing/InteractiveScamDemo";
 import ExplainableEngineSection from "@/components/landing/ExplainableEngineSection";
@@ -27,8 +29,9 @@ export default function HomePage() {
       <ModernNavbar />
 
       {/* Main Sections */}
-      <main className="flex-1 w-full relative z-10">
+      <main className="flex-1 w-full relative z-10 space-y-12">
         <HeroSection />
+        <BackgroundsAndEffectsStudio isInline={true} />
         <CoreFeaturesSection />
         <InteractiveScamDemo />
         <ExplainableEngineSection />
