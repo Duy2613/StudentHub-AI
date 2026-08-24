@@ -35,10 +35,14 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
+import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
+import { NoiseOverlay } from "@/components/auth/AuthUI";
 import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
 import ModernNavbar from "@/components/layout/ModernNavbar";
 import TactileButton from "@/components/ui/TactileButton";
+import FloatingDock from "@/components/ui/floating-dock";
+import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
+import IglooSoundAmbiencePill from "@/components/ui/IglooSoundAmbiencePill";
 import {
   AVATAR_LIST,
   VIETNAM_UNIVERSITIES,
@@ -58,73 +62,74 @@ export default function ProfilePage() {
   const [editAvatarId, setEditAvatarId] = useState("student-tech");
   const [editUniversity, setEditUniversity] = useState(VIETNAM_UNIVERSITIES[0]);
   const [editMajor, setEditMajor] = useState("");
-  const [editAcademicYear, setEditAcademicYear] = useState("");
-  const [editExpertTitle, setEditExpertTitle] = useState("");
-  const [editExpertField, setEditExpertField] = useState(EXPERT_FIELDS[0]);
-  const [editExperienceYears, setEditExperienceYears] = useState("");
+  const [editAcademicYear, setEditAcademicYear] = useState("2024 - 2028");
   const [editBio, setEditBio] = useState("");
-
+  const [editExpertTitle, setEditExpertTitle] = useState("Chuyên gia An ninh");
+  const [editExpertField, setEditExpertField] = useState(EXPERT_FIELDS[0]);
+  const [editExperienceYears, setEditExperienceYears] = useState("3+ năm");
+  const [editOrganization, setEditOrganization] = useState("Tập đoàn An ninh Mạng / Học viện");
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [editError, setEditError] = useState(null);
+  const [editError, setEditError] = useState("");
 
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!isLoading && !session) {
-      router.replace("/login");
-    }
-  }, [session, isLoading, router]);
-
-  // Load current profile
   useEffect(() => {
     if (profile) {
       setEditFullName(profile.fullName || "");
       setEditRole(profile.role || "student");
       setEditAvatarId(profile.avatarId || "student-tech");
-      if (profile.university) setEditUniversity(profile.university);
+      setEditUniversity(profile.university || VIETNAM_UNIVERSITIES[0]);
       setEditMajor(profile.major || "");
-      setEditAcademicYear(profile.academicYear || "");
-      setEditExpertTitle(profile.expertTitle || "");
-      if (profile.expertField) setEditExpertField(profile.expertField);
-      setEditExperienceYears(profile.experienceYears || "");
+      setEditAcademicYear(profile.academicYear || "2024 - 2028");
       setEditBio(profile.bio || "");
+      setEditExpertTitle(profile.expertTitle || "Chuyên gia An ninh");
+      setEditExpertField(profile.expertField || EXPERT_FIELDS[0]);
+      setEditExperienceYears(profile.experienceYears || "3+ năm");
+      setEditOrganization(profile.organization || "Tập đoàn An ninh Mạng / Học viện");
     }
   }, [profile]);
 
-  if (isLoading || !profile) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-space-950 flex flex-col items-center justify-center text-gray-300">
-        <div className="w-12 h-12 rounded-full border-2 border-teal-400 border-t-transparent animate-spin mb-4" />
-        <p className="font-medium text-gray-400">Đang tải hồ sơ...</p>
+      <div className="min-h-screen bg-space-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-teal-400 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-space-950 flex flex-col items-center justify-center p-4">
+        <p className="text-white mb-4">Không tìm thấy thông tin hồ sơ.</p>
+        <TactileButton variant="primary" onClick={() => router.push("/login")}>
+          Đăng nhập ngay
+        </TactileButton>
       </div>
     );
   }
 
   const isExpert = profile.role === "expert";
-  const trustScore = profile.trustScore ?? (isExpert ? 98 : 80);
-  const isEduVerified = profile.verifiedStudent || /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(profile.email || "");
+  const trustScore = profile.trustScore || 80;
   const isTopExpertBadge = trustScore >= 80;
+  const isEduVerified = !!profile.eduEmailVerified;
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    setEditError(null);
-
+    setEditError("");
     try {
       await updateProfile({
-        full_name: editFullName,
+        fullName: editFullName,
         role: editRole,
-        avatar_id: editAvatarId,
-        university: editRole === "student" ? editUniversity : null,
-        major: editRole === "student" ? editMajor : null,
-        academic_year: editRole === "student" ? editAcademicYear : null,
-        expert_title: editRole === "expert" ? editExpertTitle : null,
-        expert_field: editRole === "expert" ? editExpertField : null,
-        experience_years: editRole === "expert" ? editExperienceYears : null,
+        avatarId: editAvatarId,
+        university: editUniversity,
+        major: editMajor,
+        academicYear: editAcademicYear,
         bio: editBio,
-        verified_expert: editRole === "expert",
+        expertTitle: editExpertTitle,
+        expertField: editExpertField,
+        experienceYears: editExperienceYears,
+        organization: editOrganization,
       });
-
       setSaveSuccess(true);
       setTimeout(() => {
         setSaveSuccess(false);
@@ -138,40 +143,54 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-space-950 text-gray-100 flex relative overflow-x-hidden">
-      <AmbientBackground />
+    <div className="min-h-screen bg-transparent text-gray-100 flex relative overflow-x-hidden">
+      {/* 1. 3D Infinite Highway Canvas */}
+      <div className="canvas-bg-layer">
+        <RobinPayotRoadCanvas />
+      </div>
+
+      {/* 2. Film Grain Noise Overlay */}
       <NoiseOverlay />
 
+      {/* 3. Floating Quick Tools & Studio */}
+      <FloatingDock />
+      <BackgroundsAndEffectsStudio />
+
       {session ? (
-        <CollapsibleSidebar className="hidden md:flex" />
+        <CollapsibleSidebar className="hidden md:flex relative z-40" />
       ) : (
-        <ModernNavbar />
+        <header className="overlay-nav-layer">
+          <ModernNavbar />
+        </header>
       )}
 
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8 sm:py-12 space-y-8 relative z-10 min-w-0">
+      <main className="flex-1 layout-safe-container pt-24 sm:pt-32 pb-40 space-y-8 relative z-10 min-w-0">
         
         {/* Top Header */}
         <div className="flex items-center justify-between">
           <button
             type="button"
             onClick={() => router.push("/dashboard")}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Quay lại Dashboard
           </button>
 
-          <TactileButton
-            variant="primary"
-            size="sm"
-            onClick={() => setIsEditModalOpen(true)}
-            icon={Edit3}
-          >
-            Chỉnh Sửa Hồ Sơ
-          </TactileButton>
+          <div className="flex items-center gap-3">
+            <IglooSoundAmbiencePill />
+            <TactileButton
+              variant="primary"
+              size="sm"
+              onClick={() => setIsEditModalOpen(true)}
+              icon={Edit3}
+            >
+              Chỉnh Sửa Hồ Sơ
+            </TactileButton>
+          </div>
         </div>
 
         {/* Profile Identity Card */}
-        <div className="relative rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl overflow-hidden shadow-glass-deep">
+        <div className="relative rounded-3xl border border-white/10 igloo-hologram-card backdrop-blur-2xl overflow-hidden shadow-glass-deep">
           {/* Cover Header */}
           <div
             className={`h-40 sm:h-48 w-full relative ${

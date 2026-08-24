@@ -8,28 +8,30 @@ import TactileButton from "@/components/ui/TactileButton";
 export default function CallToActionSection() {
   return (
     <section className="py-24 relative z-10 overflow-hidden" id="cta">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8 relative">
+      <div className="layout-safe-container text-center space-y-8 relative">
         
         {/* Glowing Ambient Core */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-gradient-to-r from-teal-500/15 via-indigo-500/15 to-rose-500/15 filter blur-3xl pointer-events-none -z-10" />
 
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-widest">
-          <Award className="w-4 h-4 text-teal-400" />
-          <span>Sáng Tạo Trẻ Quốc Gia AI 2026 • Bảng C</span>
+        <div className="inline-flex items-center gap-2">
+          <span className="igloo-pill-badge">
+            <Award className="w-3.5 h-3.5 text-teal-400" />
+            <span>SÁNG TẠO TRẺ QUỐC GIA AI 2026 • BẢNG C</span>
+          </span>
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-3xl sm:text-5xl md:text-6xl font-normal text-white tracking-tight leading-tight">
-            <span className="font-serif-editorial italic text-gradient-primary">
+          <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight">
+            <span className="font-serif-editorial italic font-normal text-gradient-primary">
               Bảo vệ hành trình học tập,
             </span>
             <br />
-            <span className="font-sans font-black tracking-tight">
+            <span className="font-human font-black tracking-tight">
               hoàn toàn miễn phí.
             </span>
           </h2>
 
-          <p className="text-sm sm:text-base text-gray-300 max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-gray-300 font-human max-w-xl mx-auto leading-relaxed">
             Tham gia cùng hàng nghìn sinh viên Việt Nam bảo vệ không gian mạng học tập trước các thủ đoạn lừa đảo tinh vi.
           </p>
         </div>
@@ -41,6 +43,7 @@ export default function CallToActionSection() {
             size="lg"
             href="/register"
             icon={ArrowRight}
+            techSuffix="[FREE .EDU]"
           >
             Tạo Tài Khoản Sinh Viên Ngay
           </TactileButton>
@@ -50,6 +53,7 @@ export default function CallToActionSection() {
             size="lg"
             href="/scam-check"
             icon={ShieldCheck}
+            techSuffix="[AI SCAN 0.1s]"
           >
             Thử Nghiệm AI Scam Checker
           </TactileButton>

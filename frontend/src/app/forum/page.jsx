@@ -36,11 +36,15 @@ import {
   Share2
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
 import ModernNavbar from "@/components/layout/ModernNavbar";
 import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import TactileButton from "@/components/ui/TactileButton";
+import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
+import { NoiseOverlay } from "@/components/auth/AuthUI";
+import FloatingDock from "@/components/ui/floating-dock";
+import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
+import IglooSoundAmbiencePill from "@/components/ui/IglooSoundAmbiencePill";
 import { motion, AnimatePresence } from "motion/react";
 
 const CATEGORIES = [
@@ -336,47 +340,62 @@ export default function ForumPage() {
   };
 
   return (
-    <div className="min-h-screen bg-space-950 text-gray-100 flex relative overflow-x-hidden">
-      <AmbientBackground />
+    <div className="min-h-screen bg-transparent text-gray-100 flex relative overflow-x-hidden">
+      {/* 1. 3D Infinite Highway Canvas */}
+      <div className="canvas-bg-layer">
+        <RobinPayotRoadCanvas />
+      </div>
+
+      {/* 2. Film Grain Noise Overlay */}
       <NoiseOverlay />
+
+      {/* 3. Floating Quick Tools & Studio */}
+      <FloatingDock />
+      <BackgroundsAndEffectsStudio />
 
       {/* Sidebar or Modern Navbar */}
       {session ? (
-        <CollapsibleSidebar className="hidden md:flex" />
+        <CollapsibleSidebar className="hidden md:flex relative z-40" />
       ) : (
-        <ModernNavbar />
+        <header className="overlay-nav-layer">
+          <ModernNavbar />
+        </header>
       )}
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-12 relative z-10 min-w-0">
+      {/* Main Container with generous top padding for navbar */}
+      <main className="flex-1 layout-safe-container pt-28 sm:pt-32 pb-40 relative z-10 min-w-0">
         
         {/* Header & Create Post Button */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-8">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/25 text-teal-300 text-xs font-bold uppercase tracking-wider mb-2">
-              <MessageSquare className="w-4 h-4 text-teal-400" />
-              Diễn Đàn Cộng Đồng Xác Thực
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/15 border border-teal-500/30 text-teal-300 text-xs font-mono font-bold tracking-wider mb-3">
+              <span className="w-2 h-2 rounded-full bg-teal-400 igloo-radar-beacon" />
+              <span>COMMUNITY DAO • PEER-REVIEWED FEED</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white">
-              Chia Sẻ & Cảnh Báo Sinh Viên
+            <h1 className="page-title">
+              Chia Sẻ &amp; Cảnh Báo Sinh Viên
             </h1>
-            <p className="text-xs sm:text-sm text-gray-400 mt-1">
-              Thảo luận thực tế về Nhà trọ, Quán ăn, Trường học và phòng ngừa lừa đảo.
+            <p className="text-xs sm:text-sm text-gray-300 mt-2 max-w-2xl font-human">
+              Thảo luận thực chứng về Nhà trọ, Quán ăn, Cảnh báo lừa đảo và Môi trường học đường với hệ thống bình chọn tín nhiệm phi tập trung.
             </p>
           </div>
 
-          <TactileButton
-            variant="primary"
-            size="md"
-            onClick={() => setIsNewPostModalOpen(true)}
-            icon={Plus}
-          >
-            Đăng Bài Mới
-          </TactileButton>
+          <div className="flex items-center gap-3">
+            <IglooSoundAmbiencePill />
+            <TactileButton
+              variant="primary"
+              size="md"
+              techSuffix="[DAO POST]"
+              onClick={() => setIsNewPostModalOpen(true)}
+              icon={Plus}
+            >
+              Đăng Bài Mới
+            </TactileButton>
+          </div>
         </div>
 
         {/* Search & Location Filter Bar (No AI algorithm) */}
-        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-6 p-4 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-6 p-4 rounded-3xl igloo-hologram-card border border-white/10 backdrop-blur-2xl">
           <div className="sm:col-span-6 relative">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input

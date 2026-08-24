@@ -165,19 +165,19 @@ const RegisterPage = () => {
       {/* Header */}
       <div className="mb-8 flex flex-col items-center text-center">
         <div className="relative mb-5 group/icon">
-          <div className="absolute -inset-3 bg-gradient-to-tr from-indigo-600/50 to-purple-600/50 rounded-full blur-xl opacity-50 animate-pulse-slow group-hover/icon:opacity-80 transition-opacity"></div>
-          <div className="h-14 w-14 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center relative z-10 shadow-lg ring-1 ring-white/20">
+          <div className="absolute -inset-2 bg-gradient-to-tr from-teal-500/20 to-indigo-600/20 rounded-full blur-lg opacity-40 group-hover/icon:opacity-70 transition-opacity" />
+          <div className="h-14 w-14 bg-gradient-to-tr from-teal-500/30 to-indigo-600/30 border border-teal-400/30 rounded-2xl flex items-center justify-center relative z-10 shadow-md">
             {step === STEP_FORM ? (
-              <Sparkles className="h-7 w-7 text-white fill-white/20" />
+              <Sparkles className="h-7 w-7 text-teal-300" />
             ) : (
-              <KeyRound className="h-7 w-7 text-white" />
+              <KeyRound className="h-7 w-7 text-teal-300" />
             )}
           </div>
         </div>
-        <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-white via-gray-200 to-indigo-200 tracking-tight drop-shadow-sm">
+        <h2 className="text-3xl font-extrabold font-human text-white tracking-tight">
           {step === STEP_FORM ? "Tạo tài khoản" : "Xác nhận mã OTP"}
         </h2>
-        <p className="mt-2.5 text-sm text-gray-400 font-medium max-w-xs">
+        <p className="mt-2 text-sm text-gray-400 font-medium max-w-xs font-human">
           {step === STEP_FORM
             ? "Tham gia cộng đồng StudentHub AI"
             : `Nhập mã xác nhận 6 số đã gửi tới ${email}`}

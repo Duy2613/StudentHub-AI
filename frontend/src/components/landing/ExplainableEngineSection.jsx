@@ -11,6 +11,7 @@ import {
   Clock, 
   ShieldCheck 
 } from "lucide-react";
+import TextScramble from "@/components/ui/TextScramble";
 
 export default function ExplainableEngineSection() {
   const layers = [
@@ -57,28 +58,34 @@ export default function ExplainableEngineSection() {
   ];
 
   return (
-    <section className="py-20 relative z-10" id="engine">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-24 relative z-10" id="engine">
+      <div className="layout-safe-container">
         
         {/* Section Header with Editorial Serif Typography */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold uppercase tracking-widest font-mono">
-            <Layers className="w-3.5 h-3.5 text-cyan-400" />
-            <span>04 / KIẾN TRÚC ĐỘNG CƠ ĐA TẦNG</span>
-          </div>
+          {/* Machine Interface badge for section metadata */}
+          <span className="dg-badge-machine">
+            <Layers className="w-3 h-3" />
+            04 / KIẾN TRÚC ĐỘNG CƠ ĐA TẦNG
+          </span>
 
-          <h2 className="text-3xl sm:text-5xl font-normal text-white tracking-tight leading-tight">
-            <span className="font-serif-editorial italic text-gradient-primary">
+          <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight igloo-halo-hover">
+            <span className="font-serif-editorial italic font-normal text-gradient-primary">
               Xác thực 4 lớp,
             </span>
             <br />
-            <span className="font-sans font-black tracking-tight">
-              minh bạch tuyệt đối.
-            </span>
+            <TextScramble
+              text="minh bạch tuyệt đối."
+              tag="span"
+              className="font-human font-black tracking-tight text-white"
+              duration={900}
+              delay={200}
+              speed={30}
+            />
           </h2>
 
-          <p className="text-xs sm:text-sm text-gray-300 leading-relaxed max-w-xl mx-auto">
-            Tối ưu hóa độ trễ và độ chính xác với cơ chế dừng sớm, mang lại trải nghiệm phân tích minh bạch (Explainable AI).
+          <p className="text-xs sm:text-sm text-gray-300 font-human leading-relaxed max-w-xl mx-auto">
+            Tối ưu hóa độ trễ và độ chính xác với cơ chế dừng sớm (Early Exit), mang lại trải nghiệm giải trình minh bạch (Explainable AI).
           </p>
         </div>
 
@@ -93,10 +100,12 @@ export default function ExplainableEngineSection() {
               >
                 <div className="space-y-4 relative z-10">
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-black text-white/20 group-hover:text-cyan-400/40 transition-colors font-mono">
+                    {/* Step number — Machine Interface: pure numeric data */}
+                    <span className="text-2xl font-black text-white/20 group-hover:text-cyan-400/40 transition-colors font-machine">
                       {layer.step}
                     </span>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-cyan-300 font-mono">
+                    {/* Time badge — Machine Interface: performance metric */}
+                    <span className="dg-badge-machine">
                       <Clock className="w-3 h-3" /> {layer.time}
                     </span>
                   </div>
@@ -125,18 +134,27 @@ export default function ExplainableEngineSection() {
           })}
         </div>
 
-        {/* Bottom Banner: Early Exit */}
-        <div className="mt-10 p-6 sm:p-8 rounded-3xl bg-teal-950/30 border border-teal-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-3xl shadow-glass-deep">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="w-8 h-8 text-teal-400 shrink-0" />
+        {/* Bottom Banner: Early Exit — Igloo Stat Card */}
+        <div className="mt-10 igloo-stat-card igloo-border-pulse flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-2xl bg-teal-500/10 border border-teal-500/25 shrink-0">
+              <ShieldCheck className="w-7 h-7 text-teal-400" />
+            </div>
             <div>
               <h4 className="text-sm font-bold text-white">
                 Cơ Chế Dừng Sớm (Early Exit Optimization)
               </h4>
-              <p className="text-xs text-gray-300 mt-0.5 leading-relaxed">
-                Khi lớp 1 hoặc lớp 2 đạt độ tin cậy trên 85%, hệ thống lập tức xuất kết quả mà không cần đợi chạy hết 4 lớp, tiết kiệm 90% độ trễ xử lý.
+              <p className="text-xs text-gray-300 mt-0.5 leading-relaxed max-w-lg">
+                Khi lớp 1 hoặc lớp 2 đạt độ tin cậy trên 85%, hệ thống lập tức xuất kết quả
+                mà không cần đợi chạy hết 4 lớp, tiết kiệm 90% độ trễ xử lý.
               </p>
             </div>
+          </div>
+
+          {/* Igloo metric display */}
+          <div className="shrink-0 text-center sm:text-right border-t sm:border-t-0 sm:border-l border-white/5 pt-4 sm:pt-0 sm:pl-6 w-full sm:w-auto">
+            <div className="igloo-stat-number">85%</div>
+            <div className="igloo-stat-label">Cases resolved &lt; 1.5s</div>
           </div>
         </div>
 

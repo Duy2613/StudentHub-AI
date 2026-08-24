@@ -62,20 +62,28 @@ export default function CommunityShowcaseSection() {
   ];
 
   return (
-    <section className="py-20 relative z-10" id="community">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <section className="py-24 relative z-10" id="community">
+      <div className="layout-safe-container space-y-12">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-wider">
-            <Users className="w-3.5 h-3.5 text-purple-400" />
-            <span>05 / Diễn Đàn &amp; Mạng Lưới Xác Thực</span>
+          <div className="inline-flex items-center gap-2">
+            <span className="igloo-pill-badge">
+              <Users className="w-3.5 h-3.5 text-purple-400" />
+              <span>05 / DIỄN ĐÀN &amp; MẠNG LƯỚI XÁC THỰC</span>
+            </span>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-            Cộng Đồng Sinh Viên Tương Trợ &amp; Thẩm Định Thực Chứng
+          <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+            <span className="font-serif-editorial italic font-normal text-gradient-primary">
+              Cộng đồng sinh viên,
+            </span>
+            <br />
+            <span className="font-human font-black tracking-tight">
+              thẩm định thực chứng.
+            </span>
           </h2>
-          <p className="text-xs sm:text-sm text-gray-400">
+          <p className="text-xs sm:text-sm text-gray-300 font-human leading-relaxed max-w-xl mx-auto">
             Không gian chia sẻ thực tế về Nhà trọ, Quán ăn, Trường học. Cơ chế Vote Uy Tín giúp đẩy thông tin xác thực lên đầu.
           </p>
         </div>

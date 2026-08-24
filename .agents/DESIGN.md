@@ -50,6 +50,86 @@
 
 ---
 
+## 4. DIGITAL GUARDIAN Typography Protocol
+
+> **Concept**: "THE DIGITAL GUARDIAN" — sự phân tách rõ ràng giữa Ngôn ngữ Con Người và Ngôn ngữ Máy Móc.
+
+### 4.1 Font Stack
+```css
+/* Human Interface (hướng dẫn, body, headings) */
+--font-human: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
+
+/* Machine Interface (AI output, data, alerts, OCR) */
+--font-machine: var(--font-jetbrains-mono), var(--font-geist-mono), monospace;
+```
+
+### 4.2 Usage Rules
+| Context | Font | Class |
+|---|---|---|
+| Tiêu đề, body, hướng dẫn | Human Interface | `font-human` |
+| Kết quả AI scanner | Machine Interface | `.dg-terminal` |
+| Số bước, thời gian xử lý | Machine Interface | `font-machine` |
+| Badges kỹ thuật (`[AI MODE]`) | Machine Interface | `.dg-badge-machine` |
+| Cảnh báo lừa đảo | Human Interface + màu đỏ | `.dg-alert .dg-alert-danger` |
+| Kết quả an toàn | Machine Interface | `.dg-status-safe` |
+
+### 4.3 Digital Guardian CSS Utility Classes
+```
+── AI TERMINAL BLOCKS ──
+.dg-terminal             — Container for AI scanner output
+.dg-terminal-header      — Top bar with scanner name + status chip
+.dg-terminal-body        — Padding content area
+.dg-terminal-label       — Row label (e.g. "Target:", "Status:")
+.dg-terminal-value       — Row value text
+.dg-terminal-row         — Flex row container
+.dg-terminal-divider     — Horizontal separator
+.dg-terminal-detail      — Detail text with >> prefix
+
+── STATUS INDICATORS ──
+.dg-status-danger        — Red glowing uppercase text
+.dg-status-warning       — Amber glowing uppercase text
+.dg-status-safe          — Emerald glowing uppercase text
+
+── ALERT BOXES ──
+.dg-alert                — Base alert container
+.dg-alert-danger         — Red left-border variant
+.dg-alert-warning        — Amber left-border variant
+.dg-alert-safe           — Green left-border variant
+.dg-alert-title          — Bold uppercase title
+.dg-alert-body           — Body text
+
+── BADGES ──
+.dg-badge-machine        — Inline mono badge (default cyan)
+.dg-badge-machine-danger — Red variant
+.dg-badge-machine-safe   — Green variant
+.dg-badge-machine-warn   — Amber variant
+
+── SCAN BUTTON ──
+.dg-scan-btn             — CTA button (human font label)
+.dg-scan-suffix          — Inline tech suffix (machine font, e.g. "[AI MODE]")
+
+── ANIMATION ──
+.dg-cursor               — Blinking teal block cursor
+```
+
+### 4.4 Reusable Component
+```jsx
+import AITerminalBlock from "@/components/ui/AITerminalBlock";
+
+<AITerminalBlock
+  title="AI SECURITY SCANNER v2.1"
+  status="danger"  // "danger" | "warning" | "safe" | "scanning"
+  rows={[
+    { label: "Target", value: "thongbaohocphi-utc.com" },
+    { label: "Status", value: "PHÁT HIỆN NGUY CƠ CAO", isStatus: true },
+    { label: "Confidence", value: "97.4%" },
+  ]}
+  detail="Tên miền giả mạo, mới đăng ký 2 ngày trước."
+/>
+```
+
+---
+
 ## 4. Motion & Micro-Interactions (Refero & Settigation Physics)
 - **Cubic Bezier Easing**: `cubic-bezier(0.16, 1, 0.3, 1)` for snappy, premium spring-like deceleration.
 - **Settigation Orbit Rotation**: Rotating elements along circular SVG paths with dashed stroke animation (`stroke-dasharray: 2 8`), 450-degree spinning orbit transitions upon completion.

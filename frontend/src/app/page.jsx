@@ -13,7 +13,7 @@ import ModernNavbar from "@/components/layout/ModernNavbar";
 import HeroSection from "@/components/landing/HeroSection";
 import StudentDilemmaChatCarousel from "@/components/landing/StudentDilemmaChatCarousel";
 import ThreeStepTrustFlowSection from "@/components/landing/ThreeStepTrustFlowSection";
-import CoreFeaturesSection from "@/components/landing/CoreFeaturesSection";
+import IglooEcosystemShowcase from "@/components/landing/IglooEcosystemShowcase";
 import InteractiveScamDemo from "@/components/landing/InteractiveScamDemo";
 import ExplainableEngineSection from "@/components/landing/ExplainableEngineSection";
 import CommunityShowcaseSection from "@/components/landing/CommunityShowcaseSection";
@@ -25,12 +25,15 @@ import CinematicChapterNavigator from "@/components/ui/CinematicChapterNavigator
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
 import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
 import { NoiseOverlay } from "@/components/auth/AuthUI";
+import IglooAuroraDivider from "@/components/ui/IglooAuroraDivider";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-transparent text-gray-100 flex flex-col relative overflow-x-hidden">
       {/* 3D Infinite Curving Road Highway Canvas (Robin Payot Signature) */}
-      <RobinPayotRoadCanvas />
+      <div className="canvas-bg-layer">
+        <RobinPayotRoadCanvas />
+      </div>
 
       {/* Film Grain & Noise Texture */}
       <NoiseOverlay />
@@ -40,44 +43,64 @@ export default function HomePage() {
       <CinematicChapterNavigator />
 
       {/* Floating Island Navbar */}
-      <ModernNavbar />
+      <header className="overlay-nav-layer">
+        <ModernNavbar />
+      </header>
 
-      {/* Main Scrollytelling Sections with Pure Cinematic Flow */}
-      <main className="flex-1 w-full relative z-10 space-y-24 sm:space-y-32">
+      {/* Main Scrollytelling Sections with Pure Cinematic Flow + Igloo Aurora Dividers */}
+      <main className="flex-1 w-full relative z-10 pb-20">
         {/* Section 01: Hero (01. AI Knowledge Portal) */}
-        <section id="hero" className="min-h-[90vh] flex flex-col justify-center">
+        <section id="hero" className="min-h-[90vh] flex flex-col justify-center py-20 sm:py-28">
           <HeroSection />
           {/* Live Student Dilemma Dialogue */}
           <StudentDilemmaChatCarousel />
         </section>
 
-        {/* 3-Step Trust Protocol */}
-        <section id="workflow" className="min-h-[75vh] flex flex-col justify-center">
+        {/* Aurora Divider 1 */}
+        <IglooAuroraDivider intensity="normal" />
+
+        {/* Section 02: 3-Step Trust Protocol */}
+        <section id="workflow" className="min-h-[75vh] flex flex-col justify-center py-20 sm:py-28">
           <ThreeStepTrustFlowSection />
         </section>
 
-        {/* Section 02: 3 Core Pillars (02. Smart Campus Future) */}
-        <section id="features" className="min-h-[85vh] flex flex-col justify-center">
-          <CoreFeaturesSection />
+        {/* Aurora Divider 2 */}
+        <IglooAuroraDivider intensity="vivid" />
+
+        {/* Section 03: Igloo Bento Ecosystem Matrix (03. Ecosystem Showcase) */}
+        <section id="ecosystem" className="min-h-[85vh] flex flex-col justify-center py-20 sm:py-28">
+          <IglooEcosystemShowcase />
         </section>
 
-        {/* Section 03: Interactive Scam Simulation (03. AI Study Room) */}
-        <section id="demo" className="min-h-[85vh] flex flex-col justify-center">
+        {/* Aurora Divider 3 */}
+        <IglooAuroraDivider intensity="normal" />
+
+        {/* Section 04: Interactive Scam Simulation (04. AI Study Room) */}
+        <section id="demo" className="min-h-[85vh] flex flex-col justify-center py-20 sm:py-28">
           <InteractiveScamDemo />
         </section>
 
-        {/* Section 04: 4-Layer Explainable Engine (04. Neural Network) */}
-        <section id="engine" className="min-h-[85vh] flex flex-col justify-center">
+        {/* Aurora Divider 4 */}
+        <IglooAuroraDivider intensity="vivid" />
+
+        {/* Section 05: 4-Layer Explainable Engine (05. Neural Network) */}
+        <section id="engine" className="min-h-[85vh] flex flex-col justify-center py-20 sm:py-28">
           <ExplainableEngineSection />
         </section>
 
-        {/* Section 05: Community & Trust Network (05. Data Flow) */}
-        <section id="community" className="min-h-[85vh] flex flex-col justify-center">
+        {/* Aurora Divider 5 */}
+        <IglooAuroraDivider intensity="subtle" />
+
+        {/* Section 06: Community & Trust Network (06. Data Flow) */}
+        <section id="community" className="min-h-[85vh] flex flex-col justify-center py-20 sm:py-28">
           <CommunityShowcaseSection />
         </section>
 
-        {/* Section 06: Call To Action & Contest (06. Focus Mode) */}
-        <section id="cta" className="min-h-[75vh] flex flex-col justify-center">
+        {/* Aurora Divider 6 */}
+        <IglooAuroraDivider intensity="vivid" />
+
+        {/* Section 07: Call To Action & Contest (07. Focus Mode) */}
+        <section id="cta" className="min-h-[75vh] flex flex-col justify-center py-20 sm:py-28">
           <CallToActionSection />
         </section>
       </main>
