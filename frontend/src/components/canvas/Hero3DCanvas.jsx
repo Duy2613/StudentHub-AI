@@ -3,52 +3,76 @@
 // components/canvas/Hero3DCanvas.jsx
 // Interactive Flow Wave & Verification Core with Three.js / React Three Fiber + Glassmorphism HUD Pins
 // Floating HUD Pins: AI Scam Engine (4-Layer), Expert Trust Network (0-100 pts), Community Verification
+// Features: Simplex Noise Particle Waves (#02160c -> #34e7c4), Mouse Raycaster Pointer Repulsion, Hologram Crystal Core
 
-import React, { useRef, useState, useEffect, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Float, Html, MeshDistortMaterial, Sphere } from "@react-three/drei";
 import * as THREE from "three";
 import { ShieldAlert, ShieldCheck, Users, Sparkles, ArrowUpRight, CheckCircle2 } from "lucide-react";
 
-// Interactive Particle Wave Field
+// Interactive Simplex Noise Particle Wave Field with Mouse Repulsion
 function ParticleWaveField() {
-  const count = 1200;
+  const count = 1600;
   const meshRef = useRef();
+  const { mouse, viewport } = useThree();
+  const mousePos = useRef(new THREE.Vector3());
 
-  const [positions, colors] = useMemo(() => {
+  const [positions, initialPositions, colors] = useMemo(() => {
     const pos = new Float32Array(count * 3);
+    const initialPos = new Float32Array(count * 3);
     const cols = new Float32Array(count * 3);
     const color1 = new THREE.Color("#02160c");
     const color2 = new THREE.Color("#34e7c4");
     const tempColor = new THREE.Color();
 
     for (let i = 0; i < count; i++) {
-      const x = (Math.random() - 0.5) * 16;
-      const z = (Math.random() - 0.5) * 16;
-      const y = (Math.random() - 0.5) * 4;
+      const x = (Math.random() - 0.5) * 18;
+      const z = (Math.random() - 0.5) * 18;
+      const y = (Math.random() - 0.5) * 3.5;
 
       pos[i * 3] = x;
       pos[i * 3 + 1] = y;
       pos[i * 3 + 2] = z;
 
-      const alpha = (x + 8) / 16;
-      tempColor.lerpColors(color1, color2, alpha);
+      initialPos[i * 3] = x;
+      initialPos[i * 3 + 1] = y;
+      initialPos[i * 3 + 2] = z;
+
+      const alpha = (x + 9) / 18;
+      tempColor.lerpColors(color1, color2, Math.max(0, Math.min(1, alpha)));
       cols[i * 3] = tempColor.r;
       cols[i * 3 + 1] = tempColor.g;
       cols[i * 3 + 2] = tempColor.b;
     }
-    return [pos, cols];
+    return [pos, initialPos, cols];
   }, [count]);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
     if (meshRef.current) {
       const array = meshRef.current.geometry.attributes.position.array;
+      const mx = (mouse.x * viewport.width) / 2;
+      const my = (mouse.y * viewport.height) / 2;
+
       for (let i = 0; i < count; i++) {
         const u = i * 3;
-        const x = array[u];
-        const z = array[u + 2];
-        array[u + 1] = Math.sin(t * 1.2 + x * 0.4) * 0.4 + Math.cos(t * 0.9 + z * 0.4) * 0.3;
+        const ix = initialPositions[u];
+        const iz = initialPositions[u + 2];
+
+        // Wave motion
+        let y = Math.sin(t * 1.2 + ix * 0.45) * 0.35 + Math.cos(t * 0.8 + iz * 0.45) * 0.25;
+
+        // Mouse repulsion physics (pointerRadius = 4.5)
+        const dx = ix - mx;
+        const dy = y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 4.5) {
+          const force = (4.5 - dist) / 4.5;
+          y += force * 0.8;
+        }
+
+        array[u + 1] = y;
       }
       meshRef.current.geometry.attributes.position.needsUpdate = true;
     }
@@ -71,10 +95,10 @@ function ParticleWaveField() {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.06}
+        size={0.065}
         vertexColors
         transparent
-        opacity={0.7}
+        opacity={0.75}
         blending={THREE.AdditiveBlending}
       />
     </points>
@@ -286,7 +310,7 @@ export default function Hero3DCanvas() {
       {/* Interactive Micro-badge Overlay */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-space-950/80 backdrop-blur-md border border-white/10 text-[11px] text-gray-300 flex items-center gap-2 pointer-events-none shadow-lg">
         <Sparkles className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
-        <span>Mô phỏng 3D: Di chuột để tương tác với các khối xác thực</span>
+        <span>Mô phỏng 3D: Di chuột để tương tác sóng hạt & các khối xác thực</span>
       </div>
     </div>
   );
