@@ -3,18 +3,56 @@
 import React, { useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from "motion/react";
 import Link from "next/link";
+import { 
+  Home, 
+  ShieldAlert, 
+  MessageSquare, 
+  LayoutDashboard, 
+  User, 
+  Sparkles 
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const DEFAULT_ITEMS = [
+  {
+    title: "Trang Chủ",
+    icon: <Home className="w-full h-full text-teal-400" />,
+    href: "/",
+  },
+  {
+    title: "Kiểm Tra Lừa Đảo (AI 4 Lớp)",
+    icon: <ShieldAlert className="w-full h-full text-rose-400" />,
+    href: "/scam-check",
+  },
+  {
+    title: "Diễn Đàn Sinh Viên",
+    icon: <MessageSquare className="w-full h-full text-indigo-400" />,
+    href: "/forum",
+  },
+  {
+    title: "Bảng Điều Khiển",
+    icon: <LayoutDashboard className="w-full h-full text-emerald-400" />,
+    href: "/dashboard",
+  },
+  {
+    title: "Hồ Sơ & Uy Tín",
+    icon: <User className="w-full h-full text-amber-400" />,
+    href: "/profile",
+  },
+];
+
 export const FloatingDock = ({
-  items = [],
+  items = DEFAULT_ITEMS,
   desktopClassName,
   mobileClassName,
 }) => {
   return (
-    <>
-      <FloatingDockDesktop items={items} className={desktopClassName} />
-      <FloatingDockMobile items={items} className={mobileClassName} />
-    </>
+    <div className="fixed bottom-5 inset-x-0 z-40 flex justify-center pointer-events-none px-4">
+      <div className="pointer-events-auto">
+        <FloatingDockDesktop items={items} className={desktopClassName} />
+        <FloatingDockMobile items={items} className={mobileClassName} />
+      </div>
+    </div>
   );
 };
 
@@ -26,7 +64,7 @@ const FloatingDockMobile = ({ items, className }) => {
         {open && (
           <motion.div
             layoutId="nav"
-            className="absolute bottom-full mb-2 inset-x-0 flex flex-col gap-2"
+            className="absolute bottom-full mb-3 inset-x-0 flex flex-col gap-2.5 items-center"
           >
             {items.map((item, idx) => (
               <motion.div
@@ -40,16 +78,16 @@ const FloatingDockMobile = ({ items, className }) => {
                   opacity: 0,
                   y: 10,
                   transition: {
-                    delay: idx * 0.05,
+                    delay: idx * 0.04,
                   },
                 }}
-                transition={{ delay: (items.length - 1 - idx) * 0.05 }}
+                transition={{ delay: (items.length - 1 - idx) * 0.04 }}
               >
                 <Link
                   href={item.href}
-                  className="h-10 w-10 rounded-full bg-space-900 border border-white/10 flex items-center justify-center text-white"
+                  className="h-11 w-11 rounded-full bg-space-900/95 border border-white/20 backdrop-blur-xl flex items-center justify-center text-white shadow-lg"
                 >
-                  <div className="h-4 w-4">{item.icon}</div>
+                  <div className="h-5 w-5">{item.icon}</div>
                 </Link>
               </motion.div>
             ))}
@@ -57,10 +95,11 @@ const FloatingDockMobile = ({ items, className }) => {
         )}
       </AnimatePresence>
       <button
+        type="button"
         onClick={() => setOpen(!open)}
-        className="h-10 w-10 rounded-full bg-space-900 border border-white/10 flex items-center justify-center text-white"
+        className="h-12 w-12 rounded-full bg-teal-400 text-space-950 shadow-[0_0_20px_rgba(52,231,196,0.5)] flex items-center justify-center font-bold text-lg"
       >
-        <span className="text-xs">⚡</span>
+        <Sparkles className="w-5 h-5 text-space-950" />
       </button>
     </div>
   );
@@ -73,7 +112,7 @@ const FloatingDockDesktop = ({ items, className }) => {
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
       className={cn(
-        "mx-auto hidden md:flex h-16 gap-4 items-end rounded-2xl bg-space-900/80 backdrop-blur-2xl border border-white/10 px-4 pb-3 shadow-glass-deep",
+        "mx-auto hidden md:flex h-16 gap-3.5 items-end rounded-full bg-space-950/85 backdrop-blur-2xl border border-white/12 px-4 pb-3 shadow-[0_12px_40px_rgba(0,0,0,0.6)]",
         className
       )}
     >
@@ -84,7 +123,7 @@ const FloatingDockDesktop = ({ items, className }) => {
   );
 };
 
-function IconContainer({ mouseX, title, icon, href, badge }) {
+function IconContainer({ mouseX, title, icon, href }) {
   let ref = useRef(null);
 
   let distance = useTransform(mouseX, (val) => {
@@ -92,11 +131,11 @@ function IconContainer({ mouseX, title, icon, href, badge }) {
     return val - bounds.x - bounds.width / 2;
   });
 
-  let widthTransform = useTransform(distance, [-150, 0, 150], [40, 60, 40]);
-  let heightTransform = useTransform(distance, [-150, 0, 150], [40, 60, 40]);
+  let widthTransform = useTransform(distance, [-150, 0, 150], [40, 56, 40]);
+  let heightTransform = useTransform(distance, [-150, 0, 150], [40, 56, 40]);
 
-  let widthTransformIcon = useTransform(distance, [-150, 0, 150], [20, 30, 20]);
-  let heightTransformIcon = useTransform(distance, [-150, 0, 150], [20, 30, 20]);
+  let widthTransformIcon = useTransform(distance, [-150, 0, 150], [18, 26, 18]);
+  let heightTransformIcon = useTransform(distance, [-150, 0, 150], [18, 26, 18]);
 
   let width = useSpring(widthTransform, {
     mass: 0.1,
@@ -129,7 +168,7 @@ function IconContainer({ mouseX, title, icon, href, badge }) {
         style={{ width, height }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="aspect-square rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center relative group hover:border-indigo-500/50 hover:bg-white/10 transition-colors shadow-sm"
+        className="aspect-square rounded-full bg-white/5 border border-white/10 flex items-center justify-center relative group hover:border-teal-400/60 hover:bg-white/10 transition-colors shadow-sm"
       >
         <AnimatePresence>
           {hovered && (
@@ -137,7 +176,7 @@ function IconContainer({ mouseX, title, icon, href, badge }) {
               initial={{ opacity: 0, y: 10, x: "-50%" }}
               animate={{ opacity: 1, y: 0, x: "-50%" }}
               exit={{ opacity: 0, y: 2, x: "-50%" }}
-              className="px-2 py-0.5 whitespace-pre rounded-md bg-space-950/90 border border-white/15 text-white absolute left-1/2 -top-8 w-fit text-[11px] font-semibold"
+              className="px-2.5 py-1 whitespace-pre rounded-full bg-space-900/95 border border-white/15 text-white absolute left-1/2 -top-9 w-fit text-[11px] font-bold shadow-lg"
             >
               {title}
             </motion.div>
@@ -153,3 +192,5 @@ function IconContainer({ mouseX, title, icon, href, badge }) {
     </Link>
   );
 }
+
+export default FloatingDock;

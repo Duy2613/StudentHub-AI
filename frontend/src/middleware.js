@@ -1,8 +1,8 @@
 // frontend/src/middleware.js
 //
 // Next.js Edge Middleware: Bảo vệ và cô lập các tuyến đường nâng cao:
-// - Chặn và chuyển hướng về /login nếu người dùng chưa có phiên đăng nhập hợp lệ
-// - Bảo vệ các route: /workspace, /whiteboard, /ai-mentor, /dashboard, /profile, /onboarding
+// - Chặn và chuyển hướng nếu người dùng chưa có phiên đăng nhập hợp lệ
+// - Bảo vệ các route: /dashboard, /scam-check, /forum, /profile, /onboarding
 
 import { NextResponse } from "next/server";
 
@@ -12,9 +12,8 @@ export function middleware(request) {
   // Danh sách các tuyến đường yêu cầu xác thực
   const protectedRoutes = [
     "/dashboard",
-    "/workspace",
-    "/whiteboard",
-    "/ai-mentor",
+    "/scam-check",
+    "/forum",
     "/profile",
     "/onboarding",
   ];
@@ -28,13 +27,10 @@ export function middleware(request) {
       (c) => c.name.startsWith("sb-") || c.name.includes("auth-token") || c.name.includes("studenthub")
     );
 
-    // Lưu ý: Đối với Single Page App với local storage, client-side AuthContext sẽ đóng vai trò Secondary Guard.
-    // Nếu có query demo mode hoặc header xác thực, cho phép tiếp tục.
+    // Đối với Single Page App với local storage, client-side AuthContext sẽ đóng vai trò Secondary Guard.
     const isDemoParam = request.nextUrl.searchParams.get("demo") === "true";
 
     if (!hasSbToken && !isDemoParam) {
-      // Cho phép request đi qua để Client AuthContext phân giải localStorage/sessionStorage
-      // Client Auth Guard trong từng route sẽ hoàn tất kiểm tra tức thì
       return NextResponse.next();
     }
   }
@@ -45,9 +41,8 @@ export function middleware(request) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/workspace/:path*",
-    "/whiteboard/:path*",
-    "/ai-mentor/:path*",
+    "/scam-check/:path*",
+    "/forum/:path*",
     "/profile/:path*",
     "/onboarding/:path*",
   ],
