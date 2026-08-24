@@ -2,10 +2,11 @@
 
 // app/page.jsx
 // Trang chủ (Landing Page) chính thức của StudentHub AI:
-// - Đỉnh cao sáng tạo: Kết hợp tinh hoa Robin Payot (WebGL Liquid Mesh & 3D Tilt Perspective) & Controleur.ca (Interactive Dialogue & 3-Step Protocol)
+// - Đỉnh cao sáng tạo: 3D Infinite Curving Road Highway Canvas (Robin Payot Signature)
+// - Camera lướt dọc theo con đường 3D khi cuộn trang (Scroll-Driven 3D Flight)
+// - Khối màn hình 3D uốn cong (Curved Project Screens), Chrome Blobs và Cột mốc cờ phát sáng
 // - Typography: Instrument Serif / Cormorant Garamond kết hợp Geist Sans
-// - Scrollytelling Background Morphing: Tự động chuyển đổi 6 hình nền điện ảnh độ nét cao và luồng ánh sáng khí quyển khi cuộn
-// - Interactive 3D Perspective Blocks: Khối ảnh 3D, thẻ nghiêng đa trục và sóng WebGL phản xạ theo chuột
+// - 6 Phân đoạn: Hero (01. Portal) -> Tình huống Sinh viên -> 3 Bước -> 3 Trụ Cột -> Demo -> Engine -> Community -> CTA
 
 import React from "react";
 import ModernNavbar from "@/components/layout/ModernNavbar";
@@ -22,14 +23,14 @@ import FloatingDock from "@/components/ui/floating-dock";
 import CinematicScrollytellingObserver from "@/components/ui/CinematicScrollytellingObserver";
 import CinematicChapterNavigator from "@/components/ui/CinematicChapterNavigator";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
-import RobinPayotFluidCanvas from "@/components/canvas/RobinPayotFluidCanvas";
-import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
+import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
+import { NoiseOverlay } from "@/components/auth/AuthUI";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-space-950 text-gray-100 flex flex-col relative overflow-x-hidden">
-      {/* Robin Payot 3D WebGL Liquid Mesh & Ripple Shader Background */}
-      <RobinPayotFluidCanvas opacity={0.65} />
+    <div className="min-h-screen bg-transparent text-gray-100 flex flex-col relative overflow-x-hidden">
+      {/* 3D Infinite Curving Road Highway Canvas (Robin Payot Signature) */}
+      <RobinPayotRoadCanvas />
 
       {/* Film Grain & Noise Texture */}
       <NoiseOverlay />
@@ -46,11 +47,11 @@ export default function HomePage() {
         {/* Section 01: Hero (01. AI Knowledge Portal) */}
         <section id="hero" className="min-h-[90vh] flex flex-col justify-center">
           <HeroSection />
-          {/* Controleur Style Live Student Dilemma Dialogue */}
+          {/* Live Student Dilemma Dialogue */}
           <StudentDilemmaChatCarousel />
         </section>
 
-        {/* 3-Step Trust Protocol (Controleur Style) */}
+        {/* 3-Step Trust Protocol */}
         <section id="workflow" className="min-h-[75vh] flex flex-col justify-center">
           <ThreeStepTrustFlowSection />
         </section>
