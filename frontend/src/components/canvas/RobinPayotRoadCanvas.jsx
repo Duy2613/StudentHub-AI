@@ -12,7 +12,7 @@ import { ShieldAlert, Users, MessageSquare, ArrowUpRight, Sparkles, CheckCircle2
  */
 function CurvedRoadTrack({ scrollProgress }) {
   const lanesCount = 7;
-  const pointsPerLane = 140;
+  const pointsPerLane = 150;
 
   const [positions, opacities] = useMemo(() => {
     const totalPoints = lanesCount * pointsPerLane;
@@ -21,19 +21,19 @@ function CurvedRoadTrack({ scrollProgress }) {
 
     let idx = 0;
     for (let l = 0; l < lanesCount; l++) {
-      const laneOffset = (l - (lanesCount - 1) / 2) * 2.4;
+      const laneOffset = (l - (lanesCount - 1) / 2) * 2.5;
       for (let p = 0; p < pointsPerLane; p++) {
         const z = -p * 1.8;
         // Serpentine S-curve in X space
         const curveX = Math.sin(z * 0.025) * 14 + laneOffset;
-        const y = -3.2 + Math.cos(z * 0.02) * 1.2;
+        const y = -3.4 + Math.cos(z * 0.02) * 1.2;
 
         pos[idx * 3] = curveX;
         pos[idx * 3 + 1] = y;
         pos[idx * 3 + 2] = z;
 
         // Depth falloff alpha
-        opac[idx] = Math.max(0.1, 1 - (p / pointsPerLane) * 0.85);
+        opac[idx] = Math.max(0.15, 1 - (p / pointsPerLane) * 0.85);
         idx++;
       }
     }
@@ -49,12 +49,12 @@ function CurvedRoadTrack({ scrollProgress }) {
 
     let idx = 0;
     for (let l = 0; l < lanesCount; l++) {
-      const laneOffset = (l - (lanesCount - 1) / 2) * 2.4;
+      const laneOffset = (l - (lanesCount - 1) / 2) * 2.5;
       for (let p = 0; p < pointsPerLane; p++) {
         const z = -p * 1.8;
         // Dynamic undulating road wave
         const curveX = Math.sin(z * 0.025 + t * 0.3) * 14 + laneOffset;
-        const y = -3.2 + Math.cos(z * 0.02 + t * 0.2) * 1.2;
+        const y = -3.4 + Math.cos(z * 0.02 + t * 0.2) * 1.2;
 
         array[idx * 3] = curveX;
         array[idx * 3 + 1] = y;
@@ -79,7 +79,7 @@ function CurvedRoadTrack({ scrollProgress }) {
         size={0.16}
         color="#38bdf8"
         transparent
-        opacity={0.7}
+        opacity={0.65}
         blending={THREE.AdditiveBlending}
       />
     </points>
@@ -90,7 +90,7 @@ function CurvedRoadTrack({ scrollProgress }) {
  * CurvedBillboard:
  * Robin Payot curved 3D project screens along the road track
  */
-function CurvedBillboard({ position, rotationY = 0, title, subtitle, tag, icon: Icon, href, color = "#38bdf8", imageSrc }) {
+function CurvedBillboard({ position, rotationY = 0, title, subtitle, tag, icon: Icon, color = "#38bdf8" }) {
   const [hovered, setHovered] = useState(false);
   const meshRef = useRef();
 
@@ -107,38 +107,38 @@ function CurvedBillboard({ position, rotationY = 0, title, subtitle, tag, icon: 
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       >
-        <planeGeometry args={[9, 5.2, 32, 16]} />
+        <planeGeometry args={[8.5, 5.0, 32, 16]} />
         <meshPhysicalMaterial
-          color={hovered ? "#38bdf8" : "#1e293b"}
+          color={hovered ? "#38bdf8" : "#0f172a"}
           roughness={0.2}
           metalness={0.8}
           transmission={0.4}
           transparent
-          opacity={0.88}
-          emissive={hovered ? color : "#0f172a"}
-          emissiveIntensity={hovered ? 0.8 : 0.3}
+          opacity={0.75}
+          emissive={hovered ? color : "#0a0f1d"}
+          emissiveIntensity={hovered ? 0.7 : 0.25}
           side={THREE.DoubleSide}
         />
       </mesh>
 
       {/* Screen Glowing Border */}
       <lineSegments>
-        <edgesGeometry args={[new THREE.PlaneGeometry(9, 5.2)]} />
-        <lineBasicMaterial color={hovered ? "#ffffff" : color} linewidth={2} />
+        <edgesGeometry args={[new THREE.PlaneGeometry(8.5, 5.0)]} />
+        <lineBasicMaterial color={hovered ? "#ffffff" : color} linewidth={1.5} />
       </lineSegments>
 
       {/* Thin Flagpost Line connecting to road floor */}
-      <mesh position={[4.8, -3.2, 0]}>
+      <mesh position={[4.5, -3.2, 0]}>
         <cylinderGeometry args={[0.02, 0.02, 6.4, 8]} />
-        <meshBasicMaterial color="#94a3b8" />
+        <meshBasicMaterial color="#64748b" />
       </mesh>
 
       {/* Flagpost Node & Annotation HTML */}
-      <Html position={[5.2, 0.6, 0]} distanceFactor={14} center={false}>
+      <Html position={[4.8, 0.5, 0]} distanceFactor={15} center={false}>
         <div className="select-none pointer-events-auto group/item cursor-pointer">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
-            <div className="p-3 rounded-2xl bg-space-950/90 backdrop-blur-2xl border border-white/20 shadow-2xl min-w-[220px] transition-all duration-300 group-hover/item:scale-105 group-hover/item:border-cyan-400">
+            <div className="p-3 rounded-2xl bg-space-950/85 backdrop-blur-2xl border border-white/20 shadow-2xl min-w-[210px] transition-all duration-300 group-hover/item:scale-105 group-hover/item:border-cyan-400">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold text-cyan-300">{tag}</span>
                 <Icon className="w-3.5 h-3.5 text-cyan-400" />
@@ -180,9 +180,9 @@ function FloatingChromeBlobs() {
 
   return (
     <>
-      <Float speed={2} rotationIntensity={0.5} floatIntensity={1.5} position={[-8, 1, -25]}>
+      <Float speed={2} rotationIntensity={0.5} floatIntensity={1.5} position={[-9, 1, -40]}>
         <mesh ref={blob1}>
-          <sphereGeometry args={[1.6, 64, 64]} />
+          <sphereGeometry args={[1.5, 64, 64]} />
           <meshStandardMaterial
             color="#e2e8f0"
             metalness={0.95}
@@ -192,9 +192,9 @@ function FloatingChromeBlobs() {
         </mesh>
       </Float>
 
-      <Float speed={2.5} rotationIntensity={0.6} floatIntensity={1.8} position={[10, 2, -65]}>
+      <Float speed={2.5} rotationIntensity={0.6} floatIntensity={1.8} position={[11, 2, -80]}>
         <mesh ref={blob2}>
-          <sphereGeometry args={[2.2, 64, 64]} />
+          <sphereGeometry args={[2.0, 64, 64]} />
           <meshStandardMaterial
             color="#38bdf8"
             metalness={0.9}
@@ -204,9 +204,9 @@ function FloatingChromeBlobs() {
         </mesh>
       </Float>
 
-      <Float speed={3} rotationIntensity={0.4} floatIntensity={1.2} position={[-11, 0, -110]}>
+      <Float speed={3} rotationIntensity={0.4} floatIntensity={1.2} position={[-12, 0, -130]}>
         <mesh ref={blob3}>
-          <sphereGeometry args={[1.9, 64, 64]} />
+          <sphereGeometry args={[1.8, 64, 64]} />
           <meshPhysicalMaterial
             color="#818cf8"
             metalness={0.8}
@@ -229,8 +229,8 @@ function CameraFlightController({ scrollYProgress }) {
   const { camera, mouse } = useThree();
 
   useFrame(() => {
-    // Total road depth = -150
-    const targetZ = -(scrollYProgress * 140) + 12;
+    // Total road depth = -160
+    const targetZ = -(scrollYProgress * 150) + 12;
     const curveX = Math.sin(targetZ * 0.025) * 8 + mouse.x * 2.5;
     const targetY = 1.2 + mouse.y * 1.5;
 
@@ -287,9 +287,9 @@ export default function RobinPayotRoadCanvas() {
         <CurvedRoadTrack scrollProgress={scrollProgress} />
         <FloatingChromeBlobs />
 
-        {/* Section 1: AI Scam Engine */}
+        {/* Section 1: AI Scam Engine (at Z = -35) */}
         <CurvedBillboard
-          position={[-6, 1.5, -20]}
+          position={[-7, 1.5, -35]}
           rotationY={0.25}
           tag="01 • XÁC THỰC AI"
           title="AI Scam Engine 4 Lớp"
@@ -298,9 +298,9 @@ export default function RobinPayotRoadCanvas() {
           color="#38bdf8"
         />
 
-        {/* Section 2: Trust Network */}
+        {/* Section 2: Trust Network (at Z = -75) */}
         <CurvedBillboard
-          position={[7, 1.0, -55]}
+          position={[8, 1.0, -75]}
           rotationY={-0.3}
           tag="02 • MẠNG LƯỚI CỐ VẤN"
           title="Mạng Lưới Chuyên Gia Uy Tín"
@@ -309,9 +309,9 @@ export default function RobinPayotRoadCanvas() {
           color="#f59e0b"
         />
 
-        {/* Section 3: Student Community Forum */}
+        {/* Section 3: Student Community Forum (at Z = -115) */}
         <CurvedBillboard
-          position={[-7, 1.8, -90]}
+          position={[-8, 1.8, -115]}
           rotationY={0.28}
           tag="03 • DIỄN ĐÀN THỰC CHỨNG"
           title="Cộng Đồng Sinh Viên Toàn Quốc"
@@ -320,9 +320,9 @@ export default function RobinPayotRoadCanvas() {
           color="#818cf8"
         />
 
-        {/* Section 4: National Contest & Mission */}
+        {/* Section 4: National Contest & Mission (at Z = -155) */}
         <CurvedBillboard
-          position={[6, 1.2, -125]}
+          position={[7, 1.2, -155]}
           rotationY={-0.25}
           tag="04 • CUỘC THI QUỐC GIA 2026"
           title="Sáng Tạo Trẻ AI 2026"
@@ -332,7 +332,7 @@ export default function RobinPayotRoadCanvas() {
         />
       </Canvas>
 
-      {/* 3. Minimalist HUD Top-Right Mode Switcher (Robin Payot Signature) */}
+      {/* 3. Minimalist HUD Top-Right Mode Switcher */}
       <div className="fixed top-6 right-8 z-30 pointer-events-auto flex items-center gap-4 text-xs font-mono font-bold select-none">
         {["ROAD", "OVERVIEW", "LIST"].map((m) => (
           <button
@@ -349,7 +349,7 @@ export default function RobinPayotRoadCanvas() {
         ))}
       </div>
 
-      {/* 4. Minimalist HUD Bottom-Left (3 Intersecting Rings OOO & Visualizer) */}
+      {/* 4. Minimalist HUD Bottom-Left */}
       <div className="fixed bottom-6 left-8 z-30 pointer-events-auto flex items-center gap-3 select-none">
         <div className="flex -space-x-2 items-center">
           <div className="w-4 h-4 rounded-full border border-cyan-400 animate-spin" />
@@ -362,7 +362,7 @@ export default function RobinPayotRoadCanvas() {
           <span className="w-0.5 h-3.5 bg-cyan-400 animate-pulse animation-delay-300" />
           <span className="w-0.5 h-1.5 bg-cyan-400 animate-pulse animation-delay-450" />
         </div>
-        <span className="text-[10px] font-mono text-cyan-300/80">3D ROAD HIGHWAY ACTIVE</span>
+        <span className="text-[10px] font-mono text-cyan-300/80">3D HIGHWAY FLIGHT ACTIVE</span>
       </div>
     </div>
   );
