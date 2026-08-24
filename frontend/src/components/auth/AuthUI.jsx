@@ -2,24 +2,22 @@
 
 // components/auth/AuthUI.jsx
 //
-// Shared UI components for /login and /register (Clean Cinematic Wallpaper & 3D Particle Waves).
+// Shared UI components for /login and /register (Vibrant Cosmic Purple/Magenta Constellation & 3D Geometric Neural Mesh).
 // Awwwards-tier Double-Bezel architecture with hardware-accelerated 60fps ambient glow,
-// Sparkling Stardust Canvas, Robin Payot Fluid waves, and Astrolabe Rings.
+// GeometricConstellationCanvas, Robin Payot Fluid waves, and Astrolabe Rings.
 
 import React, { useState } from "react";
 import { Eye, EyeOff, Lock, Loader2, ArrowRight, AlertCircle, GraduationCap, CheckCircle2 } from "lucide-react";
 import AuthSurroundings from "@/components/auth/AuthSurroundings";
 import { Meteors } from "@/components/ui/meteors";
-import ConstellationWaveCanvas from "@/components/ui/constellation-wave-canvas";
-import CinematicVideoAtmosphere from "@/components/ui/cinematic-video-atmosphere";
+import GeometricConstellationCanvas from "@/components/canvas/GeometricConstellationCanvas";
 import SparklingStardustCanvas from "@/components/ui/SparklingStardustCanvas";
-import RobinPayotFluidCanvas from "@/components/canvas/RobinPayotFluidCanvas";
 import PageTransitionWrapper from "@/components/ui/page-transition-wrapper";
 import { BorderBeam } from "@/components/ui/border-beam";
 
 export const NoiseOverlay = () => (
   <div
-    className="absolute inset-0 z-[2] opacity-[0.035] mix-blend-overlay pointer-events-none"
+    className="absolute inset-0 z-[2] opacity-[0.03] mix-blend-overlay pointer-events-none"
     style={{
       backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
     }}
@@ -27,49 +25,31 @@ export const NoiseOverlay = () => (
 );
 
 export const AmbientBackground = ({ mode = "cosmic-wave" }) => {
-  const isEmerald = mode === "emerald-wave";
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-      {/* 1. Cinematic Photographic Wallpaper Background */}
+    <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10 w-full h-full">
+      {/* 1. User Uploaded Photographic Purple/Magenta Geometric Constellation Wallpaper */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-60 scale-100 transition-transform duration-1000"
+        className="absolute inset-0 bg-cover bg-center opacity-75 scale-105 transition-transform duration-1000"
         style={{
-          backgroundImage: `url('/wallpapers/06-focus-mode.jpg')`,
+          backgroundImage: `url('/wallpapers/geometric-constellation-purple.png')`,
         }}
       />
 
-      {/* 2. Robin Payot WebGL Liquid Mesh Wave */}
-      <RobinPayotFluidCanvas opacity={0.5} />
+      {/* 2. Interactive Real-time 60fps Geometric Constellation Web & Neural Nodes Canvas */}
+      <GeometricConstellationCanvas opacity={0.92} interactive={true} />
 
-      {/* 3. Sparkling Stardust & Twinkling Diamond Flares Canvas */}
-      <SparklingStardustCanvas count={90} speed={0.5} />
+      {/* 3. Sparkling Stardust Canvas */}
+      <SparklingStardustCanvas count={65} speed={0.4} />
 
-      {/* 4. Interactive 3D Dot Wave & Connected Constellation Mesh */}
-      <ConstellationWaveCanvas mode={mode} opacity={0.85} density="high" />
+      {/* 4. Ambient Shooting Meteors */}
+      <Meteors number={12} />
 
-      {/* 5. Procedural Cinematic Atmosphere & Meteors */}
-      <CinematicVideoAtmosphere opacity={0.6} />
-      <Meteors number={16} />
+      {/* 5. Radiant Prismatic Ambient Glows */}
+      <div className="absolute bottom-[-10%] right-[-10%] w-[55vw] h-[55vw] rounded-full bg-gradient-to-tr from-pink-600/35 to-rose-500/30 blur-[130px] mix-blend-screen" />
+      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-br from-indigo-700/30 to-purple-800/30 blur-[140px] mix-blend-screen" />
 
-      {/* 6. Multi-Hue Atmospheric Radial Mesh Glow */}
-      <div
-        className={`absolute top-[-15%] left-[-15%] w-[60vw] h-[60vw] rounded-full blur-[150px] animate-blob-slow mix-blend-screen transition-all duration-700 ${
-          isEmerald
-            ? "bg-gradient-to-r from-emerald-600/30 to-teal-600/30"
-            : "bg-gradient-to-r from-indigo-600/30 to-purple-600/30"
-        }`}
-      />
-      <div
-        className={`absolute bottom-[-20%] right-[-15%] w-[55vw] h-[55vw] rounded-full blur-[150px] animate-blob-medium animation-delay-2000 mix-blend-screen transition-all duration-700 ${
-          isEmerald
-            ? "bg-gradient-to-r from-teal-600/25 to-cyan-600/25"
-            : "bg-gradient-to-r from-blue-600/25 to-cyan-600/25"
-        }`}
-      />
-
-      {/* Subtle Legibility Gradient Overlays */}
-      <div className="absolute inset-0 bg-gradient-to-t from-space-950 via-space-950/60 to-space-950/40" />
-      <div className="absolute inset-0 bg-radial from-transparent via-space-950/30 to-space-950/90" />
+      {/* Gentle center focus gradient */}
+      <div className="absolute inset-0 bg-radial from-transparent via-space-950/20 to-space-950/60" />
     </div>
   );
 };
@@ -89,13 +69,13 @@ export const InputField = ({ label, id, name, type = "text", icon: Icon, helperT
       </label>
       {/* Focus Halo Glow */}
       <div
-        className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-teal-400 via-indigo-500 to-purple-500 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
+        className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-pink-400 via-purple-500 to-teal-400 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
           isFocused ? "opacity-100 blur-[2px]" : "opacity-0 blur-0"
         }`}
       />
       <div className="relative">
         {Icon && (
-          <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-teal-400" : "text-gray-500"}`}>
+          <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-pink-400" : "text-gray-500"}`}>
             <Icon className="h-5 w-5" />
           </div>
         )}
@@ -118,11 +98,11 @@ export const InputField = ({ label, id, name, type = "text", icon: Icon, helperT
           }}
           className={`
             block w-full ${Icon ? "pl-12" : "pl-4"} pr-4 py-3.5 text-sm
-            bg-white/5 backdrop-blur-xl border border-white/10
-            rounded-xl shadow-sm placeholder-gray-500 text-gray-100
+            bg-space-950/75 backdrop-blur-2xl border border-white/15
+            rounded-xl shadow-sm placeholder-gray-400 text-gray-100
             transition-all duration-300 ease-premium
-            focus:outline-none focus:bg-white/10 focus:border-transparent
-            hover:bg-white/[0.07] hover:border-white/20
+            focus:outline-none focus:bg-space-900/90 focus:border-transparent
+            hover:bg-space-900/60 hover:border-white/25
           `}
           {...props}
         />
@@ -148,12 +128,12 @@ export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) =>
       </label>
       {/* Focus Halo Glow */}
       <div
-        className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-teal-400 via-indigo-500 to-purple-500 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
+        className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-pink-400 via-purple-500 to-teal-400 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
           isFocused ? "opacity-100 blur-[2px]" : "opacity-0 blur-0"
         }`}
       />
       <div className="relative z-10">
-        <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-teal-400" : "text-gray-500"}`}>
+        <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-pink-400" : "text-gray-500"}`}>
           <Lock className="h-5 w-5" />
         </div>
         <input
@@ -175,18 +155,18 @@ export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) =>
           }}
           className={`
             block w-full pl-12 pr-12 py-3.5 text-sm
-            bg-white/5 backdrop-blur-xl border border-white/10
-            rounded-xl shadow-sm placeholder-gray-500 text-gray-100
+            bg-space-950/75 backdrop-blur-2xl border border-white/15
+            rounded-xl shadow-sm placeholder-gray-400 text-gray-100
             transition-all duration-300 ease-premium
-            focus:outline-none focus:bg-white/10 focus:border-transparent
-            hover:bg-white/[0.07] hover:border-white/20
+            focus:outline-none focus:bg-space-900/90 focus:border-transparent
+            hover:bg-space-900/60 hover:border-white/25
           `}
           {...props}
         />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-300 transition-colors focus:outline-none"
+          className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-200 transition-colors focus:outline-none"
         >
           {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
         </button>
@@ -203,28 +183,28 @@ export const CheckboxField = ({ id, checked, onChange, label, helperText, ...pro
         id={id}
         checked={checked}
         onChange={onChange}
-        className="w-4 h-4 rounded border-white/20 bg-white/5 text-teal-500 focus:ring-teal-400 focus:ring-offset-0 focus:ring-1 cursor-pointer accent-teal-500 transition-all"
+        className="w-4 h-4 rounded border-white/20 bg-white/5 text-pink-500 focus:ring-pink-400 focus:ring-offset-0 focus:ring-1 cursor-pointer accent-pink-500 transition-all"
         {...props}
       />
       <span className="font-medium text-gray-300 hover:text-gray-100">{label}</span>
     </label>
     {helperText && (
-      <span className="text-gray-500 text-[11px]">{helperText}</span>
+      <span className="text-gray-400 text-[11px]">{helperText}</span>
     )}
   </div>
 );
 
 export const Button = ({ children, isLoading, disabled, ...props }) => (
   <div className="relative group z-20">
-    <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 via-indigo-600 to-purple-600 rounded-2xl blur-lg opacity-60 group-hover:opacity-90 group-hover:blur-xl transition-all duration-500 ease-premium" />
+    <div className="absolute -inset-1 bg-gradient-to-r from-teal-400 via-purple-600 to-pink-500 rounded-2xl blur-lg opacity-70 group-hover:opacity-100 group-hover:blur-xl transition-all duration-500 ease-premium" />
     <button
       disabled={isLoading || disabled}
       className={`
         relative w-full flex justify-center items-center py-3.5 px-4
-        bg-gradient-to-r from-teal-500 via-indigo-600 to-purple-600
+        bg-gradient-to-r from-teal-400 via-indigo-600 to-pink-500
         rounded-xl text-sm font-bold text-white
-        shadow-[inset_0_1px_2px_rgba(255,255,255,0.3)]
-        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#06060a] focus:ring-teal-400
+        shadow-[inset_0_1px_2px_rgba(255,255,255,0.35)]
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#06060a] focus:ring-pink-400
         disabled:opacity-70 disabled:cursor-not-allowed
         transition-all duration-300 ease-premium
         active:scale-[0.98] group-hover:-translate-y-0.5 hover:brightness-110
@@ -247,8 +227,8 @@ export const GoogleButton = ({ isLoading, isDisabled, onClick }) => (
     type="button"
     onClick={onClick}
     disabled={isLoading || isDisabled}
-    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xl text-sm font-medium text-gray-300 shadow-sm hover:bg-white/10 hover:text-white hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-teal-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
-      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-white/5 hover:border-white/10 hover:text-gray-300" : ""
+    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-white/10 border border-white/15 backdrop-blur-2xl text-sm font-medium text-gray-200 shadow-sm hover:bg-white/15 hover:text-white hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-pink-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
+      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-white/10 hover:border-white/15 hover:text-gray-200" : ""
     }`}
   >
     {isLoading ? (
@@ -280,8 +260,8 @@ export const GithubButton = ({ isLoading, isDisabled, onClick }) => (
     type="button"
     onClick={onClick}
     disabled={isLoading || isDisabled}
-    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-xl text-sm font-medium text-gray-300 shadow-sm hover:bg-white/10 hover:text-white hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-teal-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
-      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-white/5 hover:border-white/10 hover:text-gray-300" : ""
+    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-white/10 border border-white/15 backdrop-blur-2xl text-sm font-medium text-gray-200 shadow-sm hover:bg-white/15 hover:text-white hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-pink-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
+      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-white/10 hover:border-white/15 hover:text-gray-200" : ""
     }`}
   >
     {isLoading ? (
@@ -298,9 +278,9 @@ export const GithubButton = ({ isLoading, isDisabled, onClick }) => (
 export const ErrorMessage = ({ message }) => {
   if (!message) return null;
   return (
-    <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 flex items-start animate-in fade-in slide-in-from-top-1 duration-300">
+    <div className="rounded-xl bg-red-500/15 border border-red-500/30 p-3 flex items-start animate-in fade-in slide-in-from-top-1 duration-300">
       <AlertCircle className="h-5 w-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" />
-      <p className="text-sm text-red-300">{message}</p>
+      <p className="text-sm text-red-200">{message}</p>
     </div>
   );
 };
@@ -308,9 +288,9 @@ export const ErrorMessage = ({ message }) => {
 export const NoticeMessage = ({ message }) => {
   if (!message) return null;
   return (
-    <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-3 flex items-start animate-in fade-in slide-in-from-top-1 duration-300">
+    <div className="rounded-xl bg-emerald-500/15 border border-emerald-500/30 p-3 flex items-start animate-in fade-in slide-in-from-top-1 duration-300">
       <CheckCircle2 className="h-5 w-5 text-emerald-400 mt-0.5 mr-3 flex-shrink-0" />
-      <p className="text-sm text-emerald-300">{message}</p>
+      <p className="text-sm text-emerald-200">{message}</p>
     </div>
   );
 };
@@ -324,19 +304,19 @@ export const StudentBenefitBanner = ({ email }) => {
   return (
     <div
       className={`mb-8 relative overflow-hidden rounded-2xl border transition-all duration-500 ease-premium ${
-        isStudent ? "bg-teal-950/30 border-teal-500/50 shadow-[0_0_25px_rgba(52,231,196,0.25)]" : "bg-white/5 border-white/10"
+        isStudent ? "bg-pink-950/40 border-pink-500/50 shadow-[0_0_25px_rgba(244,63,94,0.3)]" : "bg-white/10 border-white/15"
       }`}
     >
-      <div className={`absolute -inset-1 bg-gradient-to-r from-teal-500/20 to-indigo-500/20 blur-md transition-opacity duration-500 ${isStudent ? "opacity-100 animate-pulse-slow" : "opacity-0"}`} />
+      <div className={`absolute -inset-1 bg-gradient-to-r from-pink-500/25 to-purple-500/25 blur-md transition-opacity duration-500 ${isStudent ? "opacity-100 animate-pulse-slow" : "opacity-0"}`} />
       <div className="relative z-10 flex items-start p-4">
-        <div className={`flex-shrink-0 p-2 rounded-lg transition-colors duration-500 ${isStudent ? "bg-teal-500 text-space-950 shadow-lg shadow-teal-500/50 font-bold" : "bg-white/10 text-gray-400"}`}>
+        <div className={`flex-shrink-0 p-2 rounded-lg transition-colors duration-500 ${isStudent ? "bg-pink-500 text-white shadow-lg shadow-pink-500/50 font-bold" : "bg-white/15 text-gray-300"}`}>
           <GraduationCap className="h-5 w-5" />
         </div>
         <div className="ml-4 transition-all duration-500">
-          <h3 className={`text-sm font-semibold ${isStudent ? "text-teal-100" : "text-gray-200"}`}>Student Benefit Program</h3>
+          <h3 className={`text-sm font-semibold ${isStudent ? "text-pink-100" : "text-gray-200"}`}>Student Benefit Program</h3>
           <div className="mt-1 relative h-5">
-            <p className={`text-xs absolute top-0 left-0 transition-all duration-500 ${isStudent ? "opacity-0 translate-y-2" : "opacity-100 text-gray-400"} `}>
-              Đăng ký bằng email trường để nhận <span className="text-teal-300 font-semibold">+{STUDENT_BONUS_POINTS} điểm uy tín</span>.
+            <p className={`text-xs absolute top-0 left-0 transition-all duration-500 ${isStudent ? "opacity-0 translate-y-2" : "opacity-100 text-gray-300"} `}>
+              Đăng ký bằng email trường để nhận <span className="text-pink-300 font-semibold">+{STUDENT_BONUS_POINTS} điểm uy tín</span>.
             </p>
             <p className={`text-xs flex items-center font-medium text-emerald-300 absolute top-0 left-0 transition-all duration-500 ${isStudent ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"} `}>
               <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Đã nhận diện email trường! (+{STUDENT_BONUS_POINTS} pts)
@@ -349,22 +329,22 @@ export const StudentBenefitBanner = ({ email }) => {
 };
 
 /**
- * AuthCard: Double-bezel concentric enclosure with sweeping BorderBeam, Sparkling Stardust, and AuthSurroundings.
+ * AuthCard: Double-bezel concentric enclosure with sweeping BorderBeam and Vibrant Purple/Magenta Constellation.
  */
 export const AuthCard = ({ children, mode = "cosmic-wave" }) => (
   <PageTransitionWrapper>
-    <div className="min-h-screen relative overflow-hidden font-sans bg-space-950 select-none">
+    <div className="min-h-screen relative overflow-hidden font-sans bg-[#100322] select-none">
       <AmbientBackground mode={mode} />
       <NoiseOverlay />
       <AuthSurroundings>
         <div className="max-w-[460px] w-full perspective-1000 animate-card-in">
           {/* Outer Shell: Machine-tooled bezel with BorderBeam laser effect & glowing shadow */}
-          <div className="relative p-1.5 rounded-[32px] bg-white/[0.05] border border-white/15 shadow-[0_8px_35px_rgba(0,0,0,0.7)] backdrop-blur-3xl transition-all duration-500 hover:border-teal-400/30 hover:shadow-[0_0_40px_rgba(52,231,196,0.25)] overflow-hidden">
-            <BorderBeam size={240} duration={8} colorFrom="#34e7c4" colorTo="#818cf8" />
+          <div className="relative p-1.5 rounded-[32px] bg-white/[0.08] border border-white/20 shadow-[0_12px_45px_rgba(0,0,0,0.75)] backdrop-blur-3xl transition-all duration-500 hover:border-pink-400/40 hover:shadow-[0_0_50px_rgba(244,63,94,0.35)] overflow-hidden">
+            <BorderBeam size={260} duration={7} colorFrom="#f43f5e" colorTo="#a855f7" />
             
             {/* Inner Core: Deep Space Cyber Canvas */}
-            <div className="relative rounded-[calc(32px-0.375rem)] bg-space-950/85 backdrop-blur-2xl py-8 px-6 sm:py-10 sm:px-10 border border-white/[0.08] overflow-hidden">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-teal-300/60 to-transparent opacity-80" />
+            <div className="relative rounded-[calc(32px-0.375rem)] bg-space-950/85 backdrop-blur-3xl py-8 px-6 sm:py-10 sm:px-10 border border-white/10 overflow-hidden">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-pink-400/80 to-transparent opacity-90" />
               {children}
             </div>
           </div>
