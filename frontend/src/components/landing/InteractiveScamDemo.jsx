@@ -55,24 +55,33 @@ export default function InteractiveScamDemo() {
   const [selectedCase, setSelectedCase] = useState(DEMO_CASES[0]);
 
   return (
-    <section className="py-20 relative z-10 bg-space-900/30 border-y border-white/10" id="demo">
+    <section className="py-20 relative z-10" id="demo">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Title */}
+        {/* Section Title with Editorial Serif Typography */}
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5 text-teal-400" /> Trải Nghiệm Tức Thì
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-widest font-mono">
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>03 / TRẢI NGHIỆM TRỰC QUAN</span>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-            Mô Phỏng Phân Tích Thực Tế Của AI
+
+          <h2 className="text-3xl sm:text-5xl font-normal text-white tracking-tight leading-tight">
+            <span className="font-serif-editorial italic text-gradient-primary">
+              Mô phỏng phân tích,
+            </span>
+            <br />
+            <span className="font-sans font-black tracking-tight">
+              thực chứng cùng AI.
+            </span>
           </h2>
-          <p className="text-xs sm:text-sm text-gray-400">
+
+          <p className="text-xs sm:text-sm text-gray-300 leading-relaxed max-w-xl mx-auto">
             Chọn 1 trong các tình huống phổ biến dưới đây để xem cách hệ thống đưa ra Thước đo rủi ro và nhận định kép.
           </p>
         </div>
 
         {/* Interactive Workspace */}
-        <div className="max-w-5xl mx-auto bg-space-950/90 border border-white/12 rounded-3xl p-6 sm:p-10 shadow-glass-deep space-y-8">
+        <div className="max-w-5xl mx-auto bg-space-950/90 border border-white/12 rounded-3xl p-6 sm:p-10 shadow-glass-deep space-y-8 backdrop-blur-3xl">
           
           {/* Preset Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-3">
@@ -83,7 +92,7 @@ export default function InteractiveScamDemo() {
                 onClick={() => setSelectedCase(c)}
                 className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
                   selectedCase.id === c.id
-                    ? "bg-teal-400 text-space-950 shadow-[0_0_20px_rgba(52,231,196,0.4)]"
+                    ? "bg-teal-400 text-space-950 shadow-[0_0_20px_rgba(52,231,196,0.4)] scale-105"
                     : "bg-white/5 text-gray-300 hover:bg-white/10 border border-white/10"
                 }`}
               >
@@ -94,7 +103,7 @@ export default function InteractiveScamDemo() {
 
           {/* Sample Input Preview */}
           <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 space-y-1.5">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest font-mono">
               Nội dung mô phỏng đầu vào:
             </p>
             <p className="text-xs sm:text-sm text-gray-200 font-mono italic">
@@ -106,15 +115,15 @@ export default function InteractiveScamDemo() {
           <div
             className={`p-6 sm:p-8 rounded-3xl border transition-all ${
               selectedCase.status === "scam"
-                ? "bg-rose-950/20 border-rose-500/40"
-                : "bg-emerald-950/20 border-emerald-500/40"
+                ? "bg-rose-950/30 border-rose-500/50 shadow-[0_0_30px_rgba(244,63,94,0.15)]"
+                : "bg-emerald-950/30 border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.15)]"
             }`}
           >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-6 border-b border-white/10">
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <span
-                    className={`px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border flex items-center gap-1.5 ${
+                    className={`px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider border flex items-center gap-1.5 font-mono ${
                       selectedCase.status === "scam"
                         ? "bg-rose-500/20 text-rose-300 border-rose-500/40"
                         : "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
@@ -136,9 +145,9 @@ export default function InteractiveScamDemo() {
               {/* Gauge */}
               <div className="flex items-center gap-3 shrink-0">
                 <div className="text-right">
-                  <p className="text-[10px] text-gray-400 uppercase">Thước đo</p>
+                  <p className="text-[10px] text-gray-400 uppercase font-mono tracking-widest">Thước đo</p>
                   <p
-                    className={`text-3xl font-black ${
+                    className={`text-4xl font-mono font-black ${
                       selectedCase.status === "scam" ? "text-rose-400" : "text-emerald-400"
                     }`}
                   >
@@ -150,7 +159,7 @@ export default function InteractiveScamDemo() {
 
             {/* Dual Outputs: AI + Expert */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-6">
-              <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-2">
+              <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-2">
                 <p className="text-xs font-bold text-teal-300 flex items-center gap-1.5">
                   <Bot className="w-4 h-4 text-teal-400" /> 🤖 Phân tích từ AI Engine 4 Lớp:
                 </p>
@@ -159,7 +168,7 @@ export default function InteractiveScamDemo() {
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-black/40 border border-amber-500/20 space-y-2">
+              <div className="p-4 rounded-2xl bg-black/50 border border-amber-500/20 space-y-2">
                 <p className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
                   <Users className="w-4 h-4 text-amber-400" /> 👨‍⚕️ Cố vấn Chuyên gia Uy tín:
                 </p>
