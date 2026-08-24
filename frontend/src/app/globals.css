@@ -20,6 +20,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
+  --font-serif: var(--font-instrument-serif), var(--font-cormorant-garamond), serif;
 
   /* ---- Tailwind CSS v4 Theme Variables & Tokens ---- */
   --color-space-950: #06060a;
@@ -60,6 +61,31 @@ body {
   font-family: var(--font-sans);
   min-height: 100vh;
   overflow-x: hidden;
+}
+
+/* Typography Hierarchy */
+.font-serif-editorial {
+  font-family: var(--font-instrument-serif), var(--font-cormorant-garamond), Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+.font-sans-ui {
+  font-family: var(--font-geist-sans), var(--font-sans), sans-serif;
+}
+
+/* Orbital Knowledge System */
+.orbital-knowledge-ring {
+  border: 1px dashed rgba(52, 231, 196, 0.2);
+  border-radius: 9999px;
+  animation: spin-around 50s linear infinite;
+}
+
+.orbital-node-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #34e7c4;
+  box-shadow: 0 0 10px rgba(52, 231, 196, 0.8);
 }
 
 /* ---- Keyframes cho hiệu ứng nền & tương tác ---- */
