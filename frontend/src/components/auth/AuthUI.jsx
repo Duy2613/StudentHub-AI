@@ -2,9 +2,9 @@
 
 // components/auth/AuthUI.jsx
 //
-// Shared UI components for /login and /register (Cyber Glassmorphism & Verification Network).
-// Awwwards-tier Double-Bezel architecture with hardware-accelerated 60fps ambient glow
-// and AuthSurroundings (Astrolabe Rings, Telemetry Badges, Top Header & Trust Guarantee).
+// Shared UI components for /login and /register (Clean Cinematic Wallpaper & 3D Particle Waves).
+// Awwwards-tier Double-Bezel architecture with hardware-accelerated 60fps ambient glow,
+// Sparkling Stardust Canvas, Robin Payot Fluid waves, and Astrolabe Rings.
 
 import React, { useState } from "react";
 import { Eye, EyeOff, Lock, Loader2, ArrowRight, AlertCircle, GraduationCap, CheckCircle2 } from "lucide-react";
@@ -13,6 +13,7 @@ import { Meteors } from "@/components/ui/meteors";
 import ConstellationWaveCanvas from "@/components/ui/constellation-wave-canvas";
 import CinematicVideoAtmosphere from "@/components/ui/cinematic-video-atmosphere";
 import SparklingStardustCanvas from "@/components/ui/SparklingStardustCanvas";
+import RobinPayotFluidCanvas from "@/components/canvas/RobinPayotFluidCanvas";
 import PageTransitionWrapper from "@/components/ui/page-transition-wrapper";
 import { BorderBeam } from "@/components/ui/border-beam";
 
@@ -29,19 +30,28 @@ export const AmbientBackground = ({ mode = "cosmic-wave" }) => {
   const isEmerald = mode === "emerald-wave";
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-      {/* 1. Sparkling Stardust & Twinkling Diamond Flares Canvas */}
-      <SparklingStardustCanvas count={85} speed={0.5} />
+      {/* 1. Cinematic Photographic Wallpaper Background */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-60 scale-100 transition-transform duration-1000"
+        style={{
+          backgroundImage: `url('/wallpapers/06-focus-mode.jpg')`,
+        }}
+      />
 
-      {/* 2. Interactive 3D Dot Wave & Connected Constellation Polygon Mesh */}
-      <ConstellationWaveCanvas mode={mode} opacity={0.95} density="high" />
+      {/* 2. Robin Payot WebGL Liquid Mesh Wave */}
+      <RobinPayotFluidCanvas opacity={0.5} />
 
-      {/* 3. Procedural Cinematic Video-Grade Atmosphere */}
-      <CinematicVideoAtmosphere opacity={0.7} />
+      {/* 3. Sparkling Stardust & Twinkling Diamond Flares Canvas */}
+      <SparklingStardustCanvas count={90} speed={0.5} />
 
-      {/* 4. Meteors */}
-      <Meteors number={18} />
+      {/* 4. Interactive 3D Dot Wave & Connected Constellation Mesh */}
+      <ConstellationWaveCanvas mode={mode} opacity={0.85} density="high" />
 
-      {/* 5. Multi-Hue Atmospheric Radial Mesh (Pure GPU 60fps CSS) */}
+      {/* 5. Procedural Cinematic Atmosphere & Meteors */}
+      <CinematicVideoAtmosphere opacity={0.6} />
+      <Meteors number={16} />
+
+      {/* 6. Multi-Hue Atmospheric Radial Mesh Glow */}
       <div
         className={`absolute top-[-15%] left-[-15%] w-[60vw] h-[60vw] rounded-full blur-[150px] animate-blob-slow mix-blend-screen transition-all duration-700 ${
           isEmerald
@@ -56,12 +66,10 @@ export const AmbientBackground = ({ mode = "cosmic-wave" }) => {
             : "bg-gradient-to-r from-blue-600/25 to-cyan-600/25"
         }`}
       />
-      <div
-        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] rounded-full blur-[160px] pointer-events-none transition-all duration-700 ${
-          isEmerald ? "bg-emerald-950/20" : "bg-indigo-950/20"
-        }`}
-      />
-      <div className="absolute inset-0 bg-grid-pattern opacity-20" />
+
+      {/* Subtle Legibility Gradient Overlays */}
+      <div className="absolute inset-0 bg-gradient-to-t from-space-950 via-space-950/60 to-space-950/40" />
+      <div className="absolute inset-0 bg-radial from-transparent via-space-950/30 to-space-950/90" />
     </div>
   );
 };
