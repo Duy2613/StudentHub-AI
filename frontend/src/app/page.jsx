@@ -2,15 +2,16 @@
 
 // app/page.jsx
 // Trang chủ (Landing Page) chính thức của StudentHub AI:
-// - Nghệ thuật chỉ đạo: Editorial Academic × Human Technology × Cinematic Campus (Robin Payot 3D WebGL Fluid)
+// - Đỉnh cao sáng tạo: Kết hợp tinh hoa Robin Payot (WebGL Liquid Mesh & 3D Tilt Perspective) & Controleur.ca (Interactive Dialogue & 3-Step Protocol)
 // - Typography: Instrument Serif / Cormorant Garamond kết hợp Geist Sans
 // - Scrollytelling Background Morphing: Tự động chuyển đổi 6 hình nền điện ảnh độ nét cao và luồng ánh sáng khí quyển khi cuộn
 // - Interactive 3D Perspective Blocks: Khối ảnh 3D, thẻ nghiêng đa trục và sóng WebGL phản xạ theo chuột
-// - 6 Phân đoạn: Hero (01. Portal) -> 3 Trụ Cột (02. Campus) -> Demo (03. Study Room) -> Engine (04. Neural Net) -> Community (05. Data Flow) -> CTA (06. Focus Dusk)
 
 import React from "react";
 import ModernNavbar from "@/components/layout/ModernNavbar";
 import HeroSection from "@/components/landing/HeroSection";
+import StudentDilemmaChatCarousel from "@/components/landing/StudentDilemmaChatCarousel";
+import ThreeStepTrustFlowSection from "@/components/landing/ThreeStepTrustFlowSection";
 import CoreFeaturesSection from "@/components/landing/CoreFeaturesSection";
 import InteractiveScamDemo from "@/components/landing/InteractiveScamDemo";
 import ExplainableEngineSection from "@/components/landing/ExplainableEngineSection";
@@ -28,7 +29,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-space-950 text-gray-100 flex flex-col relative overflow-x-hidden">
       {/* Robin Payot 3D WebGL Liquid Mesh & Ripple Shader Background */}
-      <RobinPayotFluidCanvas opacity={0.6} />
+      <RobinPayotFluidCanvas opacity={0.65} />
 
       {/* Film Grain & Noise Texture */}
       <NoiseOverlay />
@@ -45,6 +46,13 @@ export default function HomePage() {
         {/* Section 01: Hero (01. AI Knowledge Portal) */}
         <section id="hero" className="min-h-[90vh] flex flex-col justify-center">
           <HeroSection />
+          {/* Controleur Style Live Student Dilemma Dialogue */}
+          <StudentDilemmaChatCarousel />
+        </section>
+
+        {/* 3-Step Trust Protocol (Controleur Style) */}
+        <section id="workflow" className="min-h-[75vh] flex flex-col justify-center">
+          <ThreeStepTrustFlowSection />
         </section>
 
         {/* Section 02: 3 Core Pillars (02. Smart Campus Future) */}
