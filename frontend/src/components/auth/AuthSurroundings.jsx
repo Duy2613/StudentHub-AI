@@ -4,18 +4,19 @@ import React, { useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
-  Bot,
-  Code2,
   ShieldCheck,
   Star,
   Sparkles,
   Zap,
   Lock,
   Network,
-  Terminal,
   CheckCircle2,
   Activity,
   Cpu,
+  GraduationCap,
+  ShieldAlert,
+  Users,
+  Award
 } from "lucide-react";
 import { motion, useMotionValue, useSpring, useAnimationFrame } from "framer-motion";
 import LiveStudioClock from "@/components/ui/live-studio-clock";
@@ -73,12 +74,16 @@ function TelemetryBadge({ item, mousePos, positionClass }) {
       transition={{ duration: 0.8, delay: item.delay, ease: [0.16, 1, 0.3, 1] }}
       className={`absolute ${positionClass} z-20 pointer-events-auto select-none`}
     >
-      <div className="group relative p-3.5 rounded-2xl bg-space-950/90 backdrop-blur-2xl border border-white/15 shadow-glass-deep hover:border-white/30 transition-all duration-300 hover:shadow-neon-primary min-w-[215px] max-w-[260px]">
+      <div className="group relative p-3.5 rounded-2xl bg-space-950/90 backdrop-blur-2xl border border-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.6)] hover:border-teal-400/40 transition-all duration-300 hover:shadow-[0_0_30px_rgba(52,231,196,0.3)] min-w-[220px] max-w-[265px]">
         {/* Glow halo */}
         <div
           className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity blur-lg pointer-events-none -z-10"
           style={{ background: item.glow }}
         />
+        
+        {/* Shimmering Corner Sparkle */}
+        <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-teal-300 opacity-60 animate-ping" />
+
         <div className="flex items-start gap-3">
           <div className={`p-2.5 rounded-xl bg-gradient-to-tr ${item.color} text-white shadow-lg shrink-0 mt-0.5 group-hover:scale-110 transition-transform duration-300`}>
             <Icon className="w-4 h-4" />
@@ -87,7 +92,7 @@ function TelemetryBadge({ item, mousePos, positionClass }) {
             <div className="flex items-center justify-between gap-1">
               <span className="text-xs font-bold text-white tracking-tight truncate">{item.title}</span>
               {item.badge && (
-                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-white/10 text-gray-200 font-mono font-semibold border border-white/10">
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-white/10 text-teal-300 font-mono font-semibold border border-teal-500/30">
                   {item.badge}
                 </span>
               )}
@@ -100,10 +105,10 @@ function TelemetryBadge({ item, mousePos, positionClass }) {
             {item.extra && (
               <div className="mt-2 pt-1.5 border-t border-white/10 flex items-center justify-between text-[10px] text-gray-400">
                 <span className="flex items-center gap-1">
-                  {item.extra.liveDot && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />}
+                  {item.extra.liveDot && <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />}
                   {item.extra.left}
                 </span>
-                <span className="font-semibold text-emerald-400">{item.extra.right}</span>
+                <span className="font-semibold text-teal-300">{item.extra.right}</span>
               </div>
             )}
           </div>
@@ -114,55 +119,57 @@ function TelemetryBadge({ item, mousePos, positionClass }) {
 }
 
 /**
- * Concentric Astrolabe Orbital Rings behind the Central Card
+ * Concentric Sparkling Astrolabe Orbital Rings behind the Central Card
  */
 function CosmicAstrolabeRings() {
   return (
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none -z-10 overflow-hidden">
-      {/* Outer Rotating Dashed Ring */}
+      {/* Outer Rotating Dashed Ring with Twinkling Star Nodes */}
       <svg
-        className="w-[740px] h-[740px] sm:w-[880px] sm:h-[880px] opacity-35 animate-[spin_70s_linear_infinite]"
+        className="w-[760px] h-[760px] sm:w-[920px] sm:h-[920px] opacity-40 animate-[spin_80s_linear_infinite]"
         viewBox="0 0 800 800"
         fill="none"
       >
         <circle
           cx="400"
           cy="400"
-          r="360"
+          r="370"
           stroke="#6366f1"
-          strokeWidth="1.2"
-          strokeDasharray="6 14"
+          strokeWidth="1.5"
+          strokeDasharray="6 16"
         />
-        <circle cx="400" cy="40" r="4.5" fill="#34e7c4" className="animate-pulse" />
-        <circle cx="760" cy="400" r="3.5" fill="#818cf8" />
-        <circle cx="40" cy="400" r="4" fill="#f59e0b" />
-        <circle cx="650" cy="650" r="3.5" fill="#ec4899" />
+        <circle cx="400" cy="30" r="5" fill="#34e7c4" className="animate-pulse shadow-[0_0_12px_#34e7c4]" />
+        <circle cx="770" cy="400" r="4" fill="#818cf8" />
+        <circle cx="30" cy="400" r="4.5" fill="#fde047" />
+        <circle cx="660" cy="660" r="4" fill="#ec4899" />
+        <circle cx="140" cy="140" r="3.5" fill="#38bdf8" />
       </svg>
 
-      {/* Middle Counter-Rotating Ring */}
+      {/* Middle Counter-Rotating Ring with Shimmering Cyan Accents */}
       <svg
-        className="absolute w-[580px] h-[580px] sm:w-[700px] sm:h-[700px] opacity-45 animate-[spin_45s_linear_infinite_reverse]"
+        className="absolute w-[600px] h-[600px] sm:w-[740px] sm:h-[740px] opacity-50 animate-[spin_50s_linear_infinite_reverse]"
         viewBox="0 0 600 600"
         fill="none"
       >
         <circle
           cx="300"
           cy="300"
-          r="270"
+          r="280"
           stroke="#34e7c4"
           strokeWidth="1.2"
-          strokeDasharray="4 10"
+          strokeDasharray="4 12"
         />
-        <circle cx="300" cy="30" r="3.5" fill="#34e7c4" />
-        <circle cx="570" cy="300" r="3.5" fill="#a855f7" />
-        <circle cx="100" cy="480" r="3" fill="#60a5fa" />
+        <circle cx="300" cy="20" r="4" fill="#34e7c4" />
+        <circle cx="580" cy="300" r="4" fill="#a855f7" />
+        <circle cx="90" cy="510" r="3.5" fill="#60a5fa" />
+        <circle cx="510" cy="90" r="3.5" fill="#fde047" />
       </svg>
 
-      {/* Inner Glowing Orbit Circle */}
-      <div className="absolute w-[460px] h-[460px] sm:w-[540px] sm:h-[540px] rounded-full border border-indigo-500/25 opacity-60 shadow-[0_0_90px_rgba(99,102,241,0.3)] animate-pulse" />
+      {/* Inner Glowing Orbit Circle with Pulsing Diamond Core */}
+      <div className="absolute w-[480px] h-[480px] sm:w-[580px] sm:h-[580px] rounded-full border border-teal-400/30 opacity-70 shadow-[0_0_100px_rgba(52,231,196,0.25)] animate-pulse" />
 
-      {/* Radial Backlight behind the central card */}
-      <div className="absolute w-[520px] h-[520px] rounded-full bg-gradient-to-tr from-indigo-600/30 via-purple-600/25 to-teal-500/20 blur-[130px] pointer-events-none" />
+      {/* Radiant Prismatic Backlight Flare behind the central card */}
+      <div className="absolute w-[560px] h-[560px] rounded-full bg-gradient-to-tr from-indigo-600/35 via-purple-600/30 to-teal-400/25 blur-[140px] pointer-events-none" />
     </div>
   );
 }
@@ -200,45 +207,45 @@ export default function AuthSurroundings({ children }) {
   const LEFT_ITEMS = [
     {
       id: 1,
-      title: "AI Mentor Socratic 2.0",
-      subtitle: "Phân tích đa bước & LaTeX",
-      icon: Bot,
-      color: "from-indigo-500 to-purple-600",
-      glow: "rgba(99,102,241,0.45)",
+      title: "Động Cơ AI 4 Lớp",
+      subtitle: "Phân tích Link, Text & OCR Ảnh",
+      icon: ShieldAlert,
+      color: "from-teal-500 to-indigo-600",
+      glow: "rgba(52,231,196,0.45)",
       badge: "ACTIVE",
       delay: 0.1,
       customContent: (
-        <div className="mt-1.5 flex items-center gap-1 text-[10px] text-indigo-300 font-mono">
-          <span className="inline-block w-1 h-3 bg-indigo-400 animate-pulse" />
-          <span className="inline-block w-1 h-2 bg-indigo-400 animate-pulse animation-delay-200" />
-          <span className="inline-block w-1 h-4 bg-indigo-400 animate-pulse animation-delay-400" />
-          <span className="inline-block w-1 h-2 bg-indigo-400 animate-pulse animation-delay-300" />
-          <span className="ml-1 text-gray-300 truncate">Socratic CoT Engine</span>
+        <div className="mt-1.5 flex items-center gap-1 text-[10px] text-teal-300 font-mono">
+          <span className="inline-block w-1 h-3 bg-teal-400 animate-pulse" />
+          <span className="inline-block w-1 h-2 bg-teal-400 animate-pulse animation-delay-200" />
+          <span className="inline-block w-1 h-4 bg-teal-400 animate-pulse animation-delay-400" />
+          <span className="inline-block w-1 h-2 bg-teal-400 animate-pulse animation-delay-300" />
+          <span className="ml-1 text-gray-300 truncate">4-Layer Verification</span>
         </div>
       ),
-      extra: { left: "120K+ bài giải", right: "● Sẵn sàng", liveDot: true },
+      extra: { left: ">1,000 Mẫu lừa đảo", right: "● 0.1s - 3s", liveDot: true },
       pos: "top-[16%] left-[2%] xl:left-[5%] hidden md:block",
     },
     {
       id: 2,
-      title: "Cố Vấn Chuyên Gia 1:1",
-      subtitle: "TS. Nguyễn Minh Đức & 30+ Mentors",
-      icon: Star,
+      title: "Mạng Lưới Chuyên Gia",
+      subtitle: "8 Chuyên ngành thẩm định thực chứng",
+      icon: Users,
       color: "from-amber-500 to-orange-500",
       glow: "rgba(245,158,11,0.45)",
-      badge: "TOP 1%",
+      badge: "TOP 5",
       delay: 0.25,
       customContent: (
         <div className="mt-1.5 flex items-center gap-1.5">
           <div className="flex -space-x-1.5">
-            <div className="w-4 h-4 rounded-full bg-amber-500/80 border border-black text-[8px] flex items-center justify-center font-bold text-black">Đ</div>
-            <div className="w-4 h-4 rounded-full bg-indigo-500/80 border border-black text-[8px] flex items-center justify-center font-bold text-white">N</div>
-            <div className="w-4 h-4 rounded-full bg-teal-500/80 border border-black text-[8px] flex items-center justify-center font-bold text-black">H</div>
+            <div className="w-4 h-4 rounded-full bg-amber-500/80 border border-black text-[8px] flex items-center justify-center font-bold text-black">A</div>
+            <div className="w-4 h-4 rounded-full bg-teal-500/80 border border-black text-[8px] flex items-center justify-center font-bold text-black">L</div>
+            <div className="w-4 h-4 rounded-full bg-indigo-500/80 border border-black text-[8px] flex items-center justify-center font-bold text-white">T</div>
           </div>
-          <span className="text-[10px] text-amber-300 font-medium">HUST, VNU, UIT</span>
+          <span className="text-[10px] text-amber-300 font-medium">Luật, An ninh mạng, Trọ</span>
         </div>
       ),
-      extra: { left: "Học thuật 1:1", right: "★ 4.98/5.0", liveDot: false },
+      extra: { left: "Xác thực 2 chiều", right: "★ 80-100 pts", liveDot: false },
       pos: "bottom-[16%] left-[2%] xl:left-[5%] hidden md:block",
     },
   ];
@@ -246,26 +253,26 @@ export default function AuthSurroundings({ children }) {
   const RIGHT_ITEMS = [
     {
       id: 3,
-      title: "Code Sandbox Engine",
-      subtitle: "def dijkstra(): heapq.heappop",
-      icon: Code2,
-      color: "from-cyan-500 to-blue-600",
-      glow: "rgba(6,182,212,0.45)",
-      badge: "O(log N)",
+      title: "Sáng Tạo Trẻ AI 2026",
+      subtitle: "Cuộc thi Quốc gia • Bảng C Sinh viên",
+      icon: Award,
+      color: "from-indigo-500 to-purple-600",
+      glow: "rgba(99,102,241,0.45)",
+      badge: "OFFICIAL",
       delay: 0.2,
       customContent: (
-        <div className="mt-1.5 px-2 py-0.5 rounded bg-black/50 border border-cyan-500/20 text-[9px] font-mono text-cyan-300">
-          <span>Python 3.12 • [0.002s]</span>
+        <div className="mt-1.5 px-2 py-0.5 rounded bg-black/50 border border-indigo-500/30 text-[9px] font-mono text-indigo-300">
+          <span>StudentHub AI • Verified Hub</span>
         </div>
       ),
-      extra: { left: "Python, TS, C++", right: "⚡ Real-time", liveDot: true },
+      extra: { left: "100% Phi thương mại", right: "⚡ Real-time", liveDot: true },
       pos: "top-[18%] right-[2%] xl:right-[5%] hidden md:block",
     },
     {
       id: 4,
-      title: "Academic Edu Trust",
-      subtitle: "Xác thực Đại học Bách Khoa, CNTT, FPT",
-      icon: ShieldCheck,
+      title: "Cấp Điểm Edu Tự Động",
+      subtitle: "Email .edu nhận ngay +30đ Uy Tín",
+      icon: GraduationCap,
       color: "from-emerald-500 to-teal-600",
       glow: "rgba(52,231,196,0.45)",
       badge: "+30 PTS",
@@ -273,10 +280,10 @@ export default function AuthSurroundings({ children }) {
       customContent: (
         <div className="mt-1.5 flex items-center gap-1.5 text-[10px] text-emerald-300">
           <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-          <span>Edu SSO Verified Campus</span>
+          <span>Edu SSO Campus Verified</span>
         </div>
       ),
-      extra: { left: "Bảo mật chuẩn", right: "✓ Đã xác thực", liveDot: false },
+      extra: { left: "Bảo vệ sinh viên", right: "✓ Đã kích hoạt", liveDot: false },
       pos: "bottom-[18%] right-[2%] xl:right-[5%] hidden md:block",
     },
   ];
@@ -289,15 +296,15 @@ export default function AuthSurroundings({ children }) {
           href="/"
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.05] hover:bg-white/15 border border-white/15 text-xs font-semibold text-gray-200 hover:text-white backdrop-blur-xl shadow-glass-deep transition-all hover:scale-105 active:scale-95 group"
         >
-          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform text-indigo-400" />
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform text-teal-400" />
           <span>Về Trang Chủ</span>
         </Link>
 
         <div className="flex items-center gap-3">
           <LiveStudioClock />
-          <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-[11px] font-mono text-indigo-200 backdrop-blur-md shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>v2.8 Hub</span>
+          <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-500/15 border border-teal-500/30 text-[11px] font-mono text-teal-200 backdrop-blur-md shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+            <span>StudentHub AI 2026</span>
           </div>
         </div>
       </header>
@@ -335,20 +342,20 @@ export default function AuthSurroundings({ children }) {
 
       {/* 3. Bottom Security Guarantee Bar */}
       <footer className="relative z-30 w-full px-4 py-4 text-center">
-        <div className="inline-flex flex-wrap items-center justify-center gap-3 sm:gap-6 px-5 py-2 rounded-full bg-space-950/80 border border-white/10 backdrop-blur-md text-[11px] text-gray-300 shadow-glass-deep">
+        <div className="inline-flex flex-wrap items-center justify-center gap-3 sm:gap-6 px-5 py-2 rounded-full bg-space-950/85 border border-white/10 backdrop-blur-md text-[11px] text-gray-300 shadow-glass-deep">
           <span className="flex items-center gap-1.5">
-            <Lock className="w-3 h-3 text-indigo-400" />
+            <Lock className="w-3 h-3 text-teal-400" />
             <span>Mã hóa End-to-End 256-bit</span>
           </span>
           <span className="hidden sm:inline text-white/20">•</span>
           <span className="flex items-center gap-1.5">
             <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-            <span>Xác thực Edu SSO & OAuth 2.0</span>
+            <span>Xác thực Edu SSO &amp; OAuth 2.0</span>
           </span>
           <span className="hidden sm:inline text-white/20">•</span>
           <span className="flex items-center gap-1.5">
             <Zap className="w-3 h-3 text-amber-400" />
-            <span>Phục vụ 24/7 không gián đoạn</span>
+            <span>Bảo vệ quyền riêng tư 100%</span>
           </span>
         </div>
       </footer>
