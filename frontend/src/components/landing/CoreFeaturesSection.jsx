@@ -17,6 +17,7 @@ import {
   Utensils
 } from "lucide-react";
 import TactileButton from "@/components/ui/TactileButton";
+import Interactive3DBlockCard from "@/components/ui/Interactive3DBlockCard";
 
 export default function CoreFeaturesSection() {
   const features = [
@@ -28,6 +29,7 @@ export default function CoreFeaturesSection() {
       tagColor: "bg-teal-500/20 text-teal-300 border-teal-500/40",
       icon: ShieldAlert,
       href: "/scam-check",
+      glowColor: "rgba(52, 231, 196, 0.4)",
       description:
         "Nhận diện chính xác thủ đoạn lừa đảo qua 3 phương thức: Link, Tin nhắn văn bản hoặc Ảnh chụp màn hình tự động OCR. Cơ chế dừng sớm giúp phản hồi chỉ trong 0.1s đến 1.5s.",
       highlights: [
@@ -45,6 +47,7 @@ export default function CoreFeaturesSection() {
       tagColor: "bg-amber-500/20 text-amber-300 border-amber-500/40",
       icon: Users,
       href: "/profile",
+      glowColor: "rgba(245, 158, 11, 0.4)",
       description:
         "Hệ thống điểm uy tín 0–100 điểm với cơ chế chấm điểm chặt chẽ: +1/+2đ khi được cộng đồng xác nhận, -1/-2đ khi spam. Tự động mở khóa danh hiệu Chuyên gia tại 80–100 điểm.",
       highlights: [
@@ -62,6 +65,7 @@ export default function CoreFeaturesSection() {
       tagColor: "bg-indigo-500/20 text-indigo-300 border-indigo-500/40",
       icon: MessageSquare,
       href: "/forum",
+      glowColor: "rgba(99, 102, 241, 0.4)",
       description:
         "Không gian chia sẻ thực tế về Nhà trọ, Quán ăn, Trường học, CLB. Cơ chế vote 'Uy tín' đẩy các bài viết có độ tin cậy cao lên đầu, tách biệt hoàn toàn với lượt like 'Hữu ích'.",
       highlights: [
@@ -99,60 +103,66 @@ export default function CoreFeaturesSection() {
           </p>
         </div>
 
-        {/* Feature Cards Grid */}
+        {/* Feature Cards Grid with Robin Payot 3D Perspective Tilt Blocks */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {features.map((feat) => {
             const Icon = feat.icon;
             return (
-              <div
+              <Interactive3DBlockCard
                 key={feat.id}
-                className="p-8 rounded-3xl bg-space-900/80 hover:bg-space-900/95 border border-white/10 hover:border-teal-400/40 backdrop-blur-3xl transition-all duration-300 flex flex-col justify-between shadow-glass-deep group hover:-translate-y-1 relative overflow-hidden"
+                glowColor={feat.glowColor}
+                maxTilt={14}
+                depth={45}
+                className="w-full h-full"
               >
-                {/* Subtle Background Chapter Number */}
-                <div className="absolute top-4 right-6 text-5xl font-mono font-black text-white/[0.03] group-hover:text-teal-400/[0.06] transition-colors pointer-events-none select-none">
-                  {feat.num}
-                </div>
-
-                <div className="space-y-5 relative z-10">
-                  <div className="flex items-center justify-between">
-                    <div className="p-3.5 rounded-2xl bg-teal-500/15 text-teal-300 border border-teal-500/30 group-hover:scale-110 transition-transform shadow-md">
-                      <Icon className="w-6 h-6" />
-                    </div>
-                    <span className={`text-[10px] font-bold uppercase px-3 py-1 rounded-full border font-mono tracking-wider ${feat.tagColor}`}>
-                      {feat.badge}
-                    </span>
+                <div className="p-8 rounded-3xl bg-space-900/85 border border-white/12 backdrop-blur-3xl transition-all duration-300 flex flex-col justify-between shadow-[0_12px_40px_rgba(0,0,0,0.6)] group relative overflow-hidden h-full min-h-[420px]">
+                  
+                  {/* Subtle Background Chapter Number */}
+                  <div className="absolute top-4 right-6 text-5xl font-mono font-black text-white/[0.04] group-hover:text-teal-400/[0.08] transition-colors pointer-events-none select-none">
+                    {feat.num}
                   </div>
 
-                  <h3 className="text-xl font-bold text-white group-hover:text-teal-300 transition-colors leading-snug">
-                    {feat.title}
-                  </h3>
+                  <div className="space-y-5 relative z-10">
+                    <div className="flex items-center justify-between">
+                      <div className="p-3.5 rounded-2xl bg-teal-500/15 text-teal-300 border border-teal-500/30 group-hover:scale-110 transition-transform shadow-md" style={{ transform: "translateZ(30px)" }}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <span className={`text-[10px] font-bold uppercase px-3 py-1 rounded-full border font-mono tracking-wider ${feat.tagColor}`} style={{ transform: "translateZ(20px)" }}>
+                        {feat.badge}
+                      </span>
+                    </div>
 
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                    {feat.description}
-                  </p>
+                    <h3 className="text-xl font-bold text-white group-hover:text-teal-300 transition-colors leading-snug" style={{ transform: "translateZ(25px)" }}>
+                      {feat.title}
+                    </h3>
 
-                  <ul className="space-y-2.5 pt-3 border-t border-white/5 text-xs text-gray-300">
-                    {feat.highlights.map((h, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5">
-                        <span className="w-4 h-4 rounded-full bg-teal-400/20 text-teal-300 flex items-center justify-center shrink-0 mt-0.5 font-bold text-[10px]">
-                          ✓
-                        </span>
-                        <span>{h}</span>
-                      </li>
-                    ))}
-                  </ul>
+                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed" style={{ transform: "translateZ(15px)" }}>
+                      {feat.description}
+                    </p>
+
+                    <ul className="space-y-2.5 pt-3 border-t border-white/5 text-xs text-gray-300" style={{ transform: "translateZ(15px)" }}>
+                      {feat.highlights.map((h, idx) => (
+                        <li key={idx} className="flex items-start gap-2.5">
+                          <span className="w-4 h-4 rounded-full bg-teal-400/20 text-teal-300 flex items-center justify-center shrink-0 mt-0.5 font-bold text-[10px]">
+                            ✓
+                          </span>
+                          <span>{h}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="pt-6 mt-6 border-t border-white/10 relative z-10" style={{ transform: "translateZ(25px)" }}>
+                    <Link
+                      href={feat.href}
+                      className="inline-flex items-center gap-2 text-xs font-bold text-teal-300 hover:text-teal-200 group-hover:translate-x-1 transition-all"
+                    >
+                      <span>Khám phá tính năng</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
                 </div>
-
-                <div className="pt-6 mt-6 border-t border-white/10 relative z-10">
-                  <Link
-                    href={feat.href}
-                    className="inline-flex items-center gap-2 text-xs font-bold text-teal-300 hover:text-teal-200 group-hover:translate-x-1 transition-all"
-                  >
-                    <span>Khám phá tính năng</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
+              </Interactive3DBlockCard>
             );
           })}
         </div>
