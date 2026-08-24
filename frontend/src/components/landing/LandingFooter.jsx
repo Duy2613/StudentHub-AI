@@ -2,126 +2,84 @@
 
 import React from "react";
 import Link from "next/link";
-import { 
-  Sparkles, 
-  ArrowRight, 
-  Globe, 
-  Share2, 
-  Mail, 
-  MessageSquare,
-  ShieldCheck,
-  Heart
-} from "lucide-react";
+import { ShieldCheck, Sparkles, Heart, ExternalLink } from "lucide-react";
 
 export default function LandingFooter() {
   return (
-    <footer className="relative bg-space-950 border-t border-white/10 pt-16 pb-12 overflow-hidden">
-      {/* High-Converting Pre-Footer CTA Banner */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
-        <div className="relative rounded-3xl p-8 sm:p-12 bg-gradient-to-r from-indigo-950 via-purple-950 to-space-950 border border-indigo-500/30 overflow-hidden shadow-glass-deep text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-8">
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none" />
+    <footer className="relative border-t border-white/10 bg-space-950/80 backdrop-blur-2xl text-gray-400 text-xs py-12 px-4 sm:px-8 z-10">
+      <div className="max-w-7xl mx-auto space-y-8">
+        
+        {/* Top Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
-          <div className="relative z-10 max-w-xl">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
-              Sẵn Sàng Chinh Phục Mọi Kỳ Thi & Bứt Phá Điểm Số?
-            </h3>
-            <p className="mt-2 text-sm text-gray-300">
-              Gia nhập cộng đồng hơn 50,000 sinh viên xuất sắc đang sử dụng StudentHub AI mỗi ngày.
-            </p>
-          </div>
-
-          <div className="relative z-10 flex flex-col sm:flex-row gap-3 shrink-0">
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold bg-white text-space-950 hover:bg-gray-100 active:scale-95 transition-all shadow-lg"
-            >
-              <span>Đăng Ký Miễn Phí Ngay</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Footer Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
-          
-          {/* Brand Info Column */}
-          <div className="col-span-2 space-y-4">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 p-[1px]">
-                <div className="w-full h-full bg-space-950 rounded-[7px] flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-indigo-400" />
+          {/* Col 1: Brand & Contest */}
+          <div className="md:col-span-2 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-teal-400 to-emerald-500 p-[1.5px]">
+                <div className="w-full h-full bg-space-950 rounded-full flex items-center justify-center">
+                  <ShieldCheck className="w-4 h-4 text-teal-400" />
                 </div>
               </div>
-              <span className="text-base font-bold text-white tracking-tight">
-                StudentHub <span className="text-indigo-400 text-xs px-1 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20">AI</span>
+              <span className="text-base font-extrabold text-white">
+                StudentHub <span className="text-teal-300 text-xs px-1.5 py-0.5 rounded bg-teal-400/20">AI</span>
               </span>
-            </Link>
+            </div>
 
-            <p className="text-xs text-gray-400 leading-relaxed max-w-sm">
-              Hệ sinh thái Trí tuệ Nhân tạo & Mạng lưới Cố vấn Học thuật xác thực dành riêng cho sinh viên các trường Đại học tại Việt Nam.
+            <p className="text-xs text-gray-300 max-w-md leading-relaxed">
+              Nền tảng phòng chống lừa đảo &amp; mạng lưới xác thực thông tin dành cho sinh viên Việt Nam. Kết hợp AI phân tích 4 lớp, chuyên gia uy tín và diễn đàn cộng đồng.
             </p>
 
-            <div className="flex items-center gap-3 pt-2">
-              <a href="#" className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors" aria-label="Website">
-                <Globe className="w-4 h-4" />
-              </a>
-              <a href="#" className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors" aria-label="Community">
-                <MessageSquare className="w-4 h-4" />
-              </a>
-              <a href="#" className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors" aria-label="Share">
-                <Share2 className="w-4 h-4" />
-              </a>
-              <a href="mailto:support@studenthub.ai" className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors" aria-label="Mail">
-                <Mail className="w-4 h-4" />
-              </a>
+            <div className="p-3 rounded-2xl bg-white/5 border border-white/5 inline-block text-[11px] text-teal-300 font-semibold">
+              🏆 Dự án dự thi <strong>Cuộc thi Sáng tạo trẻ Quốc gia trong lĩnh vực Trí tuệ nhân tạo năm 2026</strong> • Bảng C (sinh viên).
             </div>
           </div>
 
-          {/* Column 1: Tính Năng */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold text-gray-200 uppercase tracking-wider">Tính Năng</h4>
-            <ul className="space-y-2 text-xs text-gray-400">
-              <li><a href="#copilot" className="hover:text-indigo-400 transition-colors">AI Academic Copilot</a></li>
-              <li><a href="#experts" className="hover:text-indigo-400 transition-colors">Mạng lưới Cố vấn 1:1</a></li>
-              <li><a href="#features" className="hover:text-indigo-400 transition-colors">Sơ đồ Tư duy & Flashcards</a></li>
-              <li><a href="#features" className="hover:text-indigo-400 transition-colors">Review CV & Khóa luận</a></li>
+          {/* Col 2: Navigation */}
+          <div className="space-y-2.5">
+            <p className="text-xs font-bold text-white uppercase tracking-wider">Tính Năng Cốt Lõi</p>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/scam-check" className="hover:text-teal-300 transition-colors">
+                  AI Scam Checker (4 Lớp)
+                </Link>
+              </li>
+              <li>
+                <Link href="/forum" className="hover:text-teal-300 transition-colors">
+                  Diễn Đàn Cộng Đồng Sinh Viên
+                </Link>
+              </li>
+              <li>
+                <Link href="/dashboard" className="hover:text-teal-300 transition-colors">
+                  Bảng Điều Khiển &amp; Cảnh Báo
+                </Link>
+              </li>
+              <li>
+                <Link href="/profile" className="hover:text-teal-300 transition-colors">
+                  Mạng Lưới Chuyên Gia &amp; Uy Tín
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Column 2: Học Thuật & Chuyên Gia */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold text-gray-200 uppercase tracking-wider">Chuyên Gia</h4>
-            <ul className="space-y-2 text-xs text-gray-400">
-              <li><Link href="/register" className="hover:text-indigo-400 transition-colors">Đăng ký làm Cố vấn</Link></li>
-              <li><a href="#experts" className="hover:text-indigo-400 transition-colors">Tiêu chí Trust Score</a></li>
-              <li><a href="#faq" className="hover:text-indigo-400 transition-colors">Quy trình Phản biện</a></li>
-              <li><a href="#" className="hover:text-indigo-400 transition-colors">Diễn đàn Khoa học</a></li>
-            </ul>
-          </div>
-
-          {/* Column 3: Pháp Lý & Bảo Mật */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold text-gray-200 uppercase tracking-wider">Pháp Lý</h4>
-            <ul className="space-y-2 text-xs text-gray-400">
-              <li><a href="#" className="hover:text-indigo-400 transition-colors">Điều khoản dịch vụ</a></li>
-              <li><a href="#" className="hover:text-indigo-400 transition-colors">Chính sách bảo mật</a></li>
-              <li><a href="#" className="hover:text-indigo-400 transition-colors">Đạo đức học thuật AI</a></li>
-              <li><a href="#" className="hover:text-indigo-400 transition-colors">Liên hệ hỗ trợ</a></li>
+          {/* Col 3: Principles */}
+          <div className="space-y-2.5">
+            <p className="text-xs font-bold text-white uppercase tracking-wider">Nguyên Tắc Nền Tảng</p>
+            <ul className="space-y-2 text-[11px] text-gray-400">
+              <li>✓ 100% Miễn phí cho sinh viên</li>
+              <li>✓ Không thương mại hóa dịch vụ</li>
+              <li>✓ Động cơ Explainable AI minh bạch</li>
+              <li>✓ Bảo mật &amp; an toàn dữ liệu cá nhân</li>
             </ul>
           </div>
 
         </div>
 
-        {/* Bottom Bar with Status Indicator */}
-        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
-          <p>© 2026 StudentHub AI Inc. Bản quyền được bảo lưu.</p>
-
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[11px] font-medium font-mono">All AI Copilot Engines Operational</span>
-          </div>
+        {/* Bottom copyright */}
+        <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-gray-500">
+          <p>© 2026 StudentHub AI. Tất cả quyền được bảo lưu.</p>
+          <p className="flex items-center gap-1">
+            Xây dựng với tâm huyết dành cho cộng đồng sinh viên Việt Nam <Heart className="w-3 h-3 text-rose-500 fill-rose-500 inline" />
+          </p>
         </div>
 
       </div>

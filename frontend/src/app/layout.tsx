@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth/AuthContext";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
-import CustomMorphingCursor from "@/components/ui/custom-morphing-cursor";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -16,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "StudentHub AI - Hệ Sinh Thái Học Tập & Cố Vấn Học Thuật AI",
-    description: "StudentHub AI - Nền tảng Trí tuệ Nhân tạo & Mạng lưới Cố vấn Học thuật hàng đầu cho sinh viên Việt Nam",
+    title: "StudentHub AI — Nền tảng Phòng chống Lừa đảo & Mạng lưới Xác thực cho Sinh viên",
+    description: "Nền tảng phòng chống lừa đảo thực tế dành cho sinh viên Việt Nam, kết hợp AI xác thực thông tin 4 lớp, mạng lưới chuyên gia uy tín và diễn đàn cộng đồng. Dự án tham gia Cuộc thi Sáng tạo trẻ Quốc gia AI 2026.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -27,7 +26,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col bg-space-950 text-gray-100">
-                <CustomMorphingCursor />
                 <AuthProvider>
                     <SmoothScrollProvider>
                         {children}
@@ -36,4 +34,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </body>
         </html>
     );
-}
+}
