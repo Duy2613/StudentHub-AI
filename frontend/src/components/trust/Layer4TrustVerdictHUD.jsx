@@ -289,10 +289,37 @@ export default function Layer4TrustVerdictHUD({ result }) {
                     </a>
                     <span className="text-[10px] font-mono text-[#ece7e0]/60 uppercase">{ev.relation}</span>
                   </div>
-                  <p className="text-[#ece7e0]/80 italic text-[11px]">&ldquo;{ev.excerpt}&rdquo;</p>
+        {/* GLOBAL STANDARDS & ACCREDITED ECOSYSTEM COMPLIANCE */}
+        {userExplanation.matchedStandards?.length > 0 && (
+          <div className="p-4 rounded-xl bg-black/40 border border-[#ffbc09]/20 space-y-2">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="font-bold text-[#ffbc09] flex items-center gap-1.5 uppercase">
+                <Sparkles className="w-3.5 h-3.5 text-[#ffbc09]" />
+                TIÊU CHUẨN AN NINH & ĐỐI SOÁT QUỐC TẾ (GLOBAL COMPLIANCE)
+              </span>
+              <span className="text-[10px] text-emerald-400 font-bold">
+                {userExplanation.matchedStandards.length} FRAMEWORKS AUDITED
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-2 pt-1">
+              {userExplanation.matchedStandards.map((std, idx) => (
+                <div
+                  key={idx}
+                  className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[10px] font-mono text-[#ece7e0] flex items-center gap-1.5"
+                >
+                  <span className="text-[#ffbc09] font-bold">[{std.framework}]</span>
+                  <span>{std.name || std.standard || std.section || std.principle}</span>
                 </div>
               ))}
             </div>
+
+            {userExplanation.matchedUniversity && (
+              <div className="p-2 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono flex items-center gap-2 mt-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Hệ thống số đã xác thực: <strong>{userExplanation.matchedUniversity}</strong> (Accredited Domain)</span>
+              </div>
+            )}
           </div>
         )}
 
@@ -304,6 +331,8 @@ export default function Layer4TrustVerdictHUD({ result }) {
             <span>MODEL: {metrics.modelUsed || "deterministic_trust_engine"}</span>
             <span>•</span>
             <span>RULE: {auditTrail.ruleVersion || "layer4-v1.0.0"}</span>
+            <span>•</span>
+            <span>GLOBAL FRAMEWORKS: {auditTrail.globalFrameworkCount || 0}</span>
           </div>
 
           <div className="flex items-center gap-2 text-emerald-400">

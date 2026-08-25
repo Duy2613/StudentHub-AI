@@ -9,6 +9,7 @@
 import { EvidenceFusionEngine } from "./fusion/EvidenceFusionEngine.js";
 import { DeterministicTrustPolicyProvider } from "./providers/DeterministicTrustPolicyProvider.js";
 import { GeminiTrustReasoningProvider } from "./providers/GeminiTrustReasoningProvider.js";
+import { GlobalIntelligenceEngine } from "../engine/GlobalIntelligenceEngine.js";
 import { createLayer4Result } from "./types.js";
 import { LAYER_4_CONFIG } from "./config/Layer4Config.js";
 
@@ -38,7 +39,13 @@ export class Layer4TrustService {
       layer3Result,
     });
 
-    // 2. Execute Reasoning Provider
+    // 2. Global Intelligence & International Standards Correlation
+    const globalIntelligence = GlobalIntelligenceEngine.correlate({
+      fusedGraph,
+      url: layer1Result?.metrics?.inputContent || "",
+    });
+
+    // 3. Execute Reasoning Provider
     let assessment;
     try {
       assessment = await provider.reason(fusedGraph);
@@ -63,11 +70,18 @@ export class Layer4TrustService {
       conflicts: assessment.conflicts,
       limitations: assessment.limitations,
       recommendedAction: assessment.recommendedAction,
-      userExplanation: assessment.userExplanation,
+      userExplanation: {
+        ...assessment.userExplanation,
+        globalComplianceSummary: globalIntelligence.globalAuditSummary,
+        matchedStandards: globalIntelligence.matchedStandards,
+        matchedUniversity: globalIntelligence.matchedUniversity?.name || null,
+      },
       auditTrail: {
         ruleVersion: LAYER_4_CONFIG.VERSION,
         fusedEvidenceCount: totalEvidenceItems,
         hardRuleTriggered: assessment.hardRuleTriggered,
+        globalFrameworkCount: globalIntelligence.frameworkCount,
+        isAccreditedEcosystem: globalIntelligence.isAccreditedEcosystem,
       },
       metrics: {
         executionTimeMs,
