@@ -4,26 +4,29 @@
 ---
 
 ## 1. Trạng Thái Hiện Tại (Current Working Snapshot)
-- **Phiên bản**: StudentHub AI v2.8.7 (Igloo.inc Glacial Visual Suite & Human/Machine Dual Typography Lookbook).
+- **Phiên bản**: StudentHub AI v2.9.0 (AI Trust Layer 1 — Fast & Deterministic Screening Suite).
 - **Vừa triển khai & Kiểm thử thành công**:
-  1. ✅ **Chuẩn Typography Kép Human & Machine (Inter + JetBrains Mono)**:
-     - 👨 **Human Interface (Inter 400-900)**: Áp dụng toàn bộ tiêu đề chính H1 (`font-weight: 900`, `letter-spacing: -0.02em`), hướng dẫn sinh viên, nhận định cố vấn và nội dung diễn đàn.
-     - 🤖 **Machine Interface (JetBrains Mono)**: Áp dụng toàn bộ kết quả quét AI, phân tích OCR, terminal box (`.ai-analysis-box`), thẻ rủi ro (`.status-danger`, `.status-safe`), chỉ số Early Exit (`0.1s - 1.5s`), và nhãn kỹ thuật (`[AI MODE]`, `[OCR ENGINE]`).
-  2. ✅ **Hệ Thống Font Kép Chuẩn Lookbook (Inter & JetBrains Mono)**:
-     - 👨‍💼 **Human Interface (Inter 400, 600, 700, 900)**: Tiêu đề `h1.page-title` dồn chữ `-0.02em`, khối `.alert-title`, nội dung hướng dẫn, nhận định chuyên gia.
-     - 🤖 **Machine Interface (JetBrains Mono 400, 700)**: Khối `.ai-analysis-box.warning` / `.safe`, thanh `.ai-header`, nhãn `.status-danger`, viền `.details`, nhãn hậu tố kỹ thuật `span.tech-suffix`, nút `.btn-scan`.
-     - 🛡️ **Kiểm Thử Thực Tế & Tinh Chỉnh Bố Cục Chống Xung Đột**: Khắc phục triệt để hiện tượng che khuất của thanh Navbar với khoảng đệm `pt-28 sm:pt-32`, ẩn HUD đè chữ của Canvas 3D bằng cờ `showHud = false`, và bổ sung khoảng đệm chân trang `pb-40` để không bị dock nổi che khuất nội dung.
-     - 🚀 **Đồng Bộ Visual Suite Sang Toàn Bộ Hệ Thống**: Đưa 3D Highway Canvas (`RobinPayotRoadCanvas`), `NoiseOverlay`, `FloatingDock`, `BackgroundsAndEffectsStudio`, `IglooSoundAmbiencePill`, và thẻ Holographic Bento vào `scam-check`, `forum`, `dashboard`, `onboarding`, `profile`.
-  3. ✅ **Kiểm thử Next.js 16 (Turbopack)**:
-     - Build thành công 100% (13/13 route tĩnh và động, thời gian biên dịch 9.8s, 0 lỗi cú pháp).
+  1. ✅ **Layer 1 Fast & Deterministic Screening Engine (`lib/ai-trust/layer1`)**:
+     - 🛡️ **URL Screening**: Phân tích giao thức HTTP, IP thô, tên miền lừa đảo subdomain (`hcmute-login.verify-xxx.com`), homoglyph Cyrillic/Greek, file thực thi độc hại (`.exe`, `.apk`, `.ps1`), link rút gọn (`bit.ly`), whitelist giáo dục quốc gia (`.edu.vn`, `.gov.vn`).
+     - 📝 **Text Screening**: Bắt chính xác bẫy lừa OTP/mật khẩu, giả danh trường học/ngân hàng, lừa nạp cọc CTV Shopee/Lazada, malware payload (`powershell -enc`, `curl | bash`). Bảo vệ AI Style Guard không đơn phương kích hoạt BLOCK.
+     - 🖼️ **Image Screening**: Kiểm tra Magic Bytes nhị phân (PNG, JPEG, WebP, GIF), phát hiện tệp thực thi polyglot (`MZ`, `PK`) ngụy trang đuôi ảnh, cầu nối QR Code URL và OCR text screening.
+     - ⚖️ **Hard Rules + Confidence Scoring**: Chuẩn hóa 3 trạng thái (`BLOCK` early-exit [0.95-0.99], `SUSPICIOUS` [0.45-0.85], `PASS` [0.90-0.99]).
+  2. ✅ **Backend API Route (`POST /api/ai-trust/screen`)**:
+     - Route Handler siêu tốc (Target Latency < 15ms) trả về chuẩn JSON `{ layer: 1, status, confidence, reasons, signals, details, metrics }`.
+  3. ✅ **Frontend Telemetry Suite & Test Benchmark Studio**:
+     - `Layer1TelemetryHUD.jsx`: Máy đọc HUD viền tóc chuẩn typography kép (Inter + JetBrains Mono), đồng hồ đo Confidence, ma trận tín hiệu có trọng số.
+     - `Layer1LivePrechecker.jsx`: Trình quét tương tác 0ms client-side keystroke / dropzone inspection.
+     - `Layer1BenchmarkStudio.jsx`: Bộ 8 kịch bản kiểm thử mẫu thực tế (URL lừa đảo, Task scam, Trojan image, Whitelist pass).
+     - `scam-check/page.jsx`: Tích hợp toàn diện giao diện với pipeline 4 lớp.
 
 ---
 
 ## 2. Đường Dẫn File Quan Trọng
-- **Ma Trận Bento Igloo**: `frontend/src/components/landing/IglooEcosystemShowcase.jsx`
-- **Bộ Điều Khiển Âm Hưởng Băng Tuyết**: `frontend/src/components/ui/IglooSoundAmbiencePill.jsx`
-- **Giao Diện AI Terminal Block**: `frontend/src/components/ui/AITerminalBlock.jsx`
-- **Nút Bấm Xúc Giác Kèm Tech Suffix**: `frontend/src/components/ui/TactileButton.jsx`
-- **Quy Chuẩn CSS & Lookbook**: `frontend/src/app/globals.css`
-- **Trang Chủ Scrollytelling**: `frontend/src/app/page.jsx`
+- **Đặc Tả Kỹ Thuật Layer 1**: `docs/vault/01 - 🏗️ System Architecture/AI-Trust-Layer1-Screening-Spec.md`
+- **Layer 1 Core Scanner**: `frontend/src/lib/ai-trust/layer1/scanner.js`
+- **Backend API Endpoint**: `frontend/src/app/api/ai-trust/screen/route.js`
+- **Telemetry HUD**: `frontend/src/components/trust/Layer1TelemetryHUD.jsx`
+- **Live Prechecker**: `frontend/src/components/trust/Layer1LivePrechecker.jsx`
+- **Benchmark Studio**: `frontend/src/components/trust/Layer1BenchmarkStudio.jsx`
+- **Trang Scam Check**: `frontend/src/app/scam-check/page.jsx`
 - **Vault Hub**: `docs/vault/Index.md`

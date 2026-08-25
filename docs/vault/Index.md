@@ -44,6 +44,7 @@ graph TD
 
 ### 2. [[System-Architecture|🏗️ 01 - System Architecture]]
 - [[System-Architecture|Kiến Trúc Tổng Thể]]: Frontend Next.js 16 + Supabase Backend + Vercel AI SDK.
+- [[AI-Trust-Layer1-Screening-Spec|Layer 1 Screening Engine]]: Động cơ sàng lọc nhanh & tất định (Hard Rules + Confidence Scoring).
 - [[Tech-Stack|Công Nghệ Cốt Lõi]]: Danh sách thư viện và vai trò từng module.
 - [[Auth-Flow-OTP-Verification|Luồng Đăng Ký & Xác Thực OTP]]: Bảo mật 2 bước + Settigation Orbit Animation.
 - [[Database-Supabase-Schema|Supabase DB Schema]]: Bảng `profiles`, `workspaces`, `whiteboards`, `messages`.
