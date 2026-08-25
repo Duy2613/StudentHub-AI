@@ -1,5 +1,13 @@
 "use client";
 
+// frontend/src/components/canvas/RobinPayotRoadCanvas.jsx
+//
+// 3D Highway / Road Canvas (Robin Payot x Meer Mohsin x Saffron Luxury Signature):
+// - 3D Dotted Highway Track uốn lượn vào chiều sâu không gian
+// - Các BẢNG ĐEN 3D (3D Obsidian Black Billboards) đặt dọc theo con đường, mỗi bảng đặc trưng cho 1 trang/module
+// - Camera lướt theo chuyển động cuộn (Scroll Flight Controller)
+// - Click vào bảng đen sẽ mở bảng thông tin chi tiết từ A tới Z (Fullscreen Detail Inspection View)
+
 import React, { useRef, useState, useEffect, useMemo, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Float, Html } from "@react-three/drei";
@@ -16,28 +24,31 @@ import {
   ExternalLink,
   Award,
   Lock,
-  Zap
+  Zap,
+  LayoutDashboard,
+  GraduationCap
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { saffronAudio } from "@/lib/audio/saffronAudio";
 
 export const ROAD_PROJECTS = [
   {
     id: "scam-engine",
     num: "01",
-    tag: "01 • XÁC THỰC AI",
+    tag: "01 // XÁC THỰC AI",
     title: "AI Scam Engine 4 Lớp",
-    client: "StudentHub AI Core",
+    client: "StudentHub AI Core Security",
     year: "2026",
-    technologies: "Local Regex, Aggregator API, Vector RAG, Multi-LLM",
-    speed: "0.1s – 1.5s",
+    technologies: "Local Regex, Aggregator API, Vector RAG, Multi-LLM Ensemble",
+    speed: "0.1s – 1.5s [Early Exit]",
     badge: "Explainable AI (XAI)",
     description:
-      "Động cơ phân tích rủi ro đa tầng nhận diện chính xác thủ đoạn lừa cọc, học bổng giả mạo và deepfake qua Link, Text hoặc Ảnh OCR. Cơ chế dừng sớm (Early Exit) giúp 85% vụ việc có kết quả dưới 1.5 giây.",
+      "Động cơ phân tích rủi ro đa tầng nhận diện chính xác thủ đoạn lừa cọc, tuyển dụng ảo, học bổng giả mạo và deepfake qua Link, Text hoặc Ảnh OCR. Cơ chế dừng sớm (Early Exit) giúp 85% vụ việc có kết quả dưới 1.5 giây.",
     awards: ["1x Giải Nhất Bảng C Sinh Viên 2026", "1x Thẩm Định An Toàn VNCERT"],
     href: "/scam-check",
     bgImage: "/wallpapers/04-neural-network.jpg",
-    color: "#38bdf8",
+    color: "#ffbc09",
     icon: ShieldAlert,
     pos: [-7.5, 1.5, -35],
     rotY: 0.25,
@@ -45,8 +56,8 @@ export const ROAD_PROJECTS = [
   {
     id: "trust-network",
     num: "02",
-    tag: "02 • MẠNG LƯỚI CỐ VẤN",
-    title: "Mạng Lưới Chuyên Gia",
+    tag: "02 // CỐ VẤN & HỒ SƠ UY TÍN",
+    title: "Mạng Lưới Chuyên Gia & Điểm Uy Tín",
     client: "National Advisor Council",
     year: "2026",
     technologies: "Edu SSO, Reputation Ledger, Peer Verification",
@@ -57,7 +68,7 @@ export const ROAD_PROJECTS = [
     awards: ["1x Mạng Lưới Cố Vấn Quốc Gia", "1x Edu Campus Verified"],
     href: "/profile",
     bgImage: "/wallpapers/02-smart-campus-future.jpg",
-    color: "#f59e0b",
+    color: "#ffd15c",
     icon: Users,
     pos: [8, 1.0, -75],
     rotY: -0.3,
@@ -65,42 +76,62 @@ export const ROAD_PROJECTS = [
   {
     id: "forum-community",
     num: "03",
-    tag: "03 • DIỄN ĐÀN THỰC CHỨNG",
-    title: "Diễn Đàn Sinh Viên",
+    tag: "03 // DIỄN ĐÀN SINH VIÊN",
+    title: "Diễn Đàn Xác Thực & Vote Tín Nhiệm",
     client: "Campus Community Hub",
     year: "2026",
     technologies: "Campus Tagging, Trust-Weighted Upvotes, Moderation",
     speed: "Cộng đồng thực",
-    badge: "Vote Uy Tín",
+    badge: "Vote Uy Tín DAO",
     description:
       "Không gian cảnh báo bẫy lừa và đánh giá thực tế về Nhà trọ, Quán ăn, Việc làm sinh viên. Cơ chế Vote Uy Tín đẩy bài viết có độ tin cậy cao lên đầu, tách biệt với lượt tương tác thông thường.",
     awards: ["1x Diễn Đàn Sinh Viên Độc Lập", "1x Giải Pháp Vì Cộng Đồng"],
     href: "/forum",
     bgImage: "/wallpapers/05-data-flow.jpg",
-    color: "#818cf8",
+    color: "#38bdf8",
     icon: MessageSquare,
     pos: [-8, 1.8, -115],
     rotY: 0.28,
   },
   {
-    id: "contest-mission",
+    id: "dashboard-control",
     num: "04",
-    tag: "04 • CUỘC THI QUỐC GIA 2026",
-    title: "Sáng Tạo Trẻ AI 2026",
-    client: "Bộ Khoa Học & Công Nghệ",
+    tag: "04 // BẢNG ĐIỀU KHIỂN MISSION CONTROL",
+    title: "Bảng Điều Khiển Trung Tâm (Dashboard)",
+    client: "StudentHub Defense Station",
     year: "2026",
-    technologies: "Next.js 16 Turbopack, PyTorch RAG, VNCERT Data",
-    speed: "Bảng C Sinh Viên",
-    badge: "100% Phi Thương Mại",
+    technologies: "Bento Matrix, Real-time Threat Telemetry, 3D Wave Dynamics",
+    speed: "Tức thì (0.05s)",
+    badge: "Trung Tâm Chỉ Huy",
     description:
-      "Đề án công nghệ giải pháp số toàn diện bảo vệ quyền lợi sinh viên Việt Nam trước bẫy lừa đảo trên không gian mạng. Cam kết 100% miễn phí, bảo mật quyền riêng tư tối đa.",
-    awards: ["1x Đề Án Quốc Gia Xuất Sắc", "1x Digital Trust Network 2026"],
-    href: "/scam-check",
+      "Trạm chỉ huy tổng quan cung cấp bức tranh toàn cảnh về an ninh mạng học đường, tra cứu nhanh từ khóa lừa đảo, theo dõi cảnh báo nóng thời gian thực và quản lý thang điểm uy tín cá nhân.",
+    awards: ["1x Mission Control Interface 2026", "1x Dark Cocoa Obsidian Design"],
+    href: "/dashboard",
     bgImage: "/wallpapers/01-ai-knowledge-portal.jpg",
-    color: "#34e7c4",
-    icon: Sparkles,
+    color: "#ca56ed",
+    icon: LayoutDashboard,
     pos: [7.5, 1.2, -155],
     rotY: -0.25,
+  },
+  {
+    id: "register-defense",
+    num: "05",
+    tag: "05 // ĐĂNG KÝ & BẢO VỆ SỐ",
+    title: "Cổng Đăng Ký Sinh Viên .EDU",
+    client: "Saffron Academic Network",
+    year: "2026",
+    technologies: "Entropy Meter, Academic Radar, Double-Bezel Glassmorphism",
+    speed: "Xác thực 1 bước",
+    badge: "Bảo Mật Cấp Cao",
+    description:
+      "Cổng khởi tạo tài khoản bảo vệ số dành riêng cho sinh viên Việt Nam với công nghệ đo độ mạnh mật khẩu chuẩn toán học và radar nhận diện tên miền đại học (.edu.vn).",
+    awards: ["1x Saffron Academic Security 2026", "1x Human Editorial Typography"],
+    href: "/register",
+    bgImage: "/wallpapers/02-smart-campus-future.jpg",
+    color: "#34e7c4",
+    icon: GraduationCap,
+    pos: [-7.5, 1.5, -195],
+    rotY: 0.25,
   },
 ];
 
@@ -110,7 +141,7 @@ export const ROAD_PROJECTS = [
  */
 function CurvedRoadTrack() {
   const lanesCount = 7;
-  const pointsPerLane = 150;
+  const pointsPerLane = 180;
 
   const [positions] = useMemo(() => {
     const totalPoints = lanesCount * pointsPerLane;
@@ -168,11 +199,12 @@ function CurvedRoadTrack() {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.16}
-        color="#38bdf8"
+        size={0.14}
+        color="#ffbc09"
         transparent
-        opacity={0.65}
+        opacity={0.7}
         blending={THREE.AdditiveBlending}
+        depthWrite={false}
       />
     </points>
   );
@@ -180,7 +212,7 @@ function CurvedRoadTrack() {
 
 /**
  * CurvedBillboard:
- * 3D Curved project screens along the road track
+ * 3D Obsidian Black Billboard with Gold Hairline Border and Crosshairs (+)
  */
 function CurvedBillboard({ project, onSelect }) {
   const [hovered, setHovered] = useState(false);
@@ -190,28 +222,37 @@ function CurvedBillboard({ project, onSelect }) {
   useFrame((state) => {
     if (!meshRef.current) return;
     const t = state.clock.getElapsedTime();
-    meshRef.current.position.y = project.pos[1] + Math.sin(t * 1.5 + project.pos[2]) * 0.2;
+    meshRef.current.position.y = project.pos[1] + Math.sin(t * 1.5 + project.pos[2] * 0.1) * 0.25;
   });
+
+  const handleClick = (e) => {
+    e.stopPropagation();
+    saffronAudio.playHardwareKey();
+    onSelect(project);
+  };
 
   return (
     <group ref={meshRef} position={project.pos} rotation={[0, project.rotY, 0]}>
-      {/* 3D Curved Plane Screen */}
+      {/* Main 3D Obsidian Black Screen Mesh */}
       <mesh
-        onClick={() => onSelect(project)}
-        onPointerOver={() => setHovered(true)}
+        onClick={handleClick}
+        onPointerOver={() => {
+          setHovered(true);
+          saffronAudio.playClick(800);
+        }}
         onPointerOut={() => setHovered(false)}
         className="cursor-pointer"
       >
         <planeGeometry args={[8.5, 5.0, 32, 16]} />
         <meshPhysicalMaterial
-          color={hovered ? "#38bdf8" : "#0f172a"}
+          color={hovered ? "#210a07" : "#150604"}
           roughness={0.2}
           metalness={0.8}
-          transmission={0.4}
+          transmission={0.3}
           transparent
-          opacity={0.85}
-          emissive={hovered ? project.color : "#0a0f1d"}
-          emissiveIntensity={hovered ? 0.85 : 0.25}
+          opacity={0.92}
+          emissive={hovered ? project.color : "#150604"}
+          emissiveIntensity={hovered ? 0.8 : 0.2}
           side={THREE.DoubleSide}
         />
       </mesh>
@@ -219,34 +260,31 @@ function CurvedBillboard({ project, onSelect }) {
       {/* Screen Glowing Border */}
       <lineSegments>
         <edgesGeometry args={[new THREE.PlaneGeometry(8.5, 5.0)]} />
-        <lineBasicMaterial color={hovered ? "#ffffff" : project.color} linewidth={hovered ? 2.5 : 1.5} />
+        <lineBasicMaterial color={hovered ? "#ffbc09" : "#47140b"} linewidth={hovered ? 2.5 : 1.5} />
       </lineSegments>
 
       {/* Thin Flagpost Line connecting to road floor */}
       <mesh position={[4.5, -3.2, 0]}>
         <cylinderGeometry args={[0.02, 0.02, 6.4, 8]} />
-        <meshBasicMaterial color="#64748b" />
+        <meshBasicMaterial color="#47140b" />
       </mesh>
 
       {/* Flagpost Node & Annotation HTML */}
       <Html position={[4.8, 0.5, 0]} distanceFactor={15} center={false}>
         <div
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelect(project);
-          }}
-          className="select-none pointer-events-auto group/item cursor-pointer"
+          onClick={handleClick}
+          className="select-none pointer-events-auto group/item cursor-pointer font-human"
         >
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
-            <div className="p-3 rounded-2xl bg-space-950/95 backdrop-blur-2xl border border-white/20 shadow-2xl min-w-[220px] transition-all duration-300 group-hover/item:scale-110 group-hover/item:border-cyan-400">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#ffbc09] animate-ping" />
+            <div className="p-3.5 rounded-2xl bg-[#150604]/95 backdrop-blur-2xl border border-[#47140b] shadow-[0_15px_35px_rgba(0,0,0,0.9)] min-w-[240px] transition-all duration-300 group-hover/item:scale-110 group-hover/item:border-[#ffbc09]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-cyan-300">{project.tag}</span>
-                <Icon className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="text-[11px] font-mono font-bold text-[#ffbc09]">{project.tag}</span>
+                <Icon className="w-3.5 h-3.5 text-[#ffbc09]" />
               </div>
               <h4 className="text-sm font-bold text-white mt-1">{project.title}</h4>
-              <p className="text-[10px] text-teal-300 font-semibold mt-1 flex items-center gap-1">
-                <span>Bấm để xem chi tiết 3D</span>
+              <p className="text-[10px] text-[#ffd15c] font-semibold mt-1 flex items-center gap-1 font-mono">
+                <span>[ BẤM ĐỂ MỞ TOÀN BỘ A-Z ]</span>
                 <ArrowUpRight className="w-3 h-3 group-hover/item:translate-x-0.5 transition-transform" />
               </p>
             </div>
@@ -287,21 +325,21 @@ function FloatingChromeBlobs() {
       <Float speed={2} rotationIntensity={0.5} floatIntensity={1.5} position={[-9, 1, -40]}>
         <mesh ref={blob1}>
           <sphereGeometry args={[1.5, 64, 64]} />
-          <meshStandardMaterial color="#e2e8f0" metalness={0.95} roughness={0.05} />
+          <meshStandardMaterial color="#ffd15c" metalness={0.9} roughness={0.1} />
         </mesh>
       </Float>
 
       <Float speed={2.5} rotationIntensity={0.6} floatIntensity={1.8} position={[11, 2, -80]}>
         <mesh ref={blob2}>
           <sphereGeometry args={[2.0, 64, 64]} />
-          <meshStandardMaterial color="#38bdf8" metalness={0.9} roughness={0.1} wireframe={true} />
+          <meshStandardMaterial color="#ffbc09" metalness={0.85} roughness={0.15} wireframe={true} />
         </mesh>
       </Float>
 
       <Float speed={3} rotationIntensity={0.4} floatIntensity={1.2} position={[-12, 0, -130]}>
         <mesh ref={blob3}>
           <sphereGeometry args={[1.8, 64, 64]} />
-          <meshPhysicalMaterial color="#818cf8" metalness={0.8} roughness={0.15} transmission={0.6} transparent opacity={0.8} />
+          <meshPhysicalMaterial color="#38bdf8" metalness={0.8} roughness={0.15} transmission={0.6} transparent opacity={0.8} />
         </mesh>
       </Float>
     </>
@@ -316,7 +354,7 @@ function CameraFlightController({ scrollYProgress }) {
   const { camera, mouse } = useThree();
 
   useFrame(() => {
-    const targetZ = -(scrollYProgress * 150) + 12;
+    const targetZ = -(scrollYProgress * 210) + 12;
     const curveX = Math.sin(targetZ * 0.025) * 8 + mouse.x * 2.5;
     const targetY = 1.2 + mouse.y * 1.5;
 
@@ -345,8 +383,8 @@ function DetailScreen3DCanvas({ project }) {
       className="w-full h-full"
     >
       <ambientLight intensity={1.2} />
-      <directionalLight position={[5, 5, 5]} intensity={1.5} color="#38bdf8" />
-      <pointLight position={[-5, -5, -5]} intensity={1.0} color="#818cf8" />
+      <directionalLight position={[5, 5, 5]} intensity={1.5} color="#ffbc09" />
+      <pointLight position={[-5, -5, -5]} intensity={1.0} color="#ffd15c" />
 
       <Float speed={2.5} rotationIntensity={0.3} floatIntensity={0.8}>
         <group ref={meshRef}>
@@ -354,7 +392,7 @@ function DetailScreen3DCanvas({ project }) {
           <mesh rotation={[0.05, -0.15, -0.04]}>
             <planeGeometry args={[5.8, 3.4, 32, 16]} />
             <meshStandardMaterial
-              color="#0f172a"
+              color="#150604"
               metalness={0.8}
               roughness={0.2}
               emissive={project.color}
@@ -366,14 +404,14 @@ function DetailScreen3DCanvas({ project }) {
           {/* Wireframe Outline */}
           <lineSegments rotation={[0.05, -0.15, -0.04]}>
             <edgesGeometry args={[new THREE.PlaneGeometry(5.8, 3.4)]} />
-            <lineBasicMaterial color="#ffffff" linewidth={2} />
+            <lineBasicMaterial color="#ffbc09" linewidth={2} />
           </lineSegments>
 
           {/* Floating Chrome Orb */}
           <Float speed={3} rotationIntensity={0.8} floatIntensity={1.5} position={[2.6, -1.2, 0.8]}>
             <mesh>
               <sphereGeometry args={[0.45, 32, 32]} />
-              <meshStandardMaterial color="#f8fafc" metalness={0.95} roughness={0.05} />
+              <meshStandardMaterial color="#ffd15c" metalness={0.95} roughness={0.05} />
             </mesh>
           </Float>
 
@@ -381,7 +419,7 @@ function DetailScreen3DCanvas({ project }) {
           <Float speed={2} rotationIntensity={0.5} floatIntensity={1.2} position={[-2.4, 1.3, 0.6]}>
             <mesh>
               <sphereGeometry args={[0.35, 32, 32]} />
-              <meshPhysicalMaterial color="#38bdf8" transmission={0.85} opacity={0.8} transparent roughness={0.1} />
+              <meshPhysicalMaterial color="#ffbc09" transmission={0.85} opacity={0.8} transparent roughness={0.1} />
             </mesh>
           </Float>
         </group>
@@ -392,7 +430,7 @@ function DetailScreen3DCanvas({ project }) {
 
 /**
  * RobinPayotDetailView:
- * Fullscreen Interactive Detail Screen matching Robin Payot's Kokopako / Upperquad / USSF inspection view!
+ * Fullscreen Interactive Detail Screen (A to Z) with Saffron Luxury styling & explicit Back button
  */
 function RobinPayotDetailView({ project, onClose, onPrev, onNext }) {
   const Icon = project.icon;
@@ -400,9 +438,18 @@ function RobinPayotDetailView({ project, onClose, onPrev, onNext }) {
   useEffect(() => {
     document.body.style.overflow = "hidden";
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowUp") onPrev();
-      if (e.key === "ArrowDown") onNext();
+      if (e.key === "Escape") {
+        saffronAudio.playClick(400);
+        onClose();
+      }
+      if (e.key === "ArrowUp") {
+        saffronAudio.playClick(600);
+        onPrev();
+      }
+      if (e.key === "ArrowDown") {
+        saffronAudio.playClick(600);
+        onNext();
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -417,70 +464,78 @@ function RobinPayotDetailView({ project, onClose, onPrev, onNext }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.35 }}
-      className="fixed inset-0 z-[9999] bg-[#070c18] flex flex-col justify-between overflow-hidden select-none pointer-events-auto"
+      className="fixed inset-0 z-[9999] bg-[#070403] flex flex-col justify-between overflow-hidden select-none pointer-events-auto font-human"
     >
       {/* 1. Diagonal Architectural Split Background */}
       <div className="absolute inset-0 pointer-events-none -z-10 overflow-hidden">
-        {/* Deep Left Atmosphere */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#060a14] via-[#0b1326] to-[#111e3b]" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#150604] via-[#070403] to-[#210a07]" />
         
-        {/* Diagonal Soft Indigo/Cyan Wedge */}
+        {/* Saffron Gold Glow Wedge */}
         <div
-          className="absolute -top-1/4 -right-1/4 w-[90vw] h-[150vh] bg-gradient-to-bl from-cyan-900/20 via-indigo-900/15 to-transparent blur-[80px] pointer-events-none transform -rotate-12"
+          className="absolute -top-1/4 -right-1/4 w-[90vw] h-[150vh] bg-gradient-to-bl from-[#ffbc09]/15 via-[#f59e0b]/10 to-transparent blur-[80px] pointer-events-none transform -rotate-12"
         />
 
         {/* Ambient Grid Matrix */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:48px_48px] opacity-15" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#47140b_1px,transparent_1px),linear-gradient(to_bottom,#47140b_1px,transparent_1px)] bg-[size:48px_48px] opacity-25" />
       </div>
 
-      {/* 2. Top-Right Organic Curved BACK Button (Robin Payot Style) */}
+      {/* 2. Top-Right Organic Curved BACK Button */}
       <div className="absolute top-0 right-0 z-30">
         <button
-          onClick={onClose}
-          className="px-10 py-6 rounded-bl-[40px] bg-cyan-500/20 hover:bg-cyan-400 border-b border-l border-cyan-400/30 text-xs font-mono font-black tracking-widest text-cyan-200 hover:text-space-950 transition-all duration-300 backdrop-blur-2xl shadow-[0_0_30px_rgba(56,189,248,0.3)] flex items-center gap-2 group cursor-pointer"
+          onClick={() => {
+            saffronAudio.playClick(400);
+            onClose();
+          }}
+          className="px-10 py-6 rounded-bl-[40px] bg-[#ffbc09]/20 hover:bg-[#ffbc09] border-b border-l border-[#ffbc09]/40 text-xs font-mono font-black tracking-widest text-[#ffd15c] hover:text-[#150604] transition-all duration-300 backdrop-blur-2xl shadow-[0_0_30px_rgba(255,188,9,0.3)] flex items-center gap-2 group cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>BACK</span>
+          <span>[ ✕ QUAY LẠI 3D ROAD ]</span>
         </button>
       </div>
 
       {/* 3. Top-Center & Bottom-Center Floating Navigation Arrows (↑ / ↓) */}
       <button
-        onClick={onPrev}
-        className="absolute top-6 left-1/2 -translate-x-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-cyan-400 border border-white/20 text-white hover:text-space-950 transition-all duration-300 flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 group cursor-pointer"
+        onClick={() => {
+          saffronAudio.playClick(600);
+          onPrev();
+        }}
+        className="absolute top-6 left-1/2 -translate-x-1/2 z-30 w-11 h-11 rounded-full bg-[#210a07] hover:bg-[#ffbc09] border border-[#47140b] hover:border-[#ffbc09] text-white hover:text-[#150604] transition-all duration-300 flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 group cursor-pointer"
         title="Mục Trước (Phím Mũi Tên Lên)"
       >
         <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
       </button>
 
       <button
-        onClick={onNext}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 w-11 h-11 rounded-full bg-white/10 hover:bg-cyan-400 border border-white/20 text-white hover:text-space-950 transition-all duration-300 flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 group cursor-pointer"
+        onClick={() => {
+          saffronAudio.playClick(600);
+          onNext();
+        }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 w-11 h-11 rounded-full bg-[#210a07] hover:bg-[#ffbc09] border border-[#47140b] hover:border-[#ffbc09] text-white hover:text-[#150604] transition-all duration-300 flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 group cursor-pointer"
         title="Mục Tiếp Theo (Phím Mũi Tên Xuống)"
       >
         <ArrowDown className="w-5 h-5 group-hover:translate-y-0.5 transition-transform" />
       </button>
 
-      {/* 4. Main Split Content Area */}
+      {/* 4. Main Split Content Area (A to Z Details) */}
       <div className="relative z-20 flex-1 grid grid-cols-1 lg:grid-cols-12 items-center px-6 sm:px-14 lg:px-20 max-w-[1700px] w-full mx-auto my-auto gap-8">
         
-        {/* Left Side: Interactive 3D Tilted Curved Canvas (7 Cols) */}
+        {/* Left Side: Interactive 3D Tilted Curved Canvas */}
         <div className="lg:col-span-7 h-[360px] sm:h-[480px] lg:h-[540px] relative flex items-center justify-center">
           <div className="w-full h-full relative">
             <DetailScreen3DCanvas project={project} />
 
             {/* In-canvas Floating Title Badge */}
-            <div className="absolute bottom-4 left-4 p-3 rounded-2xl bg-space-950/80 backdrop-blur-xl border border-white/15 text-left pointer-events-none">
-              <span className="text-[10px] font-mono text-cyan-300 font-bold uppercase">{project.tag}</span>
+            <div className="absolute bottom-4 left-4 p-3.5 rounded-2xl bg-[#150604]/90 backdrop-blur-xl border border-[#47140b] text-left pointer-events-none">
+              <span className="text-[10px] font-mono text-[#ffbc09] font-bold uppercase">{project.tag}</span>
               <p className="text-xs font-bold text-white mt-0.5 flex items-center gap-1.5">
-                <Icon className="w-3.5 h-3.5 text-cyan-400" />
+                <Icon className="w-3.5 h-3.5 text-[#ffbc09]" />
                 <span>{project.title}</span>
               </p>
             </div>
           </div>
         </div>
 
-        {/* Right Side: Editorial Metadata Specification (5 Cols) */}
+        {/* Right Side: Editorial Metadata Specification (A to Z) */}
         <motion.div
           key={project.id}
           initial={{ opacity: 0, x: 30 }}
@@ -490,7 +545,11 @@ function RobinPayotDetailView({ project, onClose, onPrev, onNext }) {
         >
           {/* Main Display Headline */}
           <div>
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ffbc09]/15 border border-[#ffbc09]/40 text-[#ffbc09] text-xs font-mono font-bold uppercase mb-3">
+              <span className="w-2 h-2 rounded-full bg-[#ffbc09] animate-ping" />
+              <span>{project.badge}</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
               {project.title}
             </h1>
           </div>
@@ -498,49 +557,43 @@ function RobinPayotDetailView({ project, onClose, onPrev, onNext }) {
           {/* Metadata Specs (Client, Year, Technologies) */}
           <div className="space-y-3.5 pt-2 text-xs sm:text-sm">
             <div>
-              <p className="text-gray-400 italic font-serif">Client / Dự án</p>
-              <p className="text-gray-100 font-semibold mt-0.5">{project.client}</p>
+              <p className="text-[#ece7e0]/60 font-mono text-xs uppercase">[ 01 // DỰ ÁN ]</p>
+              <p className="text-white font-bold mt-0.5">{project.client}</p>
             </div>
 
             <div>
-              <p className="text-gray-400 italic font-serif">Year / Năm</p>
-              <p className="text-gray-100 font-semibold mt-0.5">{project.year}</p>
+              <p className="text-[#ece7e0]/60 font-mono text-xs uppercase">[ 02 // CÔNG NGHỆ NỀN TẢNG ]</p>
+              <p className="text-[#ffd15c] font-semibold mt-0.5">{project.technologies}</p>
             </div>
 
             <div>
-              <p className="text-gray-400 italic font-serif">Technologies / Công nghệ</p>
-              <p className="text-gray-100 font-semibold mt-0.5">{project.technologies}</p>
+              <p className="text-[#ece7e0]/60 font-mono text-xs uppercase">[ 03 // TỐC ĐỘ XỬ LÝ ]</p>
+              <p className="text-[#38bdf8] font-mono font-bold mt-0.5">{project.speed}</p>
             </div>
           </div>
 
           {/* Description Paragraph */}
-          <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-normal pt-1">
+          <p className="text-xs sm:text-sm text-[#ece7e0]/85 leading-relaxed font-normal pt-1">
             {project.description}
           </p>
 
-          {/* Visit Website / Open Tool CTA with OOO Icon */}
+          {/* Visit Website / Open Tool CTA Button */}
           <div className="pt-2">
             <Link
               href={project.href}
-              className="inline-flex items-center gap-3 text-sm sm:text-base font-bold text-cyan-300 hover:text-white transition-all group"
+              onClick={() => saffronAudio.playSuccessChime()}
+              className="inline-flex items-center gap-3 py-3 px-6 rounded-2xl bg-gradient-to-r from-[#ffbc09] via-[#f59e0b] to-[#ffd15c] text-[#150604] font-mono font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-[0_0_25px_rgba(255,188,9,0.4)] hover:scale-105 transition-all group"
             >
-              <div className="flex -space-x-1.5 items-center">
-                <div className="w-3.5 h-3.5 rounded-full border border-cyan-400 animate-spin" />
-                <div className="w-3.5 h-3.5 rounded-full border border-indigo-400 animate-spin animation-delay-200" />
-                <div className="w-3.5 h-3.5 rounded-full border border-purple-400 animate-spin animation-delay-400" />
-              </div>
-              <span className="underline underline-offset-4 decoration-cyan-400/50 group-hover:decoration-cyan-300">
-                Visit website / Mở ứng dụng
-              </span>
-              <ExternalLink className="w-4 h-4 text-cyan-400 group-hover:translate-x-1 transition-transform" />
+              <span>TRUY CẬP TRANG TRỰC TIẾP</span>
+              <ExternalLink className="w-4 h-4 text-[#150604] group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
           {/* Awards / Recognition */}
-          <div className="pt-4 border-t border-white/10 space-y-1 text-xs font-mono text-gray-400">
+          <div className="pt-4 border-t border-[#47140b] space-y-1 text-xs font-mono text-[#ece7e0]/60">
             {project.awards.map((award, idx) => (
-              <p key={idx} className="flex items-center gap-1.5 text-gray-300">
-                <span className="text-cyan-400 font-bold">★</span>
+              <p key={idx} className="flex items-center gap-1.5 text-white">
+                <span className="text-[#ffbc09] font-bold">★</span>
                 <span>{award}</span>
               </p>
             ))}
@@ -550,8 +603,8 @@ function RobinPayotDetailView({ project, onClose, onPrev, onNext }) {
       </div>
 
       {/* 5. Minimalist Bottom-Left Indicator */}
-      <div className="absolute bottom-6 left-8 z-20 flex items-center gap-3 text-xs font-mono text-gray-400 pointer-events-none">
-        <span className="text-cyan-400 font-bold">{project.num} / 04</span>
+      <div className="absolute bottom-6 left-8 z-20 flex items-center gap-3 text-xs font-mono text-[#ece7e0]/60 pointer-events-none">
+        <span className="text-[#ffbc09] font-bold">{project.num} / 05</span>
         <span className="hidden sm:inline">•</span>
         <span className="hidden sm:inline">STUDENT HUB AI 2026 ARCHITECTURE</span>
       </div>
@@ -562,9 +615,8 @@ function RobinPayotDetailView({ project, onClose, onPrev, onNext }) {
 /**
  * Main RobinPayotRoadCanvas Component
  */
-export default function RobinPayotRoadCanvas({ showHud = false }) {
+export default function RobinPayotRoadCanvas({ showHud = true, onSelectProject }) {
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [mode, setMode] = useState("ROAD"); // ROAD | OVERVIEW | LIST
   const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
@@ -579,6 +631,11 @@ export default function RobinPayotRoadCanvas({ showHud = false }) {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSelect = (project) => {
+    setSelectedProject(project);
+    if (onSelectProject) onSelectProject(project);
+  };
 
   const handlePrev = useCallback(() => {
     if (!selectedProject) return;
@@ -596,9 +653,9 @@ export default function RobinPayotRoadCanvas({ showHud = false }) {
 
   return (
     <>
-      <div className="fixed inset-0 pointer-events-none z-0 w-full h-full">
+      <div className="fixed inset-0 pointer-events-auto z-0 w-full h-full">
         {/* 1. Deep Atmospheric Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0b132b] via-[#1c2541] to-[#0b132b] opacity-95" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#150604] via-[#070403] to-[#150604] opacity-95 pointer-events-none" />
 
         {/* 2. Three.js 3D WebGL Scene */}
         <Canvas
@@ -608,9 +665,9 @@ export default function RobinPayotRoadCanvas({ showHud = false }) {
           className="w-full h-full"
         >
           <ambientLight intensity={0.9} />
-          <directionalLight position={[10, 20, 15]} intensity={1.5} color="#38bdf8" />
-          <pointLight position={[-15, -5, -40]} intensity={2.0} color="#818cf8" />
-          <pointLight position={[15, 10, -90]} intensity={2.0} color="#f43f5e" />
+          <directionalLight position={[10, 20, 15]} intensity={1.5} color="#ffbc09" />
+          <pointLight position={[-15, -5, -40]} intensity={2.0} color="#ffd15c" />
+          <pointLight position={[15, 10, -90]} intensity={2.0} color="#f59e0b" />
 
           <CameraFlightController scrollYProgress={scrollProgress} />
           <CurvedRoadTrack />
@@ -620,50 +677,31 @@ export default function RobinPayotRoadCanvas({ showHud = false }) {
             <CurvedBillboard
               key={project.id}
               project={project}
-              onSelect={(p) => setSelectedProject(p)}
+              onSelect={handleSelect}
             />
           ))}
         </Canvas>
 
-        {/* 3. Minimalist HUD Top-Right Mode Switcher (only shown when showHud is enabled) */}
+        {/* 3. Minimalist HUD Bottom-Left */}
         {showHud && (
-          <div className="fixed top-6 right-8 z-30 pointer-events-auto flex items-center gap-4 text-xs font-mono font-bold select-none">
-            {["ROAD", "OVERVIEW", "LIST"].map((m) => (
-              <button
-                key={m}
-                onClick={() => setMode(m)}
-                className={`transition-all duration-300 tracking-widest ${
-                  mode === m
-                    ? "text-cyan-300 border-b-2 border-cyan-400 pb-0.5 shadow-[0_0_12px_rgba(56,189,248,0.5)]"
-                    : "text-gray-400 hover:text-gray-200"
-                }`}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* 4. Minimalist HUD Bottom-Left (only shown when showHud is enabled) */}
-        {showHud && (
-          <div className="fixed bottom-6 left-8 z-30 pointer-events-auto flex items-center gap-3 select-none">
+          <div className="fixed bottom-6 left-8 z-30 pointer-events-auto flex items-center gap-3 select-none font-mono">
             <div className="flex -space-x-2 items-center">
-              <div className="w-4 h-4 rounded-full border border-cyan-400 animate-spin" />
-              <div className="w-4 h-4 rounded-full border border-indigo-400 animate-spin animation-delay-200" />
-              <div className="w-4 h-4 rounded-full border border-purple-400 animate-spin animation-delay-400" />
+              <div className="w-4 h-4 rounded-full border border-[#ffbc09] animate-spin" />
+              <div className="w-4 h-4 rounded-full border border-[#ffd15c] animate-spin animation-delay-200" />
             </div>
             <div className="flex items-center gap-0.5 h-3">
-              <span className="w-0.5 h-3 bg-cyan-400 animate-pulse" />
-              <span className="w-0.5 h-2 bg-cyan-400 animate-pulse animation-delay-150" />
-              <span className="w-0.5 h-3.5 bg-cyan-400 animate-pulse animation-delay-300" />
-              <span className="w-0.5 h-1.5 bg-cyan-400 animate-pulse animation-delay-450" />
+              <span className="w-0.5 h-3 bg-[#ffbc09] animate-pulse" />
+              <span className="w-0.5 h-2 bg-[#ffbc09] animate-pulse animation-delay-150" />
+              <span className="w-0.5 h-3.5 bg-[#ffbc09] animate-pulse animation-delay-300" />
             </div>
-            <span className="text-[10px] font-mono text-cyan-300/80">3D HIGHWAY FLIGHT ACTIVE</span>
+            <span className="text-[10px] text-[#ffbc09]/80 font-bold">
+              3D HIGHWAY FLIGHT // SCROLL ĐỂ LƯỚT QUA CÁC BẢNG ĐEN
+            </span>
           </div>
         )}
       </div>
 
-      {/* 5. Fullscreen Detail Inspection View Modal (Z-INDEX 9999) */}
+      {/* 4. Fullscreen Detail Inspection View Modal (Z-INDEX 9999) */}
       <AnimatePresence>
         {selectedProject && (
           <RobinPayotDetailView

@@ -20,6 +20,16 @@
   /* Machine Interface — AI output, dữ liệu OCR, cảnh báo bảo mật */
   --font-machine: var(--font-jetbrains-mono), var(--font-geist-mono), 'Courier New', monospace;
 
+  /* === SAFFRON & UAVIONIX LUXURY CYBERNETIC TOKENS === */
+  --color-saffron-gold: #ffbc09;
+  --color-saffron-amber: #f59e0b;
+  --color-saffron-cream: #ece7e0;
+  --color-saffron-purple: #ca56ed;
+  --color-cocoa-950: #150604;
+  --color-cocoa-900: #210a07;
+  --color-cocoa-800: #2f0e09;
+  --color-cocoa-border: #47140b;
+
   /* Security Status Colors */
   --color-threat-red: #ef4444;          /* Cảnh báo nguy hiểm / Phát hiện lừa đảo */
   --color-threat-red-bg: rgba(239, 68, 68, 0.08);
@@ -57,6 +67,14 @@
   --color-deep-emerald: #02160c;
   --color-cyber-indigo: #6366f1;
   --color-burnt-amber: #b15f2c;
+  --color-saffron-gold: #ffbc09;
+  --color-saffron-amber: #f59e0b;
+  --color-saffron-cream: #ece7e0;
+  --color-saffron-purple: #ca56ed;
+  --color-cocoa-950: #150604;
+  --color-cocoa-900: #210a07;
+  --color-cocoa-800: #2f0e09;
+  --color-cocoa-border: #47140b;
 
   --shadow-glass-deep: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.06);
   --shadow-neon-primary: 0 0 40px rgba(99, 102, 241, 0.55);

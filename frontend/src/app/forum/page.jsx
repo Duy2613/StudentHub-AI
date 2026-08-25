@@ -1,12 +1,12 @@
 "use client";
 
 // app/forum/page.jsx
-// Diễn đàn cộng đồng sinh viên StudentHub AI:
-// - Phân loại theo danh mục: Trường học, Quán ăn, Nhà trọ, Ngành học, CLB
-// - Tìm kiếm theo từ khóa và địa điểm (thuật toán lọc tag/text thông thường, KHÔNG AI)
-// - Vote "Uy tín" / "Không uy tín" (ưu tiên xếp hạng hiển thị bài viết)
-// - Like tách biệt hoàn toàn khỏi điểm uy tín (thể hiện "Thấy hữu ích")
-// - Bình luận mở cho Chuyên gia & Sinh viên
+//
+// Diễn đàn cộng đồng sinh viên StudentHub AI (Saffron Finance x Meer Mohsin 3D):
+// - WebGL Real-time Fluid Dynamics Canvas theo con trỏ chuột 60fps
+// - Quỹ đạo thiên văn 3D Astrolabe & vệ tinh bay quanh chu vi màn hình
+// - Saffron Swiss Grid Post Cards viền tóc hairline (#47140b) và dấu chữ thập (+)
+// - Hệ thống bình chọn tín nhiệm phi tập trung (Vote Uy tín, Like Hữu ích)
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -33,7 +33,8 @@ import {
   Send,
   Star,
   ShieldCheck,
-  Share2
+  Share2,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import ModernNavbar from "@/components/layout/ModernNavbar";
@@ -41,10 +42,15 @@ import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import TactileButton from "@/components/ui/TactileButton";
 import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
+import MohsinFluidCanvas from "@/components/ui/MohsinFluidCanvas";
+import SaffronMohsinPerimeter3DOrbit from "@/components/ui/SaffronMohsinPerimeter3DOrbit";
+import SaffronMarqueeTicker from "@/components/ui/SaffronMarqueeTicker";
+import SaffronSwissCrosshairGrid from "@/components/ui/SaffronSwissCrosshairGrid";
 import { NoiseOverlay } from "@/components/auth/AuthUI";
 import FloatingDock from "@/components/ui/floating-dock";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
 import IglooSoundAmbiencePill from "@/components/ui/IglooSoundAmbiencePill";
+import { saffronAudio } from "@/lib/audio/saffronAudio";
 import { motion, AnimatePresence } from "motion/react";
 
 const CATEGORIES = [
@@ -73,7 +79,7 @@ const INITIAL_POSTS = [
     links: ["https://phongtro-fake-sample.com"],
     trustVotes: { reputable: 48, notReputable: 2 },
     likes: 35,
-    userVoted: null, // "reputable" | "notReputable" | null
+    userVoted: null,
     userLiked: false,
     comments: [
       {
@@ -98,61 +104,31 @@ const INITIAL_POSTS = [
   },
   {
     id: 2,
-    title: "Danh sách 5 quán cơm sinh viên giá rẻ, sạch sẽ quanh KTX ĐHQG TP.HCM",
+    title: "Gợi ý quán cơm trưa sinh viên sạch sẽ, chuẩn vị tại Làng Đại học Thủ Đức",
     category: "food",
-    location: "Thủ Đức, TP.HCM (Làng Đại học ĐHQG-HCM)",
-    author: "Trần Mai Anh",
+    location: "Khu B, ĐHQG TP.HCM (Thủ Đức)",
+    author: "Trần Bảo Ngọc",
     authorRole: "student",
-    authorAvatar: "student-designer",
-    trustScore: 85,
+    authorAvatar: "student-creative",
+    trustScore: 88,
     time: "2 giờ trước",
     content:
-      "Tổng hợp 5 quán cơm bình dân sạch sẽ, canh rau tự lấy miễn phí, giá từ 25k - 30k dành cho các bạn sinh viên khu B và khu A. Đã qua kiểm chứng vệ sinh và thái độ phục vụ nhiệt tình.",
+      "Quán cơm niêu cô Ba cạnh cổng KTX Khu B bán suất ăn 25k-30k đầy đặn, canh rau miễn phí và cô chủ rất thân thiện với sinh viên. Quán có chứng nhận ATTP treo công khai.",
     images: [],
     links: [],
     trustVotes: { reputable: 62, notReputable: 1 },
-    likes: 88,
+    likes: 54,
     userVoted: null,
     userLiked: false,
     comments: [
       {
         id: "c3",
-        author: "Nguyễn Thảo Vy",
+        author: "Hoàng Văn Tuấn",
         role: "student",
-        avatar: "student-ai",
-        trustScore: 80,
+        avatar: "student-gamer",
+        trustScore: 78,
         time: "1 giờ trước",
-        text: "Quán cô Năm ở số 3 đường vành đai ngon và nhiều đồ ăn lắm, vote 5 sao!",
-      },
-    ],
-  },
-  {
-    id: 3,
-    title: "Cảnh báo fanpage giả mạo 'CLB Kỹ năng Sinh viên FTU' thu phí phỏng vấn 150k",
-    category: "club",
-    location: "Đống Đa, Hà Nội (ĐH Ngoại Thương)",
-    author: "Đặng Hoàng Long",
-    authorRole: "student",
-    authorAvatar: "student-leader",
-    trustScore: 88,
-    time: "4 giờ trước",
-    content:
-      "Hiện có page mạo danh tuyển thành viên CLB Kỹ năng sinh viên nhưng yêu cầu ứng viên nộp lệ phí dự thi vòng phỏng vấn 150.000đ qua Momo. CLB chính thức của trường KHÔNG BAO GIỜ thu phí tuyển sinh.",
-    images: [],
-    links: ["https://ftu.edu.vn/canh-bao-clb-gia-mao"],
-    trustVotes: { reputable: 54, notReputable: 0 },
-    likes: 42,
-    userVoted: null,
-    userLiked: false,
-    comments: [
-      {
-        id: "c4",
-        author: "TS. Nguyễn Minh Đức",
-        role: "expert",
-        avatar: "expert-ai",
-        trustScore: 99,
-        time: "3 giờ trước",
-        text: "Mọi hoạt động tuyển thành viên CLB sinh viên thu tiền xét tuyển đều là dấu hiệu mạo danh trục lợi. Hãy kiểm tra qua fanpage chính thức có tick xanh hoặc website trường.",
+        text: "Quán này ăn bao no luôn mọi người, trà đá miễn phí nữa!",
       },
     ],
   },
@@ -166,9 +142,8 @@ export default function ForumPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
-  const [sortBy, setSortBy] = useState("reputable"); // "reputable" | "newest" | "hot"
+  const [sortBy, setSortBy] = useState("reputable"); // 'reputable' | 'newest' | 'hot'
 
-  // Modal new post
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newCategory, setNewCategory] = useState("housing");
@@ -176,22 +151,22 @@ export default function ForumPage() {
   const [newContent, setNewContent] = useState("");
   const [newLink, setNewLink] = useState("");
 
-  // Active comment input per post
   const [commentInputs, setCommentInputs] = useState({});
 
-  // Check URL query parameters for prefill
+  // Prefill from URL query (if redirected from Scam-Check)
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const prefill = params.get("prefill");
       if (prefill) {
-        setNewTitle(`[Cảnh báo] ${prefill}`);
         setIsNewPostModalOpen(true);
+        setNewTitle(prefill);
+        setNewCategory("housing");
       }
     }
   }, []);
 
-  // Filter & Sort Logic (Tag & Location matching without AI)
+  // Filtered and Sorted Posts
   const filteredPosts = useMemo(() => {
     return posts
       .filter((post) => {
@@ -224,6 +199,7 @@ export default function ForumPage() {
 
   // Vote Reputable / Not Reputable
   const handleVote = (postId, voteType) => {
+    saffronAudio.playClick(700);
     setPosts((prev) =>
       prev.map((p) => {
         if (p.id !== postId) return p;
@@ -233,7 +209,6 @@ export default function ForumPage() {
         let newNot = p.trustVotes.notReputable;
 
         if (currentVote === voteType) {
-          // Cancel vote
           if (voteType === "reputable") newRep -= 1;
           if (voteType === "notReputable") newNot -= 1;
           return {
@@ -243,7 +218,6 @@ export default function ForumPage() {
           };
         }
 
-        // Change vote
         if (currentVote === "reputable") newRep -= 1;
         if (currentVote === "notReputable") newNot -= 1;
 
@@ -259,8 +233,9 @@ export default function ForumPage() {
     );
   };
 
-  // Like "Hữu ích" (Separated from Trust score)
+  // Like "Hữu ích"
   const handleLike = (postId) => {
+    saffronAudio.playClick(600);
     setPosts((prev) =>
       prev.map((p) => {
         if (p.id !== postId) return p;
@@ -279,6 +254,7 @@ export default function ForumPage() {
     const text = commentInputs[postId]?.trim();
     if (!text) return;
 
+    saffronAudio.playClick(800);
     const isExpert = profile?.role === "expert";
 
     const newComment = {
@@ -309,6 +285,7 @@ export default function ForumPage() {
     e.preventDefault();
     if (!newTitle.trim() || !newContent.trim()) return;
 
+    saffronAudio.playSuccessChime();
     const isExpert = profile?.role === "expert";
 
     const created = {
@@ -340,16 +317,22 @@ export default function ForumPage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent text-gray-100 flex relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#070403] text-gray-100 flex relative overflow-x-hidden selection:bg-[#ffbc09] selection:text-[#150604]">
       {/* 1. 3D Infinite Highway Canvas */}
       <div className="canvas-bg-layer">
         <RobinPayotRoadCanvas />
       </div>
 
-      {/* 2. Film Grain Noise Overlay */}
+      {/* 2. Meer Mohsin WebGL Fluid Smoke Canvas */}
+      <MohsinFluidCanvas opacity={0.6} particleDensity={45} />
+
+      {/* 3. 3D Astrolabe Orbit & Perimeter Satellites */}
+      <SaffronMohsinPerimeter3DOrbit />
+
+      {/* 4. Film Grain Noise Overlay */}
       <NoiseOverlay />
 
-      {/* 3. Floating Quick Tools & Studio */}
+      {/* 5. Floating Quick Tools & Studio */}
       <FloatingDock />
       <BackgroundsAndEffectsStudio />
 
@@ -362,77 +345,87 @@ export default function ForumPage() {
         </header>
       )}
 
-      {/* Main Container with generous top padding for navbar */}
-      <main className="flex-1 layout-safe-container pt-28 sm:pt-32 pb-40 relative z-10 min-w-0">
+      {/* Main Container */}
+      <main className="flex-1 layout-safe-container pt-24 sm:pt-28 pb-40 relative z-10 min-w-0 font-human">
         
+        {/* Top Marquee Telemetry Ticker */}
+        <SaffronMarqueeTicker className="mb-8 rounded-2xl border border-[#47140b]" />
+
         {/* Header & Create Post Button */}
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-8">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/15 border border-teal-500/30 text-teal-300 text-xs font-mono font-bold tracking-wider mb-3">
-              <span className="w-2 h-2 rounded-full bg-teal-400 igloo-radar-beacon" />
-              <span>COMMUNITY DAO • PEER-REVIEWED FEED</span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ffbc09]/15 border border-[#ffbc09]/30 text-[#ffbc09] text-xs font-mono font-bold tracking-wider mb-3">
+              <span className="w-2 h-2 rounded-full bg-[#ffbc09] animate-ping" />
+              <span>COMMUNITY DAO // PEER-REVIEWED FEED</span>
             </div>
-            <h1 className="page-title">
-              Chia Sẻ &amp; Cảnh Báo Sinh Viên
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+              <span className="text-[#ffd15c]">Chia Sẻ &amp; Cảnh Báo</span> Sinh Viên
             </h1>
-            <p className="text-xs sm:text-sm text-gray-300 mt-2 max-w-2xl font-human">
+            <p className="text-xs sm:text-sm text-[#ece7e0]/80 mt-2 max-w-2xl font-normal leading-relaxed">
               Thảo luận thực chứng về Nhà trọ, Quán ăn, Cảnh báo lừa đảo và Môi trường học đường với hệ thống bình chọn tín nhiệm phi tập trung.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <IglooSoundAmbiencePill />
-            <TactileButton
-              variant="primary"
-              size="md"
-              techSuffix="[DAO POST]"
-              onClick={() => setIsNewPostModalOpen(true)}
-              icon={Plus}
+            <button
+              type="button"
+              onClick={() => {
+                saffronAudio.playClick(600);
+                setIsNewPostModalOpen(true);
+              }}
+              className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#ffbc09] to-[#f59e0b] text-[#150604] font-extrabold text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(255,188,9,0.35)] hover:scale-105 transition-all flex items-center gap-2 cursor-pointer font-mono"
             >
-              Đăng Bài Mới
-            </TactileButton>
+              <Plus className="w-4 h-4" />
+              <span>ĐĂNG BÀI MỚI [DAO]</span>
+            </button>
           </div>
         </div>
 
-        {/* Search & Location Filter Bar (No AI algorithm) */}
-        <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-6 p-4 rounded-3xl igloo-hologram-card border border-white/10 backdrop-blur-2xl">
-          <div className="sm:col-span-6 relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm từ khóa bài viết, cảnh báo lừa đảo..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-2xl text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-teal-400 transition-all"
-            />
-          </div>
+        {/* Search & Location Filter Bar */}
+        <SaffronSwissCrosshairGrid sectionTag="01 // FILTER_CONSOLE" className="mb-6 p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+            <div className="sm:col-span-6 relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#ffbc09]" />
+              <input
+                type="text"
+                placeholder="Tìm kiếm từ khóa bài viết, cảnh báo lừa đảo..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs sm:text-sm text-[#ece7e0] placeholder-[#ece7e0]/40 focus:outline-none focus:border-[#ffbc09] transition-all font-human"
+              />
+            </div>
 
-          <div className="sm:col-span-4 relative">
-            <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-teal-400" />
-            <input
-              type="text"
-              placeholder="Lọc địa điểm (Quận, tên trường...)"
-              value={locationFilter}
-              onChange={(e) => setLocationFilter(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-2xl text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-teal-400 transition-all"
-            />
-          </div>
+            <div className="sm:col-span-4 relative">
+              <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#38bdf8]" />
+              <input
+                type="text"
+                placeholder="Lọc địa điểm (Quận, tên trường...)"
+                value={locationFilter}
+                onChange={(e) => setLocationFilter(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs sm:text-sm text-[#ece7e0] placeholder-[#ece7e0]/40 focus:outline-none focus:border-[#ffbc09] transition-all font-human"
+              />
+            </div>
 
-          <div className="sm:col-span-2">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full px-3 py-2.5 bg-[#111522] border border-white/10 rounded-2xl text-xs text-white focus:outline-none focus:border-teal-400"
-            >
-              <option value="reputable">Ưu tiên Uy Tín Cao</option>
-              <option value="newest">Mới nhất</option>
-              <option value="hot">Nhiều lượt Like</option>
-            </select>
+            <div className="sm:col-span-2">
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  saffronAudio.playClick(500);
+                  setSortBy(e.target.value);
+                }}
+                className="w-full px-3 py-2.5 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09] font-mono cursor-pointer"
+              >
+                <option value="reputable">Ưu tiên Uy Tín Cao</option>
+                <option value="newest">Mới nhất</option>
+                <option value="hot">Nhiều lượt Like</option>
+              </select>
+            </div>
           </div>
-        </div>
+        </SaffronSwissCrosshairGrid>
 
         {/* Category Horizontal Slider */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none select-none">
           {CATEGORIES.map((cat) => {
             const Icon = cat.icon;
             const isSelected = selectedCategory === cat.id;
@@ -440,11 +433,14 @@ export default function ForumPage() {
               <button
                 key={cat.id}
                 type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${
+                onClick={() => {
+                  saffronAudio.playClick(500);
+                  setSelectedCategory(cat.id);
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   isSelected
-                    ? "bg-teal-400 text-space-950 shadow-[0_0_20px_rgba(52,231,196,0.35)]"
-                    : "bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10"
+                    ? "bg-gradient-to-r from-[#ffbc09] to-[#f59e0b] text-[#150604] shadow-[0_0_20px_rgba(255,188,9,0.35)]"
+                    : "bg-[#210a07] hover:bg-[#2f0e09] text-[#ece7e0]/70 border border-[#47140b]"
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -454,77 +450,77 @@ export default function ForumPage() {
           })}
         </div>
 
-        {/* Forum Posts List */}
+        {/* Post Feed List */}
         <div className="space-y-6">
           {filteredPosts.length === 0 ? (
-            <div className="p-12 text-center rounded-3xl bg-white/[0.02] border border-white/10">
-              <MessageSquare className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-              <p className="text-sm font-bold text-gray-300">Không tìm thấy bài viết phù hợp</p>
-              <p className="text-xs text-gray-500 mt-1">Thử thay đổi từ khóa hoặc địa điểm tìm kiếm</p>
+            <div className="p-12 text-center rounded-3xl bg-[#150604]/90 border border-[#47140b] space-y-3">
+              <MessageSquare className="w-10 h-10 text-[#ffbc09]/50 mx-auto" />
+              <p className="text-white font-bold text-base">Chưa có bài viết nào phù hợp.</p>
+              <p className="text-xs text-[#ece7e0]/60">Hãy là người đầu tiên đăng bài chia sẻ hoặc cảnh báo trong khu vực này.</p>
             </div>
           ) : (
             filteredPosts.map((post) => {
-              const totalVotes = post.trustVotes.reputable + post.trustVotes.notReputable;
-              const repPercent = totalVotes > 0 ? Math.round((post.trustVotes.reputable / totalVotes) * 100) : 100;
-              const isReputableHigh = repPercent >= 80;
+              const repRatio = Math.round(
+                (post.trustVotes.reputable /
+                  (post.trustVotes.reputable + post.trustVotes.notReputable || 1)) *
+                  100
+              );
 
               return (
                 <article
                   key={post.id}
-                  className="p-6 sm:p-7 rounded-3xl bg-white/[0.03] hover:bg-white/[0.05] border border-white/10 hover:border-white/20 backdrop-blur-2xl transition-all space-y-4 shadow-glass-deep"
+                  className="rounded-3xl bg-[#150604]/90 border border-[#47140b] hover:border-[#ffbc09]/50 p-6 sm:p-8 backdrop-blur-2xl transition-all duration-300 space-y-4 shadow-[0_10px_30px_rgba(0,0,0,0.7)] relative"
                 >
-                  {/* Top Author & Meta Row */}
-                  <div className="flex flex-wrap items-center justify-between gap-3">
+                  {/* Subtle corner crosshairs (+) */}
+                  <span className="absolute top-2.5 left-3 text-[#ffbc09]/40 font-mono text-[10px] select-none">+</span>
+                  <span className="absolute top-2.5 right-3 text-[#ffbc09]/40 font-mono text-[10px] select-none">+</span>
+
+                  {/* Top Author Bar */}
+                  <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <AvatarDisplay
                         avatarId={post.authorAvatar}
                         role={post.authorRole}
-                        size="sm"
+                        size="md"
                         showBadge={true}
                       />
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-white">{post.author}</span>
-                          <span
-                            className={`text-[10px] font-semibold px-2 py-0.2 rounded-full border ${
-                              post.authorRole === "expert"
-                                ? "bg-amber-500/15 border-amber-400/40 text-amber-300"
-                                : "bg-teal-500/15 border-teal-400/40 text-teal-300"
-                            }`}
-                          >
-                            {post.trustScore} pts
+                          <span className="text-sm font-bold text-white font-human">{post.author}</span>
+                          <span className="text-[10px] font-mono text-[#ffbc09] font-bold px-1.5 py-0.2 rounded bg-[#ffbc09]/15 border border-[#ffbc09]/30">
+                            {post.trustScore} PTS
                           </span>
                         </div>
-                        <p className="text-[10px] text-gray-400 flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-teal-400" /> {post.location} • <Clock className="w-3 h-3 ml-1" /> {post.time}
-                        </p>
+                        <div className="flex items-center gap-2 text-[11px] text-[#ece7e0]/60 mt-0.5">
+                          <span className="flex items-center gap-1 font-mono text-[#38bdf8]">
+                            <MapPin className="w-3 h-3" /> {post.location}
+                          </span>
+                          <span>•</span>
+                          <span className="font-mono">{post.time}</span>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Trust Ratio Pill */}
-                    <div
-                      className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
-                        isReputableHigh
-                          ? "bg-teal-500/15 border-teal-400/40 text-teal-300"
-                          : "bg-rose-500/15 border-rose-400/40 text-rose-300"
-                      }`}
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>{repPercent}% Uy Tín ({totalVotes} votes)</span>
+                    {/* Trust Rating Badge */}
+                    <div className="flex flex-col items-end">
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#210a07] border border-[#ffbc09]/40 text-[#ffbc09] text-xs font-mono font-bold shadow-sm">
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <span>{repRatio}% UY TÍN</span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Title & Body Content */}
+                  {/* Title & Content */}
                   <div>
-                    <h2 className="text-base sm:text-lg font-bold text-white leading-snug">
+                    <h2 className="text-lg sm:text-xl font-bold text-white leading-snug">
                       {post.title}
                     </h2>
-                    <p className="text-xs sm:text-sm text-gray-300 mt-2 leading-relaxed">
+                    <p className="mt-2 text-xs sm:text-sm text-[#ece7e0]/85 leading-relaxed font-human">
                       {post.content}
                     </p>
                   </div>
 
-                  {/* Reference Links */}
+                  {/* Links */}
                   {post.links && post.links.length > 0 && (
                     <div className="flex flex-wrap gap-2 pt-1">
                       {post.links.map((lnk, idx) => (
@@ -533,92 +529,82 @@ export default function ForumPage() {
                           href={lnk}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1 text-[11px] text-teal-300 hover:text-teal-200 underline font-medium"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#210a07] border border-[#47140b] text-[11px] font-mono text-[#38bdf8] hover:border-[#ffbc09] transition-all truncate max-w-sm"
                         >
-                          <Link2 className="w-3 h-3" /> {lnk}
+                          <Link2 className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{lnk}</span>
                         </a>
                       ))}
                     </div>
                   )}
 
-                  {/* Dual Action Bar: Vote Uy Tín vs Like Hữu Ích */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-white/10 text-xs">
-                    {/* Vote Uy Tín / Không Uy Tín */}
+                  {/* Interactive Vote & Like Actions */}
+                  <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[#47140b] select-none">
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold text-gray-400 mr-1">Xác thực bài viết:</span>
-                      
                       <button
                         type="button"
                         onClick={() => handleVote(post.id, "reputable")}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all ${
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                           post.userVoted === "reputable"
-                            ? "bg-teal-400/25 border-teal-400 text-teal-200 font-bold shadow-[0_0_15px_rgba(52,231,196,0.3)]"
-                            : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10"
+                            ? "bg-[#ffbc09] text-[#150604] shadow-[0_0_15px_rgba(255,188,9,0.4)]"
+                            : "bg-[#210a07] hover:bg-[#2f0e09] text-[#ece7e0]/80 border border-[#47140b]"
                         }`}
                       >
-                        <ThumbsUp className="w-3.5 h-3.5 text-teal-400" />
+                        <ThumbsUp className="w-3.5 h-3.5" />
                         <span>Uy Tín ({post.trustVotes.reputable})</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => handleVote(post.id, "notReputable")}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all ${
+                        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                           post.userVoted === "notReputable"
-                            ? "bg-rose-500/25 border-rose-400 text-rose-200 font-bold shadow-[0_0_15px_rgba(244,63,94,0.3)]"
-                            : "bg-white/5 border-white/10 text-gray-300 hover:bg-white/10"
+                            ? "bg-rose-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.4)]"
+                            : "bg-[#210a07] hover:bg-[#2f0e09] text-[#ece7e0]/80 border border-[#47140b]"
                         }`}
                       >
-                        <ThumbsDown className="w-3.5 h-3.5 text-rose-400" />
-                        <span>Không Uy Tín ({post.trustVotes.notReputable})</span>
+                        <ThumbsDown className="w-3.5 h-3.5" />
+                        <span>Nghi Vấn ({post.trustVotes.notReputable})</span>
                       </button>
-                    </div>
 
-                    {/* Like "Hữu ích" (Tách biệt khỏi điểm uy tín) */}
-                    <div className="flex items-center gap-3">
                       <button
                         type="button"
                         onClick={() => handleLike(post.id)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                           post.userLiked
-                            ? "bg-rose-500/20 text-rose-400 font-bold"
-                            : "text-gray-400 hover:text-white hover:bg-white/5"
+                            ? "bg-rose-500/20 border border-rose-500/40 text-rose-300"
+                            : "bg-[#210a07] hover:bg-[#2f0e09] text-[#ece7e0]/70 border border-[#47140b]"
                         }`}
-                        title="Đánh dấu bài viết hữu ích (không ảnh hưởng điểm uy tín)"
                       >
-                        <Heart className={`w-4 h-4 ${post.userLiked ? "fill-rose-400 text-rose-400" : ""}`} />
-                        <span>{post.likes} Hữu ích</span>
+                        <Heart className={`w-3.5 h-3.5 ${post.userLiked ? "fill-rose-400 text-rose-400" : ""}`} />
+                        <span>Hữu ích ({post.likes})</span>
                       </button>
-
-                      <span className="text-gray-500 text-xs flex items-center gap-1">
-                        <MessageSquare className="w-3.5 h-3.5" /> {post.comments.length}
-                      </span>
                     </div>
                   </div>
 
                   {/* Comments Section */}
-                  <div className="pt-3 border-t border-white/5 space-y-3">
+                  <div className="pt-3 border-t border-[#47140b] space-y-3">
                     {post.comments.map((cm) => (
                       <div
                         key={cm.id}
                         className={`p-3 rounded-2xl border text-xs space-y-1 ${
                           cm.role === "expert"
-                            ? "bg-amber-950/20 border-amber-500/30"
-                            : "bg-white/[0.02] border-white/5"
+                            ? "bg-[#210a07] border-[#ffbc09]/40"
+                            : "bg-[#150604]/60 border-[#47140b]"
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-white">{cm.author}</span>
                             {cm.role === "expert" && (
-                              <span className="px-2 py-0.2 rounded-full bg-amber-500/20 text-amber-300 text-[9px] font-extrabold flex items-center gap-1">
-                                <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" /> Chuyên Gia Uy Tín ({cm.trustScore} pts)
+                              <span className="px-2 py-0.2 rounded-full bg-[#ffbc09]/20 text-[#ffbc09] text-[9px] font-mono font-extrabold flex items-center gap-1">
+                                <Star className="w-2.5 h-2.5 fill-[#ffbc09] text-[#ffbc09]" /> Cố Vấn Uy Tín ({cm.trustScore} pts)
                               </span>
                             )}
                           </div>
-                          <span className="text-[10px] text-gray-500">{cm.time}</span>
+                          <span className="text-[10px] text-[#ece7e0]/40 font-mono">{cm.time}</span>
                         </div>
-                        <p className="text-gray-300 leading-relaxed">{cm.text}</p>
+                        <p className="text-[#ece7e0]/85 leading-relaxed">{cm.text}</p>
                       </div>
                     ))}
 
@@ -632,12 +618,12 @@ export default function ForumPage() {
                           setCommentInputs({ ...commentInputs, [post.id]: e.target.value })
                         }
                         onKeyDown={(e) => e.key === "Enter" && handleAddComment(post.id)}
-                        className="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-teal-400"
+                        className="flex-1 px-4 py-2 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] placeholder-[#ece7e0]/40 focus:outline-none focus:border-[#ffbc09]"
                       />
                       <button
                         type="button"
                         onClick={() => handleAddComment(post.id)}
-                        className="p-2 rounded-xl bg-teal-400 text-space-950 font-bold hover:scale-105 transition-transform"
+                        className="p-2 rounded-xl bg-[#ffbc09] text-[#150604] font-bold hover:scale-105 transition-transform cursor-pointer"
                       >
                         <Send className="w-4 h-4" />
                       </button>
@@ -651,16 +637,19 @@ export default function ForumPage() {
 
         {/* Modal Create Post */}
         {isNewPostModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto">
-            <div className="w-full max-w-xl bg-space-900 border border-white/15 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0d0403]/85 backdrop-blur-xl overflow-y-auto">
+            <div className="w-full max-w-xl bg-[#150604] border border-[#47140b] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 font-human">
+              <div className="flex items-center justify-between pb-3 border-b border-[#47140b]">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Plus className="w-5 h-5 text-teal-400" /> Đăng Bài Chia Sẻ / Cảnh Báo
+                  <Plus className="w-5 h-5 text-[#ffbc09]" /> Đăng Bài Chia Sẻ / Cảnh Báo
                 </h3>
                 <button
                   type="button"
-                  onClick={() => setIsNewPostModalOpen(false)}
-                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white"
+                  onClick={() => {
+                    saffronAudio.playClick(400);
+                    setIsNewPostModalOpen(false);
+                  }}
+                  className="p-1.5 rounded-lg bg-[#210a07] hover:bg-[#2f0e09] border border-[#47140b] text-[#ece7e0]/70 hover:text-white cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -668,7 +657,7 @@ export default function ForumPage() {
 
               <form onSubmit={handleCreatePost} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5">
+                  <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5">
                     Tiêu đề bài viết
                   </label>
                   <input
@@ -677,19 +666,19 @@ export default function ForumPage() {
                     placeholder="VD: Cảnh báo chiêu trò lừa cọc phòng trọ ngõ 27 Tạ Quang Bửu..."
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-teal-400"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-sm text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5">
+                    <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5">
                       Danh mục
                     </label>
                     <select
                       value={newCategory}
                       onChange={(e) => setNewCategory(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl bg-[#111522] border border-white/10 text-xs text-white focus:outline-none focus:border-teal-400"
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
                     >
                       <option value="housing">Nhà Trọ</option>
                       <option value="food">Quán Ăn</option>
@@ -700,7 +689,7 @@ export default function ForumPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5">
+                    <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5">
                       Địa điểm / Khu vực trường
                     </label>
                     <input
@@ -708,14 +697,14 @@ export default function ForumPage() {
                       placeholder="VD: Cầu Giấy, Hà Nội hoặc ĐH Bách Khoa"
                       value={newLocation}
                       onChange={(e) => setNewLocation(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-teal-400"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5">
-                    Nội dung chi tiết & Bằng chứng
+                  <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5">
+                    Nội dung chi tiết &amp; Bằng chứng
                   </label>
                   <textarea
                     rows={4}
@@ -723,12 +712,12 @@ export default function ForumPage() {
                     placeholder="Mô tả cụ thể sự việc, thủ đoạn, bằng chứng hoặc lời khuyên cho cộng đồng..."
                     value={newContent}
                     onChange={(e) => setNewContent(e.target.value)}
-                    className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-teal-400 resize-none"
+                    className="w-full p-4 rounded-xl bg-[#210a07] border border-[#47140b] text-xs sm:text-sm text-[#ece7e0] focus:outline-none focus:border-[#ffbc09] resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5">
+                  <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5">
                     Link tham khảo / Bài đăng gốc (Tùy chọn)
                   </label>
                   <input
@@ -736,21 +725,27 @@ export default function ForumPage() {
                     placeholder="https://..."
                     value={newLink}
                     onChange={(e) => setNewLink(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-teal-400"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#47140b]">
                   <button
                     type="button"
-                    onClick={() => setIsNewPostModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-400 hover:text-white"
+                    onClick={() => {
+                      saffronAudio.playClick(400);
+                      setIsNewPostModalOpen(false);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-[#ece7e0]/60 hover:text-white cursor-pointer"
                   >
                     Hủy
                   </button>
-                  <TactileButton variant="primary" size="sm" type="submit" showArrow={false}>
+                  <button
+                    type="submit"
+                    className="py-2.5 px-5 rounded-xl bg-gradient-to-r from-[#ffbc09] to-[#f59e0b] text-[#150604] font-extrabold text-xs uppercase tracking-wider shadow-md hover:scale-105 transition-all cursor-pointer font-mono"
+                  >
                     Đăng Bài Xác Thực
-                  </TactileButton>
+                  </button>
                 </div>
               </form>
             </div>
