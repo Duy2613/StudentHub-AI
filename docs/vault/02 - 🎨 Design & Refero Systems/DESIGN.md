@@ -29,7 +29,29 @@
 
 ---
 
-## 3. Liên Kết
+## 3. Digital Guardian Typography Tokens
+
+```css
+/* Human Interface — hướng dẫn, headings, body */
+--font-human: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
+
+/* Machine Interface — AI output, OCR, scanner data */
+--font-machine: var(--font-jetbrains-mono), var(--font-geist-mono), monospace;
+
+/* Security Status Colors */
+--color-threat-red: #ef4444;
+--color-warn-amber: #f59e0b;
+--color-safe-emerald: #10b981;
+```
+
+**Key Components**:
+- `AITerminalBlock` @ `@/components/ui/AITerminalBlock`
+- CSS classes: `.dg-terminal`, `.dg-alert-*`, `.dg-badge-machine`, `.dg-scan-btn`
+- Full protocol: [[DESIGN|Agent DESIGN.md § Section 4]]
+
+---
+
+## 4. Liên Kết
 - [[Settigation-OTP-Verification-v3|💫 Settigation Orbit OTP Component]]
 - [[OpenHero-Cinematic-Aesthetics|🎬 OpenHero Cinematic Visuals]]
 - [[UI-Component-Registry|📦 Danh Mục UI Components]]

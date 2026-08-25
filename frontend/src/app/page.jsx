@@ -1,95 +1,68 @@
 "use client";
 
 // app/page.jsx
-// Trang chủ (Landing Page) chính thức của StudentHub AI:
-// - Đỉnh cao sáng tạo: 3D Infinite Curving Road Highway Canvas (Robin Payot Signature)
-// - Camera lướt dọc theo con đường 3D khi cuộn trang (Scroll-Driven 3D Flight)
-// - Khối màn hình 3D uốn cong (Curved Project Screens), Chrome Blobs và Cột mốc cờ phát sáng
-// - Typography: Instrument Serif / Cormorant Garamond kết hợp Geist Sans
-// - 6 Phân đoạn: Hero (01. Portal) -> Tình huống Sinh viên -> 3 Bước -> 3 Trụ Cột -> Demo -> Engine -> Community -> CTA
+//
+// Trang chủ (Landing Page) chính thức của StudentHub AI (3D Highway Flight & 3D Black Billboards):
+// - Trải nghiệm ban đầu: Màn hình không bị che lấp bởi các khối text tĩnh, chỉ có không gian sóng hạt 3D và đường bay
+// - Khi lướt (scroll): Camera 3D lướt qua 5 BẢNG ĐEN (3D Obsidian Black Billboards) đặt dọc theo con đường:
+//     1. [ 01 // XÁC THỰC AI ] — AI Scam Engine 4 Lớp (/scam-check)
+//     2. [ 02 // CỐ VẤN & HỒ SƠ UY TÍN ] — Mạng Lưới Chuyên Gia & Điểm Uy Tín (/profile)
+//     3. [ 03 // DIỄN ĐÀN SINH VIÊN ] — Diễn Đàn Xác Thực & Vote Tín Nhiệm (/forum)
+//     4. [ 04 // BẢNG ĐIỀU KHIỂN MISSION CONTROL ] — Dashboard (/dashboard)
+//     5. [ 05 // ĐĂNG KÝ & BẢO VỆ SỐ ] — Saffron Academic Register (/register)
+// - Khi click vào bất kỳ bảng đen nào -> Mở toàn bộ thông tin chi tiết từ A tới Z kèm phím chức năng và nút QUAY LẠI 3D ROAD
 
 import React from "react";
 import ModernNavbar from "@/components/layout/ModernNavbar";
-import HeroSection from "@/components/landing/HeroSection";
-import StudentDilemmaChatCarousel from "@/components/landing/StudentDilemmaChatCarousel";
-import ThreeStepTrustFlowSection from "@/components/landing/ThreeStepTrustFlowSection";
-import CoreFeaturesSection from "@/components/landing/CoreFeaturesSection";
-import InteractiveScamDemo from "@/components/landing/InteractiveScamDemo";
-import ExplainableEngineSection from "@/components/landing/ExplainableEngineSection";
-import CommunityShowcaseSection from "@/components/landing/CommunityShowcaseSection";
-import CallToActionSection from "@/components/landing/CallToActionSection";
-import LandingFooter from "@/components/landing/LandingFooter";
 import FloatingDock from "@/components/ui/floating-dock";
-import CinematicScrollytellingObserver from "@/components/ui/CinematicScrollytellingObserver";
-import CinematicChapterNavigator from "@/components/ui/CinematicChapterNavigator";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
 import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
+import MohsinFluidCanvas from "@/components/ui/MohsinFluidCanvas";
+import SaffronMohsinPerimeter3DOrbit from "@/components/ui/SaffronMohsinPerimeter3DOrbit";
+import SaffronMarqueeTicker from "@/components/ui/SaffronMarqueeTicker";
 import { NoiseOverlay } from "@/components/auth/AuthUI";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-transparent text-gray-100 flex flex-col relative overflow-x-hidden">
-      {/* 3D Infinite Curving Road Highway Canvas (Robin Payot Signature) */}
-      <RobinPayotRoadCanvas />
+    <div className="min-h-[500vh] bg-[#070403] text-gray-100 flex flex-col relative selection:bg-[#ffbc09] selection:text-[#150604] font-human">
+      {/* 1. 3D Infinite Curving Highway Canvas with Interactive 3D Black Billboards */}
+      <RobinPayotRoadCanvas showHud={true} />
 
-      {/* Film Grain & Noise Texture */}
+      {/* 2. Meer Mohsin Real-time WebGL Fluid Smoke Cursor Canvas */}
+      <MohsinFluidCanvas opacity={0.65} particleDensity={50} />
+
+      {/* 3. 3D Astrolabe & Perimeter Orbiting Satellites (Quay quanh chu vi) */}
+      <SaffronMohsinPerimeter3DOrbit />
+
+      {/* 4. Film Grain Texture */}
       <NoiseOverlay />
 
-      {/* Scrollytelling Master Background Observer & Fixed Chapter Morph Navigator */}
-      <CinematicScrollytellingObserver />
-      <CinematicChapterNavigator />
-
-      {/* Floating Island Navbar */}
-      <ModernNavbar />
-
-      {/* Main Scrollytelling Sections with Pure Cinematic Flow */}
-      <main className="flex-1 w-full relative z-10 space-y-24 sm:space-y-32">
-        {/* Section 01: Hero (01. AI Knowledge Portal) */}
-        <section id="hero" className="min-h-[90vh] flex flex-col justify-center">
-          <HeroSection />
-          {/* Live Student Dilemma Dialogue */}
-          <StudentDilemmaChatCarousel />
-        </section>
-
-        {/* 3-Step Trust Protocol */}
-        <section id="workflow" className="min-h-[75vh] flex flex-col justify-center">
-          <ThreeStepTrustFlowSection />
-        </section>
-
-        {/* Section 02: 3 Core Pillars (02. Smart Campus Future) */}
-        <section id="features" className="min-h-[85vh] flex flex-col justify-center">
-          <CoreFeaturesSection />
-        </section>
-
-        {/* Section 03: Interactive Scam Simulation (03. AI Study Room) */}
-        <section id="demo" className="min-h-[85vh] flex flex-col justify-center">
-          <InteractiveScamDemo />
-        </section>
-
-        {/* Section 04: 4-Layer Explainable Engine (04. Neural Network) */}
-        <section id="engine" className="min-h-[85vh] flex flex-col justify-center">
-          <ExplainableEngineSection />
-        </section>
-
-        {/* Section 05: Community & Trust Network (05. Data Flow) */}
-        <section id="community" className="min-h-[85vh] flex flex-col justify-center">
-          <CommunityShowcaseSection />
-        </section>
-
-        {/* Section 06: Call To Action & Contest (06. Focus Mode) */}
-        <section id="cta" className="min-h-[75vh] flex flex-col justify-center">
-          <CallToActionSection />
-        </section>
-      </main>
-
-      {/* Footer */}
-      <LandingFooter />
-
-      {/* Floating Visual Studio Trigger Drawer */}
+      {/* 5. Floating Studios & Dock */}
+      <FloatingDock />
       <BackgroundsAndEffectsStudio />
 
-      {/* Floating Quick Action Dock */}
-      <FloatingDock />
+      {/* Floating Island Navbar */}
+      <header className="overlay-nav-layer">
+        <ModernNavbar />
+      </header>
+
+      {/* Top Fixed Telemetry Marquee Ticker */}
+      <div className="fixed top-20 left-1/2 -translate-x-1/2 z-20 w-full max-w-4xl px-4 pointer-events-none">
+        <SaffronMarqueeTicker className="rounded-2xl border border-[#47140b] shadow-2xl backdrop-blur-xl" />
+      </div>
+
+      {/* Center Floating Scroll Flight Indicator (Initial Hint) */}
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-center pointer-events-none select-none opacity-80 animate-pulse">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#150604]/80 border border-[#ffbc09]/40 text-[#ffbc09] text-xs font-mono font-bold uppercase tracking-wider backdrop-blur-md shadow-2xl">
+          <span className="w-2 h-2 rounded-full bg-[#ffbc09] animate-ping" />
+          <span>CUỘN CHUỘT ĐỂ LƯỚT 3D QUA CÁC BẢNG ĐẶC TRƯNG TỪNG TRANG</span>
+        </div>
+      </div>
+
+      {/* Bottom Right Scroll Progress Indicator */}
+      <div className="fixed bottom-6 right-8 z-30 pointer-events-none select-none font-mono text-[11px] text-[#ffbc09] font-bold">
+        [ 01 → 05 // 3D HIGHWAY ARCHITECTURE ]
+      </div>
     </div>
   );
 }

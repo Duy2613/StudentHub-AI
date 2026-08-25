@@ -22,7 +22,7 @@ function CosmicAstrolabeRings() {
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none -z-10 overflow-hidden">
       {/* Outer Rotating Dashed Ring with Twinkling Star Nodes */}
       <svg
-        className="w-[780px] h-[780px] sm:w-[960px] sm:h-[960px] opacity-45 animate-[spin_80s_linear_infinite]"
+        className="w-[780px] h-[780px] sm:w-[960px] sm:h-[960px] opacity-25 animate-[spin_80s_linear_infinite]"
         viewBox="0 0 800 800"
         fill="none"
       >
@@ -31,19 +31,19 @@ function CosmicAstrolabeRings() {
           cy="400"
           r="370"
           stroke="#6366f1"
-          strokeWidth="1.5"
+          strokeWidth="1.2"
           strokeDasharray="6 16"
         />
-        <circle cx="400" cy="30" r="5" fill="#34e7c4" className="animate-pulse shadow-[0_0_12px_#34e7c4]" />
-        <circle cx="770" cy="400" r="4" fill="#818cf8" />
-        <circle cx="30" cy="400" r="4.5" fill="#fde047" />
-        <circle cx="660" cy="660" r="4" fill="#ec4899" />
-        <circle cx="140" cy="140" r="3.5" fill="#38bdf8" />
+        <circle cx="400" cy="30" r="4" fill="#34e7c4" className="animate-pulse" />
+        <circle cx="770" cy="400" r="3.5" fill="#818cf8" />
+        <circle cx="30" cy="400" r="3.5" fill="#38bdf8" />
+        <circle cx="660" cy="660" r="3" fill="#a78bfa" />
+        <circle cx="140" cy="140" r="3" fill="#34d399" />
       </svg>
 
       {/* Middle Counter-Rotating Ring with Shimmering Cyan Accents */}
       <svg
-        className="absolute w-[620px] h-[620px] sm:w-[780px] sm:h-[780px] opacity-55 animate-[spin_50s_linear_infinite_reverse]"
+        className="absolute w-[620px] h-[620px] sm:w-[780px] sm:h-[780px] opacity-30 animate-[spin_50s_linear_infinite_reverse]"
         viewBox="0 0 600 600"
         fill="none"
       >
@@ -51,21 +51,21 @@ function CosmicAstrolabeRings() {
           cx="300"
           cy="300"
           r="280"
-          stroke="#34e7c4"
-          strokeWidth="1.2"
+          stroke="#38bdf8"
+          strokeWidth="1"
           strokeDasharray="4 12"
         />
-        <circle cx="300" cy="20" r="4" fill="#34e7c4" />
-        <circle cx="580" cy="300" r="4" fill="#a855f7" />
-        <circle cx="90" cy="510" r="3.5" fill="#60a5fa" />
-        <circle cx="510" cy="90" r="3.5" fill="#fde047" />
+        <circle cx="300" cy="20" r="3.5" fill="#38bdf8" />
+        <circle cx="580" cy="300" r="3.5" fill="#818cf8" />
+        <circle cx="90" cy="510" r="3" fill="#60a5fa" />
+        <circle cx="510" cy="90" r="3" fill="#34d399" />
       </svg>
 
-      {/* Inner Glowing Orbit Circle with Pulsing Core */}
-      <div className="absolute w-[500px] h-[500px] sm:w-[620px] sm:h-[620px] rounded-full border border-teal-400/35 opacity-75 shadow-[0_0_120px_rgba(52,231,196,0.3)] animate-pulse" />
+      {/* Inner Glowing Orbit Circle with Subtle Pulsing Core */}
+      <div className="absolute w-[500px] h-[500px] sm:w-[620px] sm:h-[620px] rounded-full border border-teal-500/20 opacity-40 shadow-[0_0_60px_rgba(45,212,191,0.12)]" />
 
-      {/* Radiant Prismatic Backlight Flare behind the central card */}
-      <div className="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-indigo-600/40 via-purple-600/35 to-teal-400/30 blur-[150px] pointer-events-none" />
+      {/* Soft Ambient Backlight Flare behind the central card (Comfortable Deep Polar Tones) */}
+      <div className="absolute w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-indigo-900/25 via-slate-900/30 to-teal-900/20 blur-[130px] pointer-events-none" />
     </div>
   );
 }

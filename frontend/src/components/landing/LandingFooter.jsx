@@ -3,11 +3,19 @@
 import React from "react";
 import Link from "next/link";
 import { ShieldCheck, Sparkles, Heart, ExternalLink } from "lucide-react";
+import AuroraParticleCanvas from "@/components/ui/AuroraParticleCanvas";
 
 export default function LandingFooter() {
   return (
-    <footer className="relative border-t border-white/10 bg-space-950/80 backdrop-blur-2xl text-gray-400 text-xs py-12 px-4 sm:px-8 z-10">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <footer className="relative border-t border-white/10 bg-space-950/80 backdrop-blur-2xl text-gray-400 text-xs z-10 overflow-hidden">
+      {/* Igloo.inc Aurora Particle Zone */}
+      <div className="relative">
+        <AuroraParticleCanvas height={140} count={80} repelRadius={70} className="opacity-70" />
+        {/* Gradient fade to footer bg */}
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#06060a] to-transparent pointer-events-none" />
+      </div>
+
+      <div className="max-w-7xl mx-auto space-y-8 py-10 px-4 sm:px-8">
         
         {/* Top Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -39,22 +47,22 @@ export default function LandingFooter() {
             <p className="text-xs font-bold text-white uppercase tracking-wider">Tính Năng Cốt Lõi</p>
             <ul className="space-y-2">
               <li>
-                <Link href="/scam-check" className="hover:text-teal-300 transition-colors">
+                <Link href="/scam-check" className="hover:text-teal-300 transition-colors igloo-magnetic inline-block">
                   AI Scam Checker (4 Lớp)
                 </Link>
               </li>
               <li>
-                <Link href="/forum" className="hover:text-teal-300 transition-colors">
+                <Link href="/forum" className="hover:text-teal-300 transition-colors igloo-magnetic inline-block">
                   Diễn Đàn Cộng Đồng Sinh Viên
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard" className="hover:text-teal-300 transition-colors">
+                <Link href="/dashboard" className="hover:text-teal-300 transition-colors igloo-magnetic inline-block">
                   Bảng Điều Khiển &amp; Cảnh Báo
                 </Link>
               </li>
               <li>
-                <Link href="/profile" className="hover:text-teal-300 transition-colors">
+                <Link href="/profile" className="hover:text-teal-300 transition-colors igloo-magnetic inline-block">
                   Mạng Lưới Chuyên Gia &amp; Uy Tín
                 </Link>
               </li>

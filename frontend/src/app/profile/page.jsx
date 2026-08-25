@@ -1,12 +1,13 @@
 "use client";
 
 // app/profile/page.jsx
-// Hồ sơ cá nhân & Thang điểm uy tín StudentHub AI:
-// - Thang điểm 0–100 điểm (+1/+2 điểm khi xác nhận đúng, -1/-2 khi spam)
-// - Đạt 80–100 điểm -> Tự động gắn nhãn "⭐ Chuyên Gia Uy Tín"
-// - Email trường (.edu) -> Xác thực +30 điểm
-// - Lịch sử cảnh báo lừa đảo & bài viết diễn đàn
-// - Đổi avatar trong bộ có sẵn
+//
+// Hồ sơ cá nhân & Thang điểm uy tín StudentHub AI (Saffron Finance x Meer Mohsin 3D):
+// - WebGL Real-time Fluid Dynamics Canvas theo con trỏ chuột 60fps
+// - Quỹ đạo thiên văn 3D Astrolabe & vệ tinh bay quanh chu vi màn hình
+// - Saffron Swiss Grid Identity Cards với đường viền tóc hairline (#47140b) và dấu chữ thập (+)
+// - Nút HỦY & ĐÓNG QUAY LẠI TRANG rõ ràng, tiện lợi
+// - Thang điểm 0-100 pts + Huy hiệu Cố vấn / Sinh viên xác thực .edu
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -31,14 +32,24 @@ import {
   Share2,
   ArrowLeft,
   Edit3,
-  Clock
+  Clock,
+  Sparkles,
+  Zap,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
+import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
+import MohsinFluidCanvas from "@/components/ui/MohsinFluidCanvas";
+import SaffronMohsinPerimeter3DOrbit from "@/components/ui/SaffronMohsinPerimeter3DOrbit";
+import SaffronMarqueeTicker from "@/components/ui/SaffronMarqueeTicker";
+import SaffronSwissCrosshairGrid from "@/components/ui/SaffronSwissCrosshairGrid";
+import { NoiseOverlay } from "@/components/auth/AuthUI";
 import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
 import ModernNavbar from "@/components/layout/ModernNavbar";
-import TactileButton from "@/components/ui/TactileButton";
+import FloatingDock from "@/components/ui/floating-dock";
+import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
+import IglooSoundAmbiencePill from "@/components/ui/IglooSoundAmbiencePill";
+import { saffronAudio } from "@/lib/audio/saffronAudio";
 import {
   AVATAR_LIST,
   VIETNAM_UNIVERSITIES,
@@ -58,79 +69,98 @@ export default function ProfilePage() {
   const [editAvatarId, setEditAvatarId] = useState("student-tech");
   const [editUniversity, setEditUniversity] = useState(VIETNAM_UNIVERSITIES[0]);
   const [editMajor, setEditMajor] = useState("");
-  const [editAcademicYear, setEditAcademicYear] = useState("");
-  const [editExpertTitle, setEditExpertTitle] = useState("");
-  const [editExpertField, setEditExpertField] = useState(EXPERT_FIELDS[0]);
-  const [editExperienceYears, setEditExperienceYears] = useState("");
+  const [editAcademicYear, setEditAcademicYear] = useState("2024 - 2028");
   const [editBio, setEditBio] = useState("");
-
+  const [editExpertTitle, setEditExpertTitle] = useState("Chuyên gia An ninh");
+  const [editExpertField, setEditExpertField] = useState(EXPERT_FIELDS[0]);
+  const [editExperienceYears, setEditExperienceYears] = useState("3+ năm");
+  const [editOrganization, setEditOrganization] = useState("Tập đoàn An ninh Mạng / Học viện");
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [editError, setEditError] = useState(null);
+  const [editError, setEditError] = useState("");
 
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!isLoading && !session) {
-      router.replace("/login");
-    }
-  }, [session, isLoading, router]);
-
-  // Load current profile
   useEffect(() => {
     if (profile) {
       setEditFullName(profile.fullName || "");
       setEditRole(profile.role || "student");
       setEditAvatarId(profile.avatarId || "student-tech");
-      if (profile.university) setEditUniversity(profile.university);
+      setEditUniversity(profile.university || VIETNAM_UNIVERSITIES[0]);
       setEditMajor(profile.major || "");
-      setEditAcademicYear(profile.academicYear || "");
-      setEditExpertTitle(profile.expertTitle || "");
-      if (profile.expertField) setEditExpertField(profile.expertField);
-      setEditExperienceYears(profile.experienceYears || "");
+      setEditAcademicYear(profile.academicYear || "2024 - 2028");
       setEditBio(profile.bio || "");
+      setEditExpertTitle(profile.expertTitle || "Chuyên gia An ninh");
+      setEditExpertField(profile.expertField || EXPERT_FIELDS[0]);
+      setEditExperienceYears(profile.experienceYears || "3+ năm");
+      setEditOrganization(profile.organization || "Tập đoàn An ninh Mạng / Học viện");
     }
   }, [profile]);
 
-  if (isLoading || !profile) {
+  // Handle Cancel & Close to return back
+  const handleCancelAndGoBack = () => {
+    saffronAudio.playClick(400);
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/dashboard");
+    }
+  };
+
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-space-950 flex flex-col items-center justify-center text-gray-300">
-        <div className="w-12 h-12 rounded-full border-2 border-teal-400 border-t-transparent animate-spin mb-4" />
-        <p className="font-medium text-gray-400">Đang tải hồ sơ...</p>
+      <div className="min-h-screen bg-[#150604] flex flex-col items-center justify-center text-[#ece7e0]">
+        <div className="w-12 h-12 rounded-full border-2 border-[#ffbc09] border-t-transparent animate-spin mb-4" />
+        <p className="font-mono text-xs text-[#ffbc09] tracking-wider uppercase">[ INITIALIZING PROFILE // SAFFRON AI ENGINE ]</p>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-[#150604] flex flex-col items-center justify-center p-4">
+        <p className="text-white mb-4">Không tìm thấy thông tin hồ sơ.</p>
+        <button
+          type="button"
+          onClick={() => router.push("/login")}
+          className="py-2.5 px-5 rounded-xl bg-[#ffbc09] text-[#150604] font-bold text-xs"
+        >
+          Đăng nhập ngay
+        </button>
       </div>
     );
   }
 
   const isExpert = profile.role === "expert";
-  const trustScore = profile.trustScore ?? (isExpert ? 98 : 80);
-  const isEduVerified = profile.verifiedStudent || /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(profile.email || "");
+  const trustScore = profile.trustScore || 80;
   const isTopExpertBadge = trustScore >= 80;
+  const isEduVerified = !!profile.eduEmailVerified;
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
+    saffronAudio.playClick(800);
     setIsSaving(true);
-    setEditError(null);
-
+    setEditError("");
     try {
       await updateProfile({
-        full_name: editFullName,
+        fullName: editFullName,
         role: editRole,
-        avatar_id: editAvatarId,
-        university: editRole === "student" ? editUniversity : null,
-        major: editRole === "student" ? editMajor : null,
-        academic_year: editRole === "student" ? editAcademicYear : null,
-        expert_title: editRole === "expert" ? editExpertTitle : null,
-        expert_field: editRole === "expert" ? editExpertField : null,
-        experience_years: editRole === "expert" ? editExperienceYears : null,
+        avatarId: editAvatarId,
+        university: editUniversity,
+        major: editMajor,
+        academicYear: editAcademicYear,
         bio: editBio,
-        verified_expert: editRole === "expert",
+        expertTitle: editExpertTitle,
+        expertField: editExpertField,
+        experienceYears: editExperienceYears,
+        organization: editOrganization,
       });
-
+      saffronAudio.playSuccessChime();
       setSaveSuccess(true);
       setTimeout(() => {
         setSaveSuccess(false);
         setIsEditModalOpen(false);
       }, 800);
     } catch (err) {
+      saffronAudio.playAlertBuzz();
       setEditError(err.message || "Không thể lưu cập nhật.");
     } finally {
       setIsSaving(false);
@@ -138,50 +168,78 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-space-950 text-gray-100 flex relative overflow-x-hidden">
-      <AmbientBackground />
+    <div className="min-h-screen bg-[#070403] text-gray-100 flex relative overflow-x-hidden selection:bg-[#ffbc09] selection:text-[#150604]">
+      {/* 1. 3D Infinite Highway Canvas */}
+      <div className="canvas-bg-layer">
+        <RobinPayotRoadCanvas />
+      </div>
+
+      {/* 2. Meer Mohsin WebGL Fluid Smoke Canvas */}
+      <MohsinFluidCanvas opacity={0.6} particleDensity={45} />
+
+      {/* 3. 3D Astrolabe Orbit & Perimeter Satellites */}
+      <SaffronMohsinPerimeter3DOrbit />
+
+      {/* 4. Film Grain Noise Overlay */}
       <NoiseOverlay />
 
+      {/* 5. Floating Quick Tools & Studio */}
+      <FloatingDock />
+      <BackgroundsAndEffectsStudio />
+
       {session ? (
-        <CollapsibleSidebar className="hidden md:flex" />
+        <CollapsibleSidebar className="hidden md:flex relative z-40" />
       ) : (
-        <ModernNavbar />
+        <header className="overlay-nav-layer">
+          <ModernNavbar />
+        </header>
       )}
 
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8 sm:py-12 space-y-8 relative z-10 min-w-0">
+      <main className="flex-1 layout-safe-container pt-24 sm:pt-28 pb-40 space-y-8 relative z-10 min-w-0 font-human">
         
-        {/* Top Header */}
-        <div className="flex items-center justify-between">
+        {/* Top Marquee Telemetry Ticker */}
+        <SaffronMarqueeTicker className="rounded-2xl border border-[#47140b]" />
+
+        {/* Top Navigation & Explicit Cancel / Close Button */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <button
             type="button"
-            onClick={() => router.push("/dashboard")}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold transition-colors"
+            onClick={handleCancelAndGoBack}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#210a07] hover:bg-[#2f0e09] text-[#ece7e0] hover:text-[#ffbc09] border border-[#47140b] hover:border-[#ffbc09]/50 text-xs font-bold transition-all shadow-sm cursor-pointer"
+            title="Hủy thao tác và quay về trang trước"
           >
-            <ArrowLeft className="w-4 h-4" /> Quay lại Dashboard
+            <ArrowLeft className="w-4 h-4 text-[#ffbc09]" />
+            <span>[ ✕ HỦY &amp; ĐÓNG // QUAY LẠI TRANG ]</span>
           </button>
 
-          <TactileButton
-            variant="primary"
-            size="sm"
-            onClick={() => setIsEditModalOpen(true)}
-            icon={Edit3}
-          >
-            Chỉnh Sửa Hồ Sơ
-          </TactileButton>
+          <div className="flex items-center gap-3">
+            <IglooSoundAmbiencePill />
+            <button
+              type="button"
+              onClick={() => {
+                saffronAudio.playClick(600);
+                setIsEditModalOpen(true);
+              }}
+              className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#ffbc09] to-[#f59e0b] text-[#150604] font-extrabold text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(255,188,9,0.35)] hover:scale-105 transition-all flex items-center gap-2 cursor-pointer font-mono"
+            >
+              <Edit3 className="w-4 h-4" />
+              <span>Chỉnh Sửa Hồ Sơ</span>
+            </button>
+          </div>
         </div>
 
-        {/* Profile Identity Card */}
-        <div className="relative rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-2xl overflow-hidden shadow-glass-deep">
+        {/* Profile Identity Card (Swiss Grid Style) */}
+        <SaffronSwissCrosshairGrid sectionTag="01 // USER_IDENTITY_CARD" className="p-0 overflow-hidden">
           {/* Cover Header */}
           <div
             className={`h-40 sm:h-48 w-full relative ${
               isExpert
-                ? "bg-gradient-to-r from-teal-950 via-space-900 to-amber-950/50"
-                : "bg-gradient-to-r from-teal-950 via-space-900 to-indigo-950/50"
+                ? "bg-gradient-to-r from-[#2f0e09] via-[#150604] to-[#ffbc09]/20"
+                : "bg-gradient-to-r from-[#210a07] via-[#150604] to-[#38bdf8]/20"
             }`}
           >
-            <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-xs font-semibold text-gray-300">
-              Mã hồ sơ: #{String(profile.id || "1").slice(0, 8)}
+            <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-[#150604]/80 backdrop-blur-md border border-[#47140b] text-[11px] font-mono font-semibold text-[#ffd15c]">
+              MÃ HỒ SƠ: #{String(profile.id || "1").slice(0, 8)}
             </div>
           </div>
 
@@ -190,7 +248,10 @@ export default function ProfilePage() {
               {/* Avatar with Interactive Edit */}
               <div
                 className="relative group cursor-pointer"
-                onClick={() => setIsEditModalOpen(true)}
+                onClick={() => {
+                  saffronAudio.playClick(600);
+                  setIsEditModalOpen(true);
+                }}
               >
                 <AvatarDisplay
                   avatarId={profile.avatarId}
@@ -200,8 +261,8 @@ export default function ProfilePage() {
                   showBadge={true}
                   isInteractive={true}
                 />
-                <div className="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-bold gap-1 backdrop-blur-xs">
-                  <Edit3 className="w-4 h-4" /> Đổi Avatar
+                <div className="absolute inset-0 rounded-2xl bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[#ffbc09] text-xs font-bold gap-1 backdrop-blur-xs font-mono">
+                  <Edit3 className="w-4 h-4" /> ĐỔI AVATAR
                 </div>
               </div>
 
@@ -209,10 +270,13 @@ export default function ProfilePage() {
               <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => setIsEditModalOpen(true)}
-                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold transition-all"
+                  onClick={() => {
+                    saffronAudio.playClick(600);
+                    setIsEditModalOpen(true);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-[#210a07] hover:bg-[#2f0e09] border border-[#47140b] hover:border-[#ffbc09]/50 text-white text-xs font-bold transition-all cursor-pointer font-mono"
                 >
-                  Đổi vai trò / avatar
+                  [ ĐỔI VAI TRÒ / AVATAR ]
                 </button>
               </div>
             </div>
@@ -224,323 +288,275 @@ export default function ProfilePage() {
                   {profile.fullName}
                 </h1>
 
-                {/* Auto Badge "Chuyên Gia Uy Tín" at 80-100 pts */}
+                {/* Auto Badge "Chuyên Gia Uy Tín" */}
                 {isTopExpertBadge ? (
-                  <span className="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 text-xs font-bold flex items-center gap-1 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    ⭐ Chuyên Gia Uy Tín
+                  <span className="px-3 py-1 rounded-full bg-[#ffbc09]/20 border border-[#ffbc09]/50 text-[#ffbc09] text-xs font-bold font-mono flex items-center gap-1 shadow-[0_0_15px_rgba(255,188,9,0.3)]">
+                    <Star className="w-3.5 h-3.5 fill-[#ffbc09] text-[#ffbc09]" />
+                    ⭐ CỐ VẤN UY TÍN ({trustScore} PTS)
                   </span>
                 ) : (
-                  <span className="px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400/50 text-teal-300 text-xs font-bold flex items-center gap-1">
-                    <GraduationCap className="w-3.5 h-3.5 text-teal-400" />
-                    🎓 Sinh Viên Xác Thực
+                  <span className="px-3 py-1 rounded-full bg-[#38bdf8]/20 border border-[#38bdf8]/40 text-[#38bdf8] text-xs font-bold font-mono flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    SINH VIÊN THÀNH VIÊN ({trustScore} PTS)
                   </span>
                 )}
 
-                {/* Edu Verified Badge */}
                 {isEduVerified && (
-                  <span className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center gap-1">
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-bold flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    Email Trường Xác Minh (+30 pts)
+                    EMAIL .EDU VERIFIED (+30 PTS)
                   </span>
                 )}
               </div>
 
-              {/* Subtitle */}
-              <p className="text-xs sm:text-sm text-gray-300 flex flex-wrap items-center gap-2.5">
-                {isExpert ? (
-                  <>
-                    <span className="font-semibold text-amber-300 flex items-center gap-1">
-                      <Award className="w-4 h-4 text-amber-400" /> {profile.expertTitle || "Chuyên gia Tư vấn"}
-                    </span>
-                    <span>•</span>
-                    <span className="text-gray-400">{profile.expertField || "An ninh mạng"}</span>
-                    <span>•</span>
-                    <span className="text-gray-400">{profile.experienceYears || "3+ năm"}</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="font-semibold text-teal-300 flex items-center gap-1">
-                      <Building className="w-4 h-4 text-teal-400" /> {profile.university || "Đại học Thành viên"}
-                    </span>
-                    <span>•</span>
-                    <span className="text-gray-400">{profile.major || "Khoa học & Kỹ thuật"}</span>
-                    <span>•</span>
-                    <span className="text-gray-400">{profile.academicYear || "2024 - 2028"}</span>
-                  </>
-                )}
+              {/* Bio & Details */}
+              <p className="text-sm text-[#ece7e0]/80 max-w-3xl leading-relaxed">
+                {profile.bio || "Thành viên tích cực tham gia mạng lưới phòng chống lừa đảo sinh viên StudentHub AI."}
               </p>
 
-              {/* Bio */}
-              <p className="text-xs sm:text-sm text-gray-400 max-w-3xl leading-relaxed">
-                {profile.bio || "Thành viên tích cực trong cộng đồng phòng chống lừa đảo StudentHub AI."}
-              </p>
-
-              {/* Stat Highlights */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/10">
-                <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 text-center sm:text-left">
-                  <p className="text-[11px] text-gray-400 uppercase font-semibold">Điểm Uy Tín</p>
-                  <p className="text-2xl font-black text-teal-300 mt-0.5">{trustScore} pts</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs text-[#ece7e0]/70">
+                <div className="flex items-center gap-2">
+                  <Building className="w-4 h-4 text-[#ffbc09]" />
+                  <span>{isExpert ? (profile.organization || "Tổ chức chuyên môn") : (profile.university || "Đại học Thành viên")}</span>
                 </div>
-                <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 text-center sm:text-left">
-                  <p className="text-[11px] text-gray-400 uppercase font-semibold">Xác nhận đúng</p>
-                  <p className="text-2xl font-black text-emerald-400 mt-0.5">+18 lượt</p>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-[#38bdf8]" />
+                  <span>{isExpert ? (profile.expertField || "Lĩnh vực tư vấn") : (profile.major || "Chuyên ngành đào tạo")}</span>
                 </div>
-                <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 text-center sm:text-left">
-                  <p className="text-[11px] text-gray-400 uppercase font-semibold">Cảnh báo đã quét</p>
-                  <p className="text-2xl font-black text-white mt-0.5">14 vụ</p>
-                </div>
-                <div className="p-3.5 rounded-2xl bg-white/5 border border-white/5 text-center sm:text-left">
-                  <p className="text-[11px] text-gray-400 uppercase font-semibold">Bài đăng diễn đàn</p>
-                  <p className="text-2xl font-black text-white mt-0.5">6 bài</p>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-[#ca56ed]" />
+                  <span>{isExpert ? (profile.experienceYears || "3+ năm kinh nghiệm") : `Niên khóa: ${profile.academicYear || "2024 - 2028"}`}</span>
                 </div>
               </div>
             </div>
           </div>
+        </SaffronSwissCrosshairGrid>
+
+        {/* 3 Overview Stat Bento Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <SaffronSwissCrosshairGrid sectionTag="RADAR // TRUST" className="p-6 my-0 space-y-2">
+            <div className="flex items-center justify-between text-xs font-mono text-[#ece7e0]/60 uppercase">
+              <span>ĐIỂM UY TÍN TÍCH LŨY</span>
+              <Sparkles className="w-4 h-4 text-[#ffbc09]" />
+            </div>
+            <div className="text-3xl font-extrabold text-[#ffd15c] font-mono">{trustScore} / 100 PTS</div>
+            <p className="text-xs text-[#ece7e0]/70">Được đánh giá dựa trên mức độ chính xác của các cảnh báo và bình chọn cộng đồng.</p>
+          </SaffronSwissCrosshairGrid>
+
+          <SaffronSwissCrosshairGrid sectionTag="ACTIVITY // SCAMS" className="p-6 my-0 space-y-2">
+            <div className="flex items-center justify-between text-xs font-mono text-[#ece7e0]/60 uppercase">
+              <span>BÁO CÁO ĐÃ GỬI</span>
+              <ShieldAlert className="w-4 h-4 text-red-400" />
+            </div>
+            <div className="text-3xl font-extrabold text-white font-mono">14 CA</div>
+            <p className="text-xs text-[#ece7e0]/70">Đã phát hiện và cảnh báo thành công các vụ việc nghi vấn lừa cọc và học bổng giả.</p>
+          </SaffronSwissCrosshairGrid>
+
+          <SaffronSwissCrosshairGrid sectionTag="COMMUNITY // VOTES" className="p-6 my-0 space-y-2">
+            <div className="flex items-center justify-between text-xs font-mono text-[#ece7e0]/60 uppercase">
+              <span>BÌNH CHỌN HỮU ÍCH</span>
+              <Star className="w-4 h-4 text-[#38bdf8]" />
+            </div>
+            <div className="text-3xl font-extrabold text-[#38bdf8] font-mono">128 LƯỢT</div>
+            <p className="text-xs text-[#ece7e0]/70">Nhận được sự đồng thuận và cảm ơn từ các bạn sinh viên trong diễn đàn.</p>
+          </SaffronSwissCrosshairGrid>
         </div>
 
-        {/* Tabs & Details */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-            {[
-              { id: "overview", label: "Thông Tin Chuyên Môn / Học Vấn" },
-              { id: "scams", label: "Lịch Sử Quét Lừa Đảo" },
-              { id: "forum", label: "Bài Đăng Diễn Đàn Của Tôi" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
-                  activeTab === tab.id
-                    ? "bg-teal-400 text-space-950 shadow-md shadow-teal-500/30"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {activeTab === "overview" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-4">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  {isExpert ? <Award className="w-4 h-4 text-amber-400" /> : <GraduationCap className="w-4 h-4 text-teal-400" />}
-                  {isExpert ? "Chi Tiết Chuyên Gia" : "Chi Tiết Sinh Viên"}
-                </h3>
-                <div className="space-y-3 text-xs sm:text-sm">
-                  {isExpert ? (
-                    <>
-                      <div className="flex justify-between py-2 border-b border-white/5">
-                        <span className="text-gray-400">Lĩnh vực chuyên sâu:</span>
-                        <span className="font-semibold text-amber-300">{profile.expertField}</span>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-white/5">
-                        <span className="text-gray-400">Kinh nghiệm:</span>
-                        <span className="font-semibold text-white">{profile.experienceYears}</span>
-                      </div>
-                      <div className="flex justify-between py-2">
-                        <span className="text-gray-400">Cơ chế điểm:</span>
-                        <span className="font-semibold text-teal-300">Cộng đồng xác nhận (+1/+2đ)</span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex justify-between py-2 border-b border-white/5">
-                        <span className="text-gray-400">Trường Đại học:</span>
-                        <span className="font-semibold text-white">{profile.university}</span>
-                      </div>
-                      <div className="flex justify-between py-2 border-b border-white/5">
-                        <span className="text-gray-400">Chuyên ngành:</span>
-                        <span className="font-semibold text-teal-300">{profile.major}</span>
-                      </div>
-                      <div className="flex justify-between py-2">
-                        <span className="text-gray-400">Email:</span>
-                        <span className="font-semibold text-gray-300">{profile.email}</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-4">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-teal-400" />
-                  Quy Chuẩn Thang Điểm Uy Tín (0–100)
-                </h3>
-                <ul className="space-y-2.5 text-xs text-gray-300">
-                  <li className="flex items-center justify-between p-2.5 rounded-xl bg-white/5">
-                    <span>Xác thực bằng Email trường (.edu)</span>
-                    <strong className="text-emerald-400">+30 điểm</strong>
-                  </li>
-                  <li className="flex items-center justify-between p-2.5 rounded-xl bg-white/5">
-                    <span>Cộng đồng xác nhận cảnh báo chính xác</span>
-                    <strong className="text-teal-300">+1 đến +2 điểm</strong>
-                  </li>
-                  <li className="flex items-center justify-between p-2.5 rounded-xl bg-white/5">
-                    <span>Bị gắn cờ thông tin sai lệch / spam</span>
-                    <strong className="text-rose-400">-1 đến -2 điểm</strong>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "scams" && (
-            <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-3">
-              {[
-                { title: "Kiểm tra link tuyển dụng Shopee nhiệm vụ nạp cọc", risk: "94% Lừa đảo", date: "Hôm qua" },
-                { title: "Kiểm tra link phòng trọ ngõ 27 Tạ Quang Bửu", risk: "88% Lừa đảo", date: "3 ngày trước" },
-                { title: "Thông báo học bổng chính thống từ sis.hust.edu.vn", risk: "12% An toàn", date: "Tuần trước" },
-              ].map((item, idx) => (
-                <div key={idx} className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between gap-4 text-xs">
-                  <div>
-                    <p className="font-bold text-white">{item.title}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">{item.date}</p>
-                  </div>
-                  <span className="font-bold text-teal-300 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20">
-                    {item.risk}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === "forum" && (
-            <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-3">
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between gap-4 text-xs">
-                <div>
-                  <p className="font-bold text-white">Cảnh báo phòng trọ ảo ép cọc tại ngõ 27 Tạ Quang Bửu</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">Nhà Trọ • 48 lượt vote uy tín</p>
-                </div>
-                <span className="font-bold text-teal-300">Đã đăng</span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Modal Edit Profile */}
+        {/* Modal Chỉnh Sửa Hồ Sơ */}
         {isEditModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto">
-            <div className="w-full max-w-xl bg-space-900 border border-white/15 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0d0403]/85 backdrop-blur-xl overflow-y-auto">
+            <div className="w-full max-w-2xl bg-[#150604] border border-[#47140b] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 font-human">
+              <div className="flex items-center justify-between pb-3 border-b border-[#47140b]">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Edit3 className="w-5 h-5 text-teal-400" /> Chỉnh Sửa Hồ Sơ & Chọn Avatar
+                  <Edit3 className="w-5 h-5 text-[#ffbc09]" /> Chỉnh Sửa Hồ Sơ &amp; Đổi Avatar
                 </h3>
                 <button
                   type="button"
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white"
+                  onClick={() => {
+                    saffronAudio.playClick(400);
+                    setIsEditModalOpen(false);
+                  }}
+                  className="p-1.5 rounded-lg bg-[#210a07] hover:bg-[#2f0e09] border border-[#47140b] text-[#ece7e0]/70 hover:text-white cursor-pointer"
+                  title="Đóng cửa sổ"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {saveSuccess && (
-                <div className="p-3 rounded-xl bg-emerald-500/20 text-emerald-300 text-xs font-bold flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4" /> Đã cập nhật thành công!
+              {editError && (
+                <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs">
+                  {editError}
                 </div>
               )}
 
               <form onSubmit={handleSaveProfile} className="space-y-4">
-                {/* Chọn Avatar Grid */}
+                {/* Chọn Avatar */}
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-400 mb-2">
-                    Chọn Avatar Đại Diện
+                  <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-2 font-mono">
+                    [ 01 ] CHỌN AVATAR NHẬN DIỆN
                   </label>
-                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                     {AVATAR_LIST.map((av) => (
-                      <div
+                      <button
                         key={av.id}
-                        onClick={() => setEditAvatarId(av.id)}
-                        className={`cursor-pointer p-2 rounded-xl border flex flex-col items-center gap-1 transition-all ${
+                        type="button"
+                        onClick={() => {
+                          saffronAudio.playClick(500);
+                          setEditAvatarId(av.id);
+                        }}
+                        className={`p-2 rounded-2xl border transition-all cursor-pointer flex flex-col items-center gap-1 ${
                           editAvatarId === av.id
-                            ? "border-teal-400 bg-teal-950/40 ring-2 ring-teal-400/40 scale-105"
-                            : "border-white/10 bg-white/5 hover:bg-white/10"
+                            ? "bg-[#ffbc09]/20 border-[#ffbc09] shadow-[0_0_15px_rgba(255,188,9,0.3)]"
+                            : "bg-[#210a07] border-[#47140b] hover:border-white/30"
                         }`}
                       >
-                        <AvatarDisplay avatarId={av.id} role={av.role} size="sm" />
-                        <span className="text-[10px] text-gray-300 line-clamp-1 font-semibold">
-                          {av.name}
-                        </span>
-                      </div>
+                        <AvatarDisplay avatarId={av.id} size="sm" />
+                        <span className="text-[9px] text-[#ece7e0]/60 truncate w-full text-center">{av.label}</span>
+                      </button>
                     ))}
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5">
-                    Họ và tên hiển thị
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={editFullName}
-                    onChange={(e) => setEditFullName(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-teal-400"
-                  />
-                </div>
-
-                {isExpert ? (
+                {/* Tên và Vai trò */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold uppercase text-amber-300 mb-1.5">
-                      Lĩnh vực chuyên môn
+                    <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
+                      Họ và tên
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editFullName}
+                      onChange={(e) => setEditFullName(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-sm text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
+                      Vai trò tài khoản
                     </label>
                     <select
-                      value={editExpertField}
-                      onChange={(e) => setEditExpertField(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl bg-[#111522] border border-amber-500/30 text-xs text-white focus:outline-none focus:border-amber-400"
+                      value={editRole}
+                      onChange={(e) => setEditRole(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
                     >
-                      {EXPERT_FIELDS.map((f) => (
-                        <option key={f} value={f}>
-                          {f}
-                        </option>
-                      ))}
+                      <option value="student">Sinh viên</option>
+                      <option value="expert">Chuyên gia / Cố vấn</option>
                     </select>
                   </div>
+                </div>
+
+                {/* Thông tin sinh viên hoặc chuyên gia */}
+                {editRole === "student" ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
+                        Trường Đại học
+                      </label>
+                      <select
+                        value={editUniversity}
+                        onChange={(e) => setEditUniversity(e.target.value)}
+                        className="w-full px-3 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
+                      >
+                        {VIETNAM_UNIVERSITIES.map((u) => (
+                          <option key={u} value={u}>{u}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
+                        Chuyên ngành
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Khoa học Máy tính..."
+                        value={editMajor}
+                        onChange={(e) => setEditMajor(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
+                      />
+                    </div>
+                  </div>
                 ) : (
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5">
-                      Trường Đại học
-                    </label>
-                    <select
-                      value={editUniversity}
-                      onChange={(e) => setEditUniversity(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl bg-[#111522] border border-white/10 text-xs text-white focus:outline-none focus:border-teal-400"
-                    >
-                      {VIETNAM_UNIVERSITIES.map((u) => (
-                        <option key={u} value={u}>
-                          {u}
-                        </option>
-                      ))}
-                    </select>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
+                        Lĩnh vực chuyên môn
+                      </label>
+                      <select
+                        value={editExpertField}
+                        onChange={(e) => setEditExpertField(e.target.value)}
+                        className="w-full px-3 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
+                      >
+                        {EXPERT_FIELDS.map((f) => (
+                          <option key={f} value={f}>{f}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
+                        Tổ chức / Đơn vị
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Viện An ninh mạng..."
+                        value={editOrganization}
+                        onChange={(e) => setEditOrganization(e.target.value)}
+                        className="w-full px-4 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
+                      />
+                    </div>
                   </div>
                 )}
 
+                {/* Bio */}
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-400 mb-1.5">
-                    Giới thiệu ngắn (Bio)
+                  <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
+                    Giới thiệu bản thân (Bio)
                   </label>
                   <textarea
                     rows={3}
                     value={editBio}
                     onChange={(e) => setEditBio(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-white focus:outline-none focus:border-teal-400 resize-none"
+                    placeholder="Viết một vài dòng về bạn..."
+                    className="w-full p-4 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09] resize-none"
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
+                {/* Action Buttons: Hủy và Lưu */}
+                <div className="flex items-center justify-between pt-3 border-t border-[#47140b]">
                   <button
                     type="button"
-                    onClick={() => setIsEditModalOpen(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-400 hover:text-white"
+                    onClick={() => {
+                      saffronAudio.playClick(400);
+                      setIsEditModalOpen(false);
+                    }}
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#210a07] hover:bg-[#2f0e09] border border-[#47140b] text-xs font-bold text-[#ece7e0]/80 hover:text-white cursor-pointer"
                   >
-                    Hủy
+                    <X className="w-4 h-4" />
+                    <span>[ ✕ HỦY &amp; ĐÓNG CỬA SỔ ]</span>
                   </button>
-                  <TactileButton variant="primary" size="sm" type="submit" isLoading={isSaving} showArrow={false}>
-                    Lưu Thay Đổi
-                  </TactileButton>
+
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="py-2.5 px-5 rounded-xl bg-gradient-to-r from-[#ffbc09] to-[#f59e0b] text-[#150604] font-extrabold text-xs uppercase tracking-wider shadow-md hover:scale-105 transition-all cursor-pointer font-mono flex items-center gap-1.5"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-[#150604]" />
+                        <span>ĐANG LƯU...</span>
+                      </>
+                    ) : saveSuccess ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span>ĐÃ LƯU THÀNH CÔNG!</span>
+                      </>
+                    ) : (
+                      <span>LƯU HỒ SƠ MỚI</span>
+                    )}
+                  </button>
                 </div>
               </form>
             </div>

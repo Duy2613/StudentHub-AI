@@ -83,12 +83,12 @@ export default function CoreFeaturesSection() {
         
         {/* Section Header with Editorial Serif Typography */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-bold uppercase tracking-widest font-mono">
-            <Layers className="w-3.5 h-3.5 text-teal-400" />
-            <span>02 / 3 TRỤ CỘT NỀN TẢNG</span>
-          </div>
+          <span className="dg-badge-machine igloo-magnetic">
+            <Layers className="w-3 h-3" />
+            02 / 3 TRỤ CỘT NỀN TẢNG
+          </span>
 
-          <h2 className="text-3xl sm:text-5xl font-normal text-white tracking-tight leading-tight">
+          <h2 className="text-3xl sm:text-5xl font-normal text-white tracking-tight leading-tight igloo-halo-hover">
             <span className="font-serif-editorial italic text-gradient-primary">
               Giải pháp toàn diện,
             </span>
@@ -103,9 +103,9 @@ export default function CoreFeaturesSection() {
           </p>
         </div>
 
-        {/* Feature Cards Grid with Robin Payot 3D Perspective Tilt Blocks */}
+        {/* Feature Cards Grid with Robin Payot 3D Perspective Tilt + Igloo Iridescent Glass */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {features.map((feat) => {
+          {features.map((feat, index) => {
             const Icon = feat.icon;
             return (
               <Interactive3DBlockCard
@@ -113,9 +113,9 @@ export default function CoreFeaturesSection() {
                 glowColor={feat.glowColor}
                 maxTilt={14}
                 depth={45}
-                className="w-full h-full"
+                className={`w-full h-full igloo-reveal igloo-reveal-delay-${index + 1}`}
               >
-                <div className="p-8 rounded-3xl bg-space-900/85 border border-white/12 backdrop-blur-3xl transition-all duration-300 flex flex-col justify-between shadow-[0_12px_40px_rgba(0,0,0,0.6)] group relative overflow-hidden h-full min-h-[420px]">
+                <div className="igloo-glass-card p-8 transition-all duration-300 flex flex-col justify-between shadow-[0_12px_40px_rgba(0,0,0,0.6)] group relative h-full min-h-[420px]">
                   
                   {/* Subtle Background Chapter Number */}
                   <div className="absolute top-4 right-6 text-5xl font-mono font-black text-white/[0.04] group-hover:text-teal-400/[0.08] transition-colors pointer-events-none select-none">

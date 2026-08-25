@@ -13,6 +13,38 @@
   --color-cyber-indigo: #6366f1;
   --color-burnt-amber: #b15f2c;
   --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* === DIGITAL GUARDIAN TYPOGRAPHY TOKENS === */
+  /* Human Interface — Hướng dẫn, nội dung, tiêu đề */
+  --font-human: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
+  /* Machine Interface — AI output, dữ liệu OCR, cảnh báo bảo mật */
+  --font-machine: var(--font-jetbrains-mono), var(--font-geist-mono), 'Courier New', monospace;
+
+  /* === SAFFRON & UAVIONIX LUXURY CYBERNETIC TOKENS === */
+  --color-saffron-gold: #ffbc09;
+  --color-saffron-amber: #f59e0b;
+  --color-saffron-cream: #ece7e0;
+  --color-saffron-purple: #ca56ed;
+  --color-cocoa-950: #150604;
+  --color-cocoa-900: #210a07;
+  --color-cocoa-800: #2f0e09;
+  --color-cocoa-border: #47140b;
+
+  /* Security Status Colors */
+  --color-threat-red: #ef4444;          /* Cảnh báo nguy hiểm / Phát hiện lừa đảo */
+  --color-threat-red-bg: rgba(239, 68, 68, 0.08);
+  --color-threat-red-border: rgba(239, 68, 68, 0.35);
+  --color-warn-amber: #f59e0b;          /* Cảnh báo / Đang kiểm tra */
+  --color-warn-amber-bg: rgba(245, 158, 11, 0.08);
+  --color-warn-amber-border: rgba(245, 158, 11, 0.35);
+  --color-safe-emerald: #10b981;        /* An toàn / Đã xác thực */
+  --color-safe-emerald-bg: rgba(16, 185, 129, 0.08);
+  --color-safe-emerald-border: rgba(16, 185, 129, 0.35);
+
+  /* AI Terminal Surface */
+  --color-machine-bg: rgba(4, 7, 18, 0.9);
+  --color-machine-header-bg: rgba(10, 14, 30, 0.95);
+  --color-machine-border: rgba(6, 182, 212, 0.2);
 }
 
 @theme inline {
@@ -21,6 +53,9 @@
   --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
   --font-serif: var(--font-instrument-serif), var(--font-cormorant-garamond), serif;
+  /* Digital Guardian semantic aliases exposed to Tailwind */
+  --font-human: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
+  --font-machine: var(--font-jetbrains-mono), var(--font-geist-mono), monospace;
 
   /* ---- Tailwind CSS v4 Theme Variables & Tokens ---- */
   --color-space-950: #06060a;
@@ -32,6 +67,14 @@
   --color-deep-emerald: #02160c;
   --color-cyber-indigo: #6366f1;
   --color-burnt-amber: #b15f2c;
+  --color-saffron-gold: #ffbc09;
+  --color-saffron-amber: #f59e0b;
+  --color-saffron-cream: #ece7e0;
+  --color-saffron-purple: #ca56ed;
+  --color-cocoa-950: #150604;
+  --color-cocoa-900: #210a07;
+  --color-cocoa-800: #2f0e09;
+  --color-cocoa-border: #47140b;
 
   --shadow-glass-deep: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.06);
   --shadow-neon-primary: 0 0 40px rgba(99, 102, 241, 0.55);
@@ -409,3 +452,1027 @@ html {
 .animate-gradient {
   animation: gradient 8s linear infinite;
 }
+
+/* ============================================================
+   DIGITAL GUARDIAN TYPOGRAPHY SYSTEM
+   The Human/Machine Interface split for StudentHub AI
+   Human = Inter (guidance, body, headings)
+   Machine = JetBrains Mono (AI output, data, alerts, OCR)
+   ============================================================ */
+
+/* --- Convenience font classes --- */
+.font-human {
+  font-family: var(--font-human);
+}
+
+.font-machine {
+  font-family: var(--font-machine);
+}
+
+/* --- AI TERMINAL BLOCK ---
+   Dùng cho: Kết quả phân tích AI, OCR output, Scanner status
+*/
+.dg-terminal {
+  font-family: var(--font-machine);
+  background: var(--color-machine-bg);
+  border: 1px solid var(--color-machine-border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  position: relative;
+}
+
+.dg-terminal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent);
+}
+
+.dg-terminal-header {
+  background: var(--color-machine-header-bg);
+  padding: 8px 16px;
+  font-family: var(--font-machine);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dg-terminal-header::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34e7c4;
+  box-shadow: 0 0 8px rgba(52, 231, 196, 0.8);
+  animation: pulse-slow 2.5s ease-in-out infinite;
+}
+
+.dg-terminal-body {
+  padding: 18px 20px;
+  color: #cbd5e1;
+}
+
+.dg-terminal-label {
+  font-weight: 700;
+  color: #64748b;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-right: 8px;
+}
+
+.dg-terminal-value {
+  color: #e2e8f0;
+}
+
+.dg-terminal-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+}
+
+.dg-terminal-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 12px 0;
+}
+
+.dg-terminal-detail {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  border-left: 2px solid rgba(6, 182, 212, 0.3);
+  padding-left: 12px;
+  margin-top: 10px;
+  line-height: 1.7;
+}
+
+.dg-terminal-detail::before {
+  content: '>> ';
+  color: #06b6d4;
+  opacity: 0.6;
+}
+
+/* --- STATUS INDICATORS (inside terminals) --- */
+.dg-status-danger {
+  font-weight: 700;
+  color: var(--color-threat-red);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
+
+.dg-status-warning {
+  font-weight: 700;
+  color: var(--color-warn-amber);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+}
+
+.dg-status-safe {
+  font-weight: 700;
+  color: var(--color-safe-emerald);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+/* --- ALERT BOXES (Human Interface context, not terminal) ---
+   Dùng cho: Cảnh báo inline trong bài viết, hướng dẫn
+*/
+.dg-alert {
+  font-family: var(--font-human);
+  padding: 18px 22px;
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  margin: 1.5rem 0;
+}
+
+.dg-alert-title {
+  font-weight: 900;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.dg-alert-body {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.dg-alert-danger {
+  background: var(--color-threat-red-bg);
+  border: 1px solid var(--color-threat-red-border);
+  border-left-width: 4px;
+}
+
+.dg-alert-danger .dg-alert-title {
+  color: var(--color-threat-red);
+}
+
+.dg-alert-danger .dg-alert-body {
+  color: #fca5a5;
+}
+
+.dg-alert-warning {
+  background: var(--color-warn-amber-bg);
+  border: 1px solid var(--color-warn-amber-border);
+  border-left-width: 4px;
+}
+
+.dg-alert-warning .dg-alert-title {
+  color: var(--color-warn-amber);
+}
+
+.dg-alert-warning .dg-alert-body {
+  color: #fcd34d;
+}
+
+.dg-alert-safe {
+  background: var(--color-safe-emerald-bg);
+  border: 1px solid var(--color-safe-emerald-border);
+  border-left-width: 4px;
+}
+
+.dg-alert-safe .dg-alert-title {
+  color: var(--color-safe-emerald);
+}
+
+.dg-alert-safe .dg-alert-body {
+  color: #6ee7b7;
+}
+
+/* --- INLINE MACHINE BADGE ---
+   Dùng cho: tags nhỏ dán nhãn "AI MODE", "OCR", "LIVE SCAN"
+*/
+.dg-badge-machine {
+  font-family: var(--font-machine);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  color: #67e8f9;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: middle;
+}
+
+.dg-badge-machine-danger {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+}
+
+.dg-badge-machine-safe {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #6ee7b7;
+}
+
+.dg-badge-machine-warn {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #fcd34d;
+}
+
+/* --- SCAN BUTTON WITH TECH SUFFIX (Lookbook Standard) ---
+   Dùng cho: CTA bắt đầu quét AI, kết hợp Inter (Human) + JetBrains Mono (Machine)
+*/
+.btn-scan,
+.dg-scan-btn {
+  font-family: var(--font-human);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  background: #2962ff;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s var(--ease-premium);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.btn-scan:hover,
+.dg-scan-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.45), 0 0 20px rgba(56, 189, 248, 0.3);
+}
+
+.btn-scan:active,
+.dg-scan-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-scan span.tech-suffix,
+.dg-scan-suffix {
+  font-family: var(--font-machine);
+  font-weight: 400;
+  opacity: 0.75;
+  font-size: 0.85em;
+  margin-left: 6px;
+  letter-spacing: 0.05em;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* --- AI ANALYSIS / OCR RESULTS BOX (Lookbook Standard) ---
+   Terminal box styled with JetBrains Mono for AI data and OCR outputs
+*/
+.ai-analysis-box {
+  font-family: var(--font-machine);
+  background: rgba(11, 15, 28, 0.92);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 5px solid #64748b;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  font-size: 0.92rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.ai-analysis-box.warning {
+  border-left-color: #f59e0b;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.15);
+}
+
+.ai-analysis-box.danger {
+  border-left-color: #ef4444;
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+}
+
+.ai-analysis-box.safe {
+  border-left-color: #10b981;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15);
+}
+
+.ai-header {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 10px 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 1.2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+}
+
+.ai-content {
+  padding: 18px 20px;
+  color: #cbd5e1;
+  line-height: 1.6;
+}
+
+.ai-content p {
+  margin: 6px 0;
+}
+
+.ai-content .label {
+  font-weight: 700;
+  color: #94a3b8;
+  margin-right: 6px;
+}
+
+.status-danger {
+  font-weight: 700;
+  color: #f87171;
+  text-transform: uppercase;
+  background: rgba(239, 68, 68, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.status-warning {
+  font-weight: 700;
+  color: #fbbf24;
+  text-transform: uppercase;
+  background: rgba(245, 158, 11, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-safe {
+  font-weight: 700;
+  color: #34d399;
+  text-transform: uppercase;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.ai-content .details {
+  margin-top: 14px;
+  color: #94a3b8;
+  border-left: 2px solid rgba(56, 189, 248, 0.5);
+  padding-left: 12px;
+  font-style: normal;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+}
+
+/* --- SCAM ALERT BOX (Lookbook Standard) ---
+   Sử dụng font Inter với kích thước lớn và màu sắc mạnh
+*/
+.alert-box {
+  background-color: rgba(239, 68, 68, 0.08);
+  border: 2px solid #ef4444;
+  padding: 22px 26px;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.15);
+}
+
+.alert-title {
+  font-family: var(--font-human);
+  font-weight: 900;
+  color: #ef4444;
+  font-size: 1.45rem;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -0.01em;
+}
+
+/* --- TYPING CURSOR ANIMATION (for terminal outputs) --- */
+@keyframes dg-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.dg-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 1.1em;
+  background: #34e7c4;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: dg-cursor-blink 1.1s step-end infinite;
+}
+
+/* ============================================================
+   IGLOO.INC PREMIUM EFFECTS SYSTEM
+   Inspired by igloo.inc (Awwwards HOD) — Abeto + Bureaux
+   Arctic palette: indigo → purple → cyan → teal
+   ============================================================ */
+
+/* --- AURORA SWEEP ANIMATION (for IglooAuroraDivider) --- */
+@keyframes igloo-aurora-sweep {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
+
+.igloo-aurora-sweep {
+  animation: igloo-aurora-sweep 4s linear infinite;
+}
+
+/* --- IRIDESCENT GLASS CARD ---
+   Nâng cấp glass-card với aurora shimmer quét chéo mỗi 5s
+   Dùng cho: Feature cards, demo cards, CTA panels
+*/
+.igloo-glass-card {
+  position: relative;
+  background: rgba(11, 14, 25, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 24px;
+  /* NOTE: Do NOT use overflow:hidden here — it clips 3D translateZ children */
+  transition:
+    border-color 0.4s var(--ease-premium),
+    box-shadow 0.4s var(--ease-premium),
+    transform 0.4s var(--ease-premium);
+}
+
+/* Iridescent shimmer layer */
+.igloo-glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    transparent 35%,
+    rgba(99, 102, 241, 0.06) 40%,
+    rgba(168, 85, 247, 0.08) 48%,
+    rgba(6, 182, 212, 0.06) 55%,
+    rgba(52, 231, 196, 0.04) 60%,
+    transparent 65%,
+    transparent 100%
+  );
+  background-size: 250% 100%;
+  animation: igloo-shimmer-sweep 5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+  clip-path: inset(0 round 24px); /* Constrain shimmer within card shape, no need for overflow:hidden */
+}
+
+/* Top edge iridescent glow line */
+.igloo-glass-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(99, 102, 241, 0.4),
+    rgba(168, 85, 247, 0.5),
+    rgba(6, 182, 212, 0.4),
+    rgba(52, 231, 196, 0.3),
+    transparent
+  );
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.4s ease;
+}
+
+.igloo-glass-card:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow:
+    0 0 0 1px rgba(168, 85, 247, 0.1),
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(99, 102, 241, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transform: translateY(-3px);
+}
+
+.igloo-glass-card:hover::after {
+  opacity: 1;
+}
+
+@keyframes igloo-shimmer-sweep {
+  0%   { background-position: 150% 0; }
+  50%  { background-position: -50% 0; }
+  100% { background-position: 150% 0; }
+}
+
+/* --- MAGNETIC HOVER MICRO-TRANSLATE ---
+   Elements with this class make a subtle magnetic pull toward cursor.
+   Apply via JS-driven CSS custom properties or just CSS hover.
+   Used as a CSS-only approximation for non-JS contexts.
+*/
+.igloo-magnetic {
+  transition: transform 0.3s var(--ease-premium);
+  will-change: transform;
+}
+
+.igloo-magnetic:hover {
+  transform: translateY(-2px) scale(1.025);
+}
+
+/* Deep variant for primary CTAs */
+.igloo-magnetic-deep {
+  transition: transform 0.4s var(--ease-premium), box-shadow 0.4s var(--ease-premium);
+  will-change: transform;
+}
+
+.igloo-magnetic-deep:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(99, 102, 241, 0.2);
+}
+
+/* --- TEXT SCRAMBLE CIPHER CHARS ---
+   Characters during scramble animation get a subtle cyan tint
+   to reinforce the "machine decoding" aesthetic
+*/
+.igloo-scramble {
+  transition: letter-spacing 0.3s ease;
+}
+
+/* --- AURORA HALO HOVER (for section headers) ---
+   A radial glow halo that appears behind a heading on hover.
+   Mimics igloo.inc's "aurora flare" hover effect.
+*/
+.igloo-halo-hover {
+  position: relative;
+  display: inline-block;
+}
+
+.igloo-halo-hover::before {
+  content: '';
+  position: absolute;
+  inset: -20px -40px;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 50%,
+    rgba(99, 102, 241, 0.12) 0%,
+    rgba(168, 85, 247, 0.08) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-premium);
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(8px);
+}
+
+.igloo-halo-hover:hover::before {
+  opacity: 1;
+}
+
+/* --- SECTION ENTRY REVEAL (staggered fade-up) ---
+   Progressive reveal for card grids, similar to igloo.inc scrollytelling.
+*/
+@keyframes igloo-reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.igloo-reveal {
+  animation: igloo-reveal-up 0.7s var(--ease-premium) both;
+}
+
+.igloo-reveal-delay-1 { animation-delay: 0.1s; }
+.igloo-reveal-delay-2 { animation-delay: 0.2s; }
+.igloo-reveal-delay-3 { animation-delay: 0.3s; }
+.igloo-reveal-delay-4 { animation-delay: 0.4s; }
+.igloo-reveal-delay-5 { animation-delay: 0.5s; }
+
+/* --- IGLOO STAT COUNTER CARD ---
+   For numeric metric showcases (Igloo uses these for portfolio stats)
+*/
+.igloo-stat-card {
+  background: rgba(6, 8, 16, 0.9);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 16px;
+  padding: 20px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.igloo-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(99,102,241,0.5), rgba(6,182,212,0.4), transparent);
+}
+
+.igloo-stat-card:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.08);
+}
+
+.igloo-stat-number {
+  font-family: var(--font-machine);
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 50%, #34e7c4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.igloo-stat-label {
+  font-family: var(--font-machine);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #64748b;
+  margin-top: 6px;
+}
+
+/* --- IRIDESCENT BORDER PULSE ---
+   For emphasized containers. Border pulses through arctic colors.
+*/
+@keyframes igloo-border-pulse {
+  0%, 100% { border-color: rgba(99, 102, 241, 0.2); }
+  25%       { border-color: rgba(168, 85, 247, 0.3); }
+  50%       { border-color: rgba(6, 182, 212, 0.3); }
+  75%       { border-color: rgba(52, 231, 196, 0.25); }
+}
+
+.igloo-border-pulse {
+  animation: igloo-border-pulse 6s ease-in-out infinite;
+}
+
+/* ============================================================
+   IGLOO BENTO ECOSYSTEM & HOLOGRAPHIC FOIL STYLING
+   ============================================================ */
+
+.igloo-hologram-card {
+  position: relative;
+  background: radial-gradient(120% 120% at 50% 0%, rgba(18, 24, 42, 0.85) 0%, rgba(7, 10, 20, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  overflow: hidden;
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  transition: all 0.4s var(--ease-premium);
+}
+
+.igloo-hologram-card:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+  box-shadow: 
+    0 24px 60px -15px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(56, 189, 248, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+}
+
+/* Holographic Foil Reflection Layer */
+.igloo-hologram-glare {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(56, 189, 248, 0.04) 30%,
+    rgba(168, 85, 247, 0.06) 48%,
+    rgba(52, 231, 196, 0.05) 54%,
+    transparent 70%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 1;
+}
+
+.igloo-hologram-card:hover .igloo-hologram-glare {
+  opacity: 1;
+}
+
+/* Igloo Glacial Pill Badges */
+.igloo-pill-badge {
+  font-family: var(--font-machine);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #7dd3fc;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.igloo-pill-badge.threat {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.igloo-pill-badge.success {
+  background: rgba(52, 231, 196, 0.1);
+  border-color: rgba(52, 231, 196, 0.3);
+  color: #6ee7b7;
+}
+
+.igloo-pill-badge.warn {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fcd34d;
+}
+
+/* Igloo Radar Live Beacon */
+@keyframes igloo-radar-pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 0; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+.igloo-radar-beacon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.igloo-radar-beacon::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  background: inherit;
+  animation: igloo-radar-pulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
+
+/* ============================================================
+   ZERO LAYOUT COLLISION & DEFENSIVE POSITIONING GUARDS
+   ============================================================ */
+
+/* Isolates interactive z-stacks and prevents background bleed */
+.layout-safe-container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .layout-safe-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .layout-safe-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Background canvas safety containment */
+.canvas-bg-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Floating overlay tier isolation */
+.overlay-nav-layer {
+  z-index: 50;
+  position: sticky;
+  top: 0;
+}
+
+.overlay-floating-dock {
+  z-index: 45;
+  position: fixed;
+  pointer-events: auto;
+}
+
+/* ============================================================
+   DUAL TYPOGRAPHY LOOKBOOK: HUMAN (Inter) & MACHINE (JetBrains Mono)
+   ============================================================ */
+:root {
+  --font-human: var(--font-inter), sans-serif;
+  --font-machine: var(--font-jetbrains-mono), monospace;
+  --color-alert: #D32F2F; /* Màu đỏ cảnh báo */
+  --color-success: #2E7D32; /* Màu xanh an toàn */
+  --color-tech-bg: rgba(15, 23, 42, 0.75); /* Màu nền công nghệ */
+}
+
+/* 1. Tiêu đề Chính (H1) - Mạnh mẽ và Tin cậy */
+h1.page-title {
+  font-family: var(--font-human);
+  font-weight: 900; /* Black weight */
+  font-size: 3rem;
+  letter-spacing: -0.02em; /* Dồn chữ nhẹ tạo sự chắc chắn */
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  h1.page-title {
+    font-size: 2rem;
+  }
+}
+
+/* 2. Khối Phân Tích AI / Kết Quả OCR (Terminal Screen) */
+.ai-analysis-box {
+  font-family: var(--font-machine); /* Chuyển toàn bộ sang font máy */
+  background: var(--color-tech-bg);
+  border-radius: 16px;
+  border-left: 5px solid #555;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.ai-analysis-box.warning,
+.ai-analysis-box.danger {
+  border-left-color: var(--color-alert);
+  border-left-width: 6px;
+}
+
+.ai-analysis-box.safe,
+.ai-analysis-box.success {
+  border-left-color: var(--color-success);
+  border-left-width: 6px;
+}
+
+.ai-header {
+  background: rgba(30, 41, 59, 0.9);
+  padding: 10px 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+}
+
+.ai-content {
+  padding: 20px;
+}
+
+.ai-content p {
+  margin-bottom: 8px;
+}
+
+.ai-content .label {
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+/* Các từ khóa trạng thái quan trọng */
+.status-danger {
+  font-weight: 700;
+  color: #ef4444;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
+
+.status-warning {
+  font-weight: 700;
+  color: #f59e0b;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+}
+
+.status-safe {
+  font-weight: 700;
+  color: #10b981;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+}
+
+.details {
+  margin-top: 15px;
+  color: #cbd5e1;
+  /* Thêm hiệu ứng giống như đang gõ code */
+  border-left: 2px solid #38bdf8;
+  padding-left: 12px;
+  line-height: 1.6;
+}
+
+/* 3. Các nút bấm chức năng (Action Buttons) */
+.btn-scan {
+  font-family: var(--font-human);
+  font-weight: 700;
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0d9488 0%, #2563eb 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 24px rgba(13, 148, 136, 0.3);
+}
+
+.btn-scan:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(13, 148, 136, 0.45);
+}
+
+.btn-scan span.tech-suffix {
+  font-family: var(--font-machine);
+  font-weight: 400;
+  opacity: 0.85;
+  font-size: 0.85em;
+  margin-left: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* 4. Cảnh báo Lừa đảo (Scam Alert) */
+.alert-box {
+  background-color: rgba(69, 10, 10, 0.65);
+  border: 2px solid var(--color-alert);
+  padding: 20px;
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.2);
+}
+
+.alert-title {
+  font-family: var(--font-human);
+  font-weight: 900;
+  color: #f87171;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.01em;
+}
+
+

@@ -142,17 +142,17 @@ export default function GeometricConstellationCanvas({
       mouse.x += (mouse.targetX - mouse.x) * 0.1;
       mouse.y += (mouse.targetY - mouse.y) * 0.1;
 
-      // 1. Draw Deep Cosmic Gradient (Indigo -> Purple -> Radiant Magenta / Rose)
+      // 1. Draw Deep Midnight Polar Gradient (Obsidian -> Slate Navy -> Subtle Glacier Indigo)
       const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-      bgGrad.addColorStop(0, "#16042f");
-      bgGrad.addColorStop(0.35, "#340a62");
-      bgGrad.addColorStop(0.68, "#7e128e");
-      bgGrad.addColorStop(0.92, "#db2777");
-      bgGrad.addColorStop(1, "#f43f5e");
+      bgGrad.addColorStop(0, "#05070e");
+      bgGrad.addColorStop(0.35, "#0a0e1a");
+      bgGrad.addColorStop(0.7, "#0e1526");
+      bgGrad.addColorStop(0.92, "#121b30");
+      bgGrad.addColorStop(1, "#16203a");
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // Ambient radial lighting on lower right
+      // Ambient radial lighting on lower right (gentle polar glow, no eye glare)
       const radGlow = ctx.createRadialGradient(
         width * 0.8,
         height * 0.78,
@@ -161,8 +161,8 @@ export default function GeometricConstellationCanvas({
         height * 0.78,
         Math.min(width, height) * 0.85
       );
-      radGlow.addColorStop(0, "rgba(244, 63, 94, 0.6)");
-      radGlow.addColorStop(0.45, "rgba(217, 70, 239, 0.35)");
+      radGlow.addColorStop(0, "rgba(56, 189, 248, 0.12)");
+      radGlow.addColorStop(0.45, "rgba(99, 102, 241, 0.08)");
       radGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = radGlow;
       ctx.fillRect(0, 0, width, height);
@@ -252,9 +252,9 @@ export default function GeometricConstellationCanvas({
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < maxConnectDist) {
-            const lineAlpha = (1 - dist / maxConnectDist) * 0.65;
-            ctx.strokeStyle = `rgba(255, 255, 255, ${lineAlpha})`;
-            ctx.lineWidth = lineAlpha > 0.35 ? 1.6 : 1.0;
+            const lineAlpha = (1 - dist / maxConnectDist) * 0.35;
+            ctx.strokeStyle = `rgba(148, 163, 184, ${lineAlpha})`;
+            ctx.lineWidth = lineAlpha > 0.2 ? 1.2 : 0.8;
             ctx.beginPath();
             ctx.moveTo(n1.x, n1.y);
             ctx.lineTo(n2.x, n2.y);
@@ -269,10 +269,10 @@ export default function GeometricConstellationCanvas({
           const dx = node.x - mouse.x;
           const dy = node.y - mouse.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 240) {
-            const mouseAlpha = (1 - dist / 240) * 0.9;
-            ctx.strokeStyle = `rgba(254, 240, 138, ${mouseAlpha})`;
-            ctx.lineWidth = 1.8;
+          if (dist < 200) {
+            const mouseAlpha = (1 - dist / 200) * 0.45;
+            ctx.strokeStyle = `rgba(56, 189, 248, ${mouseAlpha})`;
+            ctx.lineWidth = 1.2;
             ctx.beginPath();
             ctx.moveTo(mouse.x, mouse.y);
             ctx.lineTo(node.x, node.y);
@@ -283,30 +283,30 @@ export default function GeometricConstellationCanvas({
 
       // 7. Draw Glowing Nodes
       for (let node of nodes) {
-        const glowRadius = node.radius + Math.sin(node.pulse) * 0.9;
+        const glowRadius = node.radius + Math.sin(node.pulse) * 0.7;
 
-        // Outer Soft Glow
+        // Outer Soft Glow (Gentle cyan/indigo aura, no glare)
         const nodeGlow = ctx.createRadialGradient(
           node.x,
           node.y,
           0,
           node.x,
           node.y,
-          glowRadius * 4
+          glowRadius * 3.2
         );
-        nodeGlow.addColorStop(0, "rgba(255, 255, 255, 0.95)");
-        nodeGlow.addColorStop(0.4, "rgba(244, 114, 182, 0.6)");
-        nodeGlow.addColorStop(1, "rgba(244, 114, 182, 0)");
+        nodeGlow.addColorStop(0, "rgba(255, 255, 255, 0.85)");
+        nodeGlow.addColorStop(0.4, "rgba(56, 189, 248, 0.3)");
+        nodeGlow.addColorStop(1, "rgba(56, 189, 248, 0)");
 
         ctx.fillStyle = nodeGlow;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, glowRadius * 4, 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, glowRadius * 3.2, 0, Math.PI * 2);
         ctx.fill();
 
         // Solid White Core
-        ctx.fillStyle = "#ffffff";
+        ctx.fillStyle = "#e2e8f0";
         ctx.beginPath();
-        ctx.arc(node.x, node.y, glowRadius, 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, glowRadius * 0.8, 0, Math.PI * 2);
         ctx.fill();
       }
 

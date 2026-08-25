@@ -4,25 +4,26 @@
 ---
 
 ## 1. Trạng Thái Hiện Tại (Current Working Snapshot)
-- **Phiên bản**: StudentHub AI v2.8.6 (Cinematic Motion Experience Suite & 4 Core Pillars).
-- **Vừa triển khai & Kiểm thử**:
-  1. ✅ **Đóng gói Kỹ năng Cinematic Motion Experience (v2.8.6)**:
-     - 📦 Skill `.agents/skills/cinematic-motion-experience/SKILL.md` và Vault Doc `docs/vault/03 - 🚀 Features & Modules/Cinematic-Motion-Experience-Skill.md`.
-     - Bao phủ toàn diện 4 trụ cột thiết kế chuyển động: Parallax Scrolling, Morphing Magnetic Cursor, Smooth Page Load Transitions và Cinematic Video Atmosphere.
-  2. ✅ **Xây dựng & Tích hợp Bộ Component Chuyển Động Điện Ảnh**:
-     - 🖱️ `CustomMorphingCursor.jsx`: Con trỏ chuột 2 tầng co giãn, biến hóa khi rê qua các nút tương tác, đổi chế độ blend mode và hiển thị badge động, tự động vô hiệu hóa an toàn trên màn hình cảm ứng di động.
-     - 🎬 `CinematicVideoAtmosphere.jsx`: Không gian video chuyển động thủ tục (Procedural motion loop) với chùm tia sáng anamorphic flare, dải dải cực quang phát quang sinh học và bụi sao lấp lánh (0% hao tốn băng thông MP4, tải tức thì).
-     - ⚡ `PageTransitionWrapper.jsx`: Hiệu ứng chuyển cảnh mượt mà giữa các route với thanh năng lượng laser trên cùng.
-  3. ✅ **Tích hợp đồng bộ**:
-     - Áp dụng trên toàn bộ ứng dụng: Root Layout (`layout.tsx`), Trang Chủ (`page.jsx`), Đăng Nhập (`login/page.jsx`), Đăng Ký (`register/page.jsx`).
+- **Phiên bản**: StudentHub AI v2.8.7 (Igloo.inc Glacial Visual Suite & Human/Machine Dual Typography Lookbook).
+- **Vừa triển khai & Kiểm thử thành công**:
+  1. ✅ **Chuẩn Typography Kép Human & Machine (Inter + JetBrains Mono)**:
+     - 👨 **Human Interface (Inter 400-900)**: Áp dụng toàn bộ tiêu đề chính H1 (`font-weight: 900`, `letter-spacing: -0.02em`), hướng dẫn sinh viên, nhận định cố vấn và nội dung diễn đàn.
+     - 🤖 **Machine Interface (JetBrains Mono)**: Áp dụng toàn bộ kết quả quét AI, phân tích OCR, terminal box (`.ai-analysis-box`), thẻ rủi ro (`.status-danger`, `.status-safe`), chỉ số Early Exit (`0.1s - 1.5s`), và nhãn kỹ thuật (`[AI MODE]`, `[OCR ENGINE]`).
+  2. ✅ **Hệ Thống Font Kép Chuẩn Lookbook (Inter & JetBrains Mono)**:
+     - 👨‍💼 **Human Interface (Inter 400, 600, 700, 900)**: Tiêu đề `h1.page-title` dồn chữ `-0.02em`, khối `.alert-title`, nội dung hướng dẫn, nhận định chuyên gia.
+     - 🤖 **Machine Interface (JetBrains Mono 400, 700)**: Khối `.ai-analysis-box.warning` / `.safe`, thanh `.ai-header`, nhãn `.status-danger`, viền `.details`, nhãn hậu tố kỹ thuật `span.tech-suffix`, nút `.btn-scan`.
+     - 🛡️ **Kiểm Thử Thực Tế & Tinh Chỉnh Bố Cục Chống Xung Đột**: Khắc phục triệt để hiện tượng che khuất của thanh Navbar với khoảng đệm `pt-28 sm:pt-32`, ẩn HUD đè chữ của Canvas 3D bằng cờ `showHud = false`, và bổ sung khoảng đệm chân trang `pb-40` để không bị dock nổi che khuất nội dung.
+     - 🚀 **Đồng Bộ Visual Suite Sang Toàn Bộ Hệ Thống**: Đưa 3D Highway Canvas (`RobinPayotRoadCanvas`), `NoiseOverlay`, `FloatingDock`, `BackgroundsAndEffectsStudio`, `IglooSoundAmbiencePill`, và thẻ Holographic Bento vào `scam-check`, `forum`, `dashboard`, `onboarding`, `profile`.
+  3. ✅ **Kiểm thử Next.js 16 (Turbopack)**:
+     - Build thành công 100% (13/13 route tĩnh và động, thời gian biên dịch 9.8s, 0 lỗi cú pháp).
 
 ---
 
 ## 2. Đường Dẫn File Quan Trọng
-- **Skill Chuyển Động Điện Ảnh**: `.agents/skills/cinematic-motion-experience/SKILL.md`
-- **Con Trỏ Nam Châm Biến Hóa**: `frontend/src/components/ui/custom-morphing-cursor.jsx`
-- **Không Gian Video Thủ Tục**: `frontend/src/components/ui/cinematic-video-atmosphere.jsx`
-- **Chuyển Cảnh Mượt Mà**: `frontend/src/components/ui/page-transition-wrapper.jsx`
-- **Giao Diện Auth**: `frontend/src/components/auth/AuthUI.jsx`
-- **Trang Chủ**: `frontend/src/app/page.jsx`
+- **Ma Trận Bento Igloo**: `frontend/src/components/landing/IglooEcosystemShowcase.jsx`
+- **Bộ Điều Khiển Âm Hưởng Băng Tuyết**: `frontend/src/components/ui/IglooSoundAmbiencePill.jsx`
+- **Giao Diện AI Terminal Block**: `frontend/src/components/ui/AITerminalBlock.jsx`
+- **Nút Bấm Xúc Giác Kèm Tech Suffix**: `frontend/src/components/ui/TactileButton.jsx`
+- **Quy Chuẩn CSS & Lookbook**: `frontend/src/app/globals.css`
+- **Trang Chủ Scrollytelling**: `frontend/src/app/page.jsx`
 - **Vault Hub**: `docs/vault/Index.md`
