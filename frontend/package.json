@@ -14,8 +14,9 @@
     "test:layer3": "node tests/layer3/layer3.test.mjs",
     "test:layer4": "node tests/layer4/layer4.test.mjs",
     "test:geospatial": "node tests/geospatial/geospatial_weather_camera.test.mjs",
+    "test:threat-intel": "node tests/threat-intel/threat_intelligence.test.mjs",
     "test:intelligence": "node tests/intelligence/intelligence_domains.test.mjs",
-    "test:all": "node tests/layer1/full_multimodal_evaluation.test.mjs && node tests/layer2/layer2.test.mjs && node tests/layer3/layer3.test.mjs && node tests/layer4/layer4.test.mjs && node tests/intelligence/intelligence_domains.test.mjs && node tests/geospatial/geospatial_weather_camera.test.mjs"
+    "test:all": "node tests/layer1/full_multimodal_evaluation.test.mjs && node tests/layer2/layer2.test.mjs && node tests/layer3/layer3.test.mjs && node tests/layer4/layer4.test.mjs && node tests/intelligence/intelligence_domains.test.mjs && node tests/geospatial/geospatial_weather_camera.test.mjs && node tests/threat-intel/threat_intelligence.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^4.0.80",
