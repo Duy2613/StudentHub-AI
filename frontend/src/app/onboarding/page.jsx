@@ -116,19 +116,56 @@ export default function OnboardingPage() {
     setError(null);
 
     const email = session?.user?.email || "";
-    const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(email);
-    const isExpert = role === "expert";
+    let isEdu = false;
+    let verifiedUniversity = university;
 
+    try {
+      // 1. Verify Edu Email via Backend Source of Truth (Section D.1)
+      const eduCheckRes = await fetch("/api/users/verify-edu", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const eduCheckData = await eduCheckRes.json();
+      if (eduCheckData?.success && eduCheckData?.isEdu) {
+        isEdu = true;
+        if (eduCheckData.university) verifiedUniversity = eduCheckData.university;
+      } else {
+        isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(email);
+      }
+    } catch (e) {
+      console.warn("Edu verification check fallback:", e);
+      isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(email);
+    }
+
+    const isExpert = role === "expert";
     const finalTrustScore = isExpert ? 98 : isEdu ? 80 : 50;
 
     try {
+      // 2. Sync to API backend (Phần F Data Model)
+      await fetch("/api/users/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          fullName: fullName || "Thành viên StudentHub",
+          role: isExpert ? "expert" : "student",
+          avatarId: avatarId,
+          expertField: isExpert ? expertField : null,
+          university: !isExpert ? verifiedUniversity : null,
+          major: !isExpert ? major : null,
+          onboardingCompleted: true,
+        }),
+      }).catch((e) => console.warn("Sync profile PUT error:", e));
+
+      // 3. Update Auth context & local cache
       await updateProfile({
         full_name: fullName || "Thành viên StudentHub",
         role: isExpert ? "expert" : "student",
         avatar_id: avatarId,
         reputation_score: finalTrustScore,
         trust_score: finalTrustScore,
-        university: !isExpert ? university : null,
+        university: !isExpert ? verifiedUniversity : null,
         major: !isExpert ? major : null,
         academic_year: !isExpert ? academicYear : null,
         expert_title: isExpert ? expertTitle : null,

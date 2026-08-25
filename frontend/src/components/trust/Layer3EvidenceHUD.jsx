@@ -196,7 +196,7 @@ export default function Layer3EvidenceHUD({ result, className = "" }) {
                       CLAIM #{idx + 1}
                     </span>
                     <span className="text-xs font-bold text-white font-human">
-                      {claim.subject} // {claim.predicate}
+                      {claim.subject} • {claim.predicate}
                     </span>
                   </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   MessageSquare,
@@ -10,29 +10,24 @@ import {
   ThumbsDown,
   Heart,
   Plus,
-  Filter,
-  CheckCircle,
-  AlertTriangle,
   Building,
   Utensils,
   Home,
-  BookOpen,
-  Users,
-  Image as ImageIcon,
   Link2,
   X,
   Clock,
   Send,
   Star,
   ShieldCheck,
-  Share2,
+  ShieldAlert,
   Sparkles,
+  Loader2,
+  ArrowRight,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import ModernNavbar from "@/components/layout/ModernNavbar";
 import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import TactileButton from "@/components/ui/TactileButton";
 import AeroMissionControlBackdrop from "@/components/ui/AeroMissionControlBackdrop";
 import MohsinFluidCanvas from "@/components/ui/MohsinFluidCanvas";
 import SaffronMarqueeTicker from "@/components/ui/SaffronMarqueeTicker";
@@ -44,105 +39,71 @@ import IglooSoundAmbiencePill from "@/components/ui/IglooSoundAmbiencePill";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 import { motion, AnimatePresence } from "motion/react";
 
-const CATEGORIES = [
+const FORUM_CATEGORIES = [
   { id: "all", label: "Tất Cả", icon: MessageSquare },
-  { id: "housing", label: "Nhà Trọ", icon: Home },
-  { id: "food", label: "Quán Ăn", icon: Utensils },
-  { id: "campus", label: "Trường Học", icon: Building },
-  { id: "academic", label: "Ngành Học", icon: BookOpen },
-  { id: "club", label: "CLB & Hoạt Động", icon: Users },
-];
-
-const INITIAL_POSTS = [
-  {
-    id: 1,
-    title: "Cảnh báo phòng trọ ảo ép cọc tại ngõ 27 Tạ Quang Bửu (gần ĐHBK Hà Nội)",
-    category: "housing",
-    location: "Hai Bà Trưng, Hà Nội (Gần HUST / NEU)",
-    author: "Nguyễn Minh Quân",
-    authorRole: "student",
-    authorAvatar: "student-tech",
-    trustScore: 82,
-    time: "20 phút trước",
-    content:
-      "Có đối tượng đăng tin cho thuê phòng khép kín giá 1.8 triệu đầy đủ điều hòa nóng lạnh nhưng bắt chuyển khoản cọc 1 triệu để 'giữ chỗ không người khác thuê mất'. Mình đến tận ngõ 27 kiểm tra thì số nhà đó không hề cho thuê. Các bạn tân sinh viên cẩn thận nhé!",
-    images: ["/assets/scam_room_evidence.jpg"],
-    links: ["https://phongtro-fake-sample.com"],
-    trustVotes: { reputable: 48, notReputable: 2 },
-    likes: 35,
-    userVoted: null,
-    userLiked: false,
-    comments: [
-      {
-        id: "c1",
-        author: "Luật sư Trần Thu Hà",
-        role: "expert",
-        avatar: "expert-legal",
-        trustScore: 98,
-        time: "10 phút trước",
-        text: "Cảm ơn em đã cảnh báo. Theo quy định pháp luật, giao dịch đặt cọc bắt buộc phải có biên nhận ký tên 2 bên và xác minh quyền sở hữu nhà ở của bên cho thuê.",
-      },
-      {
-        id: "c2",
-        author: "Lê Quốc Bảo",
-        role: "student",
-        avatar: "student-scholar",
-        trustScore: 80,
-        time: "5 phút trước",
-        text: "Suýt nữa mình cũng chuyển cọc cho số tài khoản đó hôm qua. May mà đọc được bài!",
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Gợi ý quán cơm trưa sinh viên sạch sẽ, chuẩn vị tại Làng Đại học Thủ Đức",
-    category: "food",
-    location: "Khu B, ĐHQG TP.HCM (Thủ Đức)",
-    author: "Trần Bảo Ngọc",
-    authorRole: "student",
-    authorAvatar: "student-creative",
-    trustScore: 88,
-    time: "2 giờ trước",
-    content:
-      "Quán cơm niêu cô Ba cạnh cổng KTX Khu B bán suất ăn 25k-30k đầy đặn, canh rau miễn phí và cô chủ rất thân thiện với sinh viên. Quán có chứng nhận ATTP treo công khai.",
-    images: [],
-    links: [],
-    trustVotes: { reputable: 62, notReputable: 1 },
-    likes: 54,
-    userVoted: null,
-    userLiked: false,
-    comments: [
-      {
-        id: "c3",
-        author: "Hoàng Văn Tuấn",
-        role: "student",
-        avatar: "student-gamer",
-        trustScore: 78,
-        time: "1 giờ trước",
-        text: "Quán này ăn bao no luôn mọi người, trà đá miễn phí nữa!",
-      },
-    ],
-  },
+  { id: "truong_hoc", label: "Trường Học", icon: Building },
+  { id: "quan_an", label: "Quán Ăn", icon: Utensils },
+  { id: "nha_tro", label: "Nhà Trọ", icon: Home },
 ];
 
 export default function ForumPage() {
   const router = useRouter();
   const { session, profile } = useAuth();
 
-  const [posts, setPosts] = useState(INITIAL_POSTS);
+  const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
-  const [sortBy, setSortBy] = useState("reputable"); // 'reputable' | 'newest' | 'hot'
+  const [sortBy, setSortBy] = useState("ranking"); // 'ranking' | 'newest' | 'likes'
+
+  // User interaction state (tracked locally and synchronized with API)
+  const [userVotes, setUserVotes] = useState({}); // { [postId]: 'trust' | 'distrust' }
+  const [userLikes, setUserLikes] = useState({}); // { [postId]: boolean }
 
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
-  const [newCategory, setNewCategory] = useState("housing");
+  const [newCategory, setNewCategory] = useState("nha_tro");
   const [newLocation, setNewLocation] = useState("");
   const [newContent, setNewContent] = useState("");
   const [newLink, setNewLink] = useState("");
+  const [isSubmittingPost, setIsSubmittingPost] = useState(false);
 
   const [commentInputs, setCommentInputs] = useState({});
+  const [postComments, setPostComments] = useState({});
+
+  // Fetch posts from backend API (Phần E.2)
+  const fetchPosts = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (selectedCategory && selectedCategory !== "all") {
+        params.set("category", selectedCategory);
+      }
+      if (searchQuery.trim()) {
+        params.set("q", searchQuery.trim());
+      }
+      if (locationFilter.trim()) {
+        params.set("locationTag", locationFilter.trim());
+      }
+      params.set("sortBy", sortBy);
+
+      const res = await fetch(`/api/forum/posts?${params.toString()}`);
+      const data = await res.json();
+
+      if (data?.success && Array.isArray(data?.posts)) {
+        setPosts(data.posts);
+      }
+    } catch (err) {
+      console.warn("Failed to fetch forum posts:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedCategory, searchQuery, locationFilter, sortBy]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   // Prefill from URL query (if redirected from Scam-Check)
   useEffect(() => {
@@ -152,95 +113,131 @@ export default function ForumPage() {
       if (prefill) {
         setIsNewPostModalOpen(true);
         setNewTitle(prefill);
-        setNewCategory("housing");
+        setNewCategory("nha_tro");
       }
     }
   }, []);
 
-  // Filtered and Sorted Posts
-  const filteredPosts = useMemo(() => {
-    return posts
-      .filter((post) => {
-        const matchesCategory =
-          selectedCategory === "all" || post.category === selectedCategory;
-
-        const matchesSearch =
-          !searchQuery.trim() ||
-          post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          post.content.toLowerCase().includes(searchQuery.toLowerCase());
-
-        const matchesLocation =
-          !locationFilter.trim() ||
-          post.location.toLowerCase().includes(locationFilter.toLowerCase());
-
-        return matchesCategory && matchesSearch && matchesLocation;
-      })
-      .sort((a, b) => {
-        if (sortBy === "reputable") {
-          const ratioA = a.trustVotes.reputable / (a.trustVotes.reputable + a.trustVotes.notReputable || 1);
-          const ratioB = b.trustVotes.reputable / (b.trustVotes.reputable + b.trustVotes.notReputable || 1);
-          return ratioB - ratioA;
-        }
-        if (sortBy === "hot") {
-          return b.likes - a.likes;
-        }
-        return b.id - a.id;
-      });
-  }, [posts, selectedCategory, searchQuery, locationFilter, sortBy]);
-
-  // Vote Reputable / Not Reputable
-  const handleVote = (postId, voteType) => {
+  // 1. Vote Uy Tín / Không Uy Tín (Phần E.3 - Ghi nhận vào Trust Score qua POST /api/forum/vote)
+  const handleVote = async (postId, voteType) => {
     saffronAudio.playClick(700);
-    setPosts((prev) =>
-      prev.map((p) => {
+    const userId = session?.user?.id || profile?.id || "guest_user";
+
+    // Optimistic UI update
+    const prevVote = userVotes[postId];
+    const isRetract = prevVote === voteType;
+    const nextVote = isRetract ? null : voteType;
+
+    setUserVotes((prev) => ({ ...prev, [postId]: nextVote }));
+
+    setPosts((prevPosts) =>
+      prevPosts.map((p) => {
         if (p.id !== postId) return p;
+        let tCount = p.trustVoteCount || 0;
+        let dCount = p.distrustVoteCount || 0;
 
-        const currentVote = p.userVoted;
-        let newRep = p.trustVotes.reputable;
-        let newNot = p.trustVotes.notReputable;
+        if (isRetract) {
+          if (voteType === "trust") tCount = Math.max(0, tCount - 1);
+          if (voteType === "distrust") dCount = Math.max(0, dCount - 1);
+        } else {
+          if (prevVote === "trust") tCount = Math.max(0, tCount - 1);
+          if (prevVote === "distrust") dCount = Math.max(0, dCount - 1);
 
-        if (currentVote === voteType) {
-          if (voteType === "reputable") newRep -= 1;
-          if (voteType === "notReputable") newNot -= 1;
-          return {
-            ...p,
-            userVoted: null,
-            trustVotes: { reputable: Math.max(0, newRep), notReputable: Math.max(0, newNot) },
-          };
+          if (voteType === "trust") tCount += 1;
+          if (voteType === "distrust") dCount += 1;
         }
-
-        if (currentVote === "reputable") newRep -= 1;
-        if (currentVote === "notReputable") newNot -= 1;
-
-        if (voteType === "reputable") newRep += 1;
-        if (voteType === "notReputable") newNot += 1;
 
         return {
           ...p,
-          userVoted: voteType,
-          trustVotes: { reputable: newRep, notReputable: newNot },
+          trustVoteCount: tCount,
+          distrustVoteCount: dCount,
         };
       })
     );
+
+    try {
+      await fetch("/api/forum/vote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          postId,
+          userId,
+          type: voteType,
+        }),
+      });
+    } catch (err) {
+      console.warn("Vote sync error:", err);
+    }
   };
 
-  // Like "Hữu ích"
+  // 2. Like "Hữu ích" (Phần E.3 - Tách biệt hoàn toàn với Trust Score)
   const handleLike = (postId) => {
     saffronAudio.playClick(600);
-    setPosts((prev) =>
-      prev.map((p) => {
+    const wasLiked = !!userLikes[postId];
+    const nextLiked = !wasLiked;
+
+    setUserLikes((prev) => ({ ...prev, [postId]: nextLiked }));
+
+    setPosts((prevPosts) =>
+      prevPosts.map((p) => {
         if (p.id !== postId) return p;
-        const newLiked = !p.userLiked;
+        const currentLikes = p.likeCount || 0;
         return {
           ...p,
-          userLiked: newLiked,
-          likes: newLiked ? p.likes + 1 : p.likes - 1,
+          likeCount: nextLiked ? currentLikes + 1 : Math.max(0, currentLikes - 1),
         };
       })
     );
   };
 
-  // Submit Comment
+  // 3. Create New Post (POST /api/forum/posts)
+  const handleCreatePost = async (e) => {
+    e.preventDefault();
+    if (!newTitle.trim() || !newContent.trim()) return;
+
+    setIsSubmittingPost(true);
+    saffronAudio.playSuccessChime();
+
+    const isExpert = profile?.role === "expert";
+    const authorTrustScore = profile?.trustScore || (isExpert ? 98 : 80);
+
+    const payload = {
+      category: newCategory,
+      locationTag: newLocation.trim() || "CAMPUS",
+      title: newTitle.trim(),
+      content: newContent.trim(),
+      images: [],
+      links: newLink.trim() ? [newLink.trim()] : [],
+      authorId: session?.user?.id || profile?.id || "usr_stu_new",
+      authorName: profile?.fullName || session?.user?.email?.split("@")[0] || "Sinh viên StudentHub",
+      authorAvatar: profile?.avatarId || (isExpert ? "expert-tech" : "student-tech"),
+      authorTrustScore,
+    };
+
+    try {
+      const res = await fetch("/api/forum/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (data?.success && data?.post) {
+        setPosts((prev) => [data.post, ...prev]);
+        setIsNewPostModalOpen(false);
+        setNewTitle("");
+        setNewContent("");
+        setNewLocation("");
+        setNewLink("");
+      }
+    } catch (err) {
+      console.warn("Failed to create post:", err);
+    } finally {
+      setIsSubmittingPost(false);
+    }
+  };
+
+  // 4. Add Comment (Local thread state)
   const handleAddComment = (postId) => {
     const text = commentInputs[postId]?.trim();
     if (!text) return;
@@ -249,69 +246,28 @@ export default function ForumPage() {
     const isExpert = profile?.role === "expert";
 
     const newComment = {
-      id: `c_${Date.now()}`,
+      id: `comm_${Date.now()}`,
       author: profile?.fullName || session?.user?.email?.split("@")[0] || "Bạn",
       role: isExpert ? "expert" : "student",
       avatar: profile?.avatarId || (isExpert ? "expert-ai" : "student-tech"),
       trustScore: profile?.trustScore || (isExpert ? 98 : 80),
       time: "Vừa xong",
-      text: text,
+      text,
     };
 
-    setPosts((prev) =>
-      prev.map((p) => {
-        if (p.id !== postId) return p;
-        return {
-          ...p,
-          comments: [...p.comments, newComment],
-        };
-      })
-    );
+    setPostComments((prev) => ({
+      ...prev,
+      [postId]: [...(prev[postId] || []), newComment],
+    }));
 
     setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
   };
 
-  // Create New Post
-  const handleCreatePost = (e) => {
-    e.preventDefault();
-    if (!newTitle.trim() || !newContent.trim()) return;
-
-    saffronAudio.playSuccessChime();
-    const isExpert = profile?.role === "expert";
-
-    const created = {
-      id: Date.now(),
-      title: newTitle,
-      category: newCategory,
-      location: newLocation || "Toàn quốc",
-      author: profile?.fullName || session?.user?.email?.split("@")[0] || "Sinh viên StudentHub",
-      authorRole: isExpert ? "expert" : "student",
-      authorAvatar: profile?.avatarId || (isExpert ? "expert-ai" : "student-tech"),
-      trustScore: profile?.trustScore || (isExpert ? 98 : 80),
-      time: "Vừa xong",
-      content: newContent,
-      images: [],
-      links: newLink ? [newLink] : [],
-      trustVotes: { reputable: 1, notReputable: 0 },
-      likes: 0,
-      userVoted: "reputable",
-      userLiked: false,
-      comments: [],
-    };
-
-    setPosts([created, ...posts]);
-    setIsNewPostModalOpen(false);
-    setNewTitle("");
-    setNewContent("");
-    setNewLocation("");
-    setNewLink("");
-  };
-
   return (
     <div className="min-h-screen bg-[#070403] text-gray-100 flex relative overflow-x-hidden selection:bg-[#ffbc09] selection:text-[#150604]">
-      {/* 1. High-End Aerospace Aviation Terminal Backdrop (Clean & Non-overlapping) */}
+      {/* 1. High-End Aerospace Aviation Terminal Backdrop */}
       <AeroMissionControlBackdrop
-        sectorTag="SECTOR_07_BETA // COMMUNITY_INTELLIGENCE"
+        sectorTag="SECTOR_07_BETA // REAL_CAMPUS_FORUM"
         gridDensity={52}
         showRadarRings={false}
       />
@@ -335,9 +291,8 @@ export default function ForumPage() {
         </header>
       )}
 
-      {/* Main Container (Pristine Vertical Flow) */}
+      {/* Main Container */}
       <main className="flex-1 layout-safe-container pt-24 sm:pt-28 pb-40 relative z-10 min-w-0 font-human">
-        
         {/* Top Marquee Telemetry Ticker */}
         <SaffronMarqueeTicker className="mb-8 rounded-2xl border border-[#47140b]/60" />
 
@@ -346,13 +301,13 @@ export default function ForumPage() {
           <div>
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ffbc09]/15 border border-[#ffbc09]/30 text-[#ffbc09] text-xs font-mono font-bold tracking-wider mb-3">
               <span className="w-2 h-2 rounded-full bg-[#ffbc09] animate-ping" />
-              <span>COMMUNITY DAO // PEER-REVIEWED FEED</span>
+              <span>PEER-REVIEWED CAMPUS INTELLIGENCE // PHẦN E</span>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
-              <span className="text-[#ffd15c]">Chia Sẻ &amp; Cảnh Báo</span> Sinh Viên
+              <span className="text-[#ffd15c]">Diễn Đàn Sinh Viên</span> Đời Sống Thực Tế
             </h1>
             <p className="text-xs sm:text-sm text-[#ece7e0]/80 mt-2 max-w-2xl font-normal leading-relaxed">
-              Thảo luận thực chứng về Nhà trọ, Quán ăn, Cảnh báo lừa đảo và Môi trường học đường với hệ thống bình chọn tín nhiệm phi tập trung.
+              Không gian chia sẻ và kiểm chứng thực tế về Trường học, Quán ăn, Nhà trọ với thang điểm tín nhiệm Trust Score minh bạch.
             </p>
           </div>
 
@@ -367,19 +322,19 @@ export default function ForumPage() {
               className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#ffbc09] to-[#f59e0b] text-[#150604] font-extrabold text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(255,188,9,0.35)] hover:scale-105 transition-all flex items-center gap-2 cursor-pointer font-mono"
             >
               <Plus className="w-4 h-4" />
-              <span>ĐĂNG BÀI MỚI [DAO]</span>
+              <span>ĐĂNG BÀI CHIA SẺ</span>
             </button>
           </div>
         </div>
 
         {/* Search & Location Filter Bar */}
-        <SaffronSwissCrosshairGrid sectionTag="01 // FILTER_CONSOLE" className="mb-6 p-4">
+        <SaffronSwissCrosshairGrid sectionTag="01 // SEARCH_FILTER_CONSOLE" className="mb-6 p-4">
           <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
             <div className="sm:col-span-6 relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#ffbc09]" />
               <input
                 type="text"
-                placeholder="Tìm kiếm từ khóa bài viết, cảnh báo lừa đảo..."
+                placeholder="Tìm kiếm từ khóa bài viết, cảnh báo trọ, quán ăn..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs sm:text-sm text-[#ece7e0] placeholder-[#ece7e0]/40 focus:outline-none focus:border-[#ffbc09] transition-all font-human"
@@ -390,7 +345,7 @@ export default function ForumPage() {
               <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#38bdf8]" />
               <input
                 type="text"
-                placeholder="Lọc theo khu vực (Thủ Đức, Cầu Giấy...)"
+                placeholder="Lọc theo vị trí / Tag (HUST, UTE, VNU_HCM...)"
                 value={locationFilter}
                 onChange={(e) => setLocationFilter(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs sm:text-sm text-[#ece7e0] placeholder-[#ece7e0]/40 focus:outline-none focus:border-[#38bdf8] transition-all font-human"
@@ -400,172 +355,196 @@ export default function ForumPage() {
             <div className="sm:col-span-2">
               <select
                 value={sortBy}
-                onChange={(e) => {
-                  saffronAudio.playClick(500);
-                  setSortBy(e.target.value);
-                }}
-                className="w-full py-2.5 px-3 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09] transition-all font-mono font-semibold cursor-pointer"
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full px-3 py-2.5 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs text-white focus:outline-none focus:border-[#ffbc09] font-mono cursor-pointer"
               >
-                <option value="reputable">⭐ Uy Tín Nhất</option>
-                <option value="newest">🕒 Mới Nhất</option>
-                <option value="hot">🔥 Nổi Bật</option>
+                <option value="ranking">⚡ Tín nhiệm cao</option>
+                <option value="newest">🕒 Mới nhất</option>
+                <option value="likes">❤️ Hữu ích nhất</option>
               </select>
             </div>
           </div>
         </SaffronSwissCrosshairGrid>
 
-        {/* Category Pills Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 mb-8 no-scrollbar">
-          {CATEGORIES.map((cat) => {
+        {/* Category Tabs (3 Core Categories - Phần E.1) */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 scrollbar-none">
+          {FORUM_CATEGORIES.map((cat) => {
             const Icon = cat.icon;
-            const isSelected = selectedCategory === cat.id;
-
+            const isActive = selectedCategory === cat.id;
             return (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => {
-                  saffronAudio.playClick(650);
+                  saffronAudio.playClick(500);
                   setSelectedCategory(cat.id);
                 }}
-                className={`px-4 py-2 rounded-2xl text-xs font-mono font-bold flex items-center gap-2 shrink-0 transition-all cursor-pointer border ${
-                  isSelected
-                    ? "bg-[#ffbc09] text-[#150604] border-[#ffbc09] shadow-[0_0_20px_rgba(255,188,9,0.3)] scale-105"
-                    : "bg-[#150604]/80 text-[#ece7e0]/70 border-[#47140b] hover:border-[#ffbc09]/50 hover:text-white"
+                className={`px-4 py-2 rounded-2xl text-xs font-mono font-bold flex items-center gap-2 border transition-all cursor-pointer whitespace-nowrap ${
+                  isActive
+                    ? "bg-[#ffbc09] text-[#150604] border-[#ffbc09] shadow-[0_0_15px_rgba(255,188,9,0.3)] scale-105"
+                    : "bg-[#150604] text-[#ece7e0]/70 border-[#47140b] hover:border-white/20 hover:text-white"
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className="w-4 h-4" />
                 <span>{cat.label}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Posts Feed Grid */}
+        {/* Post Feed List */}
         <div className="space-y-6">
-          {filteredPosts.length === 0 ? (
-            <div className="p-12 text-center rounded-3xl bg-[#150604]/90 border border-[#47140b] space-y-3">
-              <AlertTriangle className="w-10 h-10 text-[#ffbc09] mx-auto opacity-60" />
-              <p className="text-sm font-bold text-white">Không tìm thấy bài viết nào phù hợp</p>
-              <p className="text-xs text-[#ece7e0]/60">Hãy thử thay đổi từ khóa tìm kiếm hoặc danh mục.</p>
+          {isLoading ? (
+            <div className="p-12 text-center rounded-3xl bg-[#150604] border border-[#47140b] text-[#ece7e0]/60 font-mono text-xs flex flex-col items-center justify-center gap-3">
+              <Loader2 className="w-6 h-6 text-[#ffbc09] animate-spin" />
+              <span>[ ĐANG TẢI DỮ LIỆU DIỄN ĐÀN // SAFFRON PEER ENGINE ]</span>
+            </div>
+          ) : posts.length === 0 ? (
+            <div className="p-12 text-center rounded-3xl bg-[#150604] border border-[#47140b] text-[#ece7e0]/60 font-mono text-xs space-y-3">
+              <p>Chưa có bài viết nào phù hợp với bộ lọc tìm kiếm.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedCategory("all");
+                  setSearchQuery("");
+                  setLocationFilter("");
+                }}
+                className="px-4 py-2 rounded-xl bg-[#210a07] border border-[#47140b] text-[#ffbc09] hover:bg-[#ffbc09] hover:text-[#150604] transition-all cursor-pointer"
+              >
+                Đặt lại bộ lọc
+              </button>
             </div>
           ) : (
-            filteredPosts.map((post) => {
-              const totalVotes = post.trustVotes.reputable + post.trustVotes.notReputable;
-              const repPercent = totalVotes > 0 ? Math.round((post.trustVotes.reputable / totalVotes) * 100) : 100;
+            posts.map((post) => {
+              const commentsList = postComments[post.id] || [];
+              const userVoted = userVotes[post.id];
+              const isLiked = !!userLikes[post.id];
+              const isAuthorTopExpert = (post.authorTrustScore || 80) >= 80;
 
               return (
                 <article
                   key={post.id}
-                  className="p-6 rounded-3xl bg-[#120604]/90 border border-[#47140b] backdrop-blur-2xl shadow-xl space-y-4 hover:border-[#ffbc09]/40 transition-all group"
+                  className="p-5 sm:p-6 rounded-3xl bg-[#150604] border border-[#47140b] hover:border-[#ffbc09]/40 transition-all space-y-4 shadow-xl"
                 >
-                  {/* Author Header */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#47140b]/60">
+                  {/* Post Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#47140b]/60">
                     <div className="flex items-center gap-3">
-                      <AvatarDisplay avatarId={post.authorAvatar} size="md" />
+                      <AvatarDisplay avatarId={post.authorAvatar || "student-tech"} size="sm" />
                       <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-white">{post.author}</span>
-                          {post.authorRole === "expert" && (
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs sm:text-sm font-bold text-white">
+                            {post.authorName || "Thành viên"}
+                          </span>
+                          {isAuthorTopExpert && (
                             <span className="px-2 py-0.5 rounded-full bg-[#ffbc09]/20 text-[#ffbc09] text-[10px] font-mono font-bold border border-[#ffbc09]/40">
-                              ⭐ CHUYÊN GIA
+                              ⭐ Chuyên Gia Uy Tín
                             </span>
                           )}
-                        </div>
-                        <div className="flex items-center gap-2 text-[11px] text-[#ece7e0]/60 font-mono mt-0.5">
-                          <span>{post.time}</span>
-                          <span>•</span>
-                          <span className="flex items-center gap-1 text-[#38bdf8]">
-                            <MapPin className="w-3 h-3" />
-                            {post.location}
+                          <span className="text-[10.5px] font-mono text-[#ffbc09] px-2 py-0.5 rounded bg-[#ffbc09]/10 border border-[#ffbc09]/20">
+                            {post.authorTrustScore || 80} PTS
                           </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] font-mono text-[#ece7e0]/50 mt-0.5">
+                          <Clock className="w-3 h-3" />
+                          <span>{new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(post.createdAt).toLocaleDateString("vi-VN")}</span>
+                          {post.locationTag && (
+                            <>
+                              <span>•</span>
+                              <span className="text-[#38bdf8] flex items-center gap-1">
+                                <MapPin className="w-3 h-3" /> {post.locationTag}
+                              </span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
 
-                    {/* Trust Gauge Pill */}
-                    <div className="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-full border border-[#47140b] text-xs font-mono">
-                      <span className="text-[#ece7e0]/60 text-[10px]">TÍN NHIỆM DAO:</span>
-                      <span className={`font-bold ${repPercent >= 80 ? "text-emerald-400" : repPercent >= 50 ? "text-[#ffbc09]" : "text-rose-400"}`}>
-                        {repPercent}%
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-1 rounded-xl bg-[#210a07] border border-[#47140b] text-[11px] font-mono font-semibold text-[#ffd15c] uppercase">
+                        {post.category === "nha_tro" ? "🏠 Nhà Trọ" : post.category === "quan_an" ? "🍲 Quán Ăn" : "🏫 Trường Học"}
                       </span>
                     </div>
                   </div>
 
-                  {/* Post Title & Content */}
-                  <div>
-                    <h2 className="text-base sm:text-lg font-bold text-white group-hover:text-[#ffd15c] transition-colors leading-snug">
+                  {/* Post Content */}
+                  <div className="space-y-2">
+                    <h2 className="text-base sm:text-lg font-bold text-white leading-snug">
                       {post.title}
                     </h2>
-                    <p className="text-xs sm:text-sm text-[#ece7e0]/80 mt-2 leading-relaxed whitespace-pre-line font-human">
+                    <p className="text-xs sm:text-sm text-[#ece7e0]/80 leading-relaxed whitespace-pre-line font-human">
                       {post.content}
                     </p>
                   </div>
 
-                  {/* Attached Links / Images (if any) */}
+                  {/* Attached Links / Sources */}
                   {post.links && post.links.length > 0 && (
                     <div className="p-3 rounded-2xl bg-black/40 border border-[#47140b] flex items-center gap-2 text-xs font-mono text-[#38bdf8] overflow-hidden">
                       <Link2 className="w-4 h-4 shrink-0" />
-                      <span className="truncate">{post.links[0]}</span>
+                      <a href={post.links[0]} target="_blank" rel="noopener noreferrer" className="truncate hover:underline">
+                        {post.links[0]}
+                      </a>
                     </div>
                   )}
 
-                  {/* Vote & Comment Actions Toolbar */}
+                  {/* Vote & Comment Actions Toolbar (Phần E.3 - Tách bạch Like & Vote) */}
                   <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#47140b]/60">
                     <div className="flex items-center gap-2">
-                      {/* Reputable Vote Button */}
+                      {/* Reputable Trust Vote Button */}
                       <button
                         type="button"
-                        onClick={() => handleVote(post.id, "reputable")}
+                        onClick={() => handleVote(post.id, "trust")}
                         className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 border transition-all cursor-pointer ${
-                          post.userVoted === "reputable"
-                            ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50"
+                          userVoted === "trust"
+                            ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
                             : "bg-[#210a07] text-[#ece7e0]/70 border-[#47140b] hover:border-emerald-500/40 hover:text-white"
                         }`}
+                        title="Bình chọn bài viết Uy Tín (Cộng điểm tín nhiệm tác giả)"
                       >
                         <ThumbsUp className="w-3.5 h-3.5" />
-                        <span>Uy Tín ({post.trustVotes.reputable})</span>
+                        <span>Uy Tín ({post.trustVoteCount || 0})</span>
                       </button>
 
-                      {/* Not Reputable Vote Button */}
+                      {/* Not Reputable Distrust Vote Button */}
                       <button
                         type="button"
-                        onClick={() => handleVote(post.id, "notReputable")}
+                        onClick={() => handleVote(post.id, "distrust")}
                         className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 border transition-all cursor-pointer ${
-                          post.userVoted === "notReputable"
-                            ? "bg-rose-500/20 text-rose-300 border-rose-500/50"
+                          userVoted === "distrust"
+                            ? "bg-rose-500/20 text-rose-300 border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.3)]"
                             : "bg-[#210a07] text-[#ece7e0]/70 border-[#47140b] hover:border-rose-500/40 hover:text-white"
                         }`}
+                        title="Bình chọn bài viết Không Uy Tín / Khả Nghi"
                       >
                         <ThumbsDown className="w-3.5 h-3.5" />
-                        <span>Khả Nghi ({post.trustVotes.notReputable})</span>
+                        <span>Khả Nghi ({post.distrustVoteCount || 0})</span>
                       </button>
 
-                      {/* Helpful Heart Button */}
+                      {/* Helpful Heart Button (Tách biệt hoàn toàn - Like) */}
                       <button
                         type="button"
                         onClick={() => handleLike(post.id)}
                         className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 border transition-all cursor-pointer ${
-                          post.userLiked
+                          isLiked
                             ? "bg-[#ea3810]/20 text-[#ea3810] border-[#ea3810]/50"
                             : "bg-[#210a07] text-[#ece7e0]/70 border-[#47140b] hover:border-[#ea3810]/40 hover:text-white"
                         }`}
+                        title="Thả tim Hữu Ích (Không ảnh hưởng điểm tín nhiệm)"
                       >
-                        <Heart className={`w-3.5 h-3.5 ${post.userLiked ? "fill-current" : ""}`} />
-                        <span>{post.likes}</span>
+                        <Heart className={`w-3.5 h-3.5 ${isLiked ? "fill-current" : ""}`} />
+                        <span>Hữu Ích ({post.likeCount || 0})</span>
                       </button>
                     </div>
 
                     <div className="text-xs font-mono text-[#ece7e0]/60 flex items-center gap-1">
                       <MessageSquare className="w-3.5 h-3.5" />
-                      <span>{post.comments.length} Bình luận</span>
+                      <span>{commentsList.length} Bình luận</span>
                     </div>
                   </div>
 
                   {/* Comments Thread Section */}
-                  {post.comments.length > 0 && (
+                  {commentsList.length > 0 && (
                     <div className="space-y-2 pt-2">
-                      {post.comments.map((comm) => (
+                      {commentsList.map((comm) => (
                         <div
                           key={comm.id}
                           className="p-3 rounded-2xl bg-black/40 border border-[#2d0d08] text-xs space-y-1"
@@ -627,7 +606,7 @@ export default function ForumPage() {
               <div className="flex items-center justify-between pb-3 border-b border-[#47140b]">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#ffbc09] animate-ping" />
-                  <h3 className="text-base font-bold text-white font-mono">ĐĂNG BÀI MỚI // DAO COMMUNITY</h3>
+                  <h3 className="text-base font-bold text-white font-mono">ĐĂNG BÀI MỚI // DIỄN ĐÀN THỰC CHỨNG</h3>
                 </div>
                 <button
                   type="button"
@@ -646,7 +625,7 @@ export default function ForumPage() {
                   <input
                     type="text"
                     required
-                    placeholder="Ví dụ: Cảnh báo lừa đảo đặt cọc phòng trọ tại..."
+                    placeholder="Ví dụ: Cảnh báo lừa cọc phòng trọ tại ngõ 27 Tạ Quang Bửu..."
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     className="w-full px-4 py-2.5 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs sm:text-sm text-white focus:outline-none focus:border-[#ffbc09]"
@@ -661,23 +640,21 @@ export default function ForumPage() {
                     <select
                       value={newCategory}
                       onChange={(e) => setNewCategory(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs text-white focus:outline-none focus:border-[#ffbc09] font-mono"
+                      className="w-full px-3 py-2.5 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs text-white focus:outline-none focus:border-[#ffbc09] font-mono cursor-pointer"
                     >
-                      <option value="housing">🏠 Nhà Trọ</option>
-                      <option value="food">🍲 Quán Ăn</option>
-                      <option value="campus">🏫 Trường Học</option>
-                      <option value="academic">📚 Ngành Học</option>
-                      <option value="club">👥 CLB &amp; Hoạt Động</option>
+                      <option value="nha_tro">🏠 Nhà Trọ</option>
+                      <option value="quan_an">🍲 Quán Ăn</option>
+                      <option value="truong_hoc">🏫 Trường Học</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-xs font-mono text-[#ffbc09] font-bold mb-1">
-                      KHU VỰC / TỌA ĐỘ
+                      KHU VỰC / TỌA ĐỘ (TAG)
                     </label>
                     <input
                       type="text"
-                      placeholder="Ví dụ: Cầu Giấy, Hà Nội..."
+                      placeholder="Ví dụ: HUST, UTE, Thủ Đức..."
                       value={newLocation}
                       onChange={(e) => setNewLocation(e.target.value)}
                       className="w-full px-4 py-2.5 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs text-white focus:outline-none focus:border-[#ffbc09]"
@@ -692,7 +669,7 @@ export default function ForumPage() {
                   <textarea
                     required
                     rows={4}
-                    placeholder="Mô tả cụ thể sự việc, số điện thoại hoặc tài khoản nghi vấn..."
+                    placeholder="Mô tả cụ thể trải nghiệm thực tế, cảnh báo lừa cọc hoặc quán ăn vệ sinh..."
                     value={newContent}
                     onChange={(e) => setNewContent(e.target.value)}
                     className="w-full px-4 py-2.5 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs sm:text-sm text-white focus:outline-none focus:border-[#ffbc09]"
@@ -701,7 +678,7 @@ export default function ForumPage() {
 
                 <div>
                   <label className="block text-xs font-mono text-[#ffbc09] font-bold mb-1">
-                    LINK LIÊN QUAN / CHỨNG THỰC (TÙY CHỌN)
+                    LINK LIÊN QUAN / BẰNG CHỨNG (TÙY CHỌN)
                   </label>
                   <input
                     type="url"
@@ -722,9 +699,10 @@ export default function ForumPage() {
                   </button>
                   <button
                     type="submit"
+                    disabled={isSubmittingPost}
                     className="px-5 py-2.5 rounded-xl bg-[#ffbc09] hover:bg-[#ffd15c] text-[#150604] text-xs font-mono font-bold uppercase shadow-md cursor-pointer transition-all hover:scale-105"
                   >
-                    ĐĂNG BÀI LÊN DIỄN ĐÀN
+                    {isSubmittingPost ? "ĐANG ĐĂNG..." : "ĐĂNG BÀI LÊN DIỄN ĐÀN"}
                   </button>
                 </div>
               </form>

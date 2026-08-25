@@ -14,13 +14,13 @@
   --color-burnt-amber: #b15f2c;
   --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* === DIGITAL GUARDIAN TYPOGRAPHY TOKENS === */
-  /* Human Interface — Hướng dẫn, nội dung, tiêu đề */
-  --font-human: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
-  /* Machine Interface — AI output, dữ liệu OCR, cảnh báo bảo mật */
+  /* === DIGITAL GUARDIAN & HUMANIST TYPOGRAPHY TOKENS === */
+  /* Human Interface — Warm, crafted, open apertures, breathable */
+  --font-human: var(--font-plus-jakarta), var(--font-inter), system-ui, -apple-system, sans-serif;
+  /* Machine Interface — AI output, dữ liệu OCR, số liệu tài chính */
   --font-machine: var(--font-jetbrains-mono), var(--font-geist-mono), 'Courier New', monospace;
 
-  /* === SAFFRON & UAVIONIX LUXURY CYBERNETIC TOKENS === */
+  /* === SAFFRON & REFERO LUXURY CYBERNETIC TOKENS === */
   --color-saffron-gold: #ffbc09;
   --color-saffron-amber: #f59e0b;
   --color-saffron-cream: #ece7e0;
@@ -50,11 +50,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --font-sans: var(--font-plus-jakarta), var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), var(--font-geist-mono), monospace;
   --font-serif: var(--font-instrument-serif), var(--font-cormorant-garamond), serif;
   /* Digital Guardian semantic aliases exposed to Tailwind */
-  --font-human: var(--font-inter), var(--font-geist-sans), system-ui, sans-serif;
+  --font-human: var(--font-plus-jakarta), var(--font-inter), system-ui, -apple-system, sans-serif;
   --font-machine: var(--font-jetbrains-mono), var(--font-geist-mono), monospace;
 
   /* ---- Tailwind CSS v4 Theme Variables & Tokens ---- */
@@ -1474,5 +1474,125 @@ h1.page-title {
   gap: 8px;
   letter-spacing: -0.01em;
 }
+
+/* ==========================================================================
+   5. LUXURY HUMANIST DESIGN SYSTEM & AMBIENT VISUAL EFFECTS (LINEAR / STRIPE TIER)
+   ========================================================================== */
+
+/* Humanist Heading with Warm Specular Text Gradients */
+.human-heading {
+  font-family: var(--font-human);
+  letter-spacing: -0.025em;
+  line-height: 1.18;
+  background: linear-gradient(135deg, #ffffff 0%, #ece7e0 60%, #ffd15c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Warm Humanist Editorial Body Text */
+.editorial-body {
+  font-family: var(--font-human);
+  line-height: 1.68;
+  color: rgba(236, 231, 224, 0.82);
+  letter-spacing: -0.005em;
+}
+
+/* Luxury Refero Obsidian Glass Card (Double-border Specular Depth) */
+.luxury-glass-card {
+  background: rgba(18, 6, 4, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(71, 20, 11, 0.65);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxury-glass-card:hover {
+  border-color: rgba(255, 188, 9, 0.45);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.75), 0 0 30px rgba(255, 188, 9, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Atmospheric Ambient Glow Backlights */
+.ambient-glow-gold {
+  position: relative;
+}
+.ambient-glow-gold::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 10%;
+  width: 80%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(255, 188, 9, 0.12) 0%, rgba(255, 188, 9, 0) 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-emerald {
+  position: relative;
+}
+.ambient-glow-emerald::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 10%;
+  width: 80%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0) 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-glow-sky {
+  position: relative;
+}
+.ambient-glow-sky::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 10%;
+  width: 80%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(56, 189, 248, 0) 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Silky Shimmering Status Pill */
+.shimmer-pill {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-pill::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+  transform: rotate(30deg);
+  animation: shimmer-sweep 6s infinite ease-in-out;
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-150%) rotate(30deg);
+  }
+  20%, 100% {
+    transform: translateX(150%) rotate(30deg);
+  }
+}
+
 
 

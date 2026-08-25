@@ -15,13 +15,6 @@ export default function IglooSoundAmbiencePill({ className = "" }) {
   const gainNodeRef = useRef(null);
   const oscNodesRef = useRef([]);
 
-  useEffect(() => {
-    setMounted(true);
-    return () => {
-      stopAmbience();
-    };
-  }, []);
-
   const initAudioContext = () => {
     if (!audioCtxRef.current) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -31,6 +24,26 @@ export default function IglooSoundAmbiencePill({ className = "" }) {
     }
     if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
       audioCtxRef.current.resume();
+    }
+  };
+
+  const stopAmbience = () => {
+    if (gainNodeRef.current && audioCtxRef.current) {
+      const ctx = audioCtxRef.current;
+      gainNodeRef.current.gain.setValueAtTime(gainNodeRef.current.gain.value, ctx.currentTime);
+      gainNodeRef.current.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.2);
+      setTimeout(() => {
+        oscNodesRef.current.forEach((node) => {
+          try {
+            node.stop();
+            node.disconnect();
+          } catch {}
+        });
+        oscNodesRef.current = [];
+        setIsPlaying(false);
+      }, 1200);
+    } else {
+      setIsPlaying(false);
     }
   };
 
@@ -91,25 +104,12 @@ export default function IglooSoundAmbiencePill({ className = "" }) {
     setIsPlaying(true);
   };
 
-  const stopAmbience = () => {
-    if (gainNodeRef.current && audioCtxRef.current) {
-      const ctx = audioCtxRef.current;
-      gainNodeRef.current.gain.setValueAtTime(gainNodeRef.current.gain.value, ctx.currentTime);
-      gainNodeRef.current.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.2);
-      setTimeout(() => {
-        oscNodesRef.current.forEach((node) => {
-          try {
-            node.stop();
-            node.disconnect();
-          } catch (e) {}
-        });
-        oscNodesRef.current = [];
-        setIsPlaying(false);
-      }, 1200);
-    } else {
-      setIsPlaying(false);
-    }
-  };
+  useEffect(() => {
+    setMounted(true);
+    return () => {
+      stopAmbience();
+    };
+  }, []);
 
   const toggleSound = () => {
     if (isPlaying) {

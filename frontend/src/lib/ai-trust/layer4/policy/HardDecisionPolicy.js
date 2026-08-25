@@ -33,6 +33,18 @@ export class HardDecisionPolicy {
       };
     }
 
+    // 1b. Rule 1b: Layer 2 Semantic & Neural BLOCK
+    if (fusedGraph.layer2Status === "BLOCK" && !isEducational) {
+      return {
+        ruleId: "HARD_RULE_1B_LAYER2_BLOCK",
+        classification: FINAL_CLASSIFICATION.MALICIOUS,
+        riskLevel: SECURITY_RISK_LEVEL.CRITICAL,
+        action: RECOMMENDED_ACTION.BLOCK,
+        decisionConfidence: 0.98,
+        reason: "Phát hiện mối đe dọa lừa đảo / thao túng tâm lý nguy hiểm từ phân tích ngữ nghĩa và mô hình AI Tầng 2.",
+      };
+    }
+
     // 2. Rule 2: Credential Harvesting + Impersonation
     const hasCredentialDemand =
       fusedGraph.layer1Signals.some((s) => s.type === "credential_request" || s.type === "otp_request") ||
@@ -65,6 +77,22 @@ export class HardDecisionPolicy {
         action: RECOMMENDED_ACTION.BLOCK,
         decisionConfidence: 0.96,
         reason: "Phát hiện dấu hiệu bẫy tài chính nạp tiền đặt cọc / tuyển cộng tác viên lừa đảo.",
+      };
+    }
+
+    // 4. Rule 4: Academic Project / Lab / Club Advance Deposit Trap
+    const hasAcademicDepositTrap =
+      fusedGraph.layer1Signals.some((s) => s.type === "advance_reservation_deposit_demand") ||
+      fusedGraph.layer2ContextSignals.some((s) => s.type === "unauthorized_academic_deposit_trap");
+
+    if (hasAcademicDepositTrap && !isEducational) {
+      return {
+        ruleId: "HARD_RULE_5_ACADEMIC_DEPOSIT_TRAP",
+        classification: FINAL_CLASSIFICATION.MALICIOUS,
+        riskLevel: SECURITY_RISK_LEVEL.CRITICAL,
+        action: RECOMMENDED_ACTION.BLOCK,
+        decisionConfidence: 0.98,
+        reason: "Phát hiện bẫy đóng cọc giữ chỗ / nộp phí tham gia dự án NCKH, Lab nghiên cứu hoặc CLB sinh viên trái quy chế.",
       };
     }
 

@@ -33,11 +33,34 @@ export class Layer4TrustService {
     const provider = options.provider || new DeterministicTrustPolicyProvider();
 
     // 1. Evidence Fusion: Merge signals, semantics, and external evidence
-    const { fusedGraph, totalEvidenceItems, totalSignals } = EvidenceFusionEngine.fuse({
+    const {
+      fusedGraph: _fusedGraph,
+      totalEvidenceItems,
+      totalSignals,
+      shouldAbstain,
+      abstentionReason,
+      isHardNegative,
+      hardNegativeContext,
+      interactionMultiplier,
+      triggeredInteractionCount,
+      uncertainty,
+    } = EvidenceFusionEngine.fuse({
       layer1Result,
       layer2Result,
       layer3Result,
+      documentContext: options.documentContext || null,
+      conversationContext: options.conversationContext || null,
     });
+
+    // Attach fusion metadata to fusedGraph so the reasoning provider can access it
+    const fusedGraph = {
+      ..._fusedGraph,
+      shouldAbstain,
+      abstentionReason,
+      isHardNegative,
+      hardNegativeContext,
+      interactionMultiplier,
+    };
 
     // 2. Global Intelligence & International Standards Correlation
     const globalIntelligence = GlobalIntelligenceEngine.correlate({

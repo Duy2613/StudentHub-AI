@@ -50,6 +50,39 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
       };
     }
 
+    // 1.5. Abstention Path — INSUFFICIENT_EVIDENCE
+    // When OCR confidence is too low or evidence severely conflicts,
+    // do not force a binary verdict. Return INSUFFICIENT_EVIDENCE.
+    if (fusedGraph.shouldAbstain) {
+      return {
+        classification: "INSUFFICIENT_EVIDENCE",
+        status: "REQUIRE_MORE_INFORMATION",
+        truthAssessment: { status: "UNDETERMINED", confidence: 0.10 },
+        riskAssessment: { level: "UNKNOWN", confidence: 0.10, primaryVectors: [] },
+        decisionConfidence: 0.10,
+        verificationCompleteness: 0.0,
+        claims: fusedGraph.layer2Claims || [],
+        keyReasons: [fusedGraph.abstentionReason || "Insufficient evidence to make a determination"],
+        evidenceRefs: [],
+        conflicts: [],
+        limitations: ["Evidence quality too low", "Cannot make reliable determination"],
+        recommendedAction: "REQUIRE_MORE_INFORMATION",
+        userExplanation: {
+          verdict: "INSUFFICIENT_EVIDENCE",
+          why: "Không đủ bằng chứng để đưa ra kết luận đáng tin cậy. Chất lượng hình ảnh/tài liệu thấp hoặc nguồn bằng chứng mâu thuẫn nghiêm trọng.",
+          whatToDo: ["Cung cấp hình ảnh rõ nét hơn", "Xác minh trực tiếp với tổ chức được đề cập"],
+        },
+        hardRuleTriggered: null,
+        scamTypes: fusedGraph.scamTypes || [],
+        psychTactics: fusedGraph.psychTactics || [],
+        attackStage: fusedGraph.attackStage || null,
+        requestedActions: fusedGraph.requestedActions || [],
+        targetAssets: fusedGraph.targetAssets || [],
+        triggeredInteractions: fusedGraph.triggeredInteractions || [],
+        isHardNegative: fusedGraph.isHardNegative || false,
+      };
+    }
+
     // 2. Reconcile Contradictions & Temporal Updates
     const reconciliation = ContradictionReconciler.reconcile(
       fusedGraph.layer3Conflicts,
@@ -65,12 +98,16 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
     let classification = truthAssessment.status;
     let action = RECOMMENDED_ACTION.REQUIRE_VERIFICATION;
 
-    // Check Educational Immunity
+    // Check Educational Immunity & Whitelisted Domain
     const isEducational =
       fusedGraph.layer2ContextSignals.some((s) => s.type === "educational_discussion") ||
       fusedGraph.layer2Classification === "INFORMATIVE";
 
-    if (isEducational) {
+    const isWhitelistedOrBenign =
+      fusedGraph.layer1Signals.some((s) => s.type === "whitelisted_domain") ||
+      (fusedGraph.layer1Status === "PASS" && fusedGraph.layer2Classification === "BENIGN" && riskAssessment.level === SECURITY_RISK_LEVEL.NONE);
+
+    if (isEducational || (isWhitelistedOrBenign && truthAssessment.claimVerdicts.length === 0)) {
       classification = FINAL_CLASSIFICATION.VERIFIED_TRUE;
       action = RECOMMENDED_ACTION.ALLOW;
     } else if (riskAssessment.level === SECURITY_RISK_LEVEL.CRITICAL) {
@@ -123,6 +160,15 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
       recommendedAction: action,
       userExplanation: explanation,
       hardRuleTriggered: null,
+      // Evidence Fusion Engine v2 enrichments
+      scamTypes: fusedGraph.scamTypes || [],
+      psychTactics: fusedGraph.psychTactics || [],
+      attackStage: fusedGraph.attackStage || null,
+      requestedActions: fusedGraph.requestedActions || [],
+      targetAssets: fusedGraph.targetAssets || [],
+      triggeredInteractions: fusedGraph.triggeredInteractions || [],
+      isHardNegative: fusedGraph.isHardNegative || false,
+      uncertainty: fusedGraph.uncertainty || {},
     };
   }
 }

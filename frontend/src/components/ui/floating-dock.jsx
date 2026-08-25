@@ -9,7 +9,16 @@ import {
   MessageSquare, 
   LayoutDashboard, 
   User, 
-  Sparkles 
+  Sparkles,
+  Compass,
+  CreditCard,
+  Scale,
+  AlertOctagon,
+  ShoppingBag,
+  Trophy,
+  Calendar,
+  GraduationCap,
+  Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,13 +34,58 @@ const DEFAULT_ITEMS = [
     href: "/scam-check",
   },
   {
+    title: "Xếp Tín Chỉ",
+    icon: <Calendar className="w-full h-full text-amber-400" />,
+    href: "/credit-scheduler",
+  },
+  {
+    title: "Review GV",
+    icon: <GraduationCap className="w-full h-full text-sky-400" />,
+    href: "/prof-rating",
+  },
+  {
+    title: "Radar Học Bổng",
+    icon: <Award className="w-full h-full text-emerald-400" />,
+    href: "/scholarships",
+  },
+  {
+    title: "Bản Đồ An Ninh",
+    icon: <Compass className="w-full h-full text-orange-400" />,
+    href: "/safety-map",
+  },
+  {
+    title: "Radar Học Phí",
+    icon: <CreditCard className="w-full h-full text-emerald-400" />,
+    href: "/tuition-radar",
+  },
+  {
+    title: "Bóc Tách Hợp Đồng",
+    icon: <Scale className="w-full h-full text-cyan-400" />,
+    href: "/contract-check",
+  },
+  {
+    title: "Cấp Cứu SOS",
+    icon: <AlertOctagon className="w-full h-full text-red-500" />,
+    href: "/sos",
+  },
+  {
+    title: "Sàn Pass Đồ",
+    icon: <ShoppingBag className="w-full h-full text-amber-400" />,
+    href: "/marketplace",
+  },
+  {
+    title: "Hiệp Sĩ",
+    icon: <Trophy className="w-full h-full text-purple-400" />,
+    href: "/quests",
+  },
+  {
     title: "Diễn Đàn Sinh Viên",
     icon: <MessageSquare className="w-full h-full text-indigo-400" />,
     href: "/forum",
   },
   {
     title: "Bảng Điều Khiển",
-    icon: <LayoutDashboard className="w-full h-full text-emerald-400" />,
+    icon: <LayoutDashboard className="w-full h-full text-sky-400" />,
     href: "/dashboard",
   },
   {

@@ -40,12 +40,12 @@ export const ROAD_PROJECTS = [
     title: "AI Scam Engine 4 Lớp",
     client: "StudentHub AI Core Security",
     year: "2026",
-    technologies: "Local Regex, Aggregator API, Vector RAG, Multi-LLM Ensemble",
-    speed: "0.1s – 1.5s [Early Exit]",
+    technologies: "Deterministic Screening, Semantic Intent, Evidence Matching, 3D Decision Matrix",
+    speed: "0.19ms – 1.5s [Early Exit]",
     badge: "Explainable AI (XAI)",
     description:
-      "Động cơ phân tích rủi ro đa tầng nhận diện chính xác thủ đoạn lừa cọc, tuyển dụng ảo, học bổng giả mạo và deepfake qua Link, Text hoặc Ảnh OCR. Cơ chế dừng sớm (Early Exit) giúp 85% vụ việc có kết quả dưới 1.5 giây.",
-    awards: ["1x Giải Nhất Bảng C Sinh Viên 2026", "1x Thẩm Định An Toàn VNCERT"],
+      "Động cơ phân tích rủi ro đa tầng nhận diện chính xác thủ đoạn lừa cọc, tuyển dụng ảo, học bổng giả mạo và bẫy OTP qua Link, Text hoặc Ảnh OCR. Cơ chế dừng sớm (Early Exit) chặn ngay lập tức các mối nguy hại.",
+    awards: ["Phân tích đa phương thức: Link, Text, Ảnh OCR & QR Code", "Giải trình minh bạch từng bước phát hiện rủi ro"],
     href: "/scam-check",
     bgImage: "/wallpapers/04-neural-network.jpg",
     color: "#ffbc09",
@@ -58,14 +58,14 @@ export const ROAD_PROJECTS = [
     num: "02",
     tag: "02 // CỐ VẤN & HỒ SƠ UY TÍN",
     title: "Mạng Lưới Chuyên Gia & Điểm Uy Tín",
-    client: "National Advisor Council",
+    client: "StudentHub Trust Network",
     year: "2026",
-    technologies: "Edu SSO, Reputation Ledger, Peer Verification",
+    technologies: "Edu Verification, Trust Score Engine, Peer Review",
     speed: "Thời gian thực",
     badge: "Trust Score 0–100 pts",
     description:
-      "Hệ thống điểm uy tín 0–100 điểm kết hợp xác thực Email trường (.edu = +30 điểm) và mạng lưới cố vấn đa ngành (Luật, An ninh mạng, Nhà trọ). Thẩm định thực chứng 2 chiều ngăn chặn mạo danh.",
-    awards: ["1x Mạng Lưới Cố Vấn Quốc Gia", "1x Edu Campus Verified"],
+      "Hệ thống điểm uy tín 0–100 điểm kết hợp xác thực Email trường (.edu = +30 điểm) và mạng lưới cố vấn chuyên gia cộng đồng. Thẩm định thực chứng 2 chiều ngăn chặn mạo danh và farm điểm ảo.",
+    awards: ["Xác thực sinh viên chính chủ qua Email trường (.edu)", "Cơ chế chống gian lận & điều phối trọng số vote"],
     href: "/profile",
     bgImage: "/wallpapers/02-smart-campus-future.jpg",
     color: "#ffd15c",
@@ -80,12 +80,12 @@ export const ROAD_PROJECTS = [
     title: "Diễn Đàn Xác Thực & Vote Tín Nhiệm",
     client: "Campus Community Hub",
     year: "2026",
-    technologies: "Campus Tagging, Trust-Weighted Upvotes, Moderation",
-    speed: "Cộng đồng thực",
-    badge: "Vote Uy Tín DAO",
+    technologies: "LocationTag Filtering, Trust-Weighted Upvotes, Anti-Spam",
+    speed: "Thời gian thực",
+    badge: "Vote Uy Tín Thực Tế",
     description:
-      "Không gian cảnh báo bẫy lừa và đánh giá thực tế về Nhà trọ, Quán ăn, Việc làm sinh viên. Cơ chế Vote Uy Tín đẩy bài viết có độ tin cậy cao lên đầu, tách biệt với lượt tương tác thông thường.",
-    awards: ["1x Diễn Đàn Sinh Viên Độc Lập", "1x Giải Pháp Vì Cộng Đồng"],
+      "Không gian cảnh báo bẫy lừa và đánh giá thực tế về Nhà trọ, Quán ăn, Trường học. Cơ chế Vote Uy Tín đẩy bài viết có độ tin cậy cao lên đầu, tách biệt hoàn toàn với lượt thả tim thông thường.",
+    awards: ["3 Danh mục thiết thực: Trường học, Quán ăn, Nhà trọ", "Tách biệt rõ ràng giữa Like (hữu ích) và Vote (điểm uy tín)"],
     href: "/forum",
     bgImage: "/wallpapers/05-data-flow.jpg",
     color: "#38bdf8",
@@ -101,11 +101,11 @@ export const ROAD_PROJECTS = [
     client: "StudentHub Defense Station",
     year: "2026",
     technologies: "Bento Matrix, Real-time Threat Telemetry, 3D Wave Dynamics",
-    speed: "Tức thì (0.05s)",
+    speed: "Tức thì (<10ms)",
     badge: "Trung Tâm Chỉ Huy",
     description:
-      "Trạm chỉ huy tổng quan cung cấp bức tranh toàn cảnh về an ninh mạng học đường, tra cứu nhanh từ khóa lừa đảo, theo dõi cảnh báo nóng thời gian thực và quản lý thang điểm uy tín cá nhân.",
-    awards: ["1x Mission Control Interface 2026", "1x Dark Cocoa Obsidian Design"],
+      "Trạm chỉ huy tổng quan cung cấp bức tranh toàn cảnh về an ninh mạng học đường, tra cứu nhanh từ khóa cảnh báo, theo dõi Top 5 bảng xếp hạng uy tín và quản lý thông tin cá nhân.",
+    awards: ["Top 5 Bảng xếp hạng thành viên uy tín tuần/tháng", "Tìm kiếm nhanh theo từ khóa và thẻ trường học"],
     href: "/dashboard",
     bgImage: "/wallpapers/01-ai-knowledge-portal.jpg",
     color: "#ca56ed",
@@ -117,15 +117,15 @@ export const ROAD_PROJECTS = [
     id: "register-defense",
     num: "05",
     tag: "05 // ĐĂNG KÝ & BẢO VỆ SỐ",
-    title: "Cổng Đăng Ký Sinh Viên .EDU",
-    client: "Saffron Academic Network",
+    title: "Cổng Đăng Ký & Xác Thực Orbit OTP",
+    client: "StudentHub Academic Network",
     year: "2026",
-    technologies: "Entropy Meter, Academic Radar, Double-Bezel Glassmorphism",
-    speed: "Xác thực 1 bước",
-    badge: "Bảo Mật Cấp Cao",
+    technologies: "Settigation Orbit OTP v3, Edu Domain Verification, Supabase Auth",
+    speed: "Xác thực 2 bước",
+    badge: "Bảo Mật 2 Bước",
     description:
-      "Cổng khởi tạo tài khoản bảo vệ số dành riêng cho sinh viên Việt Nam với công nghệ đo độ mạnh mật khẩu chuẩn toán học và radar nhận diện tên miền đại học (.edu.vn).",
-    awards: ["1x Saffron Academic Security 2026", "1x Human Editorial Typography"],
+      "Cổng khởi tạo tài khoản bảo vệ số dành riêng cho sinh viên Việt Nam với bàn phím số xoay quỹ đạo Settigation Orbit OTP và bộ đếm ngược 60 giây an toàn tuyệt đối.",
+    awards: ["Bàn phím quỹ đạo số Orbit OTP tương tác mượt mà", "Tự động kích hoạt điểm thưởng khi dùng email trường .edu"],
     href: "/register",
     bgImage: "/wallpapers/02-smart-campus-future.jpg",
     color: "#34e7c4",
@@ -263,30 +263,49 @@ function CurvedBillboard({ project, onSelect }) {
         <lineBasicMaterial color={hovered ? "#ffbc09" : "#47140b"} linewidth={hovered ? 2.5 : 1.5} />
       </lineSegments>
 
-      {/* Thin Flagpost Line connecting to road floor */}
-      <mesh position={[4.5, -3.2, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 6.4, 8]} />
-        <meshBasicMaterial color="#47140b" />
-      </mesh>
-
-      {/* Flagpost Node & Annotation HTML */}
-      <Html position={[4.8, 0.5, 0]} distanceFactor={15} center={false}>
+      {/* Centered Large Readable 3D Billboard Content */}
+      <Html position={[0, 0, 0.15]} distanceFactor={14} center>
         <div
           onClick={handleClick}
-          className="select-none pointer-events-auto group/item cursor-pointer font-human"
+          className="select-none pointer-events-auto group/item cursor-pointer font-human w-[460px] sm:w-[520px]"
         >
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#ffbc09] animate-ping" />
-            <div className="p-3.5 rounded-2xl bg-[#150604]/95 backdrop-blur-2xl border border-[#47140b] shadow-[0_15px_35px_rgba(0,0,0,0.9)] min-w-[240px] transition-all duration-300 group-hover/item:scale-110 group-hover/item:border-[#ffbc09]">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono font-bold text-[#ffbc09]">{project.tag}</span>
-                <Icon className="w-3.5 h-3.5 text-[#ffbc09]" />
+          <div className="p-6 sm:p-7 rounded-3xl bg-[#120604]/96 backdrop-blur-2xl border-2 border-[#ffbc09]/40 group-hover/item:border-[#ffbc09] shadow-[0_20px_60px_rgba(0,0,0,0.95)] transition-all duration-300 group-hover/item:scale-105 space-y-3">
+            {/* Tag & Category Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="w-3 h-3 rounded-full bg-[#ffbc09] animate-ping" />
+                <span className="text-xs sm:text-sm font-mono font-black text-[#ffbc09] tracking-wider uppercase">
+                  {project.tag}
+                </span>
               </div>
-              <h4 className="text-sm font-bold text-white mt-1">{project.title}</h4>
-              <p className="text-[10px] text-[#ffd15c] font-semibold mt-1 flex items-center gap-1 font-mono">
-                <span>[ BẤM ĐỂ MỞ TOÀN BỘ A-Z ]</span>
-                <ArrowUpRight className="w-3 h-3 group-hover/item:translate-x-0.5 transition-transform" />
-              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#210a07] border border-[#ffbc09]/40 text-[#ffd15c]">
+                  {project.badge}
+                </span>
+                <Icon className="w-5 h-5 text-[#ffbc09]" />
+              </div>
+            </div>
+
+            {/* Big Bold Headline */}
+            <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-white group-hover/item:text-[#ffd15c] transition-colors leading-tight drop-shadow-md">
+              {project.title}
+            </h3>
+
+            {/* Description Preview */}
+            <p className="text-xs sm:text-sm text-[#ece7e0]/90 leading-relaxed line-clamp-2">
+              {project.description}
+            </p>
+
+            {/* Speed & Tech Meta */}
+            <div className="flex items-center justify-between text-[11px] font-mono text-[#38bdf8] pt-1 border-t border-[#47140b]">
+              <span>Tốc độ: {project.speed}</span>
+              <span className="text-[#ece7e0]/60">Năm 2026</span>
+            </div>
+
+            {/* Prominent Action Button CTA */}
+            <div className="w-full py-2.5 sm:py-3 px-4 rounded-2xl bg-[#ffbc09] group-hover/item:bg-[#ffd15c] text-[#150604] font-mono font-black text-xs sm:text-sm uppercase flex items-center justify-center gap-2 shadow-[0_8px_25px_rgba(255,188,9,0.4)] transition-all">
+              <span>BẤM ĐỂ MỞ TOÀN BỘ A-Z</span>
+              <ArrowUpRight className="w-4 h-4 group-hover/item:translate-x-1 group-hover/item:-translate-y-0.5 transition-transform" />
             </div>
           </div>
         </div>

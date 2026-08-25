@@ -31,6 +31,13 @@ import {
   Activity,
   Zap,
   Lock,
+  Calendar,
+  GraduationCap,
+  Award,
+  CreditCard,
+  Scale,
+  AlertOctagon,
+  ShoppingBag,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -129,20 +136,48 @@ export default function DashboardPage() {
     },
   ];
 
-  // Top 5 Leaderboard (0-100 pts)
-  const TOP_5_LEADERBOARD = [
+  // Dynamic Top 5 Leaderboard (0-100 pts)
+  const [leaderboardUsers, setLeaderboardUsers] = useState([
     { rank: 1, name: "TS. Nguyễn Minh Đức", field: "An ninh Mạng & AI", score: 99, role: "Chuyên gia", verified: true },
     { rank: 2, name: "Luật sư Trần Thu Hà", field: "Pháp lý & Quyền lợi SV", score: 98, role: "Chuyên gia", verified: true },
     { rank: 3, name: "ThS. Lê Hoàng Nam", field: "Học bổng & Hướng nghiệp", score: 97, role: "Chuyên gia", verified: true },
     { rank: 4, name: "Nguyễn Minh Quân (HUST)", field: "An toàn Mạng", score: 92, role: "Sinh viên", verified: true },
     { rank: 5, name: "Trần Bảo Ngọc (HCMUT)", field: "CTSV Đối Soát", score: 88, role: "Sinh viên", verified: true },
-  ];
+  ]);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadLeaderboard() {
+      try {
+        const res = await fetch("/api/users/leaderboard?limit=5");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.success && Array.isArray(data.leaderboard) && isMounted) {
+          const mapped = data.leaderboard.map((item, idx) => ({
+            rank: idx + 1,
+            name: item.fullName,
+            field: item.expertField || (item.role === "Student" ? "Sinh viên Xác thực" : "Chuyên gia"),
+            score: item.trustScore,
+            role: item.role === "Expert" ? "Chuyên gia" : "Sinh viên",
+            verified: item.universityEmailVerified,
+          }));
+          setLeaderboardUsers(mapped);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch live leaderboard:", err);
+      }
+    }
+    loadLeaderboard();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#070403] text-gray-100 flex relative overflow-x-hidden selection:bg-[#ffbc09] selection:text-[#150604]">
-      {/* 1. High-End Aerospace Aviation Terminal Backdrop (Clean & Non-overlapping) */}
+      {/* 1. Campus Security Mission Control Backdrop */}
       <AeroMissionControlBackdrop
-        sectorTag="SECTOR_07_ALPHA // MISSION_CONTROL_MATRIX"
+        sectorTag="STUDENTHUB_DEFENSE_CENTER // MISSION_CONTROL"
         gridDensity={52}
         showRadarRings={true}
       />
@@ -271,9 +306,9 @@ export default function DashboardPage() {
                   <span className="text-[10px] font-mono uppercase bg-[#ffbc09]/10 px-2 py-0.5 rounded-md">L1 ENGINE</span>
                 </div>
                 <div className="mt-4">
-                  <span className="text-2xl sm:text-3xl font-black text-white font-mono">142</span>
-                  <p className="text-xs text-[#ece7e0]/70 mt-1">Cảnh báo lừa đảo đã chặn</p>
-                  <p className="text-[10px] text-emerald-400 font-mono mt-0.5">✓ 99.8% Chính xác</p>
+                  <span className="text-xl sm:text-2xl font-black text-white font-mono">24/7 ACTIVE</span>
+                  <p className="text-xs text-[#ece7e0]/70 mt-1">Động cơ phòng thủ số</p>
+                  <p className="text-[10px] text-emerald-400 font-mono mt-0.5">✓ 0% False Positive</p>
                 </div>
               </div>
 
@@ -283,8 +318,8 @@ export default function DashboardPage() {
                   <span className="text-[10px] font-mono uppercase bg-[#38bdf8]/10 px-2 py-0.5 rounded-md">NETWORK</span>
                 </div>
                 <div className="mt-4">
-                  <span className="text-2xl sm:text-3xl font-black text-white font-mono">14,280</span>
-                  <p className="text-xs text-[#ece7e0]/70 mt-1">Nút sinh viên kết nối</p>
+                  <span className="text-xl sm:text-2xl font-black text-white font-mono">ONLINE</span>
+                  <p className="text-xs text-[#ece7e0]/70 mt-1">Mạng lưới xác thực học đường</p>
                   <p className="text-[10px] text-[#38bdf8] font-mono mt-0.5">● Real-time Telemetry</p>
                 </div>
               </div>
@@ -295,7 +330,7 @@ export default function DashboardPage() {
                   <span className="text-[10px] font-mono uppercase bg-emerald-500/10 px-2 py-0.5 rounded-md">LATENCY</span>
                 </div>
                 <div className="mt-4">
-                  <span className="text-2xl sm:text-3xl font-black text-white font-mono">0.04ms</span>
+                  <span className="text-xl sm:text-2xl font-black text-white font-mono">0.04ms</span>
                   <p className="text-xs text-[#ece7e0]/70 mt-1">Tốc độ quét Layer 1</p>
                   <p className="text-[10px] text-emerald-400 font-mono mt-0.5">⚡ Deterministic Zero-Lag</p>
                 </div>
@@ -307,7 +342,7 @@ export default function DashboardPage() {
                   <span className="text-[10px] font-mono uppercase bg-amber-400/10 px-2 py-0.5 rounded-md">ENCRYPTION</span>
                 </div>
                 <div className="mt-4">
-                  <span className="text-2xl sm:text-3xl font-black text-white font-mono">AES-256</span>
+                  <span className="text-xl sm:text-2xl font-black text-white font-mono">AES-256</span>
                   <p className="text-xs text-[#ece7e0]/70 mt-1">Bảo mật định danh .edu</p>
                   <p className="text-[10px] text-amber-400 font-mono mt-0.5">🔒 Zero Data Leakage</p>
                 </div>
@@ -322,38 +357,92 @@ export default function DashboardPage() {
             {/* Left Column (Col 8): Quick Actions & Recent Scam Alerts */}
             <div className="lg:col-span-8 space-y-8">
               
-              {/* Quick Action Command Center */}
+              {/* Quick Action Command Center (Full 9 Student Hub Modules) */}
               <SaffronSwissCrosshairGrid sectionTag="02 // COMMAND_STATION" className="p-6">
                 <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2 font-mono">
                   <Sparkles className="w-4 h-4 text-[#ffbc09]" />
-                  TRẠM THỰC THI &amp; THẨM ĐỊNH NHANH
+                  TRẠM THỰC THI &amp; TIỆN ÍCH GIẢNG ĐƯỜNG (9 MODULES)
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <Link
                     href="/scam-check"
-                    className="p-4 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-[#ffbc09]/60 transition-all group block"
+                    className="p-3.5 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-[#ffbc09]/60 transition-all group block"
                   >
-                    <ShieldAlert className="w-5 h-5 text-[#ffbc09] mb-2 group-hover:scale-110 transition-transform" />
-                    <p className="text-xs font-bold text-white">Quét URL / Tin Nhắn</p>
-                    <p className="text-[11px] text-[#ece7e0]/60 mt-0.5 font-human">Kiểm tra ngay qua Layer 1</p>
+                    <ShieldAlert className="w-5 h-5 text-[#ffbc09] mb-1.5 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Kiểm Tra Lừa Đảo</p>
+                    <p className="text-[10.5px] text-[#ece7e0]/60 mt-0.5 font-human">Quét Link / Text / OCR</p>
                   </Link>
 
                   <Link
-                    href="/forum"
-                    className="p-4 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-[#38bdf8]/60 transition-all group block"
+                    href="/credit-scheduler"
+                    className="p-3.5 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-amber-400/60 transition-all group block"
                   >
-                    <MessageSquare className="w-5 h-5 text-[#38bdf8] mb-2 group-hover:scale-110 transition-transform" />
-                    <p className="text-xs font-bold text-white">Đăng Báo Cáo Mới</p>
-                    <p className="text-[11px] text-[#ece7e0]/60 mt-0.5 font-human">Cảnh báo cộng đồng sinh viên</p>
+                    <Calendar className="w-5 h-5 text-amber-400 mb-1.5 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Xếp Thời Khóa Biểu</p>
+                    <p className="text-[10.5px] text-[#ece7e0]/60 mt-0.5 font-human">AI CSP chống trùng ca</p>
                   </Link>
 
                   <Link
-                    href="/profile"
-                    className="p-4 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-emerald-500/60 transition-all group block"
+                    href="/prof-rating"
+                    className="p-3.5 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-sky-400/60 transition-all group block"
                   >
-                    <ShieldCheck className="w-5 h-5 text-emerald-400 mb-2 group-hover:scale-110 transition-transform" />
-                    <p className="text-xs font-bold text-white">Xác Minh Học Vị</p>
-                    <p className="text-[11px] text-[#ece7e0]/60 mt-0.5 font-human">Nâng điểm uy tín tài khoản</p>
+                    <GraduationCap className="w-5 h-5 text-sky-400 mb-1.5 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Review Giảng Viên</p>
+                    <p className="text-[10.5px] text-[#ece7e0]/60 mt-0.5 font-human">Bí kíp thi điểm A</p>
+                  </Link>
+
+                  <Link
+                    href="/scholarships"
+                    className="p-3.5 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-emerald-400/60 transition-all group block"
+                  >
+                    <Award className="w-5 h-5 text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Radar Học Bổng</p>
+                    <p className="text-[10.5px] text-[#ece7e0]/60 mt-0.5 font-human">Samsung, Viettel 100% Free</p>
+                  </Link>
+
+                  <Link
+                    href="/safety-map"
+                    className="p-3.5 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-rose-400/60 transition-all group block"
+                  >
+                    <Compass className="w-5 h-5 text-rose-400 mb-1.5 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Bản Đồ An Ninh</p>
+                    <p className="text-[10.5px] text-[#ece7e0]/60 mt-0.5 font-human">Điểm nóng trọ quanh Làng ĐH</p>
+                  </Link>
+
+                  <Link
+                    href="/tuition-radar"
+                    className="p-3.5 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-teal-400/60 transition-all group block"
+                  >
+                    <CreditCard className="w-5 h-5 text-teal-400 mb-1.5 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Radar Học Phí</p>
+                    <p className="text-[10.5px] text-[#ece7e0]/60 mt-0.5 font-human">Đối soát STK 50+ trường ĐH</p>
+                  </Link>
+
+                  <Link
+                    href="/contract-check"
+                    className="p-3.5 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-cyan-400/60 transition-all group block"
+                  >
+                    <Scale className="w-5 h-5 text-cyan-400 mb-1.5 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Bóc Tách Hợp Đồng</p>
+                    <p className="text-[10.5px] text-[#ece7e0]/60 mt-0.5 font-human">Bẫy giá điện, mất cọc, CCCD</p>
+                  </Link>
+
+                  <Link
+                    href="/sos"
+                    className="p-3.5 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-rose-500/60 transition-all group block"
+                  >
+                    <AlertOctagon className="w-5 h-5 text-rose-500 mb-1.5 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Cấp Cứu Pháp Lý SOS</p>
+                    <p className="text-[10.5px] text-[#ece7e0]/60 mt-0.5 font-human">Khóa thẻ &amp; Tạo đơn BCA</p>
+                  </Link>
+
+                  <Link
+                    href="/marketplace"
+                    className="p-3.5 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-amber-300/60 transition-all group block"
+                  >
+                    <ShoppingBag className="w-5 h-5 text-amber-300 mb-1.5 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Sàn Pass Đồ &amp; Sách</p>
+                    <p className="text-[10.5px] text-[#ece7e0]/60 mt-0.5 font-human">Bảo chứng Trust Score</p>
                   </Link>
                 </div>
               </SaffronSwissCrosshairGrid>
@@ -410,7 +499,7 @@ export default function DashboardPage() {
                 </h3>
 
                 <div className="space-y-3">
-                  {TOP_5_LEADERBOARD.map((item) => (
+                  {leaderboardUsers.map((item) => (
                     <div
                       key={item.rank}
                       className="flex items-center justify-between p-3 rounded-2xl bg-black/40 border border-[#2d0d08]"
@@ -442,21 +531,25 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Aerospace Trust Credentials Card */}
+              {/* Campus Trust Rules Card */}
               <div className="p-6 rounded-3xl bg-gradient-to-b from-[#150604] to-[#0a0302] border border-[#ffbc09]/30 space-y-3">
                 <div className="flex items-center gap-2 text-[#ffbc09] font-mono text-xs font-bold">
                   <ShieldCheck className="w-4 h-4" />
-                  <span>TSO-C199 CERTIFIED AI SHIELD</span>
+                  <span>CƠ CHẾ ĐIỂM UY TÍN (0–100 PTS)</span>
                 </div>
-                <p className="text-xs text-[#ece7e0]/80 leading-relaxed font-human">
-                  Hệ thống thẩm định 4 lớp vận hành theo chuẩn kiến trúc phân giải danh tính đại học, đảm bảo không lưu vết dữ liệu cá nhân nhạy cảm.
+                <p className="text-xs text-[#ece7e0]/80 font-human leading-relaxed">
+                  Xác thực Email trường (.edu) cộng ngay <span className="text-[#10b981] font-bold">+30 điểm</span>. Đóng góp bài viết và vote chính xác nhận <span className="text-[#ffbc09] font-bold">+1 đến +2 điểm</span>. Đạt <span className="text-[#38bdf8] font-bold">80–100 điểm</span> tự động nhận danh hiệu Chuyên gia Uy tín.
                 </p>
-                <div className="pt-2 border-t border-[#47140b] text-[10px] font-mono text-[#ece7e0]/40 flex justify-between">
-                  <span>STATUS: SECURE</span>
-                  <span>VERSION: 1.0.0-PROD</span>
+                <div className="pt-2">
+                  <Link
+                    href="/profile"
+                    className="inline-flex items-center gap-2 text-xs font-mono font-bold text-[#ffbc09] hover:underline"
+                  >
+                    <span>Quản lý hồ sơ cá nhân</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
               </div>
-
             </div>
 
           </div>

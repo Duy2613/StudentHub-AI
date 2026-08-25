@@ -4,8 +4,45 @@
 ---
 
 ## 1. Trạng Thái Hiện Tại (Current Working Snapshot)
-- **Phiên bản**: StudentHub AI v4.0.0 (AI Trust 4-Layer Comprehensive Intelligence & Decision Pipeline Complete).
-- **Toàn Bộ 4 Lớp Đã Hoàn Thành & Kiểm Thử Tuyệt Đối (178/178 Tests PASS - 100.0%)**:
+- **Phiên bản**: StudentHub AI v7.0.0 (Production GPS Subsystem, Segment-Level Safety Risk & Traffic Aware Navigation Protocol).
+- **Trạng Thái Tiến Độ Hoàn Thành Toàn Diện**:
+  1. ✅ **Kiến Trúc Định Vị Địa Không Gian Hoàn Hảo (GPS Production Completion Protocol)**:
+     - **Location Quality Engine (`locationQualityEngine.js`)**: Phân tầng nguồn định vị 11 lớp (`DEVICE_GPS`, `BROWSER_GEOLOCATION`, `GOOGLE_GEOLOCATION_API`...), Cổng chất lượng (`EXCELLENT` $\le 10\text{m}$, `GOOD`, `ACCEPTABLE`, `POOR`, `INVALID`), Bộ phát hiện biến thiên vị trí ảo & dịch chuyển phi lý (`INVALID_POSITION_JUMP`), Bộ lọc làm mượt nhiễu dao động GPS (`smoothGpsLocation`) bảo toàn tọa độ thô (`RAW_LOCATION`) và lọc (`FILTERED_LOCATION`).
+     - **Map Matching Engine (`mapMatchingEngine.js`)**: Bắt dính tọa độ vào trục đường thực tế (`ON_ROAD`, `NEAR_ROAD`, `OFF_ROAD`), tính toán góc lệch hướng (heading vector) và khoảng cách tim đường.
+     - **Location Context Engine (`locationContextEngine.js`)**: Giải mã tọa độ khuôn viên HCMUTE, xác định bán kính tòa nhà lân cận và tuyên bố minh bạch giới hạn định vị trong nhà (`indoorLimitationNotice`).
+     - **Segment-Level Routing Engine (`segmentLevelRoutingEngine.js`)**: Bóc tách rủi ro theo **từng phân đoạn đường (Segment-Level Risk Breakdown)** thay vì gán nhãn nguy hiểm toàn tuyến; Phân định rạch ròi 3 chế độ Google Routes (`TRAFFIC_UNAWARE`, `TRAFFIC_AWARE`, `TRAFFIC_AWARE_OPTIMAL`); Hàm chi phí đa tiêu chí minh bạch.
+     - **Trip Companion Engine (`tripCompanionEngine.js`)**: Vòng đời giám sát lộ trình có chủ đích (`START_TRIP`, `IN_TRANSIT`, `ARRIVED_SAFELY`), phát hiện lệch tuyến và xác nhận đến nơi an toàn qua Geofence $(< 50\text{m})$.
+  2. ✅ **Hệ Thống Kiểm Chuẩn Đạt 100.0% Tuyệt Đối (201/201 Tests PASS)**:
+     - 9/9 GPS Quality, Map Matching & Segment Routing Tests PASS.
+     - 14/14 Intelligence Domain Tests PASS.
+     - 178/178 Layer 1-4 & Neural Multi-Head Tests PASS.
+     - ESLint Compiler: **0 Errors (Exit code 0)**.
+  2. ✅ **Milestone 1 — Chuẩn Hóa API Contract & Giao Diện Scam-Check Đỉnh Cao**:
+     - `POST /api/ai-trust/screen`: Chuẩn hóa 100% hợp đồng `{ type, content }` $\rightarrow$ `{ layer: 1, status: "BLOCK"|"SUSPICIOUS"|"PASS", confidence, reasons, signals }`.
+     - `RiskMeterSplitVerdict.jsx`: Bổ sung đồng hồ đo rủi ro (Risk Meter 0-100%), giao diện tách biệt 2 cột (**🤖 Kết luận AI** vs **👨‍⚕️ Khuyến nghị Chuyên gia**), và bảng Explainable AI Breakdown 4 bước kiểm toán.
+     - **Thanh lọc toàn bộ Dữ Liệu Ảo**: Xóa bỏ các số liệu bịa, đưa nội dung về giọng văn sinh viên chân thực.
+  3. ✅ **Milestone 2 — Hệ Thống Trust Score (0–100), Onboarding Chuẩn Avatar ID & Top 5 Leaderboard**:
+     - `POST /api/users/verify-edu`: Xác thực email trường đại học (.edu / .ac) phía backend và cộng chuẩn +30 điểm uy tín.
+     - `GET & PUT /api/users/profile`: Quản lý và đồng bộ hồ sơ `UserProfile`.
+     - `GET /api/users/leaderboard`: Top 5 bảng vinh danh điểm uy tín cao nhất.
+  4. ✅ **Milestone 3 — Diễn Đàn Sinh Viên Đời Sống Thực Tế**:
+     - `GET & POST /api/forum/posts`: 3 danh mục (`truong_hoc`, `quan_an`, `nha_tro`), lọc `locationTag`, ranking score.
+     - `POST /api/forum/vote`: Vote `trust` / `distrust` chống spam, tách bạch với nút Like.
+  5. ✅ **Milestone 4 — Bản Đồ Cảnh Báo An Ninh & Radar Đối Soát Học Phí**:
+     - **Bản Đồ An Ninh (`/safety-map`)**: Radar tọa độ an ninh quanh các Làng ĐH.
+     - **Radar Đối Soát Học Phí (`/tuition-radar`)**: Đối soát STK thụ hưởng và website nộp học phí 50+ trường ĐH.
+  6. ✅ **Milestone 5 — AI Bóc Tách Bẫy Hợp Đồng & Phòng Cấp Cứu Pháp Lý SOS**:
+     - **AI Bóc Tách Hợp Đồng (`/contract-check`)**: Bóc tách bẫy giá điện, mất cọc, giữ CCCD gốc (BLDS 2015 & BLLĐ 2019).
+     - **Phòng Cấp Cứu SOS (`/sos`)**: 15 phút vàng sơ cứu tài chính & bộ sinh Đơn Tố Giác Tội Phạm chuẩn Bộ Công An.
+  7. ✅ **Milestone 6 — Sàn Pass Đồ Bảo Chứng & Đấu Trường Hiệp Sĩ**:
+     - **Sàn Pass Đồ & Sách (`/marketplace`)**: Sàn pass giáo trình, laptop bảo chứng Trust Score (giao dịch trực tiếp tại cổng trường).
+     - **Đấu Trường Hiệp Sĩ (`/quests`)**: Nhiệm vụ an ninh hàng ngày và giả lập tình huống thực tế.
+  8. ✅ **Bộ 3 Tính Năng Viral Siêu Thiết Thực Độc Nhất Vô Nhị**:
+     - **AI Xếp Thời Khóa Biểu Tối Ưu Tín Chỉ (`/credit-scheduler`)**: Thuật toán CSP giải bài toán xếp lịch học dồn ca sáng, nghỉ Thứ 6 hoặc cân bằng đều.
+     - **AI Review Giảng Viên & Bí Kíp Vượt Môn (`/prof-rating`)**: Tra cứu phong cách giảng dạy, mức độ điểm danh, hình thức thi và bí kíp qua môn văn minh.
+     - **Radar Săn Học Bổng Doanh Nghiệp Sạch (`/scholarships`)**: 100% học bổng chính danh (Samsung, Viettel, Vallet, POSCO, Lotte...) kèm công cụ AI Khớp hồ sơ.
+  9. ✅ **Toàn Bộ 4 Lớp AI Trust Test Suite Đạt 100.0% Tuyệt Đối (178/178 Tests PASS)**.
+  10. ✅ **Kiểm Tra ESLint & Next.js Compiler Check Đạt 0 Errors (Exit Code 0)**.
   1. ✅ **Layer 1 Ultra-Precise Screening Engine (`lib/ai-trust/layer1`)**:
      - 🏛️ 70+ Brand Catalog, Token-Boundary Precision Matcher (0% FP), Damerau-Levenshtein Typosquatting, SSRF Obfuscation Defense, Magic Byte Binary & Polyglot inspection.
      - 148/148 Multi-Modal Tests PASS (100.0% Accuracy, 0.19ms latency).

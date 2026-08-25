@@ -11,7 +11,7 @@ const CREDENTIAL_INTENT_REGEX =
   /(?:nhập|cung cấp|điền|xác nhận|gửi|send|enter|input|provide|submit)\s+(?:mật khẩu|mat khau|password|mã otp|ma otp|otp|smart otp|mã pin|pin code|cvv|thẻ ngân hàng|seed phrase|private key)/i;
 
 const PAYMENT_INTENT_REGEX =
-  /(?:nạp cọc|đặt cọc|chuyển khoản|thanh toán phí|nop tien|chuyen tien|transfer money|pay fee|deposit|nạp tiền|phí xử lý|phí bảo hiểm nhiệm vụ)/i;
+  /(?:nạp cọc|đặt cọc|chuyển khoản|thanh toán phí|nop tien|chuyen tien|transfer money|pay fee|deposit|nạp tiền|phí xử lý|phí bảo hiểm nhiệm vụ|đóng cọc|cọc giữ chỗ|phí giữ chỗ|tiền cọc|đóng phí|nộp cọc|chuyển cọc|phí linh kiện)/i;
 
 const DOWNLOAD_INTENT_REGEX =
   /(?:tải xuống|cài đặt|download|install|run script|chạy lệnh|mở powershell|execute|mở file)\s+(?:\.exe|\.apk|\.ps1|\.bat|\.zip|ứng dụng|phần mềm|cập nhật|patch)/i;

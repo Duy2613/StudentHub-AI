@@ -51,11 +51,36 @@ export default function HomePage() {
         <SaffronMarqueeTicker className="rounded-2xl border border-[#47140b] shadow-2xl backdrop-blur-xl" />
       </div>
 
-      {/* Center Floating Scroll Flight Indicator (Initial Hint) */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-center pointer-events-none select-none opacity-80 animate-pulse">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#150604]/80 border border-[#ffbc09]/40 text-[#ffbc09] text-xs font-mono font-bold uppercase tracking-wider backdrop-blur-md shadow-2xl">
+      {/* Sleek Bottom-Docked Quick Flight & Access Bar (Non-intrusive, 100% unobstructed 3D view) */}
+      <div className="fixed bottom-7 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 p-1.5 sm:p-2 rounded-full bg-[#120604]/90 border border-[#ffbc09]/40 backdrop-blur-2xl shadow-[0_12px_40px_rgba(0,0,0,0.85)] max-w-full overflow-x-auto select-none pointer-events-auto">
+        <div className="hidden md:flex items-center gap-2 px-3 py-1 text-[#ffbc09] text-[11px] font-mono font-bold uppercase tracking-wider shrink-0 border-r border-[#47140b]">
           <span className="w-2 h-2 rounded-full bg-[#ffbc09] animate-ping" />
-          <span>CUỘN CHUỘT ĐỂ LƯỚT 3D QUA CÁC BẢNG ĐẶC TRƯNG TỪNG TRANG</span>
+          <span>LƯỚT 3D / TRUY CẬP NHANH:</span>
+        </div>
+
+        {/* Quick Launch Buttons */}
+        <div className="flex items-center gap-2">
+          <a
+            href="/scam-check"
+            className="px-3.5 py-1.5 rounded-full bg-[#ffbc09] hover:bg-[#ffd15c] text-[#150604] font-mono font-extrabold text-xs uppercase tracking-wider shadow-[0_4px_15px_rgba(255,188,9,0.35)] transition-all hover:scale-105 shrink-0 flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>🛡️</span>
+            <span>Quét Lừa Đảo AI</span>
+          </a>
+          <a
+            href="/credit-scheduler"
+            className="px-3.5 py-1.5 rounded-full bg-[#1a0906] hover:bg-[#250d09] border border-[#ffbc09]/40 text-[#ffd15c] font-mono font-bold text-xs uppercase tracking-wider transition-all hover:scale-105 shrink-0 flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>🎓</span>
+            <span>Xếp Lịch Tín Chỉ</span>
+          </a>
+          <a
+            href="/dashboard"
+            className="px-3.5 py-1.5 rounded-full bg-[#1a0906] hover:bg-[#250d09] border border-[#47140b] hover:border-white/30 text-white font-mono font-bold text-xs uppercase tracking-wider transition-all hover:scale-105 shrink-0 flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>⚡</span>
+            <span>Mission Control</span>
+          </a>
         </div>
       </div>
 

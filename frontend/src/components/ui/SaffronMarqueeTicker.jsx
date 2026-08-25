@@ -10,12 +10,12 @@ import React from "react";
 import { ShieldCheck, Zap, Radio, Sparkles, Lock, Star } from "lucide-react";
 
 const TICKER_ITEMS = [
-  { id: "01", icon: ShieldCheck, text: "AIRSPACE_NODES: 14,280 ACTIVE", color: "text-[#ffbc09]" },
-  { id: "02", icon: Zap, text: "AI_SCAM_INTERCEPT: 99.8% ACCURACY", color: "text-[#38bdf8]" },
-  { id: "03", icon: Radio, text: "ACADEMIC_SSO: .EDU +30 PTS BONUS", color: "text-[#10b981]" },
-  { id: "04", icon: Lock, text: "ENCRYPTION: AES-256 SQUAWK 7700", color: "text-[#ca56ed]" },
-  { id: "05", icon: Star, text: "REPUTATION: 0-100 COMMUNITY VERIFIED", color: "text-[#ffd15c]" },
-  { id: "06", icon: Sparkles, text: "DIGITAL_GUARDIAN: 24/7 ACTIVE", color: "text-[#ffbc09]" },
+  { id: "01", icon: ShieldCheck, text: "XÁC THỰC .EDU: +30 ĐIỂM UY TÍN TỰ ĐỘNG", color: "text-[#10b981]" },
+  { id: "02", icon: Zap, text: "AI SCREENING: ĐA PHƯƠNG THỨC LINK / TEXT / OCR / QR", color: "text-[#38bdf8]" },
+  { id: "03", icon: Radio, text: "DIỄN ĐÀN SINH VIÊN: TRƯỜNG HỌC / QUÁN ĂN / NHÀ TRỌ", color: "text-[#ffbc09]" },
+  { id: "04", icon: Lock, text: "BẢO VỆ 2 BƯỚC: SETTIGATION ORBIT OTP V3", color: "text-[#ca56ed]" },
+  { id: "05", icon: Star, text: "THANG ĐIỂM UY TÍN: 0–100 ĐIỂM CHỐNG GIAN LẬN", color: "text-[#ffd15c]" },
+  { id: "06", icon: Sparkles, text: "GIẢI TRÌNH MINH BẠCH: EXPLAINABLE AI BREAKDOWN", color: "text-[#ffbc09]" },
 ];
 
 export default function SaffronMarqueeTicker({ className = "" }) {

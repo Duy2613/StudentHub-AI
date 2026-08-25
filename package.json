@@ -12,7 +12,9 @@
     "test:layer2": "node frontend/tests/layer2/layer2.test.mjs",
     "test:layer3": "node frontend/tests/layer3/layer3.test.mjs",
     "test:layer4": "node frontend/tests/layer4/layer4.test.mjs",
-    "test:all": "node frontend/tests/layer1/full_multimodal_evaluation.test.mjs && node frontend/tests/layer2/layer2.test.mjs && node frontend/tests/layer3/layer3.test.mjs && node frontend/tests/layer4/layer4.test.mjs",
+    "test:geospatial": "node frontend/tests/geospatial/geospatial_weather_camera.test.mjs",
+    "test:intelligence": "node frontend/tests/intelligence/intelligence_domains.test.mjs",
+    "test:all": "node frontend/tests/layer1/full_multimodal_evaluation.test.mjs && node frontend/tests/layer2/layer2.test.mjs && node frontend/tests/layer3/layer3.test.mjs && node frontend/tests/layer4/layer4.test.mjs && node frontend/tests/models/multilabel_model.test.mjs && node frontend/tests/intelligence/intelligence_domains.test.mjs && node frontend/tests/geospatial/geospatial_weather_camera.test.mjs",
     "sync-vault": "node ./scripts/sync-vault-context.mjs",
     "vault": "powershell -ExecutionPolicy Bypass -File ./scripts/register-obsidian-vault.ps1"
   }
