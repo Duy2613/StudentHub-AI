@@ -1,31 +1,19 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ShieldAlert,
-  ShieldCheck,
-  Link2,
-  FileText,
-  ImageIcon,
-  Search,
-  Sparkles,
-  AlertTriangle,
-  Layers,
-  ArrowRight,
+  RefreshCw,
   Share2,
   Bot,
-  RefreshCw,
-  Cpu,
-  StopCircle,
-  Activity,
+  Layers,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import ModernNavbar from "@/components/layout/ModernNavbar";
 import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
-import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
+import AeroMissionControlBackdrop from "@/components/ui/AeroMissionControlBackdrop";
 import MohsinFluidCanvas from "@/components/ui/MohsinFluidCanvas";
-import SaffronMohsinPerimeter3DOrbit from "@/components/ui/SaffronMohsinPerimeter3DOrbit";
 import SaffronMarqueeTicker from "@/components/ui/SaffronMarqueeTicker";
 import SaffronSwissCrosshairGrid from "@/components/ui/SaffronSwissCrosshairGrid";
 import { NoiseOverlay } from "@/components/auth/AuthUI";
@@ -77,7 +65,6 @@ export default function ScamCheckPage() {
         if (response.ok) {
           l1Res = await response.json();
         } else {
-          // Fallback to client runner
           l1Res = await screenLayer1({ type, content, metadata });
         }
       } catch {
@@ -122,7 +109,7 @@ export default function ScamCheckPage() {
           saffronAudio.playSuccessChime();
         }
 
-        // Mock Deep Layer Synthesis for L2-L4
+        // Deep Layer Synthesis for L2-L4
         setDeepScanResult({
           title: type === "url" ? `Kiểm tra địa chỉ: ${content}` : "Phân tích nội dung khả nghi",
           input: content,
@@ -169,21 +156,20 @@ export default function ScamCheckPage() {
 
   return (
     <div className="min-h-screen bg-[#070403] text-gray-100 flex relative overflow-x-hidden selection:bg-[#ffbc09] selection:text-[#150604]">
-      {/* 1. 3D Infinite Curving Road Highway Canvas */}
-      <div className="canvas-bg-layer">
-        <RobinPayotRoadCanvas />
-      </div>
+      {/* 1. High-End Aerospace Aviation Terminal Backdrop (Clean & Non-overlapping) */}
+      <AeroMissionControlBackdrop
+        sectorTag="SECTOR_07_ALPHA // AIRSPACE_THREAT_RADAR"
+        gridDensity={52}
+        showRadarRings={true}
+      />
 
-      {/* 2. Meer Mohsin WebGL Fluid Smoke Canvas */}
-      <MohsinFluidCanvas opacity={0.6} particleDensity={45} />
+      {/* 2. Interactive WebGL Fluid Smoke Trail (Subtle & Non-Obtrusive) */}
+      <MohsinFluidCanvas opacity={0.35} particleDensity={35} />
 
-      {/* 3. 3D Astrolabe Orbit & Perimeter Satellites */}
-      <SaffronMohsinPerimeter3DOrbit />
-
-      {/* 4. Film Grain Noise Overlay */}
+      {/* 3. Film Grain Noise Overlay */}
       <NoiseOverlay />
 
-      {/* 5. Floating Quick Tools & Studio */}
+      {/* 4. Floating Quick Tools & Studio */}
       <FloatingDock />
       <BackgroundsAndEffectsStudio />
 
@@ -196,19 +182,19 @@ export default function ScamCheckPage() {
         </header>
       )}
 
-      {/* Main Content Container */}
+      {/* Main Content Container (No Overlap / Pure Precision Flow) */}
       <main className="flex-1 flex flex-col min-w-0 layout-safe-container pt-24 sm:pt-28 pb-40 relative z-10 font-human">
         {/* Top Marquee Telemetry Ticker */}
-        <SaffronMarqueeTicker className="mb-8 rounded-2xl border border-[#47140b]" />
+        <SaffronMarqueeTicker className="mb-8 rounded-2xl border border-[#47140b]/60" />
 
-        {/* Page Title & Mission Tag */}
+        {/* Page Title & Mission Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ffbc09]/15 border border-[#ffbc09]/30 text-[#ffbc09] text-xs font-mono font-bold tracking-wider mb-3">
               <span className="w-2 h-2 rounded-full bg-[#ffbc09] animate-ping" />
               <span>AI TRUST ENGINE // LAYER 1 DETERMINISTIC SCREENING</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight font-human">
               <span className="text-[#ffd15c]">Thẩm Định Rủi Ro</span> &amp; Chống Lừa Đảo
             </h1>
             <p className="text-xs sm:text-sm text-[#ece7e0]/80 mt-2 max-w-2xl font-normal leading-relaxed">
@@ -222,7 +208,7 @@ export default function ScamCheckPage() {
           </div>
         </div>
 
-        {/* SECTION 1: Interactive Live Prechecker */}
+        {/* SECTION 1: Interactive Live Prechecker Console */}
         <SaffronSwissCrosshairGrid sectionTag="01 // LIVE PRECHECKER CONSOLE" className="mb-8">
           <Layer1LivePrechecker
             onScanComplete={handleExecuteScan}
@@ -231,174 +217,163 @@ export default function ScamCheckPage() {
         </SaffronSwissCrosshairGrid>
 
         {/* SECTION 2: Realtime Scan Progress (if active) */}
-        {isScanning && (
-          <div className="p-6 rounded-2xl bg-[#120604]/90 border border-[#ffbc09]/50 backdrop-blur-2xl shadow-[0_0_30px_rgba(255,188,9,0.15)] space-y-4 mb-8">
-            <div className="flex items-center justify-between text-xs font-mono">
-              <span className="font-bold text-white flex items-center gap-2">
-                <RefreshCw className="w-4 h-4 text-[#ffbc09] animate-spin" />
-                NEURAL ENGINE: ĐANG XỬ LÝ LỚP 0{currentLayerScan}/04...
-              </span>
-              <span className="text-[#ffbc09] font-bold">{scanProgress}%</span>
-            </div>
-
-            <div className="w-full h-2 rounded-full bg-black/60 overflow-hidden border border-[#2d0d08]">
-              <motion.div
-                className="h-full bg-gradient-to-r from-[#ffbc09] via-[#ea3810] to-[#ffd15c]"
-                initial={{ width: "0%" }}
-                animate={{ width: `${scanProgress}%` }}
-                transition={{ duration: 0.2 }}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px] font-mono">
-              <span className={currentLayerScan >= 1 ? "text-[#ffbc09] font-bold" : "text-gray-500"}>
-                01. Fast Screening (&lt;15ms)
-              </span>
-              <span className={currentLayerScan >= 2 ? "text-[#ffbc09] font-bold" : "text-gray-500"}>
-                02. Aggregator Blacklist (0.4s)
-              </span>
-              <span className={currentLayerScan >= 3 ? "text-[#ffbc09] font-bold" : "text-gray-500"}>
-                03. Vector RAG Engine (1.2s)
-              </span>
-              <span className={currentLayerScan >= 4 ? "text-[#ffbc09] font-bold" : "text-gray-500"}>
-                04. Multi-LLM Ensemble
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* SECTION 3: Live Results Display (Layer 1 HUD + Deep Insights) */}
-        {layer1Result && !isScanning && (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-6 mb-10"
-          >
-            {/* Primary Layer 1 Telemetry HUD */}
-            <Layer1TelemetryHUD result={layer1Result} />
-
-            {/* If BLOCK: Show definitive Early Exit Banner */}
-            {layer1Result.status === LAYER_1_STATUS.BLOCK ? (
-              <div className="p-6 rounded-2xl bg-[#ea3810]/15 border border-[#ea3810]/50 shadow-[0_0_30px_rgba(234,56,16,0.2)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-xl bg-[#ea3810]/20 border border-[#ea3810]/40 text-[#ff6b4a] shrink-0 mt-0.5">
-                    <StopCircle className="w-6 h-6 animate-pulse" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm sm:text-base font-bold text-white font-human">
-                      CẢNH BÁO NGUY CƠ CAO // KÍCH HOẠT DỪNG TIẾN TRÌNH (EARLY EXIT)
-                    </h3>
-                    <p className="text-xs text-[#ece7e0]/80 mt-1 font-human leading-relaxed">
-                      Động cơ Layer 1 đã phát hiện bằng chứng gian lận / lừa đảo chắc chắn với độ tin cậy{" "}
-                      <strong className="font-mono text-[#ff8066]">{(layer1Result.confidence * 100).toFixed(1)}%</strong>.
-                      Hệ thống đã tự động dừng lại để tiết kiệm tài nguyên tính toán và bảo vệ người dùng ngay lập tức.
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleShareToForum}
-                  className="px-4 py-2.5 rounded-xl bg-[#ea3810] hover:bg-[#ff4520] text-white text-xs font-mono font-bold shrink-0 transition-all shadow-md flex items-center gap-2"
-                >
-                  <Share2 className="w-3.5 h-3.5" />
-                  <span>Báo Cáo Cộng Đồng</span>
-                </button>
+        <AnimatePresence>
+          {isScanning && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="p-6 rounded-2xl bg-[#120604]/90 border border-[#ffbc09]/50 backdrop-blur-2xl shadow-[0_0_30px_rgba(255,188,9,0.15)] space-y-4 mb-8"
+            >
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="font-bold text-white flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-[#ffbc09] animate-spin" />
+                  NEURAL ENGINE: ĐANG XỬ LÝ LỚP 0{currentLayerScan}/04...
+                </span>
+                <span className="text-[#ffbc09] font-bold">{scanProgress}%</span>
               </div>
-            ) : (
-              /* If SUSPICIOUS or PASS: Show Deep Inspection Tabs */
-              <div className="space-y-6">
-                {/* Result Tabs Navigation */}
-                <div className="flex items-center gap-2 border-b border-[#2d0d08] pb-2 select-none font-mono">
-                  {[
-                    { id: "l1", label: "🛡️ Layer 1 Signals", desc: "Tín hiệu tầng 1" },
-                    { id: "ai", label: "🤖 AI Analysis", desc: "Phân tích mở rộng" },
-                    { id: "expert", label: "👨‍⚕️ Cố Vấn", desc: "Nhận định chuyên gia" },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => {
-                        saffronAudio.playClick(500);
-                        setActiveResultTab(tab.id);
-                      }}
-                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        activeResultTab === tab.id
-                          ? "bg-[#ffbc09] text-[#150604] shadow-md shadow-[#ffbc09]/30"
-                          : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
 
-                {activeResultTab === "ai" && deepScanResult && (
-                  <div className="p-6 rounded-2xl bg-[#0f0504]/90 border border-[#47140b] backdrop-blur-2xl space-y-4">
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2 font-human">
-                      <Bot className="w-4 h-4 text-[#ffbc09]" />
-                      Các Yếu Tố Cần Lưu Ý Từ Mô Hình Phân Tích
-                    </h3>
-                    <ul className="space-y-2">
-                      {deepScanResult.aiAnalysis.map((item, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-start gap-3 p-3 rounded-xl bg-black/40 border border-[#2d0d08] text-xs text-[#ece7e0]"
-                        >
-                          <span className="w-5 h-5 rounded-full bg-[#ffbc09]/20 text-[#ffbc09] font-mono font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
-                            {idx + 1}
-                          </span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+              <div className="w-full h-2 rounded-full bg-black/60 overflow-hidden border border-[#2d0d08]">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-[#ffbc09] via-[#ea3810] to-[#ffd15c]"
+                  initial={{ width: "0%" }}
+                  animate={{ width: `${scanProgress}%` }}
+                  transition={{ duration: 0.2 }}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-                {activeResultTab === "expert" && deepScanResult && (
-                  <div className="p-6 rounded-2xl bg-[#0f0504]/90 border border-[#47140b] backdrop-blur-2xl space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#ffbc09]/20 border border-[#ffbc09]/40 flex items-center justify-center text-amber-300 font-bold">
-                        👨‍⚕️
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-white">{deepScanResult.expertFeedback.expertName}</p>
-                        <p className="text-xs font-mono text-[#ffbc09]">
-                          {deepScanResult.expertFeedback.badge} • {deepScanResult.expertFeedback.trustScore} PTS
-                        </p>
-                      </div>
-                    </div>
-                    <div className="p-4 rounded-xl bg-black/40 border border-[#2d0d08] text-xs text-[#ece7e0] leading-relaxed italic">
-                      &ldquo;{deepScanResult.expertFeedback.comment}&rdquo;
-                    </div>
-                  </div>
-                )}
+        {/* SECTION 3: Telemetry HUD & Multi-Tabbed Result Cards */}
+        {layer1Result && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6 mb-8"
+          >
+            {/* Layer 1 Telemetry HUD */}
+            <Layer1TelemetryHUD
+              result={layer1Result}
+              onShareToForum={handleShareToForum}
+            />
 
-                {/* Share to Forum Action */}
-                <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-[#0f0504]/90 border border-[#47140b]">
-                  <div>
-                    <p className="text-xs font-bold text-white">Bạn muốn chia sẻ kết quả này lên Diễn đàn sinh viên?</p>
-                    <p className="text-[11px] text-[#ece7e0]/60 mt-0.5">
-                      Cảnh báo sẽ được đồng bộ cùng chỉ số telemetry đối soát AI.
-                    </p>
-                  </div>
+            {/* Sub-Tabs for Extended Insights (L2 - L4) */}
+            <div className="flex items-center gap-2 border-b border-[#47140b] pb-2 overflow-x-auto">
+              <button
+                type="button"
+                onClick={() => {
+                  saffronAudio.playClick(600);
+                  setActiveResultTab("l1");
+                }}
+                className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                  activeResultTab === "l1"
+                    ? "bg-[#ffbc09] text-[#150604] shadow-md shadow-[#ffbc09]/20"
+                    : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                [01] LAYER 1 VERDICT
+              </button>
+
+              {deepScanResult && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      saffronAudio.playClick(650);
+                      setActiveResultTab("ai");
+                    }}
+                    className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                      activeResultTab === "ai"
+                        ? "bg-[#ffbc09] text-[#150604] shadow-md shadow-[#ffbc09]/20"
+                        : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    [02] AI DEEP RAG
+                  </button>
 
                   <button
                     type="button"
-                    onClick={handleShareToForum}
-                    className="py-2.5 px-4 rounded-xl bg-[#ffbc09] hover:bg-[#ffd15c] text-[#150604] text-xs font-bold font-mono flex items-center gap-2 shadow-md cursor-pointer transition-all hover:scale-105"
+                    onClick={() => {
+                      saffronAudio.playClick(700);
+                      setActiveResultTab("expert");
+                    }}
+                    className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                      activeResultTab === "expert"
+                        ? "bg-[#ffbc09] text-[#150604] shadow-md shadow-[#ffbc09]/20"
+                        : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
+                    }`}
                   >
-                    <Share2 className="w-3.5 h-3.5" />
-                    <span>{sharedNotice ? "Đang chuyển..." : "Chia Sẻ Lên Diễn Đàn"}</span>
+                    [03] EXPERT OPINION
                   </button>
+                </>
+              )}
+            </div>
+
+            {/* TAB CONTENT */}
+            {activeResultTab === "ai" && deepScanResult && (
+              <div className="p-6 rounded-2xl bg-[#0f0504]/90 border border-[#47140b] backdrop-blur-2xl space-y-4">
+                <h3 className="text-sm font-bold text-white flex items-center gap-2 font-human">
+                  <Bot className="w-4 h-4 text-[#ffbc09]" />
+                  Các Yếu Tố Cần Lưu Ý Từ Mô Hình Phân Tích
+                </h3>
+                <ul className="space-y-2">
+                  {deepScanResult.aiAnalysis.map((item, idx) => (
+                    <li
+                      key={idx}
+                      className="flex items-start gap-3 p-3 rounded-xl bg-black/40 border border-[#2d0d08] text-xs text-[#ece7e0]"
+                    >
+                      <span className="w-5 h-5 rounded-full bg-[#ffbc09]/20 text-[#ffbc09] font-mono font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                        {idx + 1}
+                      </span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {activeResultTab === "expert" && deepScanResult && (
+              <div className="p-6 rounded-2xl bg-[#0f0504]/90 border border-[#47140b] backdrop-blur-2xl space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#ffbc09]/20 border border-[#ffbc09]/40 flex items-center justify-center text-amber-300 font-bold">
+                    👨‍⚕️
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-white">{deepScanResult.expertFeedback.expertName}</p>
+                    <p className="text-xs font-mono text-[#ffbc09]">
+                      {deepScanResult.expertFeedback.badge} • {deepScanResult.expertFeedback.trustScore} PTS
+                    </p>
+                  </div>
+                </div>
+                <div className="p-4 rounded-xl bg-black/40 border border-[#2d0d08] text-xs text-[#ece7e0] leading-relaxed italic">
+                  &ldquo;{deepScanResult.expertFeedback.comment}&rdquo;
                 </div>
               </div>
             )}
+
+            {/* Share to Forum Action Banner */}
+            <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-2xl bg-[#0f0504]/90 border border-[#47140b]">
+              <div>
+                <p className="text-xs font-bold text-white">Bạn muốn chia sẻ kết quả này lên Diễn đàn sinh viên?</p>
+                <p className="text-[11px] text-[#ece7e0]/60 mt-0.5">
+                  Cảnh báo sẽ được đồng bộ cùng chỉ số telemetry đối soát AI.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleShareToForum}
+                className="py-2.5 px-4 rounded-xl bg-[#ffbc09] hover:bg-[#ffd15c] text-[#150604] text-xs font-bold font-mono flex items-center gap-2 shadow-md cursor-pointer transition-all hover:scale-105"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span>{sharedNotice ? "Đang chuyển..." : "Chia Sẻ Lên Diễn Đàn"}</span>
+              </button>
+            </div>
           </motion.div>
         )}
 
-        {/* SECTION 4: Benchmark Test Studio */}
+        {/* SECTION 4: Benchmark Preset Verification Studio */}
         <SaffronSwissCrosshairGrid sectionTag="02 // BENCHMARK VERIFICATION SUITE" className="mb-8">
           <Layer1BenchmarkStudio
             onSelectPreset={(preset) => {
