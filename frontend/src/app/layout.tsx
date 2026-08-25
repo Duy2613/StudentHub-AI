@@ -1,10 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Cormorant_Garamond, Instrument_Serif, Inter, JetBrains_Mono } from "next/font/google";
+import {
+    Geist,
+    Geist_Mono,
+    Cormorant_Garamond,
+    Instrument_Serif,
+    Inter,
+    JetBrains_Mono,
+    Plus_Jakarta_Sans,
+} from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth/AuthContext";
 import { BackgroundProvider } from "@/components/providers/BackgroundContext";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import KnowledgeCursor from "@/components/ui/KnowledgeCursor";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+    variable: "--font-plus-jakarta",
+    subsets: ["latin", "vietnamese"],
+    weight: ["400", "500", "600", "700", "800"],
+    display: "swap",
+});
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -31,7 +46,7 @@ const cormorantGaramond = Cormorant_Garamond({
 });
 
 // === DIGITAL GUARDIAN TYPOGRAPHY ===
-// Human Interface: Inter (hướng dẫn, body, headings)
+// Human Interface: Inter / Plus Jakarta Sans (hướng dẫn, body, headings)
 const inter = Inter({
     variable: "--font-inter",
     subsets: ["latin", "vietnamese"],
@@ -56,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html
             lang="vi"
-            className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${cormorantGaramond.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+            className={`${plusJakartaSans.variable} ${inter.variable} ${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} ${cormorantGaramond.variable} ${jetbrainsMono.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col bg-space-950 text-gray-100 selection:bg-teal-400 selection:text-space-950">
                 <AuthProvider>

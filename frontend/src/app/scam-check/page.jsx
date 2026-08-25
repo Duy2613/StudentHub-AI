@@ -24,6 +24,7 @@ import { saffronAudio } from "@/lib/audio/saffronAudio";
 import { motion, AnimatePresence } from "motion/react";
 
 import Layer1TelemetryHUD from "@/components/trust/Layer1TelemetryHUD";
+import RiskMeterSplitVerdict from "@/components/trust/RiskMeterSplitVerdict";
 import Layer1LivePrechecker from "@/components/trust/Layer1LivePrechecker";
 import Layer1BenchmarkStudio from "@/components/trust/Layer1BenchmarkStudio";
 import Layer2SemanticHUD from "@/components/trust/Layer2SemanticHUD";
@@ -32,6 +33,7 @@ import Layer3EvidenceHUD from "@/components/trust/Layer3EvidenceHUD";
 import Layer3BenchmarkStudio from "@/components/trust/Layer3BenchmarkStudio";
 import Layer4TrustVerdictHUD from "@/components/trust/Layer4TrustVerdictHUD";
 import Layer4BenchmarkStudio from "@/components/trust/Layer4BenchmarkStudio";
+import NeuralModelTelemetryHUD from "@/components/trust/NeuralModelTelemetryHUD";
 import { screenLayer1 } from "@/lib/ai-trust/layer1/scanner";
 import { LAYER_1_STATUS } from "@/lib/ai-trust/layer1/types";
 import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticService";
@@ -48,12 +50,13 @@ export default function ScamCheckPage() {
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [currentLayerScan, setCurrentLayerScan] = useState(1);
+  const [currentScannedInput, setCurrentScannedInput] = useState({ type: "text", content: "", metadata: {} });
   const [layer1Result, setLayer1Result] = useState(null);
   const [layer2Result, setLayer2Result] = useState(null);
   const [layer3Result, setLayer3Result] = useState(null);
   const [layer4Result, setLayer4Result] = useState(null);
   const [deepScanResult, setDeepScanResult] = useState(null);
-  const [activeResultTab, setActiveResultTab] = useState("l1"); // 'l1' | 'l2' | 'l3' | 'l4' | 'ai' | 'expert'
+  const [activeResultTab, setActiveResultTab] = useState("l1"); // 'l1' | 'l2' | 'l3' | 'l4' | 'neural' | 'ai' | 'expert'
   const [activeBenchmarkTab, setActiveBenchmarkTab] = useState("l1"); // 'l1' | 'l2' | 'l3' | 'l4'
   const [sharedNotice, setSharedNotice] = useState(false);
 
@@ -68,6 +71,7 @@ export default function ScamCheckPage() {
   }) => {
     if (!content && !metadata && !claims) return;
 
+    setCurrentScannedInput({ type, content: content || "", metadata: metadata || {} });
     saffronAudio.playHardwareKey();
     setIsScanning(true);
     setScanProgress(15);
@@ -384,6 +388,13 @@ export default function ScamCheckPage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6 mb-8"
           >
+            {/* Risk Meter & Split View (🤖 AI vs 👨‍⚕️ Expert) */}
+            <RiskMeterSplitVerdict
+              result={layer1Result}
+              currentInput={currentScannedInput}
+              onShareToForum={handleShareToForum}
+            />
+
             {/* Layer 1 Telemetry HUD */}
             <Layer1TelemetryHUD
               result={layer1Result}
@@ -458,6 +469,22 @@ export default function ScamCheckPage() {
                 </button>
               )}
 
+              {/* Neural Model Engine Telemetry Tab */}
+              <button
+                type="button"
+                onClick={() => {
+                  saffronAudio.playClick(690);
+                  setActiveResultTab("neural");
+                }}
+                className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                  activeResultTab === "neural"
+                    ? "bg-gradient-to-r from-[#ea3810] via-[#ffbc09] to-[#ffd15c] text-[#150604] shadow-lg shadow-[#ffbc09]/30"
+                    : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                [05] AI NEURAL ENGINE
+              </button>
+
               {deepScanResult && (
                 <>
                   <button
@@ -472,7 +499,7 @@ export default function ScamCheckPage() {
                         : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    [05] AI DEEP RAG
+                    [06] AI DEEP RAG
                   </button>
 
                   <button
@@ -487,7 +514,7 @@ export default function ScamCheckPage() {
                         : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    [06] EXPERT OPINION
+                    [07] EXPERT OPINION
                   </button>
                 </>
               )}
@@ -519,6 +546,14 @@ export default function ScamCheckPage() {
             {activeResultTab === "l4" && layer4Result && (
               <Layer4TrustVerdictHUD
                 result={layer4Result}
+              />
+            )}
+
+            {/* TAB CONTENT: NEURAL MODEL TELEMETRY */}
+            {activeResultTab === "neural" && (
+              <NeuralModelTelemetryHUD
+                inputContent={currentScannedInput.content}
+                metadata={currentScannedInput.metadata}
               />
             )}
 

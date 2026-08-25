@@ -24,9 +24,9 @@ const ACTION_VERB_REGEX = /(?:nhập|gửi|cung\s*cấp|chuyển|nạp|enter|sen
 
 // Educational / Academic Context Whitelist Guards (Prevent False Positives)
 const BENIGN_EDUCATIONAL_PATTERNS = [
-  /(?:bài\s+giảng|giáo\s+trình|lecture|assignment|bài\s+tập|môn\s+học|nghiên\s+cứu|khái\s+niệm|lý\s+thuyết|cấu\s+trúc\s+dữ\s+liệu|thuật\s+toán)/i,
-  /(?:explains\s+how|discusses\s+otp|password\s+authentication\s+works|mô\s+hình\s+bảo\s+mật|phương\s+thức\s+xác\s+thực)/i,
-  /(?:hướng\s+dẫn\s+thực\s+hành|slide\s+bài\s+giảng|tài\s+liệu\s+học\s+tập)/i,
+  /(?:bài\s+giảng\s+lý\s+thuyết|giáo\s+trình\s+đại\s+học|lecture\s+notes|assignment\s+question|cấu\s+trúc\s+dữ\s+liệu\s+và\s+giải\s+thuật)/i,
+  /(?:explains\s+how|discusses\s+otp|password\s+authentication\s+works|mô\s+hình\s+bảo\s+mật\s+lý\s+thuyết|phương\s+thức\s+xác\s+thực\s+hai\s+lớp)/i,
+  /(?:hướng\s+dẫn\s+thực\s+hành\s+môn|slide\s+bài\s+giảng\s+môn|tài\s+liệu\s+học\s+tập\s+môn)/i,
 ];
 
 // 2. Task Deposit & Student Job Scams
@@ -36,6 +36,13 @@ const TASK_DEPOSIT_PATTERNS = [
   /(?:hoa\s*hồng\s*(?:1[0-9]|[2-9]\d)%|hoàn\s*tiền\s*\d+%|hoàn\s*tiền\s*kèm\s*hoa\s*hồng)/i,
   /(?:việc\s*nhẹ\s*lương\s*cao|thu\s*nhập\s*\d+00k|kiếm\s*\d+00k\s*\/\s*(?:ngày|giờ|ca)|nhận\s*tiền\s*sau\s*\d+\s*phút)/i,
   /(?:nạp\s*tiền\s*vào\s*app|nạp\s*phí\s*kích\s*hoạt|nạp\s*cọc\s*kích\s*hoạt)/i,
+];
+
+// 2b. Academic Project / Lab / Club Advance Reservation Deposit Traps
+const ACADEMIC_ADVANCE_DEPOSIT_PATTERNS = [
+  /(?:đóng\s*cọc|đặt\s*cọc|chuyển\s*cọc|tiền\s*cọc|cọc\s*giữ\s*chỗ|phí\s*giữ\s*chỗ|cọc\s*\d+\s*(?:triệu|tr|k)|đóng\s*phí\s*tham\s*gia|phí\s*linh\s*kiện|đóng\s*quỹ\s*tham\s*gia)/i,
+  /(?:nghiên\s*cứu|dự\s*án|robot|clb|câu\s*lạc\s*bộ|đồ\s*án|lab|phòng\s*thí\s*nghiệm|nhóm\s*nghiên\s*cứu|tự\s*hành).*(?:đóng\s*cọc|giữ\s*chỗ|đặt\s*cọc|chuyển\s*tiền|nộp\s*tiền|chuyển\s*cọc)/i,
+  /(?:anh\s*(?:ở\s*)?trong\s*trường|nhóm\s*anh.*chuyên\s*nghiệp|thi\s*đấu\s*quốc\s*tế|thủ\s*khoa).*(?:đóng\s*cọc|giữ\s*chỗ|cọc|chuyển\s*khoản)/i,
 ];
 
 // 3. Impersonation of Authority / Institutions
@@ -87,8 +94,9 @@ export class TextDetector {
     const text = normText.normalized;
     const deobfuscated = normText.deobfuscated || text.toLowerCase();
 
-    // False Positive Guard: Check if text is strictly educational/academic context
-    const isEducational = BENIGN_EDUCATIONAL_PATTERNS.some((pat) => pat.test(text));
+    // False Positive Guard: Check if text is strictly educational/academic theoretical context
+    const hasFinancialOrCredDirective = /(?:đóng\s*cọc|đặt\s*cọc|chuyển\s*cọc|phí\s*giữ\s*chỗ|nạp\s*tiền|nạp\s*cọc|chuyển\s*khoản|tiền\s*cọc|(?:nhập|gửi|cung\s*cấp|xác\s*nhận|điền|enter|provide|send)\s+(?:mật\s*khẩu|mat\s*khau|password|mã\s*otp|ma\s*otp|smart\s*otp|mã\s*pin|pin))/i.test(text);
+    const isEducational = !hasFinancialOrCredDirective && BENIGN_EDUCATIONAL_PATTERNS.some((pat) => pat.test(text));
 
     // 1. Malicious Shell / Script Payload (Highest Severity)
     for (const pat of MALICIOUS_SHELL_PATTERNS) {
@@ -198,6 +206,21 @@ export class TextDetector {
           severity: SIGNAL_SEVERITY.MEDIUM,
           confidence: 0.50,
           evidence: { snippet: "Online task deposit / fee trigger", details: "Suspicious task/commission pattern" },
+          source: "TextDetector",
+        })
+      );
+    }
+
+    // 3b. Academic Project / Lab / Club Advance Reservation Deposit Trap
+    const isAcademicDeposit = ACADEMIC_ADVANCE_DEPOSIT_PATTERNS.some((pat) => pat.test(text) || pat.test(deobfuscated));
+    if (isAcademicDeposit && !isEducational) {
+      signals.push(
+        createSignal({
+          type: "advance_reservation_deposit_demand",
+          category: "social_engineering",
+          severity: SIGNAL_SEVERITY.HIGH,
+          confidence: 0.88,
+          evidence: { snippet: text.slice(0, 120), details: "Yêu cầu đóng cọc giữ chỗ / nộp phí tham gia dự án NCKH, CLB hoặc Lab nghiên cứu" },
           source: "TextDetector",
         })
       );

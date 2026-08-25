@@ -27,7 +27,8 @@ export class ContextAnalyzer {
     const lower = text.toLowerCase();
 
     // 1. Educational Discussion Protection
-    if (EDUCATIONAL_CONTEXT_REGEX.test(text)) {
+    const hasFinancialOrCredDirective = /(?:đóng\s*cọc|đặt\s*cọc|chuyển\s*cọc|phí\s*giữ\s*chỗ|nạp\s*tiền|nạp\s*cọc|chuyển\s*khoản|tiền\s*cọc|(?:nhập|gửi|cung\s*cấp|xác\s*nhận|điền|enter|provide|send)\s+(?:mật\s*khẩu|mat\s*khau|password|mã\s*otp|ma\s*otp|smart\s*otp|mã\s*pin|pin))/i.test(text);
+    if (!hasFinancialOrCredDirective && EDUCATIONAL_CONTEXT_REGEX.test(text)) {
       signals.push({
         type: CONTEXT_SIGNAL_TYPES.EDUCATIONAL_DISCUSSION,
         severity: "info",
@@ -103,6 +104,18 @@ export class ContextAnalyzer {
         severity: "medium",
         confidence: 0.75,
         details: "Ngữ cảnh tạo áp lực thời gian khẩn cấp nhằm thúc ép người dùng ra quyết định vội vàng.",
+      });
+    }
+
+    // 8. Academic Project / Lab / Club Advance Deposit Trap Context
+    const mentionsAcademicProject = /(?:dự án|robot|nckh|nghiên cứu|lab|phòng thí nghiệm|clb|câu lạc bộ|đồ án|nhóm anh|thi đấu quốc tế|trong trường|lê quốc thịnh)/i.test(text);
+    const mentionsAdvanceDeposit = /(?:đóng cọc|cọc giữ chỗ|đặt cọc|phí giữ chỗ|cọc \d+|chuyển cọc|tiền linh kiện|nộp cọc)/i.test(text);
+    if (mentionsAcademicProject && mentionsAdvanceDeposit) {
+      signals.push({
+        type: "unauthorized_academic_deposit_trap",
+        severity: "critical",
+        confidence: 0.98,
+        details: "Bẫy lừa cọc dự án NCKH / CLB / Lab: Quy chế các trường ĐH nghiêm cấm cá nhân thu tiền đặt cọc giữ chỗ của sinh viên để tham gia nghiên cứu.",
       });
     }
 

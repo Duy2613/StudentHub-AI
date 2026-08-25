@@ -218,16 +218,21 @@ export class UrlDetector {
       return { signals, isWhitelisted: false, parsedStructure };
     }
 
-    // 2. Whitelist Verification (Authentic .edu.vn, .gov.vn, or trusted canonical domains)
+    // 2. Whitelist Verification (Authentic .edu.vn, .gov.vn, Banks, Tech Platforms)
     if (BrandRegistry.isWhitelistedDomain(hostname)) {
       isWhitelisted = true;
+      const brand = BrandRegistry.getAuthenticBrand(hostname);
+      const detailLabel = brand
+        ? `Tên miền xác thực chính thống (${brand.name})`
+        : "Tên miền cơ quan giáo dục đại học / chính phủ chính thống (.edu.vn / .gov.vn)";
+
       signals.push(
         createSignal({
           type: LAYER_1_REASONS.WHITELISTED_DOMAIN,
           category: "url",
           severity: SIGNAL_SEVERITY.INFO,
           confidence: LAYER_1_CONFIG.CONFIDENCE_BOUNDS.WHITELIST_PASS,
-          evidence: { matchedText: hostname, details: "Verified authentic higher education / government / trusted domain" },
+          evidence: { matchedText: hostname, details: detailLabel },
           source: "UrlDetector",
         })
       );

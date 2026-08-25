@@ -205,6 +205,71 @@ class SaffronAudioEngine {
       osc.stop(now + 0.22);
     } catch (e) {}
   }
+
+  // 7. Cyber Laser Beam Pulse (Khi quét Layer 4 hoặc chụp ảnh camera)
+  playLaser(pitch = 900) {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(pitch, now);
+      osc.frequency.exponentialRampToValueAtTime(pitch * 0.2, now + 0.12);
+
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.13);
+    } catch (e) {}
+  }
+
+  // 8. Cyber Scanner Sweep
+  playScanSweep() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.exponentialRampToValueAtTime(1200, now + 0.15);
+
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.17);
+    } catch (e) {}
+  }
+
+  // 9. Aliases for benchmark and UI compatibility
+  playSuccess() {
+    return this.playSuccessChime();
+  }
+
+  playError() {
+    return this.playAlertBuzz();
+  }
+
+  playCelebration() {
+    return this.playSuccessChime();
+  }
 }
 
 export const saffronAudio = new SaffronAudioEngine();

@@ -720,7 +720,7 @@ export function resolveHomoglyphText(text) {
 
 export class BrandRegistry {
   /**
-   * Checks if domain is in authentic education/government whitelist
+   * Checks if domain belongs to authentic whitelist (universities, gov, banks, tech platforms)
    * @param {string} hostname
    * @returns {boolean}
    */
@@ -748,12 +748,28 @@ export class BrandRegistry {
       return true;
     }
 
-    // 2. Direct canonical domain match
+    // 2. Direct canonical domain match for all registered verified brands
     return BRAND_REGISTRY.some((brand) =>
       brand.canonicalDomains.some(
         (canonical) => cleanHost === canonical || cleanHost.endsWith("." + canonical)
       )
     );
+  }
+
+  /**
+   * Checks if domain matches an authentic registered brand (tech, banking, social, etc.)
+   * @param {string} hostname
+   * @returns {object|null}
+   */
+  static getAuthenticBrand(hostname) {
+    if (!hostname) return null;
+    const cleanHost = hostname.toLowerCase();
+
+    return BRAND_REGISTRY.find((brand) =>
+      brand.canonicalDomains.some(
+        (canonical) => cleanHost === canonical || cleanHost.endsWith("." + canonical)
+      )
+    ) || null;
   }
 
   /**

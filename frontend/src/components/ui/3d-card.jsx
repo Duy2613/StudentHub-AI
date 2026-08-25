@@ -98,10 +98,6 @@ export const CardItem = ({
   const ref = useRef(null);
   const [isMouseEntered] = useMouseEnter();
 
-  useEffect(() => {
-    handleAnimations();
-  }, [isMouseEntered]);
-
   const handleAnimations = () => {
     if (!ref.current) return;
     if (isMouseEntered) {
@@ -110,6 +106,10 @@ export const CardItem = ({
       ref.current.style.transform = `translateX(0px) translateY(0px) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`;
     }
   };
+
+  useEffect(() => {
+    handleAnimations();
+  }, [isMouseEntered]);
 
   return (
     <Tag
