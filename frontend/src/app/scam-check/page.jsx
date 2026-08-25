@@ -273,11 +273,6 @@ export default function ScamCheckPage() {
       setIsScanning(false);
     }
   };
-    } catch (err) {
-      console.error("Scan execution failed:", err);
-      setIsScanning(false);
-    }
-  };
 
   const handleShareToForum = () => {
     saffronAudio.playClick(800);
@@ -689,10 +684,6 @@ export default function ScamCheckPage() {
             )}
           </div>
         </SaffronSwissCrosshairGrid>
-      </main>
-    </div>
-  );
-}
       </main>
     </div>
   );

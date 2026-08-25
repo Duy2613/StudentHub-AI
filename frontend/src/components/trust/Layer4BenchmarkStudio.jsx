@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { Layer4TrustService } from "@/lib/ai-trust/layer4/Layer4TrustService";
 import { LAYER_4_TEST_CASES } from "../../../tests/layer4/layer4.test.mjs";
-import { saffronAudio } from "@/lib/saffron-audio";
+import { saffronAudio } from "@/lib/audio/saffronAudio";
 
 export default function Layer4BenchmarkStudio({ onSelectPreset }) {
   const [selectedCase, setSelectedCase] = useState(LAYER_4_TEST_CASES[0]);
