@@ -28,10 +28,14 @@ import Layer1LivePrechecker from "@/components/trust/Layer1LivePrechecker";
 import Layer1BenchmarkStudio from "@/components/trust/Layer1BenchmarkStudio";
 import Layer2SemanticHUD from "@/components/trust/Layer2SemanticHUD";
 import Layer2BenchmarkStudio from "@/components/trust/Layer2BenchmarkStudio";
+import Layer3EvidenceHUD from "@/components/trust/Layer3EvidenceHUD";
+import Layer3BenchmarkStudio from "@/components/trust/Layer3BenchmarkStudio";
 import { screenLayer1 } from "@/lib/ai-trust/layer1/scanner";
 import { LAYER_1_STATUS } from "@/lib/ai-trust/layer1/types";
 import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticService";
 import { LAYER_2_STATUS } from "@/lib/ai-trust/layer2/types";
+import { Layer3EvidenceService } from "@/lib/ai-trust/layer3/Layer3EvidenceService";
+import { LAYER_3_STATUS } from "@/lib/ai-trust/layer3/types";
 
 export default function ScamCheckPage() {
   const router = useRouter();
@@ -42,21 +46,30 @@ export default function ScamCheckPage() {
   const [currentLayerScan, setCurrentLayerScan] = useState(1);
   const [layer1Result, setLayer1Result] = useState(null);
   const [layer2Result, setLayer2Result] = useState(null);
+  const [layer3Result, setLayer3Result] = useState(null);
   const [deepScanResult, setDeepScanResult] = useState(null);
-  const [activeResultTab, setActiveResultTab] = useState("l1"); // 'l1' | 'l2' | 'ai' | 'expert'
-  const [activeBenchmarkTab, setActiveBenchmarkTab] = useState("l1"); // 'l1' | 'l2'
+  const [activeResultTab, setActiveResultTab] = useState("l1"); // 'l1' | 'l2' | 'l3' | 'ai' | 'expert'
+  const [activeBenchmarkTab, setActiveBenchmarkTab] = useState("l1"); // 'l1' | 'l2' | 'l3'
   const [sharedNotice, setSharedNotice] = useState(false);
 
   // Triggered when user selects a benchmark case or submits input from prechecker
-  const handleExecuteScan = async ({ type, content, metadata = null, layer1Result: forcedL1 = null }) => {
-    if (!content && !metadata) return;
+  const handleExecuteScan = async ({
+    type,
+    content,
+    metadata = null,
+    layer1Result: forcedL1 = null,
+    claims = null,
+    candidateSources = null,
+  }) => {
+    if (!content && !metadata && !claims) return;
 
     saffronAudio.playHardwareKey();
     setIsScanning(true);
-    setScanProgress(20);
+    setScanProgress(15);
     setCurrentLayerScan(1);
     setLayer1Result(null);
     setLayer2Result(null);
+    setLayer3Result(null);
     setDeepScanResult(null);
     setActiveResultTab("l1");
 
@@ -81,7 +94,7 @@ export default function ScamCheckPage() {
       }
 
       setLayer1Result(l1Res);
-      setScanProgress(45);
+      setScanProgress(40);
 
       // Evaluate Layer 1 Early Exit: If BLOCK -> STOP immediately!
       if (l1Res.status === LAYER_1_STATUS.BLOCK) {
@@ -95,7 +108,7 @@ export default function ScamCheckPage() {
 
       // Step 2: Layer 2 Semantic & Contextual Verification
       saffronAudio.playClick(750);
-      setScanProgress(65);
+      setScanProgress(60);
       setCurrentLayerScan(2);
 
       let l2Res;
@@ -115,7 +128,7 @@ export default function ScamCheckPage() {
       }
 
       setLayer2Result(l2Res);
-      setScanProgress(80);
+      setScanProgress(75);
 
       // Evaluate Layer 2 Early Exit: If BLOCK -> STOP!
       if (l2Res.status === LAYER_2_STATUS.BLOCK) {
@@ -128,20 +141,53 @@ export default function ScamCheckPage() {
         return;
       }
 
-      // Step 3 & 4: Forward to Layer 3 & 4
-      setTimeout(() => {
-        saffronAudio.playClick(900);
-        setScanProgress(92);
-        setCurrentLayerScan(3);
-      }, 350);
+      // Step 3: Layer 3 External Evidence & Source Verification
+      saffronAudio.playClick(850);
+      setScanProgress(88);
+      setCurrentLayerScan(3);
 
+      let l3Res;
+      try {
+        const l3Response = await fetch("/api/ai-trust/evidence", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            claims: claims || l2Res.claims,
+            candidateSources: candidateSources || l2Res.verificationPackage?.candidateSources,
+            layer2Result: l2Res,
+          }),
+        });
+        if (l3Response.ok) {
+          l3Res = await l3Response.json();
+        } else {
+          l3Res = await Layer3EvidenceService.verify({
+            claims: claims || l2Res.claims,
+            candidateSources: candidateSources || l2Res.verificationPackage?.candidateSources,
+            layer2Result: l2Res,
+          });
+        }
+      } catch {
+        l3Res = await Layer3EvidenceService.verify({
+          claims: claims || l2Res.claims,
+          candidateSources: candidateSources || l2Res.verificationPackage?.candidateSources,
+          layer2Result: l2Res,
+        });
+      }
+
+      setLayer3Result(l3Res);
+
+      // Step 4: Final Synthesis for Deep Layer 4
       setTimeout(() => {
         setScanProgress(100);
         setCurrentLayerScan(4);
         setIsScanning(false);
-        setActiveResultTab("l2");
+        setActiveResultTab("l3");
 
-        const isThreat = l2Res.status === LAYER_2_STATUS.SUSPICIOUS || l1Res.status === LAYER_1_STATUS.SUSPICIOUS;
+        const isThreat =
+          l2Res.status === LAYER_2_STATUS.SUSPICIOUS ||
+          l1Res.status === LAYER_1_STATUS.SUSPICIOUS ||
+          l3Res.status === LAYER_3_STATUS.CONTESTED;
+
         if (isThreat) {
           saffronAudio.playAlertBuzz();
         } else {
@@ -154,24 +200,24 @@ export default function ScamCheckPage() {
           input: content,
           risk: isThreat ? 75 : 8,
           status: isThreat ? "suspicious" : "safe",
-          label: isThreat ? "Đáng ngờ (Cần đối chiếu Layer 3)" : "Nguồn tin an toàn (Xác minh)",
+          label: isThreat ? "Đáng ngờ (Cần thận trọng)" : "Nguồn tin an toàn (Đã xác minh)",
           aiAnalysis: [
             l2Res.semanticSummary,
-            `Mục đích nhận diện: ${l2Res.intent?.primary?.toUpperCase()} (Tính thao túng: ${l2Res.intent?.coercive ? "CÓ" : "KHÔNG"})`,
-            l2Res.claims?.length > 0
-              ? `Trích xuất ${l2Res.claims.length} phát ngôn sự kiện cần xác minh nguồn tin tại Layer 3.`
-              : "Không phát hiện mâu thuẫn thời gian hay bẫy chiếm đoạt thông tin.",
+            `Bằng chứng Layer 3: ${l3Res.status} (Độ hoàn thiện: ${(l3Res.verificationCompleteness * 100).toFixed(0)}%, Cụm nguồn: ${l3Res.sourceIndependence?.totalClusters || 0})`,
+            l3Res.conflicts?.length > 0
+              ? `Cảnh báo: Phát hiện ${l3Res.conflicts.length} mâu thuẫn giữa các nguồn tin chính thống.`
+              : "Không phát hiện mâu thuẫn giữa các nguồn tin đối soát.",
           ],
           expertFeedback: {
             expertName: "TS. Nguyễn Minh Đức (An ninh Mạng)",
             trustScore: 98,
             badge: "⭐ Chuyên Gia Uy Tín",
             comment: isThreat
-              ? "Cần cẩn trọng khi tương tác với thông báo này. Hãy kiểm tra lại qua kênh chính thức của nhà trường hoặc ngân hàng."
+              ? "Cần cẩn trọng khi tương tác với thông báo này. Hãy kiểm tra lại qua cổng thông tin chính thức của đơn vị."
               : "Nội dung an toàn, sinh viên có thể yên tâm tiếp tục tham khảo theo quy định.",
           },
         });
-      }, 700);
+      }, 500);
     } catch (err) {
       console.error("Scan execution failed:", err);
       setIsScanning(false);
@@ -328,12 +374,29 @@ export default function ScamCheckPage() {
                 </button>
               )}
 
+              {layer3Result && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    saffronAudio.playClick(640);
+                    setActiveResultTab("l3");
+                  }}
+                  className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                    activeResultTab === "l3"
+                      ? "bg-[#00f0ff] text-[#150604] shadow-md shadow-[#00f0ff]/20"
+                      : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  [03] LAYER 3 EVIDENCE
+                </button>
+              )}
+
               {deepScanResult && (
                 <>
                   <button
                     type="button"
                     onClick={() => {
-                      saffronAudio.playClick(650);
+                      saffronAudio.playClick(660);
                       setActiveResultTab("ai");
                     }}
                     className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
@@ -342,7 +405,7 @@ export default function ScamCheckPage() {
                         : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    [03] AI DEEP RAG
+                    [04] AI DEEP RAG
                   </button>
 
                   <button
@@ -357,7 +420,7 @@ export default function ScamCheckPage() {
                         : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    [04] EXPERT OPINION
+                    [05] EXPERT OPINION
                   </button>
                 </>
               )}
@@ -375,6 +438,13 @@ export default function ScamCheckPage() {
             {activeResultTab === "l2" && layer2Result && (
               <Layer2SemanticHUD
                 result={layer2Result}
+              />
+            )}
+
+            {/* TAB CONTENT: LAYER 3 */}
+            {activeResultTab === "l3" && layer3Result && (
+              <Layer3EvidenceHUD
+                result={layer3Result}
               />
             )}
 
@@ -445,10 +515,10 @@ export default function ScamCheckPage() {
         {/* SECTION 4: Benchmark Preset Verification Studio */}
         <SaffronSwissCrosshairGrid sectionTag="02 // MULTI-LAYER BENCHMARK SUITE" className="mb-8">
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
               <button
                 onClick={() => setActiveBenchmarkTab("l1")}
-                className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer shrink-0 ${
                   activeBenchmarkTab === "l1"
                     ? "bg-[#ffbc09] text-black shadow-lg shadow-[#ffbc09]/20"
                     : "bg-white/5 hover:bg-white/10 text-[#ece7e0]/70 border border-white/10"
@@ -458,7 +528,7 @@ export default function ScamCheckPage() {
               </button>
               <button
                 onClick={() => setActiveBenchmarkTab("l2")}
-                className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer shrink-0 ${
                   activeBenchmarkTab === "l2"
                     ? "bg-[#ffbc09] text-black shadow-lg shadow-[#ffbc09]/20"
                     : "bg-white/5 hover:bg-white/10 text-[#ece7e0]/70 border border-white/10"
@@ -466,9 +536,19 @@ export default function ScamCheckPage() {
               >
                 🧠 Layer 2 Phân Tích Ngữ Nghĩa (14+ Tests)
               </button>
+              <button
+                onClick={() => setActiveBenchmarkTab("l3")}
+                className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer shrink-0 ${
+                  activeBenchmarkTab === "l3"
+                    ? "bg-[#00f0ff] text-black shadow-lg shadow-[#00f0ff]/20"
+                    : "bg-white/5 hover:bg-white/10 text-[#ece7e0]/70 border border-white/10"
+                }`}
+              >
+                🔍 Layer 3 Đối Soát Nguồn Tin (8+ Tests)
+              </button>
             </div>
 
-            {activeBenchmarkTab === "l1" ? (
+            {activeBenchmarkTab === "l1" && (
               <Layer1BenchmarkStudio
                 onSelectPreset={(preset) => {
                   handleExecuteScan({
@@ -478,7 +558,9 @@ export default function ScamCheckPage() {
                   });
                 }}
               />
-            ) : (
+            )}
+
+            {activeBenchmarkTab === "l2" && (
               <Layer2BenchmarkStudio
                 onSelectPreset={(preset) => {
                   handleExecuteScan({
@@ -486,6 +568,19 @@ export default function ScamCheckPage() {
                     content: preset.content,
                     metadata: preset.metadata,
                     layer1Result: preset.layer1Result,
+                  });
+                }}
+              />
+            )}
+
+            {activeBenchmarkTab === "l3" && (
+              <Layer3BenchmarkStudio
+                onSelectPreset={(preset) => {
+                  handleExecuteScan({
+                    type: preset.type || "text",
+                    content: preset.content,
+                    claims: preset.claims,
+                    candidateSources: preset.candidateSources,
                   });
                 }}
               />

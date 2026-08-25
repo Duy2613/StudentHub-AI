@@ -4,38 +4,38 @@
 ---
 
 ## 1. Trạng Thái Hiện Tại (Current Working Snapshot)
-- **Phiên bản**: StudentHub AI v3.1.0 (AI Trust Layer 1 + Layer 2 Comprehensive Intelligence Pipeline).
+- **Phiên bản**: StudentHub AI v3.2.0 (AI Trust Layer 1 + Layer 2 + Layer 3 Comprehensive Pipeline).
 - **Vừa triển khai & Kiểm thử thành công**:
   1. ✅ **Layer 1 Ultra-Precise Screening Engine (`lib/ai-trust/layer1`)**:
      - 🏛️ 70+ Brand Catalog, Token-Boundary Precision Matcher (0% FP), Damerau-Levenshtein Typosquatting, SSRF Obfuscation Defense, Magic Byte Binary & Polyglot inspection.
      - 151/151 Test Suites PASS (100.0% Accuracy, 0.15ms latency).
   2. ✅ **Layer 2 Semantic & Contextual Verification Engine (`lib/ai-trust/layer2`)**:
-     - 🧠 **IntentAnalyzer**: Phân tích đa mục đích (`inform`, `educate`, `request_credentials`, `request_payment`, `impersonate`, `manipulate`), phân biệt lời kêu gọi bình thường với bẫy ép buộc.
-     - 🏛️ **EntityExtractor & TrustedEntityRegistry**: Nhận diện & chuẩn hóa 70+ trường ĐH, ngân hàng, cơ quan nhà nước, phân biệt giữa nguồn tự xưng (`isClaimedAuthor`) và đối tượng thảo luận.
-     - 📋 **ClaimExtractor**: Trích xuất phát ngôn có cấu trúc (chủ ngữ, vị ngữ, tân ngữ, thời gian, phạm vi), gán mức độ ưu tiên (`CRITICAL`, `HIGH`, `MEDIUM`) và yêu cầu kiểm chứng (`NEEDS_VERIFICATION`).
-     - 🛡️ **ContextAnalyzer**: Bắt bẫy ngữ cảnh mạo danh, nạp cọc CTV Shopee, bẫy sinh trắc học VCB/VNeID, đồng thời bảo vệ tuyệt đối văn bản học thuật / bài tập bảo mật không bị chặn nhầm.
-     - ⚖️ **ConsistencyAnalyzer**: Bắt mâu thuẫn thời gian (thứ Hai vs thứ Sáu), mâu thuẫn số liệu tiền cọc, và mâu thuẫn chỉ thị.
-     - 🌐 **CrossModalAnalyzer**: Đối soát chéo Text vs Logo ảnh vs Tên miền đích URL/QR.
-     - 📦 **VerificationPlanner**: Đóng gói danh sách phát ngôn, thực thể và Candidate Sources chính thống cho **Layer 3**.
-     - ⚡ **Model Provider Abstraction**: Hỗ trợ `GeminiSemanticModelProvider` (multimodal JSON schema) và `DeterministicSemanticProvider` (zero-LLM fallback), khả năng chịu lỗi 100% khi upstream timeout.
-     - 🎯 **Test Suite 14/14 PASS (100.0%)**: Toàn bộ 14 kịch bản từ bài giảng giáo dục, mạo danh trường học, phát ngôn chưa xác thực đến fallback lỗi đều vượt qua tuyệt đối.
-  3. ✅ **Full Pipeline Integration & UI Studios**:
-     - `POST /api/ai-trust/semantic`: API endpoint Layer 2 hoàn chỉnh.
-     - `Layer2SemanticHUD.jsx`: Telemetry HUD hiển thị Intent, Claims, Entities, Bất nhất & Layer 3 Tasks.
-     - `Layer2BenchmarkStudio.jsx`: Trình kiểm thử tương tác Layer 2 trên web studio.
-     - `scam-check/page.jsx`: Tích hợp luồng quét 4 lớp liên tục.
+     - 🧠 IntentAnalyzer, EntityExtractor, ClaimExtractor, ContextAnalyzer, ConsistencyAnalyzer, CrossModalAnalyzer, VerificationPlanner.
+     - 14/14 Test Suites PASS (100.0% Accuracy, 0.40ms latency).
+  3. ✅ **Layer 3 External Evidence & Source Verification Engine (`lib/ai-trust/layer3`)**:
+     - 🔍 **QueryGenerator**: 6 chiến lược truy vấn (Exact, Entity+Action, Entity+Date, Site filter, Anti-Confirmation-Bias Contradiction, Source Claim).
+     - 🏛️ **SourceAuthorityRegistry**: Mô hình phân cấp thẩm quyền nguồn tin đặc thù theo lĩnh vực (Tier 1 -> Tier 5).
+     - 🌐 **Retrieval & Safety**: `KnowledgeBaseRetriever` + `WebSearchRetriever` (SSRF Guard chặn 127.0.0.1, 169.254.169.254).
+     - 📑 **EvidenceExtractor & TemporalEvaluator**: Trích đoạn bằng chứng tinh gọn, kiểm định mốc thời gian và cờ `OUTDATED`.
+     - 🔄 **SourceIndependenceAnalyzer**: Phân cụm bài báo sao chép (`lineage clustering`), triệt tiêu đồng thuận giả tạo.
+     - ⚖️ **SourceConflictDetector**: Bắt và đóng gói mâu thuẫn giữa các nguồn tin chính thống cho Layer 4.
+     - 🎯 **Test Suite 8/8 PASS (100.0%)**: Vượt qua tuyệt đối 8 kịch bản từ bằng chứng chính thống, không có bằng chứng (`UNVERIFIED`, không gán nhãn `FALSE`), tranh chấp nguồn tin, bài báo sao chép đến phòng thủ SSRF và fallback lỗi.
+  4. ✅ **Full Pipeline Integration & UI Studios**:
+     - `POST /api/ai-trust/evidence`: API endpoint Layer 3 hoàn chỉnh.
+     - `Layer3EvidenceHUD.jsx`: Telemetry HUD hiển thị Claim-Evidence Matrix, Cụm Lineage & Tranh chấp nguồn tin.
+     - `Layer3BenchmarkStudio.jsx`: Trình kiểm thử tương tác Layer 3 trên web studio.
+     - `scam-check/page.jsx`: Tích hợp luồng quét 4 lớp liên tục với 3 tab Benchmark Studio.
 
 ---
 
 ## 2. Đường Dẫn File Quan Trọng
 - **Đặc Tả Kỹ Thuật Layer 1**: `docs/vault/01 - 🏗️ System Architecture/AI-Trust-Layer1-Screening-Spec.md`
 - **Đặc Tả Kỹ Thuật Layer 2**: `docs/vault/01 - 🏗️ System Architecture/AI-Trust-Layer2-Semantic-Spec.md`
-- **Layer 2 Core Service**: `frontend/src/lib/ai-trust/layer2/Layer2SemanticService.js`
-- **Layer 2 Test Suite**: `frontend/tests/layer2/layer2.test.mjs`
-- **Full Multi-Modal Suite**: `frontend/tests/layer1/full_multimodal_evaluation.test.mjs`
-- **Backend API Layer 1**: `frontend/src/app/api/ai-trust/screen/route.js`
-- **Backend API Layer 2**: `frontend/src/app/api/ai-trust/semantic/route.js`
-- **Telemetry HUD L1 & L2**: `frontend/src/components/trust/Layer1TelemetryHUD.jsx` & `Layer2SemanticHUD.jsx`
-- **Benchmark Studio L1 & L2**: `frontend/src/components/trust/Layer1BenchmarkStudio.jsx` & `Layer2BenchmarkStudio.jsx`
+- **Đặc Tả Kỹ Thuật Layer 3**: `docs/vault/01 - 🏗️ System Architecture/AI-Trust-Layer3-Evidence-Spec.md`
+- **Layer 3 Core Service**: `frontend/src/lib/ai-trust/layer3/Layer3EvidenceService.js`
+- **Layer 3 Test Suite**: `frontend/tests/layer3/layer3.test.mjs`
+- **Backend API Layer 3**: `frontend/src/app/api/ai-trust/evidence/route.js`
+- **Telemetry HUD L1, L2, L3**: `Layer1TelemetryHUD.jsx`, `Layer2SemanticHUD.jsx`, `Layer3EvidenceHUD.jsx`
+- **Benchmark Studio L1, L2, L3**: `Layer1BenchmarkStudio.jsx`, `Layer2BenchmarkStudio.jsx`, `Layer3BenchmarkStudio.jsx`
 - **Trang Scam Check**: `frontend/src/app/scam-check/page.jsx`
 - **Vault Hub**: `docs/vault/Index.md`
