@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useTransition } from "react";
+import React, { useState, useEffect, useRef, useTransition, useCallback } from "react";
 import {
   Link2,
   FileText,
@@ -16,7 +16,10 @@ import {
   Sparkles,
   Loader2,
   CheckCircle2,
-  XCircle
+  XCircle,
+  RefreshCw,
+  Eye,
+  ScanLine
 } from "lucide-react";
 import TactileButton from "@/components/ui/TactileButton";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
@@ -47,10 +50,12 @@ export default function Layer1LivePrechecker({
   const [ocrText, setOcrText] = useState("");
   const [qrDetected, setQrDetected] = useState(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [cameraFacing, setCameraFacing] = useState("environment"); // 'environment' | 'user'
 
   const fileInputRef = useRef(null);
   const videoRef = useRef(null);
   const mediaStreamRef = useRef(null);
+  const liveScanIntervalRef = useRef(null);
 
   // Debounced 0ms Client Pre-Check
   useEffect(() => {
@@ -100,26 +105,37 @@ export default function Layer1LivePrechecker({
     saffronAudio.playClick(750);
     const objectUrl = URL.createObjectURL(file);
     setImagePreview(objectUrl);
+    
+    // Set immediate non-null metadata to prevent NaN KB or layout shifts
+    const initialMeta = {
+      fileName: file.name || `snapshot_${Date.now()}.jpg`,
+      mimeType: file.type || "image/jpeg",
+      fileSize: file.size || 1024,
+      ocrText: "",
+      qrContent: "",
+    };
+    setFileMeta(initialMeta);
     setOcrLoading(true);
 
     try {
-      // 1. Multimodal OCR & QR Extraction
+      // 1. Multimodal OCR & Fast QR Extraction (Bounded execution)
       const extraction = await OcrService.extract(file);
 
-      const meta = {
+      const finalMeta = {
+        ...initialMeta,
         bytes: extraction.magicBytes,
-        fileName: file.name || "camera_capture.jpg",
-        mimeType: file.type || "image/jpeg",
-        fileSize: file.size || 1024,
         ocrText: extraction.text || "",
         qrContent: extraction.qrContent || "",
         ocrConfidence: extraction.confidence,
+        executionTimeMs: extraction.executionTimeMs,
       };
 
-      setFileMeta(meta);
+      setFileMeta(finalMeta);
       setOcrText(extraction.text || "");
       setQrDetected(extraction.qrContent || null);
-      setInputValue(extraction.text ? extraction.text : `[Tệp ảnh: ${meta.fileName}]`);
+      
+      const effectiveText = extraction.text || (extraction.qrContent ? `[QR Code]: ${extraction.qrContent}` : `[Tệp ảnh: ${finalMeta.fileName}]`);
+      setInputValue(effectiveText);
       saffronAudio.playSuccessChime();
     } catch (err) {
       console.error("OCR Extraction failed:", err);
@@ -133,26 +149,48 @@ export default function Layer1LivePrechecker({
     if (file) processImageFile(file);
   };
 
-  // Camera Capture Management
-  const startCamera = async () => {
+  // Camera Capture Management with Live QR Scanner
+  const startCamera = useCallback(async (facing = "environment") => {
     saffronAudio.playClick(800);
+    stopCamera();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
       });
       mediaStreamRef.current = stream;
       setIsCameraActive(true);
+      setCameraFacing(facing);
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        videoRef.current.play().catch(() => {});
       }
+
+      // Start live QR scanning loop (every 350ms)
+      liveScanIntervalRef.current = setInterval(() => {
+        if (videoRef.current && videoRef.current.readyState === 4) {
+          try {
+            const qr = OcrService.scanQrCode(videoRef.current);
+            if (qr && !qrDetected) {
+              setQrDetected(qr);
+              saffronAudio.playLaser(1100);
+            }
+          } catch {
+            // Ignore scan frames
+          }
+        }
+      }, 350);
     } catch (err) {
       console.warn("Camera access failed:", err);
-      alert("Không thể mở máy ảnh. Vui lòng cho phép quyền truy cập camera trong trình duyệt.");
+      alert("Không thể mở camera. Vui lòng cho phép quyền truy cập máy ảnh trong trình duyệt.");
     }
-  };
+  }, [qrDetected]);
 
   const stopCamera = () => {
+    if (liveScanIntervalRef.current) {
+      clearInterval(liveScanIntervalRef.current);
+      liveScanIntervalRef.current = null;
+    }
     if (mediaStreamRef.current) {
       mediaStreamRef.current.getTracks().forEach((track) => track.stop());
       mediaStreamRef.current = null;
@@ -160,24 +198,44 @@ export default function Layer1LivePrechecker({
     setIsCameraActive(false);
   };
 
+  const toggleCameraFacing = () => {
+    const nextFacing = cameraFacing === "environment" ? "user" : "environment";
+    startCamera(nextFacing);
+  };
+
   const takeSnapshot = () => {
     if (!videoRef.current) return;
     saffronAudio.playLaser(950);
 
     const video = videoRef.current;
+    const width = video.videoWidth || 1280;
+    const height = video.videoHeight || 720;
+
     const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
+    canvas.width = width;
+    canvas.height = height;
     const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(video, 0, 0, width, height);
 
     canvas.toBlob(async (blob) => {
       stopCamera();
       if (blob) {
-        const file = new File([blob], `snapshot_${Date.now()}.jpg`, { type: "image/jpeg" });
+        const file = new File([blob], `camera_snapshot_${Date.now()}.jpg`, { type: "image/jpeg" });
         await processImageFile(file);
       }
-    }, "image/jpeg", 0.92);
+    }, "image/jpeg", 0.90);
+  };
+
+  const handleReset = () => {
+    saffronAudio.playClick(400);
+    stopCamera();
+    setInputValue("");
+    setFileMeta(null);
+    setImagePreview(null);
+    setOcrText("");
+    setQrDetected(null);
+    setInstantResult(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleRunFullScan = async () => {
@@ -199,115 +257,146 @@ export default function Layer1LivePrechecker({
     }
   };
 
-  const handleReset = () => {
-    saffronAudio.playClick(400);
-    stopCamera();
-    setInputValue("");
-    setFileMeta(null);
-    setImagePreview(null);
-    setOcrText("");
-    setQrDetected(null);
-    setInstantResult(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+  const getStatusBadge = () => {
+    if (!instantResult) return null;
+    const status = instantResult.status;
+
+    if (status === LAYER_1_STATUS.BLOCK) {
+      return (
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/50 text-[11px] font-mono font-bold animate-pulse">
+          <ShieldAlert className="w-3.5 h-3.5" />
+          <span>PHÁT HIỆN MÃ ĐỘC / LỪA ĐẢO TRỰC TIẾP (BLOCK)</span>
+        </div>
+      );
+    }
+    if (status === LAYER_1_STATUS.SUSPICIOUS) {
+      return (
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/50 text-[11px] font-mono font-bold">
+          <AlertTriangle className="w-3.5 h-3.5" />
+          <span>DẤU HIỆU ĐÁNG NGỜ — CẦN THẨM ĐỊNH ĐA LỚP</span>
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 text-[11px] font-mono font-bold">
+        <ShieldCheck className="w-3.5 h-3.5" />
+        <span>AN TOÀN SƠ BỘ — LAYER 1 PASS</span>
+      </div>
+    );
   };
 
   return (
-    <div className={`p-5 sm:p-7 rounded-2xl bg-[#0d0403]/90 border border-[#47140b] backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.7)] ${className}`}>
-      {/* Mode Selector Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/60 border border-[#2d0d08]">
-          {[
-            { id: "url", label: "🔗 Đường Dẫn (URL)", icon: Link2 },
-            { id: "text", label: "📝 Văn Bản (Text)", icon: FileText },
-            { id: "image", label: "🖼️ Hình Ảnh & Camera", icon: ImageIcon },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = inputMode === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => handleModeChange(tab.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all duration-200 ${
-                  isActive
-                    ? "bg-[#ffbc09] text-[#150604] shadow-[0_0_15px_rgba(255,188,9,0.35)]"
-                    : "text-[#ece7e0]/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
+    <div className={`p-5 rounded-2xl bg-[#150604] border border-[#ffbc09]/40 shadow-2xl relative overflow-hidden ${className}`}>
+      {/* Decorative Grid Lines */}
+      <div className="absolute inset-0 bg-[radial-gradient(#ffbc09_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+
+      {/* Header Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#2d0d08] relative z-10">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#ffbc09] animate-ping" />
+          <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+            LAYER 1 PRE-CHECKER // KIỂM ĐỊNH TỨC THÌ (0ms DETERMINISTIC)
+          </h3>
         </div>
 
-        {/* Live Client Pre-Check Badge */}
-        {instantResult && (
-          <div className="flex items-center gap-2 font-mono text-[11px] animate-fadeIn">
-            <span className="text-[#ece7e0]/50 uppercase tracking-wider">0ms Pre-check:</span>
-            {instantResult.status === LAYER_1_STATUS.BLOCK && (
-              <span className="px-2.5 py-0.5 rounded-full bg-[#ea3810]/20 border border-[#ea3810]/50 text-[#ff6b4a] font-bold flex items-center gap-1">
-                <ShieldAlert className="w-3.5 h-3.5" /> PHÁT HIỆN NGUY HIỂM (BLOCK)
-              </span>
-            )}
-            {instantResult.status === LAYER_1_STATUS.SUSPICIOUS && (
-              <span className="px-2.5 py-0.5 rounded-full bg-[#ffbc09]/20 border border-[#ffbc09]/50 text-[#ffd15c] font-bold flex items-center gap-1">
-                <AlertTriangle className="w-3.5 h-3.5" /> NGHI VẤN (SUSPICIOUS)
-              </span>
-            )}
-            {instantResult.status === LAYER_1_STATUS.PASS && (
-              <span className="px-2.5 py-0.5 rounded-full bg-[#00f0ff]/20 border border-[#00f0ff]/50 text-[#38f8d4] font-bold flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" /> AN TOÀN SƠ BỘ (PASS)
-              </span>
-            )}
-          </div>
-        )}
+        {/* Live Pre-check Verdict Pill */}
+        <div>{getStatusBadge()}</div>
       </div>
 
-      {/* Input Fields according to mode */}
-      <div className="space-y-4">
+      {/* Mode Selector Tabs */}
+      <div className="flex items-center gap-2 mt-4 relative z-10">
+        {[
+          { id: "url", label: "Đường Dẫn (URL)", icon: Link2 },
+          { id: "text", label: "Văn Bản (Text)", icon: FileText },
+          { id: "image", label: "Hình Ảnh & Camera", icon: ImageIcon },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          const isSelected = inputMode === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => handleModeChange(tab.id)}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                isSelected
+                  ? "bg-[#ffbc09] text-[#150604] shadow-lg shadow-[#ffbc09]/20"
+                  : "bg-black/40 text-[#ece7e0]/60 hover:text-white border border-[#2d0d08]"
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Input Workspaces */}
+      <div className="mt-4 relative z-10 space-y-3">
         {inputMode === "url" && (
-          <div className="relative">
+          <div>
             <input
-              type="text"
+              type="url"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Dán link cần thẩm định... (ví dụ: https://github.com/Duy2613/StudentHub-AI, vcb-portal.vip, bit.ly/xxx)"
-              className="w-full px-4 py-3.5 pl-11 rounded-xl bg-black/60 border border-[#47140b] focus:border-[#ffbc09] focus:ring-1 focus:ring-[#ffbc09] text-sm text-white placeholder:text-[#ece7e0]/30 font-mono transition-all outline-none"
+              placeholder="Dán đường dẫn cần kiểm tra (ví dụ: https://hcmute-edu.online, https://tinnhiemmang.vn...)"
+              className="w-full px-4 py-3 rounded-xl bg-black/60 border border-[#47140b] text-sm text-white placeholder:text-[#ece7e0]/30 font-mono outline-none focus:border-[#ffbc09] transition-colors"
             />
-            <Link2 className="w-4 h-4 text-[#ffbc09] absolute left-4 top-1/2 -translate-y-1/2" />
           </div>
         )}
 
         {inputMode === "text" && (
-          <div className="relative">
+          <div>
             <textarea
               rows={4}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Dán nội dung tin nhắn, bài đăng, hoặc thông báo cần kiểm tra... (ví dụ: 'Cần tuyển CTV Shopee nạp tiền cọc...', 'HCMUTE trao học bổng 20tr nộp lệ phí 500k...')"
-              className="w-full px-4 py-3.5 rounded-xl bg-black/60 border border-[#47140b] focus:border-[#ffbc09] focus:ring-1 focus:ring-[#ffbc09] text-sm text-white placeholder:text-[#ece7e0]/30 font-human transition-all outline-none resize-y min-h-[100px]"
+              placeholder="Dán tin nhắn Zalo, email, thông báo học bổng, bài tuyển CTV bán thời gian hoặc kịch bản cuộc gọi đe dọa..."
+              className="w-full px-4 py-3 rounded-xl bg-black/60 border border-[#47140b] text-sm text-white placeholder:text-[#ece7e0]/30 font-mono outline-none focus:border-[#ffbc09] transition-colors resize-none"
             />
           </div>
         )}
 
         {inputMode === "image" && (
           <div className="space-y-3">
-            {/* Live Camera Stream Modal View */}
+            {/* Live Camera View */}
             {isCameraActive ? (
-              <div className="p-4 rounded-xl bg-black/80 border border-[#ffbc09]/50 space-y-3 animate-fadeIn">
-                <div className="relative rounded-lg overflow-hidden border border-[#47140b] bg-black aspect-video flex items-center justify-center">
-                  <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 border-2 border-dashed border-[#ffbc09]/40 m-6 rounded-lg pointer-events-none" />
+              <div className="space-y-3 p-3.5 rounded-2xl bg-black/80 border border-[#ffbc09]/50 relative">
+                <div className="h-64 sm:h-72 w-full bg-black rounded-xl overflow-hidden relative flex items-center justify-center">
+                  <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+                  
+                  {/* Camera Reticle HUD */}
+                  <div className="absolute inset-0 border-2 border-dashed border-[#ffbc09]/40 m-6 rounded-lg pointer-events-none flex flex-col justify-between p-2">
+                    <div className="flex justify-between items-center text-[10px] font-mono text-[#ffbc09]">
+                      <span className="flex items-center gap-1"><ScanLine className="w-3.5 h-3.5 animate-pulse" /> LIVE OCR SCANNER</span>
+                      <span>FACING: {cameraFacing.toUpperCase()}</span>
+                    </div>
+                    {qrDetected && (
+                      <div className="self-center px-3 py-1 bg-emerald-500/80 text-black text-xs font-mono font-bold rounded-lg shadow-lg animate-bounce">
+                        ✓ ĐÃ KHÓA MÃ QR
+                      </div>
+                    )}
+                  </div>
                 </div>
+
                 <div className="flex items-center justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={stopCamera}
-                    className="px-4 py-2 rounded-xl bg-black/60 border border-[#47140b] text-xs font-mono text-[#ece7e0]/70 hover:text-white"
-                  >
-                    Hủy Camera
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={stopCamera}
+                      className="px-3.5 py-2 rounded-xl bg-black/60 border border-[#47140b] text-xs font-mono text-[#ece7e0]/70 hover:text-white"
+                    >
+                      Hủy Camera
+                    </button>
+                    <button
+                      type="button"
+                      onClick={toggleCameraFacing}
+                      className="p-2 rounded-xl bg-black/60 border border-[#47140b] text-[#ece7e0]/70 hover:text-white"
+                      title="Đổi camera trước / sau"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                    </button>
+                  </div>
+
                   <TactileButton onClick={takeSnapshot} variant="saffron" size="sm">
                     <Camera className="w-4 h-4 mr-1 text-[#150604]" />
                     <span>Chụp Ảnh Này</span>
@@ -339,7 +428,7 @@ export default function Layer1LivePrechecker({
 
                 {/* Camera Trigger Box */}
                 <div
-                  onClick={startCamera}
+                  onClick={() => startCamera("environment")}
                   className="border-2 border-dashed border-[#47140b] hover:border-[#ffbc09]/60 rounded-xl p-5 text-center cursor-pointer bg-black/40 hover:bg-black/60 transition-all group"
                 >
                   <Camera className="w-7 h-7 text-[#ffd15c] mx-auto mb-2 group-hover:scale-110 transition-transform" />
@@ -355,9 +444,9 @@ export default function Layer1LivePrechecker({
 
             {/* OCR Processing State */}
             {ocrLoading && (
-              <div className="p-3.5 rounded-xl bg-black/60 border border-[#ffbc09]/30 flex items-center gap-3 text-xs font-mono text-[#ffd15c] animate-pulse">
+              <div className="p-3.5 rounded-xl bg-black/60 border border-[#ffbc09]/40 flex items-center gap-3 text-xs font-mono text-[#ffd15c]">
                 <Loader2 className="w-4 h-4 animate-spin text-[#ffbc09]" />
-                <span>Đang trích xuất OCR Tiếng Việt &amp; quét mã QR từ hình ảnh...</span>
+                <span>⚡ Đang trích xuất OCR Tiếng Việt &amp; quét mã QR siêu tốc...</span>
               </div>
             )}
 
@@ -370,16 +459,16 @@ export default function Layer1LivePrechecker({
                     <img
                       src={imagePreview}
                       alt="Preview"
-                      className="w-14 h-14 object-cover rounded-lg border border-[#47140b]"
+                      className="w-14 h-14 object-cover rounded-lg border border-[#47140b] shrink-0"
                     />
                     <div className="min-w-0 font-mono text-xs">
-                      <div className="font-bold text-white truncate">{fileMeta?.fileName}</div>
+                      <div className="font-bold text-white truncate">{fileMeta?.fileName || "Ảnh đã chọn"}</div>
                       <div className="text-[#ece7e0]/50 text-[10px]">
-                        {fileMeta?.mimeType} • {(fileMeta?.fileSize / 1024).toFixed(1)} KB
+                        {fileMeta?.mimeType || "image/jpeg"} • {((fileMeta?.fileSize || 1024) / 1024).toFixed(1)} KB
                       </div>
                       {qrDetected && (
-                        <div className="text-[#38f8d4] text-[10.5px] font-bold flex items-center gap-1 mt-0.5">
-                          <QrCode className="w-3 h-3" /> Đã quét mã QR: {qrDetected}
+                        <div className="text-[#38f8d4] text-[10.5px] font-bold flex items-center gap-1 mt-0.5 truncate">
+                          <QrCode className="w-3 h-3 shrink-0" /> QR: {qrDetected}
                         </div>
                       )}
                     </div>
@@ -388,7 +477,7 @@ export default function Layer1LivePrechecker({
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="px-2.5 py-1 rounded bg-[#ea3810]/20 hover:bg-[#ea3810]/30 text-[#ff6b4a] text-xs font-mono"
+                    className="px-2.5 py-1 rounded bg-[#ea3810]/20 hover:bg-[#ea3810]/30 text-[#ff6b4a] text-xs font-mono cursor-pointer shrink-0"
                   >
                     Xóa ảnh
                   </button>
@@ -419,7 +508,7 @@ export default function Layer1LivePrechecker({
         <button
           type="button"
           onClick={handleReset}
-          className="px-3.5 py-2 rounded-xl bg-black/40 hover:bg-black/60 border border-[#2d0d08] text-xs font-mono text-[#ece7e0]/60 hover:text-white transition-all flex items-center gap-1.5"
+          className="px-3.5 py-2 rounded-xl bg-black/40 hover:bg-black/60 border border-[#2d0d08] text-xs font-mono text-[#ece7e0]/60 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Đặt lại</span>
