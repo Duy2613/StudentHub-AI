@@ -1,14 +1,5 @@
 "use client";
 
-// app/dashboard/page.jsx
-//
-// Bảng điều khiển trung tâm (Dashboard) — Saffron Finance x Meer Mohsin 3D:
-// - Cơ chế tương tác 2 trạng thái: Sóng Hạt 3D Tối Giản <-> Bung Mở Toàn Bộ Thông Tin A-Z khi Chạm
-// - WebGL Real-time Fluid Dynamics Canvas theo con trỏ chuột 60fps
-// - Quỹ đạo thiên văn 3D Astrolabe & vệ tinh bay quanh chu vi màn hình
-// - Ma trận Saffron Bento 3D Swiss Grid viền tóc hairline (#47140b) và dấu chữ thập (+)
-// - Nút Thu Gọn về chế độ sóng hạt tức thì
-
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -39,8 +30,7 @@ import {
   Cpu,
   Activity,
   Zap,
-  Minimize2,
-  Maximize2,
+  Lock,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -49,13 +39,12 @@ import AvatarDisplay from "@/components/AvatarDisplay";
 import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
 import LiveStudioClock from "@/components/ui/live-studio-clock";
 import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
+import ModernNavbar from "@/components/layout/ModernNavbar";
 import TactileButton from "@/components/ui/TactileButton";
-import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
+import AeroMissionControlBackdrop from "@/components/ui/AeroMissionControlBackdrop";
 import MohsinFluidCanvas from "@/components/ui/MohsinFluidCanvas";
-import SaffronMohsinPerimeter3DOrbit from "@/components/ui/SaffronMohsinPerimeter3DOrbit";
 import SaffronMarqueeTicker from "@/components/ui/SaffronMarqueeTicker";
 import SaffronSwissCrosshairGrid from "@/components/ui/SaffronSwissCrosshairGrid";
-import Interactive3DWaveMonolithCapsule from "@/components/ui/Interactive3DWaveMonolithCapsule";
 import { NoiseOverlay } from "@/components/auth/AuthUI";
 import FloatingDock from "@/components/ui/floating-dock";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
@@ -64,38 +53,8 @@ import { saffronAudio } from "@/lib/audio/saffronAudio";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { session, profile, signOut, isLoading } = useAuth();
+  const { session, profile, isLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
-
-  // 2 View Modes: "WAVE_MINIMAL" | "FULL_EXPANDED"
-  const [viewMode, setViewMode] = useState("WAVE_MINIMAL");
-
-  // Keyboard shortcut (Space) to toggle expand/collapse
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.code === "Space" && e.target === document.body) {
-        e.preventDefault();
-        if (viewMode === "WAVE_MINIMAL") {
-          saffronAudio.playSuccessChime();
-          setViewMode("FULL_EXPANDED");
-        } else {
-          saffronAudio.playClick(400);
-          setViewMode("WAVE_MINIMAL");
-        }
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [viewMode]);
-
-  const handleCardMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({
-      x: (e.clientX - rect.left) / rect.width,
-      y: (e.clientY - rect.top) / rect.height,
-    });
-  };
 
   // Redirect if not logged in or not onboarded
   useEffect(() => {
@@ -110,9 +69,9 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#150604] flex flex-col items-center justify-center text-[#ece7e0]">
+      <div className="min-h-screen bg-[#070403] flex flex-col items-center justify-center text-[#ece7e0]">
         <div className="w-12 h-12 rounded-full border-2 border-[#ffbc09] border-t-transparent animate-spin mb-4" />
-        <p className="font-mono text-xs text-[#ffbc09] tracking-wider uppercase">[ INITIALIZING DASHBOARD // SAFFRON AI ENGINE ]</p>
+        <p className="font-mono text-xs text-[#ffbc09] tracking-wider uppercase">[ INITIALIZING MISSION CONTROL // SAFFRON AI ]</p>
       </div>
     );
   }
@@ -181,21 +140,20 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#070403] text-gray-100 flex relative overflow-x-hidden selection:bg-[#ffbc09] selection:text-[#150604]">
-      {/* 1. 3D Infinite Curving Road Highway Canvas */}
-      <div className="canvas-bg-layer">
-        <RobinPayotRoadCanvas />
-      </div>
+      {/* 1. High-End Aerospace Aviation Terminal Backdrop (Clean & Non-overlapping) */}
+      <AeroMissionControlBackdrop
+        sectorTag="SECTOR_07_ALPHA // MISSION_CONTROL_MATRIX"
+        gridDensity={52}
+        showRadarRings={true}
+      />
 
-      {/* 2. Meer Mohsin WebGL Real-time Fluid Dynamics Canvas */}
-      <MohsinFluidCanvas opacity={0.65} particleDensity={50} />
+      {/* 2. Interactive WebGL Fluid Smoke Trail */}
+      <MohsinFluidCanvas opacity={0.35} particleDensity={35} />
 
-      {/* 3. 3D Astrolabe Orbit & Perimeter Satellites */}
-      <SaffronMohsinPerimeter3DOrbit />
-
-      {/* 4. Film Grain Noise Overlay */}
+      {/* 3. Film Grain Noise Overlay */}
       <NoiseOverlay />
 
-      {/* 5. Floating Quick Tools & Studio */}
+      {/* 4. Floating Quick Tools & Studio */}
       <FloatingDock />
       <BackgroundsAndEffectsStudio />
 
@@ -221,354 +179,289 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-3 select-none">
-            {/* View Mode Toggle Pill */}
-            <button
-              type="button"
-              onClick={() => {
-                if (viewMode === "WAVE_MINIMAL") {
-                  saffronAudio.playSuccessChime();
-                  setViewMode("FULL_EXPANDED");
-                } else {
-                  saffronAudio.playClick(400);
-                  setViewMode("WAVE_MINIMAL");
-                }
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#210a07] hover:bg-[#2f0e09] border border-[#47140b] hover:border-[#ffbc09]/50 text-xs font-mono font-bold text-[#ffbc09] transition-all shadow-sm cursor-pointer"
-            >
-              {viewMode === "WAVE_MINIMAL" ? (
-                <>
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  <span>[ BUNG MỞ A-Z ]</span>
-                </>
-              ) : (
-                <>
-                  <Minimize2 className="w-3.5 h-3.5" />
-                  <span>[ ✕ THU GỌN SÓNG HẠT ]</span>
-                </>
-              )}
-            </button>
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-[#47140b] text-[11px] font-mono text-[#ffbc09]">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>RADAR_ARMED // ZERO_LEAK</span>
+            </div>
 
             <IglooSoundAmbiencePill />
             <LiveStudioClock className="hidden sm:inline-flex" />
-
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#ffbc09]/15 border border-[#ffbc09]/40 text-[#ffbc09] text-xs font-bold font-mono shadow-[0_0_15px_rgba(255,188,9,0.2)]">
-              {isExpert ? <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> : <ShieldCheck className="w-3.5 h-3.5 text-[#ffbc09]" />}
-              <span>{trustScore} PTS</span>
-            </div>
-
             <UserDropdownMenu />
           </div>
         </header>
 
-        {/* Dynamic View: WAVE_MINIMAL vs FULL_EXPANDED */}
-        <AnimatePresence mode="wait">
-          {viewMode === "WAVE_MINIMAL" ? (
-            /* =========================================================================
-               STATE 1: 3D PARTICLE WAVE MINIMALIST MONOLITH CAPSULE
-               ========================================================================= */
-            <motion.div
-              key="minimal-monolith"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4 }}
-              className="flex-1 flex flex-col justify-center py-12"
-            >
-              <Interactive3DWaveMonolithCapsule
-                badge="01 // BẢNG ĐIỀU KHIỂN • SÓNG HẠT 3D"
-                title={`Xin chào, ${activeProfile.fullName}!`}
-                subtitle="Không gian sóng hạt 3D vô tận. Chạm vào viên nang hoặc bấm phím Space để bung mở toàn bộ bảng điều khiển từ A đến Z."
-                actionText="CHẠM ĐỂ MỞ BẢNG ĐIỀU KHIỂN TOÀN DIỆN [A → Z]"
-                onExpand={() => setViewMode("FULL_EXPANDED")}
-              />
-            </motion.div>
-          ) : (
-            /* =========================================================================
-               STATE 2: FULL EXPANDED MISSION CONTROL CONSOLE (A TO Z)
-               ========================================================================= */
-            <motion.main
-              key="full-console"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 30 }}
-              transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-              className="flex-1 layout-safe-container py-8 space-y-8 pb-40"
-            >
-              {/* Collapse Trigger Bar */}
-              <div className="flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => {
-                    saffronAudio.playClick(400);
-                    setViewMode("WAVE_MINIMAL");
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#210a07] hover:bg-[#2f0e09] border border-[#47140b] hover:border-[#ffbc09]/50 text-xs font-mono font-bold text-[#ffbc09] transition-all cursor-pointer shadow-sm"
-                >
-                  <Minimize2 className="w-4 h-4" />
-                  <span>[ ✕ THU GỌN VỀ CHẾ ĐỘ SÓNG HẠT 3D ]</span>
-                </button>
+        {/* Main Mission Control Scroll Area */}
+        <main className="p-4 sm:p-8 space-y-8 pb-32 max-w-7xl mx-auto w-full font-human">
+          
+          {/* Top Marquee Telemetry Ticker */}
+          <SaffronMarqueeTicker className="rounded-2xl border border-[#47140b]/60" />
 
-                <div className="text-[11px] font-mono text-[#ece7e0]/60 uppercase">
-                  STATUS: FULL_DEEP_CONSOLE_ACTIVE [A → Z]
+          {/* SECTION 1: Identity & 4-KPI Telemetry Deck */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Identity Flight Card (Col 5) */}
+            <div className="lg:col-span-5 p-6 rounded-3xl bg-[#120604]/90 border border-[#47140b] backdrop-blur-2xl shadow-xl flex flex-col justify-between space-y-4 hover:border-[#ffbc09]/40 transition-all">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3.5">
+                  <AvatarDisplay avatarId={activeProfile.avatarId} size="lg" />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-base sm:text-lg font-bold text-white leading-tight">
+                        {activeProfile.fullName}
+                      </h2>
+                      {isExpert ? (
+                        <span className="px-2 py-0.5 rounded-full bg-[#ffbc09]/20 text-[#ffbc09] text-[10px] font-mono font-bold border border-[#ffbc09]/40">
+                          ⭐ CỐ VẤN
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold border border-emerald-500/40">
+                          ✓ SINH VIÊN
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs font-mono text-[#ece7e0]/60 mt-0.5">
+                      NODE_ID: {activeProfile.id?.slice(0, 12)}...
+                    </p>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <span className="text-[10px] font-mono text-[#ece7e0]/60 uppercase block">TÍN NHIỆM:</span>
+                  <span className="text-2xl font-black text-[#ffbc09] font-mono">{trustScore} <span className="text-xs font-normal text-white">PTS</span></span>
                 </div>
               </div>
 
-              {/* Top Marquee Telemetry Ticker */}
-              <SaffronMarqueeTicker className="rounded-2xl border border-[#47140b]" />
-
-              {/* Hero Welcome Banner (Swiss Style) */}
-              <SaffronSwissCrosshairGrid sectionTag="MISSION // CONTROL" className="p-6 sm:p-8">
-                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
-                  <div className="flex items-center gap-4">
-                    <AvatarDisplay
-                      avatarId={activeProfile.avatarId}
-                      avatarUrl={activeProfile.avatarUrl}
-                      role={activeProfile.role}
-                      size="lg"
-                      showBadge={true}
-                    />
-                    <div>
-                      <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full text-xs font-mono font-bold mb-1.5 bg-[#ffbc09]/15 border border-[#ffbc09]/40 text-[#ffbc09]">
-                        <span className="w-2 h-2 rounded-full bg-[#ffbc09] animate-ping" />
-                        <span>{isExpert ? "⭐ VERIFIED EXPERT MENTOR" : "🎓 VERIFIED STUDENT MEMBER"}</span>
-                      </div>
-                      <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                        Xin chào, <span className="text-[#ffd15c]">{activeProfile.fullName}</span>!
-                      </h1>
-                      <p className="text-xs sm:text-sm text-[#ece7e0]/80 mt-1 font-normal">
-                        {isExpert
-                          ? `${activeProfile.expertTitle || "Chuyên gia Tư vấn"} • ${activeProfile.expertField || "An ninh mạng"}`
-                          : `${activeProfile.university || "Đại học Thành viên"} • ${activeProfile.major || "Khoa học & Kỹ thuật"}`}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Quick Actions */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        saffronAudio.playClick(700);
-                        router.push("/scam-check");
-                      }}
-                      className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#ffbc09] to-[#f59e0b] text-[#150604] font-extrabold text-xs tracking-wider uppercase shadow-[0_0_20px_rgba(255,188,9,0.35)] hover:scale-105 transition-all flex items-center gap-2 cursor-pointer font-mono"
-                    >
-                      <ShieldAlert className="w-4 h-4" />
-                      <span>Quét Nghi Vấn [0.1s]</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        saffronAudio.playClick(600);
-                        router.push("/forum");
-                      }}
-                      className="py-2.5 px-4 rounded-xl bg-[#210a07] hover:bg-[#2f0e09] border border-[#47140b] hover:border-[#ffbc09]/50 text-[#ece7e0] font-bold text-xs flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
-                    >
-                      <MessageSquare className="w-4 h-4 text-[#ffbc09]" />
-                      <span>Diễn Đàn Cộng Đồng</span>
-                    </button>
-                  </div>
+              {/* Progress Bar of Trust */}
+              <div className="space-y-1.5 pt-2">
+                <div className="flex justify-between text-[11px] font-mono text-[#ece7e0]/60">
+                  <span>CHỈ SỐ AN TOÀN SỐ</span>
+                  <span className="text-emerald-400 font-bold">{trustScore >= 80 ? "XÁC THỰC CAO" : "TRUNG BÌNH"}</span>
                 </div>
+                <div className="w-full h-2 rounded-full bg-black/60 overflow-hidden border border-[#2d0d08]">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#ea3810] via-[#ffbc09] to-emerald-400 rounded-full transition-all duration-700"
+                    style={{ width: `${Math.min(100, trustScore)}%` }}
+                  />
+                </div>
+              </div>
 
-                {/* Live Sentinel Defense Telemetry Bar */}
-                <div className="mt-6 pt-5 border-t border-[#47140b] grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono relative z-10">
-                  <div className="space-y-1">
-                    <p className="text-[#ece7e0]/60 text-[11px]">Trạng Thái Hệ Thống</p>
-                    <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
-                      <Activity className="w-3.5 h-3.5 animate-pulse" />
-                      <span>ONLINE [100% SECURE]</span>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[#ece7e0]/60 text-[11px]">Độ Trễ Phân Tích</p>
-                    <p className="text-[#38bdf8] font-bold">&lt; 0.12s [EARLY EXIT]</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[#ece7e0]/60 text-[11px]">Sự Vụ Đã Bảo Vệ</p>
-                    <p className="text-[#ffbc09] font-bold">1,240+ CA PHÁT HIỆN</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[#ece7e0]/60 text-[11px]">Điểm Uy Tín Cá Nhân</p>
-                    <p className="text-[#ffd15c] font-bold">{trustScore} / 100 PTS</p>
-                  </div>
+              {/* Action Buttons inside Card */}
+              <div className="flex items-center gap-3 pt-2">
+                <Link
+                  href="/profile"
+                  className="flex-1 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-center text-xs font-mono font-bold text-white transition-all"
+                >
+                  [ HỒ SƠ &amp; CHỨNG CHỈ ]
+                </Link>
+                <Link
+                  href="/scam-check"
+                  className="flex-1 py-2 px-3 rounded-xl bg-[#ffbc09] hover:bg-[#ffd15c] text-[#150604] text-center text-xs font-mono font-extrabold uppercase transition-all shadow-md"
+                >
+                  [ KIỂM TRA LỪA ĐẢO ]
+                </Link>
+              </div>
+            </div>
+
+            {/* 4 Telemetry Metrics Grid (Col 7) */}
+            <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-2 gap-4">
+              
+              <div className="p-5 rounded-3xl bg-[#120604]/90 border border-[#47140b] backdrop-blur-2xl flex flex-col justify-between hover:border-[#ffbc09]/40 transition-all">
+                <div className="flex items-center justify-between text-[#ffbc09]">
+                  <ShieldAlert className="w-5 h-5" />
+                  <span className="text-[10px] font-mono uppercase bg-[#ffbc09]/10 px-2 py-0.5 rounded-md">L1 ENGINE</span>
+                </div>
+                <div className="mt-4">
+                  <span className="text-2xl sm:text-3xl font-black text-white font-mono">142</span>
+                  <p className="text-xs text-[#ece7e0]/70 mt-1">Cảnh báo lừa đảo đã chặn</p>
+                  <p className="text-[10px] text-emerald-400 font-mono mt-0.5">✓ 99.8% Chính xác</p>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-[#120604]/90 border border-[#47140b] backdrop-blur-2xl flex flex-col justify-between hover:border-[#ffbc09]/40 transition-all">
+                <div className="flex items-center justify-between text-[#38bdf8]">
+                  <Activity className="w-5 h-5" />
+                  <span className="text-[10px] font-mono uppercase bg-[#38bdf8]/10 px-2 py-0.5 rounded-md">NETWORK</span>
+                </div>
+                <div className="mt-4">
+                  <span className="text-2xl sm:text-3xl font-black text-white font-mono">14,280</span>
+                  <p className="text-xs text-[#ece7e0]/70 mt-1">Nút sinh viên kết nối</p>
+                  <p className="text-[10px] text-[#38bdf8] font-mono mt-0.5">● Real-time Telemetry</p>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-[#120604]/90 border border-[#47140b] backdrop-blur-2xl flex flex-col justify-between hover:border-[#ffbc09]/40 transition-all">
+                <div className="flex items-center justify-between text-emerald-400">
+                  <Zap className="w-5 h-5" />
+                  <span className="text-[10px] font-mono uppercase bg-emerald-500/10 px-2 py-0.5 rounded-md">LATENCY</span>
+                </div>
+                <div className="mt-4">
+                  <span className="text-2xl sm:text-3xl font-black text-white font-mono">0.04ms</span>
+                  <p className="text-xs text-[#ece7e0]/70 mt-1">Tốc độ quét Layer 1</p>
+                  <p className="text-[10px] text-emerald-400 font-mono mt-0.5">⚡ Deterministic Zero-Lag</p>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-[#120604]/90 border border-[#47140b] backdrop-blur-2xl flex flex-col justify-between hover:border-[#ffbc09]/40 transition-all">
+                <div className="flex items-center justify-between text-amber-400">
+                  <Lock className="w-5 h-5" />
+                  <span className="text-[10px] font-mono uppercase bg-amber-400/10 px-2 py-0.5 rounded-md">ENCRYPTION</span>
+                </div>
+                <div className="mt-4">
+                  <span className="text-2xl sm:text-3xl font-black text-white font-mono">AES-256</span>
+                  <p className="text-xs text-[#ece7e0]/70 mt-1">Bảo mật định danh .edu</p>
+                  <p className="text-[10px] text-amber-400 font-mono mt-0.5">🔒 Zero Data Leakage</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* SECTION 2: Command Station & Threat Feeds (2-Column Architecture) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* Left Column (Col 8): Quick Actions & Recent Scam Alerts */}
+            <div className="lg:col-span-8 space-y-8">
+              
+              {/* Quick Action Command Center */}
+              <SaffronSwissCrosshairGrid sectionTag="02 // COMMAND_STATION" className="p-6">
+                <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2 font-mono">
+                  <Sparkles className="w-4 h-4 text-[#ffbc09]" />
+                  TRẠM THỰC THI &amp; THẨM ĐỊNH NHANH
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <Link
+                    href="/scam-check"
+                    className="p-4 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-[#ffbc09]/60 transition-all group block"
+                  >
+                    <ShieldAlert className="w-5 h-5 text-[#ffbc09] mb-2 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Quét URL / Tin Nhắn</p>
+                    <p className="text-[11px] text-[#ece7e0]/60 mt-0.5 font-human">Kiểm tra ngay qua Layer 1</p>
+                  </Link>
+
+                  <Link
+                    href="/forum"
+                    className="p-4 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-[#38bdf8]/60 transition-all group block"
+                  >
+                    <MessageSquare className="w-5 h-5 text-[#38bdf8] mb-2 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Đăng Báo Cáo Mới</p>
+                    <p className="text-[11px] text-[#ece7e0]/60 mt-0.5 font-human">Cảnh báo cộng đồng sinh viên</p>
+                  </Link>
+
+                  <Link
+                    href="/profile"
+                    className="p-4 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-emerald-500/60 transition-all group block"
+                  >
+                    <ShieldCheck className="w-5 h-5 text-emerald-400 mb-2 group-hover:scale-110 transition-transform" />
+                    <p className="text-xs font-bold text-white">Xác Minh Học Vị</p>
+                    <p className="text-[11px] text-[#ece7e0]/60 mt-0.5 font-human">Nâng điểm uy tín tài khoản</p>
+                  </Link>
                 </div>
               </SaffronSwissCrosshairGrid>
 
-              {/* 3 Core Quick Navigation Bento Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                {/* Card 1: AI Scam Checker */}
-                <div
-                  onClick={() => {
-                    saffronAudio.playClick(600);
-                    router.push("/scam-check");
-                  }}
-                  className="cursor-pointer group p-6 rounded-3xl bg-[#150604]/90 border border-[#47140b] hover:border-[#ffbc09]/60 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-2xl bg-[#ffbc09]/15 text-[#ffbc09] border border-[#ffbc09]/30 group-hover:scale-110 group-hover:bg-[#ffbc09] group-hover:text-[#150604] transition-all">
-                      <ShieldAlert className="w-6 h-6" />
-                    </div>
-                    <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-[#ffbc09]/15 border border-[#ffbc09]/30 text-[#ffbc09]">
-                      [ENGINE 4 LỚP]
-                    </span>
+              {/* Recent Community Threat Alerts Feed */}
+              <div className="p-6 rounded-3xl bg-[#120604]/90 border border-[#47140b] backdrop-blur-2xl space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#ea3810] animate-ping" />
+                    <h3 className="text-sm font-bold text-white font-mono">CẢNH BÁO NGUY HIỂM GẦN ĐÂY [REALTIME]</h3>
                   </div>
-                  <h3 className="text-lg font-black text-white group-hover:text-[#ffd15c] transition-colors flex items-center justify-between">
-                    <span>AI Scam Checker</span>
-                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#ffbc09] group-hover:translate-x-1 transition-all" />
-                  </h3>
-                  <p className="text-xs text-[#ece7e0]/70 mt-2 leading-relaxed">
-                    Kiểm tra link, tin nhắn và ảnh chụp OCR qua 4 tầng phân tích với Risk Meter 0–100%.
-                  </p>
+                  <Link
+                    href="/forum"
+                    className="text-xs font-mono text-[#ffbc09] hover:underline flex items-center gap-1"
+                  >
+                    <span>Xem tất cả</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
 
-                {/* Card 2: Community Forum */}
-                <div
-                  onClick={() => {
-                    saffronAudio.playClick(600);
-                    router.push("/forum");
-                  }}
-                  className="cursor-pointer group p-6 rounded-3xl bg-[#150604]/90 border border-[#47140b] hover:border-[#38bdf8]/60 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-2xl bg-[#38bdf8]/15 text-[#38bdf8] border border-[#38bdf8]/30 group-hover:scale-110 group-hover:bg-[#38bdf8] group-hover:text-[#150604] transition-all">
-                      <MessageSquare className="w-6 h-6" />
-                    </div>
-                    <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-[#38bdf8]/15 border border-[#38bdf8]/30 text-[#38bdf8]">
-                      [VOTE UY TÍN]
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-black text-white group-hover:text-[#38bdf8] transition-colors flex items-center justify-between">
-                    <span>Diễn Đàn Xác Thực</span>
-                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#38bdf8] group-hover:translate-x-1 transition-all" />
-                  </h3>
-                  <p className="text-xs text-[#ece7e0]/70 mt-2 leading-relaxed">
-                    Thảo luận về Nhà trọ, Quán ăn, Trường học và bình luận có gắn nhãn chuyên gia.
-                  </p>
-                </div>
-
-                {/* Card 3: Profile & Trust Score */}
-                <div
-                  onClick={() => {
-                    saffronAudio.playClick(600);
-                    router.push("/profile");
-                  }}
-                  className="cursor-pointer group p-6 rounded-3xl bg-[#150604]/90 border border-[#47140b] hover:border-[#ca56ed]/60 backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 rounded-2xl bg-[#ca56ed]/15 text-[#ca56ed] border border-[#ca56ed]/30 group-hover:scale-110 group-hover:bg-[#ca56ed] group-hover:text-[#150604] transition-all">
-                      <User className="w-6 h-6" />
-                    </div>
-                    <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-[#ca56ed]/15 border border-[#ca56ed]/30 text-[#ca56ed]">
-                      [REPUTATION]
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-black text-white group-hover:text-[#ca56ed] transition-colors flex items-center justify-between">
-                    <span>Hồ Sơ &amp; Uy Tín</span>
-                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#ca56ed] group-hover:translate-x-1 transition-all" />
-                  </h3>
-                  <p className="text-xs text-[#ece7e0]/70 mt-2 leading-relaxed">
-                    Quản lý huy hiệu trường học, lịch sử báo cáo lừa đảo và tích lũy điểm uy tín sinh viên.
-                  </p>
-                </div>
-              </div>
-
-              {/* Section: Top Flagged Scams & Leaderboard */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                {/* Left 7 Cols: Top Scam Alerts */}
-                <div className="lg:col-span-7 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                      <ShieldAlert className="w-5 h-5 text-red-400" />
-                      <span>Cảnh Báo Nóng Từ Mạng Lưới</span>
-                    </h2>
-                    <Link
-                      href="/forum"
-                      className="text-xs font-mono text-[#ffbc09] hover:underline flex items-center gap-1"
+                <div className="space-y-3">
+                  {TOP_SCAM_ALERTS.map((alert) => (
+                    <div
+                      key={alert.id}
+                      className="p-4 rounded-2xl bg-black/40 border border-[#2d0d08] hover:border-[#ffbc09]/40 transition-all space-y-2"
                     >
-                      Xem tất cả ({TOP_SCAM_ALERTS.length * 4}+) <ArrowRight className="w-3 h-3" />
-                    </Link>
-                  </div>
-
-                  <div className="space-y-3">
-                    {TOP_SCAM_ALERTS.map((alert) => (
-                      <div
-                        key={alert.id}
-                        onClick={() => {
-                          saffronAudio.playClick(600);
-                          router.push("/forum");
-                        }}
-                        className="cursor-pointer p-4 sm:p-5 rounded-2xl bg-[#150604]/90 hover:bg-[#210a07] border border-[#47140b] hover:border-red-500/50 transition-all space-y-2 group"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-red-500/15 border border-red-500/30 text-red-300">
-                            {alert.riskLevel}
-                          </span>
-                          <span className="text-[11px] text-[#ece7e0]/50 font-mono flex items-center gap-1">
-                            <Clock className="w-3 h-3" /> {alert.time}
-                          </span>
-                        </div>
-
-                        <h4 className="text-sm font-bold text-white group-hover:text-red-300 transition-colors">
-                          {alert.title}
-                        </h4>
-
-                        <p className="text-xs text-[#ece7e0]/70 line-clamp-2 leading-relaxed">
-                          {alert.desc}
-                        </p>
-
-                        <div className="pt-2 flex items-center justify-between text-[11px] text-[#ece7e0]/50 border-t border-[#47140b]/60">
-                          <span>{alert.location}</span>
-                          <span className="font-mono text-[#ffbc09] font-bold">{alert.techTag}</span>
-                        </div>
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="px-2 py-0.5 rounded-md bg-[#ea3810]/20 text-[#ea3810] font-mono font-bold text-[10px]">
+                          {alert.techTag}
+                        </span>
+                        <span className="text-[11px] font-mono text-[#ece7e0]/40">{alert.time}</span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Right 5 Cols: Top 5 Trust Leaderboard */}
-                <div className="lg:col-span-5 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                      <Star className="w-5 h-5 text-[#ffbc09] fill-[#ffbc09]" />
-                      <span>Bảng Xếp Hạng Uy Tín</span>
-                    </h2>
-                    <span className="text-[10px] font-mono text-[#ece7e0]/50 uppercase">[ TOP VERIFIED ]</span>
-                  </div>
-
-                  <div className="p-5 rounded-3xl bg-[#150604]/90 border border-[#47140b] space-y-3">
-                    {TOP_5_LEADERBOARD.map((user) => (
-                      <div
-                        key={user.rank}
-                        className="flex items-center justify-between p-2.5 rounded-xl bg-[#210a07] border border-[#47140b]/70 hover:border-[#ffbc09]/40 transition-all text-xs"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-mono font-bold text-xs ${
-                            user.rank === 1 ? "bg-[#ffbc09] text-[#150604]" :
-                            user.rank === 2 ? "bg-gray-300 text-[#150604]" :
-                            user.rank === 3 ? "bg-amber-700 text-white" :
-                            "bg-[#2f0e09] text-[#ece7e0]/60"
-                          }`}>
-                            {user.rank}
-                          </span>
-                          <div>
-                            <p className="font-bold text-white">{user.name}</p>
-                            <p className="text-[10px] text-[#ece7e0]/60">{user.field}</p>
-                          </div>
-                        </div>
-
-                        <div className="text-right">
-                          <span className="font-mono font-extrabold text-[#ffd15c]">{user.score} PTS</span>
-                        </div>
+                      <p className="text-xs sm:text-sm font-bold text-white">{alert.title}</p>
+                      <p className="text-xs text-[#ece7e0]/70 font-human leading-relaxed">{alert.desc}</p>
+                      <div className="flex items-center justify-between text-[11px] font-mono text-[#ece7e0]/50 pt-1">
+                        <span>Khu vực: {alert.location}</span>
+                        <span className="text-[#ea3810] font-bold">{alert.riskLevel}</span>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </motion.main>
-          )}
-        </AnimatePresence>
+
+            </div>
+
+            {/* Right Column (Col 4): Leaderboard & Accreditations */}
+            <div className="lg:col-span-4 space-y-8">
+              
+              {/* Top 5 Reputable Contributors Leaderboard */}
+              <div className="p-6 rounded-3xl bg-[#120604]/90 border border-[#47140b] backdrop-blur-2xl space-y-4">
+                <h3 className="text-sm font-bold text-white flex items-center gap-2 font-mono">
+                  <Star className="w-4 h-4 text-[#ffbc09]" />
+                  BẢNG VINH DANH TÍN NHIỆM
+                </h3>
+
+                <div className="space-y-3">
+                  {TOP_5_LEADERBOARD.map((item) => (
+                    <div
+                      key={item.rank}
+                      className="flex items-center justify-between p-3 rounded-2xl bg-black/40 border border-[#2d0d08]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center font-mono font-bold text-xs ${
+                          item.rank === 1
+                            ? "bg-[#ffbc09] text-[#150604]"
+                            : item.rank === 2
+                            ? "bg-slate-300 text-[#150604]"
+                            : item.rank === 3
+                            ? "bg-amber-700 text-white"
+                            : "bg-white/10 text-white/60"
+                        }`}>
+                          {item.rank}
+                        </span>
+                        <div>
+                          <p className="text-xs font-bold text-white">{item.name}</p>
+                          <p className="text-[10px] text-[#ece7e0]/50 font-mono">{item.field}</p>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-xs font-mono font-bold text-[#ffbc09]">{item.score}</span>
+                        <span className="text-[10px] text-[#ece7e0]/40 font-mono block">PTS</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Aerospace Trust Credentials Card */}
+              <div className="p-6 rounded-3xl bg-gradient-to-b from-[#150604] to-[#0a0302] border border-[#ffbc09]/30 space-y-3">
+                <div className="flex items-center gap-2 text-[#ffbc09] font-mono text-xs font-bold">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>TSO-C199 CERTIFIED AI SHIELD</span>
+                </div>
+                <p className="text-xs text-[#ece7e0]/80 leading-relaxed font-human">
+                  Hệ thống thẩm định 4 lớp vận hành theo chuẩn kiến trúc phân giải danh tính đại học, đảm bảo không lưu vết dữ liệu cá nhân nhạy cảm.
+                </p>
+                <div className="pt-2 border-t border-[#47140b] text-[10px] font-mono text-[#ece7e0]/40 flex justify-between">
+                  <span>STATUS: SECURE</span>
+                  <span>VERSION: 1.0.0-PROD</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </main>
       </div>
     </div>
   );

@@ -1,14 +1,5 @@
 "use client";
 
-// app/profile/page.jsx
-//
-// Hồ sơ cá nhân & Thang điểm uy tín StudentHub AI (Saffron Finance x Meer Mohsin 3D):
-// - WebGL Real-time Fluid Dynamics Canvas theo con trỏ chuột 60fps
-// - Quỹ đạo thiên văn 3D Astrolabe & vệ tinh bay quanh chu vi màn hình
-// - Saffron Swiss Grid Identity Cards với đường viền tóc hairline (#47140b) và dấu chữ thập (+)
-// - Nút HỦY & ĐÓNG QUAY LẠI TRANG rõ ràng, tiện lợi
-// - Thang điểm 0-100 pts + Huy hiệu Cố vấn / Sinh viên xác thực .edu
-
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -38,9 +29,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
-import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
+import AeroMissionControlBackdrop from "@/components/ui/AeroMissionControlBackdrop";
 import MohsinFluidCanvas from "@/components/ui/MohsinFluidCanvas";
-import SaffronMohsinPerimeter3DOrbit from "@/components/ui/SaffronMohsinPerimeter3DOrbit";
 import SaffronMarqueeTicker from "@/components/ui/SaffronMarqueeTicker";
 import SaffronSwissCrosshairGrid from "@/components/ui/SaffronSwissCrosshairGrid";
 import { NoiseOverlay } from "@/components/auth/AuthUI";
@@ -107,7 +97,7 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#150604] flex flex-col items-center justify-center text-[#ece7e0]">
+      <div className="min-h-screen bg-[#070403] flex flex-col items-center justify-center text-[#ece7e0]">
         <div className="w-12 h-12 rounded-full border-2 border-[#ffbc09] border-t-transparent animate-spin mb-4" />
         <p className="font-mono text-xs text-[#ffbc09] tracking-wider uppercase">[ INITIALIZING PROFILE // SAFFRON AI ENGINE ]</p>
       </div>
@@ -116,7 +106,7 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-[#150604] flex flex-col items-center justify-center p-4">
+      <div className="min-h-screen bg-[#070403] flex flex-col items-center justify-center p-4">
         <p className="text-white mb-4">Không tìm thấy thông tin hồ sơ.</p>
         <button
           type="button"
@@ -169,21 +159,20 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#070403] text-gray-100 flex relative overflow-x-hidden selection:bg-[#ffbc09] selection:text-[#150604]">
-      {/* 1. 3D Infinite Highway Canvas */}
-      <div className="canvas-bg-layer">
-        <RobinPayotRoadCanvas />
-      </div>
+      {/* 1. High-End Aerospace Aviation Terminal Backdrop (Clean & Non-overlapping) */}
+      <AeroMissionControlBackdrop
+        sectorTag="SECTOR_07_GAMMA // ACADEMIC_IDENTITY"
+        gridDensity={52}
+        showRadarRings={false}
+      />
 
-      {/* 2. Meer Mohsin WebGL Fluid Smoke Canvas */}
-      <MohsinFluidCanvas opacity={0.6} particleDensity={45} />
+      {/* 2. Interactive WebGL Fluid Smoke Trail */}
+      <MohsinFluidCanvas opacity={0.35} particleDensity={35} />
 
-      {/* 3. 3D Astrolabe Orbit & Perimeter Satellites */}
-      <SaffronMohsinPerimeter3DOrbit />
-
-      {/* 4. Film Grain Noise Overlay */}
+      {/* 3. Film Grain Noise Overlay */}
       <NoiseOverlay />
 
-      {/* 5. Floating Quick Tools & Studio */}
+      {/* 4. Floating Quick Tools & Studio */}
       <FloatingDock />
       <BackgroundsAndEffectsStudio />
 
@@ -198,14 +187,14 @@ export default function ProfilePage() {
       <main className="flex-1 layout-safe-container pt-24 sm:pt-28 pb-40 space-y-8 relative z-10 min-w-0 font-human">
         
         {/* Top Marquee Telemetry Ticker */}
-        <SaffronMarqueeTicker className="rounded-2xl border border-[#47140b]" />
+        <SaffronMarqueeTicker className="rounded-2xl border border-[#47140b]/60" />
 
         {/* Top Navigation & Explicit Cancel / Close Button */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <button
             type="button"
             onClick={handleCancelAndGoBack}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#210a07] hover:bg-[#2f0e09] text-[#ece7e0] hover:text-[#ffbc09] border border-[#47140b] hover:border-[#ffbc09]/50 text-xs font-bold transition-all shadow-sm cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#210a07] hover:bg-[#2f0e09] text-[#ece7e0] hover:text-[#ffbc09] border border-[#47140b] hover:border-[#ffbc09]/50 text-xs font-bold transition-all shadow-sm cursor-pointer font-mono"
             title="Hủy thao tác và quay về trang trước"
           >
             <ArrowLeft className="w-4 h-4 text-[#ffbc09]" />
@@ -245,324 +234,265 @@ export default function ProfilePage() {
 
           <div className="px-6 sm:px-10 pb-8 relative">
             <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-6 -mt-16 sm:-mt-20 mb-6">
-              {/* Avatar with Interactive Edit */}
-              <div
-                className="relative group cursor-pointer"
-                onClick={() => {
-                  saffronAudio.playClick(600);
-                  setIsEditModalOpen(true);
-                }}
-              >
-                <AvatarDisplay
-                  avatarId={profile.avatarId}
-                  avatarUrl={profile.avatarUrl}
-                  role={profile.role}
-                  size="2xl"
-                  showBadge={true}
-                  isInteractive={true}
-                />
-                <div className="absolute inset-0 rounded-2xl bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-[#ffbc09] text-xs font-bold gap-1 backdrop-blur-xs font-mono">
-                  <Edit3 className="w-4 h-4" /> ĐỔI AVATAR
+              {/* Avatar */}
+              <div className="relative group">
+                <div className="p-1 rounded-full bg-[#150604] border-2 border-[#ffbc09] shadow-2xl">
+                  <AvatarDisplay avatarId={profile.avatarId} size="xl" />
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    saffronAudio.playClick(600);
-                    setIsEditModalOpen(true);
-                  }}
-                  className="px-4 py-2 rounded-xl bg-[#210a07] hover:bg-[#2f0e09] border border-[#47140b] hover:border-[#ffbc09]/50 text-white text-xs font-bold transition-all cursor-pointer font-mono"
-                >
-                  [ ĐỔI VAI TRÒ / AVATAR ]
-                </button>
+              {/* Trust Badge Meter */}
+              <div className="flex items-center gap-4 bg-[#210a07] border border-[#47140b] p-3 rounded-2xl">
+                <div className="text-right">
+                  <span className="text-[10px] font-mono text-[#ece7e0]/60 uppercase block">ĐIỂM TÍN NHIỆM:</span>
+                  <span className="text-xl sm:text-2xl font-black text-[#ffbc09] font-mono">
+                    {trustScore} <span className="text-xs font-normal text-white">/ 100 PTS</span>
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-[#ffbc09]/20 border border-[#ffbc09]/40 flex items-center justify-center text-[#ffbc09]">
+                  <Award className="w-5 h-5" />
+                </div>
               </div>
             </div>
 
-            {/* Profile Information & Badges */}
-            <div className="space-y-4">
+            {/* User Info Details */}
+            <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-                  {profile.fullName}
+                  {profile.fullName || "Chưa đặt tên"}
                 </h1>
-
-                {/* Auto Badge "Chuyên Gia Uy Tín" */}
-                {isTopExpertBadge ? (
-                  <span className="px-3 py-1 rounded-full bg-[#ffbc09]/20 border border-[#ffbc09]/50 text-[#ffbc09] text-xs font-bold font-mono flex items-center gap-1 shadow-[0_0_15px_rgba(255,188,9,0.3)]">
-                    <Star className="w-3.5 h-3.5 fill-[#ffbc09] text-[#ffbc09]" />
-                    ⭐ CỐ VẤN UY TÍN ({trustScore} PTS)
+                {isExpert ? (
+                  <span className="px-3 py-1 rounded-full bg-[#ffbc09]/20 text-[#ffbc09] text-xs font-mono font-bold border border-[#ffbc09]/40">
+                    ⭐ CỐ VẤN / CHUYÊN GIA
                   </span>
                 ) : (
-                  <span className="px-3 py-1 rounded-full bg-[#38bdf8]/20 border border-[#38bdf8]/40 text-[#38bdf8] text-xs font-bold font-mono flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    SINH VIÊN THÀNH VIÊN ({trustScore} PTS)
+                  <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold border border-emerald-500/40 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    SINH VIÊN XÁC THỰC
                   </span>
                 )}
-
                 {isEduVerified && (
-                  <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-mono font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    EMAIL .EDU VERIFIED (+30 PTS)
+                  <span className="px-3 py-1 rounded-full bg-[#38bdf8]/20 text-[#38bdf8] text-xs font-mono font-bold border border-[#38bdf8]/40">
+                    ✓ EMAIL .EDU.VN
                   </span>
                 )}
               </div>
 
-              {/* Bio & Details */}
-              <p className="text-sm text-[#ece7e0]/80 max-w-3xl leading-relaxed">
-                {profile.bio || "Thành viên tích cực tham gia mạng lưới phòng chống lừa đảo sinh viên StudentHub AI."}
+              {/* Bio */}
+              <p className="text-xs sm:text-sm text-[#ece7e0]/80 max-w-3xl leading-relaxed">
+                {profile.bio || "Thành viên tích cực tham gia mạng lưới phòng chống gian lận học đường StudentHub AI."}
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs text-[#ece7e0]/70">
-                <div className="flex items-center gap-2">
+              {/* Academic Details Meta */}
+              <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-[#ece7e0]/70 pt-2 border-t border-[#47140b]/60">
+                <div className="flex items-center gap-1.5">
                   <Building className="w-4 h-4 text-[#ffbc09]" />
-                  <span>{isExpert ? (profile.organization || "Tổ chức chuyên môn") : (profile.university || "Đại học Thành viên")}</span>
+                  <span>{profile.university || "Trường Đại học"}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-[#38bdf8]" />
-                  <span>{isExpert ? (profile.expertField || "Lĩnh vực tư vấn") : (profile.major || "Chuyên ngành đào tạo")}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-[#ca56ed]" />
-                  <span>{isExpert ? (profile.experienceYears || "3+ năm kinh nghiệm") : `Niên khóa: ${profile.academicYear || "2024 - 2028"}`}</span>
-                </div>
+                {profile.major && (
+                  <div className="flex items-center gap-1.5">
+                    <BookOpen className="w-4 h-4 text-[#38bdf8]" />
+                    <span>{profile.major}</span>
+                  </div>
+                )}
+                {profile.academicYear && (
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4 text-emerald-400" />
+                    <span>Khóa: {profile.academicYear}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </SaffronSwissCrosshairGrid>
 
-        {/* 3 Overview Stat Bento Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <SaffronSwissCrosshairGrid sectionTag="RADAR // TRUST" className="p-6 my-0 space-y-2">
-            <div className="flex items-center justify-between text-xs font-mono text-[#ece7e0]/60 uppercase">
-              <span>ĐIỂM UY TÍN TÍCH LŨY</span>
-              <Sparkles className="w-4 h-4 text-[#ffbc09]" />
-            </div>
-            <div className="text-3xl font-extrabold text-[#ffd15c] font-mono">{trustScore} / 100 PTS</div>
-            <p className="text-xs text-[#ece7e0]/70">Được đánh giá dựa trên mức độ chính xác của các cảnh báo và bình chọn cộng đồng.</p>
-          </SaffronSwissCrosshairGrid>
-
-          <SaffronSwissCrosshairGrid sectionTag="ACTIVITY // SCAMS" className="p-6 my-0 space-y-2">
-            <div className="flex items-center justify-between text-xs font-mono text-[#ece7e0]/60 uppercase">
-              <span>BÁO CÁO ĐÃ GỬI</span>
-              <ShieldAlert className="w-4 h-4 text-red-400" />
-            </div>
-            <div className="text-3xl font-extrabold text-white font-mono">14 CA</div>
-            <p className="text-xs text-[#ece7e0]/70">Đã phát hiện và cảnh báo thành công các vụ việc nghi vấn lừa cọc và học bổng giả.</p>
-          </SaffronSwissCrosshairGrid>
-
-          <SaffronSwissCrosshairGrid sectionTag="COMMUNITY // VOTES" className="p-6 my-0 space-y-2">
-            <div className="flex items-center justify-between text-xs font-mono text-[#ece7e0]/60 uppercase">
-              <span>BÌNH CHỌN HỮU ÍCH</span>
-              <Star className="w-4 h-4 text-[#38bdf8]" />
-            </div>
-            <div className="text-3xl font-extrabold text-[#38bdf8] font-mono">128 LƯỢT</div>
-            <p className="text-xs text-[#ece7e0]/70">Nhận được sự đồng thuận và cảm ơn từ các bạn sinh viên trong diễn đàn.</p>
-          </SaffronSwissCrosshairGrid>
+        {/* Navigation Tabs */}
+        <div className="flex items-center gap-2 border-b border-[#47140b] pb-2">
+          <button
+            type="button"
+            onClick={() => {
+              saffronAudio.playClick(600);
+              setActiveTab("overview");
+            }}
+            className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+              activeTab === "overview"
+                ? "bg-[#ffbc09] text-[#150604] shadow-md shadow-[#ffbc09]/20"
+                : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            [01] TỔNG QUAN HỒ SƠ
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              saffronAudio.playClick(650);
+              setActiveTab("scams");
+            }}
+            className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+              activeTab === "scams"
+                ? "bg-[#ffbc09] text-[#150604] shadow-md shadow-[#ffbc09]/20"
+                : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            [02] CẢNH BÁO ĐÃ ĐĂNG
+          </button>
         </div>
 
-        {/* Modal Chỉnh Sửa Hồ Sơ */}
-        {isEditModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0d0403]/85 backdrop-blur-xl overflow-y-auto">
-            <div className="w-full max-w-2xl bg-[#150604] border border-[#47140b] rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 font-human">
-              <div className="flex items-center justify-between pb-3 border-b border-[#47140b]">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Edit3 className="w-5 h-5 text-[#ffbc09]" /> Chỉnh Sửa Hồ Sơ &amp; Đổi Avatar
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => {
-                    saffronAudio.playClick(400);
-                    setIsEditModalOpen(false);
-                  }}
-                  className="p-1.5 rounded-lg bg-[#210a07] hover:bg-[#2f0e09] border border-[#47140b] text-[#ece7e0]/70 hover:text-white cursor-pointer"
-                  title="Đóng cửa sổ"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {editError && (
-                <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs">
-                  {editError}
-                </div>
-              )}
-
-              <form onSubmit={handleSaveProfile} className="space-y-4">
-                {/* Chọn Avatar */}
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-2 font-mono">
-                    [ 01 ] CHỌN AVATAR NHẬN DIỆN
-                  </label>
-                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                    {AVATAR_LIST.map((av) => (
-                      <button
-                        key={av.id}
-                        type="button"
-                        onClick={() => {
-                          saffronAudio.playClick(500);
-                          setEditAvatarId(av.id);
-                        }}
-                        className={`p-2 rounded-2xl border transition-all cursor-pointer flex flex-col items-center gap-1 ${
-                          editAvatarId === av.id
-                            ? "bg-[#ffbc09]/20 border-[#ffbc09] shadow-[0_0_15px_rgba(255,188,9,0.3)]"
-                            : "bg-[#210a07] border-[#47140b] hover:border-white/30"
-                        }`}
-                      >
-                        <AvatarDisplay avatarId={av.id} size="sm" />
-                        <span className="text-[9px] text-[#ece7e0]/60 truncate w-full text-center">{av.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Tên và Vai trò */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
-                      Họ và tên
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={editFullName}
-                      onChange={(e) => setEditFullName(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-sm text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
-                      Vai trò tài khoản
-                    </label>
-                    <select
-                      value={editRole}
-                      onChange={(e) => setEditRole(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
-                    >
-                      <option value="student">Sinh viên</option>
-                      <option value="expert">Chuyên gia / Cố vấn</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Thông tin sinh viên hoặc chuyên gia */}
-                {editRole === "student" ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
-                        Trường Đại học
-                      </label>
-                      <select
-                        value={editUniversity}
-                        onChange={(e) => setEditUniversity(e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
-                      >
-                        {VIETNAM_UNIVERSITIES.map((u) => (
-                          <option key={u} value={u}>{u}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
-                        Chuyên ngành
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Khoa học Máy tính..."
-                        value={editMajor}
-                        onChange={(e) => setEditMajor(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
-                        Lĩnh vực chuyên môn
-                      </label>
-                      <select
-                        value={editExpertField}
-                        onChange={(e) => setEditExpertField(e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
-                      >
-                        {EXPERT_FIELDS.map((f) => (
-                          <option key={f} value={f}>{f}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
-                        Tổ chức / Đơn vị
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Viện An ninh mạng..."
-                        value={editOrganization}
-                        onChange={(e) => setEditOrganization(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09]"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Bio */}
-                <div>
-                  <label className="block text-xs font-bold uppercase text-[#ece7e0]/80 mb-1.5 font-mono">
-                    Giới thiệu bản thân (Bio)
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={editBio}
-                    onChange={(e) => setEditBio(e.target.value)}
-                    placeholder="Viết một vài dòng về bạn..."
-                    className="w-full p-4 rounded-xl bg-[#210a07] border border-[#47140b] text-xs text-[#ece7e0] focus:outline-none focus:border-[#ffbc09] resize-none"
-                  />
-                </div>
-
-                {/* Action Buttons: Hủy và Lưu */}
-                <div className="flex items-center justify-between pt-3 border-t border-[#47140b]">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      saffronAudio.playClick(400);
-                      setIsEditModalOpen(false);
-                    }}
-                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#210a07] hover:bg-[#2f0e09] border border-[#47140b] text-xs font-bold text-[#ece7e0]/80 hover:text-white cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                    <span>[ ✕ HỦY &amp; ĐÓNG CỬA SỔ ]</span>
-                  </button>
-
-                  <button
-                    type="submit"
-                    disabled={isSaving}
-                    className="py-2.5 px-5 rounded-xl bg-gradient-to-r from-[#ffbc09] to-[#f59e0b] text-[#150604] font-extrabold text-xs uppercase tracking-wider shadow-md hover:scale-105 transition-all cursor-pointer font-mono flex items-center gap-1.5"
-                  >
-                    {isSaving ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin text-[#150604]" />
-                        <span>ĐANG LƯU...</span>
-                      </>
-                    ) : saveSuccess ? (
-                      <>
-                        <Check className="w-4 h-4" />
-                        <span>ĐÃ LƯU THÀNH CÔNG!</span>
-                      </>
-                    ) : (
-                      <span>LƯU HỒ SƠ MỚI</span>
-                    )}
-                  </button>
-                </div>
-              </form>
+        {/* Tab Content */}
+        {activeTab === "overview" && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-3xl bg-[#120604]/90 border border-[#47140b] backdrop-blur-2xl space-y-3">
+              <span className="text-[10px] font-mono text-[#ffbc09] uppercase block">ĐÓNG GÓP THỰC CHỨNG</span>
+              <span className="text-3xl font-black text-white font-mono">12</span>
+              <p className="text-xs text-[#ece7e0]/60">Lần đối soát bài đăng khả nghi trên Diễn đàn</p>
+            </div>
+            <div className="p-6 rounded-3xl bg-[#120604]/90 border border-[#47140b] backdrop-blur-2xl space-y-3">
+              <span className="text-[10px] font-mono text-[#38bdf8] uppercase block">BÌNH CHỌN HỮU ÍCH</span>
+              <span className="text-3xl font-black text-white font-mono">86</span>
+              <p className="text-xs text-[#ece7e0]/60">Lượt cảm ơn từ cộng đồng sinh viên</p>
+            </div>
+            <div className="p-6 rounded-3xl bg-[#120604]/90 border border-[#47140b] backdrop-blur-2xl space-y-3">
+              <span className="text-[10px] font-mono text-emerald-400 uppercase block">CẤP ĐỘ BẢO VỆ SỐ</span>
+              <span className="text-3xl font-black text-white font-mono">LEVEL 4</span>
+              <p className="text-xs text-[#ece7e0]/60">Hệ thống kích hoạt bảo vệ chủ động 24/7</p>
             </div>
           </div>
         )}
+
+        {activeTab === "scams" && (
+          <div className="p-8 text-center rounded-3xl bg-[#120604]/90 border border-[#47140b] space-y-3">
+            <ShieldAlert className="w-10 h-10 text-[#ffbc09] mx-auto opacity-60" />
+            <p className="text-sm font-bold text-white">Bạn chưa có báo cáo cảnh báo nào vi phạm</p>
+            <p className="text-xs text-[#ece7e0]/60">Khi bạn báo cáo một đường link hoặc số tài khoản lừa đảo, báo cáo sẽ hiển thị tại đây.</p>
+          </div>
+        )}
       </main>
+
+      {/* EDIT PROFILE MODAL */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl">
+          <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 rounded-3xl bg-[#150604] border border-[#ffbc09]/50 shadow-2xl space-y-4 font-human">
+            <div className="flex items-center justify-between pb-3 border-b border-[#47140b]">
+              <h3 className="text-base font-bold text-white font-mono">CHỈNH SỬA HỒ SƠ CÁ NHÂN</h3>
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(false)}
+                className="p-1 rounded-lg text-[#ece7e0]/60 hover:text-white cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {editError && (
+              <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/50 text-xs text-rose-300">
+                {editError}
+              </div>
+            )}
+
+            {saveSuccess && (
+              <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/50 text-xs text-emerald-300">
+                ✓ Lưu thay đổi hồ sơ thành công!
+              </div>
+            )}
+
+            <form onSubmit={handleSaveProfile} className="space-y-4">
+              <div>
+                <label className="block text-xs font-mono text-[#ffbc09] font-bold mb-1">
+                  HỌ VÀ TÊN
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editFullName}
+                  onChange={(e) => setEditFullName(e.target.value)}
+                  className="w-full px-4 py-2 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs sm:text-sm text-white focus:outline-none focus:border-[#ffbc09]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-[#ffbc09] font-bold mb-1">
+                  CHỌN AVATAR
+                </label>
+                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+                  {AVATAR_LIST.map((av) => (
+                    <button
+                      key={av.id}
+                      type="button"
+                      onClick={() => setEditAvatarId(av.id)}
+                      className={`p-1 rounded-xl border transition-all ${
+                        editAvatarId === av.id
+                          ? "border-[#ffbc09] bg-[#ffbc09]/20 scale-105"
+                          : "border-transparent hover:border-white/20"
+                      }`}
+                    >
+                      <AvatarDisplay avatarId={av.id} size="sm" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-mono text-[#ffbc09] font-bold mb-1">
+                    TRƯỜNG ĐẠI HỌC
+                  </label>
+                  <select
+                    value={editUniversity}
+                    onChange={(e) => setEditUniversity(e.target.value)}
+                    className="w-full px-3 py-2 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs text-white focus:outline-none focus:border-[#ffbc09] font-mono"
+                  >
+                    {VIETNAM_UNIVERSITIES.map((u) => (
+                      <option key={u} value={u}>{u}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono text-[#ffbc09] font-bold mb-1">
+                    CHUYÊN NGÀNH
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ví dụ: Khoa học Máy tính..."
+                    value={editMajor}
+                    onChange={(e) => setEditMajor(e.target.value)}
+                    className="w-full px-4 py-2 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs text-white focus:outline-none focus:border-[#ffbc09]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-[#ffbc09] font-bold mb-1">
+                  TIỂU SỬ
+                </label>
+                <textarea
+                  rows={3}
+                  value={editBio}
+                  onChange={(e) => setEditBio(e.target.value)}
+                  className="w-full px-4 py-2 bg-[#210a07] border border-[#47140b] rounded-2xl text-xs text-white focus:outline-none focus:border-[#ffbc09]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-transparent border border-[#47140b] text-xs font-mono font-bold text-[#ece7e0]/70 hover:text-white cursor-pointer"
+                >
+                  HỦY BỎ
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="px-5 py-2 rounded-xl bg-[#ffbc09] hover:bg-[#ffd15c] text-[#150604] text-xs font-mono font-bold uppercase shadow-md cursor-pointer transition-all"
+                >
+                  {isSaving ? "ĐANG LƯU..." : "LƯU THAY ĐỔI"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
