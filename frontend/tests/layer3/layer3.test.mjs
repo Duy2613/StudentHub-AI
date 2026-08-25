@@ -206,8 +206,10 @@ async function runLayer3Tests() {
   }
 }
 
-// Execute Test Suite
-runLayer3Tests().catch((err) => {
-  console.error("Layer 3 Test Suite execution error:", err);
-  process.exit(1);
-});
+// Execute Test Suite only when run directly from command line
+if (typeof process !== "undefined" && process.argv[1] && (process.argv[1].endsWith("layer3.test.mjs") || process.argv[1].includes("layer3.test"))) {
+  runLayer3Tests().catch((err) => {
+    console.error("Layer 3 Test Suite execution error:", err);
+    process.exit(1);
+  });
+}

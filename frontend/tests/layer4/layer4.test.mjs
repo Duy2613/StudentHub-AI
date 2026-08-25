@@ -274,8 +274,10 @@ async function runLayer4Tests() {
   }
 }
 
-// Execute Test Suite
-runLayer4Tests().catch((err) => {
-  console.error("Layer 4 Test Suite execution error:", err);
-  process.exit(1);
-});
+// Execute Test Suite only when run directly from command line
+if (typeof process !== "undefined" && process.argv[1] && (process.argv[1].endsWith("layer4.test.mjs") || process.argv[1].includes("layer4.test"))) {
+  runLayer4Tests().catch((err) => {
+    console.error("Layer 4 Test Suite execution error:", err);
+    process.exit(1);
+  });
+}

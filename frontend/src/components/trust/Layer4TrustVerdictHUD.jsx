@@ -20,7 +20,7 @@ import {
   ArrowRight,
   Fingerprint,
 } from "lucide-react";
-import { saffronAudio } from "@/lib/saffron-audio";
+import { saffronAudio } from "@/lib/audio/saffronAudio";
 
 export default function Layer4TrustVerdictHUD({ result }) {
   const [expandedClaim, setExpandedClaim] = useState(null);
@@ -289,6 +289,13 @@ export default function Layer4TrustVerdictHUD({ result }) {
                     </a>
                     <span className="text-[10px] font-mono text-[#ece7e0]/60 uppercase">{ev.relation}</span>
                   </div>
+                  <p className="text-[#ece7e0]/80 italic text-[11px]">&ldquo;{ev.excerpt}&rdquo;</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* GLOBAL STANDARDS & ACCREDITED ECOSYSTEM COMPLIANCE */}
         {userExplanation.matchedStandards?.length > 0 && (
           <div className="p-4 rounded-xl bg-black/40 border border-[#ffbc09]/20 space-y-2">
