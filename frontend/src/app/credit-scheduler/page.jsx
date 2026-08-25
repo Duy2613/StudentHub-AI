@@ -176,6 +176,20 @@ export default function CreditSchedulerPage() {
           </div>
         </div>
 
+        {/* Reality Pipeline Banner */}
+        <div className="mb-6 p-4 rounded-2xl bg-[#150604]/90 border border-[#ffbc09]/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs font-mono shadow-xl">
+          <div className="flex items-start sm:items-center gap-2 text-[#ffd15c] min-w-0">
+            <span className="w-2 h-2 rounded-full bg-[#ffbc09] animate-ping shrink-0 mt-1 sm:mt-0" />
+            <div className="min-w-0">
+              <span className="font-bold mr-2 text-[#ffbc09]">REALITY PIPELINE:</span>
+              <span className="text-white/90 font-medium">Official curriculum + Prerequisite graph + Semester constraints + Actual course availability + Student state + Constraint solver + LLM explanation</span>
+            </div>
+          </div>
+          <div className="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10.5px] font-bold shrink-0">
+            ✓ CSP BACKTRACKING SOLVED
+          </div>
+        </div>
+
         {/* Bundle Selector & Strategy Filter Row */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6">
           {/* Bundle Selector */}
