@@ -2,11 +2,18 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:layer1": "node tests/layer1/layer1.test.mjs",
+    "test:url": "node tests/layer1/url_benchmark.test.mjs",
+    "test:layer2": "node tests/layer2/layer2.test.mjs",
+    "test:layer3": "node tests/layer3/layer3.test.mjs",
+    "test:layer4": "node tests/layer4/layer4.test.mjs",
+    "test:all": "node tests/layer1/full_multimodal_evaluation.test.mjs && node tests/layer2/layer2.test.mjs && node tests/layer3/layer3.test.mjs && node tests/layer4/layer4.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/react": "^4.0.80",

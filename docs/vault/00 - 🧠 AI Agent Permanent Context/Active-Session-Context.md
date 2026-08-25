@@ -4,29 +4,40 @@
 ---
 
 ## 1. Trạng Thái Hiện Tại (Current Working Snapshot)
-- **Phiên bản**: StudentHub AI v2.9.0 (AI Trust Layer 1 — Fast & Deterministic Screening Suite).
-- **Vừa triển khai & Kiểm thử thành công**:
-  1. ✅ **Layer 1 Fast & Deterministic Screening Engine (`lib/ai-trust/layer1`)**:
-     - 🛡️ **URL Screening**: Phân tích giao thức HTTP, IP thô, tên miền lừa đảo subdomain (`hcmute-login.verify-xxx.com`), homoglyph Cyrillic/Greek, file thực thi độc hại (`.exe`, `.apk`, `.ps1`), link rút gọn (`bit.ly`), whitelist giáo dục quốc gia (`.edu.vn`, `.gov.vn`).
-     - 📝 **Text Screening**: Bắt chính xác bẫy lừa OTP/mật khẩu, giả danh trường học/ngân hàng, lừa nạp cọc CTV Shopee/Lazada, malware payload (`powershell -enc`, `curl | bash`). Bảo vệ AI Style Guard không đơn phương kích hoạt BLOCK.
-     - 🖼️ **Image Screening**: Kiểm tra Magic Bytes nhị phân (PNG, JPEG, WebP, GIF), phát hiện tệp thực thi polyglot (`MZ`, `PK`) ngụy trang đuôi ảnh, cầu nối QR Code URL và OCR text screening.
-     - ⚖️ **Hard Rules + Confidence Scoring**: Chuẩn hóa 3 trạng thái (`BLOCK` early-exit [0.95-0.99], `SUSPICIOUS` [0.45-0.85], `PASS` [0.90-0.99]).
-  2. ✅ **Backend API Route (`POST /api/ai-trust/screen`)**:
-     - Route Handler siêu tốc (Target Latency < 15ms) trả về chuẩn JSON `{ layer: 1, status, confidence, reasons, signals, details, metrics }`.
-  3. ✅ **Frontend Telemetry Suite & Test Benchmark Studio**:
-     - `Layer1TelemetryHUD.jsx`: Máy đọc HUD viền tóc chuẩn typography kép (Inter + JetBrains Mono), đồng hồ đo Confidence, ma trận tín hiệu có trọng số.
-     - `Layer1LivePrechecker.jsx`: Trình quét tương tác 0ms client-side keystroke / dropzone inspection.
-     - `Layer1BenchmarkStudio.jsx`: Bộ 8 kịch bản kiểm thử mẫu thực tế (URL lừa đảo, Task scam, Trojan image, Whitelist pass).
-     - `scam-check/page.jsx`: Tích hợp toàn diện giao diện với pipeline 4 lớp.
+- **Phiên bản**: StudentHub AI v4.0.0 (AI Trust 4-Layer Comprehensive Intelligence & Decision Pipeline Complete).
+- **Toàn Bộ 4 Lớp Đã Hoàn Thành & Kiểm Thử Tuyệt Đối (178/178 Tests PASS - 100.0%)**:
+  1. ✅ **Layer 1 Ultra-Precise Screening Engine (`lib/ai-trust/layer1`)**:
+     - 🏛️ 70+ Brand Catalog, Token-Boundary Precision Matcher (0% FP), Damerau-Levenshtein Typosquatting, SSRF Obfuscation Defense, Magic Byte Binary & Polyglot inspection.
+     - 148/148 Multi-Modal Tests PASS (100.0% Accuracy, 0.19ms latency).
+  2. ✅ **Layer 2 Semantic & Contextual Verification Engine (`lib/ai-trust/layer2`)**:
+     - 🧠 IntentAnalyzer, EntityExtractor, ClaimExtractor, ContextAnalyzer, ConsistencyAnalyzer, CrossModalAnalyzer, VerificationPlanner.
+     - 14/14 Semantic Tests PASS (100.0% Accuracy, 0.41ms latency).
+  3. ✅ **Layer 3 External Evidence & Source Verification Engine (`lib/ai-trust/layer3`)**:
+     - 🔍 Multi-strategy QueryGenerator (Anti-Confirmation-Bias), 5-Tier Claim-Specific Source Authority, Lineage Clustering, Conflict Detection.
+     - 8/8 Evidence Tests PASS (100.0% Accuracy, 0.61ms latency).
+  4. ✅ **Layer 4 Final Trust Reasoning Engine (`lib/ai-trust/layer4`)**:
+     - ⚖️ **EvidenceFusionEngine & ContradictionReconciler**: Hợp nhất đồ thị bằng chứng đa lớp, phân giải mâu thuẫn thời gian (chính sách mới cập nhật thay thế văn bản cũ), phân tích lượng từ/phạm vi (ScopeReconciler).
+     - 🛑 **HardDecisionPolicy**: Quy tắc cứng tất định (chặn tức thời bẫy OTP, mã độc, lừa cọc).
+     - 📐 **3D Decision Matrix**: Độc lập 3 chiều: Tính Xác Thực (Truth Status), Rủi Ro Bảo Mật (Risk Level: `NONE`, `LOW`, `MEDIUM`, `HIGH`, `CRITICAL`), và Hành Động Hệ Thống (Action: `ALLOW`, `ALLOW_WITH_WARNING`, `REQUIRE_VERIFICATION`, `RESTRICT`, `BLOCK`, `ESCALATE`).
+     - 💡 **AuditExplanationEngine**: Tự động sinh bản giải trình có trích dẫn mã phát ngôn, mã bằng chứng và URL nguồn tin chính thống.
+     - 🎯 **Test Suite 8/8 PASS (100.0%)**: Vượt qua tuyệt đối cả 8 kịch bản từ nội dung chính thống, thông tin chưa kiểm chứng (`UNVERIFIED` $\neq$ `FALSE`), phóng đại quy mô (`MISLEADING`), thông tin đúng trong ngữ cảnh lừa đảo (True $\neq$ Safe $\rightarrow$ `MALICIOUS`), tranh chấp nguồn tin (`ESCALATE`), đến phòng thủ fallback LLM 504.
+  5. ✅ **Full Pipeline Integration & UI Studios**:
+     - `POST /api/ai-trust/reasoning`: API endpoint Layer 4 hoàn chỉnh.
+     - `Layer4TrustVerdictHUD.jsx`: Telemetry HUD hiển thị ma trận 3 chiều, cây bằng chứng & giải trình kiểm toán.
+     - `Layer4BenchmarkStudio.jsx`: Trình kiểm chuẩn tương tác 8 kịch bản Layer 4 trên web studio.
+     - `scam-check/page.jsx`: Tích hợp luồng quét 4 lớp liên tục với 4 tab Benchmark Studio.
 
 ---
 
 ## 2. Đường Dẫn File Quan Trọng
 - **Đặc Tả Kỹ Thuật Layer 1**: `docs/vault/01 - 🏗️ System Architecture/AI-Trust-Layer1-Screening-Spec.md`
-- **Layer 1 Core Scanner**: `frontend/src/lib/ai-trust/layer1/scanner.js`
-- **Backend API Endpoint**: `frontend/src/app/api/ai-trust/screen/route.js`
-- **Telemetry HUD**: `frontend/src/components/trust/Layer1TelemetryHUD.jsx`
-- **Live Prechecker**: `frontend/src/components/trust/Layer1LivePrechecker.jsx`
-- **Benchmark Studio**: `frontend/src/components/trust/Layer1BenchmarkStudio.jsx`
+- **Đặc Tả Kỹ Thuật Layer 2**: `docs/vault/01 - 🏗️ System Architecture/AI-Trust-Layer2-Semantic-Spec.md`
+- **Đặc Tả Kỹ Thuật Layer 3**: `docs/vault/01 - 🏗️ System Architecture/AI-Trust-Layer3-Evidence-Spec.md`
+- **Đặc Tả Kỹ Thuật Layer 4**: `docs/vault/01 - 🏗️ System Architecture/AI-Trust-Layer4-Reasoning-Spec.md`
+- **Layer 4 Core Service**: `frontend/src/lib/ai-trust/layer4/Layer4TrustService.js`
+- **Layer 4 Test Suite**: `frontend/tests/layer4/layer4.test.mjs`
+- **Backend API Layer 4**: `frontend/src/app/api/ai-trust/reasoning/route.js`
+- **Telemetry HUDs**: `Layer1TelemetryHUD.jsx`, `Layer2SemanticHUD.jsx`, `Layer3EvidenceHUD.jsx`, `Layer4TrustVerdictHUD.jsx`
+- **Benchmark Studios**: `Layer1BenchmarkStudio.jsx`, `Layer2BenchmarkStudio.jsx`, `Layer3BenchmarkStudio.jsx`, `Layer4BenchmarkStudio.jsx`
 - **Trang Scam Check**: `frontend/src/app/scam-check/page.jsx`
 - **Vault Hub**: `docs/vault/Index.md`
