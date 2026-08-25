@@ -3,61 +3,155 @@
  * 
  * Deep deterministic URL inspection:
  * - Structural decomposition (Scheme, Hostname, Registrable Domain, Subdomain, Port, Path, Query, Userinfo)
- * - Brand Impersonation & Deceptive Subdomain Analysis
- * - Levenshtein Typosquatting Analysis
- * - Unicode Homoglyph & Punycode Detection
- * - Credential Harvesting Paths & Suspicious Parameters
+ * - Token-Boundary Brand Impersonation & Deceptive Subdomain Analysis
+ * - Damerau-Levenshtein Typosquatting Analysis & Character Substitutions
+ * - Unicode Homoglyph & Punycode Resolver
+ * - SSRF Network Guard (Loopback, Decimal Dword, Hex, Octal, IPv6, Cloud Metadata, Localhost)
+ * - Combosquatting & Hot Phishing Lures (Biometrics, VNeID, Scholarships, Student Task Scams)
  * - Dangerous Executable Extensions in Path
- * - Shortened URL detection
- * - SSRF Network Guard (Loopback, Cloud Metadata, Localhost)
+ * - Shortened URL detection & Unencrypted HTTP
+ * - Userinfo Spoofing Detection (user@host)
  */
 
 import { LAYER_1_CONFIG } from "../config/Layer1Config.js";
 import { LAYER_1_REASONS, SIGNAL_SEVERITY, createSignal } from "../types.js";
-import { BrandRegistry, BRAND_REGISTRY, SUSPICIOUS_TLDS, KNOWN_URL_SHORTENERS } from "../registry/BrandRegistry.js";
+import {
+  BrandRegistry,
+  BRAND_REGISTRY,
+  SUSPICIOUS_TLDS,
+  KNOWN_URL_SHORTENERS,
+  resolveHomoglyphText,
+} from "../registry/BrandRegistry.js";
 
 const HOMOGLYPH_SCRIPTS_REGEX = /[\u0400-\u04FF\u0370-\u03FF]/; // Cyrillic & Greek
-const CREDENTIAL_PATH_REGEX = /(?:login|signin|verify|security|password|account|identity|otp|xac-nhan|nhan-thuong|nhan-hoc-bong|dat-coc|kich-hoat)/i;
 
-const CREDENTIAL_PARAM_REGEX = /^(password|passwd|pass|otp|verification_code|verify_code|token|security_code|pin|card|cvv)$/i;
+const HOT_PHISHING_PATH_REGEX = /(?:login|signin|verify|security|password|account|identity|otp|xac-nhan|nhan-thuong|nhan-hoc-bong|dat-coc|kich-hoat|cap-nhat-sinh-trac-hoc|sinh-trac-hoc|dinh-danh-vneid|dinh-danh|mo-khoa-tai-khoan|mo-khoa-the|nang-cap-smart-otp|dong-bo-du-lieu|tuyen-ctv|nhiem-vu-kiem-tien|nhan-qua)/i;
+
+const CREDENTIAL_PARAM_REGEX = /^(password|passwd|pass|otp|verification_code|verify_code|token|security_code|pin|card|cvv|smart_otp)$/i;
 
 const DANGEROUS_EXTENSIONS = [
   ".exe", ".scr", ".bat", ".cmd", ".ps1", ".apk", ".com", ".vbs",
-  ".vbe", ".wsf", ".hta", ".msi", ".dll", ".pif", ".iso", ".dmg"
+  ".vbe", ".wsf", ".hta", ".msi", ".dll", ".pif", ".iso", ".dmg",
+  ".sh", ".jar", ".bin", ".app", ".deb", ".rpm"
 ];
 
-// Critical SSRF Destinations (Loopback & Cloud Metadata)
-const HARD_SSRF_TARGETS = [
-  /^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/,         // Loopback
-  /^169\.254\.\d{1,3}\.\d{1,3}$/,             // Link-local / Cloud Metadata
-  /^0\.0\.0\.0$/,
-  /^localhost$/i,
-  /\.internal$/i,
-  /\.local$/i,
-  /\.onion$/i,
+// Combosquatting action words commonly combined with brand names
+const COMBOSQUAT_KEYWORDS = [
+  "login", "signin", "verify", "auth", "security", "portal", "account",
+  "otp", "sso", "ebanking", "smartbanking", "digibank", "online", "service",
+  "support", "alert", "unlock", "biometric", "update", "xacnhan", "sinhtrachoc",
+  "dinhdanh", "hocbong", "nhanthuong", "trocap", "sinhvien", "ctv", "tuyendung",
+  "kiemtien", "nhiemvu", "claim", "free", "gift", "event", "direct"
 ];
 
-// Levenshtein Distance Calculator
-function levenshtein(a, b) {
+// Damerau-Levenshtein Distance (includes adjacent character transpositions)
+function damerauLevenshtein(a, b) {
   if (a === b) return 0;
   if (!a.length) return b.length;
   if (!b.length) return a.length;
 
-  const matrix = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
-  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
-  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+  const al = a.length;
+  const bl = b.length;
+  const matrix = Array.from({ length: al + 1 }, () => new Array(bl + 1).fill(0));
 
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) {
+  for (let i = 0; i <= al; i++) matrix[i][0] = i;
+  for (let j = 0; j <= bl; j++) matrix[0][j] = j;
+
+  for (let i = 1; i <= al; i++) {
+    for (let j = 1; j <= bl; j++) {
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
       matrix[i][j] = Math.min(
-        matrix[i - 1][j] + 1,
-        matrix[i][j - 1] + 1,
-        matrix[i - 1][j - 1] + cost
+        matrix[i - 1][j] + 1,      // deletion
+        matrix[i][j - 1] + 1,      // insertion
+        matrix[i - 1][j - 1] + cost // substitution
       );
+
+      // Transposition
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        matrix[i][j] = Math.min(matrix[i][j], matrix[i - 2][j - 2] + cost);
+      }
     }
   }
-  return matrix[a.length][b.length];
+  return matrix[al][bl];
+}
+
+/**
+ * Checks if a string represents an obfuscated SSRF destination (Decimal, Hex, Octal, IPv6, Loopback)
+ * @param {string} host
+ * @returns {object|null}
+ */
+function checkSsrfTarget(host) {
+  if (!host) return null;
+  const clean = host.toLowerCase().trim();
+
+  // 1. Direct keywords
+  if (
+    clean === "localhost" ||
+    clean === "0.0.0.0" ||
+    clean.endsWith(".localhost") ||
+    clean.endsWith(".internal") ||
+    clean.endsWith(".local") ||
+    clean.endsWith(".onion")
+  ) {
+    return { type: "local_hostname", target: clean };
+  }
+
+  // 2. IPv4 Standard Regex Loopback & Link-Local / Metadata
+  if (/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(clean)) {
+    return { type: "loopback_ipv4", target: clean };
+  }
+  if (/^169\.254\.\d{1,3}\.\d{1,3}$/.test(clean)) {
+    return { type: "cloud_metadata_ipv4", target: clean };
+  }
+
+  // 3. IPv6 Format ([::1], [::ffff:127.0.0.1], [fe80::...])
+  if (clean.startsWith("[") && clean.endsWith("]")) {
+    const rawIpv6 = clean.slice(1, -1);
+    if (
+      rawIpv6 === "::1" ||
+      rawIpv6 === "::" ||
+      rawIpv6.includes("127.0.0.1") ||
+      rawIpv6.startsWith("fe80:") ||
+      rawIpv6.startsWith("fc00:") ||
+      rawIpv6.startsWith("fd00:")
+    ) {
+      return { type: "ipv6_private", target: clean };
+    }
+  }
+
+  // 4. Integer / Dword representation of IPv4 (e.g. 2130706433 = 127.0.0.1, 2852039166 = 169.254.169.254, 0 = 0.0.0.0)
+  if (/^\d+$/.test(clean)) {
+    const intVal = Number(clean);
+    if (intVal >= 0 && intVal <= 4294967295) {
+      const b1 = (intVal >>> 24) & 255;
+      const b2 = (intVal >>> 16) & 255;
+      if (b1 === 127 || (b1 === 169 && b2 === 254) || intVal === 0) {
+        return { type: "dword_ip_ssrf", target: `${b1}.${b2}...` };
+      }
+    }
+  }
+
+  // 5. Hexadecimal IP representation (e.g. 0x7f000001, 0x7f.0.0.1, 0xa9fea9fe)
+  if (/^0x[0-9a-f]+$/i.test(clean)) {
+    const intVal = parseInt(clean, 16);
+    const b1 = (intVal >>> 24) & 255;
+    const b2 = (intVal >>> 16) & 255;
+    if (b1 === 127 || (b1 === 169 && b2 === 254) || intVal === 0) {
+      return { type: "hex_ip_ssrf", target: clean };
+    }
+  }
+
+  // 6. Octal IP representation (e.g. 0177.0.0.1, 017700000001)
+  if (/^0[0-7]+$/i.test(clean)) {
+    const intVal = parseInt(clean, 8);
+    const b1 = (intVal >>> 24) & 255;
+    const b2 = (intVal >>> 16) & 255;
+    if (b1 === 127 || (b1 === 169 && b2 === 254) || intVal === 0) {
+      return { type: "octal_ip_ssrf", target: clean };
+    }
+  }
+
+  return null;
 }
 
 export class UrlDetector {
@@ -92,6 +186,7 @@ export class UrlDetector {
     const protocol = parsed.protocol.toLowerCase();
     const search = parsed.search;
     const port = parsed.port;
+    const username = parsed.username;
     const registrableDomain = BrandRegistry.getRegistrableDomain(hostname);
     const tld = hostname.split(".").pop();
 
@@ -102,28 +197,28 @@ export class UrlDetector {
       port,
       path: pathname,
       query: search,
+      username,
       tld,
       isPunycode: hostname.startsWith("xn--") || hostname.includes(".xn--"),
     };
 
-    // 1. SSRF Network Protection Check (Loopback, Cloud Metadata, Localhost)
-    for (const pattern of HARD_SSRF_TARGETS) {
-      if (pattern.test(hostname)) {
-        signals.push(
-          createSignal({
-            type: LAYER_1_REASONS.SSRF_ATTEMPT,
-            category: "network",
-            severity: SIGNAL_SEVERITY.CRITICAL,
-            confidence: 0.99,
-            evidence: { matchedText: hostname, details: "Targeting blocked loopback or cloud metadata endpoint" },
-            source: "UrlDetector",
-          })
-        );
-        return { signals, isWhitelisted: false, parsedStructure };
-      }
+    // 1. SSRF Network Protection Check (Loopback, Dword, Hex, Octal, Cloud Metadata, Localhost)
+    const ssrfMatch = checkSsrfTarget(hostname);
+    if (ssrfMatch) {
+      signals.push(
+        createSignal({
+          type: LAYER_1_REASONS.SSRF_ATTEMPT,
+          category: "network",
+          severity: SIGNAL_SEVERITY.CRITICAL,
+          confidence: 0.99,
+          evidence: { matchedText: hostname, details: `SSRF Target Detected (${ssrfMatch.type}: ${ssrfMatch.target})` },
+          source: "UrlDetector",
+        })
+      );
+      return { signals, isWhitelisted: false, parsedStructure };
     }
 
-    // 2. Whitelist Verification
+    // 2. Whitelist Verification (Authentic .edu.vn, .gov.vn, or trusted canonical domains)
     if (BrandRegistry.isWhitelistedDomain(hostname)) {
       isWhitelisted = true;
       signals.push(
@@ -132,23 +227,37 @@ export class UrlDetector {
           category: "url",
           severity: SIGNAL_SEVERITY.INFO,
           confidence: LAYER_1_CONFIG.CONFIDENCE_BOUNDS.WHITELIST_PASS,
-          evidence: { matchedText: hostname, details: "Verified authentic higher education / government domain" },
+          evidence: { matchedText: hostname, details: "Verified authentic higher education / government / trusted domain" },
           source: "UrlDetector",
         })
       );
       return { signals, isWhitelisted: true, parsedStructure };
     }
 
-    // 3. Dangerous File Extension in URL Path
+    // 3. Userinfo Spoofing Trick (e.g. http://google.com@evil.com)
+    if (username || normUrl.original.includes("@")) {
+      signals.push(
+        createSignal({
+          type: LAYER_1_REASONS.PHISHING_PATTERN,
+          category: "url",
+          severity: SIGNAL_SEVERITY.HIGH,
+          confidence: 0.85,
+          evidence: { matchedText: username || "@", details: "Deceptive Userinfo embedding in URL authority (user@host spoofing)" },
+          source: "UrlDetector",
+        })
+      );
+    }
+
+    // 4. Dangerous File Extension in URL Path
     for (const ext of DANGEROUS_EXTENSIONS) {
-      if (pathname.endsWith(ext) || pathname.includes(ext + "?")) {
+      if (pathname.endsWith(ext) || pathname.includes(ext + "?") || pathname.includes(ext + "/")) {
         signals.push(
           createSignal({
             type: LAYER_1_REASONS.DANGEROUS_EXECUTABLE,
             category: "url",
             severity: SIGNAL_SEVERITY.CRITICAL,
             confidence: LAYER_1_CONFIG.DETECTOR_RELIABILITY.KNOWN_MALICIOUS_SIGNATURE,
-            evidence: { matchedText: ext, details: `URL directly points to executable payload (${ext})` },
+            evidence: { matchedText: ext, details: `URL directly points to executable payload (${ext.toUpperCase()})` },
             source: "UrlDetector",
           })
         );
@@ -156,76 +265,130 @@ export class UrlDetector {
       }
     }
 
-    // 4. Unicode Homoglyphs & Mixed Script / Punycode
+    // 5. Unicode Homoglyphs & Mixed Script / Punycode Deception
     const hasHomoglyphs = HOMOGLYPH_SCRIPTS_REGEX.test(hostname);
-    if (parsedStructure.isPunycode || hasHomoglyphs) {
+    const resolvedHost = resolveHomoglyphText(hostname);
+    if (parsedStructure.isPunycode || hasHomoglyphs || resolvedHost !== hostname) {
       signals.push(
         createSignal({
           type: LAYER_1_REASONS.UNICODE_HOMOGLYPH,
           category: "url",
           severity: SIGNAL_SEVERITY.CRITICAL,
           confidence: LAYER_1_CONFIG.DETECTOR_RELIABILITY.HOMOGLYPH_BRAND,
-          evidence: { matchedText: hostname, details: "Cyrillic/Greek Unicode homoglyph or Punycode deception detected" },
-          source: "UrlDetector",
-        })
-      );
-    }
-
-    // 5. Brand Impersonation in Subdomain / Domain
-    const impersonation = BrandRegistry.checkBrandImpersonation(hostname);
-    if (impersonation) {
-      const isSuspiciousTLD = SUSPICIOUS_TLDS.has(tld);
-      signals.push(
-        createSignal({
-          type: impersonation.isSubdomainHijack
-            ? LAYER_1_REASONS.BRAND_IMPERSONATION_SUBDOMAIN
-            : LAYER_1_REASONS.BRAND_IMPERSONATION,
-          category: "url",
-          severity: impersonation.isSubdomainHijack || isSuspiciousTLD ? SIGNAL_SEVERITY.CRITICAL : SIGNAL_SEVERITY.HIGH,
-          confidence: LAYER_1_CONFIG.DETECTOR_RELIABILITY.DECEPTIVE_SUBDOMAIN,
           evidence: {
             matchedText: hostname,
-            brand: impersonation.brand,
-            actualDomain: impersonation.registrableDomain,
-            details: `Deceptive brand use: '${impersonation.brand}' outside official domains`,
+            resolvedHost,
+            details: "Cyrillic/Greek Unicode homoglyph or Punycode deception detected",
           },
           source: "UrlDetector",
         })
       );
     }
 
-    // 6. Typosquatting Analysis (Levenshtein distance <= 2 for major domains)
+    // 6. Token-Boundary Brand Impersonation in Subdomain / Domain
+    const impersonation = BrandRegistry.checkBrandImpersonation(hostname);
+    const isSuspiciousTLD = SUSPICIOUS_TLDS.has(tld);
+    const hasPhishingPath = HOT_PHISHING_PATH_REGEX.test(pathname);
+
+    if (impersonation) {
+      const isCriticalThreat =
+        impersonation.isSubdomainHijack ||
+        isSuspiciousTLD ||
+        hasPhishingPath ||
+        hasHomoglyphs;
+
+      signals.push(
+        createSignal({
+          type: impersonation.isSubdomainHijack
+            ? LAYER_1_REASONS.BRAND_IMPERSONATION_SUBDOMAIN
+            : LAYER_1_REASONS.BRAND_IMPERSONATION,
+          category: "url",
+          severity: isCriticalThreat ? SIGNAL_SEVERITY.CRITICAL : SIGNAL_SEVERITY.HIGH,
+          confidence: isCriticalThreat ? 0.98 : LAYER_1_CONFIG.DETECTOR_RELIABILITY.DECEPTIVE_SUBDOMAIN,
+          evidence: {
+            matchedText: hostname,
+            brand: impersonation.brand,
+            actualDomain: impersonation.registrableDomain,
+            details: `Deceptive brand impersonation: '${impersonation.brand}' outside official domains`,
+          },
+          source: "UrlDetector",
+        })
+      );
+    }
+
+    // 7. Combosquatting Heuristics (Brand + Action Keyword on unauthorized domain)
     if (!impersonation) {
+      const hostTokens = BrandRegistry.extractTokens(hostname);
+      const hostTokensSet = new Set(hostTokens);
+
       for (const brand of BRAND_REGISTRY) {
-        for (const canonical of brand.canonicalDomains) {
-          const canonicalBase = canonical.split(".")[0];
-          const hostBase = registrableDomain.split(".")[0];
-          if (hostBase.length >= 4 && canonicalBase.length >= 4) {
-            const dist = levenshtein(hostBase, canonicalBase);
-            if (dist >= 1 && dist <= 2) {
-              signals.push(
-                createSignal({
-                  type: LAYER_1_REASONS.TYPOSQUATTING,
-                  category: "url",
-                  severity: SIGNAL_SEVERITY.HIGH,
-                  confidence: LAYER_1_CONFIG.DETECTOR_RELIABILITY.TYPOSQUATTING_DOMAIN,
-                  evidence: {
-                    matchedText: hostname,
-                    targetBrand: brand.name,
-                    canonicalDomain: canonical,
-                    details: `Typosquatting variant of '${canonical}' (Edit distance: ${dist})`,
-                  },
-                  source: "UrlDetector",
-                })
-              );
-              break;
+        let brandMatched = false;
+        for (const alias of brand.aliases) {
+          if (alias.length <= 4 && hostTokensSet.has(alias)) brandMatched = true;
+          else if (alias.length > 4 && hostname.includes(alias)) brandMatched = true;
+        }
+
+        if (brandMatched) {
+          const hasCombosquatWord = COMBOSQUAT_KEYWORDS.some((kw) =>
+            hostTokensSet.has(kw) || hostname.includes(`-${kw}`) || hostname.includes(`${kw}-`)
+          );
+
+          if (hasCombosquatWord) {
+            signals.push(
+              createSignal({
+                type: LAYER_1_REASONS.BRAND_IMPERSONATION,
+                category: "url",
+                severity: isSuspiciousTLD || hasPhishingPath ? SIGNAL_SEVERITY.CRITICAL : SIGNAL_SEVERITY.HIGH,
+                confidence: 0.95,
+                evidence: {
+                  matchedText: hostname,
+                  brand: brand.name,
+                  details: `Combosquatting detected: brand '${brand.name}' combined with action keywords`,
+                },
+                source: "UrlDetector",
+              })
+            );
+            break;
+          }
+        }
+      }
+    }
+
+    // 8. Typosquatting Analysis (Damerau-Levenshtein distance for canonical domains)
+    if (!impersonation && !KNOWN_URL_SHORTENERS.has(hostname)) {
+      const hostBase = registrableDomain.split(".")[0];
+      if (hostBase && hostBase.length >= 4) {
+        for (const brand of BRAND_REGISTRY) {
+          for (const canonical of brand.canonicalDomains) {
+            const canonicalBase = canonical.split(".")[0];
+            if (canonicalBase.length >= 4 && hostBase !== canonicalBase) {
+              const dist = damerauLevenshtein(hostBase, canonicalBase);
+              const maxAllowedDist = canonicalBase.length <= 4 ? 1 : 2;
+              if (dist >= 1 && dist <= maxAllowedDist) {
+                signals.push(
+                  createSignal({
+                    type: LAYER_1_REASONS.TYPOSQUATTING,
+                    category: "url",
+                    severity: SIGNAL_SEVERITY.HIGH,
+                    confidence: LAYER_1_CONFIG.DETECTOR_RELIABILITY.TYPOSQUATTING_DOMAIN,
+                    evidence: {
+                      matchedText: hostname,
+                      targetBrand: brand.name,
+                      canonicalDomain: canonical,
+                      details: `Typosquatting variant of '${canonical}' (Edit distance: ${dist})`,
+                    },
+                    source: "UrlDetector",
+                  })
+                );
+                break;
+              }
             }
           }
         }
       }
     }
 
-    // 7. Raw IP Hostname (IPv4 / IPv6) -> SUSPICIOUS
+    // 9. Raw IP Hostname (IPv4 / IPv6) -> SUSPICIOUS
     const isIPv4 = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname);
     if (isIPv4) {
       signals.push(
@@ -240,7 +403,7 @@ export class UrlDetector {
       );
     }
 
-    // 8. URL Shortener Detection
+    // 10. URL Shortener Detection
     if (KNOWN_URL_SHORTENERS.has(hostname)) {
       signals.push(
         createSignal({
@@ -254,7 +417,7 @@ export class UrlDetector {
       );
     }
 
-    // 9. Unencrypted HTTP Transport
+    // 11. Unencrypted HTTP Transport
     if (protocol === "http:" && !hostname.startsWith("localhost")) {
       signals.push(
         createSignal({
@@ -268,21 +431,21 @@ export class UrlDetector {
       );
     }
 
-    // 10. Credential Harvesting Paths
-    if (CREDENTIAL_PATH_REGEX.test(pathname)) {
+    // 12. Hot Phishing Path Patterns (Biometrics, VNeID, OTP, Scholarship, Tasks)
+    if (hasPhishingPath) {
       signals.push(
         createSignal({
           type: LAYER_1_REASONS.PHISHING_PATH_PATTERN,
           category: "url",
-          severity: SIGNAL_SEVERITY.MEDIUM,
-          confidence: 0.50,
-          evidence: { matchedText: pathname, details: "Path matches sensitive credential/auth endpoint" },
+          severity: isSuspiciousTLD || impersonation ? SIGNAL_SEVERITY.HIGH : SIGNAL_SEVERITY.MEDIUM,
+          confidence: 0.65,
+          evidence: { matchedText: pathname, details: "Path matches high-risk authentication/biometrics/reward phishing endpoint" },
           source: "UrlDetector",
         })
       );
     }
 
-    // 11. Suspicious Query Parameters
+    // 13. Suspicious Query Parameters
     try {
       parsed.searchParams.forEach((val, key) => {
         if (CREDENTIAL_PARAM_REGEX.test(key)) {
@@ -291,7 +454,7 @@ export class UrlDetector {
               type: LAYER_1_REASONS.SUSPICIOUS_QUERY_PARAM,
               category: "url",
               severity: SIGNAL_SEVERITY.HIGH,
-              confidence: 0.70,
+              confidence: 0.75,
               evidence: { matchedText: key, details: `Parameter '${key}' matches credential harvest pattern` },
               source: "UrlDetector",
             })
@@ -299,24 +462,24 @@ export class UrlDetector {
         }
       });
     } catch {
-      // searchParams parsing fallback
+      // ignore param parse errors
     }
 
-    // 12. Suspicious TLD alone
-    if (SUSPICIOUS_TLDS.has(tld) && !impersonation) {
+    // 14. Suspicious TLD alone
+    if (isSuspiciousTLD && !impersonation) {
       signals.push(
         createSignal({
           type: LAYER_1_REASONS.SUSPICIOUS_TLD,
           category: "url",
           severity: SIGNAL_SEVERITY.LOW,
           confidence: 0.35,
-          evidence: { matchedText: `.${tld}`, details: "Low-cost generic TLD frequently observed in spam campaigns" },
+          evidence: { matchedText: `.${tld}`, details: "Low-cost generic TLD frequently observed in spam/phishing campaigns" },
           source: "UrlDetector",
         })
       );
     }
 
-    // 13. Unusual Network Port
+    // 15. Unusual Network Port
     if (port && !["80", "443", ""].includes(port)) {
       signals.push(
         createSignal({

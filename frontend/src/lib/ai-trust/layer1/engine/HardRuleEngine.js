@@ -6,7 +6,7 @@
  */
 
 import { LAYER_1_CONFIG } from "../config/Layer1Config.js";
-import { LAYER_1_REASONS } from "../types.js";
+import { LAYER_1_REASONS, SIGNAL_SEVERITY } from "../types.js";
 
 export class HardRuleEngine {
   /**
@@ -20,6 +20,7 @@ export class HardRuleEngine {
     let maxConfidence = LAYER_1_CONFIG.CONFIDENCE_BOUNDS.HARD_BLOCK_MIN;
 
     const signalTypes = new Set(signals.map((s) => s.type));
+    const criticalSignals = signals.filter((s) => s.severity === SIGNAL_SEVERITY.CRITICAL);
 
     // RULE 1: Known Malicious Shell / Script Payload (P0)
     if (signalTypes.has(LAYER_1_REASONS.MALICIOUS_SHELL_PAYLOAD)) {
@@ -52,25 +53,33 @@ export class HardRuleEngine {
       maxConfidence = Math.max(maxConfidence, 0.98);
     }
 
-    // RULE 4: Deceptive Phishing Domain / Homoglyph / Subdomain Impersonation + Phishing Path / Parameter / Corroboration (P0)
+    // RULE 4: Deceptive Phishing Domain / Homoglyph / Subdomain Impersonation / Typosquatting (P0)
     const hasDomainImpersonation =
       signalTypes.has(LAYER_1_REASONS.BRAND_IMPERSONATION_SUBDOMAIN) ||
       signalTypes.has(LAYER_1_REASONS.UNICODE_HOMOGLYPH) ||
-      signalTypes.has(LAYER_1_REASONS.BRAND_IMPERSONATION);
+      signalTypes.has(LAYER_1_REASONS.BRAND_IMPERSONATION) ||
+      signalTypes.has(LAYER_1_REASONS.TYPOSQUATTING);
 
     const hasCorroboratingSignal =
       signalTypes.has(LAYER_1_REASONS.PHISHING_PATH_PATTERN) ||
       signalTypes.has(LAYER_1_REASONS.SUSPICIOUS_QUERY_PARAM) ||
       signalTypes.has(LAYER_1_REASONS.CREDENTIAL_REQUEST) ||
       signalTypes.has(LAYER_1_REASONS.UNENCRYPTED_TRANSPORT) ||
-      signalTypes.has(LAYER_1_REASONS.SUSPICIOUS_TLD);
+      signalTypes.has(LAYER_1_REASONS.SUSPICIOUS_TLD) ||
+      signalTypes.has(LAYER_1_REASONS.SHORTENED_URL);
 
-    if (hasDomainImpersonation && (hasCorroboratingSignal || signalTypes.has(LAYER_1_REASONS.BRAND_IMPERSONATION_SUBDOMAIN) || signalTypes.has(LAYER_1_REASONS.UNICODE_HOMOGLYPH))) {
+    const hasCriticalDomainThreat =
+      signalTypes.has(LAYER_1_REASONS.BRAND_IMPERSONATION_SUBDOMAIN) ||
+      signalTypes.has(LAYER_1_REASONS.UNICODE_HOMOGLYPH) ||
+      criticalSignals.some((s) => s.category === "url" && s.type.includes("brand"));
+
+    if (hasCriticalDomainThreat || (hasDomainImpersonation && hasCorroboratingSignal)) {
       matchedRules.push("RULE_DECEPTIVE_DOMAIN_AND_PHISHING_PATH");
       reasons.add(LAYER_1_REASONS.PHISHING_PATTERN);
       if (signalTypes.has(LAYER_1_REASONS.BRAND_IMPERSONATION_SUBDOMAIN)) reasons.add(LAYER_1_REASONS.BRAND_IMPERSONATION_SUBDOMAIN);
       if (signalTypes.has(LAYER_1_REASONS.UNICODE_HOMOGLYPH)) reasons.add(LAYER_1_REASONS.UNICODE_HOMOGLYPH);
       if (signalTypes.has(LAYER_1_REASONS.BRAND_IMPERSONATION)) reasons.add(LAYER_1_REASONS.BRAND_IMPERSONATION);
+      if (signalTypes.has(LAYER_1_REASONS.TYPOSQUATTING)) reasons.add(LAYER_1_REASONS.TYPOSQUATTING);
       maxConfidence = Math.max(maxConfidence, 0.98);
     }
 

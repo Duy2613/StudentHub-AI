@@ -26,8 +26,12 @@ import { motion, AnimatePresence } from "motion/react";
 import Layer1TelemetryHUD from "@/components/trust/Layer1TelemetryHUD";
 import Layer1LivePrechecker from "@/components/trust/Layer1LivePrechecker";
 import Layer1BenchmarkStudio from "@/components/trust/Layer1BenchmarkStudio";
+import Layer2SemanticHUD from "@/components/trust/Layer2SemanticHUD";
+import Layer2BenchmarkStudio from "@/components/trust/Layer2BenchmarkStudio";
 import { screenLayer1 } from "@/lib/ai-trust/layer1/scanner";
 import { LAYER_1_STATUS } from "@/lib/ai-trust/layer1/types";
+import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticService";
+import { LAYER_2_STATUS } from "@/lib/ai-trust/layer2/types";
 
 export default function ScamCheckPage() {
   const router = useRouter();
@@ -37,44 +41,49 @@ export default function ScamCheckPage() {
   const [scanProgress, setScanProgress] = useState(0);
   const [currentLayerScan, setCurrentLayerScan] = useState(1);
   const [layer1Result, setLayer1Result] = useState(null);
+  const [layer2Result, setLayer2Result] = useState(null);
   const [deepScanResult, setDeepScanResult] = useState(null);
-  const [activeResultTab, setActiveResultTab] = useState("l1"); // 'l1' | 'ai' | 'expert' | 'xai'
+  const [activeResultTab, setActiveResultTab] = useState("l1"); // 'l1' | 'l2' | 'ai' | 'expert'
+  const [activeBenchmarkTab, setActiveBenchmarkTab] = useState("l1"); // 'l1' | 'l2'
   const [sharedNotice, setSharedNotice] = useState(false);
 
   // Triggered when user selects a benchmark case or submits input from prechecker
-  const handleExecuteScan = async ({ type, content, metadata = null }) => {
+  const handleExecuteScan = async ({ type, content, metadata = null, layer1Result: forcedL1 = null }) => {
     if (!content && !metadata) return;
 
     saffronAudio.playHardwareKey();
     setIsScanning(true);
-    setScanProgress(25);
+    setScanProgress(20);
     setCurrentLayerScan(1);
     setLayer1Result(null);
+    setLayer2Result(null);
     setDeepScanResult(null);
     setActiveResultTab("l1");
 
     try {
-      // Step 1: Call Layer 1 Authoritative Screening (via API or Client Runner fallback)
-      let l1Res;
-      try {
-        const response = await fetch("/api/ai-trust/screen", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type, content, metadata }),
-        });
-        if (response.ok) {
-          l1Res = await response.json();
-        } else {
+      // Step 1: Call Layer 1 Authoritative Screening
+      let l1Res = forcedL1;
+      if (!l1Res) {
+        try {
+          const response = await fetch("/api/ai-trust/screen", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type, content, metadata }),
+          });
+          if (response.ok) {
+            l1Res = await response.json();
+          } else {
+            l1Res = await screenLayer1({ type, content, metadata });
+          }
+        } catch {
           l1Res = await screenLayer1({ type, content, metadata });
         }
-      } catch {
-        l1Res = await screenLayer1({ type, content, metadata });
       }
 
       setLayer1Result(l1Res);
-      setScanProgress(50);
+      setScanProgress(45);
 
-      // Evaluate Early Exit: If BLOCK -> STOP immediately!
+      // Evaluate Layer 1 Early Exit: If BLOCK -> STOP immediately!
       if (l1Res.status === LAYER_1_STATUS.BLOCK) {
         setTimeout(() => {
           setScanProgress(100);
@@ -84,58 +93,85 @@ export default function ScamCheckPage() {
         return;
       }
 
-      // Step 2: If SUSPICIOUS or PASS -> Forward to Layer 2 & 3
-      setTimeout(() => {
-        saffronAudio.playClick(750);
-        setScanProgress(75);
-        setCurrentLayerScan(2);
-      }, 400);
+      // Step 2: Layer 2 Semantic & Contextual Verification
+      saffronAudio.playClick(750);
+      setScanProgress(65);
+      setCurrentLayerScan(2);
 
+      let l2Res;
+      try {
+        const l2Response = await fetch("/api/ai-trust/semantic", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, content, metadata, layer1Result: l1Res }),
+        });
+        if (l2Response.ok) {
+          l2Res = await l2Response.json();
+        } else {
+          l2Res = await Layer2SemanticService.verify({ type, content, metadata, layer1Result: l1Res });
+        }
+      } catch {
+        l2Res = await Layer2SemanticService.verify({ type, content, metadata, layer1Result: l1Res });
+      }
+
+      setLayer2Result(l2Res);
+      setScanProgress(80);
+
+      // Evaluate Layer 2 Early Exit: If BLOCK -> STOP!
+      if (l2Res.status === LAYER_2_STATUS.BLOCK) {
+        setTimeout(() => {
+          setScanProgress(100);
+          setIsScanning(false);
+          setActiveResultTab("l2");
+          saffronAudio.playAlertBuzz();
+        }, 300);
+        return;
+      }
+
+      // Step 3 & 4: Forward to Layer 3 & 4
       setTimeout(() => {
         saffronAudio.playClick(900);
-        setScanProgress(90);
+        setScanProgress(92);
         setCurrentLayerScan(3);
-      }, 800);
+      }, 350);
 
       setTimeout(() => {
         setScanProgress(100);
         setCurrentLayerScan(4);
         setIsScanning(false);
+        setActiveResultTab("l2");
 
-        const isScam = l1Res.status === LAYER_1_STATUS.SUSPICIOUS;
-        if (isScam) {
+        const isThreat = l2Res.status === LAYER_2_STATUS.SUSPICIOUS || l1Res.status === LAYER_1_STATUS.SUSPICIOUS;
+        if (isThreat) {
           saffronAudio.playAlertBuzz();
         } else {
           saffronAudio.playSuccessChime();
         }
 
-        // Deep Layer Synthesis for L2-L4
+        // Deep Layer Synthesis
         setDeepScanResult({
           title: type === "url" ? `Kiểm tra địa chỉ: ${content}` : "Phân tích nội dung khả nghi",
           input: content,
-          risk: isScam ? 75 : 8,
-          status: isScam ? "suspicious" : "safe",
-          label: isScam ? "Đáng ngờ (Cần đối chiếu nâng cao)" : "Nguồn tin an toàn (Xác minh)",
-          aiAnalysis: isScam
-            ? [
-                "Phát hiện tên miền hoặc văn bản có đặc điểm bất thường cần lưu ý.",
-                "Giao diện hoặc cấu trúc đường link có dấu hiệu che giấu máy chủ thật.",
-                "Khuyến cáo sinh viên không vội chuyển tiền hoặc nhập thông tin đăng nhập.",
-              ]
-            : [
-                "Không phát hiện dấu hiệu bẫy tài chính hoặc chiếm đoạt thông tin.",
-                "Tên miền / thông tin phù hợp với mẫu văn bản an toàn.",
-              ],
+          risk: isThreat ? 75 : 8,
+          status: isThreat ? "suspicious" : "safe",
+          label: isThreat ? "Đáng ngờ (Cần đối chiếu Layer 3)" : "Nguồn tin an toàn (Xác minh)",
+          aiAnalysis: [
+            l2Res.semanticSummary,
+            `Mục đích nhận diện: ${l2Res.intent?.primary?.toUpperCase()} (Tính thao túng: ${l2Res.intent?.coercive ? "CÓ" : "KHÔNG"})`,
+            l2Res.claims?.length > 0
+              ? `Trích xuất ${l2Res.claims.length} phát ngôn sự kiện cần xác minh nguồn tin tại Layer 3.`
+              : "Không phát hiện mâu thuẫn thời gian hay bẫy chiếm đoạt thông tin.",
+          ],
           expertFeedback: {
             expertName: "TS. Nguyễn Minh Đức (An ninh Mạng)",
             trustScore: 98,
             badge: "⭐ Chuyên Gia Uy Tín",
-            comment: isScam
-              ? "Cần cẩn trọng khi tương tác với đường link hoặc thông báo này. Hãy kiểm tra lại qua kênh chính thức của nhà trường."
+            comment: isThreat
+              ? "Cần cẩn trọng khi tương tác với thông báo này. Hãy kiểm tra lại qua kênh chính thức của nhà trường hoặc ngân hàng."
               : "Nội dung an toàn, sinh viên có thể yên tâm tiếp tục tham khảo theo quy định.",
           },
         });
-      }, 1300);
+      }, 700);
     } catch (err) {
       console.error("Scan execution failed:", err);
       setIsScanning(false);
@@ -258,7 +294,7 @@ export default function ScamCheckPage() {
               onShareToForum={handleShareToForum}
             />
 
-            {/* Sub-Tabs for Extended Insights (L2 - L4) */}
+            {/* Sub-Tabs for Extended Insights (L1 - L4) */}
             <div className="flex items-center gap-2 border-b border-[#47140b] pb-2 overflow-x-auto">
               <button
                 type="button"
@@ -275,6 +311,23 @@ export default function ScamCheckPage() {
                 [01] LAYER 1 VERDICT
               </button>
 
+              {layer2Result && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    saffronAudio.playClick(620);
+                    setActiveResultTab("l2");
+                  }}
+                  className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                    activeResultTab === "l2"
+                      ? "bg-[#ffbc09] text-[#150604] shadow-md shadow-[#ffbc09]/20"
+                      : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  [02] LAYER 2 SEMANTIC
+                </button>
+              )}
+
               {deepScanResult && (
                 <>
                   <button
@@ -289,7 +342,7 @@ export default function ScamCheckPage() {
                         : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    [02] AI DEEP RAG
+                    [03] AI DEEP RAG
                   </button>
 
                   <button
@@ -304,13 +357,28 @@ export default function ScamCheckPage() {
                         : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    [03] EXPERT OPINION
+                    [04] EXPERT OPINION
                   </button>
                 </>
               )}
             </div>
 
-            {/* TAB CONTENT */}
+            {/* TAB CONTENT: LAYER 1 */}
+            {activeResultTab === "l1" && layer1Result && (
+              <Layer1TelemetryHUD
+                result={layer1Result}
+                onShareToForum={handleShareToForum}
+              />
+            )}
+
+            {/* TAB CONTENT: LAYER 2 */}
+            {activeResultTab === "l2" && layer2Result && (
+              <Layer2SemanticHUD
+                result={layer2Result}
+              />
+            )}
+
+            {/* TAB CONTENT: AI DEEP RAG */}
             {activeResultTab === "ai" && deepScanResult && (
               <div className="p-6 rounded-2xl bg-[#0f0504]/90 border border-[#47140b] backdrop-blur-2xl space-y-4">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2 font-human">
@@ -333,6 +401,7 @@ export default function ScamCheckPage() {
               </div>
             )}
 
+            {/* TAB CONTENT: EXPERT OPINION */}
             {activeResultTab === "expert" && deepScanResult && (
               <div className="p-6 rounded-2xl bg-[#0f0504]/90 border border-[#47140b] backdrop-blur-2xl space-y-4">
                 <div className="flex items-center gap-3">
@@ -374,16 +443,54 @@ export default function ScamCheckPage() {
         )}
 
         {/* SECTION 4: Benchmark Preset Verification Studio */}
-        <SaffronSwissCrosshairGrid sectionTag="02 // BENCHMARK VERIFICATION SUITE" className="mb-8">
-          <Layer1BenchmarkStudio
-            onSelectPreset={(preset) => {
-              handleExecuteScan({
-                type: preset.type,
-                content: preset.input,
-                metadata: preset.metadata,
-              });
-            }}
-          />
+        <SaffronSwissCrosshairGrid sectionTag="02 // MULTI-LAYER BENCHMARK SUITE" className="mb-8">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveBenchmarkTab("l1")}
+                className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                  activeBenchmarkTab === "l1"
+                    ? "bg-[#ffbc09] text-black shadow-lg shadow-[#ffbc09]/20"
+                    : "bg-white/5 hover:bg-white/10 text-[#ece7e0]/70 border border-white/10"
+                }`}
+              >
+                🛡️ Layer 1 Sàng Lọc Nhanh (120+ Tests)
+              </button>
+              <button
+                onClick={() => setActiveBenchmarkTab("l2")}
+                className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                  activeBenchmarkTab === "l2"
+                    ? "bg-[#ffbc09] text-black shadow-lg shadow-[#ffbc09]/20"
+                    : "bg-white/5 hover:bg-white/10 text-[#ece7e0]/70 border border-white/10"
+                }`}
+              >
+                🧠 Layer 2 Phân Tích Ngữ Nghĩa (14+ Tests)
+              </button>
+            </div>
+
+            {activeBenchmarkTab === "l1" ? (
+              <Layer1BenchmarkStudio
+                onSelectPreset={(preset) => {
+                  handleExecuteScan({
+                    type: preset.type,
+                    content: preset.input,
+                    metadata: preset.metadata,
+                  });
+                }}
+              />
+            ) : (
+              <Layer2BenchmarkStudio
+                onSelectPreset={(preset) => {
+                  handleExecuteScan({
+                    type: preset.type,
+                    content: preset.content,
+                    metadata: preset.metadata,
+                    layer1Result: preset.layer1Result,
+                  });
+                }}
+              />
+            )}
+          </div>
         </SaffronSwissCrosshairGrid>
       </main>
     </div>

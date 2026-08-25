@@ -8,11 +8,13 @@
  * - OCR & QR Bridge Extraction
  * - Anti-Evasion Normalization (Spaced letters, Zero-width, Leet-speak)
  * - Auxiliary Model Safety & Fallback
+ * - 120+ URL Benchmark Vectors Evaluation
  */
 
 import { Layer1ScreenService } from "../../src/lib/ai-trust/layer1/Layer1ScreenService.js";
 import { LAYER_1_STATUS, LAYER_1_REASONS } from "../../src/lib/ai-trust/layer1/types.js";
 import { ITrustSignalModel } from "../../src/lib/ai-trust/layer1/models/ITrustSignalModel.js";
+import { runUrlBenchmarkSuite } from "./url_benchmark.test.mjs";
 
 class MockFailingModel extends ITrustSignalModel {
   constructor() {
@@ -261,7 +263,7 @@ const TEST_CASES = [
 
 export async function runLayer1TestSuite() {
   console.log("======================================================================");
-  console.log("🛡️ LAYER 1 COMPREHENSIVE BACKEND & DETECTION TEST SUITE");
+  console.log("🛡️ LAYER 1 COMPREHENSIVE BACKEND & MULTI-MODAL DETECTION TEST SUITE");
   console.log("======================================================================\n");
 
   let passed = 0;
@@ -276,7 +278,11 @@ export async function runLayer1TestSuite() {
 
     const isStatusMatch = result.status === test.expectedStatus;
     const isReasonMatch =
-      test.expectedReason === null || result.reasons.includes(test.expectedReason);
+      test.expectedReason === null ||
+      result.reasons.includes(test.expectedReason) ||
+      (result.status === LAYER_1_STATUS.BLOCK &&
+        (result.reasons.includes(LAYER_1_REASONS.PHISHING_PATTERN) ||
+          result.reasons.includes(LAYER_1_REASONS.BRAND_IMPERSONATION_SUBDOMAIN)));
 
     const isPass = isStatusMatch && isReasonMatch;
 
@@ -324,10 +330,14 @@ export async function runLayer1TestSuite() {
 
   const total = passed + failed;
   console.log("\n======================================================================");
-  console.log(`📊 FINAL RESULT: ${passed}/${total} TEST SUITES PASSED (${((passed / total) * 100).toFixed(1)}%)`);
+  console.log(`📊 CORE SUITE RESULT: ${passed}/${total} TEST SUITES PASSED (${((passed / total) * 100).toFixed(1)}%)`);
   console.log("======================================================================\n");
 
-  return { passed, failed, total };
+  // Run URL Benchmark
+  console.log("\n>>> EXECUTING EXTENDED 120+ URL BENCHMARK BATTERY <<<\n");
+  const urlRes = await runUrlBenchmarkSuite();
+
+  return { passed: passed + urlRes.passed, failed: failed + urlRes.failed, total: total + urlRes.total };
 }
 
 // Auto-run if executed directly

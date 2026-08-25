@@ -7,6 +7,10 @@
     "build": "cd frontend && npm run build",
     "start": "cd frontend && npm run start",
     "lint": "cd frontend && npm run lint",
+    "test:layer1": "node frontend/tests/layer1/layer1.test.mjs",
+    "test:url": "node frontend/tests/layer1/url_benchmark.test.mjs",
+    "test:layer2": "node frontend/tests/layer2/layer2.test.mjs",
+    "test:all": "node frontend/tests/layer1/full_multimodal_evaluation.test.mjs && node frontend/tests/layer2/layer2.test.mjs",
     "sync-vault": "node ./scripts/sync-vault-context.mjs",
     "vault": "powershell -ExecutionPolicy Bypass -File ./scripts/register-obsidian-vault.ps1"
   }
