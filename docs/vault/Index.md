@@ -55,8 +55,9 @@ graph TD
 - [[Academic-Action-Workflow-V1|⚡ Academic Action & Workflow Center V1]]: Action Intent → Action Plan → Task State Machine → Multi-Step Execution → Verification → Reconciliation.
 - [[Academic-Workflow-Persistence-V1|💾 Durable Academic Workflow Persistence V1]]: Crash-Safe Journaling → Startup Rehydration → Concurrency Control → Restart Recovery.
 - [[Academic-Digital-Twin-V1|👤 Student Academic Digital Twin & Eligibility Engine V1]]: Authoritative Single Source of Truth → Typed Requirement Evaluators → Auto-Reconciliation.
-- [[Academic-Notification-Orchestration-V1|🔔 Academic Notification & Deadline Orchestration V1]]: Deadline Intelligence → Reminder Policy → Notification Orchestrator → Auto-Cancellation → Multi-Tenant Authorization.
 - [[Authoritative-Student-Identity-And-Records-V1|🪪 Authoritative Student Identity & Academic Records V1]]: Supabase Auth Integration → Canonical Identity & Records Store → Centralized AcademicClock → Sync Bridge.
+- [[Student-Identity-Profile-360-V1|👤 Student Identity & Authoritative Academic Profile 360 V1]]: Unified Single Source of Truth → Freshness & Conflict Engine → Version-Pinned Sync Bridge.
+- [[Academic-Data-Provenance-Matrix-V1|📊 Academic Data Provenance & Source-of-Truth Matrix V1]]: Field-Level Authority Hierarchy → Precedence Rules → Freshness Windows.
 - [[AI-Trust-Layer1-Screening-Spec|Layer 1 Screening Engine]]: Động cơ sàng lọc nhanh & tất định (Hard Rules + Confidence Scoring).
 - [[AI-Trust-Layer2-Semantic-Spec|Layer 2 Semantic Reasoning]]: Động cơ phân tích ngữ nghĩa, ý định, trích xuất phát ngôn & mâu thuẫn nội tại.
 - [[AI-Trust-Layer3-Evidence-Spec|Layer 3 Evidence Engine]]: Động cơ đối soát nguồn tin chính thống, phát hiện mâu thuẫn & phân cụm bản sao bài viết.

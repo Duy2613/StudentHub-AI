@@ -41,6 +41,7 @@ export class StudentDigitalTwinModel {
     asOf = null,
     isStale = false,
     revision = 1,
+    evaluatedAgainstProfileRevision = null,
     version = "1.0",
     metadata = {}
   }) {
@@ -108,6 +109,7 @@ export class StudentDigitalTwinModel {
       asOf: asOf || new Date().toISOString(),
       isStale: Boolean(isStale),
       revision: typeof revision === "number" ? revision : 1,
+      evaluatedAgainstProfileRevision: typeof evaluatedAgainstProfileRevision === "number" ? evaluatedAgainstProfileRevision : null,
       version: String(version).trim(),
       metadata: { ...metadata }
     };
