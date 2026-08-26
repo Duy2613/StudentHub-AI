@@ -12,10 +12,10 @@ describe("CommunityIntelligenceE2E", () => {
   });
 
   it("should run full E2E flow: load stored experiences -> evaluate consensus -> calculate median duration", () => {
-    const toeicPosts = CommunityStore.getPostsByTopic("TOEIC_SUBMISSION");
+    const toeicPosts = CommunityStore.getPostsByTopic("TOEIC_SUBMISSION_TIME");
     assert.ok(toeicPosts.length >= 3);
 
-    const consensus = CommunityExperienceEngine.evaluateConsensus("TOEIC_SUBMISSION", toeicPosts);
+    const consensus = CommunityExperienceEngine.evaluateConsensus("TOEIC_SUBMISSION_TIME", toeicPosts);
 
     assert.strictEqual(consensus.consensusSignal, CONSENSUS_SIGNAL.STRONG_EXPERIENCE_CONSENSUS);
     assert.strictEqual(consensus.independentAccountsCount, 3);

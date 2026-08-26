@@ -1,81 +1,94 @@
-# 👥 Community & Forum Intelligence V1 (Phase T3)
+# 👥 Community Intelligence V1 (Phase T3 — Comprehensive Architecture Spec)
 
-## 1. Executive Overview
+## 1. Executive Summary
 
-**Community Intelligence V1** is the third standalone intelligence subsystem of the **StudentHub Intelligence OS**, providing the **Real-World Experience Layer**.
+**Community Intelligence V1** is the third standalone intelligence pillar of the **StudentHub Intelligence OS**. It provides the **Real-World Experience Layer**, empirical **Procedure Duration Tracking**, **Multi-Account Experience Consensus**, and robust defense mechanisms against sockpuppets and coordinated astroturfing.
 
 ```text
-STUDENT COMMUNITY POST / COMMENT
-  │
-  ▼
-CONTENT CLASSIFICATION
-(First-Hand Experience • Guide • Second-Hand Report • Question • Opinion • Speculation)
-  │
-  ▼
-CONTENT HASH & FINGERPRINTING
-(Collapses identical texts/links into single provenance clusters)
-  │
-  ▼
-ASTROTURFING & SYBIL DEFENSE
-(Detects coordinated copy-paste & commercial spam links -> SUSPECTED_COORDINATION)
-  │
-  ▼
-EXPERIENCE CONSENSUS ENGINE
-(>= 3 independent accounts with unique phrasing -> STRONG_EXPERIENCE_CONSENSUS)
-  │
-  ▼
-REAL-WORLD PROCEDURE DURATION & EDGE-CASE MINING
-(Calculates median procedure completion days across actual cohorts)
+==================================================================================
+           COMMUNITY EXPERIENCE NEVER CREATES OFFICIAL ACADEMIC POLICY
+==================================================================================
+Community reports capture OPERATIONAL REALITY (e.g. real turnaround times, friction 
+points, and edge-cases), but when conflicting with published academic guidelines, 
+the Registrar Office decisions remain the sole authoritative ground truth.
+==================================================================================
 ```
 
 ---
 
-## 2. Core Invariant: `COMMUNITY EXPERIENCE NEVER CREATES OFFICIAL ACADEMIC POLICY`
+## 2. System Topology & Operational Pipeline
 
-1. **Real-World Experience vs Academic Authority**:
-   Ý kiến hoặc chia sẻ của sinh viên trên diễn đàn đóng vai trò là **lớp dữ liệu thực tế** (thời gian xử lý thực tế, kinh nghiệm nộp hồ sơ, edge cases), nhưng **tuyệt đối không bao giờ được phép tự biến thành quy chế học vụ chính thức**.
-2. **Experience Consensus thay vì Upvote Vanity**:
-   1000 lượt upvote vào 1 bài viết tin đồn hoặc bot spam **không tạo ra đồng thuận kinh nghiệm**.
-   Đồng thuận kinh nghiệm mạnh (`STRONG_EXPERIENCE_CONSENSUS`) bắt buộc phải có **tối thiểu 3 sinh viên độc lập**, với **nội dung diễn đạt độc lập**, trong cùng một khung thời gian quy trình.
-3. **Phòng Thủ Thao Túng & Astroturfing (Suspected Coordination)**:
-   Khi nhiều tài khoản đăng nội dung giống hệt nhau hoặc spam cùng một liên kết thương mại, hệ thống gom lại thành **1 Cụm Xuất Xứ (Provenance Cluster)** và gắn cờ `SUSPECTED_COORDINATION`.
+```text
+STUDENT EXPERIENCE REPORT / FORUM THREAD
+  │
+  ▼
+SALTED IDENTITY PRIVACY & ANONYMIZATION
+(Converts SV21110001 -> STUDENT_K21_3FA28D01; preserves cohort & verification badge)
+  │
+  ▼
+7-DIMENSIONAL CONTENT CLASSIFICATION
+(FIRST_HAND_EXPERIENCE • PRACTICAL_TIP • PROCEDURE_TIMELINE • EDGE_CASE_WARNING • 
+ OPINION_REVIEW • SECOND_HAND_REPORT • UNVERIFIED_RUMOR • SPAM_OR_PROMOTION)
+  │
+  ▼
+ADVERSARIAL MANIPULATION SHIELD
+(Fingerprint hashing for copy-paste syndication • Device clustering for sockpuppets • 
+ Repeated promotional vendor link detection)
+  │
+  ▼
+REAL-WORLD EXPERIENCE CONSENSUS GRAPH
+(Evaluates >= 3 independent students across distinct phrasing & semesters)
+  │
+  ▼
+MEDIAN DURATION & EDGE-CASE MINING
+(Calculates empirical turnaround time in days • Highlights pitfalls & system nuances)
+  │
+  ▼
+OFFICIAL REGULATION CONTRAST LAYER
+(Contrasts practical realities against official policy deadlines without conflating them)
+```
 
 ---
 
-## 3. Subsystem Architecture
+## 3. Core Architectural Modules
 
-| Module | File | Role & Invariants |
+| Subsystem Component | File | Operational Invariants |
 | :--- | :--- | :--- |
-| **Domain Model** | [communityIntelligenceModel.js](file:///c:/Users/Duy/Projects/MyProj/StudentHub-AI/frontend/src/lib/intelligence/community/communityIntelligenceModel.js) | Canonical models, enums (`CONTENT_TYPE`, `CONSENSUS_SIGNAL`, `MANIPULATION_RISK`), and entities. |
-| **Experience Engine** | [communityExperienceEngine.js](file:///c:/Users/Duy/Projects/MyProj/StudentHub-AI/frontend/src/lib/intelligence/community/communityExperienceEngine.js) | Content fingerprinting, consensus calculation, median procedure duration, astroturfing defense. |
-| **Community Store** | [communityStore.js](file:///c:/Users/Duy/Projects/MyProj/StudentHub-AI/frontend/src/lib/intelligence/community/communityStore.js) | Persistent store for student experiences across topics. |
-| **Server API Routes** | [route.js](file:///c:/Users/Duy/Projects/MyProj/StudentHub-AI/frontend/src/app/api/community/experience/evaluate/route.js) | Server-authoritative endpoint (`POST /api/community/experience/evaluate`, `GET /api/community/experiences`). |
-| **UI Studio** | [CommunityIntelligenceView.jsx](file:///c:/Users/Duy/Projects/MyProj/StudentHub-AI/frontend/src/components/community/CommunityIntelligenceView.jsx) | Real-World Experience Explorer, Consensus Signal Matrix, and Procedure Duration insights (`/community`). |
+| **Domain Model & State Machines** | [communityIntelligenceModel.js](file:///c:/Users/Duy/Projects/MyProj/StudentHub-AI/frontend/src/lib/intelligence/community/communityIntelligenceModel.js) | Canonical post schema, 7 content types, salted privacy anonymization, and public payload redaction. |
+| **Experience Consensus & Integrity Engine** | [communityExperienceEngine.js](file:///c:/Users/Duy/Projects/MyProj/StudentHub-AI/frontend/src/lib/intelligence/community/communityExperienceEngine.js) | Computes $\ge 3$ independent consensus, median turnaround days, astroturfing detection, and sockpuppet burst clustering. |
+| **Durable Community Store** | [communityStore.js](file:///c:/Users/Duy/Projects/MyProj/StudentHub-AI/frontend/src/lib/intelligence/community/communityStore.js) | Persistent disk JSON store with pre-seeded topics (`TOEIC_SUBMISSION_TIME`, `PREREQUISITE_WAIVER_PRACTICE`, etc.). |
+| **Query & Discrepancy Engine** | [communityQueryEngine.js](file:///c:/Users/Duy/Projects/MyProj/StudentHub-AI/frontend/src/lib/intelligence/community/communityQueryEngine.js) | Answers student questions about real turnaround times while enforcing explicit disclaimers. |
+| **Server API Endpoints** | `api/intelligence/community/...` | Server routes (`GET/POST /posts`, `GET /consensus`, `POST /evaluate`). |
+| **Experience Studio UI** | [CommunityExperienceStudio.jsx](file:///c:/Users/Duy/Projects/MyProj/StudentHub-AI/frontend/src/components/community/CommunityExperienceStudio.jsx) | Interactive UI at `/intelligence/community` with consensus radar, turnaround timer, and edge-case callouts. |
 
 ---
 
-## 4. REST API
+## 4. Adversarial Integrity Defenses
 
-### `POST /api/community/experience/evaluate`
-- **Request**:
-  ```json
-  {
-    "topic": "TOEIC_SUBMISSION"
-  }
-  ```
+1. **Astroturfing & Coordinated Copy-Paste**: Hashes normalized content strings into SHA-256 fingerprints; flags `SUSPECTED_COORDINATION` when multiple accounts repeat identical phrasing.
+2. **Sockpuppet Cluster Detection**: Groups device and network fingerprints; detects burst posting from a single device across multiple pseudo-accounts (`SUSPECTED_SOCKPUPPET`).
+3. **Commercial Vendor Promotion**: Detects repeated third-party links and triggers `ASTROTURFING_PROMOTION`.
+4. **Rumor vs Fact Filter**: Flags hearsay keywords ("nghe nói", "bạn mình bảo") as `UNVERIFIED_RUMOR`.
+5. **Student Privacy Shield**: Generates salted HMAC-like anonymous identifiers (`STUDENT_K21_...`) while retaining verifiable cohort badges.
+
+---
+
+## 5. API Reference
+
+### `GET /api/intelligence/community/consensus?topic=TOEIC_SUBMISSION_TIME`
 - **Response**:
   ```json
   {
     "success": true,
-    "topic": "TOEIC_SUBMISSION",
-    "postsCount": 3,
-    "evaluation": {
+    "consensus": {
+      "topic": "TOEIC_SUBMISSION_TIME",
       "consensusSignal": "STRONG_EXPERIENCE_CONSENSUS",
       "manipulationRisk": "NONE",
       "independentAccountsCount": 3,
-      "provenanceClustersCount": 3,
       "medianProcedureDays": 7,
-      "summary": "Đồng thuận trải nghiệm thực tế mạnh (3 sinh viên độc lập xác nhận cùng mốc quy trình). Thời gian xử lý trung vị thực tế: 7 ngày."
+      "edgeCases": [
+        { "warning": "Scan mờ mã QR kiểm tra sẽ bị từ chối.", "cohort": "K21" }
+      ]
     }
   }
   ```

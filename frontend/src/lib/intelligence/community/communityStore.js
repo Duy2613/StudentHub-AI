@@ -1,16 +1,18 @@
 /**
  * StudentHub AI — Durable Community Intelligence Store V1
  * 
- * Persistent storage and indexing for real-world student experiences,
- * community posts, and consensus graphs.
+ * Provides persistent storage, indexing, querying, and privacy redaction
+ * for student experience reports and consensus metrics.
  */
 
 import fs from "node:fs";
 import path from "node:path";
 import {
   CommunityIntelligenceModel,
-  CONTENT_TYPE
+  CONTENT_TYPE,
+  VERIFICATION_BADGE
 } from "./communityIntelligenceModel.js";
+import { CommunityExperienceEngine } from "./communityExperienceEngine.js";
 
 const DEFAULT_STORE_DIR = path.resolve(process.cwd(), ".data");
 const DEFAULT_STORE_FILE = path.join(DEFAULT_STORE_DIR, "community_intelligence_store.json");
@@ -48,54 +50,58 @@ export class CommunityStore {
   }
 
   static #seedDefaults() {
-    const seed1 = CommunityIntelligenceModel.createCommunityPost({
-      postId: "POST_TOEIC_EXP_01",
-      authorId: "STU_21110001",
+    // Seed 1: TOEIC Verification Turnaround (3 genuine first-hand experiences showing ~7 days median)
+    const p1 = CommunityIntelligenceModel.createCommunityPost({
+      postId: "POST_TOEIC_01",
+      authorId: "SV21110001",
       authorCohort: "K21",
-      topic: "TOEIC_SUBMISSION",
+      topic: "TOEIC_SUBMISSION_TIME",
+      content: "Mình vừa nộp chứng chỉ TOEIC IIG qua cổng online sinhvien.hcmute.edu.vn, mất 7 ngày để Phòng Đào Tạo duyệt.",
       contentType: CONTENT_TYPE.FIRST_HAND_EXPERIENCE,
-      content: "Kinh nghiệm của mình: Nộp chứng chỉ TOEIC trực tiếp tại Phòng Đào Tạo (bàn số 3) mất đúng 7 ngày làm việc để cập nhật lên trang daotao.hcmute.edu.vn.",
       procedureDurationDays: 7,
-      upvotes: 42
+      badge: VERIFICATION_BADGE.VERIFIED_STUDENT,
+      upvotes: 15
     });
 
-    const seed2 = CommunityIntelligenceModel.createCommunityPost({
-      postId: "POST_TOEIC_EXP_02",
-      authorId: "STU_21110045",
+    const p2 = CommunityIntelligenceModel.createCommunityPost({
+      postId: "POST_TOEIC_02",
+      authorId: "SV21110002",
       authorCohort: "K21",
-      topic: "TOEIC_SUBMISSION",
+      topic: "TOEIC_SUBMISSION_TIME",
+      content: "Xác nhận nộp đợt tốt nghiệp tháng 6 mất đúng 6 ngày làm việc là có điểm chuẩn ngoại ngữ trên hệ thống.",
       contentType: CONTENT_TYPE.FIRST_HAND_EXPERIENCE,
-      content: "Hôm qua mình lên phòng đào tạo nộp chứng chỉ IIG, thầy tiếp nhận và hẹn 7 ngày sau kiểm tra lại cổng sinh viên.",
-      procedureDurationDays: 7,
-      upvotes: 28
+      procedureDurationDays: 6,
+      badge: VERIFICATION_BADGE.VERIFIED_STUDENT,
+      upvotes: 12
     });
 
-    const seed3 = CommunityIntelligenceModel.createCommunityPost({
-      postId: "POST_TOEIC_EXP_03",
-      authorId: "STU_22110088",
-      authorCohort: "K22",
-      topic: "TOEIC_SUBMISSION",
+    const p3 = CommunityIntelligenceModel.createCommunityPost({
+      postId: "POST_TOEIC_03",
+      authorId: "SV21110003",
+      authorCohort: "K21",
+      topic: "TOEIC_SUBMISSION_TIME",
+      content: "Kinh nghiệm của mình: nộp vào thứ 2 thì thứ 6 tuần sau được duyệt (tầm 8 ngày tính cả cuối tuần).",
       contentType: CONTENT_TYPE.FIRST_HAND_EXPERIENCE,
-      content: "Mình vừa làm xong thủ tục hậu kiểm chứng chỉ tiếng Anh tuần trước, quy trình mất khoảng 8 ngày là có tích xanh trên hệ thống.",
       procedureDurationDays: 8,
+      badge: VERIFICATION_BADGE.VERIFIED_STUDENT,
       upvotes: 19
     });
 
-    const seed4 = CommunityIntelligenceModel.createCommunityPost({
-      postId: "POST_GRAD_DEFENSE_01",
-      authorId: "STU_20110012",
-      authorCohort: "K20",
-      topic: "GRADUATION_PROJECT",
-      contentType: CONTENT_TYPE.GUIDE,
-      content: "Hướng dẫn bảo vệ đồ án: Cần chuẩn bị 3 cuốn báo cáo bìa mềm nộp cho bộ môn trước ngày hội đồng 5 ngày. Đừng nộp sát giờ vì có thể bị trừ điểm chuyên cần.",
-      procedureDurationDays: 5,
-      upvotes: 65
+    const p4 = CommunityIntelligenceModel.createCommunityPost({
+      postId: "POST_TOEIC_EDGE",
+      authorId: "SV21110004",
+      authorCohort: "K21",
+      topic: "TOEIC_SUBMISSION_TIME",
+      content: "Lưu ý: Nếu scan chứng chỉ bị mờ mã QR kiểm tra của IIG thì hệ thống sẽ từ chối và phải nộp lại từ đầu.",
+      contentType: CONTENT_TYPE.EDGE_CASE_WARNING,
+      badge: VERIFICATION_BADGE.VERIFIED_STUDENT,
+      upvotes: 28
     });
 
-    this.#postsById.set(seed1.postId, seed1);
-    this.#postsById.set(seed2.postId, seed2);
-    this.#postsById.set(seed3.postId, seed3);
-    this.#postsById.set(seed4.postId, seed4);
+    this.#postsById.set(p1.postId, p1);
+    this.#postsById.set(p2.postId, p2);
+    this.#postsById.set(p3.postId, p3);
+    this.#postsById.set(p4.postId, p4);
   }
 
   static flushToDisk() {
@@ -170,20 +176,41 @@ export class CommunityStore {
     return validated;
   }
 
-  static getPost(postId) {
+  static getPost(postId, options = { redactPrivate: true }) {
     this.#ensureHydrated();
     if (!postId) return null;
-    return this.#postsById.get(String(postId).trim()) || null;
+    const post = this.#postsById.get(String(postId).trim()) || null;
+    if (!post) return null;
+    return options.redactPrivate ? CommunityIntelligenceModel.redactForPublic(post) : post;
   }
 
-  static getPostsByTopic(topic) {
+  static getPostsByTopic(topic, options = { redactPrivate: true }) {
     this.#ensureHydrated();
-    const target = (topic || "GENERAL").toUpperCase();
-    return Array.from(this.#postsById.values()).filter(p => p.topic === target);
+    const targetTopic = String(topic || "GENERAL").toUpperCase();
+    const list = Array.from(this.#postsById.values()).filter(p => p.topic === targetTopic);
+    return options.redactPrivate
+      ? list.map(p => CommunityIntelligenceModel.redactForPublic(p))
+      : list;
   }
 
-  static getAllPosts() {
+  static getAllPosts(options = { redactPrivate: true }) {
     this.#ensureHydrated();
-    return Array.from(this.#postsById.values());
+    const list = Array.from(this.#postsById.values());
+    return options.redactPrivate
+      ? list.map(p => CommunityIntelligenceModel.redactForPublic(p))
+      : list;
+  }
+
+  static getConsensus(topic) {
+    this.#ensureHydrated();
+    const targetTopic = String(topic || "GENERAL").toUpperCase();
+    const posts = Array.from(this.#postsById.values()).filter(p => p.topic === targetTopic);
+    return CommunityExperienceEngine.evaluateConsensus(targetTopic, posts);
+  }
+
+  static getAllTopics() {
+    this.#ensureHydrated();
+    const topics = new Set(Array.from(this.#postsById.values()).map(p => p.topic));
+    return Array.from(topics);
   }
 }
