@@ -20,6 +20,7 @@ import { StudentAcademicSyncBridge } from "./studentAcademicSyncBridge.js";
 import { AcademicRecordsStore } from "./academicRecordsStore.js";
 import { StudentProfile360Service } from "./studentProfile360Service.js";
 import { StudentProfile360Store } from "./studentProfile360Store.js";
+import { AcademicRoadmapEngine } from "./academicRoadmapEngine.js";
 
 export const DEFAULT_STUDENT_PROFILE = {
   studentId: "24110001",
@@ -200,6 +201,18 @@ export function getAuthoritativeCommandCenterData(params = {}) {
     warning: null
   };
 
+  const profile360 = StudentProfile360Service.getProfile360(studentProfile.studentId);
+
+  // 7. Build Roadmap Projection from canonical state (no additional fetches)
+  const roadmap = AcademicRoadmapEngine.buildStudentRoadmap(
+    studentProfile.studentId,
+    profile360,
+    digitalTwin,
+    eligibilityResult,
+    academicTasks,
+    []
+  );
+
   return {
     success: true,
     studentProfile,
@@ -213,7 +226,8 @@ export function getAuthoritativeCommandCenterData(params = {}) {
     timelineEvents: trajectory.timelineEvents,
     notifications: persistedNotifications,
     unreadNotificationCount,
-    profile360: StudentProfile360Service.getProfile360(studentProfile.studentId),
+    profile360,
+    roadmap,
     totalActionCount: sortedInsights.filter(i => i.impact === "CRITICAL" || i.impact === "HIGH").length,
     syncStatus,
     timestamp: new Date().toISOString()
