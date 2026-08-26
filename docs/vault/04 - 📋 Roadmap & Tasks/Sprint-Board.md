@@ -34,10 +34,10 @@
   - [x] Bộ kiểm chuẩn Live-Sync 16/16 tests PASS (100.0%).
 - [x] **Phase T1: AI Trust Engine V2 — Self-Verifying Epistemic Intelligence (RELEASE LOCK)**:
   - 13 Epistemic States, Claim Graph DAG with cycle & derivation checks, Semantic Overclaim Detector (UNSUPPORTED_EXTENSION), Active Counter-Evidence & Adversarial Disproof Search, Blind-Spot & Knowledge Gap Detector, Tool Use Firewall, 5-Pass Self-Critique Pipeline, Human Review Packet, Trust Blast Radius, Server API endpoints, and Studio Console UI (`/intelligence/ai-trust`).
-- [ ] **Phase T2: Expert Intelligence V2 (QUEUED — UP NEXT)**:
-  - Multi-signal entity resolution, domain scope graphs, temporal role windows, auditable credentials, research lineage, and conflict-of-interest analysis.
-- [x] **Phase T3: Community & Forum Intelligence V1 (RELEASE LOCK)**:
-  - Contextual segmentation, first-hand claim extraction (8 claim types, 8 evidence statuses), provenance clustering (collapsing copied posts), astroturf and synthetic AI defense, multidimensional experience scoring, contradiction mapping without false averaging.
+- [x] **Phase T2: Expert Intelligence V2 — Verified Expert Knowledge Graph (RELEASE LOCK)**:
+  - Multi-signal entity resolution (ORCID, `@hcmute.edu.vn`, DOIs), identity collision defense (`IDENTITY_AMBIGUOUS`), impersonation guard, temporal credential & role effective intervals, expertise graph (ESTABLISHED/SUPPORTED/EMERGING/LIMITED), authority scope vs institutional power checks (`EXPERTISE ≠ AUTHORITY`), Disagreement Map Engine, "Why this expert?" & "Where NOT to trust" scope boundaries, Conflict of Interest (COI) graph, retraction cascades, 7 canonical query types, studio UI (`/intelligence/experts`).
+- [ ] **Phase T3: Community & Forum Intelligence V2 (QUEUED — UP NEXT)**:
+  - Experience Graph, Context-aware Consensus, Trend Detection, "Official vs Real-world Gap" detection, Astroturf/Sockpuppet multi-dimensional defense.
 - [ ] **Phase T4: Evidence Fusion Layer (QUEUED)**:
   - Fuses Official Academic Source + Expert Knowledge Graph + Community Experience Layer + AI Trust Layer into a unified authoritative Knowledge Object.
 - [ ] **Phase T5: Academic Foresight / Causal Engine (QUEUED)**:
