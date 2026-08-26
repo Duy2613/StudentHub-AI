@@ -135,11 +135,31 @@
        - **API & Giao Diện Chuẩn Tắc Server-First**: Endpoint tổng hợp `GET /api/academic/me/profile-360`, quy trình tiếp nhận đối soát `POST /api/academic/me/discrepancy-report`, trang RSC `/academic/profile` và component tương tác `Profile360View.jsx`.
        - **Tập Kiểm Chuẩn Toàn Diện**: **422/422 Tests PASS (100.0%)** trên 65 test files, 112 suites. **31/31 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
 
+    20. ✅ **Lộ Trình Học Vụ Cá Nhân & Hành Trình Sinh Viên V1 (Personal Academic Roadmap & Student Journey Projection V1 — Canonical Milestone DAG, Curriculum-Aware Rules, 4-Zone Journey View, Graduation Goal Projection, Server-First Architecture)**:
+        - **Hình Chiếu Hạ Nguồn Thuần Túy (`academicRoadmapEngine.js`)**: Không bao giờ tự tạo nguồn sự thật mới hoặc đột biến dữ liệu ngược dòng. Tổng hợp tất định từ Profile 360 + Digital Twin + Eligibility + Workflow + Deadline.
+        - **Mô Hình Cột Mốc Chuẩn Tắc (`academicMilestoneModel.js`)**: 7 loại cột mốc học vụ (`ACADEMIC_PROGRESS`, `GPA_STANDING`, `LANGUAGE_REQUIREMENT`, `TUITION_CLEARANCE`, `THESIS_ELIGIBILITY`, `GRADUATION_APPLICATION`, `GRADUATION`), 8 trạng thái, đồ thị phụ thuộc định hướng (DAG) tĩnh không phụ thuộc heuristic giao diện.
+        - **Đánh Giá Nhận Biết Khung Chương Trình Đào Tạo (`versionedCurricula.js`)**: Phân giải ngưỡng TOEIC chính xác theo khóa nhập học (K23=450, K24=500, K25=500, K26=550). Không bao giờ áp đặt quy chế mới hồi tố lên sinh viên khóa cũ.
+        - **Trình Diễn 4 Tầng Hành Trình & Mục Tiêu Tốt Nghiệp**: NOW (Cần giải quyết ngay) ➔ NEXT (Sẵn sàng) ➔ UPCOMING (Sắp tới) ➔ GOAL (Mục tiêu tốt nghiệp có phân loại độ tin cậy `ESTIMATED`/`VERIFIED`).
+
+    21. ✅ **Giả Lập Hoạch Định Học Vụ & Mô Phỏng What-If V1 (Academic Planning & What-If Simulator V1 — Sandbox Projection, Typed Scenario Ops, Zero Mutation Firewall, Explainable Deltas, RSC & Planner UI)**:
+        - **Bất Biến Tuyệt Đối (`SIMULATION != REALITY`)**: Giả lập là hình chiếu thuần túy trong bộ nhớ sandbox, không bao giờ ghi đè `Profile360`, `DigitalTwin`, `AcademicRecords`, `AcademicTasks`, `Notifications` hay DB.
+        - **Tái Sử Dụng Trực Tiếp Động Cơ Chuẩn Tắc (`AcademicEligibilityEngine`, `AcademicRoadmapEngine`)**: Động cơ giả lập áp dụng dữ kiện lên bản sao sandbox và triệu gọi trực tiếp các engine điều kiện/lộ trình chuẩn tắc — không tạo logic rẽ nhánh song song.
+        - **Bảo Vệ Đột Biến Bị Cấm & Xác Thực Chặt Chẽ**: Chặn triệt để các thao tác áp đặt kết quả trực tiếp như `FORCE_ELIGIBLE`, `FORCE_COMPLETED` hoặc sửa đổi `studentId`. Mọi thao tác đều theo dạng dữ kiện thực (`SET_GPA`, `ADD_CREDITS`, `SET_CERTIFICATE_SCORE`, `COMPLETE_COURSE`).
+        - **Mô Hình So Sánh & Giải Trình Minh Bạch**: Xuất kết quả so sánh đối ứng CURRENT vs WHAT-IF vs PROJECTED DELTA, kèm giải trình chi tiết theo từng điều khoản CTĐT cho mỗi cột mốc được giải tỏa/mở khóa.
+        - **Tích Hợp Server-First & Giao Diện Hoạch Định**: API `POST /api/academic/me/simulate`, trang RSC `/academic/planner`, component tương tác `AcademicWhatIfPlannerView.jsx`, lối tắt từ Command Center và Roadmap.
+        - **Tập Kiểm Chuẩn Toàn Diện**: **478/478 Tests PASS (100.0%)** trên 74 test files, 133 suites. **39/39 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
+
 ---
 
-## 2. Đường Dẫn File Trọng Tâm (v12 Nodes)
-- **Kiến Trúc Hồ Sơ Học Vụ 360 Chuẩn Tắc**: `docs/vault/01 - 🏗️ System Architecture/Student-Identity-Profile-360-V1.md`
-- **Ma Trận Nguồn Gốc Dữ Liệu & Nguồn Sự Thật**: `docs/vault/01 - 🏗️ System Architecture/Academic-Data-Provenance-Matrix-V1.md`
+## 2. Đường Dẫn File Trọng Tâm (v14 Nodes)
+- **Kiến Trúc Hoạch Định & Giả Lập What-If**: `docs/vault/01 - 🏗️ System Architecture/Academic-What-If-Simulation-V1.md`
+- **Mô Hình & Xác Thực Kịch Bản Giả Định**: `frontend/src/lib/intelligence/academic/academicSimulationModel.js`
+- **Động Cơ Giả Lập Sandbox & So Sánh Delta**: `frontend/src/lib/intelligence/academic/academicSimulationEngine.js`
+- **Giao Diện Hoạch Định What-If & Trang RSC**: `frontend/src/components/academic/AcademicWhatIfPlannerView.jsx`, `frontend/src/app/academic/planner/page.jsx`
+- **API Endpoint Giả Lập Học Vụ**: `frontend/src/app/api/academic/me/simulate/route.js`
+- **Kiến Trúc Lộ Trình Học Vụ & Hành Trình Sinh Viên**: `docs/vault/01 - 🏗️ System Architecture/Student-Academic-Roadmap-V1.md`
+- **Mô Hình Cột Mốc & Đồ Thị Phụ Thuộc Học Vụ**: `frontend/src/lib/intelligence/academic/academicMilestoneModel.js`
+- **Động Cơ Chiếu Lộ Trình Học Vụ**: `frontend/src/lib/intelligence/academic/academicRoadmapEngine.js`
 - **Mô Hình, Kho & Dịch Vụ Profile 360**: `frontend/src/lib/intelligence/academic/studentProfile360Model.js`, `studentProfile360Store.js`, `studentProfile360Service.js`
 - **Giao Diện Hồ Sơ 360 & Trang RSC**: `frontend/src/components/academic/Profile360View.jsx`, `frontend/src/app/academic/profile/page.jsx`
 - **Cầu Nối Đồng Bộ Bản Sao Số Có Khóa Phiên Bản**: `frontend/src/lib/intelligence/academic/studentAcademicSyncBridge.js`
