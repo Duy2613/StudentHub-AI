@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { AcademicHeader } from "./AcademicHeader.jsx";
 import { ActionCenter } from "./ActionCenter.jsx";
 import { WhatChangedSection } from "./WhatChangedSection.jsx";
@@ -147,6 +148,7 @@ export function AcademicCommandCenter({ initialData = null }) {
     timelineEvents = [],
     notifications = [],
     unreadNotificationCount = 0,
+    roadmap = null,
     syncStatus = {}
   } = data;
 
@@ -163,6 +165,34 @@ export function AcademicCommandCenter({ initialData = null }) {
         unreadNotificationCount={unreadNotificationCount}
         onOpenNotificationDrawer={() => setIsNotificationDrawerOpen(true)}
       />
+
+      {/* 1.5. Academic Journey Summary Card */}
+      {roadmap && (
+        <Link href="/academic/roadmap" className="block group">
+          <div className="rounded-2xl border border-border/60 bg-card/30 p-4 md:p-5 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-lg">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">🗺️</span>
+                <div>
+                  <h3 className="font-semibold text-sm text-foreground">Lộ trình Học vụ</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {roadmap.progress.completed}/{roadmap.progress.total} cột mốc hoàn thành
+                    {roadmap.blockers && roadmap.blockers.length > 0 && (
+                      <span className="text-red-400 ml-1">• {roadmap.blockers.length} yếu tố chặn</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <span className="text-lg font-bold text-foreground tabular-nums">{roadmap.progress.percentage}%</span>
+                </div>
+                <span className="text-muted-foreground/50 group-hover:text-foreground/60 transition-colors">→</span>
+              </div>
+            </div>
+          </div>
+        </Link>
+      )}
 
       {!hasAnyContent ? (
         <AcademicEmptyState />
