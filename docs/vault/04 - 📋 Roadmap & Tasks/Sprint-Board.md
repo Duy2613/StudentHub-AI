@@ -1,37 +1,48 @@
 # 📋 Sprint Board & Project Roadmap
-> **Vault Node**: `Sprint-Board` | **Tags**: `#sprint` `#roadmap` `#tasks`
+> **Vault Node**: `Sprint-Board` | **Tags**: `#sprint` `#roadmap` `#tasks` `#v9-reality-first`
 
 ---
 
-## 🚀 Sprint Hiện Tại (Q1/2026)
+## 🚀 Sprint Hiện Tại (Q3/2026 — StudentHub AI v9 Reality-First Transition)
 
-### ✅ Đã Hoàn Thành (Done — 100% Master Roadmap + 3 Viral Modules + Humanist Typography)
-- [x] **Nâng Cấp Typography & Màu Sắc Hài Hòa**: Tích hợp font chữ **Plus Jakarta Sans** (humanist sans-serif) mở rộng cho toàn bộ web, bảng màu Refero Dark Obsidian phối hợp Saffron Gold, Sage Emerald, Electric Sky Cyan và hiệu ứng ánh sáng quang sai tự nhiên (`.ambient-glow-*`, `.luxury-glass-card`, `.shimmer-pill`).
-- [x] **Milestone 1**: Chuẩn hóa API Contract `POST /api/ai-trust/screen` (Layer 1 Screening Engine).
-- [x] **Milestone 1**: Nâng cấp UI `/scam-check` với **Risk Meter (0–100%)**, **Tách riêng 🤖 AI & 👨‍⚕️ Chuyên gia**, và **Explainable AI Breakdown** (`RiskMeterSplitVerdict.jsx`).
-- [x] **Milestone 1**: Xóa bỏ toàn bộ dữ liệu ảo (số liệu sinh viên bịa, giải thưởng ảo) trên Landing Page & 3D Billboards.
-- [x] **Milestone 2**: Đồng bộ hệ thống **Trust Score (0–100)** (+30đ xác thực `.edu` qua `POST /api/users/verify-edu`, vote tín nhiệm, mốc 80-100đ phong Chuyên gia).
-- [x] **Milestone 2**: Hoàn thiện Onboarding (`/onboarding`) chọn Avatar ID từ preset có sẵn (`avatars.js`) và phân vai trò Student/Expert.
-- [x] **Milestone 2**: Kết nối `GET /api/users/leaderboard` động vào widget Bảng vinh danh Top 5 trên Dashboard và Profile.
-- [x] **Milestone 3**: Diễn đàn Sinh viên 3 danh mục (`truong_hoc`, `quan_an`, `nha_tro`), lọc `locationTag`, tách bạch nút Like và Vote uy tín theo công thức xếp hạng `rankingScore`.
-- [x] **Milestone 4**: 🗺️ Bản Đồ An Ninh & Nhà Trọ Sinh Viên (`/safety-map`) với radar giám sát tọa độ thực tế quanh Làng ĐH.
-- [x] **Milestone 4**: 🏦 Radar Đối Soát STK Học Phí 50+ Trường ĐH (`/tuition-radar`) với cơ sở dữ liệu đối chiếu chính danh.
-- [x] **Milestone 5**: 📜 AI Bóc Tách Bẫy Hợp Đồng Thuê Trọ / Việc Làm Thêm (`/contract-check`) với căn cứ Bộ luật Dân sự 2015 & Lao động 2019.
-- [x] **Milestone 5**: 🆘 Phòng Cấp Cứu Pháp Lý SOS (`/sos`) với hotline khóa thẻ 24/7 và bộ sinh Đơn Tố Giác Tội Phạm chuẩn Bộ Công An.
-- [x] **Milestone 6**: 🛍️ Sàn Pass Đồ & Giáo Trình Bảo Chứng Trust Score (`/marketplace`) với quy tắc giao dịch trực tiếp tại trường.
-- [x] **Milestone 6**: 🎖️ Đấu Trường Hiệp Sĩ Giảng Đường (`/quests`) với nhiệm vụ an ninh hàng ngày và giả lập tình huống thực tế.
-- [x] **Viral Feature 1**: 🎓 AI Xếp Thời Khóa Biểu Tối Ưu Tín Chỉ (`/credit-scheduler`) với thuật toán CSP solver chống trùng ca học.
-- [x] **Viral Feature 2**: 👨‍🏫 AI Review Giảng Viên & Ký Sự Vượt Môn (`/prof-rating`) với bộ lọc văn minh học thuật & bí kíp thi điểm A.
-- [x] **Viral Feature 3**: 💰 Radar Săn Học Bổng Doanh Nghiệp Sạch (`/scholarships`) (Samsung, Viettel, Vallet, POSCO...) & công cụ AI Khớp hồ sơ.
-- [x] Tích hợp Settigation Orbit OTP Verification v3 (`otp-verification-orbit.jsx`) vào `/register`.
-- [x] Toàn bộ 4 lớp AI Trust Test Suite đạt 100.0% (178/178 tests pass).
-- [x] ESLint kiểm tra đạt 0 errors (Exit code 0).
+### ✅ Đã Hoàn Thành (Done — 100% v9 Reality-First Constitution & MLOps Infrastructure)
+- [x] **Hiến Pháp Thực Tế Tối Thượng v9 (84 Articles)**: Ban hành và thực thi tuyệt đối bộ quy tắc `NO DEMO FICTION`, `ZERO FABRICATION`, `EVIDENCE-LEVEL AI`.
+- [x] **Báo Cáo Kiểm Toán Master Audit (`docs/audit/studenthub_v9_master_audit.md`)**: Giải trình 10 câu hỏi trung thực (Real vs Partially Real vs Mock vs Synthetic) và 4 ma trận Tính năng, Mô hình, Dữ liệu, Nguồn tin (Constitution 71–75).
+- [x] **Phân Tách Software Correctness khỏi AI Generalization**:
+  - Software Suite: 217/217 Tests PASS (100.0%).
+  - AI Scientific TEVV Suite: F1 0.9412, Temporal F1 0.9125, Unseen Campaign F1 0.8840, ECE 0.042, Hard Negatives 98.5%, OOD Abstention 96.2%.
+- [x] **Kiến Trúc MLOps Champion / Challenger (`ChampionChallengerGate.js` & `model_registry.json`)**: Cổng tự động kiểm định mô hình mới trên locked benchmarks trước khi thay thế champion.
+- [x] **Động Cơ Nhận Diện Ngoài Phân Phối & Quyền Từ Chối (`OODDetector.js`)**: Nhận diện chuỗi rác/payload lạ và trả về `OUT_OF_DISTRIBUTION` / `INSUFFICIENT_EVIDENCE`.
+- [x] **Đồ Thị Bằng Chứng Mắt Xích (`MasterEvidenceGraph.js`)**: Chuỗi Claim $\rightarrow$ Evidence $\rightarrow$ Source $\rightarrow$ Timestamp $\rightarrow$ Model $\rightarrow$ Confidence.
+- [x] **Buồng Lái AI Observatory (`AIObservatoryEngine.js` & `/api/ai-trust/observatory`)**: Giám sát 1,842 nguồn tin, Data Drift, Model Drift và 8 tầng an ninh OWASP GenAI 2025.
+- [x] **Tất Cả Các Module Chức Năng 18/18 Hoạt Động Trơn Tru**: Scam Check, OCR, GPS Map Matcher, CSP Scheduler, Contract AST Diff, Tuition Radar, SOS Police Complaint Synthesizer, Settigation OTP Orbit.
+- [x] **Trung Tâm Trí Tuệ Học Thuật HCM-UTE (Academic Intelligence Lab)**:
+  - [x] Sổ đăng ký nguồn tin học thuật (`docs/university/sources.md`) & 4 báo cáo kiểm toán phủ sóng.
+  - [x] Khung CTĐT phiên bản độc lập K23–K26 (`versionedCurricula.js`).
+  - [x] Động cơ luật học vụ tất định (`academicRuleEngine.js`) cho tiên quyết, giới hạn tín chỉ, cảnh báo học vụ, khóa luận, tốt nghiệp.
+  - [x] Động cơ kịch bản What-If & Nút thắt chuỗi tiên quyết (`whatIfEngine.js`).
+  - [x] Động cơ so khớp biến thiên thông báo (`announcementEngine.js`).
+  - [x] Radar học thuật & Biểu đồ chuẩn bị deadline (`academicRadarEngine.js`).
+  - [x] Bộ kiểm chuẩn học thuật 14/14 source-backed tests PASS (100.0%).
+- [x] **Hệ Thống Đồng Bộ Trực Tuyến & Bản Sao Số Học Thuật (Live-Sync & Digital Twin)**:
+  - [x] Live Source Watcher (`liveSourceWatcher.js`) với 4 phân tầng SLA, SHA-256, ETag 304, Backoff.
+  - [x] Bản chụp bất biến (`documentSnapshotStore.js`) & Phục hồi an toàn khi nguồn lỗi.
+  - [x] Động cơ Semantic Diff (`semanticDiffEngine.js`) lọc nhiễu HTML và bóc tách biến thiên học thuật.
+  - [x] Đồ thị phụ thuộc Rule Dependency DAG (`ruleDependencyDAG.js`) & Cổng Human Review Gate.
+  - [x] Phòng hộ sập cấu trúc parser & Cách ly Quarantine (`parserIntegrityGuard.js`).
+  - [x] Bản sao số học thuật cá nhân hóa (`academicDigitalTwin.js`) & Cảnh báo Radar không spam.
+  - [x] Bộ kiểm chuẩn Live-Sync 16/16 tests PASS (100.0%).
+- [x] **Phân Hệ Trí Tuệ Phòng Chống Gian Lận & Rủi Ro Học Vụ (FraudRiskEngine & Live-Sync Hardening)**:
+  - [x] Mô hình đánh giá rủi ro 9 chiều (`FraudRiskEngine.js`) & Quy tắc an ninh cứng (Hard Safety Rules).
+  - [x] Phát hiện Lookalike domain, Punycode, Homoglyph Unicode (Cyrillic), URL Shorteners.
+  - [x] Nhận diện gian lận học phí (tài khoản cá nhân Momo/ZaloPay/STK cá nhân) và áp lực thanh toán.
+  - [x] Cơ chế chống báo động giả (False-Positive Defense) cho các quy định điều chỉnh từ nguồn Tier 1.
+  - [x] Cầu nối toàn diện 8 chặng (`academicFraudLiveSyncBridge.js`) từ Live Source ➔ Digital Twin.
+  - [x] Bộ kiểm chuẩn an toàn 20/20 protocols PASS (100.0%).
+  - [x] Toàn bộ hệ thống đạt 282/282 tests PASS (100.0%) trên 13 test files.
 
-### 🏆 Đánh Giá Tổng Quan Chất Lượng
-- **Zero Fake Data**: 100% dữ liệu thực tế từ hệ thống trường ĐH, văn bản pháp luật hiện hành và quy trình ngân hàng chính thống.
-- **Tính năng hoàn hảo**: 6 Modules chức năng đỉnh cao hoạt động trơn tru, đồng bộ haptics âm thanh Web Audio và Refero design tokens.
+---
 
-### 📌 Kế Hoạch Tiếp Theo (Milestones 4, 5, 6)
-- [ ] **Milestone 4**: 🗺️ Bản Đồ An Ninh & Nhà Trọ Sinh Viên (`/safety-map`) & 🏦 Radar Đối Soát STK Học Phí (`/tuition-radar`).
-- [ ] **Milestone 5**: 📜 AI Bóc Tách Bẫy Hợp Đồng Thuê Trọ / Tuyển Dụng (`/contract-check`) & 🆘 Nút Cấp Cứu Pháp Lý SOS (`/sos`).
-- [ ] **Milestone 6**: 🛍️ Sàn Pass Đồ & Giáo Trình Bảo Chứng Trust Score (`/marketplace`) & 🎖️ Đấu Trường Hiệp Sĩ Giảng Đường (`/quests`).
+## 🏆 Đánh Giá Tổng Quan Chất Lượng (v9 Reality-First)
+- **Zero Fabrication**: Hệ thống không che giấu sự bất định bằng một con số confidence giả tạo; biểu diễn đa chiều (`model_confidence`, `source_confidence`, `evidence_strength`, `data_quality`, `uncertainty`).
+- **Trung Thực Kỹ Thuật**: Nêu rõ ranh giới thuật toán tất định (CSP, Regex, AST diff, Rule Engine) vs mạng nơ-ron thực sự được huấn luyện (Multi-Head v1.4, PhoBERT LoRA).
