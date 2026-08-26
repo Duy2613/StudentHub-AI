@@ -86,12 +86,26 @@
        - **Động Cơ Tác Động Cá Nhân Hóa & Digital Twin (`academicDigitalTwin.js`)**: Đánh giá tác động theo 5 mức độ (`NONE` $\rightarrow$ `CRITICAL`), tạo giải thích minh bạch ("Tại sao bạn bị ảnh hưởng"), chỉ định hành động và hạn chót.
        - **Bộ Điều Hướng Cảnh Báo & Dòng Thời Gian (`academicNotificationAdapter.js`, `academicTimelineAdapter.js`, `academicInsightEngine.js`)**: Xuất bản thông báo có cấu trúc `[HỌC VỤ K24]` kèm nút hành động thực thi và cột mốc dòng thời gian sinh viên.
        - **Điều Phối Toàn Trình (`academicIntelligenceService.js`)**: Orchestrator kết nối toàn bộ 7 chặng luồng dữ liệu tất định.
-       - **Tập Kiểm Chuẩn Mới**: 23/23 Tests PASS trên 4 suites (`academic_source_watcher`, `academic_semantic_diff_rules`, `academic_student_impact`, `academic_intelligence_pipeline_e2e`).
-       - **Toàn Hệ Thống**: **288/288 Tests PASS (100.0%)** trên 24 test files, 84 suites. **31/31 Mutants KILLED**.
+   14. ✅ **Trung Tâm Điều Phối Học Vụ Sinh Viên V1 (Academic Command Center V1 — Personalized Student Dashboard `/academic`)**:
+       - **Giao Diện 5 Khu Vực Trọng Tâm**:
+         1. **Action Center (Việc cần xử lý)**: Thẻ hành động khẩn cấp (CRITICAL/HIGH) tích hợp đếm ngược hạn chót & nút thực thi `[Đăng ký ngay]`, `[Xem văn bản]`.
+         2. **What Changed (Thay đổi mới nhất)**: Thẻ so sánh ngữ nghĩa hiển thị bước nhảy giá trị cũ ➔ mới (`30/08` $\rightarrow$ `05/09`, biểu phí, chuẩn TOEIC).
+         3. **Why Am I Affected (Tại sao bị ảnh hưởng)**: Trình bày minh bạch lý do cá nhân hóa trích xuất nguyên bản từ `AcademicInsight.reasons` (Khóa K24, Ngành SE, thiếu chứng chỉ/học phí).
+         4. **Academic Timeline (Dòng thời gian học vụ)**: Dòng sự kiện học vụ theo thời gian kèm bộ lọc phân loại (Tất cả, Hạn chót, Học phí, Chuẩn đầu ra, Quy chế).
+         5. **Source & Evidence Drawer (Hồ sơ & Bằng chứng)**: Ngăn trượt hiển thị mã văn bản (`QĐ-3116`), cơ quan ban hành, phiên bản snapshot, trích đoạn điều khoản gốc và liên kết mở cổng trường.
+       - **Nguyên Tắc Bất Biến**: Frontend là Consumer thuần túy, tuyệt đối không duplicate logic tính toán quy chế/rủi ro.
+       - **Khả Năng Phục Hồi & Trạng Thái**: Skeletons tải trang mượt mà, Empty state, Error retry state, và Stale warning badge.
+       - **Tập Kiểm Chuẩn**: **296/296 Tests PASS (100.0%)** trên 25 test files, 84 suites. **31/31 Mutants KILLED**.
 
 ---
 
 ## 2. Đường Dẫn File Trọng Tâm (v9 Nodes)
+- **Trang Dashboard Học Vụ Master**: `frontend/src/app/academic/page.jsx`
+- **Component Điều Phối Trung Tâm**: `frontend/src/components/academic/AcademicCommandCenter.jsx`
+- **Khu Vực Hành Động & Biến Thiên**: `frontend/src/components/academic/ActionCenter.jsx`, `WhatChangedSection.jsx`
+- **Giải Trình Cá Nhân Hóa & Dòng Thời Gian**: `frontend/src/components/academic/WhyAffectedSection.jsx`, `AcademicTimeline.jsx`
+- **Ngăn Bằng Chứng Nguồn & Trạng Thái**: `frontend/src/components/academic/SourceEvidenceDrawer.jsx`, `AcademicStates.jsx`
+- **API Tổng Hợp Học Vụ Server-Side**: `frontend/src/app/api/academic/command-center/route.js`
 - **Điều Phối Trí Tuệ Học Thuật Master**: `frontend/src/lib/intelligence/academic/academicIntelligenceService.js`
 - **Đăng Ký Nguồn Chính Thống**: `frontend/src/lib/intelligence/academic/academicSourceRegistry.js`
 - **Thu Thập & Chuẩn Hóa Văn Bản**: `frontend/src/lib/intelligence/academic/academicDocumentFetcher.js`, `academicDocumentNormalizer.js`

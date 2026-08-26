@@ -115,9 +115,20 @@
 - Formulates clear, evidence-backed explanations:
   > *"Bạn bị ảnh hưởng vì: Bạn thuộc Khóa K24 ngành Kỹ thuật Phần mềm, chuẩn đầu ra Ngoại ngữ yêu cầu 550 điểm, chứng chỉ hiện tại của bạn là 450 điểm (Chưa đạt chuẩn)."*
 
-### 2.8 Presentation Adapters
-- `AcademicNotificationAdapter.js`: Generates actionable alerts with priority routing (`RADAR_PUSH`, `IN_APP_POPUP`).
-- `AcademicTimelineAdapter.js`: Maps changes into chronological milestones for student dashboard timelines.
+### 2.8 Presentation Adapters & Command Center View Models
+- `academicNotificationAdapter.js`: Generates actionable alerts with priority routing (`RADAR_PUSH`, `IN_APP_POPUP`).
+- `academicTimelineAdapter.js`: Maps changes into chronological milestones for student dashboard timelines.
+- `academicCommandCenterViewModel.js`: Transforms raw backend data into pure presentation view models (`formatDate`, `formatRelativeDeadline`, `getImpactBadge`, `getCategoryLabel`) with zero business logic leakage.
+
+### 2.9 Academic Command Center UI Components (`frontend/src/components/academic/`)
+- `AcademicCommandCenter.jsx`: Master client state coordinator for `/academic`.
+- `AcademicHeader.jsx`: Student profile greeting, digital twin progress pills, and real-time sync badge (`LIVE` / `STALE`).
+- `ActionCenter.jsx`: High-priority action cards (`CRITICAL`/`HIGH`) with deadline countdowns and action execution buttons (`[Đăng ký ngay]`, `[Xem văn bản]`).
+- `WhatChangedSection.jsx`: Visual semantic diff cards with old $\rightarrow$ new delta highlights and source badges.
+- `WhyAffectedSection.jsx`: Transparent personal reason breakdown directly bound to `AcademicInsight.reasons`.
+- `AcademicTimeline.jsx`: Chronological milestone stream with category filters (All, Deadlines, Tuition, Requirements, Rules).
+- `SourceEvidenceDrawer.jsx`: Slide-over drawer presenting official issuer, document ID (`QĐ-3116`), version, clause citation, and verified portal link.
+- `AcademicStates.jsx`: Accessible Loading Skeletons, Empty State ("Không có việc cần xử lý"), and Error State with Retry.
 
 ---
 
@@ -129,6 +140,7 @@
 | `academic_semantic_diff_rules.test.mjs` | 7 | Cosmetic vs. semantic diff, fee/deadline changes, rule extraction. |
 | `academic_student_impact.test.mjs` | 4 | Cohort filtering, TOEIC deficit evaluation, tuition debt impact. |
 | `academic_intelligence_pipeline_e2e.test.mjs` | 4 | End-to-end 21-step synchronization and alert lifecycle. |
-| **Total New Academic Intel Tests** | **23** | **100% Pass** |
-| **Full Master Regression Suite** | **288 / 288** | **100% Pass across 24 files, 84 suites** |
+| `academic_command_center_ui.test.mjs` | 8 | View model contracts, urgent filtering, reason fidelity, empty/error fallbacks. |
+| **Total Academic Intel & UI Tests** | **31** | **100% Pass** |
+| **Full Master Regression Suite** | **296 / 296** | **100% Pass across 25 files, 84 suites** |
 | **Actual Source Mutants** | **31 / 31** | **100% Killed (0 Survived)** |
