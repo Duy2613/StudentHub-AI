@@ -157,9 +157,22 @@
         - **Giao Diện Studio Lập Kế Hoạch 2 Tầng (`AcademicWhatIfPlannerView.jsx`)**: Tích hợp tab Lập Kế Hoạch Học Kỳ (mặc định) và tab Giả Lập What-If tự do, thẻ so sánh trực quan, huy hiệu mở khóa và cầu nối hành động sang Command Center.
         - **Tập Kiểm Chuẩn Toàn Diện**: **496/496 Tests PASS (100.0%)** trên 82 test files, 141 suites. **43/43 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
 
+    23. ✅ **Studio So Sánh & Hỗ Trợ Quyết Định Học Vụ V1 (Academic Decision Studio & Plan Comparison V1 — Normalized Plan Comparison, Preference Re-Ranking, Pairwise Trade-Off Matrix, Revision-Guarded Adoption, 3-Tab Studio UI)**:
+        - **Bất Biến Hỗ Trợ Quyết Định (`DECISION_SUPPORT != AUTONOMOUS_ACTION`)**: Decision Studio là công cụ phân tích và so sánh đánh đổi tất định, không bao giờ tự ý áp đặt quyết định thay cho sinh viên. Sinh viên là người đưa ra lựa chọn cuối cùng.
+        - **Ma Trận Đánh Đổi Đối Ứng (Trade-Off Matrix)**: So khớp trực tiếp từng cặp phương án (Plan A vs B, Plan A vs C) với lợi thế, rủi ro và khuyến nghị trade-off rõ ràng.
+        - **Tái Xếp Hạng Theo Ưu Tiên Cá Nhân Hóa**: Cho phép sinh viên lựa chọn định hướng (`BALANCED`, `GRADUATE_ASAP`, `MINIMIZE_WORKLOAD`, `PROTECT_GPA`) và tự động xếp hạng lại điểm số phương án kèm giải trình minh bạch.
+        - **Lưu Nháp Có Khóa Phiên Bản (Revision-Guarded Adoption)**: Chọn kế hoạch sẽ lưu nháp vào `AcademicDecisionStore` sau khi kiểm tra khớp phiên bản (`profileRevision`, `twinRevision`), chuyển trạng thái kế hoạch cũ cùng kỳ sang `SUPERSEDED`. Tuyệt đối không tự động sửa bảng điểm hay đăng ký môn học ngoài đời.
+        - **Giao Diện Studio 3 Tầng (`AcademicWhatIfPlannerView.jsx`)**: Tab 1 (Lập Kế Hoạch), Tab 2 (Studio So Sánh & Quyết Định), Tab 3 (Giả Lập What-If Sandbox).
+        - **Tập Kiểm Chuẩn Toàn Diện**: **511/511 Tests PASS (100.0%)** trên 90 test files, 149 suites. **47/47 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
+
 ---
 
-## 2. Đường Dẫn File Trọng Tâm (v16 Nodes)
+## 2. Đường Dẫn File Trọng Tâm (v18 Nodes)
+- **Kiến Trúc Studio So Sánh & Quyết Định Học Vụ**: `docs/vault/01 - 🏗️ System Architecture/Academic-Decision-Studio-V1.md`
+- **Mô Hình Miền & Tiêu Chí So Sánh Quyết Định**: `frontend/src/lib/intelligence/academic/academicDecisionModel.js`
+- **Động Cơ Phân Tích Đánh Đổi & Xếp Hạng Quyết Định**: `frontend/src/lib/intelligence/academic/academicDecisionEngine.js`
+- **Kho Lưu Trữ Kế Hoạch Học Tập Đã Chọn**: `frontend/src/lib/intelligence/academic/academicDecisionStore.js`
+- **API Endpoint So Sánh & Quyết Định Server-First**: `frontend/src/app/api/academic/me/decision-studio/route.js`, `frontend/src/app/api/academic/me/decision-studio/adopt/route.js`
 - **Kiến Trúc Lập Kế Hoạch Học Kỳ Dựa Trên Ràng Buộc**: `docs/vault/01 - 🏗️ System Architecture/Academic-Semester-Planner-V1.md`
 - **Mô Hình & Đồ Thị Điều Kiện Tiên Quyết Học Phần**: `frontend/src/lib/intelligence/academic/academicPrerequisiteEngine.js`
 - **Mô Hình Miền & Khung Giới Hạn Tín Chỉ Kế Hoạch**: `frontend/src/lib/intelligence/academic/academicPlannerModel.js`

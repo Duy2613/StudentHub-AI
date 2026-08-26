@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { SCENARIO_OPERATIONS } from "@/lib/intelligence/academic/academicSimulationModel.js";
 import { STANDARD_TERMS } from "@/lib/intelligence/academic/academicPlannerModel.js";
+import { STUDENT_PREFERENCES, PREFERENCE_LABELS } from "@/lib/intelligence/academic/academicDecisionModel.js";
 
 // Preset scenarios for fast 1-click exploration in What-If Sandbox
 const PRESET_SCENARIOS = [
@@ -42,23 +43,31 @@ const PRESET_SCENARIOS = [
 ];
 
 export function AcademicWhatIfPlannerView({ initialData = null }) {
-  const student = initialData?.studentProfile || {};
   const currentSummary = initialData?.profile360?.academicSummary || {};
   const currentToeic = initialData?.digitalTwin?.certificates?.find(c => c.type === "TOEIC")?.score || 450;
   const currentGpa = currentSummary.cgpa ?? 2.85;
   const currentCredits = currentSummary.earnedCredits ?? 115;
   const currentDebt = initialData?.profile360?.financialClearance?.remainingDebt ?? 0;
 
-  // Active View Tab: 'PLANNER' (Semester Study Planner) or 'WHAT_IF' (Sandbox Simulation)
+  // Active View Tab: 'PLANNER' (Semester Study Planner), 'DECISION' (Decision Studio & Trade-offs), or 'WHAT_IF' (Sandbox)
   const [activeTab, setActiveTab] = useState("PLANNER");
 
-  // ─── Semester Planner State ───
+  // Shared Target Term
   const [targetTerm, setTargetTerm] = useState("2026-HK1");
+
+  // ─── Semester Planner State ───
   const [plannerData, setPlannerData] = useState(null);
   const [selectedPlanIdx, setSelectedPlanIdx] = useState(0);
   const [isPlannerLoading, setIsPlannerLoading] = useState(false);
   const [plannerError, setPlannerError] = useState(null);
   const [adoptedPlanId, setAdoptedPlanId] = useState(null);
+
+  // ─── Decision Studio State ───
+  const [studentPreference, setStudentPreference] = useState(STUDENT_PREFERENCES.BALANCED);
+  const [decisionData, setDecisionData] = useState(null);
+  const [isDecisionLoading, setIsDecisionLoading] = useState(false);
+  const [decisionError, setDecisionError] = useState(null);
+  const [adoptionFeedback, setAdoptionFeedback] = useState(null);
 
   // ─── What-If Sandbox State ───
   const [simToeic, setSimToeic] = useState(currentToeic);
@@ -70,7 +79,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
   const [simulationResult, setSimulationResult] = useState(null);
   const [simErrorMsg, setSimErrorMsg] = useState(null);
 
-  // Fetch candidate semester plans when term changes
+  // Fetch candidate semester plans
   const fetchPlannerData = useCallback(async (termId) => {
     setIsPlannerLoading(true);
     setPlannerError(null);
@@ -93,9 +102,64 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
     }
   }, []);
 
+  // Fetch Decision Studio comparison
+  const fetchDecisionData = useCallback(async (termId, pref) => {
+    setIsDecisionLoading(true);
+    setDecisionError(null);
+    try {
+      const res = await fetch("/api/academic/me/decision-studio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetTerm: termId, studentPreference: pref })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || "Không thể nạp bảng so sánh quyết định học vụ.");
+      }
+      setDecisionData(data.decisionStudio);
+      if (data.decisionStudio?.baseline?.activeAdoption) {
+        setAdoptedPlanId(data.decisionStudio.baseline.activeAdoption.planId);
+      }
+    } catch (err) {
+      setDecisionError(err.message);
+    } finally {
+      setIsDecisionLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    fetchPlannerData(targetTerm);
-  }, [targetTerm, fetchPlannerData]);
+    if (activeTab === "PLANNER") {
+      fetchPlannerData(targetTerm);
+    } else if (activeTab === "DECISION") {
+      fetchDecisionData(targetTerm, studentPreference);
+    }
+  }, [activeTab, targetTerm, studentPreference, fetchPlannerData, fetchDecisionData]);
+
+  // Handle Plan Adoption via Server API
+  const handleAdoptPlan = async (planId) => {
+    setAdoptionFeedback(null);
+    try {
+      const res = await fetch("/api/academic/me/decision-studio/adopt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planId, targetTerm })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || "Không thể chọn kế hoạch.");
+      }
+      setAdoptedPlanId(planId);
+      setAdoptionFeedback({
+        type: "SUCCESS",
+        message: data.actionBridge?.message || "Đã lưu nháp kế hoạch thành công!"
+      });
+    } catch (err) {
+      setAdoptionFeedback({
+        type: "ERROR",
+        message: err.message
+      });
+    }
+  };
 
   // Run What-If simulation via server API
   const handleRunSimulation = async (customOperations = null) => {
@@ -198,13 +262,13 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
               </span>
             </div>
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white mt-1 flex items-center gap-3">
-              <span>Hoạch Định & Mô Phỏng Học Vụ</span>
+              <span>Hoạch Định, So Sánh & Quyết Định Học Vụ</span>
               <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
-                PLANNER & WHAT-IF V1
+                DECISION STUDIO V1
               </span>
             </h1>
             <p className="text-sm text-slate-400 mt-1">
-              Khám phá đề xuất học phần học kỳ tối ưu và thử nghiệm kịch bản giả định trên môi trường sandbox không gây đột biến.
+              Đánh giá toàn diện các phương án học kỳ, phân tích đánh đổi (trade-offs) và lựa chọn định hướng cá nhân hóa.
             </p>
           </div>
 
@@ -218,21 +282,31 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
           </div>
         </div>
 
-        {/* Tab Selector: SEMESTER PLANNER vs WHAT-IF SANDBOX */}
-        <div className="flex items-center gap-2 p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl max-w-md">
+        {/* Tab Selector: SEMESTER PLANNER vs DECISION STUDIO vs WHAT-IF SANDBOX */}
+        <div className="flex items-center gap-2 p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl max-w-xl">
           <button
             onClick={() => setActiveTab("PLANNER")}
-            className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
               activeTab === "PLANNER"
                 ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
                 : "text-slate-400 hover:text-slate-200"
             }`}
           >
-            <span>📅 Lập Kế Hoạch Học Kỳ</span>
+            <span>📅 Lập Kế Hoạch</span>
+          </button>
+          <button
+            onClick={() => setActiveTab("DECISION")}
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === "DECISION"
+                ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <span>⚖️ So Sánh & Quyết Định</span>
           </button>
           <button
             onClick={() => setActiveTab("WHAT_IF")}
-            className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
               activeTab === "WHAT_IF"
                 ? "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
                 : "text-slate-400 hover:text-slate-200"
@@ -392,7 +466,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
 
                       <div className="flex items-center gap-3">
                         <button
-                          onClick={() => setAdoptedPlanId(currentPlan.planId)}
+                          onClick={() => handleAdoptPlan(currentPlan.planId)}
                           className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md ${
                             adoptedPlanId === currentPlan.planId
                               ? "bg-emerald-600 text-white cursor-default"
@@ -403,6 +477,20 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
                         </button>
                       </div>
                     </div>
+
+                    {/* Adoption Feedback Toast */}
+                    {adoptionFeedback && (
+                      <div className={`p-4 rounded-xl text-xs flex items-center justify-between ${
+                        adoptionFeedback.type === "SUCCESS"
+                          ? "bg-emerald-950/60 border border-emerald-800 text-emerald-300"
+                          : "bg-red-950/60 border border-red-800 text-red-300"
+                      }`}>
+                        <span>{adoptionFeedback.message}</span>
+                        <Link href="/academic" className="underline font-bold text-xs">
+                          Đi tới Command Center →
+                        </Link>
+                      </div>
+                    )}
 
                     {/* Course List & Actions Breakdown */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -546,7 +634,216 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
         )}
 
         {/* ═══════════════════════════════════════════════════════════════════ */}
-        {/* TAB 2: WHAT-IF SANDBOX SIMULATION                                 */}
+        {/* TAB 2: DECISION STUDIO & PLAN COMPARISON                            */}
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {activeTab === "DECISION" && (
+          <div className="space-y-8">
+            
+            {/* Preference Selector Bar */}
+            <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl space-y-4">
+              <div>
+                <div className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                  Ưu Tiên Học Tập Cá Nhân
+                </div>
+                <h2 className="text-lg font-bold text-white mt-0.5">
+                  Chọn định hướng trọng tâm của bạn để hệ thống tự động tái xếp hạng và phân tích đánh đổi
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {Object.values(STUDENT_PREFERENCES).map(pref => {
+                  const isSelected = studentPreference === pref;
+                  const item = PREFERENCE_LABELS[pref];
+                  return (
+                    <button
+                      key={pref}
+                      onClick={() => setStudentPreference(pref)}
+                      className={`p-4 rounded-2xl border text-left transition-all ${
+                        isSelected
+                          ? "bg-emerald-500/10 border-emerald-500 shadow-lg shadow-emerald-500/10 ring-1 ring-emerald-500/40"
+                          : "bg-slate-950/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900/60 text-slate-400"
+                      }`}
+                    >
+                      <div className={`font-bold text-sm ${isSelected ? "text-emerald-300" : "text-slate-200"}`}>
+                        {item.label}
+                      </div>
+                      <div className="text-[11px] text-slate-400 mt-1 line-clamp-2">
+                        {item.desc}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Recommendation Banner */}
+            {decisionData?.recommendation && (
+              <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950/60 via-slate-900 to-teal-950/60 border border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl">
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500 text-slate-950">
+                      ⭐ Đề Xuất Phù Hợp Nhất
+                    </span>
+                    <span className="text-xs text-slate-400 font-mono">
+                      Theo ưu tiên [{PREFERENCE_LABELS[studentPreference]?.label}]
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-black text-white">
+                    {decisionData.recommendation.title}
+                  </h3>
+                  <p className="text-xs text-emerald-200/80 max-w-3xl">
+                    {decisionData.recommendation.rationale}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleAdoptPlan(decisionData.recommendation.recommendedPlanId)}
+                    className="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-500/20 whitespace-nowrap"
+                  >
+                    {adoptedPlanId === decisionData.recommendation.recommendedPlanId ? "✓ Đã Chọn Nháp" : "📌 Chọn Phương Án Này"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Side-by-Side Comparison Matrix Table */}
+            {decisionData?.plans && (
+              <div className="p-6 md:p-8 rounded-3xl bg-slate-900/90 border border-slate-800/90 backdrop-blur-xl space-y-6 overflow-hidden">
+                <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
+                  <div>
+                    <h3 className="text-base font-bold text-white">Bảng So Sánh Đối Ứng Các Phương Án (Decision Matrix)</h3>
+                    <p className="text-xs text-slate-400 mt-0.5">So khớp trực tiếp các chỉ số định lượng giữa các phương án</p>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-800 text-slate-400 text-[11px] uppercase tracking-wider">
+                        <th className="py-3 px-4 w-1/4">Tiêu Chí Đánh Giá</th>
+                        {decisionData.plans.map(p => (
+                          <th key={p.planId} className="py-3 px-4 w-1/4">
+                            <div className="font-black text-white text-sm">{p.title}</div>
+                            <div className="text-[10px] text-emerald-400 font-mono mt-0.5">Điểm: {p.decisionScore}/100</div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 text-slate-200">
+                      <tr>
+                        <td className="py-3 px-4 font-semibold text-slate-400">Khối lượng Tín chỉ</td>
+                        {decisionData.plans.map(p => (
+                          <td key={p.planId} className="py-3 px-4 font-bold text-white">
+                            {p.totalCredits} TC ({p.courseCount} môn)
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <td className="py-3 px-4 font-semibold text-slate-400">Mức độ Rủi ro Học tập</td>
+                        {decisionData.plans.map(p => (
+                          <td key={p.planId} className="py-3 px-4">
+                            <span className={`px-2 py-0.5 rounded font-bold uppercase text-[10px] border ${
+                              p.riskLevel === "LOW"
+                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                : "bg-amber-500/10 border-amber-500/20 text-amber-400"
+                            }`}>
+                              {p.riskLevel}
+                            </span>
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <td className="py-3 px-4 font-semibold text-slate-400">Tiến độ Lộ trình Dự kiến</td>
+                        {decisionData.plans.map(p => (
+                          <td key={p.planId} className="py-3 px-4 font-bold text-emerald-400">
+                            {p.projectedRoadmapPercentage}%
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <td className="py-3 px-4 font-semibold text-slate-400">Tích lũy Tín chỉ Sau kỳ</td>
+                        {decisionData.plans.map(p => (
+                          <td key={p.planId} className="py-3 px-4 font-bold text-white">
+                            {p.projectedCredits} / 150 TC
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <td className="py-3 px-4 font-semibold text-slate-400">Định hướng Tiến độ Tốt nghiệp</td>
+                        {decisionData.plans.map(p => (
+                          <td key={p.planId} className="py-3 px-4 text-slate-300 text-[11px]">
+                            {p.goalAlignment}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <td className="py-3 px-4 font-semibold text-slate-400">Thao tác</td>
+                        {decisionData.plans.map(p => (
+                          <td key={p.planId} className="py-3 px-4">
+                            <button
+                              onClick={() => handleAdoptPlan(p.planId)}
+                              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                                adoptedPlanId === p.planId
+                                  ? "bg-emerald-600 text-white cursor-default"
+                                  : "bg-slate-800 hover:bg-slate-700 text-slate-200"
+                              }`}
+                            >
+                              {adoptedPlanId === p.planId ? "✓ Đã chọn" : "Chọn kế hoạch này"}
+                            </button>
+                          </td>
+                        ))}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Pairwise Trade-Off Analysis Cards */}
+            {decisionData?.tradeOffs?.length > 0 && (
+              <div className="space-y-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Phân Tích Đánh Đổi Giữa Các Phương Án (Trade-Off Breakdown)
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {decisionData.tradeOffs.map((to, i) => (
+                    <div
+                      key={i}
+                      className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl space-y-4"
+                    >
+                      <h4 className="text-sm font-black text-white flex items-center gap-2">
+                        <span>⚖️</span>
+                        <span>{to.comparisonPair}</span>
+                      </h4>
+
+                      <div className="space-y-2 text-xs">
+                        <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-800/40 text-emerald-300">
+                          <span className="font-bold block mb-0.5">✦ Lợi thế:</span>
+                          <span>{to.advantageOfPlan2}</span>
+                        </div>
+                        <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 text-amber-300">
+                          <span className="font-bold block mb-0.5">⚠️ Đánh đổi / Rủi ro:</span>
+                          <span>{to.disadvantageOfPlan2}</span>
+                        </div>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-300">
+                        <span className="font-bold text-slate-400 block mb-0.5">Gợi ý quyết định:</span>
+                        <span>{to.tradeOffVerdict}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════ */}
+        {/* TAB 3: WHAT-IF SANDBOX SIMULATION                                 */}
         {/* ═══════════════════════════════════════════════════════════════════ */}
         {activeTab === "WHAT_IF" && (
           <div className="space-y-8">

@@ -135,7 +135,7 @@ export class AcademicPlannerModel {
 
     const cleanStudent = String(studentId).trim();
     const cleanTerm = String(targetTerm).trim().toUpperCase();
-    const cleanId = planId || `PLAN_${cleanStudent}_${cleanTerm}_${planType}_${Date.now()}`;
+    const cleanId = planId || `PLAN_${cleanStudent}_${cleanTerm}_${planType}`;
 
     const totalCredits = selectedCourses.reduce((sum, c) => sum + (Number(c.credits) || 0), 0);
 
