@@ -168,30 +168,35 @@ export function AcademicCommandCenter({ initialData = null }) {
 
       {/* 1.5. Academic Journey Summary Card */}
       {roadmap && (
-        <Link href="/academic/roadmap" className="block group">
-          <div className="rounded-2xl border border-border/60 bg-card/30 p-4 md:p-5 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-lg">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">🗺️</span>
-                <div>
-                  <h3 className="font-semibold text-sm text-foreground">Lộ trình Học vụ</h3>
-                  <p className="text-xs text-muted-foreground">
-                    {roadmap.progress.completed}/{roadmap.progress.total} cột mốc hoàn thành
-                    {roadmap.blockers && roadmap.blockers.length > 0 && (
-                      <span className="text-red-400 ml-1">• {roadmap.blockers.length} yếu tố chặn</span>
-                    )}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <span className="text-lg font-bold text-foreground tabular-nums">{roadmap.progress.percentage}%</span>
-                </div>
-                <span className="text-muted-foreground/50 group-hover:text-foreground/60 transition-colors">→</span>
-              </div>
+        <div className="rounded-2xl border border-border/60 bg-card/30 p-4 md:p-5 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <Link href="/academic/roadmap" className="flex items-center gap-3 group flex-1">
+            <span className="text-xl">🗺️</span>
+            <div>
+              <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors flex items-center gap-1.5">
+                <span>Lộ trình Học vụ</span>
+                <span className="text-xs text-muted-foreground/60">→</span>
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                {roadmap.progress.completed}/{roadmap.progress.total} cột mốc hoàn thành
+                {roadmap.blockers && roadmap.blockers.length > 0 && (
+                  <span className="text-red-400 ml-1">• {roadmap.blockers.length} yếu tố chặn</span>
+                )}
+              </p>
             </div>
+          </Link>
+          <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 pt-2 sm:pt-0 border-border/30">
+            <div className="text-left sm:text-right">
+              <span className="text-lg font-bold text-foreground tabular-nums">{roadmap.progress.percentage}%</span>
+            </div>
+            <Link
+              href="/academic/planner"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-violet-500/15 text-violet-300 border border-violet-500/30 hover:bg-violet-500/25 transition-all flex items-center gap-1.5 shadow-sm"
+            >
+              <span>🔮</span>
+              <span>Giả Lập What-If</span>
+            </Link>
           </div>
-        </Link>
+        </div>
       )}
 
       {!hasAnyContent ? (

@@ -278,7 +278,14 @@ export function AcademicRoadmapView({ initialData = null }) {
             {profile?.fullName} — {profile?.studentId} — K{profile?.cohort}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <Link
+            href="/academic/planner"
+            className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-violet-500/15 text-violet-300 border border-violet-500/30 hover:bg-violet-500/25 transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            <span>🔮</span>
+            <span>Giả Lập What-If</span>
+          </Link>
           <FreshnessBadge freshness={roadmap.freshness} />
         </div>
       </div>

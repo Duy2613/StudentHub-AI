@@ -252,9 +252,11 @@ export class AcademicMilestoneModel {
     const milestoneStates = {};
 
     // Credits
-    const creditsEvidence = evidenceMap["CREDITS_MIN"] || { 
-      satisfied: summary.earnedCredits >= gradConditions.minCredits, 
-      actualValue: summary.earnedCredits, 
+    const earnedCreds = summary.earnedCredits ?? digitalTwin?.earnedCredits ?? 0;
+    const creditsEvidence = { 
+      type: "CREDITS_MIN",
+      satisfied: earnedCreds >= gradConditions.minCredits, 
+      actualValue: earnedCreds, 
       requiredValue: gradConditions.minCredits 
     };
     milestoneStates[MILESTONE_TYPES.ACADEMIC_PROGRESS] = this.deriveMilestoneState(
@@ -262,9 +264,11 @@ export class AcademicMilestoneModel {
     );
 
     // GPA
-    const gpaEvidence = evidenceMap["GPA_MIN"] || { 
-      satisfied: summary.cgpa >= gradConditions.minGpa, 
-      actualValue: summary.cgpa, 
+    const actualCgpa = summary.cgpa ?? digitalTwin?.cgpa ?? 0;
+    const gpaEvidence = { 
+      type: "GPA_MIN",
+      satisfied: actualCgpa >= gradConditions.minGpa, 
+      actualValue: actualCgpa, 
       requiredValue: gradConditions.minGpa 
     };
     milestoneStates[MILESTONE_TYPES.GPA_STANDING] = this.deriveMilestoneState(
@@ -272,9 +276,11 @@ export class AcademicMilestoneModel {
     );
 
     // Language
-    const langEvidence = evidenceMap["CERTIFICATE_PRESENT"] || { 
-      satisfied: toeicScore >= requiredToeic, 
-      actualValue: toeicScore, 
+    const actualToeic = toeicScore;
+    const langEvidence = { 
+      type: "CERTIFICATE_PRESENT",
+      satisfied: actualToeic >= requiredToeic, 
+      actualValue: actualToeic, 
       requiredValue: requiredToeic 
     };
     milestoneStates[MILESTONE_TYPES.LANGUAGE_REQUIREMENT] = this.deriveMilestoneState(
@@ -282,9 +288,11 @@ export class AcademicMilestoneModel {
     );
 
     // Tuition
-    const tuitionEvidence = evidenceMap["TUITION_CLEAR"] || { 
-      satisfied: finClearance.isCleared === true, 
-      actualValue: finClearance.remainingDebt || 0, 
+    const tuitionSatisfied = (finClearance.isCleared === true) || (digitalTwin?.tuitionPaid === true && (digitalTwin?.debtAmount || 0) === 0);
+    const tuitionEvidence = { 
+      type: "TUITION_CLEAR",
+      satisfied: tuitionSatisfied, 
+      actualValue: finClearance.remainingDebt || digitalTwin?.debtAmount || 0, 
       requiredValue: 0 
     };
     milestoneStates[MILESTONE_TYPES.TUITION_CLEARANCE] = this.deriveMilestoneState(
