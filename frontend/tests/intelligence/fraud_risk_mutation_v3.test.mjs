@@ -33,7 +33,7 @@ console.log("☠️  STUDENTHUB AI — MUTATION / DEATH TESTING SUITE (AUDIT V3)
 console.log("======================================================================");
 
 async function createAndImportMutant(mutationName, mutationFn) {
-  const originalSource = readFileSync(SOURCE_PATH, "utf-8");
+  const originalSource = readFileSync(SOURCE_PATH, "utf-8").replace(/\r\n/g, "\n");
   const mutatedSource = mutationFn(originalSource);
 
   const tempFileName = `fraudRiskEngine_MUTANT_V3_${mutationName}_${Date.now()}.js`;

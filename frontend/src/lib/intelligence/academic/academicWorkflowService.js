@@ -10,6 +10,7 @@ import { AcademicTaskModel } from "./academicTaskModel.js";
 import { AcademicTaskStore } from "./academicTaskStore.js";
 import { AcademicTaskAuthorization } from "./academicTaskAuthorization.js";
 import { AcademicWorkflowReconciliationEngine } from "./academicWorkflowReconciliationEngine.js";
+import { AcademicNotificationOrchestrator } from "./academicNotificationOrchestrator.js";
 import { ACTION_TYPES, AcademicActionIntent } from "./academicActionIntent.js";
 
 export class AcademicWorkflowService {
@@ -288,6 +289,7 @@ export class AcademicWorkflowService {
       if (AcademicWorkflowStateMachine.canTransition(task.status, targetState)) {
         task.status = targetState;
         task.completedAt = new Date().toISOString();
+        AcademicNotificationOrchestrator.onTaskCompleted(taskId, studentId);
       }
     } else if (task.status === WORKFLOW_STATES.READY || task.status === WORKFLOW_STATES.NOT_STARTED) {
       task.status = WORKFLOW_STATES.IN_PROGRESS;
@@ -335,6 +337,7 @@ export class AcademicWorkflowService {
     });
 
     AcademicTaskStore.recordEvent(taskId, event);
+    AcademicNotificationOrchestrator.onTaskCompleted(taskId, studentId);
     return AcademicTaskStore.saveTask(task);
   }
 }

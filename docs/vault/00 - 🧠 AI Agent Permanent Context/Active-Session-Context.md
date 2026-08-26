@@ -109,9 +109,24 @@
        - **Giao Diện Command Center 2.0 & Ngăn Tra Cứu Hồ Sơ Số**: `DigitalTwinDrawer.jsx` cho phép sinh viên tra cứu trực quan tiến độ học tập, chứng chỉ và lý do điều kiện xét tốt nghiệp; tích hợp nút truy cập từ `AcademicHeader.jsx`.
        - **Tập Kiểm Chuẩn**: **363/363 Tests PASS (100.0%)** trên 37 test files, 84 suites. **31/31 Mutants KILLED**.
 
+   17. ✅ **Điều Phối Thông Báo & Trí Tuệ Hạn Chót Học Vụ V1 (Academic Notification & Deadline Orchestration V1 — Event, Deadline Intelligence, Reminder Policy, Auto-Cancellation, Multi-Tenant Isolation)**:
+       - **Động Cơ Trí Tuệ Hạn Chót (`academicDeadlineEngine.js`)**: Tính toán thời gian thực theo múi giờ `Asia/Ho_Chi_Minh` (UTC+7), phân lớp trạng thái hạn chót (`FUTURE`, `DUE_SOON`, `DUE_TOMORROW`, `DUE_TODAY`, `OVERDUE`, `COMPLETED_BEFORE_DEADLINE`, `EXPIRED`) và câu chữ giải thích minh bạch.
+       - **Chính Sách Nhắc Nhở Học Vụ (`academicReminderPolicy.js`)**: Định nghĩa cấu hình các cửa sổ nhắc nhở chuẩn (7 ngày, 3 ngày, 1 ngày, sáng ngày hết hạn, quá hạn) cùng ánh xạ mức độ ưu tiên (`CRITICAL`, `HIGH`, `MEDIUM`).
+       - **Mô Hình & Máy Trạng Thái Thông Báo (`academicNotificationModel.js`, `academicNotificationStateMachine.js`)**: Định danh dedupe key tất định (`deriveDedupeKey`), quản trị chu trình trạng thái `SCHEDULED ➔ QUEUED ➔ SENT ➔ READ ➔ ACKNOWLEDGED`, hỗ trợ `SNOOZE` bảo lưu hạn chót học vụ gốc.
+       - **Lưu Trữ Bền Vững & Chống Trùng Lặp (`academicNotificationStore.js`)**: Ghi nhật ký tệp nguyên tử `.tmp` ➔ `renameSync`, tự động phục hồi sau khởi động (`rehydrate()`), khóa lạc quan chống xung đột phiên bản.
+       - **Điều Phối Trưởng & Tự Động Hủy Thông Báo (`academicNotificationOrchestrator.js`)**: Tự động hủy toàn bộ thông báo chờ khi nhiệm vụ học vụ `COMPLETED`; tự động dung hòa thông báo khi nhà trường gia hạn (ví dụ: `30/08` ➔ `05/09`, hủy lịch cũ, lập lịch mới, 0 thông báo rác/cũ).
+       - **Hàng Rào Phân Quyền & Bảo Vệ Riêng Tư (`academicNotificationAuthorization.js`)**: Chặn đứng truy cập chéo giữa các sinh viên, tự động làm sạch (sanitize) mật khẩu, OTP, thông tin nhạy cảm trước khi phát hành.
+       - **Giao Diện Ngăn Kéo Thông Báo & API Server-First**: `NotificationCenterDrawer.jsx` tích hợp bộ lọc trực quan (Tất cả, Chưa đọc, Hạn chót, Quy trình), nút chuông thông báo trên `AcademicHeader.jsx`, endpoint `/api/academic/notifications`.
+       - **Tập Kiểm Chuẩn**: **388/388 Tests PASS (100.0%)** trên 47 test files, 94 suites. **31/31 Mutants KILLED**.
+
 ---
 
-## 2. Đường Dẫn File Trọng Tâm (v9 Nodes)
+## 2. Đường Dẫn File Trọng Tâm (v10 Nodes)
+- **Kiến Trúc Điều Phối Thông Báo & Hạn Chót**: `docs/vault/01 - 🏗️ System Architecture/Academic-Notification-Orchestration-V1.md`
+- **Động Cơ Trí Tuệ Hạn Chót & Chính Sách Nhắc Nhở**: `frontend/src/lib/intelligence/academic/academicDeadlineEngine.js`, `academicReminderPolicy.js`
+- **Mô Hình, Máy Trạng Thái & Điều Phối Thông Báo**: `frontend/src/lib/intelligence/academic/academicNotificationModel.js`, `academicNotificationStateMachine.js`, `academicNotificationOrchestrator.js`
+- **Kho Lưu Trữ Bền Vững & Phân Quyền Thông Báo**: `frontend/src/lib/intelligence/academic/academicNotificationStore.js`, `academicNotificationAuthorization.js`
+- **Ngăn Kéo Trung Tâm Thông Báo**: `frontend/src/components/academic/NotificationCenterDrawer.jsx`
 - **Kiến Trúc Lưu Trữ Bền Vững Quy Trình**: `docs/vault/01 - 🏗️ System Architecture/Academic-Workflow-Persistence-V1.md`
 - **Kiến Trúc Bản Sao Số Sinh Viên & Động Cơ Điều Kiện**: `docs/vault/01 - 🏗️ System Architecture/Academic-Digital-Twin-V1.md`
 - **Mô Hình & Kho Bản Sao Số Học Vụ**: `frontend/src/lib/intelligence/academic/studentDigitalTwinModel.js`, `studentDigitalTwinStore.js`

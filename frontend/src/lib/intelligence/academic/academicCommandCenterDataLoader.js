@@ -12,6 +12,8 @@ import { AcademicRuleExtractor } from "./academicRuleExtractor.js";
 import { AcademicWorkflowService } from "./academicWorkflowService.js";
 import { StudentDigitalTwinStore } from "./studentDigitalTwinStore.js";
 import { AcademicEligibilityEngine } from "./academicEligibilityEngine.js";
+import { AcademicNotificationStore } from "./academicNotificationStore.js";
+import { AcademicNotificationOrchestrator } from "./academicNotificationOrchestrator.js";
 
 export const DEFAULT_STUDENT_PROFILE = {
   studentId: "24110001",
@@ -143,6 +145,20 @@ export function getAuthoritativeCommandCenterData(params = {}) {
     recentChanges
   );
 
+  // 6. Schedule automated deadline reminders via AcademicNotificationOrchestrator
+  for (const task of academicTasks) {
+    const linkedInsight = sortedInsights.find(i => i.insightId === task.insightId);
+    AcademicNotificationOrchestrator.scheduleTaskReminders({
+      task,
+      insight: linkedInsight
+    });
+  }
+
+  const persistedNotifications = AcademicNotificationStore.getNotificationsByStudent(studentProfile.studentId, {
+    excludeCancelled: true
+  });
+  const unreadNotificationCount = AcademicNotificationStore.countUnreadByStudent(studentProfile.studentId);
+
   const syncStatus = {
     isLive: true,
     lastSyncedAt: new Date().toISOString(),
@@ -167,7 +183,8 @@ export function getAuthoritativeCommandCenterData(params = {}) {
     academicTasks,
     recentChanges,
     timelineEvents: trajectory.timelineEvents,
-    notifications: trajectory.notifications,
+    notifications: persistedNotifications,
+    unreadNotificationCount,
     totalActionCount: sortedInsights.filter(i => i.impact === "CRITICAL" || i.impact === "HIGH").length,
     syncStatus,
     timestamp: new Date().toISOString()

@@ -2,9 +2,16 @@
 
 import React from "react";
 import { AcademicCommandCenterViewModel } from "@/lib/intelligence/academic/academicCommandCenterViewModel.js";
-import { ShieldCheck, BookOpen, Award, CheckCircle, Clock } from "lucide-react";
+import { ShieldCheck, BookOpen, Award, CheckCircle, Clock, Bell } from "lucide-react";
 
-export function AcademicHeader({ studentProfile = {}, digitalTwinState = {}, syncStatus = {}, onOpenTwinDrawer }) {
+export function AcademicHeader({ 
+  studentProfile = {}, 
+  digitalTwinState = {}, 
+  syncStatus = {}, 
+  onOpenTwinDrawer,
+  unreadNotificationCount = 0,
+  onOpenNotificationDrawer
+}) {
   const {
     fullName = "Sinh Viên",
     cohort = 2024,
@@ -84,19 +91,35 @@ export function AcademicHeader({ studentProfile = {}, digitalTwinState = {}, syn
             </div>
           </div>
 
-          {/* Sync Status Badge */}
-          <div className="flex flex-col items-start sm:items-end text-xs">
-            <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-semibold border ${
-              isLive 
-                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" 
-                : "bg-amber-500/10 text-amber-400 border-amber-500/30"
-            }`}>
-              <span className={`h-2 w-2 rounded-full ${isLive ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
-              {isLive ? "LIVE — Đồng Bộ Trực Tuyến" : "STALE — Bản Xác Minh Gần Nhất"}
+          {/* Sync Status Badge & Notification Bell */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onOpenNotificationDrawer}
+              className="relative p-2.5 rounded-2xl border border-border/60 bg-background/80 hover:bg-muted/80 text-foreground transition-all shadow-sm cursor-pointer group"
+              title="Mở Trung tâm Thông báo"
+              aria-label="Thông báo"
+            >
+              <Bell className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              {unreadNotificationCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-black text-white shadow-lg animate-pulse">
+                  {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
+                </span>
+              )}
+            </button>
+
+            <div className="flex flex-col items-start sm:items-end text-xs">
+              <div className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-semibold border ${
+                isLive 
+                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" 
+                  : "bg-amber-500/10 text-amber-400 border-amber-500/30"
+              }`}>
+                <span className={`h-2 w-2 rounded-full ${isLive ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
+                {isLive ? "LIVE — Đồng Bộ Trực Tuyến" : "STALE — Bản Xác Minh Gần Nhất"}
+              </div>
+              <span className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
+                <Clock className="h-3 w-3" /> Cập nhật: {lastSyncFormatted !== "N/A" ? lastSyncFormatted : "Đang kết nối"}
+              </span>
             </div>
-            <span className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-              <Clock className="h-3 w-3" /> Cập nhật: {lastSyncFormatted !== "N/A" ? lastSyncFormatted : "Đang kết nối"}
-            </span>
           </div>
         </div>
       </div>

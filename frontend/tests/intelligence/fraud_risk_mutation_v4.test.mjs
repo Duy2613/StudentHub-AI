@@ -275,7 +275,7 @@ test("▶ [MUTANT-11] FraudRiskEngine: Remove Beneficiary Exact Boundary Anchor"
 });
 
 test("▶ [MUTANT-12] FraudRiskEngine: Disable Hard Rule Short-Circuiting", async () => {
-  const originalCode = fs.readFileSync(FRAUD_ENGINE_SRC, "utf-8");
+  const originalCode = fs.readFileSync(FRAUD_ENGINE_SRC, "utf-8").replace(/\r\n/g, "\n");
   const mutatedCode = originalCode.replace(
     'if (hardRulesTriggered.length > 0) {\n      decision = FRAUD_DECISIONS.BLOCKED;',
     'if (false) {\n      decision = FRAUD_DECISIONS.BLOCKED;'

@@ -9,6 +9,7 @@ import { AcademicTimeline } from "./AcademicTimeline.jsx";
 import { SourceEvidenceDrawer } from "./SourceEvidenceDrawer.jsx";
 import { WorkflowDetailDrawer } from "./WorkflowDetailDrawer.jsx";
 import { DigitalTwinDrawer } from "./DigitalTwinDrawer.jsx";
+import { NotificationCenterDrawer } from "./NotificationCenterDrawer.jsx";
 import { AcademicLoadingSkeleton, AcademicEmptyState, AcademicErrorState } from "./AcademicStates.jsx";
 
 export function AcademicCommandCenter({ initialData = null }) {
@@ -18,6 +19,7 @@ export function AcademicCommandCenter({ initialData = null }) {
   const [selectedItemForEvidence, setSelectedItemForEvidence] = useState(null);
   const [selectedTaskForWorkflow, setSelectedTaskForWorkflow] = useState(null);
   const [isTwinDrawerOpen, setIsTwinDrawerOpen] = useState(false);
+  const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
   const [isMutatingStep, setIsMutatingStep] = useState(false);
 
   const fetchCommandCenterData = async () => {
@@ -85,6 +87,43 @@ export function AcademicCommandCenter({ initialData = null }) {
     }
   };
 
+  // Notification action handlers
+  const handleNotificationAction = async (action, notificationId, extra = {}) => {
+    try {
+      const res = await fetch("/api/academic/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action,
+          notificationId,
+          studentId: data?.studentProfile?.studentId || "24110001",
+          ...extra
+        })
+      });
+
+      const resJson = await res.json();
+      if (!resJson.success) {
+        throw new Error(resJson.message || "Không thể thực hiện hành động thông báo.");
+      }
+
+      // Update notification state locally from server response
+      const updatedNotif = resJson.notification;
+      setData(prev => {
+        if (!prev) return prev;
+        const nextNotifications = (prev.notifications || []).map(n => 
+          n.notificationId === notificationId ? updatedNotif : n
+        );
+        return {
+          ...prev,
+          notifications: nextNotifications,
+          unreadNotificationCount: resJson.unreadCount ?? prev.unreadNotificationCount
+        };
+      });
+    } catch (err) {
+      alert(err.message || "Lỗi xử lý thông báo.");
+    }
+  };
+
   if (loading) {
     return <AcademicLoadingSkeleton />;
   }
@@ -105,7 +144,8 @@ export function AcademicCommandCenter({ initialData = null }) {
     priorityInsights = [],
     academicTasks = [],
     recentChanges = [],
-    timelineEvents = [],
+    notifications = [],
+    unreadNotificationCount = 0,
     syncStatus = {}
   } = data;
 
@@ -119,6 +159,8 @@ export function AcademicCommandCenter({ initialData = null }) {
         digitalTwinState={digitalTwinState}
         syncStatus={syncStatus}
         onOpenTwinDrawer={() => setIsTwinDrawerOpen(true)}
+        unreadNotificationCount={unreadNotificationCount}
+        onOpenNotificationDrawer={() => setIsNotificationDrawerOpen(true)}
       />
 
       {!hasAnyContent ? (
@@ -180,6 +222,24 @@ export function AcademicCommandCenter({ initialData = null }) {
         onClose={() => setIsTwinDrawerOpen(false)}
         digitalTwin={digitalTwin}
         eligibilityResult={eligibilityResult}
+      />
+
+      {/* 8. Slide-over Notification Center Drawer */}
+      <NotificationCenterDrawer
+        isOpen={isNotificationDrawerOpen}
+        onClose={() => setIsNotificationDrawerOpen(false)}
+        notifications={notifications}
+        unreadCount={unreadNotificationCount}
+        onMarkRead={(id) => handleNotificationAction("MARK_READ", id)}
+        onAcknowledge={(id) => handleNotificationAction("ACKNOWLEDGE", id)}
+        onSnooze={(id, hours) => handleNotificationAction("SNOOZE", id, { snoozeHours: hours })}
+        onDismiss={(id) => handleNotificationAction("DISMISS", id)}
+        onOpenWorkflow={(taskId) => {
+          const targetTask = (academicTasks || []).find(t => t.taskId === taskId);
+          if (targetTask) {
+            setSelectedTaskForWorkflow(targetTask);
+          }
+        }}
       />
     </div>
   );

@@ -1,0 +1,249 @@
+/**
+ * StudentHub AI — Academic Deadline Engine V1
+ * 
+ * Deterministic date calculations, urgency classification, and time-remaining
+ * estimations for academic deadlines in Asia/Ho_Chi_Minh (UTC+7) timezone.
+ * Pure logic with injectable clock for deterministic testing.
+ */
+
+export const DEADLINE_STATES = Object.freeze({
+  NO_DEADLINE: "NO_DEADLINE",
+  FUTURE: "FUTURE",
+  DUE_SOON: "DUE_SOON",         // <= 7 days
+  DUE_TOMORROW: "DUE_TOMORROW", // <= 24 hours
+  DUE_TODAY: "DUE_TODAY",       // deadline is today
+  OVERDUE: "OVERDUE",           // current time past deadline and task incomplete
+  COMPLETED_BEFORE_DEADLINE: "COMPLETED_BEFORE_DEADLINE",
+  EXPIRED: "EXPIRED"            // past deadline and action window closed
+});
+
+export const DEADLINE_URGENCY = Object.freeze({
+  CRITICAL: "CRITICAL",
+  HIGH: "HIGH",
+  MEDIUM: "MEDIUM",
+  LOW: "LOW"
+});
+
+export class AcademicDeadlineEngine {
+  /**
+   * Parses various date formats into a canonical ISO Date string (end of day UTC+7: 23:59:59.999)
+   * @param {string|Date} dateInput 
+   * @returns {Date|null}
+   */
+  static parseDeadline(dateInput) {
+    if (!dateInput) return null;
+    if (dateInput instanceof Date) {
+      return isNaN(dateInput.getTime()) ? null : dateInput;
+    }
+
+    if (typeof dateInput !== "string") return null;
+    const trimmed = dateInput.trim();
+    if (!trimmed) return null;
+
+    // Check DD/MM/YYYY
+    const ddmmyyyyMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (ddmmyyyyMatch) {
+      const day = parseInt(ddmmyyyyMatch[1], 10);
+      const month = parseInt(ddmmyyyyMatch[2], 10) - 1;
+      const year = parseInt(ddmmyyyyMatch[3], 10);
+      // Construct date at 23:59:59.999 UTC+7 (+07:00)
+      const date = new Date(Date.UTC(year, month, day, 16, 59, 59, 999)); // 23:59:59.999 UTC+7 is 16:59:59.999 UTC
+      return isNaN(date.getTime()) ? null : date;
+    }
+
+    // Check YYYY-MM-DD
+    const yyyymmddMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (yyyymmddMatch) {
+      const year = parseInt(yyyymmddMatch[1], 10);
+      const month = parseInt(yyyymmddMatch[2], 10) - 1;
+      const day = parseInt(yyyymmddMatch[3], 10);
+      const date = new Date(Date.UTC(year, month, day, 16, 59, 59, 999));
+      return isNaN(date.getTime()) ? null : date;
+    }
+
+    // Standard ISO parse
+    const parsed = new Date(trimmed);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  /**
+   * Computes the time remaining between current clock and due date
+   * @param {Date|string} dueDate 
+   * @param {object} clock - { now: () => timestamp }
+   * @returns {object}
+   */
+  static computeTimeRemaining(dueDate, clock = { now: () => Date.now() }) {
+    const due = this.parseDeadline(dueDate);
+    if (!due) {
+      return {
+        hasDeadline: false,
+        totalHours: null,
+        days: null,
+        hours: null,
+        minutes: null,
+        isOverdue: false,
+        humanText: "Không có hạn chót"
+      };
+    }
+
+    const currentTimestamp = clock.now();
+    const dueTimestamp = due.getTime();
+    const diffMs = dueTimestamp - currentTimestamp;
+    const isOverdue = diffMs < 0;
+
+    const absDiffMs = Math.abs(diffMs);
+    const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
+    const nowVn = new Date(currentTimestamp + VN_OFFSET_MS);
+    const dueVn = new Date(dueTimestamp + VN_OFFSET_MS);
+
+    const nowMidnightVn = Date.UTC(nowVn.getUTCFullYear(), nowVn.getUTCMonth(), nowVn.getUTCDate());
+    const dueMidnightVn = Date.UTC(dueVn.getUTCFullYear(), dueVn.getUTCMonth(), dueVn.getUTCDate());
+    const calendarDayDiff = Math.round((dueMidnightVn - nowMidnightVn) / (24 * 60 * 60 * 1000));
+
+    const totalHours = Math.floor(absDiffMs / (1000 * 60 * 60));
+    const hours = Math.floor((absDiffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((absDiffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    let humanText = "";
+    if (isOverdue) {
+      if (Math.abs(calendarDayDiff) >= 1) {
+        humanText = `Đã quá hạn ${Math.abs(calendarDayDiff)} ngày`;
+      } else if (hours >= 1) {
+        humanText = `Đã quá hạn ${hours} giờ`;
+      } else {
+        humanText = "Vừa hết hạn";
+      }
+    } else {
+      if (calendarDayDiff > 1) {
+        humanText = `Còn ${calendarDayDiff} ngày`;
+      } else if (calendarDayDiff === 1) {
+        humanText = "Ngày mai hết hạn";
+      } else if (hours >= 1) {
+        humanText = `Còn ${hours} giờ (Hết hạn hôm nay)`;
+      } else if (minutes > 0) {
+        humanText = `Còn ${minutes} phút (Khẩn cấp)`;
+      } else {
+        humanText = "Hết hạn ngay lúc này";
+      }
+    }
+
+    return {
+      hasDeadline: true,
+      dueAt: due.toISOString(),
+      diffMs,
+      totalHours: isOverdue ? -totalHours : totalHours,
+      days: calendarDayDiff,
+      calendarDayDiff,
+      hours,
+      minutes,
+      isOverdue,
+      humanText
+    };
+  }
+
+  /**
+   * Evaluates comprehensive deadline status and urgency
+   * @param {object} params
+   * @param {string|Date} params.deadline
+   * @param {string} [params.taskStatus]
+   * @param {object} [params.clock]
+   * @returns {object}
+   */
+  static evaluateDeadline({
+    deadline,
+    taskStatus = "NOT_STARTED",
+    clock = { now: () => Date.now() }
+  } = {}) {
+    const timeRemaining = this.computeTimeRemaining(deadline, clock);
+
+    if (!timeRemaining.hasDeadline) {
+      return {
+        state: DEADLINE_STATES.NO_DEADLINE,
+        urgency: DEADLINE_URGENCY.LOW,
+        dueAt: null,
+        timeRemaining,
+        isActionRequired: false
+      };
+    }
+
+    if (taskStatus === "COMPLETED") {
+      return {
+        state: DEADLINE_STATES.COMPLETED_BEFORE_DEADLINE,
+        urgency: DEADLINE_URGENCY.LOW,
+        dueAt: timeRemaining.dueAt,
+        timeRemaining,
+        isActionRequired: false
+      };
+    }
+
+    if (taskStatus === "EXPIRED" || taskStatus === "CANCELLED") {
+      return {
+        state: DEADLINE_STATES.EXPIRED,
+        urgency: DEADLINE_URGENCY.LOW,
+        dueAt: timeRemaining.dueAt,
+        timeRemaining,
+        isActionRequired: false
+      };
+    }
+
+    if (timeRemaining.isOverdue) {
+      return {
+        state: DEADLINE_STATES.OVERDUE,
+        urgency: DEADLINE_URGENCY.CRITICAL,
+        dueAt: timeRemaining.dueAt,
+        timeRemaining,
+        isActionRequired: true
+      };
+    }
+
+    const { calendarDayDiff } = timeRemaining;
+
+    if (calendarDayDiff === 0) {
+      return {
+        state: DEADLINE_STATES.DUE_TODAY,
+        urgency: DEADLINE_URGENCY.CRITICAL,
+        dueAt: timeRemaining.dueAt,
+        timeRemaining,
+        isActionRequired: true
+      };
+    }
+
+    if (calendarDayDiff === 1) {
+      return {
+        state: DEADLINE_STATES.DUE_TOMORROW,
+        urgency: DEADLINE_URGENCY.CRITICAL,
+        dueAt: timeRemaining.dueAt,
+        timeRemaining,
+        isActionRequired: true
+      };
+    }
+
+    if (calendarDayDiff <= 3) {
+      return {
+        state: DEADLINE_STATES.DUE_SOON,
+        urgency: DEADLINE_URGENCY.HIGH,
+        dueAt: timeRemaining.dueAt,
+        timeRemaining,
+        isActionRequired: true
+      };
+    }
+
+    if (calendarDayDiff <= 7) {
+      return {
+        state: DEADLINE_STATES.DUE_SOON,
+        urgency: DEADLINE_URGENCY.MEDIUM,
+        dueAt: timeRemaining.dueAt,
+        timeRemaining,
+        isActionRequired: true
+      };
+    }
+
+    return {
+      state: DEADLINE_STATES.FUTURE,
+      urgency: DEADLINE_URGENCY.LOW,
+      dueAt: timeRemaining.dueAt,
+      timeRemaining,
+      isActionRequired: false
+    };
+  }
+}
