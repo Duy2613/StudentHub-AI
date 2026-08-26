@@ -1,29 +1,28 @@
 /**
- * StudentHub AI — Multi-Signal Expert Entity Resolution Engine V1
+ * StudentHub AI — Multi-Signal Expert Entity Resolution Engine V2
  * 
- * Resolves expert entities using strict multi-signal matching (ORCID, official email,
- * institutional directory, publication DOI) rather than vulnerable name-only matching.
+ * Resolves expert identities using strict multi-signal weighting:
+ * - Strong Signals: Institutional Directory URL, Verified ORCID, @hcmute.edu.vn Email, Publication DOI
+ * - Weak Signals: Social username, avatar, bio text, follower count (Zero authority weight)
  * 
  * Defends against:
- * - Same-name collision (Identity Ambiguity)
- * - Profile cloning & AI-generated fake CVs
- * - Self-claimed credentials without verification evidence
+ * - Same-Name Collisions (IDENTITY_AMBIGUOUS — never merges based on name alone)
+ * - Professor Profile Impersonation & Cloned CVs
+ * - Fake Institutional Pages & Unverified ORCIDs
  */
 
 import {
   ExpertIntelligenceModel,
-  RESOLUTION_STATUS
+  RESOLUTION_STATUS,
+  EXPERT_STATUS
 } from "./expertIntelligenceModel.js";
 
 export class ExpertEntityResolver {
   /**
    * Resolves a query/input profile against known expert entities
-   * @param {object} inputQuery Search query with name, institution, or signals (orcid, email, doi)
-   * @param {Array} candidatePool List of known Expert entities
-   * @returns {object} Entity Resolution Result
    */
   static resolve(inputQuery = {}, candidatePool = []) {
-    if (!inputQuery || (!inputQuery.name && !inputQuery.orcid && !inputQuery.verifiedEmail)) {
+    if (!inputQuery || (!inputQuery.name && !inputQuery.orcid && !inputQuery.verifiedEmail && !inputQuery.doi)) {
       return {
         status: RESOLUTION_STATUS.UNRESOLVED,
         expert: null,
@@ -38,11 +37,34 @@ export class ExpertEntityResolver {
     const queryEmail = typeof inputQuery.verifiedEmail === "string" ? inputQuery.verifiedEmail.trim().toLowerCase() : null;
     const queryDoi = typeof inputQuery.doi === "string" ? inputQuery.doi.trim().toLowerCase() : null;
     const queryInstitution = typeof inputQuery.institution === "string" ? this.#normalize(inputQuery.institution) : "";
+    const queryDirectory = typeof inputQuery.directoryUrl === "string" ? inputQuery.directoryUrl.trim().toLowerCase() : null;
 
-    // 1. Direct Strong Signal Matches (ORCID or Verified Official Email)
+    // 1. Impersonation & Fake Portal Defense
+    if (queryDirectory && !this.#isOfficialInstitutionalDomain(queryDirectory)) {
+      return {
+        status: RESOLUTION_STATUS.UNRESOLVED,
+        expert: null,
+        candidateMatches: [],
+        confidence: 0,
+        explanation: `[IMPERSONATION_GUARD] Trang thông tin cơ quan '${queryDirectory}' không thuộc danh bạ tên miền chính thống được kiểm chuẩn.`
+      };
+    }
+
+    // 2. Direct Strong Signal: Verified ORCID Match
     if (queryOrcid) {
       const match = candidatePool.find(c => c.orcid && c.orcid.trim() === queryOrcid);
       if (match) {
+        // If name provided but clashes completely with ORCID registered name
+        if (queryName && this.#normalize(match.name) !== queryName) {
+          return {
+            status: RESOLUTION_STATUS.IDENTITY_AMBIGUOUS,
+            expert: null,
+            candidateMatches: [match],
+            confidence: 0.2,
+            explanation: `[ORCID_COLLISION] Mã ORCID ${queryOrcid} đã đăng ký cho ${match.name}, xung đột với tên truy vấn ${inputQuery.name}.`
+          };
+        }
+
         return {
           status: RESOLUTION_STATUS.EXACT_MATCH,
           expert: match,
@@ -53,19 +75,35 @@ export class ExpertEntityResolver {
       }
     }
 
+    // 3. Direct Strong Signal: Institutional Email (@hcmute.edu.vn)
     if (queryEmail) {
-      const match = candidatePool.find(c => c.verifiedEmail && c.verifiedEmail.trim().toLowerCase() === queryEmail);
-      if (match) {
-        return {
-          status: RESOLUTION_STATUS.EXACT_MATCH,
-          expert: match,
-          candidateMatches: [match],
-          confidence: 0.98,
-          explanation: `Xác thực tuyệt đối thông qua địa chỉ email công vụ cơ quan: ${queryEmail}.`
-        };
+      if (queryEmail.endsWith("@hcmute.edu.vn") || queryEmail.endsWith(".edu.vn")) {
+        const match = candidatePool.find(c => c.verifiedEmail && c.verifiedEmail.trim().toLowerCase() === queryEmail);
+        if (match) {
+          return {
+            status: RESOLUTION_STATUS.EXACT_MATCH,
+            expert: match,
+            candidateMatches: [match],
+            confidence: 0.98,
+            explanation: `Xác thực tuyệt đối thông qua địa chỉ email công vụ cơ quan: ${queryEmail}.`
+          };
+        }
+      } else {
+        // Commercial email (e.g. gmail) cannot be sole strong identity proof
+        const match = candidatePool.find(c => c.verifiedEmail && c.verifiedEmail.trim().toLowerCase() === queryEmail);
+        if (match && queryName && this.#normalize(match.name) === queryName) {
+          return {
+            status: RESOLUTION_STATUS.POSSIBLE_SAME_PERSON,
+            expert: match,
+            candidateMatches: [match],
+            confidence: 0.7,
+            explanation: "Khớp email cá nhân nhưng cần đối soát thêm mã ORCID hoặc hồ sơ khoa chính thức."
+          };
+        }
       }
     }
 
+    // 4. Direct Strong Signal: Publication DOI
     if (queryDoi) {
       const match = candidatePool.find(c => Array.isArray(c.publications) && c.publications.some(p => p.doi && p.doi.toLowerCase() === queryDoi));
       if (match) {
@@ -79,7 +117,7 @@ export class ExpertEntityResolver {
       }
     }
 
-    // 2. Name-based Matching with Multi-Signal Disambiguation
+    // 5. Name-based Matching with Multi-Signal Disambiguation
     if (queryName) {
       const nameMatches = candidatePool.filter(c => this.#normalize(c.name) === queryName);
 
@@ -95,32 +133,38 @@ export class ExpertEntityResolver {
             explanation: `Khớp định danh duy nhất với cơ quan công tác ${candidate.institution}.`
           };
         }
-      }
 
-      if (nameMatches.length > 1) {
-        // Multiple experts share the exact same name -> Same-name collision
-        // Try to filter by institution
-        const filteredByInst = queryInstitution 
-          ? nameMatches.filter(c => this.#normalize(c.institution) === queryInstitution)
-          : [];
-
-        if (filteredByInst.length === 1) {
-          return {
-            status: RESOLUTION_STATUS.EXACT_MATCH,
-            expert: filteredByInst[0],
-            candidateMatches: nameMatches,
-            confidence: 0.85,
-            explanation: `Phân giải trùng tên thành công dựa trên đơn vị đào tạo: ${filteredByInst[0].institution} - ${filteredByInst[0].department}.`
-          };
-        }
-
-        // Multiple candidates remain without differentiating strong signals
         return {
           status: RESOLUTION_STATUS.IDENTITY_AMBIGUOUS,
           expert: null,
           candidateMatches: nameMatches,
           confidence: 0.4,
-          explanation: `Cảnh báo trùng tên (${nameMatches.length} chuyên gia cùng tên ${inputQuery.name}). Hệ thống không tự ý gộp hồ sơ khi thiếu mã định danh khoa học hoặc đơn vị công tác xác thực.`
+          explanation: `Cảnh báo trùng tên: Phát hiện chuyên gia trùng tên nhưng khác cơ quan công tác (${queryInstitution} vs ${candidate.institution}).`
+        };
+      }
+
+      if (nameMatches.length > 1) {
+        // Multi-candidate collision: Check if institution disambiguates
+        if (queryInstitution) {
+          const instMatches = nameMatches.filter(c => this.#normalize(c.institution) === queryInstitution);
+          if (instMatches.length === 1) {
+            return {
+              status: RESOLUTION_STATUS.EXACT_MATCH,
+              expert: instMatches[0],
+              candidateMatches: instMatches,
+              confidence: 0.88,
+              explanation: `Phân biệt trùng tên thành công nhờ đối chiếu đơn vị công tác ${queryInstitution}.`
+            };
+          }
+        }
+
+        // Multiple candidates with same name across institutions -> IDENTITY_AMBIGUOUS (Never guess!)
+        return {
+          status: RESOLUTION_STATUS.IDENTITY_AMBIGUOUS,
+          expert: null,
+          candidateMatches: nameMatches,
+          confidence: 0.3,
+          explanation: `Cảnh báo trùng tên: Phát hiện ${nameMatches.length} chuyên gia có cùng tên. Hệ thống giữ trạng thái IDENTITY_AMBIGUOUS để bảo vệ tính chính xác học thuật.`
         };
       }
     }
@@ -130,16 +174,28 @@ export class ExpertEntityResolver {
       expert: null,
       candidateMatches: [],
       confidence: 0,
-      explanation: "Không tìm thấy hồ sơ chuyên gia khớp với thông tin đã cung cấp."
+      explanation: "Không tìm thấy hồ sơ chuyên gia khớp với các tín hiệu xác thực."
     };
   }
 
-  static #normalize(str = "") {
-    return str
+  static #normalize(text = "") {
+    return String(text)
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]/g, "")
+      .replace(/^(ts|pgs\.ts|gs\.ts|thsm|th\.s|gv)\.?\s+/i, "")
+      .replace(/\s+/g, " ")
       .trim();
+  }
+
+  static #isOfficialInstitutionalDomain(url = "") {
+    try {
+      const parsed = new URL(url);
+      return parsed.hostname.endsWith("hcmute.edu.vn") ||
+             parsed.hostname.endsWith(".edu.vn") ||
+             parsed.hostname === "localhost";
+    } catch {
+      return false;
+    }
   }
 }

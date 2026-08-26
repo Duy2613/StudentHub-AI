@@ -1,15 +1,41 @@
 /**
- * StudentHub AI — Comprehensive Expert Intelligence Domain Model V1
+ * StudentHub AI — Comprehensive Expert Intelligence Domain Model V2
+ * Verified Expert Knowledge Graph & Scope Boundary Architecture
  * 
  * Canonical contracts, immutable factories, taxonomy, and state machines for:
- * - Expert Identity & Multi-Signal Entity Resolution
- * - Credential Lifecycle & Provenance Tracking
- * - Multi-dimensional Domain Expertise Graph
+ * - Expert Identity & Multi-Signal Entity Resolution (ORCID, @hcmute.edu.vn, DOIs)
+ * - Credential Lifecycle & Effective Time Intervals (CREDENTIAL ≠ CURRENT ROLE)
+ * - Multi-dimensional Domain Expertise Graph (ESTABLISHED / SUPPORTED / EMERGING / LIMITED)
  * - Authority Scope & Disciplinary Jurisdiction (EXPERTISE ≠ AUTHORITY)
- * - Claim Classification, Correction History & Retraction Propagation
- * - Conflict of Interest & Commercial Endorsement Guard
- * - Shared Evidence Clustering & Privacy Redaction
+ * - Claim Classification, Correction History (V1 -> V2) & Retraction Cascade
+ * - Disagreement Mapping (Peer discrepancies without fame bias)
+ * - "Why this expert?" & "Where NOT to trust" Scope Boundaries
+ * - Conflict of Interest & Commercial Endorsement Transparency
+ * - Shared Evidence Clustering (Shared papers != Independent Consensus)
+ * 
+ * Non-Negotiable Invariants:
+ * ==================================================================================
+ * 1. EXPERTISE NEVER AUTOMATICALLY CREATES INSTITUTIONAL AUTHORITY.
+ * 2. IDENTITY ≠ EXPERTISE (Verified person != Universal authority).
+ * 3. CREDENTIAL ≠ CURRENT ROLE (Department Head 2022 != Department Head 2026).
+ * 4. POPULARITY / RATINGS NEVER CREATE ACADEMIC CREDIBILITY.
+ * 5. PUBLICATION COUNT NEVER MAKES AN UNPROVEN CLAIM TRUE.
+ * 6. THREE EXPERTS CITING ONE STUDY = ONE PROVENANCE CLUSTER, NOT 3 INDEPENDENT PROOFS.
+ * 7. UNKNOWN MUST REMAIN UNKNOWN (NEVER GENERATIVELY AVERAGED).
+ * ==================================================================================
  */
+
+import crypto from "node:crypto";
+
+export const EXPERT_STATUS = Object.freeze({
+  VERIFIED_EXPERT: "VERIFIED_EXPERT",       // Verified identity, active credentials, proven expertise
+  PARTIALLY_VERIFIED: "PARTIALLY_VERIFIED", // Identity confirmed, but peripheral credentials pending
+  IDENTITY_AMBIGUOUS: "IDENTITY_AMBIGUOUS", // Same name / multiple candidates, insufficient disambiguation
+  UNVERIFIED_EXPERT: "UNVERIFIED_EXPERT",   // Self-claimed, missing official verification
+  STALE_PROFILE: "STALE_PROFILE",           // No active publications or roles verified in last 3+ years
+  DISPUTED: "DISPUTED",                     // Challenged by academic integrity board
+  REVOKED: "REVOKED"                        // Credentials or institutional affiliation formally withdrawn
+});
 
 export const CREDENTIAL_STATUS = Object.freeze({
   VERIFIED: "VERIFIED",                     // Confirmed by institutional registry / MOET / ORCID
@@ -22,35 +48,44 @@ export const CREDENTIAL_STATUS = Object.freeze({
 });
 
 export const EXPERTISE_LEVEL = Object.freeze({
-  STRONG: "STRONG",                     // Direct verified peer-reviewed expertise / major publications
-  MODERATE: "MODERATE",                 // Secondary / related educational background
-  NOT_ESTABLISHED: "NOT_ESTABLISHED",   // Out-of-field claims without verified domain credentials
-  DISQUALIFIED: "DISQUALIFIED"          // Retracted credentials or sanctioned conflict of interest
+  ESTABLISHED: "ESTABLISHED",               // Strong verified peer-reviewed expertise / major publications
+  SUPPORTED: "SUPPORTED",                   // Active research projects / verified specialized credentials
+  EMERGING: "EMERGING",                     // Recent secondary work or cross-disciplinary explorations
+  LIMITED: "LIMITED",                       // Heuristic familiarity, lacking primary peer-reviewed evidence
+  UNKNOWN: "UNKNOWN",                       // No grounded domain evidence available
+  OUT_OF_SCOPE: "OUT_OF_SCOPE",             // Beyond established domain scope
+  STRONG: "ESTABLISHED",                    // Compatibility alias
+  MODERATE: "SUPPORTED",                    // Compatibility alias
+  NOT_ESTABLISHED: "OUT_OF_SCOPE",          // Compatibility alias
+  DISQUALIFIED: "OUT_OF_SCOPE"              // Compatibility alias
 });
 
 export const AFFILIATION_STATUS = Object.freeze({
-  VERIFIED_ACTIVE: "VERIFIED_ACTIVE",   // Currently employed faculty / official role in valid interval
-  VERIFIED_FORMER: "VERIFIED_FORMER",   // Verified past role / alumni faculty
-  UNVERIFIED: "UNVERIFIED",             // Self-proclaimed, missing institutional verification
-  REVOKED: "REVOKED"                    // Credentials or affiliation terminated
+  VERIFIED_ACTIVE: "VERIFIED_ACTIVE",       // Currently employed faculty / official role in valid interval
+  VERIFIED_FORMER: "VERIFIED_FORMER",       // Verified past role / alumni faculty
+  UNVERIFIED: "UNVERIFIED",                 // Self-proclaimed, missing institutional verification
+  REVOKED: "REVOKED"                        // Credentials or affiliation terminated
 });
 
 export const JURISDICTION_TYPE = Object.freeze({
   TECHNICAL_DOMAIN: "TECHNICAL_DOMAIN",       // AI, Computer Science, Robotics, Electrical
+  RESEARCH_INTERPRETATION: "RESEARCH_INTERPRETATION", // Scientific analysis of published literature
   PEDAGOGICAL: "PEDAGOGICAL",                 // Teaching methodology, curriculum feedback
   INSTITUTIONAL_ADMIN: "INSTITUTIONAL_ADMIN", // Official HCMUTE administrative policy (Registrar, Rector)
   LEGAL_REGULATORY: "LEGAL_REGULATORY"        // Vietnam education law, ministerial policy
 });
 
 export const CLAIM_TYPE = Object.freeze({
-  OPINION: "OPINION",                                 // Personal viewpoint / perspective
-  INTERPRETATION: "INTERPRETATION",                   // Analytical breakdown of existing knowledge
   TECHNICAL_CLAIM: "TECHNICAL_CLAIM",                 // Specific engineering / scientific statement
   RESEARCH_CLAIM: "RESEARCH_CLAIM",                   // Novel finding / publication hypothesis
-  EXPERIENCE: "EXPERIENCE",                           // Professional / teaching experience
   PROFESSIONAL_GUIDANCE: "PROFESSIONAL_GUIDANCE",     // Career or research methodology advice
+  EXPERT_OPINION: "EXPERT_OPINION",                   // Qualified academic viewpoint
+  INTERPRETATION: "INTERPRETATION",                   // Analytical breakdown of existing knowledge
+  FIRST_HAND_EXPERIENCE: "FIRST_HAND_EXPERIENCE",     // Direct classroom / project observation
   INSTITUTIONAL_CLAIM: "INSTITUTIONAL_CLAIM",         // Statement regarding university operations
-  OFFICIAL_POLICY_CLAIM: "OFFICIAL_POLICY_CLAIM"      // Binding academic regulation / deadline
+  OFFICIAL_POLICY_CLAIM: "OFFICIAL_POLICY_CLAIM",      // Binding academic regulation / deadline
+  OPINION: "EXPERT_OPINION",                          // Compatibility alias
+  EXPERIENCE: "FIRST_HAND_EXPERIENCE"                 // Compatibility alias
 });
 
 export const CLAIM_STATUS = Object.freeze({
@@ -58,12 +93,13 @@ export const CLAIM_STATUS = Object.freeze({
   CORRECTED: "CORRECTED",                             // Replaced by updated version (V1 -> V2)
   RETRACTED: "RETRACTED",                             // Withdrawn by author or journal
   DISPUTED: "DISPUTED",                               // Active disagreement among domain peers
-  OUTDATED: "OUTDATED"                                // Stale / superseded by newer discoveries
+  OUTDATED: "OUTDATED",                               // Stale / superseded by newer discoveries
+  NEEDS_REEVALUATION: "NEEDS_REEVALUATION"            // Dependent on a retracted citation
 });
 
 export const EXPERT_CLAIM_STATUS = Object.freeze({
-  QUALIFIED_EXPERT_OPINION: "QUALIFIED_EXPERT_OPINION",     // Within verified strong expertise
-  INTERPRETATION_ONLY: "INTERPRETATION_ONLY",               // Moderate expertise / heuristic advice
+  QUALIFIED_EXPERT_OPINION: "QUALIFIED_EXPERT_OPINION",     // Within verified established expertise
+  INTERPRETATION_ONLY: "INTERPRETATION_ONLY",               // Analytical interpretation of third-party evidence
   OUT_OF_SCOPE: "OUT_OF_SCOPE",                             // Beyond established domain scope
   AUTHORITY_MISMATCH: "AUTHORITY_MISMATCH",                 // Claiming official administrative power without registrar role
   CONFLICT_OF_INTEREST: "CONFLICT_OF_INTEREST",             // Commercial bias or undeclared sponsorship
@@ -76,70 +112,94 @@ export const QUERY_ANSWER_MODE = Object.freeze({
   EXPERT_SUPPORTED: "EXPERT_SUPPORTED",                     // Strongly backed by published evidence
   EXPERT_CONFLICTED: "EXPERT_CONFLICTED",                   // Potential conflict of interest detected
   EXPERT_SCOPE_MISMATCH: "EXPERT_SCOPE_MISMATCH",           // Domain outside expert scope
-  UNVERIFIED_EXPERT: "UNVERIFIED_EXPERT"                    // Identity or credentials unverified
+  UNVERIFIED_EXPERT: "UNVERIFIED_EXPERT",                   // Identity or credentials unverified
+  DISAGREEMENT_DETECTED: "DISAGREEMENT_DETECTED"            // Divergent expert perspectives mapped
 });
 
 export const RESOLUTION_STATUS = Object.freeze({
   EXACT_MATCH: "EXACT_MATCH",                               // Confirmed single entity via multiple strong signals
-  IDENTITY_AMBIGUOUS: "IDENTITY_AMBIGUOUS",                 // Same name / multiple candidates, insufficient signals
+  POSSIBLE_SAME_PERSON: "POSSIBLE_SAME_PERSON",             // Likely match, requires minor secondary corroboration
+  IDENTITY_AMBIGUOUS: "IDENTITY_AMBIGUOUS",                 // Same name / multiple candidates across institutions
+  DIFFERENT_PERSON: "DIFFERENT_PERSON",                     // Confirmed separate entity
   UNRESOLVED: "UNRESOLVED"                                  // No matching profile found
+});
+
+export const DISAGREEMENT_REASON = Object.freeze({
+  DIFFERENT_DATASETS: "DIFFERENT_DATASETS",
+  DIFFERENT_COHORTS: "DIFFERENT_COHORTS",
+  DIFFERENT_TIMEFRAMES: "DIFFERENT_TIMEFRAMES",
+  DIFFERENT_METHODOLOGIES: "DIFFERENT_METHODOLOGIES",
+  THEORETICAL_DIVERGENCE: "THEORETICAL_DIVERGENCE"
 });
 
 export class ExpertIntelligenceModel {
   /**
-   * Creates a canonical, immutable Expert Profile entity
+   * Creates a canonical, immutable Expert Profile entity V2
    */
   static createExpert(data = {}) {
     const expertId = data.expertId || `EXP_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const name = typeof data.name === "string" ? data.name.trim() : "Chuyên Gia";
+    const canonicalIdentity = data.canonicalIdentity || name;
+    const aliases = Array.isArray(data.aliases) ? Object.freeze([...data.aliases]) : Object.freeze([name]);
     const title = typeof data.title === "string" ? data.title.trim() : "Giảng Viên";
     const institution = typeof data.institution === "string" ? data.institution.trim() : "HCMUTE";
     const department = typeof data.department === "string" ? data.department.trim() : "Khoa CNTT";
     const affiliationStatus = AFFILIATION_STATUS[data.affiliationStatus] || AFFILIATION_STATUS.VERIFIED_ACTIVE;
-    
-    // Identity resolution signals
+    const status = EXPERT_STATUS[data.status] || (affiliationStatus === AFFILIATION_STATUS.VERIFIED_ACTIVE ? EXPERT_STATUS.VERIFIED_EXPERT : EXPERT_STATUS.UNVERIFIED_EXPERT);
+
+    // Multi-signal identifiers
     const orcid = typeof data.orcid === "string" ? data.orcid.trim() : null;
-    const verifiedEmail = typeof data.verifiedEmail === "string" ? data.verifiedEmail.trim() : null;
+    const verifiedEmail = typeof data.verifiedEmail === "string" ? data.verifiedEmail.trim().toLowerCase() : null;
     const directoryUrl = typeof data.directoryUrl === "string" ? data.directoryUrl.trim() : null;
     
     // Privacy protected fields
     const privateContact = data.privateContact ? { ...data.privateContact } : null;
 
-    const scopes = Array.isArray(data.scopes) ? [...data.scopes] : [];
-    const credentials = Array.isArray(data.credentials) ? [...data.credentials] : [];
-    const publications = Array.isArray(data.publications) ? [...data.publications] : [];
-    const roles = Array.isArray(data.roles) ? [...data.roles] : [];
-    const conflicts = Array.isArray(data.conflicts) ? [...data.conflicts] : [];
+    const scopes = Array.isArray(data.scopes) ? data.scopes.map(s => this.createScopeNode(s)) : [];
+    const credentials = Array.isArray(data.credentials) ? data.credentials.map(c => this.createCredential(c)) : [];
+    const publications = Array.isArray(data.publications) ? data.publications.map(p => this.createPublication(p)) : [];
+    const roles = Array.isArray(data.roles) ? data.roles.map(r => this.createRole(r)) : [];
+    const conflicts = Array.isArray(data.conflicts) ? data.conflicts.map(cf => this.createConflict(cf)) : [];
+    const evidenceRefs = Array.isArray(data.evidenceRefs) ? [...data.evidenceRefs] : [];
 
     const isVerified = data.isVerified !== undefined
       ? Boolean(data.isVerified)
-      : (affiliationStatus === AFFILIATION_STATUS.VERIFIED_ACTIVE || affiliationStatus === AFFILIATION_STATUS.VERIFIED_FORMER);
+      : (status === EXPERT_STATUS.VERIFIED_EXPERT || affiliationStatus === AFFILIATION_STATUS.VERIFIED_ACTIVE);
 
+    // Registrar authority check: must hold active, unexpired role
+    const now = new Date();
     const hasRegistrarAuthority = Boolean(
       data.hasRegistrarAuthority || 
-      roles.some(r => r.roleTitle === "REGISTRAR_DIRECTOR" && (!r.validUntil || new Date(r.validUntil) >= new Date()))
+      roles.some(r => (r.roleTitle === "REGISTRAR_DIRECTOR" || r.roleTitle === "RECTOR") && (!r.validUntil || new Date(r.validUntil) >= now))
     );
 
     return Object.freeze({
       expertId,
+      canonicalIdentity,
+      aliases,
       name,
       title,
       institution,
       department,
       affiliationStatus,
+      status,
       orcid,
       verifiedEmail,
       directoryUrl,
       privateContact: privateContact ? Object.freeze(privateContact) : null,
-      scopes: Object.freeze(scopes.map(s => this.createScopeNode(s))),
-      credentials: Object.freeze(credentials.map(c => this.createCredential(c))),
-      publications: Object.freeze(publications.map(p => this.createPublication(p))),
-      roles: Object.freeze(roles.map(r => this.createRole(r))),
-      conflicts: Object.freeze(conflicts.map(cf => this.createConflict(cf))),
+      scopes: Object.freeze(scopes),
+      expertiseDomains: Object.freeze(scopes.map(s => s.domain)),
+      credentials: Object.freeze(credentials),
+      publications: Object.freeze(publications),
+      roles: Object.freeze(roles),
+      conflicts: Object.freeze(conflicts),
+      evidenceRefs: Object.freeze(evidenceRefs),
       hasRegistrarAuthority,
       isVerified,
       reputationScore: Number(data.reputationScore ?? 85),
-      lastVerifiedAt: data.lastVerifiedAt || new Date().toISOString(),
+      verifiedAt: data.verifiedAt || data.lastVerifiedAt || new Date().toISOString(),
+      lastVerifiedAt: data.lastVerifiedAt || data.verifiedAt || new Date().toISOString(),
+      lastCheckedAt: data.lastCheckedAt || new Date().toISOString(),
       registeredAt: data.registeredAt || new Date().toISOString()
     });
   }
@@ -148,12 +208,13 @@ export class ExpertIntelligenceModel {
    * Creates a typed Scope Graph Node
    */
   static createScopeNode(data = {}) {
-    const domain = typeof data.domain === "string" ? data.domain.trim().toUpperCase() : "GENERAL";
-    const subdomain = typeof data.subdomain === "string" ? data.subdomain.trim() : null;
-    const level = EXPERTISE_LEVEL[data.level] || EXPERTISE_LEVEL.NOT_ESTABLISHED;
+    const domain = typeof data.domain === "string" ? data.domain.trim().toUpperCase() : "GENERAL_ACADEMIC";
+    const subdomain = typeof data.subdomain === "string" ? data.subdomain.trim() : "General";
+    const level = EXPERTISE_LEVEL[data.level] || EXPERTISE_LEVEL.SUPPORTED;
     const jurisdiction = JURISDICTION_TYPE[data.jurisdiction] || JURISDICTION_TYPE.TECHNICAL_DOMAIN;
-    const citationCount = typeof data.citationCount === "number" ? data.citationCount : 0;
-    const recencyYear = typeof data.recencyYear === "number" ? data.recencyYear : new Date().getFullYear();
+    const citationCount = Number(data.citationCount || 0);
+    const recencyYear = Number(data.recencyYear || new Date().getFullYear());
+    const evidenceRefs = Array.isArray(data.evidenceRefs) ? [...data.evidenceRefs] : [];
 
     return Object.freeze({
       domain,
@@ -162,150 +223,262 @@ export class ExpertIntelligenceModel {
       jurisdiction,
       citationCount,
       recencyYear,
-      evidenceIds: Array.isArray(data.evidenceIds) ? Object.freeze([...data.evidenceIds]) : Object.freeze([])
+      evidenceRefs: Object.freeze(evidenceRefs),
+      isEstablished: level === EXPERTISE_LEVEL.ESTABLISHED || level === EXPERTISE_LEVEL.SUPPORTED
     });
   }
 
   /**
-   * Creates a Credential record with lifecycle state & validity interval
+   * Creates an immutable Credential Entity V2
    */
   static createCredential(data = {}) {
-    const credentialId = data.credentialId || `CRED_${Math.random().toString(36).slice(2, 7)}`;
+    const credentialId = data.credentialId || `CRED_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
     const type = data.type || "DEGREE_PHD";
-    const field = data.field || "Computer Science";
-    const issuer = data.issuer || "Đại học Quốc gia TP.HCM";
-    const issuedYear = data.issuedYear || 2020;
-    const validUntil = data.validUntil || null;
-    const verificationSource = data.verificationSource || "REGISTRY_MOET";
+    const title = data.title || (data.field ? `Degree in ${data.field}` : "Tiến Sĩ");
+    const issuingInstitution = data.issuingInstitution || data.issuer || "Đại Học Sư Phạm Kỹ Thuật";
+    const issuer = issuingInstitution;
+    const issuedAt = data.issuedAt || (data.issuedYear ? `${data.issuedYear}-01-01` : "2020-01-01");
+    const validUntil = data.validUntil || data.expiresAt || null;
+    const expiresAt = validUntil;
+    const verificationMethod = data.verificationMethod || data.verificationSource || (data.status === CREDENTIAL_STATUS.VERIFIED ? "OFFICIAL_MOET_REGISTRY" : "SELF_CLAIMED");
+    const verificationSource = verificationMethod;
+    const evidenceRefs = Array.isArray(data.evidenceRefs) ? [...data.evidenceRefs] : [];
+
+    let status = CREDENTIAL_STATUS[data.status] || (data.isVerified !== undefined ? (data.isVerified ? CREDENTIAL_STATUS.VERIFIED : CREDENTIAL_STATUS.UNVERIFIED) : (data.verificationSource || data.verificationMethod ? CREDENTIAL_STATUS.VERIFIED : CREDENTIAL_STATUS.UNVERIFIED));
     
-    // Auto-check expiry
-    let status = CREDENTIAL_STATUS[data.status] || (data.isVerified !== false ? CREDENTIAL_STATUS.VERIFIED : CREDENTIAL_STATUS.UNVERIFIED);
-    if (validUntil && new Date(validUntil) < new Date() && status === CREDENTIAL_STATUS.VERIFIED) {
+    // Auto detect expired credential
+    if (validUntil && new Date(validUntil) < new Date()) {
       status = CREDENTIAL_STATUS.EXPIRED;
     }
+
+    const isVerified = data.isVerified !== undefined
+      ? Boolean(data.isVerified && status !== CREDENTIAL_STATUS.EXPIRED && status !== CREDENTIAL_STATUS.REVOKED && status !== CREDENTIAL_STATUS.UNVERIFIED)
+      : (status === CREDENTIAL_STATUS.VERIFIED);
 
     return Object.freeze({
       credentialId,
       type,
-      field,
+      title,
+      field: data.field || title,
+      issuingInstitution,
       issuer,
-      issuedYear,
+      issuedAt,
+      issuedYear: Number(data.issuedYear || (issuedAt ? parseInt(issuedAt.slice(0, 4)) : 2020)),
+      expiresAt,
       validUntil,
-      verificationSource,
       status,
-      isVerified: status === CREDENTIAL_STATUS.VERIFIED
+      isVerified,
+      verificationMethod,
+      verificationSource,
+      evidenceRefs: Object.freeze(evidenceRefs),
+      verifiedAt: data.verifiedAt || new Date().toISOString()
     });
   }
 
   /**
-   * Creates a Role with effective temporal interval
+   * Creates an immutable Role Entity V2
    */
   static createRole(data = {}) {
+    const roleId = data.roleId || `ROLE_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const roleTitle = typeof data.roleTitle === "string" ? data.roleTitle.trim() : (data.title || "Giảng Viên");
+    const organization = typeof data.organization === "string" ? data.organization.trim() : (data.institution || "HCMUTE");
+    const department = typeof data.department === "string" ? data.department.trim() : "Khoa CNTT";
+    const validFrom = data.validFrom || "2020-01-01";
+    const validUntil = data.validUntil || null;
+
+    const isCurrent = !validUntil || new Date(validUntil) >= new Date();
+
     return Object.freeze({
-      roleId: data.roleId || `ROLE_${Math.random().toString(36).slice(2, 7)}`,
-      roleTitle: data.roleTitle || "FACULTY_MEMBER", // REGISTRAR_DIRECTOR, DEPT_HEAD, PROFESSOR
-      organization: data.organization || "HCMUTE",
-      validFrom: data.validFrom || "2020-01-01",
-      validUntil: data.validUntil || null,
-      isCurrent: !data.validUntil || new Date(data.validUntil) >= new Date()
+      roleId,
+      roleTitle,
+      title: roleTitle,
+      organization,
+      institution: organization,
+      department,
+      validFrom,
+      validUntil,
+      isCurrent,
+      verificationSource: data.verificationSource || "OFFICIAL_FACULTY_PAGE",
+      lastCheckedAt: data.lastCheckedAt || new Date().toISOString()
     });
   }
 
   /**
-   * Creates a Publication record
+   * Creates a Peer-Reviewed Publication node
    */
   static createPublication(data = {}) {
+    const pubId = data.pubId || `PUB_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const title = typeof data.title === "string" ? data.title.trim() : "Nghiên cứu khoa học";
+    const venue = typeof data.venue === "string" ? data.venue.trim() : "Hội nghị Khoa học HCMUTE";
+    const year = Number(data.year || new Date().getFullYear());
+    const domain = typeof data.domain === "string" ? data.domain.trim().toUpperCase() : "AI_ML";
+    const doi = typeof data.doi === "string" ? data.doi.trim().toLowerCase() : null;
+    const isRetracted = Boolean(data.isRetracted);
+    const citationCount = Number(data.citationCount || 0);
+    const provenanceClusterId = data.provenanceClusterId || `CLUSTER_${this.computeHash(title).slice(0, 8)}`;
+
     return Object.freeze({
-      pubId: data.pubId || `PUB_${Math.random().toString(36).slice(2, 7)}`,
-      title: data.title || "Research Paper",
-      venue: data.venue || "IEEE / ACM / Scopus",
-      year: data.year || 2024,
-      domain: (data.domain || "AI_ML").toUpperCase(),
-      doi: data.doi || null,
-      isRetracted: Boolean(data.isRetracted),
-      citationCount: Number(data.citationCount || 0)
+      pubId,
+      title,
+      venue,
+      year,
+      domain,
+      doi,
+      isRetracted,
+      citationCount,
+      provenanceClusterId
     });
   }
 
   /**
-   * Creates an Expert Claim record with versioning and retraction dependency
+   * Creates a Conflict of Interest Record V2
+   */
+  static createConflict(data = {}) {
+    const conflictId = data.conflictId || `COI_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const entity = typeof data.entity === "string" ? data.entity.trim() : (data.entityName || "Tổ chức thương mại");
+    const nature = data.nature || data.relationship || "COMMERCIAL_SPONSORSHIP"; // CONSULTANCY, VENDOR_COMMISSION, EMPLOYER
+    const domain = typeof data.domain === "string" ? data.domain.trim().toUpperCase() : null;
+    const isActive = data.isActive !== undefined ? Boolean(data.isActive) : true;
+    const disclosedAt = data.disclosedAt || new Date().toISOString();
+
+    return Object.freeze({
+      conflictId,
+      entity,
+      entityName: entity,
+      nature,
+      relationship: nature,
+      domain,
+      isActive,
+      disclosedAt,
+      description: data.description || `Mối quan hệ tư vấn/tài trợ với ${entity}.`
+    });
+  }
+
+  /**
+   * Creates an Expert Claim entity V2
    */
   static createExpertClaim(data = {}) {
-    const claimId = data.claimId || `EXP_CLAIM_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-    const expertId = typeof data.expertId === "string" ? data.expertId.trim() : "";
-    const text = typeof data.text === "string" ? data.text.trim() : "";
-    const domain = typeof data.domain === "string" ? data.domain.trim().toUpperCase() : "GENERAL";
-    const claimType = CLAIM_TYPE[data.claimType] || CLAIM_TYPE.TECHNICAL_CLAIM;
-    const claimJurisdiction = JURISDICTION_TYPE[data.claimJurisdiction] || JURISDICTION_TYPE.TECHNICAL_DOMAIN;
-    const version = Number(data.version || 1);
+    const claimId = data.claimId || `EXP_CLM_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const expertId = data.expertId || "EXP_UNKNOWN";
+    const statement = typeof data.statement === "string" ? data.statement.trim() : (typeof data.text === "string" ? data.text.trim() : "");
+    const claimType = CLAIM_TYPE[data.claimType] || CLAIM_TYPE.EXPERT_OPINION;
+    const domain = typeof data.domain === "string" ? data.domain.trim().toUpperCase() : "AI_ML";
+    const scope = data.scope || "GENERAL";
+    const claimJurisdiction = JURISDICTION_TYPE[data.claimJurisdiction || data.jurisdiction] || JURISDICTION_TYPE.TECHNICAL_DOMAIN;
     const supersededByClaimId = data.supersededByClaimId || null;
-    const citedEvidenceIds = Array.isArray(data.citedEvidenceIds) ? [...data.citedEvidenceIds] : [];
+    const status = data.status ? (CLAIM_STATUS[data.status] || data.status) : (supersededByClaimId ? CLAIM_STATUS.CORRECTED : CLAIM_STATUS.SUPPORTED);
+    const version = Number(data.version || 1);
+    const publishedAt = data.publishedAt || new Date().toISOString();
+    const evidenceRefs = Array.isArray(data.evidenceRefs) ? [...data.evidenceRefs] : [];
+    const citedEvidenceIds = Array.isArray(data.citedEvidenceIds) ? [...data.citedEvidenceIds] : evidenceRefs;
+    const citedPublicationDoi = data.citedPublicationDoi || null;
+    const isRetracted = Boolean(data.isRetracted || status === CLAIM_STATUS.RETRACTED);
     const isCommercialEndorsement = Boolean(data.isCommercialEndorsement);
-    const isRetracted = Boolean(data.isRetracted);
-
-    let status = CLAIM_STATUS[data.status] || CLAIM_STATUS.SUPPORTED;
-    if (isRetracted) {
-      status = CLAIM_STATUS.RETRACTED;
-    } else if (supersededByClaimId) {
-      status = CLAIM_STATUS.CORRECTED;
-    }
 
     return Object.freeze({
       claimId,
       expertId,
-      text,
-      domain,
+      statement,
+      text: statement,
       claimType,
+      domain,
+      scope,
+      jurisdiction: claimJurisdiction,
       claimJurisdiction,
-      version,
-      supersededByClaimId,
-      citedEvidenceIds: Object.freeze(citedEvidenceIds),
       status,
-      isCommercialEndorsement,
+      version,
+      publishedAt,
+      evidenceRefs: Object.freeze(evidenceRefs),
+      citedEvidenceIds: Object.freeze(citedEvidenceIds),
+      citedPublicationDoi,
       isRetracted,
-      statedAt: data.statedAt || new Date().toISOString()
+      isCommercialEndorsement,
+      correctionReason: data.correctionReason || null,
+      supersedesClaimId: data.supersedesClaimId || null,
+      supersededByClaimId
     });
   }
 
   /**
-   * Creates a Conflict of Interest Record
+   * Redacts private contact details from public view
    */
-  static createConflict(data = {}) {
-    return Object.freeze({
-      conflictId: data.conflictId || `CONF_${Math.random().toString(36).slice(2, 7)}`,
-      entityName: data.entityName || "Thương mại XYZ",
-      relationship: data.relationship || "CONSULTANT_SPONSOR", // SPONSOR, EMPLOYER, VENDOR, COMMERCIAL_PROMOTER
-      description: data.description || "Tài trợ hoặc đại diện thương mại",
-      isActive: Boolean(data.isActive !== false)
-    });
+  static redactForPublic(expert) {
+    if (!expert) return null;
+    const clone = { ...expert };
+    delete clone.privateContact;
+    return Object.freeze(clone);
   }
 
   /**
-   * Creates an Auditable Expert Evaluation Object
+   * Creates a structured Expert Evaluation response
    */
   static createExpertEvaluation(data = {}) {
     return Object.freeze({
-      evaluationId: data.evaluationId || `EXP_EVAL_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      expertId: data.expertId || "",
-      claim: data.claim || null,
-      scopeLevel: EXPERTISE_LEVEL[data.scopeLevel] || EXPERTISE_LEVEL.NOT_ESTABLISHED,
-      claimStatus: EXPERT_CLAIM_STATUS[data.claimStatus] || EXPERT_CLAIM_STATUS.OUT_OF_SCOPE,
+      evaluationId: data.evaluationId || `EXP_EVAL_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      expertId: data.expertId,
+      claim: data.claim ? this.createExpertClaim(data.claim) : null,
+      scopeLevel: EXPERTISE_LEVEL[data.scopeLevel] || EXPERTISE_LEVEL.OUT_OF_SCOPE,
+      claimStatus: EXPERT_CLAIM_STATUS[data.claimStatus] || EXPERT_CLAIM_STATUS.QUALIFIED_EXPERT_OPINION,
       answerMode: QUERY_ANSWER_MODE[data.answerMode] || QUERY_ANSWER_MODE.EXPERT_OPINION,
       isWithinExpertise: Boolean(data.isWithinExpertise),
       isWithinJurisdiction: Boolean(data.isWithinJurisdiction),
       hasConflictOfInterest: Boolean(data.hasConflictOfInterest),
-      explanation: typeof data.explanation === "string" ? data.explanation : "",
-      reputationScore: Number(data.reputationScore ?? 80),
-      evaluatedAt: data.evaluatedAt || new Date().toISOString()
+      explanation: data.explanation || "",
+      evaluatedAt: new Date().toISOString()
     });
   }
 
   /**
-   * Redacts private contact information from Expert Profile for public API consumption
+   * Creates a structured Disagreement Map between experts
    */
-  static redactForPublic(expert) {
-    if (!expert) return null;
-    const { privateContact, ...publicFields } = expert;
-    return Object.freeze(publicFields);
+  static createDisagreementMap(data = {}) {
+    return Object.freeze({
+      mapId: data.mapId || `DISAGREE_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      topic: data.topic || "Chủ đề học thuật",
+      domain: data.domain || "AI_ML",
+      expertA: data.expertA ? { ...data.expertA } : null,
+      claimA: data.claimA ? this.createExpertClaim(data.claimA) : null,
+      evidenceA: data.evidenceA || [],
+      expertB: data.expertB ? { ...data.expertB } : null,
+      claimB: data.claimB ? this.createExpertClaim(data.claimB) : null,
+      evidenceB: data.evidenceB || [],
+      divergenceReason: DISAGREEMENT_REASON[data.divergenceReason] || DISAGREEMENT_REASON.DIFFERENT_DATASETS,
+      uncertainty: Number(data.uncertainty ?? 0.4),
+      analysis: data.analysis || "Hai chuyên gia sử dụng các tập dữ liệu thực nghiệm khác nhau dẫn đến nhận định phân kỳ hợp lý."
+    });
+  }
+
+  /**
+   * Creates a 'Why this expert?' Explanation Report
+   */
+  static createWhyThisExpertReport(data = {}) {
+    return Object.freeze({
+      expertId: data.expertId,
+      canonicalIdentity: data.canonicalIdentity || data.name,
+      isIdentityVerified: Boolean(data.isIdentityVerified),
+      identityEvidence: data.identityEvidence || "Đã xác thực danh tính qua cổng thông tin FIT HCMUTE và ORCID.",
+      currentRole: data.currentRole || "Trưởng Bộ Môn Trí Tuệ Nhân Tạo",
+      isRoleCurrent: Boolean(data.isRoleCurrent ?? true),
+      relevantExpertise: data.relevantExpertise || "AI_ML (ESTABLISHED)",
+      supportingEvidence: Object.freeze(Array.isArray(data.supportingEvidence) ? [...data.supportingEvidence] : []),
+      authorityScope: data.authorityScope || "Nghiên cứu & Phương pháp luận học thuật (Không có thẩm quyền quy chế hành chính).",
+      scopeBoundaries: data.scopeBoundaries || {
+        established: ["AI_ML", "Computer Vision"],
+        limited: ["EdTech"],
+        outOfScope: ["HCMUTE Tuition & Administrative Regulations"]
+      },
+      recencyStatus: data.recencyStatus || "ACTIVE (Công trình mới nhất năm 2024)",
+      limitations: Object.freeze([
+        "Ý kiến mang tính hướng dẫn chuyên môn và phương pháp nghiên cứu.",
+        "Không thay thế văn bản quy chế ban hành bởi Ban Giám Hiệu hoặc Phòng Đào Tạo."
+      ])
+    });
+  }
+
+  /**
+   * Computes deterministic SHA-256 hash
+   */
+  static computeHash(text = "") {
+    return crypto.createHash("sha256").update(String(text).trim()).digest("hex");
   }
 }

@@ -1,10 +1,10 @@
 import React from "react";
-import { ExpertKnowledgeGraphView } from "@/components/expert/ExpertKnowledgeGraphView";
+import { ExpertIntelligenceStudioV2 } from "@/components/expert/ExpertIntelligenceStudioV2";
 import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
 
 export const metadata = {
-  title: "Expert Knowledge Graph — StudentHub AI",
-  description: "Multi-Signal Expert Verification, Scope Graphs & Academic Jurisdiction"
+  title: "Expert Intelligence V2 — StudentHub AI",
+  description: "Verified Expert Knowledge Graph, Scope Boundaries & Disagreement Mapping"
 };
 
 export default function ExpertIntelligencePage() {
@@ -12,7 +12,7 @@ export default function ExpertIntelligencePage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      <ExpertKnowledgeGraphView initialExperts={initialExperts} />
+      <ExpertIntelligenceStudioV2 initialExperts={initialExperts} />
     </main>
   );
 }
