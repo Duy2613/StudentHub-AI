@@ -144,6 +144,7 @@ export function AcademicCommandCenter({ initialData = null }) {
     priorityInsights = [],
     academicTasks = [],
     recentChanges = [],
+    timelineEvents = [],
     notifications = [],
     unreadNotificationCount = 0,
     syncStatus = {}
