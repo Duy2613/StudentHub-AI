@@ -32,14 +32,16 @@
   - [x] Phòng hộ sập cấu trúc parser & Cách ly Quarantine (`parserIntegrityGuard.js`).
   - [x] Bản sao số học thuật cá nhân hóa (`academicDigitalTwin.js`) & Cảnh báo Radar không spam.
   - [x] Bộ kiểm chuẩn Live-Sync 16/16 tests PASS (100.0%).
-- [x] **Phân Hệ Trí Tuệ Phòng Chống Gian Lận & Rủi Ro Học Vụ (FraudRiskEngine & Live-Sync Hardening)**:
-  - [x] Mô hình đánh giá rủi ro 9 chiều (`FraudRiskEngine.js`) & Quy tắc an ninh cứng (Hard Safety Rules).
-  - [x] Phát hiện Lookalike domain, Punycode, Homoglyph Unicode (Cyrillic), URL Shorteners.
-  - [x] Nhận diện gian lận học phí (tài khoản cá nhân Momo/ZaloPay/STK cá nhân) và áp lực thanh toán.
-  - [x] Cơ chế chống báo động giả (False-Positive Defense) cho các quy định điều chỉnh từ nguồn Tier 1.
-  - [x] Cầu nối toàn diện 8 chặng (`academicFraudLiveSyncBridge.js`) từ Live Source ➔ Digital Twin.
-  - [x] Bộ kiểm chuẩn an toàn 20/20 protocols PASS (100.0%).
-  - [x] Toàn bộ hệ thống đạt 282/282 tests PASS (100.0%) trên 13 test files.
+- [x] **Phase T1: AI Trust Engine V1 (RELEASE LOCK)**:
+  - Decomposes responses into atomic claims, verifies citation entailment, classifies temporal supersession vs contradiction, defends against syndication and adversarial prompt injections.
+- [x] **Phase T2: Expert Intelligence V1 (RELEASE LOCK)**:
+  - Multi-signal entity resolution (ORCID, `@hcmute.edu.vn`, DOIs), domain scope graphs, temporal role windows, non-authority invariant.
+- [x] **Phase T3: Community & Forum Intelligence V1 (RELEASE LOCK)**:
+  - Contextual segmentation, first-hand claim extraction (8 claim types, 8 evidence statuses), provenance clustering (collapsing copied posts), astroturf and synthetic AI defense, multidimensional experience scoring, contradiction mapping without false averaging.
+- [ ] **Phase T4: Evidence Fusion Layer (QUEUED)**:
+  - Fuses Official Academic Source + Expert Knowledge Graph + Community Experience Layer + AI Trust Layer into a unified authoritative Knowledge Object.
+- [ ] **Phase T5: Academic Foresight / Causal Engine (QUEUED)**:
+  - Simulates downstream degree graduation impact and policy change cascades.
 
 ---
 

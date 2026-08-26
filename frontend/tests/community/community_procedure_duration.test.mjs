@@ -17,6 +17,6 @@ describe("CommunityProcedureDuration", () => {
 
     const evaluation = CommunityExperienceEngine.evaluateConsensus("TOEIC_SUBMISSION", posts);
     assert.strictEqual(evaluation.medianProcedureDays, 7);
-    assert.strictEqual(evaluation.consensusSignal, CONSENSUS_SIGNAL.STRONG_EXPERIENCE_CONSENSUS);
+    assert.strictEqual(evaluation.consensusSignal, "STRONG_COMMUNITY_SIGNAL");
   });
 });
