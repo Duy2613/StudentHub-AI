@@ -101,9 +101,22 @@
        - **Nâng Cấp Giao Diện**: `ActionCenter.jsx` hiển thị thanh tiến độ nhiều bước (`3/4 bước hoàn tất ████████░░ 75%`) và `WorkflowDetailDrawer.jsx` cung cấp checklist trực quan, nhật ký audit history và nút hành động hoàn tất.
        - **Tập Kiểm Chuẩn**: **336/336 Tests PASS (100.0%)** trên 31 test files, 84 suites. **31/31 Mutants KILLED**.
 
+   16. ✅ **Bản Sao Số Học Vụ Sinh Viên Chuẩn Tắc & Lưu Trữ Bền Vững V1 (Durable Workflow Persistence & Authoritative Student Academic Digital Twin V1)**:
+       - **Lưu Trữ Bền Vững & Phục Hồi Sau Khởi Động (`academicTaskStore.js`)**: Ghi nhật ký tệp nguyên tử (atomic rename `.tmp` ➔ file chính), tự động nạp lại trạng thái (`rehydrate()`), chống ghi đè phiên bản cũ bằng khóa lạc quan (`revision` conflict defense), đảm bảo 100% sống sót sau khi restart tiến trình máy chủ.
+       - **Mô Hình Bản Sao Số Học Vụ Sinh Viên (`studentDigitalTwinModel.js`, `studentDigitalTwinStore.js`)**: Nguồn sự thật duy nhất (Single Source of Truth) chuẩn hóa toàn bộ danh tính, khóa K24, CTĐT, chi tiết tín chỉ, điểm GPA tích lũy, bảng điểm môn học, chứng chỉ TOEIC/IELTS đã xác thực, tình trạng học phí. Tích hợp bộ kiểm tra tính nhất quán bất biến (GPA `[0.0, 4.0]`, credits $\le$ max).
+       - **Động Cơ Đánh Giá Điều Kiện Học Vụ Chuẩn Hóa (`academicEligibilityEngine.js`)**: Đánh giá các điều kiện tốt nghiệp, khóa luận, học phần bằng các bộ thẩm định kiểu dữ liệu tường minh (`CREDITS_MIN`, `GPA_MIN`, `COURSE_COMPLETED`, `CERTIFICATE_PRESENT`, `TUITION_CLEAR`) không dùng `eval()`, xuất bản giải thích minh bạch cho sinh viên.
+       - **Tự Động Dung Hòa Quy Trình Khi Bản Sao Số Cập Nhật (`academicWorkflowReconciliationEngine.js`)**: Khi sinh viên cập nhật điểm TOEIC từ 480 lên 560 điểm trong Digital Twin, hệ thống tự động hoàn tất bước nộp chứng chỉ, nâng cao tiến độ nhiệm vụ và ghi nhận sự kiện `TASK_RECONCILED`.
+       - **Giao Diện Command Center 2.0 & Ngăn Tra Cứu Hồ Sơ Số**: `DigitalTwinDrawer.jsx` cho phép sinh viên tra cứu trực quan tiến độ học tập, chứng chỉ và lý do điều kiện xét tốt nghiệp; tích hợp nút truy cập từ `AcademicHeader.jsx`.
+       - **Tập Kiểm Chuẩn**: **363/363 Tests PASS (100.0%)** trên 37 test files, 84 suites. **31/31 Mutants KILLED**.
+
 ---
 
 ## 2. Đường Dẫn File Trọng Tâm (v9 Nodes)
+- **Kiến Trúc Lưu Trữ Bền Vững Quy Trình**: `docs/vault/01 - 🏗️ System Architecture/Academic-Workflow-Persistence-V1.md`
+- **Kiến Trúc Bản Sao Số Sinh Viên & Động Cơ Điều Kiện**: `docs/vault/01 - 🏗️ System Architecture/Academic-Digital-Twin-V1.md`
+- **Mô Hình & Kho Bản Sao Số Học Vụ**: `frontend/src/lib/intelligence/academic/studentDigitalTwinModel.js`, `studentDigitalTwinStore.js`
+- **Động Cơ Đánh Giá Điều Kiện Học Vụ**: `frontend/src/lib/intelligence/academic/academicEligibilityEngine.js`
+- **Ngăn Kéo Tra Cứu Hồ Sơ Số Sinh Viên**: `frontend/src/components/academic/DigitalTwinDrawer.jsx`
 - **Kiến Trúc Quy Trình Học Vụ**: `docs/vault/01 - 🏗️ System Architecture/Academic-Action-Workflow-V1.md`
 - **Dịch Vụ Điều Phối Quy Trình Master**: `frontend/src/lib/intelligence/academic/academicWorkflowService.js`
 - **Máy Trạng Thái & Ý Định Hành Động**: `frontend/src/lib/intelligence/academic/academicWorkflowStateMachine.js`, `academicActionIntent.js`

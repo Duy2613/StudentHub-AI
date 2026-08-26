@@ -100,4 +100,109 @@ export class AcademicWorkflowReconciliationEngine {
       reconciledCount
     };
   }
+
+  /**
+   * Reconciles active student tasks when authoritative Student Digital Twin state updates
+   * (e.g. TOEIC score updated 480 -> 560, credits increased, tuition cleared)
+   * @param {string} studentId 
+   * @param {object} digitalTwin 
+   * @returns {{ reconciledTasks: Array, reconciledCount: number }}
+   */
+  static reconcileWithDigitalTwin(studentId, digitalTwin) {
+    if (!studentId || !digitalTwin) {
+      return { reconciledTasks: [], reconciledCount: 0 };
+    }
+
+    const currentTasks = AcademicTaskStore.getTasksByStudent(studentId);
+    let reconciledCount = 0;
+    const reconciledTasks = [];
+
+    for (const task of currentTasks) {
+      // Do not mutate already terminal completed tasks
+      if (task.status === WORKFLOW_STATES.COMPLETED || task.status === WORKFLOW_STATES.CANCELLED) {
+        reconciledTasks.push(task);
+        continue;
+      }
+
+      let updatedTask = { ...task, steps: [...(task.steps || []).map(s => ({ ...s }))] };
+      let hasMutated = false;
+
+      // Check each step's action intent preconditions or requirements against new digital twin
+      for (const step of updatedTask.steps) {
+        if (step.status === WORKFLOW_STATES.COMPLETED) continue;
+
+        // 1. Check TOEIC requirement
+        const stepTitleUpper = (step.title || "").toUpperCase();
+        if (stepTitleUpper.includes("TOEIC") || stepTitleUpper.includes("NGOẠI NGỮ") || stepTitleUpper.includes("CHỨNG CHỈ")) {
+          const toeicCert = (digitalTwin.certificates || []).find(c => c.type === "TOEIC");
+          if (toeicCert && toeicCert.score >= 550) {
+            step.status = WORKFLOW_STATES.COMPLETED;
+            step.completedAt = new Date().toISOString();
+            step.evidence = {
+              type: "DIGITAL_TWIN_VERIFIED_CERTIFICATE",
+              certType: "TOEIC",
+              score: toeicCert.score,
+              sourceAuthority: digitalTwin.sourceAuthority || "HCMUTE_DAOTAO_PORTAL"
+            };
+            hasMutated = true;
+          }
+        }
+
+        // 2. Check Credits requirement
+        if (stepTitleUpper.includes("TÍN CHỈ") || stepTitleUpper.includes("ĐIỀU KIỆN ĐĂNG KÝ")) {
+          if (digitalTwin.earnedCredits >= 110) {
+            step.status = WORKFLOW_STATES.COMPLETED;
+            step.completedAt = new Date().toISOString();
+            hasMutated = true;
+          }
+        }
+      }
+
+      if (hasMutated) {
+        // Recompute progress
+        const totalSteps = updatedTask.steps.length;
+        const completedSteps = updatedTask.steps.filter(s => s.status === WORKFLOW_STATES.COMPLETED).length;
+        const percentage = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
+
+        updatedTask.progress = {
+          completedSteps,
+          totalSteps,
+          percentage
+        };
+
+        if (completedSteps === totalSteps) {
+          updatedTask.status = WORKFLOW_STATES.COMPLETED;
+          updatedTask.completedAt = new Date().toISOString();
+        }
+
+        const reconEvent = AcademicWorkflowStateMachine.createEvent(WORKFLOW_EVENTS.TASK_RECONCILED, {
+          taskId: task.taskId,
+          fromState: task.status,
+          toState: updatedTask.status,
+          actor: "DIGITAL_TWIN_RECONCILIATION",
+          reason: "Tự động dung hòa tiến độ quy trình theo dữ liệu hồ sơ số (Digital Twin) mới nhất của sinh viên.",
+          metadata: {
+            twinRevision: digitalTwin.revision,
+            completedSteps,
+            totalSteps,
+            percentage
+          }
+        });
+
+        AcademicTaskStore.recordEvent(task.taskId, reconEvent);
+        updatedTask.history = [...(updatedTask.history || []), reconEvent];
+        updatedTask.updatedAt = new Date().toISOString();
+
+        AcademicTaskStore.saveTask(updatedTask);
+        reconciledCount++;
+      }
+
+      reconciledTasks.push(updatedTask);
+    }
+
+    return {
+      reconciledTasks,
+      reconciledCount
+    };
+  }
 }

@@ -8,6 +8,7 @@ import { WhyAffectedSection } from "./WhyAffectedSection.jsx";
 import { AcademicTimeline } from "./AcademicTimeline.jsx";
 import { SourceEvidenceDrawer } from "./SourceEvidenceDrawer.jsx";
 import { WorkflowDetailDrawer } from "./WorkflowDetailDrawer.jsx";
+import { DigitalTwinDrawer } from "./DigitalTwinDrawer.jsx";
 import { AcademicLoadingSkeleton, AcademicEmptyState, AcademicErrorState } from "./AcademicStates.jsx";
 
 export function AcademicCommandCenter({ initialData = null }) {
@@ -16,6 +17,7 @@ export function AcademicCommandCenter({ initialData = null }) {
   const [error, setError] = useState(null);
   const [selectedItemForEvidence, setSelectedItemForEvidence] = useState(null);
   const [selectedTaskForWorkflow, setSelectedTaskForWorkflow] = useState(null);
+  const [isTwinDrawerOpen, setIsTwinDrawerOpen] = useState(false);
   const [isMutatingStep, setIsMutatingStep] = useState(false);
 
   const fetchCommandCenterData = async () => {
@@ -97,6 +99,8 @@ export function AcademicCommandCenter({ initialData = null }) {
 
   const {
     studentProfile = {},
+    digitalTwin = null,
+    eligibilityResult = null,
     digitalTwinState = {},
     priorityInsights = [],
     academicTasks = [],
@@ -114,6 +118,7 @@ export function AcademicCommandCenter({ initialData = null }) {
         studentProfile={studentProfile}
         digitalTwinState={digitalTwinState}
         syncStatus={syncStatus}
+        onOpenTwinDrawer={() => setIsTwinDrawerOpen(true)}
       />
 
       {!hasAnyContent ? (
@@ -167,6 +172,14 @@ export function AcademicCommandCenter({ initialData = null }) {
         onClose={() => setSelectedTaskForWorkflow(null)}
         onCompleteStep={handleCompleteStep}
         isMutating={isMutatingStep}
+      />
+
+      {/* 7. Slide-over Digital Twin & Eligibility Drawer */}
+      <DigitalTwinDrawer
+        isOpen={isTwinDrawerOpen}
+        onClose={() => setIsTwinDrawerOpen(false)}
+        digitalTwin={digitalTwin}
+        eligibilityResult={eligibilityResult}
       />
     </div>
   );

@@ -10,6 +10,8 @@ import { AcademicIntelligenceService } from "./academicIntelligenceService.js";
 import { DocumentSnapshotStore } from "./documentSnapshotStore.js";
 import { AcademicRuleExtractor } from "./academicRuleExtractor.js";
 import { AcademicWorkflowService } from "./academicWorkflowService.js";
+import { StudentDigitalTwinStore } from "./studentDigitalTwinStore.js";
+import { AcademicEligibilityEngine } from "./academicEligibilityEngine.js";
 
 export const DEFAULT_STUDENT_PROFILE = {
   studentId: "24110001",
@@ -36,6 +38,26 @@ export function getAuthoritativeCommandCenterData(params = {}) {
     ...(params.cohort ? { cohort: parseInt(params.cohort, 10) } : {}),
     ...(params.programCode ? { programCode: params.programCode } : {})
   };
+
+  // 0. Load or initialize authoritative Student Digital Twin
+  let digitalTwin = StudentDigitalTwinStore.getTwin(studentProfile.studentId);
+  if (!digitalTwin) {
+    digitalTwin = StudentDigitalTwinStore.saveTwin({
+      studentId: studentProfile.studentId,
+      fullName: studentProfile.fullName,
+      cohort: studentProfile.cohort,
+      programCode: studentProfile.programCode,
+      programName: studentProfile.programName,
+      earnedCredits: studentProfile.earnedCredits,
+      cgpa: studentProfile.cgpa,
+      courses: (studentProfile.completedCourses || []).map(code => ({ courseCode: code, isPassed: true, status: "COMPLETED" })),
+      certificates: studentProfile.englishCertificate ? [studentProfile.englishCertificate] : [],
+      tuitionPaid: studentProfile.tuitionPaid
+    });
+  }
+
+  // 0.1. Evaluate Authoritative Eligibility
+  const eligibilityResult = AcademicEligibilityEngine.evaluateEligibility(digitalTwin);
 
   // 1. Fetch active snapshots from DocumentSnapshotStore
   const activeDoc = DocumentSnapshotStore.getActiveSnapshot("DOC_QD_3116") || 
@@ -137,6 +159,8 @@ export function getAuthoritativeCommandCenterData(params = {}) {
   return {
     success: true,
     studentProfile,
+    digitalTwin,
+    eligibilityResult,
     digitalTwinState: trajectory.digitalTwinState,
     priorityInsights: sortedInsights,
     actionPlans,

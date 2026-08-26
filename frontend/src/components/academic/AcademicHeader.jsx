@@ -4,7 +4,7 @@ import React from "react";
 import { AcademicCommandCenterViewModel } from "@/lib/intelligence/academic/academicCommandCenterViewModel.js";
 import { ShieldCheck, BookOpen, Award, CheckCircle, Clock } from "lucide-react";
 
-export function AcademicHeader({ studentProfile = {}, digitalTwinState = {}, syncStatus = {} }) {
+export function AcademicHeader({ studentProfile = {}, digitalTwinState = {}, syncStatus = {}, onOpenTwinDrawer }) {
   const {
     fullName = "Sinh Viên",
     cohort = 2024,
@@ -36,9 +36,12 @@ export function AcademicHeader({ studentProfile = {}, digitalTwinState = {}, syn
               <ShieldCheck className="h-3.5 w-3.5" />
               Academic Command Center
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-background/50 px-3 py-1 text-xs font-medium text-muted-foreground">
-              MSSV: {studentId} • Khóa K{String(cohort).slice(-2)}
-            </span>
+            <button
+              onClick={onOpenTwinDrawer}
+              className="inline-flex items-center gap-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-1 text-xs font-medium text-indigo-300 transition-colors cursor-pointer"
+            >
+              MSSV: {studentId} • Khóa K{String(cohort).slice(-2)} (Xem hồ sơ số ↗)
+            </button>
           </div>
 
           <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
