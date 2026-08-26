@@ -194,9 +194,24 @@
         - **Giao Diện Trực Quan (`ExpertIntelligenceView.jsx`, `/expert`)**: Khám phá đồ thị chuyên gia, radar năng lực và sandbox thẩm định ý kiến chuyên môn.
         - **Tập Kiểm Chuẩn Toàn Diện**: **560/560 Tests PASS (100.0%)** trên 114 test files, 173 suites. **59/59 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
 
+    27. ✅ **Hệ Thống Trí Tuệ Cộng Đồng & Diễn Đàn V1 (Community & Forum Intelligence V1 — Phase T3 of StudentHub Intelligence OS: Real-World Experience Layer, Experience Consensus Engine, Procedure Duration Mining & Astroturfing Defense)**:
+        - **Bất Biến Kinh Nghiệm Cộng Đồng Không Tạo Ra Quy Chế (`COMMUNITY EXPERIENCE NEVER CREATES OFFICIAL ACADEMIC POLICY`)**: Chia sẻ trên diễn đàn là lớp dữ liệu thực tế (thời gian xử lý thực tế, kinh nghiệm nộp hồ sơ), không thể tự biến thành quy chế học vụ chính thức.
+        - **Phân Loại Nội Dung 7 Cấp (`CONTENT_TYPE`)**: `FIRST_HAND_EXPERIENCE`, `SECOND_HAND_REPORT`, `QUESTION`, `OPINION`, `SPECULATION`, `FACTUAL_CLAIM`, `GUIDE`.
+        - **Đồng Thuận Trải Nghiệm Thay Vì Lượt Like (`Experience Consensus vs Upvote Vanity`)**: 1000 lượt upvote vào 1 bài bot không tạo ra đồng thuận. Cần tối thiểu 3 sinh viên độc lập với lời văn độc lập cùng xác nhận một mốc thời gian để đạt `STRONG_EXPERIENCE_CONSENSUS`.
+        - **Phòng Thủ Thao Túng & Astroturfing (`Astroturfing & Sybil Defense`)**: Tự động gom các bài đăng sao chép (copy-paste) hoặc spam link quảng bá thương mại vào 1 Provenance Cluster và gắn cờ `SUSPECTED_COORDINATION`.
+        - **Khai Phá Thời Gian Thực Tế & Edge Case (Procedure Duration Mining)**: Tính toán thời gian hoàn thành thủ tục trung vị thực tế (ví dụ: Nộp chứng chỉ TOEIC mất trung vị 7 ngày làm việc).
+        - **Giao Diện Trực Quan (`CommunityIntelligenceView.jsx`, `/community`)**: Khám phá nhật ký trải nghiệm thực tế, ma trận đồng thuận và khiên chống spam.
+        - **Tập Kiểm Chuẩn Toàn Diện**: **575/575 Tests PASS (100.0%)** trên 122 test files, 181 suites. **63/63 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
+
 ---
 
-## 2. Đường Dẫn File Trọng Tâm (v24 Nodes)
+## 2. Đường Dẫn File Trọng Tâm (v26 Nodes)
+- **Kiến Trúc Hệ Thống Trí Tuệ Cộng Đồng**: `docs/vault/01 - 🏗️ System Architecture/Community-Intelligence-V1.md`
+- **Mô Hình Miền & Hợp Đồng Trải Nghiệm Cộng Đồng**: `frontend/src/lib/intelligence/community/communityIntelligenceModel.js`
+- **Động Cơ Đồng Thuận & Chống Thao Túng Diễn Đàn**: `frontend/src/lib/intelligence/community/communityExperienceEngine.js`
+- **Kho Lưu Trữ Bài Đăng & Nhật Ký Trải Nghiệm**: `frontend/src/lib/intelligence/community/communityStore.js`
+- **API Endpoint Đánh Giá Đồng Thuận Server-Authoritative**: `frontend/src/app/api/community/experience/evaluate/route.js`, `frontend/src/app/api/community/experiences/route.js`
+- **Giao Diện Nhật Ký Trải Nghiệm & Trang RSC**: `frontend/src/components/community/CommunityIntelligenceView.jsx`, `frontend/src/app/community/page.jsx`
 - **Kiến Trúc Hệ Thống Trí Tuệ Chuyên Gia**: `docs/vault/01 - 🏗️ System Architecture/Expert-Intelligence-V1.md`
 - **Mô Hình Miền & Hợp Đồng Tri Thức Chuyên Gia**: `frontend/src/lib/intelligence/expert/expertIntelligenceModel.js`
 - **Động Cơ Thẩm Định Phạm Vi & Thẩm Quyền Chuyên Gia**: `frontend/src/lib/intelligence/expert/expertScopeEngine.js`
