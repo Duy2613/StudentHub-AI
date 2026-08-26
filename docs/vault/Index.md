@@ -61,6 +61,7 @@ graph TD
 - [[Academic-What-If-Simulation-V1|🔮 Academic Planning & What-If Simulator V1]]: Sandbox Projection → Scenario Modeling → Simulated Eligibility & Roadmap → Explainable Deltas.
 - [[Academic-Semester-Planner-V1|📅 Academic Semester Planner & Constraint-Based Study Planning V1]]: Prerequisite DAG → Hard/Soft Constraints → Candidate Plans → What-If Composition → Explainability.
 - [[Academic-Decision-Studio-V1|⚖️ Academic Decision Studio & Plan Comparison V1]]: Normalized Comparison → Preference Re-Ranking → Pairwise Trade-Offs → Revision-Guarded Adoption.
+- [[Academic-Execution-Center-V1|📊 Academic Execution Center & Plan-Actual Reconciliation V1]]: Plan vs Actual Matrix → Plan Drift Detection → Explainable Replanning CTA.
 - [[Academic-Data-Provenance-Matrix-V1|📊 Academic Data Provenance & Source-of-Truth Matrix V1]]: Field-Level Authority Hierarchy → Precedence Rules → Freshness Windows.
 - [[AI-Trust-Layer1-Screening-Spec|Layer 1 Screening Engine]]: Động cơ sàng lọc nhanh & tất định (Hard Rules + Confidence Scoring).
 - [[AI-Trust-Layer2-Semantic-Spec|Layer 2 Semantic Reasoning]]: Động cơ phân tích ngữ nghĩa, ý định, trích xuất phát ngôn & mâu thuẫn nội tại.
