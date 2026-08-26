@@ -6,6 +6,8 @@
  * Pure logic with injectable clock for deterministic testing.
  */
 
+import { AcademicClock } from "./academicClock.js";
+
 export const DEADLINE_STATES = Object.freeze({
   NO_DEADLINE: "NO_DEADLINE",
   FUTURE: "FUTURE",
@@ -31,39 +33,7 @@ export class AcademicDeadlineEngine {
    * @returns {Date|null}
    */
   static parseDeadline(dateInput) {
-    if (!dateInput) return null;
-    if (dateInput instanceof Date) {
-      return isNaN(dateInput.getTime()) ? null : dateInput;
-    }
-
-    if (typeof dateInput !== "string") return null;
-    const trimmed = dateInput.trim();
-    if (!trimmed) return null;
-
-    // Check DD/MM/YYYY
-    const ddmmyyyyMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if (ddmmyyyyMatch) {
-      const day = parseInt(ddmmyyyyMatch[1], 10);
-      const month = parseInt(ddmmyyyyMatch[2], 10) - 1;
-      const year = parseInt(ddmmyyyyMatch[3], 10);
-      // Construct date at 23:59:59.999 UTC+7 (+07:00)
-      const date = new Date(Date.UTC(year, month, day, 16, 59, 59, 999)); // 23:59:59.999 UTC+7 is 16:59:59.999 UTC
-      return isNaN(date.getTime()) ? null : date;
-    }
-
-    // Check YYYY-MM-DD
-    const yyyymmddMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-    if (yyyymmddMatch) {
-      const year = parseInt(yyyymmddMatch[1], 10);
-      const month = parseInt(yyyymmddMatch[2], 10) - 1;
-      const day = parseInt(yyyymmddMatch[3], 10);
-      const date = new Date(Date.UTC(year, month, day, 16, 59, 59, 999));
-      return isNaN(date.getTime()) ? null : date;
-    }
-
-    // Standard ISO parse
-    const parsed = new Date(trimmed);
-    return isNaN(parsed.getTime()) ? null : parsed;
+    return AcademicClock.parseVnDeadline(dateInput);
   }
 
   /**
@@ -72,7 +42,7 @@ export class AcademicDeadlineEngine {
    * @param {object} clock - { now: () => timestamp }
    * @returns {object}
    */
-  static computeTimeRemaining(dueDate, clock = { now: () => Date.now() }) {
+  static computeTimeRemaining(dueDate, clock = { now: () => AcademicClock.now() }) {
     const due = this.parseDeadline(dueDate);
     if (!due) {
       return {
@@ -92,13 +62,7 @@ export class AcademicDeadlineEngine {
     const isOverdue = diffMs < 0;
 
     const absDiffMs = Math.abs(diffMs);
-    const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
-    const nowVn = new Date(currentTimestamp + VN_OFFSET_MS);
-    const dueVn = new Date(dueTimestamp + VN_OFFSET_MS);
-
-    const nowMidnightVn = Date.UTC(nowVn.getUTCFullYear(), nowVn.getUTCMonth(), nowVn.getUTCDate());
-    const dueMidnightVn = Date.UTC(dueVn.getUTCFullYear(), dueVn.getUTCMonth(), dueVn.getUTCDate());
-    const calendarDayDiff = Math.round((dueMidnightVn - nowMidnightVn) / (24 * 60 * 60 * 1000));
+    const calendarDayDiff = AcademicClock.computeCalendarDayDiff(due, clock);
 
     const totalHours = Math.floor(absDiffMs / (1000 * 60 * 60));
     const hours = Math.floor((absDiffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));

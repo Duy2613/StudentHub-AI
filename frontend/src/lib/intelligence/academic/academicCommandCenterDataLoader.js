@@ -15,6 +15,10 @@ import { AcademicEligibilityEngine } from "./academicEligibilityEngine.js";
 import { AcademicNotificationStore } from "./academicNotificationStore.js";
 import { AcademicNotificationOrchestrator } from "./academicNotificationOrchestrator.js";
 
+import { StudentIdentityStore } from "./studentIdentityStore.js";
+import { StudentAcademicSyncBridge } from "./studentAcademicSyncBridge.js";
+import { AcademicRecordsStore } from "./academicRecordsStore.js";
+
 export const DEFAULT_STUDENT_PROFILE = {
   studentId: "24110001",
   fullName: "Nguyễn Văn Duy",
@@ -24,7 +28,7 @@ export const DEFAULT_STUDENT_PROFILE = {
   earnedCredits: 115,
   cgpa: 2.85,
   completedCourses: ["SWEN330103", "INTR430103", "DSAA230203"],
-  englishCertificate: { type: "TOEIC", score: 480 },
+  englishCertificate: { type: "TOEIC", score: 560 },
   tuitionPaid: true
 };
 
@@ -34,28 +38,50 @@ export const DEFAULT_STUDENT_PROFILE = {
  * @returns {object} Authoritative Aggregate Payload
  */
 export function getAuthoritativeCommandCenterData(params = {}) {
+  const targetStudentId = params.studentId || "24110001";
+
+  // 0. Load Authoritative Student Identity
+  let identity = StudentIdentityStore.getIdentityByStudentId(targetStudentId);
+  if (!identity) {
+    StudentIdentityStore.rehydrate();
+    identity = StudentIdentityStore.getIdentityByStudentId(targetStudentId);
+  }
+
   const studentProfile = {
     ...DEFAULT_STUDENT_PROFILE,
-    ...(params.studentId ? { studentId: params.studentId } : {}),
+    ...(identity ? {
+      studentId: identity.studentId,
+      fullName: identity.fullName,
+      cohort: identity.cohort,
+      programCode: identity.programCode,
+      programName: identity.programName,
+      faculty: identity.faculty,
+      institutionalEmail: identity.institutionalEmail,
+      classCode: identity.classCode
+    } : {}),
     ...(params.cohort ? { cohort: parseInt(params.cohort, 10) } : {}),
     ...(params.programCode ? { programCode: params.programCode } : {})
   };
 
-  // 0. Load or initialize authoritative Student Digital Twin
+  // 0.1. Synchronize authoritative Student Digital Twin via Sync Bridge
   let digitalTwin = StudentDigitalTwinStore.getTwin(studentProfile.studentId);
   if (!digitalTwin) {
-    digitalTwin = StudentDigitalTwinStore.saveTwin({
-      studentId: studentProfile.studentId,
-      fullName: studentProfile.fullName,
-      cohort: studentProfile.cohort,
-      programCode: studentProfile.programCode,
-      programName: studentProfile.programName,
-      earnedCredits: studentProfile.earnedCredits,
-      cgpa: studentProfile.cgpa,
-      courses: (studentProfile.completedCourses || []).map(code => ({ courseCode: code, isPassed: true, status: "COMPLETED" })),
-      certificates: studentProfile.englishCertificate ? [studentProfile.englishCertificate] : [],
-      tuitionPaid: studentProfile.tuitionPaid
-    });
+    try {
+      digitalTwin = StudentAcademicSyncBridge.syncTwin(studentProfile.studentId);
+    } catch {
+      digitalTwin = StudentDigitalTwinStore.saveTwin({
+        studentId: studentProfile.studentId,
+        fullName: studentProfile.fullName,
+        cohort: studentProfile.cohort,
+        programCode: studentProfile.programCode,
+        programName: studentProfile.programName,
+        earnedCredits: studentProfile.earnedCredits,
+        cgpa: studentProfile.cgpa,
+        courses: (studentProfile.completedCourses || []).map(code => ({ courseCode: code, isPassed: true, status: "COMPLETED" })),
+        certificates: studentProfile.englishCertificate ? [studentProfile.englishCertificate] : [],
+        tuitionPaid: studentProfile.tuitionPaid
+      });
+    }
   }
 
   // 0.1. Evaluate Authoritative Eligibility
