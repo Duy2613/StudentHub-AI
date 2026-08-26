@@ -1,5 +1,16 @@
 /**
- * StudentHub AI — Comprehensive Community Experience & Consensus Engine V1
+ * StudentHub AI — Comprehensive Community Experience & Consensus Engine V2
+ * 
+ * Orchestrates:
+ * 1. Post & Multi-claim extraction
+ * 2. Provenance clustering & copy-paste collapse
+ * 3. Context segmentation (CONTEXT_SPLIT vs CONTRADICTION)
+ * 4. Operational Friction Graph & Heatmap mining
+ * 5. Official vs Real-world Reality Gap evaluation
+ * 6. Astroturf / Coordination / Sockpuppet defense
+ * 
+ * Non-Negotiable Invariant:
+ * COMMUNITY SIGNAL NEVER OVERRIDES OFFICIAL ACADEMIC REGULATIONS.
  */
 
 import {
@@ -11,12 +22,23 @@ import {
   COORDINATION_RISK,
   MANIPULATION_RISK
 } from "./communityIntelligenceModel.js";
+import { CommunityProvenanceEngine } from "./communityProvenanceEngine.js";
+import { CommunityFrictionEngine } from "./communityFrictionEngine.js";
+import { CommunityRealityGapEngine } from "./communityRealityGapEngine.js";
+import { CommunityContextEngine } from "./communityContextEngine.js";
+import { CommunityIntegrityEngine } from "./communityIntegrityEngine.js";
 
 export class CommunityExperienceEngine {
+  /**
+   * Content fingerprint delegate
+   */
   static generateContentFingerprint(text = "") {
     return CommunityIntelligenceModel.generateContentFingerprint(text);
   }
 
+  /**
+   * Extracts atomic Community Claims from raw posts
+   */
   static extractClaims(posts = []) {
     if (!Array.isArray(posts)) return [];
     const validPosts = posts.map(p => CommunityIntelligenceModel.createCommunityPost(p));
@@ -34,6 +56,8 @@ export class CommunityExperienceEngine {
       }
 
       return CommunityIntelligenceModel.createCommunityClaim({
+        claimId: `CLM_${post.postId}`,
+        authorId: post.authorHash || post.authorId,
         postIds: [post.postId],
         topic: post.topic,
         claimType,
@@ -45,172 +69,49 @@ export class CommunityExperienceEngine {
     });
   }
 
+  /**
+   * Provenance clustering delegate
+   */
   static clusterProvenance(posts = []) {
-    if (!Array.isArray(posts) || posts.length === 0) {
-      return { clusters: new Map(), clusterCount: 0, isSyndicated: false };
-    }
-
-    const clusters = new Map();
-    for (const p of posts) {
-      const fp = this.generateContentFingerprint(p.body || p.content || "");
-      if (!clusters.has(fp)) {
-        clusters.set(fp, []);
-      }
-      clusters.get(fp).push(p);
-    }
-
-    const isSyndicated = Array.from(clusters.values()).some(cluster => cluster.length >= 3);
-    return {
-      clusters,
-      clusterCount: clusters.size,
-      isSyndicated
-    };
+    return CommunityProvenanceEngine.clusterProvenance(posts);
   }
 
+  /**
+   * Context segmentation delegate
+   */
   static segmentByContext(posts = []) {
-    const segments = new Map();
-
-    for (const post of posts) {
-      const ctx = post.context || {};
-      const dept = ctx.department || "ALL";
-      const cohort = ctx.cohort || "ALL";
-      const proc = (ctx.procedure && ctx.procedure !== "GENERAL") ? ctx.procedure : "ALL";
-      const key = `${dept}::${cohort}::${proc}`;
-      if (!segments.has(key)) {
-        segments.set(key, []);
-      }
-      segments.get(key).push(post);
-    }
-
-    return segments;
+    return CommunityContextEngine.segmentByContext(posts);
   }
 
+  /**
+   * Contradiction & Context Split detection delegate
+   */
   static detectContradictions(posts = []) {
-    const durations = posts
-      .filter(p => typeof p.procedureDurationDays === "number")
-      .map(p => ({
-        postId: p.postId,
-        days: p.procedureDurationDays,
-        context: p.context,
-        author: p.authorHash || p.authorId
-      }));
+    return CommunityContextEngine.analyzeVarianceAndContradiction(posts);
+  }
 
-    if (durations.length < 2) {
-      return { hasContradiction: false, segments: [], explanation: "Không đủ dữ liệu so sánh." };
-    }
-
-    const minDays = Math.min(...durations.map(d => d.days));
-    const maxDays = Math.max(...durations.map(d => d.days));
-
-    // Group by department
-    const byDept = new Map();
-    for (const d of durations) {
-      const dept = d.context?.department || "CHUNG";
-      if (!byDept.has(dept)) byDept.set(dept, []);
-      byDept.get(dept).push(d.days);
-    }
-
-    // Contradiction occurs if distinct departments differ by >= 3 days, or same department differs by >= 6 days
-    let isContradictory = false;
-    if (byDept.size > 1) {
-      const deptMedians = Array.from(byDept.values()).map(list => this.#calculateMedian(list));
-      const minMed = Math.min(...deptMedians);
-      const maxMed = Math.max(...deptMedians);
-      if (maxMed - minMed >= 3) {
-        isContradictory = true;
-      }
-    } else {
-      if (maxDays - minDays >= 6) {
-        isContradictory = true;
-      }
-    }
-
-    if (!isContradictory) {
-      return { hasContradiction: false, segments: [], explanation: "Các báo cáo thời gian đồng nhất trong biên độ cho phép." };
-    }
-
-    const segmentsSummary = [];
-    for (const [dept, daysList] of byDept.entries()) {
-      const med = this.#calculateMedian(daysList);
-      segmentsSummary.push({ department: dept, medianDays: med, sampleCount: daysList.length });
-    }
-
+  /**
+   * Coordination risk delegate
+   */
+  static detectCoordinationRisk(posts = []) {
+    const analysis = CommunityIntegrityEngine.analyzeIntegrity(posts);
     return {
-      hasContradiction: true,
-      varianceRangeDays: { min: minDays, max: maxDays },
-      segments: segmentsSummary,
-      explanation: `Phát hiện trải nghiệm phân kỳ (${minDays} ngày vs ${maxDays} ngày). Hệ thống phân đoạn theo khoa/chương trình thay vì lấy trung bình cộng sai lệch.`
+      risk: analysis.coordinationRisk,
+      reason: analysis.explanation
     };
   }
 
-  static detectCoordinationRisk(posts = []) {
-    if (!Array.isArray(posts) || posts.length === 0) {
-      return { risk: COORDINATION_RISK.NONE, reason: "" };
-    }
-
-    // 1. Commercial promotion / Link spam
-    const linkCounts = new Map();
-    for (const p of posts) {
-      for (const link of (p.externalLinks || [])) {
-        linkCounts.set(link, (linkCounts.get(link) || 0) + 1);
-      }
-    }
-    const hasSpamLinks = Array.from(linkCounts.values()).some(cnt => cnt >= 3);
-    if (hasSpamLinks) {
-      return {
-        risk: COORDINATION_RISK.POTENTIAL_COMMERCIAL_INTEREST,
-        reason: "Phát hiện liên kết quảng bá dịch vụ thương mại hoặc tài liệu lặp lại giữa các bài đăng."
-      };
-    }
-
-    // 2. Sockpuppet Burst (deviceFingerprint)
-    const deviceClusters = new Map();
-    for (const p of posts) {
-      const dev = p.deviceFingerprint || p.provenance?.deviceFingerprint;
-      if (dev) {
-        if (!deviceClusters.has(dev)) deviceClusters.set(dev, []);
-        deviceClusters.get(dev).push(p);
-      }
-    }
-    const hasSockpuppetBurst = Array.from(deviceClusters.values()).some(cluster => {
-      const distinctAuthors = new Set(cluster.map(item => item.authorId || item.authorHash));
-      return distinctAuthors.size >= 3;
-    });
-    if (hasSockpuppetBurst) {
-      return {
-        risk: COORDINATION_RISK.COORDINATION_RISK,
-        reason: "Phát hiện nhiều tài khoản đăng bài từ cùng một thiết bị/mạng trong thời gian ngắn (Sockpuppet Cluster)."
-      };
-    }
-
-    // 3. Syndication / Coordinated copy-paste
-    const { isSyndicated } = this.clusterProvenance(posts);
-    if (isSyndicated) {
-      return {
-        risk: COORDINATION_RISK.SUSPECTED_COORDINATION,
-        reason: "Phát hiện hiện tượng sao chép nguyên văn (Copy-Paste Syndication) giữa nhiều tài khoản khác nhau."
-      };
-    }
-
-    // 4. Suspected synthetic / AI repetitive phrasing
-    const aiPhrases = ["tổng kết lại rằng", "với tư cách là một sinh viên", "trong bối cảnh học thuật số", "rất hữu ích và đáng cân nhắc"];
-    const syntheticMatches = posts.filter(p => aiPhrases.some(phrase => (p.body || p.content || "").toLowerCase().includes(phrase)));
-    if (syntheticMatches.length >= 3) {
-      return {
-        risk: COORDINATION_RISK.SUSPECTED_SYNTHETIC,
-        reason: "Phát hiện dấu hiệu văn phong tổng hợp nhân tạo (AI-generated) với cấu trúc mẫu lặp lại."
-      };
-    }
-
-    return { risk: COORDINATION_RISK.NONE, reason: "Không phát hiện dấu hiệu phối hợp bất thường." };
-  }
-
+  /**
+   * Evaluates comprehensive consensus on a topic
+   */
   static evaluateConsensus(topic = "GENERAL", posts = [], queryContext = null) {
+    const targetTopic = String(topic).toUpperCase();
+
     if (!Array.isArray(posts) || posts.length === 0) {
       return {
-        topic: String(topic).toUpperCase(),
+        topic: targetTopic,
         consensusState: CONSENSUS_STATE.UNKNOWN,
-        consensusSignal: CONSENSUS_STATE.UNKNOWN,
+        consensusSignal: CONSENSUS_SIGNAL.UNKNOWN,
         manipulationRisk: COORDINATION_RISK.NONE,
         experienceScore: CommunityIntelligenceModel.createExperienceScore({ firstHandRate: 0, independence: 0, recency: 0 }),
         independentAuthorsCount: 0,
@@ -221,36 +122,49 @@ export class CommunityExperienceEngine {
         contradictionAnalysis: null,
         frictionHotspots: [],
         edgeCases: [],
+        realityGap: CommunityRealityGapEngine.evaluateRealityGap({ topic: targetTopic, posts: [] }),
         summary: "Chưa có dữ liệu trải nghiệm thực tế từ sinh viên."
       };
     }
 
     const validPosts = posts.map(p => CommunityIntelligenceModel.createCommunityPost(p));
     const authors = new Set(validPosts.map(p => p.authorHash || p.authorId));
-    const { clusters, clusterCount } = this.clusterProvenance(validPosts);
-    const coordRisk = this.detectCoordinationRisk(validPosts);
-    const contradictionAnalysis = this.detectContradictions(validPosts);
+    
+    // 1. Provenance Clustering
+    const provAnalysis = CommunityProvenanceEngine.clusterProvenance(validPosts);
+    const clusterCount = provAnalysis.clusterCount;
 
-    // Filter first-hand experiences & practical guides
+    // 2. Integrity & Coordination Analysis
+    const integrityAnalysis = CommunityIntegrityEngine.analyzeIntegrity(validPosts);
+
+    // 3. Contradiction & Context Split Analysis
+    const contradictionAnalysis = CommunityContextEngine.analyzeVarianceAndContradiction(validPosts);
+
+    // 4. First-Hand Evidence Filtering
     const firstHandPosts = validPosts.filter(
-      p => p.contentType === CLAIM_TYPE.FIRST_HAND_EXPERIENCE || 
+      p => p.contentType === CLAIM_TYPE.FIRST_HAND_EXPERIENCE ||
            p.contentType === CLAIM_TYPE.GUIDE ||
-           p.contentType === CLAIM_TYPE.PROCEDURE_TIMELINE ||
-           p.contentType === CLAIM_TYPE.PRACTICAL_TIP
+           p.contentType === CLAIM_TYPE.WARNING
     );
     const firstHandAuthors = new Set(firstHandPosts.map(p => p.authorHash || p.authorId));
 
-    // Durations
+    // 5. Turnaround Durations
     const durations = validPosts
       .filter(p => typeof p.procedureDurationDays === "number")
       .map(p => p.procedureDurationDays);
     const medianDays = this.#calculateMedian(durations);
 
-    // Friction hotspots & edge-cases
-    const frictionHotspots = this.mineFrictionHotspots(validPosts);
-    const edgeCases = frictionHotspots.map(h => ({ warning: h.frictionSummary, cohort: h.cohort }));
+    // 6. Friction Signals & Edge Cases
+    const frictionHotspots = CommunityFrictionEngine.extractFrictionSignals(validPosts);
+    const edgeCases = CommunityIntegrityEngine.mineEdgeCases(validPosts);
 
-    // Multi-Dimensional Experience Score
+    // 7. Official vs Real-World Reality Gap
+    const realityGap = CommunityRealityGapEngine.evaluateRealityGap({
+      topic: targetTopic,
+      posts: validPosts
+    });
+
+    // 8. Multi-Dimensional Experience Score
     const firstHandRate = validPosts.length > 0 ? Number((firstHandPosts.length / validPosts.length).toFixed(2)) : 0;
     const independence = validPosts.length > 0 ? Number((clusterCount / validPosts.length).toFixed(2)) : 0;
     const recency = 1.0;
@@ -265,17 +179,17 @@ export class CommunityExperienceEngine {
       contextMatch,
       provenanceQuality,
       contradictionRate,
-      coordinationRisk: coordRisk.risk
+      coordinationRisk: integrityAnalysis.coordinationRisk
     });
 
-    // Consensus State Determination
+    // 9. Consensus State Determination
     let consensusState = CONSENSUS_STATE.WEAK_SIGNAL;
 
-    if (coordRisk.risk !== COORDINATION_RISK.NONE) {
+    if (integrityAnalysis.coordinationRisk !== COORDINATION_RISK.NONE) {
       consensusState = CONSENSUS_STATE.APPARENT_CONSENSUS;
     } else if (contradictionAnalysis.hasContradiction) {
       consensusState = CONSENSUS_STATE.MIXED_EXPERIENCES;
-    } else if (firstHandAuthors.size >= 3 && clusterCount >= 3) {
+    } else if (firstHandAuthors.size >= 3 && clusterCount >= 2) {
       consensusState = CONSENSUS_STATE.STRONG_COMMUNITY_SIGNAL;
     } else if (firstHandAuthors.size >= 2) {
       consensusState = CONSENSUS_STATE.MODERATE_COMMUNITY_SIGNAL;
@@ -283,26 +197,28 @@ export class CommunityExperienceEngine {
       consensusState = CONSENSUS_STATE.WEAK_SIGNAL;
     } else if (firstHandAuthors.size === 0) {
       consensusState = CONSENSUS_STATE.UNVERIFIED_RUMOR;
-    } else {
-      consensusState = CONSENSUS_STATE.WEAK_SIGNAL;
     }
+
+    const consensusSignal = integrityAnalysis.coordinationRisk !== COORDINATION_RISK.NONE
+      ? CONSENSUS_SIGNAL.SUSPECTED_COORDINATION
+      : (consensusState === CONSENSUS_STATE.UNVERIFIED_RUMOR ? CONSENSUS_SIGNAL.UNVERIFIED_RUMOR : consensusState);
 
     let summary = `Tín hiệu trải nghiệm cộng đồng (${authors.size} tài khoản, ${clusterCount} cụm nguồn độc lập).`;
     if (consensusState === CONSENSUS_STATE.STRONG_COMMUNITY_SIGNAL) {
       summary = `Đồng thuận trải nghiệm thực tế mạnh (${firstHandAuthors.size} sinh viên độc lập xác nhận cùng mốc quy trình). Thời gian xử lý trung vị thực tế: ${medianDays ?? 'N/A'} ngày.`;
     } else if (consensusState === CONSENSUS_STATE.MIXED_EXPERIENCES) {
-      summary = `Trải nghiệm phân kỳ giữa các đơn vị/khoa (${contradictionAnalysis.varianceRangeDays?.min} - ${contradictionAnalysis.varianceRangeDays?.max} ngày). Vui lòng xem chi tiết từng phân đoạn.`;
+      summary = `Trải nghiệm phân kỳ (${contradictionAnalysis.varianceRangeDays?.min} - ${contradictionAnalysis.varianceRangeDays?.max} ngày). Vui lòng đối chiếu chi tiết phân đoạn.`;
     } else if (consensusState === CONSENSUS_STATE.APPARENT_CONSENSUS) {
-      summary = `Cảnh báo phối hợp bất thường: Số lượng bài viết nhiều nhưng xuất phát từ nguồn sao chép hoặc có rủi ro phối hợp.`;
+      summary = `Cảnh báo phối hợp bất thường: Số lượng bài viết nhiều nhưng lặp lại từ nguồn sao chép hoặc có rủi ro phối hợp.`;
     } else if (consensusState === CONSENSUS_STATE.UNVERIFIED_RUMOR) {
       summary = "Tin đồn hoặc suy đoán chưa qua xác thực thực tế.";
     }
 
     return {
-      topic: String(topic).toUpperCase(),
+      topic: targetTopic,
       consensusState,
-      consensusSignal: coordRisk.risk !== COORDINATION_RISK.NONE ? CONSENSUS_SIGNAL.SUSPECTED_COORDINATION : consensusState,
-      manipulationRisk: coordRisk.risk,
+      consensusSignal,
+      manipulationRisk: integrityAnalysis.coordinationRisk,
       experienceScore,
       independentAuthorsCount: authors.size,
       independentAccountsCount: authors.size,
@@ -312,16 +228,20 @@ export class CommunityExperienceEngine {
       contradictionAnalysis,
       frictionHotspots,
       edgeCases,
+      realityGap,
       summary
     };
   }
 
+  /**
+   * Classifies post into Fact vs Rumor vs Opinion
+   */
   static classifyRumorVsFact(post) {
     if (!post) return { isRumor: true, category: "EMPTY" };
     const content = typeof post.body === "string" ? post.body : (typeof post.content === "string" ? post.content : "");
     const type = post.contentType || CommunityIntelligenceModel.inferClaimType(content);
 
-    if (type === CLAIM_TYPE.SECOND_HAND_REPORT || type === CLAIM_TYPE.SPECULATION || type === CLAIM_TYPE.UNVERIFIED_RUMOR) {
+    if (type === CLAIM_TYPE.SECOND_HAND_REPORT || type === CLAIM_TYPE.SPECULATION || type === CLAIM_TYPE.UNVERIFIED_RUMOR || type === CLAIM_TYPE.RUMOR) {
       return {
         isRumor: true,
         category: "UNVERIFIED_RUMOR",
@@ -329,7 +249,7 @@ export class CommunityExperienceEngine {
       };
     }
 
-    if (type === CLAIM_TYPE.FIRST_HAND_EXPERIENCE || type === CLAIM_TYPE.PROCEDURE_TIMELINE || type === CLAIM_TYPE.FACTUAL_CLAIM) {
+    if (type === CLAIM_TYPE.FIRST_HAND_EXPERIENCE || type === CLAIM_TYPE.FACTUAL_CLAIM || type === CLAIM_TYPE.GUIDE) {
       return {
         isRumor: false,
         category: "FIRST_HAND_FACT",
@@ -344,21 +264,11 @@ export class CommunityExperienceEngine {
     };
   }
 
+  /**
+   * Mines friction hotspots delegate
+   */
   static mineFrictionHotspots(posts = []) {
-    const hotspots = [];
-    for (const post of posts) {
-      const bodyLower = (post.body || post.content || "").toLowerCase();
-      if (post.contentType === CLAIM_TYPE.WARNING || bodyLower.includes("lưu ý") || bodyLower.includes("cảnh báo") || bodyLower.includes("bị từ chối")) {
-        hotspots.push({
-          postId: post.postId,
-          frictionSummary: post.body || post.content,
-          cohort: post.authorCohort,
-          department: post.context?.department || "CHUNG",
-          category: bodyLower.includes("scan") ? "DOCUMENT_SCAN_QUALITY" : (bodyLower.includes("hạn") ? "DEADLINE_CUTOFF" : "OFFICE_QUEUE")
-        });
-      }
-    }
-    return hotspots;
+    return CommunityFrictionEngine.extractFrictionSignals(posts);
   }
 
   static #calculateMedian(numbers) {
