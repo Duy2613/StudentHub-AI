@@ -59,7 +59,15 @@
       - **Kiểm Thử Sập Nguồn & Cách Ly (Quarantine)**: Dừng nạp khi trích xuất rỗng; đưa vào Quarantine khi danh mục môn học sụt giảm $> 50\%$.
       - **Báo Cáo Tập Trận Vận Hành (`docs/university/live_sync_drill.md`)**: Ghi nhận toàn bộ thông số thực tế, đạt chuẩn **`YELLOW — PRODUCTION-READY CORE WITH DOCUMENTED EXTERNAL LIMITATIONS`** (xác thực qua SHA-256 fallback thực tế và kiểm chuẩn 282/282 tests).
       - **Production Drill Test Suite (`academic_production_drill.test.mjs`)**: 9/9 Protocols PASS (100.0%).
-  11. ✅ **Phân Hệ Trí Tuệ Phòng Chống Gian Lận & Rủi Ro Học Vụ (FraudRiskEngine & Live-Sync Hardening)**:
+  11. ✅ **Chuỗi Kiểm Toán & Khóa Bảo Mật Toàn Diện (Security Audits V1 $\rightarrow$ V5 Final Release Baseline)**:
+      - **Mốc Phát Hành Tối Hậu**: Commit `3699775` (Branch `develop`, Working tree Clean).
+      - **Tập Kiểm Chuẩn Toàn Diện**: **265/265 Tests PASS (100.0%)** trên 20 test files, 84 suites.
+      - **Kiểm Thử Đột Biến Thực Tế (Mutation Testing)**: **31/31 Mutants KILLED (0 Survived)** trên 34 mutation test cases across V2, V3, V4 suites.
+      - **Tính Lặp Lại Tất Định (Repeatability)**: 3/3 lần chạy độc lập đạt 100% PASS không có flaky test.
+      - **Khóa 6 Bất Biến Bảo Mật Cấp Hệ Thống (System Invariants)**: Fail-Closed, Hard Block Monotonicity, Provenance Monotonicity, Domain Authority, Decision Field Ownership, và Boundary Semantics Preservation.
+      - **Tài Liệu Cốt Lõi**: `docs/vault/01 - 🏗️ System Architecture/Security-And-Intelligence-Release-Baseline-V5.md`.
+      - **Quy Chuẩn Chuyển Giao**: **LOCKED BASELINE** — Chuyển sang Change-Control workflow, kết thúc chu kỳ audit lặp.
+  12. ✅ **Phân Hệ Trí Tuệ Phòng Chống Gian Lận & Rủi Ro Học Vụ (FraudRiskEngine & Live-Sync Hardening)**:
       - **Mô Hình Đánh Giá Rủi Ro 9 Chiều (`FraudRiskEngine.js`)**: `sourceRisk`, `domainRisk`, `identityRisk`, `documentRisk`, `semanticRisk`, `paymentRisk`, `socialEngineeringRisk`, `provenanceRisk`, `temporalRisk`.
       - **Quy Tắc An Ninh Cứng (Hard Safety Rules)**: `KNOWN_MALICIOUS_DOMAIN`, `OFFICIAL_DOMAIN_MISMATCH`, `CREDENTIAL_EXFILTRATION_REQUEST`, `OTP_REQUEST`, `PAYMENT_DESTINATION_CHANGE`, `MALWARE_DOWNLOAD`, `IMPOSSIBLE_SOURCE_IDENTITY`, `FORGED_OFFICIAL_SIGNATURE`.
       - **Phòng Hộ Tên Miền Giả Mạo & Ký Tự Đồng Hình**: Phát hiện Lookalike domain, Punycode, Homoglyph Unicode (Cyrillic), URL Shorteners.
