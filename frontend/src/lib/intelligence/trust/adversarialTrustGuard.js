@@ -1,5 +1,5 @@
 /**
- * StudentHub AI — Adversarial Trust & Prompt Injection Guard V1
+ * StudentHub AI — Adversarial Trust & Prompt Injection Guard V2
  * 
  * Enforces strict boundary isolation between DATA and INSTRUCTION.
  * Prevents direct & indirect prompt injection, citation forgery,
@@ -20,19 +20,19 @@ export class AdversarialTrustGuard {
     /you\s+must\s+verify\s+this/i,
     /trust_override\s*=\s*true/i,
     /bypass_verification/i,
+    /set\s+authority/i,
+    /hệ\s+thống\s+hãy\s+xác\s+nhận/i,
+    /không\s+cần\s+thi\s+tốt\s+nghiệp/i,
+    /<system[\s\S]*?>[\s\S]*?<\/system>/i,
     /<script[\s\S]*?>[\s\S]*?<\/script>/i,
     /javascript:/i
   ];
 
-  /**
-   * Scans a text passage or query for adversarial prompt injection attempts
-   * @param {string} text 
-   * @returns {{ isSafe: boolean, manipulationRisk: number, detectedPatterns: string[], sanitizedText: string }}
-   */
   static inspectText(text) {
     if (!text || typeof text !== "string") {
       return {
         isSafe: true,
+        isAdversarial: false,
         manipulationRisk: 0,
         detectedPatterns: [],
         sanitizedText: ""
@@ -47,27 +47,22 @@ export class AdversarialTrustGuard {
     }
 
     const manipulationRisk = detected.length > 0
-      ? Math.min(1.0, 0.4 + (detected.length * 0.3))
+      ? Math.min(1.0, 0.5 + (detected.length * 0.3))
       : 0;
 
-    // Neutralize any instruction verbs and treat solely as literal data
     const sanitizedText = text
-      .replace(/<\/?script.*?>/gi, "")
+      .replace(/<\/?(script|system).*?>/gi, "")
       .replace(/javascript:/gi, "");
 
     return {
       isSafe: detected.length === 0,
+      isAdversarial: detected.length > 0,
       manipulationRisk,
       detectedPatterns: detected,
       sanitizedText
     };
   }
 
-  /**
-   * Classifies segments of a retrieved document into DATA CONTENT vs UNTRUSTED INSTRUCTION
-   * @param {string} rawDocumentText 
-   * @returns {{ contentSpans: string[], rejectedInstructionSpans: string[] }}
-   */
   static isolateDocumentData(rawDocumentText) {
     if (!rawDocumentText || typeof rawDocumentText !== "string") {
       return { contentSpans: [], rejectedInstructionSpans: [] };
@@ -95,11 +90,6 @@ export class AdversarialTrustGuard {
     };
   }
 
-  /**
-   * Validates whether a citation URL or identifier looks authentic or forged
-   * @param {string} urlOrId 
-   * @returns {boolean}
-   */
   static isValidCitationFormat(urlOrId) {
     if (!urlOrId || typeof urlOrId !== "string") return false;
     const clean = urlOrId.trim();
@@ -113,7 +103,6 @@ export class AdversarialTrustGuard {
         return false;
       }
     }
-    // Document IDs e.g. DOC_HCMUTE_K24_TOEIC, EVID_123
     return /^DOC_[A-Z0-9_-]+$/i.test(clean) || /^EVID_[A-Z0-9_-]+$/i.test(clean) || /^SRC_[A-Z0-9_-]+$/i.test(clean);
   }
 }

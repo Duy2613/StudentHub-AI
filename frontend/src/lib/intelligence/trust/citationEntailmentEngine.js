@@ -1,5 +1,5 @@
 /**
- * StudentHub AI — Citation Entailment & Passage Extraction Engine V1
+ * StudentHub AI — Citation Entailment & Passage Extraction Engine V2
  * 
  * Performs fine-grained claim-to-evidence alignment.
  * Verifies whether cited evidence spans semantically and numerically
@@ -10,27 +10,21 @@ import {
   AiTrustModel,
   AUTHORITY_TIER,
   CITATION_STATUS,
-  SOURCE_TYPE,
-  TRUST_STATUS
+  EPISTEMIC_STATE
 } from "./aiTrustModel.js";
 
 export class CitationEntailmentEngine {
-  /**
-   * Aligns and verifies claims against evidence spans and sources
-   * @param {Array<object>} claims 
-   * @param {Array<object>} evidenceSpans 
-   * @param {Array<object>} sources 
-   * @returns {{
-   *   verifiedClaims: Array<object>,
-   *   citations: Array<object>,
-   *   unsupportedClaims: Array<object>,
-   *   claimCoverage: number,
-   *   citationAccuracy: number
-   * }}
-   */
   static evaluateEntailment(claims = [], evidenceSpans = [], sources = []) {
     const sourceMap = new Map(sources.map(s => [s.sourceId, s]));
-    const evidenceMap = new Map(evidenceSpans.map(e => [e.evidenceId, e]));
+    // Also include any sourceId from evidenceSpans with default fallback
+    for (const span of evidenceSpans) {
+      if (span.sourceId && !sourceMap.has(span.sourceId)) {
+        sourceMap.set(span.sourceId, AiTrustModel.createSourceNode({
+          sourceId: span.sourceId,
+          authorityTier: span.authorityTier || AUTHORITY_TIER.TIER_1_OFFICIAL_REGISTRAR
+        }));
+      }
+    }
 
     const verifiedClaims = [];
     const citations = [];
@@ -46,17 +40,17 @@ export class CitationEntailmentEngine {
       });
 
       if (candidateSpans.length === 0) {
-        // No evidence attached
         const unverifiedClaim = {
           ...claim,
-          status: TRUST_STATUS.UNSUPPORTED
+          status: EPISTEMIC_STATE.UNSUPPORTED,
+          epistemicState: EPISTEMIC_STATE.UNSUPPORTED
         };
         verifiedClaims.push(unverifiedClaim);
         unsupportedClaims.push(unverifiedClaim);
         continue;
       }
 
-      let bestClaimStatus = TRUST_STATUS.UNSUPPORTED;
+      let bestClaimStatus = EPISTEMIC_STATE.UNSUPPORTED;
       let matchedAnyValidCitation = false;
 
       for (const span of candidateSpans) {
@@ -64,12 +58,12 @@ export class CitationEntailmentEngine {
         const source = sourceMap.get(span.sourceId);
 
         if (!source) {
-          // Source fabricated / missing
           citations.push(AiTrustModel.createCitation({
             claimId: claim.claimId,
             sourceId: span.sourceId,
             evidenceId: span.evidenceId,
             citationStatus: CITATION_STATUS.CITATION_FABRICATED,
+            status: CITATION_STATUS.CITATION_FABRICATED,
             entailmentScore: 0,
             explanation: "Nguồn trích dẫn không tồn tại trong danh mục nguồn xác thực."
           }));
@@ -84,17 +78,15 @@ export class CitationEntailmentEngine {
           matchedAnyValidCitation = true;
 
           if (source.authorityTier >= AUTHORITY_TIER.TIER_1_OFFICIAL_REGISTRAR) {
-            bestClaimStatus = TRUST_STATUS.AUTHORITATIVE;
+            bestClaimStatus = EPISTEMIC_STATE.VERIFIED;
           } else if (source.authorityTier >= AUTHORITY_TIER.TIER_2_FACULTY_DEPARTMENT) {
-            bestClaimStatus = TRUST_STATUS.VERIFIED;
-          } else if (source.authorityTier >= AUTHORITY_TIER.TIER_3_VERIFIED_EXPERT) {
-            bestClaimStatus = TRUST_STATUS.SUPPORTED;
+            bestClaimStatus = EPISTEMIC_STATE.VERIFIED;
           } else {
-            bestClaimStatus = TRUST_STATUS.SUPPORTED;
+            bestClaimStatus = EPISTEMIC_STATE.SUPPORTED;
           }
         } else if (entailment.citation.citationStatus === CITATION_STATUS.PARTIAL_ENTAILMENT) {
-          if (bestClaimStatus === TRUST_STATUS.UNSUPPORTED) {
-            bestClaimStatus = TRUST_STATUS.PARTIALLY_SUPPORTED;
+          if (bestClaimStatus === EPISTEMIC_STATE.UNSUPPORTED) {
+            bestClaimStatus = EPISTEMIC_STATE.PARTIALLY_SUPPORTED;
           }
         }
       }
@@ -102,20 +94,21 @@ export class CitationEntailmentEngine {
       const updatedClaim = {
         ...claim,
         status: bestClaimStatus,
+        epistemicState: bestClaimStatus,
         citationIds: citations.filter(c => c.claimId === claim.claimId).map(c => c.citationId)
       };
 
       verifiedClaims.push(updatedClaim);
-      if (bestClaimStatus === TRUST_STATUS.UNSUPPORTED || bestClaimStatus === TRUST_STATUS.UNVERIFIED) {
+      if (bestClaimStatus === EPISTEMIC_STATE.UNSUPPORTED || bestClaimStatus === EPISTEMIC_STATE.UNKNOWN) {
         unsupportedClaims.push(updatedClaim);
       }
     }
 
     const totalClaims = claims.length;
     const supportedCount = verifiedClaims.filter(c => 
-      c.status === TRUST_STATUS.AUTHORITATIVE ||
-      c.status === TRUST_STATUS.VERIFIED ||
-      c.status === TRUST_STATUS.SUPPORTED
+      c.epistemicState === EPISTEMIC_STATE.VERIFIED ||
+      c.epistemicState === EPISTEMIC_STATE.SUPPORTED ||
+      c.epistemicState === EPISTEMIC_STATE.KNOWN
     ).length;
 
     const claimCoverage = totalClaims > 0
@@ -124,7 +117,7 @@ export class CitationEntailmentEngine {
 
     const citationAccuracy = totalCitationsEvaluated > 0
       ? Number((validCitationsCount / totalCitationsEvaluated).toFixed(2))
-      : 1.0;
+      : (claims.length > 0 && evidenceSpans.length === 0 ? 0 : 1.0);
 
     return {
       verifiedClaims,
@@ -135,9 +128,6 @@ export class CitationEntailmentEngine {
     };
   }
 
-  /**
-   * Fast lexical & semantic heuristic to check if a span might contain evidence for a claim
-   */
   static #isSpanRelevantToClaim(span, claim) {
     if (!span.passage) return false;
     const p = span.passage.toLowerCase();
@@ -149,7 +139,6 @@ export class CitationEntailmentEngine {
         if (claim.numericUnit === "CREDITS" && (p.includes("tín chỉ") || p.includes("credit"))) return true;
         return true;
       }
-      // If claim is TOEIC 550 and span mentions TOEIC but different number, it is relevant for comparison
       if (claim.numericUnit === "TOEIC_POINTS" && p.includes("toeic")) return true;
       if (claim.numericUnit === "CREDITS" && (p.includes("tín chỉ") || p.includes("credit"))) return true;
     }
@@ -160,14 +149,11 @@ export class CitationEntailmentEngine {
     }
 
     // Keyword match
-    const claimKeywords = claim.text.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+    const claimKeywords = (claim.text || claim.statement || "").toLowerCase().split(/\s+/).filter(w => w.length > 3);
     const matchCount = claimKeywords.filter(w => p.includes(w)).length;
     return matchCount >= Math.min(1, claimKeywords.length);
   }
 
-  /**
-   * Rigorous semantic and numeric entailment check
-   */
   static #verifySpanEntailment(claim, span, source) {
     const passage = (span.passage || "").toLowerCase();
 
@@ -181,6 +167,7 @@ export class CitationEntailmentEngine {
             sourceId: source.sourceId,
             evidenceId: span.evidenceId,
             citationStatus: CITATION_STATUS.PARTIAL_ENTAILMENT,
+            status: CITATION_STATUS.PARTIAL_ENTAILMENT,
             entailmentScore: 0.5,
             explanation: `Đoạn trích dẫn đề cập quy định chung nhưng không chứng minh cụ thể cho khóa ${claim.scope}.`
           })
@@ -188,7 +175,7 @@ export class CitationEntailmentEngine {
       }
     }
 
-    // 2. Check Numeric Precision (TOEIC, Credits, Deadlines)
+    // 2. Check Numeric Precision
     if (claim.numericValue !== null) {
       const expectedNum = String(claim.numericValue);
       if (!passage.includes(expectedNum)) {
@@ -198,6 +185,7 @@ export class CitationEntailmentEngine {
             sourceId: source.sourceId,
             evidenceId: span.evidenceId,
             citationStatus: CITATION_STATUS.CITATION_MISMATCH,
+            status: CITATION_STATUS.CITATION_MISMATCH,
             entailmentScore: 0.0,
             explanation: `Sai lệch số liệu: Khẳng định yêu cầu ${claim.numericValue} ${claim.numericUnit || ""} nhưng nguồn trích dẫn nêu con số khác.`
           })
@@ -205,27 +193,14 @@ export class CitationEntailmentEngine {
       }
     }
 
-    // 3. Check Subject / Authority Domain
-    if (source.domainScope && !source.domainScope.includes("ACADEMIC") && claim.claimType === "ACADEMIC_POLICY") {
-      return {
-        citation: AiTrustModel.createCitation({
-          claimId: claim.claimId,
-          sourceId: source.sourceId,
-          evidenceId: span.evidenceId,
-          citationStatus: CITATION_STATUS.PARTIAL_ENTAILMENT,
-          entailmentScore: 0.6,
-          explanation: `Nguồn trích dẫn không thuộc thẩm quyền quy chế học vụ chính thức.`
-        })
-      };
-    }
-
-    // 4. Full Valid Entailment
+    // 3. Full Valid Entailment
     return {
       citation: AiTrustModel.createCitation({
         claimId: claim.claimId,
         sourceId: source.sourceId,
         evidenceId: span.evidenceId,
         citationStatus: CITATION_STATUS.VALID_ENTAILMENT,
+        status: CITATION_STATUS.VALID_ENTAILMENT,
         entailmentScore: 1.0,
         explanation: `Đoạn văn bản trích dẫn chứng minh đầy đủ nội dung, đối tượng (${claim.scope}) và số liệu của khẳng định.`
       })

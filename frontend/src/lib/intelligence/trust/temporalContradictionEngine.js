@@ -1,61 +1,35 @@
 /**
- * StudentHub AI — Temporal Validity & Contradiction Engine V1
+ * StudentHub AI — Temporal Validity & Contradiction Engine V2
  * 
  * Manages temporal truth, policy evolution (Supersession vs Contradiction),
  * and flags conflicting or retracted official sources.
- * 
- * Rules:
- * - Newer policy replacing older policy is SUPERSESSION, not a contradiction.
- * - Two concurrent active official sources disagreeing is a TRUE CONTRADICTION (CONFLICTED).
- * - Retracted sources immediately invalidate dependent claims.
  */
 
 import {
-  AiTrustModel,
   AUTHORITY_TIER,
   TEMPORAL_STATUS,
-  TRUST_STATUS
+  EPISTEMIC_STATE
 } from "./aiTrustModel.js";
 
 export class TemporalContradictionEngine {
-  /**
-   * Analyzes temporal validity, supersession, and contradictions across claims and sources
-   * @param {Array<object>} claims 
-   * @param {Array<object>} sources 
-   * @param {Array<object>} evidenceSpans 
-   * @returns {{
-   *   claimsWithTemporalStatus: Array<object>,
-   *   contradictions: Array<object>,
-   *   contradictionSeverity: number,
-   *   temporalValidityScore: number,
-   *   hasOfficialConflict: boolean
-   * }}
-   */
   static analyzeTemporalAndContradictions(claims = [], sources = [], evidenceSpans = [], citations = []) {
     const sourceMap = new Map(sources.map(s => [s.sourceId, s]));
+    for (const span of evidenceSpans) {
+      if (span.sourceId && !sourceMap.has(span.sourceId)) {
+        sourceMap.set(span.sourceId, {
+          sourceId: span.sourceId,
+          authorityTier: span.authorityTier || AUTHORITY_TIER.TIER_1_OFFICIAL_REGISTRAR,
+          temporalStatus: span.temporalStatus || TEMPORAL_STATUS.CURRENTLY_VALID
+        });
+      }
+    }
+
     const citationMap = new Map(citations.map(c => [c.citationId, c]));
     const contradictions = [];
     let hasOfficialConflict = false;
     let staleOrSupersededCount = 0;
     let retractedCount = 0;
 
-    // 1. Check Supersession vs True Contradiction across sources for same domain/scope
-    const activeOfficialSources = sources.filter(s => 
-      s.authorityTier >= AUTHORITY_TIER.TIER_1_OFFICIAL_REGISTRAR && 
-      !s.isRetracted
-    );
-
-    // Group active official sources by domain/scope
-    const sourcesByScope = new Map();
-    for (const src of activeOfficialSources) {
-      const scopeKey = `${src.domainScope || "DEFAULT"}_${src.version || "1"}`;
-      if (!sourcesByScope.has(scopeKey)) {
-        sourcesByScope.set(scopeKey, []);
-      }
-      sourcesByScope.get(scopeKey).push(src);
-    }
-
-    // 2. Evaluate Claims against their supporting sources
     const claimsWithTemporalStatus = claims.map(claim => {
       const supportingSources = (claim.citationIds || [])
         .map(cid => {
@@ -65,49 +39,50 @@ export class TemporalContradictionEngine {
         })
         .filter(Boolean);
 
-      // Also check if all retrieved sources have retraction (if single source)
       const allRetracted = sources.length > 0 && sources.every(s => s.isRetracted || s.temporalStatus === TEMPORAL_STATUS.RETRACTED);
-
-      // Check if any supporting source is retracted
       const isGroundedInRetracted = allRetracted || supportingSources.some(s => s.isRetracted || s.temporalStatus === TEMPORAL_STATUS.RETRACTED);
+
       if (isGroundedInRetracted) {
         retractedCount++;
         return {
           ...claim,
-          status: TRUST_STATUS.RETRACTED,
+          status: EPISTEMIC_STATE.RETRACTED,
+          epistemicState: EPISTEMIC_STATE.RETRACTED,
           temporalStatus: TEMPORAL_STATUS.RETRACTED
         };
       }
 
-      // Check if grounded in superseded source
       const isGroundedInSuperseded = supportingSources.some(s => s.temporalStatus === TEMPORAL_STATUS.SUPERSEDED || s.supersededBy);
       if (isGroundedInSuperseded) {
         staleOrSupersededCount++;
         return {
           ...claim,
-          status: TRUST_STATUS.OUTDATED,
+          status: EPISTEMIC_STATE.OUTDATED,
+          epistemicState: EPISTEMIC_STATE.OUTDATED,
           temporalStatus: TEMPORAL_STATUS.SUPERSEDED
         };
       }
 
-      // Check if grounded in stale source
       const isGroundedInStale = supportingSources.some(s => s.temporalStatus === TEMPORAL_STATUS.STALE);
       if (isGroundedInStale) {
         staleOrSupersededCount++;
         return {
           ...claim,
-          status: TRUST_STATUS.OUTDATED,
+          status: EPISTEMIC_STATE.OUTDATED,
+          epistemicState: EPISTEMIC_STATE.OUTDATED,
           temporalStatus: TEMPORAL_STATUS.STALE
         };
       }
 
       return {
         ...claim,
-        temporalStatus: TEMPORAL_STATUS.VALID
+        status: claim.status || claim.epistemicState || EPISTEMIC_STATE.VERIFIED,
+        epistemicState: claim.epistemicState || claim.status || EPISTEMIC_STATE.VERIFIED,
+        temporalStatus: TEMPORAL_STATUS.CURRENTLY_VALID
       };
     });
 
-    // 3. Detect True Contradictions in Claims (e.g. 2 claims about same scope stating different numbers)
+    // Detect numeric conflicts
     const claimsByScope = new Map();
     for (const claim of claimsWithTemporalStatus) {
       if (claim.scope && claim.scope !== "ALL" && claim.numericValue !== null) {

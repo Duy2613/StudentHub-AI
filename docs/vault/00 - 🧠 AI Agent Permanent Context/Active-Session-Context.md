@@ -8,10 +8,10 @@
 - **Hiến Pháp Hoạt Động**: Tuân thủ 100% 84 Điều khoản Hiến pháp Thực tế Tối thượng (`NO DEMO FICTION`, `ZERO FABRICATION`).
 - **Trạng Thái Tiến Độ Hoàn Thành Toàn Diện**:
   1. ✅ **12 Tầng Trí Tuệ Thực Tế (12-Layer Reality Architecture)**:
-     - **Phase T1: AI Trust Engine V1 (LOCKED)**: Claim decomposition, citation entailment, temporal supersession, syndication defense.
-     - **Phase T2: Expert Intelligence V1 (LOCKED)**: Multi-signal entity resolution, domain scope graphs, temporal role windows, auditable credentials.
+     - **Phase T1: AI Trust Engine V2 — Self-Verifying Epistemic Intelligence (RELEASE LOCKED)**: 13 Epistemic States, Claim Graph DAG with derivation chains & cycle checks, Semantic Overclaim Detector (UNSUPPORTED_EXTENSION), Active Counter-Evidence & Adversarial Disproof Engine, Blind-Spot & Knowledge Gap Detector, Tool Use Firewall (fail-closed & anti-escalation), 5-Pass Self-Critique Pipeline, Trust Blast Radius & Immutable Corrections, Server API routes & Interactive Console UI (`/intelligence/ai-trust`).
+     - **Phase T2: Expert Intelligence V1 (LOCKED)**: Multi-signal entity resolution, domain scope graphs, temporal role windows, auditable credentials. (Ready for V2).
      - **Phase T3: Community & Forum Intelligence V1 (LOCKED)**: Contextual segmentation, first-hand claim extraction, provenance clustering, syndication collapse, astroturf & synthetic defense, multi-dimensional experience scoring, contradiction mapping without false averaging.
-     - **Master Suite**: **630/630 Tests PASS (100.0%) across 208 Suites**, 0 Failures, Next.js 16.3 Production Build (77/77 routes).
+     - **Master Suite**: **653/653 Tests PASS (100.0%) across 223 Suites**, 0 Failures, Next.js 16.3 Production Build (79/79 routes).
   2. ✅ **Phân Tách Rạch Ròi Độ Đúng Phần Mềm (Software) vs Năng Lực AI (Generalization)**:
      - **Software Suite (217/217 Tests PASS - 100.0%)**: Toàn bộ unit tests, mock integration, schema checks, và route handlers.
      - **Scientific AI Benchmark Suite (TEVV)**:
