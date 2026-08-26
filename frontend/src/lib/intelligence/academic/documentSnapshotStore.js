@@ -59,6 +59,8 @@ export const IMMUTABLE_DOCUMENT_SNAPSHOTS = [
 ];
 
 export class DocumentSnapshotStore {
+  static #dynamicSnapshots = [];
+
   /**
    * Helper to return a deep clone of a document snapshot to prevent in-memory tampering
    */
@@ -68,13 +70,74 @@ export class DocumentSnapshotStore {
   }
 
   /**
+   * Creates and stores an immutable snapshot in the archive
+   * @param {object} snapshotDef
+   * @returns {object} Stored snapshot copy
+   */
+  static createSnapshot(snapshotDef) {
+    if (!snapshotDef || !snapshotDef.documentId) {
+      throw new Error("[DocumentSnapshotStore] Cannot create snapshot without documentId");
+    }
+
+    const snapshotId = snapshotDef.snapshotId || `SNAP_${snapshotDef.documentId}_${Date.now()}`;
+    const versionId = snapshotDef.versionId || snapshotDef.version || "v1.0";
+
+    const record = {
+      snapshotId,
+      documentId: snapshotDef.documentId,
+      versionId,
+      sourceId: snapshotDef.sourceId || "SRC_UNKNOWN",
+      sourceTier: snapshotDef.sourceTier || "TIER_1_OFFICIAL",
+      sourceUrl: snapshotDef.sourceUrl || snapshotDef.canonicalUrl || "",
+      contentHash: snapshotDef.contentHash || "",
+      normalizedContentHash: snapshotDef.normalizedContentHash || snapshotDef.contentHash || "",
+      title: snapshotDef.title || snapshotDef.documentId,
+      retrievedAt: snapshotDef.retrievedAt || snapshotDef.fetchedAt || new Date().toISOString(),
+      publishedAt: snapshotDef.publishedAt || new Date().toISOString(),
+      effectiveFrom: snapshotDef.effectiveFrom || null,
+      effectiveUntil: snapshotDef.effectiveUntil || null,
+      status: snapshotDef.status || "ACTIVE",
+      content: snapshotDef.content || snapshotDef.rawBody || "",
+      normalizedText: snapshotDef.normalizedText || "",
+      metadata: snapshotDef.metadata || {},
+      keyClausesExtracted: snapshotDef.keyClausesExtracted || []
+    };
+
+    // If new snapshot is ACTIVE, mark previous ACTIVE snapshots for this document as SUPERSEDED
+    if (record.status === "ACTIVE") {
+      this.#dynamicSnapshots
+        .filter(s => s.documentId === record.documentId && s.status === "ACTIVE")
+        .forEach(s => { s.status = "SUPERSEDED"; s.effectiveUntil = record.retrievedAt; });
+    }
+
+    this.#dynamicSnapshots.push(record);
+    return this._cloneDoc(record);
+  }
+
+  /**
    * Retrieves the active snapshot for a document ID
    * @param {string} documentId 
    * @returns {object|null}
    */
   static getActiveSnapshot(documentId) {
+    // 1. Check dynamic snapshots first (newest active)
+    const dynamicActive = this.#dynamicSnapshots.findLast(d => d.documentId === documentId && d.status === "ACTIVE");
+    if (dynamicActive) return this._cloneDoc(dynamicActive);
+
+    // 2. Fallback to seed snapshots
     const doc = IMMUTABLE_DOCUMENT_SNAPSHOTS.find(d => d.documentId === documentId && d.status === "ACTIVE");
     return this._cloneDoc(doc);
+  }
+
+  /**
+   * Retrieves a snapshot by its unique snapshotId
+   * @param {string} snapshotId 
+   * @returns {object|null}
+   */
+  static getSnapshot(snapshotId) {
+    const found = this.#dynamicSnapshots.find(s => s.snapshotId === snapshotId) ||
+      IMMUTABLE_DOCUMENT_SNAPSHOTS.find(s => s.snapshotId === snapshotId || s.documentId === snapshotId);
+    return this._cloneDoc(found);
   }
 
   /**
@@ -83,9 +146,11 @@ export class DocumentSnapshotStore {
    * @returns {object[]}
    */
   static getDocumentHistory(documentId) {
-    return IMMUTABLE_DOCUMENT_SNAPSHOTS
-      .filter(doc => doc.documentId === documentId)
-      .map(d => this._cloneDoc(d));
+    const dynamicList = this.#dynamicSnapshots.filter(doc => doc.documentId === documentId);
+    const seedList = IMMUTABLE_DOCUMENT_SNAPSHOTS.filter(doc => doc.documentId === documentId);
+
+    const merged = [...seedList, ...dynamicList];
+    return merged.map(d => this._cloneDoc(d));
   }
 
   /**
@@ -95,7 +160,9 @@ export class DocumentSnapshotStore {
    * @returns {object}
    */
   static serveLastVerifiedState(documentId, isLiveSourceFailed = false) {
-    const rawDoc = IMMUTABLE_DOCUMENT_SNAPSHOTS.find(d => d.documentId === documentId && d.status === "ACTIVE") ||
+    const rawDoc = this.#dynamicSnapshots.findLast(d => d.documentId === documentId && d.status === "ACTIVE") ||
+      this.#dynamicSnapshots.findLast(d => d.documentId === documentId) ||
+      IMMUTABLE_DOCUMENT_SNAPSHOTS.find(d => d.documentId === documentId && d.status === "ACTIVE") ||
       IMMUTABLE_DOCUMENT_SNAPSHOTS.find(d => d.documentId === documentId);
 
     if (!rawDoc) {
@@ -116,5 +183,12 @@ export class DocumentSnapshotStore {
         ? `[STALE_SOURCE_WARNING] Nguồn trực tuyến hiện đang gặp sự cố. Hệ thống đang phục vụ bản chụp snapshot có thẩm quyền được xác minh gần nhất (${activeDoc.retrievedAt}).`
         : null
     };
+  }
+
+  /**
+   * Resets dynamic snapshots (for test cleanup)
+   */
+  static resetDynamicSnapshots() {
+    this.#dynamicSnapshots = [];
   }
 }

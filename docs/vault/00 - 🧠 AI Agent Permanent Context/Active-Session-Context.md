@@ -77,21 +77,31 @@
       - **Bộ Kiểm Chuẩn An Toàn & Chống Gian Lận (`fraud_risk_intelligence.test.mjs`)**: 20/20 Protocols PASS (100.0%).
       - **Toàn Bộ Hệ Thống Đạt Chuẩn**: **282/282 Tests PASS (100.0%)** trên 13 test files.
 
+   13. ✅ **Động Cơ Trí Tuệ Học Thuật V1 (Academic Intelligence V1 — Source Watcher ➔ Document Snapshot ➔ Change Detection ➔ Rule Extraction ➔ Student Impact ➔ Timeline/Notification)**:
+       - **Source Registry & Watcher (`academicSourceRegistry.js`)**: Quản trị nguồn HCMUTE chính thống theo `OFFICIAL_HCMUTE_ALLOWLIST`, kiểm định hostname & phân cấp Tier 1 (Official) / Tier 4 (Unknown).
+       - **Bộ Thu Thập & Chuẩn Hóa An Toàn (`academicDocumentFetcher.js`, `academicDocumentNormalizer.js`)**: Giới hạn payload 5MB, chặn vi phạm redirect sang tên miền ngoài, hỗ trợ ETag 304, chuẩn hóa Unicode NFKC, loại bỏ zero-width, băm SHA-256 nội dung.
+       - **Bản Chụp Bất Biến & Quản Trị Phiên Bản (`documentSnapshotStore.js`)**: Lưu trữ bản chụp bất biến theo phiên bản (`v1.0` $\rightarrow$ `v2.0`), cơ chế deep clone phòng hộ, phục vụ trạng thái xác minh gần nhất kèm cảnh báo `[STALE_SOURCE_WARNING]`.
+       - **Động Cơ Phân Tích Biến Thiên Ngữ Nghĩa (`semanticDiffEngine.js`)**: Lọc nhiễu định dạng HTML/CSS, phân loại đột biến học vụ: `DEADLINE_CHANGE`, `FEE_CHANGE`, `REQUIREMENT_CHANGE`, `ELIGIBILITY_CHANGE`.
+       - **Động Cơ Trích Xuất Quy Tắc Học Vụ (`academicRuleExtractor.js`)**: Trích xuất `AcademicRule` có căn cứ điều khoản rõ ràng, phân định phạm vi khóa (cohorts) / ngành (programs), gắn trạng thái `VERIFIED` hoặc `PENDING_REVIEW`.
+       - **Động Cơ Tác Động Cá Nhân Hóa & Digital Twin (`academicDigitalTwin.js`)**: Đánh giá tác động theo 5 mức độ (`NONE` $\rightarrow$ `CRITICAL`), tạo giải thích minh bạch ("Tại sao bạn bị ảnh hưởng"), chỉ định hành động và hạn chót.
+       - **Bộ Điều Hướng Cảnh Báo & Dòng Thời Gian (`academicNotificationAdapter.js`, `academicTimelineAdapter.js`, `academicInsightEngine.js`)**: Xuất bản thông báo có cấu trúc `[HỌC VỤ K24]` kèm nút hành động thực thi và cột mốc dòng thời gian sinh viên.
+       - **Điều Phối Toàn Trình (`academicIntelligenceService.js`)**: Orchestrator kết nối toàn bộ 7 chặng luồng dữ liệu tất định.
+       - **Tập Kiểm Chuẩn Mới**: 23/23 Tests PASS trên 4 suites (`academic_source_watcher`, `academic_semantic_diff_rules`, `academic_student_impact`, `academic_intelligence_pipeline_e2e`).
+       - **Toàn Hệ Thống**: **288/288 Tests PASS (100.0%)** trên 24 test files, 84 suites. **31/31 Mutants KILLED**.
+
 ---
 
 ## 2. Đường Dẫn File Trọng Tâm (v9 Nodes)
+- **Điều Phối Trí Tuệ Học Thuật Master**: `frontend/src/lib/intelligence/academic/academicIntelligenceService.js`
+- **Đăng Ký Nguồn Chính Thống**: `frontend/src/lib/intelligence/academic/academicSourceRegistry.js`
+- **Thu Thập & Chuẩn Hóa Văn Bản**: `frontend/src/lib/intelligence/academic/academicDocumentFetcher.js`, `academicDocumentNormalizer.js`
+- **Phân Tích Biến Thiên Ngữ Nghĩa & Trích Xuất Quy Tắc**: `frontend/src/lib/intelligence/academic/semanticDiffEngine.js`, `academicRuleExtractor.js`
+- **Bản Sao Số & Tác Động Sinh Viên**: `frontend/src/lib/intelligence/academic/academicDigitalTwin.js`
+- **Bộ Chuyển Đổi Thông Báo & Dòng Thời Gian**: `frontend/src/lib/intelligence/academic/academicNotificationAdapter.js`, `academicTimelineAdapter.js`
 - **Động Cơ Trí Tuệ Phòng Chống Rủi Ro & Gian Lận**: `frontend/src/lib/intelligence/fraud/fraudRiskEngine.js`
 - **Cầu Nối Đồng Bộ & Kiểm Soát Rủi Ro Toàn Diện**: `frontend/src/lib/intelligence/fraud/academicFraudLiveSyncBridge.js`
 - **Bộ Kiểm Chuẩn Trí Tuệ Gian Lận & Rủi Ro**: `frontend/tests/intelligence/fraud_risk_intelligence.test.mjs`
 - **Báo Cáo Tập Trận Thực Chiến Live-Sync**: `docs/university/live_sync_drill.md`
 - **Bộ Kiểm Chuẩn Tập Trận Vận Hành**: `frontend/tests/university/academic_production_drill.test.mjs`
 - **Đặc Tả Trí Tuệ Học Thuật HCMUTE**: `docs/vault/01 - 🏗️ System Architecture/Academic-Intelligence-Engine-Spec.md`
-- **Đồng Bộ Nguồn Trực Tuyến**: `docs/university/live_sync.md`
-- **Bản Chụp Văn Bản Bất Biến**: `docs/university/document_snapshots.md`
-- **So Sánh Biến Thiên Ngữ Nghĩa**: `docs/university/semantic_diff.md`
-- **Đồ Thị Phụ Thuộc Quy Tắc (DAG)**: `docs/university/rule_dependency_graph.md`
-- **Đánh Giá Tác Động Biến Thiên**: `docs/university/change_impact.md`
-- **Tác Động Tới Sinh Viên Cá Nhân**: `docs/university/student_impact.md`
-- **Sức Khỏe Nguồn & Phòng Hộ Parser**: `docs/university/source_health.md`
-- **Lịch Sử Phiên Bản Gold Ruleset**: `docs/university/gold_ruleset_versions.md`
-- **Thư Viện Kịch Bản Sinh Viên Mẫu**: `docs/university/golden_scenarios.md`
+- **Đặc Tả Đường Ống Academic Intelligence V1**: `docs/vault/01 - 🏗️ System Architecture/Academic-Intelligence-V1-Pipeline.md`
