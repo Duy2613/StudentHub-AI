@@ -7,6 +7,7 @@ import { WhatChangedSection } from "./WhatChangedSection.jsx";
 import { WhyAffectedSection } from "./WhyAffectedSection.jsx";
 import { AcademicTimeline } from "./AcademicTimeline.jsx";
 import { SourceEvidenceDrawer } from "./SourceEvidenceDrawer.jsx";
+import { WorkflowDetailDrawer } from "./WorkflowDetailDrawer.jsx";
 import { AcademicLoadingSkeleton, AcademicEmptyState, AcademicErrorState } from "./AcademicStates.jsx";
 
 export function AcademicCommandCenter({ initialData = null }) {
@@ -14,6 +15,8 @@ export function AcademicCommandCenter({ initialData = null }) {
   const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState(null);
   const [selectedItemForEvidence, setSelectedItemForEvidence] = useState(null);
+  const [selectedTaskForWorkflow, setSelectedTaskForWorkflow] = useState(null);
+  const [isMutatingStep, setIsMutatingStep] = useState(false);
 
   const fetchCommandCenterData = async () => {
     setLoading(true);
@@ -41,6 +44,45 @@ export function AcademicCommandCenter({ initialData = null }) {
     }
   }, [initialData]);
 
+  // Server-authoritative step completion handler
+  const handleCompleteStep = async (taskId, stepId) => {
+    if (isMutatingStep) return;
+    setIsMutatingStep(true);
+    try {
+      const res = await fetch(`/api/academic/tasks/${taskId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "COMPLETE_STEP",
+          stepId,
+          studentId: data?.studentProfile?.studentId || "24110001"
+        })
+      });
+
+      const resJson = await res.json();
+      if (!resJson.success) {
+        throw new Error(resJson.message || "Không thể cập nhật bước học vụ.");
+      }
+
+      // Update task in local state from server authoritative response
+      const updatedTask = resJson.task;
+      setData(prev => {
+        if (!prev) return prev;
+        const nextTasks = (prev.academicTasks || []).map(t => t.taskId === taskId ? updatedTask : t);
+        return {
+          ...prev,
+          academicTasks: nextTasks
+        };
+      });
+
+      setSelectedTaskForWorkflow(updatedTask);
+    } catch (err) {
+      alert(err.message || "Lỗi khi cập nhật bước.");
+    } finally {
+      setIsMutatingStep(false);
+    }
+  };
+
   if (loading) {
     return <AcademicLoadingSkeleton />;
   }
@@ -57,6 +99,7 @@ export function AcademicCommandCenter({ initialData = null }) {
     studentProfile = {},
     digitalTwinState = {},
     priorityInsights = [],
+    academicTasks = [],
     recentChanges = [],
     timelineEvents = [],
     syncStatus = {}
@@ -77,10 +120,12 @@ export function AcademicCommandCenter({ initialData = null }) {
         <AcademicEmptyState />
       ) : (
         <div className="space-y-8">
-          {/* 2. Urgent Action Center (Most Critical First) */}
+          {/* 2. Urgent Action Center with Multi-Step Tasks */}
           <ActionCenter
             insights={priorityInsights}
+            academicTasks={academicTasks}
             onOpenEvidence={(item) => setSelectedItemForEvidence(item)}
+            onOpenWorkflow={(task) => setSelectedTaskForWorkflow(task)}
           />
 
           {/* 3. Grid Layout: What Changed & Why You Are Affected */}
@@ -113,6 +158,15 @@ export function AcademicCommandCenter({ initialData = null }) {
         item={selectedItemForEvidence}
         isOpen={Boolean(selectedItemForEvidence)}
         onClose={() => setSelectedItemForEvidence(null)}
+      />
+
+      {/* 6. Slide-over Workflow Detail Drawer */}
+      <WorkflowDetailDrawer
+        task={selectedTaskForWorkflow}
+        isOpen={Boolean(selectedTaskForWorkflow)}
+        onClose={() => setSelectedTaskForWorkflow(null)}
+        onCompleteStep={handleCompleteStep}
+        isMutating={isMutatingStep}
       />
     </div>
   );

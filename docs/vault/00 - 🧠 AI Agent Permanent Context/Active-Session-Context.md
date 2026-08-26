@@ -87,19 +87,30 @@
        - **Bộ Điều Hướng Cảnh Báo & Dòng Thời Gian (`academicNotificationAdapter.js`, `academicTimelineAdapter.js`, `academicInsightEngine.js`)**: Xuất bản thông báo có cấu trúc `[HỌC VỤ K24]` kèm nút hành động thực thi và cột mốc dòng thời gian sinh viên.
        - **Điều Phối Toàn Trình (`academicIntelligenceService.js`)**: Orchestrator kết nối toàn bộ 7 chặng luồng dữ liệu tất định.
    14. ✅ **Trung Tâm Điều Phối Học Vụ Sinh Viên V1 (Academic Command Center V1 — Personalized Student Dashboard `/academic`)**:
-       - **Giao Diện 5 Khu Vực Trọng Tâm**:
-         1. **Action Center (Việc cần xử lý)**: Thẻ hành động khẩn cấp (CRITICAL/HIGH) tích hợp đếm ngược hạn chót & nút thực thi `[Đăng ký ngay]`, `[Xem văn bản]`.
-         2. **What Changed (Thay đổi mới nhất)**: Thẻ so sánh ngữ nghĩa hiển thị bước nhảy giá trị cũ ➔ mới (`30/08` $\rightarrow$ `05/09`, biểu phí, chuẩn TOEIC).
-         3. **Why Am I Affected (Tại sao bị ảnh hưởng)**: Trình bày minh bạch lý do cá nhân hóa trích xuất nguyên bản từ `AcademicInsight.reasons` (Khóa K24, Ngành SE, thiếu chứng chỉ/học phí).
-         4. **Academic Timeline (Dòng thời gian học vụ)**: Dòng sự kiện học vụ theo thời gian kèm bộ lọc phân loại (Tất cả, Hạn chót, Học phí, Chuẩn đầu ra, Quy chế).
-         5. **Source & Evidence Drawer (Hồ sơ & Bằng chứng)**: Ngăn trượt hiển thị mã văn bản (`QĐ-3116`), cơ quan ban hành, phiên bản snapshot, trích đoạn điều khoản gốc và liên kết mở cổng trường.
-       - **Nguyên Tắc Bất Biến**: Frontend là Consumer thuần túy, tuyệt đối không duplicate logic tính toán quy chế/rủi ro.
-       - **Khả Năng Phục Hồi & Trạng Thái**: Skeletons tải trang mượt mà, Empty state, Error retry state, và Stale warning badge.
-       - **Tập Kiểm Chuẩn**: **296/296 Tests PASS (100.0%)** trên 25 test files, 84 suites. **31/31 Mutants KILLED**.
+       - **Giao Diện 5 Khu Vực Trọng Tâm**: Action Center, What Changed, Why Am I Affected, Academic Timeline, Source & Evidence Drawer.
+       - **Nguyên Tắc Bất Biến**: Frontend là Consumer thuần túy, Server-First data loading, authoritative server sync status (`LIVE` / `STALE`).
+       - **Tập Kiểm Chuẩn**: **299/299 Tests PASS (100.0%)** trên 25 test files, 84 suites. **31/31 Mutants KILLED**.
+
+   15. ✅ **Trung Tâm Hành Động & Quy Trình Học Vụ V1 (Academic Action & Workflow Center V1 — State Machine, Multi-Step Tasks, Reconciliation & Verification)**:
+       - **Động Cơ Ý Định Hành Động (`academicActionIntent.js`)**: Quản trị 9 loại hành động chuẩn tắc, lọc đường dẫn độc hại (`javascript:`, `data:`), kiểm tra điều kiện tiên quyết (tín chỉ, GPA, học phí, học phần).
+       - **Máy Trạng Thái Quy Trình (`academicWorkflowStateMachine.js`)**: Kiểm soát chu trình chuyển đổi trạng thái `NOT_STARTED ➔ READY ➔ IN_PROGRESS ➔ PENDING_VERIFICATION ➔ COMPLETED`, chặn đứng mọi chuyển đổi thoái lui bất hợp lệ, phát sinh `WorkflowEvent` bất biến.
+       - **Mô Hình Nhiệm Vụ & Kế Hoạch (`academicTaskModel.js`, `academicTaskStore.js`)**: Sinh định danh tất định (`derivePlanId`, `deriveTaskId`), tính toán % tiến độ chính xác theo số bước, bộ nhớ phòng hộ deep-clone chống rò rỉ mutation.
+       - **Động Cơ Đối Soát Tự Động Khi Đổi Quy Chế (`academicWorkflowReconciliationEngine.js`)**: Tự động dung hòa hạn chót (ví dụ: `30/08` ➔ `05/09`), ghi nhận sự kiện `TASK_RECONCILED`, bảo lưu 100% tiến độ các bước đã hoàn tất của sinh viên, không nhân bản task thừa.
+       - **Hàng Rào Phân Quyền & Bảo Mật Sinh Viên (`academicTaskAuthorization.js`)**: Đảm bảo sinh viên A không thể đọc/sửa nhiệm vụ của sinh viên B, kiểm soát thứ tự phụ thuộc giữa các bước.
+       - **Điều Phối Quy Trình Học Thuật Master (`academicWorkflowService.js`)**: Kết nối toàn trình từ Insight ➔ Kế hoạch ➔ Bắt đầu nhiệm vụ ➔ Hoàn thành bước ➔ Xác minh ➔ Cập nhật.
+       - **Nâng Cấp Giao Diện**: `ActionCenter.jsx` hiển thị thanh tiến độ nhiều bước (`3/4 bước hoàn tất ████████░░ 75%`) và `WorkflowDetailDrawer.jsx` cung cấp checklist trực quan, nhật ký audit history và nút hành động hoàn tất.
+       - **Tập Kiểm Chuẩn**: **336/336 Tests PASS (100.0%)** trên 31 test files, 84 suites. **31/31 Mutants KILLED**.
 
 ---
 
 ## 2. Đường Dẫn File Trọng Tâm (v9 Nodes)
+- **Kiến Trúc Quy Trình Học Vụ**: `docs/vault/01 - 🏗️ System Architecture/Academic-Action-Workflow-V1.md`
+- **Dịch Vụ Điều Phối Quy Trình Master**: `frontend/src/lib/intelligence/academic/academicWorkflowService.js`
+- **Máy Trạng Thái & Ý Định Hành Động**: `frontend/src/lib/intelligence/academic/academicWorkflowStateMachine.js`, `academicActionIntent.js`
+- **Mô Hình Nhiệm Vụ & Kho Bất Biến**: `frontend/src/lib/intelligence/academic/academicTaskModel.js`, `academicTaskStore.js`
+- **Động Cơ Đối Soát & Phân Quyền**: `frontend/src/lib/intelligence/academic/academicWorkflowReconciliationEngine.js`, `academicTaskAuthorization.js`
+- **Drawer Chi Tiết Quy Trình & Action Center**: `frontend/src/components/academic/WorkflowDetailDrawer.jsx`, `ActionCenter.jsx`
+- **API Biến Đổi Nhiệm Vụ**: `frontend/src/app/api/academic/tasks/[taskId]/route.js`
 - **Trang Dashboard Học Vụ Master**: `frontend/src/app/academic/page.jsx`
 - **Component Điều Phối Trung Tâm**: `frontend/src/components/academic/AcademicCommandCenter.jsx`
 - **Khu Vực Hành Động & Biến Thiên**: `frontend/src/components/academic/ActionCenter.jsx`, `WhatChangedSection.jsx`

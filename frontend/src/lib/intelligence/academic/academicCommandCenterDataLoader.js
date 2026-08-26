@@ -9,6 +9,7 @@
 import { AcademicIntelligenceService } from "./academicIntelligenceService.js";
 import { DocumentSnapshotStore } from "./documentSnapshotStore.js";
 import { AcademicRuleExtractor } from "./academicRuleExtractor.js";
+import { AcademicWorkflowService } from "./academicWorkflowService.js";
 
 export const DEFAULT_STUDENT_PROFILE = {
   studentId: "24110001",
@@ -113,6 +114,13 @@ export function getAuthoritativeCommandCenterData(params = {}) {
     return pA - pB;
   });
 
+  // 5. Generate or reconcile authoritative Action Plans and Academic Tasks
+  const { plans: actionPlans, tasks: academicTasks } = AcademicWorkflowService.generateActionPlansForStudent(
+    studentProfile,
+    sortedInsights,
+    recentChanges
+  );
+
   const syncStatus = {
     isLive: true,
     lastSyncedAt: new Date().toISOString(),
@@ -131,6 +139,8 @@ export function getAuthoritativeCommandCenterData(params = {}) {
     studentProfile,
     digitalTwinState: trajectory.digitalTwinState,
     priorityInsights: sortedInsights,
+    actionPlans,
+    academicTasks,
     recentChanges,
     timelineEvents: trajectory.timelineEvents,
     notifications: trajectory.notifications,

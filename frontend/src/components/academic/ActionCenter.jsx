@@ -2,9 +2,14 @@
 
 import React, { useState } from "react";
 import { AcademicCommandCenterViewModel } from "@/lib/intelligence/academic/academicCommandCenterViewModel.js";
-import { AlertOctagon, Calendar, FileText, ArrowRight, Check, ExternalLink } from "lucide-react";
+import { AlertOctagon, Calendar, FileText, ArrowRight, Check, ListChecks, ChevronRight } from "lucide-react";
 
-export function ActionCenter({ insights = [], onOpenEvidence }) {
+export function ActionCenter({
+  insights = [],
+  academicTasks = [],
+  onOpenEvidence,
+  onOpenWorkflow
+}) {
   const [executingActionId, setExecutingActionId] = useState(null);
   const [completedActionIds, setCompletedActionIds] = useState(new Set());
 
@@ -17,15 +22,28 @@ export function ActionCenter({ insights = [], onOpenEvidence }) {
     return null;
   }
 
-  const handleExecuteAction = (insightId, action) => {
+  // Map task by insightId for quick progress resolution
+  const taskMap = new Map();
+  for (const t of academicTasks) {
+    if (t.insightId) {
+      taskMap.set(t.insightId, t);
+    }
+  }
+
+  const handleExecuteAction = (insightId, action, task) => {
     if (executingActionId || completedActionIds.has(insightId)) return;
+
+    if (task && onOpenWorkflow) {
+      onOpenWorkflow(task);
+      return;
+    }
 
     setExecutingActionId(insightId);
     setTimeout(() => {
       setExecutingActionId(null);
       setCompletedActionIds((prev) => new Set([...prev, insightId]));
 
-      if (action.targetUrl) {
+      if (action?.targetUrl) {
         if (action.targetUrl.startsWith("http")) {
           window.open(action.targetUrl, "_blank", "noopener,noreferrer");
         } else {
@@ -58,6 +76,9 @@ export function ActionCenter({ insights = [], onOpenEvidence }) {
           const countdown = AcademicCommandCenterViewModel.formatRelativeDeadline(insight.deadline);
           const isDone = completedActionIds.has(insight.insightId);
           const isExecuting = executingActionId === insight.insightId;
+          const task = taskMap.get(insight.insightId);
+          const progress = task?.progress || { completedSteps: 0, totalSteps: 0, percentage: 0 };
+          const nextAction = task?.nextAction;
           const primaryAction = insight.actions?.[1] || insight.actions?.[0];
 
           return (
@@ -96,11 +117,47 @@ export function ActionCenter({ insights = [], onOpenEvidence }) {
                     {insight.whyItMatters}
                   </div>
                 )}
+
+                {/* Multi-Step Workflow Progress Bar */}
+                {task && progress.totalSteps > 0 && (
+                  <div className="mt-4 rounded-xl border border-border/50 bg-background/60 p-3 space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-foreground flex items-center gap-1.5">
+                        <ListChecks className="h-3.5 w-3.5 text-primary" />
+                        Tiến độ thực hiện
+                      </span>
+                      <span className="font-bold text-primary font-mono">
+                        {progress.completedSteps}/{progress.totalSteps} bước ({progress.percentage}%)
+                      </span>
+                    </div>
+
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/60">
+                      <div
+                        className="h-full bg-gradient-to-r from-primary to-sky-400 transition-all duration-500"
+                        style={{ width: `${progress.percentage}%` }}
+                      />
+                    </div>
+
+                    {nextAction && (
+                      <div className="text-[11px] text-muted-foreground pt-1 flex items-center gap-1">
+                        <span className="font-medium text-foreground">Bước tiếp theo:</span> {nextAction.title}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons */}
               <div className="mt-5 flex flex-wrap items-center gap-3 pt-4 border-t border-border/40">
-                {primaryAction && (
+                {task ? (
+                  <button
+                    onClick={() => onOpenWorkflow && onOpenWorkflow(task)}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary/90 transition-all active:scale-95"
+                  >
+                    <span>{progress.percentage === 100 ? "Xem kết quả" : "Tiếp tục quy trình"}</span>
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </button>
+                ) : primaryAction ? (
                   <button
                     onClick={() => handleExecuteAction(insight.insightId, primaryAction)}
                     disabled={isExecuting || isDone}
@@ -123,14 +180,14 @@ export function ActionCenter({ insights = [], onOpenEvidence }) {
                       </>
                     )}
                   </button>
-                )}
+                ) : null}
 
                 <button
                   onClick={() => onOpenEvidence && onOpenEvidence(insight)}
                   className="inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-background/60 px-3.5 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-background/90 transition-colors"
                 >
                   <FileText className="h-3.5 w-3.5" />
-                  Xem văn bản & bằng chứng
+                  Xem văn bản gốc
                 </button>
               </div>
             </div>

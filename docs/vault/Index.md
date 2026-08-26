@@ -52,6 +52,7 @@ graph TD
 - [[System-Architecture|Kiến Trúc Tổng Thể]]: Frontend Next.js 16 + Supabase Backend + Vercel AI SDK.
 - [[Security-And-Intelligence-Release-Baseline-V5|🛡️ Security & Intelligence Release Baseline (V5 Final Freeze)]]: Toàn bộ Invariants, Data Flow, Fail-Closed Contracts & Certification.
 - [[Academic-Intelligence-V1-Pipeline|🎓 Academic Intelligence V1 Pipeline]]: Source Watcher → Snapshot Versioning → Semantic Diff → Rule Extraction → Student Impact Engine → Timeline/Notification.
+- [[Academic-Action-Workflow-V1|⚡ Academic Action & Workflow Center V1]]: Action Intent → Action Plan → Task State Machine → Multi-Step Execution → Verification → Reconciliation.
 - [[AI-Trust-Layer1-Screening-Spec|Layer 1 Screening Engine]]: Động cơ sàng lọc nhanh & tất định (Hard Rules + Confidence Scoring).
 - [[AI-Trust-Layer2-Semantic-Spec|Layer 2 Semantic Reasoning]]: Động cơ phân tích ngữ nghĩa, ý định, trích xuất phát ngôn & mâu thuẫn nội tại.
 - [[AI-Trust-Layer3-Evidence-Spec|Layer 3 Evidence Engine]]: Động cơ đối soát nguồn tin chính thống, phát hiện mâu thuẫn & phân cụm bản sao bài viết.
