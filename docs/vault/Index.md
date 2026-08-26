@@ -13,6 +13,7 @@ graph TD
     Index --> Design["🎨 02 - Design & Refero Systems"]
     Index --> Features["🚀 03 - Features & Modules"]
     Index --> Roadmap["📋 04 - Roadmap & Tasks"]
+    Index --> Audit["🏛️ v9 Reality Audit & TEVV"]
 
     Meta --> ActiveCtx["Active-Session-Context.md"]
     Meta --> Memory["00-Permanent-Memory.md"]
@@ -21,6 +22,11 @@ graph TD
     Arch --> TechStack["Tech-Stack.md"]
     Arch --> AuthFlow["Auth-Flow-OTP-Verification.md"]
     Arch --> Schema["Database-Supabase-Schema.md"]
+
+    Audit --> MasterAudit["docs/audit/studenthub_v9_master_audit.md"]
+    Audit --> TEVVMatrix["docs/evaluation/evaluation_matrix.md"]
+    Audit --> ModelReg["docs/models/model_registry.md"]
+    Audit --> DriftDoc["docs/operations/drift_monitoring.md"]
 
     Design --> Refero["DESIGN.md (Refero Styles)"]
     Design --> Settigation["Settigation-OTP-Verification-v3.md"]
@@ -39,7 +45,7 @@ graph TD
 
 ### 1. [[00-Permanent-Memory|🧠 00 - AI Agent Permanent Context]]
 - [[00-Permanent-Memory|Vĩnh Viễn Ngữ Cảnh]]: Quy chuẩn ghi nhớ bộ nhớ, quy tắc tiếp nhận nhiệm vụ.
-- [[Active-Session-Context|Ngữ Cảnh Hiện Tại (Active Session)]]: Snapshot trạng thái phát triển, phiên làm việc gần nhất.
+- [[Active-Session-Context|Ngữ Cảnh Hiện Tại (Active Session)]]: Snapshot trạng thái v9 Reality-First, MLOps Champion/Challenger.
 - [[Coding-Conventions|Quy Chuẩn Code & Next.js 16/React 19]]: Không viết code thừa, tuân thủ App Router.
 
 ### 2. [[System-Architecture|🏗️ 01 - System Architecture]]
@@ -49,6 +55,7 @@ graph TD
 - [[AI-Trust-Layer3-Evidence-Spec|Layer 3 Evidence Engine]]: Động cơ đối soát nguồn tin chính thống, phát hiện mâu thuẫn & phân cụm bản sao bài viết.
 - [[AI-Trust-Layer4-Reasoning-Spec|Layer 4 Final Trust Reasoning]]: Động cơ phán quyết tin cậy tối hậu, ma trận 3 chiều (Truth, Risk, Action) & giải trình kiểm toán.
 - [[Global-Standards-and-Ecosystem-Spec|Tiêu Chuẩn Toàn Cầu & Hệ Sinh Thái Đại Học]]: MITRE ATT&CK, NIST SP 800-63B, IFCN, ISO 42001 & 50+ trường ĐH.
+- [[Academic-Intelligence-Engine-Spec|🎓 HCMUTE Academic Intelligence]]: Đồ thị tri thức, CTĐT K23-K26, Động cơ luật tất định, What-If & Radar.
 - [[Tech-Stack|Công Nghệ Cốt Lõi]]: Danh sách thư viện và vai trò từng module.
 - [[Auth-Flow-OTP-Verification|Luồng Đăng Ký & Xác Thực OTP]]: Bảo mật 2 bước + Settigation Orbit Animation.
 - [[Database-Supabase-Schema|Supabase DB Schema]]: Bảng `profiles`, `workspaces`, `whiteboards`, `messages`.
@@ -69,7 +76,7 @@ graph TD
 - [[Cinematic-Motion-Experience-Skill|Cinematic Motion Experience Skill]]: 4 trụ cột Parallax Scrolling, Magnetic Cursor, Page Transitions và Video Atmosphere.
 
 ### 5. [[Sprint-Board|📋 04 - Roadmap & Tasks]]
-- [[Sprint-Board|Sprint Tasks & Tiến Độ]]: Danh sách tính năng đang làm, hoàn tất, backlog.
+- [[Sprint-Board|Sprint Tasks & Tiến Độ]]: Danh sách tính năng đang làm, hoàn tất, backlog v9.
 - [[Architecture-Decisions-ADR|Architecture Decisions (ADR)]]: Ghi lại các quyết định kỹ thuật quan trọng.
 
 ---

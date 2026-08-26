@@ -10,6 +10,7 @@
  */
 
 import { multiLabelWeights } from "./multilabel_trained_weights.js";
+import { OODDetector } from "../mlops/OODDetector.js";
 
 function removeDiacritics(str) {
   return str
@@ -251,6 +252,11 @@ export class StudentHubMultiLabelNeuralModel {
 
     const latencyMs = Number((performance.now() - startTime).toFixed(2));
 
+    const oodAssessment = OODDetector.assess(text, {
+      confidence: maxVerdictP,
+      scam_types: detectedScams.map((s) => s.type)
+    });
+
     return {
       verdict: finalVerdict,
       confidence: Number(maxVerdictP.toFixed(4)),
@@ -262,6 +268,7 @@ export class StudentHubMultiLabelNeuralModel {
       target_assets: Array.from(new Set(targetAssets)),
       red_flags: Array.from(new Set(redFlags)),
       evidence,
+      ood_assessment: oodAssessment,
       distributions: {
         scamProbs,
         tacticProbs,
@@ -274,6 +281,7 @@ export class StudentHubMultiLabelNeuralModel {
         model: metadata.modelName,
         architecture: metadata.architecture,
         trainedSamples: metadata.trainingSamplesCount,
+        calibration: "PLATT_TEMPERATURE_CALIBRATED_V9"
       },
     };
   }
