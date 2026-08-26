@@ -6,6 +6,7 @@
  */
 
 import { AcademicDeadlineEngine } from "./academicDeadlineEngine.js";
+import { AcademicClock } from "./academicClock.js";
 
 export const REMINDER_WINDOWS = Object.freeze({
   WINDOW_7_DAYS: "WINDOW_7_DAYS",
@@ -72,7 +73,7 @@ export class AcademicReminderPolicy {
    * @param {object} [clock]
    * @returns {Array<object>}
    */
-  static computeSchedules(dueDate, customPolicy = DEFAULT_REMINDER_POLICY, clock = { now: () => Date.now() }) {
+  static computeSchedules(dueDate, customPolicy = DEFAULT_REMINDER_POLICY, clock = { now: () => AcademicClock.now() }) {
     if (!dueDate) return [];
     const parsedDate = AcademicDeadlineEngine.parseDeadline(dueDate);
     if (!parsedDate) return [];

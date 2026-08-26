@@ -56,6 +56,7 @@ graph TD
 - [[Academic-Workflow-Persistence-V1|💾 Durable Academic Workflow Persistence V1]]: Crash-Safe Journaling → Startup Rehydration → Concurrency Control → Restart Recovery.
 - [[Academic-Digital-Twin-V1|👤 Student Academic Digital Twin & Eligibility Engine V1]]: Authoritative Single Source of Truth → Typed Requirement Evaluators → Auto-Reconciliation.
 - [[Academic-Notification-Orchestration-V1|🔔 Academic Notification & Deadline Orchestration V1]]: Deadline Intelligence → Reminder Policy → Notification Orchestrator → Auto-Cancellation → Multi-Tenant Authorization.
+- [[Authoritative-Student-Identity-And-Records-V1|🪪 Authoritative Student Identity & Academic Records V1]]: Supabase Auth Integration → Canonical Identity & Records Store → Centralized AcademicClock → Sync Bridge.
 - [[AI-Trust-Layer1-Screening-Spec|Layer 1 Screening Engine]]: Động cơ sàng lọc nhanh & tất định (Hard Rules + Confidence Scoring).
 - [[AI-Trust-Layer2-Semantic-Spec|Layer 2 Semantic Reasoning]]: Động cơ phân tích ngữ nghĩa, ý định, trích xuất phát ngôn & mâu thuẫn nội tại.
 - [[AI-Trust-Layer3-Evidence-Spec|Layer 3 Evidence Engine]]: Động cơ đối soát nguồn tin chính thống, phát hiện mâu thuẫn & phân cụm bản sao bài viết.

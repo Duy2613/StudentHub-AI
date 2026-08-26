@@ -382,4 +382,11 @@ export class AcademicTaskStore {
       // ignore
     }
   }
+
+  /**
+   * Alias for resetStore
+   */
+  static clear() {
+    this.resetStore();
+  }
 }

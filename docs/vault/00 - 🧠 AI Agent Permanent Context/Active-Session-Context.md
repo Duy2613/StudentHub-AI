@@ -119,9 +119,23 @@
        - **Giao Diện Ngăn Kéo Thông Báo & API Server-First**: `NotificationCenterDrawer.jsx` tích hợp bộ lọc trực quan (Tất cả, Chưa đọc, Hạn chót, Quy trình), nút chuông thông báo trên `AcademicHeader.jsx`, endpoint `/api/academic/notifications`.
        - **Tập Kiểm Chuẩn**: **388/388 Tests PASS (100.0%)** trên 47 test files, 94 suites. **31/31 Mutants KILLED**.
 
+   18. ✅ **Nguồn Sự Thật Danh Tính & Hồ Sơ Bảng Điểm Học Vụ Chuẩn Tắc V1 (Authoritative Student Identity & Academic Records System V1 — Supabase Auth Integration, Canonical Records Store, Centralized AcademicClock, Multi-Tier Privacy, Sync Bridge)**:
+       - **Đồng Hồ Học Thuật Tập Trung (`academicClock.js`)**: Tập trung hóa toàn bộ múi giờ `Asia/Ho_Chi_Minh` (UTC+7), cung cấp phương thức `parseVnDeadline()`, `computeCalendarDayDiff()` và `createMockClock()`, loại bỏ hoàn toàn các lệnh gọi thời gian phi tất định.
+       - **Phân Cấp Quyền Riêng Tư Theo Kênh (`academicNotificationDeliveryAdapter.js`)**: Phân tách payload `IN_APP` (đầy đủ context), `EMAIL` (tóm tắt an toàn, liên kết xác thực), `PUSH` (cảnh báo 1 dòng tối giản $\le 100$ ký tự) cùng bộ lọc regex làm lớp phòng vệ chuyên sâu.
+       - **Mô Hình & Kho Danh Tính Sinh Viên Chuẩn Tắc (`studentIdentityModel.js`, `studentIdentityStore.js`)**: Quản trị MSSV, email trường (`@student.hcmute.edu.vn`), khóa K24, liên kết với Supabase Auth `authUserId`, mặt nạ CCCD/CMND. Ghi nhật ký tệp nguyên tử `.tmp` ➔ `renameSync`.
+       - **Mô Hình & Kho Bảng Điểm Học Vụ Chính Thức (`academicRecordsModel.js`, `academicRecordsStore.js`)**: Quản trị bảng điểm chính thức từng học kỳ, chuyển đổi điểm hệ 10 ➔ hệ 4 ➔ điểm chữ (A+, A, B+, B, C+, C, D+, D, F), chứng chỉ TOEIC/IELTS có cơ quan xác thực, hóa đơn học phí và điểm rèn luyện.
+       - **Cầu Nối Đồng Bộ Nguồn Sự Thật (`studentAcademicSyncBridge.js`)**: Tự động tổng hợp danh tính và bảng điểm chính thức ➔ nạp vào `StudentDigitalTwin`, kích hoạt `AcademicEligibilityEngine` và đối soát quy trình `AcademicWorkflowReconciliationEngine`.
+       - **API & Tích Hợp Hệ Thống**: `/api/student/identity`, `/api/student/records`, kết nối trực tiếp vào `academicCommandCenterDataLoader.js`.
+       - **Tập Kiểm Chuẩn**: **403/403 Tests PASS (100.0%)** trên 54 test files, 101 suites. **31/31 Mutants KILLED**.
+
 ---
 
-## 2. Đường Dẫn File Trọng Tâm (v10 Nodes)
+## 2. Đường Dẫn File Trọng Tâm (v11 Nodes)
+- **Kiến Trúc Nguồn Sự Thật Danh Tính & Bảng Điểm**: `docs/vault/01 - 🏗️ System Architecture/Authoritative-Student-Identity-And-Records-V1.md`
+- **Đồng Hồ Học Thuật & Múi Giờ UTC+7**: `frontend/src/lib/intelligence/academic/academicClock.js`
+- **Mô Hình, Kho & Dịch Vụ Danh Tính Sinh Viên**: `frontend/src/lib/intelligence/academic/studentIdentityModel.js`, `studentIdentityStore.js`, `studentIdentityService.js`
+- **Mô Hình & Kho Bảng Điểm Học Vụ Chính Thức**: `frontend/src/lib/intelligence/academic/academicRecordsModel.js`, `academicRecordsStore.js`
+- **Cầu Nối Đồng Bộ Hồ Sơ ➔ Bản Sao Số**: `frontend/src/lib/intelligence/academic/studentAcademicSyncBridge.js`
 - **Kiến Trúc Điều Phối Thông Báo & Hạn Chót**: `docs/vault/01 - 🏗️ System Architecture/Academic-Notification-Orchestration-V1.md`
 - **Động Cơ Trí Tuệ Hạn Chót & Chính Sách Nhắc Nhở**: `frontend/src/lib/intelligence/academic/academicDeadlineEngine.js`, `academicReminderPolicy.js`
 - **Mô Hình, Máy Trạng Thái & Điều Phối Thông Báo**: `frontend/src/lib/intelligence/academic/academicNotificationModel.js`, `academicNotificationStateMachine.js`, `academicNotificationOrchestrator.js`

@@ -186,4 +186,11 @@ export class StudentDigitalTwinStore {
       // ignore
     }
   }
+
+  /**
+   * Alias for resetStore
+   */
+  static clear() {
+    this.resetStore();
+  }
 }
