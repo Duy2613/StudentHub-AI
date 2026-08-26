@@ -1,5 +1,5 @@
 # 📦 Danh Mục UI Components (Auto-Synced)
-> **Vault Node**: `UI-Component-Registry` | **Last Synced**: 21:28:10 26/8/2026
+> **Vault Node**: `UI-Component-Registry` | **Last Synced**: 21:33:58 26/8/2026
 
 ---
 
@@ -54,13 +54,14 @@
 
 ---
 
-## 🌐 Các Trang & Routes Ứng Dụng (20 routes)
+## 🌐 Các Trang & Routes Ứng Dụng (21 routes)
 - `/academic`: Module **ACADEMIC**
 - `/api`: Module **API**
 - `/callback`: Module **CALLBACK**
 - `/contract-check`: Module **CONTRACT-CHECK**
 - `/credit-scheduler`: Module **CREDIT-SCHEDULER**
 - `/dashboard`: Module **DASHBOARD**
+- `/expert`: Module **EXPERT**
 - `/forum`: Module **FORUM**
 - `/login`: Module **LOGIN**
 - `/marketplace`: Module **MARKETPLACE**
