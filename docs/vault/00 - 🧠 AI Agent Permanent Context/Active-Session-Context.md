@@ -185,9 +185,24 @@
         - **Giao Diện Studio Trực Quan (`AiTrustStudioView.jsx`, `/trust`)**: Bảng điều khiển đa chiều, thanh tra luận điểm và đánh dấu đoạn trích dẫn.
         - **Tập Kiểm Chuẩn Toàn Diện**: **546/546 Tests PASS (100.0%)** trên 106 test files, 165 suites. **55/55 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
 
+    26. ✅ **Hệ Thống Trí Tuệ Chuyên Gia V1 (Expert Intelligence V1 — Phase T2 of StudentHub Intelligence OS: Expert Knowledge Graph, Scope Graph, Disciplinary Jurisdiction, Credential Provenance, Conflict of Interest & Retraction Tracking)**:
+        - **Bất Biến Chuyên Môn Không Đồng Nghĩa Thẩm Quyền Hành Chính (`EXPERTISE ≠ INSTITUTIONAL AUTHORITY`)**: Giáo sư/chuyên gia kỹ thuật giỏi có uy tín học thuật cao nhưng không có quyền tự ban hành quy chế học vụ hay mức học phí HCMUTE. Phát ngôn về quy chế bị phân loại `AUTHORITY_MISMATCH`.
+        - **Đồ Thị Năng Lực & Phạm Vi Chuyên Gia (Expert Scope Graph)**: Phân loại năng lực từng lĩnh vực (`STRONG`, `MODERATE`, `NOT_ESTABLISHED`, `DISQUALIFIED`), phát hiện phát ngôn chéo ngành (`OUT_OF_SCOPE`).
+        - **Xác Thực Học Vị & Bằng Cấp (Credential Provenance)**: Đối soát học hàm, học vị (Tiến sĩ, Thạc sĩ), cơ sở đào tạo và danh mục công trình nghiên cứu khoa học.
+        - **Phát Hiện Xung Đột Lợi Ích (Conflict of Interest)**: Tự động phát hiện và gắn cờ quảng bá thương mại, tài trợ (`CONFLICT_OF_INTEREST`) để loại khỏi nhóm chuyên gia độc lập.
+        - **Theo Dõi Đính Chính & Thu Hồi (Retraction Tracking)**: Cập nhật trạng thái `RETRACTED` khi chuyên gia hoặc hội đồng thu hồi phát ngôn/bài báo.
+        - **Giao Diện Trực Quan (`ExpertIntelligenceView.jsx`, `/expert`)**: Khám phá đồ thị chuyên gia, radar năng lực và sandbox thẩm định ý kiến chuyên môn.
+        - **Tập Kiểm Chuẩn Toàn Diện**: **560/560 Tests PASS (100.0%)** trên 114 test files, 173 suites. **59/59 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
+
 ---
 
-## 2. Đường Dẫn File Trọng Tâm (v22 Nodes)
+## 2. Đường Dẫn File Trọng Tâm (v24 Nodes)
+- **Kiến Trúc Hệ Thống Trí Tuệ Chuyên Gia**: `docs/vault/01 - 🏗️ System Architecture/Expert-Intelligence-V1.md`
+- **Mô Hình Miền & Hợp Đồng Tri Thức Chuyên Gia**: `frontend/src/lib/intelligence/expert/expertIntelligenceModel.js`
+- **Động Cơ Thẩm Định Phạm Vi & Thẩm Quyền Chuyên Gia**: `frontend/src/lib/intelligence/expert/expertScopeEngine.js`
+- **Kho Lưu Trữ Hồ Sơ & Đồ Thị Chuyên Gia**: `frontend/src/lib/intelligence/expert/expertStore.js`
+- **API Endpoint Thẩm Định Chuyên Gia Server-Authoritative**: `frontend/src/app/api/expert/evaluate/route.js`, `frontend/src/app/api/expert/graph/route.js`, `frontend/src/app/api/expert/profile/[expertId]/route.js`
+- **Giao Diện Khám Phá Chuyên Gia & Trang RSC**: `frontend/src/components/expert/ExpertIntelligenceView.jsx`, `frontend/src/app/expert/page.jsx`
 - **Kiến Trúc Động Cơ Kiểm Chứng Tin Cậy AI**: `docs/vault/01 - 🏗️ System Architecture/AI-Trust-Engine-V1.md`
 - **Mô Hình Miền & Chỉ Số Tin Cậy Đa Chiều**: `frontend/src/lib/intelligence/trust/aiTrustModel.js`
 - **Động Cơ Phân Rã Luận Điểm Cấp Nguyên Tử**: `frontend/src/lib/intelligence/trust/claimDecompositionEngine.js`
