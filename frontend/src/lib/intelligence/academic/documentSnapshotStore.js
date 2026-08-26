@@ -60,12 +60,21 @@ export const IMMUTABLE_DOCUMENT_SNAPSHOTS = [
 
 export class DocumentSnapshotStore {
   /**
+   * Helper to return a deep clone of a document snapshot to prevent in-memory tampering
+   */
+  static _cloneDoc(doc) {
+    if (!doc) return null;
+    return JSON.parse(JSON.stringify(doc));
+  }
+
+  /**
    * Retrieves the active snapshot for a document ID
    * @param {string} documentId 
    * @returns {object|null}
    */
   static getActiveSnapshot(documentId) {
-    return IMMUTABLE_DOCUMENT_SNAPSHOTS.find(doc => doc.documentId === documentId && doc.status === "ACTIVE") || null;
+    const doc = IMMUTABLE_DOCUMENT_SNAPSHOTS.find(d => d.documentId === documentId && d.status === "ACTIVE");
+    return this._cloneDoc(doc);
   }
 
   /**
@@ -74,7 +83,9 @@ export class DocumentSnapshotStore {
    * @returns {object[]}
    */
   static getDocumentHistory(documentId) {
-    return IMMUTABLE_DOCUMENT_SNAPSHOTS.filter(doc => doc.documentId === documentId);
+    return IMMUTABLE_DOCUMENT_SNAPSHOTS
+      .filter(doc => doc.documentId === documentId)
+      .map(d => this._cloneDoc(d));
   }
 
   /**
@@ -84,14 +95,17 @@ export class DocumentSnapshotStore {
    * @returns {object}
    */
   static serveLastVerifiedState(documentId, isLiveSourceFailed = false) {
-    const activeDoc = this.getActiveSnapshot(documentId) || IMMUTABLE_DOCUMENT_SNAPSHOTS.find(d => d.documentId === documentId);
+    const rawDoc = IMMUTABLE_DOCUMENT_SNAPSHOTS.find(d => d.documentId === documentId && d.status === "ACTIVE") ||
+      IMMUTABLE_DOCUMENT_SNAPSHOTS.find(d => d.documentId === documentId);
 
-    if (!activeDoc) {
+    if (!rawDoc) {
       return {
         found: false,
         error: "NO_HISTORICAL_SNAPSHOT_AVAILABLE"
       };
     }
+
+    const activeDoc = this._cloneDoc(rawDoc);
 
     return {
       found: true,

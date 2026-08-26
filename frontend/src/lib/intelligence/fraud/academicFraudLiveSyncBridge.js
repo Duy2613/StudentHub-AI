@@ -27,13 +27,14 @@ export class AcademicFraudLiveSyncBridge {
    * @returns {object} End-to-End Pipeline Execution Report
    */
   static async processIngestionPipeline(input = {}) {
+    const safeInput = (input && typeof input === "object") ? input : {};
     const {
       source = { sourceId: "SRC_UNKNOWN", sourceTier: "TIER_4_UNKNOWN", url: "" },
       rawBody = "",
       incomingHeaders = {},
       previousDoc = {},
       studentProfile = null
-    } = input;
+    } = safeInput;
 
     const pipelineStages = [];
     const executionTimestamp = new Date().toISOString();
