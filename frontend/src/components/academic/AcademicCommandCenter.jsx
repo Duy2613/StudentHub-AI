@@ -216,6 +216,13 @@ export function AcademicCommandCenter({ initialData = null }) {
               <span>🎓</span>
               <span>Chuyên Gia</span>
             </Link>
+            <Link
+              href="/community"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/25 transition-all flex items-center gap-1.5 shadow-sm"
+            >
+              <span>👥</span>
+              <span>Cộng Đồng</span>
+            </Link>
           </div>
         </div>
       )}

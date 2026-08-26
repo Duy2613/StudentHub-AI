@@ -10,7 +10,7 @@ import { AcademicTaskStore } from "../../src/lib/intelligence/academic/academicT
 import { AcademicWorkflowService } from "../../src/lib/intelligence/academic/academicWorkflowService.js";
 import { WORKFLOW_STATES } from "../../src/lib/intelligence/academic/academicWorkflowStateMachine.js";
 
-const RESTART_STORAGE_PATH = path.resolve(process.cwd(), ".data", "test_academic_workflow_restart.json");
+const RESTART_STORAGE_PATH = path.resolve(process.cwd(), ".data", `test_academic_workflow_restart_${process.pid}.json`);
 
 test("▶ [WORKFLOW-RESTART-1] Golden Scenario: Full Crash Recovery & State Integrity Across Restarts", async (t) => {
   AcademicTaskStore.setStoragePath(RESTART_STORAGE_PATH);
