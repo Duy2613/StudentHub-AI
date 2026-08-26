@@ -128,9 +128,21 @@
        - **API & Tích Hợp Hệ Thống**: `/api/student/identity`, `/api/student/records`, kết nối trực tiếp vào `academicCommandCenterDataLoader.js`.
        - **Tập Kiểm Chuẩn**: **403/403 Tests PASS (100.0%)** trên 54 test files, 101 suites. **31/31 Mutants KILLED**.
 
+   19. ✅ **Hồ Sơ Học Vụ Chuẩn Tắc 360 & Ma Trận Nguồn Gốc Dữ Liệu V1 (Student Identity + Authoritative Academic Profile 360 V1 — Provenance Matrix, Profile 360 Store, Freshness & Conflict Engine, Version Pinning, Server-First API & UI)**:
+       - **Ma Trận Nguồn Gốc Dữ Liệu (`studentDataProvenanceMatrix.js`)**: Xác lập chuẩn tắc nguồn canonical cho từng trường dữ liệu, phân cấp thẩm quyền (`AUTHORITATIVE`, `DERIVED`, `UNVERIFIED_CLAIM`), thời gian TTL hiệu lực và thứ tự ưu tiên giải quyết mâu thuẫn (`OFFICIAL_PORTAL > REGISTRAR > STUDENT_SUBMISSION`).
+       - **Mô Hình & Kho Hồ Sơ 360 (`studentProfile360Model.js`, `studentProfile360Store.js`, `studentProfile360Service.js`)**: Tổng hợp trọn vẹn danh tính, bảng điểm, chuẩn tốt nghiệp, chứng chỉ TOEIC/IELTS, công nợ học phí, độ tươi từng phần (`FRESH`, `STALE`, `UNKNOWN`, `CONFLICTED`) và danh mục mâu thuẫn. Ghi nhật ký tệp nguyên tử `.tmp` ➔ `renameSync`.
+       - **Khóa Phiên Bản & Chống Ghi Đè Lỗi Thời (`evaluatedAgainstProfileRevision`)**: Đồng bộ từ Profile 360 sang `StudentDigitalTwin` với mã định danh phiên bản ghim chặt, ngăn chặn triệt để tình trạng đánh giá không đồng bộ cũ ghi đè dữ liệu mới. Tái tạo hồ sơ tất định không tăng phiên bản vô nghĩa.
+       - **API & Giao Diện Chuẩn Tắc Server-First**: Endpoint tổng hợp `GET /api/academic/me/profile-360`, quy trình tiếp nhận đối soát `POST /api/academic/me/discrepancy-report`, trang RSC `/academic/profile` và component tương tác `Profile360View.jsx`.
+       - **Tập Kiểm Chuẩn Toàn Diện**: **422/422 Tests PASS (100.0%)** trên 65 test files, 112 suites. **31/31 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
+
 ---
 
-## 2. Đường Dẫn File Trọng Tâm (v11 Nodes)
+## 2. Đường Dẫn File Trọng Tâm (v12 Nodes)
+- **Kiến Trúc Hồ Sơ Học Vụ 360 Chuẩn Tắc**: `docs/vault/01 - 🏗️ System Architecture/Student-Identity-Profile-360-V1.md`
+- **Ma Trận Nguồn Gốc Dữ Liệu & Nguồn Sự Thật**: `docs/vault/01 - 🏗️ System Architecture/Academic-Data-Provenance-Matrix-V1.md`
+- **Mô Hình, Kho & Dịch Vụ Profile 360**: `frontend/src/lib/intelligence/academic/studentProfile360Model.js`, `studentProfile360Store.js`, `studentProfile360Service.js`
+- **Giao Diện Hồ Sơ 360 & Trang RSC**: `frontend/src/components/academic/Profile360View.jsx`, `frontend/src/app/academic/profile/page.jsx`
+- **Cầu Nối Đồng Bộ Bản Sao Số Có Khóa Phiên Bản**: `frontend/src/lib/intelligence/academic/studentAcademicSyncBridge.js`
 - **Kiến Trúc Nguồn Sự Thật Danh Tính & Bảng Điểm**: `docs/vault/01 - 🏗️ System Architecture/Authoritative-Student-Identity-And-Records-V1.md`
 - **Đồng Hồ Học Thuật & Múi Giờ UTC+7**: `frontend/src/lib/intelligence/academic/academicClock.js`
 - **Mô Hình, Kho & Dịch Vụ Danh Tính Sinh Viên**: `frontend/src/lib/intelligence/academic/studentIdentityModel.js`, `studentIdentityStore.js`, `studentIdentityService.js`

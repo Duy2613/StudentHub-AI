@@ -28,6 +28,25 @@ export const TUITION_STATUSES = Object.freeze({
   WAIVED: "WAIVED"              // Miễn giảm 100%
 });
 
+export const COURSE_STATUSES = Object.freeze({
+  ENROLLED: "ENROLLED",
+  COMPLETED: "COMPLETED",
+  FAILED: "FAILED",
+  WITHDRAWN: "WITHDRAWN",
+  IN_PROGRESS: "IN_PROGRESS",
+  REPEATED: "REPEATED",
+  TRANSFERRED: "TRANSFERRED",
+  UNKNOWN: "UNKNOWN"
+});
+
+export const CERTIFICATE_STATUSES = Object.freeze({
+  UNVERIFIED: "UNVERIFIED",
+  PENDING: "PENDING",
+  VERIFIED: "VERIFIED",
+  REJECTED: "REJECTED",
+  EXPIRED: "EXPIRED"
+});
+
 export class AcademicRecordsModel {
   /**
    * Converts a 10-scale grade to 4-scale and letter grade
@@ -66,9 +85,11 @@ export class AcademicRecordsModel {
       semester: String(rawCourse.semester || "HK1_2024_2025").trim(),
       grade10,
       grade4: converted.gpa4,
+      gpa4: converted.gpa4,
       letterGrade: rawCourse.letterGrade || converted.letter,
       isPassed: converted.isPassed,
-      status: converted.isPassed ? "COMPLETED" : (rawCourse.status || "ENROLLED")
+      status: rawCourse.courseStatus || rawCourse.status || (converted.isPassed ? "COMPLETED" : "ENROLLED"),
+      courseStatus: rawCourse.courseStatus || rawCourse.status || (converted.isPassed ? "COMPLETED" : "ENROLLED")
     });
   }
 
@@ -86,7 +107,9 @@ export class AcademicRecordsModel {
     disciplinary = {},
     authoritySource = "HCMUTE_SIS_PORTAL",
     lastSyncedAt = null,
-    metadata = {}
+    metadata = {},
+    earnedCredits: inputEarnedCredits = undefined,
+    cgpa: inputCgpa = undefined
   }) {
     if (!studentId) {
       throw new Error("[ACADEMIC_RECORDS_ERROR] studentId is mandatory.");
@@ -115,7 +138,11 @@ export class AcademicRecordsModel {
       }
     }
 
-    const cgpa = totalGpaCredits > 0 ? Number((totalGradePoints / totalGpaCredits).toFixed(2)) : 0.0;
+    if (normalizedCourses.length === 0 && typeof inputEarnedCredits === "number") {
+      earnedCredits = Math.max(0, Number(inputEarnedCredits));
+    }
+
+    const cgpa = totalGpaCredits > 0 ? Number((totalGradePoints / totalGpaCredits).toFixed(2)) : (typeof inputCgpa === "number" ? inputCgpa : 0.0);
     const remainingCredits = Math.max(0, totalRequiredCredits - earnedCredits);
 
     // Normalize verified foreign language certificates
@@ -123,7 +150,8 @@ export class AcademicRecordsModel {
       certificateId: cert.certificateId || `CERT_${cert.type}_${Date.now()}`,
       type: String(cert.type || "TOEIC").trim().toUpperCase(),
       score: Number(cert.score) || 0,
-      issuingAuthority: cert.issuingAuthority || "IIG_VIETNAM",
+      issuingAuthority: cert.issuingAuthority || cert.verificationAuthority || "IIG_VIETNAM",
+      verificationAuthority: cert.verificationAuthority || cert.issuingAuthority || "IIG_VIETNAM",
       certificateCode: cert.certificateCode || "VNF12345678",
       issuedDate: cert.issuedDate || "2025-06-15",
       expiresDate: cert.expiresDate || "2027-06-15",

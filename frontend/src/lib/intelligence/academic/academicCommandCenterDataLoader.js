@@ -18,6 +18,8 @@ import { AcademicNotificationOrchestrator } from "./academicNotificationOrchestr
 import { StudentIdentityStore } from "./studentIdentityStore.js";
 import { StudentAcademicSyncBridge } from "./studentAcademicSyncBridge.js";
 import { AcademicRecordsStore } from "./academicRecordsStore.js";
+import { StudentProfile360Service } from "./studentProfile360Service.js";
+import { StudentProfile360Store } from "./studentProfile360Store.js";
 
 export const DEFAULT_STUDENT_PROFILE = {
   studentId: "24110001",
@@ -211,6 +213,7 @@ export function getAuthoritativeCommandCenterData(params = {}) {
     timelineEvents: trajectory.timelineEvents,
     notifications: persistedNotifications,
     unreadNotificationCount,
+    profile360: StudentProfile360Service.getProfile360(studentProfile.studentId),
     totalActionCount: sortedInsights.filter(i => i.impact === "CRITICAL" || i.impact === "HIGH").length,
     syncStatus,
     timestamp: new Date().toISOString()
