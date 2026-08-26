@@ -1,5 +1,6 @@
 import React from "react";
 import { AcademicCommandCenter } from "@/components/academic/AcademicCommandCenter.jsx";
+import { getAuthoritativeCommandCenterData } from "@/lib/intelligence/academic/academicCommandCenterDataLoader.js";
 
 export const metadata = {
   title: "Academic Command Center | StudentHub AI",
@@ -7,9 +8,12 @@ export const metadata = {
 };
 
 export default function AcademicPage() {
+  // Server-First authoritative data fetching directly in RSC
+  const initialData = getAuthoritativeCommandCenterData();
+
   return (
     <main className="min-h-screen bg-background text-foreground antialiased pt-4">
-      <AcademicCommandCenter />
+      <AcademicCommandCenter initialData={initialData} />
     </main>
   );
 }

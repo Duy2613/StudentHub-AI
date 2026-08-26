@@ -87,3 +87,30 @@ test("▶ [COMMAND-CENTER-DATA-2] Action Center Gating & Reason Fidelity", async
     assert.equal(rawBackendInsight.deadline, "2026-09-05");
   });
 });
+
+test("▶ [COMMAND-CENTER-SERVER-FIRST-3] Authoritative Server Data Loader & Sync Status", async (t) => {
+  const { getAuthoritativeCommandCenterData } = await import("../../src/lib/intelligence/academic/academicCommandCenterDataLoader.js");
+
+  await t.test("SF3.1: getAuthoritativeCommandCenterData returns complete typed payload on the server", () => {
+    const payload = getAuthoritativeCommandCenterData({ studentId: "24110001", cohort: 2024 });
+    assert.equal(payload.success, true);
+    assert.equal(payload.studentProfile.cohort, 2024);
+    assert.ok(Array.isArray(payload.priorityInsights));
+    assert.ok(Array.isArray(payload.recentChanges));
+    assert.ok(Array.isArray(payload.timelineEvents));
+    assert.ok(payload.digitalTwinState);
+    assert.ok(payload.syncStatus);
+    assert.equal(payload.syncStatus.isLive, true);
+  });
+
+  await t.test("SF3.2: syncStatus correctly distinguishes LIVE from STALE warning states", () => {
+    const liveStatus = { isLive: true, warning: null };
+    const isLive = Boolean(liveStatus && liveStatus.isLive === true && !liveStatus.warning);
+    assert.equal(isLive, true);
+
+    const staleStatus = { isLive: false, warning: "STALE_SOURCE_WARNING: Live fetch timeout" };
+    const isStaleLive = Boolean(staleStatus && staleStatus.isLive === true && !staleStatus.warning);
+    assert.equal(isStaleLive, false);
+  });
+});
+

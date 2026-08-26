@@ -19,8 +19,8 @@ export function AcademicHeader({ studentProfile = {}, digitalTwinState = {}, syn
     isThesisEligible = true
   } = digitalTwinState;
 
-  const isLive = syncStatus.isLive !== false;
-  const lastSyncFormatted = AcademicCommandCenterViewModel.formatDate(syncStatus.lastSyncedAt || new Date().toISOString());
+  const isLive = Boolean(syncStatus && syncStatus.isLive === true && !syncStatus.warning && !syncStatus.isStale);
+  const lastSyncFormatted = AcademicCommandCenterViewModel.formatDate(syncStatus.lastSyncedAt);
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-card/80 via-card/40 to-background/60 p-6 md:p-8 backdrop-blur-xl shadow-xl">
@@ -92,7 +92,7 @@ export function AcademicHeader({ studentProfile = {}, digitalTwinState = {}, syn
               {isLive ? "LIVE — Đồng Bộ Trực Tuyến" : "STALE — Bản Xác Minh Gần Nhất"}
             </div>
             <span className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-              <Clock className="h-3 w-3" /> Cập nhật: {lastSyncFormatted}
+              <Clock className="h-3 w-3" /> Cập nhật: {lastSyncFormatted !== "N/A" ? lastSyncFormatted : "Đang kết nối"}
             </span>
           </div>
         </div>
