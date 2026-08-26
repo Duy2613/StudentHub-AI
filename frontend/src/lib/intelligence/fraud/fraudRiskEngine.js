@@ -1,17 +1,17 @@
 /**
- * StudentHub AI — Fraud & Risk Intelligence Engine (Production Grade — Audit V2 Hardened)
- * 
+ * StudentHub AI — Fraud & Risk Intelligence Engine (Production Grade — Audit V3 Hardened)
+ *
  * Evaluates 9 risk dimensions, deterministic hard safety rules, domain spoofing,
  * impersonation, payment fraud, social engineering, credential theft, and document tampering.
- * 
- * Audit V2 Hardening:
- * - Fail-closed input contract (null/undefined/{} → INSUFFICIENT_DATA, never VERIFIED)
- * - Case-insensitive URL canonicalization with trailing-dot and userinfo defense
- * - Targeted IDN/homoglyph detection (no blanket xn-- false positives)
- * - Payment text normalization for spaced/dashed/dotted digit evasion
- * - Contextual credential exfiltration semantic patterns
- * - Evidence-based completeness scoring (replaces hardcoded confidence)
- * - temporalRisk documented as RESERVED_NOT_DECISION_ACTIVE
+ *
+ * Audit V3 Invariant & Boundary Hardening:
+ * - Invariant A: Strict Provenance Gate (TIER_4_UNKNOWN without official URL ≠ VERIFIED_OFFICIAL)
+ * - Dangerous URI scheme filtering (javascript:, data:, file:, vbscript:, blob:)
+ * - Diacritic & unaccented adversarial coverage across OTP, password, payment, coercion
+ * - Boundary-hardened beneficiary validation (rejects attacker trailing suffixes)
+ * - Metamorphic authority invariance across canonical representations
+ * - Idempotent text normalization N(N(x)) === N(x)
+ * - Evidence completeness scoring distinct from confidence/risk
  */
 
 import { AcademicTruthEngine } from "../academic/academicTruthEngine.js";
@@ -70,18 +70,32 @@ export const OFFICIAL_HCMUTE_ALLOWLIST = [
 
 /**
  * Canonicalizes a URL to its lowercase hostname, stripping trailing dots
- * and handling case-insensitive schemes, userinfo attacks, etc.
+ * and handling case-insensitive schemes, userinfo attacks, and dangerous URI schemes.
  * @param {string} rawUrl
- * @returns {{ hostname: string, hasUserinfo: boolean, parseError: boolean }}
+ * @returns {{ hostname: string, hasUserinfo: boolean, isDangerousScheme: boolean, dangerousScheme: string, parseError: boolean }}
  */
 function canonicalizeUrl(rawUrl) {
   if (!rawUrl || typeof rawUrl !== "string") {
-    return { hostname: "", hasUserinfo: false, parseError: false };
+    return { hostname: "", hasUserinfo: false, isDangerousScheme: false, dangerousScheme: "", parseError: false };
+  }
+
+  const trimmed = rawUrl.trim();
+
+  // Detect dangerous non-HTTP/HTTPS schemes (XSS, payload injection, local file access)
+  const dangerousSchemeMatch = trimmed.match(/^(javascript|data|vbscript|file|blob):/i);
+  if (dangerousSchemeMatch) {
+    return {
+      hostname: trimmed.toLowerCase(),
+      hasUserinfo: false,
+      isDangerousScheme: true,
+      dangerousScheme: dangerousSchemeMatch[1].toLowerCase(),
+      parseError: true
+    };
   }
 
   try {
     // Case-insensitive scheme detection
-    const prefixed = /^https?:\/\//i.test(rawUrl) ? rawUrl : `https://${rawUrl}`;
+    const prefixed = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
     const parsed = new URL(prefixed);
 
     // Detect userinfo attack: https://hcmute.edu.vn@attacker.com
@@ -90,12 +104,14 @@ function canonicalizeUrl(rawUrl) {
     // Normalize: lowercase + strip trailing dots
     let hostname = parsed.hostname.toLowerCase().replace(/\.+$/, "");
 
-    return { hostname, hasUserinfo, parseError: false };
+    return { hostname, hasUserinfo, isDangerousScheme: false, dangerousScheme: "", parseError: false };
   } catch {
     // Fallback: lowercase raw string, strip trailing dots
     return {
-      hostname: rawUrl.toLowerCase().replace(/\.+$/, ""),
+      hostname: trimmed.toLowerCase().replace(/\.+$/, ""),
       hasUserinfo: false,
+      isDangerousScheme: false,
+      dangerousScheme: "",
       parseError: true
     };
   }
@@ -107,6 +123,7 @@ function canonicalizeUrl(rawUrl) {
  * - Collapses spaces/dashes/dots between digits (contextual, not global)
  * - Removes zero-width characters
  * - Preserves original text for evidence
+ * - Idempotent: normalizeText(normalizeText(x).normalized).normalized === normalizeText(x).normalized
  * @param {string} rawText
  * @returns {{ raw: string, normalized: string, hasZeroWidth: boolean }}
  */
@@ -222,8 +239,8 @@ export class FraudRiskEngine {
   /**
    * Evaluates comprehensive fraud and risk signals across 9 dimensions.
    *
-   * INPUT CONTRACT (Audit V2 — Fail-Closed):
-   * - null / undefined / non-object → INSUFFICIENT_DATA
+   * INPUT CONTRACT (Audit V3 — Fail-Closed):
+   * - null / undefined / non-object / Array / Symbol / function → INSUFFICIENT_DATA
    * - {} / empty strings only → INSUFFICIENT_DATA
    * - Valid object with at least url or text → full evaluation
    *
@@ -235,8 +252,8 @@ export class FraudRiskEngine {
    */
   static evaluateRisk(inputPayload) {
     // ---------------------------------------------------------------
-    // FIX 1 — FAIL-CLOSED INPUT CONTRACT (Audit V2)
-    // null, undefined, non-object, or empty input MUST NOT become VERIFIED
+    // INVARIANT A — FAIL-CLOSED INPUT CONTRACT
+    // null, undefined, non-object, array, symbol, function, or empty input MUST NOT become VERIFIED
     // ---------------------------------------------------------------
     if (inputPayload === null || inputPayload === undefined || typeof inputPayload !== "object" || Array.isArray(inputPayload)) {
       return {
@@ -307,7 +324,7 @@ export class FraudRiskEngine {
     let temporalRisk = 0.05;
 
     // ---------------------------------------------------------------
-    // FIX 4 — TEXT NORMALIZATION (Audit V2)
+    // TEXT NORMALIZATION (Audit V3)
     // Normalize text for detection while preserving raw text for evidence
     // ---------------------------------------------------------------
     const textAnalysis = normalizeText(rawText);
@@ -320,10 +337,18 @@ export class FraudRiskEngine {
     }
 
     // -------------------------------------------------------------
-    // 1. DOMAIN & URL RISK ANALYSIS (FIX 2 — URL CANONICALIZATION)
+    // 1. DOMAIN & URL RISK ANALYSIS (Audit V3 Hardened)
     // -------------------------------------------------------------
     const urlAnalysis = canonicalizeUrl(url);
     const parsedHostname = urlAnalysis.hostname;
+
+    // Detect Dangerous URI Schemes (javascript:, data:, file:, vbscript:, blob:)
+    if (urlAnalysis.isDangerousScheme) {
+      domainRisk = 0.99;
+      hardRulesTriggered.push(HARD_SAFETY_RULES.MALWARE_DOWNLOAD);
+      reasons.push(`Phát hiện scheme URL nguy hiểm (${urlAnalysis.dangerousScheme}:) — Nguy cơ thực thi mã độc hoặc tấn công XSS.`);
+      evidenceList.push({ type: "DANGEROUS_URI_SCHEME", scheme: urlAnalysis.dangerousScheme, originalUrl: url });
+    }
 
     // Detect userinfo attack: https://hcmute.edu.vn@attacker.com
     if (urlAnalysis.hasUserinfo) {
@@ -341,6 +366,11 @@ export class FraudRiskEngine {
       evidenceList.push({ type: "URL_SHORTENER_DETECTED", value: parsedHostname });
     }
 
+    // Check Exact Official Domain & Official Subdomains
+    const isExactOfficial = OFFICIAL_HCMUTE_ALLOWLIST.includes(parsedHostname);
+    const isOfficialSubdomain = !isExactOfficial && parsedHostname.endsWith(".hcmute.edu.vn");
+    const isOfficialDomain = isExactOfficial || isOfficialSubdomain;
+
     // Check Lookalike / Typosquatting
     const lookalikePatterns = [
       /hcmute[-_.]edu/i,
@@ -349,12 +379,9 @@ export class FraudRiskEngine {
       /spkt[-_.]hcm/i,
       /daihocsuphamkythuat\.(?:com|net)/i
     ];
-    const isExactOfficial = OFFICIAL_HCMUTE_ALLOWLIST.includes(parsedHostname);
-    const isOfficialSubdomain = !isExactOfficial && parsedHostname.endsWith(".hcmute.edu.vn");
-    const isLookalike = !isExactOfficial && !isOfficialSubdomain && lookalikePatterns.some(p => p.test(parsedHostname));
+    const isLookalike = !isOfficialDomain && lookalikePatterns.some(p => p.test(parsedHostname));
 
-    // FIX 3 — TARGETED IDN/HOMOGLYPH DETECTION (Audit V2)
-    // Instead of blanket xn-- flagging, use targeted confusable detection
+    // Targeted IDN/Homoglyph Detection
     const homoglyphResult = detectHomoglyphAttack(parsedHostname, url);
 
     if (homoglyphResult.isHomoglyph) {
@@ -367,7 +394,7 @@ export class FraudRiskEngine {
       hardRulesTriggered.push(HARD_SAFETY_RULES.OFFICIAL_DOMAIN_MISMATCH);
       reasons.push(`Tên miền [${parsedHostname}] là tên miền giả mạo (Lookalike Domain), không thuộc danh bạ chính thức của trường.`);
       evidenceList.push({ type: "LOOKALIKE_DOMAIN", hostname: parsedHostname });
-    } else if (parsedHostname && !isExactOfficial && !isOfficialSubdomain && (sourceTier === "TIER_1_OFFICIAL" || isOfficialChannel)) {
+    } else if (parsedHostname && !isOfficialDomain && (sourceTier === "TIER_1_OFFICIAL" || isOfficialChannel)) {
       domainRisk = 0.90;
       hardRulesTriggered.push(HARD_SAFETY_RULES.OFFICIAL_DOMAIN_MISMATCH);
       reasons.push("Kênh phát hành tự xưng là nguồn chính thức của trường nhưng tên miền không khớp Allowlist.");
@@ -375,14 +402,12 @@ export class FraudRiskEngine {
     }
 
     // -------------------------------------------------------------
-    // 2. CREDENTIAL & OTP EXFILTRATION (HARD SAFETY RULE)
+    // 2. CREDENTIAL & OTP EXFILTRATION (Audit V3 Diacritic Agnostic)
     // -------------------------------------------------------------
     const otpKeywords = [
-      /mã smart otp/i,
-      /gửi mã otp/i,
-      /nhập mã otp/i,
-      /cung cấp mã xác thực otp/i,
-      /forward mã otp/i
+      /(?:mã|ma)\s*(?:smart\s*)?otp/i,
+      /(?:gửi|gui|nhập|nhap|cung cấp|cung cap|forward|chuyển tiếp|chuyen tiep|chia sẻ|chia se|đọc|doc|nhắn|nhan)\s*(?:lại\s*)?(?:mã|ma)?\s*otp/i,
+      /(?:xác thực|xac thuc|bảo mật|bao mat)\s*otp/i
     ];
     if (otpKeywords.some(k => k.test(text))) {
       socialEngineeringRisk = Math.max(socialEngineeringRisk, 0.98);
@@ -391,18 +416,15 @@ export class FraudRiskEngine {
       evidenceList.push({ type: "OTP_EXFILTRATION_REQUEST" });
     }
 
-    // FIX 5 — CONTEXTUAL CREDENTIAL EXFILTRATION PATTERNS (Audit V2)
     const passwordKeywords = [
-      /nhập mật khẩu cổng thông tin/i,
-      /nhập mật khẩu vcb digibank/i,
-      /cung cấp mật khẩu tài khoản/i,
-      /xác thực mật khẩu email sinh viên/i
+      /(?:nhập|nhap|cung cấp|cung cap|xác thực|xac thuc|gửi|gui)\s*(?:mật khẩu|mat khau|password)/i,
+      /(?:mật khẩu|mat khau|password)\s*(?:cổng thông tin|cong thong tin|vcb|email|sinh viên|sinh vien|tài khoản|tai khoan)/i
     ];
     // Semantic credential-exfiltration: action verb + credential entity + outward direction
     const credentialSemanticPatterns = [
-      /(?:gửi|chuyển tiếp|forward|reply|trả lời)[\s\S]{0,30}(?:mã xác thực|mã bảo mật|mật khẩu|password|security code|authentication code)/i,
-      /(?:mã xác thực|mã bảo mật|mật khẩu|password|security code)[\s\S]{0,30}(?:gửi lại|gửi cho|chuyển cho|reply|forward)/i,
-      /chuyển tiếp[\s\S]{0,20}\d{4,8}[\s\S]{0,20}(?:bảo mật|xác thực|xác nhận)/i
+      /(?:gửi|gui|chuyển tiếp|chuyen tiep|forward|reply|trả lời|tra loi|nhắn lại|nhan lai)[\s\S]{0,30}(?:mã xác thực|ma xac thuc|mã bảo mật|ma bao mat|mật khẩu|mat khau|password|security code|authentication code|otp)/i,
+      /(?:mã xác thực|ma xac thuc|mã bảo mật|ma bao mat|mật khẩu|mat khau|password|security code|otp)[\s\S]{0,30}(?:gửi lại|gui lai|gửi cho|gui cho|chuyển cho|chuyen cho|reply|forward)/i,
+      /(?:chuyển tiếp|chuyen tiep|forward|gửi|gui)[\s\S]{0,20}\d{4,8}[\s\S]{0,20}(?:bảo mật|bao mat|xác thực|xac thuc|xác nhận|xac nhan)/i
     ];
 
     if (passwordKeywords.some(k => k.test(text))) {
@@ -411,42 +433,37 @@ export class FraudRiskEngine {
       reasons.push("Yêu cầu nhập hoặc cung cấp mật khẩu tài khoản cá nhân/ngân hàng.");
       evidenceList.push({ type: "CREDENTIAL_THEFT_REQUEST" });
     } else if (credentialSemanticPatterns.some(p => p.test(text))) {
-      // Semantic detection — elevated risk but may be SUSPICIOUS_NEEDS_REVIEW
-      // unless combined with other hard-rule signals
       socialEngineeringRisk = Math.max(socialEngineeringRisk, 0.85);
       reasons.push("Phát hiện mẫu ngữ nghĩa yêu cầu chuyển tiếp mã bảo mật / thông tin xác thực — Credential Exfiltration Candidate.");
       evidenceList.push({ type: "CREDENTIAL_SEMANTIC_EXFILTRATION_CANDIDATE" });
     }
 
-    // Check Malware / APK Download
-    if (/\.apk\b|\.exe\b|\.scr\b|\.vbs\b/i.test(text) || /\.apk\b|\.exe\b/i.test(url)) {
+    // Check Malware / Dangerous Download
+    if (/\.(?:apk|exe|scr|vbs|bat|cmd|ps1|msi)\b/i.test(text) || /\.(?:apk|exe|scr|vbs|bat|cmd|ps1|msi)\b/i.test(url)) {
       documentRisk = Math.max(documentRisk, 0.96);
       hardRulesTriggered.push(HARD_SAFETY_RULES.MALWARE_DOWNLOAD);
-      reasons.push("Yêu cầu tải tệp thực thi độc hại (.apk / .exe) ngụy trang dưới dạng ứng dụng sinh viên.");
+      reasons.push("Yêu cầu tải tệp thực thi độc hại (.apk / .exe / scripts) ngụy trang dưới dạng ứng dụng sinh viên.");
       evidenceList.push({ type: "MALWARE_DOWNLOAD_ATTACHMENT" });
     }
 
     // -------------------------------------------------------------
-    // 3. PAYMENT & FINANCIAL FRAUD ANALYSIS (FIX 4 — NORMALIZED TEXT)
-    // Uses normalized text where spaced/dashed digits are collapsed
+    // 3. PAYMENT & FINANCIAL FRAUD ANALYSIS (Audit V3 Diacritic Agnostic)
     // -------------------------------------------------------------
-    // Known official beneficiary names (case-insensitive comparison)
+    // Known official beneficiary names with strict boundary matching
     const OFFICIAL_BENEFICIARY_PATTERNS = [
-      /trường đại học sư phạm kỹ thuật/i,
-      /đh spkt/i,
-      /đhspkt/i,
-      /trường đh sư phạm kỹ thuật/i
+      /^(?:trường đại học sư phạm kỹ thuật(?:\s*tp\.?\s*hcm)?|truong dai hoc su pham ky thuat(?:\s*tp\.?\s*hcm)?)$/i,
+      /^(?:đh\s*spkt|dh\s*spkt|đhspkt|dhspkt)(?:\s*tp\.?\s*hcm)?$/i,
+      /^(?:trường đh sư phạm kỹ thuật|truong dh su pham ky thuat)(?:\s*tp\.?\s*hcm)?$/i
     ];
 
     const personalPaymentPatterns = [
-      /(?:momo|zalopay|viettelpay|shopeepay)\s*:\s*\d{9,11}/i,
-      /stk cá nhân/i,
-      /tài khoản cá nhân/i
+      /(?:momo|zalopay|viettelpay|shopeepay)[\s\S]{0,20}\d{9,11}/i,
+      /(?:stk|tài khoản|tai khoan|so tai khoan|số tài khoản)\s*(?:cá nhân|ca nhan)/i,
+      /(?:stk cá nhân|stk ca nhan|tài khoản cá nhân|tai khoan ca nhan)/i
     ];
 
-    // Check "chủ tài khoản:" separately with programmatic beneficiary validation
-    // (The previous negative lookahead regex was broken due to \s* backtracking)
-    const beneficiaryMatch = text.match(/chủ tài khoản\s*:\s*(.{0,80})/i);
+    // Check "chủ tài khoản:" / "chu tai khoan:" with programmatic beneficiary validation
+    const beneficiaryMatch = text.match(/(?:chủ tài khoản|chu tai khoan)\s*:\s*([^,\n\r;]{1,80})/i);
     let hasPersonalBeneficiary = false;
     if (beneficiaryMatch) {
       const beneficiaryName = beneficiaryMatch[1].trim();
@@ -456,27 +473,27 @@ export class FraudRiskEngine {
       }
     }
 
-    const isTuitionContext = /(?:học phí|lệ phí|phí giữ chỗ|tiền cọc|học bổng|tài trợ)/i.test(text);
+    const isTuitionContext = /(?:học phí|hoc phi|lệ phí|le phi|phí|phi|tiền|tien|nộp|nop|thanh toán|thanh toan|chuyển khoản|chuyen khoan|chuyển tiền|chuyen tien|phí giữ chỗ|phi giu cho|tiền cọc|tien coc|học bổng|hoc bong|tài trợ|tai tro|hạn nộp|han nop|khoản thu|khoan thu)/i.test(text);
 
     if (isTuitionContext && (personalPaymentPatterns.some(p => p.test(text)) || hasPersonalBeneficiary)) {
       paymentRisk = 0.98;
       hardRulesTriggered.push(HARD_SAFETY_RULES.PAYMENT_DESTINATION_CHANGE);
       reasons.push("Yêu cầu chuyển tiền học phí/lệ phí vào tài khoản cá nhân hoặc ví điện tử không chính thống.");
       evidenceList.push({ type: "PERSONAL_PAYMENT_DESTINATION" });
-    } else if (/(?:chuyển khoản gấp|nộp phạt trong 24h|nộp cọc nhận việc)/i.test(text)) {
+    } else if (/(?:chuyển khoản gấp|chuyen khoan gap|nộp phạt trong 24h|nop phat trong 24h|nộp cọc nhận việc|nop coc nhan viec)/i.test(text)) {
       paymentRisk = Math.max(paymentRisk, 0.85);
       reasons.push("Tạo áp lực tài chính khẩn cấp, đòi tiền cọc hoặc nộp phạt bất thường.");
       evidenceList.push({ type: "FINANCIAL_PRESSURE" });
     }
 
     // -------------------------------------------------------------
-    // 4. IDENTITY & SOCIAL ENGINEERING COERCION
+    // 4. IDENTITY & SOCIAL ENGINEERING COERCION (Audit V3 Diacritic Agnostic)
     // -------------------------------------------------------------
     const fakeDepartments = [
-      /ban thanh tra tài chính sinh viên/i,
-      /tổ thu học phí đặc biệt/i,
-      /hội đồng kỷ luật khẩn cấp/i,
-      /cục quản lý đào tạo quốc tế spkt/i
+      /(?:ban thanh tra tài chính sinh viên|ban thanh tra tai chinh sinh vien)/i,
+      /(?:tổ thu học phí đặc biệt|to thu hoc phi dac biet)/i,
+      /(?:hội đồng kỷ luật khẩn cấp|hoi dong ky luat khan cap)/i,
+      /(?:cục quản lý đào tạo quốc tế spkt|cuc quan ly dao tao quoc te spkt)/i
     ];
     if (fakeDepartments.some(d => d.test(text))) {
       identityRisk = 0.95;
@@ -486,10 +503,10 @@ export class FraudRiskEngine {
     }
 
     const coercionPatterns = [
-      /đình chỉ học tập ngay lập tức/i,
-      /tịch thu bằng tốt nghiệp/i,
-      /hủy tư cách sinh viên vĩnh viễn/i,
-      /tuyệt đối không chia sẻ thông báo này/i
+      /(?:đình chỉ|dinh chi)\s*(?:học tập|hoc tap)\s*(?:ngay lập tức|ngay lap tuc)?/i,
+      /(?:tịch thu|tich thu)\s*(?:bằng|bang)\s*(?:tốt nghiệp|tot nghiep)/i,
+      /(?:hủy|huy)\s*(?:tư cách|tu cach)\s*(?:sinh viên|sinh vien)/i,
+      /(?:tuyệt đối không|tuyet doi khong)\s*(?:chia sẻ|chia se)/i
     ];
     if (coercionPatterns.some(c => c.test(text))) {
       socialEngineeringRisk = Math.max(socialEngineeringRisk, 0.88);
@@ -519,14 +536,25 @@ export class FraudRiskEngine {
     }
 
     // -------------------------------------------------------------
-    // 6. PROVENANCE & SOURCE TIER RESOLUTION
+    // 6. PROVENANCE & SOURCE TIER RESOLUTION (Invariant A)
     // -------------------------------------------------------------
-    if (sourceTier === "TIER_1_OFFICIAL" && isExactOfficial) {
+    const isDeclaredOfficialTier = sourceTier === "TIER_1_OFFICIAL" || sourceTier === "TIER_2_OFFICIAL_MIRROR";
+
+    if (isOfficialDomain && isDeclaredOfficialTier) {
       sourceRisk = 0.02;
       provenanceRisk = 0.02;
-    } else if (sourceTier === "TIER_5_UNTRUSTED" || (!isExactOfficial && url)) {
+    } else if (isOfficialDomain && !isDeclaredOfficialTier) {
+      // Official domain URL present, default tier
+      sourceRisk = 0.05;
+      provenanceRisk = 0.05;
+    } else if (sourceTier === "TIER_5_UNTRUSTED" || (!isOfficialDomain && url)) {
       sourceRisk = Math.max(sourceRisk, 0.80);
       provenanceRisk = Math.max(provenanceRisk, 0.85);
+    } else {
+      // Input has NO official URL proof (unverified standalone text)
+      // Must NOT be treated as trusted official origin
+      sourceRisk = Math.max(sourceRisk, 0.35);
+      provenanceRisk = Math.max(provenanceRisk, 0.35);
     }
 
     // -------------------------------------------------------------
@@ -547,18 +575,23 @@ export class FraudRiskEngine {
     const maxRisk = Math.max(...Object.values(dimensions));
     const avgRisk = Object.values(dimensions).reduce((a, b) => a + b, 0) / Object.values(dimensions).length;
     let overallRisk = Number((maxRisk * 0.7 + avgRisk * 0.3).toFixed(2));
-    
+
     if (hardRulesTriggered.length > 0) {
       overallRisk = Math.max(overallRisk, 0.95);
     }
 
-    // FIX 6 — EVIDENCE-BASED COMPLETENESS (Audit V2)
-    // Replaces hardcoded confidence: 0.95
+    // Evidence Completeness Score (Audit V3)
     const evidenceCompleteness = computeEvidenceCompleteness(dimensions, hardRulesTriggered, evidenceList);
 
-    let decision = FRAUD_DECISIONS.VERIFIED_OFFICIAL;
-    let recommendedAction = "Cho phép hiển thị và đồng bộ bình thường.";
-    let requiresHumanReview = false;
+    // INVARIANT A: VERIFIED_OFFICIAL is strictly reserved for verified official domains with overallRisk < 0.30
+    let decision = (isOfficialDomain && overallRisk < 0.30)
+      ? FRAUD_DECISIONS.VERIFIED_OFFICIAL
+      : FRAUD_DECISIONS.SUSPICIOUS_NEEDS_REVIEW;
+
+    let recommendedAction = isOfficialDomain
+      ? "Cho phép hiển thị và đồng bộ bình thường."
+      : "CẦN ĐỐI SOÁT: Nguồn chưa xác minh chính thức, chuyển qua Human Review Gate.";
+    let requiresHumanReview = !isOfficialDomain;
 
     // Hard Rule Short-Circuit: Deterministic Hazards BLOCK immediately
     if (hardRulesTriggered.length > 0) {
@@ -569,7 +602,7 @@ export class FraudRiskEngine {
       decision = FRAUD_DECISIONS.HIGH_RISK;
       recommendedAction = "CẢNH BÁO RỦI RO CAO: Có dấu hiệu lừa đảo/giả mạo. Đưa vào diện cách ly kiểm tra.";
       requiresHumanReview = true;
-    } else if (sourceTier === "TIER_1_OFFICIAL" && evidenceList.some(e => e.type === "LEGITIMATE_REGULATION_UPDATE_CANDIDATE")) {
+    } else if (isOfficialDomain && evidenceList.some(e => e.type === "LEGITIMATE_REGULATION_UPDATE_CANDIDATE")) {
       decision = FRAUD_DECISIONS.VERIFIED_UPDATED;
       recommendedAction = "CẬP NHẬT CHÍNH THỨC: Nguồn TIER_1 hợp lệ, kích hoạt cập nhật quy tắc sau khi qua Human Review.";
       requiresHumanReview = true;

@@ -80,13 +80,13 @@ describe("[MUTATION-1] Disable Empty Input Guard → INSUFFICIENT_DATA test must
     });
 
     try {
-      // With mutation: {} should now produce VERIFIED_OFFICIAL (the original bug)
+      // With mutation: {} bypasses INSUFFICIENT_DATA and falls through to evaluation
       const result = mutant.FraudRiskEngine.evaluateRisk({});
       // If this assertion passes, it means the mutation is KILLED:
-      // The mutated code returns VERIFIED_OFFICIAL for empty input (the bad behavior)
-      assert.strictEqual(result.decision, mutant.FRAUD_DECISIONS.VERIFIED_OFFICIAL,
+      // The mutated code does NOT return INSUFFICIENT_DATA for empty input
+      assert.notStrictEqual(result.decision, mutant.FRAUD_DECISIONS.INSUFFICIENT_DATA,
         "MUTATION SURVIVED — empty input guard is NOT being tested by production code");
-      console.log("  ✓ Mutation KILLED: Empty input without guard returns VERIFIED_OFFICIAL (the original bug)");
+      console.log(`  ✓ Mutation KILLED: Empty input without guard returns ${result.decision} instead of INSUFFICIENT_DATA`);
     } finally {
       mutant.cleanup();
     }
