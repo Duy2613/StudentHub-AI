@@ -149,9 +149,23 @@
         - **Tích Hợp Server-First & Giao Diện Hoạch Định**: API `POST /api/academic/me/simulate`, trang RSC `/academic/planner`, component tương tác `AcademicWhatIfPlannerView.jsx`, lối tắt từ Command Center và Roadmap.
         - **Tập Kiểm Chuẩn Toàn Diện**: **478/478 Tests PASS (100.0%)** trên 74 test files, 133 suites. **39/39 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
 
+    22. ✅ **Lập Kế Hoạch Học Kỳ & Tối Ưu Hóa Học Vụ Dựa Trên Ràng Buộc V1 (Academic Semester Planner & Constraint-Based Study Planning V1 — Prerequisite DAG, Constraint Engine, Candidate Plans, What-If Composition, Explainability, Planner Studio UI)**:
+        - **Động Cơ Đồ Thị Tiên Quyết (`academicPrerequisiteEngine.js`)**: Kiểm soát đồ thị định hướng không chu trình (DAG) danh mục học phần HCMUTE, đánh giá điều kiện tiên quyết theo lịch sử môn đã qua, tính toán trọng số giải phóng nút thắt hạ nguồn (`unlockedDownstreamCount`) và khả dụng theo từng học kỳ (HK1, HK2, Hè).
+        - **Mô Hình Miền & Ràng Buộc Học Vụ (`academicPlannerModel.js`)**: Quản lý danh mục học kỳ chuẩn tắc (`2026-HK1`, `2026-HK2`, `2026-HK3`), khung giới hạn tín chỉ chế định ($6 \le \text{Credits} \le 20$), phân loại 3 hình thái kế hoạch (`RECOMMENDED`, `FAST_TRACK`, `LIGHT_LOAD`).
+        - **Động Cơ Lập Kế Hoạch Học Kỳ (`academicSemesterPlannerEngine.js`)**: Tự động tổng hợp 3 phương án học kỳ khả thi, áp dụng trực tiếp What-If Sandbox để chiếu kết quả tích lũy tín chỉ, tiến độ lộ trình và giải tỏa cản trở tốt nghiệp, kèm giải trình chi tiết từng môn đề xuất.
+        - **Kiểm Soát Tính Lạc Hậu & Tái Đánh Giá**: Tự động nhận diện kế hoạch hết hạn (`STALE`) khi phiên bản hồ sơ số hoặc CTĐT thay đổi (`profileRevision`, `twinRevision`).
+        - **Giao Diện Studio Lập Kế Hoạch 2 Tầng (`AcademicWhatIfPlannerView.jsx`)**: Tích hợp tab Lập Kế Hoạch Học Kỳ (mặc định) và tab Giả Lập What-If tự do, thẻ so sánh trực quan, huy hiệu mở khóa và cầu nối hành động sang Command Center.
+        - **Tập Kiểm Chuẩn Toàn Diện**: **496/496 Tests PASS (100.0%)** trên 82 test files, 141 suites. **43/43 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
+
 ---
 
-## 2. Đường Dẫn File Trọng Tâm (v14 Nodes)
+## 2. Đường Dẫn File Trọng Tâm (v16 Nodes)
+- **Kiến Trúc Lập Kế Hoạch Học Kỳ Dựa Trên Ràng Buộc**: `docs/vault/01 - 🏗️ System Architecture/Academic-Semester-Planner-V1.md`
+- **Mô Hình & Đồ Thị Điều Kiện Tiên Quyết Học Phần**: `frontend/src/lib/intelligence/academic/academicPrerequisiteEngine.js`
+- **Mô Hình Miền & Khung Giới Hạn Tín Chỉ Kế Hoạch**: `frontend/src/lib/intelligence/academic/academicPlannerModel.js`
+- **Động Cơ Lập Kế Hoạch Học Kỳ & Chiếu What-If**: `frontend/src/lib/intelligence/academic/academicSemesterPlannerEngine.js`
+- **API Endpoint Lập Kế Hoạch Học Kỳ Server-First**: `frontend/src/app/api/academic/me/planner/route.js`
+- **Giao Diện Studio Hoạch Định & Mô Phỏng 2 Tầng**: `frontend/src/components/academic/AcademicWhatIfPlannerView.jsx`, `frontend/src/app/academic/planner/page.jsx`
 - **Kiến Trúc Hoạch Định & Giả Lập What-If**: `docs/vault/01 - 🏗️ System Architecture/Academic-What-If-Simulation-V1.md`
 - **Mô Hình & Xác Thực Kịch Bản Giả Định**: `frontend/src/lib/intelligence/academic/academicSimulationModel.js`
 - **Động Cơ Giả Lập Sandbox & So Sánh Delta**: `frontend/src/lib/intelligence/academic/academicSimulationEngine.js`
