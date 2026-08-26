@@ -32,10 +32,10 @@
   - [x] Phòng hộ sập cấu trúc parser & Cách ly Quarantine (`parserIntegrityGuard.js`).
   - [x] Bản sao số học thuật cá nhân hóa (`academicDigitalTwin.js`) & Cảnh báo Radar không spam.
   - [x] Bộ kiểm chuẩn Live-Sync 16/16 tests PASS (100.0%).
-- [x] **Phase T1: AI Trust Engine V1 (RELEASE LOCK)**:
-  - Decomposes responses into atomic claims, verifies citation entailment, classifies temporal supersession vs contradiction, defends against syndication and adversarial prompt injections.
-- [x] **Phase T2: Expert Intelligence V1 (RELEASE LOCK)**:
-  - Multi-signal entity resolution (ORCID, `@hcmute.edu.vn`, DOIs), domain scope graphs, temporal role windows, non-authority invariant.
+- [x] **Phase T1: AI Trust Engine V2 — Self-Verifying Epistemic Intelligence (RELEASE LOCK)**:
+  - 13 Epistemic States, Claim Graph DAG with cycle & derivation checks, Semantic Overclaim Detector (UNSUPPORTED_EXTENSION), Active Counter-Evidence & Adversarial Disproof Search, Blind-Spot & Knowledge Gap Detector, Tool Use Firewall, 5-Pass Self-Critique Pipeline, Human Review Packet, Trust Blast Radius, Server API endpoints, and Studio Console UI (`/intelligence/ai-trust`).
+- [ ] **Phase T2: Expert Intelligence V2 (QUEUED — UP NEXT)**:
+  - Multi-signal entity resolution, domain scope graphs, temporal role windows, auditable credentials, research lineage, and conflict-of-interest analysis.
 - [x] **Phase T3: Community & Forum Intelligence V1 (RELEASE LOCK)**:
   - Contextual segmentation, first-hand claim extraction (8 claim types, 8 evidence statuses), provenance clustering (collapsing copied posts), astroturf and synthetic AI defense, multidimensional experience scoring, contradiction mapping without false averaging.
 - [ ] **Phase T4: Evidence Fusion Layer (QUEUED)**:

@@ -1,24 +1,6 @@
 /**
- * StudentHub AI — AI Trust Engine Orchestrator V1
- * 
- * Central Verification & Reliability Engine for StudentHub Intelligence OS.
- * 
- * Pipeline:
- * USER QUERY
- *   ↓
- * QUERY RISK CLASSIFICATION
- *   ↓
- * ADVERSARIAL & PROMPT INJECTION GUARD
- *   ↓
- * SOURCE INDEPENDENCE & LAUNDERING ANALYSIS
- *   ↓
- * CLAIM DECOMPOSITION (Compound & Numeric)
- *   ↓
- * CITATION ENTAILMENT & PASSAGE VERIFICATION
- *   ↓
- * TEMPORAL VALIDITY & CONTRADICTION ANALYSIS
- *   ↓
- * ABSTENTION & AUDITABLE SYNTHESIS
+ * StudentHub AI — AI Trust Engine Orchestrator V2
+ * Self-Verifying Epistemic Intelligence & Evidence-Constrained Reasoning System
  */
 
 import {
@@ -26,55 +8,91 @@ import {
   ABSTENTION_REASON,
   AUTHORITY_TIER,
   STAKE_LEVEL,
-  TRUST_STATUS
+  EPISTEMIC_STATE,
+  ANSWER_MODE,
+  TEMPORAL_STATUS
 } from "./aiTrustModel.js";
 import { AdversarialTrustGuard } from "./adversarialTrustGuard.js";
 import { SourceIndependenceEngine } from "./sourceIndependenceEngine.js";
 import { ClaimDecompositionEngine } from "./claimDecompositionEngine.js";
 import { CitationEntailmentEngine } from "./citationEntailmentEngine.js";
 import { TemporalContradictionEngine } from "./temporalContradictionEngine.js";
+import { SemanticOverclaimDetector } from "./semanticOverclaimDetector.js";
+import { CounterEvidenceEngine } from "./counterEvidenceEngine.js";
+import { BlindSpotDetector } from "./blindSpotDetector.js";
+import { ToolUseFirewall } from "./toolUseFirewall.js";
+import { EpistemicClaimGraph } from "./epistemicClaimGraph.js";
 
 export class AiTrustEngine {
-  /**
-   * Evaluates the reliability and truth status of an AI response
-   * @param {object} input 
-   * @param {string} input.query User question/query
-   * @param {string} input.rawAnswer AI generated response to evaluate
-   * @param {Array<object>} input.sources Available/retrieved sources
-   * @param {Array<object>} input.evidenceSpans Specific evidence passages
-   * @param {string} [input.stakeLevel] Optional stake override (LOW, MEDIUM, HIGH, CRITICAL)
-   * @returns {object} Canonical TrustEvaluation record
-   */
   static evaluate(input = {}) {
     const query = typeof input.query === "string" ? input.query.trim() : "";
-    const rawAnswer = typeof input.rawAnswer === "string" ? input.rawAnswer.trim() : "";
-    const sources = Array.isArray(input.sources) ? input.sources.map(s => AiTrustModel.createSource(s)) : [];
+    const rawAnswer = typeof input.rawAnswer === "string" ? input.rawAnswer.trim() : (input.draftText || "");
+    const sources = Array.isArray(input.sources) ? input.sources.map(s => AiTrustModel.createSourceNode(s)) : [];
     const evidenceSpans = Array.isArray(input.evidenceSpans) ? input.evidenceSpans.map(e => AiTrustModel.createEvidenceSpan(e)) : [];
+    const candidateCounterPool = Array.isArray(input.counterEvidencePool) ? input.counterEvidencePool.map(e => AiTrustModel.createEvidenceSpan(e)) : [];
 
-    // 1. Query Risk & Stake Classification
-    const stakeLevel = this.#classifyStake(query, rawAnswer, input.stakeLevel);
-
-    // 2. Adversarial & Prompt Injection Guard
+    // ─────────────────────────────────────────────────────────────────────────────
+    // PASS 1: INTENT & STAKE CLASSIFICATION + ADVERSARIAL INJECTION GUARD
+    // ─────────────────────────────────────────────────────────────────────────────
+    const stakeLevel = this.#classifyStake(query, rawAnswer, input.stakeLevel || input.evidenceBudget);
     const queryGuard = AdversarialTrustGuard.inspectText(query);
     const answerGuard = AdversarialTrustGuard.inspectText(rawAnswer);
     const maxManipulationRisk = Math.max(queryGuard.manipulationRisk, answerGuard.manipulationRisk);
 
-    // 3. Source Independence & Laundering Clustering
+    if (queryGuard.isAdversarial || answerGuard.isAdversarial) {
+      return this.#buildAbstentionResult({
+        query,
+        rawAnswer,
+        stakeLevel,
+        reason: ABSTENTION_REASON.PROMPT_INJECTION_DETECTED,
+        explanation: "Phát hiện dấu hiệu tấn công Prompt Injection hoặc thao túng chỉ thị an toàn."
+      });
+    }
+
     const independenceResult = SourceIndependenceEngine.analyzeIndependence(sources, evidenceSpans);
+    const rawClaims = ClaimDecompositionEngine.decompose(rawAnswer, { stakeLevel });
 
-    // 4. Claim Decomposition (Compound Sentences & Numeric Values)
-    const rawClaims = ClaimDecompositionEngine.decompose(rawAnswer, {
-      stakeLevel
-    });
+    const claimGraph = new EpistemicClaimGraph();
+    const graphClaims = rawClaims.map(c => claimGraph.addClaim(c));
 
-    // 5. Citation Entailment & Passage Extraction
-    const entailmentResult = CitationEntailmentEngine.evaluateEntailment(
-      rawClaims,
-      evidenceSpans,
-      sources
-    );
+    // ─────────────────────────────────────────────────────────────────────────────
+    // PASS 2: CITATION ENTAILMENT & SEMANTIC OVERCLAIM DETECTION
+    // ─────────────────────────────────────────────────────────────────────────────
+    const entailmentResult = CitationEntailmentEngine.evaluateEntailment(graphClaims, evidenceSpans, sources);
 
-    // 6. Temporal Validity & Contradiction Analysis
+    const overclaimChecks = [];
+    let hasOverclaim = false;
+    for (const claim of entailmentResult.verifiedClaims) {
+      const primaryPassage = evidenceSpans.find(e => claim.citationIds?.includes(e.evidenceId))?.passage || (evidenceSpans[0]?.passage || "");
+      const check = SemanticOverclaimDetector.detectOverclaim(claim.text, primaryPassage);
+      overclaimChecks.push({ claimId: claim.claimId, ...check });
+      if (check.hasOverclaim) hasOverclaim = true;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // PASS 3: ACTIVE COUNTER-EVIDENCE & ADVERSARIAL DISPROOF SEARCH
+    // ─────────────────────────────────────────────────────────────────────────────
+    const counterEvidenceSpans = [];
+    let disproveOutcome = "CONFIRMED";
+    let disproveExplanation = "Không phát hiện bằng chứng phản bác.";
+
+    if (candidateCounterPool.length > 0) {
+      for (const claim of entailmentResult.verifiedClaims) {
+        const res = CounterEvidenceEngine.searchCounterEvidence(claim, candidateCounterPool);
+        if (res.counterEvidence.length > 0) {
+          counterEvidenceSpans.push(...res.counterEvidence);
+          if (res.outcome === "CONFLICTED") {
+            disproveOutcome = "CONFLICTED";
+            disproveExplanation = res.explanation;
+          } else if (res.outcome === "WEAKENED" && disproveOutcome !== "CONFLICTED") {
+            disproveOutcome = "WEAKENED";
+            disproveExplanation = res.explanation;
+          }
+        }
+      }
+    }
+
+    // Temporal Validity & Contradictions
     const temporalResult = TemporalContradictionEngine.analyzeTemporalAndContradictions(
       entailmentResult.verifiedClaims,
       sources,
@@ -82,51 +100,99 @@ export class AiTrustEngine {
       entailmentResult.citations
     );
 
-    // 7. Abstention & Trust Status Synthesis
-    const synthesis = this.#synthesizeTrustStatus({
+    // ─────────────────────────────────────────────────────────────────────────────
+    // PASS 4: BLIND-SPOT DETECTION & UNSUPPORTED CLAIM PRUNING
+    // ─────────────────────────────────────────────────────────────────────────────
+    const blindSpotReports = [];
+    if (evidenceSpans.length > 0) {
+      for (const claim of temporalResult.claimsWithTemporalStatus) {
+        const report = BlindSpotDetector.detectBlindSpots(claim, evidenceSpans, { cohort: input.cohort || claim.scope });
+        if (report.blindSpots.length > 0) {
+          blindSpotReports.push(...report.blindSpots);
+        }
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // PASS 5: STRUCTURED SYNTHESIS, ABSTENTION & AUDIT PACKAGING
+    // ─────────────────────────────────────────────────────────────────────────────
+    const synthesis = this.#synthesizeEpistemicStatus({
       stakeLevel,
       claims: temporalResult.claimsWithTemporalStatus,
+      evidenceSpans,
       claimCoverage: entailmentResult.claimCoverage,
       citationAccuracy: entailmentResult.citationAccuracy,
-      hasOfficialConflict: temporalResult.hasOfficialConflict,
+      hasOfficialConflict: temporalResult.hasOfficialConflict || disproveOutcome === "CONFLICTED",
       contradictions: temporalResult.contradictions,
       temporalValidityScore: temporalResult.temporalValidityScore,
       maxManipulationRisk,
       sources,
-      queryGuard
+      hasOverclaim,
+      disproveOutcome
     });
 
-    // 8. Compose Verified Structured Answer
+    const sensitivityAnalysis = CounterEvidenceEngine.generateSensitivityAnalysis(
+      temporalResult.claimsWithTemporalStatus[0] || null,
+      evidenceSpans[0] || null
+    );
+
     const verifiedAnswer = this.#composeVerifiedAnswer({
       rawAnswer,
       claims: temporalResult.claimsWithTemporalStatus,
-      trustStatus: synthesis.trustStatus,
+      trustStatus: synthesis.epistemicState,
       requiresAbstention: synthesis.requiresAbstention,
       abstentionReason: synthesis.abstentionReason,
-      explanation: synthesis.explanation
+      explanation: synthesis.explanation,
+      overclaimChecks
     });
 
-    // 9. Calculate Authority Score
     const maxAuthorityTier = sources.length > 0
       ? Math.max(...sources.map(s => s.authorityTier || 0))
-      : 0;
+      : (evidenceSpans.length > 0 ? Math.max(...evidenceSpans.map(e => e.authorityTier || 0)) : 0);
 
-    return AiTrustModel.createTrustEvaluation({
+    const evaluation = AiTrustModel.createEpistemicEvaluation({
       query,
+      answerMode: synthesis.answerMode,
+      epistemicState: synthesis.epistemicState,
+      abstentionReason: synthesis.abstentionReason,
+      claims: temporalResult.claimsWithTemporalStatus,
+      evidenceSpans,
+      counterEvidenceSpans,
+      blindSpots: blindSpotReports,
+      disproveAnalysis: {
+        outcome: disproveOutcome,
+        explanation: disproveExplanation,
+        counterEvidenceCount: counterEvidenceSpans.length
+      },
+      sensitivityAnalysis,
+      humanReviewPacket: synthesis.answerMode === ANSWER_MODE.HUMAN_REVIEW_REQUIRED || synthesis.answerMode === ANSWER_MODE.CONFLICTED
+        ? AiTrustModel.createHumanReviewPacket({
+            claim: temporalResult.claimsWithTemporalStatus[0],
+            supportingEvidence: evidenceSpans,
+            counterEvidence: counterEvidenceSpans,
+            riskLevel: stakeLevel
+          })
+        : null
+    });
+
+    return Object.freeze({
+      ...evaluation,
       queryStake: stakeLevel,
       rawAnswer,
       verifiedAnswer,
-      claims: temporalResult.claimsWithTemporalStatus,
       citations: entailmentResult.citations,
-      evidenceSpans,
       sources,
-      trustStatus: synthesis.trustStatus,
+      trustStatus: synthesis.epistemicState,
       requiresAbstention: synthesis.requiresAbstention,
-      abstentionReason: synthesis.abstentionReason,
       explanation: synthesis.explanation,
       contradictions: temporalResult.contradictions,
       unsupportedClaims: entailmentResult.unsupportedClaims,
       provenanceClusters: independenceResult.provenanceClusters,
+      overclaimChecks,
+      claimGraph: {
+        nodes: claimGraph.getAllClaims(),
+        edges: claimGraph.getAllEdges()
+      },
       metrics: {
         provenanceScore: Number(independenceResult.sourceIndependenceScore.toFixed(2)),
         authorityScore: maxAuthorityTier,
@@ -142,159 +208,169 @@ export class AiTrustEngine {
     });
   }
 
-  /**
-   * Classifies stake level based on query and content
-   */
+  static verifyClaim(claim, evidencePool = []) {
+    const validClaim = AiTrustModel.createClaim(claim);
+    const validEvidence = evidencePool.map(e => AiTrustModel.createEvidenceSpan(e));
+    const entailment = CitationEntailmentEngine.evaluateEntailment([validClaim], validEvidence, []);
+    return entailment.verifiedClaims[0] || validClaim;
+  }
+
+  static validateTool(toolName, output) {
+    return ToolUseFirewall.validateToolOutput(toolName, output);
+  }
+
   static #classifyStake(query, answer, explicitStake) {
     if (explicitStake && STAKE_LEVEL[explicitStake]) {
       return STAKE_LEVEL[explicitStake];
     }
-    const text = `${query} ${answer}`.toLowerCase();
-    if (text.includes("kỷ luật") || text.includes("buộc thôi học") || text.includes("học phí") || text.includes("quy chế")) {
+    const combined = `${query} ${answer}`.toLowerCase();
+    if (combined.includes("tốt nghiệp") || combined.includes("học phí") || combined.includes("kỷ luật") || combined.includes("buộc thôi học") || combined.includes("quy chế")) {
       return STAKE_LEVEL.CRITICAL;
     }
-    if (text.includes("toeic") || text.includes("tốt nghiệp") || text.includes("tiên quyết") || text.includes("hạn nộp") || text.includes("deadline")) {
+    if (combined.includes("tiên quyết") || combined.includes("chuẩn đầu ra") || combined.includes("toeic") || combined.includes("chứng chỉ")) {
       return STAKE_LEVEL.HIGH;
     }
-    if (text.includes("môn học") || text.includes("đăng ký") || text.includes("giảng viên")) {
-      return STAKE_LEVEL.MEDIUM;
-    }
-    return STAKE_LEVEL.LOW;
+    return STAKE_LEVEL.MEDIUM;
   }
 
-  /**
-   * Synthesizes overall trust status and evaluates abstention rules
-   */
-  static #synthesizeTrustStatus(ctx) {
+  static #synthesizeEpistemicStatus(params) {
     const {
       stakeLevel,
       claims,
+      evidenceSpans,
       claimCoverage,
-      citationAccuracy,
       hasOfficialConflict,
       contradictions,
       temporalValidityScore,
-      maxManipulationRisk,
-      sources,
-      queryGuard
-    } = ctx;
+      hasOverclaim,
+      disproveOutcome
+    } = params;
 
-    // Rule A: Adversarial prompt injection detected
-    if (!queryGuard.isSafe || maxManipulationRisk >= 0.7) {
+    // 1. Conflict / Official Contradiction (Always Human Review)
+    if (hasOfficialConflict || disproveOutcome === "CONFLICTED") {
       return {
-        trustStatus: TRUST_STATUS.UNVERIFIED,
-        requiresAbstention: true,
-        abstentionReason: ABSTENTION_REASON.PROMPT_INJECTION_DETECTED,
-        explanation: "Phát hiện chỉ thị độc hại hoặc can thiệp prompt injection. Hệ thống từ chối xác thực câu trả lời."
-      };
-    }
-
-    // Rule B: Active official conflict
-    if (hasOfficialConflict) {
-      return {
-        trustStatus: TRUST_STATUS.CONFLICTED,
+        epistemicState: EPISTEMIC_STATE.CONFLICTED,
+        answerMode: ANSWER_MODE.HUMAN_REVIEW_REQUIRED,
         requiresAbstention: true,
         abstentionReason: ABSTENTION_REASON.OFFICIAL_CONFLICT,
-        explanation: "Phát hiện mâu thuẫn giữa các nguồn quy chế chính thức có cùng hiệu lực. Cần chuyển giao chuyên viên học vụ xác minh."
+        explanation: "Phát hiện mâu thuẫn giữa các văn bản quy định chính thức. Hệ thống tạm dừng kết luận và chuyển hồ sơ kiểm tra tới cán bộ phụ trách."
       };
     }
 
-    // Rule C: Retracted evidence
-    const hasRetractedClaim = claims.some(c => c.status === TRUST_STATUS.RETRACTED);
-    if (hasRetractedClaim) {
+    // 2. High Stake with Insufficient Evidence
+    if ((stakeLevel === STAKE_LEVEL.CRITICAL || stakeLevel === STAKE_LEVEL.HIGH) && (claimCoverage < 0.6 || claims.length === 0 || evidenceSpans.length === 0)) {
       return {
-        trustStatus: TRUST_STATUS.RETRACTED,
+        epistemicState: EPISTEMIC_STATE.UNSUPPORTED,
+        answerMode: ANSWER_MODE.INSUFFICIENT_EVIDENCE,
+        requiresAbstention: true,
+        abstentionReason: ABSTENTION_REASON.HIGH_STAKE_UNVERIFIED,
+        explanation: "Không đủ bằng chứng chính thức để kết luận cho yêu cầu học vụ trọng yếu này."
+      };
+    }
+
+    // 3. Stale / Superseded Policy / Retracted
+    if (claims.some(c => c.epistemicState === EPISTEMIC_STATE.RETRACTED || c.status === EPISTEMIC_STATE.RETRACTED)) {
+      return {
+        epistemicState: EPISTEMIC_STATE.RETRACTED,
+        answerMode: ANSWER_MODE.INSUFFICIENT_EVIDENCE,
         requiresAbstention: true,
         abstentionReason: ABSTENTION_REASON.SOURCE_RETRACTED,
-        explanation: "Văn bản hoặc minh chứng trích dẫn đã bị nhà trường thu hồi/hủy bỏ."
+        explanation: "Văn bản trích dẫn đã bị thu hồi hoặc hủy bỏ hiệu lực chính thức."
       };
     }
 
-    // Rule D: Outdated / Superseded evidence
-    const hasOutdatedClaim = claims.some(c => c.status === TRUST_STATUS.OUTDATED);
-    if (hasOutdatedClaim) {
+    if (temporalValidityScore < 0.5 || claims.some(c => c.epistemicState === EPISTEMIC_STATE.OUTDATED || c.status === EPISTEMIC_STATE.OUTDATED)) {
       return {
-        trustStatus: TRUST_STATUS.OUTDATED,
-        requiresAbstention: stakeLevel === STAKE_LEVEL.CRITICAL || stakeLevel === STAKE_LEVEL.HIGH,
+        epistemicState: EPISTEMIC_STATE.OUTDATED,
+        answerMode: ANSWER_MODE.PARTIALLY_SUPPORTED,
+        requiresAbstention: false,
         abstentionReason: ABSTENTION_REASON.POLICY_SUPERSEDED,
-        explanation: "Thông tin dựa trên văn bản quy định cũ đã được thay thế bởi phiên bản quy chế mới hơn."
+        explanation: "Văn bản trích dẫn thuộc phiên bản cũ, đã có quy định thay thế mới hơn."
       };
     }
 
-    // Rule E: Zero sources provided
-    if (sources.length === 0) {
-      const isHighStake = stakeLevel === STAKE_LEVEL.CRITICAL || stakeLevel === STAKE_LEVEL.HIGH;
+    // 4. Overclaim Detected
+    if (hasOverclaim) {
       return {
-        trustStatus: TRUST_STATUS.UNVERIFIED,
-        requiresAbstention: isHighStake,
-        abstentionReason: isHighStake ? ABSTENTION_REASON.HIGH_STAKE_UNVERIFIED : ABSTENTION_REASON.NONE,
-        explanation: "Không tìm thấy nguồn dữ liệu học vụ được xác thực để kiểm chứng câu trả lời."
-      };
-    }
-
-    // Rule F: High/Critical Stake with Insufficient Evidence
-    const hasAuthoritativeSource = sources.some(s => s.authorityTier >= AUTHORITY_TIER.TIER_1_OFFICIAL_REGISTRAR);
-    if ((stakeLevel === STAKE_LEVEL.CRITICAL || stakeLevel === STAKE_LEVEL.HIGH) && claimCoverage < 0.6) {
-      return {
-        trustStatus: TRUST_STATUS.UNSUPPORTED,
-        requiresAbstention: true,
-        abstentionReason: ABSTENTION_REASON.INSUFFICIENT_EVIDENCE,
-        explanation: "Câu hỏi thuộc mức độ ảnh hưởng cao nhưng chưa đủ bằng chứng quy chế chính thức để khẳng định."
-      };
-    }
-
-    // Rule G: 100% Coverage-based grading
-    if (claimCoverage === 1.0 && citationAccuracy === 1.0) {
-      if (hasAuthoritativeSource) {
-        return {
-          trustStatus: TRUST_STATUS.AUTHORITATIVE,
-          requiresAbstention: false,
-          abstentionReason: ABSTENTION_REASON.NONE,
-          explanation: "100% khẳng định được chứng minh đầy đủ bởi nguồn văn bản quy chế chính thức có hiệu lực."
-        };
-      }
-      return {
-        trustStatus: TRUST_STATUS.VERIFIED,
+        epistemicState: EPISTEMIC_STATE.PARTIALLY_SUPPORTED,
+        answerMode: ANSWER_MODE.PARTIALLY_SUPPORTED,
         requiresAbstention: false,
         abstentionReason: ABSTENTION_REASON.NONE,
-        explanation: "100% khẳng định có trích dẫn minh chứng hợp lệ."
+        explanation: "Nội dung chính được hỗ trợ, nhưng phát hiện một số chi tiết mở rộng không có trong văn bản gốc đã được cắt gọt an toàn."
       };
     }
 
-    if (claimCoverage >= 0.5) {
+    // 5. Direct Verified
+    if (claimCoverage >= 0.85 && temporalValidityScore >= 0.9 && contradictions.length === 0) {
       return {
-        trustStatus: TRUST_STATUS.PARTIALLY_SUPPORTED,
+        epistemicState: EPISTEMIC_STATE.VERIFIED,
+        answerMode: ANSWER_MODE.DIRECT_VERIFIED,
         requiresAbstention: false,
         abstentionReason: ABSTENTION_REASON.NONE,
-        explanation: `Một phần khẳng định có bằng chứng (${Math.round(claimCoverage * 100)}%), các nội dung còn lại chưa đủ dữ liệu đối soát.`
+        explanation: "Toàn bộ khẳng định được chứng minh đầy đủ bởi văn bản chính thức hiện hành."
       };
     }
 
     return {
-      trustStatus: TRUST_STATUS.UNSUPPORTED,
+      epistemicState: EPISTEMIC_STATE.SUPPORTED,
+      answerMode: ANSWER_MODE.SUPPORTED,
       requiresAbstention: false,
       abstentionReason: ABSTENTION_REASON.NONE,
-      explanation: "Minh chứng thu thập được không tương thích hoặc không chứng minh được khẳng định của AI."
+      explanation: "Thông tin được hỗ trợ bởi các nguồn tài liệu hợp lệ trong phạm vi cho phép."
     };
   }
 
-  /**
-   * Composes a transparent, auditable response separating fact, evidence, and uncertainty
-   */
-  static #composeVerifiedAnswer(params) {
-    const { rawAnswer, claims, trustStatus, requiresAbstention, abstentionReason, explanation } = params;
-
+  static #composeVerifiedAnswer({ rawAnswer, claims, trustStatus, requiresAbstention, abstentionReason, explanation, overclaimChecks = [] }) {
     if (requiresAbstention) {
-      return `[TỪ CHỐI KHẲNG ĐỊNH - ${abstentionReason}]\n${explanation}\n\n⚠️ Khuyến cáo: Sinh viên vui lòng tra cứu trực tiếp tại Cổng Thông Tin Đào Tạo HCMUTE hoặc liên hệ Phòng Đào Tạo.`;
+      return `[TỪ CHỐI KHẲNG ĐỊNH VÌ AN TOÀN HỌC VỤ] ${explanation}`;
     }
 
-    if (trustStatus === TRUST_STATUS.PARTIALLY_SUPPORTED) {
-      const supported = claims.filter(c => c.status === TRUST_STATUS.AUTHORITATIVE || c.status === TRUST_STATUS.VERIFIED || c.status === TRUST_STATUS.SUPPORTED);
-      const unsupported = claims.filter(c => c.status !== TRUST_STATUS.AUTHORITATIVE && c.status !== TRUST_STATUS.VERIFIED && c.status !== TRUST_STATUS.SUPPORTED);
+    if (trustStatus === EPISTEMIC_STATE.VERIFIED) {
+      return rawAnswer;
+    }
 
-      return `${rawAnswer}\n\n---\n📊 ĐỐI SOÁT BẰNG CHỨNG (AI TRUST ENGINE):\n✓ Đã xác thực (${supported.length}): ${supported.map(s => s.text).join("; ")}\n⚠️ Chưa có nguồn kiểm chứng (${unsupported.length}): ${unsupported.map(u => u.text).join("; ")}`;
+    if (overclaimChecks.some(c => c.hasOverclaim)) {
+      const overclaimed = overclaimChecks.find(c => c.hasOverclaim);
+      return overclaimed?.safeGroundedText || rawAnswer;
     }
 
     return rawAnswer;
+  }
+
+  static #buildAbstentionResult({ query, rawAnswer, stakeLevel, reason, explanation }) {
+    return Object.freeze({
+      evaluationId: `EVAL_ABSTAIN_${Date.now()}`,
+      query,
+      queryStake: stakeLevel,
+      rawAnswer,
+      verifiedAnswer: `[TỪ CHỐI KHẲNG ĐỊNH] ${explanation}`,
+      trustStatus: EPISTEMIC_STATE.UNKNOWN,
+      epistemicState: EPISTEMIC_STATE.UNKNOWN,
+      answerMode: ANSWER_MODE.INSUFFICIENT_EVIDENCE,
+      requiresAbstention: true,
+      abstentionReason: reason,
+      explanation,
+      claims: [],
+      citations: [],
+      evidenceSpans: [],
+      sources: [],
+      contradictions: [],
+      unsupportedClaims: [],
+      provenanceClusters: [],
+      blindSpots: [],
+      claimGraph: { nodes: [], edges: [] },
+      metrics: {
+        provenanceScore: 0,
+        authorityScore: 0,
+        evidenceQuality: 0,
+        claimCoverage: 0,
+        citationAccuracy: 0,
+        temporalValidity: 0,
+        sourceIndependenceScore: 0,
+        contradictionSeverity: 1.0,
+        manipulationRisk: 1.0,
+        uncertainty: 1.0
+      }
+    });
   }
 }
