@@ -25,8 +25,8 @@ export class Layer2DecisionEngine {
       intent = {},
     } = semanticAnalysis;
 
-    // 1. Educational Content Immunity Check (Must NOT Block)
-    const isEducational = contextSignals.some((s) => s.type === "educational_discussion");
+    // 1. Educational Content Immunity Check (Must NOT Block unless Layer 1 has active hard BLOCK)
+    const isEducational = contextSignals.some((s) => s.type === "educational_discussion") && layer1Result.status !== "BLOCK";
     if (isEducational) {
       return {
         status: LAYER_2_STATUS.PASS,

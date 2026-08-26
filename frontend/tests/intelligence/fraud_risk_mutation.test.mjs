@@ -101,7 +101,7 @@ describe("[MUTATION-2] Disable OTP Hard Rule → OTP detection must fail", () =>
     const mutant = await createAndImportMutant("otp_disabled", (src) => {
       // Comment out the entire OTP detection block
       return src.replace(
-        /if \(otpKeywords\.some\(k => k\.test\(text\)\)\) \{[\s\S]*?evidenceList\.push\(\{ type: "OTP_EXFILTRATION_REQUEST" \}\);\s*\}/,
+        /if \(!isNegativeOtpWarning && otpDemandPatterns\.some\(k => k\.test\(text\)\)\) \{[\s\S]*?evidenceList\.push\(\{ type: "OTP_EXFILTRATION_REQUEST" \}\);\s*\}/,
         "// MUTATION: OTP detection DISABLED"
       );
     });

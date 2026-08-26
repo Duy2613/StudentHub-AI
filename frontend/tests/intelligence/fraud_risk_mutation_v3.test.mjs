@@ -147,10 +147,7 @@ describe("[MUTANT-05] Disable Unaccented OTP Detection", () => {
   it("should KILL mutant: removing unaccented pattern allows 'gui ma otp' to escape", async () => {
     const mutant = await createAndImportMutant("unaccented_otp", (src) => {
       return src.replace(
-        "/(?:mã|ma)\\s*(?:smart\\s*)?otp/i",
-        "/mã smart otp/i"
-      ).replace(
-        "/(?:gửi|gui|nhập|nhap|cung cấp|cung cap|forward|chuyển tiếp|chuyen tiep|chia sẻ|chia se|đọc|doc|nhắn|nhan)\\s*(?:lại\\s*)?(?:mã|ma)?\\s*otp/i",
+        "/(?:gửi|gui|nhập|nhap|cung cấp|cung cap|forward|chuyển tiếp|chuyen tiep|chia sẻ|chia se|đọc|doc|nhắn|nhan)\\s*(?:lại\\s*)?(?:mã|ma)?\\s*(?:smart\\s*)?otp/i",
         "/gửi mã otp/i"
       );
     });

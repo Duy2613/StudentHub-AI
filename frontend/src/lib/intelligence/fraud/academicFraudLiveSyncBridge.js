@@ -39,6 +39,18 @@ export class AcademicFraudLiveSyncBridge {
     const executionTimestamp = new Date().toISOString();
 
     // -------------------------------------------------------------
+    // STAGE 0: Fail-Closed Input Invariant Check
+    // -------------------------------------------------------------
+    if (!rawBody || typeof rawBody !== "string" || rawBody.trim().length === 0) {
+      return {
+        pipelineStatus: "INSUFFICIENT_DATA",
+        finalDecision: FRAUD_DECISIONS.INSUFFICIENT_DATA,
+        summary: "Dữ liệu nguồn rỗng hoặc không hợp lệ. Từ chối nạp.",
+        stages: pipelineStages
+      };
+    }
+
+    // -------------------------------------------------------------
     // STAGE 1: Live-Sync Conditional Check
     // -------------------------------------------------------------
     const syncEval = LiveSourceWatcher.evaluateConditionalFetch(source, {
@@ -107,6 +119,16 @@ export class AcademicFraudLiveSyncBridge {
       };
     }
 
+    if (fraudEval.decision === FRAUD_DECISIONS.INSUFFICIENT_DATA) {
+      return {
+        pipelineStatus: "INSUFFICIENT_DATA",
+        finalDecision: FRAUD_DECISIONS.INSUFFICIENT_DATA,
+        summary: "Dữ liệu nguồn rỗng hoặc không hợp lệ. Không thể tiến hành nạp học vụ.",
+        fraudAssessment: fraudEval,
+        stages: pipelineStages
+      };
+    }
+
     // -------------------------------------------------------------
     // STAGE 4: Immutable Snapshot Creation
     // -------------------------------------------------------------
@@ -145,7 +167,7 @@ export class AcademicFraudLiveSyncBridge {
     pipelineStages.push({ stage: "6_RULE_DEPENDENCY_DAG", result: dagImpact });
 
     // -------------------------------------------------------------
-    // STAGE 7: Human Review Gate Holding
+    // STAGE 7: Human Review Gate Holding & Provenance Gate
     // -------------------------------------------------------------
     const candidateHolding = {
       candidateId: `CANDIDATE_${source.sourceId}_${Date.now()}`,
@@ -155,6 +177,24 @@ export class AcademicFraudLiveSyncBridge {
       reasons: diffEval.changes.map(c => `${c.field}: ${c.oldValue} -> ${c.newValue}`)
     };
     pipelineStages.push({ stage: "7_HUMAN_REVIEW_GATE", result: candidateHolding });
+
+    // Provenance Gate: Only verified official source tiers on official channels can yield VERIFIED_UPDATED
+    const isVerifiedOfficialTier = (source.sourceTier === "TIER_1_OFFICIAL" || source.sourceTier === "TIER_2_OFFICIAL_MIRROR") &&
+      fraudEval.decision !== FRAUD_DECISIONS.SUSPICIOUS_NEEDS_REVIEW;
+
+    if (!isVerifiedOfficialTier) {
+      return {
+        pipelineStatus: "UNVERIFIED_MUTATION_HELD",
+        finalDecision: FRAUD_DECISIONS.SUSPICIOUS_NEEDS_REVIEW,
+        summary: "Biến thiên quy định từ nguồn chưa xác minh chính thức. Chuyển sang Human Review Gate để kiểm chứng nguồn gốc.",
+        snapshot,
+        diff: diffEval,
+        dagImpact,
+        candidate: candidateHolding,
+        fraudAssessment: fraudEval,
+        stages: pipelineStages
+      };
+    }
 
     // -------------------------------------------------------------
     // STAGE 8: Academic Digital Twin Impact Projection

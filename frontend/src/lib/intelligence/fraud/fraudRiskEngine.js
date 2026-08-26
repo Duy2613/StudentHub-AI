@@ -404,17 +404,24 @@ export class FraudRiskEngine {
     // -------------------------------------------------------------
     // 2. CREDENTIAL & OTP EXFILTRATION (Audit V3 Diacritic Agnostic)
     // -------------------------------------------------------------
-    const otpKeywords = [
-      /(?:mã|ma)\s*(?:smart\s*)?otp/i,
-      /(?:gửi|gui|nhập|nhap|cung cấp|cung cap|forward|chuyển tiếp|chuyen tiep|chia sẻ|chia se|đọc|doc|nhắn|nhan)\s*(?:lại\s*)?(?:mã|ma)?\s*otp/i,
-      /(?:xác thực|xac thuc|bảo mật|bao mat)\s*otp/i
+    const isNegativeOtpWarning = /(?:tuyệt đối không|tuyet doi khong|không bao giờ|khong bao gio|không|khong|đừng|dung)\s+(?:chia sẻ|chia se|cung cấp|cung cap|gửi|gui|nhập|nhap|tiết lộ|tiet lo|chuyển tiếp|chuyen tiep)[\s\S]{0,30}(?:mã|ma)?\s*(?:smart\s*)?otp/i.test(text) ||
+      /(?:mã|ma)?\s*(?:smart\s*)?otp\s+(?:không được|khong duoc)\s+(?:chia sẻ|chia se|cung cấp|cung cap|gửi|gui|tiết lộ|tiet lo)/i.test(text);
+
+    const otpDemandPatterns = [
+      /(?:gửi|gui|nhập|nhap|cung cấp|cung cap|forward|chuyển tiếp|chuyen tiep|chia sẻ|chia se|đọc|doc|nhắn|nhan)\s*(?:lại\s*)?(?:mã|ma)?\s*(?:smart\s*)?otp/i,
+      /(?:xác thực|xac thuc|bảo mật|bao mat)\s*otp/i,
+      /(?:mã|ma)\s*(?:smart\s*)?otp\s*(?:về\s*(?:số|so)|của\s*bạn|cua\s*ban)/i
     ];
-    if (otpKeywords.some(k => k.test(text))) {
+
+    if (!isNegativeOtpWarning && otpDemandPatterns.some(k => k.test(text))) {
       socialEngineeringRisk = Math.max(socialEngineeringRisk, 0.98);
       hardRulesTriggered.push(HARD_SAFETY_RULES.OTP_REQUEST);
       reasons.push("Phát hiện hành vi yêu cầu cung cấp mã xác thực OTP — Vi phạm an toàn nghiêm trọng.");
       evidenceList.push({ type: "OTP_EXFILTRATION_REQUEST" });
     }
+
+    const isNegativePasswordWarning = /(?:tuyệt đối không|tuyet doi khong|không bao giờ|khong bao gio|không|khong|đừng|dung)\s+(?:chia sẻ|chia se|cung cấp|cung cap|gửi|gui|nhập|nhap|tiết lộ|tiet lo)[\s\S]{0,30}(?:mật khẩu|mat khau|password)/i.test(text) ||
+      /(?:mật khẩu|mat khau|password)\s+(?:không được|khong duoc)\s+(?:chia sẻ|chia se|cung cấp|cung cap|gửi|gui|tiết lộ|tiet lo)/i.test(text);
 
     const passwordKeywords = [
       /(?:nhập|nhap|cung cấp|cung cap|xác thực|xac thuc|gửi|gui)\s*(?:mật khẩu|mat khau|password)/i,
@@ -427,12 +434,12 @@ export class FraudRiskEngine {
       /(?:chuyển tiếp|chuyen tiep|forward|gửi|gui)[\s\S]{0,20}\d{4,8}[\s\S]{0,20}(?:bảo mật|bao mat|xác thực|xac thuc|xác nhận|xac nhan)/i
     ];
 
-    if (passwordKeywords.some(k => k.test(text))) {
+    if (!isNegativePasswordWarning && passwordKeywords.some(k => k.test(text))) {
       socialEngineeringRisk = Math.max(socialEngineeringRisk, 0.98);
       hardRulesTriggered.push(HARD_SAFETY_RULES.CREDENTIAL_EXFILTRATION_REQUEST);
       reasons.push("Yêu cầu nhập hoặc cung cấp mật khẩu tài khoản cá nhân/ngân hàng.");
       evidenceList.push({ type: "CREDENTIAL_THEFT_REQUEST" });
-    } else if (credentialSemanticPatterns.some(p => p.test(text))) {
+    } else if (!isNegativePasswordWarning && credentialSemanticPatterns.some(p => p.test(text))) {
       socialEngineeringRisk = Math.max(socialEngineeringRisk, 0.85);
       reasons.push("Phát hiện mẫu ngữ nghĩa yêu cầu chuyển tiếp mã bảo mật / thông tin xác thực — Credential Exfiltration Candidate.");
       evidenceList.push({ type: "CREDENTIAL_SEMANTIC_EXFILTRATION_CANDIDATE" });
@@ -506,7 +513,7 @@ export class FraudRiskEngine {
       /(?:đình chỉ|dinh chi)\s*(?:học tập|hoc tap)\s*(?:ngay lập tức|ngay lap tuc)?/i,
       /(?:tịch thu|tich thu)\s*(?:bằng|bang)\s*(?:tốt nghiệp|tot nghiep)/i,
       /(?:hủy|huy)\s*(?:tư cách|tu cach)\s*(?:sinh viên|sinh vien)/i,
-      /(?:tuyệt đối không|tuyet doi khong)\s*(?:chia sẻ|chia se)/i
+      /(?:tuyệt đối không|tuyet doi khong|không được|khong duoc)\s+(?:tiết lộ cho ai|nói với ai|noi voi ai|báo công an|bao cong an|báo nhà trường|bao nha truong|báo người thân|bao nguoi than)/i
     ];
     if (coercionPatterns.some(c => c.test(text))) {
       socialEngineeringRisk = Math.max(socialEngineeringRisk, 0.88);

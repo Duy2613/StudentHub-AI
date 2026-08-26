@@ -100,8 +100,11 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
 
     // Check Educational Immunity & Whitelisted Domain
     const isEducational =
-      fusedGraph.layer2ContextSignals.some((s) => s.type === "educational_discussion") ||
-      fusedGraph.layer2Classification === "INFORMATIVE";
+      (fusedGraph.layer2ContextSignals.some((s) => s.type === "educational_discussion") ||
+      fusedGraph.layer2Classification === "INFORMATIVE") &&
+      fusedGraph.layer1Status !== "BLOCK" &&
+      fusedGraph.layer2Status !== "BLOCK" &&
+      riskAssessment.level !== SECURITY_RISK_LEVEL.CRITICAL;
 
     const isWhitelistedOrBenign =
       fusedGraph.layer1Signals.some((s) => s.type === "whitelisted_domain") ||
@@ -110,7 +113,7 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
     if (isEducational || (isWhitelistedOrBenign && truthAssessment.claimVerdicts.length === 0)) {
       classification = FINAL_CLASSIFICATION.VERIFIED_TRUE;
       action = RECOMMENDED_ACTION.ALLOW;
-    } else if (riskAssessment.level === SECURITY_RISK_LEVEL.CRITICAL) {
+    } else if (riskAssessment.level === SECURITY_RISK_LEVEL.CRITICAL || fusedGraph.layer1Status === "BLOCK" || fusedGraph.layer2Status === "BLOCK") {
       classification = FINAL_CLASSIFICATION.MALICIOUS;
       action = RECOMMENDED_ACTION.BLOCK;
     } else if (reconciliation.unresolvedConflicts.length > 0) {

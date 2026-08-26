@@ -21,8 +21,8 @@ export class HardDecisionPolicy {
       fusedGraph.layer2ContextSignals.some((s) => s.type === "educational_discussion") ||
       fusedGraph.layer2Classification === "INFORMATIVE";
 
-    // 1. Rule 1: Layer 1 BLOCK
-    if (fusedGraph.layer1Status === "BLOCK" && !isEducational) {
+    // 1. Rule 1: Layer 1 BLOCK — Deterministic hard block CANNOT be overridden by educational immunity
+    if (fusedGraph.layer1Status === "BLOCK") {
       return {
         ruleId: "HARD_RULE_1_LAYER1_BLOCK",
         classification: FINAL_CLASSIFICATION.MALICIOUS,
@@ -33,8 +33,8 @@ export class HardDecisionPolicy {
       };
     }
 
-    // 1b. Rule 1b: Layer 2 Semantic & Neural BLOCK
-    if (fusedGraph.layer2Status === "BLOCK" && !isEducational) {
+    // 1b. Rule 1b: Layer 2 Semantic & Neural BLOCK — Deterministic block CANNOT be overridden
+    if (fusedGraph.layer2Status === "BLOCK") {
       return {
         ruleId: "HARD_RULE_1B_LAYER2_BLOCK",
         classification: FINAL_CLASSIFICATION.MALICIOUS,
