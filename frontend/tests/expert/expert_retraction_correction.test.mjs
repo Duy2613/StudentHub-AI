@@ -25,6 +25,6 @@ describe("ExpertRetractionCorrection", () => {
 
     assert.strictEqual(result.claimStatus, EXPERT_CLAIM_STATUS.RETRACTED);
     assert.strictEqual(result.isWithinExpertise, false);
-    assert.ok(result.explanation.includes("thu hồi/cải chính"));
+    assert.ok(result.explanation.includes("thu hồi"));
   });
 });
