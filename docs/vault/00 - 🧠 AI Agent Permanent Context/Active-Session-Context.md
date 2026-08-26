@@ -174,9 +174,31 @@
         - **Giao Diện Theo Dõi Toàn Diện (`AcademicExecutionCenterView.jsx`, `/academic/execution`)**: Bảng đối soát Plan vs Actual từng môn, thanh tiến độ tín chỉ/mục tiêu, banner cảnh báo độ lệch và lối tắt chuyển đổi nhanh.
         - **Tập Kiểm Chuẩn Toàn Diện**: **526/526 Tests PASS (100.0%)** trên 98 test files, 157 suites. **51/51 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
 
+    25. ✅ **Động Cơ Kiểm Chứng Tin Cậy AI V1 (AI Trust Engine V1 — Phase T1 of StudentHub Intelligence OS: Claim-Level Grounding, Citation Entailment, Temporal Validity, Source Independence, Adversarial Guard & Abstention)**:
+        - **Bất Biến Tin Cậy Cốt Lõi (`CONFIDENCE NEVER CREATES AUTHORITY`)**: Độ tự tin cao của mô hình AI không bao giờ được phép tự tạo ra thẩm quyền học vụ. Đầu ra của AI chỉ là lập luận tổng hợp cho đến khi được kiểm chứng với nguồn văn bản chính thức.
+        - **Kiểm Chứng Cấp Luận Điểm Nguyên Tử (Claim-Level Grounding)**: Phân rã câu trả lời thành từng mệnh đề độc lập (`Subject`, `Predicate`, `Object`, `Scope`, `NumericValue`), phòng thủ câu ghép và đối soát độc lập từng thành phần.
+        - **Khớp Nối Suy Diễn Trích Dẫn (Citation Entailment)**: Kiểm chứng đoạn trích dẫn có thực sự chứng minh số liệu (TOEIC, tín chỉ) và đối tượng (K24) hay không. Phát hiện sai lệch trích dẫn (`CITATION_MISMATCH`).
+        - **Thời Hiệu & Tiến Hóa Quy Chế (Supersession vs Contradiction)**: Phân biệt rõ văn bản mới thay thế văn bản cũ (`SUPERSEDED`) với mâu thuẫn giữa hai nguồn chính thức cùng hiệu lực (`CONFLICTED`).
+        - **Độc Lập Nguồn & Chống Rửa Nguồn (Source Laundering Defense)**: Phân cụm các nguồn sao chép (syndication) và phát hiện vòng lặp rửa nguồn (Forum -> Blog -> Search).
+        - **Phòng Thủ Adversarial & Prompt Injection**: Xử lý dữ liệu nguồn thuần túy là DATA, vô hiệu hóa các chỉ thị ghi đè prompt injection.
+        - **Cơ Chế Từ Chối Khẳng Định (Abstention)**: Bắt buộc từ chối (`INSUFFICIENT_EVIDENCE` / `OFFICIAL_CONFLICT`) khi thiếu bằng chứng chính thức cho câu hỏi mức độ rủi ro cao.
+        - **Giao Diện Studio Trực Quan (`AiTrustStudioView.jsx`, `/trust`)**: Bảng điều khiển đa chiều, thanh tra luận điểm và đánh dấu đoạn trích dẫn.
+        - **Tập Kiểm Chuẩn Toàn Diện**: **546/546 Tests PASS (100.0%)** trên 106 test files, 165 suites. **55/55 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
+
 ---
 
-## 2. Đường Dẫn File Trọng Tâm (v20 Nodes)
+## 2. Đường Dẫn File Trọng Tâm (v22 Nodes)
+- **Kiến Trúc Động Cơ Kiểm Chứng Tin Cậy AI**: `docs/vault/01 - 🏗️ System Architecture/AI-Trust-Engine-V1.md`
+- **Mô Hình Miền & Chỉ Số Tin Cậy Đa Chiều**: `frontend/src/lib/intelligence/trust/aiTrustModel.js`
+- **Động Cơ Phân Rã Luận Điểm Cấp Nguyên Tử**: `frontend/src/lib/intelligence/trust/claimDecompositionEngine.js`
+- **Động Cơ Khớp Nối Suy Diễn Trích Dẫn**: `frontend/src/lib/intelligence/trust/citationEntailmentEngine.js`
+- **Động Cơ Thời Hiệu & Phân Tích Mâu Thuẫn**: `frontend/src/lib/intelligence/trust/temporalContradictionEngine.js`
+- **Động Cơ Độc Lập Nguồn & Chống Rửa Nguồn**: `frontend/src/lib/intelligence/trust/sourceIndependenceEngine.js`
+- **Tấm Khiên Bảo Vệ Adversarial & Prompt Injection**: `frontend/src/lib/intelligence/trust/adversarialTrustGuard.js`
+- **Động Cơ Điều Phối Tin Cậy AI Tổng Hợp**: `frontend/src/lib/intelligence/trust/aiTrustEngine.js`
+- **Kho Lưu Trữ Đánh Giá & Kiểm Toán Tin Cậy**: `frontend/src/lib/intelligence/trust/aiTrustStore.js`
+- **API Endpoint Đánh Giá Tin Cậy Server-Authoritative**: `frontend/src/app/api/ai/trust/evaluate/route.js`, `frontend/src/app/api/ai/trust/evaluations/[evaluationId]/route.js`
+- **Giao Diện AI Trust Studio & Trang Server**: `frontend/src/components/trust/AiTrustStudioView.jsx`, `frontend/src/app/trust/page.jsx`
 - **Kiến Trúc Trung Tâm Thực Thi & Đối Soát Kế Hoạch**: `docs/vault/01 - 🏗️ System Architecture/Academic-Execution-Center-V1.md`
 - **Mô Hình Miền & Hợp Đồng Dữ Liệu Thực Thi**: `frontend/src/lib/intelligence/academic/academicExecutionModel.js`
 - **Động Cơ Đối Soát & Phát Hiện Độ Lệch Kế Hoạch**: `frontend/src/lib/intelligence/academic/academicPlanDriftEngine.js`

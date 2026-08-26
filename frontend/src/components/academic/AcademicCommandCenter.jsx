@@ -202,6 +202,13 @@ export function AcademicCommandCenter({ initialData = null }) {
               <span>⚖️</span>
               <span>Kế Hoạch & Quyết Định</span>
             </Link>
+            <Link
+              href="/trust"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/25 transition-all flex items-center gap-1.5 shadow-sm"
+            >
+              <span>🛡️</span>
+              <span>AI Trust</span>
+            </Link>
           </div>
         </div>
       )}
