@@ -274,6 +274,12 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
 
           <div className="flex items-center gap-3">
             <Link
+              href="/academic/execution"
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-200 transition-all shadow-sm"
+            >
+              📊 Theo Dõi Thực Thi
+            </Link>
+            <Link
               href="/academic/roadmap"
               className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-200 transition-all shadow-sm"
             >

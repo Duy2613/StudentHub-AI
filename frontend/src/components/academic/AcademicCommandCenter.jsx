@@ -189,11 +189,18 @@ export function AcademicCommandCenter({ initialData = null }) {
               <span className="text-lg font-bold text-foreground tabular-nums">{roadmap.progress.percentage}%</span>
             </div>
             <Link
+              href="/academic/execution"
+              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all flex items-center gap-1.5 shadow-sm"
+            >
+              <span>📊</span>
+              <span>Theo Dõi Thực Thi</span>
+            </Link>
+            <Link
               href="/academic/planner"
               className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-violet-500/15 text-violet-300 border border-violet-500/30 hover:bg-violet-500/25 transition-all flex items-center gap-1.5 shadow-sm"
             >
-              <span>🔮</span>
-              <span>Giả Lập What-If</span>
+              <span>⚖️</span>
+              <span>Kế Hoạch & Quyết Định</span>
             </Link>
           </div>
         </div>

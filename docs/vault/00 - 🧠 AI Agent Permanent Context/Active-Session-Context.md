@@ -165,9 +165,24 @@
         - **Giao Diện Studio 3 Tầng (`AcademicWhatIfPlannerView.jsx`)**: Tab 1 (Lập Kế Hoạch), Tab 2 (Studio So Sánh & Quyết Định), Tab 3 (Giả Lập What-If Sandbox).
         - **Tập Kiểm Chuẩn Toàn Diện**: **511/511 Tests PASS (100.0%)** trên 90 test files, 149 suites. **47/47 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
 
+    24. ✅ **Trung Tâm Theo Dõi Thực Thi & Đối Soát Kế Hoạch Học Vụ V1 (Academic Execution Center & Plan-Actual Reconciliation V1 — Plan vs Actual Matrix, Drift Detection Engine, Explainable Replanning Rationale, Execution Center UI)**:
+        - **Bất Biến Theo Dõi Không Thay Thế Cơ Quan Thẩm Quyền (`TRACK + RECONCILE != RECORD AUTHORITY`)**: Trung tâm thực thi chỉ đối soát và cảnh báo độ lệch kế hoạch, không bao giờ thay thế nguồn sự thật tối thượng (`Profile 360`, `Digital Twin`, `Academic Records`).
+        - **Nguyên Tắc Thực Tế Luôn Thắng Kế Hoạch (`ACTUAL > PLAN`)**: Khi kế hoạch kỳ vọng hoàn tất nhưng bảng điểm thực tế bị chậm hoặc điểm F, trạng thái thực tế luôn được bảo tồn và chuyển thành sự kiện độ lệch (Plan Drift).
+        - **Động Cơ Phát Hiện Độ Lệch Học Vụ (`academicPlanDriftEngine.js`)**: Phân loại độ lệch 5 cấp (`NONE`, `LOW`, `MEDIUM`, `HIGH`, `CRITICAL`), giải trình bằng tiếng Việt tường minh về nguy cơ nghẽn môn tiên quyết và cản trở tốt nghiệp, đưa ra khuyến nghị lập lại kế hoạch (`REPLAN_RECOMMENDATION`).
+        - **Không Tự Động Lập Lại Kế Hoạch (No Autonomous Replanning)**: Hệ thống cung cấp nút điều hướng đưa sinh viên về Decision Studio để tự tay lựa chọn phương án tối ưu mới, không bao giờ tự ý thay đổi kế hoạch của sinh viên.
+        - **Lưu Trữ Snapshot & Bảo Tồn Lịch Sử (`academicExecutionStore.js`)**: Quản lý đa người dùng, lưu giữ lịch sử thực thi, chuyển trạng thái `SUPERSEDED` khi sinh viên đổi kế hoạch.
+        - **Giao Diện Theo Dõi Toàn Diện (`AcademicExecutionCenterView.jsx`, `/academic/execution`)**: Bảng đối soát Plan vs Actual từng môn, thanh tiến độ tín chỉ/mục tiêu, banner cảnh báo độ lệch và lối tắt chuyển đổi nhanh.
+        - **Tập Kiểm Chuẩn Toàn Diện**: **526/526 Tests PASS (100.0%)** trên 98 test files, 157 suites. **51/51 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
+
 ---
 
-## 2. Đường Dẫn File Trọng Tâm (v18 Nodes)
+## 2. Đường Dẫn File Trọng Tâm (v20 Nodes)
+- **Kiến Trúc Trung Tâm Thực Thi & Đối Soát Kế Hoạch**: `docs/vault/01 - 🏗️ System Architecture/Academic-Execution-Center-V1.md`
+- **Mô Hình Miền & Hợp Đồng Dữ Liệu Thực Thi**: `frontend/src/lib/intelligence/academic/academicExecutionModel.js`
+- **Động Cơ Đối Soát & Phát Hiện Độ Lệch Kế Hoạch**: `frontend/src/lib/intelligence/academic/academicPlanDriftEngine.js`
+- **Kho Lưu Trữ Snapshot Thực Thi & Lịch Sử**: `frontend/src/lib/intelligence/academic/academicExecutionStore.js`
+- **API Endpoint Thực Thi & Đối Soát Server-First**: `frontend/src/app/api/academic/me/execution/route.js`, `frontend/src/app/api/academic/me/execution/reconcile/route.js`
+- **Giao Diện Theo Dõi Thực Thi & Trang RSC**: `frontend/src/components/academic/AcademicExecutionCenterView.jsx`, `frontend/src/app/academic/execution/page.jsx`
 - **Kiến Trúc Studio So Sánh & Quyết Định Học Vụ**: `docs/vault/01 - 🏗️ System Architecture/Academic-Decision-Studio-V1.md`
 - **Mô Hình Miền & Tiêu Chí So Sánh Quyết Định**: `frontend/src/lib/intelligence/academic/academicDecisionModel.js`
 - **Động Cơ Phân Tích Đánh Đổi & Xếp Hạng Quyết Định**: `frontend/src/lib/intelligence/academic/academicDecisionEngine.js`
