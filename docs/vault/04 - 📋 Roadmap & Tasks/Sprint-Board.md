@@ -34,11 +34,9 @@
   - [x] Bộ kiểm chuẩn Live-Sync 16/16 tests PASS (100.0%).
 - [x] **Phase T1: AI Trust Engine V2 — Self-Verifying Epistemic Intelligence (RELEASE LOCK)**:
   - 13 Epistemic States, Claim Graph DAG with cycle & derivation checks, Semantic Overclaim Detector (UNSUPPORTED_EXTENSION), Active Counter-Evidence & Adversarial Disproof Search, Blind-Spot & Knowledge Gap Detector, Tool Use Firewall, 5-Pass Self-Critique Pipeline, Human Review Packet, Trust Blast Radius, Server API endpoints, and Studio Console UI (`/intelligence/ai-trust`).
-- [x] **Phase T2: Expert Intelligence V2 — Verified Expert Knowledge Graph (RELEASE LOCK)**:
-  - Multi-signal entity resolution (ORCID, `@hcmute.edu.vn`, DOIs), identity collision defense (`IDENTITY_AMBIGUOUS`), impersonation guard, temporal credential & role effective intervals, expertise graph (ESTABLISHED/SUPPORTED/EMERGING/LIMITED), authority scope vs institutional power checks (`EXPERTISE ≠ AUTHORITY`), Disagreement Map Engine, "Why this expert?" & "Where NOT to trust" scope boundaries, Conflict of Interest (COI) graph, retraction cascades, 7 canonical query types, studio UI (`/intelligence/experts`).
-- [ ] **Phase T3: Community & Forum Intelligence V2 (QUEUED — UP NEXT)**:
-  - Experience Graph, Context-aware Consensus, Trend Detection, "Official vs Real-world Gap" detection, Astroturf/Sockpuppet multi-dimensional defense.
-- [ ] **Phase T4: Evidence Fusion Layer (QUEUED)**:
+- [x] **Phase T3: Community & Forum Intelligence V2 — Community Reality Graph (RELEASE LOCK)**:
+  - 11 Claim Types, 6 Author States, 6 Temporal States, 7 Consensus States, 6 Reality Gap States, Copy-Paste Syndication Collapse, Operational Friction Graph (Process -> Step -> Friction -> Cohort -> Trend), 2D Friction Heatmap Matrix, Official vs Real-World Reality Gap Engine (3 days vs 6-8 days -> SIGNIFICANT_OPERATIONAL_GAP), Privacy Redaction, 7 Canonical Query Types with 8-part structured output, Studio UI (`/intelligence/community`).
+- [ ] **Phase T4: Evidence Fusion Layer (QUEUED — UP NEXT)**:
   - Fuses Official Academic Source + Expert Knowledge Graph + Community Experience Layer + AI Trust Layer into a unified authoritative Knowledge Object.
 - [ ] **Phase T5: Academic Foresight / Causal Engine (QUEUED)**:
   - Simulates downstream degree graduation impact and policy change cascades.
