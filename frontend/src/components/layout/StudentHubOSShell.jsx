@@ -109,14 +109,14 @@ export default function StudentHubOSShell({ children }) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#070403] text-gray-100 flex flex-col font-sans selection:bg-amber-500 selection:text-black">
+    <div className="relative z-10 w-full min-h-screen bg-[#070403] text-gray-100 flex flex-col font-sans selection:bg-amber-500 selection:text-black">
       {/* Top Global Command Header */}
-      <header className="sticky top-0 z-40 h-16 bg-[#0e0705]/95 border-b border-[#2d120a] backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between">
+      <header className="sticky top-0 z-40 h-16 bg-[#0e0705] border-b border-[#2d120a] shadow-lg px-4 sm:px-6 flex items-center justify-between">
         {/* Left: Brand Logo & Current View */}
         <div className="flex items-center gap-3 sm:gap-6">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg bg-[#1a0c08] border border-[#3d1910] text-gray-300"
+            className="md:hidden p-2 rounded-lg bg-[#1a0c08] border border-[#3d1910] text-gray-200 hover:text-white"
           >
             {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
@@ -140,10 +140,10 @@ export default function StudentHubOSShell({ children }) {
               <button
                 key={role}
                 onClick={() => setActiveRole(role)}
-                className={`px-2.5 py-1 rounded text-xs font-mono font-medium transition-all ${
+                className={`px-2.5 py-1 rounded text-xs font-mono font-semibold transition-all ${
                   activeRole === role
-                    ? "bg-amber-500 text-black font-bold shadow"
-                    : "text-gray-400 hover:text-white"
+                    ? "bg-amber-500 text-black font-bold shadow-md shadow-amber-500/20"
+                    : "text-gray-300 hover:text-white hover:bg-[#1f0b07]"
                 }`}
               >
                 {role === USER_ROLES.STUDENT ? "Sinh Viên (K24)" : role === USER_ROLES.EXPERT ? "Chuyên Gia" : "Quản Trị Viên"}
@@ -156,20 +156,20 @@ export default function StudentHubOSShell({ children }) {
         <div className="hidden md:flex flex-1 max-w-md mx-6">
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#140805] border border-[#2d120a] hover:border-amber-500/40 text-gray-400 hover:text-gray-200 transition-all text-xs group"
+            className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl bg-[#140805] border border-[#2d120a] hover:border-amber-500/40 text-gray-300 hover:text-white transition-all text-xs group"
           >
             <div className="flex items-center gap-2">
               <Search size={15} className="text-gray-400 group-hover:text-amber-400" />
               <span>Tìm học phần, giảng viên, bằng chứng, quy chế...</span>
             </div>
-            <kbd className="px-1.5 py-0.5 rounded bg-[#200e08] border border-[#3d1910] text-[10px] font-mono text-gray-400">Ctrl K</kbd>
+            <kbd className="px-1.5 py-0.5 rounded bg-[#200e08] border border-[#3d1910] text-[10px] font-mono text-gray-300">Ctrl K</kbd>
           </button>
         </div>
 
         {/* Right: Security Status, Notifications & Profile */}
         <div className="flex items-center gap-2.5 sm:gap-3.5">
           {/* Zero-Trust Badge */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-mono font-semibold">
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-[11px] font-mono font-bold">
             <ShieldCheck size={13} className="text-emerald-400" />
             <span>Zero-Trust Active</span>
           </div>
@@ -178,7 +178,7 @@ export default function StudentHubOSShell({ children }) {
           <div className="relative">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 rounded-xl bg-[#140805] border border-[#2d120a] hover:border-amber-500/40 text-gray-300 transition-all"
+              className="relative p-2 rounded-xl bg-[#140805] border border-[#2d120a] hover:border-amber-500/40 text-gray-200 hover:text-white transition-all"
             >
               <Bell size={16} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500 animate-ping" />
@@ -198,10 +198,10 @@ export default function StudentHubOSShell({ children }) {
                         <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-bold ${
                           n.type === "OFFICIAL" ? "bg-blue-500/20 text-blue-400" : "bg-amber-500/20 text-amber-400"
                         }`}>{n.type}</span>
-                        <span className="text-[10px] text-gray-500">{n.time}</span>
+                        <span className="text-[10px] text-gray-400">{n.time}</span>
                       </div>
                       <h5 className="text-xs font-semibold text-gray-100 mt-1">{n.title}</h5>
-                      <p className="text-[11px] text-gray-400 mt-0.5 line-clamp-2">{n.desc}</p>
+                      <p className="text-[11px] text-gray-300 mt-0.5 line-clamp-2">{n.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -218,8 +218,8 @@ export default function StudentHubOSShell({ children }) {
               24
             </div>
             <div className="hidden sm:block text-left">
-              <p className="text-xs font-semibold text-gray-200 leading-none">Trần Bảo Duy</p>
-              <p className="text-[10px] text-amber-400/80 font-mono leading-tight">MSSV: 24110001</p>
+              <p className="text-xs font-semibold text-gray-100 leading-none">Trần Bảo Duy</p>
+              <p className="text-[10px] text-amber-400 font-mono leading-tight">MSSV: 24110001</p>
             </div>
           </Link>
         </div>
@@ -229,8 +229,8 @@ export default function StudentHubOSShell({ children }) {
       <div className="flex-1 flex overflow-hidden">
         {/* Desktop Sidebar Navigation */}
         <aside className="hidden md:flex w-64 flex-col bg-[#0b0503] border-r border-[#2d120a] p-4 shrink-0">
-          <div className="space-y-1">
-            <p className="px-3 text-[10px] font-mono uppercase tracking-wider text-gray-500 font-bold mb-2">Điều Hướng Chính</p>
+          <div className="space-y-1.5">
+            <p className="px-3 text-[10px] font-mono uppercase tracking-wider text-amber-400/80 font-bold mb-2">Điều Hướng Chính</p>
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
@@ -240,16 +240,16 @@ export default function StudentHubOSShell({ children }) {
                   href={item.href}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all group ${
                     isActive
-                      ? "bg-amber-500/10 text-amber-400 border border-amber-500/30 font-semibold shadow-sm shadow-amber-500/5"
-                      : "text-gray-400 hover:text-gray-200 hover:bg-[#140805]"
+                      ? "bg-amber-500/15 text-amber-300 border border-amber-500/40 font-bold shadow-sm shadow-amber-500/10"
+                      : "text-gray-300 hover:text-white hover:bg-[#180a06]"
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon size={16} className={isActive ? "text-amber-400" : "text-gray-400 group-hover:text-gray-200"} />
+                    <Icon size={16} className={isActive ? "text-amber-400" : "text-gray-400 group-hover:text-amber-300"} />
                     <span>{item.label}</span>
                   </div>
                   {item.badge && (
-                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${item.badgeColor}`}>
+                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border font-semibold ${item.badgeColor}`}>
                       {item.badge}
                     </span>
                   )}
@@ -260,23 +260,23 @@ export default function StudentHubOSShell({ children }) {
 
           {/* Quick Context Card */}
           <div className="mt-auto p-3.5 rounded-2xl bg-[#140805] border border-[#2d120a] space-y-2">
-            <div className="flex items-center justify-between text-[11px] font-mono text-gray-400">
+            <div className="flex items-center justify-between text-[11px] font-mono text-gray-300">
               <span>Học kỳ Hiện Tại</span>
               <span className="text-amber-400 font-bold">HK2 2025–2026</span>
             </div>
             <div className="w-full bg-[#200e08] h-1.5 rounded-full overflow-hidden">
               <div className="bg-amber-500 h-full w-[65%]" />
             </div>
-            <div className="flex items-center justify-between text-[10px] text-gray-500 font-mono">
+            <div className="flex items-center justify-between text-[10px] text-gray-400 font-mono">
               <span>Tuần 9 / 15</span>
-              <span>65% Hoàn thành</span>
+              <span className="text-amber-400 font-semibold">65% Hoàn thành</span>
             </div>
           </div>
         </aside>
 
         {/* Mobile Slide-over Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col p-6 animate-in fade-in">
+          <div className="md:hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col p-6 animate-in fade-in">
             <div className="flex items-center justify-between pb-4 border-b border-[#2d120a]">
               <span className="font-extrabold text-amber-400 font-mono text-sm">MENU STUDENTHUB OS</span>
               <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 rounded-lg bg-[#1a0c08] text-gray-300">
@@ -292,8 +292,8 @@ export default function StudentHubOSShell({ children }) {
                     key={item.href}
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center justify-between p-3 rounded-xl text-sm ${
-                      isActive ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "text-gray-300 bg-[#120704]"
+                    className={`flex items-center justify-between p-3 rounded-xl text-sm font-semibold ${
+                      isActive ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "text-gray-200 bg-[#120704]"
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -308,7 +308,7 @@ export default function StudentHubOSShell({ children }) {
         )}
 
         {/* Dynamic Workspace Container */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 bg-[#070403]">
+        <main className="relative z-10 flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 bg-[#070403]">
           <div className="max-w-7xl mx-auto space-y-6">
             {children}
           </div>
@@ -317,7 +317,7 @@ export default function StudentHubOSShell({ children }) {
 
       {/* Global Search Modal Overlay */}
       {isSearchOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-start justify-center pt-20 px-4 animate-in fade-in">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-start justify-center pt-20 px-4 animate-in fade-in">
           <div className="w-full max-w-2xl rounded-2xl bg-[#120704] border border-[#3d1910] shadow-2xl p-4 space-y-4">
             <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-[#1a0b07] border border-[#2d120a]">
               <Search className="text-amber-400" size={18} />

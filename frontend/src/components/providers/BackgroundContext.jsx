@@ -110,17 +110,17 @@ export function BackgroundProvider({ children }) {
   // Auto assign wallpaper based on current route
   useEffect(() => {
     if (!isManualOverride) {
-      if (pathname === "/") {
-        // Landing page starts with portal
-        setActiveWallpaper(WALLPAPERS[0]);
-        setActiveEffect("aurora");
-      } else if (ROUTE_WALLPAPERS[pathname]) {
+      if (ROUTE_WALLPAPERS[pathname]) {
         const targetId = ROUTE_WALLPAPERS[pathname];
         const found = WALLPAPERS.find((w) => w.id === targetId);
         if (found) {
           setActiveWallpaper(found);
           setActiveEffect(found.effect);
         }
+      } else {
+        // Default subtle atmosphere for OS and general pages
+        setActiveWallpaper(WALLPAPERS[0]);
+        setActiveEffect("aurora");
       }
     }
   }, [pathname, isManualOverride]);

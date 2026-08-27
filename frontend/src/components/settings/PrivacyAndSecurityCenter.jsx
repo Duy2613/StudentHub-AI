@@ -114,35 +114,43 @@ export default function PrivacyAndSecurityCenter() {
       </section>
 
       {/* 2. Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-[#2d120a] pb-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-[#2d120a] pb-3">
         <button
           onClick={() => setActiveTab("devices")}
-          className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
-            activeTab === "devices" ? "bg-amber-500 text-black shadow-md shadow-amber-500/20" : "text-gray-400 hover:text-white bg-[#120704]"
+          className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
+            activeTab === "devices"
+              ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20"
+              : "text-gray-300 hover:text-white bg-[#180905] border border-[#2d120a] hover:border-amber-500/40"
           }`}
         >
           Thiết Bị Đăng Nhập ({devices.length})
         </button>
         <button
           onClick={() => setActiveTab("memory")}
-          className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
-            activeTab === "memory" ? "bg-amber-500 text-black shadow-md shadow-amber-500/20" : "text-gray-400 hover:text-white bg-[#120704]"
+          className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
+            activeTab === "memory"
+              ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20"
+              : "text-gray-300 hover:text-white bg-[#180905] border border-[#2d120a] hover:border-amber-500/40"
           }`}
         >
           Bộ Nhớ AI Đã Phê Duyệt ({aiMemories.length})
         </button>
         <button
           onClick={() => setActiveTab("sources")}
-          className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
-            activeTab === "sources" ? "bg-amber-500 text-black shadow-md shadow-amber-500/20" : "text-gray-400 hover:text-white bg-[#120704]"
+          className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
+            activeTab === "sources"
+              ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20"
+              : "text-gray-300 hover:text-white bg-[#180905] border border-[#2d120a] hover:border-amber-500/40"
           }`}
         >
           Kết Nối Nguồn Dữ Liệu
         </button>
         <button
           onClick={() => setActiveTab("gdpr")}
-          className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
-            activeTab === "gdpr" ? "bg-amber-500 text-black shadow-md shadow-amber-500/20" : "text-gray-400 hover:text-white bg-[#120704]"
+          className={`px-4 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
+            activeTab === "gdpr"
+              ? "bg-amber-500 text-black shadow-lg shadow-amber-500/20"
+              : "text-gray-300 hover:text-white bg-[#180905] border border-[#2d120a] hover:border-amber-500/40"
           }`}
         >
           Xuất Dữ Liệu GDPR
@@ -152,21 +160,21 @@ export default function PrivacyAndSecurityCenter() {
       {/* 3. Tab Contents */}
       {activeTab === "devices" && (
         <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-[#120704] border border-[#2d120a] text-xs text-gray-400 leading-relaxed">
+          <div className="p-4 rounded-2xl bg-[#140805] border border-[#3d1910] text-xs text-gray-300 leading-relaxed shadow-sm">
             🛡️ <strong className="text-white">Kiểm Soát Phiên Đăng Nhập:</strong> Bạn có thể thu hồi bất kỳ thiết bị nào từ xa. Khi thu hồi, toàn bộ session token trên thiết bị đó sẽ bị vô hiệu hóa tức thì tại Gateway bảo mật.
           </div>
 
           <div className="space-y-3">
             {devices.map((d) => (
-              <div key={d.id} className="p-4 rounded-2xl bg-[#120704] border border-[#2d120a] flex items-center justify-between gap-4">
+              <div key={d.id} className="p-4.5 rounded-2xl bg-[#120704] border border-[#3d1910] shadow-md flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5">
-                  <div className="p-2.5 rounded-xl bg-[#180905] border border-[#2d120a] text-amber-400">
-                    {d.platform === "DESKTOP_WEB" ? <Laptop size={20} /> : <Smartphone size={20} />}
+                  <div className="p-3 rounded-xl bg-[#1f0b07] border border-[#3d1910] text-amber-400 shadow-inner">
+                    {d.platform === "DESKTOP_WEB" ? <Laptop size={22} /> : <Smartphone size={22} />}
                   </div>
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-semibold text-white">{d.name}</h4>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2.5">
+                      <h4 className="text-sm font-bold text-white">{d.name}</h4>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 font-bold">
                         {d.status}
                       </span>
                     </div>
@@ -176,9 +184,9 @@ export default function PrivacyAndSecurityCenter() {
 
                 <button
                   onClick={() => handleRevokeDevice(d.id)}
-                  className="px-3.5 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-mono font-bold flex items-center gap-1.5 transition-all"
+                  className="px-4 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/40 text-xs font-mono font-bold flex items-center gap-2 transition-all shadow-sm"
                 >
-                  <Trash2 size={13} />
+                  <Trash2 size={14} />
                   <span>Thu Hồi</span>
                 </button>
               </div>
@@ -220,27 +228,27 @@ export default function PrivacyAndSecurityCenter() {
 
       {activeTab === "sources" && (
         <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-[#120704] border border-[#2d120a] text-xs text-gray-400 leading-relaxed">
+          <div className="p-4 rounded-2xl bg-[#140805] border border-[#3d1910] text-xs text-gray-300 leading-relaxed shadow-sm">
             📡 <strong className="text-white">Báo Cáo Nguồn Dữ Liệu Minh Bạch:</strong> StudentHub công khai trạng thái thực tế của mọi cổng kết nối. Các nền tảng chưa được cấp quyền truy cập chính thống (như Facebook/Instagram) được hiển thị đúng trạng thái <code>NOT_CONFIGURED</code>.
           </div>
 
           <div className="space-y-3">
             {sourceStatuses.map((s, idx) => (
-              <div key={idx} className="p-4 rounded-2xl bg-[#120704] border border-[#2d120a] flex items-center justify-between gap-4">
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-xs font-semibold text-white">{s.name}</h4>
+              <div key={idx} className="p-4.5 rounded-2xl bg-[#120704] border border-[#3d1910] shadow-md flex items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2.5">
+                    <h4 className="text-xs font-bold text-white">{s.name}</h4>
                     <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
-                      s.status === "ACTIVE" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" :
-                      s.status === "AUTHORIZED" ? "bg-blue-500/10 text-blue-400 border border-blue-500/30" :
-                      "bg-gray-500/10 text-gray-400 border border-gray-500/30"
+                      s.status === "ACTIVE" ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/40" :
+                      s.status === "AUTHORIZED" ? "bg-blue-500/15 text-blue-300 border border-blue-500/40" :
+                      "bg-gray-500/15 text-gray-400 border border-gray-500/40"
                     }`}>
                       {s.status}
                     </span>
                   </div>
                   <p className="text-[11px] text-gray-400 font-mono">
-                    Loại: {s.type} {s.lastSync && `• Lần đồng bộ cuối: ${s.lastSync}`}
-                    {s.note && <span className="text-amber-400/90 ml-1">({s.note})</span>}
+                    Loại: <span className="text-gray-300">{s.type}</span> {s.lastSync && `• Lần đồng bộ cuối: ${s.lastSync}`}
+                    {s.note && <span className="text-amber-400 font-semibold ml-1.5">({s.note})</span>}
                   </p>
                 </div>
               </div>
@@ -250,20 +258,20 @@ export default function PrivacyAndSecurityCenter() {
       )}
 
       {activeTab === "gdpr" && (
-        <div className="p-6 rounded-2xl bg-[#120704] border border-[#2d120a] space-y-4 text-xs">
-          <div className="flex items-center gap-2 text-sm font-bold text-white">
-            <Download className="text-amber-400" size={18} />
+        <div className="p-6 rounded-2xl bg-[#120704] border border-[#3d1910] shadow-lg space-y-4 text-xs">
+          <div className="flex items-center gap-2.5 text-sm font-bold text-white">
+            <Download className="text-amber-400" size={20} />
             <span>Xuất Toàn Bộ Dữ Liệu Cá Nhân (Data Vault GDPR Export)</span>
           </div>
-          <p className="text-gray-400 leading-relaxed">
+          <p className="text-gray-300 leading-relaxed">
             Bạn có toàn quyền tải về bản sao lưu toàn bộ hồ sơ số cá nhân, các thiết bị đã kết nối, lịch sử mục tiêu học vụ và bộ nhớ AI theo tiêu chuẩn quyền riêng tư cao nhất.
           </p>
           <button
             onClick={handleExportData}
-            className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/10 transition-all"
+            className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all cursor-pointer"
           >
-            <Download size={14} />
-            <span>Tải Về File JSON Dữ Liệu Cá Nhân</span>
+            <Download size={15} />
+            <span>Tải Tệp JSON Hồ Sơ Vault Cá Nhân</span>
           </button>
         </div>
       )}
