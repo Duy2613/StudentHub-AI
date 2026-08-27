@@ -75,7 +75,7 @@ export default function StudentHubOSShell({ children }) {
   const navItems = [
     {
       label: "Command Center",
-      href: "/",
+      href: "/dashboard",
       icon: Zap,
       badge: "LIVE",
       badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30"
@@ -100,6 +100,13 @@ export default function StudentHubOSShell({ children }) {
       icon: Sparkles,
       badge: "Grounded",
       badgeColor: "bg-purple-500/20 text-purple-400 border-purple-500/30"
+    },
+    {
+      label: "Quét Lừa Đảo AI",
+      href: "/scam-check",
+      icon: ShieldCheck,
+      badge: "4 Lớp",
+      badgeColor: "bg-red-500/20 text-red-400 border-red-500/30"
     },
     {
       label: "Cài đặt & Quyền riêng tư",
