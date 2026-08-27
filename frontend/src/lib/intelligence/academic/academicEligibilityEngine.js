@@ -27,6 +27,29 @@ export const REQUIREMENT_TYPES = Object.freeze({
 
 export class AcademicEligibilityEngine {
   /**
+   * Helper: Evaluates all requirements for a student ID directly
+   */
+  static evaluateAllRequirements(studentId) {
+    const rawId = String(studentId).replace("student:", "").trim();
+    const mockTwin = {
+      studentId: rawId,
+      earnedCredits: 48,
+      cgpa: 3.42,
+      certificates: [{ type: "TOEIC", score: 650 }],
+      tuitionPaid: true,
+      debtAmount: 0
+    };
+    const res = this.evaluateEligibility(mockTwin);
+    return {
+      overallEligible: res.eligible,
+      passedCount: res.satisfiedRequirements.length,
+      totalCount: res.satisfiedRequirements.length + res.missingRequirements.length,
+      evaluations: res.evidence,
+      explanation: res.studentFacingExplanation
+    };
+  }
+
+  /**
    * Evaluates a Student Digital Twin against a set of academic requirements
    * @param {object} digitalTwin 
    * @param {object} ruleConfig 

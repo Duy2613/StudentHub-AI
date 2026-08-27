@@ -1,28 +1,51 @@
-import { NextResponse } from "next/server";
-import { StudentIdentityStore } from "@/lib/intelligence/academic/studentIdentityStore.js";
-import { StudentIdentityService } from "@/lib/intelligence/academic/studentIdentityService.js";
+import { StudentIdentityStore } from "../../../../lib/intelligence/academic/studentIdentityStore.js";
+import { SecurityFabric } from "../../../../lib/security/SecurityFabric.js";
+import { ObjectAuthorizer } from "../../../../lib/security/authorization/ObjectAuthorizer.js";
 
-export async function GET(request) {
-  try {
+export const GET = SecurityFabric.wrapHandler(
+  {
+    action: "READ_IDENTITY",
+    requiredPermission: "ACADEMIC.READ_OWN",
+    requiredScopes: ["academic:read"],
+    allowAnonymous: false // P0 FIX: Anonymous access to private student identity is strictly denied
+  },
+  async (request, routeParams, principal, secContext) => {
     const { searchParams } = new URL(request.url);
-    const studentId = searchParams.get("studentId") || "24110001";
+    const requestedStudentId = searchParams.get("studentId");
 
-    const identity = StudentIdentityStore.getIdentityByStudentId(studentId);
+    // Derive authoritative identity exclusively from authenticated principal
+    const authedStudentId = principal.subjectId.replace("student:", "").trim();
+
+    // Zero-Trust BOLA Defense: Prohibit accessing other students' identities
+    if (requestedStudentId && requestedStudentId !== authedStudentId) {
+      ObjectAuthorizer.assertAccess(principal, {
+        studentId: requestedStudentId,
+        ownerId: requestedStudentId
+      });
+    }
+
+    const targetStudentId = authedStudentId;
+    const identity = StudentIdentityStore.getIdentityByStudentId(targetStudentId);
+
     if (!identity) {
-      return NextResponse.json(
-        { success: false, error: `Student identity not found for MSSV: ${studentId}` },
+      return Response.json(
+        {
+          error: {
+            code: "NOT_FOUND",
+            message: `Student identity not found for MSSV: ${targetStudentId}`,
+            correlationId: secContext.correlationId
+          }
+        },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({
+    return Response.json({
       success: true,
-      data: identity
+      data: identity,
+      meta: {
+        correlationId: secContext.correlationId
+      }
     });
-  } catch (err) {
-    return NextResponse.json(
-      { success: false, error: err.message || "Internal server error." },
-      { status: 500 }
-    );
   }
-}
+);

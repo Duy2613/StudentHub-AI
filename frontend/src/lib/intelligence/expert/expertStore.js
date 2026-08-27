@@ -69,11 +69,7 @@ export class ExpertStore {
       orcid: "0000-0002-1825-0097",
       verifiedEmail: "minhnv@hcmute.edu.vn",
       directoryUrl: "https://fit.hcmute.edu.vn/faculty/minhnv",
-      privateContact: {
-        personalPhone: "+84903123456",
-        personalEmail: "minh.private@gmail.com",
-        citizenId: "079088001234"
-      },
+      privateContact: null,
       scopes: [
         { domain: "AI_ML", subdomain: "Deep Learning & NLP", level: EXPERTISE_LEVEL.ESTABLISHED, jurisdiction: JURISDICTION_TYPE.TECHNICAL_DOMAIN, citationCount: 450, recencyYear: 2024 },
         { domain: "COMPUTER_VISION", subdomain: "Edge Vision", level: EXPERTISE_LEVEL.ESTABLISHED, jurisdiction: JURISDICTION_TYPE.TECHNICAL_DOMAIN, citationCount: 220, recencyYear: 2023 },

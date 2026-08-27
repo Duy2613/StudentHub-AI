@@ -1,0 +1,145 @@
+/**
+ * StudentHub AI — Zero-Trust Security Fabric
+ * RBACPolicy V1
+ * 
+ * Role-Based Access Control definitions and permission mappings.
+ * All roles originate from server-side validated identity.
+ */
+
+export const ROLES = Object.freeze({
+  STUDENT: "STUDENT",
+  EXPERT: "EXPERT",
+  MODERATOR: "MODERATOR",
+  STAFF: "STAFF",
+  ADMIN: "ADMIN",
+  SYSTEM: "SYSTEM",
+  AI_AGENT: "AI_AGENT"
+});
+
+export const PERMISSIONS = Object.freeze({
+  // Academic Domain
+  ACADEMIC_READ_OWN: "ACADEMIC.READ_OWN",
+  ACADEMIC_READ_ANY: "ACADEMIC.READ_ANY",
+  ACADEMIC_PLAN_OWN: "ACADEMIC.PLAN_OWN",
+  ACADEMIC_EXPORT_OWN: "ACADEMIC.EXPORT_OWN",
+  ACADEMIC_MODIFY_OFFICIAL: "ACADEMIC.MODIFY_OFFICIAL", // Strictly prohibited for students & AI
+  ACADEMIC_DISCREPANCY_REPORT: "ACADEMIC.DISCREPANCY_REPORT",
+
+  // Trust & Evidence Domain
+  TRUST_READ: "TRUST.READ",
+  TRUST_ANALYZE: "TRUST.ANALYZE",
+  TRUST_EVALUATE: "TRUST.EVALUATE",
+  TRUST_ADMIN_OVERRIDE: "TRUST.ADMIN_OVERRIDE",
+
+  // Expert Domain
+  EXPERT_READ: "EXPERT.READ",
+  EXPERT_PUBLISH: "EXPERT.PUBLISH",
+  EXPERT_EVALUATE: "EXPERT.EVALUATE",
+  EXPERT_MANAGE_GRAPH: "EXPERT.MANAGE_GRAPH",
+
+  // Community Domain
+  COMMUNITY_READ: "COMMUNITY.READ",
+  COMMUNITY_POST: "COMMUNITY.POST",
+  COMMUNITY_MODERATE: "COMMUNITY.MODERATE",
+
+  // Security & Admin
+  ADMIN_SECURITY: "ADMIN.SECURITY",
+  ADMIN_AUDIT_READ: "ADMIN.AUDIT_READ",
+  ADMIN_SESSION_REVOKE: "ADMIN.SESSION_REVOKE",
+  SUPER_ADMIN: "*"
+});
+
+const ROLE_PERMISSIONS_MAP = {
+  [ROLES.STUDENT]: [
+    PERMISSIONS.ACADEMIC_READ_OWN,
+    PERMISSIONS.ACADEMIC_PLAN_OWN,
+    PERMISSIONS.ACADEMIC_EXPORT_OWN,
+    PERMISSIONS.ACADEMIC_DISCREPANCY_REPORT,
+    PERMISSIONS.TRUST_READ,
+    PERMISSIONS.TRUST_ANALYZE,
+    PERMISSIONS.EXPERT_READ,
+    PERMISSIONS.COMMUNITY_READ,
+    PERMISSIONS.COMMUNITY_POST
+  ],
+  [ROLES.EXPERT]: [
+    PERMISSIONS.ACADEMIC_READ_OWN,
+    PERMISSIONS.TRUST_READ,
+    PERMISSIONS.TRUST_ANALYZE,
+    PERMISSIONS.EXPERT_READ,
+    PERMISSIONS.EXPERT_PUBLISH,
+    PERMISSIONS.EXPERT_EVALUATE,
+    PERMISSIONS.COMMUNITY_READ,
+    PERMISSIONS.COMMUNITY_POST
+  ],
+  [ROLES.MODERATOR]: [
+    PERMISSIONS.COMMUNITY_READ,
+    PERMISSIONS.COMMUNITY_POST,
+    PERMISSIONS.COMMUNITY_MODERATE,
+    PERMISSIONS.TRUST_READ
+  ],
+  [ROLES.STAFF]: [
+    PERMISSIONS.ACADEMIC_READ_ANY,
+    PERMISSIONS.ACADEMIC_DISCREPANCY_REPORT,
+    PERMISSIONS.TRUST_READ,
+    PERMISSIONS.COMMUNITY_READ
+  ],
+  [ROLES.ADMIN]: [
+    PERMISSIONS.ACADEMIC_READ_ANY,
+    PERMISSIONS.ACADEMIC_MODIFY_OFFICIAL,
+    PERMISSIONS.TRUST_READ,
+    PERMISSIONS.TRUST_ADMIN_OVERRIDE,
+    PERMISSIONS.EXPERT_MANAGE_GRAPH,
+    PERMISSIONS.COMMUNITY_MODERATE,
+    PERMISSIONS.ADMIN_SECURITY,
+    PERMISSIONS.ADMIN_AUDIT_READ,
+    PERMISSIONS.ADMIN_SESSION_REVOKE,
+    PERMISSIONS.SUPER_ADMIN
+  ],
+  [ROLES.AI_AGENT]: [
+    PERMISSIONS.ACADEMIC_READ_OWN,
+    PERMISSIONS.ACADEMIC_PLAN_OWN,
+    PERMISSIONS.TRUST_READ,
+    PERMISSIONS.TRUST_EVALUATE,
+    PERMISSIONS.EXPERT_READ,
+    PERMISSIONS.COMMUNITY_READ
+  ],
+  [ROLES.SYSTEM]: [
+    PERMISSIONS.SUPER_ADMIN
+  ]
+};
+
+export class RBACPolicy {
+  /**
+   * Evaluates if given roles grant the requested permission
+   * @param {string[]} principalRoles 
+   * @param {string} requiredPermission 
+   * @returns {boolean}
+   */
+  static hasPermission(principalRoles = [], requiredPermission = "") {
+    if (!requiredPermission) return true;
+    const cleanPerm = String(requiredPermission).trim().toUpperCase();
+
+    for (const rawRole of principalRoles) {
+      const role = String(rawRole).trim().toUpperCase();
+      const granted = ROLE_PERMISSIONS_MAP[role] || [];
+      if (granted.includes(cleanPerm) || granted.includes(PERMISSIONS.SUPER_ADMIN)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns all granted permissions for a set of roles
+   * @param {string[]} roles 
+   * @returns {string[]}
+   */
+  static getPermissionsForRoles(roles = []) {
+    const permSet = new Set();
+    for (const r of roles) {
+      const perms = ROLE_PERMISSIONS_MAP[String(r).toUpperCase()] || [];
+      for (const p of perms) permSet.add(p);
+    }
+    return [...permSet];
+  }
+}
