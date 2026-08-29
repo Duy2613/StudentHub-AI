@@ -9,6 +9,7 @@
 import { EvidenceFusionEngine } from "./fusion/EvidenceFusionEngine.js";
 import { DeterministicTrustPolicyProvider } from "./providers/DeterministicTrustPolicyProvider.js";
 import { GeminiTrustReasoningProvider } from "./providers/GeminiTrustReasoningProvider.js";
+import { AIGatewayReasoningProvider } from "./providers/AIGatewayReasoningProvider.js";
 import { GlobalIntelligenceEngine } from "../engine/GlobalIntelligenceEngine.js";
 import { createLayer4Result } from "./types.js";
 import { LAYER_4_CONFIG } from "./config/Layer4Config.js";
@@ -30,7 +31,15 @@ export class Layer4TrustService {
     options = {},
   }) {
     const startTime = performance.now();
-    const provider = options.provider || new DeterministicTrustPolicyProvider();
+    // Default remains the deterministic policy engine — the authoritative
+    // decision science baseline (see DeterministicTrustPolicyProvider).
+    // AI enrichment is strictly opt-in via options.useAIGateway, and even
+    // then AIGatewayReasoningProvider never lets AI change the verdict —
+    // it only offers a friendlier Vietnamese narrative on top of the
+    // deterministic result (see AIGatewayReasoningProvider docstring).
+    const provider =
+      options.provider ||
+      (options.useAIGateway ? new AIGatewayReasoningProvider() : new DeterministicTrustPolicyProvider());
 
     // 1. Evidence Fusion: Merge signals, semantics, and external evidence
     const {

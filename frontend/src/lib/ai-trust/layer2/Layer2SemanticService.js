@@ -9,6 +9,7 @@ import { createLayer2Result } from "./types.js";
 import { LAYER_2_CONFIG } from "./config/Layer2Config.js";
 import { DeterministicSemanticProvider } from "./providers/DeterministicSemanticProvider.js";
 import { GeminiSemanticModelProvider } from "./providers/GeminiSemanticModelProvider.js";
+import { AIGatewayModelProvider } from "./providers/AIGatewayModelProvider.js";
 import { Layer2ConfidenceEngine } from "./engine/Layer2ConfidenceEngine.js";
 import { VerificationPlanner } from "./engine/VerificationPlanner.js";
 import { Layer2DecisionEngine } from "./engine/Layer2DecisionEngine.js";
@@ -41,9 +42,19 @@ export class Layer2SemanticService {
     const qrPayload = metadata.qrContent || metadata.qrPayload || "";
 
     // 2. Provider Selection
+    // Default remains the zero-LLM deterministic engine (test/CI reproducibility,
+    // <15ms latency, offline resilience). AI enrichment is strictly opt-in:
+    //   - options.useAIGateway: routes through the multi-vendor AI Gateway
+    //     (docs/AI-MODEL-ROUTER.md), which capability-routes across every
+    //     configured provider with automatic fallback — never a single
+    //     hard-coded vendor.
+    //   - options.useGemini: legacy single-vendor Gemini path, kept only for
+    //     historical/backward compatibility with existing integrations.
     let provider = options.provider;
     if (!provider) {
-      if (options.useGemini && process.env.GEMINI_API_KEY) {
+      if (options.useAIGateway) {
+        provider = new AIGatewayModelProvider();
+      } else if (options.useGemini && process.env.GEMINI_API_KEY) {
         provider = new GeminiSemanticModelProvider();
       } else {
         provider = new DeterministicSemanticProvider();
