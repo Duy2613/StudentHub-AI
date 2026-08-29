@@ -15,6 +15,7 @@ export * from "./analyzers/ManipulationAnalyzer.js";
 export * from "./providers/ISemanticVerificationProvider.js";
 export * from "./providers/DeterministicSemanticProvider.js";
 export * from "./providers/GeminiSemanticModelProvider.js";
+export * from "./providers/AIGatewayModelProvider.js";
 export * from "./engine/Layer2ConfidenceEngine.js";
 export * from "./engine/VerificationPlanner.js";
 export * from "./engine/Layer2DecisionEngine.js";
