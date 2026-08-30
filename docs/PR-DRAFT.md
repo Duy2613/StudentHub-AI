@@ -1,13 +1,13 @@
 # Pull Request Draft — StudentHubAI National Competition RC
 
-Status: reviewable draft only; no commit, push, or merge has been performed.
+Status: reviewable draft; final head pushed to `develop`; merge to `main` has not been performed.
 Base: `main`
-Head: current local `develop` worktree (`5aeaf71870d63f3c8e06a7d8b95148ce109d3e72`)
+Head: `develop` (`ad04de7980e26d6e3b1a68096ad97b0aea3be01b`)
 Suggested title: **StudentHubAI National Competition Release Candidate**
 
-Read-only remote check: `origin/develop` points to the same HEAD; `origin/main` is `251e7cb4a908c5a185be89a39301b294f9595dbf`; `origin/genspark_ai_developer` is `477857d83b666f862178472d2d86c859d00a6f2a`. No branch update or PR was created because a commit/ref and external GitHub write still require explicit authorization.
+Remote check: `origin/develop` points to the same final head; `origin/main` remains `251e7cb4a908c5a185be89a39301b294f9595dbf`. PR #2 is open/draft against `main`; no merge was performed.
 
-Closure baseline record: 0 staged, 288 unstaged modified files, and 199 untracked files. The worktree contains legitimate prior/session RC changes; the exact payload must be reviewed before staging.
+Closure record: final worktree is clean. Surgical release fixes are recorded in `e4c75e1`, `d2bb044`, `fbda772`, and `ad04de7`.
 
 ## Proposed commit contents
 
@@ -33,16 +33,18 @@ StudentHubAI is a frozen national-competition release candidate built around fiv
 
 Evidence Passport and Student Decision Twin preserve revisions, ownership, assumptions, and review state. Evidence Triangle keeps Official, Community, and Expert sources distinct. The Margin provides the shared production shell. The AI Gateway routes bounded, schema-validated capabilities with explicit degraded states.
 
-Local evidence: 250/250 discovered tests, final audit 6/6, security suites pass, 115/115 production routes, typecheck/build/bundle/dependency gates pass, Chromium/WebKit/mobile local coverage pass, explicit Demo Mode Trust rehearsal 3/3, and visual target 3/3. Lint exits with 0 errors and 359 legacy warnings.
+Local evidence: 252/252 discovered tests, final audit 6/6, security suites pass, 115/115 production routes, typecheck/build/bundle/dependency gates pass, Chromium/WebKit/mobile local coverage pass, explicit Demo Mode Trust rehearsal 3/3, and visual target 3/3. Lint exits with 0 errors and 359 legacy warnings. The new ExpertStore read-only-runtime regression test passes.
 
-External limitations are intentionally visible: live PostgreSQL/RLS/restart proof, staging deployment/rollback, fresh provider secrets/terms/cost/health, and Firefox on the current Windows host. See `FINAL-AUDIT-REPORT.md` section 35 for the release gate matrix.
+Remote evidence: GitHub Actions push [33302735122](https://github.com/Duy2613/StudentHub-AI/actions/runs/33302735122) and PR [33302736663](https://github.com/Duy2613/StudentHub-AI/actions/runs/33302736663) are green, including Chromium + Firefox Linux. Vercel previews are Ready; the public competition target is [student-hub-ai-weje-git-develop-vi-be-city.vercel.app](https://student-hub-ai-weje-git-develop-vi-be-city.vercel.app).
+
+External limitations are intentionally visible: live PostgreSQL/RLS/restart proof, operator-owned staging case JSON, fresh provider secrets/terms/cost/health, deployment rollback control, and Firefox on the current Windows host. See `FINAL-AUDIT-REPORT.md` section 35 for the release gate matrix.
 
 ## Review checklist
 
-- [ ] User reviews the proposed commit contents and authorizes commit.
-- [ ] User confirms the desired head branch/ref for the PR; current local reality is `develop`.
+- [x] User authorized the surgical RC closure commits and non-force push.
+- [x] Final head branch/ref is `develop`; PR #2 base remains `main`.
 - [ ] Disposable database/RLS proof attached, or `BLOCKED_BY_ENV` retained.
 - [ ] Staging/provider/rollback evidence attached, or the documented blocker retained.
-- [ ] Firefox CI/runtime evidence attached, or `BLOCKED_BY_ENV_FIREFOX` retained.
-- [ ] Commit created only after explicit authorization.
-- [ ] PR opened from the authorized ref; merge remains a separate user decision.
+- [x] Firefox Linux CI evidence attached; Windows host parity remains `BLOCKED_BY_ENV_FIREFOX`.
+- [x] Commits were created only after explicit authorization.
+- [x] PR #2 is open from the authorized ref; merge remains a separate user decision.

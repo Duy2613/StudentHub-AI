@@ -7,9 +7,9 @@ This document is intentionally explicit about what was not provable in the curre
 | Limitation | What is blocked | Required input | Reproduction/proof | Risk |
 | --- | --- | --- | --- | --- |
 | Live PostgreSQL/Supabase proof | Migration, RLS, restart, and durable concurrency certification | Disposable `STUDENTHUB_RLS_TEST_DATABASE_URL` with approved schema | `npm run test:phase3-live` currently reports `BLOCKED_BY_DATABASE_ENV` | Production data isolation is not locally certified against a real database |
-| Staging E2E | Deployed-origin smoke, auth cookies, rollback rehearsal | `STUDENTHUB_STAGING_BASE_URL` and external `STUDENTHUB_STAGING_CASES_PATH` | `cd frontend; npm run test:e2e:staging` reports missing environment | Deployment and network policy remain unverified |
+| Staging E2E | Operator-owned case matrix, auth cookies, rollback rehearsal | `STUDENTHUB_STAGING_BASE_URL` plus external `STUDENTHUB_STAGING_CASES_PATH` (and optional storage state) | The approved Vercel preview is smoke-verified; `npm run test:e2e:staging` still reports missing `STUDENTHUB_STAGING_CASES_PATH` | Deployment and network policy remain only partially verified |
 | Live AI/search/OCR/provider evidence | Provider latency, quotas, terms, grounding, and cost measurement | Fresh approved secrets, provider allowlists, and terms review; never historical archives | Run the provider-specific live/staging suites after secrets are provisioned | Offline fallbacks prove contracts, not third-party service quality |
-| Firefox on this Windows host | Firefox browser assertions and snapshots | Repair/reinstall the Playwright Firefox runtime or run the same suite in CI | `npx playwright test --project=firefox --grep "canonical product navigation"` fails at launch with `spawn UNKNOWN` | Cross-browser status is Chromium/WebKit pass, Firefox environment-blocked |
+| Firefox on this Windows host | Local Firefox assertions and snapshots | Repair/reinstall the Playwright Firefox runtime; Linux CI is already green | `npx playwright test --project=firefox --grep "canonical product navigation"` fails at launch with `spawn UNKNOWN` | Linux Firefox CI passes; Windows parity remains environment-blocked |
 
 ## Product and operational residuals
 

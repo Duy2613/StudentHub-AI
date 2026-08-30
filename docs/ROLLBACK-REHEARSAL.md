@@ -1,13 +1,13 @@
 # StudentHubAI Rollback Rehearsal Record
 
-Status: **BLOCKED_BY_ENV** — no staging deployment, disposable database, or deployment control plane is available in this workspace. This is a documented procedure, not a claimed rehearsal.
+Status: **BLOCKED_BY_ENV** — the final Vercel previews are deployed and smoke-verified, but no disposable staging database, operator case matrix, backup/snapshot, or safe deployment control plane is available in this workspace. This is a documented procedure, not a claimed rollback rehearsal.
 
 ## A. Application rollback
 
 | Step | Command/action | Expected result | Actual result |
 | --- | --- | --- | --- |
-| 1 | Capture current deployment ID and previous known-good ID | Both immutable IDs recorded | BLOCKED: no staging deployment target |
-| 2 | Deploy the RC artifact in production-build mode to staging | Staging health endpoint and core routes return 200 | BLOCKED: `STUDENTHUB_STAGING_BASE_URL` unset |
+| 1 | Capture current deployment ID and previous known-good ID | Both immutable IDs recorded | Vercel preview IDs are visible in PR checks; BLOCKED for a controlled staging rollback target |
+| 2 | Deploy the RC artifact in production-build mode to staging | Staging health endpoint and core routes return 200 | Public Vercel preview smoke PASS; official staging run BLOCKED: `STUDENTHUB_STAGING_CASES_PATH` unset |
 | 3 | Run the staging smoke suite | landing, login, Trust, Community, Expert, Academic, Dashboard, Passport, Decision Twin, and three cases pass | Not run |
 | 4 | Roll back to the previous deployment ID | Previous route assets and health checks recover | Not run |
 | 5 | Verify cookies, API paths, logs, and 404/500 rates | No stale asset/session or route regression | Not run |

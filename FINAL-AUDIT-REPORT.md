@@ -1,25 +1,24 @@
 # StudentHubAI Final Audit & Hardening Report
 
-Audit date: 2026-08-30 (Asia/Bangkok)
+Audit date: 2026-08-30 16:04 (Asia/Bangkok)
 Scope: current local `develop` worktree after Feature Freeze
 Authority: `STUDENTHUBAI_LUNA_MAX_ULTIMATE_FULL_BUILD_MASTER_PROMPT.md` and the approved repository/design sources
-Release posture: no feature additions, no merge to `main`, no commit or push
+Release posture: feature-frozen; surgical RC fixes pushed to `develop`; no merge to `main`
 
 ## 1. Executive summary
 
 The final audit resumed from the protected checkpoint and completed the local P0/P1 hardening and release verification pass. The candidate has a coherent Trust → Community → Expert → Academic → Passport/Decision Twin → Command Center story, deterministic offline-safe demo paths, server-derived authority boundaries, bounded outbound integrations, and passing local build/security/browser checks.
 
-All confirmed non-external P0/P1 findings found in this pass were fixed or covered by a typed fail-closed path. Production certification is still not claimed because live database/RLS, staging, fresh third-party providers, rollback rehearsal, and Firefox runtime proof are unavailable in this environment.
+All confirmed non-external P0/P1 findings found in this pass were fixed or covered by a typed fail-closed path. Production certification is still not claimed because live database/RLS, operator staging cases, fresh third-party providers, rollback control, and Windows Firefox parity are unavailable in this environment. The public Vercel preview and Linux browser CI are independently verified for the final head.
 
-**Verdict: `STUDENTHUBAI RC READY WITH EXTERNAL LIMITATIONS`.**
+**Verdict: `PR2_READY_FOR_FINAL_REVIEW_WITH_EXTERNAL_LIMITATIONS`.**
 
 ## 2. Baseline protected
 
 - Repository: `Duy2613/StudentHub-AI`.
-- Actual checkout: local `develop`, `HEAD 5aeaf71870d63f3c8e06a7d8b95148ce109d3e72`.
-- Requested ref `origin/genspark_ai_developer` remains a read-only comparison point at `477857d`; the local line is ahead by 3 and behind by 80 commits according to the recorded comparison.
-- The worktree was already dirty and remains preserved; no reset, checkout, merge, rebase, commit, or push was performed.
-- Closure baseline record: **0 staged**, **288 unstaged modified files**, and **199 untracked files**; `git diff --shortstat` reports `288 files changed, 9157 insertions(+), 17210 deletions(-)`. This is an aggregate of the authoritative RC work plus prior user/session changes, not a claim that every line was authored in this audit.
+- Actual checkout: local `develop`, `HEAD ad04de7980e26d6e3b1a68096ad97b0aea3be01b` (equal to `origin/develop`).
+- PR #2 remains based on `main`; `origin/main` is unchanged at `251e7cb4a908c5a185be89a39301b294f9595dbf`.
+- The final worktree is clean. RC closure fixes were kept surgical: `e4c75e1` (frontend-only CI install), `d2bb044`/`fbda772` (portable bundle budget resolver), and `ad04de7` (read-only ExpertStore fallback + focused regression test).
 - A recoverable operator-local snapshot exists outside the repository with baseline status and a secret-scan-clean redacted tracked patch; it is not part of the release payload.
 - The authoritative Obsidian vault, master prompt, current repository, design handoff, and historical Trust PDF were kept in their stated precedence order. Historical archives and credential files were not imported.
 
@@ -135,9 +134,10 @@ Chromium responsive tests pass across 360×800, 390×844, 768×1024, 1280×800, 
 | Chromium | 51 passed, 3 skipped / 54 | Functional, accessibility, responsive, Trust, Ultra, and visual targets pass |
 | WebKit | 48 passed, 3 skipped / 51 non-visual | Functional, accessibility, responsive, Trust, and Ultra pass |
 | Mobile Chromium | 13/13 passed | Navigation, breakpoints, reduced motion |
-| Firefox | 6 launch failures | Environment-only `spawn UNKNOWN`/Windows side-by-side failure before page assertions |
+| Firefox Linux (GitHub Actions) | PASS | Competition workflow completed Firefox browser gate successfully on the final head |
+| Firefox Windows (local host) | BLOCKED | Environment-only `spawn UNKNOWN`/side-by-side failure before page assertions |
 
-Firefox is **BLOCKED_BY_ENV**, not a product assertion failure.
+Firefox Linux is **PASS**; only local Windows parity remains **BLOCKED_BY_ENV**.
 
 ## 26. Performance
 
@@ -159,7 +159,7 @@ The user journey is coherent from evidence intake to action: `/cases` establishe
 
 Observed local totals:
 
-- Discovered regression suite: **250/250 test files passed**.
+- Discovered regression suite: **252/252 test files passed**.
 - Final audit hardening: **6/6**.
 - Security: P0 regression **7/7**, attack simulation **10/10**, token/session **9/9**, AI firewall **3/3**, Security Fabric integration **8/8**.
 - Auth phase 2: **9/9**; migration/RLS contract: **5/5**.
@@ -174,7 +174,10 @@ Observed local totals:
 - `npm run lint`: PASS, exit 0; **359 warnings, 0 errors**.
 - `npm run audit:bundle`: PASS.
 - `npm run audit:api-auth`: PASS; 135 handlers inventoried, 0 unprotected mutations requiring P0 review.
-- `git diff --check`: PASS (only normal line-ending conversion warnings in the dirty Windows worktree).
+- `git diff --check`: PASS; final worktree is clean after the surgical RC commits.
+- GitHub Actions final head: push run [33302735122](https://github.com/Duy2613/StudentHub-AI/actions/runs/33302735122) and PR run [33302736663](https://github.com/Duy2613/StudentHub-AI/actions/runs/33302736663) completed `success`; all quality steps, Chromium, Firefox Linux, and artifact upload passed.
+- Vercel status checks for `ad04de7` are `success` for both linked projects. The public preview target is [student-hub-ai-weje-git-develop-vi-be-city.vercel.app](https://student-hub-ai-weje-git-develop-vi-be-city.vercel.app); the duplicate [student-hub-ai-git-develop-vi-be-city.vercel.app](https://student-hub-ai-git-develop-vi-be-city.vercel.app) is Ready but SSO-protected.
+- Final-head public preview smoke: core pages and all three Case Lab tabs returned `200`, non-empty UI, and no page errors; demo APIs returned deterministic `DEMO_FIXTURE` payloads; `/api/intelligence/health` and `/api/v1/search` returned 200 after the read-only filesystem fix; private canonical APIs returned `401 UNAUTHORIZED`.
 
 ## 32. Competition superflows
 
@@ -187,10 +190,10 @@ Demo Mode is explicit and scoped to competition fixtures. Fixture labels (`DEMO_
 ## 34. External blockers
 
 1. **Database:** `STUDENTHUB_RLS_TEST_DATABASE_URL` is absent. `npm run test:phase3-live` reports `BLOCKED_BY_DATABASE_ENV`.
-2. **Staging:** `STUDENTHUB_STAGING_BASE_URL` and `STUDENTHUB_STAGING_CASES_PATH` are absent. `cd frontend; npm run test:e2e:staging` reports `STAGING_E2E_BLOCKED_BY_ENV`.
+2. **Staging:** the approved Vercel preview origin is smoke-verified, but the official staging runner still reports `STAGING_E2E_BLOCKED_BY_ENV` because operator-owned `STUDENTHUB_STAGING_CASES_PATH` (and any required storage state) is absent.
 3. **Providers:** fresh approved AI/search/OCR/institutional secrets, terms, quotas, and production network policy are absent; live health, grounding, and cost remain unverified.
-4. **Deployment/rollback:** no target deployment, backup, rollback, or observability rehearsal was authorized or available; the procedure is documented in `docs/ROLLBACK-REHEARSAL.md`.
-5. **Firefox:** the installed Playwright Firefox binary cannot launch on this Windows host (`spawn UNKNOWN`/side-by-side configuration).
+4. **Deployment/rollback:** both Vercel preview deployments are Ready, but no disposable staging control plane, backup/snapshot, or safe rollback operation is available; the procedure is documented in `docs/ROLLBACK-REHEARSAL.md`.
+5. **Firefox Windows parity:** the installed local Playwright Firefox binary cannot launch (`spawn UNKNOWN`/side-by-side configuration); the required Linux CI gate is green.
 
 ## 35. Release gate matrix
 
@@ -209,13 +212,14 @@ Demo Mode is explicit and scoped to competition fixtures. Fixture labels (`DEMO_
 | Accessibility | PASS | Axe/keyboard suites |
 | Responsive/mobile | PASS | Chromium/WebKit/mobile breakpoints |
 | Chromium/WebKit browser coverage | PASS | See section 25 |
-| Firefox browser coverage | BLOCKED | Host runtime dependency |
+| Firefox Linux browser coverage | PASS | GitHub Actions final head |
+| Firefox Windows parity | BLOCKED | Host runtime dependency |
 | Visual regression | PASS | Chromium current baselines 3/3 |
 | Build/typecheck/bundle | PASS | 115 routes and budgets |
 | Dependency audit | PASS | 0 high-or-greater findings |
 | Secret scan and clean delivery | PASS | No high-confidence secrets; accidental `.codex-temp`/`.github/skills` moved to recovery |
 | Lint quality | PASS WITH WARNINGS | 0 errors, 359 legacy warnings |
-| Staging/deployment/rollback | BLOCKED | External target and secrets absent |
+| Staging case suite/deployment rollback | BLOCKED | Operator case file, DB/provider environment, and rollback control plane absent; Vercel preview smoke is PASS |
 
 ## 36. Remaining risks
 
@@ -223,25 +227,25 @@ Demo Mode is explicit and scoped to competition fixtures. Fixture labels (`DEMO_
 - Third-party provider quality, terms, quota exhaustion, and cost are not represented by the synthetic Observatory.
 - `unsafe-inline` CSP and 359 lint warnings are quality/security-debt items for the next hardening window.
 - In-memory adapters are not durable production stores; deployment must use the approved repository/database configuration.
-- Firefox remains unverified on this host; CI or a repaired runtime should provide the missing cross-browser evidence.
+- Firefox Linux is verified in CI; only local Windows parity remains unverified until the host runtime is repaired.
 - Registered external feeds can become stale or change terms; source freshness and authority must remain visible at runtime.
 
 ## 37. Changed files
 
-Audit changes are spread across the existing dirty worktree. The principal hardening and evidence files are:
+Audit changes are spread across the frozen RC history. The principal hardening and evidence files are:
 
 - Security: `frontend/src/lib/security/core/SecurityErrorEnvelope.js`, `SecurityContext.js`, `SecurityFabric.js`, `audit/SecurityAuditLogger.js`, `hardening/RateLimiter.js`, `hardening/SecurityHeaders.js`, `hardening/SafeRemoteUrl.js`, identity resolvers/verifiers, and `AiToolFirewall.js`.
 - Trust/AI/retrieval: Trust ownership model/store/engine and routes, `AIObservatoryEngine.js`, `WebSearchRetriever.js`, `academicDocumentFetcher.js`, provider adapters, Layer 2/3 services, and URLhaus client.
 - API/data boundaries: public DTO projections and authenticated mutation responses for forum, marketplace, safety-map, reviews, intelligence, expert, academic, scheduler, scholarships, and personalization routes; `202608270001_v2_authority_foundation.sql`.
 - Integrations: guarded AI Drive/backend proxy and institutional RSS connector.
-- Tests: `frontend/tests/security/final_audit_hardening.test.mjs`, migration RLS contract assertions, and refreshed current Chromium visual snapshots.
+- Tests: `frontend/tests/security/final_audit_hardening.test.mjs`, migration RLS contract assertions, `frontend/tests/expert/expert_store_serverless_fallback.test.mjs`, and refreshed current Chromium visual snapshots.
 - Release evidence: `docs/FINAL-AUDIT-STATE-MATRIX.md`, `docs/EVALUATION-PLAN.md`, `docs/KNOWN-LIMITATIONS.md`, `docs/COMPETITION-TECHNICAL-BRIEF.md`, `docs/DEMO-SCRIPT.md`, `docs/RELEASE-CHECKLIST.md`, `docs/ROLLBACK-REHEARSAL.md`, `docs/PR-DRAFT.md`, and this report.
 - `docs/ACTIVE-BUILD-CHECKPOINT.md` is updated so the next session can resume without replanning.
 
-No commit or push was performed; all pre-existing user changes remain in place.
+The final head is pushed non-force to `origin/develop`; no merge to `main` was performed.
 
 ## 38. Final verdict
 
-**`STUDENTHUBAI RC READY WITH EXTERNAL LIMITATIONS`**
+**`PR2_READY_FOR_FINAL_REVIEW_WITH_EXTERNAL_LIMITATIONS`**
 
-The local feature-freeze candidate is ready for a controlled competition rehearsal and the documented demo path. It is not yet a production certification: provision the disposable database, fresh approved providers, staging deployment/rollback target, and a working Firefox runtime, then rerun the blocked gates before public release.
+The feature-frozen PR head is ready for final human review: local gates, GitHub push/PR CI, Linux Chromium/Firefox, Vercel preview deployment, public route/API smoke, private-route fail-closed checks, and deterministic demo flows are evidenced. It is not production certification: provision the disposable database, operator staging case file, fresh approved providers, rollback control plane, and (if required) a repaired Windows Firefox runtime, then rerun the explicitly blocked gates before public release.

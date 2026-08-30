@@ -1,18 +1,18 @@
 # StudentHubAI — Active Build Checkpoint
 
-Updated: 2026-08-30 (Asia/Bangkok) — final audit completed locally; external gates remain blocked
+Updated: 2026-08-30 16:04 (Asia/Bangkok) — RC closure evidence current at `ad04de7980e26d6e3b1a68096ad97b0aea3be01b`
 
 ## Execution authority
 
 - Authoritative build specification: `STUDENTHUBAI_LUNA_MAX_ULTIMATE_FULL_BUILD_MASTER_PROMPT.md` (read in full, 2,394 lines).
 - Repository: `Duy2613/StudentHub-AI` (`origin` points to the user-provided GitHub repository).
-- Requested development line: `genspark_ai_developer`.
-- **Worktree reality:** currently checked out on local `develop` at `5aeaf71`; compared with `origin/genspark_ai_developer` at `477857d`, local `develop` is 3 commits ahead and 80 commits behind. No checkout, merge, commit, or push was performed because the worktree is dirty and the user did not authorize history mutation.
+- Requested development line: `develop` (current checkout and PR #2 head; no merge to `main`).
+- **Worktree reality:** checked out on `develop` at `ad04de7980e26d6e3b1a68096ad97b0aea3be01b`, equal to `origin/develop`; worktree is clean. `origin/main` remains `251e7cb4a908c5a185be89a39301b294f9595dbf`.
 - Source precedence: master prompt → approved product decisions → current working repository → GitHub development ref → `project.zip` design/interaction source → `atudent (1).pdf` historical Trust seed. Historical runtime/config archives are not product source.
 
 ## Current mode
 
-**FINAL AUDIT / HARDENING COMPLETE LOCALLY.** Feature Freeze remains intact; no new product features were added. P0/P1 hardening was applied to request boundaries, error envelopes, SSRF/redirect handling, Trust object ownership, public DTO projections, provider response limits, rate-limit memory bounds, and direct forum grants. The local verification matrix and final report are complete. External database, provider, staging, rollback, and Firefox gates remain explicitly blocked. Do not replace the application, merge to `main`, commit, or push without explicit authorization.
+**FEATURE FREEZE / RC CLOSURE.** No new product features were added. Release-blocker fixes were limited to the CI install path, cross-platform bundle-budget resolution, and read-only-runtime safety for public Expert/Search/health reads. Local gates and both GitHub Actions runs are green; preview routes/APIs are smoke-verified. Live database/RLS, operator-provided staging cases, approved providers, rollback control, and the Windows Firefox binary remain explicitly external limitations. Do not merge to `main`.
 
 ## Completed baseline already present
 
@@ -52,7 +52,7 @@ Updated: 2026-08-30 (Asia/Bangkok) — final audit completed locally; external g
 | N | The Margin production migration | SHELL COMPLETE / BODY ITERATION | Shared rail, six marks, responsive top strip, and paper attribute are in production shell; route body/footnote adoption can continue only for concrete gaps. |
 | O | Competition Demo Mode | IMPLEMENTED FOR CORE FIXTURES | Add explicit mode surface/fixture categories only where a real gap remains. |
 | P | Legitimate live providers | BLOCKED BY SECRETS/TERMS | Maintain adapters, env contracts, mocks, and honest `NOT_CONFIGURED` states. |
-| Q | Feature Freeze completion | LOCAL AUDIT COMPLETE / EXTERNAL BLOCKERS | Definition gates and final local audit pass; durable PostgreSQL/RLS/session proof, staging, rollback, Firefox, and fresh live-provider proof remain environment-blocked. |
+| Q | Feature Freeze completion | RC CLOSURE / EXTERNAL LIMITATIONS | Local definition gates, remote CI, and preview smoke pass; durable PostgreSQL/RLS/session proof, operator staging cases, rollback, Firefox-on-Windows, and fresh live-provider proof remain environment-blocked. |
 
 ## Current batch
 
@@ -75,39 +75,42 @@ The worktree already contains extensive user/prior-session changes. New relevant
 
 - Targeted new integration/cross-system tests: pass.
 - Production build: passed after the preceding Ultra/AI Drive batch.
-- Discovered regression suite: `250/250` test files passed, including canonical v1 static contracts and runtime smoke.
-- Canonical runtime smoke: public Community/Experts/Search and Trust return versioned 200 contracts; personal Academic/Dashboard/Notifications fail closed with `401 UNAUTHORIZED`.
+- Discovered regression suite: `252/252` test files passed, including the read-only ExpertStore fallback and canonical v1 runtime smoke.
+- Canonical runtime smoke: public Community/Experts/Search, Intelligence health, and Trust return 200 contracts; personal Academic/Dashboard/Notifications/Passport/AI Drive fail closed with `401 UNAUTHORIZED`.
 - API authorization inventory: pass, `135` handlers inventoried, including canonical v1 and AI Drive routes.
 - Production dependency audit: `0` vulnerabilities.
 - Full lint: `0` errors, `359` legacy warnings (warning cleanup is not a build blocker).
 - Production build: pass, `115/115` generated pages/routes.
 - Chromium cases + Ultra: `9/9`; WebKit cases + Ultra: `9/9`; Chromium navigation/responsive: `13/13`; Chromium accessibility core: `6/6`.
 - Post-migration targeted checks: AI Gateway `10/10`, Personalization `3/3`, Academic Command Center `11/11`, Cross-system `7/7`, migration `6/6`, canonical/Margin static contracts `4/4`, canonical runtime `1/1`.
+- GitHub Actions at the final head: push run [33302735122](https://github.com/Duy2613/StudentHub-AI/actions/runs/33302735122) and PR run [33302736663](https://github.com/Duy2613/StudentHub-AI/actions/runs/33302736663) both completed `success`, including Chromium and Firefox Linux jobs.
+- Vercel preview deployments are `Ready` for both linked projects. The public competition target is [student-hub-ai-weje-git-develop-vi-be-city.vercel.app](https://student-hub-ai-weje-git-develop-vi-be-city.vercel.app); the duplicate `student-hub-ai` preview is SSO-protected but its deployment status is also successful.
+- Public preview smoke at the final head: core route pages returned `200` with non-empty UI and no page errors; all three deterministic case tabs rendered Passport, Decision Twin, and next-action evidence; demo APIs returned `success:true`, `demo:true`, `provenance:"DEMO_FIXTURE"`; private canonical APIs returned `401 UNAUTHORIZED`.
 
 ## External blockers
 
-- No `STUDENTHUB_RLS_TEST_DATABASE_URL`, durable database credentials, staging deployment, or approved live provider keys/terms are configured.
+- No `STUDENTHUB_RLS_TEST_DATABASE_URL`, durable database credentials, operator staging case file/control plane, or approved live provider keys/terms are configured; the public Vercel preview is deployed and smoke-verified.
 - Firefox binary on this Windows host has a side-by-side configuration problem; do not treat it as a product failure.
 - No historical credential/config archive may be used; any live integration remains explicitly `NOT_CONFIGURED` until fresh secure secrets are supplied.
 
-## Final audit checkpoint (completed locally)
+## Final audit checkpoint (completed locally and remotely where available)
 
 - Safe recovery snapshot: operator-local temporary recovery directory outside the repository (baseline status plus secret-scan-clean redacted patch; not release payload).
 - New audit state matrix: `docs/FINAL-AUDIT-STATE-MATRIX.md`.
 - New focused regression command: `npm run test:final-audit` (`6/6` passing).
 - Focused verification after hardening: P0/P1 regression, security, Layer 2, Layer 3, Layer 4, threat-intel, migration contract, auth/session, RSS/SSRF, and final-audit suites pass locally.
-- Full discovered regression suite: `npm run test:all-discovered` (`250/250` test files passing).
-- Browser verification: Chromium `51 passed + 3 skipped / 54`, WebKit non-visual `48 passed + 3 skipped / 51`, mobile Chromium `13/13`, visual target `3/3`; Firefox launch is environment-blocked (`spawn UNKNOWN`).
+- Full discovered regression suite: `npm run test:all-discovered` (`252/252` test files passing).
+- Browser verification: Chromium `51 passed + 3 skipped / 54`, WebKit non-visual `48 passed + 3 skipped / 51`, mobile Chromium `13/13`, visual target `3/3`; Firefox Linux CI passes, while local Windows launch remains environment-blocked (`spawn UNKNOWN`).
 - Explicit Demo Mode rehearsal: Trust fixtures `3/3` passed with `NEXT_PUBLIC_COMPETITION_DEMO=true`; the three cases stayed offline and made zero Trust API calls.
 - Release verification: typecheck, build (`115/115` routes), dependency audit, bundle budget, API authorization inventory (`135` handlers; `0` unprotected mutations requiring P0 review), and diff check pass. Lint exits 0 with 359 legacy warnings.
-- Required competition documents and `FINAL-AUDIT-REPORT.md` are now present with honest PASS/BLOCKED classifications.
+- Required competition documents and `FINAL-AUDIT-REPORT.md` are now present with honest PASS/BLOCKED classifications; Linux Firefox CI is PASS and only Windows parity is blocked.
 - RC closure additions: `docs/PR-DRAFT.md`, `docs/ROLLBACK-REHEARSAL.md`, stale-claim corrections in release docs, and recoverable cleanup of `.codex-temp`/`.github/skills` to an operator-local temporary recovery directory outside the repository.
-- Closure baseline: 0 staged, 288 unstaged modified, 199 untracked; the aggregate diff includes prior user/session work and remains intentionally uncommitted.
+- Closure commits on `develop`: `e4c75e1` (frontend-only CI install), `d2bb044`/`fbda772` (portable bundle budget resolver), and `ad04de7` (read-only ExpertStore fallback + focused test). The final worktree is clean and the final head is pushed non-force to `origin/develop`.
 
 ## Next actions when external environments are available
 
 1. Supply a disposable PostgreSQL/Supabase test environment and run `npm run test:phase3-live`.
-2. Supply staging base URL/case file and run `cd frontend; npm run test:e2e:staging`.
+2. Supply staging base URL plus operator-owned case JSON and run `cd frontend; npm run test:e2e:staging`.
 3. Supply fresh approved provider secrets/terms and run provider-specific live health, grounding, cost, and rollback checks.
-4. Repair the Playwright Firefox runtime or run the Firefox matrix in CI.
-5. Do not add features or relabel any external blocker as PASS; update this checkpoint with the new evidence.
+4. Keep the passing Firefox Linux CI evidence; repair the Windows Playwright Firefox runtime only if local Windows parity is required.
+5. Do not add features or relabel any external limitation as PASS; update this checkpoint with new evidence.
