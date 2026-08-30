@@ -59,7 +59,8 @@ jobs:
 
       - name: Reject unprotected mutations
         shell: bash
-        run: grep -q "Unprotected mutations requiring P0 review: 0" docs/security/API-Authorization-Inventory.md
+        run: |
+          grep -q 'Unprotected mutations requiring P0 review: 0' docs/security/API-Authorization-Inventory.md
 
       - name: Bundle budget
         run: npm run audit:bundle
