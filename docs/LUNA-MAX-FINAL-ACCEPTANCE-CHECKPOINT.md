@@ -7,6 +7,8 @@ Repository: `Duy2613/StudentHub-AI`
 Branch: `develop`  
 Code-bearing head: `25b42f7d66743468d1243866225c2394232c3390` (`fix: close frozen-scope ux and deep-link gaps`)
 
+Checkpoint publication head: `47055da4be8c734059116b98713e95e33eb7733b` (`docs: record final acceptance checkpoint`)
+
 This checkpoint records evidence from the autonomous finalization pass. It does not add product scope. No merge to `main` has been performed.
 
 ## Frozen scope and completion status
@@ -77,6 +79,66 @@ The exact code-bearing head was pushed non-force to `origin/develop`. Both requi
 - PR #2 run 16: [Competition Quality Gate](https://github.com/Duy2613/StudentHub-AI/actions/runs/33306724074) — `success`.
 
 Each run completed lint, production build, discovered regression, AI Gateway contract, security, API authorization inventory and rejection gate, bundle budget, dependency audit, Chromium Linux browser gate, Firefox Linux browser gate, and evidence upload.
+
+The checkpoint publication itself was also validated without changing product code:
+
+- Push run 17: [Competition Quality Gate](https://github.com/Duy2613/StudentHub-AI/actions/runs/33307023273) — `success`.
+- PR #2 run 18: [Competition Quality Gate](https://github.com/Duy2613/StudentHub-AI/actions/runs/33307024955) — `success`.
+- GitHub commit checks: both Vercel deployments completed successfully — [student-hub-ai-weje](https://vercel.com/vi-be-city/student-hub-ai-weje/3yyuTatK7MRNT3SVSBng4w2tQHth) and [student-hub-ai](https://vercel.com/vi-be-city/student-hub-ai/DwdKYzHAdAw73qdzXYGSRhMipscQ).
+
+## Release gate matrix
+
+| Gate | Status | Evidence / note |
+| --- | --- | --- |
+| SOURCE CLEANLINESS | PASS | Worktree clean; `develop` equals `origin/develop`; no history rewrite. |
+| SECRET SCAN | PASS | No tracked secrets introduced; historical credential archives excluded. |
+| LINT | PASS | 0 errors; 360 legacy warnings. |
+| TYPECHECK | PASS | `tsc --noEmit`. |
+| BUILD | PASS | 115/115 routes. |
+| REGRESSION | PASS | 252/252 discovered files. |
+| SECURITY | PASS | 37/37 plus final audit 6/6. |
+| AI GATEWAY | PASS | Contract/fallback suites green. |
+| API AUTH | PASS | 135 handlers; 0 unprotected mutations. |
+| BUNDLE | PASS | All named budgets under 500,000 B. |
+| DEPENDENCY AUDIT | PASS | 0 high-or-greater vulnerabilities. |
+| LANDING / HERO | PASS | Route, CTA, keyboard, responsive, and error smoke green. |
+| MOTION / 3D | PASS | Ultra and route-loop checks green; fallback remains usable. |
+| REDUCED MOTION | PASS | Still-mode navigation and accessibility checks green. |
+| THE MARGIN | PASS | Shared rail/marks and responsive transformation verified. |
+| RESPONSIVE | PASS | 320/768/1440 crawl 117/117; mobile 15/15. |
+| ACCESSIBILITY | PASS | Chromium/WebKit Axe gates and direct Ultra snapshot clean. |
+| TRUST | PASS | Canonical `trust.v1` and deterministic case paths green. |
+| COMMUNITY / REALITY GAP | PASS | Public reads and provenance distinctions green. |
+| EXPERT | PASS | Public reads remain safe on read-only runtime. |
+| ACADEMIC | PASS | Profile/knowledge responsive and accessible; deterministic states preserved. |
+| DASHBOARD | PASS | Authenticated contract boundary; unauthenticated access fails closed. |
+| DECISION TWIN | PASS | Case Lab cross-links and basis labels verified. |
+| EVIDENCE PASSPORT | PASS | Case Lab timeline/passport wiring verified. |
+| CASE LAB / THREE SUPERFLOWS | PASS | Three deep links and end-to-end Chromium/WebKit flows green. |
+| DEMO MODE | PASS | Explicit `DEMO_FIXTURE`; no hidden live-to-fake success. |
+| AUTH UX / FORMS / CONTROLS | PASS | Protected APIs 401 safely; controls have names/labels and focused interactions pass. |
+| CONSOLE / NETWORK / 404 / DEEP LINK | PASS | No unexplained page errors; expected redirects recorded; deep-link regression fixed. |
+| CHROMIUM | PASS | Full local E2E 56 passed, 3 explicit skips; Linux CI green. |
+| FIREFOX | PASS | Firefox Linux CI green; Windows host parity is separately `BLOCKED_BY_ENV` (`spawn UNKNOWN`). |
+| WEBKIT | PASS | Full local E2E 53 passed, 6 explicit skips. |
+| MOBILE | PASS | Mobile Chromium 15/15. |
+| VISUAL REGRESSION | PASS | Existing visual target checks 3/3; no blind snapshot updates. |
+| LIGHTHOUSE / PERFORMANCE | PASS | Threshold metrics pass; Windows cleanup reports post-report `EPERM`. |
+| VERCEL | PASS | Both checkpoint commit checks report completed deployments; canonical preview HTTP 200. |
+| STAGING | BLOCKED_BY_ENV | Operator staging base URL/cases path unavailable. |
+| DATABASE / RLS | BLOCKED_BY_ENV | No disposable PostgreSQL/Supabase RLS test database. |
+| LIVE PROVIDERS / RAG | BLOCKED_BY_PROVIDER | Fresh approved provider secrets/terms unavailable. |
+| ROLLBACK / BACKUP | BLOCKED_BY_ENV | No disposable staging control plane or snapshot. |
+| COMPETITION DEMO | PASS | Three deterministic competition fixtures remain demonstrable and source-honest. |
+
+## Defects found and fixed in this finalization pass
+
+- Case Lab ignored a direct `?id=` deep link; selection is now URL-backed and covered for all three frozen flows.
+- Academic Profile and Knowledge routes had narrow-viewport overflow/heading/contrast issues; mobile layout, text contrast, labels, and scroll behavior are corrected.
+- Ultra still-mode and landmark semantics had contrast, duplicate-header, and region-label defects; scoped fixes preserve the visual system and improve keyboard/Axe behavior.
+- The reduced-motion accessibility check could sample a mid-fade state; the test now waits for the explicit still-mode state before auditing.
+
+No other correctable frozen-scope defect remains from the executed matrix.
 
 ## External limitations (not correctable from this checkout)
 
