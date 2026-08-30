@@ -1,18 +1,18 @@
 # StudentHubAI — Active Build Checkpoint
 
-Updated: 2026-08-30 16:04 (Asia/Bangkok) — RC closure evidence current at `ad04de7980e26d6e3b1a68096ad97b0aea3be01b`
+Updated: 2026-08-30 17:00 (Asia/Bangkok) — RC closure evidence current at code head `25b42f7d66743468d1243866225c2394232c3390`; final acceptance checkpoint: `docs/LUNA-MAX-FINAL-ACCEPTANCE-CHECKPOINT.md`
 
 ## Execution authority
 
 - Authoritative build specification: `STUDENTHUBAI_LUNA_MAX_ULTIMATE_FULL_BUILD_MASTER_PROMPT.md` (read in full, 2,394 lines).
 - Repository: `Duy2613/StudentHub-AI` (`origin` points to the user-provided GitHub repository).
 - Requested development line: `develop` (current checkout and PR #2 head; no merge to `main`).
-- **Worktree reality:** checked out on `develop` at `ad04de7980e26d6e3b1a68096ad97b0aea3be01b`, equal to `origin/develop`; worktree is clean. `origin/main` remains `251e7cb4a908c5a185be89a39301b294f9595dbf`.
+- **Worktree reality:** checked out on `develop` at `25b42f7d66743468d1243866225c2394232c3390`, equal to `origin/develop` before this docs-only checkpoint commit; `origin/main` remains `251e7cb4a908c5a185be89a39301b294f9595dbf`.
 - Source precedence: master prompt → approved product decisions → current working repository → GitHub development ref → `project.zip` design/interaction source → `atudent (1).pdf` historical Trust seed. Historical runtime/config archives are not product source.
 
 ## Current mode
 
-**FEATURE FREEZE / RC CLOSURE.** No new product features were added. Release-blocker fixes were limited to the CI install path, cross-platform bundle-budget resolution, and read-only-runtime safety for public Expert/Search/health reads. Local gates and both GitHub Actions runs are green; preview routes/APIs are smoke-verified. Live database/RLS, operator-provided staging cases, approved providers, rollback control, and the Windows Firefox binary remain explicitly external limitations. Do not merge to `main`.
+**FEATURE FREEZE / FINAL ACCEPTANCE.** No new product features were added. Release-blocker fixes in this continuation were limited to frozen-scope deep-link behavior, responsive layout, and accessibility correctness. Local gates and both GitHub Actions runs are green; preview routes/APIs are smoke-verified. Live database/RLS, operator-provided staging cases, approved providers, rollback control, and the Windows Firefox binary remain explicitly external limitations. Do not merge to `main`.
 
 ## Completed baseline already present
 
@@ -79,11 +79,11 @@ The worktree already contains extensive user/prior-session changes. New relevant
 - Canonical runtime smoke: public Community/Experts/Search, Intelligence health, and Trust return 200 contracts; personal Academic/Dashboard/Notifications/Passport/AI Drive fail closed with `401 UNAUTHORIZED`.
 - API authorization inventory: pass, `135` handlers inventoried, including canonical v1 and AI Drive routes.
 - Production dependency audit: `0` vulnerabilities.
-- Full lint: `0` errors, `359` legacy warnings (warning cleanup is not a build blocker).
+- Full lint: `0` errors, `360` legacy warnings (warning cleanup is not a build blocker).
 - Production build: pass, `115/115` generated pages/routes.
 - Chromium cases + Ultra: `9/9`; WebKit cases + Ultra: `9/9`; Chromium navigation/responsive: `13/13`; Chromium accessibility core: `6/6`.
 - Post-migration targeted checks: AI Gateway `10/10`, Personalization `3/3`, Academic Command Center `11/11`, Cross-system `7/7`, migration `6/6`, canonical/Margin static contracts `4/4`, canonical runtime `1/1`.
-- GitHub Actions at the final head: push run [33302735122](https://github.com/Duy2613/StudentHub-AI/actions/runs/33302735122) and PR run [33302736663](https://github.com/Duy2613/StudentHub-AI/actions/runs/33302736663) both completed `success`, including Chromium and Firefox Linux jobs.
+- GitHub Actions at the code head: push run [33306722933](https://github.com/Duy2613/StudentHub-AI/actions/runs/33306722933) and PR run [33306724074](https://github.com/Duy2613/StudentHub-AI/actions/runs/33306724074) both completed `success`, including Chromium and Firefox Linux jobs.
 - Vercel preview deployments are `Ready` for both linked projects. The public competition target is [student-hub-ai-weje-git-develop-vi-be-city.vercel.app](https://student-hub-ai-weje-git-develop-vi-be-city.vercel.app); the duplicate `student-hub-ai` preview is SSO-protected but its deployment status is also successful.
 - Public preview smoke at the final head: core route pages returned `200` with non-empty UI and no page errors; all three deterministic case tabs rendered Passport, Decision Twin, and next-action evidence; demo APIs returned `success:true`, `demo:true`, `provenance:"DEMO_FIXTURE"`; private canonical APIs returned `401 UNAUTHORIZED`.
 
@@ -100,12 +100,12 @@ The worktree already contains extensive user/prior-session changes. New relevant
 - New focused regression command: `npm run test:final-audit` (`6/6` passing).
 - Focused verification after hardening: P0/P1 regression, security, Layer 2, Layer 3, Layer 4, threat-intel, migration contract, auth/session, RSS/SSRF, and final-audit suites pass locally.
 - Full discovered regression suite: `npm run test:all-discovered` (`252/252` test files passing).
-- Browser verification: Chromium `51 passed + 3 skipped / 54`, WebKit non-visual `48 passed + 3 skipped / 51`, mobile Chromium `13/13`, visual target `3/3`; Firefox Linux CI passes, while local Windows launch remains environment-blocked (`spawn UNKNOWN`).
+- Browser verification: Chromium `56 passed + 3 skipped / 59`, WebKit `53 passed + 6 skipped / 59`, mobile Chromium `15/15`; the 39-route × 3-viewport crawl is `117/117`; Firefox Linux CI passes, while local Windows launch remains environment-blocked (`spawn UNKNOWN`).
 - Explicit Demo Mode rehearsal: Trust fixtures `3/3` passed with `NEXT_PUBLIC_COMPETITION_DEMO=true`; the three cases stayed offline and made zero Trust API calls.
-- Release verification: typecheck, build (`115/115` routes), dependency audit, bundle budget, API authorization inventory (`135` handlers; `0` unprotected mutations requiring P0 review), and diff check pass. Lint exits 0 with 359 legacy warnings.
+- Release verification: typecheck, build (`115/115` routes), dependency audit, bundle budget, API authorization inventory (`135` handlers; `0` unprotected mutations requiring P0 review), and diff check pass. Lint exits 0 with 360 legacy warnings.
 - Required competition documents and `FINAL-AUDIT-REPORT.md` are now present with honest PASS/BLOCKED classifications; Linux Firefox CI is PASS and only Windows parity is blocked.
 - RC closure additions: `docs/PR-DRAFT.md`, `docs/ROLLBACK-REHEARSAL.md`, stale-claim corrections in release docs, and recoverable cleanup of `.codex-temp`/`.github/skills` to an operator-local temporary recovery directory outside the repository.
-- Closure commits on `develop`: `e4c75e1` (frontend-only CI install), `d2bb044`/`fbda772` (portable bundle budget resolver), and `ad04de7` (read-only ExpertStore fallback + focused test). The final worktree is clean and the final head is pushed non-force to `origin/develop`.
+- Closure commits on `develop`: `e4c75e1` (frontend-only CI install), `d2bb044`/`fbda772` (portable bundle budget resolver), `ad04de7` (read-only ExpertStore fallback + focused test), and `25b42f7` (frozen-scope deep-link, responsive, and accessibility fixes). The code head is pushed non-force to `origin/develop`; this document is the durable final-acceptance checkpoint.
 
 ## Next actions when external environments are available
 
