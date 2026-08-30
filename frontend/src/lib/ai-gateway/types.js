@@ -48,7 +48,8 @@ export const GATEWAY_ERROR_TYPE = {
   TIMEOUT: "TIMEOUT",                 // provider did not respond within SLA
   HTTP_ERROR: "HTTP_ERROR",           // provider returned non-2xx status
   NETWORK_ERROR: "NETWORK_ERROR",     // fetch-level failure (DNS, connection refused, abort)
-  INVALID_JSON: "INVALID_JSON",       // structured output could not be parsed/validated
+  INVALID_JSON: "INVALID_JSON",       // structured output could not be parsed
+  SCHEMA_VALIDATION_FAILED: "SCHEMA_VALIDATION_FAILED", // parsed JSON failed the caller schema
   EMPTY_RESPONSE: "EMPTY_RESPONSE",   // provider returned no usable content
 };
 
@@ -65,6 +66,8 @@ export function sanitizeGatewayError(errorType, _errorMessage = "") {
     case GATEWAY_ERROR_TYPE.NETWORK_ERROR:
       return "The AI provider is temporarily unavailable.";
     case GATEWAY_ERROR_TYPE.INVALID_JSON:
+      return "The AI response did not match the required structured format.";
+    case GATEWAY_ERROR_TYPE.SCHEMA_VALIDATION_FAILED:
       return "The AI response did not match the required structured format.";
     case GATEWAY_ERROR_TYPE.EMPTY_RESPONSE:
       return "The AI provider returned an empty response.";

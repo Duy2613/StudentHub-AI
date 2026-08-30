@@ -32,6 +32,7 @@ The warning total is tracked as debt; no broad cleanup or deletion was performed
 - Configured institutional RSS and GitHub connectors are provider-controlled. They are guarded and bounded, but their freshness, terms, and correctness still require live source review.
 - Custom test transports can bypass the production network path by design. Production uses the guarded fetcher; tests must not be interpreted as proof that an arbitrary injected transport is safe.
 - Demo fixtures are useful for deterministic judging but do not establish real-world prevalence, current prices, current deadlines, or provider uptime.
+- GenSpark AI Drive is an optional, server-only compatibility bridge and is disabled by default (`GENSPARK_AIDRIVE_ENABLED=false`); normal competition workflows do not require its token or provider.
 
 ## Not limitations
 

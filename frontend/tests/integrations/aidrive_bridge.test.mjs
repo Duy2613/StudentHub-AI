@@ -8,6 +8,7 @@ import {
 } from "../../src/lib/integrations/aidrive/GenSparkAIDriveClient.js";
 
 const baseEnv = {
+  GENSPARK_AIDRIVE_ENABLED: "true",
   GENSPARK_TOKEN: "test-token-never-returned",
   GENSPARK_BASE_URL: "https://www.genspark.ai",
   GENSPARK_AIDRIVE_API_PREFIX: "/api/aidrive",
@@ -27,7 +28,13 @@ describe("GenSpark AI Drive read-only bridge", () => {
     assert.equal(status.status, "READY");
     assert.equal(status.mode, "SERVER_READ_ONLY");
     assert.equal(JSON.stringify(status).includes(baseEnv.GENSPARK_TOKEN), false);
-    assert.equal(getAIDriveIntegrationStatus({}).status, "NOT_CONFIGURED");
+    assert.equal(getAIDriveIntegrationStatus({}).status, "DISABLED");
+    assert.equal(getAIDriveIntegrationStatus({}).optional, true);
+    assert.equal(getAIDriveIntegrationStatus({}).coreDependency, false);
+    assert.throws(
+      () => new GenSparkAIDriveClient({ env: {}, fetchImpl: async () => null }),
+      (error) => error.code === "AIDRIVE_DISABLED"
+    );
   });
 
   it("rejects custom or non-HTTPS origins unless explicitly allowlisted", () => {

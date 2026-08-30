@@ -2,6 +2,12 @@ const DEFAULT_BASE_URL = "https://www.genspark.ai";
 const DEFAULT_API_PREFIX = "/api/aidrive";
 const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const MAX_PATH_LENGTH = 512;
+const RELEASE = "aidrive-fuse-v1.0.17";
+const SDK_REFERENCE = "genspark-aidrive-sdk-v0.1.1";
+
+function isAIDriveEnabled(env = process.env) {
+  return String(env.GENSPARK_AIDRIVE_ENABLED || "").trim().toLowerCase() === "true";
+}
 
 export const AIDRIVE_CAPABILITIES = Object.freeze([
   "LIST_FILES",
@@ -62,6 +68,7 @@ function resolveConfiguration(env = process.env) {
   }
 
   return {
+    enabled: isAIDriveEnabled(env),
     token,
     baseUrl: baseUrl.origin,
     apiPrefix: apiPrefix.replace(/\/$/, ""),
@@ -72,14 +79,29 @@ function resolveConfiguration(env = process.env) {
 }
 
 export function getAIDriveIntegrationStatus(env = process.env) {
+  if (!isAIDriveEnabled(env)) {
+    return {
+      provider: "GENSPARK_AIDRIVE",
+      status: "DISABLED",
+      mode: "SERVER_READ_ONLY",
+      release: RELEASE,
+      sdkReference: SDK_REFERENCE,
+      optional: true,
+      coreDependency: false,
+      capabilities: AIDRIVE_CAPABILITIES,
+    };
+  }
+
   try {
     const config = resolveConfiguration(env);
     return {
       provider: "GENSPARK_AIDRIVE",
       status: config.token ? "READY" : "NOT_CONFIGURED",
       mode: "SERVER_READ_ONLY",
-      release: "aidrive-fuse-v1.0.17",
-      sdkReference: "genspark-aidrive-sdk-v0.1.1",
+      release: RELEASE,
+      sdkReference: SDK_REFERENCE,
+      optional: true,
+      coreDependency: false,
       origin: new URL(config.baseUrl).host,
       capabilities: AIDRIVE_CAPABILITIES,
     };
@@ -88,7 +110,9 @@ export function getAIDriveIntegrationStatus(env = process.env) {
       provider: "GENSPARK_AIDRIVE",
       status: "INVALID_CONFIGURATION",
       mode: "SERVER_READ_ONLY",
-      release: "aidrive-fuse-v1.0.17",
+      release: RELEASE,
+      optional: true,
+      coreDependency: false,
       capabilities: AIDRIVE_CAPABILITIES,
       errorCode: error.code || "INVALID_PROVIDER_CONFIGURATION",
     };
@@ -118,6 +142,13 @@ function normalizeFileItem(item) {
 
 export class GenSparkAIDriveClient {
   constructor({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
+    if (!isAIDriveEnabled(env)) {
+      throw new AIDriveIntegrationError(
+        "AI Drive is disabled for this release.",
+        "AIDRIVE_DISABLED",
+        503
+      );
+    }
     this.config = resolveConfiguration(env);
     this.fetchImpl = fetchImpl;
     if (!this.config.token) {

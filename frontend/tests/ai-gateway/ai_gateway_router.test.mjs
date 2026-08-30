@@ -245,12 +245,103 @@ async function runAIGatewayTestSuite() {
     });
     check(
       "8. generateStructured rejects schema-invalid JSON without throwing",
-      result.ok === false && result.errorType === GATEWAY_ERROR_TYPE.INVALID_JSON,
+      result.ok === false && result.errorType === GATEWAY_ERROR_TYPE.SCHEMA_VALIDATION_FAILED,
       JSON.stringify(result)
     );
   }
 
-  // 9. describeRoute never triggers a network call and reports configured=false correctly
+  // 9. Structured fallback rotates after malformed JSON without retrying candidate A
+  {
+    const invalidOpenAI = new AlwaysConfiguredOkProvider(PROVIDER_FAMILY.OPENAI_COMPATIBLE, "not-json");
+    const validGemini = new AlwaysConfiguredOkProvider(
+      PROVIDER_FAMILY.GEMINI,
+      JSON.stringify({ classification: "BENIGN" })
+    );
+    const router = new ModelRouter({
+      [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: invalidOpenAI,
+      [PROVIDER_FAMILY.GEMINI]: validGemini,
+    });
+    const result = await AIGatewayService.generateStructured({
+      capability: AI_CAPABILITY.FAST_CLASSIFICATION,
+      systemPrompt: "sys",
+      userPrompt: "user",
+      validate: (j) => j.classification === "BENIGN",
+      options: { router },
+    });
+    check(
+      "9. Structured invalid JSON rotates from candidate A to candidate B",
+      result.ok === true &&
+        result.provider === PROVIDER_FAMILY.GEMINI &&
+        result.json.classification === "BENIGN" &&
+        invalidOpenAI.callCount === 1 &&
+        result.attempts[0].errorType === GATEWAY_ERROR_TYPE.INVALID_JSON,
+      JSON.stringify(result)
+    );
+  }
+
+  // 10. Structured fallback rotates after schema failure without retrying candidate A
+  {
+    const wrongShapeOpenAI = new AlwaysConfiguredOkProvider(
+      PROVIDER_FAMILY.OPENAI_COMPATIBLE,
+      JSON.stringify({ unexpected: true })
+    );
+    const validGemini = new AlwaysConfiguredOkProvider(
+      PROVIDER_FAMILY.GEMINI,
+      JSON.stringify({ classification: "BENIGN" })
+    );
+    const router = new ModelRouter({
+      [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: wrongShapeOpenAI,
+      [PROVIDER_FAMILY.GEMINI]: validGemini,
+    });
+    const result = await AIGatewayService.generateStructured({
+      capability: AI_CAPABILITY.FAST_CLASSIFICATION,
+      systemPrompt: "sys",
+      userPrompt: "user",
+      validate: (j) => j.classification === "BENIGN",
+      options: { router },
+    });
+    check(
+      "10. Structured schema failure rotates from candidate A to candidate B",
+      result.ok === true &&
+        result.provider === PROVIDER_FAMILY.GEMINI &&
+        result.json.classification === "BENIGN" &&
+        wrongShapeOpenAI.callCount === 1 &&
+        result.attempts[0].errorType === GATEWAY_ERROR_TYPE.SCHEMA_VALIDATION_FAILED,
+      JSON.stringify(result)
+    );
+  }
+
+  // 11. All structured candidates invalid -> fail closed, one call per candidate
+  {
+    const wrongShapeOpenAI = new AlwaysConfiguredOkProvider(
+      PROVIDER_FAMILY.OPENAI_COMPATIBLE,
+      JSON.stringify({ unexpected: true })
+    );
+    const invalidJsonGemini = new AlwaysConfiguredOkProvider(PROVIDER_FAMILY.GEMINI, "not-json");
+    const router = new ModelRouter({
+      [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: wrongShapeOpenAI,
+      [PROVIDER_FAMILY.GEMINI]: invalidJsonGemini,
+    });
+    const result = await AIGatewayService.generateStructured({
+      capability: AI_CAPABILITY.CLAIM_EXTRACTION,
+      systemPrompt: "sys",
+      userPrompt: "user",
+      validate: (j) => j.classification === "BENIGN",
+      options: { router },
+    });
+    check(
+      "11. All structured candidates invalid -> fail closed without deterministic retries",
+      result.ok === false &&
+        result.errorType === GATEWAY_ERROR_TYPE.SCHEMA_VALIDATION_FAILED &&
+        result.attempts.length === 3 &&
+        result.attempts.every((attempt) => !attempt.ok) &&
+        wrongShapeOpenAI.callCount === 2 &&
+        invalidJsonGemini.callCount === 1,
+      JSON.stringify(result)
+    );
+  }
+
+  // 12. describeRoute never triggers a network call and reports configured=false correctly
   {
     const router = new ModelRouter({
       [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: new NeverConfiguredProvider(PROVIDER_FAMILY.OPENAI_COMPATIBLE),
@@ -260,13 +351,13 @@ async function runAIGatewayTestSuite() {
     const geminiEntry = route.find((r) => r.provider === PROVIDER_FAMILY.GEMINI);
     const openaiEntry = route.find((r) => r.provider === PROVIDER_FAMILY.OPENAI_COMPATIBLE);
     check(
-      "9. describeRoute reports per-candidate configured status without calling generate()",
+      "12. describeRoute reports per-candidate configured status without calling generate()",
       Array.isArray(route) && geminiEntry?.configured === true && openaiEntry?.configured === false,
       JSON.stringify(route)
     );
   }
 
-  // 10. Capability with no routes configured (EMBEDDING) -> ok:false NOT_CONFIGURED, no throw
+  // 13. Capability with no routes configured (EMBEDDING) -> ok:false NOT_CONFIGURED, no throw
   {
     const router = new ModelRouter();
     const result = await router.route({
@@ -275,7 +366,7 @@ async function runAIGatewayTestSuite() {
       userPrompt: "user",
     });
     check(
-      "10. Unrouted capability (EMBEDDING) returns NOT_CONFIGURED instead of throwing",
+      "13. Unrouted capability (EMBEDDING) returns NOT_CONFIGURED instead of throwing",
       result.ok === false && result.errorType === GATEWAY_ERROR_TYPE.NOT_CONFIGURED,
       JSON.stringify(result)
     );

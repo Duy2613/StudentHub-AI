@@ -9,6 +9,7 @@ import {
 function failure(error) {
   if (error instanceof AIDriveIntegrationError) {
     const messages = {
+      AIDRIVE_DISABLED: "AI Drive là tích hợp tùy chọn và đang tắt trong bản phát hành này.",
       AIDRIVE_NOT_CONFIGURED: "AI Drive chưa được cấu hình trên máy chủ.",
       INVALID_REMOTE_PATH: "Đường dẫn AI Drive không hợp lệ.",
       UNAPPROVED_PROVIDER_ORIGIN: "Nguồn AI Drive chưa được phê duyệt.",

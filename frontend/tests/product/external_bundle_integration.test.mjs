@@ -27,7 +27,7 @@ describe("external bundle integration contract", () => {
 
   it("documents every supplied artifact class and its safe disposition", () => {
     const spec = readFileSync(new URL("../../../docs/integrations/EXTERNAL-BUNDLE-INTEGRATION-SPEC.md", import.meta.url), "utf8");
-    for (const marker of ["webapp.tar.gz", "AI Drive wheels", "node_modules.tar.gz", "genspark_llm", "git-credentials", "HOST_STATE_EXCLUDED"]) {
+    for (const marker of ["webapp.tar.gz", "AI Drive wheels", "node_modules.tar.gz", "genspark_llm", "git-credentials", "HOST_STATE_EXCLUDED", "GENSPARK_AIDRIVE_ENABLED=false", "OPTIONAL / NOT CONFIGURED / NON-CORE"]) {
       assert.ok(spec.includes(marker), marker);
     }
   });

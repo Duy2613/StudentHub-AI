@@ -28,16 +28,18 @@ async function readJsonBounded(response) {
 }
 
 export class GeminiProvider extends IModelProvider {
-  constructor() {
+  constructor({ env = process.env, fetchImpl = globalThis.fetch } = {}) {
     super(PROVIDER_FAMILY.GEMINI);
+    this.env = env;
+    this.fetchImpl = fetchImpl;
   }
 
   isConfigured() {
-    return Boolean(process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY);
+    return Boolean(this.env.GEMINI_API_KEY || this.env.GOOGLE_GENERATIVE_AI_API_KEY);
   }
 
   async generate({ catalogEntry, systemPrompt, userPrompt, jsonMode = false, timeoutMs = 2500, maxOutputTokens = 1024 }) {
-    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    const apiKey = this.env.GEMINI_API_KEY || this.env.GOOGLE_GENERATIVE_AI_API_KEY;
 
     if (!apiKey) {
       const err = new Error("GEMINI_API_KEY not configured");
@@ -52,12 +54,22 @@ export class GeminiProvider extends IModelProvider {
 
     try {
       const url = `${GEMINI_ENDPOINT_BASE}/${catalogEntry.model}:generateContent`;
-      const response = await fetch(url, {
+      if (typeof this.fetchImpl !== "function") {
+        const err = new Error("Gemini fetch is unavailable");
+        err.gatewayErrorType = GATEWAY_ERROR_TYPE.NETWORK_ERROR;
+        throw err;
+      }
+
+      const response = await this.fetchImpl(url, {
         method: "POST",
         signal: controller.signal,
         headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
+          // Gemini's systemInstruction is a trusted channel. Keep all
+          // user/evidence text in a separate user content part so retrieved
+          // data cannot be promoted into trusted instructions.
+          systemInstruction: { parts: [{ text: String(systemPrompt || "") }] },
+          contents: [{ role: "user", parts: [{ text: String(userPrompt || "") }] }],
           generationConfig: {
             ...(jsonMode ? { responseMimeType: "application/json" } : {}),
             temperature: 0.1,

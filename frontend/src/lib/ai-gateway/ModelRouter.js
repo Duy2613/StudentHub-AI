@@ -5,6 +5,9 @@
  * configured fallback chain (AI_GATEWAY_CONFIG.CAPABILITY_ROUTES), skips
  * any model whose provider/secrets are not configured, retries transient
  * errors once per candidate, and stops at the first successful response.
+ * Structured callers can provide a parser and validator; those checks are
+ * performed inside the candidate lifecycle so deterministic output failures
+ * advance to the next candidate without retrying the same model.
  *
  * This is the ONLY place capability -> model selection logic lives.
  * Domain code (Layer 2, Layer 4, AI Mentor) must never hard-code a model id.
@@ -67,6 +70,8 @@ export class ModelRouter {
    * @param {boolean} [params.jsonMode]
    * @param {number} [params.timeoutMs]
    * @param {number} [params.maxOutputTokens]
+   * @param {(text: string) => unknown} [params.parseResponse] - optional structured parser
+   * @param {(value: unknown) => boolean} [params.validateResponse] - optional structured validator
    * @returns {Promise<{ ok: boolean, provider?: string, model?: string, text?: string, attempts: object[], errorType?: string, errorMessage?: string }>}
    */
   async route({
@@ -76,6 +81,8 @@ export class ModelRouter {
     jsonMode = false,
     timeoutMs = AI_GATEWAY_CONFIG.SLA.DEFAULT_TIMEOUT_MS,
     maxOutputTokens = AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS,
+    parseResponse = null,
+    validateResponse = null,
   }) {
     const chain = (AI_GATEWAY_CONFIG.CAPABILITY_ROUTES[capability] || []).slice(
       0,
@@ -152,6 +159,57 @@ export class ModelRouter {
             maxOutputTokens: boundedOutputTokens,
           });
 
+          let parsedResponse;
+          if (typeof parseResponse === "function") {
+            try {
+              parsedResponse = parseResponse(String(text ?? ""));
+            } catch {
+              const errorType = GATEWAY_ERROR_TYPE.INVALID_JSON;
+              const errorMessage = "Model output was not valid JSON";
+              lastError = { errorType, errorMessage };
+              attempts.push(
+                createAttemptRecord({
+                  provider: catalogEntry.provider,
+                  model: catalogEntry.model,
+                  ok: false,
+                  errorType,
+                  errorMessage,
+                  latencyMs: Date.now() - startedAt,
+                })
+              );
+              // Parsing is deterministic for this response. Do not retry the
+              // same candidate; continue with the next configured model.
+              break;
+            }
+
+            let valid = true;
+            if (typeof validateResponse === "function") {
+              try {
+                valid = Boolean(validateResponse(parsedResponse));
+              } catch {
+                valid = false;
+              }
+            }
+            if (!valid) {
+              const errorType = GATEWAY_ERROR_TYPE.SCHEMA_VALIDATION_FAILED;
+              const errorMessage = "Model output failed schema validation";
+              lastError = { errorType, errorMessage };
+              attempts.push(
+                createAttemptRecord({
+                  provider: catalogEntry.provider,
+                  model: catalogEntry.model,
+                  ok: false,
+                  errorType,
+                  errorMessage,
+                  latencyMs: Date.now() - startedAt,
+                })
+              );
+              // Schema validation is deterministic for this response. Do not
+              // retry the same candidate; continue with the next configured model.
+              break;
+            }
+          }
+
           attempts.push(
             createAttemptRecord({
               provider: catalogEntry.provider,
@@ -165,7 +223,8 @@ export class ModelRouter {
             ok: true,
             provider: catalogEntry.provider,
             model: catalogEntry.model,
-            text,
+            text: String(text ?? ""),
+            ...(typeof parseResponse === "function" ? { json: parsedResponse } : {}),
             attempts,
           };
         } catch (err) {

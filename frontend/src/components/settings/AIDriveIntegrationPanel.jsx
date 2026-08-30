@@ -52,6 +52,7 @@ export default function AIDriveIntegrationPanel() {
   }, [load]);
 
   const ready = status?.status === "READY";
+  const disabled = status?.status === "DISABLED";
   return (
     <section className="surface-card overflow-hidden" aria-labelledby="aidrive-title">
       <div className="flex flex-col gap-4 border-b border-white/10 p-5 sm:flex-row sm:items-center sm:justify-between">
@@ -59,8 +60,8 @@ export default function AIDriveIntegrationPanel() {
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-teal-400/25 bg-teal-400/10 text-teal-300"><Cloud size={20} /></span>
           <div>
             <p className="eyebrow">External evidence source</p>
-            <h3 id="aidrive-title" className="mt-1 text-base font-bold text-app-primary">GenSpark AI Drive bridge</h3>
-            <p className="mt-1 max-w-2xl text-xs leading-5 text-app-muted">Kết nối server-only, chỉ đọc. Token không bao giờ được gửi xuống trình duyệt; FUSE và script đặc quyền không chạy trong ứng dụng.</p>
+            <h3 id="aidrive-title" className="mt-1 text-base font-bold text-app-primary">Optional AI Drive source</h3>
+            <p className="mt-1 max-w-2xl text-xs leading-5 text-app-muted">Tích hợp GenSpark server-only, chỉ đọc và không thuộc luồng lõi. Tắt mặc định; token không bao giờ được gửi xuống trình duyệt.</p>
           </div>
         </div>
         <button type="button" onClick={load} disabled={loading} className="secondary-action self-start" aria-label="Làm mới trạng thái AI Drive">
@@ -80,11 +81,13 @@ export default function AIDriveIntegrationPanel() {
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
               <span className={`rounded-md border px-2 py-1 ${ready ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : "border-white/10 bg-white/[0.04] text-app-muted"}`}>{status.status}</span>
               <span className="rounded-md border border-white/10 px-2 py-1 text-app-muted">{status.mode}</span>
+              <span className="rounded-md border border-white/10 px-2 py-1 text-app-muted">OPTIONAL · NON-CORE</span>
               <span className="rounded-md border border-white/10 px-2 py-1 text-app-muted">{status.release}</span>
               {ready && <span className="inline-flex items-center gap-1 text-emerald-300"><ShieldCheck size={13} /> HTTPS allowlist verified</span>}
             </div>
 
-            {!ready && <p className="text-xs leading-5 text-app-muted">Đặt `GENSPARK_TOKEN` trong secret store của server để kích hoạt. Không dùng các file `genspark_llm.yaml` hoặc `git-credentials.txt` đã cung cấp.</p>}
+            {disabled && <p className="text-xs leading-5 text-app-muted">AI Drive đang tắt mặc định vì không phải dependency của sản phẩm thi đấu. Luồng lõi không cần `GENSPARK_TOKEN`; chỉ bật bằng cờ server sau khi có phê duyệt production.</p>}
+            {!ready && !disabled && <p className="text-xs leading-5 text-app-muted">Đặt `GENSPARK_TOKEN` trong secret store của server để kích hoạt. Không dùng các file `genspark_llm.yaml` hoặc `git-credentials.txt` đã cung cấp.</p>}
 
             {ready && listing && (
               <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">

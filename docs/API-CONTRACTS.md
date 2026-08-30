@@ -23,7 +23,7 @@ Raw stacks, provider secrets, and internal SQL are server-only.
 | `POST /api/v1/decisions` | validate/evaluate/persist a non-demo Decision Twin | authenticated owner |
 | `GET|POST /api/v1/passports` | list/create owner Passport | authenticated owner |
 | `GET|PATCH /api/v1/passports/:passportId` | read/append a Passport event | authenticated owner |
-| `GET /api/v1/integrations/aidrive` | read-only integration status/list/usage | authenticated, `INTEGRATION.READ` |
+| `GET /api/v1/integrations/aidrive` | optional read-only integration status/list/usage (`DISABLED` by default) | authenticated, `INTEGRATION.READ`; never a core dependency |
 | legacy `/api/ai-trust/*`, `/api/intelligence/*`, `/api/academic/*` | compatibility contracts | route-specific SecurityFabric policy |
 
 ## Domain response principles

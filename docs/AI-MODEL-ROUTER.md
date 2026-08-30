@@ -44,7 +44,9 @@ Layer2SemanticService / Layer4TrustService / /api/chat (AI Mentor)
         - walks AI_GATEWAY_CONFIG.CAPABILITY_ROUTES[capability]
         - skips any (provider, model) whose secrets are not configured
         - retries transient errors once per candidate (429/5xx/timeout)
-        - stops at first successful, schema-valid response
+        - for structured requests: parses and validates each candidate before
+          accepting it; deterministic parse/schema failures advance to the
+          next candidate without retrying the same model
         - records every attempt for provenance/audit
                 │
                 ▼
@@ -140,7 +142,12 @@ createGatewayResult`) including:
 - `ok`, `provider`, `model` actually used (or `null` if none succeeded)
 - `attempts[]` — one record per (provider, model) tried, with
   `errorType` (`NOT_CONFIGURED | TIMEOUT | HTTP_ERROR | NETWORK_ERROR |
-  INVALID_JSON | EMPTY_RESPONSE`), latency, and a safe error message
+  INVALID_JSON | SCHEMA_VALIDATION_FAILED | EMPTY_RESPONSE`), latency, and a
+  safe error message. For structured generation, a provider response is only
+  successful after JSON parsing and the caller validator both pass. A parse
+  failure records `INVALID_JSON`; a parsed response rejected by the validator
+  records `SCHEMA_VALIDATION_FAILED` and moves to the next candidate without a
+  deterministic retry.
 - `totalLatencyMs`, `requestId`, `timestamp`, `schemaVersion`
 
 This provenance is attached by callers (`gatewayAttempts`,
@@ -176,7 +183,13 @@ configured. Coverage includes:
 - capability with zero configured providers → `NOT_CONFIGURED`
 - first candidate configured but fails → falls through to next candidate
 - transient error retried once then fallback → attempt count matches policy
-- structured output schema validation failure → `INVALID_JSON`, not thrown
+- malformed JSON → `INVALID_JSON`, then fallback to the next candidate
+- schema validation failure → `SCHEMA_VALIDATION_FAILED`, then fallback to the
+  next candidate
+- all structured candidates invalid → fail closed without repeating a
+  deterministic candidate
+- Gemini trusted system instruction and untrusted user/evidence content are
+  serialized into separate request fields
 - successful structured output → `json` populated, `ok: true`
 
 Live end-to-end verification against a real provider is **BLOCKED_BY_PROVIDER**

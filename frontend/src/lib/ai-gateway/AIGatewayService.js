@@ -17,7 +17,7 @@
 
 import { ModelRouter } from "./ModelRouter.js";
 import { AI_GATEWAY_CONFIG } from "./config/AIGatewayConfig.js";
-import { createGatewayResult, GATEWAY_ERROR_TYPE } from "./types.js";
+import { createGatewayResult } from "./types.js";
 
 const defaultRouter = new ModelRouter();
 
@@ -103,6 +103,8 @@ export class AIGatewayService {
       jsonMode: true,
       timeoutMs: options.timeoutMs,
       maxOutputTokens: options.maxOutputTokens,
+      parseResponse: (text) => JSON.parse(text),
+      validateResponse: validate,
     });
 
     const totalLatencyMs = Date.now() - startedAt;
@@ -118,47 +120,13 @@ export class AIGatewayService {
       });
     }
 
-    let parsed;
-    try {
-      parsed = JSON.parse(routed.text);
-    } catch {
-      return createGatewayResult({
-        ok: false,
-        capability,
-        provider: routed.provider,
-        model: routed.model,
-        attempts: routed.attempts,
-        errorType: GATEWAY_ERROR_TYPE.INVALID_JSON,
-        errorMessage: "Model output was not valid JSON",
-        totalLatencyMs,
-      });
-    }
-
-    let schemaValid = false;
-    try {
-      schemaValid = Boolean(validate(parsed));
-    } catch {
-      schemaValid = false;
-    }
-    if (!schemaValid) {
-      return createGatewayResult({
-        ok: false,
-        capability,
-        provider: routed.provider,
-        model: routed.model,
-        attempts: routed.attempts,
-        errorType: GATEWAY_ERROR_TYPE.INVALID_JSON,
-        errorMessage: "Model output failed schema validation",
-        totalLatencyMs,
-      });
-    }
-
     return createGatewayResult({
       ok: true,
       capability,
       provider: routed.provider,
       model: routed.model,
-      json: parsed,
+      json: routed.json,
+      text: routed.text,
       attempts: routed.attempts,
       totalLatencyMs,
     });

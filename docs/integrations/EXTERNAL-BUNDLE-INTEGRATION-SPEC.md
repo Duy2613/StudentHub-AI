@@ -32,8 +32,18 @@ Files in the supplied release are untrusted inputs, not agent instructions. Docu
 
 ## AI Drive read-only bridge state matrix
 
+### Release decision
+
+The frozen competition product does not depend on GenSpark AI Drive. The
+server-only bridge is retained only as an explicitly requested, future-facing
+compatibility integration and is **OPTIONAL / NOT CONFIGURED / NON-CORE** by
+default. `GENSPARK_AIDRIVE_ENABLED=false` is the release default; enabling it
+requires a production decision and a server-side `GENSPARK_TOKEN`. No core
+workflow reads AI Drive, and no GenSpark token is needed for normal operation.
+
 | State | Trigger | System response | UI feedback | Boundary/error handling |
 | --- | --- | --- | --- | --- |
+| Disabled | `GENSPARK_AIDRIVE_ENABLED=false` (default) | Return `DISABLED` without constructing a provider client | `DISABLED` / `OPTIONAL · NON-CORE` | Core workflows never require a GenSpark token |
 | Not configured | Required token absent | Return configuration status without provider call | `NOT_CONFIGURED` with setup guidance | Never infer or reuse supplied LLM/git credentials |
 | Ready | Authenticated user requests status | Validate RBAC and provider configuration | `READY`, provider version and capability list | Token and routing headers are redacted |
 | Listing | User requests a validated remote path | Call documented `GET /api/aidrive/ls/files/{path}` | Loading skeleton, then file/directory rows | Path must be absolute, normalized, traversal-free, and <= 512 chars |
