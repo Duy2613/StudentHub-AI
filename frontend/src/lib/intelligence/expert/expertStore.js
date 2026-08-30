@@ -51,8 +51,15 @@ export class ExpertStore {
 
   static #ensureStorageDir() {
     const dir = path.dirname(this.#storageFilePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      return true;
+    } catch {
+      // Serverless deployments can expose a read-only filesystem. Reads should
+      // still serve the deterministic reference dataset in that environment.
+      return false;
     }
   }
 
@@ -256,7 +263,14 @@ export class ExpertStore {
   }
 
   static rehydrate() {
-    this.#ensureStorageDir();
+    if (!this.#ensureStorageDir()) {
+      this.#expertsById.clear();
+      this.#claimsById.clear();
+      this.#seedDefaults();
+      this.#isHydrated = true;
+      return false;
+    }
+
     if (!fs.existsSync(this.#storageFilePath)) {
       this.clear();
       this.persist();
@@ -299,7 +313,7 @@ export class ExpertStore {
   }
 
   static persist() {
-    this.#ensureStorageDir();
+    if (!this.#ensureStorageDir()) return false;
     const data = {
       version: "2.0.0",
       updatedAt: new Date().toISOString(),
@@ -309,8 +323,10 @@ export class ExpertStore {
 
     try {
       fs.writeFileSync(this.#storageFilePath, JSON.stringify(data, null, 2), "utf8");
+      return true;
     } catch {
       // ignore
+      return false;
     }
   }
 
