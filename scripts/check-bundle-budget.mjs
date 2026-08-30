@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveNextChunkPath } from "./next-chunk-path.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const frontend = join(root, "frontend");
@@ -15,7 +16,7 @@ for (const routeName of ["trust", "community", "expert"]) {
   const assignmentIndex = source.indexOf(" = ", source.indexOf(routeAssignment));
   const manifest = JSON.parse(source.slice(source.indexOf("{", assignmentIndex), source.lastIndexOf(";")));
   const chunks = manifest.entryJSFiles?.[`[project]/src/app/${routeName}/page`] || [];
-  const totalBytes = chunks.reduce((sum, chunk) => sum + statSync(join(frontend, ".next", chunk)).size, 0);
+  const totalBytes = chunks.reduce((sum, chunk) => sum + statSync(resolveNextChunkPath(frontend, chunk)).size, 0);
   totals.set(routeName, totalBytes);
   console.log(`[BUNDLE_MEASURE] /${routeName} initial JS: ${totalBytes} bytes across ${chunks.length} chunks.`);
 }
