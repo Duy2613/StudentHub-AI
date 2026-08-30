@@ -2,17 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { 
-  ShieldCheck, 
-  Star, 
-  MessageSquare, 
-  CheckCircle2, 
-  Award, 
-  ArrowRight,
-  Sparkles,
-  Building,
-  GraduationCap
-} from "lucide-react";
+import { ShieldCheck, Star, ArrowRight, Building, GraduationCap } from "lucide-react";
 
 export default function ExpertShowcase() {
   const [activeCategory, setActiveCategory] = useState("all");

@@ -9,8 +9,8 @@
  */
 
 import { GLOBAL_SECURITY_STANDARDS } from "../standards/GlobalStandardsRegistry.js";
-import { UNIVERSITY_ECOSYSTEM_REGISTRY, matchUniversityEcosystem } from "../ecosystem/UniversityEcosystemRegistry.js";
-import { SOCIAL_MEDIA_THREAT_PATTERNS } from "../ecosystem/SocialMediaThreatSurfaces.js";
+import { matchUniversityEcosystem } from "../ecosystem/UniversityEcosystemRegistry.js";
+
 
 export class GlobalIntelligenceEngine {
   /**

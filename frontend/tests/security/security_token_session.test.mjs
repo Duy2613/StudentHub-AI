@@ -7,9 +7,8 @@ import assert from "node:assert/strict";
 
 import { TokenValidator } from "../../src/lib/security/identity/TokenValidator.js";
 import { SessionManager } from "../../src/lib/security/identity/SessionManager.js";
-import { IdentityResolver } from "../../src/lib/security/identity/IdentityResolver.js";
-import { AUTH_ASSURANCE_LEVEL, PRINCIPAL_TYPE } from "../../src/lib/security/core/SecurityPrincipal.js";
-import { SecurityError, SECURITY_ERROR_CODE } from "../../src/lib/security/core/SecurityErrorEnvelope.js";
+import { AUTH_ASSURANCE_LEVEL } from "../../src/lib/security/core/SecurityPrincipal.js";
+import { SECURITY_ERROR_CODE } from "../../src/lib/security/core/SecurityErrorEnvelope.js";
 
 describe("Security Fabric — Token & Session Validation", () => {
   const secretKey = "test-token-secret-key-32bytes-secure-seed-value";
@@ -65,6 +64,26 @@ describe("Security Fabric — Token & Session Validation", () => {
           assert.strictEqual(err.code, SECURITY_ERROR_CODE.INVALID_ISSUER);
           return true;
         }
+      );
+    });
+
+    it("should reject signed tokens missing mandatory issuer or expiration claims", () => {
+      const missingIssuer = validator.signToken({
+        sub: "student:24110001",
+        iss: undefined
+      });
+      assert.throws(
+        () => validator.validateToken(missingIssuer),
+        (err) => err.code === SECURITY_ERROR_CODE.INVALID_ISSUER
+      );
+
+      const missingExpiration = validator.signToken({
+        sub: "student:24110001",
+        exp: undefined
+      });
+      assert.throws(
+        () => validator.validateToken(missingExpiration),
+        (err) => err.code === SECURITY_ERROR_CODE.UNAUTHORIZED
       );
     });
 

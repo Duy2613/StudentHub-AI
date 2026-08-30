@@ -33,5 +33,17 @@ Thumbs.db
 .idea/
 *.tsbuildinfo
 
+# Browser verification artifacts
+frontend/playwright-report/
+frontend/playwright-report-staging/
+frontend/test-results/
+frontend/.lighthouseci/
+frontend/.lhci-chrome-profile/
+frontend/.lhci-temp/
+
 # Runtime Data
 .data/
+
+# Operator/agent scratch (never release payload)
+.codex-temp/
+.github/skills/

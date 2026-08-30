@@ -12,6 +12,13 @@ import {
   SOURCE_CLASSIFICATION,
   CONNECTOR_HEALTH
 } from "./ISourceConnector.js";
+import { validateRemoteUrlSync } from "../../security/hardening/SafeRemoteUrl.js";
+
+const MAX_FEED_BYTES = 1 * 1024 * 1024;
+const DEFAULT_FEED_URLS = Object.freeze([
+  "https://pdt.hcmute.edu.vn/rss/thong-bao-chung.rss",
+  "https://fit.hcmute.edu.vn/rss/thong-bao-khoa.rss"
+]);
 
 export class InstitutionalRssConnector extends ISourceConnector {
   #feedUrls;
@@ -30,10 +37,12 @@ export class InstitutionalRssConnector extends ISourceConnector {
       ...options
     });
 
-    this.#feedUrls = options.feedUrls || [
-      "https://pdt.hcmute.edu.vn/rss/thong-bao-chung.rss",
-      "https://fit.hcmute.edu.vn/rss/thong-bao-khoa.rss"
-    ];
+    const configuredFeeds = Array.isArray(options.feedUrls) ? options.feedUrls : DEFAULT_FEED_URLS;
+    this.#feedUrls = configuredFeeds
+      .map((url) => validateRemoteUrlSync(url))
+      .filter((result) => result.ok)
+      .map((result) => result.url)
+      .slice(0, 10);
   }
 
   /**
@@ -46,19 +55,23 @@ export class InstitutionalRssConnector extends ISourceConnector {
       try {
         const fetchedItems = [];
         for (const url of this.#feedUrls) {
+          const guard = validateRemoteUrlSync(url);
+          if (!guard.ok) continue;
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 5000);
           
           try {
-            const res = await fetch(url, {
+            const res = await fetch(guard.url, {
               headers: { "User-Agent": "StudentHub-Academic-Agent/1.0" },
-              signal: controller.signal
+              signal: controller.signal,
+              redirect: "error"
             });
             clearTimeout(timeoutId);
 
             if (res.ok) {
               const xmlText = await res.text();
-              const parsed = this.#parseRssXml(xmlText, url);
+              if (new TextEncoder().encode(xmlText).byteLength > MAX_FEED_BYTES) continue;
+              const parsed = this.#parseRssXml(xmlText, guard.url);
               fetchedItems.push(...parsed);
             }
           } catch {

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
-// Realistic campus cyber safety training quests (Zero fake data)
+// Deterministic training content. Completion is intentionally pending until a
+// durable event/reward ledger is configured; these quests do not mint points.
 let QUESTS_REGISTRY = [
   {
     id: "quest-01",
@@ -43,28 +45,25 @@ let QUESTS_REGISTRY = [
 /**
  * GET /api/quests/daily
  */
-export async function GET() {
-  try {
-    return NextResponse.json({
-      success: true,
-      count: QUESTS_REGISTRY.length,
-      quests: QUESTS_REGISTRY,
-    });
-  } catch (error) {
-    console.error("[Quests GET Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi tải nhiệm vụ." },
-      { status: 500 }
-    );
-  }
-}
+export const GET = SecurityFabric.wrapHandler({
+  action: "READ_DAILY_QUESTS",
+  allowAnonymous: true,
+  maxRequests: 90
+}, async () => Response.json({
+  success: true,
+  count: QUESTS_REGISTRY.length,
+  quests: QUESTS_REGISTRY,
+  sourceState: "STATIC_TRAINING_FIXTURE",
+  isAuthoritative: false,
+  dataNotice: "Nội dung huấn luyện tĩnh; hoàn thành chỉ được ghi nhận chờ kiểm tra."
+}));
 
 /**
  * POST /api/quests/daily
  * Claim reward for completed quest
  * Body: { questId: string }
  */
-export async function POST(request) {
+async function submitQuestCompletion(request, _routeContext, principal) {
   try {
     const body = await request.json();
     const { questId } = body || {};
@@ -77,19 +76,25 @@ export async function POST(request) {
       );
     }
 
-    quest.isCompleted = true;
-
     return NextResponse.json({
       success: true,
-      message: `Chúc mừng bạn đã hoàn thành nhiệm vụ và nhận +${quest.rewardPoints} Điểm Tín Nhiệm!`,
-      quest,
-      rewardPoints: quest.rewardPoints,
+      message: "Đã ghi nhận yêu cầu hoàn thành để kiểm tra. Điểm tín nhiệm không được tự động thay đổi.",
+      quest: { ...quest, isCompleted: false },
+      submission: {
+        actorId: principal.subjectId,
+        status: "PENDING_VERIFICATION",
+        requestedAt: new Date().toISOString(),
+      },
+      rewardPoints: 0,
     });
   } catch (error) {
-    console.error("[Quests POST Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi nhận thưởng nhiệm vụ." },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "SUBMIT_QUEST_COMPLETION",
+  requiredPermission: "COMMUNITY.POST",
+  maxRequests: 20,
+  maxBodyBytes: 16 * 1024,
+}, submitQuestCompletion);

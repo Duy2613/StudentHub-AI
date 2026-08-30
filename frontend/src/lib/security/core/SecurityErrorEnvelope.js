@@ -38,9 +38,41 @@ export const SECURITY_ERROR_CODE = Object.freeze({
   PROMPT_INJECTION_BLOCKED: "PROMPT_INJECTION_BLOCKED",
   
   RATE_LIMIT_EXCEEDED: "RATE_LIMIT_EXCEEDED",
+  DATABASE_UNAVAILABLE: "DATABASE_UNAVAILABLE",
+  CSRF_ORIGIN_REJECTED: "CSRF_ORIGIN_REJECTED",
+  REQUEST_TOO_LARGE: "REQUEST_TOO_LARGE",
   RESOURCE_EXHAUSTED: "RESOURCE_EXHAUSTED",
   HARD_SAFETY_VIOLATION: "HARD_SAFETY_VIOLATION",
   INTERNAL_SECURITY_ERROR: "INTERNAL_SECURITY_ERROR"
+});
+
+const PUBLIC_ERROR_MESSAGES = Object.freeze({
+  UNAUTHORIZED: "Authentication is required to perform this action.",
+  INVALID_CREDENTIALS: "The supplied credentials are not valid.",
+  TOKEN_EXPIRED: "Your session has expired. Please sign in again.",
+  SESSION_EXPIRED: "Your session has expired. Please sign in again.",
+  SESSION_REVOKED: "This session is no longer active.",
+  FORBIDDEN: "You do not have permission to perform this action.",
+  OBJECT_NOT_OWNED: "You do not have access to this resource.",
+  INSUFFICIENT_ROLE: "Your account role cannot perform this action.",
+  INSUFFICIENT_PERMISSION: "Your account is not permitted to perform this action.",
+  INSUFFICIENT_SCOPE: "The requested scope is not available for this session.",
+  PURPOSE_NOT_ALLOWED: "This operation is not allowed for the declared purpose.",
+  STEP_UP_REQUIRED: "Additional authentication is required for this operation.",
+  CAPABILITY_REQUIRED: "A valid capability is required for this operation.",
+  CAPABILITY_EXPIRED: "The capability has expired.",
+  CAPABILITY_MISMATCH: "The capability does not match this operation.",
+  CAPABILITY_REPLAY_DETECTED: "The capability has already been used.",
+  AI_TOOL_DENIED: "This AI tool invocation is not permitted.",
+  AI_ESCALATION_BLOCKED: "The requested AI escalation is not permitted.",
+  PROMPT_INJECTION_BLOCKED: "The request contains disallowed instructions.",
+  RATE_LIMIT_EXCEEDED: "Too many requests. Please try again later.",
+  DATABASE_UNAVAILABLE: "The service is temporarily unavailable.",
+  CSRF_ORIGIN_REJECTED: "The request origin was rejected.",
+  REQUEST_TOO_LARGE: "The request exceeds the permitted size.",
+  RESOURCE_EXHAUSTED: "The requested resource limit was exceeded.",
+  HARD_SAFETY_VIOLATION: "The request was blocked by a safety policy.",
+  INTERNAL_SECURITY_ERROR: "The request could not be completed securely."
 });
 
 export class SecurityError extends Error {
@@ -83,11 +115,20 @@ export class SecurityError extends Error {
   get stepUpChallenge() { return this.#stepUpChallenge; }
 
   toResponsePayload() {
+    // Keep the legacy RFC-style fields for existing clients while exposing the
+    // stable public contract consumed by the web/mobile clients.  `message`
+    // remains an alias for backwards compatibility; it is always the safe
+    // message supplied to the error, never the original exception text.
+    const retryable = this.#details?.retryable === true || [429, 502, 503, 504].includes(this.#statusCode);
+    const publicMessage = PUBLIC_ERROR_MESSAGES[this.#code] || "The requested operation could not be completed.";
     return {
       error: {
         code: this.#code,
-        message: this.message,
+        message: publicMessage,
+        userMessage: publicMessage,
         correlationId: this.#correlationId,
+        requestId: this.#correlationId,
+        retryable,
         ...(this.#stepUpChallenge ? { stepUpChallenge: this.#stepUpChallenge } : {}),
         timestamp: new Date().toISOString()
       }

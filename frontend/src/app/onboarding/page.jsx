@@ -12,26 +12,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  GraduationCap,
-  Sparkles,
-  Award,
-  CheckCircle2,
-  ArrowRight,
-  ArrowLeft,
-  User,
-  Building,
-  BookOpen,
-  Briefcase,
-  Star,
-  Check,
-  ShieldCheck,
-  Layers,
-  Radio,
-  Cpu,
-  Activity,
-  Zap
-} from "lucide-react";
+import { GraduationCap, Award, CheckCircle2, ArrowLeft, User, Building, BookOpen, Briefcase, Star, Check } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import {
   AVATAR_LIST,
@@ -43,10 +24,8 @@ import AvatarDisplay from "@/components/AvatarDisplay";
 import TactileButton from "@/components/ui/TactileButton";
 import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
 import { NoiseOverlay } from "@/components/auth/AuthUI";
-import FloatingDock from "@/components/ui/floating-dock";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
-import IglooSoundAmbiencePill from "@/components/ui/IglooSoundAmbiencePill";
-import IglooAuroraDivider from "@/components/ui/IglooAuroraDivider";
+
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -200,14 +179,8 @@ export default function OnboardingPage() {
       {/* 2. Film Grain & Ambient Noise */}
       <NoiseOverlay />
 
-      {/* 3. Floating Quick Tools & Studio */}
-      <FloatingDock />
+      {/* 3. Floating Studio */}
       <BackgroundsAndEffectsStudio />
-
-      {/* 4. Top Ambience Bar */}
-      <div className="fixed top-6 right-6 z-40">
-        <IglooSoundAmbiencePill />
-      </div>
 
       <div className="max-w-4xl w-full relative z-10 layout-safe-container pb-28">
         {/* Header Branding with Dual Typography */}

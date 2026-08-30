@@ -2,31 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ShieldCheck,
-  ShieldAlert,
-  Star,
-  Award,
-  GraduationCap,
-  Building,
-  BookOpen,
-  Briefcase,
-  Layers,
-  CheckCircle2,
-  Calendar,
-  MessageSquare,
-  FileText,
-  Upload,
-  X,
-  Check,
-  Loader2,
-  Share2,
-  ArrowLeft,
-  Edit3,
-  Clock,
-  Sparkles,
-  Zap,
-} from "lucide-react";
+import { ShieldAlert, Award, Building, BookOpen, CheckCircle2, Calendar, X, ArrowLeft, Edit3 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import AeroMissionControlBackdrop from "@/components/ui/AeroMissionControlBackdrop";
@@ -36,9 +12,7 @@ import SaffronSwissCrosshairGrid from "@/components/ui/SaffronSwissCrosshairGrid
 import { NoiseOverlay } from "@/components/auth/AuthUI";
 import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
 import ModernNavbar from "@/components/layout/ModernNavbar";
-import FloatingDock from "@/components/ui/floating-dock";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
-import IglooSoundAmbiencePill from "@/components/ui/IglooSoundAmbiencePill";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 import {
   AVATAR_LIST,
@@ -172,8 +146,7 @@ export default function ProfilePage() {
       {/* 3. Film Grain Noise Overlay */}
       <NoiseOverlay />
 
-      {/* 4. Floating Quick Tools & Studio */}
-      <FloatingDock />
+      {/* 4. Studio Controls */}
       <BackgroundsAndEffectsStudio />
 
       {session ? (
@@ -202,7 +175,6 @@ export default function ProfilePage() {
           </button>
 
           <div className="flex items-center gap-3">
-            <IglooSoundAmbiencePill />
             <button
               type="button"
               onClick={() => {

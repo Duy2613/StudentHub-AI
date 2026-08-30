@@ -4,7 +4,7 @@
  * Synthesizes compound social-engineering contexts and protects educational & benign discussions.
  */
 
-import { CONTEXT_SIGNAL_TYPES, SIGNAL_SEVERITY } from "../types.js";
+import { CONTEXT_SIGNAL_TYPES } from "../types.js";
 
 const EDUCATIONAL_CONTEXT_REGEX =
   /(?:bài tập môn|giáo trình|môn an toàn|tìm hiểu về|nghiên cứu cơ chế|khái niệm|lecture explains|in this tutorial|assignment on|academic study)/i;

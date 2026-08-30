@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Sparkles, HelpCircle, ArrowRight, ShieldCheck, AlertCircle, Compass, CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
+import { Sparkles, Compass, ChevronDown, ChevronUp } from "lucide-react";
 
 export function GroundedRecommendationStudio({ studentId = "24110001" }) {
   const [recommendations, setRecommendations] = useState([]);

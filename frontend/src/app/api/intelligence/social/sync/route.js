@@ -5,12 +5,13 @@ export const dynamic = "force-dynamic";
 
 export const POST = SecurityFabric.wrapHandler({
   action: "EXECUTE_SOURCE_SYNC",
-  allowAnonymous: true,
-  handler: async ({ request, principal, correlationId }) => {
+  requiredPermission: "ADMIN.SECURITY",
+  allowAnonymous: false,
+  handler: async ({ request, correlationId }) => {
     let body = {};
     try {
       body = await request.json();
-    } catch (_) {}
+    } catch {}
 
     const connectorId = body.connectorId || "official_portal_hcmute";
     const result = await IncrementalSyncEngine.runIncrementalSync(connectorId, body);

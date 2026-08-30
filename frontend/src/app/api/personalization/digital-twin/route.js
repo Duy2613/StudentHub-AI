@@ -5,21 +5,25 @@
 
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { PersonalDigitalTwin } from "@/lib/personalization/PersonalDigitalTwin.js";
+import { ObjectAuthorizer } from "@/lib/security/authorization/ObjectAuthorizer.js";
 
 export const GET = SecurityFabric.wrapHandler(
   {
     action: "READ_DIGITAL_TWIN",
     requiredPermission: "ACADEMIC.PLAN_OWN",
     requiredScopes: ["academic:read"],
-    allowAnonymous: true
+    allowAnonymous: false
   },
   async (request, routeParams, principal, secContext) => {
     const { searchParams } = new URL(request.url);
     const requestedStudentId = searchParams.get("studentId");
 
-    const subjectId = principal.isAuthenticated
-      ? principal.subjectId
-      : `student:${requestedStudentId || "24110001"}`;
+    const subjectId = principal.subjectId;
+    const authenticatedStudentId = subjectId.replace("student:", "").trim();
+
+    if (requestedStudentId && requestedStudentId !== authenticatedStudentId) {
+      ObjectAuthorizer.assertAccess(principal, { studentId: requestedStudentId });
+    }
 
     const twin = PersonalDigitalTwin.buildDigitalTwin(subjectId);
 

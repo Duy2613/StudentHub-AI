@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { SecurityError } from "@/lib/security/core/SecurityErrorEnvelope.js";
 
 // Comprehensive Vietnamese & Global Higher-Education Domain Mapping
 const KNOWN_EDU_DOMAINS = [
@@ -28,55 +29,75 @@ const KNOWN_EDU_DOMAINS = [
 
 /**
  * POST /api/users/verify-edu
- * Xác thực email trường đại học (.edu / .ac) để cộng +30 điểm uy tín
- * Hợp đồng Section D.1: Cấm client tự phong `isEdu = true`, backend là nguồn chân lý.
+ * Confirms an already mailbox-verified institutional identity.
+ * Domain syntax never grants reputation or expert authority by itself.
  */
-export async function POST(request) {
-  try {
-    const body = await request.json();
-    const { email } = body || {};
-
-    if (!email || typeof email !== "string") {
-      return NextResponse.json(
-        { success: false, error: "Vui lòng cung cấp địa chỉ email cần xác thực." },
+export const POST = SecurityFabric.wrapHandler(
+  {
+    action: "VERIFY_INSTITUTIONAL_EMAIL",
+    allowAnonymous: false
+  },
+  async (request, routeParams, principal, secContext) => {
+    let body = {};
+    try {
+      body = await request.json();
+    } catch {
+      return Response.json(
+        { error: { code: "VALIDATION_FAILED", message: "Request body must be valid JSON.", correlationId: secContext.correlationId } },
         { status: 400 }
       );
     }
 
-    const cleanEmail = email.trim().toLowerCase();
-    const domainMatch = cleanEmail.split("@")[1] || "";
+    const principalEmail = String(principal.email || "").trim().toLowerCase();
+    const requestedEmail = typeof body.email === "string" ? body.email.trim().toLowerCase() : principalEmail;
 
-    // 1. Kiểm tra cấu trúc domain .edu, .edu.vn, .ac.vn, .ac.uk,...
-    const isEduDomain = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$|\.edu\.vn$|\.ac\.vn$)/i.test(cleanEmail);
-
-    if (!isEduDomain) {
-      return NextResponse.json({
-        success: false,
-        isEdu: false,
-        trustScoreDelta: 0,
-        error: "Email không thuộc danh mục tên miền giáo dục (.edu / .edu.vn / .ac).",
-      });
+    if (!principalEmail) {
+      throw SecurityError.forbidden(
+        "Authenticated identity does not contain an email claim.",
+        secContext.correlationId
+      );
     }
 
-    // 2. Tra cứu tên trường đối ứng
-    const foundSchool = KNOWN_EDU_DOMAINS.find((item) => domainMatch.includes(item.domain));
-    const universityName = foundSchool ? foundSchool.name : `Đại học Đối tác (${domainMatch})`;
+    if (requestedEmail !== principalEmail) {
+      throw SecurityError.forbidden(
+        "You can only verify the email bound to your authenticated identity.",
+        secContext.correlationId,
+        "OBJECT_NOT_OWNED"
+      );
+    }
 
-    return NextResponse.json({
+    const domainMatch = principalEmail.split("@")[1] || "";
+
+    const isEduDomain = /(\.edu$|\.edu\.\w+$|\.ac\.\w+$|\.edu\.vn$|\.ac\.vn$)/i.test(domainMatch);
+
+    if (!isEduDomain) {
+      return Response.json({
+        success: false,
+        isEdu: false,
+        verificationStatus: "NOT_INSTITUTIONAL_DOMAIN",
+        error: "Email không thuộc danh mục tên miền giáo dục được hỗ trợ."
+      }, { status: 422 });
+    }
+
+    if (principal.attributes?.emailVerified !== true) {
+      return Response.json({
+        success: false,
+        isEdu: false,
+        verificationStatus: "MAILBOX_VERIFICATION_REQUIRED",
+        error: "Hãy xác thực quyền sở hữu hộp thư với nhà cung cấp danh tính trước."
+      }, { status: 409 });
+    }
+
+    const foundSchool = KNOWN_EDU_DOMAINS.find((item) => domainMatch === item.domain || domainMatch.endsWith(`.${item.domain}`));
+    const universityName = foundSchool ? foundSchool.name : `Cơ sở giáo dục (${domainMatch})`;
+
+    return Response.json({
       success: true,
       isEdu: true,
       university: universityName,
-      trustScoreDelta: 30,
-      baseScore: 50,
-      newTrustScore: 80,
-      badge: "🎓 Sinh Viên Xác Thực (.edu)",
-      message: `Xác thực email trường thành công! Tài khoản của bạn được nâng cấp +30 điểm uy tín.`,
+      verificationStatus: "VERIFIED_INSTITUTION_EMAIL",
+      verifiedBy: "IDENTITY_PROVIDER_EMAIL_PROOF",
+      message: "Email tổ chức đã được đối chiếu với danh tính đăng nhập. Trạng thái này không tự cấp vai trò chuyên gia hoặc điểm uy tín."
     });
-  } catch (error) {
-    console.error("[Verify Edu API Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống trong quá trình kiểm tra email trường." },
-      { status: 500 }
-    );
   }
-}
+);

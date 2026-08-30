@@ -20,7 +20,7 @@
 import { RBACPolicy } from "./RBACPolicy.js";
 import { ABACPolicy } from "./ABACPolicy.js";
 import { ReBACPolicy, RELATIONSHIPS } from "./ReBACPolicy.js";
-import { SecurityError, SECURITY_ERROR_CODE } from "../core/SecurityErrorEnvelope.js";
+import { SECURITY_ERROR_CODE } from "../core/SecurityErrorEnvelope.js";
 
 export const DECISION = Object.freeze({
   ALLOW: "ALLOW",

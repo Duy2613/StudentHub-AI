@@ -8,7 +8,7 @@
 
 import { QueryGenerator } from "./query/QueryGenerator.js";
 import { KnowledgeBaseRetriever } from "./retrieval/KnowledgeBaseRetriever.js";
-import { WebSearchRetriever } from "./retrieval/WebSearchRetriever.js";
+
 import { SourceAuthorityRegistry } from "./registry/SourceAuthorityRegistry.js";
 import { EvidenceExtractor } from "./extractors/EvidenceExtractor.js";
 import { TemporalEvaluator } from "./extractors/TemporalEvaluator.js";
@@ -62,7 +62,7 @@ export class Layer3EvidenceService {
     try {
       retrievedSources = await retriever.search(allQueries);
     } catch (err) {
-      console.warn(`[Layer 3 Search Error]: ${err.message}, falling back to Knowledge Base`);
+      console.warn(`[Layer 3 Search Error]: ${err?.name || "retriever_error"}; falling back to Knowledge Base`);
       const fallbackRetriever = new KnowledgeBaseRetriever();
       retrievedSources = await fallbackRetriever.search(allQueries);
     }

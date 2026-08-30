@@ -1,36 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Award, 
-  BookOpen, 
-  CheckCircle2, 
-  ShieldCheck, 
-  ShieldAlert, 
-  UserCheck, 
-  Layers, 
-  Activity, 
-  Search, 
-  Building2,
-  FileCheck2,
-  Sparkles,
-  AlertTriangle,
-  Fingerprint,
-  Clock,
-  History,
-  Link2,
-  ExternalLink,
-  ShieldX,
-  Scale,
-  Compass,
-  FileText,
-  Users,
-  Check,
-  XCircle,
-  HelpCircle,
-  TrendingDown,
-  RefreshCw
-} from "lucide-react";
+import { Award, BookOpen, CheckCircle2, ShieldCheck, ShieldAlert, Search, Building2, Sparkles, AlertTriangle, Fingerprint, Link2, ShieldX, Scale, Compass, Users, HelpCircle, RefreshCw } from "lucide-react";
 
 export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
   const [experts, setExperts] = useState(initialExperts);

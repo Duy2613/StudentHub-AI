@@ -33,7 +33,7 @@ export class GeminiTrustReasoningProvider extends ITrustReasoningModel {
       clearTimeout(timeoutId);
       return this.fallbackProvider.reason(fusedGraph);
     } catch (err) {
-      console.warn(`[Layer 4 Gemini Model Fallback]: ${err.message}`);
+      console.warn(`[Layer 4 Gemini Model Fallback]: ${err?.name || "provider_error"}`);
       return this.fallbackProvider.reason(fusedGraph);
     }
   }

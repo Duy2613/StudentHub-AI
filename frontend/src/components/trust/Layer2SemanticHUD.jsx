@@ -1,25 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Brain,
-  ShieldCheck,
-  ShieldAlert,
-  AlertTriangle,
-  FileSearch,
-  Layers,
-  ArrowRight,
-  Sparkles,
-  Target,
-  Compass,
-  Zap,
-  CheckCircle2,
-  Clock,
-  Building2,
-  ExternalLink,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { Brain, ShieldCheck, ShieldAlert, AlertTriangle, FileSearch, Layers, Target, Compass, CheckCircle2, Building2, ChevronDown, ChevronUp } from "lucide-react";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 import { LAYER_2_STATUS, SEMANTIC_CLASSIFICATION } from "@/lib/ai-trust/layer2/types";
 

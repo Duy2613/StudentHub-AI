@@ -1,26 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  User,
-  GraduationCap,
-  Award,
-  BookOpen,
-  FileCheck,
-  ShieldCheck,
-  AlertTriangle,
-  Clock,
-  ExternalLink,
-  ChevronRight,
-  Sparkles,
-  RefreshCw,
-  CheckCircle2,
-  XCircle,
-  HelpCircle,
-  Building,
-  CreditCard,
-  MessageSquare
-} from "lucide-react";
+import { User, GraduationCap, Award, BookOpen, AlertTriangle, Clock, CheckCircle2, XCircle, Building, CreditCard, MessageSquare } from "lucide-react";
 
 export function Profile360View({ profile, onDiscrepancyReport, className = "" }) {
   const [activeTab, setActiveTab] = useState("requirements"); // 'requirements' | 'courses' | 'certificates' | 'provenance'

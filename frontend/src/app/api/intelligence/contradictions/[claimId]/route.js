@@ -4,7 +4,7 @@
  */
 
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
-import { ContradictionEngine } from "@/lib/intelligence/fusion/ContradictionEngine.js";
+
 import { ConflictResolutionEngine } from "@/lib/intelligence/fusion/ConflictResolutionEngine.js";
 import { ClaimEntity } from "@/lib/intelligence/fabric/ClaimEntity.js";
 
@@ -17,6 +17,9 @@ export const GET = SecurityFabric.wrapHandler(
   },
   async (request, routeParams, principal, secContext) => {
     const { claimId } = await routeParams.params;
+    if (typeof claimId !== "string" || !/^[A-Za-z0-9:_-]{1,160}$/.test(claimId)) {
+      return Response.json({ success: false, error: { code: "CLAIM_ID_INVALID", userMessage: "Mã claim không hợp lệ.", requestId: secContext.correlationId, retryable: false } }, { status: 400 });
+    }
 
     const mockClaim = new ClaimEntity({
       claimId,
@@ -35,7 +38,10 @@ export const GET = SecurityFabric.wrapHandler(
       success: true,
       data: {
         claimId,
-        resolution
+        resolution,
+        sourceState: "SYNTHETIC_CONTRADICTION_BENCHMARK",
+        isAuthoritative: false,
+        dataNotice: "Phân tích này là benchmark quyết định; cần nạp evidence thật trước khi dùng trong quyết định."
       },
       meta: {
         correlationId: secContext.correlationId

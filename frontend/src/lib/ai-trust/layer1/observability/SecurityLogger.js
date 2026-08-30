@@ -92,8 +92,8 @@ export class SecurityLogger {
 
   static error(message, err = {}) {
     console.error(`[AI-TRUST-L1-ERROR] ${message}`, {
-      message: err.message || err,
-      stack: err.stack ? err.stack.split("\n").slice(0, 3) : undefined,
+      errorName: err?.name || (typeof err === "string" ? "Error" : "UnknownError"),
+      errorCode: err?.code || null,
     });
   }
 }

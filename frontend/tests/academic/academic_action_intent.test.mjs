@@ -16,7 +16,7 @@ test("▶ [ACTION-INTENT-1] Action Intent Creation & Target Sanitization", async
 
     assert.equal(intent.type, "REGISTER");
     assert.equal(intent.label, "Đăng ký học lại");
-    assert.equal(intent.target, "/credit-scheduler");
+    assert.equal(intent.target, "/academic?view=planner");
   });
 
   await t.test("AI1.2: rejects invalid action types", () => {

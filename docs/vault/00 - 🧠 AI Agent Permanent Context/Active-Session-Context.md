@@ -1,6 +1,45 @@
 # ⚡ Active Session Context & Working State
 > **Vault Node**: `Active-Session-Context` | **Tags**: `#active-session` `#state` `#v9-reality-first` `#mlops`
 
+## 2026-08-29 - Feature freeze cross-system completion
+
+- Student Decision Twin and Living Evidence Passport are now production domain contracts with PostgreSQL schema/repository, RLS policies, owner-bound API v1 routes, immutable Passport revisions, deterministic decision factors, and demo/live separation.
+- `/cases` is the Evidence Case Lab: three explicitly labeled deterministic competition superflows for fake scholarship, fake internship, and academic information conflict.
+- Each superflow exposes Official, Community, Expert, conflicts, unknowns, Evidence Passport history, Decision Twin options, and one next clear move.
+- New motion uses CSS 3D and `motion/react` client isolation with mobile collapse and reduced-motion fallback; no heavy WebGL was added to a core route.
+- Verified baseline: production build 106 pages; 243/243 discovered test files pass; new Chromium desktop/mobile/API gate 3/3 pass; API inventory 125 handlers with zero unprotected mutations requiring P0 review.
+- Freeze verdict: `FEATURE FREEZE READY WITH EXTERNAL PROVIDER BLOCKERS`. Live PostgreSQL/RLS, session restart, staging, and provider proof remain environment-blocked.
+- Canonical handoff: `FEATURE-FREEZE-REPORT.md` and `docs/POST-FEATURE-FREEZE-AUDIT-BACKLOG.md`. No new major pillar should be added before competition.
+
+## 2026-08-28 — Frontend V2 competition core
+
+- Landing page `/` đã được tái thiết kế thành **The Living Campus Atlas**: 4 chương điện ảnh, editorial typography Việt, Trust pipeline tương tác, accordion Intelligence theo Official / Community / Expert, CTA và footer tối giản.
+- Loại bỏ homepage 500vh 3D-highway nhiều lớp và các overlay cạnh tranh; thay bằng parallax transform/opacity, responsive layout, keyboard focus, skip link và reduced-motion guard.
+- Bộ ảnh nguyên bản dùng cho landing page nằm tại `frontend/public/images/atlas/`, được tạo riêng theo palette off-black / ivory / mineral mint và tối ưu WebP.
+- Entry point: `frontend/src/components/landing/LivingCampusAtlas.jsx`; visual system cô lập tại `living-campus-atlas.module.css` để không ảnh hưởng authenticated surfaces.
+- Verification landing: targeted ESLint pass; production build 102 routes pass; Playwright render ở 1440×900 và 390×844 không có horizontal overflow.
+- Primary product information architecture is now `Trust / Community / Experts` in `UnifiedAppShell`; personal destinations remain secondary.
+- `/trust` is the canonical competition flow: image/text/URL input, lazy browser OCR labeled `CLIENT_OCR_HINT`, actual four-layer pipeline status, separate risk/confidence/evidence/source-agreement signals, evidence reasons, case timeline, truthful related-case empty state, lazy 2D TrustGraph with list fallback, and Community/Expert handoff.
+- `/scam-check` is a compatibility redirect to `/trust`; its previous WebGL/audio/HUD page is no longer a second Trust implementation.
+- `/community` is presented as Student Collective Intelligence; `/expert` emphasizes domain scope and removes the leaderboard-style reputation-points treatment.
+- Core frontend network calls begin migration through `frontend/src/lib/api/` with normalized errors and `credentials: include`.
+- Frontend audit and route classification: `docs/frontend/FRONTEND-AUDIT.md`.
+- Verified gates: targeted lint 0 errors/0 warnings; full lint 0 errors/336 warnings; Next.js production build passes with 102 pages; `/trust` initial JS 356,857 bytes under the 500,000-byte budget; runtime GET for Trust/Community/Expert returns 200; legacy route returns 307 to `/trust`; 239/239 discovered test files pass.
+- Frontend verification phase completed: Playwright and axe are installed; 48/48 desktop/mobile Chromium browser tests pass; 239/239 discovered regression files pass; build produces 102 routes; lint has 0 errors/336 warnings; production dependency audit has 0 vulnerabilities.
+- Runtime contracts now normalize typed failures, preserve Retry-After/trace IDs, validate core response status with Zod, cancel stale scans, and keep provider clean/findings/unavailable states distinct.
+- Initial JavaScript after deferring analysis-only validators: Trust 360,164 B, Community 325,808 B, Expert 327,837 B. Trust is below the 500,000 B competition gate.
+- Current frontend boundaries: E2E provider responses are deterministic browser fixtures rather than staging proof; Chromium is covered but Firefox/WebKit are not; shared CSS and 336 legacy lint warnings remain debt; browser OCR degradation is verified but accuracy was not re-benchmarked.
+- Final evidence: `docs/frontend/VERIFICATION-SPEC.md`, `docs/frontend/PERFORMANCE.md`, `COMPETITION-DEMO.md`, `FINAL-FRONTEND-AUDIT.md`.
+
+## 2026-08-27 — V2 continuation checkpoint
+
+- PHASE 1 API/security triage completed against the uncommitted working tree.
+- All 116 handlers have an explicit `PUBLIC`, `AUTHENTICATED`, `ADMIN`, or `SERVICE_ONLY` inventory class; unclassified mutation P0 count is now zero.
+- Public analyzers have rate/body limits; stateful legacy mutations derive actors server-side; the catch-all proxy is restricted to four auth contracts.
+- Server OCR now reports `SERVER_OCR_NOT_CONFIGURED` instead of claiming image-byte OCR; client text is labeled `CLIENT_OCR_HINT`.
+- Current verified gates: build/TypeScript pass, 236/236 discovered test files pass, lint 0 errors/341 warnings, dependency audit clean, bundle budget pass.
+- Active next phase: Supabase/OIDC identity unification, gated by durable session/revocation persistence and RLS infrastructure. See `docs/EXECUTION_STATE.md` and `docs/architecture/adr/ADR-001-Identity-Authority.md`.
+
 ---
 
 ## 1. Trạng Thái Hiện Tại (Current Working Snapshot)
@@ -338,3 +377,39 @@
 - **Bộ Kiểm Chuẩn Tập Trận Vận Hành**: `frontend/tests/university/academic_production_drill.test.mjs`
 - **Đặc Tả Trí Tuệ Học Thuật HCMUTE**: `docs/vault/01 - 🏗️ System Architecture/Academic-Intelligence-Engine-Spec.md`
 - **Đặc Tả Đường Ống Academic Intelligence V1**: `docs/vault/01 - 🏗️ System Architecture/Academic-Intelligence-V1-Pipeline.md`
+
+## 10. UI/UX Reconstruction — 2026-08-27
+- Hợp nhất các authenticated shell về `frontend/src/components/layout/UnifiedAppShell.jsx`; `StudentHubOSShell` và `GlobalAppShell` giữ vai trò compatibility wrapper.
+- Chuẩn hóa semantic UI tokens, application shell, skip link, command search, mobile navigation và reduced-motion trong `frontend/src/app/globals.css`.
+- Tái thiết kế `frontend/src/components/home/CommandCenterDashboard.jsx` theo hướng action-first, giải thích được và ưu tiên evidence.
+- Đổi Next.js edge convention từ `frontend/src/middleware.js` sang `frontend/src/proxy.js`.
+- Siết fallback secret: production không còn sử dụng secret mặc định trong `CapabilityManager` và `TokenValidator`; test-only secret chỉ tồn tại ngoài production.
+- Kiểm chứng: production build pass, full regression suite pass, security suite pass, academic intelligence suite pass.
+
+## 11. Quality Gate Hardening — 2026-08-27
+- Thêm `scripts/run-discovered-tests.mjs` để tự động phát hiện và chạy mọi test `frontend/tests/**/*.test.mjs`.
+- Thêm API route contract smoke test: kiểm tra handler HTTP tường minh và ngăn browser global lọt vào server route.
+- Thêm `test:all-discovered` và `test:quality`; quality gate cuối cùng pass: lint không error, production build pass, 234/234 test files pass.
+- Nâng cấp T2/T3/T4: Evidence Fusion Studio đọc Knowledge Object thật và drill-down provenance/conflict/unknowns; Community Studio truy vấn theo topic/cohort và đo provenance, friction, reality gap; Expert Studio có dossier kiểm chứng, reliability history và authority boundaries.
+- Sửa Expert Discovery dùng đúng canonical fields (`status`, `name`, `scopes`, `conflicts`), bổ sung hồ sơ Toán học scoped; public expert API không còn trả raw private expert object.
+- Forum API thêm validation chiều dài/nội dung/link HTTPS, provenance integrity metadata và xếp hạng Wilson confidence-adjusted.
+- Quality gate cuối cùng pass: lint, production build và 235/235 test files.
+- Forum Like/Comment đã được đóng vòng server-side qua PATCH ledger, chống reaction lặp theo user/post và trả comments sau reload trong cùng runtime.
+
+## 12. PHASE 2/3 Authority & PostgreSQL Foundation — 2026-08-27
+- Đã thêm JWKS/OIDC verification, one-time proof exchange, opaque hashed PostgreSQL sessions, HttpOnly/SameSite cookie, revocation/expiry, CSRF exact-origin và production rejection của legacy in-memory session.
+- Đã thêm migration V2 cho profile an toàn, private roles/sessions/audit/expert/reputation, forum và nền móng evidence/claims; migration chủ động xóa policy/grant profile legacy không an toàn.
+- Forum POST/GET mặc định dùng PostgreSQL và fail closed 503; memory adapter chỉ bật tường minh ngoài production.
+- Live RLS harness kiểm tra anonymous, A/B, self-role, reputation, expert verification, foreign session và service role đã sẵn sàng nhưng chưa chạy vì thiếu `STUDENTHUB_RLS_TEST_DATABASE_URL`.
+- Quality gate: 239/239 discovered test files, build/TypeScript pass, lint 0 errors/341 warnings, dependency audit 0, bundle `/scam-check` 885,917 bytes.
+- PHASE 2/3 chưa được đánh dấu hoàn tất: browser bearer callers, refresh/re-auth, live clean migration/RLS và server-restart E2E còn thiếu.
+
+## 13. Living Campus Atlas — Cinematic Landing Refinement — 2026-08-28
+- Landing `/` được nâng cấp theo ngôn ngữ editorial-cinematic: opening sequence ngắn, hero typography cỡ lớn, knowledge ribbon nhiều lớp, pointer aura và chương chuyển cảnh perspective gập đôi.
+- Tham chiếu trực tiếp OpenHero/Hyliox cùng ba screen recording của người dùng; không sao chép nhận diện thương hiệu hay nội dung của nguồn.
+- Master implementation prompt: `docs/frontend/LIVING-CAMPUS-ATLAS-MASTER-PROMPT.md`.
+- Mã chính: `frontend/src/components/landing/LivingCampusAtlas.jsx` và `living-campus-atlas.module.css`.
+- Motion có reduced-motion fallback; pointer effect cập nhật trực tiếp qua ref, tránh setState theo từng frame; mobile tắt/giảm hiệu ứng 3D nặng.
+- Kiểm chứng: targeted ESLint pass, production build pass 102/102 routes, Playwright 1440px và 390px không horizontal overflow.
+- Refinement v2 tham chiếu Robin Payot, Sendoso, Meer Mohsin, Lucerra, USAvionix, Edolus và hai video mới: hero knowledge monolith, tri-lens glass core, 4-gate energy pipeline, product orbit chapter và closing copy mới.
+- Đã sửa stacking-context khiến global cinematic wallpaper phủ section product sáng; QA lại không page error và không horizontal overflow.

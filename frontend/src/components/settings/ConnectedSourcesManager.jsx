@@ -1,17 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Link2,
-  RefreshCw,
-  Trash2,
-  CheckCircle2,
-  AlertCircle,
-  ExternalLink,
-  Shield,
-  Clock,
-  Layers
-} from "lucide-react";
+import { Link2, RefreshCw, Layers } from "lucide-react";
 
 export function ConnectedSourcesManager() {
   const [sources, setSources] = useState([]);

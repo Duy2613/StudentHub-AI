@@ -4,35 +4,35 @@
  * Retrieves detailed audit trail and claim graph for a specific trust evaluation.
  */
 
-import { NextResponse } from "next/server";
-import { AiTrustStore } from "@/lib/intelligence/trust/aiTrustStore";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { AiTrustStore } from "@/lib/intelligence/trust/aiTrustStore.js";
 
-export async function GET(req, { params }) {
-  try {
-    const { evaluationId } = await params;
-    if (!evaluationId) {
-      return NextResponse.json(
-        { success: false, error: "Missing evaluationId parameter" },
-        { status: 400 }
-      );
-    }
-
-    const evaluation = AiTrustStore.getEvaluation(evaluationId);
-    if (!evaluation) {
-      return NextResponse.json(
-        { success: false, error: "Evaluation record not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      evaluation
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error retrieving trust evaluation" },
-      { status: 500 }
-    );
+export const GET = SecurityFabric.wrapHandler({
+  action: "READ_TRUST_EVALUATION",
+  requiredPermission: "TRUST.READ",
+  requiredScopes: ["trust:read"],
+  allowAnonymous: false,
+  maxRequests: 120
+}, async (_request, routeParams, principal, secContext) => {
+  const { evaluationId } = await routeParams.params;
+  if (!evaluationId) {
+    return Response.json({ success: false, error: {
+      code: "TRUST_EVALUATION_ID_REQUIRED",
+      userMessage: "Thiếu mã đánh giá tin cậy.",
+      requestId: secContext.correlationId,
+      retryable: false
+    } }, { status: 400 });
   }
-}
+
+  const evaluation = AiTrustStore.getEvaluationForPrincipal(evaluationId, principal);
+  if (!evaluation) {
+    return Response.json({ success: false, error: {
+      code: "TRUST_EVALUATION_NOT_FOUND",
+      userMessage: "Không tìm thấy đánh giá tin cậy.",
+      requestId: secContext.correlationId,
+      retryable: false
+    } }, { status: 404 });
+  }
+
+  return Response.json({ success: true, evaluation, meta: { requestId: secContext.correlationId } });
+});

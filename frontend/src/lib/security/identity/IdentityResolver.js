@@ -11,8 +11,9 @@
 import { SecurityPrincipal, PRINCIPAL_TYPE, AUTH_ASSURANCE_LEVEL } from "../core/SecurityPrincipal.js";
 import { TokenValidator } from "./TokenValidator.js";
 import { SessionManager } from "./SessionManager.js";
+import { getDurableSessionService } from "./DurableSessionService.js";
 import { StudentIdentityStore } from "../../intelligence/academic/studentIdentityStore.js";
-import { SecurityError, SECURITY_ERROR_CODE } from "../core/SecurityErrorEnvelope.js";
+import { SecurityError } from "../core/SecurityErrorEnvelope.js";
 
 const tokenValidator = new TokenValidator();
 
@@ -24,7 +25,7 @@ export class IdentityResolver {
    * @param {boolean} [options.allowAnonymous] - If true, returns anonymous principal instead of throwing 401
    * @returns {SecurityPrincipal}
    */
-  static resolvePrincipal(request, { allowAnonymous = false } = {}) {
+  static async resolvePrincipal(request, { allowAnonymous = false } = {}) {
     if (!request) {
       if (allowAnonymous) return SecurityPrincipal.anonymous();
       throw SecurityError.unauthorized("Missing HTTP request context.");
@@ -45,11 +46,23 @@ export class IdentityResolver {
                           this.#extractCookie(cookieHeader, "sb-access-token");
                           
     if (sessionCookie) {
-      // Check if cookie is a JWT or SessionId
-      if (sessionCookie.startsWith("sess_")) {
+      // Legacy in-memory sessions exist only as an explicit local migration escape hatch.
+      // Production must never silently fall back to restart-volatile authentication.
+      if (sessionCookie.startsWith("sess_") &&
+          process.env.NODE_ENV !== "production" &&
+          process.env.STUDENTHUB_ALLOW_LEGACY_SESSIONS === "true") {
         return this.resolveFromSessionId(sessionCookie);
       }
-      return this.resolveFromToken(sessionCookie);
+      try {
+        return await this.resolveFromDurableSession(sessionCookie);
+      } catch (error) {
+        if (error instanceof SecurityError) throw error;
+        throw new SecurityError({
+          code: "DATABASE_UNAVAILABLE",
+          message: "Authentication service is temporarily unavailable.",
+          statusCode: 503
+        });
+      }
     }
 
     // 3. Unauthenticated request
@@ -91,7 +104,10 @@ export class IdentityResolver {
     }
 
     // Look up authoritative identity in store if student
-    let attributes = { ...payload.attributes };
+    let attributes = {
+      ...payload.attributes,
+      emailVerified: payload.email_verified === true || payload.user_metadata?.email_verified === true
+    };
     if (studentId) {
       const identity = StudentIdentityStore.getIdentityByStudentId(studentId);
       if (identity) {
@@ -146,6 +162,27 @@ export class IdentityResolver {
     });
   }
 
+  static async resolveFromDurableSession(sessionSecret) {
+    const session = await getDurableSessionService().validateSession(sessionSecret);
+    const roles = Array.isArray(session.roles) && session.roles.length ? session.roles : ["STUDENT"];
+    let principalType = PRINCIPAL_TYPE.STUDENT;
+    if (roles.includes("ADMIN")) principalType = PRINCIPAL_TYPE.ADMIN;
+    else if (roles.includes("MODERATOR")) principalType = PRINCIPAL_TYPE.MODERATOR;
+    else if (roles.includes("EXPERT")) principalType = PRINCIPAL_TYPE.EXPERT;
+    else if (roles.includes("SERVICE")) principalType = PRINCIPAL_TYPE.SYSTEM;
+
+    return new SecurityPrincipal({
+      subjectId: String(session.user_id || session.userId),
+      principalType,
+      roles,
+      permissions: this.#deriveDefaultPermissions(principalType),
+      scopes: ["academic:read", "academic:plan", "community:read", "trust:read"],
+      sessionId: "opaque-cookie",
+      assuranceLevel: AUTH_ASSURANCE_LEVEL.AAL1_NORMAL,
+      attributes: { authProvider: "supabase" }
+    });
+  }
+
   /**
    * Derives baseline permissions for a role
    * @param {string} principalType 
@@ -176,6 +213,13 @@ export class IdentityResolver {
   static #extractCookie(cookieHeader, name) {
     if (!cookieHeader) return null;
     const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`));
-    return match ? decodeURIComponent(match[1]) : null;
+    if (!match) return null;
+    try {
+      return decodeURIComponent(match[1]);
+    } catch {
+      // Malformed percent-encoding must fail closed as an absent credential,
+      // never escape as an unhandled parser exception.
+      return null;
+    }
   }
 }

@@ -6,20 +6,7 @@
  */
 
 import React, { useState } from "react";
-import {
-  GraduationCap,
-  Award,
-  CheckCircle2,
-  AlertCircle,
-  Clock,
-  BookOpen,
-  Calendar,
-  Layers,
-  Sparkles,
-  ChevronRight,
-  TrendingUp,
-  FileText
-} from "lucide-react";
+import { FileText } from "lucide-react";
 
 export default function AcademicWorkspace360() {
   const [activeTab, setActiveTab] = useState("transcript");
@@ -68,63 +55,65 @@ export default function AcademicWorkspace360() {
   return (
     <div className="space-y-6">
       {/* 1. Header Profile Banner */}
-      <section className="p-6 rounded-3xl bg-[#120704] border border-[#3d1910] shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <section className="p-6 rounded-3xl surface-card flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-black font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-amber-500/20 font-mono">
+          <div className="w-16 h-16 rounded-2xl bg-teal-400/10 border border-teal-500/30 text-teal-300 font-extrabold text-2xl flex items-center justify-center shadow-lg shadow-teal-500/10 font-mono">
             24
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-white">Trần Bảo Duy</h1>
+              <h1 className="text-xl font-bold text-app-primary">Trần Bảo Duy</h1>
               <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-bold">XÁC THỰC EDU.VN</span>
             </div>
-            <p className="text-xs text-gray-400 mt-0.5">
-              MSSV: <span className="font-mono text-amber-400 font-semibold">24110001</span> • Khoa CNTT • Trường ĐH Sư Phạm Kỹ Thuật TP.HCM
+            <p className="text-xs text-app-muted mt-0.5">
+              MSSV: <span className="font-mono text-teal-300 font-semibold">24110001</span> • Khoa CNTT • Trường ĐH Sư Phạm Kỹ Thuật TP.HCM
             </p>
-            <p className="text-xs text-gray-500 mt-1 font-mono">Chương trình: Đại Trà (Kỹ Sư CNTT - 150 TC)</p>
+            <p className="text-xs text-gray-400 mt-1 font-mono">Chương trình: Đại Trà (Kỹ Sư CNTT - 150 TC)</p>
           </div>
         </div>
 
         {/* Quick Stats Capsule */}
-        <div className="flex items-center gap-4 p-3 rounded-2xl bg-[#090302] border border-[#2d120a]">
+        <div className="flex items-center gap-4 p-3 rounded-2xl bg-space-950/70 border border-white/10">
           <div className="text-center px-3">
-            <p className="text-[10px] font-mono text-gray-400 uppercase">GPA Hiện Tại</p>
-            <p className="text-lg font-mono font-bold text-amber-400">8.35</p>
+            <p className="text-[10px] font-mono text-app-muted uppercase">GPA Hiện Tại</p>
+            <p className="text-lg font-mono font-bold text-teal-300">8.35</p>
           </div>
-          <div className="w-px h-8 bg-[#200e08]" />
+          <div className="w-px h-8 bg-white/10" />
           <div className="text-center px-3">
-            <p className="text-[10px] font-mono text-gray-400 uppercase">Tín Chỉ</p>
-            <p className="text-lg font-mono font-bold text-white">48 / 150</p>
+            <p className="text-[10px] font-mono text-app-muted uppercase">Tín Chỉ</p>
+            <p className="text-lg font-mono font-bold text-app-primary">48 / 150</p>
           </div>
-          <div className="w-px h-8 bg-[#200e08]" />
+          <div className="w-px h-8 bg-white/10" />
           <div className="text-center px-3">
-            <p className="text-[10px] font-mono text-gray-400 uppercase">Học Lực</p>
+            <p className="text-[10px] font-mono text-app-muted uppercase">Học Lực</p>
             <p className="text-xs font-semibold text-emerald-400 mt-1">Giỏi</p>
           </div>
         </div>
       </section>
 
       {/* 2. Workspace Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#2d120a] pb-2">
+      <div className="flex items-center gap-2 border-b border-white/10 pb-2">
         <button
+          type="button"
           onClick={() => setActiveTab("transcript")}
           className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
             activeTab === "transcript"
-              ? "bg-amber-500 text-black shadow-md shadow-amber-500/20"
-              : "text-gray-400 hover:text-white bg-[#120704]"
+              ? "bg-teal-400 text-space-950 shadow-md shadow-teal-400/20"
+              : "text-app-muted hover:text-app-primary bg-white/[0.03]"
           }`}
         >
           Bảng Điểm Học Kỳ & Tiến Độ
         </button>
         <button
+          type="button"
           onClick={() => setActiveTab("rules")}
           className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
             activeTab === "rules"
-              ? "bg-amber-500 text-black shadow-md shadow-amber-500/20"
-              : "text-gray-400 hover:text-white bg-[#120704]"
+              ? "bg-teal-400 text-space-950 shadow-md shadow-teal-400/20"
+              : "text-app-muted hover:text-app-primary bg-white/[0.03]"
           }`}
         >
-          Quy Chế & Chuẩn Đầu Ra (QĐ 1422)
+          Quy Chế & Chuẩn Đầu Ra (QĐ 3116 / QĐ 1422)
         </button>
       </div>
 
@@ -132,14 +121,14 @@ export default function AcademicWorkspace360() {
       {activeTab === "transcript" && (
         <div className="space-y-6">
           {semesters.map((sem) => (
-            <div key={sem.id} className="p-5 rounded-2xl bg-[#120704] border border-[#2d120a] space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-[#200e08]">
+            <div key={sem.id} className="p-5 rounded-2xl surface-card space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-white/10">
                 <div>
-                  <h3 className="text-sm font-bold text-white">{sem.name}</h3>
-                  <p className="text-[11px] text-gray-400 font-mono mt-0.5">Số tín chỉ đăng ký: {sem.credits} TC</p>
+                  <h3 className="text-sm font-bold text-app-primary">{sem.name}</h3>
+                  <p className="text-[11px] text-app-muted font-mono mt-0.5">Số tín chỉ đăng ký: {sem.credits} TC</p>
                 </div>
                 {sem.gpa && (
-                  <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-teal-400/10 text-teal-300 border border-teal-500/30">
                     GPA: {sem.gpa.toFixed(2)}
                   </span>
                 )}
@@ -148,7 +137,7 @@ export default function AcademicWorkspace360() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="text-[10px] font-mono text-gray-500 uppercase border-b border-[#200e08]">
+                    <tr className="text-[10px] font-mono text-app-muted uppercase border-b border-white/10">
                       <th className="pb-2">Mã HP</th>
                       <th className="pb-2">Tên Học Phần</th>
                       <th className="pb-2">Tín Chỉ</th>
@@ -156,13 +145,13 @@ export default function AcademicWorkspace360() {
                       <th className="pb-2">Trạng Thái</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#200e08]">
+                  <tbody className="divide-y divide-white/10">
                     {sem.courses.map((c) => (
-                      <tr key={c.code} className="hover:bg-[#180905] transition-colors">
-                        <td className="py-2.5 font-mono text-amber-400/90">{c.code}</td>
-                        <td className="py-2.5 font-medium text-gray-200">{c.name}</td>
-                        <td className="py-2.5 font-mono text-gray-400">{c.credits}</td>
-                        <td className="py-2.5 font-mono font-bold text-gray-100">{c.grade}</td>
+                      <tr key={c.code} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="py-2.5 font-mono text-teal-300/90">{c.code}</td>
+                        <td className="py-2.5 font-medium text-app-primary">{c.name}</td>
+                        <td className="py-2.5 font-mono text-app-muted">{c.credits}</td>
+                        <td className="py-2.5 font-mono font-bold text-app-primary">{c.grade}</td>
                         <td className="py-2.5">
                           <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-semibold ${
                             c.status === "PASSED" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" : "bg-blue-500/10 text-blue-400 border border-blue-500/30"
@@ -181,29 +170,29 @@ export default function AcademicWorkspace360() {
       )}
 
       {activeTab === "rules" && (
-        <div className="p-6 rounded-2xl bg-[#120704] border border-[#2d120a] space-y-4 text-xs">
-          <div className="flex items-center gap-2 text-sm font-bold text-white">
-            <FileText className="text-amber-400" size={18} />
+        <div className="p-6 rounded-2xl surface-card space-y-4 text-xs">
+          <div className="flex items-center gap-2 text-sm font-bold text-app-primary">
+            <FileText className="text-teal-300" size={18} />
             <span>Đối Soát Quy Chế Học Vụ Tốt Nghiệp Khóa K24</span>
           </div>
-          <p className="text-gray-400 leading-relaxed">
-            Hệ thống đối soát tự động hồ sơ của bạn với Quyết định số 1422/QĐ-ĐHSPKT quy định về chuẩn đầu ra tốt nghiệp đại học chính quy.
+          <p className="text-app-muted leading-relaxed">
+            Hệ thống đối soát tự động hồ sơ của bạn với Quyết định số 3116/QĐ-ĐHSPKT (thay thế QĐ 3811/2024) và Quyết định 1422 quy định về chuẩn đầu ra tốt nghiệp đại học chính quy.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-            <div className="p-4 rounded-xl bg-[#180905] border border-[#2d120a] space-y-2">
-              <span className="text-[10px] font-mono uppercase text-gray-400 font-bold">1. Chuẩn Ngoại Ngữ</span>
-              <p className="font-semibold text-gray-200">TOEIC 650+ / IELTS 6.0</p>
-              <span className="text-[10px] font-mono text-amber-400">Đang theo đuổi (75%)</span>
+            <div className="p-4 rounded-xl bg-space-950/70 border border-white/10 space-y-2">
+              <span className="text-[10px] font-mono uppercase text-app-muted font-bold">1. Chuẩn Ngoại Ngữ</span>
+              <p className="font-semibold text-app-primary">TOEIC 650+ / IELTS 6.0</p>
+              <span className="text-[10px] font-mono text-teal-300">Đang theo đuổi (75%)</span>
             </div>
-            <div className="p-4 rounded-xl bg-[#180905] border border-[#2d120a] space-y-2">
-              <span className="text-[10px] font-mono uppercase text-gray-400 font-bold">2. Chuẩn Tin Học</span>
-              <p className="font-semibold text-gray-200">MOS / IC3 Master</p>
+            <div className="p-4 rounded-xl bg-space-950/70 border border-white/10 space-y-2">
+              <span className="text-[10px] font-mono uppercase text-app-muted font-bold">2. Chuẩn Tin Học</span>
+              <p className="font-semibold text-app-primary">MOS / IC3 Master</p>
               <span className="text-[10px] font-mono text-emerald-400">Đã đạt chứng chỉ</span>
             </div>
-            <div className="p-4 rounded-xl bg-[#180905] border border-[#2d120a] space-y-2">
-              <span className="text-[10px] font-mono uppercase text-gray-400 font-bold">3. Giáo Dục Thể Chất & QP</span>
-              <p className="font-semibold text-gray-200">Đủ 5 tín chỉ theo quy định</p>
+            <div className="p-4 rounded-xl bg-space-950/70 border border-white/10 space-y-2">
+              <span className="text-[10px] font-mono uppercase text-app-muted font-bold">3. Giáo Dục Thể Chất & QP</span>
+              <p className="font-semibold text-app-primary">Đủ 5 tín chỉ theo quy định</p>
               <span className="text-[10px] font-mono text-emerald-400">Đã hoàn thành 100%</span>
             </div>
           </div>

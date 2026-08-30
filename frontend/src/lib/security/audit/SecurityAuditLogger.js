@@ -79,13 +79,13 @@ export class SecurityAuditLogger {
       eventId: `audit_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       timestamp: new Date().toISOString(),
       eventType,
-      subject: String(subject).trim(),
-      action: String(action).trim().toUpperCase(),
-      resource: String(resource).trim(),
+      subject: this.#boundedText(subject, 128),
+      action: this.#boundedText(action, 96).toUpperCase(),
+      resource: this.#boundedText(resource, 160),
       decision,
-      reason,
+      reason: this.#sanitizeReason(reason),
       correlationId: correlationId || `corr_${Date.now()}`,
-      clientIp: String(clientIp).trim(),
+      clientIp: this.#boundedText(clientIp, 64),
       details: this.#sanitizeDetails(details)
     });
 
@@ -144,16 +144,31 @@ export class SecurityAuditLogger {
 
   static #sanitizeDetails(details) {
     if (!details || typeof details !== "object") return details;
+    if (Array.isArray(details)) return details.slice(0, 50).map(value => this.#sanitizeDetails(value));
     const sanitized = { ...details };
     const sensitiveKeys = ["password", "token", "secret", "otp", "key", "authorization", "cookie"];
 
     for (const k of Object.keys(sanitized)) {
       if (sensitiveKeys.some(sk => k.toLowerCase().includes(sk))) {
         sanitized[k] = "[REDACTED]";
+      } else if (typeof sanitized[k] === "string") {
+        sanitized[k] = this.#boundedText(sanitized[k], 512);
       } else if (typeof sanitized[k] === "object") {
         sanitized[k] = this.#sanitizeDetails(sanitized[k]);
       }
     }
     return sanitized;
+  }
+
+  static #boundedText(value, maxLength) {
+    return String(value ?? "").trim().slice(0, maxLength);
+  }
+
+  static #sanitizeReason(reason) {
+    return this.#boundedText(reason, 240)
+      .replace(/Bearer\s+[^\s]+/gi, "Bearer [REDACTED]")
+      .replace(/https?:\/\/[^\s]+/gi, "[REDACTED_URL]")
+      .replace(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/g, "[REDACTED_EMAIL]")
+      .replace(/((?:principal|subject|user|account)\s*['"]?)[^'"\s]+/gi, "$1[REDACTED]");
   }
 }

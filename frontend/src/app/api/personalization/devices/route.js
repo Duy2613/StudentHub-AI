@@ -11,10 +11,10 @@ export const GET = SecurityFabric.wrapHandler(
     action: "READ_DEVICES",
     requiredPermission: "ACADEMIC.PLAN_OWN",
     requiredScopes: ["academic:read"],
-    allowAnonymous: true
+    allowAnonymous: false
   },
   async (request, routeParams, principal, secContext) => {
-    const subjectId = principal.isAuthenticated ? principal.subjectId : "student:24110001";
+    const subjectId = principal.subjectId;
     const devices = DeviceSyncEngine.getDevicesForSubject(subjectId);
 
     // If no devices exist, auto-register default desktop
@@ -43,10 +43,10 @@ export const POST = SecurityFabric.wrapHandler(
     action: "REGISTER_DEVICE",
     requiredPermission: "ACADEMIC.PLAN_OWN",
     requiredScopes: ["academic:plan"],
-    allowAnonymous: true
+    allowAnonymous: false
   },
   async (request, routeParams, principal, secContext) => {
-    const subjectId = principal.isAuthenticated ? principal.subjectId : "student:24110001";
+    const subjectId = principal.subjectId;
     const body = await request.json();
 
     const device = DeviceSyncEngine.registerDevice({

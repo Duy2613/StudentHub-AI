@@ -1,20 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Shield,
-  Smartphone,
-  Laptop,
-  Tablet,
-  Trash2,
-  Download,
-  RotateCcw,
-  CheckCircle2,
-  AlertTriangle,
-  Lock,
-  ExternalLink,
-  Key
-} from "lucide-react";
+import { Shield, Smartphone, Laptop, Tablet, Trash2, Download, RotateCcw, CheckCircle2, Lock, Key } from "lucide-react";
 
 export function PrivacyAccessCenter() {
   const [devices, setDevices] = useState([]);

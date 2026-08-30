@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
-// Genuine campus marketplace items (Zero fake data, realistic items & locations)
+// Deterministic marketplace UI fixture.  It is intentionally not presented as
+// a live durable marketplace until a reviewed persistence/identity adapter is
+// configured.
 let MARKETPLACE_ITEMS = [
   {
     id: "item-01",
@@ -79,42 +82,56 @@ let MARKETPLACE_ITEMS = [
 /**
  * GET /api/marketplace/items?category=&q=
  */
-export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const category = searchParams.get("category") || "ALL";
-    const q = (searchParams.get("q") || "").toLowerCase().trim();
+const toPublicItem = (item) => {
+  const safeItem = { ...item };
+  delete safeItem.sellerId;
+  delete safeItem.sellerName;
+  return {
+    ...safeItem,
+    sellerName: "Người bán trong cộng đồng",
+    sellerTrustScore: null,
+    sellerEduVerified: false,
+    verifiedSafetyLevel: item.verifiedSafetyLevel === "UNASSESSED" ? "UNASSESSED" : "FIXTURE_UNASSESSED",
+    sourceState: item.sourceState || "SYNTHETIC_FIXTURE",
+    isAuthoritative: false
+  };
+};
 
-    let list = MARKETPLACE_ITEMS.filter((item) => {
-      if (category !== "ALL" && item.category !== category) return false;
-      if (q) {
-        const matchTitle = item.title.toLowerCase().includes(q);
-        const matchDesc = item.description.toLowerCase().includes(q);
-        const matchLoc = item.campusLocation.toLowerCase().includes(q);
-        if (!matchTitle && !matchDesc && !matchLoc) return false;
-      }
-      return true;
-    });
+export const GET = SecurityFabric.wrapHandler({
+  action: "READ_MARKETPLACE_ITEMS",
+  allowAnonymous: true,
+  maxRequests: 90
+}, async (request) => {
+  const { searchParams } = new URL(request.url);
+  const category = (searchParams.get("category") || "ALL").slice(0, 40);
+  const q = (searchParams.get("q") || "").toLowerCase().trim().slice(0, 120);
 
-    return NextResponse.json({
-      success: true,
-      count: list.length,
-      items: list,
-    });
-  } catch (error) {
-    console.error("[Marketplace GET Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi tải sàn pass đồ." },
-      { status: 500 }
-    );
-  }
-}
+  const list = MARKETPLACE_ITEMS.filter((item) => {
+    if (category !== "ALL" && item.category !== category) return false;
+    if (q) {
+      const matchTitle = item.title.toLowerCase().includes(q);
+      const matchDesc = item.description.toLowerCase().includes(q);
+      const matchLoc = item.campusLocation.toLowerCase().includes(q);
+      if (!matchTitle && !matchDesc && !matchLoc) return false;
+    }
+    return true;
+  }).map(toPublicItem);
+
+  return Response.json({
+    success: true,
+    count: list.length,
+    items: list,
+    sourceState: "SYNTHETIC_FIXTURE",
+    isAuthoritative: false,
+    dataNotice: "Danh sách minh họa; người bán, giá và trạng thái an toàn chưa được xác minh production."
+  }, { headers: { "Cache-Control": "no-store" } });
+});
 
 /**
  * POST /api/marketplace/items
  * Đăng tin pass đồ cũ mới
  */
-export async function POST(request) {
+async function createMarketplaceItem(request, _routeContext, principal) {
   try {
     const body = await request.json();
     const {
@@ -125,39 +142,51 @@ export async function POST(request) {
       originalPrice,
       condition,
       conditionLabel,
-      sellerName,
-      sellerRole,
-      sellerTrustScore,
-      sellerEduVerified,
       campusLocation,
       description,
     } = body || {};
 
-    if (!title || !price || !campusLocation || !description) {
+    if (typeof title !== "string" || typeof campusLocation !== "string" || typeof description !== "string" ||
+        !title.trim() || !campusLocation.trim() || !description.trim() ||
+        title.trim().length > 180 || campusLocation.trim().length > 180 || description.trim().length > 4000) {
       return NextResponse.json(
-        { success: false, error: "Vui lòng nhập đầy đủ Tiêu đề, Giá bán, Địa điểm giao dịch và Mô tả." },
+        { success: false, error: { code: "INVALID_MARKETPLACE_ITEM", userMessage: "Vui lòng nhập tiêu đề, giá, địa điểm và mô tả hợp lệ." } },
         { status: 400 }
       );
     }
 
-    const trustScoreNum = Number(sellerTrustScore || 80);
+    const numericPrice = Number(price);
+    const numericOriginalPrice = originalPrice === undefined || originalPrice === null || originalPrice === ""
+      ? numericPrice * 1.5
+      : Number(originalPrice);
+    if (!Number.isFinite(numericPrice) || numericPrice <= 0 || numericPrice > 1_000_000_000 ||
+        !Number.isFinite(numericOriginalPrice) || numericOriginalPrice <= 0 || numericOriginalPrice > 2_000_000_000) {
+      return NextResponse.json({ success: false, error: { code: "INVALID_MARKETPLACE_PRICE", userMessage: "Giá bán không hợp lệ." } }, { status: 400 });
+    }
+
+    const sellerName = principal.attributes?.fullName
+      || principal.email?.split("@")[0]
+      || "Thành viên StudentHub";
 
     const newItem = {
       id: `item-${Date.now()}`,
       title: title.trim(),
       category: category || "GIAO_TRINH",
       categoryName: categoryName || "Giáo trình & Sách",
-      price: Number(price),
-      originalPrice: Number(originalPrice || price * 1.5),
+      price: numericPrice,
+      originalPrice: numericOriginalPrice,
       condition: condition || "GOOD_90",
       conditionLabel: conditionLabel || "Đã qua sử dụng, hoạt động tốt",
       sellerName: sellerName || "Sinh viên StudentHub",
-      sellerRole: sellerRole || "student",
-      sellerTrustScore: trustScoreNum,
-      sellerEduVerified: Boolean(sellerEduVerified),
+      sellerId: principal.subjectId,
+      sellerRole: principal.principalType.toLowerCase(),
+      sellerTrustScore: null,
+      sellerEduVerified: principal.attributes?.emailVerified === true,
       campusLocation: campusLocation.trim(),
       description: description.trim(),
-      verifiedSafetyLevel: trustScoreNum >= 80 ? "HIGH_TRUST" : "VERIFIED",
+      verifiedSafetyLevel: "UNASSESSED",
+      sourceState: "USER_SUBMITTED_PENDING_REVIEW",
+      isAuthoritative: false,
       createdAt: new Date().toISOString(),
     };
 
@@ -167,15 +196,25 @@ export async function POST(request) {
       {
         success: true,
         message: "Đã đăng món đồ lên Sàn Pass Đồ Bảo Chứng thành công!",
-        item: newItem,
+        // Return only the authenticated submitter's own server-assigned
+        // subject for client reconciliation; anonymous list reads stay
+        // redacted by toPublicItem.
+        item: {
+          ...toPublicItem(newItem),
+          sellerId: principal.subjectId,
+          sellerRole: principal.principalType.toLowerCase()
+        },
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error("[Marketplace POST Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi đăng món đồ." },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "CREATE_MARKETPLACE_ITEM",
+  requiredPermission: "COMMUNITY.POST",
+  maxRequests: 20,
+  maxBodyBytes: 64 * 1024,
+}, createMarketplaceItem);

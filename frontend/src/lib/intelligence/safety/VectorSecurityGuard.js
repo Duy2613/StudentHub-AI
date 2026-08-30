@@ -6,7 +6,7 @@
  * Core Principle: High vector similarity alone NEVER bypasses access control or data minimization.
  */
 
-import { SecurityError, SECURITY_ERROR_CODE } from "../../security/core/SecurityErrorEnvelope.js";
+
 
 export const VECTOR_SECURITY_TIER = Object.freeze({
   PUBLIC: "PUBLIC",

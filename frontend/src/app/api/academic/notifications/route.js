@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
 import { AcademicNotificationStore } from "@/lib/intelligence/academic/academicNotificationStore.js";
 import { AcademicNotificationOrchestrator } from "@/lib/intelligence/academic/academicNotificationOrchestrator.js";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { ObjectAuthorizer } from "@/lib/security/authorization/ObjectAuthorizer.js";
 
-export async function GET(request) {
+async function getNotifications(request, routeParams, principal) {
   try {
     const { searchParams } = new URL(request.url);
-    const studentId = searchParams.get("studentId") || "24110001";
+    const requestedStudentId = searchParams.get("studentId");
+    const studentId = principal.subjectId.replace("student:", "").trim();
+    if (requestedStudentId && requestedStudentId !== studentId) {
+      ObjectAuthorizer.assertAccess(principal, { studentId: requestedStudentId });
+    }
     const status = searchParams.get("status") || null;
     const unreadOnly = searchParams.get("unreadOnly") === "true";
 
@@ -24,17 +30,23 @@ export async function GET(request) {
       notifications
     });
   } catch (err) {
+    if (err?.name === "SecurityError") throw err;
     return NextResponse.json(
-      { success: false, message: err.message || "Failed to fetch notifications." },
+      { success: false, message: "Không thể tải thông báo học vụ." },
       { status: 400 }
     );
   }
 }
 
-export async function POST(request) {
+async function updateNotification(request, routeParams, principal) {
   try {
     const body = await request.json();
-    const { action, notificationId, studentId = "24110001", snoozeHours = 4 } = body || {};
+    const { action, notificationId, studentId: requestedStudentId, snoozeHours = 4 } = body || {};
+    const studentId = principal.subjectId.replace("student:", "").trim();
+
+    if (requestedStudentId && requestedStudentId !== studentId) {
+      ObjectAuthorizer.assertAccess(principal, { studentId: requestedStudentId });
+    }
 
     if (!notificationId) {
       return NextResponse.json(
@@ -77,10 +89,31 @@ export async function POST(request) {
       unreadCount
     });
   } catch (err) {
-    const status = err.message.includes("FORBIDDEN") ? 403 : 400;
+    if (err?.name === "SecurityError") throw err;
+    const status = err?.code === "FORBIDDEN" || err?.code === "OBJECT_NOT_OWNED" ? 403 : 400;
     return NextResponse.json(
-      { success: false, message: err.message || "Failed to process notification action." },
+      { success: false, message: "Không thể cập nhật thông báo học vụ." },
       { status }
     );
   }
 }
+
+export const GET = SecurityFabric.wrapHandler(
+  {
+    action: "READ_ACADEMIC_NOTIFICATIONS",
+    requiredPermission: "ACADEMIC.READ_OWN",
+    requiredScopes: ["academic:read"],
+    allowAnonymous: false
+  },
+  getNotifications
+);
+
+export const POST = SecurityFabric.wrapHandler(
+  {
+    action: "UPDATE_ACADEMIC_NOTIFICATION",
+    requiredPermission: "ACADEMIC.PLAN_OWN",
+    requiredScopes: ["academic:plan"],
+    allowAnonymous: false
+  },
+  updateNotification
+);

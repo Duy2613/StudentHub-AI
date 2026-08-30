@@ -1,20 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Search,
-  ExternalLink,
-  ShieldCheck,
-  ShieldAlert,
-  AlertTriangle,
-  Play,
-  Zap,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Layers,
-  Scale,
-} from "lucide-react";
+import { Search, Play, Zap } from "lucide-react";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 import { Layer3EvidenceService } from "@/lib/ai-trust/layer3/Layer3EvidenceService";
 import { LAYER_3_TEST_CASES } from "../../../tests/layer3/layer3.test.mjs";

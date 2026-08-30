@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useBackground, WALLPAPERS } from "@/components/providers/BackgroundContext";
-import { motion } from "framer-motion";
+
 
 export default function CinematicChapterNavigator() {
   const { activeWallpaper, setScrollySection } = useBackground();

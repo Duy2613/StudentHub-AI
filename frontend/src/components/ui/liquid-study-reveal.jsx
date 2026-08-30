@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Sparkles, ArrowRight, BookOpen, Bot, Zap, RefreshCw } from "lucide-react";
+import { Sparkles, BookOpen } from "lucide-react";
 
 /**
  * LiquidStudyReveal: Inspired by Lumora Studio's signature Liquid Cursor Reveal canvas.

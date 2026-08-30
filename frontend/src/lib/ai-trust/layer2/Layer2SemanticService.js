@@ -8,7 +8,7 @@
 import { createLayer2Result } from "./types.js";
 import { LAYER_2_CONFIG } from "./config/Layer2Config.js";
 import { DeterministicSemanticProvider } from "./providers/DeterministicSemanticProvider.js";
-import { GeminiSemanticModelProvider } from "./providers/GeminiSemanticModelProvider.js";
+import { AIGatewayModelProvider } from "./providers/AIGatewayModelProvider.js";
 import { Layer2ConfidenceEngine } from "./engine/Layer2ConfidenceEngine.js";
 import { VerificationPlanner } from "./engine/VerificationPlanner.js";
 import { Layer2DecisionEngine } from "./engine/Layer2DecisionEngine.js";
@@ -40,11 +40,17 @@ export class Layer2SemanticService {
     const ocrText = (metadata.ocrText || "").slice(0, LAYER_2_CONFIG.LIMITS.MAX_OCR_CHARACTERS);
     const qrPayload = metadata.qrContent || metadata.qrPayload || "";
 
-    // 2. Provider Selection
+    // 2. Provider Selection. The deterministic provider remains the default
+    // authority; the shared AI Gateway is explicit opt-in and always falls
+    // back to the deterministic provider when configuration/output is absent.
     let provider = options.provider;
     if (!provider) {
-      if (options.useGemini && process.env.GEMINI_API_KEY) {
-        provider = new GeminiSemanticModelProvider();
+      if (options.useAIGateway) {
+        provider = new AIGatewayModelProvider();
+      } else if (options.useGemini && process.env.GEMINI_API_KEY) {
+        // Keep all vendor traffic behind the shared capability router. The
+        // legacy direct provider remains exported for compatibility only.
+        provider = new AIGatewayModelProvider();
       } else {
         provider = new DeterministicSemanticProvider();
       }
@@ -62,7 +68,7 @@ export class Layer2SemanticService {
         options,
       });
     } catch (err) {
-      console.warn(`[Layer2 Service Fallback] Provider failed: ${err.message}`);
+      console.warn(`[Layer2 Service Fallback] Provider failed (${err?.name || "provider_error"})`);
       const fallback = new DeterministicSemanticProvider();
       semanticAnalysis = await fallback.analyzeSemantics({
         text: boundedText,
@@ -72,7 +78,7 @@ export class Layer2SemanticService {
         layer1Result,
       });
       semanticAnalysis.modelStatus = "fallback_used";
-      semanticAnalysis.fallbackReason = err.message;
+      semanticAnalysis.fallbackReason = err?.name === "AbortError" ? "TIMEOUT" : "PROVIDER_UNAVAILABLE";
     }
 
     // 4. Calibrate Confidence

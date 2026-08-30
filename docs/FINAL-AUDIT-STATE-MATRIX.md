@@ -1,0 +1,15 @@
+# Final Audit State Matrix
+
+This matrix is the bounded state-transition record used during the post-freeze audit. It covers only existing high-risk workflows; it is not a feature roadmap.
+
+| Workflow | Trigger | Action | Boundary conditions | Error / recovery path |
+| --- | --- | --- | --- | --- |
+| Trust evaluation ownership | Authenticated `POST /api/ai/trust/evaluate` | Derive `ownerId` from the verified `SecurityPrincipal`; persist evaluation with owner and visibility | Client-supplied student/user IDs are ignored; detail reads require authenticated owner or privileged principal | Invalid payload returns a safe 400 envelope; provider failure falls back to deterministic result; cross-owner lookup is indistinguishable from not-found |
+| Trust detail read | Authenticated `GET` for evaluation/claim/evidence/audit | Resolve parent evaluation and return only artifacts accessible to the principal | Seed/unowned fixtures are admin/system-only; IDs are length-bounded and rate-limited | Invalid ID → safe 400; inaccessible/missing artifact → safe 404; no store exception text is returned |
+| Safety report submission | Authenticated community member submits report | Validate text, category, coordinates; stamp server identity and `PENDING_REVIEW` | Author IDs and trust scores never enter public projection; counts are marked synthetic until moderation | Validation → safe 400; persistence/provider failure is handled by Security Fabric; no realtime/authoritative claim is emitted |
+| OCR hint analysis | Public bounded OCR request | Validate media/text/QR limits and run client-OCR hint path | Hints are explicitly non-authoritative; input is capped before parsing | Invalid media/oversize → safe 4xx; decode failure → safe generic error; no raw image or parser details in response/logs |
+| AI provider fallback | Gateway request for a capability | Route through configured provider chain, bounded prompts/timeouts/output, deterministic fallback | Provider URL must be HTTPS and public; API keys remain headers; response JSON is schema-validated | Timeout/network/HTTP/invalid JSON becomes sanitized gateway status; no fabricated live success |
+| Academic document redirect | Layer 3 fetches a registered academic source | Validate scheme/authority, resolve DNS before each hop, follow only bounded manual redirects | Private/link-local/metadata IPs, credentials, unsafe hosts, and oversized bodies are blocked | Unsafe redirect or DNS failure → fail closed; source is downgraded/unverified rather than treated as official |
+| Schedule optimization | Public bounded schedule request | Validate mode, section shape, period range, and search-space product before CSP search | Maximum course/section counts and 250k search-space cap prevent algorithmic DoS | Invalid/oversized search → safe 400/413; valid but conflicting input returns an empty plan set |
+
+All transitions preserve the canonical public error fields (`code`, `userMessage`, `requestId`, `retryable`) where the route owns the response; uncaught failures are normalized by `SecurityFabric`.

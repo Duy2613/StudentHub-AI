@@ -275,6 +275,7 @@ export class CommunityStore {
     this.#ensureHydrated();
     const record = {
       feedbackId: `FB_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      reporterId: feedback.reporterId || null,
       postId: feedback.postId || null,
       topic: feedback.topic || "GENERAL",
       action: feedback.action || "SAME_EXPERIENCE", // SAME_EXPERIENCE, OUTDATED, WRONG, CONTEXT_DIFFERENT

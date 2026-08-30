@@ -9,26 +9,8 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Mail,
-  Lock,
-  User,
-  Eye,
-  EyeOff,
-  ArrowRight,
-  ArrowLeft,
-  Sparkles,
-  ShieldCheck,
-  GraduationCap,
-  Star,
-  CheckCircle2,
-  AlertCircle,
-  Loader2,
-  KeyRound,
-  Radio,
-  Zap,
-} from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { Eye, EyeOff, ArrowRight, ArrowLeft, Sparkles, ShieldCheck, GraduationCap, Star, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+
 import {
   signInWithPassword,
   signUpWithEmail,

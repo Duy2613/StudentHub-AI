@@ -6,21 +6,24 @@
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { AiRecommendationEngine } from "@/lib/intelligence/recommendation/AiRecommendationEngine.js";
 import { StudentProfile360Service } from "@/lib/intelligence/academic/studentProfile360Service.js";
+import { ObjectAuthorizer } from "@/lib/security/authorization/ObjectAuthorizer.js";
 
 export const GET = SecurityFabric.wrapHandler(
   {
     action: "READ_RECOMMENDATIONS",
     requiredPermission: "ACADEMIC.PLAN_OWN",
     requiredScopes: ["academic:plan"],
-    allowAnonymous: true
+    allowAnonymous: false
   },
   async (request, routeParams, principal, secContext) => {
     const { searchParams } = new URL(request.url);
     const requestedStudentId = searchParams.get("studentId");
 
-    const studentId = principal.isAuthenticated
-      ? principal.subjectId.replace("student:", "").trim()
-      : (requestedStudentId || "24110001");
+    const studentId = principal.subjectId.replace("student:", "").trim();
+
+    if (requestedStudentId && requestedStudentId !== studentId) {
+      ObjectAuthorizer.assertAccess(principal, { studentId: requestedStudentId });
+    }
 
     const profile360 = StudentProfile360Service.getStudentProfile360(studentId);
 

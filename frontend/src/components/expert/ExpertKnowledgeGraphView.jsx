@@ -1,27 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Award, 
-  BookOpen, 
-  CheckCircle2, 
-  ShieldCheck, 
-  ShieldAlert, 
-  UserCheck, 
-  Layers, 
-  Activity, 
-  Search, 
-  Building2,
-  FileCheck2,
-  Sparkles,
-  AlertTriangle,
-  Fingerprint,
-  Clock,
-  History,
-  Link2,
-  ExternalLink,
-  ShieldX
-} from "lucide-react";
+import { Award, BookOpen, CheckCircle2, ShieldCheck, ShieldAlert, UserCheck, Activity, Search, Building2, FileCheck2, Sparkles, AlertTriangle, Fingerprint, ShieldX } from "lucide-react";
 
 export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
   const [experts, setExperts] = useState(initialExperts);

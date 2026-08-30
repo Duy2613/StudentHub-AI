@@ -60,7 +60,10 @@ export const GET = SecurityFabric.wrapHandler(
       data: healthMetrics,
       meta: {
         correlationId: secContext.correlationId
-      }
+      },
+      sourceState: "SYNTHETIC_HEALTH_BENCHMARK",
+      isAuthoritative: false,
+      dataNotice: "Các chỉ số tổng hợp hiện dùng fixture/benchmark cục bộ, không phải SLO production."
     });
   }
 );

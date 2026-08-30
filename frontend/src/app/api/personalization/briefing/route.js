@@ -5,9 +5,9 @@ export const dynamic = "force-dynamic";
 
 export const GET = SecurityFabric.wrapHandler({
   action: "READ_ACADEMIC_BRIEFING",
-  allowAnonymous: true,
-  handler: async ({ request, principal, correlationId }) => {
-    const subjectId = principal?.subjectId || "student:24110001";
+  allowAnonymous: false,
+  handler: async ({ principal, correlationId }) => {
+    const subjectId = principal.subjectId;
     const briefing = AcademicBriefingEngine.compileBriefing(subjectId);
 
     return Response.json({

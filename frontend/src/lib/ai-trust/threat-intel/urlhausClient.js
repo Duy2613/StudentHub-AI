@@ -6,6 +6,8 @@
  * Includes timeout protection (2.5s), local cache, rate limiting, and zero-fabrication status mapping.
  */
 
+import { validateRemoteUrlSync } from "../../security/hardening/SafeRemoteUrl.js";
+
 export const URLHAUS_STATUS = {
   KNOWN_MALICIOUS: "KNOWN_MALICIOUS",
   NO_KNOWN_THREAT: "NO_KNOWN_THREAT",
@@ -17,6 +19,15 @@ export const URLHAUS_STATUS = {
 // In-memory LRU-like cache for queried URLs/domains to avoid rate limits
 const URLHAUS_CACHE = new Map();
 const CACHE_TTL_MS = 1000 * 60 * 15; // 15 minutes
+const MAX_CACHE_ENTRIES = 5_000;
+
+function cacheResult(cacheKey, data) {
+  if (!URLHAUS_CACHE.has(cacheKey) && URLHAUS_CACHE.size >= MAX_CACHE_ENTRIES) {
+    const oldestKey = URLHAUS_CACHE.keys().next().value;
+    if (oldestKey) URLHAUS_CACHE.delete(oldestKey);
+  }
+  URLHAUS_CACHE.set(cacheKey, { timestamp: Date.now(), data });
+}
 
 /**
  * Normalizes input URL/Host for threat query
@@ -63,6 +74,21 @@ export async function queryUrlhausUrl(targetUrl, { timeoutMs = 2500 } = {}) {
     };
   }
 
+  // Never forward loopback, private, metadata, or non-HTTP targets to a
+  // third-party threat feed. This is both an SSRF boundary and a data-egress
+  // boundary for user-supplied URLs.
+  if (!validateRemoteUrlSync(normalized.fullUrl).ok) {
+    return {
+      status: URLHAUS_STATUS.INVALID_INPUT,
+      isMalicious: false,
+      threatType: null,
+      tags: [],
+      reference: null,
+      latencyMs: Number((performance.now() - startTime).toFixed(2)),
+      source: "URLHAUS_ABUSE_CH",
+    };
+  }
+
   // Check in-memory cache first
   const cacheKey = `url:${normalized.fullUrl}`;
   const cached = URLHAUS_CACHE.get(cacheKey);
@@ -74,9 +100,11 @@ export async function queryUrlhausUrl(targetUrl, { timeoutMs = 2500 } = {}) {
     };
   }
 
+  let timeoutId = null;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    const boundedTimeout = Math.min(Math.max(Number(timeoutMs) || 2500, 250), 10000);
+    timeoutId = setTimeout(() => controller.abort(), boundedTimeout);
 
     const formData = new URLSearchParams();
     formData.append("url", normalized.fullUrl);
@@ -92,9 +120,12 @@ export async function queryUrlhausUrl(targetUrl, { timeoutMs = 2500 } = {}) {
     });
 
     clearTimeout(timeoutId);
+    timeoutId = null;
 
     if (!response.ok) {
       if (response.status === 429) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
         return {
           status: URLHAUS_STATUS.RATE_LIMITED,
           isMalicious: false,
@@ -108,26 +139,28 @@ export async function queryUrlhausUrl(targetUrl, { timeoutMs = 2500 } = {}) {
       throw new Error(`HTTP Error ${response.status}`);
     }
 
-    const data = await response.json();
+    const raw = await response.arrayBuffer();
+    if (raw.byteLength > 1 * 1024 * 1024) throw new Error("URLhaus response exceeded the size limit");
+    const data = JSON.parse(new TextDecoder().decode(raw));
     const isMalicious = data.query_status === "ok" && data.url_status !== "offline";
 
     const result = {
       status: isMalicious ? URLHAUS_STATUS.KNOWN_MALICIOUS : URLHAUS_STATUS.NO_KNOWN_THREAT,
       isMalicious,
       threatType: isMalicious ? (data.threat || "MALWARE_DISTRIBUTION") : null,
-      tags: Array.isArray(data.tags) ? data.tags : [],
+      tags: Array.isArray(data.tags) ? data.tags.filter(tag => typeof tag === "string").slice(0, 50) : [],
       urlStatus: data.url_status || null,
       reference: data.urlhaus_reference || null,
       firstSeen: data.date_added || null,
-      reporter: data.reporter || null,
       latencyMs: Number((performance.now() - startTime).toFixed(2)),
       source: "URLHAUS_ABUSE_CH",
     };
 
     // Cache successful response
-    URLHAUS_CACHE.set(cacheKey, { timestamp: Date.now(), data: result });
+    cacheResult(cacheKey, result);
     return result;
   } catch (err) {
+    if (timeoutId) clearTimeout(timeoutId);
     // Graceful offline fallback
     const latencyMs = Number((performance.now() - startTime).toFixed(2));
     return {
@@ -136,7 +169,7 @@ export async function queryUrlhausUrl(targetUrl, { timeoutMs = 2500 } = {}) {
       threatType: null,
       tags: [],
       reference: null,
-      errorNotice: err?.name === "AbortError" ? "TIMEOUT_EXCEEDED" : (err?.message || "NETWORK_ERROR"),
+      errorNotice: err?.name === "AbortError" ? "TIMEOUT_EXCEEDED" : "NETWORK_ERROR",
       latencyMs,
       source: "URLHAUS_ABUSE_CH",
     };
@@ -160,6 +193,16 @@ export async function queryUrlhausHost(targetHost, { timeoutMs = 2500 } = {}) {
     };
   }
 
+  if (!validateRemoteUrlSync(`https://${normalized.hostname}`).ok) {
+    return {
+      status: URLHAUS_STATUS.INVALID_INPUT,
+      isMalicious: false,
+      urlCount: 0,
+      latencyMs: Number((performance.now() - startTime).toFixed(2)),
+      source: "URLHAUS_ABUSE_CH",
+    };
+  }
+
   const cacheKey = `host:${normalized.hostname}`;
   const cached = URLHAUS_CACHE.get(cacheKey);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
@@ -170,9 +213,11 @@ export async function queryUrlhausHost(targetHost, { timeoutMs = 2500 } = {}) {
     };
   }
 
+  let timeoutId = null;
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    const boundedTimeout = Math.min(Math.max(Number(timeoutMs) || 2500, 250), 10000);
+    timeoutId = setTimeout(() => controller.abort(), boundedTimeout);
 
     const formData = new URLSearchParams();
     formData.append("host", normalized.hostname);
@@ -188,12 +233,15 @@ export async function queryUrlhausHost(targetHost, { timeoutMs = 2500 } = {}) {
     });
 
     clearTimeout(timeoutId);
+    timeoutId = null;
 
     if (!response.ok) {
       throw new Error(`HTTP Error ${response.status}`);
     }
 
-    const data = await response.json();
+    const raw = await response.arrayBuffer();
+    if (raw.byteLength > 1 * 1024 * 1024) throw new Error("URLhaus response exceeded the size limit");
+    const data = JSON.parse(new TextDecoder().decode(raw));
     const isMalicious = data.query_status === "ok" && Array.isArray(data.urls) && data.urls.length > 0;
 
     const result = {
@@ -206,14 +254,15 @@ export async function queryUrlhausHost(targetHost, { timeoutMs = 2500 } = {}) {
       source: "URLHAUS_ABUSE_CH",
     };
 
-    URLHAUS_CACHE.set(cacheKey, { timestamp: Date.now(), data: result });
+    cacheResult(cacheKey, result);
     return result;
   } catch (err) {
+    if (timeoutId) clearTimeout(timeoutId);
     return {
       status: URLHAUS_STATUS.API_UNAVAILABLE,
       isMalicious: false,
       urlCount: 0,
-      errorNotice: err?.name === "AbortError" ? "TIMEOUT_EXCEEDED" : (err?.message || "NETWORK_ERROR"),
+      errorNotice: err?.name === "AbortError" ? "TIMEOUT_EXCEEDED" : "NETWORK_ERROR",
       latencyMs: Number((performance.now() - startTime).toFixed(2)),
       source: "URLHAUS_ABUSE_CH",
     };

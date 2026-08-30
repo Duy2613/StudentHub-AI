@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useBackground } from "@/components/providers/BackgroundContext";
 
 export default function CinematicScrollytellingObserver() {

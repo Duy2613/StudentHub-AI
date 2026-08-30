@@ -106,7 +106,10 @@ export class AiToolFirewall {
     }
 
     // 2. Agent Permissions to call tool
-    if (agentPrincipal.agentIdentity && !agentPrincipal.agentIdentity.allowedTools.includes(toolId) && !agentPrincipal.agentIdentity.allowedTools.includes("*")) {
+    const allowedTools = Array.isArray(agentPrincipal.agentIdentity?.allowedTools)
+      ? agentPrincipal.agentIdentity.allowedTools
+      : [];
+    if (agentPrincipal.agentIdentity && !allowedTools.includes(toolId) && !allowedTools.includes("*")) {
       throw new SecurityError({
         code: SECURITY_ERROR_CODE.AI_TOOL_DENIED,
         message: `Agent '${agentPrincipal.agentIdentity.agentId}' is not authorized to invoke tool '${toolId}'.`,
@@ -150,7 +153,7 @@ export class AiToolFirewall {
 
     // 7. Prevent Cross-Student Data Access via Tool Arguments
     const delegatorId = agentPrincipal.attributes?.delegatorId;
-    if (delegatorId && toolInput.studentId) {
+    if (typeof delegatorId === "string" && delegatorId && toolInput.studentId) {
       const cleanDelegator = delegatorId.replace("student:", "").trim();
       const cleanTarget = String(toolInput.studentId).replace("student:", "").trim();
       if (cleanDelegator !== cleanTarget) {
@@ -166,10 +169,10 @@ export class AiToolFirewall {
     let rawResult;
     try {
       rawResult = await executor(toolInput);
-    } catch (err) {
+    } catch {
       throw new SecurityError({
         code: SECURITY_ERROR_CODE.INTERNAL_SECURITY_ERROR,
-        message: `Tool execution failed: ${err.message}`,
+        message: "Tool execution failed while processing the request.",
         statusCode: 500
       });
     }

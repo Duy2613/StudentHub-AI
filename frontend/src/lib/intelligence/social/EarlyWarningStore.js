@@ -83,13 +83,16 @@ export class EarlyWarningStore {
     const tempFile = `${this.#storageFilePath}.tmp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
     try {
       fs.writeFileSync(tempFile, JSON.stringify(payload, null, 2), "utf8");
-      fs.renameSync(tempFile, this.#storageFilePath);
-    } catch (err) {
       try {
-        if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
+        fs.renameSync(tempFile, this.#storageFilePath);
       } catch {
-        // ignore
+        fs.copyFileSync(tempFile, this.#storageFilePath);
+        try { fs.unlinkSync(tempFile); } catch {}
       }
+    } catch {
+      try {
+        fs.writeFileSync(this.#storageFilePath, JSON.stringify(payload, null, 2), "utf8");
+      } catch {}
     }
   }
 

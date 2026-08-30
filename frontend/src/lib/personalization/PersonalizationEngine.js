@@ -6,7 +6,7 @@
 
 import { PersonalDigitalTwin } from "./PersonalDigitalTwin.js";
 import { ExpertDiscoveryEngine } from "../intelligence/expert/ExpertDiscoveryEngine.js";
-import { AiRecommendationEngine } from "../intelligence/recommendation/AiRecommendationEngine.js";
+
 
 export const PERSONA_TYPE = Object.freeze({
   NEW_STUDENT: "NEW_STUDENT",                     // First year student (0-30 credits)
@@ -70,7 +70,6 @@ export class PersonalizationEngine {
 
     // 1. Determine Urgent Academic Priorities based on Persona & Progress
     const urgentPriorities = [];
-    const earnedCredits = digitalTwin.academicContext?.earnedCredits || 0;
 
     if (persona === PERSONA_TYPE.NEW_STUDENT) {
       urgentPriorities.push({
@@ -157,6 +156,12 @@ export class PersonalizationEngine {
       commandCenterId: `cmd_${subjectId}_${Date.now()}`,
       compiledAt: new Date().toISOString(),
       subjectId,
+      // The local stores intentionally seed deterministic records for tests and
+      // competition rehearsal. They are not an institutional live feed, so the
+      // API exposes this state instead of allowing the UI to imply freshness.
+      sourceState: "SYNTHETIC_FIXTURE",
+      dataNotice: "Context hiện tại được dựng từ dữ liệu fixture cục bộ. Chưa có nguồn học vụ trực tiếp được kết nối.",
+      isAuthoritative: false,
       persona,
       preferences,
       digitalTwinSummary: {
@@ -164,6 +169,7 @@ export class PersonalizationEngine {
         studentId: digitalTwin.identity.studentId,
         cgpa: digitalTwin.academicContext.cgpa,
         earnedCredits: digitalTwin.academicContext.earnedCredits,
+        totalRequiredCredits: digitalTwin.academicContext.totalRequiredCredits,
         completionPercentage: digitalTwin.academicContext.completionPercentage,
         academicStanding: digitalTwin.identity.academicStanding
       },
@@ -172,9 +178,17 @@ export class PersonalizationEngine {
       nextBestAction,
       personalizedExperts,
       communitySignals,
+      provenance: {
+        type: "SYNTHETIC_FIXTURE",
+        sourceCount: 0,
+        isAuthoritative: false,
+        notice: "Các lịch, khuyến nghị và tín hiệu mẫu chỉ dùng cho kiểm thử; chưa phải dữ liệu trực tiếp."
+      },
       explainability: {
-        sourceCount: 4,
-        provenanceType: "GROUNDED_ACADEMIC_TWIN",
+        sourceCount: 0,
+        provenanceType: "SYNTHETIC_FIXTURE",
+        sourceState: "SYNTHETIC_FIXTURE",
+        isAuthoritative: false,
         privacyFilterActive: true
       }
     };

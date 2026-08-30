@@ -8,6 +8,9 @@
 import { ISemanticVerificationProvider } from "./ISemanticVerificationProvider.js";
 import { DeterministicSemanticProvider } from "./DeterministicSemanticProvider.js";
 import { LAYER_2_CONFIG } from "../config/Layer2Config.js";
+import { validateRemoteUrlSync } from "../../../security/hardening/SafeRemoteUrl.js";
+
+const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
 
 export class GeminiSemanticModelProvider extends ISemanticVerificationProvider {
   constructor(apiKey = null) {
@@ -30,13 +33,24 @@ export class GeminiSemanticModelProvider extends ISemanticVerificationProvider {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), LAYER_2_CONFIG.SLA.MAX_TIMEOUT_MS);
 
-      const prompt = this.buildStructuredPrompt(params);
+      if (!validateRemoteUrlSync(GEMINI_ENDPOINT).ok) {
+        throw new Error("Gemini endpoint failed URL policy validation");
+      }
+
+      const boundedParams = {
+        ...params,
+        text: String(params?.text || "").slice(0, LAYER_2_CONFIG.LIMITS.MAX_TEXT_CHARACTERS),
+        ocrText: String(params?.ocrText || "").slice(0, LAYER_2_CONFIG.LIMITS.MAX_OCR_CHARACTERS),
+        url: String(params?.url || "").slice(0, 2048),
+        qrPayload: String(params?.qrPayload || "").slice(0, 4096)
+      };
+      const prompt = this.buildStructuredPrompt(boundedParams);
 
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${LAYER_2_CONFIG.MODEL.GEMINI_MODEL}:generateContent?key=${this.apiKey}`,
+        `${GEMINI_ENDPOINT}/${encodeURIComponent(LAYER_2_CONFIG.MODEL.GEMINI_MODEL)}:generateContent`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "x-goog-api-key": this.apiKey },
           signal: controller.signal,
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }],
@@ -55,7 +69,13 @@ export class GeminiSemanticModelProvider extends ISemanticVerificationProvider {
         throw new Error(`Gemini API returned status ${response.status}`);
       }
 
-      const json = await response.json();
+      const contentLength = Number(response.headers.get("content-length") || 0);
+      if (Number.isFinite(contentLength) && contentLength > 2 * 1024 * 1024) {
+        throw new Error("Gemini response exceeded the size limit");
+      }
+      const raw = await response.arrayBuffer();
+      if (raw.byteLength > 2 * 1024 * 1024) throw new Error("Gemini response exceeded the size limit");
+      const json = JSON.parse(new TextDecoder().decode(raw));
       const textOutput = json.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!textOutput) throw new Error("Empty model response");
 
@@ -65,12 +85,12 @@ export class GeminiSemanticModelProvider extends ISemanticVerificationProvider {
         providerId: this.providerId,
       };
     } catch (err) {
-      console.warn(`[Layer2 Gemini Provider Warning] Falling back to deterministic engine: ${err.message}`);
+      console.warn(`[Layer2 Gemini Provider Warning] Falling back to deterministic engine (${err?.name || "provider_error"})`);
       const fallbackResult = await this.fallbackEngine.analyzeSemantics(params);
       return {
         ...fallbackResult,
         modelStatus: "fallback_used",
-        fallbackReason: err.message,
+        fallbackReason: err?.name === "AbortError" ? "TIMEOUT" : "GEMINI_PROVIDER_UNAVAILABLE",
       };
     }
   }

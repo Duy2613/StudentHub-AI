@@ -4,35 +4,35 @@
  * Retrieves evidence span passage, source lineage, content hash, and validity window.
  */
 
-import { NextResponse } from "next/server";
-import { AiTrustStore } from "@/lib/intelligence/trust/aiTrustStore";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { AiTrustStore } from "@/lib/intelligence/trust/aiTrustStore.js";
 
-export async function GET(req, { params }) {
-  try {
-    const { evidenceId } = await params;
-    if (!evidenceId) {
-      return NextResponse.json(
-        { success: false, error: "evidenceId is required." },
-        { status: 400 }
-      );
-    }
-
-    const evidence = AiTrustStore.getEvidence(evidenceId);
-    if (!evidence) {
-      return NextResponse.json(
-        { success: false, error: "Evidence span not found." },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      evidence
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error retrieving evidence" },
-      { status: 500 }
-    );
+export const GET = SecurityFabric.wrapHandler({
+  action: "READ_TRUST_EVIDENCE",
+  requiredPermission: "TRUST.READ",
+  requiredScopes: ["trust:read"],
+  allowAnonymous: false,
+  maxRequests: 120
+}, async (_request, routeParams, principal, secContext) => {
+  const { evidenceId } = await routeParams.params;
+  if (!evidenceId) {
+    return Response.json({ success: false, error: {
+      code: "TRUST_EVIDENCE_ID_REQUIRED",
+      userMessage: "Thiếu mã bằng chứng.",
+      requestId: secContext.correlationId,
+      retryable: false
+    } }, { status: 400 });
   }
-}
+
+  const evidence = AiTrustStore.getEvidenceForPrincipal(evidenceId, principal);
+  if (!evidence) {
+    return Response.json({ success: false, error: {
+      code: "TRUST_EVIDENCE_NOT_FOUND",
+      userMessage: "Không tìm thấy bằng chứng kiểm chứng.",
+      requestId: secContext.correlationId,
+      retryable: false
+    } }, { status: 404 });
+  }
+
+  return Response.json({ success: true, evidence, meta: { requestId: secContext.correlationId } });
+});

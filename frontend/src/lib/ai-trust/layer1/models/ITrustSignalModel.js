@@ -26,7 +26,6 @@ export class ITrustSignalModel {
    * @param {object} [params.context]
    * @returns {Promise<object|null>} { isSuspicious, confidence, modelLabel, rawOutput }
    */
-  // eslint-disable-next-line no-unused-vars
   async analyzeText({ text, context = {} }) {
     throw new Error("analyzeText must be implemented by subclass");
   }
@@ -38,7 +37,6 @@ export class ITrustSignalModel {
    * @param {object} [params.context]
    * @returns {Promise<object|null>}
    */
-  // eslint-disable-next-line no-unused-vars
   async analyzeUrl({ url, context = {} }) {
     throw new Error("analyzeUrl must be implemented by subclass");
   }
@@ -99,7 +97,7 @@ export async function executeAuxiliaryModelSafe({
 
     return { modelSignals, modelUsed: model.name };
   } catch (err) {
-    SecurityLogger.warn(`Auxiliary model '${model.name}' failed or timed out: ${err.message}. Falling back to deterministic rules.`);
+    SecurityLogger.warn(`Auxiliary model '${model.name}' failed or timed out (${err?.name || "model_error"}). Falling back to deterministic rules.`);
     return { modelSignals: [], modelUsed: null };
   }
 }

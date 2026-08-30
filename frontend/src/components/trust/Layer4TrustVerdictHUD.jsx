@@ -1,26 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ShieldCheck,
-  ShieldAlert,
-  AlertTriangle,
-  HelpCircle,
-  ExternalLink,
-  ChevronDown,
-  Sparkles,
-  Layers,
-  Cpu,
-  Info,
-  Scale,
-  Activity,
-  FileText,
-  Clock,
-  ArrowRight,
-  Fingerprint,
-} from "lucide-react";
-import { saffronAudio } from "@/lib/audio/saffronAudio";
+import { safeExternalUrl } from "@/lib/security/safeExternalUrl";
+
+import { ShieldCheck, ShieldAlert, AlertTriangle, HelpCircle, ExternalLink, Sparkles, Info, Scale, FileText, Fingerprint } from "lucide-react";
+
 
 export default function Layer4TrustVerdictHUD({ result }) {
   const [expandedClaim, setExpandedClaim] = useState(null);
@@ -279,7 +263,7 @@ export default function Layer4TrustVerdictHUD({ result }) {
                 <div key={idx} className="p-3 rounded-xl bg-black/40 border border-[#2d0d08] text-xs space-y-1">
                   <div className="flex items-center justify-between">
                     <a
-                      href={ev.sourceUrl}
+                      href={safeExternalUrl(ev.sourceUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-bold text-cyan-300 hover:underline flex items-center gap-1.5"

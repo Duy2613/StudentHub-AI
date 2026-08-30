@@ -28,13 +28,6 @@ describe("P0 Security Regression — BOLA & PII Protection", () => {
     scopes: ["academic:read"]
   });
 
-  const tokenStudentB = tokenValidator.signToken({
-    sub: "student:24110002",
-    email: "24110002@student.hcmute.edu.vn",
-    roles: ["student"],
-    scopes: ["academic:read"]
-  });
-
   beforeEach(() => {
     StudentIdentityStore.rehydrate();
     StudentProfile360Store.rehydrate();

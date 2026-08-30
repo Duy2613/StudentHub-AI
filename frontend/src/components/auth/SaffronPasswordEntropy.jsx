@@ -7,7 +7,7 @@
 // - Hiển thị tỷ lệ Entropy (Bits), phân đoạn thanh trạng thái phát sáng Saffron/Emerald
 
 import React from "react";
-import { ShieldCheck, ShieldAlert, KeyRound, Lock } from "lucide-react";
+import { KeyRound } from "lucide-react";
 
 export default function SaffronPasswordEntropy({ password = "" }) {
   if (!password) return null;

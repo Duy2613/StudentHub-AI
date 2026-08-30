@@ -8,7 +8,8 @@
 
 import { EvidenceFusionEngine } from "./fusion/EvidenceFusionEngine.js";
 import { DeterministicTrustPolicyProvider } from "./providers/DeterministicTrustPolicyProvider.js";
-import { GeminiTrustReasoningProvider } from "./providers/GeminiTrustReasoningProvider.js";
+import { AIGatewayReasoningProvider } from "./providers/AIGatewayReasoningProvider.js";
+
 import { GlobalIntelligenceEngine } from "../engine/GlobalIntelligenceEngine.js";
 import { createLayer4Result } from "./types.js";
 import { LAYER_4_CONFIG } from "./config/Layer4Config.js";
@@ -30,7 +31,11 @@ export class Layer4TrustService {
     options = {},
   }) {
     const startTime = performance.now();
-    const provider = options.provider || new DeterministicTrustPolicyProvider();
+    // Deterministic policy is always authoritative. The shared AI Gateway is
+    // opt-in and can only enrich the explanation after policy evaluation.
+    const provider = options.provider || (options.useAIGateway
+      ? new AIGatewayReasoningProvider()
+      : new DeterministicTrustPolicyProvider());
 
     // 1. Evidence Fusion: Merge signals, semantics, and external evidence
     const {
@@ -73,7 +78,7 @@ export class Layer4TrustService {
     try {
       assessment = await provider.reason(fusedGraph);
     } catch (err) {
-      console.warn(`[Layer 4 Service Provider Error]: ${err.message}, falling back to deterministic policy`);
+      console.warn(`[Layer 4 Service Provider Error]: ${err?.name || "provider_error"}; falling back to deterministic policy`);
       const fallback = new DeterministicTrustPolicyProvider();
       assessment = await fallback.reason(fusedGraph);
     }

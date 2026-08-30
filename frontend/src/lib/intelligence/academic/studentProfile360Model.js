@@ -5,8 +5,8 @@
  * curriculum graduation requirements, financial clearance, and section-level provenance.
  */
 
-import { StudentIdentityModel, ACADEMIC_STATUSES } from "./studentIdentityModel.js";
-import { AcademicRecordsModel, COURSE_STATUSES, CERTIFICATE_STATUSES, TUITION_STATUSES } from "./academicRecordsModel.js";
+import { StudentIdentityModel } from "./studentIdentityModel.js";
+import { AcademicRecordsModel, CERTIFICATE_STATUSES, TUITION_STATUSES } from "./academicRecordsModel.js";
 import { 
   CANONICAL_SOURCES, 
   DATA_AUTHORITY_LEVELS, 

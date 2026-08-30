@@ -1,15 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Sliders,
-  Sparkles,
-  Brain,
-  Trash2,
-  CheckCircle2,
-  Save,
-  RotateCcw
-} from "lucide-react";
+import { Sliders, Sparkles, Brain } from "lucide-react";
 
 export function PersonalizationControls() {
   const [goals, setGoals] = useState([]);

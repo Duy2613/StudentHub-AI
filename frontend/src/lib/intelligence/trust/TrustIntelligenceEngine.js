@@ -4,7 +4,7 @@
  */
 
 import { ReputationGraph } from "../fabric/ReputationGraph.js";
-import { ProvenanceGraph } from "../fabric/ProvenanceGraph.js";
+
 
 export const TRUST_LEVEL = Object.freeze({
   VERY_HIGH: "VERY_HIGH",   // 0.85 - 1.00

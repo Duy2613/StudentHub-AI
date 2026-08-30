@@ -1,26 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Layers,
-  ShieldCheck,
-  AlertTriangle,
-  Clock,
-  Search,
-  HelpCircle,
-  History,
-  GitCompare,
-  CheckCircle2,
-  Users,
-  Award,
-  Sparkles,
-  ArrowRight,
-  Info,
-  ChevronRight,
-  ExternalLink,
-  Flame,
-  FileText
-} from "lucide-react";
+import { Layers, ShieldCheck, AlertTriangle, Search, HelpCircle, GitCompare, Users, Award, Sparkles, Flame } from "lucide-react";
 
 export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
   const [objects] = useState(initialKnowledgeObjects);

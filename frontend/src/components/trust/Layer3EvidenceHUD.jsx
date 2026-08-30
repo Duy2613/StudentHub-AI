@@ -1,22 +1,9 @@
 "use client";
 
 import React from "react";
-import {
-  FileText,
-  ExternalLink,
-  ShieldCheck,
-  ShieldAlert,
-  AlertTriangle,
-  HelpCircle,
-  Clock,
-  Layers,
-  Scale,
-  CheckCircle2,
-  XCircle,
-  Network,
-  ArrowRight,
-} from "lucide-react";
-import { LAYER_3_STATUS, CLAIM_EVIDENCE_RELATION } from "@/lib/ai-trust/layer3/types";
+import { FileText, ExternalLink, ShieldCheck, HelpCircle, Clock, Scale, Network, ArrowRight } from "lucide-react";
+import { LAYER_3_STATUS } from "@/lib/ai-trust/layer3/types";
+import { safeExternalUrl } from "@/lib/security/safeExternalUrl";
 
 export default function Layer3EvidenceHUD({ result, className = "" }) {
   if (!result) return null;
@@ -219,7 +206,7 @@ export default function Layer3EvidenceHUD({ result, className = "" }) {
                       >
                         <div className="flex items-center justify-between gap-2 font-mono text-[10px]">
                           <a
-                            href={ev.sourceUrl}
+                            href={safeExternalUrl(ev.sourceUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[#38f8d4] hover:underline flex items-center gap-1 truncate max-w-[280px]"

@@ -5,9 +5,9 @@ export const dynamic = "force-dynamic";
 
 export const GET = SecurityFabric.wrapHandler({
   action: "READ_USER_GOALS",
-  allowAnonymous: true,
-  handler: async ({ request, principal, correlationId }) => {
-    const subjectId = principal?.subjectId || "student:24110001";
+  allowAnonymous: false,
+  handler: async ({ principal, correlationId }) => {
+    const subjectId = principal.subjectId;
     const goals = UserGoalEngine.getGoals(subjectId);
 
     return Response.json({
@@ -20,13 +20,13 @@ export const GET = SecurityFabric.wrapHandler({
 
 export const POST = SecurityFabric.wrapHandler({
   action: "CREATE_USER_GOAL",
-  allowAnonymous: true,
+  allowAnonymous: false,
   handler: async ({ request, principal, correlationId }) => {
-    const subjectId = principal?.subjectId || "student:24110001";
+    const subjectId = principal.subjectId;
     let body = {};
     try {
       body = await request.json();
-    } catch (_) {}
+    } catch {}
 
     const created = UserGoalEngine.createGoal(subjectId, body);
 

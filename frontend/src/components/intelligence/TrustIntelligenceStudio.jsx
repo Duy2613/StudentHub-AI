@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ShieldCheck, UserCheck, AlertTriangle, History, Info, Sparkles, CheckCircle2, ChevronRight } from "lucide-react";
+import { ShieldCheck, AlertTriangle, Sparkles, CheckCircle2 } from "lucide-react";
 
 export function TrustIntelligenceStudio({ subjectId = "student:24110001" }) {
   const [profile, setProfile] = useState(null);

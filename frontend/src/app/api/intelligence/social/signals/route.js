@@ -13,7 +13,7 @@ const signalsBuffer = [];
 export const GET = SecurityFabric.wrapHandler({
   action: "READ_SOCIAL_SIGNALS",
   allowAnonymous: true,
-  handler: async ({ request, principal, correlationId }) => {
+  handler: async ({ correlationId }) => {
     return Response.json({
       success: true,
       data: signalsBuffer.slice(-30).reverse(),
@@ -25,12 +25,13 @@ export const GET = SecurityFabric.wrapHandler({
 
 export const POST = SecurityFabric.wrapHandler({
   action: "INGEST_SOCIAL_SIGNAL",
-  allowAnonymous: true,
-  handler: async ({ request, principal, correlationId }) => {
+  requiredPermission: "COMMUNITY.POST",
+  allowAnonymous: false,
+  handler: async ({ request, correlationId }) => {
     let payload = {};
     try {
       payload = await request.json();
-    } catch (_) {}
+    } catch {}
 
     // 1. Normalize
     const normalizedItem = ContentItemNormalizer.normalize(payload, {

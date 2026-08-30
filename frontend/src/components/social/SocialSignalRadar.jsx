@@ -1,19 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Radio,
-  AlertTriangle,
-  Flame,
-  CheckCircle2,
-  Users,
-  Clock,
-  Sparkles,
-  ExternalLink,
-  ShieldCheck,
-  RefreshCw,
-  Send
-} from "lucide-react";
+import { Radio, AlertTriangle, Users, Sparkles, RefreshCw, Send } from "lucide-react";
 
 export function SocialSignalRadar() {
   const [warnings, setWarnings] = useState([]);

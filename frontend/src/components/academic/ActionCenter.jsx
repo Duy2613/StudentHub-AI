@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { AcademicCommandCenterViewModel } from "@/lib/intelligence/academic/academicCommandCenterViewModel.js";
+import { safeExternalUrl, safeInternalPath } from "@/lib/security/safeExternalUrl.js";
 import { AlertOctagon, Calendar, FileText, ArrowRight, Check, ListChecks, ChevronRight } from "lucide-react";
 
 export function ActionCenter({
@@ -44,11 +45,11 @@ export function ActionCenter({
       setCompletedActionIds((prev) => new Set([...prev, insightId]));
 
       if (action?.targetUrl) {
-        if (action.targetUrl.startsWith("http")) {
-          window.open(action.targetUrl, "_blank", "noopener,noreferrer");
-        } else {
-          window.location.href = action.targetUrl;
-        }
+        const externalUrl = safeExternalUrl(action.targetUrl);
+        const internalPath = safeInternalPath(action.targetUrl);
+
+        if (externalUrl) window.open(externalUrl, "_blank", "noopener,noreferrer");
+        else if (internalPath) window.location.assign(internalPath);
       }
     }, 600);
   };

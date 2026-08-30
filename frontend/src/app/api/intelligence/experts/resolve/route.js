@@ -7,8 +7,9 @@
 
 import { NextResponse } from "next/server";
 import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
-export async function POST(req) {
+async function resolveExpertEntity(req) {
   try {
     const body = await req.json().catch(() => ({}));
     const resolution = ExpertStore.resolveEntity(body);
@@ -18,9 +19,16 @@ export async function POST(req) {
       resolution
     });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error resolving expert entity" },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler(
+  {
+    action: "RESOLVE_EXPERT_ENTITY",
+    requiredPermission: "EXPERT.MANAGE_GRAPH",
+    allowAnonymous: false,
+    maxRequests: 30
+  },
+  resolveExpertEntity
+);

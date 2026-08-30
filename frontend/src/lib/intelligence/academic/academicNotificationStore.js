@@ -43,8 +43,8 @@ export class AcademicNotificationStore {
           }
         }
       }
-    } catch (err) {
-      console.error("[AcademicNotificationStore] Rehydration failed:", err.message);
+    } catch {
+      console.error("[AcademicNotificationStore] Rehydration failed");
     } finally {
       this.#isHydrated = true;
     }
@@ -97,8 +97,8 @@ export class AcademicNotificationStore {
       const tempFile = path.join(DATA_DIR, `.tmp_notif_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.json`);
       fs.writeFileSync(tempFile, JSON.stringify(payload, null, 2), "utf-8");
       fs.renameSync(tempFile, STORAGE_FILE);
-    } catch (err) {
-      console.error("[AcademicNotificationStore] Disk flush failed:", err.message);
+    } catch {
+      console.error("[AcademicNotificationStore] Disk flush failed");
     }
   }
 

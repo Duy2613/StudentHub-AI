@@ -5,12 +5,7 @@
  * into canonical representation and aligns their semantic relations.
  */
 
-import {
-  EvidenceFusionModel,
-  CLAIM_RELATION_TYPE,
-  KNOWLEDGE_LAYER,
-  AUTHORITY_CLASS
-} from "./evidenceFusionModel.js";
+import { EvidenceFusionModel, CLAIM_RELATION_TYPE, KNOWLEDGE_LAYER } from "./evidenceFusionModel.js";
 
 export class EvidenceFusionClaimAligner {
   /**

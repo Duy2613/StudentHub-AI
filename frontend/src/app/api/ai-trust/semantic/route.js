@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticService";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
 /**
  * POST /api/ai-trust/semantic
@@ -7,7 +8,7 @@ import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticServi
  * Authoritative Layer 2: Semantic & Contextual Verification Endpoint
  * Analyzes meaning, intent, consistency, extracts claims & packages Layer 3 tasks.
  */
-export async function POST(request) {
+async function analyzeSemantics(request) {
   try {
     let body;
     try {
@@ -23,6 +24,13 @@ export async function POST(request) {
     }
 
     const { type = "text", content = "", metadata = {}, layer1Result = {}, options = {} } = body || {};
+
+    if (typeof content !== "string" || content.length > 12_000 ||
+        !metadata || typeof metadata !== "object" || Array.isArray(metadata) ||
+        !layer1Result || typeof layer1Result !== "object" || Array.isArray(layer1Result) ||
+        !options || typeof options !== "object" || Array.isArray(options)) {
+      return NextResponse.json({ error: { code: "SEMANTIC_INPUT_INVALID", userMessage: "Dữ liệu phân tích ngữ nghĩa không hợp lệ hoặc vượt giới hạn." }, status: "BAD_REQUEST" }, { status: 400 });
+    }
 
     if (!content && !metadata?.ocrText && !metadata?.qrContent && !metadata?.url) {
       return NextResponse.json(
@@ -52,14 +60,13 @@ export async function POST(request) {
       },
     });
   } catch (error) {
-    console.error("[Layer2 API Error]:", error);
-    return NextResponse.json(
-      {
-        error: "Lỗi hệ thống khi xử lý thẩm định Layer 2.",
-        details: error?.message || "Unknown error",
-        status: "INTERNAL_ERROR",
-      },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "ANALYZE_TRUST_SEMANTICS",
+  allowAnonymous: true,
+  maxRequests: 30,
+  maxBodyBytes: 256 * 1024,
+}, analyzeSemantics);

@@ -14,7 +14,7 @@ import { EarlyWarningEngine, WARNING_CATEGORY, WARNING_LIFECYCLE } from "../../s
 import { EarlyWarningStore } from "../../src/lib/intelligence/social/EarlyWarningStore.js";
 import { AiMemoryGuard } from "../../src/lib/intelligence/safety/AiMemoryGuard.js";
 import { AiMemoryStore } from "../../src/lib/intelligence/safety/AiMemoryStore.js";
-import { DeviceSyncEngine, DEVICE_PLATFORM, DEVICE_SECURITY_STATUS } from "../../src/lib/personalization/DeviceSyncEngine.js";
+import { DeviceSyncEngine, DEVICE_PLATFORM } from "../../src/lib/personalization/DeviceSyncEngine.js";
 import { DeviceSyncStore } from "../../src/lib/personalization/DeviceSyncStore.js";
 
 describe("P1 State Durability & Restart Survival", () => {
@@ -95,7 +95,7 @@ describe("P1 State Durability & Restart Survival", () => {
     const prop = AiMemoryGuard.proposeMemory(subjectId, {
       text: "Sinh viên muốn đăng ký các lớp học của Thầy Triết vào Thứ 3."
     });
-    const approved = AiMemoryGuard.approveMemory(subjectId, prop.candidateId);
+    AiMemoryGuard.approveMemory(subjectId, prop.candidateId);
 
     // 2. Simulate restart
     AiMemoryStore.rehydrate();

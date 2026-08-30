@@ -9,8 +9,9 @@ import { NextResponse } from "next/server";
 import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
 import { ExpertScopeEngine } from "@/lib/intelligence/expert/expertScopeEngine";
 import { ExpertContextEngine } from "@/lib/intelligence/expert/expertContextEngine";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
-export async function POST(req) {
+async function verifyExpertClaim(req) {
   try {
     const body = await req.json().catch(() => ({}));
     const { expertId, statement, text, domain, claimType, claimJurisdiction, isCommercialEndorsement } = body;
@@ -60,9 +61,15 @@ export async function POST(req) {
       scopeBoundaries
     });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error verifying claim" },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler(
+  {
+    action: "VERIFY_EXPERT_CLAIM_SCOPE",
+    allowAnonymous: true,
+    maxRequests: 30
+  },
+  verifyExpertClaim
+);

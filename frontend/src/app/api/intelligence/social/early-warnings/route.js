@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const GET = SecurityFabric.wrapHandler({
   action: "READ_EARLY_WARNINGS",
   allowAnonymous: true,
-  handler: async ({ request, principal, correlationId }) => {
+  handler: async ({ correlationId }) => {
     const warnings = EarlyWarningEngine.listActiveWarnings();
     return Response.json({
       success: true,

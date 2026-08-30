@@ -1,20 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Sparkles,
-  Calendar,
-  AlertCircle,
-  Award,
-  CheckCircle2,
-  ChevronRight,
-  TrendingUp,
-  Clock,
-  BookOpen,
-  HelpCircle,
-  ShieldCheck,
-  Zap
-} from "lucide-react";
+import { Sparkles, Calendar, AlertCircle, Award, Zap } from "lucide-react";
 
 export function PersonalAcademicBriefing() {
   const [briefing, setBriefing] = useState(null);

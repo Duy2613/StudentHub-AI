@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { UserCheck, CheckCircle2, ChevronRight } from "lucide-react";
+import { UserCheck, ChevronRight } from "lucide-react";
 
 export function WhyAffectedSection({ insights = [], studentProfile = {} }) {
   const activeInsightsWithReasons = insights.filter(

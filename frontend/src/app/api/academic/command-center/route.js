@@ -9,31 +9,43 @@
  * - Source sync status & provenance
  */
 
-import { NextResponse } from "next/server";
 import { getAuthoritativeCommandCenterData } from "@/lib/intelligence/academic/academicCommandCenterDataLoader.js";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { ObjectAuthorizer } from "@/lib/security/authorization/ObjectAuthorizer.js";
 
-export async function GET(request) {
-  try {
+export const dynamic = "force-dynamic";
+
+export const GET = SecurityFabric.wrapHandler(
+  {
+    action: "READ_ACADEMIC_COMMAND_CENTER",
+    requiredPermission: "ACADEMIC.READ_OWN",
+    requiredScopes: ["academic:read"],
+    allowAnonymous: false
+  },
+  async (request, routeParams, principal, secContext) => {
     const { searchParams } = new URL(request.url);
-    const cohort = searchParams.get("cohort");
-    const programCode = searchParams.get("programCode");
-    const studentId = searchParams.get("studentId");
+    const requestedStudentId = searchParams.get("studentId");
+    const studentId = principal.subjectId.replace("student:", "").trim();
+
+    if (requestedStudentId && requestedStudentId !== studentId) {
+      ObjectAuthorizer.assertAccess(principal, {
+        studentId: requestedStudentId,
+        ownerId: requestedStudentId
+      });
+    }
 
     const payload = getAuthoritativeCommandCenterData({
       studentId,
-      cohort,
-      programCode
+      cohort: principal.attributes?.cohort,
+      programCode: principal.attributes?.programCode
     });
 
-    return NextResponse.json(payload);
-  } catch (err) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: "INTERNAL_ACADEMIC_SERVICE_ERROR",
-        message: err.message || "Không thể khởi tạo dữ liệu Academic Command Center."
-      },
-      { status: 500 }
-    );
+    return Response.json({
+      ...payload,
+      meta: {
+        ...(payload.meta || {}),
+        correlationId: secContext.correlationId
+      }
+    });
   }
-}
+);

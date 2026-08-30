@@ -9,8 +9,9 @@
 import { NextResponse } from "next/server";
 import { getAuthoritativeCommandCenterData } from "@/lib/intelligence/academic/academicCommandCenterDataLoader";
 import { AcademicDecisionEngine } from "@/lib/intelligence/academic/academicDecisionEngine";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
-export async function POST(request) {
+async function adoptDecisionPlan(request, routeParams, principal) {
   try {
     const body = await request.json().catch(() => ({}));
     const planId = body.planId;
@@ -24,7 +25,9 @@ export async function POST(request) {
     }
 
     // Load Authoritative Baseline Data (Server-Side)
-    const serverData = getAuthoritativeCommandCenterData();
+    const serverData = getAuthoritativeCommandCenterData({
+      studentId: principal.subjectId.replace("student:", "").trim()
+    });
     if (!serverData.success) {
       return NextResponse.json(
         { success: false, error: "Không thể nạp dữ liệu học vụ cơ sở từ máy chủ." },
@@ -54,9 +57,18 @@ export async function POST(request) {
       {
         success: false,
         error: "Lỗi lưu nháp kế hoạch học tập.",
-        message: err.message
       },
       { status: 400 }
     );
   }
 }
+
+export const POST = SecurityFabric.wrapHandler(
+  {
+    action: "ADOPT_ACADEMIC_PLAN",
+    requiredPermission: "ACADEMIC.PLAN_OWN",
+    requiredScopes: ["academic:plan"],
+    allowAnonymous: false
+  },
+  adoptDecisionPlan
+);

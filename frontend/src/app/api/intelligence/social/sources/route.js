@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const GET = SecurityFabric.wrapHandler({
   action: "READ_SOCIAL_SOURCES",
   allowAnonymous: true,
-  handler: async ({ request, principal, correlationId }) => {
+  handler: async ({ correlationId }) => {
     const connectors = ConnectorRegistry.listConnectors();
     return Response.json({
       success: true,

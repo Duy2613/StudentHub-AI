@@ -15,4 +15,5 @@ export * from "./explainer/AuditExplanationEngine.js";
 export * from "./providers/ITrustReasoningModel.js";
 export * from "./providers/DeterministicTrustPolicyProvider.js";
 export * from "./providers/GeminiTrustReasoningProvider.js";
+export * from "./providers/AIGatewayReasoningProvider.js";
 export * from "./Layer4TrustService.js";

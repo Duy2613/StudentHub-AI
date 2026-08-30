@@ -11,6 +11,11 @@ import { SecurityPrincipal } from "./SecurityPrincipal.js";
 
 const asyncLocalStorage = new AsyncLocalStorage();
 
+function safeHeaderValue(value, fallback, maxLength, pattern = /[^A-Za-z0-9_.:@/,+ -]/g) {
+  const clean = String(value || "").replace(pattern, "_").trim().slice(0, maxLength);
+  return clean || fallback;
+}
+
 export class SecurityContext {
   #correlationId;
   #principal;
@@ -37,11 +42,11 @@ export class SecurityContext {
     purpose = "GENERAL_OPERATION",
     timestamp = new Date().toISOString()
   } = {}) {
-    this.#correlationId = correlationId || `sec_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    this.#correlationId = safeHeaderValue(correlationId, `sec_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`, 128, /[^A-Za-z0-9_.:-]/g);
     this.#principal = principal instanceof SecurityPrincipal ? principal : SecurityPrincipal.anonymous();
-    this.#clientIp = String(clientIp || "127.0.0.1").trim();
-    this.#userAgent = String(userAgent || "Unknown").trim();
-    this.#purpose = String(purpose || "GENERAL_OPERATION").trim().toUpperCase();
+    this.#clientIp = safeHeaderValue(clientIp, "127.0.0.1", 64, /[^A-Fa-f0-9:.,%_-]/g);
+    this.#userAgent = safeHeaderValue(userAgent, "Unknown", 256);
+    this.#purpose = safeHeaderValue(purpose, "GENERAL_OPERATION", 80, /[^A-Za-z0-9_.:-]/g).toUpperCase();
     this.#timestamp = timestamp;
     this.#auditEvents = [];
   }
@@ -93,16 +98,17 @@ export class SecurityContext {
    */
   static fromRequest(request, principal = null) {
     const headers = request?.headers;
-    const correlationId = headers?.get("x-correlation-id") ||
-                          headers?.get("x-request-id") ||
-                          `sec_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    const correlationId = safeHeaderValue(headers?.get("x-correlation-id") ||
+                          headers?.get("x-request-id"),
+                          `sec_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
+                          128,
+                          /[^A-Za-z0-9_.:-]/g);
     
-    const clientIp = headers?.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-                     headers?.get("x-real-ip") ||
-                     "127.0.0.1";
+    const clientIp = safeHeaderValue(headers?.get("x-forwarded-for")?.split(",")[0] ||
+                     headers?.get("x-real-ip"), "127.0.0.1", 64, /[^A-Fa-f0-9:.,%_-]/g);
                      
-    const userAgent = headers?.get("user-agent") || "Unknown";
-    const purpose = headers?.get("x-security-purpose") || "GENERAL_OPERATION";
+    const userAgent = safeHeaderValue(headers?.get("user-agent"), "Unknown", 256);
+    const purpose = safeHeaderValue(headers?.get("x-security-purpose"), "GENERAL_OPERATION", 80, /[^A-Za-z0-9_.:-]/g);
 
     return new SecurityContext({
       correlationId,

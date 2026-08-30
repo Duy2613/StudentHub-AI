@@ -141,14 +141,14 @@ export class IncrementalSyncEngine {
     } catch (error) {
       job.status = SYNC_JOB_STATUS.FAILED;
       job.retryCount += 1;
-      job.lastError = error.message;
+      job.lastError = "SYNC_PROVIDER_FAILED";
 
       const waitSec = RateLimitManager.triggerBackoff(connectorId);
       ConnectorRegistry.updateConnectorHealth(connectorId, CONNECTOR_HEALTH.DEGRADED);
 
       return {
         status: SYNC_JOB_STATUS.FAILED,
-        error: error.message,
+        error: "SYNC_PROVIDER_FAILED",
         retryAfterSeconds: waitSec
       };
     }

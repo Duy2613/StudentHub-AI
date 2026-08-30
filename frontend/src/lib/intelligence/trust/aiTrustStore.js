@@ -202,6 +202,74 @@ export class AiTrustStore {
     return this.#evaluationsById.get(String(evaluationId).trim()) || null;
   }
 
+  /**
+   * Object-level authorization for trust artifacts.  The store is shared by
+   * the process, so route-level authentication alone is insufficient: a
+   * student must only be able to retrieve evaluations created for their own
+   * verified subject.  Internal fixtures remain available to administrators
+   * for diagnostics but are hidden from ordinary principals.
+   */
+  static #isPrivilegedPrincipal(principal) {
+    return Boolean(principal?.isAuthenticated && (
+      principal.hasRole?.("ADMIN") ||
+      principal.hasRole?.("SYSTEM") ||
+      principal.hasPermission?.("ADMIN.SECURITY") ||
+      principal.hasPermission?.("ADMIN.AUDIT_READ") ||
+      principal.hasPermission?.("TRUST.ADMIN_OVERRIDE")
+    ));
+  }
+
+  static #normalizeOwnerId(value) {
+    return String(value || "").trim().replace(/^student:/i, "");
+  }
+
+  static #principalOwnsEvaluation(evaluation, principal) {
+    if (!evaluation || !principal?.isAuthenticated) return false;
+    if (this.#isPrivilegedPrincipal(principal)) return true;
+    const ownerId = this.#normalizeOwnerId(evaluation.ownerId);
+    const subjectId = this.#normalizeOwnerId(principal.subjectId);
+    return Boolean(ownerId && subjectId && ownerId === subjectId);
+  }
+
+  static #findEvaluationForClaim(claimId) {
+    const normalized = String(claimId || "").trim();
+    if (!normalized) return null;
+    for (const evaluation of this.#evaluationsById.values()) {
+      if ((evaluation.claims || []).some(claim => claim?.claimId === normalized)) return evaluation;
+    }
+    return null;
+  }
+
+  static #findEvaluationForEvidence(evidenceId) {
+    const normalized = String(evidenceId || "").trim();
+    if (!normalized) return null;
+    for (const evaluation of this.#evaluationsById.values()) {
+      if ((evaluation.evidenceSpans || []).some(evidence => evidence?.evidenceId === normalized)) return evaluation;
+      if ((evaluation.counterEvidenceSpans || []).some(evidence => evidence?.evidenceId === normalized)) return evaluation;
+    }
+    return null;
+  }
+
+  static getEvaluationForPrincipal(evaluationId, principal) {
+    this.#ensureHydrated();
+    const evaluation = this.getEvaluation(evaluationId);
+    return this.#principalOwnsEvaluation(evaluation, principal) ? evaluation : null;
+  }
+
+  static getClaimForPrincipal(claimId, principal) {
+    this.#ensureHydrated();
+    const claim = this.getClaim(claimId);
+    const parent = this.#findEvaluationForClaim(claimId);
+    return claim && this.#principalOwnsEvaluation(parent, principal) ? claim : null;
+  }
+
+  static getEvidenceForPrincipal(evidenceId, principal) {
+    this.#ensureHydrated();
+    const evidence = this.getEvidence(evidenceId);
+    const parent = this.#findEvaluationForEvidence(evidenceId);
+    return evidence && this.#principalOwnsEvaluation(parent, principal) ? evidence : null;
+  }
+
   static getClaim(claimId) {
     this.#ensureHydrated();
     if (!claimId) return null;
@@ -228,6 +296,34 @@ export class AiTrustStore {
     const targetId = String(invalidatedSourceOrDocId || "").toLowerCase();
 
     for (const evaluation of this.#evaluationsById.values()) {
+      const usesSource = (evaluation.evidenceSpans || []).some(
+        e => (e.sourceId && e.sourceId.toLowerCase().includes(targetId)) ||
+             (e.documentId && e.documentId.toLowerCase().includes(targetId))
+      );
+      if (usesSource) {
+        affectedEvaluations.push({
+          evaluationId: evaluation.evaluationId,
+          query: evaluation.query,
+          currentStatus: evaluation.epistemicState || evaluation.trustStatus,
+          actionRequired: "NEEDS_REEVALUATION"
+        });
+      }
+    }
+
+    return {
+      invalidatedEntity: invalidatedSourceOrDocId,
+      affectedCount: affectedEvaluations.length,
+      affectedEvaluations
+    };
+  }
+
+  static computeBlastRadiusForPrincipal(invalidatedSourceOrDocId, principal) {
+    this.#ensureHydrated();
+    const targetId = String(invalidatedSourceOrDocId || "").toLowerCase();
+    const affectedEvaluations = [];
+
+    for (const evaluation of this.#evaluationsById.values()) {
+      if (!this.#principalOwnsEvaluation(evaluation, principal)) continue;
       const usesSource = (evaluation.evidenceSpans || []).some(
         e => (e.sourceId && e.sourceId.toLowerCase().includes(targetId)) ||
              (e.documentId && e.documentId.toLowerCase().includes(targetId))

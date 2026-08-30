@@ -1,11 +1,25 @@
 # 🌌 StudentHub OS — Personal Academic Operating System
 
-> **A production-capable, multi-audience, evidence-aware, zero-trust Personal Academic Operating System for university students, verified faculty, and academic moderators.**
+> **A release-candidate, multi-audience, evidence-aware, zero-trust Personal Academic Operating System for university students, verified faculty, and academic moderators.**
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.3.0_Turbopack-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![Node.js 24](https://img.shields.io/badge/Node.js-24.x-green?style=flat&logo=node.js)](https://nodejs.org/)
 [![Zero-Trust Security](https://img.shields.io/badge/Security-Zero--Trust_Fabric-emerald?style=flat&logo=shield)](https://github.com/Duy2613/StudentHub-AI)
-[![Tests Passing](https://img.shields.io/badge/Tests-100%25_Passing-brightgreen?style=flat)](https://github.com/Duy2613/StudentHub-AI)
+[![Tests Passing](https://img.shields.io/badge/Tests-250%2F250_Local-brightgreen?style=flat)](https://github.com/Duy2613/StudentHub-AI)
+
+---
+
+## Release candidate status
+
+The current source base is frozen for competition release review. The local candidate is **`STUDENTHUBAI RC READY WITH EXTERNAL LIMITATIONS`** on `develop` at `5aeaf71870d63f3c8e06a7d8b95148ce109d3e72`.
+
+- 250/250 discovered test files pass; final audit hardening is 6/6.
+- Production build generates 115/115 routes; typecheck passes.
+- Chromium, WebKit, mobile Chromium, and current visual baselines pass their documented local gates.
+- Dependency audit reports 0 vulnerabilities; lint exits with 0 errors and 359 legacy warnings.
+- Live PostgreSQL/RLS, staging, fresh provider credentials/terms, rollback rehearsal, and Firefox on this Windows host remain external blockers. See [`FINAL-AUDIT-REPORT.md`](FINAL-AUDIT-REPORT.md), [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md), and [`docs/KNOWN-LIMITATIONS.md`](docs/KNOWN-LIMITATIONS.md).
+
+The worktree is intentionally preserved without a commit or push. Do not treat local fixture data or synthetic Observatory metrics as live production evidence.
 
 ---
 
@@ -70,7 +84,7 @@
 
 5. **🛡️ Privacy, Security & Sources Center (`/settings`)**:
    - Multi-device management and remote session revocation.
-   - AI Memory audit and GDPR compliant personal data vault export.
+   - AI Memory audit and personal data vault export controls.
    - Transparent source connector health status matrix.
 
 ---
@@ -107,6 +121,10 @@ StudentHub OS includes comprehensive automated test suites covering security att
 # Run all master test suites
 npm run test:all
 
+# Run the complete discovered regression and final audit suites
+npm run test:all-discovered
+npm run test:final-audit
+
 # Run specific domain suites
 npm run test:security              # Zero-Trust attack simulations & BOLA checks
 npm run test:p0-p1                 # BOLA/IDOR and state durability regression
@@ -114,6 +132,9 @@ npm run test:os-slices             # 4 Invariant E2E vertical slices
 npm run test:db                    # Database repository persistence tests
 npm run test:provip-reconstruction # Social intelligence & personalization
 npm run test:intelligence-fabric   # T1–T4 Intelligence & Adversarial Matrix
+
+# Run the primary local browser gate from frontend/
+cd frontend && npx playwright test --project=chromium
 ```
 
 ---

@@ -1,24 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Users, 
-  Clock, 
-  ShieldAlert, 
-  ShieldCheck, 
-  CheckCircle2, 
-  MessageSquare, 
-  Sparkles, 
-  Layers, 
-  Activity, 
-  AlertTriangle, 
-  Send,
-  Building2,
-  HelpCircle,
-  ThumbsUp,
-  Filter,
-  ShieldX
-} from "lucide-react";
+import { Users, Clock, ShieldAlert, CheckCircle2, MessageSquare, Sparkles, Activity, AlertTriangle, Send, Building2, ThumbsUp } from "lucide-react";
 
 export function CommunityExperienceStudio({ initialPosts = [], initialConsensus = null }) {
   const [posts, setPosts] = useState(initialPosts);

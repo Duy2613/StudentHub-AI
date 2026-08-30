@@ -1,23 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { 
-  ShieldAlert, 
-  ShieldCheck, 
-  Search, 
-  Sparkles, 
-  ArrowRight, 
-  AlertTriangle, 
-  CheckCircle2, 
-  Bot, 
-  Users,
-  Layers,
-  ChevronRight
-} from "lucide-react";
+
+import { ShieldAlert, Sparkles, ArrowRight, CheckCircle2, Users } from "lucide-react";
 import TactileButton from "@/components/ui/TactileButton";
 import Interactive3DBlockCard from "@/components/ui/Interactive3DBlockCard";
-import { motion, AnimatePresence } from "motion/react";
+
 
 const DEMO_CASES = [
   {

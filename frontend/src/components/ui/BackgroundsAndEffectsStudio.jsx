@@ -1,19 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
-import { 
-  Sparkles, 
-  Image as ImageIcon, 
-  Layers, 
-  Check, 
-  Palette, 
-  Eye, 
-  X, 
-  ChevronRight,
-  Maximize2,
-  Minimize2
-} from "lucide-react";
+
+import { Sparkles, Image as ImageIcon, Check, Palette, X } from "lucide-react";
 import { useBackground, WALLPAPERS } from "@/components/providers/BackgroundContext";
 import { motion, AnimatePresence } from "motion/react";
 

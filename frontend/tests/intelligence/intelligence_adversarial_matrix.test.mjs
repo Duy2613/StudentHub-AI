@@ -6,10 +6,9 @@
 import { describe, it, beforeEach } from "node:test";
 import assert from "node:assert/strict";
 
-import { ExpertDiscoveryEngine } from "../../src/lib/intelligence/expert/ExpertDiscoveryEngine.js";
 import { CommunityConsensusEngine } from "../../src/lib/intelligence/community/CommunityConsensusEngine.js";
 import { EvidenceEntity, EVIDENCE_TYPE } from "../../src/lib/intelligence/fabric/EvidenceEntity.js";
-import { SourceEntity, SOURCE_TYPE, SOURCE_STATUS } from "../../src/lib/intelligence/fabric/SourceEntity.js";
+import { SourceEntity } from "../../src/lib/intelligence/fabric/SourceEntity.js";
 import { ClaimEntity } from "../../src/lib/intelligence/fabric/ClaimEntity.js";
 import { ConflictResolutionEngine, RESOLUTION_VERDICT } from "../../src/lib/intelligence/fusion/ConflictResolutionEngine.js";
 import { ConfidenceCalibrationEngine } from "../../src/lib/intelligence/fusion/ConfidenceCalibrationEngine.js";
@@ -173,7 +172,7 @@ describe("T1–T4 Adversarial Test Matrix (10 Invariant Scenarios)", () => {
   // Scenario 8: Duplicate validation submitted twice -> idempotent
   it("Scenario 8 — Submitting identical validation twice does not double-count in reputation graph", () => {
     const studentId = "student:24110001";
-    const res1 = ReputationGraph.applyReputationDelta({
+    ReputationGraph.applyReputationDelta({
       subjectId: studentId,
       topicId: "academic.curriculum",
       action: REPUTATION_ACTION.EXPERT_VALIDATED_CLAIM
@@ -199,7 +198,6 @@ describe("T1–T4 Adversarial Test Matrix (10 Invariant Scenarios)", () => {
 
   // Scenario 10: Reposted article by 10 accounts -> recognized as single content hash
   it("Scenario 10 — Same quoted text reposted by 10 accounts has independence penalized", () => {
-    const sameText = "Thông báo mới từ phòng CTSV về học bổng khuyến khích học tập kỳ 1.";
     const source1 = new SourceEntity({ publisher: "Trang tin A", url: "https://a.com", contentHash: "hash_shared_123" });
     const source2 = new SourceEntity({ publisher: "Trang tin B", url: "https://b.com", contentHash: "hash_shared_123" });
 

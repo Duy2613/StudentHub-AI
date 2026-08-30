@@ -1,17 +1,18 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 /**
- * StudentHub AI — Grounded AI Studio Route
+ * StudentHub AI — Canonical Redirect: /ai -> /trust
+ * Contextual AI verification and intelligence workflows live in the Trust Engine.
  */
+export default function AIRedirectPage() {
+  const router = useRouter();
 
-import React from "react";
-import StudentHubOSShell from "@/components/layout/StudentHubOSShell";
-import GroundedAIStudio from "@/components/ai/GroundedAIStudio";
+  useEffect(() => {
+    router.replace("/trust");
+  }, [router]);
 
-export default function AIPage() {
-  return (
-    <StudentHubOSShell>
-      <GroundedAIStudio />
-    </StudentHubOSShell>
-  );
+  return null;
 }

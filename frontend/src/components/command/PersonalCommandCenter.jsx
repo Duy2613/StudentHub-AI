@@ -2,23 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  Compass,
-  Calendar,
-  Sparkles,
-  Award,
-  Users,
-  Layers,
-  CheckCircle2,
-  Clock,
-  AlertTriangle,
-  ArrowRight,
-  ShieldCheck,
-  BookOpen,
-  HelpCircle,
-  ChevronRight,
-  RefreshCw
-} from "lucide-react";
+import { Compass, Calendar, Sparkles, Award, Users, Clock, HelpCircle, ChevronRight } from "lucide-react";
 import { PersonalAcademicBriefing } from "./PersonalAcademicBriefing";
 
 export function PersonalCommandCenter({ initialData = null }) {

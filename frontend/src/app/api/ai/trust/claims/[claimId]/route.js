@@ -4,35 +4,35 @@
  * Retrieves atomic claim details, cited evidence and derivation traces.
  */
 
-import { NextResponse } from "next/server";
-import { AiTrustStore } from "@/lib/intelligence/trust/aiTrustStore";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { AiTrustStore } from "@/lib/intelligence/trust/aiTrustStore.js";
 
-export async function GET(req, { params }) {
-  try {
-    const { claimId } = await params;
-    if (!claimId) {
-      return NextResponse.json(
-        { success: false, error: "claimId is required." },
-        { status: 400 }
-      );
-    }
-
-    const claim = AiTrustStore.getClaim(claimId);
-    if (!claim) {
-      return NextResponse.json(
-        { success: false, error: "Claim not found." },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      claim
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error retrieving claim" },
-      { status: 500 }
-    );
+export const GET = SecurityFabric.wrapHandler({
+  action: "READ_TRUST_CLAIM",
+  requiredPermission: "TRUST.READ",
+  requiredScopes: ["trust:read"],
+  allowAnonymous: false,
+  maxRequests: 120
+}, async (_request, routeParams, principal, secContext) => {
+  const { claimId } = await routeParams.params;
+  if (!claimId) {
+    return Response.json({ success: false, error: {
+      code: "TRUST_CLAIM_ID_REQUIRED",
+      userMessage: "Thiếu mã khẳng định cần kiểm chứng.",
+      requestId: secContext.correlationId,
+      retryable: false
+    } }, { status: 400 });
   }
-}
+
+  const claim = AiTrustStore.getClaimForPrincipal(claimId, principal);
+  if (!claim) {
+    return Response.json({ success: false, error: {
+      code: "TRUST_CLAIM_NOT_FOUND",
+      userMessage: "Không tìm thấy khẳng định kiểm chứng.",
+      requestId: secContext.correlationId,
+      retryable: false
+    } }, { status: 404 });
+  }
+
+  return Response.json({ success: true, claim, meta: { requestId: secContext.correlationId } });
+});

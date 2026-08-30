@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Search, BookOpen, Award, FileText, Bookmark, Sparkles, X, ArrowRight, ShieldCheck } from "lucide-react";
+import { Search, BookOpen, Award, FileText, Sparkles, X, ShieldCheck } from "lucide-react";
 
 export function CommandPalette({ isOpen, onClose }) {
   const [query, setQuery] = useState("");

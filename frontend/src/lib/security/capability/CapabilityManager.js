@@ -13,7 +13,7 @@ import { SecurityError, SECURITY_ERROR_CODE } from "../core/SecurityErrorEnvelop
 
 export class CapabilityManager {
   static #capabilities = new Map(); // capabilityId -> capabilityObject
-  static #secretKey = process.env.CAPABILITY_SECRET || "studenthub-capability-hmac-secret-production-2026";
+  static #testSecret = "studenthub-capability-test-only";
 
   /**
    * Issues a new capability
@@ -193,11 +193,18 @@ export class CapabilityManager {
 
   static #signPayload(payload) {
     const raw = `${payload.capabilityId}:${payload.subject}:${payload.action}:${payload.resource}:${payload.purpose}:${payload.expiresAt}:${payload.maxUses}`;
-    return crypto.createHmac("sha256", this.#secretKey).update(raw).digest("hex");
+    return crypto.createHmac("sha256", this.#getSecret()).update(raw).digest("hex");
   }
 
   static #verifySignature(payload) {
     const expected = this.#signPayload(payload);
     return crypto.timingSafeEqual(Buffer.from(payload.signature || "", "utf8"), Buffer.from(expected, "utf8"));
+  }
+
+  static #getSecret() {
+    const configured = process.env.CAPABILITY_SECRET;
+    if (configured) return configured;
+    if (process.env.NODE_ENV !== "production") return this.#testSecret;
+    throw new Error("CAPABILITY_SECRET must be configured in production.");
   }
 }

@@ -1,19 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Bell, 
-  X, 
-  CheckCheck, 
-  Clock, 
-  AlertTriangle, 
-  ShieldCheck, 
-  ArrowRight, 
-  Calendar,
-  CheckCircle,
-  Eye,
-  AlarmClock
-} from "lucide-react";
+import { Bell, X, CheckCheck, Clock, AlertTriangle, ShieldCheck, ArrowRight, Calendar, CheckCircle, AlarmClock } from "lucide-react";
 
 export function NotificationCenterDrawer({
   isOpen = false,

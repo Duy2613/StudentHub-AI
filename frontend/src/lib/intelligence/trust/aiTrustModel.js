@@ -367,6 +367,11 @@ export class AiTrustModel {
 
     return Object.freeze({
       evaluationId: data.evaluationId || `EVAL_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      // Ownership is assigned from the verified SecurityPrincipal by the API
+      // boundary.  Missing ownership means an internal/system fixture and must
+      // never be treated as public user data.
+      ownerId: typeof data.ownerId === "string" && data.ownerId.trim() ? data.ownerId.trim() : null,
+      visibility: data.visibility || (data.ownerId ? "PRIVATE" : "INTERNAL"),
       query: typeof data.query === "string" ? data.query.trim() : "",
       answerMode,
       epistemicState,

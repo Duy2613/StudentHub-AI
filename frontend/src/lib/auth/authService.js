@@ -6,7 +6,7 @@
 // - Cơ chế đồng bộ Bearer Token sang POST /api/auth/sync tuần tự, chống lệch pha (Async Mismatch)
 // - Hỗ trợ "Remember Me" chuyển đổi linh hoạt localStorage / sessionStorage / in-memory
 
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "../supabase/client.js";
 
 const API_BASE = typeof window !== "undefined"
   ? "" // Sử dụng Next.js Route Proxy cùng origin để triệt tiêu lỗi CORS Preflight
@@ -16,13 +16,27 @@ const API_BASE = typeof window !== "undefined"
 // 1. CHUẨN HÓA LOGGING & INTERCEPTOR DỊCH MÃ LỖI (DIAGNOSTIC LOGGING)
 // =========================================================================
 
+function redactAuthLogText(value) {
+  return String(value || "")
+    .replace(/bearer\s+[a-z0-9._-]+/gi, "Bearer [REDACTED]")
+    .replace(/(password|token|otp|secret|key)\s*[:=]\s*[^\s,;]+/gi, "$1=[REDACTED]")
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[REDACTED_EMAIL]")
+    .slice(0, 300);
+}
+
 export function logAuthError(functionName, error, extraContext = null) {
-  const detail = error?.message || error?.error_description || (typeof error === "string" ? error : JSON.stringify(error));
-  console.error(`[AUTH_ERROR] - [${functionName}] - Chi tiết:`, detail, extraContext ? { extraContext } : "");
+  const detail = error?.name || error?.code || (typeof error === "string" ? "AUTH_ERROR" : "AUTH_ERROR");
+  const safeContext = extraContext && typeof extraContext === "object"
+    ? Object.fromEntries(Object.entries(extraContext).slice(0, 8).map(([key, value]) => [key, redactAuthLogText(value)]))
+    : "";
+  console.error(`[AUTH_ERROR] - [${redactAuthLogText(functionName)}] - ${detail}`, safeContext);
 }
 
 export function logAuthInfo(functionName, message, data = null) {
-  console.log(`[AUTH_INFO] - [${functionName}] - ${message}`, data ? data : "");
+  const safeData = data && typeof data === "object"
+    ? Object.fromEntries(Object.entries(data).filter(([key]) => !/token|password|secret|cookie|authorization|key/i.test(key)).slice(0, 8))
+    : "";
+  console.log(`[AUTH_INFO] - [${redactAuthLogText(functionName)}] - ${redactAuthLogText(message)}`, safeData);
 }
 
 /**

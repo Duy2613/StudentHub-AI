@@ -1,21 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  ShieldCheck,
-  AlertTriangle,
-  FileText,
-  Search,
-  CheckCircle2,
-  XCircle,
-  HelpCircle,
-  Clock,
-  Layers,
-  ArrowRight,
-  Sparkles,
-  RefreshCw,
-  GitPullRequest
-} from "lucide-react";
+import { ShieldCheck, AlertTriangle, FileText, Search, CheckCircle2, HelpCircle, Sparkles, RefreshCw } from "lucide-react";
 
 export function AiTrustConsoleV2() {
   const [query, setQuery] = useState("Quy định chuẩn đầu ra TOEIC của sinh viên K24 là bao nhiêu?");

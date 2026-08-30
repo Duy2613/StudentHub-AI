@@ -7,15 +7,17 @@
 import { NextResponse } from "next/server";
 import { AiTrustEngine } from "@/lib/intelligence/trust/aiTrustEngine";
 import { SemanticOverclaimDetector } from "@/lib/intelligence/trust/semanticOverclaimDetector";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
-export async function POST(req) {
+async function verifyClaim(req) {
   try {
     const body = await req.json().catch(() => ({}));
     const { claim, evidenceSpans } = body;
 
-    if (!claim) {
+    if (!claim || typeof claim !== "object" || Array.isArray(claim) ||
+        (evidenceSpans !== undefined && (!Array.isArray(evidenceSpans) || evidenceSpans.length > 40))) {
       return NextResponse.json(
-        { success: false, error: "claim object is required." },
+        { success: false, error: { code: "CLAIM_INPUT_INVALID", userMessage: "Claim hoặc evidence không hợp lệ hoặc vượt giới hạn." } },
         { status: 400 }
       );
     }
@@ -30,9 +32,13 @@ export async function POST(req) {
       overclaim
     });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error verifying claim" },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "VERIFY_TRUST_CLAIM",
+  allowAnonymous: true,
+  maxRequests: 30,
+  maxBodyBytes: 128 * 1024,
+}, verifyClaim);

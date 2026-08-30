@@ -5,7 +5,7 @@
  * knowledge diffing (WHAT CHANGED), and public redaction.
  */
 
-import { EvidenceFusionModel, EPISTEMIC_FINAL_STATE, EVIDENCE_HEALTH_STATE } from "./evidenceFusionModel.js";
+import { EvidenceFusionModel } from "./evidenceFusionModel.js";
 import { EvidenceFusionAdjudicator } from "./evidenceFusionAdjudicator.js";
 
 export class EvidenceFusionStore {

@@ -6,7 +6,7 @@
  * and optimistic revision increments.
  */
 
-import { NOTIFICATION_STATUSES, AcademicNotificationModel } from "./academicNotificationModel.js";
+import { NOTIFICATION_STATUSES } from "./academicNotificationModel.js";
 
 export const NOTIFICATION_COMMANDS = Object.freeze({
   QUEUE: "QUEUE",

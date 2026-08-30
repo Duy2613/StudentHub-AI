@@ -7,17 +7,12 @@
 
 import { IEvidenceRetriever } from "./IEvidenceRetriever.js";
 import { KnowledgeBaseRetriever } from "./KnowledgeBaseRetriever.js";
-import { SourceAuthorityRegistry } from "../registry/SourceAuthorityRegistry.js";
-import { LAYER_3_CONFIG } from "../config/Layer3Config.js";
 
-const SSRF_BLOCKED_HOSTNAMES = [
-  "localhost",
-  "127.0.0.1",
-  "0.0.0.0",
-  "169.254.169.254",
-  "::1",
-  "fe80::",
-];
+import { LAYER_3_CONFIG } from "../config/Layer3Config.js";
+import { validateRemoteUrl, validateRemoteUrlSync, isRedirectStatus } from "../../../security/hardening/SafeRemoteUrl.js";
+
+const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
+const MAX_REDIRECT_HOPS = 4;
 
 export class WebSearchRetriever extends IEvidenceRetriever {
   constructor() {
@@ -42,41 +37,71 @@ export class WebSearchRetriever extends IEvidenceRetriever {
     }
 
     try {
-      const parsed = new URL(url);
-
-      // SSRF Boundary Check
-      if (
-        SSRF_BLOCKED_HOSTNAMES.some((h) => parsed.hostname === h || parsed.hostname.endsWith(".internal") || parsed.hostname.endsWith(".local"))
-      ) {
-        console.warn(`[Layer 3 SSRF Guard] Blocked access to restricted destination: ${url}`);
-        return { html: "", textContent: "", status: 403, error: "SSRF_RESTRICTED" };
-      }
+      const initialGuard = validateRemoteUrlSync(url);
+      if (!initialGuard.ok) return { html: "", textContent: "", status: 403, error: initialGuard.code };
 
       // Check KB first for known documents
-      const kbDoc = await this.kbRetriever.fetch(url);
+      const kbDoc = await this.kbRetriever.fetch(initialGuard.url);
       if (kbDoc.status === 200) {
         return kbDoc;
       }
 
-      // Real fetch with timeout constraint
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), LAYER_3_CONFIG.SLA.MAX_TIMEOUT_MS);
+      // Network fetches revalidate DNS before every hop and never follow an
+      // unvalidated redirect.  This closes private-range and DNS-rebinding
+      // SSRF paths that a single `redirect: follow` request leaves open.
+      let currentUrl = initialGuard.url;
+      let redirectCount = 0;
+      let res;
+      while (true) {
+        const hopGuard = await validateRemoteUrl(currentUrl, { resolveDns: true });
+        if (!hopGuard.ok) return { html: "", textContent: "", status: 403, error: hopGuard.code };
 
-      const res = await fetch(url, {
-        headers: {
-          "User-Agent": "StudentHubAI-Trust-EvidenceEngine/1.0",
-          Accept: "text/html,application/xhtml+xml,text/plain",
-        },
-        signal: controller.signal,
-      });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), LAYER_3_CONFIG.SLA.MAX_TIMEOUT_MS);
+        try {
+          res = await fetch(hopGuard.url, {
+            redirect: "manual",
+            headers: {
+              "User-Agent": "StudentHubAI-Trust-EvidenceEngine/1.0",
+              Accept: "text/html,application/xhtml+xml,text/plain",
+            },
+            signal: controller.signal,
+          });
+        } finally {
+          clearTimeout(timeoutId);
+        }
 
-      clearTimeout(timeoutId);
+        if (!isRedirectStatus(res.status)) break;
+        const location = res.headers.get("location");
+        if (!location) break;
+        if (redirectCount >= MAX_REDIRECT_HOPS) {
+          return { html: "", textContent: "", status: 508, error: "REDIRECT_LIMIT_EXCEEDED" };
+        }
 
-      if (!res.ok) {
-        return { html: "", textContent: "", status: res.status };
+        let nextUrl;
+        try {
+          nextUrl = new URL(location, hopGuard.url).toString();
+        } catch {
+          return { html: "", textContent: "", status: 502, error: "MALFORMED_REDIRECT_URL" };
+        }
+        const nextGuard = validateRemoteUrlSync(nextUrl);
+        if (!nextGuard.ok) return { html: "", textContent: "", status: 403, error: nextGuard.code };
+        currentUrl = nextGuard.url;
+        redirectCount += 1;
       }
 
-      const html = await res.text();
+      if (!res.ok) return { html: "", textContent: "", status: res.status };
+
+      const contentLength = Number(res.headers.get("content-length") || 0);
+      if (Number.isFinite(contentLength) && contentLength > MAX_RESPONSE_BYTES) {
+        return { html: "", textContent: "", status: 413, error: "PAYLOAD_TOO_LARGE" };
+      }
+
+      const bytes = new Uint8Array(await res.arrayBuffer());
+      if (bytes.byteLength > MAX_RESPONSE_BYTES) {
+        return { html: "", textContent: "", status: 413, error: "PAYLOAD_TOO_LARGE" };
+      }
+      const html = new TextDecoder().decode(bytes);
       const textContent = html
         .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
         .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
@@ -88,10 +113,11 @@ export class WebSearchRetriever extends IEvidenceRetriever {
         html,
         textContent,
         status: 200,
+        finalUrl: currentUrl,
       };
     } catch (err) {
-      console.warn(`[Layer3 Web Fetch Error]: ${err.message}`);
-      return { html: "", textContent: "", status: 500, error: err.message };
+      const status = err?.name === "AbortError" ? 504 : 502;
+      return { html: "", textContent: "", status, error: err?.name === "AbortError" ? "FETCH_TIMEOUT" : "NETWORK_FETCH_FAILURE" };
     }
   }
 }

@@ -85,6 +85,35 @@ describe("Security Fabric — Master Gateway Integration", () => {
     assert.strictEqual(body.error.code, "UNAUTHORIZED");
   });
 
+  it("should execute the compatibility handler embedded in policy config", async () => {
+    const handler = SecurityFabric.wrapHandler({
+      action: "READ_PUBLIC_SIGNAL",
+      allowAnonymous: true,
+      handler: async ({ request, principal, correlationId, securityContext }) => Response.json({
+        path: new URL(request.url).pathname,
+        subject: principal.subjectId,
+        correlationId,
+        sameContext: correlationId === securityContext.correlationId
+      })
+    });
+
+    const response = await handler(new Request("https://studenthub.ai/api/public-signal"), {});
+    assert.strictEqual(response.status, 200);
+    assert.deepEqual(await response.json(), {
+      path: "/api/public-signal",
+      subject: "anonymous",
+      correlationId: response.headers.get("x-correlation-id"),
+      sameContext: true
+    });
+  });
+
+  it("should fail fast when a route is configured without a handler", () => {
+    assert.throws(
+      () => SecurityFabric.wrapHandler({ action: "BROKEN_ROUTE" }),
+      /requires a route handler function/
+    );
+  });
+
   it("should trigger rate limiting 429 when max request quota is exceeded", async () => {
     const handler = SecurityFabric.wrapHandler(
       {
@@ -109,6 +138,44 @@ describe("Security Fabric — Master Gateway Integration", () => {
     assert.strictEqual(response.status, 429);
     const body = await response.json();
     assert.strictEqual(body.error.code, "RATE_LIMIT_EXCEEDED");
+  });
+
+  it("should isolate rate-limit quotas between different route actions", async () => {
+    const firstAction = SecurityFabric.wrapHandler(
+      { action: "ACTION_A", allowAnonymous: true, maxRequests: 1 },
+      async () => Response.json({ ok: true })
+    );
+    const secondAction = SecurityFabric.wrapHandler(
+      { action: "ACTION_B", allowAnonymous: true, maxRequests: 1 },
+      async () => Response.json({ ok: true })
+    );
+    const request = new Request("https://studenthub.ai/api/test", {
+      headers: { "x-forwarded-for": "10.0.0.100" }
+    });
+
+    assert.strictEqual((await firstAction(request, {})).status, 200);
+    assert.strictEqual((await firstAction(request, {})).status, 429);
+    assert.strictEqual((await secondAction(request, {})).status, 200);
+  });
+
+  it("should reject an oversized declared request before executing the handler", async () => {
+    let executed = false;
+    const handler = SecurityFabric.wrapHandler(
+      { action: "SMALL_BODY_ONLY", allowAnonymous: true, maxBodyBytes: 16 },
+      async () => {
+        executed = true;
+        return Response.json({ ok: true });
+      }
+    );
+    const response = await handler(new Request("https://studenthub.ai/api/test", {
+      method: "POST",
+      headers: { "content-length": "17" },
+      body: "12345678901234567"
+    }), {});
+
+    assert.strictEqual(response.status, 413);
+    assert.strictEqual((await response.json()).error.code, "REQUEST_TOO_LARGE");
+    assert.strictEqual(executed, false);
   });
 
   it("should return step-up challenge when high-assurance operation lacks AAL2", async () => {

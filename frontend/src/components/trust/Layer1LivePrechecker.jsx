@@ -1,31 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useTransition, useCallback } from "react";
-import {
-  Link2,
-  FileText,
-  Image as ImageIcon,
-  Upload,
-  Zap,
-  RotateCcw,
-  ShieldAlert,
-  ShieldCheck,
-  AlertTriangle,
-  Camera,
-  QrCode,
-  Sparkles,
-  Loader2,
-  CheckCircle2,
-  XCircle,
-  RefreshCw,
-  Eye,
-  ScanLine
-} from "lucide-react";
+import { Link2, FileText, Image as ImageIcon, Upload, Zap, RotateCcw, ShieldAlert, ShieldCheck, AlertTriangle, Camera, QrCode, Sparkles, Loader2, RefreshCw, ScanLine } from "lucide-react";
 import TactileButton from "@/components/ui/TactileButton";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 import { screenLayer1 } from "@/lib/ai-trust/layer1/scanner";
 import { LAYER_1_STATUS } from "@/lib/ai-trust/layer1/types";
-import { OcrService } from "@/lib/ai-trust/vision/OcrService";
 
 /**
  * Interactive Live Pre-Checker for Layer 1
@@ -43,7 +23,7 @@ export default function Layer1LivePrechecker({
   const [fileMeta, setFileMeta] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [instantResult, setInstantResult] = useState(null);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   // OCR & Camera State
   const [ocrLoading, setOcrLoading] = useState(false);
@@ -56,6 +36,18 @@ export default function Layer1LivePrechecker({
   const videoRef = useRef(null);
   const mediaStreamRef = useRef(null);
   const liveScanIntervalRef = useRef(null);
+
+  const stopCamera = useCallback(() => {
+    if (liveScanIntervalRef.current) {
+      clearInterval(liveScanIntervalRef.current);
+      liveScanIntervalRef.current = null;
+    }
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    }
+    setIsCameraActive(false);
+  }, []);
 
   // Debounced 0ms Client Pre-Check
   useEffect(() => {
@@ -104,7 +96,10 @@ export default function Layer1LivePrechecker({
 
     saffronAudio.playClick(750);
     const objectUrl = URL.createObjectURL(file);
-    setImagePreview(objectUrl);
+    setImagePreview((previousUrl) => {
+      if (previousUrl) URL.revokeObjectURL(previousUrl);
+      return objectUrl;
+    });
     
     // Set immediate non-null metadata to prevent NaN KB or layout shifts
     const initialMeta = {
@@ -119,6 +114,7 @@ export default function Layer1LivePrechecker({
 
     try {
       // 1. Multimodal OCR & Fast QR Extraction (Bounded execution)
+      const { OcrService } = await import("@/lib/ai-trust/vision/OcrService");
       const extraction = await OcrService.extract(file);
 
       const finalMeta = {
@@ -154,6 +150,7 @@ export default function Layer1LivePrechecker({
     saffronAudio.playClick(800);
     stopCamera();
     try {
+      const { OcrService } = await import("@/lib/ai-trust/vision/OcrService");
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
       });
@@ -184,19 +181,7 @@ export default function Layer1LivePrechecker({
       console.warn("Camera access failed:", err);
       alert("Không thể mở camera. Vui lòng cho phép quyền truy cập máy ảnh trong trình duyệt.");
     }
-  }, [qrDetected]);
-
-  const stopCamera = () => {
-    if (liveScanIntervalRef.current) {
-      clearInterval(liveScanIntervalRef.current);
-      liveScanIntervalRef.current = null;
-    }
-    if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
-      mediaStreamRef.current = null;
-    }
-    setIsCameraActive(false);
-  };
+  }, [qrDetected, stopCamera]);
 
   const toggleCameraFacing = () => {
     const nextFacing = cameraFacing === "environment" ? "user" : "environment";

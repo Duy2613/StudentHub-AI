@@ -1,28 +1,47 @@
-import { NextResponse } from "next/server";
 import { AcademicRecordsStore } from "@/lib/intelligence/academic/academicRecordsStore.js";
-import { StudentAcademicSyncBridge } from "@/lib/intelligence/academic/studentAcademicSyncBridge.js";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { ObjectAuthorizer } from "@/lib/security/authorization/ObjectAuthorizer.js";
 
-export async function GET(request) {
-  try {
+
+export const dynamic = "force-dynamic";
+
+export const GET = SecurityFabric.wrapHandler(
+  {
+    action: "READ_TRANSCRIPT",
+    requiredPermission: "ACADEMIC.READ_OWN",
+    requiredScopes: ["academic:read"],
+    allowAnonymous: false
+  },
+  async (request, routeParams, principal, secContext) => {
     const { searchParams } = new URL(request.url);
-    const studentId = searchParams.get("studentId") || "24110001";
+    const requestedStudentId = searchParams.get("studentId");
+    const studentId = principal.subjectId.replace("student:", "").trim();
+
+    if (requestedStudentId && requestedStudentId !== studentId) {
+      ObjectAuthorizer.assertAccess(principal, {
+        studentId: requestedStudentId,
+        ownerId: requestedStudentId
+      });
+    }
 
     const records = AcademicRecordsStore.getRecordByStudentId(studentId);
     if (!records) {
-      return NextResponse.json(
-        { success: false, error: `Academic records not found for MSSV: ${studentId}` },
+      return Response.json(
+        {
+          error: {
+            code: "NOT_FOUND",
+            message: `Academic records not found for MSSV: ${studentId}`,
+            correlationId: secContext.correlationId
+          }
+        },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({
+    return Response.json({
       success: true,
-      data: records
+      data: records,
+      meta: { correlationId: secContext.correlationId }
     });
-  } catch (err) {
-    return NextResponse.json(
-      { success: false, error: err.message || "Internal server error." },
-      { status: 500 }
-    );
   }
-}
+);

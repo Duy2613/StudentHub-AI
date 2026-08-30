@@ -1,25 +1,13 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import { 
-  ShieldAlert, 
-  ShieldCheck, 
-  ArrowRight, 
-  Sparkles, 
-  CheckCircle2, 
-  Search,
-  Users,
-  AlertTriangle,
-  Lock,
-  Layers,
-  Palette
-} from "lucide-react";
+
+import { ShieldAlert, ShieldCheck, ArrowRight, Sparkles, CheckCircle2, Users } from "lucide-react";
 import Hero3DCanvas from "@/components/canvas/Hero3DCanvas";
 import TactileButton from "@/components/ui/TactileButton";
 import IglooSoundAmbiencePill from "@/components/ui/IglooSoundAmbiencePill";
 import { useBackground } from "@/components/providers/BackgroundContext";
-import { motion } from "motion/react";
+
 
 export default function HeroSection() {
   const { activeWallpaper } = useBackground();
@@ -39,7 +27,7 @@ export default function HeroSection() {
 
       <div className="layout-safe-container relative z-10">
         
-        {/* Top Editorial Metadata Bar — Machine Interface typography & Igloo Sound Pill */}
+        {/* Top Editorial Metadata Bar — Machine Interface typography */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-10 text-[11px] tracking-widest text-gray-400 uppercase border-b border-white/10 pb-4">
           <div className="flex items-center gap-2 font-machine">
             <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
@@ -55,7 +43,6 @@ export default function HeroSection() {
           </div>
 
           <div className="flex items-center gap-3">
-            <IglooSoundAmbiencePill />
             {/* Machine Interface badge */}
             <span className="dg-badge-machine">
               <Sparkles className="w-3 h-3 text-teal-400" />

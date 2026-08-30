@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 
 import { AiRecommendationEngine, RECOMMENDATION_CONFIDENCE_BAND } from "../../src/lib/intelligence/recommendation/AiRecommendationEngine.js";
 import { AiContextCompiler } from "../../src/lib/intelligence/recommendation/AiContextCompiler.js";
-import { OutcomeFeedbackEngine, OUTCOME_STATUS } from "../../src/lib/intelligence/recommendation/OutcomeFeedbackEngine.js";
+import { OutcomeFeedbackEngine } from "../../src/lib/intelligence/recommendation/OutcomeFeedbackEngine.js";
 import { SecurityPrincipal, PRINCIPAL_TYPE } from "../../src/lib/security/core/SecurityPrincipal.js";
 import { AgentIdentity } from "../../src/lib/security/ai/AgentIdentity.js";
 
@@ -17,12 +17,6 @@ describe("AI Grounded Recommendation Engine & Context Compiler", () => {
   });
 
   it("should compile sanitized AI context with Security Fabric data minimization", () => {
-    const userPrincipal = new SecurityPrincipal({
-      subjectId: "student:24110001",
-      roles: ["student"],
-      scopes: ["academic:read", "academic:plan"]
-    });
-
     const agent = AgentIdentity.createAcademicPlannerAgent("24110001");
     const agentPrincipal = new SecurityPrincipal({
       subjectId: "agent:academic_planner_24110001",

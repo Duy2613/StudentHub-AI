@@ -29,59 +29,24 @@ const DEFAULT_ITEMS = [
     href: "/",
   },
   {
-    title: "Kiểm Tra Lừa Đảo (AI 4 Lớp)",
-    icon: <ShieldAlert className="w-full h-full text-rose-400" />,
-    href: "/scam-check",
+    title: "Trust Engine (AI Thẩm Định)",
+    icon: <ShieldAlert className="w-full h-full text-emerald-400" />,
+    href: "/trust",
   },
   {
-    title: "Xếp Tín Chỉ",
-    icon: <Calendar className="w-full h-full text-amber-400" />,
-    href: "/credit-scheduler",
-  },
-  {
-    title: "Review GV",
-    icon: <GraduationCap className="w-full h-full text-sky-400" />,
-    href: "/prof-rating",
-  },
-  {
-    title: "Radar Học Bổng",
-    icon: <Award className="w-full h-full text-emerald-400" />,
-    href: "/scholarships",
-  },
-  {
-    title: "Bản Đồ An Ninh",
-    icon: <Compass className="w-full h-full text-orange-400" />,
-    href: "/safety-map",
-  },
-  {
-    title: "Radar Học Phí",
-    icon: <CreditCard className="w-full h-full text-emerald-400" />,
-    href: "/tuition-radar",
-  },
-  {
-    title: "Bóc Tách Hợp Đồng",
-    icon: <Scale className="w-full h-full text-cyan-400" />,
-    href: "/contract-check",
-  },
-  {
-    title: "Cấp Cứu SOS",
-    icon: <AlertOctagon className="w-full h-full text-red-500" />,
-    href: "/sos",
-  },
-  {
-    title: "Sàn Pass Đồ",
-    icon: <ShoppingBag className="w-full h-full text-amber-400" />,
-    href: "/marketplace",
-  },
-  {
-    title: "Hiệp Sĩ",
-    icon: <Trophy className="w-full h-full text-purple-400" />,
-    href: "/quests",
-  },
-  {
-    title: "Diễn Đàn Sinh Viên",
+    title: "Cộng Đồng Tri Thức",
     icon: <MessageSquare className="w-full h-full text-indigo-400" />,
-    href: "/forum",
+    href: "/community",
+  },
+  {
+    title: "Mạng Lưới Chuyên Gia",
+    icon: <GraduationCap className="w-full h-full text-amber-400" />,
+    href: "/expert",
+  },
+  {
+    title: "Academic 360",
+    icon: <Calendar className="w-full h-full text-cyan-400" />,
+    href: "/academic",
   },
   {
     title: "Bảng Điều Khiển",
@@ -89,8 +54,8 @@ const DEFAULT_ITEMS = [
     href: "/dashboard",
   },
   {
-    title: "Hồ Sơ & Uy Tín",
-    icon: <User className="w-full h-full text-amber-400" />,
+    title: "Hồ Sơ & Bảo Mật",
+    icon: <User className="w-full h-full text-purple-400" />,
     href: "/profile",
   },
 ];

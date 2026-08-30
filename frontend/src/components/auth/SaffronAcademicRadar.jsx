@@ -8,7 +8,7 @@
 // - Typography: Kết hợp font-human tự nhiên, chữ nghiêng tinh tế và nhãn in hoa chuẩn xác
 
 import React, { useEffect, useRef } from "react";
-import { GraduationCap, ShieldCheck, Zap, Radio, CheckCircle2, Sparkles } from "lucide-react";
+import { GraduationCap, Radio, CheckCircle2, Sparkles } from "lucide-react";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 
 export const ACADEMIC_EMAIL_REGEX = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i;

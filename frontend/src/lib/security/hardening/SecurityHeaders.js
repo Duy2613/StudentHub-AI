@@ -26,7 +26,7 @@ export class SecurityHeaders {
     // 1. Content Security Policy (CSP)
     headers.set(
       "Content-Security-Policy",
-      "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;"
+      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;"
     );
 
     // 2. Strict Transport Security (HSTS)
@@ -45,7 +45,12 @@ export class SecurityHeaders {
     headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(self)");
 
     // 7. Strict CORS Origin Matching (Never wildcard * for credentials)
-    if (requestOrigin && (TRUSTED_ORIGINS.includes(requestOrigin) || requestOrigin.endsWith(".vercel.app"))) {
+    const configuredOrigins = String(process.env.STUDENTHUB_ALLOWED_ORIGINS || "")
+      .split(",")
+      .map(origin => origin.trim())
+      .filter(Boolean);
+    const isPreviewOrigin = /^https:\/\/studenthub-ai(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(requestOrigin || "");
+    if (requestOrigin && (TRUSTED_ORIGINS.includes(requestOrigin) || configuredOrigins.includes(requestOrigin) || isPreviewOrigin)) {
       headers.set("Access-Control-Allow-Origin", requestOrigin);
       headers.set("Access-Control-Allow-Credentials", "true");
       headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");

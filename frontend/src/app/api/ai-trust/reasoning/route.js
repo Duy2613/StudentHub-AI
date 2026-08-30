@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Layer4TrustService } from "@/lib/ai-trust/layer4/Layer4TrustService";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
 export const runtime = "nodejs";
 
@@ -8,7 +9,7 @@ export const runtime = "nodejs";
  * 
  * Layer 4 Authoritative Final Trust Reasoning Endpoint
  */
-export async function POST(request) {
+async function reasonAboutEvidence(request) {
   try {
     const body = await request.json();
     const { layer1Result, layer2Result, layer3Result } = body;
@@ -21,15 +22,13 @@ export async function POST(request) {
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    console.error("[AI-Trust-Layer4 Error]:", error);
-    return NextResponse.json(
-      {
-        layer: 4,
-        classification: "UNVERIFIED",
-        status: "REQUIRE_VERIFICATION",
-        error: error.message || "Internal server error during final trust reasoning",
-      },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "REASON_ABOUT_TRUST_EVIDENCE",
+  allowAnonymous: true,
+  maxRequests: 20,
+  maxBodyBytes: 256 * 1024,
+}, reasonAboutEvidence);

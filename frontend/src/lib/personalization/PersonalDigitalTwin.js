@@ -9,7 +9,7 @@ import { AcademicRecordsStore } from "../intelligence/academic/academicRecordsSt
 import { AcademicEligibilityEngine } from "../intelligence/academic/academicEligibilityEngine.js";
 import { TrustIntelligenceEngine } from "../intelligence/trust/TrustIntelligenceEngine.js";
 import { DeviceSyncEngine } from "./DeviceSyncEngine.js";
-import { PropertyFilter } from "../security/authorization/PropertyFilter.js";
+
 
 export const DATA_CLASSIFICATION = Object.freeze({
   USER_OWNED: "USER_OWNED",                     // Goals, notes, custom study patterns, bookmarks

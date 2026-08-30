@@ -1,21 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  ShieldAlert,
-  ShieldCheck,
-  AlertTriangle,
-  Bot,
-  UserCheck,
-  CheckCircle2,
-  Share2,
-  ExternalLink,
-  Info,
-  Layers,
-  ArrowRight,
-  Flame,
-  Lock,
-} from "lucide-react";
+import { ShieldAlert, ShieldCheck, AlertTriangle, Bot, UserCheck, CheckCircle2, Share2, Info, Layers } from "lucide-react";
 import { LAYER_1_STATUS } from "@/lib/ai-trust/layer1/types";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { CommunityStore } from "@/lib/intelligence/community/communityStore.js";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
-export async function POST(request) {
+async function createCommunityFeedback(request, routeParams, principal) {
   try {
     const body = await request.json();
     if (!body || !body.topic) {
@@ -11,16 +12,26 @@ export async function POST(request) {
       );
     }
 
-    const record = CommunityStore.registerFeedback(body);
+    const record = CommunityStore.registerFeedback({
+      ...body,
+      reporterId: principal.subjectId,
+      cohort: principal.attributes?.cohort || "UNKNOWN"
+    });
     return NextResponse.json({
       success: true,
       feedback: record,
       message: "Ghi nhận phản hồi thực tế thành công."
     });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to record community feedback" },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler(
+  {
+    action: "CREATE_COMMUNITY_FEEDBACK",
+    requiredPermission: "COMMUNITY.POST",
+    allowAnonymous: false
+  },
+  createCommunityFeedback
+);

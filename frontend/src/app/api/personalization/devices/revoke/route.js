@@ -11,10 +11,10 @@ export const POST = SecurityFabric.wrapHandler(
     action: "REVOKE_DEVICE",
     requiredPermission: "ACADEMIC.PLAN_OWN",
     requiredScopes: ["academic:plan"],
-    allowAnonymous: true
+    allowAnonymous: false
   },
   async (request, routeParams, principal, secContext) => {
-    const subjectId = principal.isAuthenticated ? principal.subjectId : "student:24110001";
+    const subjectId = principal.subjectId;
     const body = await request.json();
     const { deviceId, revokeAllOthers, currentDeviceId } = body;
 

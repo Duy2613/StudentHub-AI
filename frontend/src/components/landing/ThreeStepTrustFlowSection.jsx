@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Search, Compass, ShieldCheck, Zap, ArrowRight, Sparkles } from "lucide-react";
+import { Search, ShieldCheck, Zap, ArrowRight, Sparkles } from "lucide-react";
 import Interactive3DBlockCard from "@/components/ui/Interactive3DBlockCard";
 
 export default function ThreeStepTrustFlowSection() {

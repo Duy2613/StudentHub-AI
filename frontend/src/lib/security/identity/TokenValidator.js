@@ -30,7 +30,7 @@ export class TokenValidator {
   constructor({
     expectedIssuer = process.env.JWT_ISSUER || "https://studenthub.ai",
     expectedAudience = process.env.JWT_AUDIENCE || "studenthub-api",
-    secretOrKey = process.env.JWT_SECRET || "studenthub-zero-trust-secret-key-production-grade-2026",
+    secretOrKey = process.env.JWT_SECRET || (process.env.NODE_ENV === "production" ? null : "studenthub-jwt-test-only"),
     clockSkewSeconds = 30
   } = {}) {
     this.#expectedIssuer = expectedIssuer;
@@ -130,15 +130,20 @@ export class TokenValidator {
       });
     }
 
-    // Expiration (exp)
-    if (payload.exp !== undefined) {
-      if (typeof payload.exp !== "number" || nowEpoch > (payload.exp + this.#clockSkewSeconds)) {
-        throw new SecurityError({
-          code: SECURITY_ERROR_CODE.TOKEN_EXPIRED,
-          message: "Authorization token has expired.",
-          statusCode: 401
-        });
-      }
+    // Expiration (exp) is mandatory for bearer credentials.
+    if (typeof payload.exp !== "number") {
+      throw new SecurityError({
+        code: SECURITY_ERROR_CODE.UNAUTHORIZED,
+        message: "Token missing valid 'exp' (expiration) claim.",
+        statusCode: 401
+      });
+    }
+    if (nowEpoch > (payload.exp + this.#clockSkewSeconds)) {
+      throw new SecurityError({
+        code: SECURITY_ERROR_CODE.TOKEN_EXPIRED,
+        message: "Authorization token has expired.",
+        statusCode: 401
+      });
     }
 
     // Not Before (nbf)
@@ -154,7 +159,7 @@ export class TokenValidator {
 
     // Issuer (iss)
     const targetIssuer = options.issuer || this.#expectedIssuer;
-    if (targetIssuer && payload.iss && payload.iss !== targetIssuer) {
+    if (targetIssuer && (!payload.iss || payload.iss !== targetIssuer)) {
       throw new SecurityError({
         code: SECURITY_ERROR_CODE.INVALID_ISSUER,
         message: `Token issuer mismatch. Expected '${targetIssuer}', got '${payload.iss}'.`,
@@ -210,6 +215,7 @@ export class TokenValidator {
 
   #verifySignature(signedData, signatureB64, alg) {
     try {
+      if (!this.#secretOrKey) return false;
       if (alg === "HS256") {
         const hmac = crypto.createHmac("sha256", this.#secretOrKey);
         hmac.update(signedData);

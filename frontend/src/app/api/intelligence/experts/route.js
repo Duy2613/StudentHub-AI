@@ -29,9 +29,14 @@ export const GET = SecurityFabric.wrapHandler(
         limit
       });
 
+      const safeMatches = discoveryResults.topMatches.map(({ rawExpert, ...match }) => ({
+        ...match,
+        profile: ExpertPublicDTO.toPublicDTO(rawExpert)
+      }));
+
       return Response.json({
         success: true,
-        data: discoveryResults,
+        data: { ...discoveryResults, topMatches: safeMatches },
         meta: {
           correlationId: secContext.correlationId
         }

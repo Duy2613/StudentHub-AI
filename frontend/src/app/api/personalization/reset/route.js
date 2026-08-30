@@ -11,10 +11,10 @@ export const POST = SecurityFabric.wrapHandler(
     action: "RESET_PERSONALIZATION",
     requiredPermission: "ACADEMIC.PLAN_OWN",
     requiredScopes: ["academic:plan"],
-    allowAnonymous: true
+    allowAnonymous: false
   },
   async (request, routeParams, principal, secContext) => {
-    const subjectId = principal.isAuthenticated ? principal.subjectId : "student:24110001";
+    const subjectId = principal.subjectId;
     const res = PersonalizationEngine.resetPersonalization(subjectId);
 
     return Response.json({

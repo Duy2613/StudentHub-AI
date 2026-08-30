@@ -1,0 +1,78 @@
+name: Competition Quality Gate
+
+on:
+  pull_request:
+  push:
+    branches: [develop]
+
+concurrency:
+  group: competition-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Install Chromium runtime
+        run: npx playwright install --with-deps chromium
+        working-directory: frontend
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build
+
+      - name: Discovered regression suite
+        run: npm run test:all-discovered
+
+      - name: API authorization inventory
+        run: npm run audit:api-auth
+
+      - name: Reject unprotected mutations
+        shell: bash
+        run: grep -q "Unprotected mutations requiring P0 review: 0" docs/security/API-Authorization-Inventory.md
+
+      - name: Bundle budget
+        run: npm run audit:bundle
+
+      - name: Production dependency audit
+        run: npm audit --omit=dev
+        working-directory: frontend
+
+      - name: Evidence Case Lab browser gate
+        run: npx playwright test tests/e2e/cases.spec.ts --project chromium
+        working-directory: frontend
+
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: competition-playwright-evidence
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          if-no-files-found: ignore
+          retention-days: 14

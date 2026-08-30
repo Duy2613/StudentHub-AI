@@ -1,35 +1,14 @@
 "use client";
 
-import React, { useState, useMemo, useCallback, useEffect } from "react";
-import {
-  Award,
-  Search,
-  ExternalLink,
-  CheckCircle2,
-  AlertTriangle,
-  Clock,
-  Building,
-  GraduationCap,
-  Sparkles,
-  Zap,
-  Copy,
-  Check,
-  FileText,
-  X,
-  Loader2,
-  DollarSign,
-  Filter,
-  Flame,
-  ShieldCheck,
-  Download,
-} from "lucide-react";
+import React, { useState, useCallback, useEffect } from "react";
+import { ExternalLink, CheckCircle2, Clock, Sparkles, Zap, Copy, Check, FileText, X, Loader2, ShieldCheck, Download } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import ModernNavbar from "@/components/layout/ModernNavbar";
 import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
 import AeroMissionControlBackdrop from "@/components/ui/AeroMissionControlBackdrop";
 import MohsinFluidCanvas from "@/components/ui/MohsinFluidCanvas";
 import SaffronMarqueeTicker from "@/components/ui/SaffronMarqueeTicker";
-import SaffronSwissCrosshairGrid from "@/components/ui/SaffronSwissCrosshairGrid";
+
 import { NoiseOverlay } from "@/components/auth/AuthUI";
 import FloatingDock from "@/components/ui/floating-dock";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";

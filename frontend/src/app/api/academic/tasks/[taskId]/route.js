@@ -14,16 +14,18 @@ export const GET = SecurityFabric.wrapHandler(
     action: "READ_TASK",
     requiredPermission: "ACADEMIC.READ_OWN",
     requiredScopes: ["academic:read"],
-    allowAnonymous: true
+    allowAnonymous: false
   },
   async (request, routeParams, principal, secContext) => {
     const { taskId } = await routeParams.params;
     const { searchParams } = new URL(request.url);
     const requestedStudentId = searchParams.get("studentId");
 
-    const authedStudentId = principal.isAuthenticated
-      ? principal.subjectId.replace("student:", "").trim()
-      : (requestedStudentId || "24110001");
+    const authedStudentId = principal.subjectId.replace("student:", "").trim();
+
+    if (requestedStudentId && requestedStudentId !== authedStudentId) {
+      ObjectAuthorizer.assertAccess(principal, { studentId: requestedStudentId });
+    }
 
     const task = AcademicTaskStore.getTask(taskId);
     if (!task) {
@@ -40,9 +42,7 @@ export const GET = SecurityFabric.wrapHandler(
     }
 
     // Zero-Trust BOLA Object Check
-    if (principal.isAuthenticated) {
-      ObjectAuthorizer.assertAccess(principal, task);
-    }
+    ObjectAuthorizer.assertAccess(principal, task);
 
     const events = AcademicTaskStore.getEvents(taskId);
 
@@ -62,7 +62,7 @@ export const POST = SecurityFabric.wrapHandler(
     action: "MUTATE_TASK",
     requiredPermission: "ACADEMIC.PLAN_OWN",
     requiredScopes: ["academic:plan"],
-    allowAnonymous: true
+    allowAnonymous: false
   },
   async (request, routeParams, principal, secContext) => {
     const { taskId } = await routeParams.params;
@@ -70,12 +70,14 @@ export const POST = SecurityFabric.wrapHandler(
     const { action, stepId, studentId: clientSentStudentId, evidence = null } = body;
 
     // Derived identity from server context — NEVER trust client-sent studentId alone!
-    const effectiveStudentId = principal.isAuthenticated
-      ? principal.subjectId.replace("student:", "").trim()
-      : (clientSentStudentId || "24110001");
+    const effectiveStudentId = principal.subjectId.replace("student:", "").trim();
+
+    if (clientSentStudentId && clientSentStudentId !== effectiveStudentId) {
+      ObjectAuthorizer.assertAccess(principal, { studentId: clientSentStudentId });
+    }
 
     const task = AcademicTaskStore.getTask(taskId);
-    if (task && principal.isAuthenticated) {
+    if (task) {
       ObjectAuthorizer.assertAccess(principal, task);
     }
 

@@ -1,23 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Layers, 
-  Zap, 
-  Search, 
-  Database, 
-  Cpu, 
-  CheckCircle2, 
-  Clock, 
-  ShieldCheck,
-  Calendar,
-  FileCheck2,
-  ShieldAlert,
-  Navigation,
-  Radar,
-  ArrowRight,
-  Sparkles
-} from "lucide-react";
+import { Layers, ShieldCheck, Calendar, FileCheck2, ShieldAlert, Navigation, Radar, Sparkles } from "lucide-react";
 import TextScramble from "@/components/ui/TextScramble";
 
 export default function ExplainableEngineSection() {

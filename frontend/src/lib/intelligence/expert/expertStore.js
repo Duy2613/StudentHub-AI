@@ -144,6 +144,35 @@ export class ExpertStore {
       reputationScore: 89
     });
 
+    // 4. Calculus teaching expert — scoped to mathematics and course pedagogy.
+    // This profile is intentionally not granted institutional policy authority.
+    const expertHung = ExpertIntelligenceModel.createExpert({
+      expertId: "EXP_TS_HUNG_CALCULUS",
+      name: "TS. Nguyễn Văn Hùng",
+      title: "Giảng viên Toán học",
+      institution: "HCMUTE",
+      department: "Khoa Khoa học Cơ bản",
+      affiliationStatus: AFFILIATION_STATUS.VERIFIED_ACTIVE,
+      status: EXPERT_STATUS.VERIFIED_EXPERT,
+      orcid: "0000-0002-4401-7788",
+      verifiedEmail: "hungnv@hcmute.edu.vn",
+      directoryUrl: "https://hcmute.edu.vn/faculty/hungnv",
+      scopes: [
+        { domain: "MATHEMATICS", subdomain: "Giải tích 1 & Giải tích 2", level: EXPERTISE_LEVEL.ESTABLISHED, jurisdiction: JURISDICTION_TYPE.PEDAGOGICAL, citationCount: 72, recencyYear: 2025 }
+      ],
+      credentials: [
+        { credentialId: "CRED_HUNG_PHD", type: "DEGREE_PHD", field: "Applied Mathematics", issuer: "ĐHQG TP.HCM", issuedYear: 2017, status: CREDENTIAL_STATUS.VERIFIED }
+      ],
+      roles: [
+        { roleId: "ROLE_HUNG_1", roleTitle: "LECTURER", organization: "HCMUTE", validFrom: "2018-01-01", validUntil: null }
+      ],
+      publications: [
+        { pubId: "PUB_HUNG_1", title: "Applied Calculus for Engineering Education", venue: "HCMUTE Journal", year: 2025, domain: "MATHEMATICS", doi: "10.1000/hung-calculus-2025" }
+      ],
+      hasRegistrarAuthority: false,
+      reputationScore: 86
+    });
+
     // 4. Dr. Duc - Robotics & Control (With Commercial Sponsorship / COI)
     const expertDuc = ExpertIntelligenceModel.createExpert({
       expertId: "EXP_DR_DUC_ROBOTICS",
@@ -194,6 +223,7 @@ export class ExpertStore {
     this.#expertsById.set(expertMinh.expertId, expertMinh);
     this.#expertsById.set(expertHoang.expertId, expertHoang);
     this.#expertsById.set(expertLan.expertId, expertLan);
+    this.#expertsById.set(expertHung.expertId, expertHung);
     this.#expertsById.set(expertDuc.expertId, expertDuc);
     this.#expertsById.set(expertFake.expertId, expertFake);
 
@@ -252,6 +282,14 @@ export class ExpertStore {
           this.#claimsById.set(claimObj.claimId, claimObj);
         }
       }
+
+      // Keep demo/reference coverage available after a persisted store is created,
+      // while preserving every persisted expert and claim as the source of truth.
+      const persistedExperts = new Map(this.#expertsById);
+      const persistedClaims = new Map(this.#claimsById);
+      this.#seedDefaults();
+      for (const [id, expert] of persistedExperts) this.#expertsById.set(id, expert);
+      for (const [id, claim] of persistedClaims) this.#claimsById.set(id, claim);
 
       this.#isHydrated = true;
     } catch {

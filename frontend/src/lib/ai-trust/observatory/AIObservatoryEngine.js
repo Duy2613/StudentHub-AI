@@ -8,7 +8,9 @@
 
 export class AIObservatoryEngine {
   /**
-   * Aggregates real-time health, drift, benchmark, and security metrics
+   * Returns the deterministic benchmark snapshot used by the observatory UI.
+   * These values are not a live production measurement; callers must surface
+   * the explicit source-state metadata below.
    * @returns {object} Cockpit Telemetry Snapshot
    */
   static getObservatorySnapshot() {
@@ -18,10 +20,14 @@ export class AIObservatoryEngine {
       system_name: "StudentHub AI Laboratory & Flight Deck",
       version: "v9.0.0-RealityFirst",
       timestamp,
-      environment: "PRODUCTION_OBSERVABILITY",
+      environment: "LOCAL_SYNTHETIC_BENCHMARK",
+      sourceState: "SYNTHETIC_FIXTURE",
+      isAuthoritative: false,
+      dataNotice: "Deterministic benchmark telemetry; not a live production measurement.",
       constitution_compliance: {
         constitution_version: "v9.0.0",
-        zero_demo_fiction: true,
+        zero_demo_fiction: false,
+        fixture_backed: true,
         software_ai_decoupled: true,
         champion_challenger_governed: true
       },
@@ -54,7 +60,8 @@ export class AIObservatoryEngine {
           ece: 0.042,
           brier_score: 0.061,
           avg_latency_ms: 1.82,
-          cost_per_query: "$0.000000"
+          cost_per_query: null,
+          cost_state: "NOT_MEASURED"
         },
         challengers: [
           {

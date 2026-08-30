@@ -14,12 +14,7 @@
 import { ExpertStore } from "./expertStore.js";
 import { ExpertScopeEngine } from "./expertScopeEngine.js";
 import { ExpertContextEngine } from "./expertContextEngine.js";
-import {
-  EXPERTISE_LEVEL,
-  QUERY_ANSWER_MODE,
-  JURISDICTION_TYPE,
-  EXPERT_STATUS
-} from "./expertIntelligenceModel.js";
+import { EXPERTISE_LEVEL, QUERY_ANSWER_MODE } from "./expertIntelligenceModel.js";
 
 export class ExpertQueryEngine {
   /**
