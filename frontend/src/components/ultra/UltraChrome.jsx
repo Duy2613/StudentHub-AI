@@ -144,8 +144,9 @@ export function UltraLauncher() {
     ];
 
     return (
-        <div
+        <aside
             className="fixed right-4 top-1/2 z-[880] -translate-y-1/2"
+            aria-label="Điều khiển Ultra"
             onMouseEnter={() => setExpanded(true)}
             onMouseLeave={() => setExpanded(false)}
         >
@@ -221,7 +222,7 @@ export function UltraLauncher() {
                     </span>
                 </div>
             </div>
-        </div>
+        </aside>
     );
 }
 
@@ -232,42 +233,44 @@ export function UltraRouteBeacon() {
     const group = route ? ULTRA_GROUPS[route.group] : null;
 
     return (
-        <AnimatePresence mode="wait">
-            <motion.div
-                key={pathname}
-                initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
-                transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
-                className="pointer-events-none fixed bottom-4 left-4 z-[870] hidden max-w-[300px] items-center gap-2.5 rounded-2xl border px-3 py-2 md:flex"
-                style={{
-                    borderColor: "var(--ux-border)",
-                    background: "color-mix(in srgb, var(--ux-bg-1) 88%, transparent)",
-                    backdropFilter: "blur(14px)",
-                }}
-            >
-                <span
-                    className="h-2 w-2 shrink-0 rounded-full"
+        <aside aria-label="Ngữ cảnh trang hiện tại">
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={pathname}
+                    initial={{ opacity: 0, y: 14, filter: "blur(6px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -10, filter: "blur(6px)" }}
+                    transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+                    className="pointer-events-none fixed bottom-4 left-4 z-[870] hidden max-w-[300px] items-center gap-2.5 rounded-2xl border px-3 py-2 md:flex"
                     style={{
-                        background: group?.color || "var(--ux-accent)",
-                        boxShadow: `0 0 12px ${group?.color || "var(--ux-accent)"}`,
-                        animation: "ux-pulse 2.2s ease-in-out infinite",
+                        borderColor: "var(--ux-border)",
+                        background: "color-mix(in srgb, var(--ux-bg-1) 88%, transparent)",
+                        backdropFilter: "blur(14px)",
                     }}
-                />
-                <span className="min-w-0">
+                >
                     <span
-                        className="block font-mono text-[9px] font-black uppercase tracking-[0.18em]"
-                        style={{ color: group?.color || "var(--ux-accent)" }}
-                    >
-                        {group?.label || "STUDENTHUB AI"}
+                        className="h-2 w-2 shrink-0 rounded-full"
+                        style={{
+                            background: group?.color || "var(--ux-accent)",
+                            boxShadow: `0 0 12px ${group?.color || "var(--ux-accent)"}`,
+                            animation: "ux-pulse 2.2s ease-in-out infinite",
+                        }}
+                    />
+                    <span className="min-w-0">
+                        <span
+                            className="block font-mono text-[9px] font-black uppercase tracking-[0.18em]"
+                            style={{ color: group?.color || "var(--ux-accent)" }}
+                        >
+                            {group?.label || "STUDENTHUB AI"}
+                        </span>
+                        <span className="block truncate text-[11.5px] font-bold text-white/85">
+                            {route?.title || pathname}
+                        </span>
                     </span>
-                    <span className="block truncate text-[11.5px] font-bold text-white/85">
-                        {route?.title || pathname}
-                    </span>
-                </span>
-                <Zap className="h-3.5 w-3.5 shrink-0 text-white/25" />
-            </motion.div>
-        </AnimatePresence>
+                    <Zap className="h-3.5 w-3.5 shrink-0 text-white/25" />
+                </motion.div>
+            </AnimatePresence>
+        </aside>
     );
 }
 

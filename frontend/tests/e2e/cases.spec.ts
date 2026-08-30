@@ -22,6 +22,20 @@ test.describe("Evidence Case Lab", () => {
     await expect(page.getByRole("heading", { name: "Xác minh theo hồ sơ", exact: true }).first()).toBeVisible();
   });
 
+  test("opens the requested superflow from a shareable deep link", async ({ page }) => {
+    const deepLinks = [
+      { id: "fake-scholarship", tab: "Học bổng giả", title: "Yêu cầu đặt cọc để nhận học bổng" },
+      { id: "fake-internship", tab: "Thực tập giả", title: "Nhà tuyển dụng yêu cầu phí thiết bị" },
+      { id: "academic-conflict", tab: "Xung đột học vụ", title: "Tin đồn thay đổi điều kiện tiên quyết" },
+    ];
+
+    for (const flow of deepLinks) {
+      await page.goto(`/cases?id=${flow.id}`);
+      await expect(page.getByRole("tab", { name: new RegExp(flow.tab) })).toHaveAttribute("aria-selected", "true");
+      await expect(page.getByRole("heading", { name: flow.title })).toBeVisible();
+    }
+  });
+
   test("keeps the evidence narrative readable without horizontal overflow on mobile", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/cases");

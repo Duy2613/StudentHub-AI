@@ -15,6 +15,11 @@ const productHeadings = {
   "/expert": "Đúng người, đúng phạm vi, đúng bằng chứng.",
 };
 
+const extendedResponsiveRoutes = {
+  "/academic/profile": "Nguyễn Văn Duy",
+  "/intelligence/knowledge": "Evidence Fusion & Knowledge Object",
+};
+
 for (const viewport of viewports) {
   test(`core products fit ${viewport.width}x${viewport.height}`, async ({ page }, testInfo) => {
     await page.setViewportSize(viewport);
@@ -26,6 +31,18 @@ for (const viewport of viewports) {
       expect(overflow, `${path} horizontal overflow`).toBeLessThanOrEqual(1);
     }
     await page.screenshot({ path: testInfo.outputPath(`expert-${viewport.width}x${viewport.height}.png`), fullPage: true });
+  });
+}
+
+for (const viewport of [{ width: 320, height: 900 }, { width: 768, height: 900 }]) {
+  test(`extended product surfaces fit ${viewport.width}x${viewport.height}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    for (const [path, heading] of Object.entries(extendedResponsiveRoutes)) {
+      await page.goto(path);
+      await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(overflow, `${path} horizontal overflow`).toBeLessThanOrEqual(1);
+    }
   });
 }
 

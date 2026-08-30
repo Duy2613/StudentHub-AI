@@ -261,7 +261,14 @@ export function UltraMarquee({
 
     if (motionId === "still") {
         return (
-            <div className={`flex gap-6 overflow-x-auto ${className}`}>{items}</div>
+            <div
+                className={`flex gap-6 overflow-x-auto ${className}`}
+                role="region"
+                aria-label="Nội dung chạy ngang"
+                tabIndex={0}
+            >
+                {items}
+            </div>
         );
     }
 

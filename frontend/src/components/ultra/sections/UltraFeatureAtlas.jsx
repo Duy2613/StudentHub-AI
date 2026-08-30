@@ -168,7 +168,7 @@ export default function UltraFeatureAtlas() {
                                                         className="rounded border px-1.5 py-0.5 font-mono text-[8.5px] font-black"
                                                         style={{
                                                             borderColor: "var(--ux-border)",
-                                                            color: "rgba(255,255,255,0.45)",
+                                                            color: "var(--ux-text, #ece7e0)",
                                                             background: "var(--ux-bg-0)",
                                                         }}
                                                     >

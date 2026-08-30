@@ -14,15 +14,15 @@ export default function AcademicProfilePage() {
   const profile = StudentProfile360Service.getProfile360("24110001");
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 antialiased p-4 md:p-8 max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    <main className="w-full min-w-0 min-h-screen bg-slate-950 text-slate-100 antialiased p-4 md:p-8 max-w-6xl mx-auto space-y-6">
+      <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/academic"
           className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white bg-slate-900 border border-slate-800 px-3.5 py-2 rounded-xl transition-all"
         >
           <ChevronLeft className="w-4 h-4" /> Quay lại Academic Command Center
         </Link>
-        <span className="text-xs text-slate-500 font-mono">
+        <span className="text-xs text-slate-400 font-mono">
           Trạng thái xác minh: AUTHORITATIVE
         </span>
       </div>

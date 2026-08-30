@@ -306,7 +306,23 @@ html[data-ultra-motion="still"] *::after {
   background: var(--ux-accent);
 }
 
-/* Route-local accessible muted text floor. White/40 falls below WCAG AA on ux-bg-0. */
-html[data-ultra-theme] .text-white\/40 {
-  color: rgba(255, 255, 255, 0.64);
+/*
+ * Route-local accessible muted text floor.
+ *
+ * Ultra's cinematic surfaces are deliberately very dark, so the low-opacity
+ * white utilities used for HUD metadata can fall below WCAG AA (especially
+ * for the 11px labels rendered by the data panels). Keep the visual hierarchy
+ * through size/spacing while giving every muted label a theme-aware, readable
+ * foreground. The selector is scoped to this route and intentionally leaves
+ * the brighter text-white/65+ utilities untouched.
+ */
+html[data-ultra-theme] .text-white\/25,
+html[data-ultra-theme] .text-white\/30,
+html[data-ultra-theme] .text-white\/35,
+html[data-ultra-theme] .text-white\/40,
+html[data-ultra-theme] .text-white\/45,
+html[data-ultra-theme] .text-white\/50,
+html[data-ultra-theme] .text-white\/55,
+html[data-ultra-theme] .text-white\/60 {
+  color: var(--ux-text) !important;
 }

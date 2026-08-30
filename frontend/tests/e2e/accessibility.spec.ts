@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { completeTextScan, mockTrustPipeline } from "./fixtures/trust";
 
-for (const path of ["/trust", "/community", "/expert", "/login"]) {
+for (const path of ["/trust", "/community", "/expert", "/login", "/academic/profile", "/intelligence/knowledge"]) {
   test(`${path} has no serious or critical axe violations`, async ({ page }) => {
     await page.goto(path);
     const results = await new AxeBuilder({ page }).analyze();

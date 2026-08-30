@@ -63,7 +63,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-white tracking-tight">{identity.fullName}</h2>
+                <h1 className="text-xl font-bold text-white tracking-tight">{identity.fullName}</h1>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/30">
                   MSSV: {identity.studentId}
                 </span>
@@ -106,7 +106,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
           </div>
           <div className="flex items-baseline gap-1.5">
             <span className="text-2xl font-bold text-white tracking-tight">{academicSummary?.earnedCredits || 0}</span>
-            <span className="text-xs text-slate-500">/ {academicSummary?.totalRequiredCredits || 150}</span>
+            <span className="text-xs text-slate-400">/ {academicSummary?.totalRequiredCredits || 150}</span>
           </div>
           <div className="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
             <div
@@ -126,7 +126,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
             <span className="text-2xl font-bold text-white tracking-tight">
               {academicSummary?.cgpa !== null ? academicSummary.cgpa.toFixed(2) : "N/A"}
             </span>
-            <span className="text-xs text-slate-500">/ 4.00</span>
+            <span className="text-xs text-slate-400">/ 4.00</span>
           </div>
           <div className="text-[11px] font-semibold text-emerald-400 mt-3">
             Xếp loại: {academicSummary?.academicStanding || "Bình thường"}
@@ -143,7 +143,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
             <span className="text-2xl font-bold text-white tracking-tight">
               {graduationRequirements.filter(r => r.isSatisfied).length}
             </span>
-            <span className="text-xs text-slate-500">/ {graduationRequirements.length}</span>
+            <span className="text-xs text-slate-400">/ {graduationRequirements.length}</span>
           </div>
           <div className="text-[11px] font-medium text-slate-400 mt-3">
             {graduationRequirements.filter(r => !r.isSatisfied).length === 0 ? "✓ Đủ điều kiện tốt nghiệp" : `Còn ${graduationRequirements.filter(r => !r.isSatisfied).length} điều kiện chưa đạt`}
@@ -169,7 +169,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
       </div>
 
       {/* 3. Section Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+      <div className="flex min-w-0 items-center gap-2 overflow-x-auto border-b border-slate-800 pb-2 scrollbar-none">
         <button
           onClick={() => setActiveTab("requirements")}
           className={`px-4 py-2 text-xs font-semibold rounded-xl transition-all ${
@@ -233,7 +233,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
                   <XCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                 )}
                 <div>
-                  <h4 className="text-sm font-semibold text-white">{req.title}</h4>
+                  <h2 className="text-sm font-semibold text-white">{req.title}</h2>
                   <p className="text-xs text-slate-400 mt-1">{req.studentFacingExplanation}</p>
                 </div>
               </div>
@@ -345,7 +345,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
                 <div>
                   <div className="flex items-center gap-2">
                     <Award className="w-5 h-5 text-indigo-400" />
-                    <h4 className="text-base font-bold text-white">{cert.type} Quốc Tế</h4>
+                    <h2 className="text-base font-bold text-white">{cert.type} Quốc Tế</h2>
                   </div>
                   <div className="flex items-baseline gap-2 mt-2">
                     <span className="text-3xl font-extrabold text-white tracking-tight">{cert.score}</span>

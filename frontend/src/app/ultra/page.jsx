@@ -34,9 +34,9 @@ export default function UltraLabPage() {
             >
                 <UltraChrome />
                 <UltraKeyboardRouter />
-                <header className="overlay-nav-layer">
+                <div className="overlay-nav-layer">
                     <ModernNavbar />
-                </header>
+                </div>
 
                 <UltraChapterNav />
 

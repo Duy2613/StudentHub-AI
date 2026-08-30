@@ -36,6 +36,11 @@ test.describe("Ultra Experience Lab", () => {
   test("passes the serious and critical accessibility gate", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/ultra");
+    // The provider applies the reduced-motion preference in a client effect;
+    // wait for that state and the initial card reveal to settle before taking
+    // the accessibility snapshot (otherwise Axe can sample a mid-fade color).
+    await expect(page.locator("html")).toHaveAttribute("data-ultra-motion", "still");
+    await page.waitForTimeout(800);
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations.filter((violation) => ["serious", "critical"].includes(violation.impact || ""))).toEqual([]);
   });

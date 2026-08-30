@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import {
@@ -66,6 +66,20 @@ export function CompetitionCaseStudio({ flows }) {
   const active = useMemo(() => flows.find((flow) => flow.id === activeId) || flows[0], [activeId, flows]);
   const recommended = active.decision.options.find((option) => option.id === active.decision.recommendedOptionId);
 
+  useEffect(() => {
+    const requestedId = new URLSearchParams(window.location.search).get("id");
+    if (requestedId && flows.some((flow) => flow.id === requestedId)) {
+      setActiveId(requestedId);
+    }
+  }, [flows]);
+
+  function selectFlow(id) {
+    setActiveId(id);
+    const url = new URL(window.location.href);
+    url.searchParams.set("id", id);
+    window.history.replaceState(null, "", `${url.pathname}?${url.searchParams.toString()}${url.hash}`);
+  }
+
   return (
     <div className={styles.workspace}>
       <header className={styles.hero}>
@@ -89,7 +103,7 @@ export function CompetitionCaseStudio({ flows }) {
             type="button"
             role="tab"
             aria-selected={active.id === flow.id}
-            onClick={() => setActiveId(flow.id)}
+            onClick={() => selectFlow(flow.id)}
           >
             <span>{flow.navLabel}</span>
             <small>{readable(flow.currentRisk)}</small>
