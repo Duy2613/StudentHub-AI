@@ -1,34 +1,30 @@
 import { NextResponse } from "next/server";
-import { Layer4TrustService } from "@/lib/ai-trust/layer4/Layer4TrustService";
 import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
 export const runtime = "nodejs";
 
 /**
- * POST /api/ai-trust/reasoning
- * 
- * Layer 4 Authoritative Final Trust Reasoning Endpoint
+ * The old client-composed endpoint cannot establish provenance for the layer
+ * results supplied by a browser. It is intentionally retired so forged
+ * VERIFIED/evidence payloads cannot reach the final policy boundary.
  */
-async function reasonAboutEvidence(request) {
-  try {
-    const body = await request.json();
-    const { layer1Result, layer2Result, layer3Result } = body;
-
-    const result = await Layer4TrustService.evaluate({
-      layer1Result,
-      layer2Result,
-      layer3Result,
-    });
-
-    return NextResponse.json(result, { status: 200 });
-  } catch (error) {
-    throw error;
-  }
+async function rejectClientComposedReasoning() {
+  return NextResponse.json({
+    success: false,
+    error: {
+      code: "TRUST_REASONING_REQUIRES_CANONICAL_PIPELINE",
+      userMessage: "Hãy sử dụng luồng Trust Engine chuẩn để hệ thống tự kiểm tra và giữ provenance của từng tầng.",
+    },
+    canonicalEndpoint: "/api/v1/trust",
+  }, {
+    status: 410,
+    headers: { "Cache-Control": "no-store" },
+  });
 }
 
 export const POST = SecurityFabric.wrapHandler({
-  action: "REASON_ABOUT_TRUST_EVIDENCE",
+  action: "REJECT_CLIENT_COMPOSED_TRUST_REASONING",
   allowAnonymous: true,
   maxRequests: 20,
   maxBodyBytes: 256 * 1024,
-}, reasonAboutEvidence);
+}, rejectClientComposedReasoning);

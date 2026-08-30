@@ -73,6 +73,19 @@ test("canonical v1 APIs expose honest public contracts and fail closed for perso
     assert.equal(trustBody.demo, false);
     assert.ok(trustBody.data.layer1);
 
+    const legacyReasoningResponse = await fetch(`${baseUrl}/api/ai-trust/reasoning`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        layer1Result: { status: "PASS" },
+        layer2Result: { status: "PASS" },
+        layer3Result: { status: "VERIFIED", externalEvidence: true },
+      }),
+    });
+    const legacyReasoningBody = await legacyReasoningResponse.json();
+    assert.equal(legacyReasoningResponse.status, 410);
+    assert.equal(legacyReasoningBody.error?.code, "TRUST_REASONING_REQUIRES_CANONICAL_PIPELINE");
+
     for (const path of ["/api/v1/academic", "/api/v1/dashboard", "/api/v1/notifications"]) {
       const response = await fetch(`${baseUrl}${path}`);
       const body = await response.json();

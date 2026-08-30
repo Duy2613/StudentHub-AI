@@ -21,7 +21,7 @@ export class TemporalEvaluator {
     if (!publishedAt) {
       return {
         freshness: FRESHNESS_STATUS.UNKNOWN,
-        isValidForClaim: true,
+        isValidForClaim: false,
         timeDeltaDays: null,
         notes: "Không xác định được ngày công bố nguồn tin.",
       };
@@ -31,15 +31,23 @@ export class TemporalEvaluator {
     if (isNaN(pubDate.getTime())) {
       return {
         freshness: FRESHNESS_STATUS.UNKNOWN,
-        isValidForClaim: true,
+        isValidForClaim: false,
         timeDeltaDays: null,
         notes: "Định dạng ngày công bố không hợp lệ.",
       };
     }
 
     const now = new Date();
+    if (pubDate.getTime() > now.getTime() + 24 * 60 * 60 * 1000) {
+      return {
+        freshness: FRESHNESS_STATUS.UNKNOWN,
+        isValidForClaim: false,
+        timeDeltaDays: null,
+        notes: "Ngày công bố nằm trong tương lai và không thể được dùng làm bằng chứng hiện tại.",
+      };
+    }
     const timeDeltaDays = Math.max(0, Math.floor((now.getTime() - pubDate.getTime()) / (1000 * 60 * 60 * 24)));
-    const claimYear = claim.time || "2026";
+    const claimYear = typeof claim.time === "string" && /^\d{4}$/.test(claim.time) ? claim.time : null;
     const pubYear = pubDate.getFullYear().toString();
 
     // 1. Year Mismatch (e.g. Claim is about 2026, but Source is from 2022)
@@ -62,7 +70,7 @@ export class TemporalEvaluator {
 
     return {
       freshness,
-      isValidForClaim: true,
+        isValidForClaim: freshness !== FRESHNESS_STATUS.OUTDATED && freshness !== FRESHNESS_STATUS.UNKNOWN,
       timeDeltaDays,
       notes: `Nguồn tin phát hành ngày ${pubDate.toISOString().slice(0, 10)}.`,
     };

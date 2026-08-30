@@ -17,3 +17,4 @@ export * from "./engine/SourceConflictDetector.js";
 export * from "./engine/CompletenessEngine.js";
 export * from "./engine/Layer3DecisionEngine.js";
 export * from "./Layer3EvidenceService.js";
+export * from "./TrustBoundary.js";

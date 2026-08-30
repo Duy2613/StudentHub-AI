@@ -32,20 +32,31 @@ export class Layer1ScreenService {
    * @param {object} [params.options={}]
    * @returns {Promise<object>} Standardized Layer 1 Output Schema
    */
-  static async screen({ type = "text", content = "", metadata = {}, options = {} }) {
+  static async screen(params = {}) {
+    const input = params && typeof params === "object" && !Array.isArray(params) ? params : {};
+    const type = input.type === undefined ? "text" : input.type;
+    const content = input.content === undefined ? "" : input.content;
+    const metadata = input.metadata && typeof input.metadata === "object" && !Array.isArray(input.metadata) ? input.metadata : {};
+    const options = input.options && typeof input.options === "object" && !Array.isArray(input.options) ? input.options : {};
     const startTime = typeof performance !== "undefined" ? performance.now() : Date.now();
-    const requestId = options.requestId || `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const requestId = typeof options.requestId === "string" && options.requestId.trim()
+      ? options.requestId.trim().slice(0, 160)
+      : `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const normalizedType = String(type || "text").toLowerCase();
     const detectorsExecuted = ["NormalizationService"];
 
     const rawSignals = [];
     let isWhitelisted = false;
+    let forceUnknown = false;
+    let unknownReason = null;
 
     try {
       // 1. Dispatch according to input type
       if (normalizedType === "url" || normalizedType === "link") {
         detectorsExecuted.push("UrlDetector");
         const normUrl = NormalizationService.normalizeUrl(content);
+        forceUnknown = !normUrl.isValid;
+        unknownReason = normUrl.invalidReason || null;
 
         if (normUrl.isOverLength) {
           rawSignals.push(
@@ -69,6 +80,8 @@ export class Layer1ScreenService {
         if (metadata.qrContent) detectorsExecuted.push("QrDetector");
 
         const normBytes = NormalizationService.normalizeBytes(metadata.bytes || content, metadata.fileSize || 0);
+        forceUnknown = !normBytes.isValid;
+        unknownReason = normBytes.isOverSize ? LAYER_1_REASONS.OVERSIZED_FILE : "BINARY_INPUT_UNAVAILABLE_OR_MALFORMED";
 
         const imgRes = ImageDetector.detect({
           bytes: normBytes.bytes,
@@ -83,6 +96,8 @@ export class Layer1ScreenService {
       } else if (normalizedType === "file") {
         detectorsExecuted.push("FileDetector");
         const normBytes = NormalizationService.normalizeBytes(metadata.bytes || content, metadata.fileSize || 0);
+        forceUnknown = !normBytes.isValid;
+        unknownReason = normBytes.isOverSize ? LAYER_1_REASONS.OVERSIZED_FILE : "BINARY_INPUT_UNAVAILABLE_OR_MALFORMED";
 
         const fileRes = FileDetector.detect({
           bytes: normBytes.bytes,
@@ -95,6 +110,8 @@ export class Layer1ScreenService {
         // Text Screening
         detectorsExecuted.push("TextDetector");
         const normText = NormalizationService.normalizeText(content);
+        forceUnknown = !normText.isValid;
+        unknownReason = normText.isValid ? null : "TEXT_INPUT_EMPTY_OR_MALFORMED";
 
         if (normText.isOverLength) {
           rawSignals.push(
@@ -140,6 +157,7 @@ export class Layer1ScreenService {
         modelUsed,
         timestamp: Date.now(),
         inputType: normalizedType,
+        providerIndependent: true,
       };
 
       // 4. Resolve Decision
@@ -149,7 +167,15 @@ export class Layer1ScreenService {
         isWhitelisted,
         requestId,
         metrics,
+        forceUnknown,
+        unknownReason,
       });
+
+      finalResult.signals = finalResult.signals.map((signal) => ({
+        ...signal,
+        requestId,
+        observedAt: signal.observedAt || new Date().toISOString(),
+      }));
 
       // 5. Emit PII-Redacted Security Audit Log
       SecurityLogger.logScreenEvent({
@@ -167,8 +193,8 @@ export class Layer1ScreenService {
           createSignal({
             type: LAYER_1_REASONS.PHISHING_PATTERN,
             category: "system",
-            severity: SIGNAL_SEVERITY.MEDIUM,
-            confidence: 0.50,
+            severity: SIGNAL_SEVERITY.HIGH,
+            confidence: 0,
             evidence: { details: "Internal error during inspection; safely routed to Layer 2" },
             source: "Layer1ScreenService_ErrorHandler",
           }),
@@ -182,7 +208,10 @@ export class Layer1ScreenService {
           modelUsed: null,
           timestamp: Date.now(),
           inputType: normalizedType,
+          providerIndependent: true,
         },
+        forceUnknown: true,
+        unknownReason: "LAYER1_INTERNAL_FAILURE",
       });
     }
   }

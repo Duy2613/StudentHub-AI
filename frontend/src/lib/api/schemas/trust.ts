@@ -58,7 +58,24 @@ export const trustSemanticResultSchema = trustLayerResultSchema.extend({ status:
 export const trustEvidenceResultSchema = trustLayerResultSchema.extend({ status: z.string().min(1) });
 export const trustReasoningResultSchema = trustLayerResultSchema.extend({ status: z.string().min(1) });
 
+export const canonicalTrustResponseSchema = z.object({
+  success: z.literal(true),
+  contractVersion: z.literal("trust.v1"),
+  requestId: z.string().min(1),
+  depth: z.literal("full"),
+  demo: z.literal(false),
+  data: z.object({
+    input: z.object({ type: z.string().min(1) }).passthrough(),
+    layer1: trustLayerResultSchema,
+    layer2A: trustLayerResultSchema.nullable().optional(),
+    layer2: trustLayerResultSchema.nullable().optional(),
+    layer3: trustLayerResultSchema.nullable().optional(),
+    layer4: trustLayerResultSchema.nullable().optional(),
+  }).passthrough(),
+}).passthrough();
+
 export type RelatedCase = z.infer<typeof relatedCaseSchema>;
 export type ThreatProviderResult = z.infer<typeof threatProviderResultSchema>;
 export type ExpertConsensus = z.infer<typeof expertConsensusSchema>;
 export type TrustLayerResult = z.infer<typeof trustLayerResultSchema>;
+export type CanonicalTrustResponse = z.infer<typeof canonicalTrustResponseSchema>;

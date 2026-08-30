@@ -7,7 +7,7 @@
 import { CONTEXT_SIGNAL_TYPES } from "../types.js";
 
 const EDUCATIONAL_CONTEXT_REGEX =
-  /(?:bài tập môn|giáo trình|môn an toàn|tìm hiểu về|nghiên cứu cơ chế|khái niệm|lecture explains|in this tutorial|assignment on|academic study)/i;
+  /(?:bài tập môn|bài giảng môn|giáo trình|môn an toàn|tìm hiểu về|nghiên cứu cơ chế|khái niệm|lecture explains|in this tutorial|assignment on|academic study)/i;
 
 const SATIRE_HUMOR_REGEX =
   /(?:banned exams forever|hủy bỏ thi cử vĩnh viễn|nghỉ học cả năm|😂|🤣|chuyện hài|meme|troll)/i;

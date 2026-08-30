@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Layer1ScreenService } from "@/lib/ai-trust/layer1/Layer1ScreenService.js";
 import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticService.js";
+import { Layer2AReputationService } from "@/lib/ai-trust/layer2a/Layer2AReputationService.js";
 import { Layer3EvidenceService } from "@/lib/ai-trust/layer3/Layer3EvidenceService.js";
 import { Layer4TrustService } from "@/lib/ai-trust/layer4/Layer4TrustService.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
@@ -51,6 +52,13 @@ async function runCanonicalTrust(request, routeParams, principal, securityContex
   }
 
   const useAIGateway = body?.useAIGateway === true;
+  const urlTarget = type === "url" ? (content || metadata.url || "") : "";
+  const layer2A = type === "url"
+    ? await Layer2AReputationService.verify({
+      url: layer1.status === "BLOCK" ? "" : urlTarget,
+      requestId,
+    })
+    : await Layer2AReputationService.verify({ url: "", requestId });
   const layer2 = layer1.status === "BLOCK" ? null : await Layer2SemanticService.verify({
     ...input,
     layer1Result: layer1,
@@ -59,13 +67,14 @@ async function runCanonicalTrust(request, routeParams, principal, securityContex
   const layer3 = layer1.status === "BLOCK" || !layer2 ? null : await Layer3EvidenceService.verify({
     claims: layer2.claims,
     layer2Result: layer2,
-    options: {},
+    options: { requestId },
   });
   const layer4 = await Layer4TrustService.evaluate({
     layer1Result: layer1,
     layer2Result: layer2,
+    layer2AResult: layer2A,
     layer3Result: layer3,
-    options: { useAIGateway },
+    options: { requestId, useAIGateway },
   });
 
   return NextResponse.json({
@@ -74,7 +83,7 @@ async function runCanonicalTrust(request, routeParams, principal, securityContex
     requestId,
     depth,
     demo: false,
-    data: { input: { type }, layer1, layer2, layer3, layer4 },
+    data: { input: { type }, layer1, layer2A, layer2, layer3, layer4 },
   });
 }
 

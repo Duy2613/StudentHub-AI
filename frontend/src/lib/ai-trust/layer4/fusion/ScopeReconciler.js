@@ -14,7 +14,8 @@ export class ScopeReconciler {
    * @returns {object} { isOvergeneralized, scopeDiscrepancyNote }
    */
   static evaluateScope(claim = {}, evidenceItems = []) {
-    const rawClaim = (claim.rawText || "").toLowerCase();
+    const safeClaim = claim && typeof claim === "object" && !Array.isArray(claim) ? claim : {};
+    const rawClaim = typeof safeClaim.rawText === "string" ? safeClaim.rawText.toLowerCase() : "";
     const hasUniversalQuantifier =
       rawClaim.includes("mọi sinh viên") ||
       rawClaim.includes("tất cả sinh viên") ||
@@ -25,12 +26,15 @@ export class ScopeReconciler {
       return { isOvergeneralized: false, scopeDiscrepancyNote: null };
     }
 
-    const hasBoundedEvidence = evidenceItems.some(
-      (e) =>
-        e.excerpt.toLowerCase().includes("tối đa") ||
-        e.excerpt.toLowerCase().includes("xét cấp cho") ||
-        e.excerpt.toLowerCase().includes("chỉ dành cho") ||
+    const hasBoundedEvidence = (Array.isArray(evidenceItems) ? evidenceItems : []).some(
+      (e) => Boolean(e && typeof e === "object") && (
+        typeof e.excerpt === "string" && (
+          e.excerpt.toLowerCase().includes("tối đa") ||
+          e.excerpt.toLowerCase().includes("xét cấp cho") ||
+          e.excerpt.toLowerCase().includes("chỉ dành cho")
+        ) ||
         e.relation === "PARTIALLY_SUPPORTS"
+      )
     );
 
     if (hasBoundedEvidence) {

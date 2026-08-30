@@ -1,4 +1,4 @@
-import type { Page, Route } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 export const trustPayloads = {
   screen: {
@@ -15,7 +15,7 @@ export const trustPayloads = {
     status: "PARTIAL",
     verificationCompleteness: 0.62,
     sourceAgreement: "MIXED",
-    evidence: [{ title: "Cảnh báo giả mạo học phí", publisher: "StudentHub Safety", url: "https://studenthub.example/safety" }],
+    evidence: [{ title: "Cảnh báo giả mạo học phí", publisher: "StudentHub Safety" }],
     providerResults: [
       { provider: "Google Safe Browsing", status: "clean", latencyMs: 87, signals: [] },
       { provider: "VirusTotal", status: "unavailable", signals: [] },
@@ -34,25 +34,39 @@ export const trustPayloads = {
       recommendedActionNote: "Dừng giao dịch và xác minh qua cổng trường chính thức.",
     },
   },
+  layer2A: {
+    layer: "2A",
+    provider: "Layer 2A fixture",
+    providerStatus: "SUCCESS",
+    finding: "NO_KNOWN_THREAT",
+    provenance: { noMatchIsSafetyProof: false },
+  },
 } as const;
 
 type TrustOverride = Partial<Record<keyof typeof trustPayloads, unknown>>;
 
-function endpoint(route: Route) {
-  const pathname = new URL(route.request().url()).pathname;
-  if (pathname.endsWith("/screen")) return "screen";
-  if (pathname.endsWith("/semantic")) return "semantic";
-  if (pathname.endsWith("/evidence")) return "evidence";
-  return "reasoning";
+export function canonicalTrustResponse(overrides: TrustOverride = {}) {
+  const layer1 = overrides.screen ?? trustPayloads.screen;
+  const layer2 = overrides.semantic ?? trustPayloads.semantic;
+  const layer3 = overrides.evidence ?? trustPayloads.evidence;
+  const layer4 = overrides.reasoning ?? trustPayloads.reasoning;
+  const layer2A = overrides.layer2A ?? trustPayloads.layer2A;
+  return {
+    success: true,
+    contractVersion: "trust.v1",
+    requestId: "e2e-trust-fixture",
+    depth: "full",
+    demo: false,
+    data: { input: { type: "text" }, layer1, layer2A, layer2, layer3, layer4 },
+  };
 }
 
 export async function mockTrustPipeline(page: Page, overrides: TrustOverride = {}) {
-  await page.route("**/api/ai-trust/**", async (route) => {
-    const key = endpoint(route);
+  await page.route("**/api/v1/trust", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify(overrides[key] ?? trustPayloads[key]),
+      body: JSON.stringify(canonicalTrustResponse(overrides)),
     });
   });
 }

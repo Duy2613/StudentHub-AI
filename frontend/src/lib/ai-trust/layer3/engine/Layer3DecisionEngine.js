@@ -22,25 +22,31 @@ export class Layer3DecisionEngine {
     evidence = [],
     conflicts = [],
     completeness = 0,
-  }) {
+    externalEvidence = false,
+  } = {}) {
+    const safeClaims = Array.isArray(claims) ? claims.filter((claim) => claim && typeof claim === "object" && claim.claimId) : [];
+    const safeEvidence = Array.isArray(evidence) ? evidence.filter((item) => item && typeof item === "object") : [];
+    const safeConflicts = Array.isArray(conflicts) ? conflicts.filter((conflict) => conflict && typeof conflict === "object") : [];
+    const safeCompleteness = Number.isFinite(Number(completeness)) ? Number(completeness) : 0;
     const claimStatuses = {};
 
-    // 1. If no claims to verify, return VERIFIED
-    if (claims.length === 0) {
+    // 1. No claim is not a verified claim. This status is deliberately
+    // non-final so downstream policy cannot render it as safe.
+    if (safeClaims.length === 0) {
       return {
-        status: LAYER_3_STATUS.VERIFIED,
+        status: LAYER_3_STATUS.NOT_APPLICABLE,
         claimStatuses: {},
-        limitations: ["Không có phát ngôn sự kiện cần đối soát nguồn tin."],
+        limitations: ["Không có phát ngôn sự kiện cần đối soát nguồn tin; trạng thái này không chứng minh an toàn."],
       };
     }
 
-    // 2. If no evidence retrieved at all -> UNVERIFIED (MANDATORY: NOT FALSE!)
-    if (evidence.length === 0) {
-      for (const c of claims) {
+    // 2. If no evidence retrieved at all -> INSUFFICIENT_EVIDENCE (NOT FALSE)
+    if (safeEvidence.length === 0) {
+      for (const c of safeClaims) {
         claimStatuses[c.claimId] = "UNVERIFIED";
       }
       return {
-        status: LAYER_3_STATUS.UNVERIFIED,
+        status: LAYER_3_STATUS.INSUFFICIENT_EVIDENCE,
         claimStatuses,
         limitations: ["Không tìm thấy nguồn tin bên ngoài đối soát cho các phát ngôn này."],
       };
@@ -51,25 +57,32 @@ export class Layer3DecisionEngine {
     let hasStrongContradict = false;
     let hasPartialSupport = false;
     let hasOutdatedOnly = false;
+    let hasUnverified = false;
 
-    for (const c of claims) {
-      const claimEvs = evidence.filter((e) => e.claimId === c.claimId);
+    for (const c of safeClaims) {
+      const claimEvs = safeEvidence.filter((e) => e.claimId === c.claimId);
 
       if (claimEvs.length === 0) {
         claimStatuses[c.claimId] = "UNVERIFIED";
+        hasUnverified = true;
         continue;
       }
 
       // Check if all evidence is outdated
-      const allOutdated = claimEvs.every((e) => e.freshness === FRESHNESS_STATUS.OUTDATED);
-      if (allOutdated) {
+      const usableFreshness = new Set([
+        FRESHNESS_STATUS.CURRENT,
+        FRESHNESS_STATUS.RECENT,
+        FRESHNESS_STATUS.AGING,
+      ]);
+      const allOutdatedOrUnknown = claimEvs.every((e) => !usableFreshness.has(e.freshness));
+      if (allOutdatedOrUnknown) {
         claimStatuses[c.claimId] = "OUTDATED_EVIDENCE";
         hasOutdatedOnly = true;
         continue;
       }
 
       // Filter to current/recent evidence
-      const currentEvs = claimEvs.filter((e) => e.freshness !== FRESHNESS_STATUS.OUTDATED);
+      const currentEvs = claimEvs.filter((e) => usableFreshness.has(e.freshness));
 
       const hasSupport = currentEvs.some(
         (e) => e.relation === CLAIM_EVIDENCE_RELATION.STRONGLY_SUPPORTS || e.relation === CLAIM_EVIDENCE_RELATION.SUPPORTS
@@ -92,13 +105,14 @@ export class Layer3DecisionEngine {
         hasStrongSupport = true;
       } else {
         claimStatuses[c.claimId] = "UNVERIFIED";
+        hasUnverified = true;
       }
     }
 
     // 4. Resolve Overall Layer 3 Status
-    if (conflicts.length > 0) {
-      for (const conf of conflicts) {
-        claimStatuses[conf.claimId] = "CONTESTED";
+    if (safeConflicts.length > 0) {
+      for (const conf of safeConflicts) {
+        if (conf.claimId) claimStatuses[conf.claimId] = "CONTESTED";
       }
       return {
         status: LAYER_3_STATUS.CONTESTED,
@@ -115,7 +129,43 @@ export class Layer3DecisionEngine {
       };
     }
 
-    if (hasStrongSupport || hasStrongContradict || hasPartialSupport) {
+    if (hasUnverified || safeCompleteness < 0.75) {
+      return {
+        status: LAYER_3_STATUS.INSUFFICIENT_EVIDENCE,
+        claimStatuses,
+        limitations: ["Chưa đủ bằng chứng có thể dùng để xác minh toàn bộ các phát ngôn."],
+      };
+    }
+
+    const usableExternalEvidence = safeEvidence.filter((item) =>
+      item.liveEvidence === true &&
+      item.sourceType !== "LOCAL_KNOWLEDGE_BASE" &&
+      typeof item.sourceFingerprint === "string" &&
+      item.sourceFingerprint.length > 0 &&
+      item.providerStatus === "SUCCESS" &&
+      item.retrievalOutcome === "SUCCESS"
+    );
+    const externalCoverage = safeClaims.length > 0
+      ? new Set(usableExternalEvidence.map((item) => item.claimId)).size / safeClaims.length
+      : 0;
+
+    if (!externalEvidence || externalCoverage < 1) {
+      return {
+        status: LAYER_3_STATUS.PARTIAL,
+        claimStatuses,
+        limitations: ["Chỉ có dữ liệu cục bộ hoặc nguồn chưa được xác nhận trực tiếp; không coi là xác minh bên ngoài."],
+      };
+    }
+
+    if (hasPartialSupport) {
+      return {
+        status: LAYER_3_STATUS.VERIFIED_WITH_CONFLICT,
+        claimStatuses,
+        limitations: ["Bằng chứng chỉ hỗ trợ một phần phạm vi của ít nhất một phát ngôn."],
+      };
+    }
+
+    if (hasStrongSupport || hasStrongContradict) {
       return {
         status: LAYER_3_STATUS.VERIFIED,
         claimStatuses,

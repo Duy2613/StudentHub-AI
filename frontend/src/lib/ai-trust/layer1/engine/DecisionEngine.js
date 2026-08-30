@@ -18,9 +18,34 @@ export class DecisionEngine {
    * @param {boolean} [params.isWhitelisted=false] - Authoritative whitelist indicator
    * @param {string} [params.requestId]
    * @param {object} [params.metrics]
-   * @returns {object} Standardized Layer 1 Result DTO
-   */
-  static resolve({ signals = [], isWhitelisted = false, requestId = null, metrics = {} }) {
+   * @param {boolean} [params.forceUnknown=false] - local boundary could not
+   *   produce a reliable result; never convert this state to PASS
+   * @param {string} [params.unknownReason]
+  * @returns {object} Standardized Layer 1 Result DTO
+  */
+  static resolve(params = {}) {
+    const hasObjectParams = params && typeof params === "object" && !Array.isArray(params);
+    const input = hasObjectParams ? params : {};
+    if (!hasObjectParams || !Array.isArray(input.signals)) {
+      return createLayer1Result({
+        status: LAYER_1_STATUS.UNKNOWN,
+        confidence: 0,
+        reasons: [LAYER_1_REASONS.INVALID_INPUT],
+        nextLayer: 2,
+        details: {
+          decisionRationale: "Không nhận được tập tín hiệu cục bộ hợp lệ. Không suy diễn thành an toàn.",
+          scope: "LOCAL_SCREEN_ONLY",
+          providerIndependent: true,
+          notFinalSafety: true,
+        },
+      });
+    }
+    const signals = input.signals;
+    const isWhitelisted = input.isWhitelisted === true;
+    const requestId = typeof input.requestId === "string" ? input.requestId.slice(0, 160) : null;
+    const metrics = input.metrics && typeof input.metrics === "object" && !Array.isArray(input.metrics) ? input.metrics : {};
+    const forceUnknown = input.forceUnknown === true;
+    const unknownReason = typeof input.unknownReason === "string" ? input.unknownReason.slice(0, 160) : null;
     // 1. Deduplicate and aggregate signals
     const { uniqueSignals, severityCounts } = SignalAggregator.aggregate(signals);
 
@@ -51,8 +76,32 @@ export class DecisionEngine {
       });
     }
 
-    // CASE 2: AUTHORITATIVE WHITELIST PASS
-    if (isWhitelisted) {
+    const hasCritical = severityCounts[SIGNAL_SEVERITY.CRITICAL] > 0;
+    const hasHigh = severityCounts[SIGNAL_SEVERITY.HIGH] > 0;
+    const hasMedium = severityCounts[SIGNAL_SEVERITY.MEDIUM] > 0;
+
+    // CASE 2: INVALID / INCOMPLETE LOCAL INSPECTION
+    if (forceUnknown && !hasCritical) {
+      return createLayer1Result({
+        status: LAYER_1_STATUS.UNKNOWN,
+        confidence: 0,
+        reasons: [unknownReason || LAYER_1_REASONS.INVALID_INPUT],
+        signals: uniqueSignals,
+        nextLayer: 2,
+        requestId,
+        metrics,
+        details: {
+          hardTriggersCount: 0,
+          decisionRationale: "Không thể hoàn tất kiểm tra cục bộ một cách đáng tin cậy. Không suy diễn thành an toàn.",
+          scope: "LOCAL_SCREEN_ONLY",
+          providerIndependent: true,
+          notFinalSafety: true,
+        },
+      });
+    }
+
+    // CASE 3: AUTHORITATIVE WHITELIST HINT (only when no material signal)
+    if (isWhitelisted && !hasHigh && !hasMedium) {
       const confidence = ConfidenceEngine.calculate({
         status: LAYER_1_STATUS.PASS,
         isWhitelisted: true,
@@ -74,11 +123,7 @@ export class DecisionEngine {
       });
     }
 
-    // CASE 3: SUSPICIOUS (Routing to Layer 2 for deeper analysis)
-    const hasCritical = severityCounts[SIGNAL_SEVERITY.CRITICAL] > 0;
-    const hasHigh = severityCounts[SIGNAL_SEVERITY.HIGH] > 0;
-    const hasMedium = severityCounts[SIGNAL_SEVERITY.MEDIUM] > 0;
-
+    // CASE 4: SUSPICIOUS (Routing to Layer 2 for deeper analysis)
     if (hasCritical || hasHigh || hasMedium) {
       const confidence = ConfidenceEngine.calculate({
         status: LAYER_1_STATUS.SUSPICIOUS,
@@ -109,7 +154,7 @@ export class DecisionEngine {
       });
     }
 
-    // CASE 4: CLEAN PASS (Routing to Layer 2)
+    // CASE 5: CLEAN PASS (Routing to Layer 2)
     const confidence = ConfidenceEngine.calculate({
       status: LAYER_1_STATUS.PASS,
       signals: uniqueSignals,

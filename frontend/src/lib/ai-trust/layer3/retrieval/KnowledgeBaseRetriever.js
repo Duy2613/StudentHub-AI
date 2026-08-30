@@ -8,7 +8,8 @@
 
 import { IEvidenceRetriever } from "./IEvidenceRetriever.js";
 import { SourceAuthorityRegistry } from "../registry/SourceAuthorityRegistry.js";
-import { createSource, FRESHNESS_STATUS } from "../types.js";
+import { createSource, FRESHNESS_STATUS, SOURCE_TYPE, EVIDENCE_PROVIDER_STATUS } from "../types.js";
+import { markNetworkGuardedRetriever } from "./NetworkGuard.js";
 
 export const INSTITUTIONAL_KNOWLEDGE_BASE = [
   // Official HCMUTE Tuition Policy (Verified Official Document)
@@ -138,6 +139,8 @@ export const INSTITUTIONAL_KNOWLEDGE_BASE = [
 export class KnowledgeBaseRetriever extends IEvidenceRetriever {
   constructor() {
     super("institutional_knowledge_base_retriever");
+    markNetworkGuardedRetriever(this);
+    this.networkGuarded = true;
   }
 
   /**
@@ -207,6 +210,12 @@ export class KnowledgeBaseRetriever extends IEvidenceRetriever {
               publishedAt: doc.publishedAt,
               clusterId: doc.clusterId || doc.id,
               isOfficial: authority.isOfficial,
+              sourceType: SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE,
+              providerStatus: EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY,
+              liveEvidence: false,
+              sourceFingerprint: `local:${doc.id}`,
+              contentFingerprint: `local-content:${doc.id}`,
+              retrievalOutcome: "SUCCESS",
             })
           );
         }
@@ -224,6 +233,12 @@ export class KnowledgeBaseRetriever extends IEvidenceRetriever {
       textContent: doc.content,
       publishedAt: doc.publishedAt,
       status: 200,
+      sourceType: SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE,
+      providerStatus: EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY,
+      liveEvidence: false,
+      retrievalOutcome: "SUCCESS",
+      sourceFingerprint: `local:${doc.id}`,
+      contentFingerprint: `local-content:${doc.id}`,
     };
   }
 }

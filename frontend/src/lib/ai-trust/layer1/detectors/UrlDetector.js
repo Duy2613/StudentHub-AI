@@ -22,6 +22,7 @@ import {
   KNOWN_URL_SHORTENERS,
   resolveHomoglyphText,
 } from "../registry/BrandRegistry.js";
+import { validateRemoteUrlSync } from "../../../security/hardening/SafeRemoteUrl.js";
 
 const HOMOGLYPH_SCRIPTS_REGEX = /[\u0400-\u04FF\u0370-\u03FF]/; // Cyrillic & Greek
 
@@ -166,13 +167,17 @@ export class UrlDetector {
 
     if (!normUrl || !normUrl.isValid || !normUrl.parsed) {
       if (normUrl?.original) {
+        const isUnsupportedScheme = normUrl.invalidReason === "UNSUPPORTED_SCHEME" || normUrl.isUnsupportedScheme;
+        const isOversized = normUrl.invalidReason === "URL_TOO_LONG" || normUrl.isOverLength;
         signals.push(
           createSignal({
-            type: LAYER_1_REASONS.PHISHING_PATTERN,
+            type: isUnsupportedScheme
+              ? LAYER_1_REASONS.UNSUPPORTED_SCHEME
+              : (isOversized ? LAYER_1_REASONS.PAYLOAD_LIMIT_EXCEEDED : LAYER_1_REASONS.PHISHING_PATTERN),
             category: "url",
-            severity: SIGNAL_SEVERITY.MEDIUM,
-            confidence: 0.50,
-            evidence: { snippet: normUrl.original.slice(0, 80), details: "Malformed URL syntax" },
+            severity: isUnsupportedScheme ? SIGNAL_SEVERITY.CRITICAL : (isOversized ? SIGNAL_SEVERITY.HIGH : SIGNAL_SEVERITY.MEDIUM),
+            confidence: isUnsupportedScheme ? 0.99 : (isOversized ? 0.80 : 0.50),
+            evidence: { snippet: normUrl.original.slice(0, 80), details: isUnsupportedScheme ? "Unsupported URL scheme" : (isOversized ? "URL exceeds the local inspection limit" : "Malformed URL syntax") },
             source: "UrlDetector",
           })
         );
@@ -201,6 +206,27 @@ export class UrlDetector {
       tld,
       isPunycode: hostname.startsWith("xn--") || hostname.includes(".xn--"),
     };
+
+    // Reuse the shared outbound boundary even though Layer 1 never performs
+    // the request itself. This catches canonicalized private, loopback,
+    // link-local, metadata, internal, credential-bearing, and unsupported
+    // destinations before any later layer can treat them as ordinary URLs.
+    const remoteValidation = validateRemoteUrlSync(parsed.toString());
+    if (!remoteValidation.ok) {
+      const isSsrf = remoteValidation.code === "SSRF_RESTRICTED";
+      const isUnsupported = remoteValidation.code === "UNSUPPORTED_REMOTE_SCHEME";
+      signals.push(
+        createSignal({
+          type: isSsrf ? LAYER_1_REASONS.SSRF_ATTEMPT : (isUnsupported ? LAYER_1_REASONS.UNSUPPORTED_SCHEME : LAYER_1_REASONS.PHISHING_PATTERN),
+          category: isSsrf ? "network" : "url",
+          severity: isSsrf || isUnsupported ? SIGNAL_SEVERITY.CRITICAL : SIGNAL_SEVERITY.HIGH,
+          confidence: isSsrf || isUnsupported ? 0.99 : 0.90,
+          evidence: { matchedText: hostname, details: `Remote URL boundary rejected: ${remoteValidation.code}` },
+          source: "UrlDetector",
+        })
+      );
+      return { signals, isWhitelisted: false, parsedStructure };
+    }
 
     // 1. SSRF Network Protection Check (Loopback, Dword, Hex, Octal, Cloud Metadata, Localhost)
     const ssrfMatch = checkSsrfTarget(hostname);
@@ -236,7 +262,8 @@ export class UrlDetector {
           source: "UrlDetector",
         })
       );
-      return { signals, isWhitelisted: true, parsedStructure };
+      // Whitelisting is only a scoped local hint. Continue inspecting path,
+      // userinfo, query, port, and deception indicators before deciding.
     }
 
     // 3. Userinfo Spoofing Trick (e.g. http://google.com@evil.com)
@@ -294,6 +321,7 @@ export class UrlDetector {
     const impersonation = BrandRegistry.checkBrandImpersonation(hostname);
     const isSuspiciousTLD = SUSPICIOUS_TLDS.has(tld);
     const hasPhishingPath = HOT_PHISHING_PATH_REGEX.test(pathname);
+    const shouldFlagPhishingPath = hasPhishingPath && (!isWhitelisted || Boolean(impersonation) || isSuspiciousTLD);
 
     if (impersonation) {
       const isCriticalThreat =
@@ -322,7 +350,7 @@ export class UrlDetector {
     }
 
     // 7. Combosquatting Heuristics (Brand + Action Keyword on unauthorized domain)
-    if (!impersonation) {
+    if (!impersonation && !isWhitelisted) {
       const hostTokens = BrandRegistry.extractTokens(hostname);
       const hostTokensSet = new Set(hostTokens);
 
@@ -360,7 +388,7 @@ export class UrlDetector {
     }
 
     // 8. Typosquatting Analysis (Damerau-Levenshtein distance for canonical domains)
-    if (!impersonation && !KNOWN_URL_SHORTENERS.has(hostname)) {
+    if (!impersonation && !isWhitelisted && !KNOWN_URL_SHORTENERS.has(hostname)) {
       const hostBase = registrableDomain.split(".")[0];
       if (hostBase && hostBase.length >= 4) {
         for (const brand of BRAND_REGISTRY) {
@@ -437,7 +465,7 @@ export class UrlDetector {
     }
 
     // 12. Hot Phishing Path Patterns (Biometrics, VNeID, OTP, Scholarship, Tasks)
-    if (hasPhishingPath) {
+    if (shouldFlagPhishingPath) {
       signals.push(
         createSignal({
           type: LAYER_1_REASONS.PHISHING_PATH_PATTERN,

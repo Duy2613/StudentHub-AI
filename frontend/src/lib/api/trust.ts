@@ -1,5 +1,5 @@
 import { apiRequest } from "./client";
-import { trustEvidenceResultSchema, trustReasoningResultSchema, trustScreenResultSchema, trustSemanticResultSchema, type TrustLayerResult } from "./schemas/trust";
+import { canonicalTrustResponseSchema, trustEvidenceResultSchema, trustReasoningResultSchema, trustScreenResultSchema, trustSemanticResultSchema, type CanonicalTrustResponse, type TrustLayerResult } from "./schemas/trust";
 
 export type { ExpertConsensus, RelatedCase, ThreatProviderResult, TrustLayerResult } from "./schemas/trust";
 
@@ -10,6 +10,14 @@ export type TrustInput = {
 };
 
 export const trustApi = {
+  canonical(input: TrustInput, signal?: AbortSignal) {
+    return apiRequest<CanonicalTrustResponse>("/api/v1/trust", {
+      method: "POST",
+      body: JSON.stringify({ ...input, depth: "full" }),
+      signal,
+      schema: canonicalTrustResponseSchema,
+    });
+  },
   screen(input: TrustInput, signal?: AbortSignal) {
     return apiRequest<TrustLayerResult>("/api/ai-trust/screen", {
       method: "POST",

@@ -14,7 +14,7 @@ import { saffronAudio } from "@/lib/audio/saffronAudio";
 export default function RiskMeterSplitVerdict({ result, currentInput = {}, onShareToForum }) {
   if (!result) return null;
 
-  const { status, confidence = 0.9, reasons = [], signals = [], details = {} } = result;
+  const { status = LAYER_1_STATUS.UNKNOWN, confidence = 0, reasons = [], signals = [], details = {} } = result;
 
   const isBlock = status === LAYER_1_STATUS.BLOCK;
   const isSuspicious = status === LAYER_1_STATUS.SUSPICIOUS;
@@ -25,7 +25,7 @@ export default function RiskMeterSplitVerdict({ result, currentInput = {}, onSha
     ? Math.round(Math.max(85, confidence * 100))
     : isSuspicious
     ? Math.round(Math.max(45, Math.min(75, confidence * 70)))
-    : Math.round(Math.max(5, (1 - confidence) * 20));
+    : Math.round(Math.max(0, (1 - confidence) * 20));
 
   // Visual Theme Config
   const theme = isBlock
@@ -50,7 +50,7 @@ export default function RiskMeterSplitVerdict({ result, currentInput = {}, onSha
         desc: "Có tín hiệu đáng ngờ cần kiểm chứng thêm nguồn tin chính thức.",
         statusTag: "CẦN LƯU Ý",
       }
-    : {
+    : isPass ? {
         border: "border-teal-500/50",
         bg: "bg-[#041512]/90",
         badgeBg: "bg-teal-500/20 border-teal-500/60 text-teal-300",
@@ -58,7 +58,16 @@ export default function RiskMeterSplitVerdict({ result, currentInput = {}, onSha
         meterText: "text-teal-400",
         title: "CHƯA PHÁT HIỆN DẤU HIỆU ĐÁNG NGỜ (PASS)",
         desc: "Không phát hiện dấu hiệu lừa đảo rõ ràng ở Layer 1.",
-        statusTag: "AN TOÀN",
+        statusTag: "CHƯA PHÁT HIỆN DẤU HIỆU Ở LAYER 1",
+      } : {
+        border: "border-cyan-500/50",
+        bg: "bg-[#07131a]/90",
+        badgeBg: "bg-cyan-500/15 border-cyan-500/50 text-cyan-300",
+        meterGrad: "from-cyan-700 via-cyan-500 to-slate-300",
+        meterText: "text-cyan-300",
+        title: "CHƯA CÓ KẾT LUẬN ĐÁNG TIN CẬY (UNKNOWN)",
+        desc: "Layer 1 chưa tạo được kết quả đủ tin cậy để hướng dẫn hành động.",
+        statusTag: "CẦN ĐỐI SOÁT THÊM",
       };
 
   return (
@@ -72,8 +81,10 @@ export default function RiskMeterSplitVerdict({ result, currentInput = {}, onSha
               <ShieldAlert className="w-8 h-8 text-[#ea3810]" />
             ) : isSuspicious ? (
               <AlertTriangle className="w-8 h-8 text-[#ffbc09]" />
-            ) : (
+            ) : isPass ? (
               <ShieldCheck className="w-8 h-8 text-teal-400" />
+            ) : (
+              <Info className="w-8 h-8 text-cyan-300" />
             )}
           </div>
           <div>
@@ -184,9 +195,13 @@ export default function RiskMeterSplitVerdict({ result, currentInput = {}, onSha
               <p className="text-[#ffd15c]">
                 ⚠️ Khuyến cáo AI: Nội dung có điểm bất thường. Hãy đối chiếu với website hoặc hotline chính thức trước khi thực hiện giao dịch.
               </p>
-            ) : (
+            ) : isPass ? (
               <p className="text-teal-300">
-                ✓ Khuyến cáo AI: Không phát hiện bẫy lừa đảo trực diện. Vẫn nên duy trì cảnh giác với các yêu cầu giao dịch bất thường.
+                ℹ Khuyến cáo AI: Layer 1 chưa phát hiện dấu hiệu trực diện; kết quả này không phải xác nhận an toàn.
+              </p>
+            ) : (
+              <p className="text-cyan-300">
+                ? Khuyến cáo AI: Layer 1 chưa tạo được kết luận đáng tin cậy. Không tiếp tục giao dịch cho đến khi có đối soát.
               </p>
             )}
           </div>

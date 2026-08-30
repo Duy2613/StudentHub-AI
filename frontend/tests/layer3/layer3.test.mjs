@@ -2,8 +2,8 @@
  * Layer 3 — Comprehensive Automated Test Suite
  * 
  * Verifies all 8 core Layer 3 specifications:
- * 1. Case A — Strong Official Evidence (STRONGLY_SUPPORTS)
- * 2. Case B — No Reliable Evidence Found (UNVERIFIED, NEVER FALSE!)
+ * 1. Case A — Strong Official Evidence (local fixture; PARTIAL until live retrieval)
+ * 2. Case B — No Reliable Evidence Found (INSUFFICIENT_EVIDENCE, NEVER FALSE!)
  * 3. Case C — Contradictory Evidence (CONTESTED with conflict package)
  * 4. Case D — Old / Outdated Evidence (OUTDATED / INSUFFICIENT)
  * 5. Case E — Copied / Syndicated Sources (Clustered into 1 evidence lineage)
@@ -30,7 +30,7 @@ export const LAYER_3_TEST_CASES = [
       },
     ],
     candidateSources: [{ officialDomains: ["hcmute.edu.vn"] }],
-    expectedStatus: LAYER_3_STATUS.VERIFIED,
+    expectedStatus: LAYER_3_STATUS.PARTIAL,
     expectedClaimStatus: "SUPPORTED",
   },
   {
@@ -46,7 +46,7 @@ export const LAYER_3_TEST_CASES = [
       },
     ],
     candidateSources: [{ officialDomains: ["hcmute.edu.vn"] }],
-    expectedStatus: LAYER_3_STATUS.UNVERIFIED,
+    expectedStatus: LAYER_3_STATUS.INSUFFICIENT_EVIDENCE,
     expectedClaimStatus: "UNVERIFIED",
   },
   {
@@ -94,7 +94,7 @@ export const LAYER_3_TEST_CASES = [
       },
     ],
     candidateSources: [{ officialDomains: ["dantri.com.vn", "thanhnien.vn"] }],
-    expectedStatus: LAYER_3_STATUS.VERIFIED,
+    expectedStatus: LAYER_3_STATUS.PARTIAL,
     expectedClusterCount: 1, // Must be clustered into 1 lineage, not 2 independent sources
   },
   {
@@ -110,7 +110,7 @@ export const LAYER_3_TEST_CASES = [
       },
     ],
     candidateSources: [{ officialDomains: ["hcmute.edu.vn"] }],
-    expectedStatus: LAYER_3_STATUS.VERIFIED,
+    expectedStatus: LAYER_3_STATUS.PARTIAL,
     expectedClaimStatus: "PARTIALLY_SUPPORTED",
   },
 ];
@@ -180,10 +180,12 @@ async function runLayer3Tests() {
     },
   });
 
-  const isFallbackPassed = fallbackResult.status === LAYER_3_STATUS.VERIFIED;
+  const isFallbackPassed = fallbackResult.status === LAYER_3_STATUS.PARTIAL &&
+    fallbackResult.externalEvidence === false &&
+    fallbackResult.limitations.some((item) => item.includes("cục bộ") || item.includes("fallback"));
   if (isFallbackPassed) {
     passedCount++;
-    console.log("✅ [PASS] Fallback Resilience: Cleanly caught simulated retriever error and seamlessly fell back to Knowledge Base.");
+    console.log("✅ [PASS] Fallback Resilience: Caught simulated retriever error and fell back to explicitly non-live Knowledge Base evidence.");
   } else {
     console.error("❌ [FAIL] Fallback Resilience test failed.");
   }

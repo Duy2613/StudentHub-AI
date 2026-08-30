@@ -15,9 +15,9 @@ export default function Layer4TrustVerdictHUD({ result }) {
   const {
     classification = "UNVERIFIED",
     status = "REQUIRE_VERIFICATION",
-    truthAssessment = { status: "UNVERIFIED", confidence: 0.5 },
-    riskAssessment = { level: "LOW", confidence: 0.5, primaryVectors: [] },
-    decisionConfidence = 0.5,
+    truthAssessment = { status: "UNVERIFIED", confidence: 0 },
+    riskAssessment = { level: "UNKNOWN", confidence: 0, primaryVectors: [] },
+    decisionConfidence = 0,
     verificationCompleteness = 0.0,
     claims = [],
     keyReasons = [],
@@ -62,9 +62,12 @@ export default function Layer4TrustVerdictHUD({ result }) {
         return { bg: "bg-amber-500/20 text-amber-400 border-amber-500/40", label: "TRUNG BÌNH (MEDIUM)" };
       case "LOW":
         return { bg: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40", label: "THẤP (LOW)" };
+      case "UNKNOWN":
+        return { bg: "bg-white/10 text-white/70 border-white/20", label: "CHƯA XÁC ĐỊNH (UNKNOWN)" };
       case "NONE":
-      default:
         return { bg: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40", label: "AN TOÀN (NONE)" };
+      default:
+        return { bg: "bg-white/10 text-white/70 border-white/20", label: "CHƯA XÁC ĐỊNH (UNKNOWN)" };
     }
   };
 
@@ -76,13 +79,15 @@ export default function Layer4TrustVerdictHUD({ result }) {
         return { bg: "bg-orange-600 text-white", label: "GIỚI HẠN (RESTRICT)" };
       case "ALLOW_WITH_WARNING":
         return { bg: "bg-amber-500 text-black", label: "CẢNH BÁO KÈM THEO" };
+      case "ALLOW_WITH_CAUTION":
+        return { bg: "bg-amber-500 text-black", label: "CHO PHÉP CÓ ĐIỀU KIỆN" };
       case "REQUIRE_VERIFICATION":
         return { bg: "bg-cyan-500 text-black", label: "CẦN ĐỐI SOÁT THÊM" };
       case "ESCALATE":
         return { bg: "bg-purple-600 text-white", label: "CHUYỂN DUYỆT CHUYÊN GIA" };
       case "ALLOW":
       default:
-        return { bg: "bg-emerald-500 text-black", label: "CHO PHÉP (ALLOW)" };
+        return { bg: "bg-cyan-500 text-black", label: "CẦN ĐỐI SOÁT THÊM" };
     }
   };
 
@@ -328,7 +333,7 @@ export default function Layer4TrustVerdictHUD({ result }) {
 
           <div className="flex items-center gap-2 text-emerald-400">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>LAYER 4 AUDIT TRAIL VERIFIED</span>
+            <span>LAYER 4 AUDIT TRAIL · EVIDENCE BOUND</span>
           </div>
         </div>
       </div>

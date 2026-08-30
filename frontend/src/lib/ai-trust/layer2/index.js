@@ -19,4 +19,5 @@ export * from "./providers/AIGatewayModelProvider.js";
 export * from "./engine/Layer2ConfidenceEngine.js";
 export * from "./engine/VerificationPlanner.js";
 export * from "./engine/Layer2DecisionEngine.js";
+export * from "./guards/SemanticBoundary.js";
 export { Layer2SemanticService } from "./Layer2SemanticService.js";

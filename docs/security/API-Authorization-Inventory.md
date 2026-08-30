@@ -1,11 +1,11 @@
 # API Authorization Inventory
 
-Generated from source by `npm run audit:api-auth` on 2026-08-29T23:59:39.786Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
+Generated from source by `npm run audit:api-auth` on 2026-08-30T16:56:42.778Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
 
-- Route files: 108
-- HTTP handlers: 135
+- Route files: 109
+- HTTP handlers: 136
 - Authentication required by Security Fabric: 70
-- Explicit anonymous access: 59
+- Explicit anonymous access: 60
 - No visible Security Fabric wrapper: 6
 - Unprotected mutations requiring P0 review: 0
 
@@ -34,12 +34,13 @@ Generated from source by `npm run audit:api-auth` on 2026-08-29T23:59:39.786Z. T
 | /api/ai-trust/evidence | POST | PUBLIC | anonymous allowed | ANALYZE_TRUST_EVIDENCE | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/ai-trust/observatory | GET | ADMIN | required | READ_AI_OBSERVATORY | ADMIN.SECURITY | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/ai-trust/ocr | POST | PUBLIC | anonymous allowed | ANALYZE_OCR_HINTS | — | public or domain-defined | default/configured | 512 * 1024 bytes | manual/none | state mutation | policy declared |
-| /api/ai-trust/reasoning | POST | PUBLIC | anonymous allowed | REASON_ABOUT_TRUST_EVIDENCE | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/ai-trust/reasoning | POST | PUBLIC | anonymous allowed | REJECT_CLIENT_COMPOSED_TRUST_REASONING | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/ai-trust/reputation | POST | PUBLIC | anonymous allowed | LOOKUP_TRUST_URL_REPUTATION | — | public or domain-defined | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/ai-trust/screen | POST | PUBLIC | anonymous allowed | SCREEN_TRUST_INPUT | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/ai-trust/semantic | POST | PUBLIC | anonymous allowed | ANALYZE_TRUST_SEMANTICS | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/ai/trust/audit/[answerId] | GET | AUTHENTICATED | required | READ_TRUST_AUDIT | TRUST.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/ai/trust/claims/[claimId] | GET | AUTHENTICATED | required | READ_TRUST_CLAIM | TRUST.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
-| /api/ai/trust/evaluate | POST | AUTHENTICATED | required | CREATE_TRUST_EVALUATION | TRUST.ANALYZE | authenticated principal | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/ai/trust/evaluate | POST | AUTHENTICATED | required | CREATE_TRUST_EVALUATION | TRUST.ANALYZE | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/ai/trust/evaluations/[evaluationId] | GET | AUTHENTICATED | required | READ_TRUST_EVALUATION | TRUST.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/ai/trust/evidence/[evidenceId] | GET | AUTHENTICATED | required | READ_TRUST_EVIDENCE | TRUST.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/ai/trust/verify-claim | POST | PUBLIC | anonymous allowed | VERIFY_TRUST_CLAIM | — | public or domain-defined | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |

@@ -721,8 +721,8 @@ export const URL_BENCHMARK_CASES = [
   {
     category: "10. Suspicious Transport — Raw IPv4 Hostname",
     url: "http://192.168.1.50/dashboard",
-    expectedStatus: LAYER_1_STATUS.SUSPICIOUS,
-    expectedReason: LAYER_1_REASONS.IP_BASED_HOST,
+    expectedStatus: LAYER_1_STATUS.BLOCK,
+    expectedReason: LAYER_1_REASONS.SSRF_ATTEMPT,
   },
   {
     category: "10. Suspicious Transport — Raw IPv4 Host Announcements",

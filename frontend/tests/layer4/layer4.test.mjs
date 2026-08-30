@@ -2,8 +2,8 @@
  * Layer 4 — Comprehensive Automated Test Suite
  * 
  * Verifies all 8 core Layer 4 specifications:
- * 1. Legitimate Official Content -> VERIFIED_TRUE / ALLOW / Risk: NONE
- * 2. Unverified Emerging Claim -> UNVERIFIED (NOT FALSE!) / REQUIRE_VERIFICATION / Risk: LOW
+ * 1. Legitimate Official Content -> VERIFIED_TRUE / ALLOW_WITH_CAUTION / Risk: NONE
+ * 2. Unverified Emerging Claim -> INSUFFICIENT_EVIDENCE (NOT FALSE!) / REVIEW / Risk: LOW
  * 3. Misleading Overstatement (Scope Discrepancy) -> MISLEADING / ALLOW_WITH_WARNING / Risk: MEDIUM
  * 4. Explicit Phishing (OTP Demand) -> MALICIOUS / BLOCK / Risk: CRITICAL
  * 5. Genuine Info in Malicious Context (True != Safe) -> MALICIOUS / BLOCK / Risk: CRITICAL
@@ -14,6 +14,9 @@
 
 import { Layer4TrustService } from "../../src/lib/ai-trust/layer4/Layer4TrustService.js";
 import { FINAL_CLASSIFICATION, SECURITY_RISK_LEVEL, RECOMMENDED_ACTION } from "../../src/lib/ai-trust/layer4/types.js";
+import { markTrustedLayer3Result } from "../../src/lib/ai-trust/layer3/TrustBoundary.js";
+
+const TEST_EVIDENCE_URL = process.env.TRUST_ENGINE_TEST_EVIDENCE_URL || "https://example.invalid/resource";
 
 export const LAYER_4_TEST_CASES = [
   // 1. Legitimate Content
@@ -28,13 +31,29 @@ export const LAYER_4_TEST_CASES = [
       contextSignals: [],
       claims: [{ claimId: "c1", subject: "HCMUTE", predicate: "học phí", rawText: "HCMUTE điều chỉnh học phí năm 2026" }],
     },
-    layer3Result: {
+    layer3Result: markTrustedLayer3Result({
       status: "VERIFIED",
       claimStatuses: { c1: "SUPPORTED" },
-      evidence: [{ evidenceId: "ev1", claimId: "c1", relation: "STRONGLY_SUPPORTS", excerpt: "HCMUTE điều chỉnh học phí..." }],
+      evidence: [{
+        evidenceId: "ev1",
+        claimId: "c1",
+        sourceUrl: TEST_EVIDENCE_URL,
+        sourceType: "OFFICIAL_INSTITUTION",
+        providerStatus: "SUCCESS",
+        liveEvidence: true,
+        sourceFingerprint: "fixture-source-fingerprint",
+        retrievalOutcome: "SUCCESS",
+        authorityTier: "TIER_5_PRIMARY_AUTHORITATIVE",
+        freshness: "CURRENT",
+        relevance: 0.95,
+        strength: 0.95,
+        relation: "STRONGLY_SUPPORTS",
+        excerpt: "HCMUTE điều chỉnh học phí...",
+      }],
       verificationCompleteness: 0.95,
+      externalEvidence: true,
       conflicts: [],
-    },
+    }),
     expectedClassification: FINAL_CLASSIFICATION.VERIFIED_TRUE,
     expectedAction: RECOMMENDED_ACTION.ALLOW,
     expectedRisk: SECURITY_RISK_LEVEL.NONE,
@@ -59,7 +78,7 @@ export const LAYER_4_TEST_CASES = [
       verificationCompleteness: 0.85,
       conflicts: [],
     },
-    expectedClassification: FINAL_CLASSIFICATION.UNVERIFIED,
+    expectedClassification: FINAL_CLASSIFICATION.INSUFFICIENT_EVIDENCE,
     expectedAction: RECOMMENDED_ACTION.REQUIRE_VERIFICATION,
     expectedRisk: SECURITY_RISK_LEVEL.LOW,
   },
@@ -161,13 +180,13 @@ export const LAYER_4_TEST_CASES = [
       claimStatuses: { c6: "CONTESTED" },
       evidence: [
         { evidenceId: "ev6a", claimId: "c6", sourceUrl: "https://vnexpress.net/1", publishedAt: "2026-08-20T00:00:00Z", relation: "STRONGLY_SUPPORTS", excerpt: "Diễn ra thứ Hai" },
-        { evidenceId: "ev6b", claimId: "c6", sourceUrl: "https://tuoitre.vn/2", publishedAt: "2026-08-21T00:00:00Z", relation: "STRONGLY_CONTRADICTS", excerpt: "Dời lịch sang thứ Sáu" },
+        { evidenceId: "ev6b", claimId: "c6", sourceUrl: "https://tuoitre.vn/2", publishedAt: "2026-08-22T00:00:00Z", relation: "STRONGLY_CONTRADICTS", excerpt: "Dời lịch sang thứ Sáu" },
       ],
       conflicts: [{ conflictId: "conf1", claimId: "c6", conflictType: "POLICY_DISCREPANCY" }],
       verificationCompleteness: 0.90,
     },
-    expectedClassification: FINAL_CLASSIFICATION.VERIFIED_TRUE, // Reconciled by temporal ordering
-    expectedAction: RECOMMENDED_ACTION.ALLOW,
+    expectedClassification: FINAL_CLASSIFICATION.INSUFFICIENT_EVIDENCE,
+    expectedAction: RECOMMENDED_ACTION.REVIEW,
     expectedRisk: SECURITY_RISK_LEVEL.NONE,
   },
 
@@ -193,8 +212,8 @@ export const LAYER_4_TEST_CASES = [
       conflicts: [{ conflictId: "conf2", claimId: "c7", conflictType: "POLICY_DISCREPANCY" }],
       verificationCompleteness: 0.90,
     },
-    expectedClassification: "CONTESTED",
-    expectedAction: RECOMMENDED_ACTION.ESCALATE,
+    expectedClassification: FINAL_CLASSIFICATION.INSUFFICIENT_EVIDENCE,
+    expectedAction: RECOMMENDED_ACTION.REVIEW,
     expectedRisk: SECURITY_RISK_LEVEL.HIGH,
   },
 ];
@@ -248,10 +267,11 @@ async function runLayer4Tests() {
     },
   });
 
-  const isFallbackPassed = fallbackResult.classification === FINAL_CLASSIFICATION.VERIFIED_TRUE;
+  const isFallbackPassed = fallbackResult.classification === FINAL_CLASSIFICATION.VERIFIED_TRUE &&
+    fallbackResult.status === RECOMMENDED_ACTION.ALLOW_WITH_CAUTION;
   if (isFallbackPassed) {
     passedCount++;
-    console.log("✅ [PASS] Model Fallback Resilience: Cleanly caught simulated LLM 504 error, fell back to deterministic decision policy, and maintained VERIFIED_TRUE.");
+    console.log("✅ [PASS] Model Fallback Resilience: Cleanly caught simulated LLM 504 error and maintained the deterministic evidence-bound decision.");
   } else {
     console.error("❌ [FAIL] Model Fallback Resilience test failed.");
   }

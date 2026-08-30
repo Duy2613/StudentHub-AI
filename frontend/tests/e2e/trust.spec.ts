@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { completeTextScan, mockTrustPipeline, trustPayloads } from "./fixtures/trust";
+import { canonicalTrustResponse, completeTextScan, mockTrustPipeline, trustPayloads } from "./fixtures/trust";
 
 test.describe("Trust flagship flow", () => {
   test("renders verdict, separate metrics, partial providers and related cases", async ({ page }) => {
@@ -7,7 +7,7 @@ test.describe("Trust flagship flow", () => {
     await completeTextScan(page);
 
     await expect(page.getByText("Rủi ro", { exact: true })).toBeVisible();
-    await expect(page.getByText("AI confidence", { exact: true })).toBeVisible();
+    await expect(page.getByText("Độ chắc quyết định", { exact: true })).toBeVisible();
     await expect(page.getByText("Bằng chứng", { exact: true })).toBeVisible();
     await expect(page.getByText("Source agreement", { exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Tình trạng nguồn đối soát" })).toBeVisible();
@@ -20,7 +20,7 @@ test.describe("Trust flagship flow", () => {
 
   test("invalid URL is rejected before any request", async ({ page }) => {
     let requests = 0;
-    page.on("request", (request) => { if (request.url().includes("/api/ai-trust/")) requests += 1; });
+    page.on("request", (request) => { if (request.url().includes("/api/v1/trust")) requests += 1; });
     await page.goto("/trust");
     await page.getByRole("tab", { name: "URL" }).click();
     await page.getByLabel("Đường dẫn cần kiểm tra").fill("javascript:alert(1)");
@@ -64,7 +64,7 @@ test.describe("Trust flagship flow", () => {
   });
 
   test("429 includes retry guidance and correlation reference", async ({ page }) => {
-    await page.route("**/api/ai-trust/screen", (route) => route.fulfill({ status: 429, headers: { "Retry-After": "17", "x-request-id": "trace-rate-17" }, contentType: "application/json", body: JSON.stringify({ error: { message: "rate limited" } }) }));
+    await page.route("**/api/v1/trust", (route) => route.fulfill({ status: 429, headers: { "Retry-After": "17", "x-request-id": "trace-rate-17" }, contentType: "application/json", body: JSON.stringify({ error: { message: "rate limited" } }) }));
     await page.goto("/trust");
     await page.getByRole("tab", { name: "Văn bản" }).click();
     await page.getByLabel("Nội dung tin nhắn hoặc thông báo").fill("Kiểm tra giới hạn tốc độ");
@@ -74,7 +74,7 @@ test.describe("Trust flagship flow", () => {
   });
 
   test("invalid JSON fails closed", async ({ page }) => {
-    await page.route("**/api/ai-trust/screen", (route) => route.fulfill({ status: 200, contentType: "text/plain", body: "not-json" }));
+    await page.route("**/api/v1/trust", (route) => route.fulfill({ status: 200, contentType: "text/plain", body: "not-json" }));
     await page.goto("/trust");
     await page.getByRole("tab", { name: "Văn bản" }).click();
     await page.getByLabel("Nội dung tin nhắn hoặc thông báo").fill("Dữ liệu hợp đồng lỗi");
@@ -83,7 +83,7 @@ test.describe("Trust flagship flow", () => {
   });
 
   test("schema mismatch fails closed", async ({ page }) => {
-    await page.route("**/api/ai-trust/screen", (route) => route.fulfill({ status: 200, contentType: "application/json", body: "{}" }));
+    await page.route("**/api/v1/trust", (route) => route.fulfill({ status: 200, contentType: "application/json", body: "{}" }));
     await page.goto("/trust");
     await page.getByRole("tab", { name: "Văn bản" }).click();
     await page.getByLabel("Nội dung tin nhắn hoặc thông báo").fill("Phản hồi thiếu trường bắt buộc");
@@ -93,7 +93,7 @@ test.describe("Trust flagship flow", () => {
 
   for (const [status, message] of [[401, "đăng nhập lại"], [403, "không có quyền"], [503, "tạm thời không khả dụng"]] as const) {
     test(`${status} maps to a recoverable user state`, async ({ page }) => {
-      await page.route("**/api/ai-trust/screen", (route) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify({ error: { message: "safe upstream message" } }) }));
+      await page.route("**/api/v1/trust", (route) => route.fulfill({ status, contentType: "application/json", body: JSON.stringify({ error: { message: "safe upstream message" } }) }));
       await page.goto("/trust");
       await page.getByRole("tab", { name: "Văn bản" }).click();
       await page.getByLabel("Nội dung tin nhắn hoặc thông báo").fill("Kiểm tra trạng thái API");
@@ -103,16 +103,15 @@ test.describe("Trust flagship flow", () => {
   }
 
   test("late Scan A cannot overwrite Scan B", async ({ page }) => {
-    await page.route("**/api/ai-trust/screen", async (route) => {
+    await page.route("**/api/v1/trust", async (route) => {
       const body = route.request().postDataJSON() as { content?: string };
       if (body.content?.includes("Scan A")) await new Promise((resolve) => setTimeout(resolve, 700));
-      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(trustPayloads.screen) });
-    });
-    await page.route("**/api/ai-trust/semantic", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(trustPayloads.semantic) }));
-    await page.route("**/api/ai-trust/evidence", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(trustPayloads.evidence) }));
-    await page.route("**/api/ai-trust/reasoning", async (route) => {
-      const body = route.request().postDataJSON() as { layer1Result?: unknown };
-      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ...trustPayloads.reasoning, userExplanation: { ...trustPayloads.reasoning.userExplanation, verdictTitle: body.layer1Result ? "Kết quả Scan B" : "Kết quả không hợp lệ" } }) });
+      const title = body.content?.includes("Scan B") ? "Kết quả Scan B" : "Kết quả Scan A";
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(canonicalTrustResponse({ reasoning: { ...trustPayloads.reasoning, userExplanation: { ...trustPayloads.reasoning.userExplanation, verdictTitle: title } } })),
+      });
     });
     await page.goto("/trust");
     await page.getByRole("tab", { name: "Văn bản" }).click();
@@ -126,11 +125,10 @@ test.describe("Trust flagship flow", () => {
     await expect(page.getByRole("heading", { name: "Kết quả Scan B" })).toBeVisible();
   });
 
-  test("slow evidence keeps completed layers visible instead of a single spinner", async ({ page }) => {
-    await mockTrustPipeline(page);
-    await page.route("**/api/ai-trust/evidence", async (route) => {
+  test("slow canonical pipeline exposes in-flight state and keeps the result bound to the latest scan", async ({ page }) => {
+    await page.route("**/api/v1/trust", async (route) => {
       await new Promise((resolve) => setTimeout(resolve, 900));
-      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(trustPayloads.evidence) });
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(canonicalTrustResponse()) });
     });
     await page.goto("/trust");
     await page.getByRole("tab", { name: "Văn bản" }).click();
@@ -138,7 +136,7 @@ test.describe("Trust flagship flow", () => {
     await page.getByRole("button", { name: /Phân tích rủi ro/ }).click();
 
     const steps = page.locator(".pipeline-list li");
-    await expect(steps.nth(1)).toHaveAttribute("data-status", "done");
+    await expect(steps.nth(1)).toHaveAttribute("data-status", "running");
     await expect(steps.nth(2)).toHaveAttribute("data-status", "running");
     await expect(page.getByRole("heading", { name: trustPayloads.reasoning.userExplanation.verdictTitle })).toBeVisible();
   });

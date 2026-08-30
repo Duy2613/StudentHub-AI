@@ -11,7 +11,7 @@ test.describe("explicit competition demo mode", () => {
     test(`${demoCase.button} is visibly labeled and does not call Trust APIs`, async ({ page }) => {
       let trustRequests = 0;
       page.on("request", (request) => {
-        if (request.url().includes("/api/ai-trust/")) trustRequests += 1;
+        if (request.url().includes("/api/v1/trust")) trustRequests += 1;
       });
 
       await page.goto("/trust");

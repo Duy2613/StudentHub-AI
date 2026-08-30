@@ -71,8 +71,8 @@ const TEST_CASES = [
     category: "URL - Raw IPv4 Host",
     type: "url",
     content: "http://192.168.1.50/dashboard",
-    expectedStatus: LAYER_1_STATUS.SUSPICIOUS,
-    expectedReason: LAYER_1_REASONS.IP_BASED_HOST,
+    expectedStatus: LAYER_1_STATUS.BLOCK,
+    expectedReason: LAYER_1_REASONS.SSRF_ATTEMPT,
   },
   {
     category: "URL - Deceptive Subdomain Impersonation (Hard Block)",

@@ -15,7 +15,8 @@ import { CrossModalAnalyzer } from "../analyzers/CrossModalAnalyzer.js";
 import { ManipulationAnalyzer } from "../analyzers/ManipulationAnalyzer.js";
 import { StudentHubNeuralModel } from "../../models/StudentHubNeuralModel.js";
 import { StudentHubMultiLabelNeuralModel } from "../../models/StudentHubMultiLabelNeuralModel.js";
-import { SEMANTIC_CLASSIFICATION } from "../types.js";
+import { SEMANTIC_CLASSIFICATION, SEMANTIC_PROVIDER_STATUS } from "../types.js";
+import { SEMANTIC_BOUNDARY_LIMITS } from "../guards/SemanticBoundary.js";
 
 export class DeterministicSemanticProvider extends ISemanticVerificationProvider {
   constructor() {
@@ -25,15 +26,22 @@ export class DeterministicSemanticProvider extends ISemanticVerificationProvider
   /**
    * Executes local semantic analysis pipeline with StudentHub Neural Model
    */
-  async analyzeSemantics({ text = "", url = "", ocrText = "", qrPayload = "", layer1Result = {}, options = {} }) {
-    const combinedText = `${text} ${ocrText}`.trim();
+  async analyzeSemantics({ text = "", url = "", ocrText = "", qrPayload = "", layer1Result = {}, options = {} } = {}) {
+    const safeText = typeof text === "string" ? text.slice(0, SEMANTIC_BOUNDARY_LIMITS.TEXT) : "";
+    const safeUrl = typeof url === "string" ? url.slice(0, SEMANTIC_BOUNDARY_LIMITS.URL) : "";
+    const safeOcrText = typeof ocrText === "string" ? ocrText.slice(0, SEMANTIC_BOUNDARY_LIMITS.OCR) : "";
+    const safeQrPayload = typeof qrPayload === "string" ? qrPayload.slice(0, SEMANTIC_BOUNDARY_LIMITS.QR) : "";
+    const safeLayer1Result = layer1Result && typeof layer1Result === "object" && !Array.isArray(layer1Result)
+      ? { ...layer1Result, signals: Array.isArray(layer1Result.signals) ? layer1Result.signals.slice(0, 40) : [] }
+      : { status: "UNKNOWN", signals: [] };
+    const combinedText = `${safeText} ${safeOcrText}`.trim();
 
     // 0. StudentHub Multi-Head & Single-Head Neural Model Prediction
-    const neuralPrediction = StudentHubNeuralModel.predict(combinedText, { url, ocrText, qrPayload });
-    const multiLabelPrediction = StudentHubMultiLabelNeuralModel.predict(combinedText, { url, ocrText, qrPayload });
+    const neuralPrediction = StudentHubNeuralModel.predict(combinedText, { url: safeUrl, ocrText: safeOcrText, qrPayload: safeQrPayload });
+    const multiLabelPrediction = StudentHubMultiLabelNeuralModel.predict(combinedText, { url: safeUrl, ocrText: safeOcrText, qrPayload: safeQrPayload });
 
     // 1. Intent Analysis
-    const intent = IntentAnalyzer.analyze(combinedText, { url, qrPayload });
+    const intent = IntentAnalyzer.analyze(combinedText, { url: safeUrl, qrPayload: safeQrPayload });
     const hasConcreteScamType = multiLabelPrediction.scam_types && multiLabelPrediction.scam_types.length > 0;
     if (multiLabelPrediction.verdict === "SCAM" && hasConcreteScamType && intent.primary === "inform") {
       if (multiLabelPrediction.requested_actions.includes("OTP") || multiLabelPrediction.requested_actions.includes("PASSWORD")) {
@@ -46,15 +54,15 @@ export class DeterministicSemanticProvider extends ISemanticVerificationProvider
     }
 
     // 2. Entity Extraction & Claim Extraction
-    const entities = EntityExtractor.extract(combinedText, { url });
-    const claims = ClaimExtractor.extract(combinedText, entities, { url });
+    const entities = EntityExtractor.extract(combinedText, { url: safeUrl });
+    const claims = ClaimExtractor.extract(combinedText, entities, { url: safeUrl });
 
     // 3. Context Analysis & Social Engineering Synthesizer
     const contextSignals = ContextAnalyzer.analyze({
       text: combinedText,
       intent,
       entities,
-      layer1Signals: layer1Result.signals || [],
+      layer1Signals: safeLayer1Result.signals,
     });
 
     // Augment contextSignals with Neural Model detections only when concrete category exists
@@ -82,12 +90,12 @@ export class DeterministicSemanticProvider extends ISemanticVerificationProvider
 
     // 5. Multi-modal Cross Referencing
     const crossModalFindings = CrossModalAnalyzer.analyze({
-      text,
-      url,
-      ocrText,
-      qrPayload,
+      text: safeText,
+      url: safeUrl,
+      ocrText: safeOcrText,
+      qrPayload: safeQrPayload,
       entities,
-      layer1Result,
+      layer1Result: safeLayer1Result,
     });
 
     // 6. Psychological Manipulation Scoring
@@ -166,6 +174,12 @@ export class DeterministicSemanticProvider extends ISemanticVerificationProvider
       crossModalFindings,
       manipulation,
       classification,
+      modelStatus: SEMANTIC_PROVIDER_STATUS.LOCAL_DETERMINISTIC,
+      confidenceKind: "deterministic_heuristic_candidate_only",
+      confidenceSource: this.providerId,
+      providerIndependent: true,
+      aiCannotOverrideSecurity: true,
+      inputTrust: "UNTRUSTED_CONTENT_ISOLATED",
       neuralModel: {
         primaryCategory: neuralPrediction.primaryCategory,
         threatScore: neuralPrediction.threatScore,

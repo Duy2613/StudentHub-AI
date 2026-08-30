@@ -17,9 +17,10 @@ export class CompletenessEngine {
   static calculateCompleteness({ claims = [], evidence = [], sources = [], independence = {} }) {
     if (!claims || claims.length === 0) {
       return {
-        verificationCompleteness: 1.0,
-        evidenceConfidence: 0.90,
-        crossSourceAgreement: { agreementScore: 1.0, supportingSourcesCount: 0, contradictingSourcesCount: 0 },
+        verificationCompleteness: 0.0,
+        evidenceConfidence: 0.0,
+        crossSourceAgreement: { agreementScore: 0.0, supportingSourcesCount: 0, contradictingSourcesCount: 0 },
+        provenanceCoverage: 0.0,
       };
     }
 
@@ -28,11 +29,18 @@ export class CompletenessEngine {
     let supportingCount = 0;
     let contradictingCount = 0;
 
-    const claimIdsWithEvidence = new Set(evidence.map((e) => e.claimId));
+    const validClaimIds = new Set(claims.map((claim) => claim?.claimId).filter(Boolean));
+    const claimIdsWithEvidence = new Set(
+      evidence.filter((item) => validClaimIds.has(item?.claimId)).map((item) => item.claimId)
+    );
     verifiedClaimsCount = claimIdsWithEvidence.size;
 
     for (const ev of evidence) {
       let weight = 0.5;
+
+      if (ev.liveEvidence !== true || ev.sourceType === "LOCAL_KNOWLEDGE_BASE") {
+        weight -= 0.20;
+      }
 
       if (ev.authorityTier === SOURCE_AUTHORITY_TIER.TIER_5_PRIMARY_AUTHORITATIVE) {
         weight += LAYER_3_CONFIG.WEIGHTS.PRIMARY_SOURCE_BONUS;
@@ -72,14 +80,17 @@ export class CompletenessEngine {
 
     // Agreement Score
     const totalPolarized = supportingCount + contradictingCount;
-    let agreementScore = 1.0;
+    let agreementScore = 0.0;
     if (totalPolarized > 0) {
       agreementScore = Math.max(supportingCount, contradictingCount) / totalPolarized;
     }
 
     // Evidence Confidence
-    const avgWeight = evidence.length > 0 ? totalEvidenceWeight / evidence.length : 0.4;
-    const evidenceConfidence = Math.min(0.99, Math.max(0.1, avgWeight * completenessRatio));
+    const avgWeight = evidence.length > 0 ? totalEvidenceWeight / evidence.length : 0;
+    const evidenceConfidence = Math.min(0.99, Math.max(0, avgWeight * completenessRatio));
+    const provenanceCoverage = evidence.length > 0
+      ? evidence.filter((item) => item?.sourceType && item?.sourceFingerprint && item?.retrievalOutcome === "SUCCESS").length / evidence.length
+      : 0;
 
     return {
       verificationCompleteness: Number(verificationCompleteness.toFixed(2)),
@@ -90,6 +101,7 @@ export class CompletenessEngine {
         contradictingSourcesCount: contradictingCount,
         totalPolarizedSources: totalPolarized,
       },
+      provenanceCoverage: Number(provenanceCoverage.toFixed(2)),
     };
   }
 }

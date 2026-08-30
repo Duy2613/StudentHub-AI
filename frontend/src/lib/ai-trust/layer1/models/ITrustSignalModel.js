@@ -45,22 +45,42 @@ export class ITrustSignalModel {
 /**
  * Safe Model Invocation Wrapper with Timeout & Fallback
  */
-export async function executeAuxiliaryModelSafe({
-  model = null,
-  type = "text",
-  content = "",
-  context = {},
-  timeoutMs = 1500,
-}) {
-  if (!model || !(model instanceof ITrustSignalModel)) {
+export async function executeAuxiliaryModelSafe(params = {}) {
+  const input = params && typeof params === "object" && !Array.isArray(params) ? params : {};
+  const model = input.model || null;
+  const type = typeof input.type === "string" ? input.type : "text";
+  const content = input.content ?? "";
+  const context = input.context && typeof input.context === "object" && !Array.isArray(input.context) ? input.context : {};
+  const timeoutMs = input.timeoutMs;
+
+  let isSupportedModel = false;
+  try {
+    isSupportedModel = Boolean(model && model instanceof ITrustSignalModel);
+  } catch {
+    isSupportedModel = false;
+  }
+  if (!isSupportedModel) {
     return { modelSignals: [], modelUsed: null };
   }
 
   const modelSignals = [];
+  let rawModelName = "";
+  try {
+    rawModelName = model.name;
+  } catch {
+    rawModelName = "";
+  }
+  const modelName = typeof rawModelName === "string" && rawModelName.trim()
+    ? rawModelName.trim().slice(0, 120)
+    : "auxiliary_trust_model";
+  const boundedTimeoutMs = typeof timeoutMs === "number" && Number.isFinite(timeoutMs)
+    ? Math.max(1, Math.min(10_000, timeoutMs))
+    : 1500;
+  let timeoutHandle = null;
 
   try {
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error(`Model execution timed out after ${timeoutMs}ms`)), timeoutMs)
+      timeoutHandle = setTimeout(() => reject(new Error(`Model execution timed out after ${boundedTimeoutMs}ms`)), boundedTimeoutMs)
     );
 
     const executionPromise = (async () => {
@@ -73,10 +93,13 @@ export async function executeAuxiliaryModelSafe({
     const result = await Promise.race([executionPromise, timeoutPromise]);
 
     if (result && typeof result === "object") {
-      // Validate and clamp model confidence
-      const clampedConfidence = Math.max(0, Math.min(1, Number(result.confidence) || 0.5));
+      // Invalid or missing model confidence is unknown (0), never an invented
+      // midpoint that could make an uncalibrated model appear trustworthy.
+      const clampedConfidence = typeof result.confidence === "number" && Number.isFinite(result.confidence)
+        ? Math.max(0, Math.min(1, result.confidence))
+        : 0;
 
-      if (result.isSuspicious) {
+      if (result.isSuspicious === true) {
         // Model contributes ONLY to SUSPICIOUS (Severity MEDIUM), never CRITICAL / BLOCK
         modelSignals.push(
           createSignal({
@@ -85,19 +108,21 @@ export async function executeAuxiliaryModelSafe({
             severity: SIGNAL_SEVERITY.MEDIUM,
             confidence: Math.min(0.75, clampedConfidence),
             evidence: {
-              modelName: model.name,
-              modelLabel: String(result.modelLabel || "model_suspicion").slice(0, 50),
+              modelName,
+              modelLabel: typeof result.modelLabel === "string" ? result.modelLabel.slice(0, 50) : "unlabelled_model_signal",
               details: "Auxiliary lightweight model indicated potential anomaly (Secondary corroboration only)",
             },
-            source: model.name,
+            source: modelName,
           })
         );
       }
     }
 
-    return { modelSignals, modelUsed: model.name };
+    return { modelSignals, modelUsed: modelName };
   } catch (err) {
-    SecurityLogger.warn(`Auxiliary model '${model.name}' failed or timed out (${err?.name || "model_error"}). Falling back to deterministic rules.`);
+    SecurityLogger.warn(`Auxiliary model '${modelName}' failed or timed out (${err?.name || "model_error"}). Falling back to deterministic rules.`);
     return { modelSignals: [], modelUsed: null };
+  } finally {
+    if (timeoutHandle !== null) clearTimeout(timeoutHandle);
   }
 }
