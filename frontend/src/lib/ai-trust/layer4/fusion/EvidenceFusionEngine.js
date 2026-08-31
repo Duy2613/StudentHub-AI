@@ -149,6 +149,7 @@ export class EvidenceFusionEngine {
     const layer1Result = input.layer1Result && typeof input.layer1Result === "object" ? input.layer1Result : null;
     const layer2Result = input.layer2Result && typeof input.layer2Result === "object" ? input.layer2Result : null;
     const layer2AResult = input.layer2AResult && typeof input.layer2AResult === "object" ? input.layer2AResult : null;
+    const layer2CResult = input.layer2CResult && typeof input.layer2CResult === "object" ? input.layer2CResult : null;
     const layer3Result = input.layer3Result && typeof input.layer3Result === "object" ? input.layer3Result : null;
     const documentContext = input.documentContext && typeof input.documentContext === "object" ? input.documentContext : null;
     const conversationContext = input.conversationContext && typeof input.conversationContext === "object" ? input.conversationContext : null;
@@ -159,6 +160,7 @@ export class EvidenceFusionEngine {
     const layer2Claims = objectArray(layer2Result?.claims);
     const layer2ConsistencyFindings = objectArray(layer2Result?.consistencyFindings);
     const layer2CrossModalFindings = objectArray(layer2Result?.crossModalFindings);
+    const layer2CDomainSignals = objectArray(layer2CResult?.riskSignals);
     const layer3Sources = objectArray(layer3Result?.sources);
     const layer3Evidence = objectArray(layer3Result?.evidence);
     const layer3Conflicts = objectArray(layer3Result?.conflicts);
@@ -183,6 +185,14 @@ export class EvidenceFusionEngine {
       layer2CrossModalFindings,
       layer2Status: typeof layer2Result?.status === "string" ? layer2Result.status : "UNKNOWN",
       layer2Classification: typeof layer2Result?.classification === "string" ? layer2Result.classification : "UNKNOWN",
+
+      // L2C is a bounded domain-risk signal. It is retained separately from
+      // generic semantic context so L4 can use it as advisory suspicion only.
+      layer2CResult,
+      layer2CClassification: typeof layer2CResult?.classification === "string" ? layer2CResult.classification : "UNKNOWN_STUDENT_RISK",
+      layer2CDomainSignals,
+      layer2CModelStatus: typeof layer2CResult?.modelStatus === "string" ? layer2CResult.modelStatus : "UNKNOWN",
+      layer2CModelVersion: typeof layer2CResult?.modelVersion === "string" ? layer2CResult.modelVersion : null,
 
       // Layer 2A is a separate threat-intelligence boundary. Its no-match
       // finding is retained as a bounded absence of a known match, never as
@@ -253,6 +263,12 @@ export class EvidenceFusionEngine {
     for (const signal of fusedGraph.layer2ContextSignals) {
       const mapped = CONTEXT_TO_SCAM_TYPE[safeText(signal.type)];
       if (mapped) scamTypes.add(mapped);
+    }
+
+    for (const signal of fusedGraph.layer2CDomainSignals) {
+      if (typeof signal.code === "string" && signal.code.includes("PHISHING")) scamTypes.add(SCAM_TYPES.PHISHING);
+      if (typeof signal.code === "string" && signal.code.includes("ADVANCE_FEE")) scamTypes.add(SCAM_TYPES.ADVANCE_FEE_SCAM);
+      if (typeof signal.code === "string" && signal.code.includes("ACCOUNT_TAKEOVER")) scamTypes.add(SCAM_TYPES.ACCOUNT_TAKEOVER);
     }
 
     // From Layer 2 manipulation tactics
@@ -376,10 +392,11 @@ export class EvidenceFusionEngine {
 
     // ── 10. Compound Evidence Metrics ─────────────────────────────────────────
     const totalEvidenceItems = fusedGraph.layer3Evidence.length + fusedGraph.crossFieldContradictions.length;
-    const totalSignals = fusedGraph.layer1Signals.length + fusedGraph.layer2ContextSignals.length;
+    const totalSignals = fusedGraph.layer1Signals.length + fusedGraph.layer2ContextSignals.length + fusedGraph.layer2CDomainSignals.length;
     const hasPhishingSignals =
       fusedGraph.layer1Signals.some((s) => safeText(s.type).includes("credential") || safeText(s.type).includes("otp") || safeText(s.type).includes("phishing")) ||
-      fusedGraph.layer2ContextSignals.some((s) => safeText(s.type).includes("credential") || safeText(s.type).includes("account_takeover"));
+      fusedGraph.layer2ContextSignals.some((s) => safeText(s.type).includes("credential") || safeText(s.type).includes("account_takeover")) ||
+      fusedGraph.layer2CDomainSignals.some((s) => safeText(s.code).includes("PHISHING") || safeText(s.code).includes("CREDENTIAL"));
 
     // ── Return Enhanced Fused Graph ────────────────────────────────────────────
     return {

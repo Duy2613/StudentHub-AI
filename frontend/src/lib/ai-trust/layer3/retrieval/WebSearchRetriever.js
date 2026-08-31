@@ -16,6 +16,24 @@ import { validateRemoteUrl, validateRemoteUrlSync, isRedirectStatus } from "../.
 const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const MAX_REDIRECT_HOPS = 4;
 
+function createAbortError(reason) {
+  const error = reason instanceof Error ? reason : new Error("Evidence retrieval cancelled");
+  error.name = "AbortError";
+  return error;
+}
+
+function throwIfAborted(signal) {
+  if (signal?.aborted) throw createAbortError(signal.reason);
+}
+
+function bindAbortSignal(controller, signal) {
+  if (!signal || typeof signal.addEventListener !== "function") return () => {};
+  const onAbort = () => controller.abort(signal.reason);
+  if (signal.aborted) onAbort();
+  else signal.addEventListener("abort", onAbort, { once: true });
+  return () => signal.removeEventListener?.("abort", onAbort);
+}
+
 export class WebSearchRetriever extends IEvidenceRetriever {
   constructor({ fetchImpl = globalThis.fetch } = {}) {
     super("live_web_search_retriever");
@@ -33,6 +51,7 @@ export class WebSearchRetriever extends IEvidenceRetriever {
     // No search-provider credentials are configured in this repository. The
     // explicit local result is useful for offline operation, but callers are
     // told through source provenance that it is not live external evidence.
+    throwIfAborted(options?.signal);
     this.lastSearchStatus = EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY;
     return this.kbRetriever.search(Array.isArray(queries) ? queries.slice(0, 240) : [], options);
   }
@@ -40,7 +59,9 @@ export class WebSearchRetriever extends IEvidenceRetriever {
   /**
    * Safely fetches and sanitizes remote web page
    */
-  async fetch(url) {
+  async fetch(url, options = {}) {
+    const signal = options?.signal;
+    throwIfAborted(signal);
     if (!url || typeof url !== "string") {
       return { html: "", textContent: "", status: 400 };
     }
@@ -50,7 +71,8 @@ export class WebSearchRetriever extends IEvidenceRetriever {
       if (!initialGuard.ok) return { html: "", textContent: "", status: 403, error: initialGuard.code };
 
       // Check KB first for known documents
-      const kbDoc = await this.kbRetriever.fetch(initialGuard.url);
+      const kbDoc = await this.kbRetriever.fetch(initialGuard.url, options);
+      throwIfAborted(signal);
       if (kbDoc.status === 200) {
         return kbDoc;
       }
@@ -66,10 +88,13 @@ export class WebSearchRetriever extends IEvidenceRetriever {
       let redirectCount = 0;
       let res;
       while (true) {
+        throwIfAborted(signal);
         const hopGuard = await validateRemoteUrl(currentUrl, { resolveDns: true });
+        throwIfAborted(signal);
         if (!hopGuard.ok) return { html: "", textContent: "", status: 403, error: hopGuard.code };
 
         const controller = new AbortController();
+        const unbindAbort = bindAbortSignal(controller, signal);
         const timeoutId = setTimeout(() => controller.abort(), LAYER_3_CONFIG.SLA.MAX_TIMEOUT_MS);
         try {
           res = await this.fetchImpl(hopGuard.url, {
@@ -82,7 +107,9 @@ export class WebSearchRetriever extends IEvidenceRetriever {
           });
         } finally {
           clearTimeout(timeoutId);
+          unbindAbort();
         }
+        throwIfAborted(signal);
 
         if (!isRedirectStatus(res.status)) break;
         const location = res.headers.get("location");
@@ -145,6 +172,7 @@ export class WebSearchRetriever extends IEvidenceRetriever {
         retrievalOutcome: "SUCCESS",
       };
     } catch (err) {
+      if (signal?.aborted) throw createAbortError(signal.reason);
       const status = err?.name === "AbortError" ? 504 : 502;
       return { html: "", textContent: "", status, error: err?.name === "AbortError" ? "FETCH_TIMEOUT" : "NETWORK_FETCH_FAILURE", sourceType: SOURCE_TYPE.SEARCH_RETRIEVAL, providerStatus: err?.name === "AbortError" ? EVIDENCE_PROVIDER_STATUS.TIMEOUT : EVIDENCE_PROVIDER_STATUS.UNAVAILABLE, liveEvidence: false, retrievalOutcome: "FAILURE" };
     }

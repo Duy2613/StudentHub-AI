@@ -28,7 +28,6 @@ import {
   FRESHNESS_STATUS,
   SOURCE_TYPE,
   EVIDENCE_PROVIDER_STATUS,
-  SOURCE_AUTHORITY_TIER,
 } from "./types.js";
 import { LAYER_3_CONFIG } from "./config/Layer3Config.js";
 
@@ -86,6 +85,13 @@ function safeCandidate(candidate) {
 
 function nowMs() {
   return typeof performance !== "undefined" ? performance.now() : Date.now();
+}
+
+function throwIfAborted(signal) {
+  if (!signal?.aborted) return;
+  const error = signal.reason instanceof Error ? signal.reason : new Error("Layer 3 retrieval cancelled");
+  error.name = "AbortError";
+  throw error;
 }
 
 async function sha256Hex(value) {
@@ -175,23 +181,27 @@ export class Layer3EvidenceService {
     let fetchRetriever = retriever;
 
     try {
+      throwIfAborted(safeOptions.signal);
       if (typeof retriever.search !== "function") throw new Error("RETRIEVER_SEARCH_UNAVAILABLE");
-      const searchResult = await retriever.search(boundedQueries, { requestId });
+      const searchResult = await retriever.search(boundedQueries, { requestId, signal: safeOptions.signal });
+      throwIfAborted(safeOptions.signal);
       retrievedSources = asArray(searchResult).map(safeCandidate).filter(Boolean).slice(0, MAX_RETRIEVED_SOURCES);
       if (retrieverId.includes("knowledge_base") || retrievedSources.some((src) => src.sourceType === SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE)) {
         retrievalMode = "LOCAL_KNOWLEDGE_BASE";
         retrievalStatus = EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY;
       }
     } catch (err) {
+      if (safeOptions.signal?.aborted || err?.name === "AbortError") throw err;
       retrievalStatus = EVIDENCE_PROVIDER_STATUS.UNAVAILABLE;
       retrievalMode = "LOCAL_FALLBACK";
       auditEvents.push({ type: "RETRIEVER_FAILURE", code: boundedString(err?.message, 120) || "RETRIEVER_FAILURE", at: new Date().toISOString() });
       try {
         const fallback = new KnowledgeBaseRetriever();
         fetchRetriever = fallback;
-        retrievedSources = asArray(await fallback.search(boundedQueries, { requestId }))
+        retrievedSources = asArray(await fallback.search(boundedQueries, { requestId, signal: safeOptions.signal }))
           .map(safeCandidate).filter(Boolean).slice(0, MAX_RETRIEVED_SOURCES);
       } catch (fallbackError) {
+        if (safeOptions.signal?.aborted || fallbackError?.name === "AbortError") throw fallbackError;
         retrievedSources = [];
         auditEvents.push({ type: "LOCAL_FALLBACK_FAILURE", code: boundedString(fallbackError?.message, 120) || "LOCAL_FALLBACK_FAILURE", at: new Date().toISOString() });
       }
@@ -201,6 +211,7 @@ export class Layer3EvidenceService {
     const processedSources = [];
 
     for (const src of retrievedSources) {
+      throwIfAborted(safeOptions.signal);
       const urlGuard = validateRemoteUrlSync(src.url);
       if (!urlGuard.ok) {
         auditEvents.push({ type: "RETRIEVAL_REJECTED", code: urlGuard.code, sourceId: src.sourceId || null, at: new Date().toISOString() });
@@ -210,10 +221,12 @@ export class Layer3EvidenceService {
       let fetchResult;
       try {
         if (typeof fetchRetriever.fetch !== "function") throw new Error("RETRIEVER_FETCH_UNAVAILABLE");
-        fetchResult = safeFetchResult(await fetchRetriever.fetch(urlGuard.url, { requestId }));
+        fetchResult = safeFetchResult(await fetchRetriever.fetch(urlGuard.url, { requestId, signal: safeOptions.signal }));
       } catch (err) {
+        if (safeOptions.signal?.aborted || err?.name === "AbortError") throw err;
         fetchResult = { html: "", textContent: "", status: 502, error: boundedString(err?.message, 120) || "FETCH_FAILURE" };
       }
+      throwIfAborted(safeOptions.signal);
 
       const fetchedSuccessfully = isSuccessfulFetch(fetchResult);
       const sourceType = inferSourceType(src, fetchResult, retrieverId);

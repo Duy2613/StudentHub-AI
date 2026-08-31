@@ -138,6 +138,10 @@ export class AIGatewayModelProvider extends ISemanticVerificationProvider {
         systemPrompt,
         userPrompt,
         validate: isValidLayer2Shape,
+        options: {
+          requestId: safeParams.options?.requestId,
+          signal: safeParams.options?.signal,
+        },
       });
     } catch (error) {
       return {

@@ -56,6 +56,7 @@ export class Layer4TrustService {
     const layer1Result = safeObject(input.layer1Result);
     const layer2Result = safeObject(input.layer2Result);
     const layer2AResult = safeObject(input.layer2AResult);
+    const layer2CResult = safeObject(input.layer2CResult);
     const layer3Result = safeObject(input.layer3Result);
     const options = safeObject(input.options) || {};
     const startTime = nowMs();
@@ -71,6 +72,7 @@ export class Layer4TrustService {
         layer1Result,
         layer2Result,
         layer2AResult,
+        layer2CResult,
         layer3Result,
         documentContext: options.documentContext || null,
         conversationContext: options.conversationContext || null,
@@ -85,6 +87,9 @@ export class Layer4TrustService {
           layer2CrossModalFindings: [],
           layer2Status: layer2Result?.status || "UNKNOWN",
           layer2Classification: "UNKNOWN",
+          layer2CResult,
+          layer2CClassification: layer2CResult?.classification || "UNKNOWN_STUDENT_RISK",
+          layer2CDomainSignals: Array.isArray(layer2CResult?.riskSignals) ? layer2CResult.riskSignals : [],
           layer2AResult,
           layer2AFinding: layer2AResult?.finding || "UNKNOWN",
           layer2AProviderStatus: layer2AResult?.providerStatus || "NOT_APPLICABLE",
@@ -118,7 +123,6 @@ export class Layer4TrustService {
       isHardNegative,
       hardNegativeContext,
       interactionMultiplier,
-      uncertainty,
     } = fusion;
 
     // Attach fusion metadata to fusedGraph so the reasoning provider can access it

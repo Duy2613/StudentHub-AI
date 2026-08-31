@@ -47,6 +47,7 @@ export class AIGatewayService {
       jsonMode: false,
       timeoutMs: options.timeoutMs,
       maxOutputTokens: options.maxOutputTokens,
+      signal: options.signal,
     });
 
     const totalLatencyMs = Date.now() - startedAt;
@@ -58,6 +59,7 @@ export class AIGatewayService {
         attempts: routed.attempts,
         errorType: routed.errorType,
         errorMessage: routed.errorMessage,
+        requestId: options.requestId,
         totalLatencyMs,
       });
     }
@@ -69,6 +71,7 @@ export class AIGatewayService {
       model: routed.model,
       text: routed.text,
       attempts: routed.attempts,
+      requestId: options.requestId,
       totalLatencyMs,
     });
   }
@@ -103,6 +106,7 @@ export class AIGatewayService {
       jsonMode: true,
       timeoutMs: options.timeoutMs,
       maxOutputTokens: options.maxOutputTokens,
+      signal: options.signal,
       parseResponse: (text) => JSON.parse(text),
       validateResponse: validate,
     });
@@ -116,6 +120,7 @@ export class AIGatewayService {
         attempts: routed.attempts,
         errorType: routed.errorType,
         errorMessage: routed.errorMessage,
+        requestId: options.requestId,
         totalLatencyMs,
       });
     }
@@ -128,6 +133,7 @@ export class AIGatewayService {
       json: routed.json,
       text: routed.text,
       attempts: routed.attempts,
+      requestId: options.requestId,
       totalLatencyMs,
     });
   }

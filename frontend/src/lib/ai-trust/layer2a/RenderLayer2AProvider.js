@@ -183,10 +183,6 @@ function fingerprintTarget(value) {
   return createHash("sha256").update(value, "utf8").digest("hex").slice(0, 32);
 }
 
-function nowIso(clock) {
-  return new Date(clock()).toISOString();
-}
-
 class ProviderHttpError extends Error {
   constructor(status) {
     super("Layer 2A provider HTTP failure");
@@ -201,6 +197,20 @@ class ProviderBodyError extends Error {
     this.name = "ProviderBodyError";
     this.code = code;
   }
+}
+
+function createAbortError(reason) {
+  const error = reason instanceof Error ? reason : new Error("Layer 2A request cancelled");
+  error.name = "AbortError";
+  return error;
+}
+
+function bindAbortSignal(controller, signal) {
+  if (!signal || typeof signal.addEventListener !== "function") return () => {};
+  const onAbort = () => controller.abort(signal.reason);
+  if (signal.aborted) onAbort();
+  else signal.addEventListener("abort", onAbort, { once: true });
+  return () => signal.removeEventListener?.("abort", onAbort);
 }
 
 async function readBoundedJson(response, maxBytes) {
@@ -311,10 +321,11 @@ export class RenderLayer2AProvider {
     this.cache.set(key, { storedAt: this.clock(), ttlMs, result });
   }
 
-  async #requestOnce(endpoint, targetUrl, requestId) {
+  async #requestOnce(endpoint, targetUrl, requestId, signal) {
     if (typeof this.fetchImpl !== "function") throw new Error("FETCH_UNAVAILABLE");
 
     const controller = new AbortController();
+    const unbindAbort = bindAbortSignal(controller, signal);
     const timeoutId = setTimeout(() => controller.abort(), this.config.timeoutMs);
     try {
       const response = await this.fetchImpl(endpoint, {
@@ -334,6 +345,7 @@ export class RenderLayer2AProvider {
       return normalizeLayer2AProviderPayload(await readBoundedJson(response, this.config.MAX_RESPONSE_BYTES));
     } finally {
       clearTimeout(timeoutId);
+      unbindAbort();
     }
   }
 
@@ -355,7 +367,24 @@ export class RenderLayer2AProvider {
     return true;
   }
 
-  async check({ url, requestId = null } = {}) {
+  async #sleepWithSignal(ms, signal) {
+    if (!signal) return this.sleep(ms);
+    if (signal.aborted) throw createAbortError(signal.reason);
+
+    let onAbort;
+    const abortPromise = new Promise((_, reject) => {
+      onAbort = () => reject(createAbortError(signal.reason));
+      signal.addEventListener?.("abort", onAbort, { once: true });
+    });
+    try {
+      await Promise.race([Promise.resolve().then(() => this.sleep(ms)), abortPromise]);
+    } finally {
+      signal.removeEventListener?.("abort", onAbort);
+    }
+  }
+
+  async check({ url, requestId = null, signal } = {}) {
+    if (signal?.aborted) throw createAbortError(signal.reason);
     const startedAt = this.clock();
     const normalizedUrl = typeof url === "string" ? url.trim() : "";
     const targetFingerprint = normalizedUrl ? fingerprintTarget(normalizedUrl) : null;
@@ -410,8 +439,9 @@ export class RenderLayer2AProvider {
     const endpoint = `${baseUrl}${LAYER_2A_CONFIG.ENDPOINT_PATH}`;
     let lastError = null;
     for (let attempt = 0; attempt <= this.config.MAX_RETRIES; attempt += 1) {
+      if (signal?.aborted) throw createAbortError(signal.reason);
       try {
-        const normalized = await this.#requestOnce(endpoint, urlGuard.url, baseRequestId);
+        const normalized = await this.#requestOnce(endpoint, urlGuard.url, baseRequestId, signal);
         if (!normalized.ok) {
           this.#recordFailure();
           return createLayer2AResult({
@@ -451,10 +481,11 @@ export class RenderLayer2AProvider {
         this.#putCached(cacheKey, result, normalized.cacheTtlMs || 0);
         return result;
       } catch (error) {
+        if (signal?.aborted) throw createAbortError(signal.reason);
         lastError = error;
         if (attempt < this.config.MAX_RETRIES && this.#isRetryable(error)) {
           const jitter = Math.max(0, Math.min(this.config.RETRY_JITTER_MAX_MS, Math.floor(this.random() * this.config.RETRY_JITTER_MAX_MS)));
-          if (jitter) await this.sleep(jitter);
+          if (jitter) await this.#sleepWithSignal(jitter, signal);
           continue;
         }
         break;

@@ -23,14 +23,18 @@ export class Layer2AReputationService {
     let result;
     try {
       result = typeof provider?.check === "function"
-        ? await provider.check({ url, requestId })
+        ? await provider.check({ url, requestId, signal: options.signal })
         : createLayer2AResult({
           providerStatus: LAYER_2A_PROVIDER_STATUS.UNAVAILABLE,
           finding: LAYER_2A_FINDING.UNKNOWN,
           requestId,
           errorCode: "PROVIDER_CHECK_UNAVAILABLE",
         });
-    } catch {
+    } catch (error) {
+      // Cancellation is control flow, not a provider outage. Let the
+      // orchestrator suppress the stale run instead of publishing UNKNOWN
+      // for a request the caller explicitly cancelled.
+      if (options.signal?.aborted || error?.name === "AbortError") throw error;
       result = createLayer2AResult({
         providerStatus: LAYER_2A_PROVIDER_STATUS.UNAVAILABLE,
         finding: LAYER_2A_FINDING.UNKNOWN,

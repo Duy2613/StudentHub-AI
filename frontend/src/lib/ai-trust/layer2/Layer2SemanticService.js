@@ -113,7 +113,7 @@ export class Layer2SemanticService {
       ocrText: boundedString(metadata.ocrText, SEMANTIC_BOUNDARY_LIMITS.OCR),
       qrPayload: boundedString(metadata.qrContent || metadata.qrPayload, SEMANTIC_BOUNDARY_LIMITS.QR),
       layer1Result,
-      options: {},
+      options: { requestId, signal: options.signal },
     };
 
     let provider = options.provider;
@@ -132,13 +132,15 @@ export class Layer2SemanticService {
       semanticAnalysis = normalizeSemanticAnalysis(rawAnalysis, { source: provider.providerId || "provider" });
       if (!semanticAnalysis) throw new Error("SEMANTIC_PROVIDER_INVALID_RESPONSE");
     } catch (error) {
+      if (options.signal?.aborted) throw error;
       fallbackUsed = true;
       const fallback = new DeterministicSemanticProvider();
       try {
         const rawFallback = await fallback.analyzeSemantics(semanticParams);
         semanticAnalysis = normalizeSemanticAnalysis(rawFallback, { source: fallback.providerId }) ||
           createUnknownSemanticAnalysis("DETERMINISTIC_FALLBACK_INVALID");
-      } catch {
+      } catch (fallbackError) {
+        if (options.signal?.aborted) throw fallbackError;
         semanticAnalysis = createUnknownSemanticAnalysis("DETERMINISTIC_FALLBACK_FAILURE");
       }
       semanticAnalysis.modelStatus = error?.name === "AbortError"

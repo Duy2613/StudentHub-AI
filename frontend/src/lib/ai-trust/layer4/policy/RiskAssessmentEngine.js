@@ -25,6 +25,7 @@ export class RiskAssessmentEngine {
 
     const layer1Signals = asArray(fusedGraph.layer1Signals).filter((item) => item && typeof item === "object" && !Array.isArray(item));
     const layer2ContextSignals = asArray(fusedGraph.layer2ContextSignals).filter((item) => item && typeof item === "object" && !Array.isArray(item));
+    const layer2CDomainSignals = asArray(fusedGraph.layer2CDomainSignals).filter((item) => item && typeof item === "object" && !Array.isArray(item));
     const layer3Evidence = asArray(fusedGraph.layer3Evidence).filter((item) => item && typeof item === "object" && !Array.isArray(item));
     const layer2Claims = asArray(fusedGraph.layer2Claims).filter((item) => item && typeof item === "object" && !Array.isArray(item));
     const layer3Conflicts = asArray(fusedGraph.layer3Conflicts).filter((item) => item && typeof item === "object" && !Array.isArray(item));
@@ -57,7 +58,8 @@ export class RiskAssessmentEngine {
     const hasSuspiciousSignal =
       fusedGraph?.layer1Status === "SUSPICIOUS" ||
       fusedGraph?.layer2Status === "SUSPICIOUS" ||
-      fusedGraph?.layer2Classification === "DECEPTIVE";
+      fusedGraph?.layer2Classification === "DECEPTIVE" ||
+      (typeof fusedGraph?.layer2CClassification === "string" && !["NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN"].includes(fusedGraph.layer2CClassification));
     const threatProviderFailed = fusedGraph?.layer2AResult &&
       !["SUCCESS", "success", "healthy"].includes(fusedGraph.layer2AProviderStatus) &&
       fusedGraph.layer2AFinding !== "NO_KNOWN_THREAT";
@@ -105,6 +107,13 @@ export class RiskAssessmentEngine {
     if (hasPartial) {
       primaryVectors.push(LAYER_4_CONFIG.HARM_CATEGORIES.ACADEMIC_MISINFORMATION);
       riskScore = Math.max(riskScore, 0.50);
+    }
+
+    // L2C is advisory domain intelligence. It can raise suspicion/risk but it
+    // never becomes a hard block and never clears stronger negative evidence.
+    if (fusedGraph?.layer2CClassification && !["NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN"].includes(fusedGraph.layer2CClassification)) {
+      primaryVectors.push("student_domain_risk_pattern");
+      riskScore = Math.max(riskScore, layer2CDomainSignals.some((signal) => ["CRITICAL", "HIGH", "critical", "high"].includes(signal.severity)) ? 0.75 : 0.55);
     }
 
     if (hasSuspiciousSignal) {

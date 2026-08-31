@@ -111,6 +111,8 @@ function getLocalSuspicion(fusedGraph, riskAssessment) {
   return fusedGraph?.layer1Status === "SUSPICIOUS" ||
     fusedGraph?.layer2Status === "SUSPICIOUS" ||
     fusedGraph?.layer2Classification === "DECEPTIVE" ||
+    (typeof fusedGraph?.layer2CClassification === "string" &&
+      !["NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN"].includes(fusedGraph.layer2CClassification)) ||
     riskAssessment?.level === SECURITY_RISK_LEVEL.HIGH ||
     riskAssessment?.level === SECURITY_RISK_LEVEL.MEDIUM;
 }
@@ -134,6 +136,7 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
       layer1Signals: asArray(fusedGraph.layer1Signals),
       layer2ContextSignals: asArray(fusedGraph.layer2ContextSignals),
       layer2CrossModalFindings: asArray(fusedGraph.layer2CrossModalFindings),
+      layer2CDomainSignals: asArray(fusedGraph.layer2CDomainSignals),
       layer2Claims: asArray(fusedGraph.layer2Claims),
       layer3Sources: asArray(fusedGraph.layer3Sources),
       layer3Evidence: asArray(fusedGraph.layer3Evidence),

@@ -81,6 +81,7 @@ export class ModelRouter {
     jsonMode = false,
     timeoutMs = AI_GATEWAY_CONFIG.SLA.DEFAULT_TIMEOUT_MS,
     maxOutputTokens = AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS,
+    signal,
     parseResponse = null,
     validateResponse = null,
   }) {
@@ -112,6 +113,11 @@ export class ModelRouter {
     let lastError = null;
 
     for (const entryId of chain) {
+      if (signal?.aborted) {
+        const error = signal.reason instanceof Error ? signal.reason : new Error("AI gateway request cancelled");
+        error.name = "AbortError";
+        throw error;
+      }
       const catalogEntry = AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId];
       if (!catalogEntry) {
         attempts.push(createAttemptRecord({
@@ -147,9 +153,13 @@ export class ModelRouter {
 
       const maxAttempts = 1 + AI_GATEWAY_CONFIG.RETRY.MAX_RETRIES_PER_CANDIDATE;
       for (let attemptIndex = 0; attemptIndex < maxAttempts; attemptIndex += 1) {
+        if (signal?.aborted) {
+          const error = signal.reason instanceof Error ? signal.reason : new Error("AI gateway request cancelled");
+          error.name = "AbortError";
+          throw error;
+        }
         const startedAt = Date.now();
         try {
-          // eslint-disable-next-line no-await-in-loop
           const { text } = await provider.generate({
             catalogEntry,
             systemPrompt: boundedSystemPrompt,
@@ -157,6 +167,7 @@ export class ModelRouter {
             jsonMode,
             timeoutMs: boundedTimeout,
             maxOutputTokens: boundedOutputTokens,
+            signal,
           });
 
           let parsedResponse;
@@ -228,6 +239,7 @@ export class ModelRouter {
             attempts,
           };
         } catch (err) {
+          if (signal?.aborted) throw err;
           const latencyMs = Date.now() - startedAt;
           const errorType = err.gatewayErrorType || GATEWAY_ERROR_TYPE.NETWORK_ERROR;
           lastError = { errorType, errorMessage: sanitizeGatewayError(errorType, err.message) };

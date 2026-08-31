@@ -14,6 +14,20 @@ import { PROVIDER_FAMILY, GATEWAY_ERROR_TYPE } from "../types.js";
 const GEMINI_ENDPOINT_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 const MAX_PROVIDER_RESPONSE_BYTES = 2 * 1024 * 1024;
 
+function createAbortError(reason) {
+  const error = reason instanceof Error ? reason : new Error("AI provider request cancelled");
+  error.name = "AbortError";
+  return error;
+}
+
+function bindAbortSignal(controller, signal) {
+  if (!signal || typeof signal.addEventListener !== "function") return () => {};
+  const onAbort = () => controller.abort(signal.reason);
+  if (signal.aborted) onAbort();
+  else signal.addEventListener("abort", onAbort, { once: true });
+  return () => signal.removeEventListener?.("abort", onAbort);
+}
+
 async function readJsonBounded(response) {
   const contentLength = Number(response?.headers?.get?.("content-length") || 0);
   if (Number.isFinite(contentLength) && contentLength > MAX_PROVIDER_RESPONSE_BYTES) {
@@ -38,7 +52,8 @@ export class GeminiProvider extends IModelProvider {
     return Boolean(this.env.GEMINI_API_KEY || this.env.GOOGLE_GENERATIVE_AI_API_KEY);
   }
 
-  async generate({ catalogEntry, systemPrompt, userPrompt, jsonMode = false, timeoutMs = 2500, maxOutputTokens = 1024 }) {
+  async generate({ catalogEntry, systemPrompt, userPrompt, jsonMode = false, timeoutMs = 2500, maxOutputTokens = 1024, signal }) {
+    if (signal?.aborted) throw createAbortError(signal.reason);
     const apiKey = this.env.GEMINI_API_KEY || this.env.GOOGLE_GENERATIVE_AI_API_KEY;
 
     if (!apiKey) {
@@ -50,6 +65,7 @@ export class GeminiProvider extends IModelProvider {
     const boundedTimeout = Math.min(Math.max(Number(timeoutMs) || 2500, 250), 30000);
     const boundedOutputTokens = Math.min(Math.max(Math.floor(Number(maxOutputTokens) || 1), 1), 8192);
     const controller = new AbortController();
+    const unbindAbort = bindAbortSignal(controller, signal);
     const timeoutId = setTimeout(() => controller.abort(), boundedTimeout);
 
     try {
@@ -77,6 +93,7 @@ export class GeminiProvider extends IModelProvider {
           },
         }),
       });
+      if (signal?.aborted) throw createAbortError(signal.reason);
 
       if (!response.ok) {
         const err = new Error("Gemini provider returned an HTTP error");
@@ -86,6 +103,7 @@ export class GeminiProvider extends IModelProvider {
       }
 
       const json = await readJsonBounded(response);
+      if (signal?.aborted) throw createAbortError(signal.reason);
       const text = json?.candidates?.[0]?.content?.parts?.[0]?.text;
 
       if (!text) {
@@ -96,6 +114,7 @@ export class GeminiProvider extends IModelProvider {
 
       return { text };
     } catch (err) {
+      if (signal?.aborted) throw createAbortError(signal.reason);
       if (err.name === "AbortError") {
         const timeoutErr = new Error("Gemini provider timed out");
         timeoutErr.gatewayErrorType = GATEWAY_ERROR_TYPE.TIMEOUT;
@@ -107,6 +126,7 @@ export class GeminiProvider extends IModelProvider {
       throw err;
     } finally {
       clearTimeout(timeoutId);
+      unbindAbort();
     }
   }
 }

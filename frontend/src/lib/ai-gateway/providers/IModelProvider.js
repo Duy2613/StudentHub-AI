@@ -19,7 +19,7 @@ export class IModelProvider {
    * @param {object} catalogEntry - entry from AI_GATEWAY_CONFIG.MODEL_CATALOG
    * @returns {boolean} true if required secrets/config are present
    */
-  isConfigured(catalogEntry) {
+  isConfigured() {
     throw new Error(`isConfigured() must be implemented by ${this.constructor.name}`);
   }
 
@@ -32,9 +32,10 @@ export class IModelProvider {
    * @param {boolean} [params.jsonMode] - request structured JSON output
    * @param {number} [params.timeoutMs]
    * @param {number} [params.maxOutputTokens]
+   * @param {AbortSignal} [params.signal] - caller cancellation signal
    * @returns {Promise<{ text: string }>} raw text content (JSON-mode text is still a string)
    */
-  async generate({ catalogEntry, systemPrompt, userPrompt, jsonMode, timeoutMs, maxOutputTokens }) {
+  async generate() {
     throw new Error(`generate() must be implemented by ${this.constructor.name}`);
   }
 }
