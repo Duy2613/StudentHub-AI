@@ -4,7 +4,7 @@ Status: evidence-bound handoff. This report does not claim government certificat
 
 ## 1. Authority and scope
 
-The user request defined the work: harden Layers 1, 2A, 2B, 3, and 4; red-team them; add regression coverage; run repository and CI gates; preserve PR #2 as Draft; and never merge `main`.
+The user request defined the work: harden Layers 1, 2A, 2B, 3, and 4; audit and upgrade the remaining repository capabilities; red-team them; add regression coverage; run repository and CI gates; preserve PR #2 as Draft; and never merge `main`.
 
 The attached master prompt at `D:\Download\STUDENTHUBAI_LUNA_MAX_SOVEREIGN_HIGH_ASSURANCE_TRUST_ENGINE_MASTER_PROMPT.md` was read completely and supplied the M3 exit gates, Section 63 system gate, Section 70 reporting format, and the explicit runtime-state/degradation rules. Repository `AGENTS.md` and the Obsidian vault were consulted. Attached-document instructions were treated as acceptance criteria, not as authorization to merge, certify, or invent external evidence.
 
@@ -13,11 +13,12 @@ The state matrices used during implementation are recorded in [`docs/TRUST-ENGIN
 ## 2. Revision and repository state
 
 - Tested Trust Engine implementation SHA: `86bca0d7163477d52232bd098438ce4cc9f9fba4` (`security(trust): harden trust engine boundaries`).
+- Whole-system hardening SHA: `0bfcfbea010963d614efd13f7cc4f6726adb4bd2` (`security: harden whole-system trust boundaries`).
 - Baseline SHA before implementation: `ea30f901db3ddf3e30614342617418d1ce361e63`.
-- Branch: `develop`; implementation push completed to `origin/develop`.
+- Branch: `develop`; whole-system commit is ready for the authorized push to `origin/develop`.
 - `main` SHA observed before handoff: `251e7cb4a908c5a185be89a39301b294f9595dbf`.
-- Implementation worktree at verification: clean; `git status --short --branch` returned `## develop...origin/develop`.
-- PR #2 raw API state at implementation publication: `number=2 state=open draft=True merged=False head=86bca0d7163477d52232bd098438ce4cc9f9fba4 base=main`.
+- Implementation worktree before report publication: clean after commit; `git status --short --branch` returned `## develop...origin/develop [ahead 1]`.
+- PR #2 was previously observed as `number=2 state=open draft=True merged=False base=main`; its head must be rechecked after the whole-system push.
 
 No merge operation was performed. PR #2 remains Draft and `main` was not changed.
 
@@ -299,25 +300,40 @@ The retired client-composed routes return explicit 410 responses: `frontend/src/
 
 ## 12. Full repository, browser, and CI evidence
 
+### 12.1 Whole-system maximum-upgrade evidence
+
+The repository-wide directive is recorded in [`docs/WHOLE-SYSTEM-MAXIMUM-UPGRADE-DIRECTIVE.md`](WHOLE-SYSTEM-MAXIMUM-UPGRADE-DIRECTIVE.md). The current hardening commit adds a memory-only provider-auth boundary and server-owned opaque session flow at `frontend/src/lib/supabase/client.js:21` (`dynamicAuthStorage`), `frontend/src/lib/auth/authService.js:217` (`exchangeApplicationSession`), `frontend/src/lib/auth/authService.js:281` (serialized auth subscription), and `frontend/src/lib/auth/AuthContext.jsx:207` (authority-first initialization). It adds bounded cryptographic identifiers at `frontend/src/lib/security/secureId.js:28` (`createSecureId`), initial academic authority enforcement at `frontend/src/lib/intelligence/academic/academicDocumentFetcher.js`, and cookie precedence at `frontend/src/lib/security/identity/IdentityResolver.js:35` (`resolvePrincipal`).
+
+The exact current focused raw results are:
+
+```text
+Auth resilience and authority ordering: ℹ tests 14 / ℹ pass 14 / ℹ fail 0 / EXIT_CODE=0
+Final audit hardening:                 ℹ tests 7  / ℹ pass 7  / ℹ fail 0 / EXIT_CODE=0
+Secure identifier contracts:           ℹ tests 4  / ℹ pass 4  / ℹ fail 0 / EXIT_CODE=0
+Academic source watcher:               ℹ tests 9  / ℹ pass 9  / ℹ fail 0 / EXIT_CODE=0
+Trust boundary combination:            ℹ tests 42 / ℹ pass 42 / ℹ fail 0 / EXIT_CODE=0
+```
+
+The named tests proving those rows are `frontend/tests/auth/auth_resilience_contracts.test.mjs` (`does not let browser storage failure prevent provider logout`, `checks the authoritative application session before restoring demo cache`, and `serializes Supabase auth subscription after initial session reconciliation`), `frontend/tests/security/final_audit_hardening.test.mjs` (`treats the server-owned cookie as authoritative over a conflicting bearer`), `frontend/tests/security/secure_id_contracts.test.mjs` (`contains no non-cryptographic random ID generator in authoritative ID paths`), `frontend/tests/academic/academic_source_watcher.test.mjs` (`S2.4: Initial official authority is checked before any transport call`), and `frontend/tests/trust/trust_engine_high_assurance.test.mjs` (`FALSE_SAFE_GOOGLE_CANARY_P0` and `MOCK_REQUIRED_L2A_PIPELINE_REMAINS_UNKNOWN_AND_REVIEW_ONLY`).
+
 Discovered regression suite:
 
 ```text
-[QUALITY_GATE] PASS: 258/258 discovered test files
+[QUALITY_GATE] PASS: 260/260 discovered test files
 ```
 
-Full quality gate (`npm run test:quality`) raw highlights:
+Final quality/build raw highlights:
 
 ```text
-✖ 351 problems (0 errors, 351 warnings)
+[QUALITY_GATE] PASS: 260/260 discovered test files
+✖ 349 problems (0 errors, 349 warnings)
   0 errors and 1 warning potentially fixable with the --fix option.
-✓ Compiled successfully in 15.0s
-✓ Finished TypeScript in 1342ms
-✓ Collecting page data using 15 workers in 1591ms
-✓ Generating static pages using 15 workers (116/116) in 919ms
-[QUALITY_GATE] PASS: 258/258 discovered test files
+✓ Compiled successfully in 4.4s
+  Finished TypeScript in 3.0s ...
+✓ Generating static pages using 15 workers (116/116) in 1043ms
 ```
 
-The quality command exited 0. TypeScript also exited with `TSC_EXIT=0`. The four repository layer scripts exited 0 with raw final counts `Layer 1 TP=57 TN=66 FP=0 FN=0`, `Layer 2 14/14 passed, 0 failed`, `Layer 3 8/8 passed, 0 failed`, and `Layer 4 8/8 passed, 0 failed`.
+The final `npm test`, `npm run build`, and `npx tsc --noEmit --pretty false` commands exited 0. The four repository layer scripts exited 0 with raw final counts `Layer 1 TP=57 TN=66 FP=0 FN=0`, `Layer 2 14/14 passed, 0 failed`, `Layer 3 8/8 passed, 0 failed`, and `Layer 4 8/8 passed, 0 failed`.
 
 Security and contract gates:
 
@@ -348,9 +364,9 @@ npm run audit:api-auth
 Wrote docs\security\API-Authorization-Inventory.md with 136 handlers.
 
 npm run audit:bundle
-[BUNDLE_MEASURE] /trust initial JS: 379622 bytes across 5 chunks.
-[BUNDLE_MEASURE] /community initial JS: 335899 bytes across 4 chunks.
-[BUNDLE_MEASURE] /expert initial JS: 337882 bytes across 4 chunks.
+[BUNDLE_MEASURE] /trust initial JS: 380189 bytes across 5 chunks.
+[BUNDLE_MEASURE] /community initial JS: 336466 bytes across 4 chunks.
+[BUNDLE_MEASURE] /expert initial JS: 338449 bytes across 4 chunks.
 [BUNDLE_BUDGET] /trust budget: 500000 bytes.
 [BUNDLE_BUDGET] PASS
 ```
@@ -360,15 +376,14 @@ The scanned secret-pattern command returned `SECRET_SCAN_EXIT=1` with no output;
 Browser and responsive evidence:
 
 ```text
-Trust Chromium E2E: 3 skipped, 14 passed (35.2s), TEST_EXIT=0
-Trust WebKit E2E: 3 skipped, 14 passed (1.1m), TEST_EXIT=0
-Mobile Chromium: 15 passed (40.7s), TEST_EXIT=0
-Accessibility + visual: 11 passed (23.7s), TEST_EXIT=0
+Full Chromium E2E: 3 skipped, 56 passed (1.8m), TEST_EXIT=0
+WebKit Evidence Case Lab: 6 passed (15.9s), TEST_EXIT=0
+Responsive/reduced-motion mobile matrix: 4 passed (7.6s), TEST_EXIT=0
 ```
 
 The Trust visual baselines were intentionally regenerated for the implemented navigation/provider-state topology, then the complete accessibility/visual command passed `11/11`. Local Firefox could not launch the installed executable and produced `Error: browserType.launch: spawn UNKNOWN`, followed by `14 failed`, `6 skipped`, `14 passed`, `TEST_EXIT=1`. The remote GitHub Firefox gate passed, so this local executable-launch failure remains an environment limitation rather than an application assertion result.
 
-Remote evidence after pushing the implementation:
+Remote evidence from the prior Trust implementation publication (the whole-system SHA still requires a fresh remote run after push):
 
 ```text
 COMMIT_STATUS state=success total=2
@@ -385,8 +400,9 @@ Both remote `quality` jobs completed successfully, including install, lint, prod
 1. Layer 2A: the one-time Render `google.com` state probe returned no body and exited 1 after timeout/interruption; `STUDENTHUB_LAYER2_BASE_URL` was unset. The required verdict is `L2A_M3_BLOCKED_BY_EXTERNAL_BACKEND`. The official phishing canary separately returned `DANGEROUS`, so no `BACKEND_DEFECT` was declared.
 2. Layer 2B: no AI gateway credentials or URL were configured; the deterministic fallback passed its adversarial tests, but a live gateway M3 claim is unavailable. Verdict: `L2B_M3_BLOCKED_BY_MISSING_EVIDENCE`.
 3. Layer 3: no retrieval-provider URL was configured; the local knowledge base and guarded failure path passed, but live independent retrieval evidence is unavailable. Verdict: `L3_M3_BLOCKED_BY_MISSING_EVIDENCE`.
-4. The live database phase was not runnable locally: `npm run test:phase3-live` returned exactly `BLOCKED_BY_DATABASE_ENV: STUDENTHUB_RLS_TEST_DATABASE_URL is required` and exited 1. This is an external environment blocker, not a passing database claim.
+4. The live database phase was not runnable locally: `npm run test:phase3-live` returned exactly `BLOCKED_BY_DATABASE_ENV: STUDENTHUB_RLS_TEST_DATABASE_URL is required` and exited 2. This is an external environment blocker, not a passing database claim.
 5. Local Firefox launch returned `spawn UNKNOWN`; remote Firefox CI passed. No local Firefox pass is claimed.
+6. Vercel CLI deployment was not authorized in this runtime: `Vercel CLI 54.7.1` returned `No existing credentials found. Starting login flow...` and entered device authentication. No Preview or Production deployment is claimed without a real account credential/project link.
 
 ## 14. Final verdicts
 
