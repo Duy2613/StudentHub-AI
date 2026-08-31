@@ -483,6 +483,18 @@ Preview deployment URLs:
 * student-hub-ai-weje Preview:
   https://student-hub-ai-weje-git-codex-trust-engine-v5-17eaab-vi-be-city.vercel.app
 
+Fresh HTTP recheck after the report commit produced these raw status lines:
+
+~~~text
+200 https://student-hub-ai-weje-git-codex-trust-engine-v5-17eaab-vi-be-city.vercel.app/trust
+302 https://vercel.com/sso-api?url=https%3A%2F%2Fstudent-hub-ai-git-codex-trust-engine-v5-sequ-cf3d7a-vi-be-city.vercel.app%2Ftrust&nonce=<ephemeral>
+~~~
+
+The weje Preview is publicly reachable for the tested route. The
+student-hub-ai Preview is deployment-successful but protected by Vercel
+authentication in this environment; its public route is therefore
+UNVERIFIED_CLAIM — requires human verification.
+
 The Vercel CLI was not authenticated in this environment, but the repository
 Vercel integration completed both Preview deployments and GitHub checks.
 
