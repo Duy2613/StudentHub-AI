@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
 import { analyzeContractIntelligence } from "@/lib/intelligence/contract/contractIntelligenceEngine";
 import { computeDocumentVersionDiff, extractDocumentIntelligence } from "@/lib/intelligence/document/documentVersionDiffEngine";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
 /**
  * POST /api/contract-check/analyze
  * Body: { mode: "CONTRACT_CHECK" | "VERSION_DIFF", type: "HOUSING" | "EMPLOYMENT", text: string, textV1?: string, textV2?: string }
  */
-export async function POST(request) {
+async function analyzeContract(request) {
   try {
     const body = await request.json();
     const { mode = "CONTRACT_CHECK", type = "HOUSING", text = "", textV1 = "", textV2 = "" } = body || {};
+    if (!["CONTRACT_CHECK", "VERSION_DIFF"].includes(mode) || !["HOUSING", "EMPLOYMENT"].includes(type) ||
+        [text, textV1, textV2].some(value => typeof value !== "string" || value.length > 80_000)) {
+      return Response.json({ success: false, error: {
+        code: "CONTRACT_INPUT_INVALID",
+        userMessage: "Văn bản hoặc chế độ phân tích không hợp lệ.",
+        retryable: false
+      } }, { status: 400 });
+    }
 
     if (mode === "VERSION_DIFF") {
       if (!textV1 || !textV2) {
@@ -65,10 +74,13 @@ export async function POST(request) {
       legalDisclaimer: analysis.legalDisclaimer,
     });
   } catch (error) {
-    console.error("[Contract Check API Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi bóc tách hợp đồng." },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "ANALYZE_CONTRACT",
+  allowAnonymous: true,
+  maxRequests: 20,
+  maxBodyBytes: 256 * 1024,
+}, analyzeContract);

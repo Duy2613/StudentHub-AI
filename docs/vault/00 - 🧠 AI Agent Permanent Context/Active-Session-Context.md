@@ -1,6 +1,45 @@
 # ⚡ Active Session Context & Working State
 > **Vault Node**: `Active-Session-Context` | **Tags**: `#active-session` `#state` `#v9-reality-first` `#mlops`
 
+## 2026-08-29 - Feature freeze cross-system completion
+
+- Student Decision Twin and Living Evidence Passport are now production domain contracts with PostgreSQL schema/repository, RLS policies, owner-bound API v1 routes, immutable Passport revisions, deterministic decision factors, and demo/live separation.
+- `/cases` is the Evidence Case Lab: three explicitly labeled deterministic competition superflows for fake scholarship, fake internship, and academic information conflict.
+- Each superflow exposes Official, Community, Expert, conflicts, unknowns, Evidence Passport history, Decision Twin options, and one next clear move.
+- New motion uses CSS 3D and `motion/react` client isolation with mobile collapse and reduced-motion fallback; no heavy WebGL was added to a core route.
+- Verified baseline: production build 106 pages; 243/243 discovered test files pass; new Chromium desktop/mobile/API gate 3/3 pass; API inventory 125 handlers with zero unprotected mutations requiring P0 review.
+- Freeze verdict: `FEATURE FREEZE READY WITH EXTERNAL PROVIDER BLOCKERS`. Live PostgreSQL/RLS, session restart, staging, and provider proof remain environment-blocked.
+- Canonical handoff: `FEATURE-FREEZE-REPORT.md` and `docs/POST-FEATURE-FREEZE-AUDIT-BACKLOG.md`. No new major pillar should be added before competition.
+
+## 2026-08-28 — Frontend V2 competition core
+
+- Landing page `/` đã được tái thiết kế thành **The Living Campus Atlas**: 4 chương điện ảnh, editorial typography Việt, Trust pipeline tương tác, accordion Intelligence theo Official / Community / Expert, CTA và footer tối giản.
+- Loại bỏ homepage 500vh 3D-highway nhiều lớp và các overlay cạnh tranh; thay bằng parallax transform/opacity, responsive layout, keyboard focus, skip link và reduced-motion guard.
+- Bộ ảnh nguyên bản dùng cho landing page nằm tại `frontend/public/images/atlas/`, được tạo riêng theo palette off-black / ivory / mineral mint và tối ưu WebP.
+- Entry point: `frontend/src/components/landing/LivingCampusAtlas.jsx`; visual system cô lập tại `living-campus-atlas.module.css` để không ảnh hưởng authenticated surfaces.
+- Verification landing: targeted ESLint pass; production build 102 routes pass; Playwright render ở 1440×900 và 390×844 không có horizontal overflow.
+- Primary product information architecture is now `Trust / Community / Experts` in `UnifiedAppShell`; personal destinations remain secondary.
+- `/trust` is the canonical competition flow: image/text/URL input, lazy browser OCR labeled `CLIENT_OCR_HINT`, actual four-layer pipeline status, separate risk/confidence/evidence/source-agreement signals, evidence reasons, case timeline, truthful related-case empty state, lazy 2D TrustGraph with list fallback, and Community/Expert handoff.
+- `/scam-check` is a compatibility redirect to `/trust`; its previous WebGL/audio/HUD page is no longer a second Trust implementation.
+- `/community` is presented as Student Collective Intelligence; `/expert` emphasizes domain scope and removes the leaderboard-style reputation-points treatment.
+- Core frontend network calls begin migration through `frontend/src/lib/api/` with normalized errors and `credentials: include`.
+- Frontend audit and route classification: `docs/frontend/FRONTEND-AUDIT.md`.
+- Verified gates: targeted lint 0 errors/0 warnings; full lint 0 errors/336 warnings; Next.js production build passes with 102 pages; `/trust` initial JS 356,857 bytes under the 500,000-byte budget; runtime GET for Trust/Community/Expert returns 200; legacy route returns 307 to `/trust`; 239/239 discovered test files pass.
+- Frontend verification phase completed: Playwright and axe are installed; 48/48 desktop/mobile Chromium browser tests pass; 239/239 discovered regression files pass; build produces 102 routes; lint has 0 errors/336 warnings; production dependency audit has 0 vulnerabilities.
+- Runtime contracts now normalize typed failures, preserve Retry-After/trace IDs, validate core response status with Zod, cancel stale scans, and keep provider clean/findings/unavailable states distinct.
+- Initial JavaScript after deferring analysis-only validators: Trust 360,164 B, Community 325,808 B, Expert 327,837 B. Trust is below the 500,000 B competition gate.
+- Current frontend boundaries: E2E provider responses are deterministic browser fixtures rather than staging proof; Chromium is covered but Firefox/WebKit are not; shared CSS and 336 legacy lint warnings remain debt; browser OCR degradation is verified but accuracy was not re-benchmarked.
+- Final evidence: `docs/frontend/VERIFICATION-SPEC.md`, `docs/frontend/PERFORMANCE.md`, `COMPETITION-DEMO.md`, `FINAL-FRONTEND-AUDIT.md`.
+
+## 2026-08-27 — V2 continuation checkpoint
+
+- PHASE 1 API/security triage completed against the uncommitted working tree.
+- All 116 handlers have an explicit `PUBLIC`, `AUTHENTICATED`, `ADMIN`, or `SERVICE_ONLY` inventory class; unclassified mutation P0 count is now zero.
+- Public analyzers have rate/body limits; stateful legacy mutations derive actors server-side; the catch-all proxy is restricted to four auth contracts.
+- Server OCR now reports `SERVER_OCR_NOT_CONFIGURED` instead of claiming image-byte OCR; client text is labeled `CLIENT_OCR_HINT`.
+- Current verified gates: build/TypeScript pass, 236/236 discovered test files pass, lint 0 errors/341 warnings, dependency audit clean, bundle budget pass.
+- Active next phase: Supabase/OIDC identity unification, gated by durable session/revocation persistence and RLS infrastructure. See `docs/EXECUTION_STATE.md` and `docs/architecture/adr/ADR-001-Identity-Authority.md`.
+
 ---
 
 ## 1. Trạng Thái Hiện Tại (Current Working Snapshot)
@@ -205,6 +244,44 @@
         - **Giao Diện Trực Quan (`CommunityIntelligenceView.jsx`, `/community`)**: Khám phá nhật ký trải nghiệm thực tế, ma trận đồng thuận và khiên chống spam.
         - **Tập Kiểm Chuẩn Toàn Diện**: **575/575 Tests PASS (100.0%)** trên 122 test files, 181 suites. **63/63 Mutants KILLED**. 3/3 chu kỳ lặp lại tất định.
 
+    28. ✅ **Khung Bảo Mật Không Tin Cậy Zero-Trust Security Fabric Promax V1 (Identity, RBAC/ABAC/ReBAC, Capability Tokens, Purpose Binding, Risk-Adaptive Engine & AI Tool Firewall)**:
+        - **Bất Biến Danh Tính Máy Chủ Tối Thượng (`IDENTITY ESTABLISHED EXCLUSIVELY FROM AUTHENTICATED CONTEXT`)**: Triệt tiêu hoàn toàn thói quen tin tưởng `studentId` hoặc `role` do frontend/client gửi lên. Identity xác lập từ `SecurityPrincipal` sau khi kiểm định chữ ký mật mã JWT (`iss`, `aud`, `sub`, `exp`, `nbf`) và trạng thái phiên `SessionManager` (timeout 30m idle, 24h absolute, thu hồi tức thì).
+        - **Động Cơ Phân Quyền Tập Trung 11 Bước (`AuthorizationEngine.js`)**: Kiểm soát chặt chẽ quy trình `HARD DENY ➔ AUTHENTICATION ➔ SESSION ➔ SCOPE ➔ RBAC ➔ ABAC ➔ ReBAC ➔ CAPABILITY ➔ PURPOSE ➔ RISK ➔ ALLOW`.
+        - **Phòng Thủ BOLA & BFLA Đa Tầng (`ObjectAuthorizer.js`, `FunctionAuthorizer.js`)**: Đảm bảo sinh viên A không thể đọc/sửa bất kỳ tài nguyên nào của sinh viên B nếu không có ủy quyền; chặn đứng các hành động nhạy cảm hoặc sửa đổi quy chế học vụ chính thức (`ACADEMIC.MODIFY_OFFICIAL` bị cấm tuyệt đối).
+        - **Thẻ Năng Lực Đơn Kỳ Chống Tấn Công Replay (`CapabilityManager.js`)**: Phát hành capability có chữ ký HMAC, giới hạn số lần sử dụng (`maxUses: 1`), phát hiện và chặn đứng 100% tấn công phát lại (Replay Attacks).
+        - **Ràng Buộc Mục Đích Nghiệp Vụ Tường Minh (`PurposeValidator.js`)**: Yêu cầu khai báo mục đích hợp lệ (`ACADEMIC_PLANNING`, `TRUST_ANALYSIS`, `EXPORT_REQUEST`), từ chối hành vi mở rộng quyền hạn ngầm định.
+        - **Động Cơ Rủi Ro Thích Ứng & Thách Thức Nâng Cấp Xác Thực (`RiskEngine.js`)**: Tự động kích hoạt cơ chế Step-Up Challenge (`AAL2_STEP_UP`) khi phát hiện hành động có rủi ro cao (xuất bảng điểm toàn khóa, đổi cấu hình bảo mật).
+        - **Định Danh AI Agent & Tường Lửa Công Cụ AI (`AgentIdentity.js`, `AiDelegationEngine.js`, `AiToolFirewall.js`)**: AI Agent có định danh riêng (`AcademicPlannerAgent`, `TrustVerifierAgent`), hoạt động theo ủy quyền thu hẹp từ sinh viên, chỉ được triệu gọi công cụ trong danh mục cho phép (Tool Allowlist), tự động lọc bỏ chỉ thị Prompt Injection và tối thiểu hóa dữ liệu đầu ra (`PropertyFilter.js`).
+        - **Tập Kiểm Chuẩn An Ninh 10 Vector Tấn Công (`test:security`)**: **25/25 Tests PASS (100.0%)** trên 4 test suites (`security_fabric_attack_simulation`, `security_token_session`, `security_ai_tool_firewall`, `security_fabric_integration`), 0 lỗ hổng. Master suite đạt **822/822 Tests PASS (100.0%)**.
+
+    29. ✅ **Mạng Lưới Trí Tuệ Học Vụ Hợp Nhất T1–T4 Intelligence Fabric Promax V1 (Trust + Expert + Community + Evidence Fusion + Contradiction Engine + Brier Calibration + Grounded AI Recommendations)**:
+        - **Bất Biến Nhận Thức Luận Cốt Lõi (`EPISTEMIC INVARIANTS`)**: `TRUST ≠ TRUTH`, `REPUTATION ≠ EXPERTISE`, `POPULARITY ≠ EVIDENCE`, `COMMUNITY CONSENSUS ≠ FACT`, `CONFIDENCE ≠ CERTAINTY`, `AI REASONING ≠ AUTHORIZATION`.
+        - **T1 Động Cơ Tin Cậy Đa Chiều (`TrustIntelligenceEngine.js`, `TrustExplanationEngine.js`, `ReputationGraph.js`)**: 10 chiều tin cậy phân lập (Identity, Behavior, Contribution, Evidence, Academic, Community, Expertise, Consistency, Temporal, Integrity). Điểm uy tín phân nhánh theo chủ đề với độ suy giảm theo thời gian (Half-life = 90 ngày) và cơ chế chống cấu kết/thao túng phiếu (`POTENTIAL_COORDINATION`).
+        - **T2 Động Cơ Chuyên Gia & Ranh Giới Thẩm Quyền (`ExpertDiscoveryEngine.js`, `ExpertReliabilityTracker.js`)**: Phân tách triệt để giữa phạm vi chuyên môn (`EXPERTISE`) và độ tin cậy lịch sử (`RELIABILITY`). Xếp hạng đa tín hiệu kết hợp yếu tố xung đột lợi ích minh bạch.
+        - **T3 Động Cơ Trí Tuệ Cộng Đồng & Quản Trị Mệnh Đề (`CommunityClaimExtractor.js`, `CommunityConsensusEngine.js`, `CommunityCorrectionSystem.js`)**: Mệnh đề thực tế First-Class Claim bảo lưu văn bản gốc trong `ProvenanceGraph`. Tính toán đồng thuận theo trọng số minh chứng, bảo tồn góc nhìn thiểu số (`Minority Signal`) và phân hóa khóa đào tạo. Nhật ký đính chính bất biến không xóa đè lịch sử.
+        - **T4 Hợp Nhất Minh Chứng & Bộ Phân Loại Mâu Thuẫn 6 Dạng (`ContradictionEngine.js`, `ConflictResolutionEngine.js`, `SnapshotReproducibilityStore.js`)**: 4 tầng tri thức (Official Truth, AI Reasoning, Expert Interpretation, Community Reality). Phân loại mâu thuẫn thời gian, phạm vi và phiên bản. Ưu tiên quy chế chính thức nhưng bảo tồn sắc thái vận hành thực tế (ví dụ: Cổng quy định mở 24h nhưng thường nghẽn lúc 22h).
+        - **Hiệu Chuẩn Độ Tin Cậy & Brier Score (`ConfidenceCalibrationEngine.js`)**: Đánh giá độ lệch xác suất lịch sử theo công thức Brier Score ($BS < 0.15$), triệt tiêu ảo tưởng chắc chắn toán học ($C < 0.98$).
+        - **Động Cơ Khuyến Nghị AI Có Căn Cứ & Vòng Lặp Phản Hồi (`AiRecommendationEngine.js`, `AiContextCompiler.js`, `OutcomeFeedbackEngine.js`)**: Tạo khuyến nghị `RecommendationObject` giải trình rõ "Tại sao? Dựa trên minh chứng nào? Có giả định bất định gì? Phương án thay thế là gì?". Tối thiểu hóa dữ liệu trước khi nạp vào AI Agent. Vòng lặp phản hồi kết quả thực tế (Closed-Loop Outcome Feedback) tự động cập nhật Brier Calibration và điểm uy tín chuyên gia.
+        - **Tập Kiểm Chuẩn Trí Tuệ Toàn Diện (`test:intelligence-fabric`)**: **26/26 Tests PASS (100.0%)** trên 7 test suites bao gồm 10 kịch bản Ma trận Kháng cự (Adversarial Matrix). Toàn bộ Master Suite đạt **848/848 Tests PASS (100.0%)**.
+
+    30. ✅ **Tái Thiết Cấu Trúc Sản Phẩm, Bản Sao Số Cá Nhân Hóa & Trung Tâm Điều Phối (Personal Digital Twin + Personal Command Center + Cross-Device Continuity + Privacy Trust Center V1)**:
+        - **Bản Sao Số Cá Nhân Hóa 5 Tầng Dữ Liệu (`PersonalDigitalTwin.js`)**: Phân loại rành mạch 5 tầng (`INSTITUTION_PROVIDED`, `SYSTEM_DERIVED`, `USER_OWNED`, `COMMUNITY_DERIVED`, `SECURITY_SENSITIVE`). Cam kết tuyệt đối chống giám sát xâm lấn (**Anti-Surveillance Guarantee**: Không quét trình duyệt, không đọc tệp tin/clipboard, không nghe lén).
+        - **Đồng Bộ Đa Thiết Bị & Quản Lý Phiên Server-Authoritative (`DeviceSyncEngine.js`)**: Đăng ký và quản lý thiết bị đa nền tảng (`DESKTOP_WEB`, `MOBILE_IOS`, `MOBILE_ANDROID`, `TABLET`), cập nhật nhịp tim (Heartbeat), thu hồi phiên từ xa tức thời (Remote Session Revocation) và tự động xử lý xung đột phiên bản.
+        - **Động Cơ Cá Nhân Hóa Đa Đối Tượng (`PersonalizationEngine.js`)**: Phân loại tự động các nhóm người dùng (`NEW_STUDENT`, `STUDENT`, `SENIOR_STUDENT`, `EXPERT`, `MODERATOR`, `STAFF_ADMIN`), sinh ngữ cảnh điều phối giải trình minh bạch ("Tại sao tôi thấy điều này? - Dựa trên minh chứng nào?"). Hỗ trợ đặt lại cài đặt cá nhân hóa về an toàn mặc định (`RESET_PERSONALIZATION`).
+        - **Hệ Khung Ứng Dụng Toàn Cầu & Điều Hướng Thông Minh (`GlobalAppShell.jsx`, `CommandPalette.jsx`)**: Giao diện thích ứng (Desktop Sidebar + Mobile Drawer), thanh tìm kiếm Universal Search (`Ctrl+K` / `Cmd+K`) phân loại đa thực thể (Môn học, Chuyên gia, Quy chế, Bản ghi cá nhân), huy hiệu bảo vệ Zero-Trust.
+        - **Trung Tâm Điều Phối Học Vụ Cá Nhân (Home / `PersonalCommandCenter.jsx`)**: Tích hợp lịch học thực tế hôm nay, ưu tiên cấp bách theo tiến độ, hành động khuyến nghị AI tối ưu tiếp theo (`Next Best Action`), tín hiệu chuyên gia và cộng đồng phù hợp.
+        - **Trung Tâm Quyền Riêng Tư & Kiểm Soát Dữ Liệu (`PrivacyAccessCenter.jsx`)**: Quản lý thiết bị đăng nhập, thu hồi phiên làm việc trên thiết bị lạ, kết nối SSO tài khoản trường đại học, xuất toàn bộ dữ liệu cá nhân chuẩn GDPR Article 20 Portability.
+        - **Tập Kiểm Chuẩn Tái Thiết Sản Phẩm (`test:product-reconstruction`)**: **10/10 Tests PASS (100.0%)** trên 4 test suites. Master Suite toàn bộ dự án đạt **858/858 Tests PASS (100.0%)**.
+
+    31. ✅ **Tái Thiết Cấu Trúc Toàn Diện PROVIP (Social Intelligence Fabric + AI Content Firewall + Early Warning + Hyper-Personalization Briefing V1)**:
+        - **Mạng Lưới Trí Tuệ Xã Hội Hợp Pháp (`ISourceConnector.js`, `ConnectorRegistry.js`, `RateLimitManager.js`, `IncrementalSyncEngine.js`, `DataRetentionManager.js`)**: Chuẩn hóa các kênh nạp dữ liệu chính quy (Cổng đào tạo, RSS thông báo, GitHub học vụ, Discord nhóm học), quản lý token bucket giới hạn tần suất, đồng bộ gia tăng có con trỏ checkpoint và quy định thời hạn lưu trữ tối thiểu (Data Retention).
+        - **Chuẩn Hóa Đa Ngôn Ngữ & Trích Xuất Tín Hiệu (`ContentItemNormalizer.js`, `EntityResolutionEngine.js`, `SocialClaimExtractor.js`, `SocialSignalQualityEngine.js`)**: Mở rộng từ lóng học vụ tiếng Việt, định danh thực thể (Mã môn, Giảng viên, Khoa, Quy chế), phân loại 11 nhóm tín hiệu (`QUESTION`, `WARNING`, `CORRECTION`, `RUMOR`, `OFFICIAL_STATEMENT`...) và đánh giá chất lượng 7 chiều (Specificity, Evidence, Independence, Freshness...).
+        - **Phát Hiện Trùng Lặp & Chống Thao Túng Đồng Bộ (`SocialDuplicationDetector.js`, `CoordinationDetector.js`)**: Gom cụm bài đăng nhân bản ($10 \text{ bản sao} \neq 10 \text{ nguồn độc lập}$), suy giảm trọng số theo $\frac{1}{\sqrt{N}}$, phát hiện chiến dịch thao túng đồng bộ trong khung giờ ngắn (`POTENTIAL_COORDINATION`).
+        - **Động Cơ Cảnh Báo Sớm & Cầu Nối Đối Soát Quy Chế (`EarlyWarningEngine.js`, `SocialToOfficialPipeline.js`)**: Quản lý vòng đời cảnh báo (`UNVERIFIED` $\to$ `EMERGING` $\to$ `CORROBORATED` $\to$ `CONFIRMED` $\to$ `RESOLVED`), cung cấp khuyến nghị 2 tầng (Chính sách quy chế chính thức + Thực tế vận hành).
+        - **Tường Lửa An Toàn Nội Dung AI, Vector Security & Chống Đầu Độc Bộ Nhớ (`SocialContentFirewall.js`, `VectorSecurityGuard.js`, `AiMemoryGuard.js`)**: Cách ly tuyệt đối văn bản bên ngoài ở dạng `CONTENT` (tuyệt đối không cho phép thực thi như `INSTRUCTION`), chống Prompt Injection và RAG Poisoning. Lọc trước và sau khi truy vấn vector embedding. Bộ nhớ 5 tầng với quy trình phê duyệt `CandidateMemory` $\to$ `ApprovedMemory`.
+        - **Cá Nhân Hóa Đột Phá & Bản Tin Học Vụ Hàng Ngày (`UserGoalEngine.js`, `AcademicBriefingEngine.js`, `PersonalAcademicBriefing.jsx`, `SocialSignalRadar.jsx`)**: Quản lý mục tiêu học tập, biên dịch "My Academic Briefing" trả lời 6 câu hỏi trọng tâm ("Thay đổi gì?", "Hạn chót nào?", "Chuyên gia nào?", "Khuyến nghị gì?", "Tại sao tôi thấy điều này?").
+        - **Tập Kiểm Chuẩn PROVIP Toàn Diện (`test:provip-reconstruction`)**: **18/18 Tests PASS (100.0%)** trên 7 test suites. Master Suite toàn bộ dự án đạt **876/876 Tests PASS (100.0%)**.
+
 ---
 
 ## 2. Đường Dẫn File Trọng Tâm (v26 Nodes)
@@ -300,3 +377,39 @@
 - **Bộ Kiểm Chuẩn Tập Trận Vận Hành**: `frontend/tests/university/academic_production_drill.test.mjs`
 - **Đặc Tả Trí Tuệ Học Thuật HCMUTE**: `docs/vault/01 - 🏗️ System Architecture/Academic-Intelligence-Engine-Spec.md`
 - **Đặc Tả Đường Ống Academic Intelligence V1**: `docs/vault/01 - 🏗️ System Architecture/Academic-Intelligence-V1-Pipeline.md`
+
+## 10. UI/UX Reconstruction — 2026-08-27
+- Hợp nhất các authenticated shell về `frontend/src/components/layout/UnifiedAppShell.jsx`; `StudentHubOSShell` và `GlobalAppShell` giữ vai trò compatibility wrapper.
+- Chuẩn hóa semantic UI tokens, application shell, skip link, command search, mobile navigation và reduced-motion trong `frontend/src/app/globals.css`.
+- Tái thiết kế `frontend/src/components/home/CommandCenterDashboard.jsx` theo hướng action-first, giải thích được và ưu tiên evidence.
+- Đổi Next.js edge convention từ `frontend/src/middleware.js` sang `frontend/src/proxy.js`.
+- Siết fallback secret: production không còn sử dụng secret mặc định trong `CapabilityManager` và `TokenValidator`; test-only secret chỉ tồn tại ngoài production.
+- Kiểm chứng: production build pass, full regression suite pass, security suite pass, academic intelligence suite pass.
+
+## 11. Quality Gate Hardening — 2026-08-27
+- Thêm `scripts/run-discovered-tests.mjs` để tự động phát hiện và chạy mọi test `frontend/tests/**/*.test.mjs`.
+- Thêm API route contract smoke test: kiểm tra handler HTTP tường minh và ngăn browser global lọt vào server route.
+- Thêm `test:all-discovered` và `test:quality`; quality gate cuối cùng pass: lint không error, production build pass, 234/234 test files pass.
+- Nâng cấp T2/T3/T4: Evidence Fusion Studio đọc Knowledge Object thật và drill-down provenance/conflict/unknowns; Community Studio truy vấn theo topic/cohort và đo provenance, friction, reality gap; Expert Studio có dossier kiểm chứng, reliability history và authority boundaries.
+- Sửa Expert Discovery dùng đúng canonical fields (`status`, `name`, `scopes`, `conflicts`), bổ sung hồ sơ Toán học scoped; public expert API không còn trả raw private expert object.
+- Forum API thêm validation chiều dài/nội dung/link HTTPS, provenance integrity metadata và xếp hạng Wilson confidence-adjusted.
+- Quality gate cuối cùng pass: lint, production build và 235/235 test files.
+- Forum Like/Comment đã được đóng vòng server-side qua PATCH ledger, chống reaction lặp theo user/post và trả comments sau reload trong cùng runtime.
+
+## 12. PHASE 2/3 Authority & PostgreSQL Foundation — 2026-08-27
+- Đã thêm JWKS/OIDC verification, one-time proof exchange, opaque hashed PostgreSQL sessions, HttpOnly/SameSite cookie, revocation/expiry, CSRF exact-origin và production rejection của legacy in-memory session.
+- Đã thêm migration V2 cho profile an toàn, private roles/sessions/audit/expert/reputation, forum và nền móng evidence/claims; migration chủ động xóa policy/grant profile legacy không an toàn.
+- Forum POST/GET mặc định dùng PostgreSQL và fail closed 503; memory adapter chỉ bật tường minh ngoài production.
+- Live RLS harness kiểm tra anonymous, A/B, self-role, reputation, expert verification, foreign session và service role đã sẵn sàng nhưng chưa chạy vì thiếu `STUDENTHUB_RLS_TEST_DATABASE_URL`.
+- Quality gate: 239/239 discovered test files, build/TypeScript pass, lint 0 errors/341 warnings, dependency audit 0, bundle `/scam-check` 885,917 bytes.
+- PHASE 2/3 chưa được đánh dấu hoàn tất: browser bearer callers, refresh/re-auth, live clean migration/RLS và server-restart E2E còn thiếu.
+
+## 13. Living Campus Atlas — Cinematic Landing Refinement — 2026-08-28
+- Landing `/` được nâng cấp theo ngôn ngữ editorial-cinematic: opening sequence ngắn, hero typography cỡ lớn, knowledge ribbon nhiều lớp, pointer aura và chương chuyển cảnh perspective gập đôi.
+- Tham chiếu trực tiếp OpenHero/Hyliox cùng ba screen recording của người dùng; không sao chép nhận diện thương hiệu hay nội dung của nguồn.
+- Master implementation prompt: `docs/frontend/LIVING-CAMPUS-ATLAS-MASTER-PROMPT.md`.
+- Mã chính: `frontend/src/components/landing/LivingCampusAtlas.jsx` và `living-campus-atlas.module.css`.
+- Motion có reduced-motion fallback; pointer effect cập nhật trực tiếp qua ref, tránh setState theo từng frame; mobile tắt/giảm hiệu ứng 3D nặng.
+- Kiểm chứng: targeted ESLint pass, production build pass 102/102 routes, Playwright 1440px và 390px không horizontal overflow.
+- Refinement v2 tham chiếu Robin Payot, Sendoso, Meer Mohsin, Lucerra, USAvionix, Edolus và hai video mới: hero knowledge monolith, tri-lens glass core, 4-gate energy pipeline, product orbit chapter và closing copy mới.
+- Đã sửa stacking-context khiến global cinematic wallpaper phủ section product sáng; QA lại không page error và không horizontal overflow.

@@ -9,7 +9,7 @@
 
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { Sparkles, ArrowRight, Radio, ShieldCheck, Zap, Maximize2 } from "lucide-react";
+import { ArrowRight, Maximize2 } from "lucide-react";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 
 export default function Interactive3DWaveMonolithCapsule({

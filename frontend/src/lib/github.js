@@ -12,6 +12,9 @@ export async function fetchGitHubExpertData(rawUsername) {
   }
 
   const username = rawUsername.trim().replace(/^@/, "");
+  if (!/^[A-Za-z0-9-]{1,39}$/.test(username)) {
+    throw new Error("Tên người dùng GitHub không hợp lệ.");
+  }
 
   try {
     // 1. Gọi GitHub User API
@@ -95,7 +98,7 @@ export async function fetchGitHubExpertData(rawUsername) {
       reputationScore,
     };
   } catch (error) {
-    console.error("[GitHub API Error]:", error);
+    console.error("[GitHub API Error]:", error?.name || "github_request_failed");
     throw error;
   }
 }

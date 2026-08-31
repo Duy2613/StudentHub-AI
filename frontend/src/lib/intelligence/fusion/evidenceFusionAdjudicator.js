@@ -5,16 +5,10 @@
  * expert disagreement preservation, and operational reality gap separation.
  */
 
-import {
-  EvidenceFusionModel,
-  EPISTEMIC_FINAL_STATE,
-  EVIDENCE_HEALTH_STATE,
-  KNOWLEDGE_LAYER,
-  AUTHORITY_CLASS
-} from "./evidenceFusionModel.js";
+import { EvidenceFusionModel, EPISTEMIC_FINAL_STATE, EVIDENCE_HEALTH_STATE, KNOWLEDGE_LAYER } from "./evidenceFusionModel.js";
 import { EvidenceFusionClaimAligner } from "./evidenceFusionClaimAligner.js";
 import { EvidenceFusionIndependenceEngine } from "./evidenceFusionIndependenceEngine.js";
-import { EvidenceFusionScopeEngine } from "./evidenceFusionScopeEngine.js";
+
 import { EvidenceFusionTemporalEngine } from "./evidenceFusionTemporalEngine.js";
 
 export class EvidenceFusionAdjudicator {

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { CommunityQueryEngine } from "@/lib/intelligence/community/communityQueryEngine.js";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
-export async function POST(request) {
+async function queryCommunityKnowledge(request) {
   try {
     const body = await request.json().catch(() => ({}));
     const result = CommunityQueryEngine.query(body);
@@ -10,9 +11,13 @@ export async function POST(request) {
       result
     });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Failed to execute community query" },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "QUERY_COMMUNITY_KNOWLEDGE",
+  allowAnonymous: true,
+  maxRequests: 60,
+  maxBodyBytes: 64 * 1024,
+}, queryCommunityKnowledge);

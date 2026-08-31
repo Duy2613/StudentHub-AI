@@ -1,38 +1,30 @@
-/**
- * StudentHub AI — API Route: POST /api/ai/trust/verify-claim
- * 
- * Verifies single atomic claim against candidate evidence spans with overclaim detection.
- */
-
 import { NextResponse } from "next/server";
-import { AiTrustEngine } from "@/lib/intelligence/trust/aiTrustEngine";
-import { SemanticOverclaimDetector } from "@/lib/intelligence/trust/semanticOverclaimDetector";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
-export async function POST(req) {
-  try {
-    const body = await req.json().catch(() => ({}));
-    const { claim, evidenceSpans } = body;
-
-    if (!claim) {
-      return NextResponse.json(
-        { success: false, error: "claim object is required." },
-        { status: 400 }
-      );
-    }
-
-    const verifiedClaim = AiTrustEngine.verifyClaim(claim, Array.isArray(evidenceSpans) ? evidenceSpans : []);
-    const primaryPassage = evidenceSpans?.[0]?.passage || "";
-    const overclaim = SemanticOverclaimDetector.detectOverclaim(claim.text || claim.statement || "", primaryPassage);
-
-    return NextResponse.json({
-      success: true,
-      claim: verifiedClaim,
-      overclaim
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error verifying claim" },
-      { status: 500 }
-    );
-  }
+/**
+ * Retired caller-composed claim endpoint. A claim and evidence supplied by a
+ * browser are candidate data, not authoritative verification. The canonical
+ * pipeline owns retrieval and policy decisions.
+ */
+async function rejectClientComposedClaim(_request, _routeParams, _principal, secContext) {
+  return NextResponse.json({
+    success: false,
+    error: {
+      code: "TRUST_CLAIM_REQUIRES_CANONICAL_PIPELINE",
+      userMessage: "Claim phải được kiểm chứng trong pipeline chuẩn.",
+      requestId: secContext.correlationId,
+      retryable: false,
+    },
+    canonicalEndpoint: "/api/v1/trust",
+  }, {
+    status: 410,
+    headers: { "Cache-Control": "no-store" },
+  });
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "VERIFY_TRUST_CLAIM",
+  allowAnonymous: true,
+  maxRequests: 30,
+  maxBodyBytes: 128 * 1024,
+}, rejectClientComposedClaim);

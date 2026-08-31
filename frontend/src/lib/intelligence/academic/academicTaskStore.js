@@ -85,10 +85,7 @@ export class AcademicTaskStore {
       };
 
       const serialized = JSON.stringify(payload, null, 2);
-      const tempPath = `${this.#storageFilePath}.tmp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-
-      fs.writeFileSync(tempPath, serialized, "utf-8");
-      fs.renameSync(tempPath, this.#storageFilePath);
+      fs.writeFileSync(this.#storageFilePath, serialized, "utf-8");
     } catch (err) {
       // In constrained environments where disk is unwritable, fallback gracefully to memory-only
       if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {

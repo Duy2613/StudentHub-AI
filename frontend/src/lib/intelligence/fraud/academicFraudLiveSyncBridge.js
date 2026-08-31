@@ -12,9 +12,9 @@
  * 8. Academic Digital Twin & Cohort-Scoped Impact Recomputation
  */
 
-import { LiveSourceWatcher, SOURCE_TRUST_TIERS } from "../academic/liveSourceWatcher.js";
+import { LiveSourceWatcher } from "../academic/liveSourceWatcher.js";
 import { DocumentSnapshotStore } from "../academic/documentSnapshotStore.js";
-import { ParserIntegrityGuard, INGESTION_SAFETY_STATES } from "../academic/parserIntegrityGuard.js";
+import { ParserIntegrityGuard } from "../academic/parserIntegrityGuard.js";
 import { FraudRiskEngine, FRAUD_DECISIONS } from "./fraudRiskEngine.js";
 import { SemanticDiffEngine } from "../academic/semanticDiffEngine.js";
 import { RuleDependencyDAG, RULE_LIFECYCLE_STATES } from "../academic/ruleDependencyDAG.js";

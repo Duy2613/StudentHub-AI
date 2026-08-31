@@ -1,25 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Activity,
-  AlertTriangle,
-  Layers,
-  Search,
-  TrendingUp,
-  Clock,
-  ExternalLink,
-  ShieldCheck,
-  CheckCircle2,
-  Copy,
-  Users,
-  BarChart3,
-  HelpCircle,
-  ChevronRight,
-  Flame,
-  Info,
-  ArrowUpRight
-} from "lucide-react";
+import { AlertTriangle, Search, ShieldCheck, CheckCircle2, Copy, Users, BarChart3, Flame, Info, ArrowUpRight } from "lucide-react";
 
 export function CommunityIntelligenceStudioV2({
   initialTopics = ["TOEIC_SUBMISSION_TIME", "GRADUATION_DOSSIER_REVIEW", "COURSE_REGISTRATION"],

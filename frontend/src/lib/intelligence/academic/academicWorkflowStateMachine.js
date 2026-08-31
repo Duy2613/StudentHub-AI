@@ -7,6 +7,8 @@
  * - Handles terminal and recoverable states deterministically
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export const WORKFLOW_STATES = Object.freeze({
   NOT_STARTED: "NOT_STARTED",
   READY: "READY",
@@ -127,7 +129,7 @@ export class AcademicWorkflowStateMachine {
     }
 
     return Object.freeze({
-      eventId: eventId || `EVT_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      eventId: eventId || createSecureId("EVT"),
       taskId,
       type,
       fromState,

@@ -1,23 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Brain,
-  ShieldCheck,
-  ShieldAlert,
-  AlertTriangle,
-  FileSearch,
-  Terminal,
-  Play,
-  Zap,
-  CheckCircle2,
-  XCircle,
-  Search,
-} from "lucide-react";
+import { Brain, Play, Zap, Search } from "lucide-react";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
-import { LAYER_2_STATUS, SEMANTIC_CLASSIFICATION } from "@/lib/ai-trust/layer2/types";
-import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticService";
-import { LAYER_2_TEST_CASES } from "../../../tests/layer2/layer2.test.mjs";
+import { LAYER_2_STATUS } from "@/lib/ai-trust/layer2/types";
+import { LAYER_2_BENCHMARK_CASES } from "@/lib/ai-trust/layer2/benchmarkCases";
 
 export default function Layer2BenchmarkStudio({ onSelectPreset, className = "" }) {
   const [isRunningAll, setIsRunningAll] = useState(false);
@@ -27,6 +14,7 @@ export default function Layer2BenchmarkStudio({ onSelectPreset, className = "" }
   const handleRunAll = async () => {
     setIsRunningAll(true);
     saffronAudio.playClick(800);
+    const { Layer2SemanticService } = await import("@/lib/ai-trust/layer2/Layer2SemanticService");
 
     const startTime = performance.now();
     let passed = 0;
@@ -34,7 +22,7 @@ export default function Layer2BenchmarkStudio({ onSelectPreset, className = "" }
     let totalLatency = 0;
     const itemResults = [];
 
-    for (const test of LAYER_2_TEST_CASES) {
+    for (const test of LAYER_2_BENCHMARK_CASES) {
       const result = await Layer2SemanticService.verify({
         type: test.type,
         content: test.content,
@@ -81,7 +69,7 @@ export default function Layer2BenchmarkStudio({ onSelectPreset, className = "" }
     saffronAudio.playCelebration();
   };
 
-  const filteredCases = LAYER_2_TEST_CASES.filter(
+  const filteredCases = LAYER_2_BENCHMARK_CASES.filter(
     (c) =>
       c.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.content.toLowerCase().includes(searchTerm.toLowerCase()) ||

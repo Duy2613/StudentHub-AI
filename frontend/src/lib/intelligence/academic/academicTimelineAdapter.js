@@ -6,6 +6,8 @@
  * - Highlights student-specific impact badges and deadlines.
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export class AcademicTimelineAdapter {
   /**
    * Adapts an AcademicChange and optional AcademicInsight into a Timeline Event
@@ -19,7 +21,7 @@ export class AcademicTimelineAdapter {
     const isAffected = insight ? (insight.impact !== "NONE") : true;
 
     return {
-      timelineId: `TL_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      timelineId: createSecureId("TL"),
       date: eventDate,
       milestoneTitle: insight?.title || change.field || "Cập Nhật Học Vụ",
       summary: insight?.whatChanged || change.description || "Quy định học vụ mới ban hành.",

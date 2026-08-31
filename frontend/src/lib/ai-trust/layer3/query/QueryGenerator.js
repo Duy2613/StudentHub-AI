@@ -7,6 +7,17 @@
 
 import { LAYER_3_CONFIG } from "../config/Layer3Config.js";
 
+function sanitizeQueryPart(value, maxLength = 180) {
+  return typeof value === "string"
+    ? value.normalize("NFKC").replace(/[\u0000-\u001F\u007F\u200B-\u200D\u2060\uFEFF]/g, " ").replace(/\s+/g, " ").trim().slice(0, maxLength)
+    : "";
+}
+
+function safeDomain(value) {
+  const domain = sanitizeQueryPart(value, 180).toLowerCase();
+  return /^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/.test(domain) && domain.includes(".") ? domain : null;
+}
+
 export class QueryGenerator {
   /**
    * Generates search queries for a claim and candidate sources
@@ -18,10 +29,10 @@ export class QueryGenerator {
     if (!claim || !claim.rawText) return [];
 
     const queries = [];
-    const rawText = claim.rawText.replace(/["\n\r]/g, " ").trim();
-    const subject = claim.subject || "";
-    const predicate = claim.predicate || "";
-    const primaryDomain = candidateSources[0]?.officialDomains?.[0] || null;
+    const rawText = sanitizeQueryPart(claim.rawText, 180).replace(/["']/g, " ");
+    const subject = sanitizeQueryPart(claim.subject, 120);
+    const predicate = sanitizeQueryPart(claim.predicate, 180);
+    const primaryDomain = safeDomain(candidateSources[0]?.officialDomains?.[0]);
 
     // Strategy A: Exact Claim Search
     queries.push({
@@ -41,10 +52,11 @@ export class QueryGenerator {
     });
 
     // Strategy C: Entity + Date / Year
-    if (claim.time) {
+    const claimTime = sanitizeQueryPart(claim.time, 40);
+    if (claimTime) {
       queries.push({
         strategy: "ENTITY_TEMPORAL",
-        query: `${subject} ${predicate} ${claim.time}`.trim(),
+        query: `${subject} ${predicate} ${claimTime}`.trim(),
         purpose: "Kiểm tra mốc thời gian hiệu lực",
         targetClaimId: claim.claimId,
       });

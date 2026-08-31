@@ -8,25 +8,7 @@
 
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  Sparkles,
-  ArrowLeft,
-  Star,
-  Award,
-  ShieldCheck,
-  Building,
-  Briefcase,
-  CheckCircle2,
-  MessageSquare,
-  Send,
-  Calendar,
-  Heart,
-  Share2,
-  Check,
-  HelpCircle,
-  Clock,
-  UserCheck,
-} from "lucide-react";
+import { Sparkles, ArrowLeft, Star, Award, Building, CheckCircle2, MessageSquare, Send, Heart, Share2, Check, UserCheck } from "lucide-react";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
 

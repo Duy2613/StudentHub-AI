@@ -11,7 +11,7 @@ export default function KnowledgeIntelligencePage() {
   const allObjects = EvidenceFusionStore.getAll({ redactPrivate: true });
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
+    <main className="w-full min-w-0 min-h-screen bg-slate-950 text-slate-100">
       <KnowledgeObjectStudio initialKnowledgeObjects={allObjects} />
     </main>
   );

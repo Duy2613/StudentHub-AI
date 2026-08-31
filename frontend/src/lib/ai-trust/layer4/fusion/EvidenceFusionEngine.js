@@ -32,6 +32,8 @@ import {
   RISK_INTERACTION_TERMS,
   HARD_NEGATIVE_CONTEXTS,
 } from "../../models/ScamTaxonomy.js";
+import { isTrustedLayer2AResult } from "../../layer2a/TrustBoundary.js";
+import { isTrustedLayer3Result } from "../../layer3/TrustBoundary.js";
 
 // ─── Abstention Thresholds ────────────────────────────────────────────────────
 const ABSTENTION_CONFIG = {
@@ -106,6 +108,22 @@ const ASSET_SIGNAL_PATTERNS = [
   { pattern: /số\s+điện\s+thoại|phone\s+number|số\s+sim/i, asset: TARGET_ASSETS.PHONE_NUMBER },
 ];
 
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function objectArray(value) {
+  return asArray(value).filter((item) => item && typeof item === "object" && !Array.isArray(item));
+}
+
+function safeNumber(value, fallback = 0) {
+  return Number.isFinite(Number(value)) ? Number(value) : fallback;
+}
+
+function safeText(value) {
+  return typeof value === "string" ? value : "";
+}
+
 export class EvidenceFusionEngine {
   /**
    * Fuses multi-layer results into an enhanced Evidence Graph with:
@@ -126,47 +144,86 @@ export class EvidenceFusionEngine {
    * @param {object} [params.conversationContext] - From AttackStageAnalyzer (multi-message)
    * @returns {object} Enhanced evidence graph + fusion metrics
    */
-  static fuse({
-    layer1Result = null,
-    layer2Result = null,
-    layer3Result = null,
-    documentContext = null,
-    conversationContext = null,
-  }) {
+  static fuse(params = {}) {
+    const input = params && typeof params === "object" && !Array.isArray(params) ? params : {};
+    const layer1Result = input.layer1Result && typeof input.layer1Result === "object" ? input.layer1Result : null;
+    const layer2Result = input.layer2Result && typeof input.layer2Result === "object" ? input.layer2Result : null;
+    const layer2AResult = input.layer2AResult && typeof input.layer2AResult === "object" ? input.layer2AResult : null;
+    const layer3Result = input.layer3Result && typeof input.layer3Result === "object" ? input.layer3Result : null;
+    const documentContext = input.documentContext && typeof input.documentContext === "object" ? input.documentContext : null;
+    const conversationContext = input.conversationContext && typeof input.conversationContext === "object" ? input.conversationContext : null;
+
+    const layer1Signals = objectArray(layer1Result?.signals);
+    const layer2ContextSignals = objectArray(layer2Result?.contextSignals);
+    const layer2Entities = objectArray(layer2Result?.entities);
+    const layer2Claims = objectArray(layer2Result?.claims);
+    const layer2ConsistencyFindings = objectArray(layer2Result?.consistencyFindings);
+    const layer2CrossModalFindings = objectArray(layer2Result?.crossModalFindings);
+    const layer3Sources = objectArray(layer3Result?.sources);
+    const layer3Evidence = objectArray(layer3Result?.evidence);
+    const layer3Conflicts = objectArray(layer3Result?.conflicts);
+    const layer3ClaimStatuses = layer3Result?.claimStatuses && typeof layer3Result.claimStatuses === "object" && !Array.isArray(layer3Result.claimStatuses)
+      ? layer3Result.claimStatuses
+      : {};
+    const crossFieldContradictions = objectArray(documentContext?.crossFieldValidation?.contradictions);
 
     // ── 1. Base Evidence Graph (backward compatible) ──────────────────────────
     const fusedGraph = {
-      layer1Signals: layer1Result?.signals || [],
-      layer1Status: layer1Result?.status || "PASS",
-      layer1Reasons: layer1Result?.reasons || [],
+      layer1Signals,
+      layer1Status: typeof layer1Result?.status === "string" ? layer1Result.status : "UNKNOWN",
+      layer1Reasons: asArray(layer1Result?.reasons).filter((reason) => typeof reason === "string").slice(0, 40),
 
-      layer2Intent: layer2Result?.intent || { primary: "inform", coercive: false },
-      layer2Entities: layer2Result?.entities || [],
-      layer2Claims: layer2Result?.claims || [],
-      layer2ContextSignals: layer2Result?.contextSignals || [],
-      layer2ConsistencyFindings: layer2Result?.consistencyFindings || [],
-      layer2CrossModalFindings: layer2Result?.crossModalFindings || [],
-      layer2Status: layer2Result?.status || "PASS",
-      layer2Classification: layer2Result?.classification || "BENIGN",
+      layer2Intent: layer2Result?.intent && typeof layer2Result.intent === "object" && !Array.isArray(layer2Result.intent)
+        ? layer2Result.intent
+        : { primary: "inform", coercive: false },
+      layer2Entities,
+      layer2Claims,
+      layer2ContextSignals,
+      layer2ConsistencyFindings,
+      layer2CrossModalFindings,
+      layer2Status: typeof layer2Result?.status === "string" ? layer2Result.status : "UNKNOWN",
+      layer2Classification: typeof layer2Result?.classification === "string" ? layer2Result.classification : "UNKNOWN",
+
+      // Layer 2A is a separate threat-intelligence boundary. Its no-match
+      // finding is retained as a bounded absence of a known match, never as
+      // proof that the target is safe.
+      layer2AResult,
+      layer2AResultTrusted: isTrustedLayer2AResult(layer2AResult),
+      layer2AFinding: layer2AResult?.finding || "UNKNOWN",
+      layer2AProviderStatus: layer2AResult?.providerStatus || "NOT_APPLICABLE",
+      layer2ASecurityClassification: layer2AResult?.securityClassification || "UNKNOWN",
+      layer2AProviderConfidence: Number.isFinite(layer2AResult?.providerConfidence)
+        ? layer2AResult.providerConfidence
+        : null,
 
       // ManipulationAnalyzer v2 output
-      layer2ManipulationResult: layer2Result?.details?.manipulationResult || null,
-      layer2AttackStageResult: layer2Result?.details?.attackStageResult || null,
+      layer2ManipulationResult: layer2Result?.details?.manipulationResult && typeof layer2Result.details.manipulationResult === "object"
+        ? layer2Result.details.manipulationResult
+        : null,
+      layer2AttackStageResult: layer2Result?.details?.attackStageResult && typeof layer2Result.details.attackStageResult === "object"
+        ? layer2Result.details.attackStageResult
+        : null,
 
-      layer3Sources: layer3Result?.sources || [],
-      layer3Evidence: layer3Result?.evidence || [],
-      layer3ClaimStatuses: layer3Result?.claimStatuses || {},
-      layer3Conflicts: layer3Result?.conflicts || [],
-      layer3Independence: layer3Result?.sourceIndependence || { totalClusters: 0 },
-      layer3Agreement: layer3Result?.crossSourceAgreement || { agreementScore: 1.0 },
-      layer3Completeness: layer3Result?.verificationCompleteness || 0.0,
-      layer3Status: layer3Result?.status || "UNVERIFIED",
+      layer3Sources,
+      layer3Evidence,
+      layer3Result,
+      layer3ResultTrusted: isTrustedLayer3Result(layer3Result),
+      layer3ClaimStatuses,
+      layer3Conflicts,
+      layer3Independence: layer3Result?.sourceIndependence && typeof layer3Result.sourceIndependence === "object" && !Array.isArray(layer3Result.sourceIndependence)
+        ? layer3Result.sourceIndependence
+        : { totalClusters: 0 },
+      layer3Agreement: layer3Result?.crossSourceAgreement && typeof layer3Result.crossSourceAgreement === "object" && !Array.isArray(layer3Result.crossSourceAgreement)
+        ? layer3Result.crossSourceAgreement
+        : { agreementScore: 0 },
+      layer3Completeness: Math.max(0, Math.min(1, safeNumber(layer3Result?.verificationCompleteness, 0))),
+      layer3Status: typeof layer3Result?.status === "string" ? layer3Result.status : "INSUFFICIENT_EVIDENCE",
 
       // Document intelligence
       documentClassification: documentContext?.classification || null,
       documentForensics: documentContext?.forensics || null,
-      crossFieldContradictions: documentContext?.crossFieldValidation?.contradictions || [],
-      documentForensicFlags: documentContext?.classification?.forensicFlags || [],
+      crossFieldContradictions,
+      documentForensicFlags: asArray(documentContext?.classification?.forensicFlags).filter((flag) => typeof flag === "string").slice(0, 40),
 
       // Conversation context
       attackStageProgression: conversationContext?.stageProgression || null,
@@ -178,27 +235,28 @@ export class EvidenceFusionEngine {
 
     // From Layer 1 signals
     for (const signal of fusedGraph.layer1Signals) {
-      const mapped = SIGNAL_TO_SCAM_TYPE[signal.type];
+      const signalType = safeText(signal.type);
+      const mapped = SIGNAL_TO_SCAM_TYPE[signalType];
       if (mapped) scamTypes.add(mapped);
 
       // URL/domain signals → phishing
-      if (signal.type?.includes("domain") || signal.type?.includes("url")) {
+      if (signalType.includes("domain") || signalType.includes("url")) {
         scamTypes.add(SCAM_TYPES.PHISHING);
       }
       // SSRF → remote access
-      if (signal.type?.includes("ssrf")) {
+      if (signalType.includes("ssrf")) {
         scamTypes.add(SCAM_TYPES.REMOTE_ACCESS_SCAM);
       }
     }
 
     // From Layer 2 context signals
     for (const signal of fusedGraph.layer2ContextSignals) {
-      const mapped = CONTEXT_TO_SCAM_TYPE[signal.type];
+      const mapped = CONTEXT_TO_SCAM_TYPE[safeText(signal.type)];
       if (mapped) scamTypes.add(mapped);
     }
 
     // From Layer 2 manipulation tactics
-    const tactics = fusedGraph.layer2ManipulationResult?.detectedTactics || [];
+    const tactics = objectArray(fusedGraph.layer2ManipulationResult?.detectedTactics);
     const hasPanic = tactics.some((t) => t.tactic === PSYCH_TACTICS.PANIC);
     const hasShame = tactics.some((t) => t.tactic === PSYCH_TACTICS.SHAME);
     const hasLove = tactics.some((t) => t.tactic === PSYCH_TACTICS.LOVE);
@@ -218,7 +276,7 @@ export class EvidenceFusionEngine {
     if (attackStage === ATTACK_STAGES.RECOVERY_EXPLOITATION) scamTypes.add(SCAM_TYPES.RECOVERY_SCAM);
 
     // ── 3. Psychological Tactics Aggregation ──────────────────────────────────
-    const psychTactics = tactics.map((t) => t.tactic);
+    const psychTactics = tactics.map((t) => safeText(t.tactic)).filter(Boolean).slice(0, 40);
 
     // ── 4. Requested Actions Inference ────────────────────────────────────────
     const requestedActions = new Set();
@@ -274,15 +332,14 @@ export class EvidenceFusionEngine {
     }
 
     // ── 7. Uncertainty Quantification ─────────────────────────────────────────
-    const ocrConfidence = documentContext?.ocrConfidence || 1.0;
-    const crossFieldContradictions = fusedGraph.crossFieldContradictions;
+    const ocrConfidence = Math.max(0, Math.min(1, safeNumber(documentContext?.ocrConfidence, 1.0)));
 
     const uncertainty = {
       ocr: ocrConfidence < ABSTENTION_CONFIG.MIN_OCR_CONFIDENCE ? "HIGH" : "LOW",
       document: crossFieldContradictions.length > 2 ? "HIGH" :
                 crossFieldContradictions.length > 0 ? "MEDIUM" : "LOW",
-      url: fusedGraph.layer3Agreement.agreementScore < 0.5 ? "HIGH" : "LOW",
-      identity: fusedGraph.layer2ConsistencyFindings.some((f) => f.type?.includes("identity")) ? "HIGH" : "LOW",
+      url: safeNumber(fusedGraph.layer3Agreement.agreementScore, 0) < 0.5 ? "HIGH" : "LOW",
+      identity: fusedGraph.layer2ConsistencyFindings.some((f) => safeText(f.type).includes("identity")) ? "HIGH" : "LOW",
     };
 
     const highUncertaintyCount = Object.values(uncertainty).filter((v) => v === "HIGH").length;
@@ -297,15 +354,17 @@ export class EvidenceFusionEngine {
       fusedGraph.layer1Signals.length === 0 &&
       fusedGraph.layer2ContextSignals.length === 0
     );
+    const isNoEvidenceWithoutThreatLookup =
+      fusedGraph.layer3Evidence.length === 0 && fusedGraph.layer2AFinding !== "NO_KNOWN_THREAT";
     const isHighConflict = (
       fusedGraph.layer3Conflicts.length > 2 &&
-      fusedGraph.layer3Agreement.agreementScore < ABSTENTION_CONFIG.MIN_SOURCE_AGREEMENT
+      safeNumber(fusedGraph.layer3Agreement.agreementScore, 0) < ABSTENTION_CONFIG.MIN_SOURCE_AGREEMENT
     );
 
     // Only abstain if NOT already blocked at L1
     const shouldAbstain = (
       layer1Result?.status !== "BLOCK" &&
-      (isOcrOnlyEvidence || (isHighConflict && highUncertaintyCount >= 2))
+      (isOcrOnlyEvidence || isNoEvidenceWithoutThreatLookup || (isHighConflict && highUncertaintyCount >= 2))
     );
 
     // ── 9. Hard Negative Detection ────────────────────────────────────────────
@@ -319,8 +378,8 @@ export class EvidenceFusionEngine {
     const totalEvidenceItems = fusedGraph.layer3Evidence.length + fusedGraph.crossFieldContradictions.length;
     const totalSignals = fusedGraph.layer1Signals.length + fusedGraph.layer2ContextSignals.length;
     const hasPhishingSignals =
-      fusedGraph.layer1Signals.some((s) => s.type?.includes("credential") || s.type?.includes("otp") || s.type?.includes("phishing")) ||
-      fusedGraph.layer2ContextSignals.some((s) => s.type?.includes("credential") || s.type?.includes("account_takeover"));
+      fusedGraph.layer1Signals.some((s) => safeText(s.type).includes("credential") || safeText(s.type).includes("otp") || safeText(s.type).includes("phishing")) ||
+      fusedGraph.layer2ContextSignals.some((s) => safeText(s.type).includes("credential") || safeText(s.type).includes("account_takeover"));
 
     // ── Return Enhanced Fused Graph ────────────────────────────────────────────
     return {
@@ -347,6 +406,7 @@ export class EvidenceFusionEngine {
       shouldAbstain,
       abstentionReason: shouldAbstain ? (
         isOcrOnlyEvidence ? "OCR_ONLY_LOW_CONFIDENCE" :
+        isNoEvidenceWithoutThreatLookup ? "INSUFFICIENT_EVIDENCE" :
         isHighConflict ? "HIGH_SOURCE_CONFLICT" : "INSUFFICIENT_EVIDENCE"
       ) : null,
 
@@ -366,11 +426,11 @@ export class EvidenceFusionEngine {
    */
   static _buildSearchText(layer1Result, layer2Result) {
     const parts = [
-      layer1Result?.metrics?.inputContent || "",
-      layer2Result?.semanticSummary || "",
-      ...(layer2Result?.claims || []).map((c) => c.rawText || ""),
-      ...(layer2Result?.contextSignals || []).map((s) => s.details || ""),
+      safeText(layer1Result?.metrics?.inputContent),
+      safeText(layer2Result?.semanticSummary),
+      ...objectArray(layer2Result?.claims).map((c) => safeText(c.rawText)),
+      ...objectArray(layer2Result?.contextSignals).map((s) => safeText(s.details)),
     ];
-    return parts.join(" ").trim();
+    return parts.join(" ").slice(0, 200_000).trim();
   }
 }

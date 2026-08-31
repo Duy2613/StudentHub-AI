@@ -26,6 +26,7 @@
  */
 
 import crypto from "node:crypto";
+import { createSecureId } from "../../security/secureId.js";
 
 export const EXPERT_STATUS = Object.freeze({
   VERIFIED_EXPERT: "VERIFIED_EXPERT",       // Verified identity, active credentials, proven expertise
@@ -137,7 +138,7 @@ export class ExpertIntelligenceModel {
    * Creates a canonical, immutable Expert Profile entity V2
    */
   static createExpert(data = {}) {
-    const expertId = data.expertId || `EXP_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const expertId = data.expertId || createSecureId("EXP");
     const name = typeof data.name === "string" ? data.name.trim() : "Chuyên Gia";
     const canonicalIdentity = data.canonicalIdentity || name;
     const aliases = Array.isArray(data.aliases) ? Object.freeze([...data.aliases]) : Object.freeze([name]);
@@ -232,7 +233,7 @@ export class ExpertIntelligenceModel {
    * Creates an immutable Credential Entity V2
    */
   static createCredential(data = {}) {
-    const credentialId = data.credentialId || `CRED_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const credentialId = data.credentialId || createSecureId("CRED");
     const type = data.type || "DEGREE_PHD";
     const title = data.title || (data.field ? `Degree in ${data.field}` : "Tiến Sĩ");
     const issuingInstitution = data.issuingInstitution || data.issuer || "Đại Học Sư Phạm Kỹ Thuật";
@@ -279,7 +280,7 @@ export class ExpertIntelligenceModel {
    * Creates an immutable Role Entity V2
    */
   static createRole(data = {}) {
-    const roleId = data.roleId || `ROLE_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const roleId = data.roleId || createSecureId("ROLE");
     const roleTitle = typeof data.roleTitle === "string" ? data.roleTitle.trim() : (data.title || "Giảng Viên");
     const organization = typeof data.organization === "string" ? data.organization.trim() : (data.institution || "HCMUTE");
     const department = typeof data.department === "string" ? data.department.trim() : "Khoa CNTT";
@@ -307,7 +308,7 @@ export class ExpertIntelligenceModel {
    * Creates a Peer-Reviewed Publication node
    */
   static createPublication(data = {}) {
-    const pubId = data.pubId || `PUB_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const pubId = data.pubId || createSecureId("PUB");
     const title = typeof data.title === "string" ? data.title.trim() : "Nghiên cứu khoa học";
     const venue = typeof data.venue === "string" ? data.venue.trim() : "Hội nghị Khoa học HCMUTE";
     const year = Number(data.year || new Date().getFullYear());
@@ -334,7 +335,7 @@ export class ExpertIntelligenceModel {
    * Creates a Conflict of Interest Record V2
    */
   static createConflict(data = {}) {
-    const conflictId = data.conflictId || `COI_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const conflictId = data.conflictId || createSecureId("COI");
     const entity = typeof data.entity === "string" ? data.entity.trim() : (data.entityName || "Tổ chức thương mại");
     const nature = data.nature || data.relationship || "COMMERCIAL_SPONSORSHIP"; // CONSULTANCY, VENDOR_COMMISSION, EMPLOYER
     const domain = typeof data.domain === "string" ? data.domain.trim().toUpperCase() : null;
@@ -358,7 +359,7 @@ export class ExpertIntelligenceModel {
    * Creates an Expert Claim entity V2
    */
   static createExpertClaim(data = {}) {
-    const claimId = data.claimId || `EXP_CLM_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const claimId = data.claimId || createSecureId("EXP_CLM");
     const expertId = data.expertId || "EXP_UNKNOWN";
     const statement = typeof data.statement === "string" ? data.statement.trim() : (typeof data.text === "string" ? data.text.trim() : "");
     const claimType = CLAIM_TYPE[data.claimType] || CLAIM_TYPE.EXPERT_OPINION;
@@ -414,7 +415,7 @@ export class ExpertIntelligenceModel {
    */
   static createExpertEvaluation(data = {}) {
     return Object.freeze({
-      evaluationId: data.evaluationId || `EXP_EVAL_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      evaluationId: data.evaluationId || createSecureId("EXP_EVAL"),
       expertId: data.expertId,
       claim: data.claim ? this.createExpertClaim(data.claim) : null,
       scopeLevel: EXPERTISE_LEVEL[data.scopeLevel] || EXPERTISE_LEVEL.OUT_OF_SCOPE,
@@ -433,7 +434,7 @@ export class ExpertIntelligenceModel {
    */
   static createDisagreementMap(data = {}) {
     return Object.freeze({
-      mapId: data.mapId || `DISAGREE_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      mapId: data.mapId || createSecureId("DISAGREE"),
       topic: data.topic || "Chủ đề học thuật",
       domain: data.domain || "AI_ML",
       expertA: data.expertA ? { ...data.expertA } : null,

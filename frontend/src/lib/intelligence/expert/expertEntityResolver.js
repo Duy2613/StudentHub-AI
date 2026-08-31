@@ -11,11 +11,7 @@
  * - Fake Institutional Pages & Unverified ORCIDs
  */
 
-import {
-  ExpertIntelligenceModel,
-  RESOLUTION_STATUS,
-  EXPERT_STATUS
-} from "./expertIntelligenceModel.js";
+import { RESOLUTION_STATUS } from "./expertIntelligenceModel.js";
 
 export class ExpertEntityResolver {
   /**

@@ -5,7 +5,7 @@
  * and enforces contradiction handling (Critical/High evidence dominates weak PASS metadata).
  */
 
-import { SIGNAL_SEVERITY } from "../types.js";
+import { SIGNAL_SEVERITY, createSignal } from "../types.js";
 
 export class SignalAggregator {
   /**
@@ -27,16 +27,28 @@ export class SignalAggregator {
     const categoryDistribution = {};
 
     for (const sig of rawSignals) {
-      if (!sig || !sig.type) continue;
+      if (!sig || typeof sig !== "object" || typeof sig.type !== "string" || !sig.type.trim()) continue;
 
-      const key = `${sig.type}_${sig.category || "default"}`;
+      const normalizedSignal = createSignal({
+        type: sig.type.trim().slice(0, 120),
+        category: typeof sig.category === "string" ? sig.category.slice(0, 80) : "security",
+        severity: Object.values(SIGNAL_SEVERITY).includes(sig.severity) ? sig.severity : SIGNAL_SEVERITY.INFO,
+        confidence: Number.isFinite(sig.confidence) ? sig.confidence : 0,
+        evidence: sig.evidence && typeof sig.evidence === "object" && !Array.isArray(sig.evidence) ? sig.evidence : {},
+        source: typeof sig.source === "string" ? sig.source.slice(0, 120) : "layer1_boundary",
+        signalId: typeof sig.signalId === "string" ? sig.signalId.slice(0, 160) : null,
+        ruleVersion: typeof sig.ruleVersion === "string" ? sig.ruleVersion.slice(0, 120) : "layer1-boundary-v1",
+        observedAt: typeof sig.observedAt === "string" ? sig.observedAt : null,
+      });
+
+      const key = `${normalizedSignal.type}_${normalizedSignal.category || "default"}`;
 
       if (!signalMap.has(key)) {
-        signalMap.set(key, { ...sig, occurrences: 1 });
+        signalMap.set(key, { ...normalizedSignal, occurrences: 1 });
       } else {
         // If duplicate signal type, preserve highest confidence and note occurrence count
         const existing = signalMap.get(key);
-        existing.confidence = Math.max(existing.confidence, sig.confidence);
+        existing.confidence = Math.max(existing.confidence, normalizedSignal.confidence);
         existing.occurrences = (existing.occurrences || 1) + 1;
       }
     }

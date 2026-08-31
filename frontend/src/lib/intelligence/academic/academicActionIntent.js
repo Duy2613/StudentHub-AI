@@ -28,8 +28,8 @@ export const EXECUTION_MODES = Object.freeze({
 // Trusted internal routing paths mapped to action types
 export const TRUSTED_INTERNAL_ROUTES = Object.freeze({
   [ACTION_TYPES.CHECK_ELIGIBILITY]: "/academic?view=twin",
-  [ACTION_TYPES.REGISTER]: "/credit-scheduler",
-  [ACTION_TYPES.PAY]: "/tuition-radar",
+  [ACTION_TYPES.REGISTER]: "/academic?view=planner",
+  [ACTION_TYPES.PAY]: "/academic?view=tuition",
   [ACTION_TYPES.UPLOAD_DOCUMENT]: "/academic?action=upload",
   [ACTION_TYPES.SUBMIT_APPLICATION]: "/academic?action=submit",
   [ACTION_TYPES.CHECK_STATUS]: "/academic?view=status",

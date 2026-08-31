@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { motion } from "motion/react";
+import React, { useRef } from "react";
+
 
 /**
  * AeroMissionControlBackdrop

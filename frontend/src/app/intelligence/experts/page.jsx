@@ -1,18 +1,16 @@
 import React from "react";
-import { ExpertIntelligenceStudioV2 } from "@/components/expert/ExpertIntelligenceStudioV2";
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import { GlobalAppShell } from "@/components/layout/GlobalAppShell";
+import { ExpertLensView } from "@/components/intelligence/ExpertLensView";
 
 export const metadata = {
-  title: "Expert Intelligence V2 — StudentHub AI",
-  description: "Verified Expert Knowledge Graph, Scope Boundaries & Disagreement Mapping"
+  title: "T2 Expert Intelligence Lens | StudentHub AI",
+  description: "Khám phá chuyên gia theo thẩm quyền kiểm định chính quy và lịch sử độ chính xác."
 };
 
-export default function ExpertIntelligencePage() {
-  const initialExperts = ExpertStore.getAllExperts({ redactPrivate: true });
-
+export default function ExpertLensPage() {
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
-      <ExpertIntelligenceStudioV2 initialExperts={initialExperts} />
-    </main>
+    <GlobalAppShell>
+      <ExpertLensView />
+    </GlobalAppShell>
   );
 }

@@ -13,15 +13,7 @@
  * COMMUNITY SIGNAL NEVER OVERRIDES OFFICIAL ACADEMIC REGULATIONS.
  */
 
-import {
-  CommunityIntelligenceModel,
-  CLAIM_TYPE,
-  EVIDENCE_STATUS,
-  CONSENSUS_STATE,
-  CONSENSUS_SIGNAL,
-  COORDINATION_RISK,
-  MANIPULATION_RISK
-} from "./communityIntelligenceModel.js";
+import { CommunityIntelligenceModel, CLAIM_TYPE, EVIDENCE_STATUS, CONSENSUS_STATE, CONSENSUS_SIGNAL, COORDINATION_RISK } from "./communityIntelligenceModel.js";
 import { CommunityProvenanceEngine } from "./communityProvenanceEngine.js";
 import { CommunityFrictionEngine } from "./communityFrictionEngine.js";
 import { CommunityRealityGapEngine } from "./communityRealityGapEngine.js";

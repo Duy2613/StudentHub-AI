@@ -4,39 +4,46 @@
  * Retrieves immutable audit records, answer dependency graphs and blast radius analysis.
  */
 
-import { NextResponse } from "next/server";
-import { AiTrustStore } from "@/lib/intelligence/trust/aiTrustStore";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { AiTrustStore } from "@/lib/intelligence/trust/aiTrustStore.js";
 
-export async function GET(req, { params }) {
-  try {
-    const { answerId } = await params;
-    if (!answerId) {
-      return NextResponse.json(
-        { success: false, error: "answerId is required." },
-        { status: 400 }
-      );
-    }
-
-    const evaluation = AiTrustStore.getEvaluation(answerId);
-    if (!evaluation) {
-      return NextResponse.json(
-        { success: false, error: "Audit record not found for evaluation." },
-        { status: 404 }
-      );
-    }
-
-    const blastRadius = AiTrustStore.computeBlastRadius(evaluation.evidenceSpans?.[0]?.sourceId || answerId);
-
-    return NextResponse.json({
-      success: true,
-      auditRecord: evaluation.auditRecord,
-      evaluation,
-      blastRadius
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error retrieving audit record" },
-      { status: 500 }
-    );
+export const GET = SecurityFabric.wrapHandler({
+  action: "READ_TRUST_AUDIT",
+  requiredPermission: "TRUST.READ",
+  requiredScopes: ["trust:read"],
+  allowAnonymous: false,
+  maxRequests: 120
+}, async (_request, routeParams, principal, secContext) => {
+  const { answerId } = await routeParams.params;
+  if (!answerId) {
+    return Response.json({ success: false, error: {
+      code: "TRUST_EVALUATION_ID_REQUIRED",
+      userMessage: "Thiếu mã bản ghi kiểm chứng.",
+      requestId: secContext.correlationId,
+      retryable: false
+    } }, { status: 400 });
   }
-}
+
+  const evaluation = AiTrustStore.getEvaluationForPrincipal(answerId, principal);
+  if (!evaluation) {
+    return Response.json({ success: false, error: {
+      code: "TRUST_EVALUATION_NOT_FOUND",
+      userMessage: "Không tìm thấy bản ghi kiểm chứng.",
+      requestId: secContext.correlationId,
+      retryable: false
+    } }, { status: 404 });
+  }
+
+  const blastRadius = AiTrustStore.computeBlastRadiusForPrincipal(
+    evaluation.evidenceSpans?.[0]?.sourceId || answerId,
+    principal
+  );
+
+  return Response.json({
+    success: true,
+    auditRecord: evaluation.auditRecord,
+    evaluation,
+    blastRadius,
+    meta: { requestId: secContext.correlationId }
+  });
+});

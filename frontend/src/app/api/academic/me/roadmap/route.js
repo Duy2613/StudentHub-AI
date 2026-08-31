@@ -8,10 +8,13 @@
 
 import { NextResponse } from "next/server";
 import { getAuthoritativeCommandCenterData } from "@/lib/intelligence/academic/academicCommandCenterDataLoader";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
-export async function GET(request) {
+async function getRoadmap(request, routeParams, principal) {
   try {
-    const data = getAuthoritativeCommandCenterData();
+    const data = getAuthoritativeCommandCenterData({
+      studentId: principal.subjectId.replace("student:", "").trim()
+    });
     
     if (!data.success || !data.roadmap) {
       return NextResponse.json(
@@ -27,9 +30,16 @@ export async function GET(request) {
       timestamp: data.timestamp
     });
   } catch (err) {
-    return NextResponse.json(
-      { error: "Roadmap generation failed", detail: err.message, success: false },
-      { status: 500 }
-    );
+    throw err;
   }
 }
+
+export const GET = SecurityFabric.wrapHandler(
+  {
+    action: "READ_ACADEMIC_ROADMAP",
+    requiredPermission: "ACADEMIC.READ_OWN",
+    requiredScopes: ["academic:read"],
+    allowAnonymous: false
+  },
+  getRoadmap
+);

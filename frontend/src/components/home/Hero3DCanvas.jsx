@@ -6,9 +6,9 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, Html, MeshDistortMaterial, Sphere, Torus, Octahedron, Box } from "@react-three/drei";
-import * as THREE from "three";
-import { Bot, Code2, Network, Sparkles, Zap, ArrowUpRight } from "lucide-react";
+import { Float, Html, MeshDistortMaterial, Sphere } from "@react-three/drei";
+
+import { Bot, Code2, Network, Sparkles, ArrowUpRight } from "lucide-react";
 
 function HologramCore({ hoverPin, setHoverPin }) {
   const coreRef = useRef();

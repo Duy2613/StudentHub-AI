@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ShieldCheck, Sparkles, Heart, ExternalLink } from "lucide-react";
+import { ShieldCheck, Heart } from "lucide-react";
 import AuroraParticleCanvas from "@/components/ui/AuroraParticleCanvas";
 
 export default function LandingFooter() {

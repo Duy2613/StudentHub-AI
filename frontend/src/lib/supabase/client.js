@@ -1,9 +1,9 @@
 // frontend/src/lib/supabase/client.js
 //
-// Supabase Client với Custom Dynamic Storage Adapter an toàn tuyệt đối:
-// - Khi người dùng tick "Ghi nhớ đăng nhập" (Remember Me = true): Lưu trữ lâu dài qua localStorage.
-// - Khi không tick (Remember Me = false): Lưu trữ trong sessionStorage (tự động xóa khi đóng tab/trình duyệt).
-// - Fallback an toàn qua In-Memory Storage khi trình duyệt chặn cookie/storage (Incognito mode, Safari sandbox).
+// Supabase client with a memory-only auth adapter.
+// Provider access/refresh credentials are transient exchange material. They
+// must never be persisted in Web Storage; the application session boundary is
+// the server-issued HttpOnly studenthub_session cookie.
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -21,46 +21,23 @@ if (!envUrl || !envAnonKey) {
 const memoryStorage = new Map();
 
 /**
- * Dynamic Storage Adapter: Chuyển đổi linh hoạt giữa localStorage và sessionStorage với try-catch an toàn
+ * Compatibility-preserving Supabase storage adapter.
+ *
+ * Supabase still expects a storage-shaped object, but every value remains in
+ * process memory for the current page. Preferences and non-sensitive profile
+ * caches are owned by their callers and are deliberately not handled here.
  */
 export const dynamicAuthStorage = {
   getItem: (key) => {
-    if (typeof window === "undefined") return null;
-    try {
-      const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
-      if (isRemembered) {
-        return localStorage.getItem(key) || sessionStorage.getItem(key) || memoryStorage.get(key) || null;
-      }
-      return sessionStorage.getItem(key) || memoryStorage.get(key) || null;
-    } catch {
-      return memoryStorage.get(key) || null;
-    }
+    return typeof window === "undefined" ? null : memoryStorage.get(key) || null;
   },
   setItem: (key, value) => {
     if (typeof window === "undefined") return;
-    try {
-      memoryStorage.set(key, value);
-      const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
-      if (isRemembered) {
-        localStorage.setItem(key, value);
-        sessionStorage.setItem(key, value);
-      } else {
-        sessionStorage.setItem(key, value);
-        localStorage.removeItem(key);
-      }
-    } catch {
-      memoryStorage.set(key, value);
-    }
+    memoryStorage.set(key, value);
   },
   removeItem: (key) => {
     if (typeof window === "undefined") return;
-    try {
-      memoryStorage.delete(key);
-      localStorage.removeItem(key);
-      sessionStorage.removeItem(key);
-    } catch {
-      memoryStorage.delete(key);
-    }
+    memoryStorage.delete(key);
   },
 };
 

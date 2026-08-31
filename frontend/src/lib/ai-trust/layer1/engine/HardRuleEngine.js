@@ -12,15 +12,18 @@ export class HardRuleEngine {
   /**
    * Evaluates if detected signals satisfy any deterministic HARD BLOCK rule
    * @param {Array} signals
-   * @returns {object} { isHardBlock, matchedRules, primaryConfidence, reasons }
-   */
+  * @returns {object} { isHardBlock, matchedRules, primaryConfidence, reasons }
+  */
   static evaluate(signals = []) {
+    const safeSignals = Array.isArray(signals)
+      ? signals.filter((signal) => signal && typeof signal === "object" && !Array.isArray(signal))
+      : [];
     const matchedRules = [];
     const reasons = new Set();
     let maxConfidence = LAYER_1_CONFIG.CONFIDENCE_BOUNDS.HARD_BLOCK_MIN;
 
-    const signalTypes = new Set(signals.map((s) => s.type));
-    const criticalSignals = signals.filter((s) => s.severity === SIGNAL_SEVERITY.CRITICAL);
+    const signalTypes = new Set(safeSignals.filter((signal) => typeof signal.type === "string").map((signal) => signal.type));
+    const criticalSignals = safeSignals.filter((signal) => signal.severity === SIGNAL_SEVERITY.CRITICAL);
 
     // RULE 1: Known Malicious Shell / Script Payload (P0)
     if (signalTypes.has(LAYER_1_REASONS.MALICIOUS_SHELL_PAYLOAD)) {
@@ -71,7 +74,7 @@ export class HardRuleEngine {
     const hasCriticalDomainThreat =
       signalTypes.has(LAYER_1_REASONS.BRAND_IMPERSONATION_SUBDOMAIN) ||
       signalTypes.has(LAYER_1_REASONS.UNICODE_HOMOGLYPH) ||
-      criticalSignals.some((s) => s.category === "url" && s.type.includes("brand"));
+      criticalSignals.some((signal) => signal.category === "url" && typeof signal.type === "string" && signal.type.includes("brand"));
 
     if (hasCriticalDomainThreat || (hasDomainImpersonation && hasCorroboratingSignal)) {
       matchedRules.push("RULE_DECEPTIVE_DOMAIN_AND_PHISHING_PATH");
@@ -109,6 +112,15 @@ export class HardRuleEngine {
     if (signalTypes.has(LAYER_1_REASONS.SSRF_ATTEMPT)) {
       matchedRules.push("RULE_SSRF_NETWORK_BLOCK");
       reasons.add(LAYER_1_REASONS.SSRF_ATTEMPT);
+      maxConfidence = Math.max(maxConfidence, 0.99);
+    }
+
+    // RULE 9: Unsupported active URL schemes are blocked at the boundary so
+    // no later layer can accidentally treat javascript:/data:/file: or a
+    // similar non-web payload as an ordinary URL.
+    if (signalTypes.has(LAYER_1_REASONS.UNSUPPORTED_SCHEME)) {
+      matchedRules.push("RULE_UNSUPPORTED_URL_SCHEME");
+      reasons.add(LAYER_1_REASONS.UNSUPPORTED_SCHEME);
       maxConfidence = Math.max(maxConfidence, 0.99);
     }
 

@@ -1,36 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import {
-  ShieldAlert,
-  ShieldCheck,
-  AlertTriangle,
-  MapPin,
-  Search,
-  Plus,
-  Compass,
-  Radio,
-  Building,
-  Home,
-  CheckCircle2,
-  X,
-  Clock,
-  ThumbsUp,
-  ThumbsDown,
-  ChevronRight,
-  Filter,
-  Loader2,
-  Navigation,
-  Crosshair,
-  Flame,
-  PhoneCall,
-  Route,
-  Sparkles,
-} from "lucide-react";
+import { ShieldCheck, AlertTriangle, MapPin, Plus, Radio, Building, X, Clock, ThumbsUp, ChevronRight, Loader2, Navigation, Crosshair, Flame, Route } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import ModernNavbar from "@/components/layout/ModernNavbar";
 import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
-import AvatarDisplay from "@/components/AvatarDisplay";
+
 import AeroMissionControlBackdrop from "@/components/ui/AeroMissionControlBackdrop";
 import MohsinFluidCanvas from "@/components/ui/MohsinFluidCanvas";
 import SaffronMarqueeTicker from "@/components/ui/SaffronMarqueeTicker";
@@ -115,26 +90,6 @@ export default function SafetyMapPage() {
     return reports.find((r) => r.id === selectedReportId) || reports[0] || null;
   }, [reports, selectedReportId]);
 
-  const handleVerify = async (reportId) => {
-    saffronAudio.playClick(700);
-    try {
-      const res = await fetch(`/api/safety-map/reports/${reportId}/verify`, {
-        method: "POST",
-      });
-      const data = await res.json();
-      if (data?.success) {
-        setReports((prev) =>
-          prev.map((r) =>
-            r.id === reportId ? { ...r, verifiedCount: r.verifiedCount + 1 } : r
-          )
-        );
-        saffronAudio.playSuccessChime();
-      }
-    } catch (err) {
-      console.warn("Verify error:", err);
-    }
-  };
-
   const handleCreateReport = async (e) => {
     e.preventDefault();
     saffronAudio.playClick(700);
@@ -209,13 +164,13 @@ export default function SafetyMapPage() {
           <div>
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ea3810]/15 border border-[#ea3810]/30 text-[#ff715b] text-xs font-mono font-bold tracking-wider mb-3">
               <span className="w-2 h-2 rounded-full bg-[#ea3810] animate-ping" />
-              <span>LIVE GEOSPATIAL THREAT RADAR // PROVENANCE-BACKED</span>
+              <span>SAFETY SIGNAL SNAPSHOT // CẦN XÁC MINH</span>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
               <span className="text-[#ffd15c]">Bản Đồ An Ninh &amp; GPS</span> Định Tuyến An Toàn
             </h1>
             <p className="text-xs sm:text-sm text-[#ece7e0]/80 mt-2 max-w-2xl font-normal leading-relaxed">
-              Hệ thống radar đối soát điểm nóng lừa cọc, danh bạ trọ an toàn, định vị trạm Công an 24/7 và tính toán 3 tuyến đường (Fastest / Safest / Balanced) theo chi phí an toàn.
+              Bản đồ tổng hợp tín hiệu cộng đồng và dữ liệu minh họa để kiểm tra luồng trải nghiệm. Hãy xác minh với nguồn chính thức trước khi hành động; chưa có cảnh báo an ninh thời gian thực.
             </p>
           </div>
 
@@ -240,12 +195,12 @@ export default function SafetyMapPage() {
           <div className="flex items-start sm:items-center gap-2 text-[#ffd15c] min-w-0">
             <span className="w-2 h-2 rounded-full bg-[#ffbc09] animate-ping shrink-0 mt-1 sm:mt-0" />
             <div className="min-w-0">
-              <span className="font-bold mr-2 text-[#ffbc09]">REALITY PIPELINE:</span>
-              <span className="text-white/90 font-medium">GPS → accuracy → map matching → road segment → traffic → weather → camera → incidents → safety evidence → route risk</span>
+              <span className="font-bold mr-2 text-[#ffbc09]">EVIDENCE STATE:</span>
+              <span className="text-white/90 font-medium">snapshot → community signal → pending review → verify with official source</span>
             </div>
           </div>
           <div className="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10.5px] font-bold shrink-0">
-            ✓ SUB-10M MAP MATCHING
+            SNAPSHOT / NOT LIVE
           </div>
         </div>
 
@@ -260,10 +215,10 @@ export default function SafetyMapPage() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
-                GPS FIX: ±10m (EXCELLENT)
+                ROUTE MODEL: LOCAL FIXTURE
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#ffbc09]/20 text-[#ffbc09] border border-[#ffbc09]/30">
-                TRAFFIC_AWARE_OPTIMAL
+                LIVE FEED: NOT CONNECTED
               </span>
             </div>
           </div>
@@ -272,7 +227,7 @@ export default function SafetyMapPage() {
           <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-xs font-mono text-amber-300">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 shrink-0" />
-              <span>CẢNH BÁO PHÂN ĐOẠN: Nguy cơ ngập nước xiết tập trung tại Đoạn dốc Võ Văn Ngân; các đoạn còn lại an toàn.</span>
+              <span>TÍN HIỆU MINH HỌA: Nguy cơ ngập nước tại Đoạn dốc Võ Văn Ngân — cần kiểm tra nguồn địa phương trước khi di chuyển.</span>
             </div>
             <span className="text-[10px] text-amber-400 font-bold underline cursor-pointer">
               Chi tiết phân đoạn →
@@ -422,7 +377,7 @@ export default function SafetyMapPage() {
                 {/* Radar HUD Telemetry Overlay */}
                 <div className="absolute top-3 left-3 px-2.5 py-1 rounded-xl bg-black/70 border border-[#47140b] text-[10px] font-mono text-[#ece7e0]/70 flex items-center gap-1.5">
                   <Radio className="w-3 h-3 text-[#ffbc09] animate-pulse" />
-                  <span>RADAR ACTIVE: {reports.length} ĐIỂM GIÁM SÁT</span>
+                  <span>SNAPSHOT: {reports.length} ĐIỂM THAM CHIẾU</span>
                 </div>
               </div>
 
@@ -455,7 +410,7 @@ export default function SafetyMapPage() {
                   DANH SÁCH BÁO CÁO THEO KHU VỰC ({reports.length})
                 </span>
                 <span className="text-xs font-mono text-[#ece7e0]/50">
-                  CẬP NHẬT THEO THỜI GIAN THỰC
+                  DỮ LIỆU MINH HỌA / CHƯA LIVE
                 </span>
               </div>
 
@@ -574,7 +529,7 @@ export default function SafetyMapPage() {
 
                   <div className="p-3 rounded-xl bg-black/40 border border-[#47140b] space-y-1">
                     <span className="text-[10.5px] font-mono text-[#ece7e0]/50 uppercase block">
-                      ĐỊA ĐIỂM CHÍNH XÁC:
+                      ĐỊA ĐIỂM TRONG BẢN GHI (CẦN XÁC MINH):
                     </span>
                     <p className="text-xs font-mono text-[#ffd15c] font-semibold flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 text-[#ffbc09] shrink-0" />
@@ -584,7 +539,7 @@ export default function SafetyMapPage() {
 
                   <div className="space-y-1">
                     <span className="text-[10.5px] font-mono text-[#ece7e0]/50 uppercase block">
-                      NỘI DUNG PHẢN ÁNH THỰC TẾ:
+                      NỘI DUNG PHẢN ÁNH (TÍN HIỆU CHƯA XÁC MINH):
                     </span>
                     <p className="text-xs sm:text-sm text-[#ece7e0]/80 leading-relaxed font-human whitespace-pre-line">
                       {activeReport.description}
@@ -616,12 +571,12 @@ export default function SafetyMapPage() {
                         {activeReport.authorName}
                       </span>
                       <span className="text-[10px] font-mono text-[#ffbc09]">
-                        Trust Score: {activeReport.authorTrustScore || 80} PTS
+                        Tín hiệu cộng đồng — chưa phải chứng nhận sự thật
                       </span>
                     </div>
                   </div>
                   <span className="text-[11px] font-mono text-emerald-400 font-bold">
-                    ✓ ĐÃ XÁC THỰC
+                    {activeReport.verificationState === "PENDING_REVIEW" ? "ĐANG CHỜ DUYỆT" : "CHƯA XÁC MINH"}
                   </span>
                 </div>
 
@@ -634,23 +589,15 @@ export default function SafetyMapPage() {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     <button
                       type="button"
-                      onClick={() => handleVerify(activeReport.id)}
-                      className="py-2.5 px-3 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-mono font-bold flex items-center justify-center gap-2 cursor-pointer transition-all"
+                      disabled
+                      title="Luồng xác minh chính thức chưa được kết nối"
+                      className="py-2.5 px-3 rounded-xl bg-emerald-500/10 text-emerald-300/60 border border-emerald-500/30 text-xs font-mono font-bold flex items-center justify-center gap-2 cursor-not-allowed"
                     >
                       <ThumbsUp className="w-3.5 h-3.5" />
-                      <span>Xác nhận đúng</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => saffronAudio.playClick(400)}
-                      className="py-2.5 px-3 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-mono font-bold flex items-center justify-center gap-2 cursor-pointer transition-all"
-                    >
-                      <ThumbsDown className="w-3.5 h-3.5" />
-                      <span>Báo cáo sai</span>
+                      <span>Luồng xác minh chính thức chưa khả dụng</span>
                     </button>
                   </div>
                 </div>

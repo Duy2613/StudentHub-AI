@@ -7,15 +7,16 @@
 import { NextResponse } from "next/server";
 import { ExpertScopeEngine } from "@/lib/intelligence/expert/expertScopeEngine";
 import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
-export async function POST(req) {
+async function evaluateExpertScope(req) {
   try {
     const body = await req.json().catch(() => ({}));
     const { expertId, claim } = body;
 
-    if (!expertId || !claim) {
+    if (typeof expertId !== "string" || expertId.length > 160 || !claim || typeof claim !== "object" || Array.isArray(claim)) {
       return NextResponse.json(
-        { success: false, error: "expertId and claim object are required." },
+        { success: false, error: { code: "EXPERT_INPUT_INVALID", userMessage: "Mã chuyên gia và claim hợp lệ là bắt buộc." } },
         { status: 400 }
       );
     }
@@ -23,7 +24,7 @@ export async function POST(req) {
     const expert = ExpertStore.getExpert(expertId);
     if (!expert) {
       return NextResponse.json(
-        { success: false, error: `Expert not found for ID: ${expertId}` },
+        { success: false, error: { code: "EXPERT_NOT_FOUND", userMessage: "Không tìm thấy hồ sơ chuyên gia." } },
         { status: 404 }
       );
     }
@@ -43,9 +44,13 @@ export async function POST(req) {
       evaluation
     });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error in Expert Intelligence Engine" },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "ANALYZE_EXPERT_SCOPE",
+  allowAnonymous: true,
+  maxRequests: 30,
+  maxBodyBytes: 128 * 1024,
+}, evaluateExpertScope);

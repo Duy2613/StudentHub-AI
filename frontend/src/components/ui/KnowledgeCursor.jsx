@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useRef } from "react";
 
 export default function KnowledgeCursor() {
-  const [position, setPosition] = useState({ x: -100, y: -100 });
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const cursorDotRef = useRef(null);
@@ -12,7 +11,11 @@ export default function KnowledgeCursor() {
 
   useEffect(() => {
     // Only enable on desktop with fine pointer
-    if (typeof window === "undefined" || window.matchMedia("(pointer: coarse)").matches) {
+    if (
+      typeof window === "undefined" ||
+      window.matchMedia("(pointer: coarse)").matches ||
+      window.location.pathname.startsWith("/ultra")
+    ) {
       return;
     }
 

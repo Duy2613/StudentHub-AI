@@ -166,6 +166,13 @@ export function AcademicCommandCenter({ initialData = null }) {
         onOpenNotificationDrawer={() => setIsNotificationDrawerOpen(true)}
       />
 
+      {data.dataNotice && (
+        <div className="truth-note" role="note">
+          <span aria-hidden="true">?</span>
+          <span>{data.dataNotice}</span>
+        </div>
+      )}
+
       {/* 1.5. Academic Journey Summary Card */}
       {roadmap && (
         <div className="rounded-2xl border border-border/60 bg-card/30 p-4 md:p-5 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">

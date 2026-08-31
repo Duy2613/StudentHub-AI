@@ -14,7 +14,7 @@ import {
   SCENARIO_OPERATIONS, 
   DELTA_TYPES 
 } from "./academicSimulationModel.js";
-import { AcademicEligibilityEngine, ELIGIBILITY_STATUS } from "./academicEligibilityEngine.js";
+import { AcademicEligibilityEngine } from "./academicEligibilityEngine.js";
 import { AcademicRoadmapEngine } from "./academicRoadmapEngine.js";
 import { MILESTONE_STATES, MILESTONE_TYPES } from "./academicMilestoneModel.js";
 import { getCurriculumForStudent } from "./versionedCurricula.js";

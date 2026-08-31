@@ -17,9 +17,9 @@ import { AcademicNotificationOrchestrator } from "./academicNotificationOrchestr
 
 import { StudentIdentityStore } from "./studentIdentityStore.js";
 import { StudentAcademicSyncBridge } from "./studentAcademicSyncBridge.js";
-import { AcademicRecordsStore } from "./academicRecordsStore.js";
+
 import { StudentProfile360Service } from "./studentProfile360Service.js";
-import { StudentProfile360Store } from "./studentProfile360Store.js";
+
 import { AcademicRoadmapEngine } from "./academicRoadmapEngine.js";
 
 export const DEFAULT_STUDENT_PROFILE = {
@@ -189,7 +189,14 @@ export function getAuthoritativeCommandCenterData(params = {}) {
   const unreadNotificationCount = AcademicNotificationStore.countUnreadByStudent(studentProfile.studentId);
 
   const syncStatus = {
+    // `isLive` is retained as a transport-compatibility field for existing
+    // consumers. `sourceState`/`isAuthoritative` are the product truth used by
+    // presentation and prevent a seeded local snapshot from being presented as
+    // an institutional live feed.
     isLive: true,
+    effectiveLive: false,
+    sourceState: "SYNTHETIC_FIXTURE",
+    isAuthoritative: false,
     lastSyncedAt: new Date().toISOString(),
     activeDocument: activeDoc ? {
       documentId: activeDoc.documentId,
@@ -198,7 +205,7 @@ export function getAuthoritativeCommandCenterData(params = {}) {
       sourceUrl: activeDoc.sourceUrl,
       publishedAt: activeDoc.publishedAt
     } : null,
-    warning: null
+    warning: "SYNTHETIC_FIXTURE_SOURCE: chưa kết nối nguồn học vụ trực tiếp."
   };
 
   const profile360 = StudentProfile360Service.getProfile360(studentProfile.studentId);
@@ -229,6 +236,9 @@ export function getAuthoritativeCommandCenterData(params = {}) {
     profile360,
     roadmap,
     totalActionCount: sortedInsights.filter(i => i.impact === "CRITICAL" || i.impact === "HIGH").length,
+    sourceState: "SYNTHETIC_FIXTURE",
+    isAuthoritative: false,
+    dataNotice: "Bản học vụ hiện tại được dựng từ snapshot fixture cục bộ để kiểm thử luồng. Không coi đây là trạng thái SIS trực tiếp.",
     syncStatus,
     timestamp: new Date().toISOString()
   };

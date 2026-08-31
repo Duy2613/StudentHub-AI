@@ -35,8 +35,8 @@ import SaffronSwissCrosshairGrid from "@/components/ui/SaffronSwissCrosshairGrid
 import { NoiseOverlay } from "@/components/auth/AuthUI";
 import FloatingDock from "@/components/ui/floating-dock";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
-import IglooSoundAmbiencePill from "@/components/ui/IglooSoundAmbiencePill";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
+import { safeExternalUrl } from "@/lib/security/safeExternalUrl";
 import { motion, AnimatePresence } from "motion/react";
 
 const FORUM_CATEGORIES = [
@@ -199,7 +199,6 @@ export default function ForumPage() {
     saffronAudio.playSuccessChime();
 
     const isExpert = profile?.role === "expert";
-    const authorTrustScore = profile?.trustScore || (isExpert ? 98 : 80);
 
     const payload = {
       category: newCategory,
@@ -211,7 +210,6 @@ export default function ForumPage() {
       authorId: session?.user?.id || profile?.id || "usr_stu_new",
       authorName: profile?.fullName || session?.user?.email?.split("@")[0] || "Sinh viên StudentHub",
       authorAvatar: profile?.avatarId || (isExpert ? "expert-tech" : "student-tech"),
-      authorTrustScore,
     };
 
     try {
@@ -312,7 +310,6 @@ export default function ForumPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <IglooSoundAmbiencePill />
             <button
               type="button"
               onClick={() => {
@@ -477,14 +474,21 @@ export default function ForumPage() {
                   </div>
 
                   {/* Attached Links / Sources */}
-                  {post.links && post.links.length > 0 && (
-                    <div className="p-3 rounded-2xl bg-black/40 border border-[#47140b] flex items-center gap-2 text-xs font-mono text-[#38bdf8] overflow-hidden">
-                      <Link2 className="w-4 h-4 shrink-0" />
-                      <a href={post.links[0]} target="_blank" rel="noopener noreferrer" className="truncate hover:underline">
-                        {post.links[0]}
-                      </a>
-                    </div>
-                  )}
+                  {post.links && post.links.length > 0 && (() => {
+                    const safeHref = safeExternalUrl(post.links[0]);
+                    return (
+                      <div className="p-3 rounded-2xl bg-black/40 border border-[#47140b] flex items-center gap-2 text-xs font-mono text-[#38bdf8] overflow-hidden">
+                        <Link2 className="w-4 h-4 shrink-0" />
+                        {safeHref ? (
+                          <a href={safeHref} target="_blank" rel="noopener noreferrer" className="truncate hover:underline">
+                            {post.links[0]}
+                          </a>
+                        ) : (
+                          <span className="truncate text-[#ece7e0]/60">{post.links[0]}</span>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   {/* Vote & Comment Actions Toolbar (Phần E.3 - Tách bạch Like & Vote) */}
                   <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#47140b]/60">

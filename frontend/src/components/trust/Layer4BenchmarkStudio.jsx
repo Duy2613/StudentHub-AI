@@ -1,21 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Play,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Sparkles,
-  Scale,
-  ShieldCheck,
-  ShieldAlert,
-  AlertTriangle,
-  HelpCircle,
-  ExternalLink,
-  ChevronRight,
-} from "lucide-react";
+
+import { Play, CheckCircle2, XCircle, Sparkles, Scale, ChevronRight } from "lucide-react";
 import { Layer4TrustService } from "@/lib/ai-trust/layer4/Layer4TrustService";
 import { LAYER_4_TEST_CASES } from "../../../tests/layer4/layer4.test.mjs";
 import { saffronAudio } from "@/lib/audio/saffronAudio";

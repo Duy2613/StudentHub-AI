@@ -10,8 +10,9 @@ import { NextResponse } from "next/server";
 import { getAuthoritativeCommandCenterData } from "@/lib/intelligence/academic/academicCommandCenterDataLoader";
 import { AcademicSimulationEngine } from "@/lib/intelligence/academic/academicSimulationEngine";
 import { AcademicSimulationModel } from "@/lib/intelligence/academic/academicSimulationModel";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
-export async function POST(request) {
+async function simulateAcademicScenario(request, routeParams, principal) {
   try {
     const body = await request.json().catch(() => ({}));
     const rawScenario = body.scenario || body.operations || body;
@@ -30,7 +31,9 @@ export async function POST(request) {
     }
 
     // Load Authoritative Baseline Data (Server-Side)
-    const serverData = getAuthoritativeCommandCenterData();
+    const serverData = getAuthoritativeCommandCenterData({
+      studentId: principal.subjectId.replace("student:", "").trim()
+    });
     if (!serverData.success) {
       return NextResponse.json(
         { success: false, error: "Không thể nạp dữ liệu học vụ cơ sở từ máy chủ." },
@@ -59,9 +62,18 @@ export async function POST(request) {
       {
         success: false,
         error: "Lỗi thực thi giả lập học vụ.",
-        message: err.message
       },
       { status: 500 }
     );
   }
 }
+
+export const POST = SecurityFabric.wrapHandler(
+  {
+    action: "SIMULATE_ACADEMIC_SCENARIO",
+    requiredPermission: "ACADEMIC.PLAN_OWN",
+    requiredScopes: ["academic:plan"],
+    allowAnonymous: false
+  },
+  simulateAcademicScenario
+);

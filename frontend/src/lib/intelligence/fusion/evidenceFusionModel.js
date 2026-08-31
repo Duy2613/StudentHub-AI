@@ -18,6 +18,7 @@
  */
 
 import crypto from "node:crypto";
+import { createSecureId } from "../../security/secureId.js";
 
 export const FUSION_POLICY_VERSION = "1.0.0";
 
@@ -103,7 +104,7 @@ export class EvidenceFusionModel {
    * Creates a normalized Canonical Claim
    */
   static createCanonicalClaim(data = {}) {
-    const claimId = data.claimId || `FUS_CLM_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const claimId = data.claimId || createSecureId("FUS_CLM");
     const subject = typeof data.subject === "string" ? data.subject.trim() : "GENERAL_ACADEMIC_TOPIC";
     const predicate = typeof data.predicate === "string" ? data.predicate.trim() : "REQUIRES";
     const value = data.value !== undefined ? data.value : null;
@@ -165,7 +166,7 @@ export class EvidenceFusionModel {
    * Creates a Canonical Knowledge Object
    */
   static createKnowledgeObject(data = {}) {
-    const knowledgeObjectId = data.knowledgeObjectId || `KNO_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const knowledgeObjectId = data.knowledgeObjectId || createSecureId("KNO");
     const version = Number(data.version || 1);
     const subject = typeof data.subject === "string" ? data.subject.trim() : "ACADEMIC_REGULATION";
     const topic = typeof data.topic === "string" ? data.topic.trim().toUpperCase() : subject.toUpperCase();

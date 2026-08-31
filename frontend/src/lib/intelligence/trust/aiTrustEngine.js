@@ -3,15 +3,7 @@
  * Self-Verifying Epistemic Intelligence & Evidence-Constrained Reasoning System
  */
 
-import {
-  AiTrustModel,
-  ABSTENTION_REASON,
-  AUTHORITY_TIER,
-  STAKE_LEVEL,
-  EPISTEMIC_STATE,
-  ANSWER_MODE,
-  TEMPORAL_STATUS
-} from "./aiTrustModel.js";
+import { AiTrustModel, ABSTENTION_REASON, STAKE_LEVEL, EPISTEMIC_STATE, ANSWER_MODE } from "./aiTrustModel.js";
 import { AdversarialTrustGuard } from "./adversarialTrustGuard.js";
 import { SourceIndependenceEngine } from "./sourceIndependenceEngine.js";
 import { ClaimDecompositionEngine } from "./claimDecompositionEngine.js";
@@ -22,6 +14,7 @@ import { CounterEvidenceEngine } from "./counterEvidenceEngine.js";
 import { BlindSpotDetector } from "./blindSpotDetector.js";
 import { ToolUseFirewall } from "./toolUseFirewall.js";
 import { EpistemicClaimGraph } from "./epistemicClaimGraph.js";
+import { createSecureId } from "../../security/secureId.js";
 
 export class AiTrustEngine {
   static evaluate(input = {}) {
@@ -44,6 +37,7 @@ export class AiTrustEngine {
         query,
         rawAnswer,
         stakeLevel,
+        ownerId: input.ownerId,
         reason: ABSTENTION_REASON.PROMPT_INJECTION_DETECTED,
         explanation: "Phát hiện dấu hiệu tấn công Prompt Injection hoặc thao túng chỉ thị an toàn."
       });
@@ -151,6 +145,8 @@ export class AiTrustEngine {
       : (evidenceSpans.length > 0 ? Math.max(...evidenceSpans.map(e => e.authorityTier || 0)) : 0);
 
     const evaluation = AiTrustModel.createEpistemicEvaluation({
+      ownerId: input.ownerId,
+      visibility: input.ownerId ? "PRIVATE" : "INTERNAL",
       query,
       answerMode: synthesis.answerMode,
       epistemicState: synthesis.epistemicState,
@@ -337,9 +333,11 @@ export class AiTrustEngine {
     return rawAnswer;
   }
 
-  static #buildAbstentionResult({ query, rawAnswer, stakeLevel, reason, explanation }) {
+  static #buildAbstentionResult({ query, rawAnswer, stakeLevel, ownerId = null, reason, explanation }) {
     return Object.freeze({
-      evaluationId: `EVAL_ABSTAIN_${Date.now()}`,
+      evaluationId: createSecureId("EVAL_ABSTAIN"),
+      ownerId: typeof ownerId === "string" && ownerId.trim() ? ownerId.trim() : null,
+      visibility: ownerId ? "PRIVATE" : "INTERNAL",
       query,
       queryStake: stakeLevel,
       rawAnswer,

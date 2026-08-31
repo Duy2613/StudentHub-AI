@@ -1,41 +1,37 @@
-import { NextResponse } from "next/server";
 import { SCHOLARSHIP_REGISTRY } from "@/lib/scholarship/scholarshipRegistry";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
 /**
  * GET /api/scholarships/list?major=&type=&q=
  */
-export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const major = (searchParams.get("major") || "").toLowerCase().trim();
-    const sponsorType = searchParams.get("type") || "ALL";
-    const q = (searchParams.get("q") || "").toLowerCase().trim();
+export const GET = SecurityFabric.wrapHandler({
+  action: "READ_SCHOLARSHIP_REGISTRY",
+  allowAnonymous: true,
+  maxRequests: 90
+}, async (request) => {
+  const { searchParams } = new URL(request.url);
+  const major = (searchParams.get("major") || "").toLowerCase().trim().slice(0, 120);
+  const sponsorType = (searchParams.get("type") || "ALL").slice(0, 60);
+  const q = (searchParams.get("q") || "").toLowerCase().trim().slice(0, 120);
 
-    let list = SCHOLARSHIP_REGISTRY.filter((sch) => {
-      if (sponsorType !== "ALL" && sch.sponsorType !== sponsorType) return false;
-      if (major) {
-        const matchMajor = sch.targetMajors.some((m) => m.toLowerCase().includes(major));
-        if (!matchMajor) return false;
-      }
-      if (q) {
-        const matchName = sch.name.toLowerCase().includes(q);
-        const matchSponsor = sch.sponsor.toLowerCase().includes(q);
-        const matchBenefits = sch.benefits.toLowerCase().includes(q);
-        if (!matchName && !matchSponsor && !matchBenefits) return false;
-      }
-      return true;
-    });
+  const list = SCHOLARSHIP_REGISTRY.filter((sch) => {
+    if (sponsorType !== "ALL" && sch.sponsorType !== sponsorType) return false;
+    if (major && !sch.targetMajors.some((m) => m.toLowerCase().includes(major))) return false;
+    if (q) {
+      const matchName = sch.name.toLowerCase().includes(q);
+      const matchSponsor = sch.sponsor.toLowerCase().includes(q);
+      const matchBenefits = sch.benefits.toLowerCase().includes(q);
+      if (!matchName && !matchSponsor && !matchBenefits) return false;
+    }
+    return true;
+  });
 
-    return NextResponse.json({
-      success: true,
-      count: list.length,
-      scholarships: list,
-    });
-  } catch (error) {
-    console.error("[Scholarships GET Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi tải danh sách học bổng." },
-      { status: 500 }
-    );
-  }
-}
+  return Response.json({
+    success: true,
+    count: list.length,
+    scholarships: list,
+    sourceState: "CURATED_STATIC_REGISTRY",
+    isAuthoritative: false,
+    dataNotice: "Học bổng tham khảo; cần xác nhận hạn nộp và điều kiện trên website nhà tài trợ."
+  }, { headers: { "Cache-Control": "no-store" } });
+});

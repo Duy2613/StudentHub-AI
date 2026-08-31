@@ -8,7 +8,7 @@
 // - Sound feedback toggle button integrated with saffronAudio engine
 
 import React, { useState, useEffect } from "react";
-import { ShieldCheck, Radio, Volume2, VolumeX, Activity, Compass, Lock } from "lucide-react";
+import { Radio, Volume2, VolumeX, Activity } from "lucide-react";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 import LiveStudioClock from "@/components/ui/live-studio-clock";
 

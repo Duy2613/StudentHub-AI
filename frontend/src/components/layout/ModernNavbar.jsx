@@ -3,13 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  ShieldCheck,
-  Menu, 
-  X, 
-  Sparkles,
-  Zap
-} from "lucide-react";
+import { ShieldCheck, Menu, X, Zap } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
 import LiveStudioClock from "@/components/ui/live-studio-clock";
@@ -21,21 +15,16 @@ export default function ModernNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [hoveredTab, setHoveredTab] = useState(null);
 
-  // Streamlined nav items with no wrapping
+  // Streamlined nav items centered on canonical product pillars
   const navTabs = [
     { label: "Trang Chủ", href: "/" },
-    { label: "Kiểm Tra Lừa Đảo", href: "/scam-check", highlight: true, badge: "AI 4 Lớp" },
-    { label: "Xếp Tín Chỉ", href: "/credit-scheduler" },
-    { label: "Review GV", href: "/prof-rating" },
-    { label: "Học Bổng", href: "/scholarships" },
-    { label: "Bản Đồ An Ninh", href: "/safety-map" },
-    { label: "Radar Học Phí", href: "/tuition-radar" },
-    { label: "Bóc Tách Hợp Đồng", href: "/contract-check" },
-    { label: "Cấp Cứu SOS", href: "/sos", highlight: true },
-    { label: "Sàn Pass Đồ", href: "/marketplace" },
+    { label: "Trust Engine", href: "/trust", highlight: true, badge: "AI 4 Lớp" },
+    { label: "Community", href: "/community" },
+    { label: "Expert Network", href: "/expert" },
     { label: "Diễn Đàn", href: "/forum" },
+    { label: "Học Vụ 360", href: "/academic" },
     ...(session ? [
-      { label: "Bảng Điều Khiển", href: "/dashboard" },
+      { label: "Command Center", href: "/dashboard" },
       { label: "Hồ Sơ", href: "/profile" },
     ] : []),
   ];

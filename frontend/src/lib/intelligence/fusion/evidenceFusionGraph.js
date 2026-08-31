@@ -10,6 +10,7 @@ import {
   KNOWLEDGE_LAYER,
   AUTHORITY_CLASS
 } from "./evidenceFusionModel.js";
+import { createSecureId } from "../../security/secureId.js";
 
 export class EvidenceFusionGraph {
   #nodes = new Map();
@@ -24,7 +25,7 @@ export class EvidenceFusionGraph {
    * Adds a node to the fusion graph
    */
   addNode(node = {}) {
-    const id = node.id || node.claimId || node.sourceId || node.expertId || node.postId || `NODE_${Math.random().toString(36).slice(2, 7)}`;
+    const id = node.id || node.claimId || node.sourceId || node.expertId || node.postId || createSecureId("NODE");
     const type = node.type || (node.claimId ? "CLAIM" : (node.expertId ? "EXPERT" : "SOURCE"));
 
     const normalizedNode = {

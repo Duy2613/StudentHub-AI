@@ -1,6 +1,7 @@
 import React from "react";
 import { ExpertIntelligenceView } from "@/components/expert/ExpertIntelligenceView";
 import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import UnifiedAppShell from "@/components/layout/UnifiedAppShell";
 
 export const metadata = {
   title: "Expert Intelligence — StudentHub AI",
@@ -10,9 +11,5 @@ export const metadata = {
 export default function ExpertPage() {
   const initialExperts = ExpertStore.getAllExperts();
 
-  return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
-      <ExpertIntelligenceView initialExperts={initialExperts} />
-    </main>
-  );
+  return <UnifiedAppShell><ExpertIntelligenceView initialExperts={initialExperts} /></UnifiedAppShell>;
 }

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { AcademicCommandCenterViewModel } from "@/lib/intelligence/academic/academicCommandCenterViewModel.js";
-import { History, Calendar, Filter, FileText, ChevronRight } from "lucide-react";
+import { History, Calendar, FileText, ChevronRight } from "lucide-react";
 
 const TIMELINE_FILTERS = [
   { id: "ALL", label: "Tất cả" },

@@ -1,17 +1,8 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  ShieldCheck,
-  Star,
-  Sparkles,
-  Zap,
-  Lock,
-  CheckCircle2,
-  GraduationCap,
-} from "lucide-react";
+import { ArrowLeft, Zap, Lock, CheckCircle2 } from "lucide-react";
 import LiveStudioClock from "@/components/ui/live-studio-clock";
 
 /**

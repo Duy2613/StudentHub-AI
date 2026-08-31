@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
+import { createSecureId } from "@/lib/security/secureId.js";
 
 // Genuine campus safety zones and alert reports (Zero Fake Data)
 let SAFETY_REPORTS = [
@@ -98,74 +100,104 @@ let SAFETY_REPORTS = [
  * GET /api/safety-map/reports?zone=&category=&severity=
  * Lấy danh sách điểm cảnh báo an ninh và nhà trọ sinh viên
  */
-export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const zone = searchParams.get("zone") || "";
-    const category = searchParams.get("category") || "";
-    const severity = searchParams.get("severity") || "";
-    const q = (searchParams.get("q") || "").toLowerCase().trim();
+const toPublicReport = (item) => ({
+  ...item,
+  // Do not expose account identifiers or present fixture author scores as
+  // verified identity.  Counts remain community signals, not truth labels.
+  authorId: undefined,
+  authorName: "Cộng đồng StudentHub",
+  authorRole: "community",
+  authorTrustScore: null,
+  sourceState: item.status === "PENDING_REVIEW" ? "USER_SUBMITTED_PENDING_REVIEW" : "SYNTHETIC_FIXTURE",
+  verificationState: item.status === "PENDING_REVIEW" ? "PENDING_REVIEW" : "UNVERIFIED_FIXTURE",
+  isAuthoritative: false,
+  countsAreSynthetic: item.status !== "PENDING_REVIEW"
+});
 
-    let list = SAFETY_REPORTS.filter((item) => {
-      if (zone && zone !== "ALL" && item.zone !== zone) return false;
-      if (category && category !== "ALL" && item.category !== category) return false;
-      if (severity && severity !== "ALL" && item.severity !== severity) return false;
-      if (q) {
-        const matchTitle = item.title.toLowerCase().includes(q);
-        const matchDesc = item.description.toLowerCase().includes(q);
-        const matchAddress = item.address.toLowerCase().includes(q);
-        const matchZone = item.zoneName.toLowerCase().includes(q);
-        if (!matchTitle && !matchDesc && !matchAddress && !matchZone) return false;
-      }
-      return true;
-    });
+export const GET = SecurityFabric.wrapHandler({
+  action: "READ_SAFETY_REPORTS",
+  allowAnonymous: true,
+  maxRequests: 90
+}, async (request) => {
+  const { searchParams } = new URL(request.url);
+  const zone = searchParams.get("zone") || "";
+  const category = searchParams.get("category") || "";
+  const severity = searchParams.get("severity") || "";
+  const q = (searchParams.get("q") || "").toLowerCase().trim().slice(0, 120);
 
-    return NextResponse.json({
-      success: true,
-      count: list.length,
-      reports: list,
-    });
-  } catch (error) {
-    console.error("[Safety Map GET Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi tải bản đồ an ninh." },
-      { status: 500 }
-    );
-  }
-}
+  const list = SAFETY_REPORTS.filter((item) => {
+    if (zone && zone !== "ALL" && item.zone !== zone) return false;
+    if (category && category !== "ALL" && item.category !== category) return false;
+    if (severity && severity !== "ALL" && item.severity !== severity) return false;
+    if (q) {
+      const matchTitle = item.title.toLowerCase().includes(q);
+      const matchDesc = item.description.toLowerCase().includes(q);
+      const matchAddress = item.address.toLowerCase().includes(q);
+      const matchZone = item.zoneName.toLowerCase().includes(q);
+      if (!matchTitle && !matchDesc && !matchAddress && !matchZone) return false;
+    }
+    return true;
+  }).map(toPublicReport);
+
+  return Response.json({
+    success: true,
+    count: list.length,
+    reports: list,
+    sourceState: "SYNTHETIC_FIXTURE",
+    isAuthoritative: false,
+    dataNotice: "Bản đồ hiện hiển thị tín hiệu minh họa và báo cáo chờ duyệt; không phải cảnh báo an ninh thời gian thực."
+  });
+});
 
 /**
  * POST /api/safety-map/reports
  * Gửi báo cáo cảnh báo điểm đen an ninh / bẫy cọc mới
  */
-export async function POST(request) {
+async function createSafetyReport(request, _routeContext, principal) {
   try {
     const body = await request.json();
-    const { title, category, zone, zoneName, address, coordinates, description, severity, authorName, authorRole, authorTrustScore } = body || {};
+    const { title, category, zone, zoneName, address, coordinates, description } = body || {};
 
-    if (!title || !description || !address) {
+    if (typeof title !== "string" || typeof description !== "string" || typeof address !== "string" ||
+        !title.trim() || !description.trim() || !address.trim() ||
+        title.trim().length > 180 || description.trim().length > 4000 || address.trim().length > 240) {
       return NextResponse.json(
-        { success: false, error: "Tiêu đề, địa chỉ và mô tả chi tiết là bắt buộc." },
+        { success: false, error: { code: "INVALID_SAFETY_REPORT", userMessage: "Tiêu đề, địa chỉ và mô tả hợp lệ là bắt buộc." } },
         { status: 400 }
       );
     }
 
+    const parsedCoordinates = coordinates && typeof coordinates === "object"
+      ? { lat: Number(coordinates.lat), lng: Number(coordinates.lng) }
+      : { lat: 10.875, lng: 106.78 };
+    if (!Number.isFinite(parsedCoordinates.lat) || !Number.isFinite(parsedCoordinates.lng) ||
+        parsedCoordinates.lat < -90 || parsedCoordinates.lat > 90 ||
+        parsedCoordinates.lng < -180 || parsedCoordinates.lng > 180) {
+      return NextResponse.json({ success: false, error: { code: "INVALID_COORDINATES", userMessage: "Tọa độ bản đồ không hợp lệ." } }, { status: 400 });
+    }
+
+    const allowedCategories = new Set(["SCAM_DEPOSIT", "SECURITY_HAZARD", "POLICE_STATION", "VERIFIED_SAFE_ZONE"]);
+    const safeCategory = allowedCategories.has(category) ? category : "SCAM_DEPOSIT";
+
     const newReport = {
-      id: `rep-${Date.now()}`,
+      id: createSecureId("rep"),
       title: title.trim(),
-      category: category || "SCAM_DEPOSIT",
+      category: safeCategory,
       zone: zone || "LANG_DAI_HOC_THU_DUC",
-      zoneName: zoneName || "Khu vực Giảng đường",
+      zoneName: typeof zoneName === "string" ? zoneName.trim().slice(0, 120) : "Khu vực Giảng đường",
       address: address.trim(),
-      coordinates: coordinates || { lat: 10.875, lng: 106.78 },
+      coordinates: parsedCoordinates,
       description: description.trim(),
-      severity: severity || "MEDIUM",
-      authorName: authorName || "Thành viên StudentHub",
-      authorRole: authorRole || "student",
-      authorTrustScore: Number(authorTrustScore || 80),
-      verifiedCount: 1,
+      severity: "UNDER_REVIEW",
+      authorId: principal.subjectId,
+      authorName: principal.attributes?.fullName || principal.email?.split("@")[0] || "Thành viên StudentHub",
+      authorRole: principal.principalType.toLowerCase(),
+      authorTrustScore: null,
+      verifiedCount: 0,
       contestedCount: 0,
-      status: "ACTIVE_ALERT",
+      status: "PENDING_REVIEW",
+      sourceState: "USER_SUBMITTED_PENDING_REVIEW",
+      isAuthoritative: false,
       createdAt: new Date().toISOString(),
     };
 
@@ -175,15 +207,25 @@ export async function POST(request) {
       {
         success: true,
         message: "Đã ghi nhận báo cáo an ninh lên bản đồ cộng đồng.",
-        report: newReport,
+        // The authenticated submitter may reconcile their own pending report
+        // with the server-assigned subject. Anonymous/public reads remain
+        // redacted by toPublicReport.
+        report: {
+          ...toPublicReport(newReport),
+          authorId: principal.subjectId,
+          authorRole: principal.principalType.toLowerCase()
+        },
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error("[Safety Map POST Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi tạo báo cáo an ninh." },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "CREATE_SAFETY_REPORT",
+  requiredPermission: "COMMUNITY.POST",
+  maxRequests: 10,
+  maxBodyBytes: 64 * 1024,
+}, createSafetyReport);

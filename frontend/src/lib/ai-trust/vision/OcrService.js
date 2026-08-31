@@ -104,7 +104,7 @@ export class OcrService {
       this.workerInstance = worker;
       return worker;
     } catch (err) {
-      console.warn("[OCR Worker Notice]:", err.message);
+      console.warn("[OCR Worker Notice]:", err?.name || "worker_error");
       return null;
     } finally {
       this.isInitializing = false;
@@ -146,7 +146,7 @@ export class OcrService {
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       return code ? code.data : null;
     } catch (err) {
-      console.warn("[QR Scan Warning]:", err.message);
+      console.warn("[QR Scan Warning]:", err?.name || "qr_error");
       return null;
     }
   }
@@ -171,7 +171,7 @@ export class OcrService {
         const arrayBuffer = await slice.arrayBuffer();
         magicBytes = Array.from(new Uint8Array(arrayBuffer));
       } catch (err) {
-        console.warn("[Magic Bytes Extraction Warning]:", err);
+        console.warn("[Magic Bytes Extraction Warning]:", err?.name || "magic_bytes_error");
       }
     }
 
@@ -184,7 +184,7 @@ export class OcrService {
           qrContent = this.scanQrCode(preprocessed.canvas);
         }
       } catch (err) {
-        console.warn("[Preprocessing Warning]:", err);
+        console.warn("[Preprocessing Warning]:", err?.name || "preprocessing_error");
       }
     }
 
@@ -216,7 +216,7 @@ export class OcrService {
         confidence = ocrResult.confidence;
       }
     } catch (err) {
-      console.warn("[OCR Extraction Notice]:", err?.message);
+      console.warn("[OCR Extraction Notice]:", err?.name || "ocr_error");
     }
 
     // If QR was found and text is minimal, format QR details into text

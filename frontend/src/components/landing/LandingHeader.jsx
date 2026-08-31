@@ -2,17 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { 
-  Sparkles, 
-  ArrowRight, 
-  Menu, 
-  X, 
-  GraduationCap, 
-  ShieldCheck, 
-  ChevronRight,
-  User,
-  LayoutDashboard
-} from "lucide-react";
+import { Sparkles, ArrowRight, Menu, X, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
 import LiveStudioClock from "@/components/ui/live-studio-clock";

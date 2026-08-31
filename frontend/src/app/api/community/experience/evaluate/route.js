@@ -8,8 +8,9 @@
 import { NextResponse } from "next/server";
 import { CommunityExperienceEngine } from "@/lib/intelligence/community/communityExperienceEngine";
 import { CommunityStore } from "@/lib/intelligence/community/communityStore";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
-export async function POST(req) {
+async function evaluateCommunityExperience(req) {
   try {
     const body = await req.json().catch(() => ({}));
     const { topic, customPosts } = body;
@@ -28,9 +29,13 @@ export async function POST(req) {
       evaluation
     });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error evaluating community consensus" },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "ANALYZE_COMMUNITY_EXPERIENCE",
+  allowAnonymous: true,
+  maxRequests: 30,
+  maxBodyBytes: 256 * 1024,
+}, evaluateCommunityExperience);

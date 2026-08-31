@@ -10,8 +10,8 @@ describe("AiTrustClaimGraph", () => {
   it("should build claim graph DAG and prevent circular dependencies", () => {
     const graph = new EpistemicClaimGraph();
 
-    const c1 = graph.addClaim({ claimId: "C1", text: "K24 yêu cầu TOEIC 550", epistemicState: EPISTEMIC_STATE.VERIFIED });
-    const c2 = graph.addClaim({ claimId: "C2", text: "Sinh viên K24 đủ điều kiện tốt nghiệp", epistemicState: EPISTEMIC_STATE.SUPPORTED });
+    graph.addClaim({ claimId: "C1", text: "K24 yêu cầu TOEIC 550", epistemicState: EPISTEMIC_STATE.VERIFIED });
+    graph.addClaim({ claimId: "C2", text: "Sinh viên K24 đủ điều kiện tốt nghiệp", epistemicState: EPISTEMIC_STATE.SUPPORTED });
 
     graph.addEdge("C1", "C2", CLAIM_RELATION.DEPENDS_ON);
 

@@ -26,7 +26,14 @@ export function AcademicHeader({
     isThesisEligible = true
   } = digitalTwinState;
 
-  const isLive = Boolean(syncStatus && syncStatus.isLive === true && !syncStatus.warning && !syncStatus.isStale);
+  const isLive = Boolean(
+    syncStatus
+      && syncStatus.isLive === true
+      && syncStatus.sourceState !== "SYNTHETIC_FIXTURE"
+      && syncStatus.isAuthoritative !== false
+      && !syncStatus.warning
+      && !syncStatus.isStale
+  );
   const lastSyncFormatted = AcademicCommandCenterViewModel.formatDate(syncStatus.lastSyncedAt);
 
   return (
@@ -55,7 +62,7 @@ export function AcademicHeader({
             Xin chào, {fullName}
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Ngành {programName} — Bản sao số học vụ được đồng bộ theo thời gian thực.
+            Ngành {programName} — Bản sao số học vụ hiển thị trạng thái nguồn và thời điểm đồng bộ.
           </p>
         </div>
 
@@ -114,7 +121,7 @@ export function AcademicHeader({
                   : "bg-amber-500/10 text-amber-400 border-amber-500/30"
               }`}>
                 <span className={`h-2 w-2 rounded-full ${isLive ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
-                {isLive ? "LIVE — Đồng Bộ Trực Tuyến" : "STALE — Bản Xác Minh Gần Nhất"}
+                {isLive ? "LIVE — Đồng Bộ Trực Tuyến" : "SNAPSHOT — Cần xác minh nguồn"}
               </div>
               <span className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
                 <Clock className="h-3 w-3" /> Cập nhật: {lastSyncFormatted !== "N/A" ? lastSyncFormatted : "Đang kết nối"}

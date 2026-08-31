@@ -1,5 +1,6 @@
 import React from "react";
 import { AiTrustConsoleV2 } from "@/components/trust/AiTrustConsoleV2";
+import UnifiedAppShell from "@/components/layout/UnifiedAppShell";
 
 export const metadata = {
   title: "AI Trust Engine V2 — Epistemic Intelligence Studio | StudentHub AI",
@@ -7,5 +8,5 @@ export const metadata = {
 };
 
 export default function AiTrustPage() {
-  return <AiTrustConsoleV2 />;
+  return <UnifiedAppShell><AiTrustConsoleV2 /></UnifiedAppShell>;
 }

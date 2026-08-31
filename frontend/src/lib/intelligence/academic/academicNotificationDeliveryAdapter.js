@@ -174,8 +174,8 @@ export class AcademicNotificationDeliveryAdapter {
             results[channel] = { success: false, error: `Unsupported channel: ${channel}` };
             overallSuccess = false;
         }
-      } catch (err) {
-        results[channel] = { success: false, error: err.message };
+      } catch {
+        results[channel] = { success: false, error: "DELIVERY_FAILED" };
         overallSuccess = false;
       }
     }

@@ -2,21 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { 
-  MessageSquare, 
-  ThumbsUp, 
-  ThumbsDown, 
-  Heart, 
-  ShieldCheck, 
-  MapPin, 
-  Star, 
-  ArrowRight,
-  Sparkles,
-  Users,
-  Home,
-  Utensils,
-  Building
-} from "lucide-react";
+import { ThumbsUp, Heart, ShieldCheck, MapPin, Star, ArrowRight, Users } from "lucide-react";
 import TactileButton from "@/components/ui/TactileButton";
 
 export default function CommunityShowcaseSection() {

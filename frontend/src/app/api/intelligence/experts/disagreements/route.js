@@ -4,22 +4,33 @@
  * Returns peer disagreement mappings between experts across domains without reputation bias.
  */
 
-import { NextResponse } from "next/server";
 import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
 import { ExpertDisagreementMap } from "@/lib/intelligence/expert/expertDisagreementMap";
 import { DISAGREEMENT_REASON } from "@/lib/intelligence/expert/expertIntelligenceModel";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
-export async function GET(req) {
-  try {
-    const { searchParams } = new URL(req.url);
-    const domain = searchParams.get("domain") || "AI_ML";
+export const GET = SecurityFabric.wrapHandler({
+  action: "READ_EXPERT_DISAGREEMENTS",
+  allowAnonymous: true,
+  maxRequests: 60
+}, async (req, _routeParams, _principal, secContext) => {
+  const { searchParams } = new URL(req.url);
+  const domain = (searchParams.get("domain") || "AI_ML").trim().slice(0, 60).toUpperCase();
+  if (domain !== "AI_ML") {
+    return Response.json({ success: false, error: {
+      code: "EXPERT_DISAGREEMENT_DOMAIN_UNAVAILABLE",
+      userMessage: "Hiện chỉ có bản minh họa bất đồng trong miền AI/ML.",
+      requestId: secContext.correlationId,
+      retryable: false
+    } }, { status: 400 });
+  }
 
-    const allExperts = ExpertStore.getAllExperts({ redactPrivate: true });
-    const expMinh = allExperts.find(e => e.expertId === "EXP_DR_MINH_AI");
-    const expLan = allExperts.find(e => e.expertId === "EXP_TS_LAN_EDTECH");
+  const allExperts = ExpertStore.getAllExperts({ redactPrivate: true });
+  const expMinh = allExperts.find(e => e.expertId === "EXP_DR_MINH_AI");
+  const expLan = allExperts.find(e => e.expertId === "EXP_TS_LAN_EDTECH");
 
-    // Sample peer disagreement mapping for AI in higher education
-    const disagreements = [
+  // Sample peer disagreement mapping for AI in higher education
+  const disagreements = [
       ExpertDisagreementMap.analyzeDisagreement({
         topic: "Hiệu quả của AI Chatbot trong việc chấm điểm đồ án tự động",
         domain: "AI_ML",
@@ -40,18 +51,16 @@ export async function GET(req) {
         divergenceReason: DISAGREEMENT_REASON.DIFFERENT_METHODOLOGIES,
         analysis: "TS. Minh tiếp cận theo bài toán kỹ thuật định lượng (độ khớp mã nguồn và testcase), trong khi TS. Lan phân tích dưới góc độ sư phạm sư phạm kỹ thuật (tương tác sư phạm và đánh giá tư duy)."
       })
-    ];
+  ];
 
-    return NextResponse.json({
-      success: true,
-      domain,
-      totalDisagreements: disagreements.length,
-      disagreements
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error retrieving disagreements" },
-      { status: 500 }
-    );
-  }
-}
+  return Response.json({
+    success: true,
+    domain,
+    totalDisagreements: disagreements.length,
+    disagreements,
+    sourceState: "SYNTHETIC_EXPERT_BENCHMARK",
+    isAuthoritative: false,
+    dataNotice: "Bản đồ bất đồng là ví dụ tái lập để minh họa phương pháp; không phải khảo sát trực tiếp hiện tại.",
+    meta: { requestId: secContext.correlationId }
+  });
+});

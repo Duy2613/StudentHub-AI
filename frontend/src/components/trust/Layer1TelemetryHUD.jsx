@@ -1,22 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  ShieldAlert,
-  ShieldCheck,
-  AlertTriangle,
-  Zap,
-  Activity,
-  Cpu,
-  Clock,
-  Layers,
-  ArrowRight,
-  StopCircle,
-  FileSearch,
-  CheckCircle2,
-  Lock,
-  Flame,
-} from "lucide-react";
+import { ShieldCheck, AlertTriangle, Activity, Cpu, Clock, Layers, ArrowRight, StopCircle } from "lucide-react";
 import { LAYER_1_STATUS } from "@/lib/ai-trust/layer1/types";
 
 /**

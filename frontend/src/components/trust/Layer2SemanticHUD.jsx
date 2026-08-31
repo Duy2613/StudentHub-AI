@@ -1,25 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Brain,
-  ShieldCheck,
-  ShieldAlert,
-  AlertTriangle,
-  FileSearch,
-  Layers,
-  ArrowRight,
-  Sparkles,
-  Target,
-  Compass,
-  Zap,
-  CheckCircle2,
-  Clock,
-  Building2,
-  ExternalLink,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { Brain, ShieldCheck, ShieldAlert, AlertTriangle, FileSearch, HelpCircle, Layers, Target, Compass, CheckCircle2, Building2, ChevronDown, ChevronUp } from "lucide-react";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 import { LAYER_2_STATUS, SEMANTIC_CLASSIFICATION } from "@/lib/ai-trust/layer2/types";
 
@@ -30,9 +12,9 @@ export default function Layer2SemanticHUD({ result, className = "" }) {
   if (!result || result.layer !== 2) return null;
 
   const {
-    status = LAYER_2_STATUS.PASS,
-    classification = SEMANTIC_CLASSIFICATION.BENIGN,
-    confidence = 0.9,
+    status = LAYER_2_STATUS.UNKNOWN,
+    classification = SEMANTIC_CLASSIFICATION.UNKNOWN,
+    confidence = 0,
     semanticSummary = "",
     intent = {},
     entities = [],
@@ -48,6 +30,7 @@ export default function Layer2SemanticHUD({ result, className = "" }) {
   const isSuspicious = status === LAYER_2_STATUS.SUSPICIOUS;
   const isNeedsVerification = status === LAYER_2_STATUS.NEEDS_VERIFICATION;
   const isPass = status === LAYER_2_STATUS.PASS;
+  const isUnknown = !isBlock && !isSuspicious && !isNeedsVerification && !isPass;
 
   const statusColor = isBlock
     ? "text-[#ff4d4d] border-[#ea3810]/50 bg-[#ea3810]/10"
@@ -55,7 +38,9 @@ export default function Layer2SemanticHUD({ result, className = "" }) {
     ? "text-[#ffd15c] border-[#ffbc09]/50 bg-[#ffbc09]/10"
     : isNeedsVerification
     ? "text-[#00f0ff] border-[#00f0ff]/50 bg-[#00f0ff]/10"
-    : "text-[#38f8d4] border-[#00f0ff]/50 bg-[#00f0ff]/10";
+    : isPass
+    ? "text-[#38f8d4] border-[#00f0ff]/50 bg-[#00f0ff]/10"
+    : "text-white/70 border-white/20 bg-white/10";
 
   const StatusIcon = isBlock
     ? ShieldAlert
@@ -63,7 +48,9 @@ export default function Layer2SemanticHUD({ result, className = "" }) {
     ? AlertTriangle
     : isNeedsVerification
     ? FileSearch
-    : ShieldCheck;
+    : isPass
+    ? ShieldCheck
+    : HelpCircle;
 
   const tasks = verificationPackage?.verificationTasks || [];
   const candidateSources = verificationPackage?.candidateSources || [];
@@ -116,7 +103,7 @@ export default function Layer2SemanticHUD({ result, className = "" }) {
             Tổng Kết Ý Nghĩa Ngữ Cảnh (Semantic Summary)
           </div>
           <p className="text-xs text-[#ece7e0] leading-relaxed font-human font-medium">
-            {semanticSummary || "Văn bản đã được giải nghĩa hoàn tất."}
+            {semanticSummary || (isUnknown ? "Chưa có kết quả ngữ nghĩa đủ tin cậy." : "Văn bản đã được giải nghĩa hoàn tất.")}
           </p>
           <div className="text-[11px] text-[#ece7e0]/60 italic font-mono pt-1">
             &ldquo;{result?.details?.decisionRationale}&rdquo;

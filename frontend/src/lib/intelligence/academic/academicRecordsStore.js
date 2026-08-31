@@ -53,7 +53,7 @@ export class AcademicRecordsStore {
       // Fallback
     }
 
-    if (this.#recordsByStudentId.size === 0) {
+    if (this.#recordsByStudentId.size === 0 || !this.#recordsByStudentId.has("24110001")) {
       this.#seedDefaultRecords();
     }
 

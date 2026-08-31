@@ -2,7 +2,8 @@
 
 import React, { useEffect } from "react";
 import { AcademicCommandCenterViewModel } from "@/lib/intelligence/academic/academicCommandCenterViewModel.js";
-import { X, ShieldCheck, FileText, ExternalLink, Calendar, Hash, Building2, Quote } from "lucide-react";
+import { safeExternalUrl } from "@/lib/security/safeExternalUrl.js";
+import { X, ShieldCheck, FileText, ExternalLink, Calendar, Building2, Quote } from "lucide-react";
 
 export function SourceEvidenceDrawer({ item, isOpen, onClose }) {
   // Handle ESC key to close
@@ -19,7 +20,7 @@ export function SourceEvidenceDrawer({ item, isOpen, onClose }) {
   if (!isOpen || !item) return null;
 
   const title = item.title || item.milestoneTitle || item.subject || "Thông Tin Văn Bản Học Vụ";
-  const sourceUrl = item.source?.canonicalUrl || item.sourceUrl || "https://daotao.hcmute.edu.vn";
+  const sourceUrl = safeExternalUrl(item.source?.canonicalUrl || item.sourceUrl) || "https://daotao.hcmute.edu.vn";
   const sourceId = item.source?.sourceId || item.sourceId || "SRC_HCMUTE_DAOTAO";
   const evidenceText = item.evidence?.textSpan || item.whatChanged || item.summary || item.description || "Nội dung văn bản quy chế chính thức.";
   const clauseName = item.evidence?.clauseName || item.field || "Điều khoản chung";

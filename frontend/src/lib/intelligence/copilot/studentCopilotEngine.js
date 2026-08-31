@@ -10,7 +10,7 @@
  * 6. 🚨 EMERGENCY (Instant 112/113/115 dispatch, GPS SOS beacon)
  */
 
-import { HCMUTE_UNIVERSITY_PROFILE } from "../academic/hcmuteKnowledgeGraph.js";
+
 import { calculateGeospatialSafetyScore } from "../safety/geospatialSafetyEngine.js";
 import { getEvaluatedStudentRadar } from "../radar/studentRadarEngine.js";
 import { evaluatePrerequisiteCascade } from "../academic/academicReasoningEngine.js";

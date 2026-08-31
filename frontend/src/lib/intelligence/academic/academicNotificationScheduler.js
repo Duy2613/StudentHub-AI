@@ -107,10 +107,10 @@ export class AcademicNotificationScheduler {
             summary.details.push({ notificationId: notif.notificationId, status: "FAILED" });
           }
         }
-      } catch (err) {
+      } catch {
         summary.failedCount++;
         this.#metrics.totalFailed++;
-        summary.details.push({ notificationId: notif.notificationId, error: err.message });
+        summary.details.push({ notificationId: notif.notificationId, error: "PROCESSING_FAILED" });
       }
     }
 

@@ -2,29 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import {
-  ShieldAlert,
-  ShieldCheck,
-  Zap,
-  Users,
-  Search,
-  Database,
-  Cpu,
-  ArrowRight,
-  Sparkles,
-  CheckCircle2,
-  AlertTriangle,
-  Radio,
-  ExternalLink,
-  Lock,
-  Layers,
-  Star,
-  Activity,
-  Compass,
-  Clock,
-  MessageSquare
-} from "lucide-react";
-import { motion } from "motion/react";
+import { ShieldAlert, ShieldCheck, Zap, Users, Database, ArrowRight, CheckCircle2, Star, Clock, MessageSquare } from "lucide-react";
+
 import Interactive3DBlockCard from "@/components/ui/Interactive3DBlockCard";
 
 export default function IglooEcosystemShowcase() {

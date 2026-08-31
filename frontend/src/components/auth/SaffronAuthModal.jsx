@@ -8,7 +8,7 @@
 
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X } from "lucide-react";
+
 import SaffronAuthDeck from "@/components/auth/SaffronAuthDeck";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 

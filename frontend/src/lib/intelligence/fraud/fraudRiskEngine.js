@@ -14,7 +14,7 @@
  * - Evidence completeness scoring distinct from confidence/risk
  */
 
-import { AcademicTruthEngine } from "../academic/academicTruthEngine.js";
+
 
 export const FRAUD_DECISIONS = {
   VERIFIED_OFFICIAL: "VERIFIED_OFFICIAL",

@@ -9,7 +9,7 @@ import React, { useRef, useState, useEffect, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Float, Html, MeshDistortMaterial, Sphere } from "@react-three/drei";
 import * as THREE from "three";
-import { ShieldAlert, ShieldCheck, Users, Sparkles, ArrowUpRight, CheckCircle2 } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Users, ArrowUpRight } from "lucide-react";
 
 // Interactive Simplex Noise Particle Wave Field with Mouse Repulsion
 function ParticleWaveField() {

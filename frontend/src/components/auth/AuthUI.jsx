@@ -26,19 +26,18 @@ export const NoiseOverlay = () => (
 
 export const AmbientBackground = ({ mode = "cosmic-wave" }) => {
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 w-full h-full bg-[#05070e]">
-      {/* 1. Interactive Real-time 60fps Geometric Constellation Web & Neural Nodes Canvas */}
-      <GeometricConstellationCanvas opacity={1} interactive={true} />
-
-      {/* 2. Sparkling Stardust Canvas */}
-      <SparklingStardustCanvas count={45} speed={0.35} />
-
-      {/* 3. Ambient Shooting Meteors */}
-      <Meteors number={8} />
-
-      {/* 4. Soft Polar Ambient Glows (Gentle & Eye-Comfortable) */}
-      <div className="absolute bottom-[-10%] right-[-10%] w-[45vw] h-[45vw] rounded-full bg-gradient-to-tr from-teal-900/15 via-cyan-950/20 to-transparent blur-[140px] pointer-events-none" />
-      <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-br from-indigo-950/20 via-slate-900/25 to-transparent blur-[140px] pointer-events-none" />
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 w-full h-full bg-[#07090e]">
+      {/* 1. Subtle mineral-mint architectural lighting */}
+      <div className="absolute -top-[20%] left-1/2 -translate-x-1/2 w-[70vw] h-[50vh] rounded-full bg-gradient-to-b from-[#79d8bd]/10 to-transparent blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[45vw] h-[45vw] rounded-full bg-gradient-to-tr from-[#6ea8fe]/08 via-transparent to-transparent blur-[140px] pointer-events-none" />
+      {/* 2. Architectural hairline coordinate grid */}
+      <div
+        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        style={{
+          backgroundImage: "linear-gradient(rgba(241, 238, 230, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(241, 238, 230, 0.4) 1px, transparent 1px)",
+          backgroundSize: "4rem 4rem"
+        }}
+      />
     </div>
   );
 };
@@ -155,7 +154,9 @@ export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) =>
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-200 transition-colors focus:outline-none"
+          aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+          aria-pressed={showPassword}
+          className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-200 transition-colors focus:outline-none focus-visible:text-teal-300 focus-visible:ring-2 focus-visible:ring-teal-400/60 rounded-lg"
         >
           {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
         </button>

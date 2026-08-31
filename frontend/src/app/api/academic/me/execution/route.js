@@ -13,14 +13,17 @@ import { NextResponse } from "next/server";
 import { getAuthoritativeCommandCenterData } from "@/lib/intelligence/academic/academicCommandCenterDataLoader";
 import { AcademicPlanDriftEngine } from "@/lib/intelligence/academic/academicPlanDriftEngine";
 import { AcademicExecutionStore } from "@/lib/intelligence/academic/academicExecutionStore";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
-export async function GET(request) {
+async function getExecution(request, routeParams, principal) {
   try {
     const { searchParams } = new URL(request.url);
     const targetTerm = searchParams.get("targetTerm") || "2026-HK1";
 
     // 1. Load Authoritative Academic Baseline (Server-Side)
-    const serverData = getAuthoritativeCommandCenterData();
+    const serverData = getAuthoritativeCommandCenterData({
+      studentId: principal.subjectId.replace("student:", "").trim()
+    });
     if (!serverData.success) {
       return NextResponse.json(
         { success: false, error: "Không thể nạp dữ liệu học vụ cơ sở từ máy chủ." },
@@ -54,9 +57,18 @@ export async function GET(request) {
       {
         success: false,
         error: "Lỗi tính toán đối soát tiến độ và độ lệch kế hoạch học vụ.",
-        message: err.message
       },
       { status: 400 }
     );
   }
 }
+
+export const GET = SecurityFabric.wrapHandler(
+  {
+    action: "READ_ACADEMIC_EXECUTION",
+    requiredPermission: "ACADEMIC.READ_OWN",
+    requiredScopes: ["academic:read"],
+    allowAnonymous: false
+  },
+  getExecution
+);

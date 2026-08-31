@@ -9,7 +9,7 @@
  */
 
 import { AcademicPrerequisiteEngine } from "./academicPrerequisiteEngine.js";
-import { AcademicPlannerModel, PLAN_TYPES, PLANNING_MODE, CREDIT_BOUNDS } from "./academicPlannerModel.js";
+import { AcademicPlannerModel, PLAN_TYPES, PLANNING_MODE } from "./academicPlannerModel.js";
 import { AcademicSimulationEngine } from "./academicSimulationEngine.js";
 import { SCENARIO_OPERATIONS } from "./academicSimulationModel.js";
 import { getCurriculumForStudent } from "./versionedCurricula.js";

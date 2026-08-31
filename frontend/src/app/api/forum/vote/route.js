@@ -1,19 +1,22 @@
 import { NextResponse } from "next/server";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
 // In-memory vote ledger to prevent multiple votes per user per post (Phần E.3)
 const VOTES_LEDGER = new Map(); // key: `${postId}_${userId}` -> 'trust' | 'distrust'
+const MAX_VOTE_KEYS = 50_000;
 
 /**
  * POST /api/forum/vote
  * Gửi phiếu vote uy tín / không uy tín cho bài viết
  * Body: { postId: string, userId: string, type: "trust" | "distrust" }
  */
-export async function POST(request) {
+async function castForumVote(request, routeParams, principal) {
   try {
     const body = await request.json();
-    const { postId, userId, type } = body || {};
+    const { postId, type } = body || {};
+    const userId = principal.subjectId;
 
-    if (!postId || !userId || !type || (type !== "trust" && type !== "distrust")) {
+    if (typeof postId !== "string" || postId.length > 160 || !postId || !userId || !type || (type !== "trust" && type !== "distrust")) {
       return NextResponse.json(
         {
           success: false,
@@ -40,6 +43,10 @@ export async function POST(request) {
     }
 
     // Set new or updated vote
+    if (!VOTES_LEDGER.has(voteKey) && VOTES_LEDGER.size >= MAX_VOTE_KEYS) {
+      const oldestKey = VOTES_LEDGER.keys().next().value;
+      if (oldestKey) VOTES_LEDGER.delete(oldestKey);
+    }
     VOTES_LEDGER.set(voteKey, type);
     scoreDelta = type === "trust" ? (previousVote === "distrust" ? 2 : 1) : (previousVote === "trust" ? -2 : -1);
 
@@ -49,17 +56,23 @@ export async function POST(request) {
       message: type === "trust" ? "Đã bình chọn UY TÍN cho bài viết (+điểm tín nhiệm tác giả)." : "Đã bình chọn KHÔNG UY TÍN cho bài viết.",
       vote: {
         postId,
-        userId,
         type,
         timestamp: new Date().toISOString(),
       },
       scoreDelta,
     });
   } catch (error) {
-    console.error("[Forum Vote API Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi ghi nhận bình chọn." },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler(
+  {
+    action: "VOTE_ON_COMMUNITY_POST",
+    requiredPermission: "COMMUNITY.POST",
+    allowAnonymous: false,
+    maxRequests: 30,
+    maxBodyBytes: 16 * 1024
+  },
+  castForumVote
+);

@@ -50,6 +50,13 @@ graph TD
 
 ### 2. [[System-Architecture|🏗️ 01 - System Architecture]]
 - [[System-Architecture|Kiến Trúc Tổng Thể]]: Frontend Next.js 16 + Supabase Backend + Vercel AI SDK.
+- [[AUDIT/PROVIP_FORENSIC_AUDIT|🔍 PROVIP Forensic Audit & Ground-Truth Verification]]: Reality Verification, Backend Authority, Data Authenticity & Production Certification.
+- [[AUDIT/PROVIP_REPAIR_RESULT|🛡️ PROVIP P0 Repair & Durability Verification]]: BOLA/IDOR Remediation, PII Masking, Atomic Crash-Safe Stores & 100% Green Test Suite.
+- [[AUDIT/FINAL_PRODUCTIONIZATION_RESULT|🚀 StudentHub OS Final Productionization & UI/UX Reconstruction]]: Database Repository Layer, Multi-Audience Shell, Grounded AI Studio & Final Production Go-Verdict.
+- [[Social-Intelligence-Fabric-And-AI-Safety-Firewall-V1|📡 Social Intelligence Fabric, AI Safety Firewall & Hyper-Personalization V1]]: Legitimate Connectors, Anti-Coordination, Early Warning, AI Content Firewall & Briefing.
+- [[Personal-Digital-Twin-And-Command-Center-V1|👤 Personal Digital Twin, Command Center & Cross-Device Sync V1]]: Multi-Audience Personalization, Server-Authoritative Device Sync & Command Center.
+- [[Zero-Trust-Security-Fabric-Promax-V1|🛡️ Zero-Trust Security Fabric Promax V1]]: Identity, RBAC/ABAC/ReBAC, Capabilities, Purpose, Risk & AI Tool Firewall.
+- [[T1-T4-Intelligence-Fabric-Promax-V1|🧠 T1–T4 Intelligence Fabric Promax V1]]: Trust, Expert, Community, Evidence Fusion, Contradiction Engine, Calibration & AI Recommendations.
 - [[Security-And-Intelligence-Release-Baseline-V5|🛡️ Security & Intelligence Release Baseline (V5 Final Freeze)]]: Toàn bộ Invariants, Data Flow, Fail-Closed Contracts & Certification.
 - [[Academic-Intelligence-V1-Pipeline|🎓 Academic Intelligence V1 Pipeline]]: Source Watcher → Snapshot Versioning → Semantic Diff → Rule Extraction → Student Impact Engine → Timeline/Notification.
 - [[Academic-Action-Workflow-V1|⚡ Academic Action & Workflow Center V1]]: Action Intent → Action Plan → Task State Machine → Multi-Step Execution → Verification → Reconciliation.

@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
 /**
  * POST /api/sos/generate-complaint
  * Tự động tạo Đơn Tố Giác Tội Phạm chuẩn theo quy định Bộ Công An & Bộ luật Tố tụng Hình sự 2015
  * Body: { victimName, victimCccd, victimPhone, victimAddress, targetName, targetAccount, targetPhone, amountLost, eventDescription, targetPoliceStation }
  */
-export async function POST(request) {
+async function generateComplaint(request, _routeContext, _principal, secContext) {
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const {
       victimName,
       victimDob,
@@ -23,14 +24,18 @@ export async function POST(request) {
       targetPoliceStation,
     } = body || {};
 
-    if (!victimName || !victimPhone || !amountLost || !eventDescription) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Vui lòng nhập đầy đủ Họ tên, Số điện thoại người tố giác, Số tiền thiệt hại và Diễn biến vụ việc.",
-        },
-        { status: 400 }
-      );
+    const stringFields = [victimName, victimDob, victimCccd, victimPhone, victimAddress, targetName, targetAccount, targetBank, targetPhone, eventDescription, targetPoliceStation];
+    if (stringFields.some(value => value !== undefined && typeof value !== "string") ||
+        stringFields.some(value => typeof value === "string" && value.length > 4000) ||
+        typeof victimName !== "string" || typeof victimPhone !== "string" || typeof eventDescription !== "string" ||
+        !victimName.trim() || !victimPhone.trim() || !eventDescription.trim() ||
+        !Number.isFinite(Number(amountLost)) || Number(amountLost) <= 0 || Number(amountLost) > 10_000_000_000) {
+      return Response.json({ success: false, error: {
+        code: "COMPLAINT_INPUT_INVALID",
+        userMessage: "Vui lòng nhập thông tin vụ việc hợp lệ.",
+        requestId: secContext.correlationId,
+        retryable: false
+      } }, { status: 400 });
     }
 
     const today = new Date();
@@ -101,10 +106,12 @@ ${victimName.toUpperCase()}
       ],
     });
   } catch (error) {
-    console.error("[Complaint Gen API Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi tạo đơn tố giác." },
-      { status: 500 }
-    );
+    throw error;
   }
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "GENERATE_PRIVATE_COMPLAINT_DRAFT",
+  maxRequests: 10,
+  maxBodyBytes: 128 * 1024,
+}, generateComplaint);

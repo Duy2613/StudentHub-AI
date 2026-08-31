@@ -1,26 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Layers,
-  ShieldCheck,
-  AlertTriangle,
-  Clock,
-  Search,
-  HelpCircle,
-  History,
-  GitCompare,
-  CheckCircle2,
-  Users,
-  Award,
-  Sparkles,
-  ArrowRight,
-  Info,
-  ChevronRight,
-  ExternalLink,
-  Flame,
-  FileText
-} from "lucide-react";
+import { Layers, ShieldCheck, AlertTriangle, Search, HelpCircle, GitCompare, Users, Award, Sparkles, Flame } from "lucide-react";
 
 export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
   const [objects] = useState(initialKnowledgeObjects);
@@ -76,7 +57,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-10 font-sans selection:bg-indigo-500/30">
+    <div className="w-full min-w-0 min-h-screen bg-slate-950 text-slate-100 p-6 md:p-10 font-sans selection:bg-indigo-500/30">
       {/* Header */}
       <header className="max-w-7xl mx-auto mb-8 border-b border-slate-800/80 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -108,13 +89,15 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Knowledge Object Selector & Top Summary Bar */}
         <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800/90 space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <label className="text-xs text-slate-400 font-mono block mb-1">Chọn Đối Tượng Tri Thức (Knowledge Object)</label>
+          <div className="flex min-w-0 flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="min-w-0">
+              <label htmlFor="knowledge-object-select" className="text-xs text-slate-400 font-mono block mb-1">Chọn Đối Tượng Tri Thức (Knowledge Object)</label>
               <select
+                id="knowledge-object-select"
+                aria-label="Chọn đối tượng tri thức"
                 value={selectedId}
                 onChange={e => setSelectedId(e.target.value)}
-                className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500/50 font-medium"
+                className="w-full max-w-full min-w-0 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500/50 font-medium"
               >
                 {objects.map(o => (
                   <option key={o.knowledgeObjectId} value={o.knowledgeObjectId}>

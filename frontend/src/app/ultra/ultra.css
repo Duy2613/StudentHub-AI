@@ -1,0 +1,328 @@
+/* ULTRA EXPERIENCE LAYER — Design tokens, keyframes & utilities
+   Tầng nâng cấp trải nghiệm toàn cục (theme runtime + 3D + motion)
+   ════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Giá trị mặc định — UltraProvider sẽ ghi đè runtime theo theme đang chọn */
+  --ux-accent: #ffbc09;
+  --ux-accent-2: #ffd15c;
+  --ux-accent-3: #ea3810;
+  --ux-bg-0: #070403;
+  --ux-bg-1: #150604;
+  --ux-bg-2: #210a07;
+  --ux-border: #47140b;
+  --ux-text: #ece7e0;
+  --ux-glow: rgba(255, 188, 9, 0.42);
+  --ux-glow-soft: rgba(255, 188, 9, 0.14);
+  --ux-blur: 24px;
+  --ux-parallax: 1;
+}
+
+/* ── Keyframes ────────────────────────────────────────────── */
+@keyframes ux-border-run {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes ux-grain-shift {
+  0%   { transform: translate3d(0, 0, 0); }
+  33%  { transform: translate3d(-1.5%, 1%, 0); }
+  66%  { transform: translate3d(1%, -1.5%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes ux-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.45; transform: scale(0.78); }
+}
+
+@keyframes ux-float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+@keyframes ux-sheen {
+  0%   { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(220%) skewX(-18deg); }
+}
+
+@keyframes ux-scanline {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  12%  { opacity: 0.7; }
+  88%  { opacity: 0.7; }
+  100% { transform: translateY(1200%); opacity: 0; }
+}
+
+@keyframes ux-ring-expand {
+  0%   { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+@keyframes ux-tilt-idle {
+  0%, 100% { transform: perspective(1200px) rotateX(0deg) rotateY(0deg); }
+  25%      { transform: perspective(1200px) rotateX(1.6deg) rotateY(-2.2deg); }
+  75%      { transform: perspective(1200px) rotateX(-1.4deg) rotateY(2deg); }
+}
+
+@keyframes ux-gradient-pan {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes ux-marquee-x {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── Utility: kính Ultra ──────────────────────────────────── */
+.ux-glass {
+  position: relative;
+  border: 1px solid var(--ux-border);
+  background: color-mix(in srgb, var(--ux-bg-1) 82%, transparent);
+  backdrop-filter: blur(var(--ux-blur));
+  border-radius: 1.5rem;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: border-color 0.35s var(--ease-premium), transform 0.35s var(--ease-premium),
+    box-shadow 0.35s var(--ease-premium);
+}
+
+.ux-glass:hover {
+  border-color: color-mix(in srgb, var(--ux-accent) 48%, transparent);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.7),
+    0 0 42px var(--ux-glow-soft),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Lớp sheen quét sáng khi hover */
+.ux-sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.ux-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 45%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.14),
+    transparent
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+.ux-sheen:hover::after {
+  opacity: 1;
+  animation: ux-sheen 0.95s var(--ease-premium);
+}
+
+/* ── Utility: chữ gradient theo theme ────────────────────── */
+.ux-text-accent {
+  background: linear-gradient(
+    100deg,
+    var(--ux-accent-2) 0%,
+    var(--ux-accent) 45%,
+    var(--ux-accent-3) 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ux-gradient-pan 7s ease-in-out infinite;
+}
+
+/* ── Utility: nút Ultra ──────────────────────────────────── */
+.ux-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.35rem;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+  border: 1px solid var(--ux-border);
+  background: var(--ux-bg-2);
+  color: var(--ux-text);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.22s var(--ease-premium), box-shadow 0.3s var(--ease-premium),
+    border-color 0.3s var(--ease-premium), background-color 0.3s var(--ease-premium);
+}
+.ux-btn:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--ux-accent) 60%, transparent);
+  box-shadow: 0 12px 34px var(--ux-glow-soft);
+}
+.ux-btn:active { transform: translateY(0) scale(0.975); }
+
+.ux-btn-primary {
+  background: linear-gradient(120deg, var(--ux-accent), var(--ux-accent-2));
+  color: #100704;
+  border-color: transparent;
+  box-shadow: 0 10px 30px var(--ux-glow);
+}
+.ux-btn-primary:hover {
+  box-shadow: 0 16px 44px var(--ux-glow);
+}
+
+/* ── Utility: thẻ 3D tilt ────────────────────────────────── */
+.ux-tilt {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.ux-tilt-layer {
+  transform: translateZ(38px);
+}
+
+/* ── Utility: scanline HUD ───────────────────────────────── */
+.ux-scan {
+  position: relative;
+  overflow: hidden;
+}
+.ux-scan::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in srgb, var(--ux-accent) 30%, transparent),
+    transparent
+  );
+  animation: ux-scanline 4.5s linear infinite;
+  pointer-events: none;
+}
+
+/* ── Utility: viền chạy sáng ─────────────────────────────── */
+.ux-border-beam {
+  position: relative;
+}
+.ux-border-beam::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--ux-beam-angle, 0deg),
+    transparent 0deg,
+    var(--ux-accent) 40deg,
+    transparent 90deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: ux-beam-spin 4.5s linear infinite;
+  pointer-events: none;
+}
+
+@property --ux-beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes ux-beam-spin {
+  to { --ux-beam-angle: 360deg; }
+}
+
+/* ── Utility: marquee vô hạn ─────────────────────────────── */
+.ux-marquee {
+  display: flex;
+  width: max-content;
+  animation: ux-marquee-x 26s linear infinite;
+}
+.ux-marquee:hover { animation-play-state: paused; }
+
+/* ── Utility: reveal khi vào khung nhìn ─────────────────── */
+.ux-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s var(--ease-premium), transform 0.8s var(--ease-premium);
+}
+.ux-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Utility: bento grid nền lưới ───────────────────────── */
+.ux-grid-bg {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--ux-accent) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--ux-accent) 7%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 40%, transparent 100%);
+}
+
+/* ── Con trỏ Ultra: ẩn con trỏ mặc định khi bật ─────────── */
+html[data-ultra-cursor="on"] .ux-cursor-none,
+html[data-ultra-cursor="on"] .ux-cursor-none * {
+  cursor: none;
+}
+
+/* ── Mức "still": vô hiệu hoá mọi animation ─────────────── */
+html[data-ultra-motion="still"] *,
+html[data-ultra-motion="still"] *::before,
+html[data-ultra-motion="still"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ux-marquee,
+  .ux-text-accent,
+  .ux-scan::before,
+  .ux-border-beam::before {
+    animation: none !important;
+  }
+  .ux-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ── Scrollbar Ultra ────────────────────────────────────── */
+.ux-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+.ux-scrollbar::-webkit-scrollbar-track { background: var(--ux-bg-0); }
+.ux-scrollbar::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--ux-accent) 45%, transparent);
+  border-radius: 9999px;
+}
+.ux-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--ux-accent);
+}
+
+/*
+ * Route-local accessible muted text floor.
+ *
+ * Ultra's cinematic surfaces are deliberately very dark, so the low-opacity
+ * white utilities used for HUD metadata can fall below WCAG AA (especially
+ * for the 11px labels rendered by the data panels). Keep the visual hierarchy
+ * through size/spacing while giving every muted label a theme-aware, readable
+ * foreground. The selector is scoped to this route and intentionally leaves
+ * the brighter text-white/65+ utilities untouched.
+ */
+html[data-ultra-theme] .text-white\/25,
+html[data-ultra-theme] .text-white\/30,
+html[data-ultra-theme] .text-white\/35,
+html[data-ultra-theme] .text-white\/40,
+html[data-ultra-theme] .text-white\/45,
+html[data-ultra-theme] .text-white\/50,
+html[data-ultra-theme] .text-white\/55,
+html[data-ultra-theme] .text-white\/60 {
+  color: var(--ux-text) !important;
+}

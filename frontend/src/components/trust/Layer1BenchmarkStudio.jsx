@@ -1,24 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Sparkles,
-  ShieldAlert,
-  ShieldCheck,
-  AlertTriangle,
-  Link2,
-  FileText,
-  ImageIcon,
-  ArrowRight,
-  Terminal,
-  Play,
-  Zap,
-  CheckCircle2,
-  XCircle,
-  BarChart3,
-  Layers,
-  Search,
-} from "lucide-react";
+import { Link2, FileText, ImageIcon, Terminal, Play, Zap, CheckCircle2, XCircle, Layers, Search } from "lucide-react";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 import { LAYER_1_STATUS } from "@/lib/ai-trust/layer1/types";
 import { Layer1ScreenService } from "@/lib/ai-trust/layer1/Layer1ScreenService";

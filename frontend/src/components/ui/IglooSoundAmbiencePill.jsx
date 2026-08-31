@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Volume2, VolumeX, Sparkles } from "lucide-react";
+import { VolumeX } from "lucide-react";
 
 /**
  * IglooSoundAmbiencePill — Igloo.inc style procedural Web Audio ambient sound & haptic feedback.

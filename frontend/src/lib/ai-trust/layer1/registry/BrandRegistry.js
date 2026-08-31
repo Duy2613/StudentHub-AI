@@ -737,18 +737,9 @@ export class BrandRegistry {
       return false;
     }
 
-    // 1. National higher education & government suffixes
-    if (
-      cleanHost.endsWith(".edu.vn") ||
-      cleanHost.endsWith(".gov.vn") ||
-      cleanHost.endsWith(".ac.uk") ||
-      cleanHost.endsWith(".edu") ||
-      cleanHost.endsWith(".gov")
-    ) {
-      return true;
-    }
-
-    // 2. Direct canonical domain match for all registered verified brands
+    // A top-level suffix is not an identity proof. Only a registered
+    // canonical domain (or its subdomain) may produce the local whitelist
+    // hint, and that hint remains scoped to Layer 1 screening.
     return BRAND_REGISTRY.some((brand) =>
       brand.canonicalDomains.some(
         (canonical) => cleanHost === canonical || cleanHost.endsWith("." + canonical)

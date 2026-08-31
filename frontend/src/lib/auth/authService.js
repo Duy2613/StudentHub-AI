@@ -3,26 +3,93 @@
 // Hệ thống dịch vụ xác thực trung tâm (Auth Core Service) kết nối Supabase Auth + ASP.NET Core Backend:
 // - Bọc 100% try/catch toàn diện với chuẩn Diagnostic Logging: [AUTH_ERROR] & [AUTH_INFO]
 // - Interceptor bắt và dịch chính xác toàn bộ mã lỗi Supabase & ASP.NET Core sang tiếng Việt
-// - Cơ chế đồng bộ Bearer Token sang POST /api/auth/sync tuần tự, chống lệch pha (Async Mismatch)
-// - Hỗ trợ "Remember Me" chuyển đổi linh hoạt localStorage / sessionStorage / in-memory
+// - Provider bearer proof is kept in memory only and exchanged for an opaque
+//   server-issued HttpOnly cookie before the UI claims an authenticated session.
+// - "Remember Me" stores preferences/demo data only, never credentials.
 
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from "../supabase/client.js";
 
 const API_BASE = typeof window !== "undefined"
   ? "" // Sử dụng Next.js Route Proxy cùng origin để triệt tiêu lỗi CORS Preflight
   : (process.env.NEXT_PUBLIC_API_URL || "https://studenthub-api-8fqp.onrender.com");
 
+let volatileToken = null;
+let exchangeInFlight = null;
+let lastExchangedToken = null;
+let lastExchangeResult = null;
+
+function getBrowserStorage(storageName) {
+  if (typeof window === "undefined") return null;
+  try {
+    return window[storageName] || null;
+  } catch (error) {
+    logAuthError(`storage:${storageName}`, error);
+    return null;
+  }
+}
+
+function readBrowserStorage(storageName, key) {
+  const storage = getBrowserStorage(storageName);
+  if (!storage) return null;
+  try {
+    return storage.getItem(key);
+  } catch (error) {
+    logAuthError(`storage:${storageName}:read`, error);
+    return null;
+  }
+}
+
+function writeBrowserStorage(storageName, key, value) {
+  const storage = getBrowserStorage(storageName);
+  if (!storage) return false;
+  try {
+    storage.setItem(key, value);
+    return true;
+  } catch (error) {
+    logAuthError(`storage:${storageName}:write`, error);
+    return false;
+  }
+}
+
+function removeBrowserStorage(storageName, key) {
+  const storage = getBrowserStorage(storageName);
+  if (!storage) return;
+  try {
+    storage.removeItem(key);
+  } catch (error) {
+    logAuthError(`storage:${storageName}:remove`, error);
+  }
+}
+
+function isRememberedSession() {
+  return readBrowserStorage("localStorage", "studenthub_remember_me") === "true";
+}
+
 // =========================================================================
 // 1. CHUẨN HÓA LOGGING & INTERCEPTOR DỊCH MÃ LỖI (DIAGNOSTIC LOGGING)
 // =========================================================================
 
+function redactAuthLogText(value) {
+  return String(value || "")
+    .replace(/bearer\s+[a-z0-9._-]+/gi, "Bearer [REDACTED]")
+    .replace(/(password|token|otp|secret|key)\s*[:=]\s*[^\s,;]+/gi, "$1=[REDACTED]")
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[REDACTED_EMAIL]")
+    .slice(0, 300);
+}
+
 export function logAuthError(functionName, error, extraContext = null) {
-  const detail = error?.message || error?.error_description || (typeof error === "string" ? error : JSON.stringify(error));
-  console.error(`[AUTH_ERROR] - [${functionName}] - Chi tiết:`, detail, extraContext ? { extraContext } : "");
+  const detail = error?.name || error?.code || (typeof error === "string" ? "AUTH_ERROR" : "AUTH_ERROR");
+  const safeContext = extraContext && typeof extraContext === "object"
+    ? Object.fromEntries(Object.entries(extraContext).slice(0, 8).map(([key, value]) => [key, redactAuthLogText(value)]))
+    : "";
+  console.error(`[AUTH_ERROR] - [${redactAuthLogText(functionName)}] - ${detail}`, safeContext);
 }
 
 export function logAuthInfo(functionName, message, data = null) {
-  console.log(`[AUTH_INFO] - [${functionName}] - ${message}`, data ? data : "");
+  const safeData = data && typeof data === "object"
+    ? Object.fromEntries(Object.entries(data).filter(([key]) => !/token|password|secret|cookie|authorization|key/i.test(key)).slice(0, 8))
+    : "";
+  console.log(`[AUTH_INFO] - [${redactAuthLogText(functionName)}] - ${redactAuthLogText(message)}`, safeData);
 }
 
 /**
@@ -119,56 +186,123 @@ export function translateAuthError(error) {
 }
 
 // =========================================================================
-// 2. TOKEN & PREFERENCE STORAGE HELPERS (AN TOÀN CHỐNG CRASH)
+// 2. TRANSIENT TOKEN & PREFERENCE HELPERS
 // =========================================================================
 
 export function setRememberMePreference(rememberMe) {
   if (typeof window === "undefined") return;
-  try {
-    if (rememberMe) {
-      localStorage.setItem("studenthub_remember_me", "true");
-    } else {
-      localStorage.removeItem("studenthub_remember_me");
-    }
-  } catch (err) {
-    logAuthError("setRememberMePreference", err);
+  if (rememberMe) {
+    writeBrowserStorage("localStorage", "studenthub_remember_me", "true");
+  } else {
+    removeBrowserStorage("localStorage", "studenthub_remember_me");
   }
 }
 
 export function getStoredToken() {
   if (typeof window === "undefined") return null;
-  try {
-    const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
-    if (isRemembered) {
-      return localStorage.getItem("studenthub_jwt_token") || sessionStorage.getItem("studenthub_jwt_token");
+  return volatileToken;
+}
+
+export function setStoredToken(token) {
+  if (typeof window === "undefined") return;
+  volatileToken = typeof token === "string" && token ? token : null;
+}
+
+function resetExchangeState() {
+  volatileToken = null;
+  exchangeInFlight = null;
+  lastExchangedToken = null;
+  lastExchangeResult = null;
+}
+
+/**
+ * Exchanges one verified upstream proof for the server-owned opaque session.
+ * The response intentionally contains no credential and the browser relies on
+ * the HttpOnly cookie set by the same-origin route.
+ */
+export async function exchangeApplicationSession(upstreamToken) {
+  if (typeof window === "undefined") {
+    return { success: false, code: "BROWSER_CONTEXT_REQUIRED" };
+  }
+  if (typeof upstreamToken !== "string" || !upstreamToken.trim()) {
+    return { success: false, code: "UPSTREAM_TOKEN_REQUIRED" };
+  }
+  if (lastExchangedToken === upstreamToken && lastExchangeResult?.success) {
+    return lastExchangeResult;
+  }
+  if (exchangeInFlight?.token === upstreamToken) {
+    return exchangeInFlight.promise;
+  }
+
+  const promise = (async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/auth/session/exchange`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${upstreamToken}`,
+        },
+        body: "{}",
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || data?.success !== true || !data?.session) {
+        return {
+          success: false,
+          code: data?.error?.code || `SESSION_EXCHANGE_HTTP_${res.status}`,
+        };
+      }
+
+      const result = { success: true, session: data.session };
+      lastExchangedToken = upstreamToken;
+      lastExchangeResult = result;
+      return result;
+    } catch (error) {
+      logAuthError("exchangeApplicationSession", error);
+      return { success: false, code: "SESSION_EXCHANGE_NETWORK_FAILURE" };
+    } finally {
+      volatileToken = null;
     }
-    return sessionStorage.getItem("studenthub_jwt_token");
-  } catch (err) {
-    logAuthError("getStoredToken", err);
-    return null;
+  })();
+
+  exchangeInFlight = { token: upstreamToken, promise };
+  try {
+    return await promise;
+  } finally {
+    if (exchangeInFlight?.promise === promise) exchangeInFlight = null;
   }
 }
 
-export function setStoredToken(token, rememberMe = false) {
-  if (typeof window === "undefined") return;
+/**
+ * Reads only the server-authoritative cookie session.  Dependency failure is
+ * distinct from a normal signed-out state so callers cannot silently promote
+ * an unavailable identity service to an authenticated UI.
+ */
+export async function getApplicationSession() {
+  if (typeof window === "undefined") {
+    return { authenticated: false, unavailable: false, user: null, code: "BROWSER_CONTEXT_REQUIRED" };
+  }
+
   try {
-    if (token) {
-      if (rememberMe) {
-        localStorage.setItem("studenthub_jwt_token", token);
-        sessionStorage.setItem("studenthub_jwt_token", token);
-        localStorage.setItem("studenthub_remember_me", "true");
-      } else {
-        sessionStorage.setItem("studenthub_jwt_token", token);
-        localStorage.removeItem("studenthub_jwt_token");
-        localStorage.removeItem("studenthub_remember_me");
-      }
-    } else {
-      sessionStorage.removeItem("studenthub_jwt_token");
-      localStorage.removeItem("studenthub_jwt_token");
-      localStorage.removeItem("studenthub_remember_me");
+    const res = await fetch(`${API_BASE}/api/auth/session`, {
+      method: "GET",
+      credentials: "include",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+    const data = await res.json().catch(() => null);
+    if (res.ok && data?.authenticated === true && data?.user) {
+      return { authenticated: true, unavailable: false, user: data.user, code: null };
     }
-  } catch (err) {
-    logAuthError("setStoredToken", err);
+    return {
+      authenticated: false,
+      unavailable: res.status >= 500,
+      user: null,
+      code: data?.error?.code || `SESSION_READ_HTTP_${res.status}`,
+    };
+  } catch (error) {
+    logAuthError("getApplicationSession", error);
+    return { authenticated: false, unavailable: true, user: null, code: "SESSION_READ_NETWORK_FAILURE" };
   }
 }
 
@@ -203,7 +337,7 @@ export async function loginBackend(email, password, rememberMe = false) {
 
     if (data?.token) {
       setStoredToken(data.token, rememberMe);
-      logAuthInfo("loginBackend", "Đã lưu JWT Token thành công.");
+      logAuthInfo("loginBackend", "Đã giữ JWT tạm thời trong bộ nhớ cho luồng tương thích.");
     }
 
     return data;
@@ -288,9 +422,13 @@ export async function syncBackendUser(userData = {}, explicitToken = null) {
 }
 
 /**
- * Lấy thông tin user hiện tại qua JWT Bearer: GET /api/auth/me
+ * Resolves the current user from the opaque application session first, with a
+ * page-memory-only legacy backend bearer fallback during migration.
  */
 export async function getMeBackend() {
+  const applicationSession = await getApplicationSession();
+  if (applicationSession.authenticated) return applicationSession.user;
+
   const token = getStoredToken();
   if (!token) return null;
 
@@ -405,6 +543,12 @@ export async function verifySignupOtp(email, token) {
     if (data?.session?.access_token) {
       setStoredToken(data.session.access_token, true);
       await syncBackendUser(data.user, data.session.access_token);
+      const exchanged = await exchangeApplicationSession(data.session.access_token);
+      if (!exchanged.success) {
+        const exchangeError = new Error("Không thể tạo phiên đăng nhập an toàn. Vui lòng thử lại.");
+        exchangeError.code = exchanged.code;
+        throw exchangeError;
+      }
     }
 
     logAuthInfo("verifySignupOtp", "Xác thực OTP thành công.");
@@ -450,18 +594,9 @@ export async function signInWithPassword(email, password, rememberMe = false) {
   logAuthInfo("signInWithPassword", `Bắt đầu đăng nhập: ${cleanEmail} (Remember: ${rememberMe})`);
 
   try {
-    // 1. Thử đăng nhập qua Backend ASP.NET Core
-    try {
-      const backendResult = await loginBackend(cleanEmail, password, rememberMe);
-      if (backendResult?.user && backendResult?.token) {
-        logAuthInfo("signInWithPassword", "Đăng nhập ASP.NET Core thành công.");
-        return { user: backendResult.user, token: backendResult.token };
-      }
-    } catch (backendErr) {
-      logAuthInfo("signInWithPassword", "Chuyển sang đăng nhập Supabase Auth.");
-    }
-
-    // 2. Đăng nhập qua Supabase Auth
+    // Supabase/OIDC is the sole end-user identity authority. The external
+    // ASP.NET service remains a profile-sync compatibility dependency and may
+    // not independently establish an authenticated application session.
     const { data, error } = await supabase.auth.signInWithPassword({
       email: cleanEmail,
       password,
@@ -476,6 +611,12 @@ export async function signInWithPassword(email, password, rememberMe = false) {
       setStoredToken(data.session.access_token, rememberMe);
       // Gọi đồng bộ sang ASP.NET Core Backend
       await syncBackendUser(data.user, data.session.access_token);
+      const exchanged = await exchangeApplicationSession(data.session.access_token);
+      if (!exchanged.success) {
+        const exchangeError = new Error("Không thể tạo phiên đăng nhập an toàn. Vui lòng thử lại.");
+        exchangeError.code = exchanged.code;
+        throw exchangeError;
+      }
     }
 
     logAuthInfo("signInWithPassword", "Đăng nhập Supabase thành công.");
@@ -543,22 +684,37 @@ export async function signInWithGitHub() {
 export async function signOutSupabase() {
   logAuthInfo("signOutSupabase", "Bắt đầu đăng xuất và xóa phiên.");
   try {
-    setStoredToken(null);
     if (typeof window !== "undefined") {
-      sessionStorage.removeItem("studenthub_user_profile");
-      sessionStorage.removeItem("studenthub_demo_user");
-      sessionStorage.removeItem("studenthub_jwt_token");
-      localStorage.removeItem("studenthub_user_profile");
-      localStorage.removeItem("studenthub_demo_user");
-      localStorage.removeItem("studenthub_jwt_token");
-      localStorage.removeItem("studenthub_remember_me");
+      try {
+        const logoutResponse = await fetch(`${API_BASE}/api/auth/session/logout`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!logoutResponse.ok && logoutResponse.status !== 401) {
+          logAuthError("signOutSupabase:applicationSession", new Error(`Logout HTTP ${logoutResponse.status}`));
+        }
+      } catch (error) {
+        logAuthError("signOutSupabase:applicationSession", error);
+      }
+
+      resetExchangeState();
+      removeBrowserStorage("sessionStorage", "studenthub_user_profile");
+      removeBrowserStorage("sessionStorage", "studenthub_demo_user");
+      // Remove credentials left by pre-migration releases. No new secret is
+      // ever written to either Web Storage API.
+      removeBrowserStorage("sessionStorage", "studenthub_jwt_token");
+      removeBrowserStorage("localStorage", "studenthub_user_profile");
+      removeBrowserStorage("localStorage", "studenthub_demo_user");
+      removeBrowserStorage("localStorage", "studenthub_jwt_token");
+      removeBrowserStorage("localStorage", "studenthub_remember_me");
     }
 
     const { error } = await supabase.auth.signOut().catch(() => ({ error: null }));
     if (error) {
       logAuthError("signOutSupabase", error);
     }
-    logAuthInfo("signOutSupabase", "Đã xóa toàn bộ token và phiên làm việc.");
+    logAuthInfo("signOutSupabase", "Đã xóa trạng thái trình duyệt; kết quả thu hồi phiên máy chủ đã được xử lý riêng.");
   } catch (error) {
     logAuthError("signOutSupabase", error);
   }
@@ -571,12 +727,15 @@ export async function updateUserProfile(profileData) {
   logAuthInfo("updateUserProfile", "Cập nhật thông tin hồ sơ:", profileData);
   try {
     if (typeof window !== "undefined") {
-      const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
-      const storage = isRemembered ? localStorage : sessionStorage;
-      const cached = storage.getItem("studenthub_user_profile");
-      const current = cached ? JSON.parse(cached) : {};
-      const updated = { ...current, ...profileData };
-      storage.setItem("studenthub_user_profile", JSON.stringify(updated));
+      const storageName = isRememberedSession() ? "localStorage" : "sessionStorage";
+      const cached = readBrowserStorage(storageName, "studenthub_user_profile");
+      let current = {};
+      try {
+        current = cached ? JSON.parse(cached) : {};
+      } catch (error) {
+        logAuthError("updateUserProfile:parseCache", error);
+      }
+      writeBrowserStorage(storageName, "studenthub_user_profile", JSON.stringify({ ...current, ...profileData }));
     }
 
     const { data } = await supabase.auth.updateUser({

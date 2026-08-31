@@ -9,6 +9,8 @@ import { LAYER_1_CONFIG } from "../config/Layer1Config.js";
 
 // Zero-width & invisible Unicode characters used for evasion
 const ZERO_WIDTH_REGEX = /[\u200B-\u200D\uFEFF\u2060\u00AD\u180E]/g;
+const ZERO_WIDTH_TEST_REGEX = /[\u200B-\u200D\uFEFF\u2060\u00AD\u180E]/u;
+const URL_SCHEME_REGEX = /^([a-z][a-z0-9+.-]*):/i;
 
 // Leet-speak mapping table for secondary normalized stream
 const LEET_MAP = {
@@ -32,20 +34,52 @@ export class NormalizationService {
    * @returns {object} { original, normalized, parsed, isValid, hasZeroWidthChars, isOverLength }
    */
   static normalizeUrl(rawUrl) {
-    const original = String(rawUrl || "").trim();
+    const original = typeof rawUrl === "string" ? rawUrl.trim() : "";
     if (!original) {
-      return { original: "", normalized: "", parsed: null, isValid: false };
+      return { original: "", normalized: "", parsed: null, isValid: false, invalidReason: "EMPTY_INPUT" };
     }
 
     const isOverLength = original.length > LAYER_1_CONFIG.LIMITS.MAX_URL_LENGTH;
-    const hasZeroWidthChars = ZERO_WIDTH_REGEX.test(original);
+    const hasZeroWidthChars = ZERO_WIDTH_TEST_REGEX.test(original);
 
     // Strip zero-width characters and normalize Unicode
     let cleaned = original.replace(ZERO_WIDTH_REGEX, "").normalize("NFKC").trim();
 
+    const explicitScheme = cleaned.match(URL_SCHEME_REGEX)?.[1]?.toLowerCase() || null;
+    const isUnsupportedScheme = Boolean(explicitScheme && !["http", "https"].includes(explicitScheme));
+
+    if (isOverLength) {
+      return {
+        original,
+        normalized: cleaned.slice(0, LAYER_1_CONFIG.LIMITS.MAX_URL_LENGTH),
+        parsed: null,
+        isValid: false,
+        isOverLength: true,
+        hasZeroWidthChars,
+        explicitScheme,
+        isUnsupportedScheme,
+        invalidReason: "URL_TOO_LONG",
+      };
+    }
+
+    if (isUnsupportedScheme) {
+      return {
+        original,
+        normalized: cleaned,
+        parsed: null,
+        isValid: false,
+        isOverLength: false,
+        hasZeroWidthChars,
+        explicitScheme,
+        isUnsupportedScheme: true,
+        invalidReason: "UNSUPPORTED_SCHEME",
+      };
+    }
+
     // Auto-prepend http:// if scheme is missing for structural parsing
     let workingUrl = cleaned;
-    if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//i.test(workingUrl)) {
+    const hadExplicitHttpScheme = /^https?:\/\//i.test(workingUrl);
+    if (!hadExplicitHttpScheme) {
       workingUrl = "http://" + workingUrl;
     }
 
@@ -54,7 +88,7 @@ export class NormalizationService {
 
     try {
       parsed = new URL(workingUrl);
-      isValid = true;
+      isValid = /^https?:$/.test(parsed.protocol) && Boolean(parsed.hostname);
     } catch {
       isValid = false;
     }
@@ -66,6 +100,10 @@ export class NormalizationService {
       isValid,
       hasZeroWidthChars,
       isOverLength,
+      explicitScheme,
+      implicitScheme: !hadExplicitHttpScheme,
+      isUnsupportedScheme: false,
+      invalidReason: isValid ? null : "MALFORMED_URL",
     };
   }
 
@@ -75,13 +113,13 @@ export class NormalizationService {
    * @returns {object} { original, normalized, deobfuscated, hasZeroWidthChars, isOverLength }
    */
   static normalizeText(rawText) {
-    const original = String(rawText || "");
+    const original = typeof rawText === "string" ? rawText : "";
     if (!original.trim()) {
       return { original: "", normalized: "", deobfuscated: "", isValid: false };
     }
 
     const isOverLength = original.length > LAYER_1_CONFIG.LIMITS.MAX_TEXT_LENGTH;
-    const hasZeroWidthChars = ZERO_WIDTH_REGEX.test(original);
+    const hasZeroWidthChars = ZERO_WIDTH_TEST_REGEX.test(original);
 
     // 1. Replace zero-width characters with spaces if between words, or strip them
     const normalized = original.replace(ZERO_WIDTH_REGEX, " ").normalize("NFKC");

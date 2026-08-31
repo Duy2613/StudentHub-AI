@@ -8,11 +8,7 @@
  * 4. Distinguishes RARE_EDGE_CASE from SYSTEMIC_INCIDENT
  */
 
-import {
-  CommunityIntelligenceModel,
-  COORDINATION_RISK,
-  MANIPULATION_RISK
-} from "./communityIntelligenceModel.js";
+import { CommunityIntelligenceModel, COORDINATION_RISK } from "./communityIntelligenceModel.js";
 import { CommunityProvenanceEngine } from "./communityProvenanceEngine.js";
 
 export class CommunityIntegrityEngine {

@@ -1,45 +1,33 @@
-/**
- * StudentHub AI — API Route: POST /api/ai/trust/evaluate
- * 
- * Server-authoritative AI Trust Evaluation endpoint.
- * Evaluates claims, verifies citations, checks temporal validity,
- * guards against prompt injection and returns multi-dimensional trust metrics.
- */
-
 import { NextResponse } from "next/server";
-import { AiTrustEngine } from "@/lib/intelligence/trust/aiTrustEngine";
-import { AiTrustStore } from "@/lib/intelligence/trust/aiTrustStore";
+import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
-export async function POST(req) {
-  try {
-    const body = await req.json().catch(() => ({}));
-    const { query, rawAnswer, sources, evidenceSpans, stakeLevel } = body;
-
-    if (!query && !rawAnswer) {
-      return NextResponse.json(
-        { success: false, error: "Missing required fields: query or rawAnswer is required." },
-        { status: 400 }
-      );
-    }
-
-    const evaluation = AiTrustEngine.evaluate({
-      query: query || "",
-      rawAnswer: rawAnswer || "",
-      sources: Array.isArray(sources) ? sources : [],
-      evidenceSpans: Array.isArray(evidenceSpans) ? evidenceSpans : [],
-      stakeLevel
-    });
-
-    AiTrustStore.saveEvaluation(evaluation);
-
-    return NextResponse.json({
-      success: true,
-      evaluation
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal server error in AI Trust Engine" },
-      { status: 500 }
-    );
-  }
+/**
+ * Retired client-composed trust endpoint.
+ *
+ * A caller-provided source/evidence bundle cannot establish live provenance,
+ * freshness, retrieval integrity, or independence. It therefore cannot be
+ * allowed to reach a VERIFIED result. Authentication and authorization are
+ * still enforced by SecurityFabric before this retirement response.
+ */
+async function rejectClientComposedEvaluation(_request, _routeParams, _principal, secContext) {
+  return NextResponse.json({
+    success: false,
+    error: {
+      code: "TRUST_EVALUATION_REQUIRES_CANONICAL_PIPELINE",
+      userMessage: "Đánh giá tin cậy phải đi qua pipeline xác minh chuẩn.",
+      requestId: secContext.correlationId,
+      retryable: false,
+    },
+    canonicalEndpoint: "/api/v1/trust",
+  }, {
+    status: 410,
+    headers: { "Cache-Control": "no-store" },
+  });
 }
+
+export const POST = SecurityFabric.wrapHandler({
+  action: "CREATE_TRUST_EVALUATION",
+  requiredPermission: "TRUST.ANALYZE",
+  maxRequests: 30,
+  maxBodyBytes: 256 * 1024,
+}, rejectClientComposedEvaluation);

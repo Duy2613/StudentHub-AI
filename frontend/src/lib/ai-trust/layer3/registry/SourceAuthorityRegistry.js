@@ -202,6 +202,16 @@ export class SourceAuthorityRegistry {
       };
     }
 
+    if (typeof urlOrDomain !== "string") {
+      return {
+        tier: SOURCE_AUTHORITY_TIER.TIER_1_UNKNOWN_LOW,
+        score: LAYER_3_CONFIG.AUTHORITY_SCORES.TIER_1_UNKNOWN_LOW,
+        basis: ["invalid_source_identifier"],
+        organization: "Unknown Source",
+        isOfficial: false,
+      };
+    }
+
     let hostname = urlOrDomain.toLowerCase().trim();
     try {
       if (hostname.startsWith("http://") || hostname.startsWith("https://")) {
@@ -214,39 +224,24 @@ export class SourceAuthorityRegistry {
     // Direct match against registry
     for (const item of DOMAIN_AUTHORITY_CATALOG) {
       if (hostname === item.domain || hostname.endsWith(`.${item.domain}`)) {
-        const typeScore = item.authorityProfiles[claimType] || item.authorityProfiles.institutional || 0.85;
+        const hasClaimProfile = Object.prototype.hasOwnProperty.call(item.authorityProfiles, claimType);
+        const typeScore = hasClaimProfile
+          ? item.authorityProfiles[claimType]
+          : Math.min(LAYER_3_CONFIG.AUTHORITY_SCORES.TIER_3_REPUTABLE_SECONDARY, item.isOfficial ? 0.60 : 0.55);
         return {
           tier: item.tier,
           score: typeScore,
           basis: [
-            item.isOfficial ? "official_institutional_domain" : "reputable_secondary_press",
-            `claim_type_relevance_${claimType}`,
-          ],
-          organization: item.organization,
-          isOfficial: item.isOfficial,
+              item.isOfficial ? "registered_institutional_domain" : "reputable_secondary_press",
+              `claim_type_relevance_${claimType}`,
+              ...(hasClaimProfile ? [] : ["claim_type_not_explicitly_authorized"]),
+            ],
+            organization: item.organization,
+            isOfficial: item.isOfficial,
+            authorityScope: Object.keys(item.authorityProfiles),
+            claimSpecificMatch: hasClaimProfile,
         };
       }
-    }
-
-    // Heuristics for .gov.vn or .edu.vn
-    if (hostname.endsWith(".gov.vn")) {
-      return {
-        tier: SOURCE_AUTHORITY_TIER.TIER_5_PRIMARY_AUTHORITATIVE,
-        score: 0.95,
-        basis: ["national_government_tld"],
-        organization: "Cơ quan Nhà nước Việt Nam",
-        isOfficial: true,
-      };
-    }
-
-    if (hostname.endsWith(".edu.vn")) {
-      return {
-        tier: SOURCE_AUTHORITY_TIER.TIER_5_PRIMARY_AUTHORITATIVE,
-        score: 0.92,
-        basis: ["accredited_higher_education_tld"],
-        organization: "Cơ sở Giáo dục Đại học Việt Nam",
-        isOfficial: true,
-      };
     }
 
     // Default unverified / unknown domain

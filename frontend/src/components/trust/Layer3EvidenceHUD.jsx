@@ -1,22 +1,9 @@
 "use client";
 
 import React from "react";
-import {
-  FileText,
-  ExternalLink,
-  ShieldCheck,
-  ShieldAlert,
-  AlertTriangle,
-  HelpCircle,
-  Clock,
-  Layers,
-  Scale,
-  CheckCircle2,
-  XCircle,
-  Network,
-  ArrowRight,
-} from "lucide-react";
-import { LAYER_3_STATUS, CLAIM_EVIDENCE_RELATION } from "@/lib/ai-trust/layer3/types";
+import { FileText, ExternalLink, ShieldCheck, HelpCircle, Clock, Scale, Network, ArrowRight } from "lucide-react";
+import { LAYER_3_STATUS } from "@/lib/ai-trust/layer3/types";
+import { safeExternalUrl } from "@/lib/security/safeExternalUrl";
 
 export default function Layer3EvidenceHUD({ result, className = "" }) {
   if (!result) return null;
@@ -32,7 +19,7 @@ export default function Layer3EvidenceHUD({ result, className = "" }) {
     conflicts = [],
     temporalAssessment = {},
     verificationCompleteness = 0,
-    evidenceConfidence = 0.5,
+    evidenceConfidence = 0,
     limitations = [],
     metrics = {},
   } = result;
@@ -115,7 +102,7 @@ export default function Layer3EvidenceHUD({ result, className = "" }) {
         <div className="p-3 rounded-xl bg-black/60 border border-[#2d0d08]">
           <div className="text-[10px] font-mono text-[#ece7e0]/50 uppercase">Đồng Thuận Nguồn</div>
           <div className="text-lg font-bold font-mono text-[#ffbc09] mt-0.5">
-            {((crossSourceAgreement.agreementScore || 1) * 100).toFixed(0)}% ({crossSourceAgreement.supportingSourcesCount || 0} ủng hộ / {crossSourceAgreement.contradictingSourcesCount || 0} bác bỏ)
+            {((Number.isFinite(Number(crossSourceAgreement.agreementScore)) ? Number(crossSourceAgreement.agreementScore) : 0) * 100).toFixed(0)}% ({crossSourceAgreement.supportingSourcesCount || 0} ủng hộ / {crossSourceAgreement.contradictingSourcesCount || 0} bác bỏ)
           </div>
         </div>
         <div className="p-3 rounded-xl bg-black/60 border border-[#2d0d08]">
@@ -219,7 +206,7 @@ export default function Layer3EvidenceHUD({ result, className = "" }) {
                       >
                         <div className="flex items-center justify-between gap-2 font-mono text-[10px]">
                           <a
-                            href={ev.sourceUrl}
+                            href={safeExternalUrl(ev.sourceUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[#38f8d4] hover:underline flex items-center gap-1 truncate max-w-[280px]"

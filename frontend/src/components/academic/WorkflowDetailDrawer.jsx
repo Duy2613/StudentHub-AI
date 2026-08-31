@@ -2,20 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { AcademicCommandCenterViewModel } from "@/lib/intelligence/academic/academicCommandCenterViewModel.js";
-import {
-  X,
-  CheckCircle2,
-  Circle,
-  Lock,
-  ArrowRight,
-  Clock,
-  FileText,
-  ShieldCheck,
-  Calendar,
-  History,
-  AlertCircle,
-  ExternalLink
-} from "lucide-react";
+import { X, CheckCircle2, Circle, Lock, ArrowRight, FileText, Calendar, History } from "lucide-react";
 
 export function WorkflowDetailDrawer({
   task,

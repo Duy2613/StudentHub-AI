@@ -25,23 +25,45 @@ export class AdversarialTrustGuard {
     /không\s+cần\s+thi\s+tốt\s+nghiệp/i,
     /<system[\s\S]*?>[\s\S]*?<\/system>/i,
     /<script[\s\S]*?>[\s\S]*?<\/script>/i,
-    /javascript:/i
+    /javascript:/i,
+    /(?:do\s+not|don't)\s+follow\s+(?:the\s+)?(?:safety|validation|security)\s+(?:rules|checks)/i,
+    /(?:set|return|classify|label)\s+(?:this|the\s+(?:url|source|claim|document|content))\s+as\s+(?:safe|verified|official|trusted)/i,
+    /(?:ignore|override|bypass)\s+(?:the\s+)?(?:security|trust|verification|evidence)\s+(?:engine|policy|check|rule)/i,
+    /(?:reveal|print|dump|exfiltrate)\s+(?:the\s+)?(?:prompt|system|secret|credential|api\s*key)/i,
   ];
 
   static inspectText(text) {
-    if (!text || typeof text !== "string") {
+    if (text === null || text === undefined || text === "") {
       return {
         isSafe: true,
         isAdversarial: false,
         manipulationRisk: 0,
         detectedPatterns: [],
-        sanitizedText: ""
+        sanitizedText: "",
+        inputValid: true,
       };
     }
 
+    if (typeof text !== "string") {
+      return {
+        isSafe: false,
+        isAdversarial: false,
+        manipulationRisk: 1,
+        detectedPatterns: ["INVALID_INPUT_TYPE"],
+        sanitizedText: "",
+        inputValid: false,
+      };
+    }
+
+    const normalized = text
+      .normalize("NFKC")
+      .replace(/[\u200B-\u200D\u2060\uFEFF]/g, "")
+      .replace(/[\u0000-\u001F\u007F]/g, " ");
+
     const detected = [];
     for (const pattern of this.#INJECTION_PATTERNS) {
-      if (pattern.test(text)) {
+      pattern.lastIndex = 0;
+      if (pattern.test(normalized)) {
         detected.push(pattern.source);
       }
     }
@@ -50,7 +72,7 @@ export class AdversarialTrustGuard {
       ? Math.min(1.0, 0.5 + (detected.length * 0.3))
       : 0;
 
-    const sanitizedText = text
+    const sanitizedText = normalized
       .replace(/<\/?(script|system).*?>/gi, "")
       .replace(/javascript:/gi, "");
 
@@ -59,7 +81,8 @@ export class AdversarialTrustGuard {
       isAdversarial: detected.length > 0,
       manipulationRisk,
       detectedPatterns: detected,
-      sanitizedText
+      sanitizedText,
+      inputValid: true,
     };
   }
 
@@ -96,9 +119,17 @@ export class AdversarialTrustGuard {
     if (clean.startsWith("http://") || clean.startsWith("https://")) {
       try {
         const parsed = new URL(clean);
-        return parsed.hostname.endsWith(".edu.vn") || 
-               parsed.hostname.endsWith("hcmute.edu.vn") ||
-               parsed.hostname === "localhost";
+        const hostname = parsed.hostname.toLowerCase().replace(/\.+$/, "");
+        // This helper validates format only. It is deliberately conservative:
+        // private/local hosts and broad suffix claims are not citations of
+        // authority. Authority must come from the Layer 3 registry.
+        return parsed.protocol === "https:" &&
+          hostname !== "localhost" &&
+          !hostname.endsWith(".localhost") &&
+          !hostname.endsWith(".internal") &&
+          !hostname.endsWith(".local") &&
+          !/^(?:127\.|10\.|192\.168\.|169\.254\.)/.test(hostname) &&
+          hostname.includes(".");
       } catch {
         return false;
       }

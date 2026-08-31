@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import { ShieldCheck, Sparkles, ArrowRight, CheckCircle2, Star, Award } from "lucide-react";
+
+import { ShieldCheck, ArrowRight, CheckCircle2, Award } from "lucide-react";
 import TactileButton from "@/components/ui/TactileButton";
 
 export default function CallToActionSection() {

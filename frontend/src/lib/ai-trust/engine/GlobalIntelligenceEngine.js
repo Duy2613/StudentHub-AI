@@ -9,8 +9,21 @@
  */
 
 import { GLOBAL_SECURITY_STANDARDS } from "../standards/GlobalStandardsRegistry.js";
-import { UNIVERSITY_ECOSYSTEM_REGISTRY, matchUniversityEcosystem } from "../ecosystem/UniversityEcosystemRegistry.js";
-import { SOCIAL_MEDIA_THREAT_PATTERNS } from "../ecosystem/SocialMediaThreatSurfaces.js";
+import { matchUniversityEcosystem } from "../ecosystem/UniversityEcosystemRegistry.js";
+
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function isExternalEvidence(item) {
+  return Boolean(item &&
+    item.liveEvidence === true &&
+    item.sourceType !== "LOCAL_KNOWLEDGE_BASE" &&
+    item.providerStatus === "SUCCESS" &&
+    item.retrievalOutcome === "SUCCESS" &&
+    typeof item.sourceFingerprint === "string" &&
+    item.sourceFingerprint.trim());
+}
 
 export class GlobalIntelligenceEngine {
   /**
@@ -21,12 +34,13 @@ export class GlobalIntelligenceEngine {
    * @returns {object} Standard compliance profile & threat mappings
    */
   static correlate({ fusedGraph = {}, url = "" }) {
+    fusedGraph = fusedGraph && typeof fusedGraph === "object" && !Array.isArray(fusedGraph) ? fusedGraph : {};
     const matchedStandards = [];
     const complianceNotes = [];
     let matchedUniversity = null;
 
     // 1. Match University Subdomain Ecosystem
-    if (url) {
+    if (typeof url === "string" && url.trim()) {
       try {
         const parsedUrl = new URL(url.startsWith("http") ? url : `https://${url}`);
         matchedUniversity = matchUniversityEcosystem(parsedUrl.hostname);
@@ -37,8 +51,8 @@ export class GlobalIntelligenceEngine {
 
     // 2. Correlate with MITRE ATT&CK Techniques
     const hasPhishingSignals =
-      fusedGraph.layer1Signals?.some((s) => s.type?.includes("credential") || s.type?.includes("otp") || s.type?.includes("phishing")) ||
-      fusedGraph.layer2ContextSignals?.some((s) => s.type?.includes("credential") || s.type?.includes("account_takeover"));
+      asArray(fusedGraph.layer1Signals).some((s) => typeof s?.type === "string" && (s.type.includes("credential") || s.type.includes("otp") || s.type.includes("phishing"))) ||
+      asArray(fusedGraph.layer2ContextSignals).some((s) => typeof s?.type === "string" && (s.type.includes("credential") || s.type.includes("account_takeover")));
 
     if (hasPhishingSignals) {
       matchedStandards.push({
@@ -62,28 +76,23 @@ export class GlobalIntelligenceEngine {
     }
 
     // 3. Correlate with IFCN Fact-Checking Principles
-    const hasSourcingEvidence = fusedGraph.layer3Evidence?.length > 0;
+    const hasSourcingEvidence = asArray(fusedGraph.layer3Evidence).some(isExternalEvidence);
     if (hasSourcingEvidence) {
       matchedStandards.push({
         framework: "IFCN Code of Principles",
         principle: "Principle 2: Standards and Transparency of Sources",
-        status: "COMPLIANT",
+        status: "MAPPED_FOR_AUDIT",
       });
     }
-
-    // 4. ISO/IEC 42001 & AI Risk Management Mapping
-    matchedStandards.push({
-      framework: "ISO/IEC 42001 & ISO/IEC 23894:2023",
-      standard: "Trustworthy Artificial Intelligence Management System",
-      status: "COMPLIANT",
-    });
 
     return {
       matchedStandards,
       matchedUniversity,
       frameworkCount: matchedStandards.length,
       isAccreditedEcosystem: Boolean(matchedUniversity),
-      globalAuditSummary: `Đã đối soát cùng ${matchedStandards.length} tiêu chuẩn bảo mật & kiểm chứng quốc tế (MITRE, NIST, IFCN, ISO, OWASP).`,
+      globalAuditSummary: matchedStandards.length > 0
+        ? `Đã ánh xạ ${matchedStandards.length} khung tham chiếu cho mục đích audit; đây không phải chứng nhận tuân thủ.`
+        : "Không có ánh xạ khung tham chiếu đủ điều kiện từ bằng chứng hiện tại.",
     };
   }
 }

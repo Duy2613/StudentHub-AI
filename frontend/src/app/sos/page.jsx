@@ -1,30 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import {
-  ShieldAlert,
-  AlertOctagon,
-  PhoneCall,
-  Lock,
-  FileText,
-  Printer,
-  Copy,
-  Check,
-  Building,
-  CheckCircle2,
-  AlertTriangle,
-  HelpCircle,
-  Loader2,
-  Clock,
-  Sparkles,
-  Zap,
-  Navigation,
-  Radio,
-  Timer,
-  Siren,
-  HeartPulse,
-  Flame,
-} from "lucide-react";
+import { AlertOctagon, PhoneCall, Lock, FileText, Copy, Check, Navigation, Radio, Timer } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import ModernNavbar from "@/components/layout/ModernNavbar";
 import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
@@ -37,7 +14,7 @@ import FloatingDock from "@/components/ui/floating-dock";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
 import IglooSoundAmbiencePill from "@/components/ui/IglooSoundAmbiencePill";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
-import { motion, AnimatePresence } from "motion/react";
+
 import { OFFICIAL_EMERGENCY_HOTLINES, generateEmergencySosPayload } from "@/lib/intelligence/emergency/emergencySystemEngine";
 
 export default function SosLegalRoomPage() {
@@ -539,7 +516,7 @@ export default function SosLegalRoomPage() {
                       {b.hotline}
                     </a>
                   </div>
-                  <p className="text-[11px] text-[#ece7e0]/70 font-mono">SMS Khóa Thẻ: {b.smsLockSyntax || "Xem app ngân hàng"}</p>
+                  <p className="text-[11px] text-[#ece7e0]/70 font-mono">Khóa khẩn cấp: {b.urgentLockMethod || "Xem ứng dụng hoặc trang chính thức của ngân hàng"}</p>
                 </div>
               ))}
             </div>

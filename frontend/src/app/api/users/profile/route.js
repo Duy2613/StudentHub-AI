@@ -1,4 +1,6 @@
-import { NextResponse } from "next/server";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { SecurityError } from "@/lib/security/core/SecurityErrorEnvelope.js";
+import { createSecureId } from "@/lib/security/secureId.js";
 
 // In-memory profile storage keyed by email/id (Phần F)
 const PROFILES_DB = new Map();
@@ -37,33 +39,51 @@ PROFILES_DB.set("expert.ai@studenthub.ai", {
 /**
  * GET /api/users/profile?email=...
  */
-export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const email = (searchParams.get("email") || "").toLowerCase().trim();
+export const dynamic = "force-dynamic";
 
-    if (!email) {
-      return NextResponse.json(
-        { success: false, error: "Vui lòng cung cấp email của tài khoản." },
-        { status: 400 }
+function getPrincipalEmail(principal, correlationId) {
+  const email = String(principal?.email || "").toLowerCase().trim();
+  if (!email) {
+    throw SecurityError.forbidden(
+      "Authenticated identity does not contain a verified email claim.",
+      correlationId
+    );
+  }
+  return email;
+}
+
+export const GET = SecurityFabric.wrapHandler(
+  {
+    action: "READ_OWN_PROFILE",
+    allowAnonymous: false
+  },
+  async (request, routeParams, principal, secContext) => {
+    const { searchParams } = new URL(request.url);
+    const requestedEmail = (searchParams.get("email") || "").toLowerCase().trim();
+    const email = getPrincipalEmail(principal, secContext.correlationId);
+
+    if (requestedEmail && requestedEmail !== email) {
+      throw SecurityError.forbidden(
+        "You can only access your own profile.",
+        secContext.correlationId,
+        "OBJECT_NOT_OWNED"
       );
     }
 
     const found = PROFILES_DB.get(email);
     if (found) {
-      return NextResponse.json({ success: true, profile: found });
+      return Response.json({ success: true, profile: found });
     }
 
-    // Default Profile structure for new users
-    const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$|\.edu\.vn$|\.ac\.vn$)/i.test(email);
+    // Identity verification is a server workflow; an email suffix alone proves nothing.
     const defaultProfile = {
-      id: `usr_${Date.now()}`,
-      supabaseUserId: `sup_${Date.now()}`,
+      id: createSecureId("usr"),
+      supabaseUserId: principal.subjectId,
       email: email,
       fullName: email.split("@")[0] || "Sinh viên",
       role: "student",
-      trustScore: isEdu ? 80 : 50,
-      universityEmailVerified: isEdu,
+      trustScore: 50,
+      universityEmailVerified: false,
       avatarId: "student-tech",
       expertField: null,
       onboardingCompleted: false,
@@ -72,72 +92,68 @@ export async function GET(request) {
 
     PROFILES_DB.set(email, defaultProfile);
 
-    return NextResponse.json({ success: true, profile: defaultProfile });
-  } catch (error) {
-    console.error("[Profile GET API Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi tải hồ sơ." },
-      { status: 500 }
-    );
+    return Response.json({ success: true, profile: defaultProfile });
   }
-}
+);
 
 /**
  * PUT /api/users/profile
- * Body: { email, fullName, role, avatarId, expertField, university, major, onboardingCompleted }
+ * Mutable body fields: { fullName, avatarId, university, major, onboardingCompleted }
+ * Security-sensitive role/trust/verification fields are always server-authoritative.
  */
-export async function PUT(request) {
-  try {
-    const body = await request.json();
-    const { email, fullName, role, avatarId, expertField, university, major, onboardingCompleted } = body || {};
-
-    if (!email) {
-      return NextResponse.json(
-        { success: false, error: "Vui lòng cung cấp email tài khoản cần cập nhật." },
+export const PUT = SecurityFabric.wrapHandler(
+  {
+    action: "UPDATE_OWN_PROFILE",
+    allowAnonymous: false
+  },
+  async (request, routeParams, principal, secContext) => {
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return Response.json(
+        { error: { code: "VALIDATION_FAILED", message: "Request body must be valid JSON.", correlationId: secContext.correlationId } },
         { status: 400 }
       );
     }
 
-    const cleanEmail = email.toLowerCase().trim();
-    const existing = PROFILES_DB.get(cleanEmail) || {
-      id: `usr_${Date.now()}`,
-      supabaseUserId: `sup_${Date.now()}`,
-      email: cleanEmail,
+    const { email: requestedEmail, fullName, avatarId, university, major, onboardingCompleted } = body || {};
+    const email = getPrincipalEmail(principal, secContext.correlationId);
+
+    if (requestedEmail && String(requestedEmail).toLowerCase().trim() !== email) {
+      throw SecurityError.forbidden(
+        "You can only update your own profile.",
+        secContext.correlationId,
+        "OBJECT_NOT_OWNED"
+      );
+    }
+
+    const existing = PROFILES_DB.get(email) || {
+      id: createSecureId("usr"),
+      supabaseUserId: principal.subjectId,
+      email,
+      role: "student",
       trustScore: 50,
       universityEmailVerified: false,
       createdAt: new Date().toISOString(),
     };
 
-    // Calculate score updates if .edu verified
-    const isEdu = existing.universityEmailVerified || /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$|\.edu\.vn$|\.ac\.vn$)/i.test(cleanEmail);
-    const calculatedScore = Math.max(existing.trustScore || 50, isEdu ? 80 : 50);
-
     const updatedProfile = {
       ...existing,
-      fullName: fullName !== undefined ? fullName.trim() : existing.fullName,
-      role: role === "expert" ? "expert" : "student",
+      fullName: typeof fullName === "string" ? fullName.trim().slice(0, 120) : existing.fullName,
       avatarId: avatarId || existing.avatarId || "student-tech",
-      expertField: role === "expert" ? (expertField || "An ninh mạng & Phòng chống lừa đảo") : null,
-      university: university || existing.university || (isEdu ? "Đại học Thành viên" : "Chưa cập nhật"),
+      university: university || existing.university || "Chưa cập nhật",
       major: major || existing.major || "Khoa học & Kỹ thuật",
-      trustScore: calculatedScore,
-      universityEmailVerified: isEdu,
       onboardingCompleted: onboardingCompleted !== undefined ? Boolean(onboardingCompleted) : true,
       updatedAt: new Date().toISOString(),
     };
 
-    PROFILES_DB.set(cleanEmail, updatedProfile);
+    PROFILES_DB.set(email, updatedProfile);
 
-    return NextResponse.json({
+    return Response.json({
       success: true,
       message: "Cập nhật hồ sơ thành công!",
       profile: updatedProfile,
     });
-  } catch (error) {
-    console.error("[Profile PUT API Error]:", error);
-    return NextResponse.json(
-      { success: false, error: "Lỗi hệ thống khi cập nhật hồ sơ." },
-      { status: 500 }
-    );
   }
-}
+);

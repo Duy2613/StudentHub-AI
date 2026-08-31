@@ -4,29 +4,34 @@
  * Retrieves the full Expert Knowledge Graph nodes and edges.
  */
 
-import { NextResponse } from "next/server";
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import { ExpertStore } from "@/lib/intelligence/expert/expertStore.js";
+import { ExpertPublicDTO } from "@/lib/intelligence/expert/ExpertPublicDTO.js";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
-export async function GET() {
-  try {
-    const experts = ExpertStore.getAllExperts();
+export const GET = SecurityFabric.wrapHandler({
+  action: "READ_EXPERT_GRAPH",
+  allowAnonymous: true,
+  maxRequests: 90
+}, async () => {
+    const experts = ExpertStore.getAllExperts({ redactPrivate: true });
 
     // Construct graph nodes and edges
     const nodes = [];
     const edges = [];
 
     for (const exp of experts) {
+      const publicExpert = ExpertPublicDTO.toPublicDTO(exp);
       nodes.push({
-        id: exp.expertId,
-        label: exp.name,
+        id: publicExpert.expertId,
+        label: publicExpert.name,
         type: "EXPERT",
-        title: exp.title,
-        institution: exp.institution,
-        isVerified: exp.isVerified,
-        hasRegistrarAuthority: exp.hasRegistrarAuthority
+        title: publicExpert.title,
+        institution: publicExpert.institution,
+        isVerified: publicExpert.verificationSummary?.identity === "VERIFIED",
+        hasRegistrarAuthority: publicExpert.hasRegistrarAuthority
       });
 
-      for (const sc of exp.scopes) {
+      for (const sc of (exp.scopes || [])) {
         const domainNodeId = `DOMAIN_${sc.domain}`;
         if (!nodes.some(n => n.id === domainNodeId)) {
           nodes.push({
@@ -45,18 +50,15 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({
+    return Response.json({
       success: true,
       graph: {
         nodes,
         edges,
         totalExperts: experts.length
-      }
+      },
+      sourceState: "CURATED_EXPERT_GRAPH",
+      isAuthoritative: false,
+      dataNotice: "Đồ thị chuyên gia tham khảo; thông tin xác thực cần đối soát hồ sơ chính thức."
     });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error.message || "Internal error retrieving expert graph" },
-      { status: 500 }
-    );
-  }
-}
+});

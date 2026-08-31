@@ -9,13 +9,16 @@ import { NextResponse } from "next/server";
 import { getAuthoritativeCommandCenterData } from "@/lib/intelligence/academic/academicCommandCenterDataLoader";
 import { AcademicPlanDriftEngine } from "@/lib/intelligence/academic/academicPlanDriftEngine";
 import { AcademicExecutionStore } from "@/lib/intelligence/academic/academicExecutionStore";
+import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
-export async function POST(request) {
+async function reconcileExecution(request, routeParams, principal) {
   try {
     const body = await request.json().catch(() => ({}));
     const targetTerm = body.targetTerm || "2026-HK1";
 
-    const serverData = getAuthoritativeCommandCenterData();
+    const serverData = getAuthoritativeCommandCenterData({
+      studentId: principal.subjectId.replace("student:", "").trim()
+    });
     if (!serverData.success) {
       return NextResponse.json(
         { success: false, error: "Không thể nạp dữ liệu học vụ cơ sở từ máy chủ." },
@@ -47,9 +50,18 @@ export async function POST(request) {
       {
         success: false,
         error: "Lỗi đồng bộ đối soát kế hoạch học vụ.",
-        message: err.message
       },
       { status: 400 }
     );
   }
 }
+
+export const POST = SecurityFabric.wrapHandler(
+  {
+    action: "RECONCILE_ACADEMIC_EXECUTION",
+    requiredPermission: "ACADEMIC.PLAN_OWN",
+    requiredScopes: ["academic:plan"],
+    allowAnonymous: false
+  },
+  reconcileExecution
+);

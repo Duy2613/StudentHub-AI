@@ -7,7 +7,7 @@
 // - Telemetry transition badge: [ SCENE_SWITCH // 01 -> 02 ]
 // - Supports trigger on route changes, auth mode switches, or modal openings.
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function MohsinCurtainTransition({

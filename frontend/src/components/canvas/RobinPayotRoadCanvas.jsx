@@ -12,22 +12,7 @@ import React, { useRef, useState, useEffect, useMemo, useCallback } from "react"
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Float, Html } from "@react-three/drei";
 import * as THREE from "three";
-import { 
-  ShieldAlert, 
-  Users, 
-  MessageSquare, 
-  ArrowUpRight, 
-  Sparkles, 
-  ArrowLeft, 
-  ArrowUp, 
-  ArrowDown, 
-  ExternalLink,
-  Award,
-  Lock,
-  Zap,
-  LayoutDashboard,
-  GraduationCap
-} from "lucide-react";
+import { ShieldAlert, Users, MessageSquare, ArrowUpRight, ArrowLeft, ArrowUp, ArrowDown, ExternalLink, LayoutDashboard, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { saffronAudio } from "@/lib/audio/saffronAudio";

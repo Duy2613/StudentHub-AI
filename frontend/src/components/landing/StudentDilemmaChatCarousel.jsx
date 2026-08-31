@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MessageSquare, ShieldAlert, ShieldCheck, Star, Sparkles, ArrowRight, UserCheck } from "lucide-react";
+import { MessageSquare, ShieldAlert, Star } from "lucide-react";
 import Interactive3DBlockCard from "@/components/ui/Interactive3DBlockCard";
 
 const DILEMMAS = [
