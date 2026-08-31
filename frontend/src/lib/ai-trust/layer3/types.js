@@ -10,6 +10,8 @@
  */
 
 import { createSecureId } from "../../security/secureId.js";
+import { VERIFICATION_TASK_TYPES } from "../layer2/types.js";
+import { L2C_VERIFICATION_TASK_TYPES, verificationTaskCatalog } from "../v5/l2c/verificationPackage.js";
 
 export const LAYER_3_STATUS = {
   VERIFIED: "VERIFIED",                               // High-authority evidence conclusively confirms or refutes claim
@@ -115,6 +117,32 @@ function safeObject(value) {
 
 function safeNonNegativeNumber(value, fallback = 0) {
   return Number.isFinite(Number(value)) ? Math.max(0, Number(value)) : fallback;
+}
+
+function normalizeVerificationTask(value, index) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const type = boundedString(value.type, 100);
+  const isL2C = Object.values(L2C_VERIFICATION_TASK_TYPES).includes(type);
+  if (!isL2C && !Object.values(VERIFICATION_TASK_TYPES).includes(type)) return null;
+  const catalog = isL2C ? verificationTaskCatalog(type) : null;
+  const sourceScope = ["OFFICIAL_INSTITUTION", "OFFICIAL_SOURCE", "THREAT_INTELLIGENCE", "GENERAL_SOURCE"].includes(value.sourceScope)
+    ? value.sourceScope
+    : catalog?.sourceScope || "GENERAL_SOURCE";
+  const requirements = catalog?.evidenceRequirements || (Array.isArray(value.evidenceRequirements) ? value.evidenceRequirements : []);
+  return {
+    taskId: boundedString(value.taskId, 160) || `verification-task-${index + 1}`,
+    type,
+    classification: boundedString(value.classification, 120) || null,
+    priority: ["CRITICAL", "HIGH", "MEDIUM", "LOW"].includes(String(value.priority).toUpperCase()) ? String(value.priority).toUpperCase() : "MEDIUM",
+    claimId: boundedString(value.claimId, 160) || null,
+    purpose: boundedString(value.purpose, 240) || catalog?.purpose || `verification ${type}`,
+    targetClaim: boundedString(value.targetClaim, 1200) || catalog?.targetClaim || null,
+    sourceScope,
+    evidenceRequirements: requirements.slice(0, 4).map((item) => boundedString(item, 240)).filter(Boolean),
+    origin: isL2C ? "L2C_DOMAIN_AI" : "L2B_SEMANTIC",
+    candidateOnly: true,
+    inputTrust: "UNTRUSTED_MODEL_OUTPUT",
+  };
 }
 
 function normalizeClaimStatusMap(value, claimIds) {
@@ -308,6 +336,10 @@ export function createLayer3Result(input = {}) {
   retrievalMode = "UNKNOWN",
   externalEvidence = false,
   auditEvents = [],
+  verificationTasks = [],
+  verificationTaskSummary = {},
+  candidateClaimOrigins = [],
+  evidenceRequirements = [],
   } = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   const safeClaims = Array.isArray(claims) ? claims.slice(0, 40).filter((claim) => claim && typeof claim === "object" && !Array.isArray(claim)).map((claim) => ({
     claimId: boundedString(claim.claimId, 160),
@@ -320,10 +352,22 @@ export function createLayer3Result(input = {}) {
     claimType: boundedString(claim.claimType, 80) || "GENERAL_FACT",
     importance: boundedString(claim.importance, 40) || "medium",
     verificationRequired: claim.verificationRequired !== false,
+    origin: boundedString(claim.origin, 80) || "L2B_SEMANTIC",
+    candidateOnly: claim.candidateOnly !== false,
+    sourceScope: boundedString(claim.sourceScope, 120) || "GENERAL_SOURCE",
+    verificationTaskId: boundedString(claim.verificationTaskId, 160) || null,
   })) : [];
   const safeSources = Array.isArray(sources) ? sources.slice(0, 80).filter((source) => source && typeof source === "object" && !Array.isArray(source)).map((source) => createSource(source)) : [];
   const safeEvidence = Array.isArray(evidence) ? evidence.slice(0, 160).filter((item) => item && typeof item === "object" && !Array.isArray(item)).map((item) => createEvidence(item)) : [];
   const safeConflicts = Array.isArray(conflicts) ? conflicts.slice(0, 80).filter((conflict) => conflict && typeof conflict === "object" && !Array.isArray(conflict)).map(normalizeConflict) : [];
+  const safeVerificationTasks = Array.isArray(verificationTasks)
+    ? verificationTasks.slice(0, 80).map(normalizeVerificationTask).filter(Boolean)
+    : [];
+  const safeTaskSummary = safeObject(verificationTaskSummary);
+  const taskCount = safeVerificationTasks.length;
+  const l2bTaskCount = safeVerificationTasks.filter((task) => task.origin === "L2B_SEMANTIC").length;
+  const l2cTaskCount = safeVerificationTasks.filter((task) => task.origin === "L2C_DOMAIN_AI").length;
+  const boundedSummaryCount = (value, fallback = 0) => Math.min(taskCount, safeNonNegativeNumber(value, fallback));
   const validExternalEvidence = safeEvidence.some((item) =>
     item.liveEvidence === true &&
     item.sourceType !== SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE &&
@@ -375,6 +419,18 @@ export function createLayer3Result(input = {}) {
       };
     })(),
     conflicts: safeConflicts,
+    verificationTasks: safeVerificationTasks,
+    verificationTaskSummary: {
+      totalTasks: taskCount,
+      l2bTaskCount,
+      l2cTaskCount,
+      deduplicatedCount: boundedSummaryCount(safeTaskSummary.deduplicatedCount),
+      highImpactTaskCount: boundedSummaryCount(safeTaskSummary.highImpactTaskCount),
+      tasksWithQueries: boundedSummaryCount(safeTaskSummary.tasksWithQueries),
+      tasksWithoutQueries: boundedSummaryCount(safeTaskSummary.tasksWithoutQueries),
+    },
+    candidateClaimOrigins: Array.from(new Set(Array.isArray(candidateClaimOrigins) ? candidateClaimOrigins.map((item) => boundedString(item, 120)).filter(Boolean) : [])).slice(0, 8),
+    evidenceRequirements: Array.from(new Set(Array.isArray(evidenceRequirements) ? evidenceRequirements.map((item) => boundedString(item, 240)).filter(Boolean) : [])).slice(0, 16),
     temporalAssessment: (() => {
       const source = safeObject(temporalAssessment);
       return {

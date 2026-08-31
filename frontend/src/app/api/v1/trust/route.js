@@ -143,7 +143,11 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
   const urlTarget = type === "url" ? (content || metadata.url || "") : "";
   const layer2A = type === "url"
     ? await Layer2AReputationService.verify({
-      url: layer1.status === "BLOCK" ? "" : urlTarget,
+      // The Layer 2A service applies the disclosure policy independently.
+      // A local hard block must not blanket-suppress a valid public target,
+      // while private/metadata/SSRF targets are still skipped before any
+      // provider receives them.
+      url: urlTarget,
       requestId,
     })
     : await Layer2AReputationService.verify({ url: "", requestId });

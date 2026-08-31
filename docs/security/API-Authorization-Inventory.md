@@ -1,6 +1,6 @@
 # API Authorization Inventory
 
-Generated from source by `npm run audit:api-auth` on 2026-08-31T11:04:26.287Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
+Generated from source by `npm run audit:api-auth` on 2026-08-31T18:18:35.832Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
 
 - Route files: 110
 - HTTP handlers: 137

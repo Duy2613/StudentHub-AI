@@ -32,6 +32,14 @@ export class RiskAssessmentEngine {
     const layer3ClaimStatuses = fusedGraph.layer3ClaimStatuses && typeof fusedGraph.layer3ClaimStatuses === "object" && !Array.isArray(fusedGraph.layer3ClaimStatuses)
       ? fusedGraph.layer3ClaimStatuses
       : {};
+    const bridge = fusedGraph?.l2cL3EvidenceBridge && typeof fusedGraph.l2cL3EvidenceBridge === "object" && !Array.isArray(fusedGraph.l2cL3EvidenceBridge)
+      ? fusedGraph.l2cL3EvidenceBridge
+      : {};
+    const l2cEvidenceGap = fusedGraph?.layer2CVerificationRequested === true && (
+      Number(bridge.requestedTaskCount) <= 0 ||
+      Number(bridge.observedTaskCount) < Number(bridge.requestedTaskCount) ||
+      Number(bridge.independentEvidenceCount) <= 0
+    );
     const hasReconciliation = reconciliation && typeof reconciliation === "object" && !Array.isArray(reconciliation);
     const unresolvedConflicts = hasReconciliation
       ? asArray(reconciliation.unresolvedConflicts).filter((item) => item && typeof item === "object" && !Array.isArray(item))
@@ -114,6 +122,13 @@ export class RiskAssessmentEngine {
     if (fusedGraph?.layer2CClassification && !["NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN"].includes(fusedGraph.layer2CClassification)) {
       primaryVectors.push("student_domain_risk_pattern");
       riskScore = Math.max(riskScore, layer2CDomainSignals.some((signal) => ["CRITICAL", "HIGH", "critical", "high"].includes(signal.severity)) ? 0.75 : 0.55);
+    }
+
+    if (l2cEvidenceGap) {
+      primaryVectors.push("student_domain_verification_gap");
+      // Missing L3 evidence remains reviewable suspicion. This is advisory
+      // risk, never a hard block and never a clearance path.
+      riskScore = Math.max(riskScore, 0.75);
     }
 
     if (hasSuspiciousSignal) {

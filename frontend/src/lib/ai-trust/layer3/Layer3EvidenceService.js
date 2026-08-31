@@ -30,12 +30,23 @@ import {
   EVIDENCE_PROVIDER_STATUS,
 } from "./types.js";
 import { LAYER_3_CONFIG } from "./config/Layer3Config.js";
+import { VERIFICATION_TASK_TYPES } from "../layer2/types.js";
+import {
+  L2C_VERIFICATION_TASK_TYPES,
+  normalizeStudentDomainVerificationPackage,
+  verificationTaskCatalog,
+} from "../v5/l2c/verificationPackage.js";
 
 const MAX_CLAIMS = 40;
 const MAX_CANDIDATES = 80;
 const MAX_QUERY_COUNT = 240;
 const MAX_RETRIEVED_SOURCES = 80;
 const MAX_TEXT_LENGTH = 1_000_000;
+const MAX_VERIFICATION_TASKS = 80;
+
+const L2B_TASK_TYPES = new Set(Object.values(VERIFICATION_TASK_TYPES));
+const L2C_TASK_TYPES = new Set(Object.values(L2C_VERIFICATION_TASK_TYPES));
+const TASK_SOURCE_SCOPES = new Set(["OFFICIAL_INSTITUTION", "OFFICIAL_SOURCE", "THREAT_INTELLIGENCE", "GENERAL_SOURCE"]);
 
 function asArray(value) {
   return Array.isArray(value) ? value : [];
@@ -61,7 +72,98 @@ function safeClaim(claim, index) {
     claimType: boundedString(claim.claimType, 80) || "GENERAL_FACT",
     importance: boundedString(claim.importance, 40) || "medium",
     verificationRequired: claim.verificationRequired !== false,
+    origin: boundedString(claim.origin, 80) || "L2B_SEMANTIC",
+    candidateOnly: claim.candidateOnly !== false,
+    sourceScope: boundedString(claim.sourceScope, 120) || "GENERAL_SOURCE",
+    verificationTaskId: boundedString(claim.verificationTaskId, 160) || null,
   };
+}
+
+function safeVerificationTask(task, index, forcedOrigin = null) {
+  if (!task || typeof task !== "object" || Array.isArray(task)) return null;
+  const type = boundedString(task.type, 100);
+  const isL2C = L2C_TASK_TYPES.has(type);
+  if (!L2B_TASK_TYPES.has(type) && !isL2C) return null;
+  const catalog = isL2C ? verificationTaskCatalog(type) : null;
+  const origin = forcedOrigin || (isL2C ? "L2C_DOMAIN_AI" : "L2B_SEMANTIC");
+  const sourceScope = TASK_SOURCE_SCOPES.has(task.sourceScope) ? task.sourceScope : catalog?.sourceScope || "GENERAL_SOURCE";
+  const fixedRequirements = catalog?.evidenceRequirements || [];
+  return {
+    taskId: boundedString(task.taskId, 160) || `verification-task-${index + 1}`,
+    type,
+    classification: boundedString(task.classification, 120) || null,
+    priority: ["CRITICAL", "HIGH", "MEDIUM", "LOW"].includes(String(task.priority).toUpperCase()) ? String(task.priority).toUpperCase() : "MEDIUM",
+    claimId: boundedString(task.claimId, 160) || null,
+    purpose: boundedString(task.purpose, 240) || catalog?.purpose || `verification ${type}`,
+    targetClaim: boundedString(task.targetClaim, 1_200) || catalog?.targetClaim || null,
+    sourceScope,
+    evidenceRequirements: (fixedRequirements.length > 0 ? fixedRequirements : asArray(task.evidenceRequirements))
+      .map((item) => boundedString(item, 240)).filter(Boolean).slice(0, 4),
+    origin,
+    candidateOnly: true,
+    inputTrust: "UNTRUSTED_MODEL_OUTPUT",
+  };
+}
+
+function taskDedupeKey(task) {
+  return [task.type, task.claimId || "", task.purpose || "", task.targetClaim || ""].join("|").toLowerCase();
+}
+
+function mergeVerificationTasks(layer2Result, layer2CVerificationPackage) {
+  const l2bRaw = asArray(layer2Result?.verificationPackage?.verificationTasks || layer2Result?.verificationTasks).slice(0, MAX_VERIFICATION_TASKS);
+  const l2cPackage = normalizeStudentDomainVerificationPackage(layer2CVerificationPackage);
+  const l2cRaw = asArray(l2cPackage.verificationTasks).slice(0, MAX_VERIFICATION_TASKS);
+  const merged = [];
+  const keys = new Set();
+  let deduplicatedCount = 0;
+  for (const [index, task] of [...l2bRaw.map((item) => ({ item, origin: "L2B_SEMANTIC" })), ...l2cRaw.map((item) => ({ item, origin: "L2C_DOMAIN_AI" }))].entries()) {
+    const safe = safeVerificationTask(task.item, index, task.origin);
+    if (!safe) continue;
+    const key = taskDedupeKey(safe);
+    if (keys.has(key)) {
+      deduplicatedCount += 1;
+      continue;
+    }
+    keys.add(key);
+    merged.push(safe);
+    if (merged.length >= MAX_VERIFICATION_TASKS) break;
+  }
+  return {
+    tasks: merged,
+    l2bTaskCount: l2bRaw.length,
+    l2cTaskCount: l2cRaw.length,
+    deduplicatedCount,
+    highImpactTaskCount: merged.filter((task) => ["CRITICAL", "HIGH"].includes(task.priority)).length,
+    l2cPackage: l2cPackage.status === "UNKNOWN" && l2cRaw.length === 0 ? null : l2cPackage,
+  };
+}
+
+function l2cCandidateClaims(verificationPackage) {
+  const pkg = verificationPackage && typeof verificationPackage === "object" ? verificationPackage : {};
+  return asArray(pkg.domainClaims).slice(0, 12).map((claim) => ({
+    claimId: claim.claimId,
+    subject: "StudentHub domain classification",
+    predicate: "requires independent verification",
+    object: claim.classification || "high-impact student-domain risk",
+    scope: "OFFICIAL_INSTITUTION",
+    rawText: claim.statement,
+    claimType: "institutional",
+    importance: claim.importance || "high",
+    verificationRequired: true,
+    origin: "L2C_DOMAIN_AI",
+    candidateOnly: true,
+    sourceScope: "OFFICIAL_INSTITUTION",
+  }));
+}
+
+function dedupeClaims(claims) {
+  const seen = new Set();
+  return claims.map(safeClaim).filter(Boolean).filter((claim) => {
+    const key = `${claim.claimId}|${claim.rawText}`.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, MAX_CLAIMS);
 }
 
 function safeCandidate(candidate) {
@@ -146,6 +248,8 @@ export class Layer3EvidenceService {
     const claims = input.claims;
     const candidateSources = input.candidateSources;
     const layer2Result = input.layer2Result;
+    const layer2CResult = input.layer2CResult;
+    const layer2CVerificationPackage = input.layer2CVerificationPackage || layer2CResult?.verificationPackage;
     const options = input.options;
     const startTime = nowMs();
     const safeOptions = options && typeof options === "object" ? options : {};
@@ -158,7 +262,8 @@ export class Layer3EvidenceService {
     const rawClaims = asArray(claims).length > 0
       ? claims
       : asArray(layer2Result?.verificationPackage?.claims || layer2Result?.claims);
-    const targetClaims = rawClaims.map(safeClaim).filter(Boolean).slice(0, MAX_CLAIMS);
+    const taskMerge = mergeVerificationTasks(layer2Result, layer2CVerificationPackage);
+    const targetClaims = dedupeClaims([...rawClaims, ...l2cCandidateClaims(taskMerge.l2cPackage)]);
 
     const rawCandidates = asArray(candidateSources).length > 0
       ? candidateSources
@@ -169,6 +274,13 @@ export class Layer3EvidenceService {
     for (const claim of targetClaims) {
       const claimQueries = QueryGenerator.generateQueries(claim, targetCandidates);
       allQueries.push(...claimQueries);
+    }
+    const taskQueryCounts = new Map();
+    for (const task of taskMerge.tasks) {
+      const relatedClaim = targetClaims.find((claim) => claim.claimId === task.claimId) || null;
+      const taskQueries = QueryGenerator.generateTaskQueries(task, relatedClaim);
+      taskQueryCounts.set(task.taskId, taskQueries.length);
+      allQueries.push(...taskQueries);
     }
     const boundedQueries = allQueries.slice(0, MAX_QUERY_COUNT);
 
@@ -352,6 +464,18 @@ export class Layer3EvidenceService {
       },
       verificationCompleteness,
       evidenceConfidence,
+      verificationTasks: taskMerge.tasks,
+      verificationTaskSummary: {
+        totalTasks: taskMerge.tasks.length,
+        l2bTaskCount: taskMerge.l2bTaskCount,
+        l2cTaskCount: taskMerge.l2cTaskCount,
+        deduplicatedCount: taskMerge.deduplicatedCount,
+        highImpactTaskCount: taskMerge.highImpactTaskCount,
+        tasksWithQueries: taskMerge.tasks.filter((task) => (taskQueryCounts.get(task.taskId) || 0) > 0).length,
+        tasksWithoutQueries: taskMerge.tasks.filter((task) => (taskQueryCounts.get(task.taskId) || 0) === 0).length,
+      },
+      candidateClaimOrigins: Array.from(new Set(targetClaims.map((claim) => claim.origin).filter(Boolean))).slice(0, 4),
+      evidenceRequirements: asArray(taskMerge.l2cPackage?.evidenceRequirements).slice(0, 16),
       limitations,
       nextLayer: 4,
       requestId,
@@ -367,6 +491,8 @@ export class Layer3EvidenceService {
         retrievalMode,
         externalEvidence,
         providerIndependent: retrieverId.includes("knowledge_base"),
+        verificationTasksCount: taskMerge.tasks.length,
+        l2cVerificationTasksCount: taskMerge.l2cTaskCount,
       },
     }));
   }

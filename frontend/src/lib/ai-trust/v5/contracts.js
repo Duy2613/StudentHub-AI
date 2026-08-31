@@ -30,7 +30,7 @@ export const STAGE_IDS = Object.freeze(["l1", "l2a", "l2b", "l2c", "l3", "l4", "
 
 export const STAGE_FINDINGS = Object.freeze({
   l1: Object.freeze(["LOCAL_BLOCK", "LOCAL_SUSPICIOUS", "LOCAL_CLEAR", "LOCAL_UNKNOWN"]),
-  l2a: Object.freeze(["THREAT_MATCH", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE"]),
+  l2a: Object.freeze(["THREAT_MATCH", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE", "SKIPPED_PRIVACY_SAFETY"]),
   l2b: Object.freeze([
     "SEMANTIC_NORMAL",
     "SEMANTIC_SUSPICIOUS",
@@ -94,9 +94,9 @@ export const STAGE_DEFINITIONS = Object.freeze({
     architecturalLayer: "L2A",
     stageName: "THREAT INTELLIGENCE",
     role: "Threat Intelligence",
-    checking: "Đối chiếu URL với adapter threat-intelligence được cấu hình và ghi nhận trạng thái provider.",
+    checking: "Phân loại disclosure URL bằng policy ALLOW/REDACT/SKIP rồi, nếu được phép, chỉ đối chiếu reputation; không fetch/render/execute target.",
     notProve: "NO_KNOWN_THREAT không phải là Verified Safe và không loại trừ mối đe dọa chưa biết.",
-    limitations: ["Phụ thuộc khả dụng, phạm vi và độ tươi của provider; lỗi/timeout luôn giữ UNKNOWN."],
+    limitations: ["Phụ thuộc khả dụng, phạm vi và độ tươi của provider; lỗi/timeout luôn giữ UNKNOWN.", "Private/local/link-local/metadata/SSRF-sensitive target bị SKIP và không tạo provider finding."],
     nextStage: "l2b",
   }),
   l2b: Object.freeze({
@@ -114,9 +114,9 @@ export const STAGE_DEFINITIONS = Object.freeze({
     architecturalLayer: "L2C",
     stageName: "STUDENTHUB DOMAIN AI",
     role: "StudentHub Domain Risk Model",
-    checking: "So khớp pattern lừa đảo/thao túng đặc thù đời sống sinh viên Việt Nam bằng baseline có version.",
+    checking: "So khớp pattern lừa đảo/thao túng đặc thù đời sống sinh viên Việt Nam bằng baseline có version và tạo verification task candidate-only cho L3.",
     notProve: "Domain score chưa hiệu chuẩn không phải xác suất và không thể hạ cấp hard negative.",
-    limitations: ["Runtime hiện là baseline rule model; chưa có artifact fine-tuned và không thay thế bằng chứng/Chính sách L4."],
+    limitations: ["Runtime hiện là baseline rule model; chưa có artifact fine-tuned và không thay thế bằng chứng/Chính sách L4.", "Verification package chỉ là yêu cầu kiểm tra, không phải evidence hoặc citation."],
     nextStage: "l3",
   }),
   l3: Object.freeze({
@@ -124,9 +124,9 @@ export const STAGE_DEFINITIONS = Object.freeze({
     architecturalLayer: "L3",
     stageName: "EVIDENCE & PROVENANCE",
     role: "Evidence & Provenance",
-    checking: "Đánh giá nguồn, quan hệ hỗ trợ/mâu thuẫn, freshness, authority, independence và completeness.",
+    checking: "Đánh giá nguồn, quan hệ hỗ trợ/mâu thuẫn, freshness, authority, independence và completeness; merge task L2B với yêu cầu xác minh L2C.",
     notProve: "Giải thích do model sinh ra không phải evidence; local KB không phải xác minh bên ngoài.",
-    limitations: ["Thiếu nguồn, nguồn stale, trùng lineage hoặc retrieval outage làm giảm completeness và không được nâng confidence."],
+    limitations: ["Thiếu nguồn, nguồn stale, trùng lineage hoặc retrieval outage làm giảm completeness và không được nâng confidence.", "Task từ L2C không tự tạo source, evidence hoặc citation."],
     nextStage: "l4",
   }),
   l4: Object.freeze({
@@ -229,7 +229,48 @@ function publicSignals(value) {
 function publicClaims(value) {
   return Array.isArray(value) ? value.slice(0, 40).map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
-    return publicRecord(item, ["claimId", "text", "claim", "statement", "subject", "predicate", "rawText", "status", "authority"]);
+    return publicRecord(item, ["claimId", "text", "claim", "statement", "subject", "predicate", "rawText", "status", "authority", "origin", "candidateOnly", "sourceScope", "verificationTaskId"]);
+  }).filter(Boolean) : [];
+}
+
+function publicVerificationPackage(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const domainClaims = Array.isArray(value.domainClaims) ? value.domainClaims.slice(0, 8).map((claim) => {
+    if (!claim || typeof claim !== "object" || Array.isArray(claim)) return null;
+    return publicRecord(claim, ["claimId", "classification", "statement", "importance", "origin", "candidateOnly", "inputTrust"]);
+  }).filter(Boolean) : [];
+  const verificationTasks = Array.isArray(value.verificationTasks) ? value.verificationTasks.slice(0, 12).map((task) => {
+    if (!task || typeof task !== "object" || Array.isArray(task)) return null;
+    const output = publicRecord(task, [
+      "taskId", "type", "classification", "priority", "claimId", "purpose", "targetClaim", "sourceScope",
+      "origin", "candidateOnly", "inputTrust",
+    ]);
+    if (output) {
+      output.evidenceRequirements = publicStringList(task.evidenceRequirements, 4, 240);
+    }
+    return output;
+  }).filter(Boolean) : [];
+  return {
+    schemaVersion: publicText(value.schemaVersion, 120) || "l2c.verification.v1",
+    status: ["REQUIRED", "NOT_REQUIRED", "UNKNOWN"].includes(value.status) ? value.status : "UNKNOWN",
+    domainClaims,
+    verificationTasks,
+    candidateSourcePurposes: publicStringList(value.candidateSourcePurposes, 12, 180),
+    evidenceRequirements: publicStringList(value.evidenceRequirements, 16, 240),
+    candidateOnly: value.candidateOnly === true,
+    inputTrust: publicText(value.inputTrust, 120) || "UNTRUSTED_MODEL_OUTPUT",
+  };
+}
+
+function publicVerificationTasks(value) {
+  return Array.isArray(value) ? value.slice(0, 80).map((task) => {
+    if (!task || typeof task !== "object" || Array.isArray(task)) return null;
+    const output = publicRecord(task, [
+      "taskId", "type", "classification", "priority", "claimId", "purpose", "targetClaim", "sourceScope",
+      "origin", "candidateOnly", "inputTrust",
+    ]);
+    if (output) output.evidenceRequirements = publicStringList(task.evidenceRequirements, 4, 240);
+    return output;
   }).filter(Boolean) : [];
 }
 
@@ -304,6 +345,7 @@ function publicLayerResult(value, layerId) {
     "datasetVersion", "modelScore", "calibratedRisk", "calibrationStatus", "confidenceKind", "severity", "explanation",
     "semanticSummary", "sourceAgreement", "verificationCompleteness", "evidenceCompleteness", "externalEvidence", "retrievalMode",
     "retrievalStatus", "hardRuleTriggered", "classificationSource", "inputLength",
+    "reputationLookupPolicy", "reputationLookupReason", "reputationLookupStatus", "reputationLookupTargetClass", "reputationLookupDisclosed",
   ]) || {};
 
   if (["l1", "l2b", "l2c"].includes(layerId)) base.signals = publicSignals(value.signals || value.riskSignals || value.contextSignals);
@@ -328,6 +370,7 @@ function publicLayerResult(value, layerId) {
     base.secondaryClassifications = Array.isArray(value.secondaryClassifications) ? value.secondaryClassifications.slice(0, 8).map((item) => publicText(item, 120)).filter(Boolean) : [];
     base.riskSignals = publicSignals(value.riskSignals);
     base.studentContext = publicRecord(value.studentContext, ["language", "inputType", "institutionContext"]);
+    base.verificationPackage = publicVerificationPackage(value.verificationPackage);
   }
   if (layerId === "l3") {
     base.sources = publicSources(value.sources);
@@ -338,6 +381,12 @@ function publicLayerResult(value, layerId) {
     base.providerResults = publicProviders(value.providerResults);
     base.relatedCases = publicRelatedCases(value.relatedCases);
     base.claimStatuses = publicRecord(value.claimStatuses, Object.keys(value.claimStatuses || {}).slice(0, 40));
+    base.verificationTasks = publicVerificationTasks(value.verificationTasks);
+    base.verificationTaskSummary = publicRecord(value.verificationTaskSummary, [
+      "totalTasks", "l2bTaskCount", "l2cTaskCount", "deduplicatedCount", "highImpactTaskCount", "tasksWithQueries", "tasksWithoutQueries",
+    ]);
+    base.candidateClaimOrigins = publicStringList(value.candidateClaimOrigins, 20, 120);
+    base.evidenceRequirements = publicStringList(value.evidenceRequirements, 16, 240);
   }
   if (layerId === "l4") {
     base.keyReasons = Array.isArray(value.keyReasons) ? value.keyReasons.slice(0, 20).map((item) => publicText(item, 700)).filter(Boolean) : [];
@@ -407,6 +456,10 @@ export function createStageEnvelope(input = {}) {
     nextStage: definition.nextStage,
     safeToContinue: value.safeToContinue === true,
     userAction: boundedString(value.userAction, 500) || "Đọc finding cùng limitations trước khi hành động.",
+    verificationPackage: publicVerificationPackage(value.verificationPackage),
+    verificationTaskSummary: publicRecord(value.verificationTaskSummary, [
+      "totalTasks", "l2bTaskCount", "l2cTaskCount", "deduplicatedCount", "highImpactTaskCount", "tasksWithQueries", "tasksWithoutQueries",
+    ]),
     audit: {
       attempt: Number.isInteger(value.audit?.attempt) && value.audit.attempt > 0 ? value.audit.attempt : 0,
       attemptCount: Number.isInteger(value.audit?.attemptCount) && value.audit.attemptCount > 0 ? value.audit.attemptCount : 0,

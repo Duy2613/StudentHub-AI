@@ -1,4 +1,5 @@
 import { STUDENT_DOMAIN_TAXONOMY_VERSION, taxonomyEntry } from "./taxonomy.js";
+import { buildStudentDomainVerificationPackage } from "./verificationPackage.js";
 
 export const STUDENT_DOMAIN_MODEL_VERSION = "studenthub-domain-rule-baseline-1.0.0";
 export const STUDENT_DOMAIN_MODEL_TYPE = "BASELINE_RULE_MODEL";
@@ -249,6 +250,10 @@ export class StudentDomainRiskModel {
     const secondaryClassifications = sorted.slice(1, 5).map((match) => match.classification);
     const hasOnlySoftSignals = matches.length > 0 && highRiskMatches.length === 0;
     const classification = hasOnlySoftSignals ? "UNKNOWN_STUDENT_RISK" : primary;
+    const verificationPackage = buildStudentDomainVerificationPackage({
+      classification,
+      secondaryClassifications,
+    });
     const severity = highRiskMatches.some((match) => match.severity === "CRITICAL")
       ? "CRITICAL"
       : highRiskMatches.length > 0
@@ -275,9 +280,12 @@ export class StudentDomainRiskModel {
       explanation: matches.length
         ? `Baseline nhận diện ${primary.replaceAll("_", " ")} từ các pattern cục bộ: ${signals.slice(0, 3).map((signal) => signal.code).join(", ")}.`
         : "Baseline không thấy pattern rủi ro sinh viên đặc thù đủ mạnh trong input.",
-      evidenceNeeded: matches.length
-        ? ["Đối chiếu nguồn chính thức của trường", "Kiểm tra kênh thanh toán và danh tính người gửi", "Xác minh độc lập qua kênh đã biết"]
-        : ["Nếu claim có tác động cao, vẫn cần nguồn chính thức độc lập"],
+      evidenceNeeded: verificationPackage.status === "REQUIRED"
+        ? verificationPackage.evidenceRequirements
+        : matches.length
+          ? ["Đối chiếu nguồn chính thức của trường", "Kiểm tra kênh thanh toán và danh tính người gửi", "Xác minh độc lập qua kênh đã biết"]
+          : ["Nếu claim có tác động cao, vẫn cần nguồn chính thức độc lập"],
+      verificationPackage,
       limitations: [
         "Đây là baseline rule model, không phải model đã fine-tune.",
         "MODEL_SCORE chưa được hiệu chuẩn nên không phải xác suất.",

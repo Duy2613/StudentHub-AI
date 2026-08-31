@@ -15,6 +15,7 @@ import {
   createStageEnvelope,
   toPublicPipelineResult,
 } from "./contracts.js";
+import { decideReputationLookup } from "../layer2a/ReputationLookupPolicy.js";
 import { failedStage, stageFromL1, stageFromL2A, stageFromL2B, stageFromL2C, stageFromL3, stageFromL4, stageFromL5 } from "./stageAdapters.js";
 
 const TRANSIENT_L2A_STATUSES = new Set(["TIMEOUT", "RATE_LIMITED", "UNAVAILABLE", "CIRCUIT_OPEN", "ERROR"]);
@@ -170,13 +171,17 @@ export class TrustPipelineOrchestrator {
       return this.services.l1({ ...input, options: { requestId, signal } });
     }
     if (stageId === "l2a") {
-      // L1 is the first safety boundary. A hard local block may still allow
-      // typed downstream analysis, but no later provider receives the target
-      // URL. This prevents a reputation/evidence adapter from touching a
-      // known-malicious destination while preserving the hard negative for L4.
-      const l1Blocked = rawResults.l1?.status === "BLOCK";
-      const url = !l1Blocked && input.type === "url" ? input.content || input.metadata.url || "" : "";
-      return this.services.l2a({ url, requestId, options: this.providers.l2a ? { provider: this.providers.l2a, signal } : { signal } });
+      // L1 hard-block status does not by itself decide disclosure. The typed
+      // policy prevents private/metadata/SSRF targets from leaving the trust
+      // boundary, while valid public targets may receive reputation-only
+      // lookup. L1's hard negative remains authoritative regardless.
+      const url = input.type === "url" ? input.content || input.metadata.url || "" : "";
+      return this.services.l2a({
+        url,
+        reputationLookup: decideReputationLookup(url),
+        requestId,
+        options: this.providers.l2a ? { provider: this.providers.l2a, signal } : { signal },
+      });
     }
     if (stageId === "l2b") {
       return this.services.l2b({ ...input, layer1Result: rawResults.l1, options: this.providers.l2b ? { provider: this.providers.l2b, requestId, signal } : { requestId, signal } });
@@ -189,6 +194,8 @@ export class TrustPipelineOrchestrator {
         claims: rawResults.l2b?.claims || [],
         candidateSources: rawResults.l2b?.verificationPackage?.candidateSources || [],
         layer2Result: rawResults.l2b || null,
+        layer2CResult: rawResults.l2c || null,
+        layer2CVerificationPackage: rawResults.l2c?.verificationPackage || null,
         options: { requestId, signal, ...(this.providers.l3 ? { retriever: this.providers.l3 } : {}) },
       });
     }
@@ -269,7 +276,10 @@ export class TrustPipelineOrchestrator {
         this._assertActive(signal);
         lastRaw = raw;
         const retryable = isRetryEligible(stageId, raw) && attempt < startAttempt + this.maxRetriesPerStage;
-        const operationStatus = retryable ? OPERATION_STATUS.PARTIAL : (isTransient(stageId, raw) ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED);
+        const reputationSkipped = stageId === "l2a" && raw?.reputationLookupPolicy === "SKIP" && raw?.notApplicable !== true;
+        const operationStatus = reputationSkipped
+          ? OPERATION_STATUS.SKIPPED
+          : retryable ? OPERATION_STATUS.PARTIAL : (isTransient(stageId, raw) ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED);
         finalStage = this._adapt(stageId, raw || {}, pipeline.requestId, attemptTiming, operationStatus, attempt);
         this._recordAttempt(pipeline, stageId, attempt, finalStage);
         if (retryable) {

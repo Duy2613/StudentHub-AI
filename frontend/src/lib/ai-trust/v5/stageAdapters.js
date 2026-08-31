@@ -84,12 +84,16 @@ export function stageFromL2A(raw, requestId, timing = {}, notApplicable = false)
   const providerStatus = statusFor(raw?.providerStatus, notApplicable ? "NOT_APPLICABLE" : "UNKNOWN");
   const finding = notApplicable || raw?.finding === "NOT_APPLICABLE" ? "NOT_APPLICABLE" : STAGE_FINDINGS.l2a.includes(raw?.finding) ? raw.finding : "UNKNOWN";
   const hardNegative = finding === "THREAT_MATCH";
+  const lookupPolicy = typeof raw?.reputationLookupPolicy === "string" ? raw.reputationLookupPolicy : null;
+  const lookupReason = typeof raw?.reputationLookupReason === "string" ? raw.reputationLookupReason : null;
+  const lookupSkipped = finding === "SKIPPED_PRIVACY_SAFETY" || (lookupPolicy === "SKIP" && lookupReason && lookupReason !== "INVALID_URL" && finding !== "NOT_APPLICABLE");
+  const lookupRedacted = lookupPolicy === "REDACT";
   const hasProviderScore = typeof raw?.providerConfidence === "number" && Number.isFinite(raw.providerConfidence);
   const success = providerStatus === "SUCCESS";
   return createStageEnvelope({
     ...stageBase("l2a", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso()),
     finding,
-    severity: hardNegative ? "CRITICAL" : finding === "UNKNOWN" ? "HIGH" : "INFO",
+    severity: hardNegative || lookupSkipped ? "CRITICAL" : finding === "UNKNOWN" ? "HIGH" : "INFO",
     providerStatus,
     providerId: raw?.provider || null,
     confidence: hasProviderScore ? raw.providerConfidence : null,
@@ -98,19 +102,25 @@ export function stageFromL2A(raw, requestId, timing = {}, notApplicable = false)
       ? "Threat intelligence trả về khớp mối đe dọa đã biết; đây là hard negative."
       : finding === "NO_KNOWN_THREAT"
         ? "Không phát hiện mối đe dọa đã biết trong provider lần này."
+        : finding === "SKIPPED_PRIVACY_SAFETY"
+          ? `Không gửi URL ra provider vì policy ${lookupReason || "SAFETY_BOUNDARY"}; hard negative của L1 vẫn được giữ.`
         : finding === "NOT_APPLICABLE"
           ? "Input không phải URL tương thích nên threat lookup không áp dụng."
           : "Threat intelligence không trả về kết quả đủ tin cậy.",
-    reasons: [raw?.message, raw?.errorCode, ...(safeArray(raw?.threatTypes).map((item) => `Threat type: ${item}`))].filter(Boolean).map((item) => safeText(item)).slice(0, 12),
+    reasons: [raw?.message, raw?.errorCode, lookupReason ? `Reputation lookup reason: ${lookupReason}` : null, ...(safeArray(raw?.threatTypes).map((item) => `Threat type: ${item}`))].filter(Boolean).map((item) => safeText(item)).slice(0, 12),
     signals: [
-      signal(`L2A_${finding}`, finding === "NO_KNOWN_THREAT" ? "Provider không có khớp đã biết trong lần lookup này." : `Finding của adapter: ${finding}.`, raw?.provider || "layer2a_adapter", hardNegative ? "CRITICAL" : "INFO"),
-      ...(providerStatus !== "SUCCESS" && finding !== "NOT_APPLICABLE" ? [signal("PROVIDER_NOT_HEALTHY", `Provider status: ${providerStatus}.`, raw?.provider || "layer2a_adapter", "HIGH")] : []),
+      signal(`L2A_${finding}`, finding === "NO_KNOWN_THREAT" ? "Provider không có khớp đã biết trong lần lookup này." : `Finding của adapter: ${finding}.`, raw?.provider || "layer2a_adapter", hardNegative || lookupSkipped ? "CRITICAL" : "INFO"),
+      ...(lookupSkipped ? [signal("REPUTATION_LOOKUP_SKIPPED", `Không disclosure URL ra ngoài: ${lookupReason || "SAFETY_BOUNDARY"}.`, "layer2a_disclosure_policy", "CRITICAL")] : []),
+      ...(lookupRedacted ? [signal("REPUTATION_LOOKUP_REDACTED", "URL nhạy cảm đã được loại bỏ query/fragment trước khi reputation lookup.", "layer2a_disclosure_policy", "HIGH")] : []),
+      ...(providerStatus !== "SUCCESS" && finding !== "NOT_APPLICABLE" && !lookupSkipped ? [signal("PROVIDER_NOT_HEALTHY", `Provider status: ${providerStatus}.`, raw?.provider || "layer2a_adapter", "HIGH")] : []),
     ],
-    evidenceRefs: success && !notApplicable ? [`provider-observation:${requestId}`] : [],
+    evidenceRefs: success && !notApplicable && !lookupSkipped ? [`provider-observation:${requestId}`] : [],
     meaning: hardNegative
       ? "Mọi stage sau phải giữ nguyên security MALICIOUS/BLOCK; semantic/domain không được hạ cấp."
       : finding === "NO_KNOWN_THREAT"
         ? "Chỉ là NO_KNOWN_THREAT trong phạm vi provider và thời điểm đã kiểm tra."
+        : finding === "SKIPPED_PRIVACY_SAFETY"
+          ? "SKIP chỉ chứng minh policy không disclosure target; không phải provider result và không phải SAFE."
         : "Không có kết quả provider đáng tin cậy để dùng làm clearance.",
     userAction: hardNegative ? "Dừng target và không tiếp tục hành động." : "Chờ semantic/domain/evidence và policy; không gọi là Verified Safe.",
     safeToContinue: true,
@@ -120,6 +130,11 @@ export function stageFromL2A(raw, requestId, timing = {}, notApplicable = false)
       threatTypes: safeArray(raw?.threatTypes).slice(0, 20),
       providerResults: safeArray(raw?.providerResults).slice(0, 20),
       notApplicable: Boolean(notApplicable || raw?.notApplicable),
+      reputationLookupPolicy: lookupPolicy,
+      reputationLookupReason: lookupReason,
+      reputationLookupStatus: raw?.reputationLookupStatus || null,
+      reputationLookupTargetClass: raw?.reputationLookupTargetClass || null,
+      reputationLookupDisclosed: raw?.reputationLookupDisclosed === true,
     },
   });
 }
@@ -174,6 +189,8 @@ export function stageFromL2C(raw, requestId, timing = {}) {
   const classification = STAGE_FINDINGS.l2c.includes(raw?.classification) ? raw.classification : "UNKNOWN_STUDENT_RISK";
   const highRisk = !["NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK"].includes(classification);
   const modelScore = typeof raw?.modelScore === "number" ? raw.modelScore : null;
+  const verificationPackage = raw?.verificationPackage && typeof raw.verificationPackage === "object" ? raw.verificationPackage : null;
+  const verificationTaskCount = safeArray(verificationPackage?.verificationTasks).length;
   return createStageEnvelope({
     ...stageBase("l2c", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso()),
     finding: classification,
@@ -189,6 +206,7 @@ export function stageFromL2C(raw, requestId, timing = {}) {
     signals: [
       ...safeArray(raw?.riskSignals).slice(0, 32).map((item) => signal(item?.code || item?.type || "DOMAIN_SIGNAL", item?.details || "Domain signal.", item?.source || "student_domain_rule_baseline", item?.severity || "INFO")),
       ...(modelScore !== null ? [signal("MODEL_SCORE", `MODEL_SCORE=${modelScore}; calibration=NOT_CALIBRATED; đây không phải probability.`, "student_domain_intelligence", "INFO")] : []),
+      ...(verificationTaskCount > 0 ? [signal("VERIFICATION_TASKS_REQUESTED", `${verificationTaskCount} candidate verification task(s) được chuyển sang L3; chưa phải evidence.`, "l2c_verification_bridge", "HIGH")] : []),
     ],
     evidenceRefs: [],
     meaning: highRisk ? "Đây là candidate risk theo bối cảnh sinh viên Việt Nam để nâng suspicion và yêu cầu evidence." : "Không thấy pattern domain không đồng nghĩa với nội dung an toàn.",
@@ -203,7 +221,11 @@ export function stageFromL2C(raw, requestId, timing = {}) {
       datasetVersion: raw?.datasetVersion || null,
       promptInjectionDetected: raw?.promptInjectionDetected === true,
       secondaryClassifications: safeArray(raw?.secondaryClassifications).slice(0, 8),
+      verificationSchemaVersion: verificationPackage?.schemaVersion || null,
+      verificationTaskCount,
+      verificationCandidateOnly: verificationPackage?.candidateOnly === true,
     },
+    verificationPackage,
   });
 }
 
@@ -225,6 +247,22 @@ export function stageFromL3(raw, requestId, timing = {}) {
   const local = String(raw?.retrievalMode || "").includes("LOCAL") || raw?.externalEvidence !== true;
   const stale = finding === "STALE" || Number(raw?.temporalAssessment?.outdatedEvidenceCount) > 0;
   const partialOperation = ["PARTIAL", "UNAVAILABLE", "FAIL", "ERROR"].some((value) => statusFor(raw?.status).includes(value)) || ["UNAVAILABLE", "FAIL", "ERROR"].some((value) => statusFor(raw?.retrievalStatus).includes(value));
+  const sourceTaskSummary = raw?.verificationTaskSummary && typeof raw.verificationTaskSummary === "object" ? raw.verificationTaskSummary : {};
+  const verificationTasks = safeArray(raw?.verificationTasks).slice(0, 80);
+  const taskCount = verificationTasks.length;
+  const l2bTaskCount = verificationTasks.filter((task) => task?.origin === "L2B_SEMANTIC").length;
+  const l2cTaskCount = verificationTasks.filter((task) => task?.origin === "L2C_DOMAIN_AI").length;
+  const boundedTaskSummaryCount = (value) => Math.min(taskCount, Math.max(0, Number.isFinite(Number(value)) ? Number(value) : 0));
+  const taskSummary = {
+    totalTasks: taskCount,
+    l2bTaskCount,
+    l2cTaskCount,
+    deduplicatedCount: boundedTaskSummaryCount(sourceTaskSummary.deduplicatedCount),
+    highImpactTaskCount: boundedTaskSummaryCount(sourceTaskSummary.highImpactTaskCount),
+    tasksWithQueries: boundedTaskSummaryCount(sourceTaskSummary.tasksWithQueries),
+    tasksWithoutQueries: boundedTaskSummaryCount(sourceTaskSummary.tasksWithoutQueries),
+  };
+  const l2cEvidenceCount = evidence.filter((item) => String(item?.claimId || "").startsWith("l2c-domain-")).length;
   return createStageEnvelope({
     ...stageBase("l3", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso(), partialOperation ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED),
     finding,
@@ -233,13 +271,14 @@ export function stageFromL3(raw, requestId, timing = {}) {
     providerId: raw?.metrics?.retrievalProvider || raw?.retrievalMode || "evidence_retriever",
     confidence: typeof raw?.verificationCompleteness === "number" ? raw.verificationCompleteness : null,
     confidenceKind: "EVIDENCE_COMPLETENESS_SCORE_NON_PROBABILISTIC",
-    summary: finding === "SUPPORTED" ? "Bằng chứng hiện có hỗ trợ claim trong phạm vi nguồn đã kiểm tra." : finding === "CONTRADICTED" ? "Bằng chứng hiện có mâu thuẫn với claim." : finding === "MIXED" ? "Nguồn/evidence có mâu thuẫn hoặc không đồng nhất." : finding === "STALE" ? "Evidence có dấu hiệu stale, không đủ để dùng như current proof." : "Chưa có đủ evidence độc lập và current để xác minh claim.",
+    summary: `${finding === "SUPPORTED" ? "Bằng chứng hiện có hỗ trợ claim trong phạm vi nguồn đã kiểm tra." : finding === "CONTRADICTED" ? "Bằng chứng hiện có mâu thuẫn với claim." : finding === "MIXED" ? "Nguồn/evidence có mâu thuẫn hoặc không đồng nhất." : finding === "STALE" ? "Evidence có dấu hiệu stale, không đủ để dùng như current proof." : "Chưa có đủ evidence độc lập và current để xác minh claim."}${l2cTaskCount > 0 ? ` L3 đã nhận ${l2cTaskCount} task(s) từ L2C để kiểm tra độc lập.` : ""}`,
     reasons: [raw?.retrievalMode, raw?.retrievalStatus, raw?.crossSourceAgreement].filter(Boolean).map((item) => safeText(item)).slice(0, 12),
     signals: [
       signal("SOURCES_CHECKED", `${sources.length} source(s), ${evidence.length} evidence item(s).`, "layer3_provenance", "INFO"),
       signal(local ? "LOCAL_KNOWLEDGE_BASE_OR_FALLBACK" : "EXTERNAL_EVIDENCE", local ? "Local/fallback không được label externally verified." : "Có source được adapter network guard cho phép.", "layer3_provenance", local ? "HIGH" : "INFO"),
       ...(stale ? [signal("STALE_EVIDENCE", `${raw?.temporalAssessment?.outdatedEvidenceCount || 1} evidence item(s) outdated/stale.`, "layer3_temporal", "HIGH")] : []),
       ...(safeArray(raw?.conflicts).length > 0 ? [signal("EVIDENCE_CONFLICT", `${safeArray(raw.conflicts).length} conflict(s) được giữ lại, không bị xóa.`, "layer3_conflict", "HIGH")] : []),
+      ...(verificationTasks.length > 0 ? [signal("L2C_EVIDENCE_BRIDGE", `${verificationTasks.length} verification task(s) được merge; L2C output vẫn là candidate-only.`, "l2c_l3_bridge", "HIGH")] : []),
     ],
     evidenceRefs: evidence.map((item) => item?.evidenceId).filter((item) => typeof item === "string").slice(0, 40),
     meaning: "Layer 3 mô tả provenance, authority, freshness và independence của nguồn; model-generated explanation không phải evidence.",
@@ -256,7 +295,15 @@ export function stageFromL3(raw, requestId, timing = {}) {
       retrievalStatus: raw?.retrievalStatus || null,
       completeness: raw?.verificationCompleteness ?? null,
       sourceIndependence: raw?.sourceIndependence || null,
+      verificationTaskCount: taskCount,
+      l2bTaskCount,
+      l2cTaskCount,
+      deduplicatedTaskCount: taskSummary.deduplicatedCount,
+      l2cEvidenceCount,
     },
+    verificationTasks,
+    verificationTaskSummary: taskSummary,
+    evidenceRequirements: safeArray(raw?.evidenceRequirements).slice(0, 16),
   });
 }
 

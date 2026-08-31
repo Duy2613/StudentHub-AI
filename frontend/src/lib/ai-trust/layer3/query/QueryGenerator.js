@@ -6,6 +6,7 @@
  */
 
 import { LAYER_3_CONFIG } from "../config/Layer3Config.js";
+import { L2C_VERIFICATION_TASK_TYPES, verificationTaskCatalog } from "../../v5/l2c/verificationPackage.js";
 
 function sanitizeQueryPart(value, maxLength = 180) {
   return typeof value === "string"
@@ -92,5 +93,44 @@ export class QueryGenerator {
     });
 
     return queries.slice(0, LAYER_3_CONFIG.LIMITS.MAX_QUERIES_PER_CLAIM);
+  }
+
+  /**
+   * Generates retrieval queries for a fixed L2C verification task. The task
+   * type selects the wording; model-provided instructions are never used as
+   * query templates.
+   */
+  static generateTaskQueries(task, claim = null) {
+    if (!task || typeof task !== "object" || Array.isArray(task)) return [];
+    if (!Object.values(L2C_VERIFICATION_TASK_TYPES).includes(task.type)) return [];
+    const catalog = verificationTaskCatalog(task.type);
+    if (!catalog) return [];
+    const target = sanitizeQueryPart(task.targetClaim || claim?.rawText || "", 180);
+    const subject = sanitizeQueryPart(claim?.subject, 100);
+    const queryTarget = sanitizeQueryPart(`${subject} ${target}`.trim(), 220);
+    const base = `${catalog.purpose} ${queryTarget}`.trim();
+    const taskId = sanitizeQueryPart(task.taskId, 160) || "l2c-task";
+    const common = {
+      targetClaimId: task.claimId || claim?.claimId || null,
+      verificationTaskId: taskId,
+      purpose: catalog.purpose,
+      sourceScope: catalog.sourceScope,
+      isCandidateOnly: true,
+      origin: "L2C_DOMAIN_AI",
+    };
+    const queries = [{
+      strategy: "L2C_OFFICIAL_TASK",
+      query: base,
+      ...common,
+    }];
+    if (queryTarget) {
+      queries.push({
+        strategy: "L2C_TASK_CONTRADICTION",
+        query: `${queryTarget} đính chính OR cảnh báo lừa đảo OR giả mạo OR không chính thức`,
+        isContradictionSeeking: true,
+        ...common,
+      });
+    }
+    return queries.slice(0, 2);
   }
 }

@@ -106,18 +106,37 @@ function stageOrderValid(pipeline, stages) {
 }
 
 function stageStatusValid(stages) {
-  return STAGE_IDS.every((stageId) => [
-    OPERATION_STATUS.COMPLETED,
-    OPERATION_STATUS.PARTIAL,
-    OPERATION_STATUS.FAILED,
-    OPERATION_STATUS.BLOCKED,
-  ].includes(stages?.[stageId]?.operationStatus));
+  return STAGE_IDS.every((stageId) => {
+    const stage = stages?.[stageId];
+    const terminal = [
+      OPERATION_STATUS.COMPLETED,
+      OPERATION_STATUS.PARTIAL,
+      OPERATION_STATUS.FAILED,
+      OPERATION_STATUS.BLOCKED,
+    ].includes(stage?.operationStatus);
+    const expectedL2ASkip = stageId === "l2a" && stage?.operationStatus === OPERATION_STATUS.SKIPPED &&
+      stageRaw(stages, "l2a").reputationLookupPolicy === "SKIP";
+    return terminal || expectedL2ASkip;
+  });
 }
 
 function hasPolicyVersionMismatch(stages) {
   const policyVersion = bounded(stageRaw(stages, "l4").policyVersion, 160);
   const pipelineVersion = bounded(stageRaw(stages, "l5").policyVersion, 160);
   return Boolean(policyVersion && pipelineVersion && policyVersion !== pipelineVersion);
+}
+
+function l2cEvidenceBridgeGap(stages) {
+  const l2c = asObject(stages?.l2c);
+  const packageValue = asObject(l2c.verificationPackage);
+  const requestedTasks = asArray(packageValue.verificationTasks);
+  if (packageValue.status !== "REQUIRED" || requestedTasks.length === 0) return false;
+  const l3 = asObject(stages?.l3);
+  const l3Summary = asObject(l3.verificationTaskSummary);
+  const l3Raw = stageRaw(stages, "l3");
+  const observedTasks = Number(l3Summary.l2cTaskCount ?? l3Raw.l2cTaskCount ?? 0);
+  const l2cEvidenceCount = Number(l3Raw.l2cEvidenceCount ?? 0);
+  return observedTasks < requestedTasks.length || l2cEvidenceCount <= 0;
 }
 
 export class AdversarialAssuranceAuditor {
@@ -191,6 +210,12 @@ export class AdversarialAssuranceAuditor {
       modelWeaknesses.push("unsupported_narrative");
     }
 
+    if (l2cEvidenceBridgeGap(stages)) {
+      addAnomaly(anomalies, "L2C_EVIDENCE_BRIDGE_GAP", "HIGH", "L2C đã yêu cầu verification task nhưng L3 chưa quan sát đủ task hoặc chưa trả evidence gắn với candidate domain claim.", ["l2c", "l3", "l4"]);
+      evidenceWeaknesses.push("l2c_evidence_bridge_gap");
+      recommendedRechecks.push("verify_l2c_tasks_and_independent_evidence");
+    }
+
     if (hasPolicyVersionMismatch(stages)) {
       addAnomaly(anomalies, "POLICY_VERSION_MISMATCH", "HIGH", "Policy version giữa decision và assurance không khớp.", ["l4", "l5"]);
       crossLayerConflicts.push("policy_version");
@@ -227,7 +252,7 @@ export class AdversarialAssuranceAuditor {
     }
 
     const criticalCodes = new Set(["DROPPED_HARD_NEGATIVE", "FAILURE_IMPROVED_RESULT", "STAGE_ORDER_INVALID", "MISSING_REQUIRED_STAGE", "PREMATURE_PIPELINE_COMPLETION"]);
-    const highCodes = new Set(["EVIDENCE_INDEPENDENCE_OVERSTATED", "STALE_EVIDENCE", "CONFIDENCE_EVIDENCE_MISMATCH", "UNSUPPORTED_NARRATIVE_CLAIM", "POLICY_VERSION_MISMATCH", "STAGE_SKIP_OR_INCOMPLETE"]);
+    const highCodes = new Set(["EVIDENCE_INDEPENDENCE_OVERSTATED", "STALE_EVIDENCE", "CONFIDENCE_EVIDENCE_MISMATCH", "UNSUPPORTED_NARRATIVE_CLAIM", "L2C_EVIDENCE_BRIDGE_GAP", "POLICY_VERSION_MISMATCH", "STAGE_SKIP_OR_INCOMPLETE"]);
     let status = "ASSURANCE_PASS";
     if (!validStageSet(stages)) status = "BLOCKED_BY_MISSING_EVIDENCE";
     else if (anomalies.some((item) => criticalCodes.has(item.code))) status = "REVIEW_REQUIRED";

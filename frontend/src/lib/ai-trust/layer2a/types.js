@@ -7,6 +7,11 @@
  */
 
 import { createSecureId } from "../../security/secureId.js";
+import {
+  REPUTATION_LOOKUP_POLICY,
+  REPUTATION_LOOKUP_REASON,
+  REPUTATION_LOOKUP_STATUS,
+} from "./ReputationLookupPolicy.js";
 
 export const LAYER_2A_CAPABILITY = {
   URL_REPUTATION: "URL_REPUTATION",
@@ -32,6 +37,7 @@ export const LAYER_2A_FINDING = {
   NO_KNOWN_THREAT: "NO_KNOWN_THREAT",
   UNKNOWN: "UNKNOWN",
   NOT_APPLICABLE: "NOT_APPLICABLE",
+  SKIPPED_PRIVACY_SAFETY: "SKIPPED_PRIVACY_SAFETY",
 };
 
 function boundedString(value, maxLength) {
@@ -67,6 +73,18 @@ function securityClassificationFor(finding) {
   if (finding === LAYER_2A_FINDING.NO_KNOWN_THREAT) return "NO_KNOWN_THREAT";
   if (finding === LAYER_2A_FINDING.NOT_APPLICABLE) return "NOT_APPLICABLE";
   return "UNKNOWN";
+}
+
+function normalizeLookupPolicy(value) {
+  return Object.values(REPUTATION_LOOKUP_POLICY).includes(value) ? value : null;
+}
+
+function normalizeLookupReason(value) {
+  return Object.values(REPUTATION_LOOKUP_REASON).includes(value) ? value : null;
+}
+
+function normalizeLookupStatus(value) {
+  return Object.values(REPUTATION_LOOKUP_STATUS).includes(value) ? value : null;
 }
 
 function normalizeProviderResult(value) {
@@ -118,6 +136,11 @@ export function createLayer2AResult(input = {}) {
   errorCode = null,
   contractViolation = null,
   notApplicable = false,
+  reputationLookupPolicy = null,
+  reputationLookupReason = null,
+  reputationLookupStatus = null,
+  reputationLookupTargetClass = null,
+  reputationLookupDisclosed = null,
   } = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   const normalizedFinding = normalizeFinding(finding);
   const normalizedStatus = normalizeStatus(providerStatus);
@@ -157,6 +180,11 @@ export function createLayer2AResult(input = {}) {
     errorCode: boundedString(errorCode, 120) || null,
     contractViolation: boundedString(contractViolation, 120) || null,
     notApplicable: Boolean(notApplicable),
+    reputationLookupPolicy: normalizeLookupPolicy(reputationLookupPolicy),
+    reputationLookupReason: normalizeLookupReason(reputationLookupReason),
+    reputationLookupStatus: normalizeLookupStatus(reputationLookupStatus),
+    reputationLookupTargetClass: boundedString(reputationLookupTargetClass, 100) || null,
+    reputationLookupDisclosed: typeof reputationLookupDisclosed === "boolean" ? reputationLookupDisclosed : null,
     provenance: {
       sourceType: "THREAT_INTELLIGENCE",
       authorityScope: "URL reputation and known-threat lookup only",

@@ -64,7 +64,7 @@ function legacyToV5(payload: Record<string, unknown>): TrustV5Response {
   const layer3 = (data.layer3 && typeof data.layer3 === "object" ? data.layer3 : null) as Record<string, unknown> | null;
   const layer4 = (data.layer4 && typeof data.layer4 === "object" ? data.layer4 : null) as Record<string, unknown> | null;
   const layer1Finding = layer1?.status === "BLOCK" ? "LOCAL_BLOCK" : layer1?.status === "SUSPICIOUS" ? "LOCAL_SUSPICIOUS" : layer1?.status === "PASS" ? "LOCAL_CLEAR" : "LOCAL_UNKNOWN";
-  const l2aFinding = typeof layer2A?.finding === "string" && ["THREAT_MATCH", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE"].includes(layer2A.finding) ? layer2A.finding : "UNKNOWN";
+  const l2aFinding = typeof layer2A?.finding === "string" && ["THREAT_MATCH", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE", "SKIPPED_PRIVACY_SAFETY"].includes(layer2A.finding) ? layer2A.finding : "UNKNOWN";
   const l2bFinding = layer2?.status === "UNKNOWN" ? "UNKNOWN" : layer2?.status === "PASS" ? "SEMANTIC_NORMAL" : "SEMANTIC_SUSPICIOUS";
   const l3Status = String(layer3?.status || "").toUpperCase();
   const l3Finding = l3Status.includes("CONTEST") ? "MIXED" : l3Status.includes("VERIFIED") ? "SUPPORTED" : l3Status.includes("PARTIAL") ? "MIXED" : l3Status.includes("UNAVAILABLE") ? "UNAVAILABLE" : "INSUFFICIENT";

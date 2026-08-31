@@ -157,12 +157,20 @@ export class EvidenceFusionEngine {
     const layer1Signals = objectArray(layer1Result?.signals);
     const layer2ContextSignals = objectArray(layer2Result?.contextSignals);
     const layer2Entities = objectArray(layer2Result?.entities);
-    const layer2Claims = objectArray(layer2Result?.claims);
+    const layer2BClaims = objectArray(layer2Result?.claims);
     const layer2ConsistencyFindings = objectArray(layer2Result?.consistencyFindings);
     const layer2CrossModalFindings = objectArray(layer2Result?.crossModalFindings);
     const layer2CDomainSignals = objectArray(layer2CResult?.riskSignals);
+    const layer2CVerificationPackage = layer2CResult?.verificationPackage && typeof layer2CResult.verificationPackage === "object" && !Array.isArray(layer2CResult.verificationPackage)
+      ? layer2CResult.verificationPackage
+      : null;
     const layer3Sources = objectArray(layer3Result?.sources);
     const layer3Evidence = objectArray(layer3Result?.evidence);
+    const layer2CVerificationClaims = objectArray(layer3Result?.claims)
+      .filter((claim) => claim.origin === "L2C_DOMAIN_AI")
+      .slice(0, 12);
+    const layer2Claims = [...layer2BClaims, ...layer2CVerificationClaims];
+    const layer3VerificationTasks = objectArray(layer3Result?.verificationTasks).slice(0, 80);
     const layer3Conflicts = objectArray(layer3Result?.conflicts);
     const layer3ClaimStatuses = layer3Result?.claimStatuses && typeof layer3Result.claimStatuses === "object" && !Array.isArray(layer3Result.claimStatuses)
       ? layer3Result.claimStatuses
@@ -179,7 +187,9 @@ export class EvidenceFusionEngine {
         ? layer2Result.intent
         : { primary: "inform", coercive: false },
       layer2Entities,
+      layer2BClaims,
       layer2Claims,
+      layer2CVerificationClaims,
       layer2ContextSignals,
       layer2ConsistencyFindings,
       layer2CrossModalFindings,
@@ -193,6 +203,21 @@ export class EvidenceFusionEngine {
       layer2CDomainSignals,
       layer2CModelStatus: typeof layer2CResult?.modelStatus === "string" ? layer2CResult.modelStatus : "UNKNOWN",
       layer2CModelVersion: typeof layer2CResult?.modelVersion === "string" ? layer2CResult.modelVersion : null,
+      // Explicit bridge metadata: L2C requests verification, L3 observes
+      // candidate tasks and returns independent evidence. The package itself
+      // is never counted as evidence.
+      layer2CVerificationPackage,
+      layer2CVerificationRequested: layer2CVerificationPackage?.status === "REQUIRED",
+      layer3VerificationTasks,
+      layer3VerificationTaskSummary: layer3Result?.verificationTaskSummary && typeof layer3Result.verificationTaskSummary === "object"
+        ? layer3Result.verificationTaskSummary
+        : { totalTasks: layer3VerificationTasks.length },
+      l2cL3EvidenceBridge: {
+        requestedTaskCount: Array.isArray(layer2CVerificationPackage?.verificationTasks) ? layer2CVerificationPackage.verificationTasks.length : 0,
+        observedTaskCount: layer3VerificationTasks.filter((task) => task.origin === "L2C_DOMAIN_AI").length,
+        independentEvidenceCount: layer3Evidence.filter((item) => String(item.claimId || "").startsWith("l2c-domain-")).length,
+        modelOutputCountedAsEvidence: false,
+      },
 
       // Layer 2A is a separate threat-intelligence boundary. Its no-match
       // finding is retained as a bounded absence of a known match, never as

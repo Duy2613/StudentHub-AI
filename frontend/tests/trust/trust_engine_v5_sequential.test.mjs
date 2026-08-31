@@ -8,6 +8,7 @@ import {
   toPublicPipelineResult,
   toPublicStageEnvelope,
 } from "../../src/lib/ai-trust/v5/contracts.js";
+import { createLayer3Result } from "../../src/lib/ai-trust/layer3/types.js";
 import {
   TrustPipelineCancelledError,
   TrustPipelineOrchestrator,
@@ -23,8 +24,16 @@ import {
   isAssuranceDowngradeOnly,
 } from "../../src/lib/ai-trust/v5/l5/AdversarialAssuranceAuditor.js";
 import { Layer4TrustService } from "../../src/lib/ai-trust/layer4/Layer4TrustService.js";
+import { EvidenceFusionEngine } from "../../src/lib/ai-trust/layer4/fusion/EvidenceFusionEngine.js";
+import { Layer2AReputationService } from "../../src/lib/ai-trust/layer2a/Layer2AReputationService.js";
 import { normalizeLayer2AProviderPayload } from "../../src/lib/ai-trust/layer2a/RenderLayer2AProvider.js";
 import { markTrustedLayer2AResult } from "../../src/lib/ai-trust/layer2a/TrustBoundary.js";
+import { Layer3EvidenceService } from "../../src/lib/ai-trust/layer3/Layer3EvidenceService.js";
+import { markNetworkGuardedRetriever } from "../../src/lib/ai-trust/layer3/retrieval/NetworkGuard.js";
+import {
+  L2C_VERIFICATION_TASK_TYPES,
+  normalizeStudentDomainVerificationPackage,
+} from "../../src/lib/ai-trust/v5/l2c/verificationPackage.js";
 
 const REQUEST_ID = "v5-test-request";
 
@@ -204,18 +213,20 @@ test("L1_BLOCK_PROPAGATION", async () => {
   });
 });
 
-test("L1_HARD_BLOCK_REDACTS_DOWNSTREAM_TARGET", async () => {
+test("L1_HARD_BLOCK_INVALID_TARGET_STAYS_WITHIN_LOCAL_BOUNDARY", async () => {
   let observedUrl = null;
   const { orchestrator } = createHarness({
     l1: async () => ({ layer: 1, status: "BLOCK", signals: [{ type: "dangerous_extension", severity: "CRITICAL" }], reasons: ["local hard block"] }),
-    l2a: async ({ url }) => {
+    l2a: async ({ url, requestId, options }) => {
       observedUrl = url;
-      return { ...trustedNoMatch(), notApplicable: true, finding: "NOT_APPLICABLE", securityClassification: "NOT_APPLICABLE", providerStatus: "NOT_APPLICABLE" };
+      return Layer2AReputationService.verify({ url, requestId, options });
     },
   });
   const result = await orchestrator.run({ type: "url", content: "blocked-target" });
-  assert.equal(observedUrl, "");
+  assert.equal(observedUrl, "blocked-target");
   assert.equal(result.stages.l1.finding, "LOCAL_BLOCK");
+  assert.equal(result.stages.l2a.finding, "UNKNOWN");
+  assert.equal(result.stages.l2a.operationStatus, "SKIPPED");
   assert.equal(result.finalDecision.security, "MALICIOUS");
   assert.equal(result.finalDecision.action, "BLOCK");
 });
@@ -611,4 +622,319 @@ test("CANCELLATION_AND_STALE_RUNS_ARE_NOT_PUBLISHED", async () => {
   await assert.rejects(first, (error) => error instanceof TrustPipelineCancelledError);
   const secondResult = await second;
   assert.equal(secondResult.requestId.startsWith("req_v5"), true);
+});
+
+test("L1_PUBLIC_HARD_BLOCK_CAN_REPUTATION_CHECK", async () => {
+  const publicTarget = process.env.TRUST_ENGINE_PUBLIC_TARGET || "https://public.example/blocked";
+  let providerCalls = 0;
+  let observedUrl = null;
+  const provider = {
+    async check({ url }) {
+      providerCalls += 1;
+      observedUrl = url;
+      return trustedThreat();
+    },
+  };
+  const { orchestrator } = createHarness({
+    l1: async () => ({ layer: 1, status: "BLOCK", signals: [{ type: "dangerous_extension", severity: "CRITICAL" }], reasons: ["local hard block"] }),
+    l2a: ({ url, requestId, options }) => Layer2AReputationService.verify({ url, requestId, options }),
+  }, { layer2AProvider: provider });
+
+  const result = await orchestrator.run({ type: "url", content: publicTarget });
+
+  assert.equal(providerCalls, 1);
+  assert.equal(observedUrl, new URL(publicTarget).toString());
+  assert.equal(result.stages.l1.finding, "LOCAL_BLOCK");
+  assert.equal(result.stages.l2a.finding, "THREAT_MATCH");
+  assert.equal(result.layerResults.layer2A.reputationLookupPolicy, "ALLOW");
+  assert.equal(result.layerResults.layer2A.reputationLookupReason, "PUBLIC_SECURITY_TARGET");
+  assert.equal(result.finalDecision.security, "MALICIOUS");
+  assert.equal(result.finalDecision.action, "BLOCK");
+});
+
+test("L1_PRIVATE_HARD_BLOCK_NEVER_LEAKS_TO_PROVIDER", async () => {
+  const privateTarget = process.env.TRUST_ENGINE_PRIVATE_TARGET || "http://169.254.169.254/metadata";
+  let providerCalls = 0;
+  const provider = {
+    async check() {
+      providerCalls += 1;
+      throw new Error("private target must not reach provider");
+    },
+  };
+  const { orchestrator } = createHarness({
+    l1: async () => ({ layer: 1, status: "BLOCK", signals: [{ type: "ssrf_target", severity: "CRITICAL" }], reasons: ["local SSRF hard block"] }),
+    l2a: ({ url, requestId, options }) => Layer2AReputationService.verify({ url, requestId, options }),
+  }, { layer2AProvider: provider });
+
+  const result = await orchestrator.run({ type: "url", content: privateTarget });
+
+  assert.equal(providerCalls, 0);
+  assert.equal(result.stages.l1.finding, "LOCAL_BLOCK");
+  assert.equal(result.stages.l2a.operationStatus, "SKIPPED");
+  assert.equal(result.stages.l2a.finding, "SKIPPED_PRIVACY_SAFETY");
+  assert.ok(result.stages.l2a.signals.some((signal) => signal.code === "REPUTATION_LOOKUP_SKIPPED" && /METADATA_TARGET/.test(signal.details)));
+  assert.equal(result.layerResults.layer2A.reputationLookupPolicy, "SKIP");
+  assert.equal(result.layerResults.layer2A.reputationLookupReason, "METADATA_TARGET");
+  assert.equal(result.finalDecision.security, "MALICIOUS");
+  assert.equal(result.finalDecision.action, "BLOCK");
+});
+
+test("L1_HARD_NEGATIVE_SURVIVES_L2A_NO_MATCH", async () => {
+  const publicTarget = process.env.TRUST_ENGINE_PUBLIC_TARGET || "https://public.example/no-known-match";
+  let providerCalls = 0;
+  const provider = {
+    async check({ url }) {
+      providerCalls += 1;
+      assert.equal(url, new URL(publicTarget).toString());
+      return trustedNoMatch();
+    },
+  };
+  const { orchestrator } = createHarness({
+    l1: async () => ({ layer: 1, status: "BLOCK", signals: [{ type: "dangerous_extension", severity: "CRITICAL" }], reasons: ["local hard block"] }),
+    l2a: ({ url, requestId, options }) => Layer2AReputationService.verify({ url, requestId, options }),
+  }, { layer2AProvider: provider });
+
+  const result = await orchestrator.run({ type: "url", content: publicTarget });
+
+  assert.equal(providerCalls, 1);
+  assert.equal(result.stages.l2a.finding, "NO_KNOWN_THREAT");
+  assert.equal(result.layerResults.layer2A.reputationLookupPolicy, "ALLOW");
+  assert.equal(result.finalDecision.security, "MALICIOUS");
+  assert.equal(result.finalDecision.action, "BLOCK");
+});
+
+test("L2A_SENSITIVE_URL_REDACTS_BEFORE_PROVIDER", async () => {
+  const sensitiveTarget = process.env.TRUST_ENGINE_SENSITIVE_TARGET || "https://public.example/account?token=fixture-secret&next=notice#fragment-secret";
+  let observedUrl = null;
+  const result = await Layer2AReputationService.verify({
+    url: sensitiveTarget,
+    requestId: REQUEST_ID,
+    options: {
+      provider: {
+        async check({ url }) {
+          observedUrl = url;
+          return trustedNoMatch();
+        },
+      },
+    },
+  });
+
+  assert.equal(result.reputationLookupPolicy, "REDACT");
+  assert.equal(result.reputationLookupReason, "SENSITIVE_URL");
+  assert.equal(result.reputationLookupStatus, "LOOKUP_REDACTED");
+  assert.equal(observedUrl, "https://public.example/account");
+  assert.equal(observedUrl.includes("fixture-secret"), false);
+  assert.equal(observedUrl.includes("fragment-secret"), false);
+});
+
+test("L2C_FAKE_SCHOLARSHIP_CREATES_VERIFICATION_TASKS", () => {
+  const result = StudentDomainRiskModel.analyze({ content: "Học bổng yêu cầu đóng phí xử lý và chuyển khoản vào tài khoản cá nhân ngay." });
+  const packageValue = result.verificationPackage;
+  const types = packageValue.verificationTasks.map((task) => task.type);
+
+  assert.equal(result.classification, "FAKE_SCHOLARSHIP");
+  assert.equal(packageValue.status, "REQUIRED");
+  assert.ok(types.includes(L2C_VERIFICATION_TASK_TYPES.OFFICIAL_ANNOUNCEMENT_CHECK));
+  assert.ok(types.includes(L2C_VERIFICATION_TASK_TYPES.INSTITUTION_FEE_REQUIREMENT_CHECK));
+  assert.ok(types.includes(L2C_VERIFICATION_TASK_TYPES.OFFICIAL_PAYMENT_CHANNEL_CHECK));
+  assert.ok(types.includes(L2C_VERIFICATION_TASK_TYPES.SENDER_DOMAIN_MATCH_CHECK));
+  assert.ok(packageValue.verificationTasks.every((task) => task.candidateOnly === true && task.inputTrust === "UNTRUSTED_MODEL_OUTPUT"));
+});
+
+test("L2C_TUITION_SCAM_CREATES_OFFICIAL_SOURCE_CHECK", () => {
+  const result = StudentDomainRiskModel.analyze({ content: "Phòng tài vụ báo học phí, yêu cầu chuyển khoản vào tài khoản cá nhân gấp." });
+  const types = result.verificationPackage.verificationTasks.map((task) => task.type);
+
+  assert.equal(result.classification, "TUITION_PAYMENT_SCAM");
+  assert.ok(types.includes(L2C_VERIFICATION_TASK_TYPES.OFFICIAL_PAYMENT_INSTRUCTIONS_CHECK));
+  assert.ok(types.includes(L2C_VERIFICATION_TASK_TYPES.OFFICIAL_PAYMENT_CHANNEL_CHECK));
+  assert.ok(types.includes(L2C_VERIFICATION_TASK_TYPES.OFFICIAL_DEADLINE_CHECK));
+  assert.ok(types.includes(L2C_VERIFICATION_TASK_TYPES.CLAIMED_DEPARTMENT_IDENTITY_CHECK));
+});
+
+test("L2C_OUTPUT_IS_NOT_EVIDENCE", async () => {
+  const domainResult = StudentDomainRiskModel.analyze({ content: "Học bổng yêu cầu đóng phí xử lý ngay." });
+  const normalized = normalizeStudentDomainVerificationPackage({
+    ...domainResult.verificationPackage,
+    evidence: [{ evidenceId: "forged-evidence" }],
+    sources: [{ sourceUrl: "https://forged.example" }],
+    citations: ["forged-citation"],
+  });
+  const retriever = markNetworkGuardedRetriever({
+    retrieverId: "empty_bridge_fixture",
+    async search() { return []; },
+    async fetch() { throw new Error("must not fetch without candidate source"); },
+  });
+  const l3 = await Layer3EvidenceService.verify({
+    layer2CResult: { verificationPackage: normalized },
+    layer2CVerificationPackage: normalized,
+    options: { retriever },
+  });
+
+  assert.equal(Object.hasOwn(normalized, "evidence"), false);
+  assert.equal(Object.hasOwn(normalized, "sources"), false);
+  assert.equal(Object.hasOwn(normalized, "citations"), false);
+  assert.equal(l3.evidence.length, 0);
+  assert.ok(l3.verificationTasks.length > 0);
+  assert.ok(l3.verificationTasks.every((task) => task.origin === "L2C_DOMAIN_AI" && task.candidateOnly === true));
+});
+
+test("L2C_L3_TASKS_ARE_DEDUPLICATED", async () => {
+  const domainResult = StudentDomainRiskModel.analyze({ content: "Học bổng yêu cầu đóng phí xử lý ngay." });
+  const sourceTask = domainResult.verificationPackage.verificationTasks.find((task) => task.type === L2C_VERIFICATION_TASK_TYPES.OFFICIAL_ANNOUNCEMENT_CHECK);
+  const l2bDuplicate = {
+    ...sourceTask,
+    taskId: "l2b-duplicate-announcement-task",
+    origin: "L2B_SEMANTIC",
+    instructions: "untrusted instructions must not be used",
+  };
+  const queries = [];
+  const retriever = markNetworkGuardedRetriever({
+    retrieverId: "dedupe_bridge_fixture",
+    async search(received) { queries.push(...received); return []; },
+    async fetch() { throw new Error("no source expected"); },
+  });
+  const l3 = await Layer3EvidenceService.verify({
+    layer2Result: { claims: [], verificationPackage: { verificationTasks: [l2bDuplicate] } },
+    layer2CResult: domainResult,
+    layer2CVerificationPackage: domainResult.verificationPackage,
+    options: { retriever },
+  });
+  const taskKeys = l3.verificationTasks.map((task) => `${task.type}|${task.claimId}|${task.purpose}|${task.targetClaim}`);
+
+  assert.ok(l3.verificationTaskSummary.deduplicatedCount >= 1);
+  assert.equal(new Set(taskKeys).size, taskKeys.length);
+  assert.equal(l3.verificationTaskSummary.l2cTaskCount, domainResult.verificationPackage.verificationTasks.length);
+  assert.ok(queries.length <= 240);
+});
+
+test("L3_UNTRUSTED_TASK_SUMMARY_CANNOT_EXCEED_NORMALIZED_TASKS", () => {
+  const result = createLayer3Result({
+    verificationTasks: [{
+      type: L2C_VERIFICATION_TASK_TYPES.OFFICIAL_SOURCE_EXISTENCE_CHECK,
+      classification: "FAKE_SCHOLARSHIP",
+      origin: "ATTACKER_CONTROLLED",
+    }],
+    verificationTaskSummary: {
+      totalTasks: 999999,
+      l2cTaskCount: 999999,
+      highImpactTaskCount: 999999,
+      tasksWithQueries: 999999,
+      tasksWithoutQueries: 999999,
+    },
+  });
+
+  assert.equal(result.verificationTaskSummary.totalTasks, 1);
+  assert.equal(result.verificationTaskSummary.l2cTaskCount, 1);
+  assert.equal(result.verificationTaskSummary.highImpactTaskCount, 1);
+  assert.equal(result.verificationTaskSummary.tasksWithQueries, 1);
+  assert.equal(result.verificationTaskSummary.tasksWithoutQueries, 1);
+});
+
+test("L2C_L3_EVIDENCE_FLOWS_TO_L4", async () => {
+  const domainResult = StudentDomainRiskModel.analyze({ content: "Học bổng yêu cầu đóng phí xử lý ngay." });
+  const domainClaim = domainResult.verificationPackage.domainClaims[0];
+  const retriever = markNetworkGuardedRetriever({
+    retrieverId: "live_l2c_bridge_fixture",
+    async search() {
+      return [{
+        sourceId: "l2c-bridge-source",
+        url: "https://bridge.example/official-scholarship",
+        domain: "bridge.example",
+        title: "Official scholarship notice",
+        publisher: "Bridge institution",
+        sourceType: "SEARCH_RETRIEVAL",
+        providerStatus: "SUCCESS",
+        liveEvidence: true,
+        sourceFingerprint: "l2c-bridge-source-fingerprint",
+        clusterId: "l2c-bridge-cluster",
+        retrievalOutcome: "SUCCESS",
+      }];
+    },
+    async fetch() {
+      return {
+        status: 200,
+        textContent: domainClaim.statement,
+        publishedAt: new Date().toISOString(),
+        sourceType: "SEARCH_RETRIEVAL",
+        providerStatus: "SUCCESS",
+        liveEvidence: true,
+        retrievalOutcome: "SUCCESS",
+      };
+    },
+  });
+  const l3 = await Layer3EvidenceService.verify({
+    layer2CResult: domainResult,
+    layer2CVerificationPackage: domainResult.verificationPackage,
+    options: { retriever, requestId: REQUEST_ID },
+  });
+  const l4 = await Layer4TrustService.evaluate({
+    layer1Result: { layer: 1, status: "PASS", signals: [] },
+    layer2AResult: null,
+    layer2Result: { layer: 2, status: "PASS", classification: "BENIGN", claims: [], contextSignals: [] },
+    layer2CResult: domainResult,
+    layer3Result: l3,
+  });
+  const fusion = EvidenceFusionEngine.fuse({
+    layer1Result: { layer: 1, status: "PASS", signals: [] },
+    layer2Result: { layer: 2, status: "PASS", classification: "BENIGN", claims: [], contextSignals: [] },
+    layer2CResult: domainResult,
+    layer3Result: l3,
+  });
+
+  assert.ok(l3.verificationTasks.some((task) => task.origin === "L2C_DOMAIN_AI"));
+  assert.ok(l3.evidence.some((item) => item.claimId === domainClaim.claimId && item.liveEvidence === true));
+  assert.equal(fusion.fusedGraph.l2cL3EvidenceBridge.modelOutputCountedAsEvidence, false);
+  assert.ok(fusion.fusedGraph.l2cL3EvidenceBridge.independentEvidenceCount > 0);
+  assert.ok(l4.riskAssessment.primaryVectors.includes("student_domain_risk_pattern"));
+  assert.ok(l4.auditTrail.fusedEvidenceCount > 0);
+  assert.ok(["WARN", "REVIEW"].includes(l4.enforcement));
+});
+
+test("L2C_HIGH_RISK_WITH_MISSING_EVIDENCE_REMAINS_REVIEWABLE", async () => {
+  const domainResult = StudentDomainRiskModel.analyze({ content: "Học bổng yêu cầu đóng phí xử lý ngay." });
+  const l3 = await Layer3EvidenceService.verify({
+    layer2CResult: domainResult,
+    layer2CVerificationPackage: domainResult.verificationPackage,
+    options: {
+      retriever: markNetworkGuardedRetriever({
+        retrieverId: "missing_l2c_evidence_fixture",
+        async search() { return []; },
+        async fetch() { throw new Error("must not fetch"); },
+      }),
+    },
+  });
+  const l4 = await Layer4TrustService.evaluate({
+    layer1Result: { layer: 1, status: "PASS", signals: [] },
+    layer2AResult: null,
+    layer2Result: { layer: 2, status: "PASS", classification: "BENIGN", claims: [], contextSignals: [] },
+    layer2CResult: domainResult,
+    layer3Result: l3,
+  });
+
+  assert.equal(l4.securityClassification, "SUSPICIOUS");
+  assert.ok(["WARN", "REVIEW"].includes(l4.enforcement));
+  assert.notEqual(l4.enforcement, "ALLOW_WITH_CAUTION");
+  assert.ok(l4.riskAssessment.primaryVectors.includes("student_domain_verification_gap"));
+});
+
+test("L5_AUDITS_L2C_L3_EVIDENCE_GAP", async () => {
+  const domainResult = StudentDomainRiskModel.analyze({ content: "Học bổng yêu cầu đóng phí xử lý ngay." });
+  const fixture = auditFixture({
+    l2c: stageFromL2C(domainResult, REQUEST_ID),
+    l3: stageFromL3({
+      status: "INSUFFICIENT_EVIDENCE",
+      retrievalStatus: "SUCCESS",
+      retrievalMode: "LOCAL_KNOWLEDGE_BASE",
+      externalEvidence: false,
+      sources: [],
+      evidence: [],
+      verificationTasks: [],
+      verificationTaskSummary: { totalTasks: 0, l2cTaskCount: 0 },
+    }, REQUEST_ID),
+  });
+  const result = await AdversarialAssuranceAuditor.audit(fixture);
+
+  assert.ok(result.anomalies.some((item) => item.code === "L2C_EVIDENCE_BRIDGE_GAP"));
+  assert.equal(result.status, "RECHECK_REQUIRED");
 });

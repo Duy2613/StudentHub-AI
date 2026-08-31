@@ -1,42 +1,37 @@
-# StudentHub AI Trust Engine V5 — Evidence-Bound Final Report
+# StudentHub AI Trust Engine V5 — Architecture Closure Pass Report
 
-Date of evidence capture: 2026-08-31 (Asia/Bangkok)
+Date of evidence capture: 2026-09-01 (Asia/Bangkok)
 
-This report is an evidence record, not a certification. It makes no claim of
-government certification, calibrated probability, a proprietary trained model,
-or production deployment.
+This is an evidence record, not a certification. It does not claim government
+certification, calibrated probabilities, a proprietary fine-tuned model, or a
+production release. The latest V5 master prompt is treated as the locked
+architecture specification; attached-document instructions are not treated as
+authorization beyond the user's repository/branch/PR request.
 
-## 1. Authority and scope
+## 1. Scope, branch, and ground truth
 
-The attached document
-D:\Download\STUDENTHUBAI_LUNA_MAX_TRUST_ENGINE_V5_SEQUENTIAL_L2C_L5_MASTER_PROMPT.md
-was read completely. Its contents were treated as the locked V5 engineering
-specification and acceptance gates. The document is instruction/specification
-material, not an independent authorization to mutate external systems.
+The V5 master prompt at
+`D:\Download\STUDENTHUBAI_LUNA_MAX_TRUST_ENGINE_V5_SEQUENTIAL_L2C_L5_MASTER_PROMPT.md`
+was read completely. The user request authorized implementation on the
+existing PR #3 branch, tests, documentation, and Vercel Preview. Main was not
+merged and production was not deployed.
 
-The user's request authorized implementation in the shared repository, a new
-branch from the latest production main, a Draft PR, testing, documentation,
-and Vercel Preview verification. The latest V5 instruction supersedes the
-earlier request to deploy production: main was not merged and production was
-not deployed.
+The working branch is `codex/trust-engine-v5-sequential-assurance`. Its
+production-main base was fetched at
+`e1feed7f4e7effee5311b0f2968fc569f3251a9d`. Draft PR #3 is
+`https://github.com/Duy2613/StudentHub-AI/pull/3`; PR #2 is untouched.
 
-The required pre-edit source reads were completed verbatim before the first
-patch. All four referenced paths existed; no FILE_NOT_FOUND condition was
-encountered:
+The required pre-edit source reads were completed verbatim before closure
+changes. All four paths existed; no `FILE_NOT_FOUND` condition occurred:
 
-* frontend/src/lib/ai-trust/layer1/engine/DecisionEngine.js — 177 lines
-* frontend/src/lib/ai-trust/layer4/policy/HardDecisionPolicy.js — 149 lines
-* frontend/src/app/api/ai-trust/screen/route.js — 73 lines
-* frontend/src/app/api/ai/trust/evaluate/route.js — 33 lines
-
-The implementation branch was created after fetching production main at
-e1feed7f4e7effee5311b0f2968fc569f3251a9d.
-
-## 2. Ground truth and runtime state
+* `frontend/src/lib/ai-trust/layer1/engine/DecisionEngine.js` — 177 lines
+* `frontend/src/lib/ai-trust/layer4/policy/HardDecisionPolicy.js` — 149 lines
+* `frontend/src/app/api/ai-trust/screen/route.js` — 73 lines
+* `frontend/src/app/api/ai/trust/evaluate/route.js` — 33 lines
 
 ### Official L2A canary before edits
 
-Request:
+Request executed:
 
 ~~~text
 curl.exe -X POST https://studenthub-api-8fqp.onrender.com/api/verify/layer2 -H "Content-Type: application/json" -d '{"type":"url","content":"https://testsafebrowsing.appspot.com/s/phishing.html"}'
@@ -48,30 +43,31 @@ Raw response:
 {"verdict":"DANGEROUS","confidence":0.99,"reason":"Google Safe Browsing detected a threat: SOCIAL_ENGINEERING.","providers":[{"provider":"Google Safe Browsing","success":true,"verdict":"DANGEROUS","confidence":0.99,"message":"Threat detected: SOCIAL_ENGINEERING."}]}
 ~~~
 
-Exit code: 0. This is not a BACKEND_DEFECT.
+Exit code: `0`. This observation is not a `BACKEND_DEFECT`.
 
-### One-shot runtime probes
+### One-shot runtime state
 
-STATE_L2A_BACKEND=LIVE. Raw probe response for the requested google.com body:
+The requested `google.com` probe returned this raw body:
 
 ~~~json
 {"verdict":"SAFE","confidence":0.95,"reason":"Google Safe Browsing did not report this URL as a known threat.","providers":[{"provider":"Google Safe Browsing","success":true,"verdict":"SAFE","confidence":0.95,"message":"No known Safe Browsing threat was returned."}]}
 ~~~
 
-STATE_AI_GATEWAY=DETERMINISTIC_FALLBACK_ONLY: no AI Gateway credentials were
-configured and no live AI Gateway evidence was available.
+The resulting states are:
 
-STATE_RETRIEVAL_PROVIDER=LOCAL_KNOWLEDGE_BASE_ONLY: no search/retrieval
-provider credentials were configured and no live retrieval evidence was
-available.
+* `STATE_L2A_BACKEND=LIVE`: the configured backend returned a valid response.
+* `STATE_AI_GATEWAY=DETERMINISTIC_FALLBACK_ONLY`: no configured live AI Gateway evidence.
+* `STATE_RETRIEVAL_PROVIDER=LOCAL_KNOWLEDGE_BASE_ONLY`: no configured live retrieval provider.
 
-These states reduce the claim scope of L2B and L3 only. They do not block the
-local L1 or deterministic L4 work.
+These are runtime command observations, not maturity claims. Missing external
+dependencies narrow only the affected layer's claim scope.
 
-## 3. Baseline before V5 changes
+## 2. Pre-change baseline
 
-The PowerShell equivalent of the requested tail -30 was used:
-Select-Object -Last 30. The following are the raw baseline result lines.
+The requested commands were run from the repository root. PowerShell used
+`Select-Object -Last 30` as the equivalent of `tail -30`.
+
+Raw baseline result lines:
 
 ~~~text
 L1: TP: 57, TN: 66, FP: 0, FN: 0
@@ -88,332 +84,310 @@ L4: failed 0
 L4: [QUALITY_GATE] PASS: 1/1 selected test files
 ~~~
 
-## 4. V5 architecture delivered
+## 3. Closure implementation evidence
 
-The sequential contract is defined by
-frontend/src/lib/ai-trust/v5/contracts.js:29 (STAGE_IDS),
-:81 (STAGE_DEFINITIONS), :360 (createStageEnvelope), and
-:456 (toPublicPipelineResult). The orchestrator is
-frontend/src/lib/ai-trust/v5/TrustPipelineOrchestrator.js:107
-(TrustPipelineOrchestrator), with stage execution at :168,
-single-stage execution at :242, complete sequential execution at :311,
-and retry at :399.
+### P0-A — typed L1-to-L2A reputation disclosure
 
-The public sanitizer removes server-only raw metadata at
-contracts.js:456. The V5 regression PUBLIC_RESPONSE_OMITS_SERVER_RAW_METADATA
-proves that raw layer results, assurance internals, audit metadata, and secret
-raw metadata are not returned.
+`frontend/src/lib/ai-trust/layer2a/ReputationLookupPolicy.js:101`
+(`decideReputationLookup`) classifies targets into `ALLOW`, `REDACT`, or
+`SKIP`, with an allowlisted reason and target class. The function recognizes
+private/network, metadata, SSRF-sensitive, invalid, sensitive-query, and valid
+public cases. `frontend/src/lib/ai-trust/layer2a/Layer2AReputationService.js:14`
+(`Layer2AReputationService.verify`) recomputes that decision at the provider
+boundary, never trusts a caller hint, never fetches/renders/executes the
+target, and refuses provider invocation for `SKIP`.
 
-The API is exposed at
-frontend/src/app/api/v1/trust/route.js:93 (runCanonicalTrust) and
-:178 (POST), with the alias route protected at
-frontend/src/app/api/v1/trust/analyze/route.js:9 (POST). The client invokes
-the sequential stream at
-frontend/src/lib/api/trust.ts:154 (sequentialRequest) and
-frontend/src/components/trust/AiTrustStudioView.jsx:196
-(trustApi.sequential). The seven-card UX is rendered by
-frontend/src/components/trust/TrustPipelineTimeline.jsx:48.
+`frontend/src/lib/ai-trust/v5/TrustPipelineOrchestrator.js:169`
+(`_stageWorker`) passes a valid public target for reputation-only lookup even
+when L1 has blocked it. `frontend/src/lib/ai-trust/v5/stageAdapters.js:83`
+(`stageFromL2A`) exposes `SKIPPED_PRIVACY_SAFETY` and truthful lookup signals.
+`frontend/src/lib/ai-trust/layer2a/types.js:115`
+(`createLayer2AResult`) constrains the policy fields and maps a skipped lookup
+to `UNKNOWN`, never `SAFE`.
 
-The exact V5 unit test SEQUENTIAL_STAGE_CONTRACT_AND_ORDER at
-frontend/tests/trust/trust_engine_v5_sequential.test.mjs:134 verifies the
-seven-stage order and stage envelope. Raw V5 suite result:
+Named proof tests in
+`frontend/tests/trust/trust_engine_v5_sequential.test.mjs` are:
+
+* `L1_PUBLIC_HARD_BLOCK_CAN_REPUTATION_CHECK` — line 627
+* `L1_PRIVATE_HARD_BLOCK_NEVER_LEAKS_TO_PROVIDER` — line 655
+* `L1_HARD_NEGATIVE_SURVIVES_L2A_NO_MATCH` — line 682
+* `L2A_SENSITIVE_URL_REDACTS_BEFORE_PROVIDER` — line 705
+
+The direct V5 suite raw result for these tests and the existing hard-negative
+regressions was:
 
 ~~~text
-ℹ tests 50
-ℹ pass 50
+✔ L1_PUBLIC_HARD_BLOCK_CAN_REPUTATION_CHECK
+✔ L1_PRIVATE_HARD_BLOCK_NEVER_LEAKS_TO_PROVIDER
+✔ L1_HARD_NEGATIVE_SURVIVES_L2A_NO_MATCH
+✔ L2A_SENSITIVE_URL_REDACTS_BEFORE_PROVIDER
+ℹ tests 62
+ℹ pass 62
 ℹ fail 0
-ℹ cancelled 0
-ℹ skipped 0
-ℹ todo 0
 ~~~
 
-## 5. Per-layer evidence and verdicts
+### P0-B — L2C-to-L3 evidence bridge
 
-The labels below distinguish a locally evidenced implementation gate from a
-national-high-impact M3 claim. A blocked M3 label is intentional when the
-required external evidence was not available.
+`frontend/src/lib/ai-trust/v5/l2c/verificationPackage.js:230`
+(`buildStudentDomainVerificationPackage`) creates fixed, bounded,
+candidate-only domain claims and verification tasks. The normalizer at line
+258 discards model-supplied evidence, sources, and citations, reconstructs
+only fixed taxonomy tasks, and marks the package
+`inputTrust=UNTRUSTED_MODEL_OUTPUT`.
+
+`frontend/src/lib/ai-trust/v5/l2c/StudentDomainRiskModel.js:208`
+(`StudentDomainRiskModel`) attaches the package to the existing baseline
+classification. `frontend/src/lib/ai-trust/layer3/Layer3EvidenceService.js:112`
+(`mergeVerificationTasks`) deduplicates bounded L2B/L2C tasks, preserves source
+scope, and keeps candidate-only origin markers. The L3 service at line 246
+generates fixed task queries through
+`frontend/src/lib/ai-trust/layer3/query/QueryGenerator.js:103`
+(`generateTaskQueries`) and returns actual evidence only from its retrieval
+boundary. `frontend/src/lib/ai-trust/layer3/types.js:317`
+(`createLayer3Result`) canonicalizes tasks and caps summary metadata to the
+normalized task set.
+
+`frontend/src/lib/ai-trust/layer4/fusion/EvidenceFusionEngine.js:127`
+(`EvidenceFusionEngine`) keeps the L2C risk signal separate from L3 evidence
+and records `modelOutputCountedAsEvidence=false`. The missing-evidence risk
+path is at
+`frontend/src/lib/ai-trust/layer4/policy/RiskAssessmentEngine.js:15`
+(`RiskAssessmentEngine`). L5 bridge auditing is at
+`frontend/src/lib/ai-trust/v5/l5/AdversarialAssuranceAuditor.js:129`
+(`l2cEvidenceBridgeGap`), called by `audit` at line 143.
+
+Named proof tests in
+`frontend/tests/trust/trust_engine_v5_sequential.test.mjs` are:
+
+* `L2C_FAKE_SCHOLARSHIP_CREATES_VERIFICATION_TASKS` — line 729
+* `L2C_TUITION_SCAM_CREATES_OFFICIAL_SOURCE_CHECK` — line 743
+* `L2C_OUTPUT_IS_NOT_EVIDENCE` — line 754
+* `L2C_L3_TASKS_ARE_DEDUPLICATED` — line 781
+* `L3_UNTRUSTED_TASK_SUMMARY_CANNOT_EXCEED_NORMALIZED_TASKS` — line 810
+* `L2C_L3_EVIDENCE_FLOWS_TO_L4` — line 833
+* `L2C_HIGH_RISK_WITH_MISSING_EVIDENCE_REMAINS_REVIEWABLE` — line 893
+* `L5_AUDITS_L2C_L3_EVIDENCE_GAP` — line 920
+
+The exact V5 raw count above is the evidence for all named tests in this
+section; every listed test emitted `✔` before the `62/62` summary. No L2C
+model output is claimed as evidence.
+
+## 4. Per-layer evidence-bound verdicts
+
+These verdicts distinguish deterministic implementation evidence from
+national-high-impact M3 evidence. A blocked verdict is intentional where the
+required external exercise was not available.
 
 ### L1 — Local Security Screening
 
-Implementation evidence:
-frontend/src/lib/ai-trust/layer1/engine/DecisionEngine.js:26
-(DecisionEngine.resolve) and
-frontend/src/lib/ai-trust/v5/TrustPipelineOrchestrator.js:168
-(_stageWorker). A hard L1 block redacts the downstream target before L2A.
-
-Proof tests:
-L1_LOCAL_CLEAR_AND_UNKNOWN_NEVER_FINAL_SAFE (:180),
-L1_BLOCK_PROPAGATION (:194), and
-L1_HARD_BLOCK_REDACTS_DOWNSTREAM_TARGET (:207).
-
-Raw proof:
+Implementation path: `frontend/src/lib/ai-trust/layer1/engine/DecisionEngine.js:26`
+(`DecisionEngine.resolve`) plus the P0-A routing path at
+`frontend/src/lib/ai-trust/v5/TrustPipelineOrchestrator.js:169`
+(`_stageWorker`). Tests: `L1_LOCAL_CLEAR_AND_UNKNOWN_NEVER_FINAL_SAFE`,
+`L1_BLOCK_PROPAGATION`, `L1_PUBLIC_HARD_BLOCK_CAN_REPUTATION_CHECK`,
+`L1_PRIVATE_HARD_BLOCK_NEVER_LEAKS_TO_PROVIDER`, and
+`L1_HARD_NEGATIVE_SURVIVES_L2A_NO_MATCH` in the V5 file at lines 180, 194,
+627, 655, and 682. Raw layer result:
 
 ~~~text
-TP: 57, TN: 66, FP: 0, FN: 0
-ℹ tests 50
-ℹ pass 50
-ℹ fail 0
+True Positives (Threats Blocked)   [TP]: 57
+True Negatives (Legitimate Passed)  [TN]: 66
+False Positives (False Alarms)      [FP]: 0
+False Negatives (Missed Threats)    [FN]: 0
+[QUALITY_GATE] PASS: 1/1 selected test files
 ~~~
 
-Verdict: L1_M3_PASS for the deterministic local gate, supported by the
-baseline and the named V5 hard-negative/propagation tests. This is not a
+Verdict: `L1_M3_PASS` for the deterministic local gate only. This is not a
 government certification claim.
 
 ### L2A — Threat Intelligence
 
-Implementation evidence:
-frontend/src/lib/ai-trust/layer2a/Layer2AReputationService.js:8
-(verify), frontend/src/lib/ai-trust/layer2a/RenderLayer2AProvider.js:95
-(normalizeLayer2AProviderPayload), and :386 (check). Provider timeout,
-abort, malformed response, circuit-open, and provider-contradiction paths
-remain UNKNOWN; no known threat is not converted to SAFE.
-
-Proof tests:
-THREAT_MATCH_HARD_BLOCK_PRESERVED (:223),
-NO_KNOWN_THREAT_NOT_SAFE (:238),
-PROVIDER_TIMEOUT_UNKNOWN (:248),
-PROVIDER_ERROR_UNKNOWN (:257),
-CIRCUIT_OPEN_UNKNOWN (:266),
-PROVIDER_CONTRACT_CONTRADICTION (:273), and
-NO_SYNTHETIC_GOOGLE_CONFIDENCE (:283). The live canary above is additional
-external evidence.
-
-Raw proof:
+Implementation path:
+`frontend/src/lib/ai-trust/layer2a/Layer2AReputationService.js:14`
+(`verify`) and
+`frontend/src/lib/ai-trust/layer2a/ReputationLookupPolicy.js:101`
+(`decideReputationLookup`). Tests:
+`THREAT_MATCH_HARD_BLOCK_PRESERVED`, `NO_KNOWN_THREAT_NOT_SAFE`,
+`PROVIDER_TIMEOUT_UNKNOWN`, `PROVIDER_ERROR_UNKNOWN`, `CIRCUIT_OPEN_UNKNOWN`,
+`PROVIDER_CONTRACT_CONTRADICTION`, `L1_PUBLIC_HARD_BLOCK_CAN_REPUTATION_CHECK`,
+`L1_PRIVATE_HARD_BLOCK_NEVER_LEAKS_TO_PROVIDER`,
+`L1_HARD_NEGATIVE_SURVIVES_L2A_NO_MATCH`, and
+`L2A_SENSITIVE_URL_REDACTS_BEFORE_PROVIDER`. Raw counts:
 
 ~~~text
-{"verdict":"DANGEROUS","confidence":0.99,"reason":"Google Safe Browsing detected a threat: SOCIAL_ENGINEERING.","providers":[{"provider":"Google Safe Browsing","success":true,"verdict":"DANGEROUS","confidence":0.99,"message":"Threat detected: SOCIAL_ENGINEERING."}]}
-ℹ tests 50
-ℹ pass 50
+Total Test Scenarios Evaluated : 14
+Passed                         : 14 / 14
+Failed                         : 0
+[QUALITY_GATE] PASS: 1/1 selected test files
+ℹ tests 62
+ℹ pass 62
 ℹ fail 0
 ~~~
 
-Verdict: L2A_M3_BLOCKED_BY_MISSING_EXTERNAL_FAILURE_EVIDENCE. The live
-provider canary was reachable, but a live provider-outage/compromise exercise
-was not available; controlled failure tests prove code behavior only.
+The live canary is `DANGEROUS` in Section 1. Verdict:
+`L2A_M3_BLOCKED_BY_MISSING_EXTERNAL_FAILURE_EVIDENCE`. Provider reachability
+was proven, but a live outage/compromise exercise was not available.
 
 ### L2B — Semantic Intelligence
 
-Implementation evidence:
-frontend/src/lib/ai-trust/layer2/Layer2SemanticService.js:71
-(verify), frontend/src/lib/ai-gateway/AIGatewayService.js:34
-(generateText), :93 (generateStructured), and
-frontend/src/lib/ai-gateway/ModelRouter.js:77 (route). Request cancellation
-is propagated through the model provider boundary.
-
-Proof tests:
-L2B_SEMANTIC_AI_CANNOT_CLEAR_THREAT (:289),
-PROMPT_INJECTION_ISOLATED (:300),
-INVALID_MODEL_SCHEMA_FALLBACK (:307),
-SEMANTIC_TIMEOUT_TYPED (:315),
-CLAIMS_EXTRACTION_BOUNDED (:322), and
-NO_SEMANTIC_SAFE_ASSERTION (:329).
-
-Raw proof:
+Implementation path:
+`frontend/src/lib/ai-trust/layer2/Layer2SemanticService.js:71`
+(`verify`) and the provider boundary at
+`frontend/src/lib/ai-gateway/AIGatewayService.js:34` (`generateText`). Tests:
+`L2B_SEMANTIC_AI_CANNOT_CLEAR_THREAT`, `PROMPT_INJECTION_ISOLATED`,
+`INVALID_MODEL_SCHEMA_FALLBACK`, `SEMANTIC_TIMEOUT_TYPED`,
+`CLAIMS_EXTRACTION_BOUNDED`, and `NO_SEMANTIC_SAFE_ASSERTION`. Raw counts:
 
 ~~~text
-ℹ tests 50
-ℹ pass 50
+ℹ tests 62
+ℹ pass 62
 ℹ fail 0
 ~~~
 
-Verdict: L2B_M3_BLOCKED_BY_MISSING_LIVE_AI_GATEWAY_EVIDENCE. The runtime was
-DETERMINISTIC_FALLBACK_ONLY; no live provider result or live provider-failure
-exercise may be represented as evidence.
+Verdict: `L2B_M3_BLOCKED_BY_MISSING_LIVE_AI_GATEWAY_EVIDENCE` because the
+runtime state is `DETERMINISTIC_FALLBACK_ONLY`.
 
 ### L2C — StudentHub Domain AI
 
-Implementation evidence:
-frontend/src/lib/ai-trust/v5/l2c/taxonomy.js:1 (version/taxonomy),
-frontend/src/lib/ai-trust/v5/l2c/StudentDomainRiskModel.js:208
-(StudentDomainRiskModel.analyze),
-frontend/src/lib/ai-trust/v5/l2c/datasetSchema.js:54
-(validateStudentDomainCase), :64 (isEligibleForFineTuning), and
-frontend/src/lib/ai-trust/v5/l2c/evaluationHarness.js:49
-(runStudentDomainEvaluation).
-
-Proof tests:
-DOMAIN_CLASSIFICATION_SCHEMA_VALID (:372),
-BENIGN_CONTROL_FALSE_POSITIVE_GUARD (:379),
-L2C_UNKNOWN_NEVER_SAFE (:348),
-UNCALIBRATED_SCORE_NOT_PROBABILITY (:357),
-MODEL_VERSION_PRESENT (:366),
-L2C_CANNOT_OVERRIDE_THREAT_MATCH (:336),
-L2C_RISK_CAN_RAISE_SUSPICION (:387), and
-L2C_DATASET_PRIVACY_AND_FINE_TUNE_GATE (:399).
-
-Raw proof:
+Implementation path:
+`frontend/src/lib/ai-trust/v5/l2c/StudentDomainRiskModel.js:208`
+(`StudentDomainRiskModel`), taxonomy at
+`frontend/src/lib/ai-trust/v5/l2c/taxonomy.js:1`, dataset gate at
+`frontend/src/lib/ai-trust/v5/l2c/datasetSchema.js:54`
+(`validateStudentDomainCase`), and closure bridge at
+`frontend/src/lib/ai-trust/v5/l2c/verificationPackage.js:230`
+(`buildStudentDomainVerificationPackage`). Tests:
+`DOMAIN_CLASSIFICATION_SCHEMA_VALID`, `BENIGN_CONTROL_FALSE_POSITIVE_GUARD`,
+`L2C_UNKNOWN_NEVER_SAFE`, `UNCALIBRATED_SCORE_NOT_PROBABILITY`,
+`MODEL_VERSION_PRESENT`, `L2C_CANNOT_OVERRIDE_THREAT_MATCH`,
+`L2C_FAKE_SCHOLARSHIP_CREATES_VERIFICATION_TASKS`,
+`L2C_TUITION_SCAM_CREATES_OFFICIAL_SOURCE_CHECK`, and
+`L2C_OUTPUT_IS_NOT_EVIDENCE`. Raw counts:
 
 ~~~text
-ℹ tests 50
-ℹ pass 50
+ℹ tests 62
+ℹ pass 62
 ℹ fail 0
 ~~~
 
-Verdict: L2C_BASELINE_READY. The baseline taxonomy, DTO, deterministic
-domain-risk model, evaluation harness, privacy schema, and model card are
-evidenced by the named tests and the following files:
-
-* docs/ai/STUDENTHUB-DOMAIN-DATASET-SCHEMA.md
-* docs/ai/STUDENTHUB-DOMAIN-EVALUATION.md
-* docs/ai/STUDENTHUB-DOMAIN-RISK-MODEL-CARD.md
-
-Separate verdict: L2C_FINE_TUNE_BLOCKED_BY_DATA_QUALITY. No verified training
-dataset or trained artifact exists, so no proprietary model or probability
-claim is made.
+Verdict: `L2C_BASELINE_READY_WITH_EVIDENCE_BRIDGE`. The implementation is a
+versioned deterministic baseline with taxonomy, dataset schema, evaluation
+harness, model card, and candidate-only verification package. Separate
+verdict: `L2C_FINE_TUNE_BLOCKED_BY_DATA_QUALITY`; no trained artifact or
+calibrated probability claim exists.
 
 ### L3 — Evidence and Provenance
 
-Implementation evidence:
-frontend/src/lib/ai-trust/layer3/Layer3EvidenceService.js:144
-(verify) and
-frontend/src/lib/ai-trust/layer3/retrieval/WebSearchRetriever.js:50
-(search) / :62 (fetch). Retrieval failure is partial and visible;
-duplicate sources are not independent; stale/conflicting evidence remains
-visible; caller cancellation is not rewritten as a provider timeout.
-
-Proof tests:
-LOCAL_KB_NOT_EXTERNAL_VERIFIED (:407),
-SOURCE_DUPLICATES_NOT_INDEPENDENT (:413),
-STALE_EVIDENCE_VISIBLE (:420),
-CONFLICTS_PRESERVED (:426),
-MISSING_SOURCE_LOWERS_COMPLETENESS (:432),
-RETRIEVAL_FAILURE_PARTIAL (:439), and
-PROMPT_INJECTION_FROM_SOURCE_ISOLATED (:449).
-
-Raw proof:
-
-~~~text
-ℹ tests 50
-ℹ pass 50
-ℹ fail 0
-~~~
-
-Verdict: L3_M3_BLOCKED_BY_MISSING_LIVE_RETRIEVAL_EVIDENCE. Runtime state was
-LOCAL_KNOWLEDGE_BASE_ONLY; the local corpus is not external verification.
-
-### L4 — Deterministic Trust Policy
-
-Implementation evidence:
-frontend/src/lib/ai-trust/layer4/policy/HardDecisionPolicy.js:25
-(HardDecisionPolicy.evaluate),
-frontend/src/lib/ai-trust/layer4/Layer4TrustService.js:54
-(Layer4TrustService.evaluate),
-frontend/src/lib/ai-trust/layer4/fusion/EvidenceFusionEngine.js:147
-(EvidenceFusionEngine.fuse),
-frontend/src/lib/ai-trust/layer4/policy/RiskAssessmentEngine.js:21
-(RiskAssessmentEngine.assessRisk), and
-frontend/src/lib/ai-trust/layer4/providers/DeterministicTrustPolicyProvider.js:151.
-L4 remains authoritative and preserves hard negatives.
-
-Proof tests:
-SECURITY_TRUTH_ACTION_SEPARATE (:478),
-POLICY_VERSION_PRESENT_AND_DETERMINISTIC_REPLAY (:490),
-HARD_NEGATIVE_PRECEDENCE (:503), plus the pre-change L4 suite with
-8 / 8 and failed 0.
-
-Raw proof:
+Implementation path:
+`frontend/src/lib/ai-trust/layer3/Layer3EvidenceService.js:112`
+(`mergeVerificationTasks`) and `:246` (`verify`), with DTO boundary at
+`frontend/src/lib/ai-trust/layer3/types.js:317` (`createLayer3Result`). Tests:
+`LOCAL_KB_NOT_EXTERNAL_VERIFIED`, `SOURCE_DUPLICATES_NOT_INDEPENDENT`,
+`STALE_EVIDENCE_VISIBLE`, `CONFLICTS_PRESERVED`,
+`MISSING_SOURCE_LOWERS_COMPLETENESS`, `RETRIEVAL_FAILURE_PARTIAL`,
+`PROMPT_INJECTION_FROM_SOURCE_ISOLATED`, `L2C_OUTPUT_IS_NOT_EVIDENCE`,
+`L2C_L3_TASKS_ARE_DEDUPLICATED`, and `L2C_L3_EVIDENCE_FLOWS_TO_L4`. Raw
+counts:
 
 ~~~text
 8 / 8
 failed 0
-ℹ tests 50
-ℹ pass 50
+[QUALITY_GATE] PASS: 1/1 selected test files
+ℹ tests 62
+ℹ pass 62
 ℹ fail 0
 ~~~
 
-Verdict: L4_M3_PASS for the deterministic policy gate, with no AI or
-retrieval component authorized to clear hard-negative evidence.
+The closure fixture proves the bridge can produce live evidence only through a
+network-guarded retriever; it does not prove a production retrieval provider.
+Verdict: `L3_M3_BLOCKED_BY_MISSING_LIVE_RETRIEVAL_EVIDENCE` because runtime
+state is `LOCAL_KNOWLEDGE_BASE_ONLY`.
+
+### L4 — Deterministic Trust Policy
+
+Implementation path:
+`frontend/src/lib/ai-trust/layer4/fusion/EvidenceFusionEngine.js:127`
+(`EvidenceFusionEngine`),
+`frontend/src/lib/ai-trust/layer4/policy/HardDecisionPolicy.js:25`
+(`HardDecisionPolicy.evaluate`), and
+`frontend/src/lib/ai-trust/layer4/Layer4TrustService.js:54`
+(`Layer4TrustService.evaluate`). Tests:
+`SECURITY_TRUTH_ACTION_SEPARATE`,
+`POLICY_VERSION_PRESENT_AND_DETERMINISTIC_REPLAY`, `HARD_NEGATIVE_PRECEDENCE`,
+`L2C_L3_EVIDENCE_FLOWS_TO_L4`, and
+`L2C_HIGH_RISK_WITH_MISSING_EVIDENCE_REMAINS_REVIEWABLE`. Raw counts:
+
+~~~text
+Total Test Scenarios Evaluated : 8
+Passed                         : 8 / 8
+Failed                         : 0
+[QUALITY_GATE] PASS: 1/1 selected test files
+ℹ tests 62
+ℹ pass 62
+ℹ fail 0
+~~~
+
+Verdict: `L4_M3_PASS` for the deterministic policy gate. L2C remains advisory;
+the L3 independent evidence result is separately fused and hard negatives
+remain protected.
 
 ### L5 — Adversarial Assurance
 
-Implementation evidence:
-frontend/src/lib/ai-trust/v5/l5/AdversarialAssuranceAuditor.js:123
-(audit), :271 (applyAssuranceDowngrade), and :301
-(isAssuranceDowngradeOnly). L5 can downgrade or require review, but cannot
-upgrade safety.
-
-Proof tests:
-L5_NEVER_UPGRADES_SAFETY (:515),
-L5_CAN_DOWNGRADE_TO_REVIEW (:523),
-L5_DETECTS_DROPPED_HARD_NEGATIVE (:529),
-L5_DETECTS_EVIDENCE_CONCENTRATION (:539),
-L5_DETECTS_STALE_EVIDENCE (:545),
-L5_DETECTS_CONFIDENCE_INFLATION (:551),
-L5_DETECTS_UNSUPPORTED_AI_NARRATIVE (:557),
-L5_DETECTS_STAGE_SKIP (:563),
-L5_AI_FAILURE_FALLS_BACK_DETERMINISTIC (:570), and
-L5_MISSING_EVIDENCE_IS_BLOCKED (:579).
-
-Raw proof:
+Implementation path:
+`frontend/src/lib/ai-trust/v5/l5/AdversarialAssuranceAuditor.js:143`
+(`AdversarialAssuranceAuditor.audit`), including the bridge check at `:129`
+(`l2cEvidenceBridgeGap`). Tests:
+`L5_NEVER_UPGRADES_SAFETY`, `L5_CAN_DOWNGRADE_TO_REVIEW`,
+`L5_DETECTS_DROPPED_HARD_NEGATIVE`, `L5_DETECTS_EVIDENCE_CONCENTRATION`,
+`L5_DETECTS_STALE_EVIDENCE`, `L5_DETECTS_CONFIDENCE_INFLATION`,
+`L5_DETECTS_UNSUPPORTED_AI_NARRATIVE`, `L5_DETECTS_STAGE_SKIP`,
+`L5_AI_FAILURE_FALLS_BACK_DETERMINISTIC`,
+`L5_MISSING_EVIDENCE_IS_BLOCKED`, and `L5_AUDITS_L2C_L3_EVIDENCE_GAP`. Raw
+counts:
 
 ~~~text
-ℹ tests 50
-ℹ pass 50
+ℹ tests 62
+ℹ pass 62
 ℹ fail 0
 ~~~
 
-Verdict: L5_ASSURANCE_PASS for the deterministic auditor gate. A formal
-cross-browser M3 claim remains blocked by the Firefox host launch failure
-recorded below.
+Verdict: `L5_ASSURANCE_PASS` for the deterministic auditor gate. The overall
+cross-browser UX claim remains limited by the host/engine results in Section
+6.
 
-## 6. Sequential user experience
+## 5. Full regression, security, build, and dependency evidence
 
-The E2E test
-frontend/tests/e2e/trust-v5-sequential.spec.ts:4
-(renders all seven stages and their epistemic boundaries through the live
-local route) verifies seven distinct stage cards, ordering, stage status,
-finding, evidence/signals, meaning, non-proof, limitations, next-stage text,
-baseline-model wording, and absence of probability/content-safe overclaims.
-The orchestration and UI implementation is cited in Section 4.
-
-Raw browser results:
-
-~~~text
-Chromium: 60 tests, 3 skipped, 57 passed (2.2m)
-WebKit: 60 tests, 6 skipped, 54 passed (3.3m)
-Mobile Chromium: 15 passed (56.2s)
-~~~
-
-Firefox did not reach application assertions because the host could not launch
-the browser. Raw blocker:
-
-~~~text
-Error: browserType.launch: spawn UNKNOWN
-Call log:
-  - <launching> C:\Users\Duy\AppData\Local\ms-playwright\firefox-1538\firefox\firefox.exe -no-remote -headless ...
-...
-56 failed
-...
-3 skipped
-1 passed (25.3s)
-~~~
-
-Verdict: SEQUENTIAL_TRUST_PIPELINE_PASS for Chromium/WebKit/mobile evidence;
-Firefox cross-browser evidence is
-UNVERIFIED_CLAIM — requires human verification due the host launch blocker.
-
-## 7. Regression, security, build, and CI evidence
-
-### Full repository and static gates
-
-Raw outputs:
+Full discovered regression command: `npm run test:all-discovered`.
 
 ~~~text
 [QUALITY_GATE] PASS: 261/261 discovered test files
-✖ 338 problems (0 errors, 338 warnings)
-found 0 vulnerabilities
 ~~~
 
-npm run test:quality exited 0; the 338 root lint warnings are legacy
-warnings, not errors. npx tsc --noEmit exited 0 with no output.
+Root lint command: `npm run lint`.
 
-The production build compiled successfully, completed TypeScript validation,
-generated static pages 117/117, and included /api/v1/trust and
-/api/v1/trust/analyze.
+~~~text
+✖ 338 problems (0 errors, 338 warnings)
+~~~
 
-### Security and contract gates
+The warning count is legacy repository output; lint exited `0` and introduced
+no error. Workspace TypeScript binary
+`frontend/node_modules/.bin/tsc --noEmit` exited `0` with no output. The root
+`npx tsc --noEmit` invocation was not used as evidence because it resolved a
+non-compiler stub and emitted:
 
-Raw pass/fail counts:
+~~~text
+This is not the tsc command you are looking for
+~~~
+
+Production build command: `npm run build`.
+
+~~~text
+✓ Compiled successfully in 63s
+  Finished TypeScript in 11.1s ...
+✓ Generating static pages using 15 workers (117/117) in 2.5s
+~~~
+
+Security and contract commands produced these raw counts:
 
 ~~~text
 P0 BOLA/PII: ℹ tests 7 / ℹ pass 7 / ℹ fail 0
@@ -426,7 +400,7 @@ Phase 2 auth: ℹ tests 10 / ℹ pass 10 / ℹ fail 0
 Phase 3 contract: ℹ tests 5 / ℹ pass 5 / ℹ fail 0
 ~~~
 
-API authorization inventory raw output:
+API inventory command raw output:
 
 ~~~text
 Wrote docs\security\API-Authorization-Inventory.md with 137 handlers.
@@ -438,106 +412,130 @@ No visible Security Fabric wrapper 6
 Unprotected mutations requiring P0 review 0
 ~~~
 
-Bundle and dependency outputs:
+Bundle audit raw output:
 
 ~~~text
-[BUNDLE_MEASURE] /trust initial JS: 394484 bytes across 6 chunks.
-[BUNDLE_MEASURE] /community initial JS: 337527 bytes across 5 chunks.
-[BUNDLE_MEASURE] /expert initial JS: 339510 bytes across 5 chunks.
+[BUNDLE_MEASURE] /trust initial JS: 394918 bytes across 6 chunks.
 [BUNDLE_BUDGET] /trust budget: 500000 bytes.
 [BUNDLE_BUDGET] PASS
 ~~~
 
-The live PostgreSQL phase remained externally blocked. Raw output:
+Production dependency audit used the existing lockfile with
+`npm audit --prefix frontend --omit=dev --audit-level=high`:
+
+~~~text
+found 0 vulnerabilities
+~~~
+
+The live PostgreSQL/RLS exercise remains externally blocked:
 
 ~~~text
 BLOCKED_BY_DATABASE_ENV: STUDENTHUB_RLS_TEST_DATABASE_URL is required
 ~~~
 
-### GitHub CI and Vercel Preview
+This is an exact external blocker, not a passed live-database claim.
 
-Final application evidence was produced at implementation SHA
-fe6be91f8d066aa5c887258bc72cdcb0109b8d6c. The later commits 3a0ae24 and
-7e3e270 are documentation-only follow-ups on the same branch; they do not
-alter application code or the cited source line numbers. The immutable
-current branch tip is the head SHA of Draft PR #3 at handoff.
+## 6. Browser and accessibility evidence
 
-Raw GitHub status excerpts:
+The dev-server verification skill was applied after starting Next development
+server. `agent-browser` opened `/trust`; its accessibility snapshot showed the
+seven stage cards. The raw checks returned:
 
 ~~~text
-"statusState": "success"
-"context": "Vercel – student-hub-ai", "state": "success"
-"context": "Vercel – student-hub-ai-weje", "state": "success"
-"name": "quality", "status": "completed", "conclusion": "success"
-"name": "Vercel Preview Comments", "status": "completed", "conclusion": "success"
+HAS_CONTENT
+OK
 ~~~
 
-Preview smoke result:
+The screenshot was saved outside the repository at
+`C:\Users\Duy\AppData\Local\Temp\studenthub-trust-dev-check.png`.
 
-~~~json
-{"url":"https://student-hub-ai-weje-git-codex-trust-engine-v5-17eaab-vi-be-city.vercel.app/trust","httpStatus":200,"title":"Trust Engine | StudentHub AI","stageCount":7,"pipelineStatus":"IDLE"}
-~~~
-
-Preview deployment URLs:
-
-* student-hub-ai Preview:
-  https://student-hub-ai-git-codex-trust-engine-v5-sequ-cf3d7a-vi-be-city.vercel.app
-* student-hub-ai-weje Preview:
-  https://student-hub-ai-weje-git-codex-trust-engine-v5-17eaab-vi-be-city.vercel.app
-
-Fresh HTTP recheck after the report commit produced these raw status lines:
+The direct V5 E2E test
+`Trust Engine V5 sequential experience › renders all seven stages and their epistemic boundaries through the live local route`
+passed in both Chromium and WebKit:
 
 ~~~text
-200 https://student-hub-ai-weje-git-codex-trust-engine-v5-17eaab-vi-be-city.vercel.app/trust
-302 https://vercel.com/sso-api?url=https%3A%2F%2Fstudent-hub-ai-git-codex-trust-engine-v5-sequ-cf3d7a-vi-be-city.vercel.app%2Ftrust&nonce=<ephemeral>
+Chromium: 1 passed (15.2s)
+WebKit: 1 passed (18.4s)
 ~~~
 
-The weje Preview is publicly reachable for the tested route. The
-student-hub-ai Preview is deployment-successful but protected by Vercel
-authentication in this environment; its public route is therefore
-UNVERIFIED_CLAIM — requires human verification.
+Chromium full E2E raw summary:
 
-The Vercel CLI was not authenticated in this environment, but the repository
-Vercel integration completed both Preview deployments and GitHub checks.
+~~~text
+3 skipped
+57 passed (2.6m)
+~~~
 
-## 8. Branch and PR state
+Chromium accessibility command raw summary for
+`frontend/tests/e2e/accessibility.spec.ts`:
 
-* Branch: codex/trust-engine-v5-sequential-assurance
-* Base: latest fetched production main
-  e1feed7f4e7effee5311b0f2968fc569f3251a9d
-* Draft PR: https://github.com/Duy2613/StudentHub-AI/pull/3
-* PR state: open, draft, not merged
-* PR #2: left untouched
-* main: not merged into and not modified
+~~~text
+8 passed (31.6s)
+~~~
 
-## 9. Final evidence-bound verdicts
+Mobile Chromium raw summary:
 
-The following verdicts are deliberately separate:
+~~~text
+15 passed (1.3m)
+~~~
 
-* L1_M3_PASS: deterministic local gate evidenced by the L1 baseline and
-  named V5 tests in Section 5.
-* L2A_M3_BLOCKED_BY_MISSING_EXTERNAL_FAILURE_EVIDENCE: live canary passed,
-  but no live outage/compromise exercise was available.
-* L2B_M3_BLOCKED_BY_MISSING_LIVE_AI_GATEWAY_EVIDENCE: runtime was
-  deterministic fallback only.
-* L2C_BASELINE_READY: contract/taxonomy/baseline/evaluation/model-card gate
-  is evidenced; L2C_FINE_TUNE_BLOCKED_BY_DATA_QUALITY remains explicit.
-* L3_M3_BLOCKED_BY_MISSING_LIVE_RETRIEVAL_EVIDENCE: runtime was local KB only.
-* L4_M3_PASS: deterministic policy gate evidenced by replay/hard-negative
-  tests and the pre-change L4 suite.
-* L5_ASSURANCE_PASS: deterministic assurance gate evidenced; Firefox
-  cross-browser evidence remains unverified.
-* SEQUENTIAL_TRUST_PIPELINE_PASS: seven-stage UX evidenced on
-  Chromium/WebKit/mobile; Firefox is externally blocked.
+Full WebKit run was not a clean repository-wide pass:
 
-Overall V5 implementation verdict:
+~~~text
+5 failed
+6 skipped
+49 passed (7.7m)
+~~~
 
-TRUST_ENGINE_V5_EXPLAINABLE_ASSURANCE_PASS_WITH_LIMITATIONS
+The failures were pre-existing/non-closure surfaces: a print-event timing
+case, TrustGraph rendering under WebKit timing, and three Ultra animation or
+command-palette cases. Targeted reruns passed the print test (`1 passed,
+18.1s`), TrustGraph (`1 passed, 25.0s`), Ultra reduced-motion and a11y
+subtests, while Ultra command-palette Escape remained engine-sensitive. The
+Trust V5 sequential test itself passed in WebKit. Therefore:
 
-Overall independent national-high-impact maturity verdict:
+`SEQUENTIAL_TRUST_V5_PASS_FOR_CHROMIUM_WEBKIT_MOBILE_WITH_WEBKIT_LEGACY_LIMITATION`.
 
-M3_BLOCKED_BY_MISSING_EVIDENCE
+Local Firefox could not launch the installed browser:
 
-The overall M3 verdict is intentionally not upgraded while L2A live-failure,
-L2B live-AI, L3 live-retrieval, database-RLS, and Firefox-host evidence remain
-unavailable. No missing external dependency was converted into SAFE.
+~~~text
+Error: browserType.launch: spawn UNKNOWN
+1 failed
+~~~
+
+This is `UNVERIFIED_CLAIM — requires human verification` for local Firefox,
+not an application assertion failure. The authoritative Firefox Linux result
+is deferred to the GitHub CI run after push.
+
+## 7. CI, Preview, and release boundary
+
+The repository workflow
+`.github/workflows/competition-quality.yml` runs Node 24, install, lint,
+production build, discovered regression, AI Gateway contract, security,
+authorization inventory, bundle, dependency audit, and Chromium/Firefox
+browser gates. CI evidence and Preview URLs will be appended at handoff after
+the closure commit is pushed.
+
+No production deployment is claimed. Main remains unmerged, and Draft PR #3
+must remain Draft.
+
+## 8. Final evidence-bound verdicts
+
+* `L1_M3_PASS` — deterministic local gate only, supported by the L1 raw matrix and named P0-A tests in Section 4.
+* `L2A_M3_BLOCKED_BY_MISSING_EXTERNAL_FAILURE_EVIDENCE` — live canary is available; outage/compromise exercise is not.
+* `L2B_M3_BLOCKED_BY_MISSING_LIVE_AI_GATEWAY_EVIDENCE` — runtime is deterministic fallback only.
+* `L2C_BASELINE_READY_WITH_EVIDENCE_BRIDGE` — package/taxonomy/evaluation boundary is tested; `L2C_FINE_TUNE_BLOCKED_BY_DATA_QUALITY` remains.
+* `L3_M3_BLOCKED_BY_MISSING_LIVE_RETRIEVAL_EVIDENCE` — runtime is local KB only, while the controlled bridge fixture passes.
+* `L4_M3_PASS` — deterministic policy and hard-negative precedence are tested.
+* `L5_ASSURANCE_PASS` — deterministic downgrade-only auditor and L2C/L3 gap audit are tested.
+* `UNVERIFIED_CLAIM — requires human verification` — local Firefox host launch and final post-push CI/Preview status.
+
+Implementation closure target:
+
+`TRUST_ENGINE_V5_ARCHITECTURE_CLOSURE_PASS`
+
+Independent national-high-impact maturity verdict:
+
+`M3_BLOCKED_BY_MISSING_EVIDENCE`
+
+No dependency outage, unknown result, model score, no-match, task package, or
+pipeline completion is converted into `SAFE`.
