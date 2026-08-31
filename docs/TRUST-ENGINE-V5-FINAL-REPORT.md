@@ -457,8 +457,10 @@ BLOCKED_BY_DATABASE_ENV: STUDENTHUB_RLS_TEST_DATABASE_URL is required
 ### GitHub CI and Vercel Preview
 
 Final application evidence was produced at implementation SHA
-fe6be91f8d066aa5c887258bc72cdcb0109b8d6c; the final report itself is a
-documentation-only follow-up commit on the same branch.
+fe6be91f8d066aa5c887258bc72cdcb0109b8d6c. The later commits 3a0ae24 and
+7e3e270 are documentation-only follow-ups on the same branch; they do not
+alter application code or the cited source line numbers. The immutable
+current branch tip is the head SHA of Draft PR #3 at handoff.
 
 Raw GitHub status excerpts:
 
