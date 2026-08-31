@@ -15,6 +15,7 @@ test("Trust input desktop visual baseline", async ({ page }) => {
 test("Trust result, graph and mobile visual baselines", async ({ page }) => {
   await mockTrustPipeline(page);
   await completeTextScan(page);
+  await expect(page.getByRole("heading", { name: "StudentHub TrustGraph" })).toBeVisible();
   await expect(page).toHaveScreenshot("trust-result-desktop.png", { animations: "disabled", fullPage: true, mask: [page.locator("time")], maxDiffPixelRatio: 0.05 });
   const graph = page.locator("section", { has: page.getByRole("heading", { name: "StudentHub TrustGraph" }) });
   await expect(graph).toHaveScreenshot("trustgraph-desktop.png", { animations: "disabled", maxDiffPixelRatio: 0.05 });

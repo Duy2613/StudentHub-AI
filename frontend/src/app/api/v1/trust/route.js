@@ -4,6 +4,7 @@ import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticServi
 import { Layer2AReputationService } from "@/lib/ai-trust/layer2a/Layer2AReputationService.js";
 import { Layer3EvidenceService } from "@/lib/ai-trust/layer3/Layer3EvidenceService.js";
 import { Layer4TrustService } from "@/lib/ai-trust/layer4/Layer4TrustService.js";
+import { TrustPipelineCancelledError, TrustPipelineOrchestrator } from "@/lib/ai-trust/v5/TrustPipelineOrchestrator.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
 export const runtime = "nodejs";
@@ -13,7 +14,7 @@ const MAX_CONTENT_CHARS = 160_000;
 
 function safeMetadata(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "extractionAuthority"];
+  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "extractionAuthority", "institutionContext"];
   return Object.fromEntries(allowed.filter((key) => Object.hasOwn(value, key)).map((key) => {
     const item = value[key];
     if (typeof item === "string") return [key, item.slice(0, 32_000)];
@@ -22,7 +23,74 @@ function safeMetadata(value) {
   }).filter(([, item]) => item !== null));
 }
 
-async function runCanonicalTrust(request, routeParams, principal, securityContext) {
+function wantsV5Stream(request, body) {
+  return body?.stream === true || request.headers.get("accept")?.toLowerCase().includes("text/event-stream");
+}
+
+function sseChunk(event) {
+  return `event: ${event.type || "trust"}\ndata: ${JSON.stringify(event)}\n\n`;
+}
+
+function streamV5Pipeline(request, input, requestId) {
+  const encoder = new TextEncoder();
+  const abortController = new AbortController();
+  const forwardAbort = () => abortController.abort(request.signal.reason || "client-disconnected");
+  if (request.signal.aborted) forwardAbort();
+  else request.signal.addEventListener("abort", forwardAbort, { once: true });
+
+  const stream = new ReadableStream({
+    start(controller) {
+      let closed = false;
+      const close = () => {
+        if (closed) return;
+        closed = true;
+        try { controller.close(); } catch { /* stream was already cancelled */ }
+      };
+      const send = (event) => {
+        if (closed) return;
+        try { controller.enqueue(encoder.encode(sseChunk({ ...event, requestId }))); } catch { closed = true; }
+      };
+      const orchestrator = new TrustPipelineOrchestrator();
+      orchestrator.run(input, {
+        requestId,
+        signal: abortController.signal,
+        onTransition: (transition) => send({
+          type: "stage",
+          event: transition.event,
+          stageId: transition.stageId,
+          data: transition.pipeline,
+        }),
+        }).then((result) => {
+          send({ type: "complete", event: "PIPELINE_COMPLETED", stageId: "l5", data: result });
+          close();
+        }).catch((error) => {
+          if (!(error instanceof TrustPipelineCancelledError)) {
+            send({ type: "error", event: "PIPELINE_FAILED", error: { code: "PIPELINE_FAILED", message: "Trust pipeline không thể hoàn tất." } });
+          }
+          close();
+      }).finally(() => request.signal.removeEventListener("abort", forwardAbort));
+    },
+    cancel() {
+      abortController.abort("stream-cancelled");
+      request.signal.removeEventListener("abort", forwardAbort);
+    },
+  });
+
+  return new Response(stream, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Connection: "keep-alive",
+      "X-Accel-Buffering": "no",
+      "X-Content-Type-Options": "nosniff",
+      "X-AI-Trust-Contract": "trust.v5",
+      "X-AI-Trust-Request-Id": requestId,
+    },
+  });
+}
+
+export async function runCanonicalTrust(request, routeParams, principal, securityContext) {
   let body;
   try {
     body = await request.json();
@@ -45,6 +113,26 @@ async function runCanonicalTrust(request, routeParams, principal, securityContex
 
   const requestId = securityContext.correlationId;
   const input = { type, content, metadata };
+  if (body?.version === "v5") {
+    if (wantsV5Stream(request, body)) return streamV5Pipeline(request, input, requestId);
+    const pipeline = await new TrustPipelineOrchestrator().run(input, { requestId, signal: request.signal });
+    return NextResponse.json({
+      success: true,
+      contractVersion: "trust.v5",
+      requestId,
+      version: "v5",
+      demo: false,
+      data: pipeline,
+    }, {
+      status: 200,
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+        "X-Content-Type-Options": "nosniff",
+        "X-AI-Trust-Contract": "trust.v5",
+        "X-AI-Trust-Request-Id": requestId,
+      },
+    });
+  }
   const layer1 = await Layer1ScreenService.screen({ ...input, options: { requestId } });
   const depth = body?.depth === "full" ? "full" : "screen";
   if (depth === "screen") {

@@ -9,6 +9,7 @@ import { ApiError, apiErrorMessage } from "@/lib/api/errors";
 import { deriveSafetyActions } from "@/lib/trust/safetyActions";
 import { COMPETITION_DEMO_CASES } from "@/lib/trust/competitionDemoCases";
 import TrustSectionBoundary from "./TrustSectionBoundary";
+import TrustPipelineTimeline from "./TrustPipelineTimeline";
 
 const TrustGraph2D = dynamic(() => import("./TrustGraph2D"), {
   ssr: false,
@@ -64,6 +65,44 @@ function buildGraph(input, layers) {
   return { nodes, edges };
 }
 
+function legacyStatusFromV5(status) {
+  if (status === "RUNNING") return "running";
+  if (status === "PARTIAL") return "partial";
+  if (["FAILED", "BLOCKED", "SKIPPED"].includes(status)) return "error";
+  if (status === "COMPLETED") return "done";
+  return "waiting";
+}
+
+function legacyPipelineFromV5(currentPipeline, previousPipeline = EMPTY_PIPELINE) {
+  const stages = currentPipeline?.stages || {};
+  const l1 = stages.l1;
+  const externalStages = [stages.l2a, stages.l2b, stages.l2c, stages.l3].filter(Boolean);
+  const reasoningStages = [stages.l4, stages.l5].filter(Boolean);
+  const external = externalStages.find((stage) => stage.operationStatus === "RUNNING") || externalStages.find((stage) => stage.operationStatus === "PARTIAL" || stage.operationStatus === "FAILED") || externalStages[externalStages.length - 1];
+  const reasoning = reasoningStages.find((stage) => stage.operationStatus === "RUNNING") || reasoningStages.find((stage) => stage.operationStatus === "PARTIAL" || stage.operationStatus === "FAILED") || reasoningStages[reasoningStages.length - 1];
+  const copy = previousPipeline.map((item) => ({ ...item }));
+  const update = (id, stage, fallbackDetail) => {
+    const item = copy.find((entry) => entry.id === id);
+    if (!item || !stage) return;
+    item.status = legacyStatusFromV5(stage.operationStatus);
+    item.detail = stage.finding || stage.summary || fallbackDetail;
+  };
+  update("local", l1, "Đang chờ Layer 1");
+  update("external", external, "Đang chờ các nguồn đối soát");
+  update("reasoning", reasoning, "Đang chờ policy và assurance");
+  return copy;
+}
+
+function v5VerdictTitle(decision) {
+  switch (decision?.security) {
+    case "MALICIOUS": return "NGUY HIỂM · ĐÃ CHẶN";
+    case "SUSPICIOUS": return "ĐÁNG NGỜ · CẦN THẬN TRỌNG";
+    case "NO_KNOWN_THREAT": return "CHƯA THẤY MỐI ĐE DỌA ĐÃ BIẾT";
+    case "NOT_APPLICABLE": return "KHÔNG ÁP DỤNG";
+    default: return "CHƯA ĐỦ BẰNG CHỨNG";
+  }
+}
+
 export function AiTrustStudioView() {
   const demoEnabled = process.env.NEXT_PUBLIC_COMPETITION_DEMO === "true";
   const [mode, setMode] = useState("image");
@@ -75,7 +114,8 @@ export function AiTrustStudioView() {
   const [error, setError] = useState(null);
   const [ocr, setOcr] = useState(null);
   const [pipeline, setPipeline] = useState(EMPTY_PIPELINE);
-  const [layers, setLayers] = useState({ layer1: null, layer2A: null, layer2: null, layer3: null, layer4: null });
+  const [v5Pipeline, setV5Pipeline] = useState(null);
+  const [layers, setLayers] = useState({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null });
   const [timeline, setTimeline] = useState([]);
   const [demoCaseId, setDemoCaseId] = useState(null);
   const fileInput = useRef(null);
@@ -83,7 +123,7 @@ export function AiTrustStudioView() {
   const scanSequence = useRef(0);
 
   const updateStep = (id, status, detail = "") => setPipeline((items) => items.map((item) => item.id === id ? { ...item, status, detail } : item));
-  const record = (label, status) => setTimeline((items) => [...items, { label, status, at: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) }]);
+  const record = (label, status) => setTimeline((items) => [...items, { id: `${Date.now()}-${items.length}`, label, status, at: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) }]);
 
   const acceptFile = (nextFile) => {
     setError(null);
@@ -109,7 +149,7 @@ export function AiTrustStudioView() {
     scanSequence.current += 1;
     activeScan.current?.abort("reset");
     setFile(null); setPreview(null); setContent(""); setError(null); setOcr(null); setDemoCaseId(null);
-    setPipeline(EMPTY_PIPELINE); setLayers({ layer1: null, layer2A: null, layer2: null, layer3: null, layer4: null }); setTimeline([]);
+    setPipeline(EMPTY_PIPELINE); setV5Pipeline(null); setLayers({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null }); setTimeline([]);
   };
 
   const analyze = async () => {
@@ -117,8 +157,8 @@ export function AiTrustStudioView() {
     const controller = new AbortController();
     activeScan.current = controller;
     const scanId = ++scanSequence.current;
-    setError(null); setProcessing(true); setPipeline(EMPTY_PIPELINE); setTimeline([]);
-    setLayers({ layer1: null, layer2A: null, layer2: null, layer3: null, layer4: null });
+    setError(null); setProcessing(true); setPipeline(EMPTY_PIPELINE); setV5Pipeline(null); setTimeline([]);
+    setLayers({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null });
     let extracted = content.trim();
     try {
       const demoCase = demoEnabled ? COMPETITION_DEMO_CASES.find((item) => item.id === demoCaseId) : null;
@@ -153,21 +193,35 @@ export function AiTrustStudioView() {
       updateStep("local", "running");
       updateStep("external", "running", "Đang kiểm tra nguồn và luận điểm");
       updateStep("reasoning", "running", "Chờ phán quyết xác định");
-      const response = await trustApi.canonical(input, controller.signal);
+      const response = await trustApi.sequential(input, controller.signal, (event) => {
+        if (scanId !== scanSequence.current || !event?.data) return;
+        setV5Pipeline(event.data);
+        setPipeline((items) => legacyPipelineFromV5(event.data, items));
+        if (event.event === "STAGE_STARTED" || event.event === "STAGE_COMPLETED" || event.event === "STAGE_RETRY_SCHEDULED") {
+          record(`V5 ${String(event.stageId || "stage").toUpperCase()}`, readable(event.event));
+        }
+        const eventLayers = event.data.layerResults;
+        if (eventLayers) setLayers({
+          layer1: eventLayers.layer1 || null,
+          layer2A: eventLayers.layer2A || null,
+          layer2: eventLayers.layer2B || null,
+          layer2C: eventLayers.layer2C || null,
+          layer3: eventLayers.layer3 || null,
+          layer4: eventLayers.layer4 || null,
+        });
+      });
       if (scanId !== scanSequence.current) return;
-      const { layer1, layer2A, layer2, layer3, layer4 } = response.data;
-      setLayers({ layer1, layer2A: layer2A || null, layer2: layer2 || null, layer3: layer3 || null, layer4: layer4 || null });
-      updateStep("local", "done", readable(layer1?.status)); record("Phân tích rủi ro cục bộ", readable(layer1?.status));
-      if (layer1?.status === "BLOCK") {
-        updateStep("external", "skipped", "Dừng sớm do Layer 1 chặn"); record("Đối soát bằng chứng", "SKIPPED");
-      } else {
-        const threatProviderFailed = layer2A && !["SUCCESS", "NOT_APPLICABLE"].includes(String(layer2A.providerStatus));
-        const evidenceIncomplete = layer3 && ["PARTIAL", "INSUFFICIENT_EVIDENCE", "UNKNOWN"].includes(String(layer3.status));
-        const externalStatus = threatProviderFailed || evidenceIncomplete ? "partial" : "done";
-        const externalDetail = [layer2A?.finding, layer3?.status].filter(Boolean).map(readable).join(" · ") || "Không có kết quả nguồn";
-        updateStep("external", externalStatus, externalDetail); record("Đối soát bằng chứng", externalDetail);
-      }
-      updateStep("reasoning", "done", readable(layer4?.status)); record("Phán quyết được tổng hợp", readable(layer4?.status));
+      setV5Pipeline(response.data);
+      const resultLayers = response.data.layerResults || {};
+      const layer1 = resultLayers.layer1 || null;
+      const layer2A = resultLayers.layer2A || null;
+      const layer2 = resultLayers.layer2B || null;
+      const layer2C = resultLayers.layer2C || null;
+      const layer3 = resultLayers.layer3 || null;
+      const layer4 = resultLayers.layer4 || null;
+      setLayers({ layer1, layer2A, layer2, layer2C, layer3, layer4 });
+      setPipeline((items) => legacyPipelineFromV5(response.data, items));
+      record("V5 pipeline hoàn tất", readable(response.data.pipelineStatus));
     } catch (caught) {
       if (caught instanceof ApiError && caught.code === "ABORTED" && scanId !== scanSequence.current) return;
       const message = caught instanceof ApiError ? apiErrorMessage(caught) : "Pipeline gặp lỗi ngoài dự kiến.";
@@ -176,9 +230,10 @@ export function AiTrustStudioView() {
     } finally { if (scanId === scanSequence.current) setProcessing(false); }
   };
 
-  const hasResult = Boolean(layers.layer4);
-  const risk = readable(layers.layer4?.riskAssessment?.level || layers.layer4?.riskLevel || layers.layer1?.riskLevel, "CHƯA XÁC ĐỊNH");
-  const verdict = layers.layer4?.userExplanation?.verdictTitle || readable(layers.layer4?.status, "Đang chờ phân tích");
+  const hasNativeV5 = Boolean(v5Pipeline && v5Pipeline.pipelineVersion !== "trust-v5-compatibility");
+  const hasResult = Boolean(layers.layer4 || v5Pipeline?.finalDecision);
+  const risk = readable(layers.layer4?.riskAssessment?.level || layers.layer4?.riskLevel || (hasNativeV5 ? v5Pipeline?.finalDecision?.security : null) || layers.layer1?.riskLevel, "CHƯA XÁC ĐỊNH");
+  const verdict = hasNativeV5 ? v5VerdictTitle(v5Pipeline?.finalDecision) : layers.layer4?.userExplanation?.verdictTitle || readable(layers.layer4?.status, "Đang chờ phân tích");
   const reasons = deriveReasons(layers);
   const graph = useMemo(() => buildGraph({ type: mode, content: content || "Ảnh đầu vào" }, layers), [mode, content, layers]);
   const layer2AProvider = layers.layer2A && !layers.layer2A.notApplicable ? [{
@@ -203,10 +258,11 @@ export function AiTrustStudioView() {
       </div>
       <aside className="intelligence-panel pipeline-panel"><div className="panel-heading"><div><p className="product-kicker">Live pipeline</p><h2 className="product-section-title">Dấu vết xử lý</h2></div><span className={`live-indicator ${processing ? "is-live" : ""}`}>{processing ? "RUNNING" : hasResult ? "COMPLETE" : "READY"}</span></div><ol className="pipeline-list">{pipeline.map((step, index) => <li key={step.id} data-status={step.status}><span className="pipeline-index">{step.status === "done" ? <Check size={14} /> : index + 1}</span><div><strong>{step.label}</strong><small>{step.detail || (step.status === "waiting" ? "Chờ bước trước" : readable(step.status))}</small></div></li>)}</ol>{ocr && <div className="ocr-readout"><div><FileImage size={15} /><span>OCR trong trình duyệt</span><strong>{ocr.authority}</strong></div><p>{String(ocr.text || ocr.qrContent).slice(0, 180)}{String(ocr.text || ocr.qrContent).length > 180 ? "..." : ""}</p></div>}</aside>
     </section>
+    <TrustPipelineTimeline pipeline={v5Pipeline} processing={processing} />
     {hasResult && <div className="result-stack">
       <section className="verdict-panel" aria-labelledby="verdict-title"><div className="verdict-main"><div className="flex items-center justify-between gap-3"><p className="product-kicker">02 · Verdict</p><button type="button" className="text-link print-trigger" onClick={() => window.print()}><Printer size={14} /> In báo cáo</button></div><div className="verdict-icon"><ShieldAlert size={24} /></div><h2 id="verdict-title">{verdict}</h2><p>{layers.layer4?.userExplanation?.recommendedActionNote || "Đọc các lý do và bằng chứng trước khi thực hiện hành động tiếp theo."}</p></div><dl className="verdict-metrics"><div><dt>Rủi ro</dt><dd data-risk={risk}>{risk}</dd><dd className="metric-note">Mức tác hại tiềm năng</dd></div><div><dt>Độ chắc quyết định</dt><dd>{confidenceLevel(layers.layer4)}</dd><dd className="metric-note">Không phải bằng chứng an toàn</dd></div><div><dt>Bằng chứng</dt><dd>{evidenceLevel(layers.layer3)}</dd><dd className="metric-note">Mức đủ của nguồn</dd></div><div><dt>Source agreement</dt><dd>{readable(layers.layer3?.sourceAgreement || layers.layer3?.status, "CHƯA CÓ")}</dd><dd className="metric-note">Mức đồng thuận nguồn</dd></div></dl></section>
       <section className="intelligence-panel safety-actions" aria-labelledby="safety-actions-title"><div className="panel-heading"><div><p className="product-kicker">Hành động an toàn · Quy tắc xác định</p><h2 id="safety-actions-title" className="product-section-title">Bạn nên làm gì?</h2></div><ShieldCheck size={18} /></div><ol className="reason-list">{safetyActions.map((action, index) => <li key={action}><span>{index + 1}</span><p>{action}</p></li>)}</ol><p className="product-copy mt-3">Khuyến nghị này được chọn theo loại tín hiệu, không phải nội dung sinh ngẫu nhiên.</p></section>
-      <section className="result-grid"><div className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">03 · Evidence</p><h2 className="product-section-title">Vì sao có phán quyết này?</h2></div><span className="signal-badge">{reasons.length} tín hiệu</span></div>{reasons.length ? <ol className="reason-list">{reasons.map((reason, index) => <li key={reason}><span>{String(index + 1).padStart(2, "0")}</span><p>{reason}</p></li>)}</ol> : <div className="empty-state">Pipeline chưa trả về diễn giải đủ để hiển thị. StudentHub không tự tạo lý do thay thế.</div>}</div><div className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">Case timeline</p><h2 className="product-section-title">Trình tự kiểm chứng</h2></div><Clock3 size={18} /></div><ol className="case-timeline">{timeline.map((event) => <li key={`${event.label}-${event.at}`}><time>{event.at}</time><span /><div><strong>{event.label}</strong><small>{event.status}</small></div></li>)}</ol></div></section>
+      <section className="result-grid"><div className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">03 · Evidence</p><h2 className="product-section-title">Vì sao có phán quyết này?</h2></div><span className="signal-badge">{reasons.length} tín hiệu</span></div>{reasons.length ? <ol className="reason-list">{reasons.map((reason, index) => <li key={reason}><span>{String(index + 1).padStart(2, "0")}</span><p>{reason}</p></li>)}</ol> : <div className="empty-state">Pipeline chưa trả về diễn giải đủ để hiển thị. StudentHub không tự tạo lý do thay thế.</div>}</div><div className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">Case timeline</p><h2 className="product-section-title">Trình tự kiểm chứng</h2></div><Clock3 size={18} /></div><ol className="case-timeline">{timeline.map((event) => <li key={event.id || `${event.label}-${event.at}`}><time>{event.at}</time><span /><div><strong>{event.label}</strong><small>{event.status}</small></div></li>)}</ol></div></section>
       {providers.length > 0 && <section className="intelligence-panel" aria-labelledby="provider-status-title"><div className="panel-heading"><div><p className="product-kicker">Provider status</p><h2 id="provider-status-title" className="product-section-title">Tình trạng nguồn đối soát</h2></div><span className="signal-badge">{providers.some((item) => ["error", "unavailable", "unknown", "not_configured", "timeout", "invalid_response", "circuit_open", "rate_limited"].includes(item.status)) ? "PARTIAL" : "COMPLETE"}</span></div><div className="provider-grid">{providers.map((provider) => <article key={provider.provider} className="provider-row"><div><strong>{provider.provider}</strong><small>{provider.latencyMs != null ? `${provider.latencyMs} ms` : "Không có latency"}</small></div><span data-provider-status={provider.status}>{readable(provider.status)}</span><p>{provider.signals?.length ? provider.signals.join(" · ") : provider.status === "clean" ? "Không phát hiện tín hiệu trong lần kiểm tra này." : "Không đủ dữ liệu để kết luận sạch."}</p></article>)}</div></section>}
       <section className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">04 · Related intelligence</p><h2 className="product-section-title">Case liên quan</h2></div><span className="signal-badge">{relatedCases.length} case</span></div>{relatedCases.length ? <div className="related-case-list">{relatedCases.map((item) => <article key={item.id}><div><strong>{item.title || item.id}</strong><span>{Math.round(item.similarity * 100)}% tương đồng</span></div><p>{item.sharedSignals.join(" · ") || "Không có tín hiệu dùng chung được công bố."}</p></article>)}</div> : <div className="empty-state">Không tìm thấy case liên quan.</div>}</section>
       <TrustSectionBoundary section="trustgraph" fallbackTitle="TrustGraph không tải được">
