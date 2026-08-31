@@ -15,10 +15,10 @@ The state matrices used during implementation are recorded in [`docs/TRUST-ENGIN
 - Tested Trust Engine implementation SHA: `86bca0d7163477d52232bd098438ce4cc9f9fba4` (`security(trust): harden trust engine boundaries`).
 - Whole-system hardening SHA: `0bfcfbea010963d614efd13f7cc4f6726adb4bd2` (`security: harden whole-system trust boundaries`).
 - Baseline SHA before implementation: `ea30f901db3ddf3e30614342617418d1ce361e63`.
-- Branch: `develop`; whole-system commit is ready for the authorized push to `origin/develop`.
+- Branch: `develop`; whole-system commit was pushed to `origin/develop`.
 - `main` SHA observed before handoff: `251e7cb4a908c5a185be89a39301b294f9595dbf`.
-- Implementation worktree before report publication: clean after commit; `git status --short --branch` returned `## develop...origin/develop [ahead 1]`.
-- PR #2 was previously observed as `number=2 state=open draft=True merged=False base=main`; its head must be rechecked after the whole-system push.
+- Implementation worktree after publication: clean; `git status --short --branch` returned `## develop...origin/develop`.
+- PR #2 current raw API state: `number=2 state=open draft=True merged=False head=d7e4c6f002bbbfade2976f5d1a98447ec8f66c64 base=main`.
 
 No merge operation was performed. PR #2 remains Draft and `main` was not changed.
 
@@ -383,14 +383,17 @@ Responsive/reduced-motion mobile matrix: 4 passed (7.6s), TEST_EXIT=0
 
 The Trust visual baselines were intentionally regenerated for the implemented navigation/provider-state topology, then the complete accessibility/visual command passed `11/11`. Local Firefox could not launch the installed executable and produced `Error: browserType.launch: spawn UNKNOWN`, followed by `14 failed`, `6 skipped`, `14 passed`, `TEST_EXIT=1`. The remote GitHub Firefox gate passed, so this local executable-launch failure remains an environment limitation rather than an application assertion result.
 
-Remote evidence from the prior Trust implementation publication (the whole-system SHA still requires a fresh remote run after push):
+Remote evidence for the whole-system SHA `d7e4c6f002bbbfade2976f5d1a98447ec8f66c64`:
 
 ```text
 COMMIT_STATUS state=success total=2
 STATUS context=Vercel – student-hub-ai state=success description=Deployment has completed
 STATUS context=Vercel – student-hub-ai-weje state=success description=Deployment has completed
-RUN id=33324431409 status=completed conclusion=success
-RUN id=33324429762 status=completed conclusion=success
+RUN id=33349581826 status=completed conclusion=success
+RUN id=33349579900 status=completed conclusion=success
+DEPLOYMENT environment=Preview – student-hub-ai state=success target=https://student-hub-m3ie7s31z-vi-be-city.vercel.app
+DEPLOYMENT environment=Preview – student-hub-ai-weje state=success target=https://student-hub-ai-weje-efy4cmp7w-vi-be-city.vercel.app
+PREVIEW_SMOKE status=200 server=Vercel target=/ and /trust for both deployments
 ```
 
 Both remote `quality` jobs completed successfully, including install, lint, production build, discovered regression suite, AI Gateway contract, security regression, authorization inventory, mutation protection, bundle budget, dependency audit, and Chromium and Firefox Evidence Case Lab gates. The remote Firefox result is the browser evidence; the local Firefox launch failure is not silently relabeled as a pass.
@@ -402,7 +405,7 @@ Both remote `quality` jobs completed successfully, including install, lint, prod
 3. Layer 3: no retrieval-provider URL was configured; the local knowledge base and guarded failure path passed, but live independent retrieval evidence is unavailable. Verdict: `L3_M3_BLOCKED_BY_MISSING_EVIDENCE`.
 4. The live database phase was not runnable locally: `npm run test:phase3-live` returned exactly `BLOCKED_BY_DATABASE_ENV: STUDENTHUB_RLS_TEST_DATABASE_URL is required` and exited 2. This is an external environment blocker, not a passing database claim.
 5. Local Firefox launch returned `spawn UNKNOWN`; remote Firefox CI passed. No local Firefox pass is claimed.
-6. Vercel CLI deployment was not authorized in this runtime: `Vercel CLI 54.7.1` returned `No existing credentials found. Starting login flow...` and entered device authentication. No Preview or Production deployment is claimed without a real account credential/project link.
+6. Vercel Preview is deployed and smoke-tested above. Production deployment is blocked by missing Vercel authorization: `Vercel CLI 54.7.1` returned `No existing credentials found. Starting login flow...` and entered device authentication. No `vercel --prod` operation was executed, and `main` was not changed.
 
 ## 14. Final verdicts
 
@@ -413,6 +416,8 @@ Both remote `quality` jobs completed successfully, including install, lint, prod
 | Layer 2B | `L2B_M3_BLOCKED_BY_MISSING_EVIDENCE` — six boundary tests `6 pass / 0 fail` and mutation `15/15 killed`, but no live AI gateway state. |
 | Layer 3 | `L3_M3_BLOCKED_BY_MISSING_EVIDENCE` — seven boundary tests `7 pass / 0 fail`, historical `8/8`, but no live retrieval provider. |
 | Layer 4 | `L4_M3_PASS` — thirteen boundary tests `13 pass / 0 fail`, historical `8/8`, and mutation `15/15 killed`; deterministic policy remains authoritative. |
+| Preview deployment | `DEPLOYED` — GitHub deployment API reported both Preview environments `success`; the two exact target URLs returned HTTP `200` for `/` and `/trust`. |
+| Production deployment | `PRODUCTION_BLOCKED_BY_MISSING_VERCEL_CREDENTIAL` — no authenticated CLI/project link was available; no production claim is made. |
 
 System verdict: `TRUST_ENGINE_SOVEREIGN_HIGH_ASSURANCE_PASS_WITH_EXTERNAL_LIMITATIONS`. This is a bounded engineering verdict for the tested deterministic/fail-safe implementation and green remote CI/Vercel status. It is not an unqualified “all layers live M3” release verdict because Layers 2A, 2B, and 3 have the exact external/missing-evidence blockers above, and the local live database phase is unavailable.
 
