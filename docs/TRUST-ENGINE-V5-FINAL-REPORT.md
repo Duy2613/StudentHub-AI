@@ -101,6 +101,10 @@ target, and refuses provider invocation for `SKIP`.
 (`_stageWorker`) passes a valid public target for reputation-only lookup even
 when L1 has blocked it. `frontend/src/lib/ai-trust/v5/stageAdapters.js:83`
 (`stageFromL2A`) exposes `SKIPPED_PRIVACY_SAFETY` and truthful lookup signals.
+The legacy full-depth route uses the same service boundary at
+`frontend/src/app/api/v1/trust/route.js:145` and no longer replaces a blocked
+URL with an empty L2A input. Query strings and fragments containing disclosure
+material are redacted before provider invocation.
 `frontend/src/lib/ai-trust/layer2a/types.js:115`
 (`createLayer2AResult`) constrains the policy fields and maps a skipped lookup
 to `UNKNOWN`, never `SAFE`.
@@ -512,8 +516,58 @@ The repository workflow
 `.github/workflows/competition-quality.yml` runs Node 24, install, lint,
 production build, discovered regression, AI Gateway contract, security,
 authorization inventory, bundle, dependency audit, and Chromium/Firefox
-browser gates. CI evidence and Preview URLs will be appended at handoff after
-the closure commit is pushed.
+browser gates. The closure commit was pushed as `64856cc33702e3bfafeba739d5003754fcf642ea`.
+
+Raw GitHub API result for the post-push run and job:
+
+~~~text
+run 33424725483: status=completed conclusion=success head_sha=64856cc33702e3bfafeba739d5003754fcf642ea
+job 99595419232 (quality): status=completed conclusion=success
+Evidence Case Lab browser gate (Chromium): completed success
+Evidence Case Lab browser gate (Firefox): completed success
+~~~
+
+The same job also completed lint, production build, discovered regression,
+AI Gateway contract, security regression, API authorization inventory,
+mutation, bundle, dependency audit, and browser-evidence upload steps with
+`success` conclusions. The run is linked at
+`https://github.com/Duy2613/StudentHub-AI/actions/runs/33424725483`.
+
+Raw GitHub PR state:
+
+~~~text
+number=3 state=open draft=true base=main head=codex/trust-engine-v5-sequential-assurance
+~~~
+
+Raw Vercel commit statuses:
+
+~~~text
+Vercel – student-hub-ai: success — Deployment has completed
+Vercel – student-hub-ai-weje: success — Deployment has completed
+~~~
+
+Preview verification used the public deployment
+`https://student-hub-ai-weje-git-codex-trust-engine-v5-17eaab-vi-be-city.vercel.app`.
+The exact route check returned:
+
+~~~text
+GET /trust: HTTP/1.1 200 OK; Content-Type: text/html; charset=utf-8; X-Matched-Path: /trust
+GET /api/v1/trust (version=v5): HTTP_STATUS=200; CONTENT_TYPE=application/json
+stageIds=["l1","l2a","l2b","l2c","l3","l4","l5"]
+pipelineStatus=COMPLETED
+l2cFinding=FAKE_SCHOLARSHIP
+l3L2cTaskCount=5
+l4Security=SUSPICIOUS
+l4Action=WARN
+l5Status=ASSURANCE_PASS
+~~~
+
+The named sequential UI test in
+`frontend/tests/e2e/trust-v5-sequential.spec.ts` remains the application-level
+proof for the seven-stage contract; the remote route result above is a
+deployment smoke check, not a replacement for the test. The other project
+Preview returned `HTTP/1.1 302 Found` to Vercel SSO, while its Vercel status was
+successful; no auth bypass was attempted.
 
 No production deployment is claimed. Main remains unmerged, and Draft PR #3
 must remain Draft.
@@ -527,7 +581,7 @@ must remain Draft.
 * `L3_M3_BLOCKED_BY_MISSING_LIVE_RETRIEVAL_EVIDENCE` — runtime is local KB only, while the controlled bridge fixture passes.
 * `L4_M3_PASS` — deterministic policy and hard-negative precedence are tested.
 * `L5_ASSURANCE_PASS` — deterministic downgrade-only auditor and L2C/L3 gap audit are tested.
-* `UNVERIFIED_CLAIM — requires human verification` — local Firefox host launch and final post-push CI/Preview status.
+* `UNVERIFIED_CLAIM — requires human verification` — local Firefox host launch remains unavailable on this Windows host, although the authoritative Firefox Linux CI step passed; local WebKit repository-wide legacy failures remain in Section 6.
 
 Implementation closure target:
 
