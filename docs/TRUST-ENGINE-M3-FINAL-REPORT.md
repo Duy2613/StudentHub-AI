@@ -15,10 +15,10 @@ The state matrices used during implementation are recorded in [`docs/TRUST-ENGIN
 - Tested Trust Engine implementation SHA: `86bca0d7163477d52232bd098438ce4cc9f9fba4` (`security(trust): harden trust engine boundaries`).
 - Whole-system hardening SHA: `0bfcfbea010963d614efd13f7cc4f6726adb4bd2` (`security: harden whole-system trust boundaries`).
 - Baseline SHA before implementation: `ea30f901db3ddf3e30614342617418d1ce361e63`.
-- Branch: `develop`; whole-system commit was pushed to `origin/develop`.
+- Branch: `develop`; whole-system commit was pushed to `origin/develop`, followed by the report-only publication commit `ea7148f088139ef9901a7cde224ea6be4cead4cf`.
 - `main` SHA observed before handoff: `251e7cb4a908c5a185be89a39301b294f9595dbf`.
-- Implementation worktree after publication: clean; `git status --short --branch` returned `## develop...origin/develop`.
-- PR #2 current raw API state: `number=2 state=open draft=True merged=False head=d7e4c6f002bbbfade2976f5d1a98447ec8f66c64 base=main`.
+- Runtime evidence-checkpoint worktree: clean; `git status --short --branch` returned `## develop...origin/develop`.
+- PR #2 raw API state at the runtime evidence checkpoint: `number=2 state=open draft=True merged=False head=d7e4c6f002bbbfade2976f5d1a98447ec8f66c64 base=main`. The later `ea7148f0…` commit changed documentation only; a final remote check confirmed PR #2 remained open/Draft/unmerged and `main` unchanged.
 
 No merge operation was performed. PR #2 remains Draft and `main` was not changed.
 
@@ -395,6 +395,8 @@ DEPLOYMENT environment=Preview – student-hub-ai state=success target=https://s
 DEPLOYMENT environment=Preview – student-hub-ai-weje state=success target=https://student-hub-ai-weje-efy4cmp7w-vi-be-city.vercel.app
 PREVIEW_SMOKE status=200 server=Vercel target=/ and /trust for both deployments
 ```
+
+The report-only publication SHA `ea7148f088139ef9901a7cde224ea6be4cead4cf` also produced two successful Preview deployments, with smoke-test targets `https://student-hub-ais20ul1t-vi-be-city.vercel.app` and `https://student-hub-ai-weje-ieqby7y2f-vi-be-city.vercel.app`; both `/` and `/trust` returned HTTP `200` from Vercel.
 
 Both remote `quality` jobs completed successfully, including install, lint, production build, discovered regression suite, AI Gateway contract, security regression, authorization inventory, mutation protection, bundle budget, dependency audit, and Chromium and Firefox Evidence Case Lab gates. The remote Firefox result is the browser evidence; the local Firefox launch failure is not silently relabeled as a pass.
 
