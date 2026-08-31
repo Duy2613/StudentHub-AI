@@ -14,6 +14,7 @@ import { markTrustedLayer3Result } from "./TrustBoundary.js";
 
 import { SourceAuthorityRegistry } from "./registry/SourceAuthorityRegistry.js";
 import { EvidenceExtractor } from "./extractors/EvidenceExtractor.js";
+import { createSecureId } from "../../security/secureId.js";
 import { TemporalEvaluator } from "./extractors/TemporalEvaluator.js";
 import { SourceIndependenceAnalyzer } from "./extractors/SourceIndependenceAnalyzer.js";
 import { ClaimEvidenceMatcher } from "./extractors/ClaimEvidenceMatcher.js";
@@ -143,7 +144,7 @@ export class Layer3EvidenceService {
     const startTime = nowMs();
     const safeOptions = options && typeof options === "object" ? options : {};
     const requestId = boundedString(safeOptions.requestId || layer2Result?.requestId, 160) ||
-      `req_l3_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      createSecureId("req_l3");
     const retriever = safeOptions.retriever || new KnowledgeBaseRetriever();
     const retrieverId = boundedString(retriever?.retrieverId, 160) || "unknown_retriever";
     const auditEvents = [];

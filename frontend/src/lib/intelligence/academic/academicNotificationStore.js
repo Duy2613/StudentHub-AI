@@ -12,6 +12,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { AcademicNotificationModel } from "./academicNotificationModel.js";
+import { createSecureId } from "../../security/secureId.js";
 
 const DATA_DIR = path.resolve(process.cwd(), ".data");
 const STORAGE_FILE = path.join(DATA_DIR, "academic_notifications_store.json");
@@ -94,7 +95,7 @@ export class AcademicNotificationStore {
         notifications: Array.from(this.#notificationsById.values())
       };
 
-      const tempFile = path.join(DATA_DIR, `.tmp_notif_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.json`);
+      const tempFile = path.join(DATA_DIR, `.tmp_notif_${createSecureId("tmp")}.json`);
       fs.writeFileSync(tempFile, JSON.stringify(payload, null, 2), "utf-8");
       fs.renameSync(tempFile, STORAGE_FILE);
     } catch {

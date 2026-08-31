@@ -9,6 +9,7 @@
 
 import { SocialContentFirewall } from "./SocialContentFirewall.js";
 import { AiMemoryStore } from "./AiMemoryStore.js";
+import { createSecureId } from "../../security/secureId.js";
 
 export const MEMORY_TIER = Object.freeze({
   SHORT_TERM_CONTEXT: "SHORT_TERM_CONTEXT",
@@ -45,7 +46,7 @@ export class AiMemoryGuard {
 
     // 2. Propose as candidate memory
     const candidate = {
-      candidateId: `cand_mem_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      candidateId: createSecureId("cand_mem"),
       subjectId,
       text: SocialContentFirewall.sanitizeText(text),
       category: memoryInput.category || "PREFERENCE",
@@ -79,7 +80,7 @@ export class AiMemoryGuard {
 
     const [candidate] = record.candidateMemories.splice(candidateIndex, 1);
     const approved = {
-      memoryId: `mem_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      memoryId: createSecureId("mem"),
       subjectId,
       text: candidate.text,
       category: candidate.category,

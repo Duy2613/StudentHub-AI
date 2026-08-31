@@ -8,6 +8,7 @@
 import { EarlyWarningEngine, WARNING_CATEGORY } from "./EarlyWarningEngine.js";
 import { ContradictionEngine } from "../fusion/ContradictionEngine.js";
 import { ExpertDiscoveryEngine } from "../expert/ExpertDiscoveryEngine.js";
+import { createSecureId } from "../../security/secureId.js";
 
 export class SocialToOfficialPipeline {
   /**
@@ -60,7 +61,7 @@ export class SocialToOfficialPipeline {
 
     // 5. Dual-Layered Advisory Output
     return Object.freeze({
-      pipelineId: `pipe_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      pipelineId: createSecureId("pipe"),
       topic,
       officialPolicy: {
         rule: officialPolicy.officialRule,

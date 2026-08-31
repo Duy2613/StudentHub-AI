@@ -35,17 +35,21 @@ export class IdentityResolver {
     const authHeader = headers?.get("authorization") || headers?.get("Authorization");
     const cookieHeader = headers?.get("cookie") || "";
 
-    // 1. Try Bearer Token in Authorization Header
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      const rawToken = authHeader.slice(7).trim();
-      return this.resolveFromToken(rawToken);
-    }
+    // 1. The server-owned session cookie is authoritative whenever present.
+    // Never let a second credential override a valid/revoked cookie, and never
+    // fall back to a bearer token when the cookie is malformed or invalid.
+    const hasApplicationCookie = this.#hasCookie(cookieHeader, "studenthub_session");
+    const hasProviderCookie = this.#hasCookie(cookieHeader, "sb-access-token");
+    const sessionCookie = hasApplicationCookie
+      ? this.#extractCookie(cookieHeader, "studenthub_session")
+      : hasProviderCookie
+        ? this.#extractCookie(cookieHeader, "sb-access-token")
+        : null;
 
-    // 2. Try Session Cookie (e.g. sb-access-token, studenthub_session)
-    const sessionCookie = this.#extractCookie(cookieHeader, "studenthub_session") ||
-                          this.#extractCookie(cookieHeader, "sb-access-token");
-                          
-    if (sessionCookie) {
+    if (hasApplicationCookie || hasProviderCookie) {
+      if (!sessionCookie) {
+        throw SecurityError.unauthorized("Malformed session cookie.");
+      }
       // Legacy in-memory sessions exist only as an explicit local migration escape hatch.
       // Production must never silently fall back to restart-volatile authentication.
       if (sessionCookie.startsWith("sess_") &&
@@ -63,6 +67,13 @@ export class IdentityResolver {
           statusCode: 503
         });
       }
+    }
+
+    // 2. Bearer remains a compatibility path for stateless integrations only
+    // when no session cookie was supplied at all.
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const rawToken = authHeader.slice(7).trim();
+      return this.resolveFromToken(rawToken);
     }
 
     // 3. Unauthenticated request
@@ -221,5 +232,10 @@ export class IdentityResolver {
       // never escape as an unhandled parser exception.
       return null;
     }
+  }
+
+  static #hasCookie(cookieHeader, name) {
+    if (!cookieHeader) return false;
+    return new RegExp(`(?:^|;\\s*)${name}=`).test(cookieHeader);
   }
 }

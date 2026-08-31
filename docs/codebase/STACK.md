@@ -5,8 +5,8 @@
 | Area | Value | Evidence |
 |---|---|---|
 | Primary language | JavaScript/JSX with a smaller strict TypeScript surface | `frontend/src/`, `frontend/tsconfig.json` |
-| Runtime + version | Node.js; exact supported version `[TODO]` | `frontend/package.json` (no `engines`) |
-| Package manager | npm | `frontend/package-lock.json` |
+| Runtime + version | Node.js 24.x | `.nvmrc`, root/frontend `package.json`, CI workflow |
+| Package manager | npm 11.x | root/frontend `package.json`, `frontend/package-lock.json` |
 | Module/build system | ES modules, Next.js App Router and Turbopack build | `frontend/package.json`, `frontend/next.config.ts` |
 
 ## 2) Production Frameworks and Dependencies
@@ -36,7 +36,7 @@
 ```bash
 npm ci
 npm run build
-node scripts/run-discovered-tests.mjs
+npm test
 npm run lint
 npm run test:e2e
 npm run lighthouse
@@ -46,7 +46,7 @@ npm run lighthouse
 
 - Config sources: `frontend/next.config.ts`, `frontend/tsconfig.json`, `frontend/eslint.config.mjs`, `frontend/vercel.json`.
 - Declared variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_API_URL`, `DATABASE_URL`, `STUDENTHUB_SESSION_PEPPER`, `SUPABASE_JWT_AUDIENCE`, `DATABASE_SSL_REJECT_UNAUTHORIZED`, `STUDENTHUB_RLS_TEST_DATABASE_URL`.
-- Deployment/runtime constraint: staging E2E additionally requires `STUDENTHUB_STAGING_BASE_URL`; supported Node version is `[TODO]`.
+- Deployment/runtime constraint: staging E2E additionally requires `STUDENTHUB_STAGING_BASE_URL`; supported runtime is Node 24.x with npm 11.x.
 
 ## 6) Evidence
 

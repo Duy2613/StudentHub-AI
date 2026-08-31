@@ -8,6 +8,8 @@
  * - Correlates errors with immutable security telemetry
  */
 
+import { createCorrelationId } from "../secureId.js";
+
 export const SECURITY_ERROR_CODE = Object.freeze({
   UNAUTHORIZED: "UNAUTHORIZED",
   INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
@@ -103,7 +105,10 @@ export class SecurityError extends Error {
     this.name = "SecurityError";
     this.#code = code;
     this.#statusCode = statusCode;
-    this.#correlationId = correlationId || `sec_err_${Date.now()}`;
+    const candidateCorrelationId = String(correlationId || "").trim();
+    this.#correlationId = /^[A-Za-z0-9_.:-]{1,128}$/.test(candidateCorrelationId)
+      ? candidateCorrelationId
+      : createCorrelationId("sec_err");
     this.#details = details;
     this.#stepUpChallenge = stepUpChallenge;
   }

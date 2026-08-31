@@ -2,6 +2,8 @@
  * Layer 1 — Type Definitions, Severity Levels & Standardized Reasons Taxonomy
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export const LAYER_1_STATUS = {
   BLOCK: "BLOCK",           // Strong evidence of malicious / phishing / scam payload -> Early Exit STOP
   SUSPICIOUS: "SUSPICIOUS", // Anomaly or suspicious indicators detected -> Forward to Layer 2
@@ -239,7 +241,7 @@ export function createLayer1Result(params = {}) {
     ? input.signals.filter((signal) => signal && typeof signal === "object" && !Array.isArray(signal)).slice(0, 100).map((signal) => createSignal(signal))
     : [];
   const nextLayer = Number.isInteger(input.nextLayer) && input.nextLayer > 0 && input.nextLayer <= 4 ? input.nextLayer : 2;
-  const requestId = boundedString(input.requestId, "", 160) || `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const requestId = boundedString(input.requestId, "", 160) || createSecureId("req_l1");
   const metricsInput = safeObject(input.metrics);
   const detailsInput = safeObject(input.details);
   const hardTriggersCount = boundedNonNegativeInteger(detailsInput.hardTriggersCount, 0);

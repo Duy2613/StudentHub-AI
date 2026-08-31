@@ -97,7 +97,28 @@ test("▶ [ACADEMIC-SOURCE-2] Document Fetcher Boundedness & Status", async (t) 
     AcademicDocumentFetcher.resetTransport();
   });
 
-  await t.test("S2.4: Oversized response exceeding 5MB is rejected with PAYLOAD_TOO_LARGE", async () => {
+  await t.test("S2.4: Initial official authority is checked before any transport call", async () => {
+    let transportCalls = 0;
+    AcademicDocumentFetcher.setTransport(async () => {
+      transportCalls += 1;
+      return { status: 200, headers: {}, body: "must not be fetched", finalUrl: "https://attacker.example/" };
+    });
+
+    const res = await AcademicDocumentFetcher.fetchDocument({
+      sourceId: "SRC_ATTACKER_CONTROLLED",
+      canonicalUrl: "https://attacker.example/login",
+      sourceTier: "TIER_1_OFFICIAL"
+    });
+
+    assert.equal(res.success, false);
+    assert.equal(res.error, "INITIAL_AUTHORITY_VIOLATION");
+    assert.equal(res.statusCode, 403);
+    assert.equal(transportCalls, 0, "authority failure must prevent network transport");
+
+    AcademicDocumentFetcher.resetTransport();
+  });
+
+  await t.test("S2.5: Oversized response exceeding 5MB is rejected with PAYLOAD_TOO_LARGE", async () => {
     const hugeBody = "X".repeat(6 * 1024 * 1024); // 6MB
     AcademicDocumentFetcher.setTransport(async () => ({
       status: 200,

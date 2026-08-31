@@ -3,6 +3,8 @@
  * Evaluates collective student agreement while explicitly preserving minority viewpoints and cohort variances.
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export class CommunityConsensusEngine {
   /**
    * Computes evidence-weighted consensus across community observations for a specific proposition
@@ -30,7 +32,7 @@ export class CommunityConsensusEngine {
     // 1. Group observations by distinct author to prevent duplicate astroturfing
     const uniqueAuthorMap = new Map();
     for (const obs of observations) {
-      const author = obs.studentId || `anon_${Math.random()}`;
+      const author = obs.studentId || createSecureId("anon");
       if (!uniqueAuthorMap.has(author)) {
         uniqueAuthorMap.set(author, obs);
       }

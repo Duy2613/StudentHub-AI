@@ -10,6 +10,7 @@
 
 import crypto from "node:crypto";
 import { SecurityError, SECURITY_ERROR_CODE } from "../core/SecurityErrorEnvelope.js";
+import { createCorrelationId, createSecureId } from "../secureId.js";
 
 export class CapabilityManager {
   static #capabilities = new Map(); // capabilityId -> capabilityObject
@@ -41,7 +42,7 @@ export class CapabilityManager {
     }
 
     const now = Date.now();
-    const capabilityId = `cap_${now}_${crypto.randomBytes(12).toString("hex")}`;
+    const capabilityId = createSecureId("cap");
     const expiresAt = now + (ttlSeconds * 1000);
 
     const payload = {
@@ -55,7 +56,7 @@ export class CapabilityManager {
       maxUses: Math.max(1, maxUses),
       usedCount: 0,
       revoked: false,
-      correlationId: correlationId || `corr_${now}`
+      correlationId: correlationId || createCorrelationId("corr")
     };
 
     const signature = this.#signPayload(payload);

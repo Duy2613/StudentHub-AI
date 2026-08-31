@@ -32,4 +32,4 @@ The external ASP.NET authentication service is a compatibility dependency, not a
 5. Login, logout, refresh, expiry, revocation, and protected-route E2E tests.
 6. Removal of production bearer storage only after every caller uses the cookie boundary.
 
-JWKS verification, one-time exchange, durable-session repository, cookie resolution, CSRF baseline, and revocation are implemented and contract-tested. Live Supabase/PostgreSQL integration, browser E2E, refresh/re-auth, and caller migration have not passed. Until those gates pass, the existing browser-token code remains a documented security risk and must not be described as production-ready.
+JWKS verification, one-time exchange, durable-session repository, cookie resolution, CSRF baseline, cookie precedence, and revocation are implemented and contract-tested. Browser bearer persistence has been removed; the provider proof is page-memory-only and is exchanged for the application cookie. Live Supabase/PostgreSQL integration, browser E2E, refresh/re-auth, and operational deployment evidence remain required before production readiness can be claimed.

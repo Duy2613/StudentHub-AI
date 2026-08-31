@@ -16,7 +16,7 @@
 | Store | Role | Access layer | Key risk | Evidence |
 |---|---|---|---|---|
 | PostgreSQL | Durable production records/sessions | `PostgresPool`, repositories | live RLS proof needs dedicated env | `frontend/src/lib/server/database/` |
-| Supabase | Identity and optional data adapter | Supabase client | Web Storage exposure when remember-me persists | `frontend/src/lib/supabase/client.js` |
+| Supabase | Identity and optional data adapter | Supabase provider proof in page memory; application identity in HttpOnly cookie | live browser refresh/restart proof pending | `frontend/src/lib/supabase/client.js` |
 | `.data` JSON | Local/test persistence | domain stores/DatabaseAdapter | unsuitable for multi-instance production | `frontend/src/lib/db/DatabaseAdapter.js` |
 | In-memory stores | deterministic tests/dev escape hatch | injected adapters | restart loss if enabled outside test/dev | `frontend/src/lib/db/DatabaseAdapter.js` |
 

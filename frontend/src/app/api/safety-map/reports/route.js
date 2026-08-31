@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { SecurityFabric } from "@/lib/security/SecurityFabric";
+import { createSecureId } from "@/lib/security/secureId.js";
 
 // Genuine campus safety zones and alert reports (Zero Fake Data)
 let SAFETY_REPORTS = [
@@ -179,7 +180,7 @@ async function createSafetyReport(request, _routeContext, principal) {
     const safeCategory = allowedCategories.has(category) ? category : "SCAM_DEPOSIT";
 
     const newReport = {
-      id: `rep-${Date.now()}`,
+      id: createSecureId("rep"),
       title: title.trim(),
       category: safeCategory,
       zone: zone || "LANG_DAI_HOC_THU_DUC",

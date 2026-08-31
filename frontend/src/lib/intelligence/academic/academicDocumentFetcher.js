@@ -68,6 +68,25 @@ export class AcademicDocumentFetcher {
         finalUrl: targetUrl
       };
     }
+
+    // A caller may not elevate an arbitrary public URL by labelling it as an
+    // official source.  This check must happen before custom or built-in
+    // transport is invoked so an authority failure has zero network effect.
+    const requiresOfficialAuthority = source.sourceTier === "TIER_1_OFFICIAL" ||
+      source.sourceTier === "TIER_2_OFFICIAL_MIRROR";
+    if (requiresOfficialAuthority && !AcademicSourceRegistry.isOfficialAuthority(targetGuard.hostname)) {
+      return {
+        success: false,
+        statusCode: 403,
+        error: "INITIAL_AUTHORITY_VIOLATION",
+        rawBody: "",
+        headers: {},
+        etag: null,
+        lastModified: null,
+        isRedirected: false,
+        finalUrl: targetGuard.url
+      };
+    }
     const requestHeaders = {
       "User-Agent": "StudentHubAI-AcademicLiveSync/1.0 (+https://studenthub.ai)",
       "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,application/pdf;q=0.8,*/*;q=0.7"

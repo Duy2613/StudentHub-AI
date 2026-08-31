@@ -30,7 +30,7 @@ import OtpVerificationOrbit from "@/components/ui/otp-verification-orbit";
 
 export default function SaffronAuthDeck({ initialMode = "register" }) {
   const router = useRouter();
-  const { ensureSynced, loginAsDemo } = useAuth();
+  const { loginAsDemo } = useAuth();
 
   // Mode: "login" | "register"
   const [mode, setMode] = useState(initialMode);
@@ -111,7 +111,6 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
     try {
       const { user } = await signInWithPassword(email, password, rememberMe);
       saffronAudio.playSuccessChime();
-      await ensureSynced();
       const isOnboarded = user?.user_metadata?.onboarded;
       if (!isOnboarded) {
         router.push("/onboarding");

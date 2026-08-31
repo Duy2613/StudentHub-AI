@@ -1,5 +1,6 @@
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { SecurityError } from "@/lib/security/core/SecurityErrorEnvelope.js";
+import { createSecureId } from "@/lib/security/secureId.js";
 
 // In-memory profile storage keyed by email/id (Phần F)
 const PROFILES_DB = new Map();
@@ -76,7 +77,7 @@ export const GET = SecurityFabric.wrapHandler(
 
     // Identity verification is a server workflow; an email suffix alone proves nothing.
     const defaultProfile = {
-      id: `usr_${Date.now()}`,
+      id: createSecureId("usr"),
       supabaseUserId: principal.subjectId,
       email: email,
       fullName: email.split("@")[0] || "Sinh viên",
@@ -128,7 +129,7 @@ export const PUT = SecurityFabric.wrapHandler(
     }
 
     const existing = PROFILES_DB.get(email) || {
-      id: `usr_${Date.now()}`,
+      id: createSecureId("usr"),
       supabaseUserId: principal.subjectId,
       email,
       role: "student",

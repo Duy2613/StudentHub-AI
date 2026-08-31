@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDurableSessionService, SESSION_COOKIE_NAME } from "@/lib/security/identity/DurableSessionService.js";
+import { clearSessionCookie, getDurableSessionService, SESSION_COOKIE_NAME } from "@/lib/security/identity/DurableSessionService.js";
 import { AuthRouteGuard } from "@/lib/security/hardening/AuthRouteGuard.js";
 import { SecurityError } from "@/lib/security/core/SecurityErrorEnvelope.js";
 
@@ -28,6 +28,11 @@ export async function POST(request) {
     if (error instanceof SecurityError) {
       return NextResponse.json(error.toResponsePayload(), { status: error.statusCode, headers: { "cache-control": "no-store" } });
     }
-    return NextResponse.json({ error: { code: "DATABASE_UNAVAILABLE", message: "Logout persistence is unavailable." } }, { status: 503, headers: { "cache-control": "no-store" } });
+    const response = NextResponse.json({ error: { code: "DATABASE_UNAVAILABLE", message: "Logout persistence is unavailable; server-side revocation requires recovery." } }, { status: 503, headers: { "cache-control": "no-store" } });
+    // Clear the browser cookie even when durable revocation is unavailable.
+    // The 503 remains explicit so callers do not claim that server revocation
+    // completed; the client must re-authenticate after dependency recovery.
+    response.headers.set("set-cookie", clearSessionCookie());
+    return response;
   }
 }

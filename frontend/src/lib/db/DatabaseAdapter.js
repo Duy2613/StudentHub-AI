@@ -12,6 +12,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { supabase } from "../supabase/client.js";
+import { createSecureId } from "../security/secureId.js";
 
 export const ADAPTER_MODE = Object.freeze({
   AUTO: "AUTO",
@@ -203,7 +204,7 @@ export class DatabaseAdapter {
       records
     };
 
-    const tempFile = `${this.#filePath}.tmp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const tempFile = `${this.#filePath}.tmp_${createSecureId("tmp")}`;
     try {
       fs.writeFileSync(tempFile, JSON.stringify(payload, null, 2), "utf8");
       fs.renameSync(tempFile, this.#filePath);

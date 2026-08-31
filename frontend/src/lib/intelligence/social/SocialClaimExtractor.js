@@ -6,6 +6,8 @@
  * Invariant: Extracted claims are CANDIDATES and NEVER automatically trusted as truth.
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export const SOCIAL_SIGNAL_TYPE = Object.freeze({
   QUESTION: "QUESTION",
   EXPERIENCE: "EXPERIENCE",
@@ -111,7 +113,7 @@ export class SocialClaimExtractor {
     const primaryEntity = contentItem.linkedEntities?.[0] || null;
 
     return Object.freeze({
-      claimCandidateId: `cand_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      claimCandidateId: createSecureId("cand"),
       contentId: contentItem.contentId,
       sourceId: contentItem.sourceId,
       authorId: contentItem.author?.authorId,

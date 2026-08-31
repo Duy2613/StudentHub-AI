@@ -4,7 +4,7 @@
 //
 // Đăng nhập StudentHub AI:
 // - Đăng nhập bằng Google OAuth & GitHub OAuth
-// - Hỗ trợ tính năng "Ghi nhớ đăng nhập" (Remember Me): linh hoạt chuyển đổi localStorage / sessionStorage
+// - "Ghi nhớ đăng nhập" chỉ điều khiển preference/demo; phiên thật dùng HttpOnly cookie
 // - Trải nghiệm Demo Sinh viên & Chuyên gia uy tín tức thì
 // - Tích hợp CreativeShaderCanvas & Double-Bezel Cyber Glassmorphism
 
@@ -32,7 +32,7 @@ import { useAuth } from "@/lib/auth/AuthContext";
 
 const LoginPage = () => {
   const router = useRouter();
-  const { ensureSynced, loginAsDemo } = useAuth();
+  const { loginAsDemo } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,6 +48,8 @@ const LoginPage = () => {
       const urlError = params.get("error");
       if (urlError === "google_login_failed" || urlError === "oauth_failed") {
         setError("Đăng nhập bằng OAuth không thành công hoặc đã bị hủy. Vui lòng thử lại.");
+      } else if (urlError === "session_unavailable") {
+        setError("Dịch vụ phiên đăng nhập an toàn đang tạm thời không khả dụng. Vui lòng thử lại sau.");
       } else if (urlError === "email_registered_use_password") {
         setError(
           "Tài khoản này đã được đăng ký bằng Email & Mật khẩu từ trước. Theo chính sách bảo mật, bạn không thể đăng nhập bằng OAuth cho tài khoản này. Vui lòng nhập Mật khẩu để đăng nhập."
@@ -62,8 +64,7 @@ const LoginPage = () => {
     setIsLoading(true);
     try {
       const { user } = await signInWithPassword(email, password, rememberMe);
-      await ensureSynced();
-      
+
       const isOnboarded = user?.user_metadata?.onboarded;
       if (!isOnboarded) {
         router.push("/onboarding");

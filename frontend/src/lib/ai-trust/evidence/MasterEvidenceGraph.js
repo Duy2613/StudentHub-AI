@@ -7,6 +7,8 @@
  * timestamps, corroborations, and contradicting signals.
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export const FactCategory = {
   OFFICIAL_FACT: "OFFICIAL_FACT",
   VERIFIED_FACT: "VERIFIED_FACT",
@@ -31,7 +33,7 @@ export const SourceTier = {
 
 export class MasterEvidenceGraph {
   constructor(claimStatement, options = {}) {
-    this.graphId = `EVID_GRAPH_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    this.graphId = createSecureId("EVID_GRAPH");
     this.claim = {
       statement: claimStatement,
       created_at: new Date().toISOString(),
@@ -60,7 +62,7 @@ export class MasterEvidenceGraph {
     extractedFeatures = {}
   }) {
     const item = {
-      evidence_id: `EVID_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      evidence_id: createSecureId("EVID"),
       type,
       description,
       confidence: Number(confidence.toFixed(4)),

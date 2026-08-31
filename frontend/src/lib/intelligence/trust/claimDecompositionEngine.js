@@ -11,6 +11,7 @@
  */
 
 import { AiTrustModel, CLAIM_TYPE, STAKE_LEVEL, TRUST_STATUS } from "./aiTrustModel.js";
+import { createSecureId } from "../../security/secureId.js";
 
 export class ClaimDecompositionEngine {
   /**
@@ -53,7 +54,7 @@ export class ClaimDecompositionEngine {
       });
 
       return AiTrustModel.createClaim({
-        claimId: `CLAIM_${index + 1}_${Math.random().toString(36).slice(2, 6)}`,
+        claimId: `CLAIM_${index + 1}_${createSecureId("claim")}`,
         text: clauseText,
         subject: extracted.subject,
         predicate: extracted.predicate,

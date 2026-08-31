@@ -6,6 +6,8 @@
  * candidate finding; it is never a safety verdict.
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export const LAYER_2A_CAPABILITY = {
   URL_REPUTATION: "URL_REPUTATION",
   THREAT_INTELLIGENCE: "THREAT_INTELLIGENCE",
@@ -140,7 +142,7 @@ export function createLayer2AResult(input = {}) {
     providerConfidence: optionalProviderConfidence(providerConfidence),
     checkedAt: safeTimestamp(checkedAt),
     latencyMs: boundedLatency,
-    requestId: boundedString(requestId, 160) || `req_l2a_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    requestId: boundedString(requestId, 160) || createSecureId("req_l2a"),
     targetFingerprint: boundedString(targetFingerprint, 128) || null,
     cacheMetadata: {
       hit: Boolean(cacheMetadata?.hit),

@@ -12,6 +12,7 @@ import { StudentProfile360Model } from "./studentProfile360Model.js";
 import { StudentProfile360Store } from "./studentProfile360Store.js";
 import { StudentAcademicSyncBridge } from "./studentAcademicSyncBridge.js";
 import { AcademicClock } from "./academicClock.js";
+import { createSecureId } from "../../security/secureId.js";
 
 export class StudentProfile360Service {
   /**
@@ -179,7 +180,7 @@ export class StudentProfile360Service {
     }
 
     const reviewRequest = Object.freeze({
-      requestId: `REV_REQ_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      requestId: createSecureId("REV_REQ"),
       studentId,
       field,
       claimedValue,

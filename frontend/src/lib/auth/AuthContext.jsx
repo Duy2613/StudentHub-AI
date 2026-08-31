@@ -5,18 +5,19 @@
 // Trình quản lý xác thực & trạng thái người dùng (Auth Context Provider):
 // - Kiến trúc State Machine chống vòng lặp vô hạn (Infinite Loop Prevention)
 // - Bọc 100% try/catch với Diagnostic Logging [AUTH_ERROR] & [AUTH_INFO]
-// - Đồng bộ Bearer Token sang ASP.NET Core Backend tuần tự
+// - Authenticated UI state is established only after the server-owned opaque
+//   HttpOnly session exists; provider proof remains transient.
 // - Tự động định dạng Profile với đầy đủ thuộc tính an toàn (Zero undefined crash)
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase/client";
 import {
-  getMeBackend,
+  exchangeApplicationSession,
+  getApplicationSession,
   signOutSupabase,
   updateUserProfile as updateUserProfileService,
   syncBackendUser,
   getStoredToken,
-  setStoredToken,
   logAuthError,
   logAuthInfo,
 } from "./authService";
@@ -71,6 +72,53 @@ const DEMO_EXPERT = {
   questionsCount: 2,
 };
 
+function getClientStorage(storageName) {
+  if (typeof window === "undefined") return null;
+  try {
+    return window[storageName] || null;
+  } catch (error) {
+    logAuthError(`AuthContext:storage:${storageName}`, error);
+    return null;
+  }
+}
+
+function readClientStorage(storageName, key) {
+  const storage = getClientStorage(storageName);
+  if (!storage) return null;
+  try {
+    return storage.getItem(key);
+  } catch (error) {
+    logAuthError(`AuthContext:storage:${storageName}:read`, error);
+    return null;
+  }
+}
+
+function writeClientStorage(storageName, key, value) {
+  const storage = getClientStorage(storageName);
+  if (!storage) return false;
+  try {
+    storage.setItem(key, value);
+    return true;
+  } catch (error) {
+    logAuthError(`AuthContext:storage:${storageName}:write`, error);
+    return false;
+  }
+}
+
+function removeClientStorage(storageName, key) {
+  const storage = getClientStorage(storageName);
+  if (!storage) return;
+  try {
+    storage.removeItem(key);
+  } catch (error) {
+    logAuthError(`AuthContext:storage:${storageName}:remove`, error);
+  }
+}
+
+function isRememberedSession() {
+  return readClientStorage("localStorage", "studenthub_remember_me") === "true";
+}
+
 /**
  * Định dạng Profile chuẩn hóa an toàn từ User Object
  */
@@ -80,10 +128,9 @@ function formatProfile(user) {
   let cached = {};
   if (typeof window !== "undefined") {
     try {
-      const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
-      const s = isRemembered
-        ? localStorage.getItem("studenthub_user_profile") || sessionStorage.getItem("studenthub_user_profile")
-        : sessionStorage.getItem("studenthub_user_profile");
+      const s = isRememberedSession()
+        ? readClientStorage("localStorage", "studenthub_user_profile") || readClientStorage("sessionStorage", "studenthub_user_profile")
+        : readClientStorage("sessionStorage", "studenthub_user_profile");
       if (s) cached = JSON.parse(s);
     } catch (err) {
       logAuthError("formatProfile:parseCache", err);
@@ -125,6 +172,17 @@ function formatProfile(user) {
   };
 }
 
+function normalizeApplicationUser(user) {
+  const roles = Array.isArray(user?.roles) ? user.roles : [];
+  const primaryRole = String(roles[0] || user?.role || "student").toLowerCase();
+  return {
+    ...user,
+    id: String(user?.id || user?.userId || ""),
+    role: primaryRole,
+    roles,
+  };
+}
+
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -133,6 +191,7 @@ export function AuthProvider({ children }) {
 
   // Idempotency tracking ref để tránh loop vô hạn
   const lastSessionTokenRef = useRef(null);
+  const applicationSessionReadyRef = useRef(false);
 
   // Khởi tạo Auth khi Mount (Single execution)
   useEffect(() => {
@@ -143,12 +202,53 @@ export function AuthProvider({ children }) {
       try {
         if (typeof window === "undefined") return;
 
-        const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
+        const isRemembered = isRememberedSession();
 
-        // 1. Kiểm tra Demo Mode đã lưu
+        // 1. Restore the server-authoritative opaque session first. Provider
+        // credentials may be absent after reload by design.
+        const applicationState = await getApplicationSession();
+        if (applicationState.authenticated && applicationState.user && mounted) {
+          applicationSessionReadyRef.current = true;
+          const applicationUser = normalizeApplicationUser(applicationState.user);
+          setSession({ user: applicationUser, authority: "APPLICATION_SESSION" });
+          setProfile(formatProfile(applicationUser));
+          setIsDemoMode(false);
+          setIsLoading(false);
+          logAuthInfo("AuthProvider", "Đã nạp phiên HttpOnly do máy chủ quản lý.");
+          return;
+        }
+        if (applicationState.unavailable) {
+          logAuthError("AuthProvider:applicationSession", { code: applicationState.code });
+        }
+
+        // 2. A current Supabase proof is accepted only long enough to create
+        // the opaque application session.
+        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+          logAuthError("AuthProvider:getSession", sessionError);
+        }
+
+        if (currentSession?.user && mounted) {
+          lastSessionTokenRef.current = currentSession.access_token;
+          const exchanged = await exchangeApplicationSession(currentSession.access_token);
+          if (exchanged.success && mounted) {
+            applicationSessionReadyRef.current = true;
+            setSession({ user: currentSession.user, authority: "APPLICATION_SESSION" });
+            setProfile(formatProfile(currentSession.user));
+            setIsDemoMode(false);
+            setIsLoading(false);
+            logAuthInfo("AuthProvider", "Đã trao đổi proof Supabase sang phiên HttpOnly.");
+            return;
+          }
+          logAuthError("AuthProvider:sessionExchange", { code: exchanged.code });
+        }
+
+        // 3. Demo mode is an explicit local presentation mode. It is checked
+        // only after authoritative application/provider identities so stale
+        // demo cache can never shadow a real server session.
         const savedDemo = isRemembered
-          ? localStorage.getItem("studenthub_demo_user") || sessionStorage.getItem("studenthub_demo_user")
-          : sessionStorage.getItem("studenthub_demo_user");
+          ? readClientStorage("localStorage", "studenthub_demo_user") || readClientStorage("sessionStorage", "studenthub_demo_user")
+          : readClientStorage("sessionStorage", "studenthub_demo_user");
 
         if (savedDemo) {
           try {
@@ -166,34 +266,9 @@ export function AuthProvider({ children }) {
           }
         }
 
-        // 2. Kiểm tra Supabase Session trước
-        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) {
-          logAuthError("AuthProvider:getSession", sessionError);
-        }
-
-        if (currentSession?.user && mounted) {
-          lastSessionTokenRef.current = currentSession.access_token;
-          setSession(currentSession);
-          setProfile(formatProfile(currentSession.user));
-          setStoredToken(currentSession.access_token, isRemembered);
-          setIsLoading(false);
-          logAuthInfo("AuthProvider", "Đã nạp Supabase Session thành công.");
-          return;
-        }
-
-        // 3. Fallback kiểm tra Backend JWT Token
-        const backendUser = await getMeBackend();
-        if (backendUser && mounted) {
-          setSession({ user: backendUser });
-          setProfile(formatProfile(backendUser));
-          setIsLoading(false);
-          logAuthInfo("AuthProvider", "Đã nạp ASP.NET Core Backend Session thành công.");
-          return;
-        }
-
-        // 4. Không có session nào
+        // 4. No authoritative session is available.
         if (mounted) {
+          applicationSessionReadyRef.current = false;
           setSession(null);
           setProfile(null);
           setIsLoading(false);
@@ -205,35 +280,55 @@ export function AuthProvider({ children }) {
       }
     };
 
-    initAuth();
+    let listener;
 
-    // 5. Lắng nghe thay đổi Auth State (Google/GitHub OAuth và token refresh)
-    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+    // 5. Subscribe only after the authoritative initialization read/exchange
+    // completes. This prevents Supabase's INITIAL_SESSION callback from
+    // racing the cookie restore and replaying a one-time provider proof.
+    const subscribeToAuthChanges = () => {
       if (!mounted) return;
-      
-      const newToken = newSession?.access_token || null;
-      // Tránh lặp vô hạn nếu token không thay đổi
-      if (newToken === lastSessionTokenRef.current && !!newSession === !!session) {
-        return;
-      }
+      const { data } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+        if (!mounted) return;
 
-      lastSessionTokenRef.current = newToken;
-      logAuthInfo("AuthProvider:onAuthStateChange", `Sự kiện: ${_event}`);
-
-      if (newSession?.user) {
-        setSession(newSession);
-        setProfile(formatProfile(newSession.user));
-        setIsDemoMode(false);
-        if (newToken) {
-          setStoredToken(newToken);
-          syncBackendUser(newSession.user, newToken).catch(() => {});
+        if (_event === "INITIAL_SESSION" && applicationSessionReadyRef.current) {
+          return;
         }
-      } else if (_event === "SIGNED_OUT") {
-        setSession(null);
-        setProfile(null);
-        setIsDemoMode(false);
-      }
-    });
+
+        const newToken = newSession?.access_token || null;
+        // Tránh lặp vô hạn nếu token không thay đổi
+        if (newToken && newToken === lastSessionTokenRef.current && _event !== "SIGNED_OUT") {
+          return;
+        }
+
+        lastSessionTokenRef.current = newToken;
+        logAuthInfo("AuthProvider:onAuthStateChange", `Sự kiện: ${_event}`);
+
+        if (newSession?.user && newToken) {
+          const exchanged = await exchangeApplicationSession(newToken);
+          if (!mounted) return;
+          if (exchanged.success) {
+            applicationSessionReadyRef.current = true;
+            setSession({ user: newSession.user, authority: "APPLICATION_SESSION" });
+            setProfile(formatProfile(newSession.user));
+            setIsDemoMode(false);
+          } else {
+            applicationSessionReadyRef.current = false;
+            setSession(null);
+            setProfile(null);
+            setIsDemoMode(false);
+            logAuthError("AuthProvider:onAuthStateChange:exchange", { code: exchanged.code });
+          }
+        } else if (_event === "SIGNED_OUT") {
+          applicationSessionReadyRef.current = false;
+          setSession(null);
+          setProfile(null);
+          setIsDemoMode(false);
+        }
+      });
+      listener = data;
+    };
+
+    initAuth().finally(subscribeToAuthChanges);
 
     return () => {
       mounted = false;
@@ -248,14 +343,20 @@ export function AuthProvider({ children }) {
     logAuthInfo("ensureSynced", "Bắt đầu gọi đồng bộ sang ASP.NET Core.");
     try {
       if (session?.user) {
-        const token = session.access_token || getStoredToken();
+        const token = getStoredToken();
+        if (!token) {
+          return { success: false, code: "TRANSIENT_PROVIDER_PROOF_UNAVAILABLE" };
+        }
         const payload = {
           ...session.user,
           fullName: fullName || session.user.user_metadata?.full_name || session.user.email,
         };
-        await syncBackendUser(payload, token);
+        const synced = await syncBackendUser(payload, token);
+        return synced
+          ? { success: true }
+          : { success: false, code: "BACKEND_SYNC_UNAVAILABLE" };
       }
-      return { success: true };
+      return { success: false, code: "AUTHENTICATED_SESSION_REQUIRED" };
     } catch (err) {
       logAuthError("ensureSynced", err);
       return { success: false, error: err };
@@ -274,13 +375,13 @@ export function AuthProvider({ children }) {
       setIsDemoMode(true);
       if (typeof window !== "undefined") {
         if (rememberMe) {
-          localStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
-          sessionStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
-          localStorage.setItem("studenthub_remember_me", "true");
+          writeClientStorage("localStorage", "studenthub_demo_user", JSON.stringify(demoData));
+          writeClientStorage("sessionStorage", "studenthub_demo_user", JSON.stringify(demoData));
+          writeClientStorage("localStorage", "studenthub_remember_me", "true");
         } else {
-          sessionStorage.setItem("studenthub_demo_user", JSON.stringify(demoData));
-          localStorage.removeItem("studenthub_demo_user");
-          localStorage.removeItem("studenthub_remember_me");
+          writeClientStorage("sessionStorage", "studenthub_demo_user", JSON.stringify(demoData));
+          removeClientStorage("localStorage", "studenthub_demo_user");
+          removeClientStorage("localStorage", "studenthub_remember_me");
         }
       }
     } catch (err) {
@@ -298,9 +399,8 @@ export function AuthProvider({ children }) {
         const merged = { ...(profile || {}), ...profileUpdates };
         setProfile(merged);
         if (typeof window !== "undefined") {
-          const isRemembered = localStorage.getItem("studenthub_remember_me") === "true";
-          const storage = isRemembered ? localStorage : sessionStorage;
-          storage.setItem("studenthub_user_profile", JSON.stringify(merged));
+          const storageName = isRememberedSession() ? "localStorage" : "sessionStorage";
+          writeClientStorage(storageName, "studenthub_user_profile", JSON.stringify(merged));
         }
         await updateUserProfileService(profileUpdates);
         return merged;
@@ -319,6 +419,7 @@ export function AuthProvider({ children }) {
     logAuthInfo("signOut", "Đang đăng xuất...");
     try {
       lastSessionTokenRef.current = null;
+      applicationSessionReadyRef.current = false;
       setIsDemoMode(false);
       await signOutSupabase();
       setSession(null);

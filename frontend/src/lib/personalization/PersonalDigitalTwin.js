@@ -9,6 +9,7 @@ import { AcademicRecordsStore } from "../intelligence/academic/academicRecordsSt
 import { AcademicEligibilityEngine } from "../intelligence/academic/academicEligibilityEngine.js";
 import { TrustIntelligenceEngine } from "../intelligence/trust/TrustIntelligenceEngine.js";
 import { DeviceSyncEngine } from "./DeviceSyncEngine.js";
+import { createSecureId } from "../security/secureId.js";
 
 
 export const DATA_CLASSIFICATION = Object.freeze({
@@ -202,7 +203,7 @@ export class PersonalDigitalTwin {
       vault = this.#personalVaults.get(subjectId);
     }
     const savedItem = {
-      savedId: `save_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      savedId: createSecureId("save"),
       savedAt: new Date().toISOString(),
       ...item
     };

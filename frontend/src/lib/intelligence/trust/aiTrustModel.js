@@ -4,6 +4,7 @@
  */
 
 import crypto from "node:crypto";
+import { createSecureId } from "../../security/secureId.js";
 
 export const EPISTEMIC_STATE = Object.freeze({
   KNOWN: "KNOWN",
@@ -157,7 +158,7 @@ export const ABSTENTION_REASON = Object.freeze({
 
 export class AiTrustModel {
   static createClaim(data = {}) {
-    const claimId = data.claimId || `CLAIM_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const claimId = data.claimId || createSecureId("CLAIM");
     const text = typeof data.text === "string" ? data.text.trim() : (typeof data.statement === "string" ? data.statement.trim() : "");
     const subject = typeof data.subject === "string" ? data.subject.trim() : "HCMUTE";
     const predicate = typeof data.predicate === "string" ? data.predicate.trim() : "REQUIRES";
@@ -200,7 +201,7 @@ export class AiTrustModel {
   }
 
   static createEvidenceSpan(data = {}) {
-    const evidenceId = data.evidenceId || `EVID_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const evidenceId = data.evidenceId || createSecureId("EVID");
     const sourceId = typeof data.sourceId === "string" ? data.sourceId.trim() : "SRC_OFFICIAL";
     const documentId = typeof data.documentId === "string" ? data.documentId.trim() : "DOC_GENERAL";
     const passage = typeof data.passage === "string" ? data.passage.trim() : "";
@@ -236,7 +237,7 @@ export class AiTrustModel {
 
   static createCitation(data = {}) {
     return Object.freeze({
-      citationId: data.citationId || `CITE_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      citationId: data.citationId || createSecureId("CITE"),
       claimId: data.claimId,
       evidenceId: data.evidenceId,
       status: CITATION_STATUS[data.citationStatus || data.status] || CITATION_STATUS.VALID_ENTAILMENT,
@@ -248,7 +249,7 @@ export class AiTrustModel {
   }
 
   static createSourceNode(data = {}) {
-    const sourceId = data.sourceId || `SRC_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const sourceId = data.sourceId || createSecureId("SRC");
     const name = typeof data.name === "string" ? data.name.trim() : "HCMUTE Official Source";
     const url = typeof data.url === "string" ? data.url.trim() : "https://hcmute.edu.vn";
     const sourceType = SOURCE_TYPE[data.sourceType] || SOURCE_TYPE.OFFICIAL;
@@ -275,7 +276,7 @@ export class AiTrustModel {
 
   static createClaimEdge(data = {}) {
     return Object.freeze({
-      edgeId: data.edgeId || `EDGE_${Math.random().toString(36).slice(2, 8)}`,
+      edgeId: data.edgeId || createSecureId("EDGE"),
       fromClaimId: data.fromClaimId,
       toClaimId: data.toClaimId,
       relation: CLAIM_RELATION[data.relation] || CLAIM_RELATION.SUPPORTS,
@@ -310,7 +311,7 @@ export class AiTrustModel {
 
   static createKnowledgeGapReport(data = {}) {
     return Object.freeze({
-      gapId: data.gapId || `GAP_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      gapId: data.gapId || createSecureId("GAP"),
       blindSpots: Object.freeze(Array.isArray(data.blindSpots) ? [...data.blindSpots] : []),
       requiredEvidenceRequests: Object.freeze(Array.isArray(data.requiredEvidenceRequests) ? [...data.requiredEvidenceRequests] : []),
       actionableGuidance: data.actionableGuidance || "Cần bổ sung văn bản quy định chính thức để xác minh đầy đủ."
@@ -319,7 +320,7 @@ export class AiTrustModel {
 
   static createHumanReviewPacket(data = {}) {
     return Object.freeze({
-      reviewId: data.reviewId || `REV_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      reviewId: data.reviewId || createSecureId("REV"),
       claim: data.claim ? this.createClaim(data.claim) : null,
       supportingEvidence: Object.freeze(Array.isArray(data.supportingEvidence) ? [...data.supportingEvidence] : []),
       counterEvidence: Object.freeze(Array.isArray(data.counterEvidence) ? [...data.counterEvidence] : []),
@@ -365,8 +366,9 @@ export class AiTrustModel {
       else epistemicState = EPISTEMIC_STATE.SUPPORTED;
     }
 
+    const evaluationId = data.evaluationId || createSecureId("EVAL");
     return Object.freeze({
-      evaluationId: data.evaluationId || `EVAL_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      evaluationId,
       // Ownership is assigned from the verified SecurityPrincipal by the API
       // boundary.  Missing ownership means an internal/system fixture and must
       // never be treated as public user data.
@@ -387,7 +389,7 @@ export class AiTrustModel {
       humanReviewPacket: data.humanReviewPacket || null,
       auditRecord: {
         timestamp: new Date().toISOString(),
-        evaluationId: data.evaluationId || `EVAL_${Date.now()}`,
+        evaluationId,
         policyVersion: data.policyVersion || "V2.0_2025",
         modelVersion: data.modelVersion || "StudentHub-Epistemic-V2",
         immutableHash: this.computeContentHash(JSON.stringify(claims))

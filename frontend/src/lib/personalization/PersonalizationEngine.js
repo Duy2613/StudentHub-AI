@@ -6,6 +6,7 @@
 
 import { PersonalDigitalTwin } from "./PersonalDigitalTwin.js";
 import { ExpertDiscoveryEngine } from "../intelligence/expert/ExpertDiscoveryEngine.js";
+import { createSecureId } from "../security/secureId.js";
 
 
 export const PERSONA_TYPE = Object.freeze({
@@ -153,7 +154,7 @@ export class PersonalizationEngine {
     ];
 
     return {
-      commandCenterId: `cmd_${subjectId}_${Date.now()}`,
+      commandCenterId: createSecureId("cmd"),
       compiledAt: new Date().toISOString(),
       subjectId,
       // The local stores intentionally seed deterministic records for tests and

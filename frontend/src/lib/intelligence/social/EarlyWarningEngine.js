@@ -8,6 +8,7 @@
  */
 
 import { EarlyWarningStore } from "./EarlyWarningStore.js";
+import { createSecureId } from "../../security/secureId.js";
 
 export const WARNING_LIFECYCLE = Object.freeze({
   UNVERIFIED: "UNVERIFIED",
@@ -53,7 +54,7 @@ export class EarlyWarningEngine {
 
     if (!warning) {
       warning = {
-        warningId: `warn_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        warningId: createSecureId("warn"),
         category,
         title,
         summary,

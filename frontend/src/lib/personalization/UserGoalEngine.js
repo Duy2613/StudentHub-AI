@@ -6,6 +6,7 @@
  */
 
 import { UserGoalStore } from "./UserGoalStore.js";
+import { createSecureId } from "../security/secureId.js";
 
 export const GOAL_PRIORITY = Object.freeze({
   HIGH: "HIGH",
@@ -38,7 +39,7 @@ export class UserGoalEngine {
     if (!subjectId) throw new Error("[GOAL_ERROR] subjectId is required.");
 
     const goal = {
-      goalId: `goal_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      goalId: createSecureId("goal"),
       subjectId,
       title: goalData.title || "Mục tiêu học vụ mới",
       priority: goalData.priority || GOAL_PRIORITY.MEDIUM,

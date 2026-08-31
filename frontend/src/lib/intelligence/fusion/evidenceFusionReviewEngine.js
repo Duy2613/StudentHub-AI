@@ -5,6 +5,8 @@
  * authoritative conflicts or retracted evidence are detected.
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export class EvidenceFusionReviewEngine {
   /**
    * Generates a structured review packet for human review
@@ -12,7 +14,7 @@ export class EvidenceFusionReviewEngine {
   static generateReviewPacket(knowledgeObject, reason = "AUTHORITATIVE_CONFLICT") {
     if (!knowledgeObject) return null;
 
-    const packetId = `REV_PKT_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const packetId = createSecureId("REV_PKT");
 
     return Object.freeze({
       packetId,

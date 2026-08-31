@@ -2,13 +2,14 @@
 // Applies security headers and correlation IDs at the edge.
 
 import { NextResponse } from "next/server";
+import { createCorrelationId } from "./lib/security/secureId.js";
 
 export function proxy(request) {
   const { pathname } = request.nextUrl;
   const incomingCorrelationId = request.headers.get("x-correlation-id") || "";
   const correlationId = /^[A-Za-z0-9_.:-]{1,128}$/.test(incomingCorrelationId)
     ? incomingCorrelationId
-    : `sec_edge_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    : createCorrelationId("sec_edge");
   const response = NextResponse.next();
 
   response.headers.set("x-correlation-id", correlationId);

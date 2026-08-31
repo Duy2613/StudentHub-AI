@@ -5,6 +5,8 @@
  * Core Principle: 10 copies of the same statement do NOT equal 10 independent sources.
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export class SocialDuplicationDetector {
   static #clusterIndex = new Map(); // clusterId -> Array<ContentItem>
 
@@ -75,7 +77,7 @@ export class SocialDuplicationDetector {
     }
 
     // New unique cluster
-    const newClusterId = `cluster_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const newClusterId = createSecureId("cluster");
     this.#clusterIndex.set(newClusterId, [contentItem]);
 
     return {

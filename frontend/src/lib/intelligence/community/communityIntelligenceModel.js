@@ -4,6 +4,7 @@
  */
 
 import crypto from "node:crypto";
+import { createSecureId } from "../../security/secureId.js";
 
 export const CLAIM_TYPE = Object.freeze({
   FIRST_HAND_EXPERIENCE: "FIRST_HAND_EXPERIENCE", // Direct personal observation / completed procedure
@@ -141,7 +142,7 @@ export const MODERATION_STATE = Object.freeze({
 
 export class CommunityIntelligenceModel {
   static createAuthor(data = {}) {
-    const authorId = typeof data.authorId === "string" ? data.authorId.trim() : `ANON_${Math.random().toString(36).slice(2, 7)}`;
+    const authorId = typeof data.authorId === "string" ? data.authorId.trim() : createSecureId("ANON");
     const canonicalIdentity = typeof data.canonicalIdentity === "string" ? data.canonicalIdentity.trim() : `Sinh viên ${data.cohort || "K24"}`;
     const cohort = typeof data.cohort === "string" ? data.cohort.trim().toUpperCase() : "K24";
     const accountAgeDays = typeof data.accountAgeDays === "number" ? data.accountAgeDays : 180;
@@ -185,14 +186,14 @@ export class CommunityIntelligenceModel {
 
   static anonymizeAuthorId(rawAuthorId, cohort = "K24") {
     if (!rawAuthorId || rawAuthorId.startsWith("ANON")) {
-      return `ANON_${cohort}_${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      return `${createSecureId(`ANON_${cohort}`)}`.toUpperCase();
     }
     const hash = crypto.createHash("sha256").update(`SALT_STUDENT_PRIVACY_V2_${rawAuthorId}`).digest("hex").slice(0, 8);
     return `STUDENT_${cohort}_${hash.toUpperCase()}`;
   }
 
   static createCommunityPost(data = {}) {
-    const postId = data.postId || `POST_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const postId = data.postId || createSecureId("POST");
     const authorId = typeof data.authorId === "string" ? data.authorId.trim() : "ANON_STUDENT";
     const authorCohort = typeof data.authorCohort === "string" ? data.authorCohort.trim().toUpperCase() : "K24";
     const authorHash = data.authorHash || this.anonymizeAuthorId(authorId, authorCohort);
@@ -275,7 +276,7 @@ export class CommunityIntelligenceModel {
   }
 
   static createCommunityClaim(data = {}) {
-    const claimId = data.claimId || `CLM_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const claimId = data.claimId || createSecureId("CLM");
     const postIds = Array.isArray(data.postIds) ? [...data.postIds] : (data.postId ? [data.postId] : []);
     const authorId = data.authorId || (data.authorHash || "ANON_STUDENT");
     const topic = typeof data.topic === "string" ? data.topic.trim().toUpperCase() : "GENERAL";
@@ -323,7 +324,7 @@ export class CommunityIntelligenceModel {
   }
 
   static createCommunityExperience(data = {}) {
-    const experienceId = data.experienceId || `EXP_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    const experienceId = data.experienceId || createSecureId("EXP");
     const authorId = data.authorId || "ANON_STUDENT";
     const postId = data.postId || "POST_UNKNOWN";
     const event = typeof data.event === "string" ? data.event.trim() : (data.title || "Thực hiện quy trình học vụ");
@@ -350,7 +351,7 @@ export class CommunityIntelligenceModel {
   }
 
   static createProvenanceCluster(data = {}) {
-    const clusterId = data.clusterId || `PROV_CLUS_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const clusterId = data.clusterId || createSecureId("PROV_CLUS");
     const signature = data.signature || "SIG_DEFAULT";
     const sourceOrigin = data.sourceOrigin || "ORIGINAL_STUDENT_POST";
     const postIds = Array.isArray(data.postIds) ? [...data.postIds] : [];
@@ -373,7 +374,7 @@ export class CommunityIntelligenceModel {
   }
 
   static createFrictionSignal(data = {}) {
-    const frictionId = data.frictionId || `FRIC_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const frictionId = data.frictionId || createSecureId("FRIC");
     const process = typeof data.process === "string" ? data.process.trim() : "Quy trình Đào Tạo";
     const step = typeof data.step === "string" ? data.step.trim() : "Nộp hồ sơ";
     const frictionType = typeof data.frictionType === "string" ? data.frictionType.trim() : "DELAY_CONFIRMATION";
@@ -403,7 +404,7 @@ export class CommunityIntelligenceModel {
   }
 
   static createOfficialRealityGap(data = {}) {
-    const gapId = data.gapId || `GAP_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const gapId = data.gapId || createSecureId("GAP");
     const topic = typeof data.topic === "string" ? data.topic.trim().toUpperCase() : "GENERAL";
     const officialTarget = typeof data.officialTarget === "string" ? data.officialTarget.trim() : "3 ngày làm việc";
     const officialCitation = typeof data.officialCitation === "string" ? data.officialCitation.trim() : "QĐ 3116/QĐ-ĐHSPKT";

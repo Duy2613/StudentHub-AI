@@ -5,9 +5,10 @@
 | Severity | Concern | Evidence | Impact | Suggested action |
 |---|---|---|---|---|
 | High | Live staging/provider and PostgreSQL RLS are not evidenced in this environment | staging/live test configs | Release cannot claim production integration proof | Run on approved staging/DB infrastructure |
-| Medium | Remember-me persists auth material in Web Storage | `src/lib/supabase/client.js`, `auth/authService.js` | XSS would increase token theft impact | Complete server-issued HttpOnly cookie cutover |
-| Medium | Academic fetch accepts a caller-supplied initial URL before redirect authority checks | `academicDocumentFetcher.js` | SSRF risk if exposed to untrusted server input | Validate protocol and allowlisted hostname before fetch |
-| Medium | 359 lint warnings | lint baseline | Correctness debt can hide future regressions | Burn down by rule/domain without disabling rules |
+| Medium | Live session exchange, staging/provider, and PostgreSQL RLS are not evidenced in this environment | staging/live test configs | Release cannot claim production integration proof | Run on approved staging/DB infrastructure |
+| Medium | Browser bearer persistence was previously present; local cutover is now memory-only provider proof plus HttpOnly application cookie | `src/lib/supabase/client.js`, `auth/authService.js` | Live restart/refresh/E2E proof is still required | Execute the approved live auth matrix |
+| Medium | Academic source authority is now checked before the initial transport call and on redirects | `academicDocumentFetcher.js` | Future registry/transport changes could regress SSRF controls | Keep initial-authority and redirect regression tests |
+| Medium | 349 lint warnings | current lint gate | Correctness debt can hide future regressions | Burn down by rule/domain without disabling rules |
 | Medium | Very large trained-weight/data artefacts | `.codebase-scan.txt` metrics | checkout/build/cache cost | Move/version large artefacts via model storage strategy |
 
 ## 2) Technical Debt
@@ -23,8 +24,8 @@
 
 | Risk | OWASP category | Evidence | Current mitigation | Gap |
 |---|---|---|---|---|
-| Web Storage tokens | A07 | `authService.js`, Supabase dynamic storage | logout clears both stores; backend validates tokens | no HttpOnly-only browser session |
-| Initial URL SSRF | A10 | `academicDocumentFetcher.js` | official registry and redirect validation | pre-fetch authority validation missing |
+| Web Storage tokens | A07 | `authService.js`, Supabase dynamic storage | no new credential enters Web Storage; same-origin calls use the HttpOnly application cookie | live browser refresh/restart proof pending |
+| Initial URL SSRF | A10 | `academicDocumentFetcher.js` | initial authority, protocol, size, timeout, and redirect validation | maintain registry and DNS-rebinding controls |
 | Client-side navigation injection | A03 | `ActionCenter.jsx` | fixed with HTTP(S)/single-slash allowlist and regression test | none known in changed path |
 | Production authorization | A01 | `src/lib/security`, API routes | server identity/capability services and BOLA tests | live RLS env proof pending |
 

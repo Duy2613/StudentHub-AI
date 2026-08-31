@@ -4,6 +4,10 @@ import { SecurityError, SECURITY_ERROR_CODE } from "../core/SecurityErrorEnvelop
 
 export const SESSION_COOKIE_NAME = "studenthub_session";
 
+export function clearSessionCookie({ secure = process.env.NODE_ENV === "production" } = {}) {
+  return `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT${secure ? "; Secure" : ""}`;
+}
+
 export class DurableSessionService {
   constructor({ repository, pepper, now = () => new Date(), idleMs = 30 * 60_000, absoluteMs = 24 * 60 * 60_000 } = {}) {
     this.repository = repository || new PostgresSessionRepository();
@@ -69,7 +73,7 @@ export class DurableSessionService {
   }
 
   clearCookie({ secure = process.env.NODE_ENV === "production" } = {}) {
-    return `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT${secure ? "; Secure" : ""}`;
+    return clearSessionCookie({ secure });
   }
 }
 

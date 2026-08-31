@@ -5,9 +5,9 @@
  */
 
 import { NextResponse } from "next/server";
-import { randomUUID } from "node:crypto";
 import { CommunityStore } from "@/lib/intelligence/community/communityStore";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { createSecureId } from "@/lib/security/secureId.js";
 
 export const GET = SecurityFabric.wrapHandler({
   action: "READ_COMMUNITY_INTELLIGENCE_POSTS",
@@ -41,7 +41,7 @@ async function createCommunityIntelligencePost(req, routeParams, principal) {
 
     const saved = CommunityStore.savePost({
       ...body,
-      postId: `POST_${Date.now()}_${randomUUID().slice(0, 8)}`,
+      postId: createSecureId("POST"),
       authorId: principal.subjectId,
       authorCohort: principal.attributes?.cohort || "UNKNOWN",
       verifiedIdentity: principal.attributes?.emailVerified ? "VERIFIED_STUDENT" : "UNVERIFIED_GUEST",

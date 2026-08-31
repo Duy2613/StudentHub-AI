@@ -14,6 +14,7 @@ import { CounterEvidenceEngine } from "./counterEvidenceEngine.js";
 import { BlindSpotDetector } from "./blindSpotDetector.js";
 import { ToolUseFirewall } from "./toolUseFirewall.js";
 import { EpistemicClaimGraph } from "./epistemicClaimGraph.js";
+import { createSecureId } from "../../security/secureId.js";
 
 export class AiTrustEngine {
   static evaluate(input = {}) {
@@ -334,7 +335,7 @@ export class AiTrustEngine {
 
   static #buildAbstentionResult({ query, rawAnswer, stakeLevel, ownerId = null, reason, explanation }) {
     return Object.freeze({
-      evaluationId: `EVAL_ABSTAIN_${Date.now()}`,
+      evaluationId: createSecureId("EVAL_ABSTAIN"),
       ownerId: typeof ownerId === "string" && ownerId.trim() ? ownerId.trim() : null,
       visibility: ownerId ? "PRIVATE" : "INTERNAL",
       query,

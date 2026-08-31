@@ -6,6 +6,7 @@
  */
 
 import { createHash } from "node:crypto";
+import { createSecureId } from "../../security/secureId.js";
 import { validateRemoteUrlSync } from "../../security/hardening/SafeRemoteUrl.js";
 import { LAYER_2A_CONFIG, getLayer2AConfig } from "./config.js";
 import {
@@ -360,7 +361,7 @@ export class RenderLayer2AProvider {
     const targetFingerprint = normalizedUrl ? fingerprintTarget(normalizedUrl) : null;
     const baseRequestId = typeof requestId === "string" && requestId.trim()
       ? requestId.trim().slice(0, 160)
-      : `req_l2a_${this.clock()}_${Math.random().toString(36).slice(2, 8)}`;
+      : createSecureId("req_l2a");
 
     const urlGuard = validateRemoteUrlSync(normalizedUrl);
     if (!urlGuard.ok || normalizedUrl.length > this.config.MAX_URL_LENGTH) {

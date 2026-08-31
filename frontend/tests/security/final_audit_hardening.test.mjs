@@ -20,6 +20,7 @@ import {
 } from "../../src/lib/security/core/SecurityErrorEnvelope.js";
 import { SecurityPrincipal, PRINCIPAL_TYPE } from "../../src/lib/security/core/SecurityPrincipal.js";
 import { IdentityResolver } from "../../src/lib/security/identity/IdentityResolver.js";
+import { setDurableSessionServiceForTests } from "../../src/lib/security/identity/DurableSessionService.js";
 import { AiTrustStore } from "../../src/lib/intelligence/trust/aiTrustStore.js";
 import { AiTrustModel, EPISTEMIC_STATE } from "../../src/lib/intelligence/trust/aiTrustModel.js";
 import { AIObservatoryEngine } from "../../src/lib/ai-trust/observatory/AIObservatoryEngine.js";
@@ -74,12 +75,34 @@ describe("Final audit hardening boundaries", () => {
 
   it("fails closed on malformed credential cookies", async () => {
     const request = new Request("https://studenthub.ai/api/session", {
-      headers: { cookie: "studenthub_session=%ZZ" }
+      headers: {
+        cookie: "studenthub_session=%ZZ",
+        authorization: "Bearer a-valid-looking-compatibility-token"
+      }
     });
     await assert.rejects(
       IdentityResolver.resolvePrincipal(request),
       error => error?.code === SECURITY_ERROR_CODE.UNAUTHORIZED
     );
+  });
+
+  it("treats the server-owned cookie as authoritative over a conflicting bearer", async () => {
+    setDurableSessionServiceForTests({
+      validateSession: async () => ({ user_id: "cookie-authority-user", roles: ["STUDENT"] })
+    });
+
+    try {
+      const request = new Request("https://studenthub.ai/api/session", {
+        headers: {
+          cookie: "studenthub_session=opaque-cookie",
+          authorization: "Bearer this-conflicting-token-must-not-win"
+        }
+      });
+      const principal = await IdentityResolver.resolvePrincipal(request);
+      assert.equal(principal.subjectId, "cookie-authority-user");
+    } finally {
+      setDurableSessionServiceForTests(undefined);
+    }
   });
 
   it("enforces owner isolation for persisted Trust evaluations", () => {

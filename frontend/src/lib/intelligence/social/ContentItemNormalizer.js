@@ -8,6 +8,7 @@
 
 import { EntityResolutionEngine } from "./EntityResolutionEngine.js";
 import { SOURCE_CLASSIFICATION } from "./ISourceConnector.js";
+import { createSecureId } from "../../security/secureId.js";
 
 export class ContentItemNormalizer {
   // Common Vietnamese academic slang dictionary
@@ -70,7 +71,7 @@ export class ContentItemNormalizer {
    */
   static normalize(rawPayload = {}, context = {}) {
     const rawText = (rawPayload.content || rawPayload.text || rawPayload.body || rawPayload.title || "").trim();
-    const rawId = rawPayload.rawId || rawPayload.id || `raw_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const rawId = rawPayload.rawId || rawPayload.id || createSecureId("raw");
     const sourceId = context.sourceId || rawPayload.sourceId || "src_unknown";
     const connectorId = context.connectorId || rawPayload.connectorId || "connector_general";
     const sourceClassification = context.sourceClassification || rawPayload.sourceClassification || SOURCE_CLASSIFICATION.SOCIAL;
@@ -84,7 +85,7 @@ export class ContentItemNormalizer {
     const linkedEntities = EntityResolutionEngine.resolveEntities(rawText);
 
     return Object.freeze({
-      contentId: `ci_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      contentId: createSecureId("ci"),
       rawId: String(rawId),
       sourceId: String(sourceId),
       connectorId: String(connectorId),

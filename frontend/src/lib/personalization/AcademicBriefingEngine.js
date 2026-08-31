@@ -10,6 +10,7 @@ import { StudentProfile360Service } from "../intelligence/academic/studentProfil
 import { ExpertDiscoveryEngine } from "../intelligence/expert/ExpertDiscoveryEngine.js";
 import { EarlyWarningEngine } from "../intelligence/social/EarlyWarningEngine.js";
 import { UserGoalEngine } from "./UserGoalEngine.js";
+import { createSecureId } from "../security/secureId.js";
 
 export class AcademicBriefingEngine {
   /**
@@ -93,7 +94,7 @@ export class AcademicBriefingEngine {
     ];
 
     return Object.freeze({
-      briefingId: `brief_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      briefingId: createSecureId("brief"),
       subjectId,
       studentName: profile?.identity?.fullName || "Sinh viên HCMUTE",
       academicSummary: {

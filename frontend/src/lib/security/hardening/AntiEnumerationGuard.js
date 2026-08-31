@@ -8,6 +8,7 @@
  */
 
 import crypto from "node:crypto";
+import { createCorrelationId } from "../secureId.js";
 
 export class AntiEnumerationGuard {
   /**
@@ -32,7 +33,9 @@ export class AntiEnumerationGuard {
       error: {
         code: "RESOURCE_NOT_FOUND_OR_FORBIDDEN",
         message: "The requested resource could not be found or access is denied.",
-        correlationId: correlationId || `sec_${Date.now()}`,
+        correlationId: /^[A-Za-z0-9_.:-]{1,128}$/.test(String(correlationId || "").trim())
+          ? String(correlationId).trim()
+          : createCorrelationId("sec"),
         timestamp: new Date().toISOString()
       }
     };

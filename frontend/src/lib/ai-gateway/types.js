@@ -8,6 +8,8 @@
  * See: docs/AI-MODEL-ROUTER.md, docs/PROVIDER-REGISTRY.md
  */
 
+import { createSecureId } from "../security/secureId.js";
+
 /**
  * Capability classes a caller may request. The router maps a capability
  * to the cheapest/fastest model catalog entry that can satisfy it, with an
@@ -128,7 +130,7 @@ export function createGatewayResult({
     attempts,
     errorType,
     errorMessage: ok ? null : sanitizeGatewayError(errorType, errorMessage),
-    requestId: requestId || `req_gw_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    requestId: requestId || createSecureId("req_gw"),
     totalLatencyMs: Number(totalLatencyMs.toFixed?.(2) ?? totalLatencyMs),
     timestamp: Date.now(),
     schemaVersion: "ai-gateway-v1",

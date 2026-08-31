@@ -11,6 +11,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { createCorrelationId, createSecureId } from "../secureId.js";
 
 export const SECURITY_EVENT_TYPE = Object.freeze({
   // Authentication Events
@@ -44,6 +45,13 @@ export const SECURITY_EVENT_TYPE = Object.freeze({
   SECURITY_POLICY_VIOLATION: "SECURITY_POLICY_VIOLATION"
 });
 
+function safeCorrelationId(value) {
+  const candidate = String(value || "").trim();
+  return /^[A-Za-z0-9_.:-]{1,128}$/.test(candidate)
+    ? candidate
+    : createCorrelationId("corr");
+}
+
 const DEFAULT_STORE_DIR = path.resolve(process.cwd(), ".data");
 const DEFAULT_STORE_FILE = path.join(DEFAULT_STORE_DIR, "security_audit_logs.json");
 
@@ -76,7 +84,7 @@ export class SecurityAuditLogger {
     details = {}
   }) {
     const auditRecord = Object.freeze({
-      eventId: `audit_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      eventId: createSecureId("audit"),
       timestamp: new Date().toISOString(),
       eventType,
       subject: this.#boundedText(subject, 128),
@@ -84,7 +92,7 @@ export class SecurityAuditLogger {
       resource: this.#boundedText(resource, 160),
       decision,
       reason: this.#sanitizeReason(reason),
-      correlationId: correlationId || `corr_${Date.now()}`,
+      correlationId: safeCorrelationId(correlationId),
       clientIp: this.#boundedText(clientIp, 64),
       details: this.#sanitizeDetails(details)
     });

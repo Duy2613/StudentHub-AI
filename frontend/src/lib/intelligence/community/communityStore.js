@@ -15,6 +15,7 @@ import {
 import { CommunityExperienceEngine } from "./communityExperienceEngine.js";
 import { CommunityFrictionEngine } from "./communityFrictionEngine.js";
 import { CommunityRealityGapEngine } from "./communityRealityGapEngine.js";
+import { createSecureId } from "../../security/secureId.js";
 
 const DEFAULT_STORE_DIR = path.resolve(process.cwd(), ".data");
 const DEFAULT_STORE_FILE = path.join(DEFAULT_STORE_DIR, "community_intelligence_store_v2.json");
@@ -155,7 +156,7 @@ export class CommunityStore {
         feedback: this.#feedbackList
       };
       const serialized = JSON.stringify(payload, null, 2);
-      const tempPath = `${this.#storageFilePath}.tmp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      const tempPath = `${this.#storageFilePath}.tmp_${createSecureId("tmp")}`;
       fs.writeFileSync(tempPath, serialized, "utf-8");
       fs.renameSync(tempPath, this.#storageFilePath);
     } catch {
@@ -274,7 +275,7 @@ export class CommunityStore {
   static registerFeedback(feedback = {}) {
     this.#ensureHydrated();
     const record = {
-      feedbackId: `FB_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      feedbackId: createSecureId("FB"),
       reporterId: feedback.reporterId || null,
       postId: feedback.postId || null,
       topic: feedback.topic || "GENERAL",

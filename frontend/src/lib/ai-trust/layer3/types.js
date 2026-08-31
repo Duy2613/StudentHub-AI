@@ -9,6 +9,8 @@
  * - Claim Status, Candidate Source, Evidence Item, and Layer 4 Verification Package builders
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export const LAYER_3_STATUS = {
   VERIFIED: "VERIFIED",                               // High-authority evidence conclusively confirms or refutes claim
   VERIFIED_WITH_CONFLICT: "VERIFIED_WITH_CONFLICT",   // Primary evidence found but secondary discrepancies exist
@@ -143,7 +145,7 @@ function normalizeConflict(value) {
  */
 export function createEvidence(input = {}) {
   const {
-  evidenceId = `ev-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+  evidenceId = createSecureId("ev"),
   claimId,
   sourceId,
   sourceUrl,
@@ -214,7 +216,7 @@ export function createEvidence(input = {}) {
  */
 export function createSource(input = {}) {
   const {
-  sourceId = `src-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+  sourceId = createSecureId("src"),
   url,
   domain,
   title = "",
@@ -385,7 +387,7 @@ export function createLayer3Result(input = {}) {
     evidenceConfidence: boundedUnit(evidenceConfidence),
     limitations: Array.isArray(limitations) ? limitations.slice(0, 20).filter((item) => typeof item === "string").map((item) => boundedString(item, 600)) : [],
     nextLayer: Number.isInteger(nextLayer) && nextLayer > 0 && nextLayer <= 4 ? nextLayer : 4,
-    requestId: boundedString(requestId, 160) || `req_l3_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    requestId: boundedString(requestId, 160) || createSecureId("req_l3"),
     metrics: {
       executionTimeMs: Number.isFinite(safeMetrics.executionTimeMs) ? Math.max(0, safeMetrics.executionTimeMs) : 0,
       queriesExecutedCount: Number.isFinite(safeMetrics.queriesExecutedCount) ? Math.max(0, safeMetrics.queriesExecutedCount) : 0,

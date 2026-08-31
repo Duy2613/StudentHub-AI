@@ -8,6 +8,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { AiTrustModel, EPISTEMIC_STATE } from "./aiTrustModel.js";
+import { createSecureId } from "../../security/secureId.js";
 
 const DEFAULT_STORE_DIR = path.resolve(process.cwd(), ".data");
 const DEFAULT_STORE_FILE = path.join(DEFAULT_STORE_DIR, "ai_trust_evaluations.json");
@@ -101,7 +102,7 @@ export class AiTrustStore {
         corrections: this.#corrections
       };
       const serialized = JSON.stringify(payload, null, 2);
-      const tempPath = `${this.#storageFilePath}.tmp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      const tempPath = `${this.#storageFilePath}.tmp_${createSecureId("tmp")}`;
       fs.writeFileSync(tempPath, serialized, "utf-8");
       fs.renameSync(tempPath, this.#storageFilePath);
     } catch {
@@ -351,7 +352,7 @@ export class AiTrustStore {
   static recordCorrection(correctionData = {}) {
     this.#ensureHydrated();
     const correction = {
-      correctionId: `CORR_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      correctionId: createSecureId("CORR"),
       timestamp: new Date().toISOString(),
       previousEvaluationId: correctionData.previousEvaluationId,
       reason: correctionData.reason || "Cập nhật theo văn bản ban hành mới nhất.",

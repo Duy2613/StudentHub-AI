@@ -8,6 +8,8 @@
  * - Verification Tasks Package for Layer 3 consumption
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export const LAYER_2_STATUS = {
   BLOCK: "BLOCK",                         // Strong contextual evidence of malicious / deceptive intent -> STOP
   SUSPICIOUS: "SUSPICIOUS",               // Strong contextual/cross-modal anomaly requiring external proof -> L3
@@ -305,7 +307,7 @@ export function createClaim(params = {}) {
   const verificationRequired = input.verificationRequired;
   const verificationReason = input.verificationReason;
   const rawText = input.rawText;
-  const safeClaimId = typeof claimId === "string" && claimId.trim() ? claimId.trim().slice(0, 160) : `claim-${Date.now()}`;
+  const safeClaimId = typeof claimId === "string" && claimId.trim() ? claimId.trim().slice(0, 160) : createSecureId("claim");
   const safeSubject = typeof subject === "string" ? subject.trim().slice(0, 240) : "unknown";
   const safePredicate = typeof predicate === "string" ? predicate.trim().slice(0, 500) : "claims";
   const safeObject = typeof object === "string" ? object.slice(0, 800) : "";
@@ -388,7 +390,7 @@ export function createLayer2Result(params = {}) {
   const safeDetails = details && typeof details === "object" && !Array.isArray(details) ? details : {};
   const safeVerificationPackage = normalizeVerificationPackage(verificationPackage, safeClaims, safeEntities);
   const safeNextLayer = Number.isInteger(nextLayer) && nextLayer > 0 && nextLayer <= 4 ? nextLayer : 3;
-  const safeRequestId = typeof requestId === "string" && requestId.trim() ? requestId.trim().slice(0, 160) : `req_l2_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const safeRequestId = typeof requestId === "string" && requestId.trim() ? requestId.trim().slice(0, 160) : createSecureId("req_l2");
   const safeProviderId = boundedText(safeDetails.providerId, 120) || null;
   const safeModelProvider = boundedText(safeDetails.modelProvider, 120) || null;
   const safeModelUsed = boundedText(safeDetails.modelUsed, 120) || null;

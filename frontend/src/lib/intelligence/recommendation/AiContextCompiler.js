@@ -5,6 +5,7 @@
 
 import { PropertyFilter } from "../../security/authorization/PropertyFilter.js";
 import { PurposeValidator } from "../../security/purpose/PurposeValidator.js";
+import { createSecureId } from "../../security/secureId.js";
 
 export class AiContextCompiler {
   /**
@@ -64,7 +65,7 @@ export class AiContextCompiler {
     }));
 
     return {
-      contextId: `ctx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      contextId: createSecureId("ctx"),
       purpose,
       agentId: agentPrincipal.agentIdentity?.agentId || "unidentified_agent",
       targetSubjectId: agentPrincipal.subjectId,

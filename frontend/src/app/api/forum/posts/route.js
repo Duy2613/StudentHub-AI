@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { PostgresForumRepository } from "@/lib/forum/PostgresForumRepository.js";
 import { DatabaseUnavailableError } from "@/lib/server/database/PostgresPool.js";
+import { createSecureId } from "@/lib/security/secureId.js";
 
 // In-memory store conforming to ForumPost model (Phần F)
 let FORUM_POSTS = [
@@ -240,7 +241,7 @@ async function updateForumPost(request, routeParams, principal) {
       const normalizedText = normalizeText(text, 1000);
       if (normalizedText.length < 2) return NextResponse.json({ success: false, error: "Bình luận cần ít nhất 2 ký tự." }, { status: 400 });
       const comment = {
-        id: `comment-${Date.now()}`,
+        id: createSecureId("comment"),
         authorId: actor,
         authorName: normalizeText(principal.attributes?.fullName || principal.email || "Thành viên StudentHub", 80),
         text: normalizedText,
@@ -281,7 +282,7 @@ async function createForumPost(request, routeParams, principal) {
     }
 
     const newPost = {
-      id: `post-${Date.now()}`,
+      id: createSecureId("post"),
       category: normalizedCategory,
       locationTag: normalizeText(locationTag || "CAMPUS", 80).toUpperCase(),
       title: normalizedTitle,

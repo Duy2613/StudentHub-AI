@@ -4,6 +4,7 @@ import {
   PROFESSOR_REVIEWS,
   moderateReviewComment,
 } from "@/lib/prof/profReviewRegistry";
+import { createSecureId } from "@/lib/security/secureId.js";
 
 /**
  * GET /api/prof-rating/reviews?professorId=
@@ -86,7 +87,7 @@ async function createProfessorReview(request, _routeContext, principal, secConte
     }
 
     const newReview = {
-      id: `rev-${Date.now()}`,
+      id: createSecureId("rev"),
       professorId,
       authorId: principal.subjectId,
       studentRole: principal.principalType,

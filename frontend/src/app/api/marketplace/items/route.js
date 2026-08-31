@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { SecurityFabric } from "@/lib/security/SecurityFabric";
+import { createSecureId } from "@/lib/security/secureId.js";
 
 // Deterministic marketplace UI fixture.  It is intentionally not presented as
 // a live durable marketplace until a reviewed persistence/identity adapter is
@@ -169,7 +170,7 @@ async function createMarketplaceItem(request, _routeContext, principal) {
       || "Thành viên StudentHub";
 
     const newItem = {
-      id: `item-${Date.now()}`,
+      id: createSecureId("item"),
       title: title.trim(),
       category: category || "GIAO_TRINH",
       categoryName: categoryName || "Giáo trình & Sách",

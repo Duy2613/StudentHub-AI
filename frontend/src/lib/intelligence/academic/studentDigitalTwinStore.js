@@ -8,6 +8,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { StudentDigitalTwinModel } from "./studentDigitalTwinModel.js";
+import { createSecureId } from "../../security/secureId.js";
 
 const DEFAULT_TWIN_STORE_DIR = path.resolve(process.cwd(), ".data");
 const DEFAULT_TWIN_STORE_FILE = path.join(DEFAULT_TWIN_STORE_DIR, "student_digital_twins.json");
@@ -66,7 +67,7 @@ export class StudentDigitalTwinStore {
       };
 
       const serialized = JSON.stringify(payload, null, 2);
-      const tempPath = `${this.#storageFilePath}.tmp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      const tempPath = `${this.#storageFilePath}.tmp_${createSecureId("tmp")}`;
 
       fs.writeFileSync(tempPath, serialized, "utf-8");
       fs.renameSync(tempPath, this.#storageFilePath);

@@ -13,6 +13,7 @@ import { AIGatewayModelProvider } from "./providers/AIGatewayModelProvider.js";
 import { Layer2ConfidenceEngine } from "./engine/Layer2ConfidenceEngine.js";
 import { VerificationPlanner } from "./engine/VerificationPlanner.js";
 import { Layer2DecisionEngine } from "./engine/Layer2DecisionEngine.js";
+import { createSecureId } from "../../security/secureId.js";
 import {
   SEMANTIC_BOUNDARY_LIMITS,
   createUnknownSemanticAnalysis,
@@ -76,7 +77,7 @@ export class Layer2SemanticService {
     const metadata = safeMetadata(input.metadata);
     const layer1Result = sanitizeLayer1ForSemantic(input.layer1Result);
     const options = input.options && typeof input.options === "object" && !Array.isArray(input.options) ? input.options : {};
-    const requestId = boundedString(options.requestId, 160) || `req_l2_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const requestId = boundedString(options.requestId, 160) || createSecureId("req_l2");
 
     if (!INPUT_TYPES.has(rawType) || !hasPayload({ content, metadata })) {
       const unknown = createUnknownSemanticAnalysis(!INPUT_TYPES.has(rawType) ? "INVALID_INPUT_TYPE" : "EMPTY_SEMANTIC_INPUT");

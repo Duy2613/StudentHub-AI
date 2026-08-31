@@ -3,6 +3,8 @@
  * Calculates explainable confidence scores and measures calibration error against empirical historical outcomes.
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export class ConfidenceCalibrationEngine {
   static #calibrationHistory = [];
 
@@ -84,7 +86,7 @@ export class ConfidenceCalibrationEngine {
     }
 
     const item = {
-      recordId: `cal_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      recordId: createSecureId("cal"),
       claimId: record.claimId || "unknown",
       predictedConfidence: Math.max(0, Math.min(1, Number(record.predictedConfidence))),
       observedOutcome: Number(record.observedOutcome) === 1 ? 1 : 0,

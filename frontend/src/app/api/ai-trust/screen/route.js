@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Layer1ScreenService } from "@/lib/ai-trust/layer1/Layer1ScreenService";
 import { SecurityFabric } from "@/lib/security/SecurityFabric";
+import { createSecureId } from "@/lib/security/secureId.js";
 
 /**
  * POST /api/ai-trust/screen
@@ -41,7 +42,7 @@ async function screenTrustInput(request) {
       );
     }
 
-    const requestId = `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const requestId = createSecureId("req");
 
     const result = await Layer1ScreenService.screen({
       type: type || "text",

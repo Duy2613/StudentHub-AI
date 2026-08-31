@@ -5,15 +5,15 @@
 // Trình xử lý Callback OAuth (Google / GitHub qua Supabase Auth):
 // - Loại bỏ hoàn toàn lệch pha đồng bộ (Async Mismatch) bằng chuỗi thực thi tuần tự:
 //   1. Trực tiếp giải mã Session từ URL qua supabase.auth.getSession()
-//   2. Lưu Bearer Token vào Storage tức thì
-//   3. Gọi POST /api/auth/sync sang ASP.NET Core Backend
+//   2. Dùng Bearer proof tạm thời để đồng bộ và trao đổi phiên một lần
+//   3. Nhận opaque HttpOnly application session từ máy chủ
 //   4. Phân luồng an toàn: Chưa Onboarded -> /onboarding | Đã Onboarded -> /dashboard
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import {
-  setStoredToken,
+  exchangeApplicationSession,
   syncBackendUser,
   signOutSupabase,
   logAuthError,
@@ -47,16 +47,24 @@ export default function AuthCallbackPage() {
           logAuthInfo("OAuthCallback", "Không tìm thấy session tức thì, đợi onAuthStateChange...");
           
           // Fallback đợi onAuthStateChange nếu URL hash parsing đang diễn ra
-          const { data: authListener } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-            if (newSession?.user) {
-              authListener.subscription.unsubscribe();
+          let timeoutId;
+          let subscription;
+          let settled = false;
+          const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+            if (newSession?.user && !settled) {
+              settled = true;
+              clearTimeout(timeoutId);
+              subscription?.unsubscribe();
               await handleSuccessfulSession(newSession);
             }
           });
+          subscription = authListener?.subscription;
 
           // Timeout an toàn 4 giây
-          setTimeout(() => {
-            authListener.subscription.unsubscribe();
+          timeoutId = setTimeout(() => {
+            if (settled) return;
+            settled = true;
+            subscription?.unsubscribe();
             router.replace("/login?error=oauth_failed");
           }, 4000);
           return;
@@ -74,8 +82,6 @@ export default function AuthCallbackPage() {
       const accessToken = currentSession.access_token;
       logAuthInfo("OAuthCallback", `Xác thực thành công cho user: ${user.email}`);
 
-      // 2. Lưu token vào Storage
-      setStoredToken(accessToken, true);
       setStatusMessage("Đang đồng bộ dữ liệu với máy chủ ASP.NET Core...");
 
       // 3. Kiểm tra xem tài khoản có bị xung đột (ban đầu đăng ký email/mật khẩu)
@@ -113,7 +119,21 @@ export default function AuthCallbackPage() {
         accessToken
       );
 
-      // 5. Kiểm tra Onboarding và điều hướng
+      // 5. Exchange the transient provider proof for the server-owned opaque
+      // session. Failure is terminal: the UI must not claim authentication
+      // when durable session persistence is unavailable.
+      setStatusMessage("Đang tạo phiên đăng nhập an toàn...");
+      const exchanged = await exchangeApplicationSession(accessToken);
+      if (!exchanged.success) {
+        const exchangeError = new Error("Không thể tạo phiên đăng nhập an toàn.");
+        exchangeError.code = exchanged.code;
+        logAuthError("OAuthCallback:sessionExchange", exchangeError);
+        await signOutSupabase();
+        router.replace("/login?error=session_unavailable");
+        return;
+      }
+
+      // 6. Kiểm tra Onboarding và điều hướng
       const isOnboarded = user.user_metadata?.onboarded === true;
       const role = user.user_metadata?.role;
 

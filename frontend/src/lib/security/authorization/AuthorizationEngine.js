@@ -21,6 +21,7 @@ import { RBACPolicy } from "./RBACPolicy.js";
 import { ABACPolicy } from "./ABACPolicy.js";
 import { ReBACPolicy, RELATIONSHIPS } from "./ReBACPolicy.js";
 import { SECURITY_ERROR_CODE } from "../core/SecurityErrorEnvelope.js";
+import { createCorrelationId } from "../secureId.js";
 
 export const DECISION = Object.freeze({
   ALLOW: "ALLOW",
@@ -57,7 +58,10 @@ export class AuthorizationEngine {
     context = null,
     allowAnonymous = false
   }) {
-    const correlationId = context?.correlationId || `authz_${Date.now()}`;
+    const suppliedCorrelationId = String(context?.correlationId || "").trim();
+    const correlationId = /^[A-Za-z0-9_.:-]{1,128}$/.test(suppliedCorrelationId)
+      ? suppliedCorrelationId
+      : createCorrelationId("authz");
 
     // =========================================================================
     // 1. HARD DENY RULES (IMMUTABLE BOUNDARIES — CANNOT BE OVERRIDDEN)

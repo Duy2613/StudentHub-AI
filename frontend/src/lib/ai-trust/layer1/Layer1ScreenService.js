@@ -14,6 +14,7 @@
 import { LAYER_1_CONFIG } from "./config/Layer1Config.js";
 import { LAYER_1_REASONS, SIGNAL_SEVERITY, createSignal } from "./types.js";
 import { SecurityLogger } from "./observability/SecurityLogger.js";
+import { createSecureId } from "../../security/secureId.js";
 import { NormalizationService } from "./normalization/NormalizationService.js";
 import { UrlDetector } from "./detectors/UrlDetector.js";
 import { TextDetector } from "./detectors/TextDetector.js";
@@ -41,7 +42,7 @@ export class Layer1ScreenService {
     const startTime = typeof performance !== "undefined" ? performance.now() : Date.now();
     const requestId = typeof options.requestId === "string" && options.requestId.trim()
       ? options.requestId.trim().slice(0, 160)
-      : `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      : createSecureId("req_l1");
     const normalizedType = String(type || "text").toLowerCase();
     const detectorsExecuted = ["NormalizationService"];
 

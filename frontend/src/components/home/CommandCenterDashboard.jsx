@@ -128,9 +128,8 @@ export default function CommandCenterDashboard() {
 
     setState("loading");
     setError("");
-    const headers = session.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined;
 
-    fetch("/api/v1/dashboard", { credentials: "include", headers })
+    fetch("/api/v1/dashboard", { credentials: "include" })
       .then(async (response) => {
         const payload = await response.json().catch(() => ({}));
         if (!response.ok || payload.success !== true) {

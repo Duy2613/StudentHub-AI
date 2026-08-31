@@ -8,6 +8,8 @@
  * - Truth Assessment, Risk Assessment, and Auditable Explanation builders
  */
 
+import { createSecureId } from "../../security/secureId.js";
+
 export const FINAL_CLASSIFICATION = {
   VERIFIED_TRUE: "VERIFIED_TRUE",                 // Supported by official primary authoritative evidence
   LIKELY_TRUE: "LIKELY_TRUE",                     // Strong secondary evidence without contradiction
@@ -236,7 +238,7 @@ export function createLayer4Result(input = {}) {
     recommendedAction: canonicalAction,
     userExplanation: safeExplanation,
     auditTrail: {
-      requestId: boundedText(safeAuditTrail.requestId, 160) || `req_l4_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      requestId: boundedText(safeAuditTrail.requestId, 160) || createSecureId("req_l4"),
       timestamp: boundedText(safeAuditTrail.timestamp, 80) || new Date().toISOString(),
       ruleVersion: boundedText(safeAuditTrail.ruleVersion, 120) || "layer4-v1.0.0",
       fusedEvidenceCount: Number.isFinite(Number(safeAuditTrail.fusedEvidenceCount)) ? Math.max(0, Number(safeAuditTrail.fusedEvidenceCount)) : 0,

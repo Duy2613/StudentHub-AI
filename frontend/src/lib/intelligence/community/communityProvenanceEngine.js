@@ -9,6 +9,7 @@ import {
   CommunityIntelligenceModel,
   COORDINATION_RISK
 } from "./communityIntelligenceModel.js";
+import { createSecureId } from "../../security/secureId.js";
 
 export class CommunityProvenanceEngine {
   /**
@@ -121,7 +122,7 @@ export class CommunityProvenanceEngine {
 
     for (const clm of claimsArray) {
       if (clm.authorId) uniqueAuthors.add(clm.authorId);
-      const provId = clm.provenanceClusterId || clm.sourceHash || (clm.postIds && clm.postIds[0]) || `CLUS_${Math.random()}`;
+      const provId = clm.provenanceClusterId || clm.sourceHash || (clm.postIds && clm.postIds[0]) || createSecureId("CLUS");
       uniqueClusters.add(provId);
     }
 

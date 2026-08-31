@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { describe, it } from "node:test";
 import { exportJWK, generateKeyPair, SignJWT } from "jose";
 
-import { DurableSessionService } from "../../src/lib/security/identity/DurableSessionService.js";
+import { clearSessionCookie, DurableSessionService } from "../../src/lib/security/identity/DurableSessionService.js";
 import { OidcTokenVerifier } from "../../src/lib/security/identity/OidcTokenVerifier.js";
 import { SessionExchangeService } from "../../src/lib/security/identity/SessionExchangeService.js";
 import { CsrfGuard } from "../../src/lib/security/hardening/CsrfGuard.js";
@@ -98,6 +98,15 @@ describe("PHASE 2 — durable opaque sessions", () => {
     const created = await service.createSession({ userId: "11111111-1111-4111-8111-111111111111", jti: "expiry" });
     clock = new Date("2026-08-27T00:02:01.000Z");
     await assert.rejects(service.validateSession(created.secret), /invalid, expired, or revoked/i);
+  });
+
+  it("provides a safe cookie clear response independently of persistence availability", () => {
+    const cookie = clearSessionCookie({ secure: true });
+    assert.match(cookie, /^studenthub_session=;/);
+    assert.match(cookie, /HttpOnly/);
+    assert.match(cookie, /SameSite=Lax/);
+    assert.match(cookie, /Max-Age=0/);
+    assert.match(cookie, /Secure/);
   });
 
   it("rejects replay of the same verified upstream proof even without jti", async () => {

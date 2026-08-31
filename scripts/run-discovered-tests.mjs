@@ -4,6 +4,10 @@ import { spawnSync } from "node:child_process";
 
 const root = join(process.cwd(), "frontend", "tests");
 
+function normalizePath(value) {
+  return String(value || "").replaceAll("\\", "/").replace(/^\.\//, "");
+}
+
 function collect(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const target = join(dir, entry.name);
@@ -12,9 +16,26 @@ function collect(dir) {
   });
 }
 
-const tests = collect(root).sort();
-if (!tests.length) {
+const allTests = collect(root).sort();
+const requestedPatterns = process.argv.slice(2)
+  .filter((argument) => argument && !argument.startsWith("-"))
+  .map(normalizePath);
+
+const tests = requestedPatterns.length
+  ? allTests.filter((test) => {
+      const label = normalizePath(relative(process.cwd(), test));
+      return requestedPatterns.some((pattern) =>
+        label === pattern || label.endsWith(`/${pattern}`)
+      );
+    })
+  : allTests;
+
+if (!allTests.length) {
   console.error("[QUALITY_GATE] No test files discovered.");
+  process.exit(1);
+}
+if (!tests.length) {
+  console.error(`[QUALITY_GATE] No tests matched: ${requestedPatterns.join(", ")}`);
   process.exit(1);
 }
 
@@ -29,4 +50,5 @@ for (const test of tests) {
   passed += 1;
 }
 
-console.log(`\n[QUALITY_GATE] PASS: ${passed}/${tests.length} discovered test files`);
+const scope = requestedPatterns.length ? "selected" : "discovered";
+console.log(`\n[QUALITY_GATE] PASS: ${passed}/${tests.length} ${scope} test files`);

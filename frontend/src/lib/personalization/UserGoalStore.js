@@ -7,6 +7,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { createSecureId } from "../security/secureId.js";
 
 const DEFAULT_STORE_DIR = path.resolve(process.cwd(), ".data");
 const DEFAULT_STORE_FILE = path.join(DEFAULT_STORE_DIR, "user_goals_store.json");
@@ -82,7 +83,7 @@ export class UserGoalStore {
       goals: goalsObj
     };
 
-    const tempFile = `${this.#storageFilePath}.tmp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const tempFile = `${this.#storageFilePath}.tmp_${createSecureId("tmp")}`;
     try {
       fs.writeFileSync(tempFile, JSON.stringify(payload, null, 2), "utf8");
       try {
