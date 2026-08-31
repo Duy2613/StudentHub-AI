@@ -1,11 +1,11 @@
 # API Authorization Inventory
 
-Generated from source by `npm run audit:api-auth` on 2026-08-31T01:48:39.031Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
+Generated from source by `npm run audit:api-auth` on 2026-08-31T11:04:26.287Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
 
-- Route files: 109
-- HTTP handlers: 136
+- Route files: 110
+- HTTP handlers: 137
 - Authentication required by Security Fabric: 70
-- Explicit anonymous access: 60
+- Explicit anonymous access: 61
 - No visible Security Fabric wrapper: 6
 - Unprotected mutations requiring P0 review: 0
 
@@ -146,6 +146,7 @@ Generated from source by `npm run audit:api-auth` on 2026-08-31T01:48:39.031Z. T
 | /api/v1/passports | GET | AUTHENTICATED | required | READ_OWN_EVIDENCE_PASSPORTS | PASSPORT.READ_OWN | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/v1/passports | POST | AUTHENTICATED | required | CREATE_OWN_EVIDENCE_PASSPORT | PASSPORT.WRITE_OWN | public or domain-defined | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/v1/search | GET | PUBLIC | anonymous allowed | SEARCH_CANONICAL_PRODUCT | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/v1/trust/analyze | POST | PUBLIC | anonymous allowed | RUN_CANONICAL_TRUST_PIPELINE | — | public or domain-defined | default/configured | 512 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/v1/trust | POST | PUBLIC | anonymous allowed | RUN_CANONICAL_TRUST_PIPELINE | — | public or domain-defined | default/configured | 512 * 1024 bytes | manual/none | state mutation | policy declared |
 
 ## Interpretation
