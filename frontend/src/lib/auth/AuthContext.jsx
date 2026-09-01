@@ -142,7 +142,19 @@ function formatProfile(user) {
   const fullName = user.fullName || user.FullName || meta.full_name || meta.name || cached.fullName || "Người dùng StudentHub";
   const rawRole = (user.role || user.Role || meta.role || cached.role || "student").toLowerCase();
   const isExpert = rawRole === "expert";
-  const isEdu = user.universityEmailVerified || user.UniversityEmailVerified || /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(email);
+  // An email suffix is only a candidate for verification. It is not proof and
+  // must never grant a verified-student label or a reputation score.
+  const isEdu = user.universityEmailVerified === true
+    || user.UniversityEmailVerified === true
+    || meta.verified_student === true;
+  const explicitTrustScore = [
+    user.reputation_score,
+    user.reputationScore,
+    user.trustScore,
+    user.TrustScore,
+    meta.reputation_score,
+    meta.trust_score,
+  ].find((value) => Number.isFinite(Number(value)));
 
   return {
     id: String(user.id || user.Id || cached.id || "user-1"),
@@ -151,18 +163,18 @@ function formatProfile(user) {
     role: isExpert ? "expert" : "student",
     avatarId: cached.avatarId || meta.avatar_id || (isExpert ? "expert-ai" : "student-tech"),
     avatarUrl: cached.avatarUrl || meta.avatar_url || null,
-    university: cached.university || meta.university || (isEdu ? "Đại học Thành viên (Email Edu)" : "Chưa cập nhật"),
+    university: cached.university || meta.university || (isEdu ? "Đã xác minh theo nguồn tổ chức" : "Chưa cập nhật"),
     major: cached.major || meta.major || "Khoa học & Kỹ thuật",
     academicYear: cached.academicYear || meta.academic_year || "2024-2028",
     expertTitle: cached.expertTitle || meta.expert_title || "Chuyên gia Tư vấn & Nghiên cứu",
     expertField: cached.expertField || meta.expert_field || "Trí tuệ nhân tạo (AI & Machine Learning)",
     experienceYears: cached.experienceYears || meta.experience_years || "3+ năm kinh nghiệm",
     bio: cached.bio || meta.bio || (isExpert ? "Chuyên gia giải đáp học thuật và định hướng nghiên cứu cho sinh viên." : "Sinh viên đam mê học tập, khám phá công nghệ và AI."),
-    trustScore: user.reputation_score || user.reputationScore || user.trustScore || user.TrustScore || cached.reputation_score || cached.trustScore || meta.reputation_score || meta.trust_score || (isExpert ? 98 : isEdu ? 80 : 50),
-    reputationScore: user.reputation_score || user.reputationScore || cached.reputation_score || meta.reputation_score || (isExpert ? 98 : isEdu ? 80 : 50),
+    trustScore: explicitTrustScore ?? 50,
+    reputationScore: explicitTrustScore ?? 50,
     githubUsername: cached.github_username || cached.githubUsername || meta.github_username || meta.user_name || null,
     topRepos: cached.top_repos || cached.topRepos || meta.top_repos || [],
-    verifiedStudent: user.universityEmailVerified || user.UniversityEmailVerified || meta.verified_student || isEdu,
+    verifiedStudent: isEdu,
     verifiedExpert: isExpert || meta.verified_expert === true,
     onboarded: cached.onboarded === true || meta.onboarded === true,
     badges: cached.badges || meta.badges || (isExpert ? ["⭐ Chuyên Gia Uy Tín", "Cố Vấn Xuất Sắc", "Top Người Giải Đáp"] : ["Sinh Viên Tiên Phong", "Học Giả Tích Cực"]),

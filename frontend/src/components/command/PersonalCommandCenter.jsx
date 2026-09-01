@@ -138,7 +138,7 @@ export function PersonalCommandCenter({ initialData = null }) {
                 <Calendar className="w-4 h-4 text-cyan-400" />
                 <span>Lịch Học & Hoạt Động Hôm Nay</span>
               </div>
-              <Link href="/academic" className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center space-x-1 font-medium">
+              <Link href="/dashboard" className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center space-x-1 font-medium">
                 <span>Toàn bộ thời khóa biểu</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </Link>
@@ -182,7 +182,7 @@ export function PersonalCommandCenter({ initialData = null }) {
                 <Award className="w-4 h-4" />
                 <span>Chuyên Gia Phù Hợp (T2 Lens)</span>
               </div>
-              <Link href="/intelligence/experts" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+              <Link href="/expert" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">
                 Tra cứu thêm
               </Link>
             </div>
@@ -210,7 +210,7 @@ export function PersonalCommandCenter({ initialData = null }) {
                 <Users className="w-4 h-4" />
                 <span>Tín Hiệu Cộng Đồng (T3 Lens)</span>
               </div>
-              <Link href="/intelligence/community" className="text-xs text-emerald-400 hover:text-emerald-300 font-medium">
+              <Link href="/community" className="text-xs text-emerald-400 hover:text-emerald-300 font-medium">
                 Xem chi tiết
               </Link>
             </div>
@@ -233,16 +233,16 @@ export function PersonalCommandCenter({ initialData = null }) {
               Truy Cập Nhanh 4 Thấu Kính Trí Tuệ
             </span>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <Link href="/intelligence/trust" className="p-3 rounded-xl bg-neutral-950/60 border border-neutral-800 hover:border-cyan-500/40 block text-neutral-300 hover:text-cyan-300 font-medium transition-all">
+              <Link href="/trust" className="p-3 rounded-xl bg-neutral-950/60 border border-neutral-800 hover:border-cyan-500/40 block text-neutral-300 hover:text-cyan-300 font-medium transition-all">
                 🛡️ T1 Trust Lens
               </Link>
-              <Link href="/intelligence/experts" className="p-3 rounded-xl bg-neutral-950/60 border border-neutral-800 hover:border-indigo-500/40 block text-neutral-300 hover:text-indigo-300 font-medium transition-all">
+              <Link href="/expert" className="p-3 rounded-xl bg-neutral-950/60 border border-neutral-800 hover:border-indigo-500/40 block text-neutral-300 hover:text-indigo-300 font-medium transition-all">
                 🎓 T2 Expert Lens
               </Link>
-              <Link href="/intelligence/community" className="p-3 rounded-xl bg-neutral-950/60 border border-neutral-800 hover:border-emerald-500/40 block text-neutral-300 hover:text-emerald-300 font-medium transition-all">
+              <Link href="/community" className="p-3 rounded-xl bg-neutral-950/60 border border-neutral-800 hover:border-emerald-500/40 block text-neutral-300 hover:text-emerald-300 font-medium transition-all">
                 👥 T3 Community
               </Link>
-              <Link href="/intelligence/evidence" className="p-3 rounded-xl bg-neutral-950/60 border border-neutral-800 hover:border-purple-500/40 block text-neutral-300 hover:text-purple-300 font-medium transition-all">
+              <Link href="/trust" className="p-3 rounded-xl bg-neutral-950/60 border border-neutral-800 hover:border-purple-500/40 block text-neutral-300 hover:text-purple-300 font-medium transition-all">
                 🧩 T4 Evidence
               </Link>
             </div>

@@ -12,6 +12,28 @@
 import { createWorker } from "tesseract.js";
 import jsQR from "jsqr";
 
+function uniqueMatches(text, pattern) {
+  return [...new Set(String(text || "").match(pattern) || [])].slice(0, 50);
+}
+
+function extractEntities(text, qrContent) {
+  const normalizedText = String(text || "");
+  return {
+    urls: uniqueMatches(normalizedText, /https?:\/\/[^\s)\]}>,]+/gi),
+    emails: uniqueMatches(normalizedText, /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi),
+    bankAccounts: uniqueMatches(normalizedText, /\b\d{9,16}\b/g),
+    phoneNumbers: uniqueMatches(normalizedText, /\b(?:0\d{9,10}|\+84\d{9,10})\b/g),
+    qrPayloads: qrContent ? [String(qrContent).slice(0, 4000)] : [],
+  };
+}
+
+function buildTextRegions() {
+  // Tesseract returns text here, not source-image coordinates. Do not invent
+  // bounding boxes from line order; overlays are rendered only when a future
+  // provider supplies validated coordinates.
+  return [];
+}
+
 export class OcrService {
   static workerInstance = null;
   static isInitializing = false;
@@ -30,10 +52,11 @@ export class OcrService {
       img = imageSource;
     } else {
       img = new Image();
-      const url = typeof imageSource === "string" ? imageSource : URL.createObjectURL(imageSource);
+      const objectUrl = typeof imageSource === "string" ? null : URL.createObjectURL(imageSource);
+      const url = objectUrl || imageSource;
       await new Promise((resolve) => {
-        img.onload = () => resolve();
-        img.onerror = () => resolve();
+        img.onload = () => { if (objectUrl) URL.revokeObjectURL(objectUrl); resolve(); };
+        img.onerror = () => { if (objectUrl) URL.revokeObjectURL(objectUrl); resolve(); };
         img.src = url;
       });
     }
@@ -161,7 +184,7 @@ export class OcrService {
     const startTime = performance.now();
     let text = "";
     let qrContent = null;
-    let confidence = 0.85;
+    let confidence = null;
     let magicBytes = [];
 
     // 1. Process Magic Bytes if input is File or Blob
@@ -197,9 +220,12 @@ export class OcrService {
         const worker = await this.getWorker();
         if (worker) {
           const res = await worker.recognize(ocrTarget);
+          const rawConfidence = res.data?.confidence;
           return {
             text: (res.data?.text || "").trim(),
-            confidence: Number(((res.data?.confidence || 85) / 100).toFixed(2)),
+            confidence: typeof rawConfidence === "number" && Number.isFinite(rawConfidence)
+              ? Number((rawConfidence / 100).toFixed(2))
+              : null,
           };
         }
         return null;
@@ -232,6 +258,8 @@ export class OcrService {
       confidence,
       magicBytes,
       executionTimeMs,
+      entities: extractEntities(text, qrContent),
+      regions: buildTextRegions(),
     };
   }
 }

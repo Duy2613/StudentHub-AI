@@ -287,11 +287,11 @@ export default function LivingCampusAtlas() {
           <a href="#knowledge-core">Lăng kính quang học</a>
           <a href="#intelligence">Cộng đồng</a>
           <Link href="/expert">Chuyên gia</Link>
-          <Link href="/academic">Học vụ</Link>
+          <Link href="/dashboard">Dashboard</Link>
         </nav>
         <div className={styles.headerActions}>
           <Link href="/login" className={styles.loginLink}>Đăng nhập</Link>
-          <Link href="/dashboard" className={styles.headerCta}>Mở hệ điều hành <ArrowRight aria-hidden="true" /></Link>
+          <Link href="/trust" className={styles.headerCta}>Mở Trust Engine <ArrowRight aria-hidden="true" /></Link>
           <button
             type="button"
             className={styles.menuButton}
@@ -314,8 +314,8 @@ export default function LivingCampusAtlas() {
             <a href="#knowledge-core" onClick={() => setMenuOpen(false)}>Lăng kính quang học</a>
             <a href="#intelligence" onClick={() => setMenuOpen(false)}>Cộng đồng</a>
             <Link href="/expert">Chuyên gia</Link>
-            <Link href="/academic">Học vụ</Link>
-            <Link href="/dashboard">Mở hệ điều hành</Link>
+            <Link href="/dashboard">Dashboard</Link>
+            <Link href="/trust">Mở Trust Engine</Link>
           </motion.nav>
         )}
       </header>
@@ -340,7 +340,7 @@ export default function LivingCampusAtlas() {
             </h1>
             <p className={styles.heroCopy}>Một hệ điều hành học tập biết kiểm chứng trước khi khuyên bạn.</p>
             <div className={styles.heroActions}>
-              <Link href="/dashboard" className={styles.primaryAction} data-cursor-text="Mở"><ArrowDownRight aria-hidden="true" />Mở StudentHub</Link>
+              <Link href="/trust" className={styles.primaryAction} data-cursor-text="Mở"><ArrowDownRight aria-hidden="true" />Kiểm tra trước khi tin</Link>
               <a href="#knowledge-core" className={styles.textAction}>Khám phá lăng kính quang học <ArrowRight aria-hidden="true" /></a>
             </div>
           </motion.div>
@@ -476,7 +476,7 @@ export default function LivingCampusAtlas() {
           </Reveal>
           <footer className={styles.footer}>
             <BrandMark />
-            <nav aria-label="Điều hướng cuối trang"><Link href="/trust">Trust</Link><Link href="/community">Community</Link><Link href="/expert">Experts</Link><Link href="/academic">Academic OS</Link></nav>
+            <nav aria-label="Điều hướng cuối trang"><Link href="/trust">Trust</Link><Link href="/community">Community</Link><Link href="/expert">Experts</Link><Link href="/cases">Case Lab (Demo)</Link></nav>
             <div className={styles.legalLinks}><Link href="/settings/privacy">Quyền riêng tư</Link><Link href="/settings/privacy#terms">Điều khoản</Link></div>
           </footer>
         </section>

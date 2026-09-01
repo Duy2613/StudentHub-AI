@@ -3,8 +3,9 @@ import { ApiError, type ApiErrorCode } from "./errors";
 
 export { ApiError } from "./errors";
 
-type ApiRequestOptions<T> = RequestInit & {
+export type ApiRequestOptions<T> = RequestInit & {
   timeoutMs?: number;
+  requestId?: string;
   schema?: ZodType<T>;
 };
 
@@ -24,75 +25,105 @@ function codeForStatus(status: number): ApiErrorCode {
 function traceIdFrom(response: Response, payload: unknown): string | null {
   const record = payload && typeof payload === "object" ? payload as Record<string, unknown> : null;
   const nestedError = record?.error && typeof record.error === "object" ? record.error as Record<string, unknown> : null;
-  const candidate = response.headers.get("x-request-id") || response.headers.get("x-correlation-id") || nestedError?.traceId || record?.traceId;
-  return typeof candidate === "string" ? candidate.slice(0, 80) : null;
+  const candidate = response.headers.get("x-request-id")
+    || response.headers.get("x-correlation-id")
+    || nestedError?.requestId
+    || nestedError?.traceId
+    || record?.requestId
+    || record?.traceId;
+  return typeof candidate === "string" && candidate.trim() ? candidate.trim().slice(0, 120) : null;
 }
 
-function messageFrom(payload: unknown): string {
+function safeMessageFrom(payload: unknown): string {
   if (!payload || typeof payload !== "object") return "Yêu cầu không thể hoàn tất.";
   const record = payload as Record<string, unknown>;
   const nestedError = record.error && typeof record.error === "object" ? record.error as Record<string, unknown> : null;
-  const candidate = nestedError?.message || record.message;
-  return typeof candidate === "string" ? candidate : "Yêu cầu không thể hoàn tất.";
+  const candidate = nestedError?.userMessage || record.userMessage;
+  return typeof candidate === "string" && candidate.trim() ? candidate.trim().slice(0, 240) : "Yêu cầu không thể hoàn tất.";
+}
+
+function boundedTimeout(value: number): number {
+  return Number.isFinite(value) && value > 0 ? Math.min(Math.trunc(value), 120_000) : 15_000;
+}
+
+function shouldSetJsonContentType(body: BodyInit | null | undefined, headers: Headers): boolean {
+  if (!body || headers.has("Content-Type")) return false;
+  return typeof FormData === "undefined" || !(body instanceof FormData);
 }
 
 export async function apiRequest<T>(path: string, options: ApiRequestOptions<T> = {}): Promise<T> {
-  const { timeoutMs = 15_000, schema, signal: callerSignal, ...init } = options;
+  const {
+    timeoutMs = 15_000,
+    requestId,
+    schema,
+    signal: callerSignal,
+    ...init
+  } = options;
   const controller = new AbortController();
   let timedOut = false;
   const abortFromCaller = () => controller.abort(callerSignal?.reason);
   if (callerSignal?.aborted) abortFromCaller();
   else callerSignal?.addEventListener("abort", abortFromCaller, { once: true });
-  const timeout = setTimeout(() => { timedOut = true; controller.abort("timeout"); }, timeoutMs);
+  const timeout = setTimeout(() => {
+    timedOut = true;
+    controller.abort("timeout");
+  }, boundedTimeout(timeoutMs));
 
-  let response: Response;
+  const headers = new Headers(init.headers);
+  if (!headers.has("Accept")) headers.set("Accept", "application/json");
+  if (shouldSetJsonContentType(init.body, headers)) headers.set("Content-Type", "application/json");
+  if (requestId?.trim()) headers.set("X-Request-ID", requestId.trim().slice(0, 120));
+
   try {
-    response = await fetch(path, {
+    const response = await fetch(path, {
       ...init,
       signal: controller.signal,
       credentials: "include",
-      headers: {
-        Accept: "application/json",
-        ...(init.body ? { "Content-Type": "application/json" } : {}),
-        ...init.headers,
-      },
+      headers,
     });
-  } catch (caught) {
-    if (controller.signal.aborted) {
-      throw new ApiError(timedOut ? "Request timed out." : "Request aborted.", timedOut ? "TIMEOUT" : "ABORTED");
+    const raw = await response.text();
+    let payload: unknown = null;
+    if (raw) {
+      try {
+        payload = JSON.parse(raw);
+      } catch {
+        const traceId = traceIdFrom(response, null);
+        throw new ApiError("Response was not valid JSON.", "INVALID_RESPONSE", { status: response.status, traceId, requestId: requestId || traceId });
+      }
     }
-    throw new ApiError(caught instanceof Error ? caught.message : "Network request failed.", "NETWORK_ERROR");
+    const traceId = traceIdFrom(response, payload);
+    if (!response.ok) {
+      const code = codeForStatus(response.status);
+      const retryHeader = response.headers.get("Retry-After");
+      const parsedRetry = retryHeader ? Number.parseInt(retryHeader, 10) : Number.NaN;
+      const retryAfter = Number.isFinite(parsedRetry) ? Math.max(0, Math.min(parsedRetry, 86_400)) : null;
+      throw new ApiError(safeMessageFrom(payload), code, {
+        status: response.status,
+        retryAfter,
+        traceId,
+        requestId: requestId || traceId,
+        userMessage: safeMessageFrom(payload),
+      });
+    }
+    if (!schema) return payload as T;
+    const parsed = schema.safeParse(payload);
+    if (!parsed.success) {
+      throw new ApiError("Response did not match the expected contract.", "SCHEMA_MISMATCH", {
+        status: response.status,
+        traceId,
+        requestId: requestId || traceId,
+        issues: parsed.error.issues.slice(0, 5).map((issue) => `${issue.path.join(".")}: ${issue.message}`),
+      });
+    }
+    return parsed.data;
+  } catch (caught) {
+    if (caught instanceof ApiError) throw caught;
+    if (controller.signal.aborted) {
+      throw new ApiError(timedOut ? "Request timed out." : "Request aborted.", timedOut ? "TIMEOUT" : "ABORTED", { requestId });
+    }
+    throw new ApiError("Network request failed.", "NETWORK_ERROR", { requestId });
   } finally {
     clearTimeout(timeout);
     callerSignal?.removeEventListener("abort", abortFromCaller);
   }
-
-  const raw = await response.text();
-  let payload: unknown = null;
-  if (raw) {
-    try { payload = JSON.parse(raw); }
-    catch {
-      throw new ApiError("Response was not valid JSON.", "INVALID_RESPONSE", { status: response.status, traceId: traceIdFrom(response, null) });
-    }
-  }
-  const traceId = traceIdFrom(response, payload);
-  if (!response.ok) {
-    const retryHeader = response.headers.get("Retry-After");
-    const parsedRetry = retryHeader ? Number.parseInt(retryHeader, 10) : Number.NaN;
-    throw new ApiError(messageFrom(payload), codeForStatus(response.status), {
-      status: response.status,
-      retryAfter: Number.isFinite(parsedRetry) ? parsedRetry : null,
-      traceId,
-    });
-  }
-  if (!schema) return payload as T;
-  const parsed = schema.safeParse(payload);
-  if (!parsed.success) {
-    throw new ApiError("Response did not match the expected contract.", "SCHEMA_MISMATCH", {
-      status: response.status,
-      traceId,
-      issues: parsed.error.issues.slice(0, 5).map((issue) => `${issue.path.join(".")}: ${issue.message}`),
-    });
-  }
-  return parsed.data;
 }

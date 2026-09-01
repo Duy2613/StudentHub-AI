@@ -81,7 +81,7 @@ export default function HeroSection() {
               <TactileButton
                 variant="primary"
                 size="lg"
-                href="/scam-check"
+                href="/trust"
                 icon={ShieldAlert}
                 techSuffix="[AI SCAN 0.1s]"
               >

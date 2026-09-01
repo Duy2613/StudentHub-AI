@@ -13,6 +13,39 @@ export const TRUSTED_ORIGINS = Object.freeze([
   "https://studenthub.ai"
 ]);
 
+function configuredConnectOrigins() {
+  const values = [
+    typeof process !== "undefined" ? process.env.NEXT_PUBLIC_SUPABASE_URL : "",
+    typeof process !== "undefined" ? process.env.NEXT_PUBLIC_API_URL : "",
+    typeof process !== "undefined" ? process.env.STUDENTHUB_ALLOWED_ORIGINS : "",
+    typeof process !== "undefined" ? process.env.STUDENTHUB_LEGACY_VERIFICATION_BASE_URL : "",
+    typeof process !== "undefined" ? process.env.LEGACY_VERIFICATION_BASE_URL : ""
+  ];
+  const origins = new Set(["'self'"]);
+  for (const rawValue of values) {
+    for (const rawOrigin of String(rawValue || "").split(",")) {
+      try {
+        const parsed = new URL(rawOrigin.trim());
+        if (parsed.protocol === "http:" || parsed.protocol === "https:") origins.add(parsed.origin);
+      } catch {
+        // Invalid or empty configuration is not added to the browser policy.
+      }
+    }
+  }
+  return [...origins].join(" ");
+}
+
+export function getContentSecurityPolicy() {
+  return [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https:",
+    "font-src 'self' data:",
+    "connect-src " + configuredConnectOrigins()
+  ].join("; ") + ";";
+}
+
 export class SecurityHeaders {
   /**
    * Applies standard security headers to a response
@@ -24,10 +57,7 @@ export class SecurityHeaders {
     if (!headers) return headers;
 
     // 1. Content Security Policy (CSP)
-    headers.set(
-      "Content-Security-Policy",
-      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:;"
-    );
+    headers.set("Content-Security-Policy", getContentSecurityPolicy());
 
     // 2. Strict Transport Security (HSTS)
     headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");

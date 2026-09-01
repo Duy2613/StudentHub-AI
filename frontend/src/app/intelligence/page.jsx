@@ -1,17 +1,6 @@
-"use client";
+import { redirect } from "next/navigation";
 
-/**
- * StudentHub AI — Unified Intelligence Workspace Route
- */
-
-import React from "react";
-import StudentHubOSShell from "@/components/layout/StudentHubOSShell";
-import UnifiedIntelligenceWorkspace from "@/components/intelligence/UnifiedIntelligenceWorkspace";
-
-export default function IntelligencePage() {
-  return (
-    <StudentHubOSShell>
-      <UnifiedIntelligenceWorkspace />
-    </StudentHubOSShell>
-  );
+/** Compatibility entry: Trust is the canonical intelligence starting point. */
+export default function IntelligenceCompatibilityRoute() {
+  redirect("/trust");
 }

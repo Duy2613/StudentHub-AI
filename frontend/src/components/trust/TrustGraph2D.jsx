@@ -9,6 +9,8 @@ const nodeTone = {
   SOURCE: "var(--info)",
   COMMUNITY: "var(--community)",
   EXPERT: "var(--expert)",
+  PASSPORT: "var(--warning)",
+  CASE: "var(--info)",
 };
 
 const positions = [
@@ -24,19 +26,21 @@ const relationshipLabel = {
 };
 
 export default function TrustGraph2D({ graph }) {
+  const safeGraph = graph && Array.isArray(graph.nodes) && Array.isArray(graph.edges) ? graph : { nodes: [], edges: [] };
   const [mode, setMode] = useState("graph");
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState("ALL");
-  const [selectedId, setSelectedId] = useState(graph.nodes[0]?.id || null);
+  const [selectedId, setSelectedId] = useState(safeGraph.nodes[0]?.id || null);
   const [zoom, setZoom] = useState(1);
-  const nodes = useMemo(() => graph.nodes.map((node, index) => ({ ...node, position: positions[index % positions.length] })), [graph.nodes]);
-  const visible = nodes.filter((node) => (kind === "ALL" || node.kind === kind) && node.label.toLowerCase().includes(query.toLowerCase()));
+  const nodes = useMemo(() => safeGraph.nodes.slice(0, 50).map((node, index) => ({ ...node, position: positions[index % positions.length] })), [safeGraph.nodes]);
+  const visible = nodes.filter((node) => (kind === "ALL" || node.kind === kind) && String(node.label || "").toLowerCase().includes(query.toLowerCase()));
   const visibleIds = new Set(visible.map((node) => node.id));
-  const selected = visible.find((node) => node.id === selectedId) || visible[0];
+  const activeSelectedId = nodes.some((node) => node.id === selectedId) ? selectedId : nodes[0]?.id;
+  const selected = visible.find((node) => node.id === activeSelectedId) || visible[0];
   const connectedIds = (() => {
     if (!selected?.id) return new Set();
     const ids = new Set([selected.id]);
-    graph.edges.forEach((edge) => {
+      safeGraph.edges.forEach((edge) => {
       if (edge.from === selected.id) ids.add(edge.to);
       if (edge.to === selected.id) ids.add(edge.from);
     });
@@ -60,7 +64,7 @@ export default function TrustGraph2D({ graph }) {
       <div className="graph-toolbar">
         <label className="graph-search"><Search size={15} /><span className="sr-only">Tìm node</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm claim hoặc nguồn" /></label>
         <div className="flex gap-2 overflow-x-auto">
-          {["ALL", "INPUT", "CLAIM", "SOURCE"].map((item) => <button type="button" key={item} aria-pressed={kind === item} onClick={() => setKind(item)} className={`filter-chip ${kind === item ? "is-active" : ""}`}>{item === "ALL" ? "Tất cả" : item}</button>)}
+          {["ALL", "INPUT", "CLAIM", "SOURCE", "CASE", "COMMUNITY", "EXPERT", "PASSPORT"].map((item) => <button type="button" key={item} aria-pressed={kind === item} onClick={() => setKind(item)} className={`filter-chip ${kind === item ? "is-active" : ""}`}>{item === "ALL" ? "Tất cả" : item}</button>)}
         </div>
       </div>
       <div className="graph-legend" aria-label="Chú giải loại node">{visibleKinds.map((item) => <span key={item}><i style={{ "--node-color": nodeTone[item] || "var(--text-muted)" }} />{item}</span>)}</div>
@@ -70,23 +74,23 @@ export default function TrustGraph2D({ graph }) {
             <div className="graph-zoom-controls"><button type="button" onClick={() => setZoom((value) => Math.min(1.4, value + .1))} aria-label="Phóng to"><ZoomIn size={15} /></button><button type="button" onClick={() => setZoom((value) => Math.max(.75, value - .1))} aria-label="Thu nhỏ"><ZoomOut size={15} /></button></div>
             <div className="graph-stage" style={{ transform: `scale(${zoom})` }}>
               <svg className="absolute inset-0 h-full w-full" aria-hidden="true">
-                {graph.edges.filter((edge) => visibleIds.has(edge.from) && visibleIds.has(edge.to)).map((edge) => {
+                {safeGraph.edges.filter((edge) => visibleIds.has(edge.from) && visibleIds.has(edge.to)).map((edge, edgeIndex) => {
                   const from = nodes.find((node) => node.id === edge.from)?.position;
                   const to = nodes.find((node) => node.id === edge.to)?.position;
                   const related = !selected || edge.from === selected.id || edge.to === selected.id;
-                  return from && to ? <g key={`${edge.from}-${edge.to}`} className={related ? "is-related" : "is-dimmed"}><title>{relationshipLabel[edge.label] || edge.label}</title><line x1={`${from[0]}%`} y1={`${from[1]}%`} x2={`${to[0]}%`} y2={`${to[1]}%`} className="graph-edge" /></g> : null;
+                  return from && to ? <g key={`${edge.from}-${edge.to}-${edgeIndex}`} className={related ? "is-related" : "is-dimmed"}><title>{relationshipLabel[edge.label] || edge.label}</title><line x1={`${from[0]}%`} y1={`${from[1]}%`} x2={`${to[0]}%`} y2={`${to[1]}%`} className="graph-edge" /></g> : null;
                 })}
               </svg>
-              {visible.map((node) => <button type="button" key={node.id} aria-pressed={selectedId === node.id} onClick={() => setSelectedId(node.id)} className={`graph-node ${selectedId === node.id ? "is-selected" : ""} ${selected && !connectedIds.has(node.id) ? "is-dimmed" : ""}`} style={{ left: `${node.position[0]}%`, top: `${node.position[1]}%`, "--node-color": nodeTone[node.kind] || "var(--text-muted)" }}><span>{node.kind}</span><strong>{node.label}</strong></button>)}
+              {visible.map((node) => <button type="button" key={node.id} aria-pressed={activeSelectedId === node.id} onClick={() => setSelectedId(node.id)} className={`graph-node ${activeSelectedId === node.id ? "is-selected" : ""} ${selected && !connectedIds.has(node.id) ? "is-dimmed" : ""}`} style={{ left: `${node.position[0]}%`, top: `${node.position[1]}%`, "--node-color": nodeTone[node.kind] || "var(--text-muted)" }}><span>{node.kind}</span><strong>{node.label}</strong></button>)}
             </div>
           </div>
           <aside className="node-inspector" aria-live="polite">
             <p className="product-kicker">Node inspector</p>
-            {selected ? <><span className="signal-badge mt-3">{selected.kind}</span><h3 className="mt-4 text-base font-bold text-app-primary">{selected.label}</h3><p className="product-copy mt-2">{selected.detail || "Không có mô tả bổ sung."}</p><div className="mt-5 border-t border-white/8 pt-4"><span className="data-label">Quan hệ trực tiếp</span><p className="mt-2 text-xs text-app-muted">{graph.edges.filter((edge) => edge.from === selected.id || edge.to === selected.id).map((edge) => relationshipLabel[edge.label] || edge.label).join(" · ") || "Chưa có"}</p></div></> : <p className="product-copy mt-3">Không tìm thấy node phù hợp.</p>}
+            {selected ? <><span className="signal-badge mt-3">{selected.kind}</span><h3 className="mt-4 text-base font-bold text-app-primary">{selected.label}</h3><p className="product-copy mt-2">{selected.detail || "Không có mô tả bổ sung."}</p><div className="mt-5 border-t border-white/8 pt-4"><span className="data-label">Quan hệ trực tiếp</span><p className="mt-2 text-xs text-app-muted">{safeGraph.edges.filter((edge) => edge.from === selected.id || edge.to === selected.id).map((edge) => relationshipLabel[edge.label] || edge.label).join(" · ") || "Chưa có"}</p></div></> : <p className="product-copy mt-3">Không tìm thấy node phù hợp.</p>}
           </aside>
         </div>
       ) : (
-        <div className="divide-y divide-white/8" role="list">{visible.length ? visible.map((node) => { const relationships = graph.edges.filter((edge) => edge.from === node.id || edge.to === node.id).map((edge) => edge.label); return <div role="listitem" key={node.id}><button type="button" aria-pressed={selectedId === node.id} onClick={() => setSelectedId(node.id)} className="graph-list-row"><span className="signal-badge">{node.kind}</span><span><strong>{node.label}</strong><small>{node.detail}</small><small>Quan hệ: {relationships.join(" · ") || "Chưa có"}</small></span></button></div>; }) : <div className="empty-state m-4">Không tìm thấy node phù hợp.</div>}</div>
+        <div className="divide-y divide-white/8" role="list">{visible.length ? visible.map((node) => { const relationships = safeGraph.edges.filter((edge) => edge.from === node.id || edge.to === node.id).map((edge) => edge.label); return <div role="listitem" key={node.id}><button type="button" aria-pressed={activeSelectedId === node.id} onClick={() => setSelectedId(node.id)} className="graph-list-row"><span className="signal-badge">{node.kind}</span><span><strong>{node.label}</strong><small>{node.detail}</small><small>Quan hệ: {relationships.join(" · ") || "Chưa có"}</small></span></button></div>; }) : <div className="empty-state m-4">Không tìm thấy node phù hợp.</div>}</div>
       )}
     </section>
   );

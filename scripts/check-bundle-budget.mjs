@@ -21,10 +21,12 @@ for (const routeName of ["trust", "community", "expert"]) {
   console.log(`[BUNDLE_MEASURE] /${routeName} initial JS: ${totalBytes} bytes across ${chunks.length} chunks.`);
 }
 
-const trustBytes = totals.get("trust") || 0;
-console.log(`[BUNDLE_BUDGET] /trust budget: ${budgetBytes} bytes.`);
-if (trustBytes > budgetBytes) {
-  console.error("[BUNDLE_BUDGET] FAIL: Trust route exceeds the interim initial-JS budget.");
+const overBudget = [...totals.entries()].filter(([, bytes]) => bytes > budgetBytes);
+for (const [routeName] of totals) {
+  console.log(`[BUNDLE_BUDGET] /${routeName} budget: ${budgetBytes} bytes.`);
+}
+if (overBudget.length) {
+  console.error(`[BUNDLE_BUDGET] FAIL: ${overBudget.map(([routeName]) => `/${routeName}`).join(", ")} exceed the interim initial-JS budget.`);
   process.exitCode = 1;
 } else {
   console.log("[BUNDLE_BUDGET] PASS");

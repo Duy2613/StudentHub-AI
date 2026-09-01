@@ -131,7 +131,7 @@ export default function IglooEcosystemShowcase() {
                   </span>
 
                   <Link
-                    href="/scam-check"
+                    href="/trust"
                     className="btn-scan text-xs py-2 px-4 group"
                   >
                     <span>Kiểm tra ngay</span>
@@ -284,7 +284,7 @@ export default function IglooEcosystemShowcase() {
                     Lọc theo tên trường Đại học
                   </span>
                   <Link
-                    href="/forum"
+                    href="/community"
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-300 hover:text-indigo-200 transition-colors font-human"
                   >
                     <span>Vào diễn đàn</span>
@@ -357,7 +357,7 @@ export default function IglooEcosystemShowcase() {
                     Cập nhật thời gian thực
                   </span>
                   <Link
-                    href="/scam-check"
+                    href="/trust"
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-300 hover:text-teal-200 transition-colors font-human"
                   >
                     <span>Khám phá Radar</span>

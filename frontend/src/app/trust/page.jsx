@@ -1,5 +1,5 @@
 import React from "react";
-import { AiTrustStudioView } from "@/components/trust/AiTrustStudioView";
+import TrustWorkspaceClient from "@/components/trust/TrustWorkspaceClient";
 import UnifiedAppShell from "@/components/layout/UnifiedAppShell";
 
 export const metadata = {
@@ -8,5 +8,5 @@ export const metadata = {
 };
 
 export default function TrustPage() {
-  return <UnifiedAppShell><AiTrustStudioView /></UnifiedAppShell>;
+  return <UnifiedAppShell><TrustWorkspaceClient /></UnifiedAppShell>;
 }

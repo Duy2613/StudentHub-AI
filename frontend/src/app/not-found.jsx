@@ -45,7 +45,7 @@ export default function NotFound() {
           </Link>
 
           <Link
-            href="/ai"
+            href="/trust"
             className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/40 hover:bg-white/10 transition-all flex flex-col gap-1 text-xs"
           >
             <div className="flex items-center gap-1.5 text-white font-semibold">
@@ -56,7 +56,7 @@ export default function NotFound() {
           </Link>
 
           <Link
-            href="/academic"
+            href="/trust"
             className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/40 hover:bg-white/10 transition-all flex flex-col gap-1 text-xs"
           >
             <div className="flex items-center gap-1.5 text-white font-semibold">
@@ -67,7 +67,7 @@ export default function NotFound() {
           </Link>
 
           <Link
-            href="/academic/planner"
+            href="/community"
             className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/40 hover:bg-white/10 transition-all flex flex-col gap-1 text-xs"
           >
             <div className="flex items-center gap-1.5 text-white font-semibold">

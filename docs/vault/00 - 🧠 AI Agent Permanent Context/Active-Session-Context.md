@@ -413,3 +413,24 @@
 - Kiểm chứng: targeted ESLint pass, production build pass 102/102 routes, Playwright 1440px và 390px không horizontal overflow.
 - Refinement v2 tham chiếu Robin Payot, Sendoso, Meer Mohsin, Lucerra, USAvionix, Edolus và hai video mới: hero knowledge monolith, tri-lens glass core, 4-gate energy pipeline, product orbit chapter và closing copy mới.
 - Đã sửa stacking-context khiến global cinematic wallpaper phủ section product sáng; QA lại không page error và không horizontal overflow.
+
+## 14. F02 Foundation — 2026-09-01
+
+- F00/F01 scope and information architecture remain the approved authority; no routes, shell JSX, navigation behavior, backend, database, auth, or visual component system were changed.
+- Implemented the canonical frontend foundation: `frontend/src/lib/ui-state/model.ts`, `frontend/src/lib/backend/ports.ts`, `providerFactory.ts`, `DemoProvider.ts`, `FutureLiveProvider.ts`, and `adapters/ApiProviderAdapter.ts`.
+- `DemoProvider` is deterministic and network-free with explicit `DEMO_FIXTURE` provenance. Live selection is explicit and returns typed `UNAVAILABLE` until the approved live environment exists; a demo bundle is rejected in the live slot.
+- Hardened `frontend/src/lib/api/client.ts`, `errors.ts`, `trust.ts`, `community.ts`, and `experts.ts` for bounded request IDs, abort/timeout, schema validation, safe messages, retryability, and current transport compatibility.
+- Added semantic token aliases in `frontend/src/app/globals.css` without changing the approved baseline visual direction.
+- Added bounded handoff `docs/visual-contracts/APP_SHELL.md`; visual implementation remains Antigravity-owned and F03/F04-gated.
+- Verification: F02 foundation `23/23` PASS; Trust V5 `62/62` PASS; canonical API `1/1` PASS; canonical v1 `2/2` PASS; P0 routes `1/1` PASS; route contract `2/2` PASS; auth resilience `14/14` PASS; typecheck/lint/build PASS. Live ASP.NET and PostgreSQL/Supabase/RLS evidence remains `BLOCKED_BY_ENV`.
+- Next handoff after the continuous program: visual contracts are ready for Antigravity; live backend integration is environment-gated.
+
+## 15. Continuous Full Product Engineering Program — 2026-09-01
+
+- Final status: `FULL_ENGINEERING_PROGRAM_COMPLETE_WITH_ENV_BLOCKERS`.
+- Route inventory remains 39: 13 `KEEP`, 13 `MERGE_INTO`, 4 `REMOVE` compatibility redirects, and 9 `POST_V1`; Trust, Community, and Expert remain the only core pillars.
+- Local engineering coverage completed the canonical shell/nav, Trust input/report/multimodal, TrustGraph/Passport seams, Community/Expert seams, state/error/cancellation rules, privacy/auth boundaries, responsive/accessibility gates, and route performance budget.
+- Verification: discovered suite `265/265`; Chromium `67` passed and `3` explicit-demo cases skipped; typecheck/build pass with `117/117` static pages; lint `0` errors/`332` warnings; dependency audit `0` vulnerabilities; API authorization inventory `137` handlers; route bundle budgets pass.
+- `agent-browser` was unavailable; Playwright was the local browser fallback. Field CWV/Lighthouse was not executed.
+- ASP.NET collaborator/live backend, Supabase/PostgreSQL/RLS clean-database proof, production provider credentials/observability/deployment, and final Antigravity visual acceptance remain `BLOCKED_BY_ENV` or `NOT_EXECUTED`.
+- Handoff index: `docs/visual-contracts/GLOBAL_VISUAL_SYSTEM.md` plus the feature contracts for App Shell, Trust Input/Report, Multimodal, TrustGraph, Evidence Passport, Community, Expert, and Landing.

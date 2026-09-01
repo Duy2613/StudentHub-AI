@@ -230,6 +230,8 @@ export function stageFromL2C(raw, requestId, timing = {}) {
 }
 
 function evidenceFinding(raw) {
+  const legacyStatus = statusFor(raw?.legacyIntegration?.status, "");
+  if (["UNAVAILABLE", "ERROR", "INVALID_RESPONSE"].includes(legacyStatus)) return "UNAVAILABLE";
   const status = statusFor(raw?.status);
   if (status.includes("STALE") || Number(raw?.temporalAssessment?.outdatedEvidenceCount) > 0) return "STALE";
   if (status.includes("CONTEST") || status.includes("MIXED") || safeArray(raw?.conflicts).length > 0) return "MIXED";
@@ -312,8 +314,10 @@ export function stageFromL4(raw, requestId, timing = {}) {
   const hardNegative = finding === "MALICIOUS" || raw?.enforcement === "BLOCK";
   const truth = raw?.truthStatus || "INSUFFICIENT_EVIDENCE";
   const action = raw?.enforcement || raw?.recommendedAction || "REVIEW";
+  const legacyIntegration = raw?.legacyIntegration && typeof raw.legacyIntegration === "object" ? raw.legacyIntegration : null;
+  const operationStatus = timing.operationStatus || OPERATION_STATUS.COMPLETED;
   return createStageEnvelope({
-    ...stageBase("l4", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso()),
+    ...stageBase("l4", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso(), operationStatus),
     finding,
     severity: finding === "MALICIOUS" ? "CRITICAL" : finding === "SUSPICIOUS" ? "HIGH" : "INFO",
     providerStatus: "DETERMINISTIC_POLICY",
@@ -328,6 +332,7 @@ export function stageFromL4(raw, requestId, timing = {}) {
       signal("TRUTH_AXIS", truth, "layer4_deterministic_policy", "INFO"),
       signal("ENFORCEMENT_AXIS", action, "layer4_deterministic_policy", action === "BLOCK" ? "CRITICAL" : action === "REVIEW" ? "HIGH" : "INFO"),
       ...(raw?.hardRuleTriggered ? [signal("HARD_POLICY_RULE", raw.hardRuleTriggered, "layer4_deterministic_policy", "CRITICAL")] : []),
+      ...(legacyIntegration ? [signal("LEGACY_SYNTHESIS_STATUS", legacyIntegration.status || "UNKNOWN", "legacy_verification_layer4", legacyIntegration.status === "UNAVAILABLE" ? "HIGH" : "INFO")] : []),
     ],
     evidenceRefs: safeArray(raw?.evidenceRefs).filter((item) => typeof item === "string").slice(0, 40),
     meaning: hardNegative ? "L4 là authoritative policy boundary; hard negative giữ MALICIOUS/BLOCK." : "L4 tách riêng security, truth và action; UNKNOWN/thiếu evidence phải REVIEW.",
@@ -341,6 +346,9 @@ export function stageFromL4(raw, requestId, timing = {}) {
       policyVersion: raw?.auditTrail?.ruleVersion || null,
       hardNegative,
       narrativeEvidenceRefs: safeArray(raw?.userExplanation?.evidenceRefs).slice(0, 40),
+      legacyIntegrationStatus: legacyIntegration?.status || null,
+      legacyIntegrationProviderStatus: legacyIntegration?.providerStatus || null,
+      legacyIntegrationVerdict: legacyIntegration?.rawVerdict || null,
     },
   });
 }

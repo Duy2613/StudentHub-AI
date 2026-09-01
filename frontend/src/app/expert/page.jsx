@@ -1,6 +1,5 @@
 import React from "react";
-import { ExpertIntelligenceView } from "@/components/expert/ExpertIntelligenceView";
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import ExpertWorkspaceClient from "@/components/expert/ExpertWorkspaceClient";
 import UnifiedAppShell from "@/components/layout/UnifiedAppShell";
 
 export const metadata = {
@@ -9,7 +8,5 @@ export const metadata = {
 };
 
 export default function ExpertPage() {
-  const initialExperts = ExpertStore.getAllExperts();
-
-  return <UnifiedAppShell><ExpertIntelligenceView initialExperts={initialExperts} /></UnifiedAppShell>;
+  return <UnifiedAppShell><ExpertWorkspaceClient /></UnifiedAppShell>;
 }

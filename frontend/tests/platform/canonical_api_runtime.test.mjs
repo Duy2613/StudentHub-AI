@@ -62,6 +62,23 @@ test("canonical v1 APIs expose honest public contracts and fail closed for perso
       assert.equal(body.contractVersion, contractVersion, path);
     }
 
+    const liveHealth = await fetch(baseUrl + "/api/health/live");
+    const liveHealthBody = await liveHealth.json();
+    assert.equal(liveHealth.status, 200);
+    assert.equal(liveHealthBody.status, "LIVE");
+    assert.equal(liveHealth.headers.get("cache-control"), "no-store");
+
+    const readyHealth = await fetch(baseUrl + "/api/health/ready");
+    const readyHealthBody = await readyHealth.json();
+    assert.ok([200, 503].includes(readyHealth.status));
+    assert.equal(readyHealthBody.ready, readyHealth.status === 200);
+    assert.equal(readyHealth.headers.get("cache-control"), "no-store");
+
+    const trustPage = await fetch(baseUrl + "/trust");
+    assert.equal(trustPage.status, 200);
+    assert.match(trustPage.headers.get("content-security-policy") || "", /default-src 'self'/);
+    assert.equal(trustPage.headers.get("x-frame-options"), "DENY");
+
     const trustResponse = await fetch(`${baseUrl}/api/v1/trust`, {
       method: "POST",
       headers: { "content-type": "application/json" },

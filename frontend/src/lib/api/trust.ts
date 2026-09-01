@@ -145,13 +145,31 @@ function statusCodeFor(status: number): ApiError["code"] {
   return "SERVER_ERROR";
 }
 
+function requestIdFrom(response: Response, payload: unknown): string | null {
+  const record = payload && typeof payload === "object" ? payload as Record<string, unknown> : null;
+  const nestedError = record?.error && typeof record.error === "object" ? record.error as Record<string, unknown> : null;
+  const candidate = response.headers.get("x-request-id") || response.headers.get("x-correlation-id") || nestedError?.requestId || nestedError?.traceId || record?.requestId || record?.traceId;
+  return typeof candidate === "string" && candidate.trim() ? candidate.trim().slice(0, 120) : null;
+}
+
+function safeMessageFrom(payload: unknown): string {
+  if (!payload || typeof payload !== "object") return "Yêu cầu Trust không thể hoàn tất.";
+  const record = payload as Record<string, unknown>;
+  const nestedError = record.error && typeof record.error === "object" ? record.error as Record<string, unknown> : null;
+  const candidate = nestedError?.userMessage || record.userMessage;
+  return typeof candidate === "string" && candidate.trim() ? candidate.trim().slice(0, 240) : "Yêu cầu Trust không thể hoàn tất.";
+}
+
 async function readJsonOrNull(response: Response): Promise<unknown> {
   const raw = await response.text();
   if (!raw) return null;
-  try { return JSON.parse(raw); } catch { throw new ApiError("Response was not valid JSON.", "INVALID_RESPONSE", { status: response.status }); }
+  try { return JSON.parse(raw); } catch {
+    const requestId = requestIdFrom(response, null);
+    throw new ApiError("Response was not valid JSON.", "INVALID_RESPONSE", { status: response.status, requestId, traceId: requestId });
+  }
 }
 
-async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | undefined, onEvent?: (event: TrustV5Event) => void): Promise<TrustV5Response> {
+async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | undefined, onEvent?: (event: TrustV5Event) => void, requestId?: string): Promise<TrustV5Response> {
   const controller = new AbortController();
   let timedOut = false;
   const abortFromCaller = () => controller.abort(callerSignal?.reason);
@@ -166,18 +184,18 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
         body: JSON.stringify({ ...input, depth: "full", version: "v5", stream: true }),
         signal: controller.signal,
         credentials: "include",
-        headers: { Accept: "text/event-stream, application/json", "Content-Type": "application/json" },
+        headers: { Accept: "text/event-stream, application/json", "Content-Type": "application/json", ...(requestId ? { "X-Request-ID": requestId.slice(0, 120) } : {}) },
       });
-    } catch (caught) {
-      if (controller.signal.aborted) throw new ApiError(timedOut ? "Request timed out." : "Request aborted.", timedOut ? "TIMEOUT" : "ABORTED");
-      throw new ApiError(caught instanceof Error ? caught.message : "Network request failed.", "NETWORK_ERROR");
+    } catch {
+      if (controller.signal.aborted) throw new ApiError(timedOut ? "Request timed out." : "Request aborted.", timedOut ? "TIMEOUT" : "ABORTED", { requestId });
+      throw new ApiError("Network request failed.", "NETWORK_ERROR", { requestId });
     }
     if (!response.ok) {
       const payload = await readJsonOrNull(response);
       const record = payload && typeof payload === "object" ? payload as Record<string, unknown> : {};
-      const nested = record.error && typeof record.error === "object" ? record.error as Record<string, unknown> : {};
       const retryAfter = Number.parseInt(response.headers.get("Retry-After") || "", 10);
-      throw new ApiError(typeof nested.message === "string" ? nested.message : "Trust pipeline request failed.", statusCodeFor(response.status), { status: response.status, retryAfter: Number.isFinite(retryAfter) ? retryAfter : null, traceId: response.headers.get("x-request-id") || response.headers.get("x-correlation-id") });
+      const responseRequestId = requestIdFrom(response, payload);
+      throw new ApiError(safeMessageFrom(record), statusCodeFor(response.status), { status: response.status, retryAfter: Number.isFinite(retryAfter) ? retryAfter : null, traceId: responseRequestId, requestId: requestId || responseRequestId, userMessage: safeMessageFrom(record) });
     }
     const contentType = response.headers.get("content-type") || "";
     if (!contentType.toLowerCase().includes("text/event-stream")) {
@@ -186,7 +204,7 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
       onEvent?.({ type: "complete", event: "PIPELINE_COMPLETED", stageId: "l5", requestId: result.requestId, data: result.data });
       return result;
     }
-    if (!response.body) throw new ApiError("Streaming response did not include a readable body.", "INVALID_RESPONSE");
+    if (!response.body) throw new ApiError("Streaming response did not include a readable body.", "INVALID_RESPONSE", { requestId });
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
@@ -195,9 +213,9 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
       const dataLines = block.split(/\r?\n/).filter((line) => line.startsWith("data:")).map((line) => line.slice(5).trim());
       if (!dataLines.length) return;
       let event: TrustV5Event;
-      try { event = JSON.parse(dataLines.join("\n")) as TrustV5Event; } catch { throw new ApiError("Streaming response contained malformed event data.", "INVALID_RESPONSE"); }
+      try { event = JSON.parse(dataLines.join("\n")) as TrustV5Event; } catch { throw new ApiError("Streaming response contained malformed event data.", "INVALID_RESPONSE", { requestId }); }
       onEvent?.(event);
-      if (event.type === "error") throw new ApiError(event.error?.message || "Trust pipeline failed.", "SERVER_ERROR");
+      if (event.type === "error") throw new ApiError("Trust pipeline failed.", "SERVER_ERROR", { requestId: event.requestId || requestId });
       if (event.type === "complete" && event.data) completed = parseV5Response({ success: true, contractVersion: "trust.v5", requestId: event.requestId || event.data.requestId, version: "v5", demo: false, data: event.data });
     };
     while (true) {
@@ -212,8 +230,14 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
       if (done) break;
     }
     if (buffer.trim()) dispatch(buffer);
-    if (!completed) throw new ApiError("Streaming response ended without a completed V5 result.", "INVALID_RESPONSE");
+    if (!completed) throw new ApiError("Streaming response ended without a completed V5 result.", "INVALID_RESPONSE", { requestId });
     return completed;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    if (controller.signal.aborted) {
+      throw new ApiError(timedOut ? "Request timed out." : "Request aborted.", timedOut ? "TIMEOUT" : "ABORTED", { requestId });
+    }
+    throw new ApiError("Network request failed.", "NETWORK_ERROR", { requestId });
   } finally {
     clearTimeout(timeout);
     callerSignal?.removeEventListener("abort", abortFromCaller);
@@ -265,8 +289,8 @@ export const trustApi = {
       schema: trustReasoningResultSchema,
     });
   },
-  sequential(input: TrustInput, signal?: AbortSignal, onEvent?: (event: TrustV5Event) => void) {
-    return sequentialRequest(input, signal, onEvent);
+  sequential(input: TrustInput, signal?: AbortSignal, onEvent?: (event: TrustV5Event) => void, requestId?: string) {
+    return sequentialRequest(input, signal, onEvent, requestId);
   },
 };
 

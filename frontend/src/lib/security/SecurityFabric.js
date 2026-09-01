@@ -199,6 +199,12 @@ export class SecurityFabric {
 
         const errorResponse = Response.json(payload, { status: statusCode });
         errorResponse.headers.set("x-correlation-id", correlationId);
+        if (statusCode === 429) {
+          const retryAfter = Number(err?.details?.retryAfterSeconds);
+          if (Number.isFinite(retryAfter) && retryAfter > 0) {
+            errorResponse.headers.set("Retry-After", String(Math.min(86_400, Math.ceil(retryAfter))));
+          }
+        }
         SecurityHeaders.applySecurityHeaders(errorResponse.headers, origin);
         return errorResponse;
       }

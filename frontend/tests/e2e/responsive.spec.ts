@@ -16,8 +16,8 @@ const productHeadings = {
 };
 
 const extendedResponsiveRoutes = {
-  "/academic/profile": "Nguyễn Văn Duy",
-  "/intelligence/knowledge": "Evidence Fusion & Knowledge Object",
+  "/profile": "Không tìm thấy thông tin hồ sơ.",
+  "/trust": "Kiểm tra trước khi bạn tin.",
 };
 
 for (const viewport of viewports) {

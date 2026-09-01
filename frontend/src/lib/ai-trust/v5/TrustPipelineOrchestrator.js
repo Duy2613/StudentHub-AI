@@ -17,6 +17,7 @@ import {
 } from "./contracts.js";
 import { decideReputationLookup } from "../layer2a/ReputationLookupPolicy.js";
 import { failedStage, stageFromL1, stageFromL2A, stageFromL2B, stageFromL2C, stageFromL3, stageFromL4, stageFromL5 } from "./stageAdapters.js";
+import { buildCanonicalTrustProjection } from "../integrations/canonicalTrustProjection.js";
 
 const TRANSIENT_L2A_STATUSES = new Set(["TIMEOUT", "RATE_LIMITED", "UNAVAILABLE", "CIRCUIT_OPEN", "ERROR"]);
 const TRANSIENT_L3_STATUSES = new Set(["TIMEOUT", "UNAVAILABLE", "ERROR", "NOT_CONFIGURED"]);
@@ -83,8 +84,19 @@ function completedTiming(timing) {
 function isTransient(stageId, result) {
   const providerStatus = String(result?.providerStatus || result?.retrievalStatus || result?.metrics?.providerStatus || "").toUpperCase();
   if (stageId === "l2a") return TRANSIENT_L2A_STATUSES.has(providerStatus);
-  if (stageId === "l3") return TRANSIENT_L3_STATUSES.has(providerStatus);
+  if (stageId === "l3") return TRANSIENT_L3_STATUSES.has(providerStatus) || ["UNAVAILABLE", "INVALID_RESPONSE", "ERROR"].includes(String(result?.legacyIntegration?.status || "").toUpperCase());
+  if (stageId === "l4") return ["UNAVAILABLE", "INVALID_RESPONSE", "ERROR", "PARTIAL"].includes(String(result?.legacyIntegration?.status || result?.legacyIntegration?.providerStatus || "").toUpperCase());
   return false;
+}
+
+function adapterIsEnabled(adapter) {
+  if (!adapter || typeof adapter !== "object") return false;
+  if (adapter.enabled === true || adapter.isConfigured === true) return true;
+  try {
+    return typeof adapter.isConfigured === "function" && adapter.isConfigured() === true;
+  } catch {
+    return false;
+  }
 }
 
 export function isRetryEligible(stageId, result = {}) {
@@ -122,6 +134,8 @@ export class TrustPipelineOrchestrator {
       l2b: options.semanticProvider || null,
       l3: options.retriever || null,
     };
+    this.legacyVerificationAdapter = options.legacyVerificationAdapter || null;
+    this.legacyVerificationEnabled = adapterIsEnabled(this.legacyVerificationAdapter);
     this.maxRetriesPerStage = Number.isInteger(options.maxRetriesPerStage) ? Math.max(0, Math.min(1, options.maxRetriesPerStage)) : 1;
     this._activeController = null;
     this._lastRun = null;
@@ -166,7 +180,7 @@ export class TrustPipelineOrchestrator {
     });
   }
 
-  _stageWorker(stageId, input, rawResults, requestId, signal) {
+  async _stageWorker(stageId, input, rawResults, requestId, signal) {
     if (stageId === "l1") {
       return this.services.l1({ ...input, options: { requestId, signal } });
     }
@@ -176,11 +190,16 @@ export class TrustPipelineOrchestrator {
       // boundary, while valid public targets may receive reputation-only
       // lookup. L1's hard negative remains authoritative regardless.
       const url = input.type === "url" ? input.content || input.metadata.url || "" : "";
+      const reputationProvider = this.providers.l2a || (
+        this.legacyVerificationEnabled && typeof this.legacyVerificationAdapter?.layer2Provider === "function"
+          ? this.legacyVerificationAdapter.layer2Provider()
+          : null
+      );
       return this.services.l2a({
         url,
         reputationLookup: decideReputationLookup(url),
         requestId,
-        options: this.providers.l2a ? { provider: this.providers.l2a, signal } : { signal },
+        options: reputationProvider ? { provider: reputationProvider, signal } : { signal },
       });
     }
     if (stageId === "l2b") {
@@ -190,24 +209,94 @@ export class TrustPipelineOrchestrator {
       return this.services.l2c({ content: input.content || input.metadata.ocrText || input.metadata.qrContent || "", inputType: input.type, context: { inputType: input.type, institutionContext: input.metadata.institutionContext }, layer1Result: rawResults.l1, layer2BResult: rawResults.l2b, signal });
     }
     if (stageId === "l3") {
-      return this.services.l3({
+      const layer3Params = {
         claims: rawResults.l2b?.claims || [],
         candidateSources: rawResults.l2b?.verificationPackage?.candidateSources || [],
         layer2Result: rawResults.l2b || null,
         layer2CResult: rawResults.l2c || null,
         layer2CVerificationPackage: rawResults.l2c?.verificationPackage || null,
+        input,
+        requestId,
+        signal,
         options: { requestId, signal, ...(this.providers.l3 ? { retriever: this.providers.l3 } : {}) },
-      });
+      };
+      if (this.legacyVerificationEnabled && typeof this.legacyVerificationAdapter?.verifyLayer3 === "function") {
+        return this.legacyVerificationAdapter.verifyLayer3(layer3Params);
+      }
+      return this.services.l3(layer3Params);
     }
     if (stageId === "l4") {
-      return this.services.l4({
+      const localResult = await this.services.l4({
         layer1Result: rawResults.l1 || null,
         layer2AResult: rawResults.l2a || null,
         layer2Result: rawResults.l2b || null,
         layer2CResult: rawResults.l2c || null,
         layer3Result: rawResults.l3 || null,
+        input,
         options: { requestId, signal },
       });
+      if (!this.legacyVerificationEnabled || typeof this.legacyVerificationAdapter?.verifyLayer4 !== "function") return localResult;
+
+      const legacyLayer3 = rawResults.l3?.legacyIntegration;
+      const canRunIndependentSynthesis = !legacyLayer3 || (
+        legacyLayer3.status === "COMPLETED" &&
+        legacyLayer3.stop !== true &&
+        legacyLayer3.canContinueToLayer4 !== false
+      );
+      if (!canRunIndependentSynthesis) {
+        return {
+          ...localResult,
+          legacyIntegration: {
+            status: "SKIPPED",
+            providerStatus: "SKIPPED",
+            providerId: "legacy_verification_layer4",
+            requestId,
+            rawVerdict: null,
+            assessmentConfidence: null,
+            evidenceAgreement: null,
+            sourceQuality: null,
+            stop: true,
+            canContinueToLayer4: false,
+            reason: "Legacy Layer 3 continuation policy did not authorize independent Layer 4 synthesis.",
+            contradictoryEvidence: [],
+            sources: [],
+            sourceOrigin: "LAYER_4_INDEPENDENT_RESEARCH",
+            limitations: ["Layer 4 legacy synthesis was skipped by validated server-side continuation policy."],
+          },
+        };
+      }
+
+      const independent = await this.legacyVerificationAdapter.verifyLayer4({
+        input,
+        layer1Result: rawResults.l1 || null,
+        layer2AResult: rawResults.l2a || null,
+        layer2Result: rawResults.l2b || null,
+        layer2CResult: rawResults.l2c || null,
+        layer3Result: rawResults.l3 || null,
+        unresolvedSignals: rawResults.l3?.legacyIntegration?.unresolvedSignals || [],
+        requestId,
+        signal,
+      });
+      return {
+        ...localResult,
+        legacyIntegration: independent || {
+          status: "UNAVAILABLE",
+          providerStatus: "UNAVAILABLE",
+          providerId: "legacy_verification_layer4",
+          requestId,
+          rawVerdict: null,
+          assessmentConfidence: null,
+          evidenceAgreement: null,
+          sourceQuality: null,
+          stop: true,
+          canContinueToLayer4: false,
+          reason: "Legacy Layer 4 returned no usable result.",
+          contradictoryEvidence: [],
+          sources: [],
+          sourceOrigin: "LAYER_4_INDEPENDENT_RESEARCH",
+          limitations: ["No independent legacy synthesis was used by the canonical policy."],
+        },
+      };
     }
     const auditStages = cloneSafe(rawResults._pipelineStages || {});
     if (auditStages.l5) {
@@ -384,6 +473,29 @@ export class TrustPipelineOrchestrator {
       };
       pipeline.pipelineStatus = partial ? PIPELINE_STATUS.PARTIAL : PIPELINE_STATUS.COMPLETED;
       pipeline.completedAt = nowIso();
+      const projection = buildCanonicalTrustProjection({
+        requestId,
+        input,
+        pipeline,
+        layers: {
+          layer1: rawResults.l1 || null,
+          layer2A: rawResults.l2a || null,
+          layer2: rawResults.l2b || null,
+          layer2C: rawResults.l2c || null,
+          layer3: rawResults.l3 || null,
+          layer4: rawResults.l4 || null,
+        },
+        finalDecision: pipeline.finalDecision,
+      });
+      pipeline.verificationId = projection.verificationId;
+      pipeline.mode = projection.mode;
+      pipeline.state = projection.state;
+      pipeline.input = projection.input;
+      pipeline.layers = projection.layers;
+      pipeline.decision = projection.decision;
+      pipeline.evidence = projection.evidence;
+      pipeline.graph = projection.graph;
+      pipeline.passport = projection.passport;
       await this._emit(pipeline, "PIPELINE_COMPLETED", onTransition);
       const publicResult = toPublicPipelineResult(cloneSafe(pipeline));
       this._lastRun = cloneSafe(pipeline);

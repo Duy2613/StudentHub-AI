@@ -93,3 +93,23 @@
 - **Trung Thực Kỹ Thuật**: Nêu rõ ranh giới thuật toán tất định (CSP, Regex, AST diff, Rule Engine) vs mạng nơ-ron thực sự được huấn luyện (Multi-Head v1.4, PhoBERT LoRA).
 - **Quality Gate**: Tự động phát hiện 234 test files; lint/build/full regression đều pass trong `npm run test:quality`.
 - **T2/T3/T4 Premium Upgrade**: Evidence Fusion/Community/Expert Studio đã chuyển từ mock presentation sang API-driven drill-down, provenance, authority boundaries, cohort filtering và evidence-aware forum ranking; quality gate pass 235/235.
+
+### F02 Foundation — 2026-09-01
+
+- [x] Hoàn thiện canonical UI state envelope, transition guard và stale request/run guard.
+- [x] Hoàn thiện typed Trust/Community/Expert/Passport/provider/error/provenance contracts.
+- [x] Tách explicit `DEMO`/`LIVE`/`UNAVAILABLE`; DemoProvider deterministic/network-free; live không fallback sang demo.
+- [x] Hoàn thiện API provider adapter cho các transport capability hiện có; capability thiếu trả typed unavailable, không phát minh endpoint.
+- [x] Bổ sung semantic token aliases và reduced-motion foundation, không visual polish.
+- [x] F02 verification: foundation 23/23, Trust V5 62/62, selected API/route/auth regressions pass, typecheck/lint/build pass.
+- [x] F03–F17 local engineering gates completed: shell/navigation, Trust core flows, multimodal, graph/passport seams, Community/Expert seams, state coverage, accessibility, responsive/browser regression, bundle/security audits.
+- [ ] F12 advanced cinematic/motion/media polish remains Antigravity-owned and is intentionally not claimed by Luna.
+- [ ] F18/F19 live backend and fullstack RC remain `BLOCKED_BY_ENV` pending approved ASP.NET/Supabase/PostgreSQL/RLS/provider/deployment environment.
+
+### Continuous program checkpoint — 2026-09-01
+
+- Final status: `FULL_ENGINEERING_PROGRAM_COMPLETE_WITH_ENV_BLOCKERS`.
+- Canonical product: Trust P0, Community P1, Expert P1; no fourth pillar or feature sprawl added.
+- Verification: discovered `265/265`, Chromium `67` passed + `3` explicit-demo skips, build `117/117`, lint `0` errors/`332` warnings, bundle budgets pass, API authorization inventory `137` handlers, dependency audit `0` vulnerabilities.
+- Exact `agent-browser` execution is unavailable in this environment; Playwright fallback is the recorded browser evidence. No commit, push, or merge performed.
+- Antigravity handoff package: `docs/visual-contracts/`; Luna completion report: `docs/reports/LUNA_FULL_COMPLETION_REPORT.md`.

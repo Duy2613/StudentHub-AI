@@ -57,7 +57,7 @@ export default function UserDropdownMenu({ className = "" }) {
   const isExpert = profile?.role === "expert";
   const fullName = profile?.fullName || session?.user?.user_metadata?.full_name || session?.user?.email?.split("@")[0] || "Thành viên StudentHub";
   const email = profile?.email || session?.user?.email || "";
-  const trustScore = profile?.trustScore ?? (isExpert ? 98 : 80);
+  const trustScore = profile?.trustScore ?? 50;
   const roleLabel = isExpert ? "⭐ Chuyên gia uy tín" : "🎓 Sinh viên";
 
   return (
@@ -147,26 +147,26 @@ export default function UserDropdownMenu({ className = "" }) {
               </Link>
 
               <Link
-                href="/scam-check"
+                href="/trust"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-gray-200 hover:text-white hover:bg-white/10 transition-colors group"
               >
                 <ShieldAlert className="w-4 h-4 text-rose-400 group-hover:scale-110 transition-transform" />
                 <div className="flex flex-col">
-                  <span className="font-semibold">AI Scam Checker</span>
+                  <span className="font-semibold">Trust Engine</span>
                   <span className="text-[10px] text-gray-400">Kiểm tra link, text & OCR</span>
                 </div>
               </Link>
 
               <Link
-                href="/forum"
+                href="/community"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-gray-200 hover:text-white hover:bg-white/10 transition-colors group"
               >
                 <MessageSquare className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
                 <div className="flex flex-col">
-                  <span className="font-semibold">Diễn đàn cộng đồng</span>
-                  <span className="text-[10px] text-gray-400">Nhà trọ, quán ăn, trường học</span>
+                  <span className="font-semibold">Quan sát cộng đồng</span>
+                  <span className="text-[10px] text-gray-400">Bằng chứng trải nghiệm có ngữ cảnh</span>
                 </div>
               </Link>
 

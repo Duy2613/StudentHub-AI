@@ -164,7 +164,7 @@ export default function InteractiveScamDemo() {
               <TactileButton
                 variant="primary"
                 size="md"
-                href="/scam-check"
+                    href="/trust"
                 icon={ArrowRight}
                 techSuffix="[OCR ENGINE]"
               >

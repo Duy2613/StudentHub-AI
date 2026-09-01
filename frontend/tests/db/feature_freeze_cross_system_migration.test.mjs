@@ -6,6 +6,7 @@ import { describe, it } from "node:test";
 
 const repositoryRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const sql = readFileSync(join(repositoryRoot, "database", "migrations", "202608290001_feature_freeze_cross_system.sql"), "utf8");
+const screenshotSql = readFileSync(join(repositoryRoot, "database", "migrations", "202609010001_private_screenshot_storage.sql"), "utf8");
 const passportRoute = readFileSync(join(repositoryRoot, "frontend", "src", "app", "api", "v1", "passports", "route.js"), "utf8");
 const decisionRoute = readFileSync(join(repositoryRoot, "frontend", "src", "app", "api", "v1", "decisions", "route.js"), "utf8");
 const repository = readFileSync(join(repositoryRoot, "frontend", "src", "lib", "intelligence", "crossSystem", "PostgresCrossSystemRepository.js"), "utf8");
@@ -62,5 +63,18 @@ describe("Feature-freeze cross-system migration contract", () => {
     assert.match(decisionRoute, /basis: "USER_ASSUMPTION"/);
     assert.match(decisionRoute, /certainty: "UNKNOWN"/);
     assert.match(decisionRoute, /uncertainty: Math\.max\(4/);
+  });
+
+  it("prepares a private, owner-scoped screenshot storage boundary", () => {
+    assert.match(screenshotSql, /create table if not exists public\.screenshot_objects/i);
+    assert.match(screenshotSql, /alter table public\.screenshot_objects enable row level security/i);
+    assert.match(screenshotSql, /trust-screenshots-private/i);
+    assert.match(screenshotSql, /insert into storage\.buckets[\s\S]*?values[\s\S]*?false,\s*8388608/i);
+    assert.match(screenshotSql, /file_size_limit/i);
+    assert.match(screenshotSql, /image\/png.*image\/jpeg.*image\/webp/i);
+    assert.match(screenshotSql, /storage\.foldername\(name\)\)\[1\] = auth\.uid\(\)::text/i);
+    assert.match(screenshotSql, /screenshot_storage_owner_select/i);
+    assert.match(screenshotSql, /screenshot_storage_owner_delete/i);
+    assert.doesNotMatch(screenshotSql, /create policy[^;]+for select to anon/i);
   });
 });

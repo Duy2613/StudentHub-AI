@@ -7,7 +7,9 @@ import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
 
 export default function Error({ error, reset }) {
   useEffect(() => {
-    console.error("[StudentHub Error Boundary]:", error);
+    // Keep diagnostics out of the rendered surface. Providers may include
+    // internal details or identifiers that are not safe to expose to users.
+    if (process.env.NODE_ENV !== "production") console.error("[StudentHub Error Boundary]", error?.name || "unknown_error");
   }, [error]);
 
   return (
@@ -27,12 +29,6 @@ export default function Error({ error, reset }) {
         <p className="text-sm text-gray-400 leading-relaxed mb-6">
           Hệ thống gặp sự cố tạm thời khi đồng bộ dữ liệu. Bạn có thể nhấn nút thử lại hoặc quay về Trang Chủ.
         </p>
-
-        {error?.message && (
-          <div className="p-3 mb-6 rounded-xl bg-black/40 border border-white/5 text-left text-xs font-mono text-gray-400 overflow-x-auto">
-            <code>{error.message}</code>
-          </div>
-        )}
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button

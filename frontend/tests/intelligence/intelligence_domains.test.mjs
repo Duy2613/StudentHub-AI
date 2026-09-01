@@ -50,7 +50,10 @@ describe("Domain 1: Academic & University OS", () => {
     assert.strictEqual(provenance.isGoldEligible, true);
     assert.strictEqual(provenance.provenanceScore, 1.0);
 
-    const freshness = calculateFreshnessScore("2026-08-20T00:00:00.000Z", "ANNOUNCEMENT");
+    // Keep the assertion stable as the calendar advances: a recent announcement
+    // should remain inside the documented FRESH decay window at test time.
+    const recentAnnouncement = new Date(Date.now() - (24 * 60 * 60 * 1000)).toISOString();
+    const freshness = calculateFreshnessScore(recentAnnouncement, "ANNOUNCEMENT");
     assert.strictEqual(freshness.status, "FRESH");
   });
 

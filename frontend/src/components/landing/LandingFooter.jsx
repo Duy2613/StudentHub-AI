@@ -34,7 +34,7 @@ export default function LandingFooter() {
             </div>
 
             <p className="text-xs text-gray-300 max-w-md leading-relaxed">
-              Nền tảng phòng chống lừa đảo &amp; mạng lưới xác thực thông tin dành cho sinh viên Việt Nam. Kết hợp AI phân tích 4 lớp, chuyên gia uy tín và diễn đàn cộng đồng.
+              Nền tảng Trust-first dành cho sinh viên Việt Nam. Kết hợp phân tích có bằng chứng, quan sát cộng đồng và chuyên gia đúng phạm vi.
             </p>
 
             <div className="p-3 rounded-2xl bg-white/5 border border-white/5 inline-block text-[11px] text-teal-300 font-semibold">
@@ -47,13 +47,13 @@ export default function LandingFooter() {
             <p className="text-xs font-bold text-white uppercase tracking-wider">Tính Năng Cốt Lõi</p>
             <ul className="space-y-2">
               <li>
-                <Link href="/scam-check" className="hover:text-teal-300 transition-colors igloo-magnetic inline-block">
-                  AI Scam Checker (4 Lớp)
+                <Link href="/trust" className="hover:text-teal-300 transition-colors igloo-magnetic inline-block">
+                  Trust Engine
                 </Link>
               </li>
               <li>
-                <Link href="/forum" className="hover:text-teal-300 transition-colors igloo-magnetic inline-block">
-                  Diễn Đàn Cộng Đồng Sinh Viên
+                <Link href="/community" className="hover:text-teal-300 transition-colors igloo-magnetic inline-block">
+                  Quan sát cộng đồng
                 </Link>
               </li>
               <li>
@@ -63,7 +63,7 @@ export default function LandingFooter() {
               </li>
               <li>
                 <Link href="/profile" className="hover:text-teal-300 transition-colors igloo-magnetic inline-block">
-                  Mạng Lưới Chuyên Gia &amp; Uy Tín
+                  Mạng lưới chuyên gia
                 </Link>
               </li>
             </ul>

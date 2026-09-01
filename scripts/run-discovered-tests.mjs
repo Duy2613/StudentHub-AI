@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join, relative } from "node:path";
 import { spawnSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 
 const root = join(process.cwd(), "frontend", "tests");
 
@@ -40,9 +41,16 @@ if (!tests.length) {
 }
 
 let passed = 0;
+const extensionLoader = pathToFileURL(join(root, "foundation", "ts-extension-loader.mjs")).href;
+const inheritedNodeOptions = process.env.NODE_OPTIONS || "";
+const childNodeOptions = inheritedNodeOptions.includes("ts-extension-loader.mjs")
+  ? inheritedNodeOptions
+  : `${inheritedNodeOptions} --loader ${extensionLoader}`.trim();
+const childEnv = { ...process.env, NODE_OPTIONS: childNodeOptions };
+
 for (const test of tests) {
   const label = relative(process.cwd(), test);
-  const result = spawnSync(process.execPath, [test], { stdio: "inherit", env: process.env });
+  const result = spawnSync(process.execPath, [test], { stdio: "inherit", env: childEnv });
   if (result.status !== 0) {
     console.error(`\n[QUALITY_GATE] FAILED: ${label}`);
     process.exit(result.status || 1);

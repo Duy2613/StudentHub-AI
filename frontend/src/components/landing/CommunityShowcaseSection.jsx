@@ -128,7 +128,7 @@ export default function CommunityShowcaseSection() {
                 </div>
 
                 <Link
-                  href="/forum"
+                  href="/community"
                   className="text-xs font-bold text-purple-300 hover:text-white flex items-center gap-1 group"
                 >
                   <span>Xem thảo luận</span>
@@ -146,8 +146,8 @@ export default function CommunityShowcaseSection() {
             <p className="text-xs text-gray-400 mt-0.5">Tìm kiếm nhanh theo tên trường hoặc khu vực trên toàn quốc.</p>
           </div>
 
-          <TactileButton variant="primary" size="md" href="/forum" icon={ArrowRight}>
-            Truy Cập Diễn Đàn Sinh Viên
+          <TactileButton variant="primary" size="md" href="/community" icon={ArrowRight}>
+            Mở quan sát cộng đồng
           </TactileButton>
         </div>
 

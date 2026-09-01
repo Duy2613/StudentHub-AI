@@ -5,13 +5,13 @@
  */
 
 import React from "react";
-import StudentHubOSShell from "@/components/layout/StudentHubOSShell";
-import PrivacyAndSecurityCenter from "@/components/settings/PrivacyAndSecurityCenter";
+import UnifiedAppShell from "@/components/layout/UnifiedAppShell";
+import { PrivacyAccessCenter } from "@/components/settings/PrivacyAccessCenter";
 
 export default function SettingsPage() {
   return (
-    <StudentHubOSShell>
-      <PrivacyAndSecurityCenter />
-    </StudentHubOSShell>
+    <UnifiedAppShell>
+      <PrivacyAccessCenter />
+    </UnifiedAppShell>
   );
 }

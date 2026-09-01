@@ -51,7 +51,7 @@ export default function CallToActionSection() {
           <TactileButton
             variant="secondary"
             size="lg"
-            href="/scam-check"
+            href="/trust"
             icon={ShieldCheck}
             techSuffix="[AI SCAN 0.1s]"
           >

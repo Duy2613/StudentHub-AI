@@ -21,7 +21,12 @@ test("CASE B — benign response is not forced into high risk", async ({ page })
   await expect(page.locator('.verdict-metrics dd[data-risk="CRITICAL"]')).toHaveCount(0);
 });
 
-test("CASE C — live partial providers remain distinct", async ({ page }) => {
+test("CASE C — invalid input is rejected before provider execution", async ({ page }) => {
+  await submit(page, stagingCases.invalid);
+  await expect(page.locator(".error-callout")).toContainText(/không hợp lệ|hợp lệ/i);
+});
+
+test("CASE D — live partial providers remain distinct", async ({ page }) => {
   await submit(page, stagingCases.partial);
   await expect(page.getByRole("heading", { name: "Tình trạng nguồn đối soát" })).toBeVisible();
   for (const status of stagingCases.partial.expectedProviderStatuses || ["findings", "unknown", "unavailable"]) {
@@ -29,13 +34,13 @@ test("CASE C — live partial providers remain distinct", async ({ page }) => {
   }
 });
 
-test("CASE D — insufficient evidence never renders safe", async ({ page }) => {
+test("CASE E — insufficient evidence never renders safe", async ({ page }) => {
   await submit(page, stagingCases.insufficient);
   await expect(page.locator(".verdict-panel")).toContainText(stagingCases.insufficient.expected || "Chưa đủ bằng chứng");
   await expect(page.getByText("AN TOÀN", { exact: true })).toHaveCount(0);
 });
 
-test("CASE E — configured live failure remains recoverable", async ({ page }) => {
+test("CASE F — configured live failure remains recoverable", async ({ page }) => {
   await submit(page, stagingCases.failure);
   await expect(page.locator(".error-callout")).toContainText(stagingCases.failure.expectedErrorFragment || /quá nhiều|không khả dụng|quá lâu/i);
   await expect(page.getByRole("heading", { level: 1, name: "Kiểm tra trước khi bạn tin." })).toBeVisible();

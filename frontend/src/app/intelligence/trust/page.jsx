@@ -1,16 +1,6 @@
-import React from "react";
-import { GlobalAppShell } from "@/components/layout/GlobalAppShell";
-import { TrustLensView } from "@/components/intelligence/TrustLensView";
+import { redirect } from "next/navigation";
 
-export const metadata = {
-  title: "T1 Trust Intelligence Lens | StudentHub AI",
-  description: "Giải mã ma trận tin cậy đa chiều và giải trình minh bạch hồ sơ học vụ."
-};
-
-export default function TrustLensPage() {
-  return (
-    <GlobalAppShell>
-      <TrustLensView />
-    </GlobalAppShell>
-  );
+/** Compatibility entry: TrustGraph is part of a Trust case, not a peer route. */
+export default function TrustIntelligenceCompatibilityRoute() {
+  redirect("/trust");
 }

@@ -136,6 +136,7 @@ describe("Security Fabric — Master Gateway Integration", () => {
     // 4th request must be rejected with 429
     const response = await handler(mockRequest, {});
     assert.strictEqual(response.status, 429);
+    assert.match(response.headers.get("Retry-After") || "", /^[1-9][0-9]*$/);
     const body = await response.json();
     assert.strictEqual(body.error.code, "RATE_LIMIT_EXCEEDED");
   });

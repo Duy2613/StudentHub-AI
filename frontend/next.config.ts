@@ -21,6 +21,46 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
+        source: "/intelligence",
+        destination: "/trust",
+        permanent: false,
+      },
+      {
+        source: "/intelligence/ai-trust",
+        destination: "/trust",
+        permanent: false,
+      },
+      {
+        source: "/intelligence/community",
+        destination: "/community",
+        permanent: false,
+      },
+      {
+        source: "/intelligence/evidence",
+        destination: "/trust",
+        permanent: false,
+      },
+      {
+        source: "/intelligence/experts",
+        destination: "/expert",
+        permanent: false,
+      },
+      {
+        source: "/intelligence/knowledge",
+        destination: "/trust",
+        permanent: false,
+      },
+      {
+        source: "/intelligence/trust",
+        destination: "/trust",
+        permanent: false,
+      },
+      {
+        source: "/academic/profile",
+        destination: "/profile",
+        permanent: false,
+      },
+      {
         source: "/credit-scheduler",
         destination: "/academic?view=planner",
         permanent: false,
@@ -28,6 +68,11 @@ const nextConfig: NextConfig = {
       {
         source: "/prof-rating",
         destination: "/expert",
+        permanent: false,
+      },
+      {
+        source: "/profile/:id",
+        destination: "/profile?profileId=:id",
         permanent: false,
       },
       {
@@ -43,6 +88,16 @@ const nextConfig: NextConfig = {
       {
         source: "/quests",
         destination: "/dashboard",
+        permanent: false,
+      },
+      {
+        source: "/forum",
+        destination: "/community",
+        permanent: false,
+      },
+      {
+        source: "/ultra",
+        destination: "/cases",
         permanent: false,
       },
     ];

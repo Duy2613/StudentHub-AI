@@ -1,6 +1,5 @@
 import React from "react";
-import { CommunityIntelligenceView } from "@/components/community/CommunityIntelligenceView";
-import { CommunityStore } from "@/lib/intelligence/community/communityStore";
+import CommunityWorkspaceClient from "@/components/community/CommunityWorkspaceClient";
 import UnifiedAppShell from "@/components/layout/UnifiedAppShell";
 
 export const metadata = {
@@ -9,7 +8,5 @@ export const metadata = {
 };
 
 export default function CommunityPage() {
-  const initialPosts = CommunityStore.getAllPosts();
-
-  return <UnifiedAppShell><CommunityIntelligenceView initialPosts={initialPosts} /></UnifiedAppShell>;
+  return <UnifiedAppShell><CommunityWorkspaceClient /></UnifiedAppShell>;
 }

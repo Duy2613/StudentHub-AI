@@ -12,7 +12,7 @@ const DEFAULT_ANNOTATIONS = Object.freeze([
   { mark: "✻", title: "Ghi chú của hệ thống", body: "AI tách điều đã biết khỏi điều cần kiểm tra tiếp." },
   { mark: "!!", title: "Được cộng đồng đọc", body: "Tín hiệu xã hội luôn hiển thị phạm vi và trạng thái." },
   { mark: "?", title: "Khoảng chưa chắc", body: "Khi thiếu dữ kiện, hệ thống dừng và nói rõ điều còn thiếu." },
-  { mark: "→", title: "Tham chiếu liên quan", body: "Đi đến lớp Trust, Community, Expert hoặc Academic tương ứng." },
+  { mark: "→", title: "Tham chiếu liên quan", body: "Đi đến lớp Trust, Community, Expert hoặc Evidence Passport tương ứng." },
   { mark: "✕", title: "Đính chính", body: "Thay đổi quan trọng giữ lại lịch sử và lý do thay đổi." },
 ]);
 
@@ -35,6 +35,7 @@ export default function MarginRail({
   displayName = "Sinh viên",
   mobileOpen = false,
   onMobileToggle,
+  onNavigate,
 }) {
   const chapterNumber = safeChapter(chapter);
   const visibleAnnotations = (Array.isArray(annotations) ? annotations : DEFAULT_ANNOTATIONS).slice(0, 6);
@@ -52,6 +53,7 @@ export default function MarginRail({
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={() => { if (compact) onNavigate?.(); }}
                   className={`margin-nav-link ${active ? "is-active" : ""}`}
                   aria-current={active ? "page" : undefined}
                 >
@@ -93,7 +95,7 @@ export default function MarginRail({
         </div>
       </aside>
 
-      <details className="margin-mobile-strip" open={mobileOpen} onToggle={(event) => onMobileToggle?.(event.currentTarget.open)}>
+      <details id="mobile-navigation" className="margin-mobile-strip" open={mobileOpen} onToggle={(event) => onMobileToggle?.(event.currentTarget.open)}>
         <summary>
           <span className="margin-mobile-summary-mark"><Menu size={15} aria-hidden="true" /></span>
           <span><span className="margin-meta">Chapter {chapterNumber}</span><strong>{chapterLabel}</strong></span>

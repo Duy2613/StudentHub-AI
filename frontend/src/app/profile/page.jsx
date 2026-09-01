@@ -5,13 +5,12 @@ import { useRouter } from "next/navigation";
 import { ShieldAlert, Award, Building, BookOpen, CheckCircle2, Calendar, X, ArrowLeft, Edit3 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
+import UnifiedAppShell from "@/components/layout/UnifiedAppShell";
 import AeroMissionControlBackdrop from "@/components/ui/AeroMissionControlBackdrop";
 import MohsinFluidCanvas from "@/components/ui/MohsinFluidCanvas";
 import SaffronMarqueeTicker from "@/components/ui/SaffronMarqueeTicker";
 import SaffronSwissCrosshairGrid from "@/components/ui/SaffronSwissCrosshairGrid";
 import { NoiseOverlay } from "@/components/auth/AuthUI";
-import CollapsibleSidebar from "@/components/layout/CollapsibleSidebar";
-import ModernNavbar from "@/components/layout/ModernNavbar";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 import {
@@ -80,8 +79,8 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-[#070403] flex flex-col items-center justify-center p-4">
-        <p className="text-white mb-4">Không tìm thấy thông tin hồ sơ.</p>
+      <main className="min-h-screen bg-[#070403] flex flex-col items-center justify-center p-4">
+        <h1 className="text-white mb-4 text-center">Không tìm thấy thông tin hồ sơ.</h1>
         <button
           type="button"
           onClick={() => router.push("/login")}
@@ -89,14 +88,16 @@ export default function ProfilePage() {
         >
           Đăng nhập ngay
         </button>
-      </div>
+      </main>
     );
   }
 
   const isExpert = profile.role === "expert";
-  const trustScore = profile.trustScore || 80;
-  const isTopExpertBadge = trustScore >= 80;
+  const trustScore = typeof profile.trustScore === "number" && Number.isFinite(profile.trustScore)
+    ? Math.max(0, Math.min(100, profile.trustScore))
+    : null;
   const isEduVerified = !!profile.eduEmailVerified;
+  const hasVerifiedStudentProof = profile.verifiedStudent === true || isEduVerified;
 
   const handleSaveProfile = async (e) => {
     e.preventDefault();
@@ -132,6 +133,7 @@ export default function ProfilePage() {
   };
 
   return (
+    <UnifiedAppShell>
     <div className="min-h-screen bg-[#070403] text-gray-100 flex relative overflow-x-hidden selection:bg-[#ffbc09] selection:text-[#150604]">
       {/* 1. High-End Aerospace Aviation Terminal Backdrop (Clean & Non-overlapping) */}
       <AeroMissionControlBackdrop
@@ -148,14 +150,6 @@ export default function ProfilePage() {
 
       {/* 4. Studio Controls */}
       <BackgroundsAndEffectsStudio />
-
-      {session ? (
-        <CollapsibleSidebar className="hidden md:flex relative z-40" />
-      ) : (
-        <header className="overlay-nav-layer">
-          <ModernNavbar />
-        </header>
-      )}
 
       <main className="flex-1 layout-safe-container pt-24 sm:pt-28 pb-40 space-y-8 relative z-10 min-w-0 font-human">
         
@@ -200,7 +194,7 @@ export default function ProfilePage() {
             }`}
           >
             <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-[#150604]/80 backdrop-blur-md border border-[#47140b] text-[11px] font-mono font-semibold text-[#ffd15c]">
-              MÃ HỒ SƠ: #{String(profile.id || "1").slice(0, 8)}
+              MÃ HỒ SƠ: {profile.id ? `#${String(profile.id).slice(0, 8)}` : "CHƯA CÓ ID"}
             </div>
           </div>
 
@@ -218,7 +212,7 @@ export default function ProfilePage() {
                 <div className="text-right">
                   <span className="text-[10px] font-mono text-[#ece7e0]/60 uppercase block">ĐIỂM TÍN NHIỆM:</span>
                   <span className="text-xl sm:text-2xl font-black text-[#ffbc09] font-mono">
-                    {trustScore} <span className="text-xs font-normal text-white">/ 100 PTS</span>
+                    {trustScore === null ? "CHƯA CÔNG BỐ" : <>{trustScore} <span className="text-xs font-normal text-white">/ 100 PTS</span></>}
                   </span>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-[#ffbc09]/20 border border-[#ffbc09]/40 flex items-center justify-center text-[#ffbc09]">
@@ -237,10 +231,14 @@ export default function ProfilePage() {
                   <span className="px-3 py-1 rounded-full bg-[#ffbc09]/20 text-[#ffbc09] text-xs font-mono font-bold border border-[#ffbc09]/40">
                     ⭐ CỐ VẤN / CHUYÊN GIA
                   </span>
-                ) : (
+                ) : hasVerifiedStudentProof ? (
                   <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-mono font-bold border border-emerald-500/40 flex items-center gap-1.5">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     SINH VIÊN XÁC THỰC
+                  </span>
+                ) : (
+                  <span className="px-3 py-1 rounded-full bg-white/10 text-white/70 text-xs font-mono font-bold border border-white/15">
+                    SINH VIÊN · CHƯA XÁC MINH
                   </span>
                 )}
                 {isEduVerified && (
@@ -252,7 +250,7 @@ export default function ProfilePage() {
 
               {/* Bio */}
               <p className="text-xs sm:text-sm text-[#ece7e0]/80 max-w-3xl leading-relaxed">
-                {profile.bio || "Thành viên tích cực tham gia mạng lưới phòng chống gian lận học đường StudentHub AI."}
+                {profile.bio || "Chưa có mô tả được công bố."}
               </p>
 
               {/* Academic Details Meta */}
@@ -466,5 +464,6 @@ export default function ProfilePage() {
         </div>
       )}
     </div>
+    </UnifiedAppShell>
   );
 }

@@ -4,7 +4,8 @@ import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticServi
 import { Layer2AReputationService } from "@/lib/ai-trust/layer2a/Layer2AReputationService.js";
 import { Layer3EvidenceService } from "@/lib/ai-trust/layer3/Layer3EvidenceService.js";
 import { Layer4TrustService } from "@/lib/ai-trust/layer4/Layer4TrustService.js";
-import { TrustPipelineCancelledError, TrustPipelineOrchestrator } from "@/lib/ai-trust/v5/TrustPipelineOrchestrator.js";
+import { TrustPipelineCancelledError } from "@/lib/ai-trust/v5/TrustPipelineOrchestrator.js";
+import { createTrustOrchestrator } from "@/lib/ai-trust/TrustOrchestrator.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
 export const runtime = "nodejs";
@@ -50,7 +51,7 @@ function streamV5Pipeline(request, input, requestId) {
         if (closed) return;
         try { controller.enqueue(encoder.encode(sseChunk({ ...event, requestId }))); } catch { closed = true; }
       };
-      const orchestrator = new TrustPipelineOrchestrator();
+      const orchestrator = createTrustOrchestrator();
       orchestrator.run(input, {
         requestId,
         signal: abortController.signal,
@@ -115,7 +116,7 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
   const input = { type, content, metadata };
   if (body?.version === "v5") {
     if (wantsV5Stream(request, body)) return streamV5Pipeline(request, input, requestId);
-    const pipeline = await new TrustPipelineOrchestrator().run(input, { requestId, signal: request.signal });
+    const pipeline = await createTrustOrchestrator().run(input, { requestId, signal: request.signal });
     return NextResponse.json({
       success: true,
       contractVersion: "trust.v5",

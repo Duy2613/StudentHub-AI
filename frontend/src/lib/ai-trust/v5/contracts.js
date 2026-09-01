@@ -281,6 +281,7 @@ function publicSources(value) {
       "evidenceId", "claimId", "sourceId", "sourceUrl", "url", "title", "publisher", "domain", "sourceType",
       "authorityTier", "freshness", "publishedAt", "retrievedAt", "relation", "status", "retrievalOutcome",
       "sourceFingerprint", "clusterId", "excerpt", "relevance", "strength", "liveEvidence", "providerStatus",
+      "origin", "provider",
     ]);
   }).filter(Boolean) : [];
 }
@@ -290,6 +291,20 @@ function publicProviders(value) {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
     return publicRecord(item, ["provider", "success", "verdict", "confidence", "message", "threatTypes", "status", "latencyMs", "reference"]);
   }).filter(Boolean) : [];
+}
+
+function publicLegacyIntegration(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const output = publicRecord(value, [
+    "status", "providerStatus", "providerId", "rawVerdict", "legacyAssessmentConfidence", "assessmentConfidence",
+    "evidenceAgreement", "sourceQuality", "stop", "canContinueToLayer4", "continuationDerived", "reason",
+    "sourceOrigin", "sourceCount", "evidenceCount", "errorCode", "latencyMs",
+  ]);
+  if (!output) return null;
+  output.contradictoryEvidence = publicStringList(value.contradictoryEvidence, 20, 700);
+  output.sources = publicSources(value.sources);
+  output.limitations = publicStringList(value.limitations, 8, 600);
+  return output;
 }
 
 function publicRelatedCases(value) {
@@ -387,6 +402,7 @@ function publicLayerResult(value, layerId) {
     ]);
     base.candidateClaimOrigins = publicStringList(value.candidateClaimOrigins, 20, 120);
     base.evidenceRequirements = publicStringList(value.evidenceRequirements, 16, 240);
+    base.legacyIntegration = publicLegacyIntegration(value.legacyIntegration);
   }
   if (layerId === "l4") {
     base.keyReasons = Array.isArray(value.keyReasons) ? value.keyReasons.slice(0, 20).map((item) => publicText(item, 700)).filter(Boolean) : [];
@@ -396,6 +412,8 @@ function publicLayerResult(value, layerId) {
     base.riskAssessment = publicRecord(value.riskAssessment, ["level", "score", "confidence", "primaryRisk", "uncertainty"]);
     base.metrics = publicRecord(value.metrics, ["modelUsed", "ruleVersion", "providerStatus", "latencyMs"]);
     base.relatedCases = publicRelatedCases(value.relatedCases);
+    base.legacyIntegration = publicLegacyIntegration(value.legacyIntegration);
+    base.independentResearchSources = publicSources(value.independentResearchSources);
   }
   return base;
 }

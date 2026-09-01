@@ -25,6 +25,7 @@ import TactileButton from "@/components/ui/TactileButton";
 import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
 import { NoiseOverlay } from "@/components/auth/AuthUI";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
+import { ApiError, apiErrorMessage } from "@/lib/api/errors";
 
 
 export default function OnboardingPage() {
@@ -65,6 +66,7 @@ export default function OnboardingPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [verificationNotice, setVerificationNotice] = useState("");
 
   // Initialize from session / metadata
   useEffect(() => {
@@ -93,6 +95,7 @@ export default function OnboardingPage() {
   const handleFinish = async () => {
     setIsSubmitting(true);
     setError(null);
+    setVerificationNotice("");
 
     const email = session?.user?.email || "";
     let isEdu = false;
@@ -105,16 +108,15 @@ export default function OnboardingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      const eduCheckData = await eduCheckRes.json();
-      if (eduCheckData?.success && eduCheckData?.isEdu) {
+      const eduCheckData = await eduCheckRes.json().catch(() => null);
+      if (eduCheckRes.ok && eduCheckData?.success === true && eduCheckData?.isEdu === true) {
         isEdu = true;
         if (eduCheckData.university) verifiedUniversity = eduCheckData.university;
       } else {
-        isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(email);
+        setVerificationNotice("Chưa thể xác minh email tổ chức từ provider hiện tại; hệ thống không cấp trạng thái sinh viên xác thực thay thế.");
       }
-    } catch (e) {
-      console.warn("Edu verification check fallback:", e);
-      isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(email);
+    } catch {
+      setVerificationNotice("Provider xác minh email chưa khả dụng; hệ thống giữ trạng thái xác minh ở mức chưa biết.");
     }
 
     const isExpert = role === "expert";
@@ -122,7 +124,7 @@ export default function OnboardingPage() {
 
     try {
       // 2. Sync to API backend (Phần F Data Model)
-      await fetch("/api/users/profile", {
+      const profileResponse = await fetch("/api/users/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -135,7 +137,11 @@ export default function OnboardingPage() {
           major: !isExpert ? major : null,
           onboardingCompleted: true,
         }),
-      }).catch((e) => console.warn("Sync profile PUT error:", e));
+      });
+      const profileData = await profileResponse.json().catch(() => null);
+      if (!profileResponse.ok || profileData?.success !== true) {
+        throw new ApiError("Không thể xác nhận lưu hồ sơ với profile API.", profileResponse.status === 401 ? "UNAUTHORIZED" : profileResponse.status === 403 ? "FORBIDDEN" : "INVALID_RESPONSE", { status: profileResponse.status });
+      }
 
       // 3. Update Auth context & local cache
       await updateProfile({
@@ -162,7 +168,7 @@ export default function OnboardingPage() {
 
       router.replace("/dashboard");
     } catch (err) {
-      setError(err.message || "Không thể lưu thông tin hồ sơ.");
+      setError(err instanceof ApiError ? apiErrorMessage(err) : "Không thể lưu thông tin hồ sơ.");
       setIsSubmitting(false);
     }
   };
@@ -233,6 +239,11 @@ export default function OnboardingPage() {
           {error && (
             <div className="mb-6 p-4 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs font-human">
               {error}
+            </div>
+          )}
+          {verificationNotice && (
+            <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-100" role="status">
+              {verificationNotice}
             </div>
           )}
 

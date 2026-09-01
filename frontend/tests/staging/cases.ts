@@ -11,6 +11,7 @@ export type StagingCase = {
 export type StagingCases = {
   suspicious: StagingCase;
   benign: StagingCase;
+  invalid: StagingCase;
   partial: StagingCase;
   insufficient: StagingCase;
   failure: StagingCase;
@@ -19,7 +20,7 @@ export type StagingCases = {
 const path = process.env.STUDENTHUB_STAGING_CASES_PATH;
 if (!path) throw new Error("STAGING_E2E_BLOCKED_BY_ENV: STUDENTHUB_STAGING_CASES_PATH is required");
 const parsed = JSON.parse(readFileSync(path, "utf8")) as Partial<StagingCases>;
-for (const key of ["suspicious", "benign", "partial", "insufficient", "failure"] as const) {
+for (const key of ["suspicious", "benign", "invalid", "partial", "insufficient", "failure"] as const) {
   if (!parsed[key]?.value || !["text", "url"].includes(parsed[key]?.type || "")) {
     throw new Error(`STAGING_E2E_BLOCKED_BY_ENV: invalid or missing staging case '${key}'`);
   }
