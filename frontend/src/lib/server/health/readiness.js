@@ -26,7 +26,7 @@ export async function checkReadiness() {
   }
 
   const supabaseAuthConfigured = hasValue(process.env.NEXT_PUBLIC_SUPABASE_URL)
-    && hasValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    && (hasValue(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) || hasValue(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY));
   const sessionConfigured = supabaseAuthConfigured
     && databaseConfigured
     && hasValue(process.env.STUDENTHUB_SESSION_PEPPER);
