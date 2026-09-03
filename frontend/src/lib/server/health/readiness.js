@@ -1,6 +1,6 @@
-import { getLegacyVerificationConfig } from "@/lib/ai-trust/integrations/legacyVerification/config.js";
-import { getLayer2AConfig } from "@/lib/ai-trust/layer2a/config.js";
-import { getPostgresPool } from "@/lib/server/database/PostgresPool.js";
+import { getLegacyVerificationConfig } from "../../ai-trust/integrations/legacyVerification/config.js";
+import { getLayer2AConfig } from "../../ai-trust/layer2a/config.js";
+import { getPostgresPool } from "../database/PostgresPool.js";
 
 function hasValue(value) {
   return typeof value === "string" && value.trim().length > 0;

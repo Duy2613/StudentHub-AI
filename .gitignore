@@ -47,3 +47,5 @@ frontend/.lhci-temp/
 # Operator/agent scratch (never release payload)
 .codex-temp/
 .github/skills/
+
+.vercel
