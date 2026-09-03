@@ -240,7 +240,7 @@ function nodeLabelForEvidence(item) {
   return item.source.title || item.source.id || item.provider || item.type;
 }
 
-export function buildTrustGraph({ requestId, input = {}, layers = {}, evidence = [] } = {}) {
+export function buildTrustGraph({ requestId, input = {}, layers = {}, evidence = [], caseId = null } = {}) {
   const nodes = [];
   const edges = [];
   const nodeIds = new Set();
@@ -260,6 +260,12 @@ export function buildTrustGraph({ requestId, input = {}, layers = {}, evidence =
   };
 
   addNode({ id: inputId, kind: "INPUT", label: input.type === "url" ? safeText(input.content, 240) : "Trust input", detail: "Actual input received by the canonical Trust API.", origin: "LAYER_1_INTERNAL" });
+  if (caseId) {
+    const caseNodeId = `case:${caseId}`;
+    addNode({ id: caseNodeId, kind: "CASE", label: `Case #${caseId.slice(0, 8)}`, detail: "Authoritative owner-bound case in PostgreSQL.", origin: "POSTGRES_DB" });
+    addEdge(inputId, caseNodeId, "recorded_as");
+  }
+
   const claims = safeArray(layers.layer2?.claims, 40).filter((claim) => safeText(claim?.claimId, 180));
   for (const claim of claims) {
     const claimId = safeText(claim.claimId, 180);
@@ -295,7 +301,7 @@ function passportEvent(id, type, status, references = [], metadata = {}) {
   };
 }
 
-export function buildPassportProjection({ requestId, pipelineStatus, stages = {}, finalDecision = null, evidence = [] } = {}) {
+export function buildPassportProjection({ requestId, pipelineStatus, stages = {}, finalDecision = null, evidence = [], caseId = null } = {}) {
   const events = [];
   for (const stageId of ["l1", "l2a", "l3", "l4"]) {
     const stage = asRecord(stages[stageId]);
@@ -310,19 +316,19 @@ export function buildPassportProjection({ requestId, pipelineStatus, stages = {}
   if (finalDecision) events.push(passportEvent(`${requestId}:verdict`, "VERDICT_COMPOSED", pipelineStatus, [], { security: finalDecision.security, truth: finalDecision.truth, action: finalDecision.action }));
   return {
     schemaVersion: "trust.passport-projection.v1",
-    persistenceStatus: "NOT_PERSISTED",
+    persistenceStatus: caseId ? "PERSISTED" : "NOT_PERSISTED",
     appendOnly: true,
-    caseId: null,
-    revision: null,
-    reason: "The canonical Trust run has no authenticated case owner/revision scope; events are representable but not persisted here.",
+    caseId: caseId || null,
+    revision: caseId ? 1 : null,
+    reason: caseId ? "The canonical Trust run is durably bound to authenticated case." : "The canonical Trust run has no authenticated case owner/revision scope; events are representable but not persisted here.",
     events,
   };
 }
 
-export function buildCanonicalTrustProjection({ requestId, input, pipeline, layers, finalDecision } = {}) {
+export function buildCanonicalTrustProjection({ requestId, input, pipeline, layers, finalDecision, caseId = null } = {}) {
   const evidence = buildCanonicalEvidence({ requestId, input, layers });
-  const graph = buildTrustGraph({ requestId, input, layers, evidence });
-  const passport = buildPassportProjection({ requestId, pipelineStatus: pipeline?.pipelineStatus, stages: pipeline?.stages, finalDecision, evidence });
+  const graph = buildTrustGraph({ requestId, input, layers, evidence, caseId });
+  const passport = buildPassportProjection({ requestId, pipelineStatus: pipeline?.pipelineStatus, stages: pipeline?.stages, finalDecision, evidence, caseId });
   const layer3 = asRecord(layers?.layer3);
   const layer4 = asRecord(layers?.layer4);
   const unresolvedSignals = [

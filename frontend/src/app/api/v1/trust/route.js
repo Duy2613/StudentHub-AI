@@ -9,6 +9,7 @@ import { createTrustOrchestrator } from "@/lib/ai-trust/TrustOrchestrator.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { DurableTrustRepository } from "@/lib/server/database/DurableTrustRepository.js";
 import { TrustPersistenceMapper } from "@/lib/ai-trust/v5/TrustPersistenceMapper.js";
+import { TrustCasePassportBinder } from "@/lib/intelligence/passport/TrustCasePassportBinder.js";
 
 export const runtime = "nodejs";
 
@@ -73,9 +74,13 @@ function streamV5Pipeline(request, input, requestId, principal) {
               requestId,
             });
             if (durableDto) {
-              DurableTrustRepository.persistTrustRecord(durableDto).catch((err) => {
-                console.error("[TrustPersistence] Stream background persistence error:", err.message);
-              });
+              const caseId = durableDto.caseRecord.id;
+              const ownerId = durableDto.caseRecord.ownerId;
+              DurableTrustRepository.persistTrustRecord(durableDto)
+                .then(() => TrustCasePassportBinder.bindCaseToPassport({ caseId, ownerId, pipelineResult: result, input }))
+                .catch((err) => {
+                  console.error("[TrustPersistence] Stream background persistence error:", err.message);
+                });
             }
           } catch (mapErr) {
             console.error("[TrustPersistence] Stream mapping error:", mapErr.message);
@@ -148,9 +153,12 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
         });
         if (durableDto) {
           caseId = durableDto.caseRecord.id;
-          DurableTrustRepository.persistTrustRecord(durableDto).catch((err) => {
-            console.error("[TrustPersistence] Background persistence error:", err.message);
-          });
+          const ownerId = durableDto.caseRecord.ownerId;
+          DurableTrustRepository.persistTrustRecord(durableDto)
+            .then(() => TrustCasePassportBinder.bindCaseToPassport({ caseId, ownerId, pipelineResult: pipeline, input }))
+            .catch((err) => {
+              console.error("[TrustPersistence] Background persistence/passport error:", err.message);
+            });
         }
       } catch (err) {
         console.error("[TrustPersistence] Mapping error:", err.message);
