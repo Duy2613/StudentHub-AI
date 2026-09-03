@@ -1,7 +1,14 @@
-import { readdirSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join, relative } from "node:path";
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
+
+const localEnv = join(process.cwd(), "frontend", ".env.local");
+if (!process.env.DATABASE_URL && existsSync(localEnv) && typeof process.loadEnvFile === "function") {
+  try {
+    process.loadEnvFile(localEnv);
+  } catch {}
+}
 
 const root = join(process.cwd(), "frontend", "tests");
 

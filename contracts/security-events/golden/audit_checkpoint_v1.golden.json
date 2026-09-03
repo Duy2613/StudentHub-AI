@@ -1,0 +1,32 @@
+{
+  "fixtureMetadata": {
+    "fixtureType": "GOLDEN",
+    "contractVersion": "SECURITY_EVENT_CONTRACT_V1",
+    "targetFamily": "security.studenthub.audit_checkpoint.v1",
+    "canonicalByteRule": "RFC_8259_CANONICAL_UTF8",
+    "expectedPayloadHash": "d89d192c1d1b36ddcd838c12f5500670de08bc62ad2c03d180a23e2ff76b3df3",
+    "expectedCitadelAcceptance": "ACCEPTED"
+  },
+  "canonicalPayloadJson": "{\"checkpoint_id\":\"chk-compliance-789\",\"checkpoint_type\":\"SESSION_AUDIT\",\"record_count\":42,\"snapshot_hash\":\"a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90\",\"timestamp\":\"2026-09-04T00:00:00.000Z\"}",
+  "inputEnvelope": {
+    "eventId": "evt-golden-audit-003",
+    "eventType": "security.studenthub.audit_checkpoint.v1",
+    "schemaVersion": "studenthub-security-event-v1",
+    "occurredAt": "2026-09-04T00:00:00.000Z",
+    "producedAt": "2026-09-04T00:00:00.000Z",
+    "producer": "StudentHub-AI",
+    "environment": "production",
+    "correlationId": "corr-golden-003",
+    "causationId": null,
+    "subject": "studenthub-compliance",
+    "classification": "INTERNAL",
+    "payload": {
+      "checkpoint_id": "chk-compliance-789",
+      "checkpoint_type": "SESSION_AUDIT",
+      "record_count": 42,
+      "snapshot_hash": "a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90",
+      "timestamp": "2026-09-04T00:00:00.000Z"
+    },
+    "payloadHash": "d89d192c1d1b36ddcd838c12f5500670de08bc62ad2c03d180a23e2ff76b3df3"
+  }
+}

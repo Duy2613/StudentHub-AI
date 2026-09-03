@@ -1,11 +1,14 @@
-﻿/**
+/**
  * StudentHub AI — SecurityOutboxRepository
  * 
  * Manages transactional persistence and bounded leasing of the security outbox.
  * Supports:
  * - Atomic transactional insert within existing PostgreSQL transactions
  * - Concurrency-safe batch leasing with FOR UPDATE SKIP LOCKED
+ * - Expired lease recovery for crashed worker resiliency
+ * - Strict state machine transition validation
  * - Exponential backoff scheduling and Dead-Letter state transitions
+ * - Private schema isolation with safe runtime schema resolution
  * - Durable File Adapter / In-Memory fallback for test sandboxes
  */
 
@@ -20,6 +23,63 @@ export const OUTBOX_STATE = Object.freeze({
   FAILED: "FAILED",
   DEAD_LETTER: "DEAD_LETTER",
 });
+
+let resolvedOutboxSchema = null;
+
+/**
+ * Resolves whether security_outbox resides in 'private' or 'public' schema
+ * without failing the active transaction.
+ * @param {import("pg").PoolClient | import("pg").Pool} clientOrPool 
+ * @returns {Promise<string|null>} 'private', 'public', or null if not present
+ */
+export async function getOutboxSchema(clientOrPool) {
+  if (resolvedOutboxSchema !== null) return resolvedOutboxSchema;
+  try {
+    const res = await clientOrPool.query(`
+      SELECT table_schema 
+      FROM information_schema.tables 
+      WHERE table_name = 'security_outbox' 
+      ORDER BY (table_schema = 'private') DESC 
+      LIMIT 1
+    `);
+    if (res.rows.length > 0) {
+      resolvedOutboxSchema = res.rows[0].table_schema;
+      return resolvedOutboxSchema;
+    }
+  } catch {}
+  resolvedOutboxSchema = false;
+  return false;
+}
+
+export function resetResolvedOutboxSchema() {
+  resolvedOutboxSchema = null;
+}
+
+/**
+ * Enforces valid state machine transitions.
+ * @param {string} oldState 
+ * @param {string} newState 
+ */
+export function assertValidTransition(oldState, newState) {
+  if (oldState === newState) return;
+
+  if (oldState === OUTBOX_STATE.DELIVERED) {
+    throw new Error(`INVALID_STATE_TRANSITION: DELIVERED is a terminal outbox state, cannot transition to ${newState}.`);
+  }
+  if (oldState === OUTBOX_STATE.DEAD_LETTER) {
+    throw new Error(`INVALID_STATE_TRANSITION: DEAD_LETTER is a terminal outbox state, cannot transition to ${newState}.`);
+  }
+
+  if (oldState === OUTBOX_STATE.PENDING && newState !== OUTBOX_STATE.PROCESSING) {
+    throw new Error(`INVALID_STATE_TRANSITION: PENDING may only transition to PROCESSING (got ${newState}).`);
+  }
+  if (oldState === OUTBOX_STATE.PROCESSING && ![OUTBOX_STATE.DELIVERED, OUTBOX_STATE.FAILED, OUTBOX_STATE.DEAD_LETTER].includes(newState)) {
+    throw new Error(`INVALID_STATE_TRANSITION: PROCESSING may only transition to DELIVERED, FAILED, or DEAD_LETTER (got ${newState}).`);
+  }
+  if (oldState === OUTBOX_STATE.FAILED && ![OUTBOX_STATE.PROCESSING, OUTBOX_STATE.DEAD_LETTER].includes(newState)) {
+    throw new Error(`INVALID_STATE_TRANSITION: FAILED may only transition to PROCESSING or DEAD_LETTER (got ${newState}).`);
+  }
+}
 
 export class SecurityOutboxRepository {
   /**
@@ -37,12 +97,19 @@ export class SecurityOutboxRepository {
       throw new TypeError("SecurityOutboxRepository.insertInTransaction requires an active pg client.");
     }
     if (!envelope || !envelope.eventId || !envelope.payloadHash) {
-      throw new ValueError("Invalid envelope supplied to security outbox.");
+      throw new TypeError("Invalid envelope supplied to security outbox: eventId and payloadHash are required.");
+    }
+
+    const schema = await getOutboxSchema(client);
+    if (!schema) {
+      const err = new Error("Table security_outbox does not exist in database.");
+      err.code = "42P01";
+      throw err;
     }
 
     const outboxId = crypto.randomUUID();
     await client.query(
-      `INSERT INTO public.security_outbox (
+      `INSERT INTO ${schema}.security_outbox (
          id, event_id, event_type, schema_version, classification,
          payload, payload_hash, delivery_state, attempt_count, max_attempts,
          next_attempt_at, created_at, updated_at
@@ -107,7 +174,8 @@ export class SecurityOutboxRepository {
   }
 
   /**
-   * Claims a batch of pending/failed outbox records with leasing.
+   * Claims a batch of pending, failed, or expired processing outbox records with leasing.
+   * Implements lease recovery for worker crash resiliency.
    * @param {number} limit 
    * @param {number} leaseSeconds 
    * @returns {Promise<Array<object>>}
@@ -115,15 +183,21 @@ export class SecurityOutboxRepository {
   static async claimPendingBatch(limit = 10, leaseSeconds = 30) {
     try {
       const pool = getPostgresPool();
+      const schema = await getOutboxSchema(pool);
+      if (!schema) throw new Error("security_outbox table not found");
       const client = await pool.connect();
       try {
         await client.query("BEGIN");
+
         const res = await client.query(
           `SELECT id, event_id, event_type, schema_version, classification,
-                  payload, payload_hash, attempt_count, max_attempts
-           FROM public.security_outbox
-           WHERE delivery_state IN ('PENDING', 'FAILED')
-             AND next_attempt_at <= now()
+                  payload, payload_hash, attempt_count, max_attempts, delivery_state
+           FROM ${schema}.security_outbox
+           WHERE (
+             (delivery_state IN ('PENDING', 'FAILED') AND next_attempt_at <= now())
+             OR
+             (delivery_state = 'PROCESSING' AND lease_expires_at <= now())
+           )
            ORDER BY next_attempt_at ASC
            LIMIT $1
            FOR UPDATE SKIP LOCKED`,
@@ -134,7 +208,7 @@ export class SecurityOutboxRepository {
         if (rows.length > 0) {
           const ids = rows.map((r) => r.id);
           await client.query(
-            `UPDATE public.security_outbox
+            `UPDATE ${schema}.security_outbox
              SET delivery_state = 'PROCESSING',
                  lease_expires_at = now() + ($1 || ' seconds')::interval,
                  updated_at = now()
@@ -156,13 +230,22 @@ export class SecurityOutboxRepository {
       const all = await adapter.findAll();
       const now = new Date();
       const eligible = all
-        .filter((r) => r.delivery_state === OUTBOX_STATE.PENDING || r.delivery_state === OUTBOX_STATE.FAILED)
-        .filter((r) => !r.next_attempt_at || new Date(r.next_attempt_at) <= now)
+        .filter((r) => {
+          if (r.delivery_state === OUTBOX_STATE.PENDING || r.delivery_state === OUTBOX_STATE.FAILED) {
+            return !r.next_attempt_at || new Date(r.next_attempt_at) <= now;
+          }
+          if (r.delivery_state === OUTBOX_STATE.PROCESSING) {
+            return r.lease_expires_at && new Date(r.lease_expires_at) <= now;
+          }
+          return false;
+        })
         .slice(0, limit);
 
       for (const item of eligible) {
+        assertValidTransition(item.delivery_state, OUTBOX_STATE.PROCESSING);
         item.delivery_state = OUTBOX_STATE.PROCESSING;
         item.lease_expires_at = new Date(now.getTime() + leaseSeconds * 1000).toISOString();
+        item.updated_at = new Date().toISOString();
         await adapter.save(item, "id");
       }
       return eligible;
@@ -175,8 +258,10 @@ export class SecurityOutboxRepository {
   static async markDelivered(eventId) {
     try {
       const pool = getPostgresPool();
+      const schema = await getOutboxSchema(pool);
+      if (!schema) throw new Error("security_outbox table not found");
       await pool.query(
-        `UPDATE public.security_outbox
+        `UPDATE ${schema}.security_outbox
          SET delivery_state = 'DELIVERED',
              delivered_at = now(),
              lease_expires_at = NULL,
@@ -189,9 +274,11 @@ export class SecurityOutboxRepository {
       const all = await adapter.findAll();
       const existing = all.find((r) => r.event_id === eventId);
       if (existing) {
+        assertValidTransition(existing.delivery_state, OUTBOX_STATE.DELIVERED);
         existing.delivery_state = OUTBOX_STATE.DELIVERED;
         existing.delivered_at = new Date().toISOString();
         existing.lease_expires_at = null;
+        existing.updated_at = new Date().toISOString();
         await adapter.save(existing, "id");
       }
     }
@@ -203,8 +290,10 @@ export class SecurityOutboxRepository {
   static async markFailed(eventId, { code = "DELIVERY_ERROR", reason = "", retryDelayMs = 2000 }) {
     try {
       const pool = getPostgresPool();
+      const schema = await getOutboxSchema(pool);
+      if (!schema) throw new Error("security_outbox table not found");
       await pool.query(
-        `UPDATE public.security_outbox
+        `UPDATE ${schema}.security_outbox
          SET attempt_count = attempt_count + 1,
              delivery_state = CASE
                WHEN attempt_count + 1 >= max_attempts THEN 'DEAD_LETTER'
@@ -224,15 +313,17 @@ export class SecurityOutboxRepository {
       const existing = all.find((r) => r.event_id === eventId);
       if (existing) {
         existing.attempt_count = (existing.attempt_count || 0) + 1;
-        if (existing.attempt_count >= (existing.max_attempts || 5)) {
-          existing.delivery_state = OUTBOX_STATE.DEAD_LETTER;
-        } else {
-          existing.delivery_state = OUTBOX_STATE.FAILED;
-        }
+        const targetState = existing.attempt_count >= (existing.max_attempts || 5)
+          ? OUTBOX_STATE.DEAD_LETTER
+          : OUTBOX_STATE.FAILED;
+
+        assertValidTransition(existing.delivery_state, targetState);
+        existing.delivery_state = targetState;
         existing.next_attempt_at = new Date(Date.now() + retryDelayMs).toISOString();
         existing.last_failure_code = code;
         existing.last_failure_reason = reason;
         existing.lease_expires_at = null;
+        existing.updated_at = new Date().toISOString();
         await adapter.save(existing, "id");
       }
     }
@@ -244,9 +335,11 @@ export class SecurityOutboxRepository {
   static async getStats() {
     try {
       const pool = getPostgresPool();
+      const schema = await getOutboxSchema(pool);
+      if (!schema) throw new Error("security_outbox table not found");
       const res = await pool.query(
         `SELECT delivery_state, count(*)::int AS count
-         FROM public.security_outbox
+         FROM ${schema}.security_outbox
          GROUP BY delivery_state`
       );
       const stats = { PENDING: 0, PROCESSING: 0, DELIVERED: 0, FAILED: 0, DEAD_LETTER: 0 };

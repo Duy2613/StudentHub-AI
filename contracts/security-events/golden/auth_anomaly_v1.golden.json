@@ -1,0 +1,33 @@
+{
+  "fixtureMetadata": {
+    "fixtureType": "GOLDEN",
+    "contractVersion": "SECURITY_EVENT_CONTRACT_V1",
+    "targetFamily": "security.studenthub.auth_anomaly.v1",
+    "canonicalByteRule": "RFC_8259_CANONICAL_UTF8",
+    "expectedPayloadHash": "3a3d02a489049ef79b9092d625cb2d4d335e25f4fff3a99ee57c0dbd1fa0dc7c",
+    "expectedCitadelAcceptance": "ACCEPTED"
+  },
+  "canonicalPayloadJson": "{\"action\":\"SUSPICIOUS_TOKEN_REPLAY\",\"actor_id\":\"user-anon-456\",\"client_ip\":\"192.0.2.1\",\"detected_at\":\"2026-09-04T00:00:00.000Z\",\"severity\":\"HIGH\",\"violation_code\":\"AUTH_ANOMALY_REPLAY\"}",
+  "inputEnvelope": {
+    "eventId": "evt-golden-auth-002",
+    "eventType": "security.studenthub.auth_anomaly.v1",
+    "schemaVersion": "studenthub-security-event-v1",
+    "occurredAt": "2026-09-04T00:00:00.000Z",
+    "producedAt": "2026-09-04T00:00:00.000Z",
+    "producer": "StudentHub-AI",
+    "environment": "production",
+    "correlationId": "corr-golden-002",
+    "causationId": null,
+    "subject": "studenthub-security-fabric",
+    "classification": "CONFIDENTIAL",
+    "payload": {
+      "action": "SUSPICIOUS_TOKEN_REPLAY",
+      "actor_id": "user-anon-456",
+      "client_ip": "192.0.2.1",
+      "detected_at": "2026-09-04T00:00:00.000Z",
+      "severity": "HIGH",
+      "violation_code": "AUTH_ANOMALY_REPLAY"
+    },
+    "payloadHash": "3a3d02a489049ef79b9092d625cb2d4d335e25f4fff3a99ee57c0dbd1fa0dc7c"
+  }
+}

@@ -1,11 +1,11 @@
 # API Authorization Inventory
 
-Generated from source by `npm run audit:api-auth` on 2026-09-01T13:52:27.319Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
+Generated from source by `npm run audit:api-auth` on 2026-09-03T19:21:01.615Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
 
-- Route files: 110
-- HTTP handlers: 137
-- Authentication required by Security Fabric: 70
-- Explicit anonymous access: 61
+- Route files: 115
+- HTTP handlers: 142
+- Authentication required by Security Fabric: 73
+- Explicit anonymous access: 63
 - No visible Security Fabric wrapper: 6
 - Unprotected mutations requiring P0 review: 0
 
@@ -58,6 +58,8 @@ Generated from source by `npm run audit:api-auth` on 2026-09-01T13:52:27.319Z. T
 | /api/forum/posts | PATCH | AUTHENTICATED | required | INTERACT_WITH_COMMUNITY_POST | COMMUNITY.POST | authenticated principal | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/forum/posts | POST | AUTHENTICATED | required | CREATE_COMMUNITY_POST | COMMUNITY.POST | authenticated principal | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/forum/vote | POST | AUTHENTICATED | required | VOTE_ON_COMMUNITY_POST | COMMUNITY.POST | authenticated principal | default/configured | 16 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/health/live | GET | PUBLIC | anonymous allowed | HEALTH_LIVE | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/health/ready | GET | PUBLIC | anonymous allowed | HEALTH_READY | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/claims/[claimId] | GET | PUBLIC | anonymous allowed | READ_CLAIM_DETAIL | TRUST.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | contract conflict |
 | /api/intelligence/community/consensus | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_CONSENSUS | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/community/evaluate | POST | PUBLIC | anonymous allowed | ANALYZE_COMMUNITY_POSTS | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
@@ -146,7 +148,10 @@ Generated from source by `npm run audit:api-auth` on 2026-09-01T13:52:27.319Z. T
 | /api/v1/passports | GET | AUTHENTICATED | required | READ_OWN_EVIDENCE_PASSPORTS | PASSPORT.READ_OWN | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/v1/passports | POST | AUTHENTICATED | required | CREATE_OWN_EVIDENCE_PASSPORT | PASSPORT.WRITE_OWN | public or domain-defined | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/v1/search | GET | PUBLIC | anonymous allowed | SEARCH_CANONICAL_PRODUCT | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/v1/security/assurance | GET | ADMIN | required | ADMIN_CITADEL_ASSURANCE_READ | — | public or domain-defined | 60/minute declared | 0 bytes | manual/none | public/read-only candidate | explicit bootstrap/session contract |
 | /api/v1/trust/analyze | POST | PUBLIC | anonymous allowed | RUN_CANONICAL_TRUST_PIPELINE | — | public or domain-defined | default/configured | 512 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/v1/trust/cases/[caseId] | GET | AUTHENTICATED | required | READ_TRUST_CASE_DETAIL | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/v1/trust/cases | GET | AUTHENTICATED | required | READ_TRUST_CASE_HISTORY | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/v1/trust | POST | PUBLIC | anonymous allowed | RUN_CANONICAL_TRUST_PIPELINE | — | public or domain-defined | default/configured | 512 * 1024 bytes | manual/none | state mutation | policy declared |
 
 ## Interpretation

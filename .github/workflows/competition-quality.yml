@@ -3,7 +3,9 @@ name: Competition Quality Gate
 on:
   pull_request:
   push:
-    branches: [develop]
+    branches:
+      - develop
+      - 'integration/**'
 
 concurrency:
   group: competition-quality-${{ github.ref }}

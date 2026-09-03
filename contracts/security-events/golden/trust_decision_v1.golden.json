@@ -1,0 +1,34 @@
+{
+  "fixtureMetadata": {
+    "fixtureType": "GOLDEN",
+    "contractVersion": "SECURITY_EVENT_CONTRACT_V1",
+    "targetFamily": "security.studenthub.trust_decision.v1",
+    "canonicalByteRule": "RFC_8259_CANONICAL_UTF8",
+    "expectedPayloadHash": "29e3f88e2f51cbaca2ebed2f0b48df998ada1ea3c3db2bbb5cf9719205ae8dba",
+    "expectedCitadelAcceptance": "ACCEPTED"
+  },
+  "canonicalPayloadJson": "{\"case_id\":\"case-golden-001\",\"claim_count\":3,\"evaluated_at\":\"2026-09-04T00:00:00.000Z\",\"evidence_count\":5,\"input_type\":\"text\",\"verdict\":\"VERIFIED\",\"visibility\":\"PRIVATE\"}",
+  "inputEnvelope": {
+    "eventId": "evt-golden-trust-001",
+    "eventType": "security.studenthub.trust_decision.v1",
+    "schemaVersion": "studenthub-security-event-v1",
+    "occurredAt": "2026-09-04T00:00:00.000Z",
+    "producedAt": "2026-09-04T00:00:00.000Z",
+    "producer": "StudentHub-AI",
+    "environment": "production",
+    "correlationId": "corr-golden-001",
+    "causationId": null,
+    "subject": "studenthub-trust-engine",
+    "classification": "INTERNAL",
+    "payload": {
+      "case_id": "case-golden-001",
+      "claim_count": 3,
+      "evaluated_at": "2026-09-04T00:00:00.000Z",
+      "evidence_count": 5,
+      "input_type": "text",
+      "verdict": "VERIFIED",
+      "visibility": "PRIVATE"
+    },
+    "payloadHash": "29e3f88e2f51cbaca2ebed2f0b48df998ada1ea3c3db2bbb5cf9719205ae8dba"
+  }
+}

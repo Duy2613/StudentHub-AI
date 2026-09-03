@@ -1,0 +1,14 @@
+{
+  "name": "payload_hash_mismatch",
+  "envelope": {
+    "eventId": "evt-neg-005",
+    "eventType": "security.studenthub.trust_decision.v1",
+    "schemaVersion": "studenthub-security-event-v1",
+    "producer": "StudentHub-AI",
+    "payload": {
+      "verdict": "SAFE"
+    },
+    "payloadHash": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "expectedFailure": "PAYLOAD_HASH_MISMATCH"
+}

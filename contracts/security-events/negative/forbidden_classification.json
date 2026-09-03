@@ -1,0 +1,15 @@
+{
+  "name": "forbidden_classification",
+  "envelope": {
+    "eventId": "evt-neg-006",
+    "eventType": "security.studenthub.trust_decision.v1",
+    "schemaVersion": "studenthub-security-event-v1",
+    "producer": "StudentHub-AI",
+    "classification": "TOP_SECRET_UNKNOWN",
+    "payload": {
+      "verdict": "SAFE"
+    },
+    "payloadHash": "b85fc617c359d9693d154fbdcd83ed940a9fee2f7ed4ae432b3879905a9ea102"
+  },
+  "expectedFailure": "INVALID_CLASSIFICATION"
+}
