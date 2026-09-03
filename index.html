@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#04060b">
+  <title>The Open Constant — Intelligent Reasoning Visualization</title>
+  <style>
+    :root {
+      --ink: #04060b;
+      --cyan: #74e8ff;
+      --cyan-soft: rgba(116, 232, 255, .62);
+      --violet: #b990ff;
+      --warm: #ffd5aa;
+      --line: rgba(174, 226, 255, .24);
+      --glass: rgba(4, 8, 20, .52);
+      --muted: rgba(226, 239, 255, .58);
+      --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--ink);
+      color: #eef8ff;
+      font-family: var(--font-sans);
+    }
+
+    body { isolation: isolate; }
+
+    button {
+      color: inherit;
+      font: inherit;
+    }
+
+    .stage {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 75% 44%, rgba(88, 47, 155, .25), transparent 32%),
+        radial-gradient(circle at 20% 70%, rgba(17, 155, 190, .16), transparent 30%),
+        #04060b;
+    }
+
+    #poster {
+      position: absolute;
+      inset: -4%;
+      width: 108%;
+      height: 108%;
+      object-fit: cover;
+      opacity: .31;
+      z-index: 0;
+      filter: saturate(.86) contrast(1.08) brightness(.52);
+      transform: scale(1.03);
+      transition: opacity .8s ease, filter .8s ease;
+    }
+
+    .stage.fallback #poster {
+      opacity: .75;
+      filter: saturate(.86) contrast(1.08) brightness(.72);
+    }
+
+    #webgl {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      outline: none;
+      z-index: 2;
+    }
+
+    .media-video {
+      position: absolute;
+      inset: -4%;
+      width: 108%;
+      height: 108%;
+      z-index: 1;
+      display: block;
+      object-fit: cover;
+      opacity: 0;
+      pointer-events: none;
+      filter: saturate(.78) contrast(1.06) brightness(.45);
+      mix-blend-mode: screen;
+      transition: opacity .8s ease;
+    }
+
+    .vignette,
+    .scanlines,
+    .frame {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .vignette {
+      background:
+        radial-gradient(circle at 50% 46%, transparent 25%, rgba(1, 3, 8, .18) 64%, rgba(1, 2, 6, .8) 100%),
+        linear-gradient(180deg, rgba(2, 3, 9, .35), transparent 20%, transparent 78%, rgba(2, 3, 9, .6));
+      z-index: 2;
+    }
+
+    .scanlines {
+      z-index: 3;
+      opacity: .075;
+      background: repeating-linear-gradient(180deg, rgba(255,255,255,.11) 0, rgba(255,255,255,.11) 1px, transparent 1px, transparent 5px);
+      mix-blend-mode: overlay;
+    }
+
+    .frame {
+      inset: 28px;
+      z-index: 4;
+      border: 1px solid rgba(116, 232, 255, .26);
+      border-radius: 32px;
+      clip-path: polygon(0 0, 39% 0, 40% 2px, 60% 2px, 61% 0, 100% 0, 100% 39%, calc(100% - 2px) 40%, calc(100% - 2px) 60%, 100% 61%, 100% 100%, 61% 100%, 60% calc(100% - 2px), 40% calc(100% - 2px), 39% 100%, 0 100%, 0 61%, 2px 60%, 2px 40%, 0 39%);
+      opacity: .8;
+    }
+
+    .hud {
+      position: absolute;
+      inset: 0;
+      z-index: 7;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 52px clamp(42px, 6vw, 108px) 46px;
+      pointer-events: none;
+    }
+
+    .hud button,
+    .hud a,
+    .hud input { pointer-events: auto; }
+
+    .topbar,
+    .bottombar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      font-family: var(--font-mono);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      position: relative;
+      width: 26px;
+      height: 26px;
+      border: 1px solid var(--cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(116,232,255,.36), inset 0 0 16px rgba(116,232,255,.18);
+    }
+
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border: 1px solid var(--cyan-soft);
+      border-radius: 50%;
+    }
+
+    .brand-mark::after {
+      inset: 11px;
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+    }
+
+    .brand-name { font-size: 11px; }
+    .brand-sub { color: rgba(238,248,255,.44); font-size: 8px; }
+
+    .signal {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+    }
+
+    .signal-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #76f4bf;
+      box-shadow: 0 0 13px #76f4bf;
+    }
+
+    .hero-copy {
+      align-self: center;
+      width: min(620px, 58vw);
+      transform: translateY(-3vh);
+    }
+
+    .eyebrow,
+    .micro-label {
+      margin: 0 0 18px;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: .26em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 620px;
+      margin: 0;
+      font-size: clamp(52px, 8vw, 132px);
+      line-height: .84;
+      font-weight: 400;
+      letter-spacing: -.075em;
+      text-transform: uppercase;
+      text-wrap: balance;
+      text-shadow: 0 0 40px rgba(116,232,255,.15);
+    }
+
+    .hero-copy p {
+      max-width: 390px;
+      margin: 25px 0 0;
+      color: rgba(238,248,255,.62);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .hero-copy strong { color: #fff; font-weight: 500; }
+
+    .side-panel {
+      position: absolute;
+      top: 50%;
+      right: clamp(42px, 6vw, 108px);
+      z-index: 8;
+      width: 194px;
+      transform: translateY(-44%);
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(12,19,38,.66), rgba(6,8,20,.28));
+      box-shadow: 0 18px 60px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.08);
+      backdrop-filter: blur(18px);
+    }
+
+    .side-panel::before {
+      content: "";
+      position: absolute;
+      left: -1px;
+      top: 28px;
+      width: 2px;
+      height: 42px;
+      background: var(--cyan);
+      box-shadow: 0 0 18px var(--cyan);
+    }
+
+    .side-panel h2 {
+      margin: 0 0 17px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 0;
+      border-top: 1px solid rgba(174,226,255,.13);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .metric b { color: var(--warm); font-weight: 400; }
+    .metric b.cyan { color: var(--cyan); }
+
+    .media-name {
+      overflow: hidden;
+      max-width: 155px;
+      color: rgba(238,248,255,.48);
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: .03em;
+      line-height: 1.4;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bottombar { align-items: end; }
+
+    .loop-readout {
+      display: grid;
+      gap: 9px;
+      width: min(400px, 42vw);
+    }
+
+    .loop-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      color: rgba(238,248,255,.55);
+    }
+
+    .loop-row b { color: #fff; font-weight: 400; }
+
+    .progress {
+      position: relative;
+      width: 100%;
+      height: 2px;
+      overflow: hidden;
+      background: rgba(174,226,255,.18);
+    }
+
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--violet), var(--warm));
+      box-shadow: 0 0 12px var(--cyan);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control {
+      min-width: 42px;
+      padding: 10px 12px;
+      border: 1px solid rgba(174,226,255,.28);
+      border-radius: 999px;
+      background: rgba(5,10,23,.42);
+      color: rgba(238,248,255,.76);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      transition: border-color .25s ease, background .25s ease, color .25s ease, transform .25s ease;
+      backdrop-filter: blur(12px);
+    }
+
+    .control:hover,
+    .control:focus-visible {
+      border-color: var(--cyan);
+      background: rgba(34,101,140,.28);
+      color: #fff;
+      outline: none;
+      transform: translateY(-2px);
+    }
+
+    .control[aria-pressed="true"] { border-color: var(--warm); color: var(--warm); }
+
+    .notice {
+      position: absolute;
+      left: 50%;
+      bottom: 27%;
+      z-index: 8;
+      max-width: 360px;
+      padding: 9px 12px;
+      border: 1px solid rgba(116,232,255,.28);
+      border-radius: 999px;
+      background: rgba(2,6,15,.6);
+      color: rgba(238,248,255,.7);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      transform: translateX(-50%);
+      backdrop-filter: blur(12px);
+      transition: opacity .35s ease, transform .35s ease;
+    }
+
+    .notice[data-hidden="true"] { opacity: 0; transform: translate(-50%, 8px); }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 900px) {
+      .hud { padding: 40px 42px 35px; }
+      .side-panel { right: 42px; width: 174px; }
+      .hero-copy { width: min(520px, 62vw); }
+      .frame { inset: 22px; }
+    }
+
+    @media (max-width: 680px) {
+      .frame { inset: 14px; border-radius: 22px; }
+      .hud { padding: 30px 28px 25px; }
+      .topbar { align-items: flex-start; }
+      .brand-sub, .signal span { display: none; }
+      .hero-copy { width: min(100%, 360px); transform: translateY(-11vh); }
+      h1 { font-size: clamp(48px, 17vw, 84px); }
+      .hero-copy p { max-width: 300px; margin-top: 18px; font-size: 12px; }
+      .side-panel { top: auto; right: 28px; bottom: 114px; width: 166px; transform: none; padding: 13px; }
+      .side-panel h2 { margin-bottom: 10px; font-size: 10px; }
+      .metric { padding: 8px 0; font-size: 8px; }
+      .bottombar { align-items: end; }
+      .loop-readout { width: calc(100vw - 56px); }
+      .controls { position: absolute; right: 28px; bottom: 25px; }
+      .notice { bottom: 41%; max-width: calc(100vw - 56px); text-align: center; line-height: 1.45; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <img id="poster" src="./media/open-constant/knowledge-constellation.png" alt="Abstract constellation of connected knowledge nodes around an iridescent lens">
+    <canvas id="webgl" aria-label="Interactive three-dimensional visualization of an optical reasoning manifold"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="scanlines" aria-hidden="true"></div>
+    <div class="frame" aria-hidden="true"></div>
+
+    <div class="hud">
+      <header class="topbar">
+        <a class="brand" href="#main" aria-label="The Open Constant home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>
+            <span class="brand-name">The Open Constant</span><br>
+            <span class="brand-sub">Intelligent reasoning / visual study 01</span>
+          </span>
+        </a>
+        <span class="signal"><span class="signal-dot" aria-hidden="true"></span><span>Optical system online</span></span>
+      </header>
+
+      <main class="hero-copy" id="main">
+        <p class="eyebrow">01 / Evidence becomes form</p>
+        <h1>Keep the<br>question<br>open.</h1>
+        <p><strong>A living visualization of reasoning in motion.</strong><br>Move through the field. Watch relationships refract, settle, and become legible without pretending that uncertainty has disappeared.</p>
+      </main>
+
+      <aside class="side-panel" aria-label="Visualization parameters">
+        <p class="micro-label">Live parameters</p>
+        <h2>Optical manifold</h2>
+        <div class="metric"><span>Loop</span><b id="loopValue">08.00s</b></div>
+        <div class="metric"><span>Depth blur</span><b class="cyan">ACTIVE</b></div>
+        <div class="metric"><span>Refraction</span><b class="cyan">DYNAMIC</b></div>
+        <div class="metric"><span>Vol. dust</span><b id="dustValue">1,800</b></div>
+        <div class="metric"><span>Media</span><b id="mediaCount">09</b></div>
+        <div class="metric"><span>Source</span><span class="media-name" id="mediaName">loading local media</span></div>
+      </aside>
+
+      <div class="notice" id="notice" role="status" aria-live="polite" data-hidden="true"></div>
+
+      <footer class="bottombar">
+        <div class="loop-readout">
+          <div class="loop-row"><span>Cycle <b id="cycleValue">01 / 09</b></span><span id="timeValue">00.00 / 08.00</span></div>
+          <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+        </div>
+        <div class="controls" aria-label="Visualization controls">
+          <button class="control" id="playButton" type="button" aria-pressed="false">Pause</button>
+          <button class="control" id="resetButton" type="button">Reset</button>
+          <button class="control" id="motionButton" type="button" aria-pressed="false">Motion</button>
+        </div>
+      </footer>
+    </div>
+    <p class="sr-only" id="sceneStatus">Loading the interactive Three.js scene.</p>
+  </div>
+
+  <script src="./media/open-constant/three.min.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const stage = document.getElementById("stage");
+      const canvas = document.getElementById("webgl");
+      const poster = document.getElementById("poster");
+      const notice = document.getElementById("notice");
+      const sceneStatus = document.getElementById("sceneStatus");
+      const progressBar = document.getElementById("progressBar");
+      const timeValue = document.getElementById("timeValue");
+      const cycleValue = document.getElementById("cycleValue");
+      const mediaName = document.getElementById("mediaName");
+      const playButton = document.getElementById("playButton");
+      const resetButton = document.getElementById("resetButton");
+      const motionButton = document.getElementById("motionButton");
+
+      const MEDIA_ROOT = "./media/open-constant/";
+      const MEDIA = [
+        { file: "hailuo-dreamlike-a.mp4", label: "Hailuo / dreamlike A" },
+        { file: "hailuo-dreamlike-b.mp4", label: "Hailuo / dreamlike B" },
+        { file: "pixverse-constellation.mp4", label: "PixVerse / constellation" },
+        { file: "dreamina-magical-a.mp4", label: "Dreamina / magical A" },
+        { file: "dreamina-magical-b.mp4", label: "Dreamina / magical B" },
+        { file: "generated-4-16.mp4", label: "Generated / 16:16" },
+        { file: "generated-4-15.mp4", label: "Generated / 16:15" },
+        { file: "generated-1.mp4", label: "Generated / one" },
+        { file: "generated-3-57.mp4", label: "Generated / 15:57" }
+      ];
+      const LOOP_MS = 8000;
+      const DUST_COUNT = 1800;
+      const reducedMotionPreference = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      let renderer;
+      let scene;
+      let camera;
+      let clock;
+      let animationFrame = 0;
+      let running = false;
+      let pageVisible = !document.hidden;
+      let pausedByUser = false;
+      let manualReducedMotion = false;
+      let loopEpoch = performance.now();
+      let pauseStartedAt = 0;
+      let lastTime = performance.now();
+      let nextMediaSwap = LOOP_MS;
+      let cycleIndex = 0;
+      let pulse = 0;
+      let mediaSlots = [];
+      let activeSlot = 0;
+      let dustMaterial;
+      let lensMaterial;
+      let innerMaterial;
+      let haloMaterial;
+      let pointerTarget = { x: 0, y: 0 };
+      let pointer = { x: 0, y: 0 };
+      let lensGroup;
+      let networkGroup;
+      let manifoldGroup;
+      let dust;
+      let nearDust;
+      let halo;
+      let pulseRing;
+      let disposableResources = [];
+
+      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+      const lerp = (from, to, amount) => from + (to - from) * amount;
+      const isReducedMotion = () => reducedMotionPreference || manualReducedMotion;
+
+      function showNotice(message) {
+        notice.textContent = message;
+        notice.dataset.hidden = "false";
+        window.clearTimeout(showNotice.timeout);
+        showNotice.timeout = window.setTimeout(() => { notice.dataset.hidden = "true"; }, 2600);
+      }
+
+      function setStatus(message) {
+        sceneStatus.textContent = message;
+      }
+
+      function dispose(resource) {
+        if (resource && typeof resource.dispose === "function") resource.dispose();
+      }
+
+      function makeShaderMaterial(vertexShader, fragmentShader, uniforms, options = {}) {
+        const material = new THREE.ShaderMaterial({
+          vertexShader,
+          fragmentShader,
+          uniforms,
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+          ...options
+        });
+        disposableResources.push(material);
+        return material;
+      }
+
+      const mediaVertexShader = `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `;
+
+      const mediaFragmentShader = `
+        uniform sampler2D uTexture;
+        uniform float uOpacity;
+        uniform float uMediaAspect;
+        uniform float uViewportAspect;
+        varying vec2 vUv;
+        void main() {
+          vec2 uv = vUv;
+          float ratio = uViewportAspect / max(uMediaAspect, 0.1);
+          if (ratio > 1.0) {
+            uv.y = (uv.y - 0.5) * ratio + 0.5;
+          } else {
+            uv.x = (uv.x - 0.5) / ratio + 0.5;
+          }
+          vec4 sampleColor = texture2D(uTexture, clamp(uv, 0.001, 0.999));
+          float edge = smoothstep(0.0, 0.12, vUv.x) * smoothstep(1.0, 0.88, vUv.x) * smoothstep(0.0, 0.12, vUv.y) * smoothstep(1.0, 0.88, vUv.y);
+          gl_FragColor = vec4(sampleColor.rgb * vec3(0.62, 0.74, 1.0), sampleColor.a * uOpacity * edge);
+        }
+      `;
+
+      const dustVertexShader = `
+        uniform float uTime;
+        uniform float uPixelRatio;
+        uniform float uFocus;
+        attribute float aSize;
+        attribute float aSeed;
+        varying float vDepth;
+        varying float vSeed;
+        void main() {
+          vec3 p = position;
+          p.x += sin(uTime * 0.12 + aSeed * 7.0) * 0.04;
+          p.y += cos(uTime * 0.10 + aSeed * 5.0) * 0.035;
+          p.z += sin(uTime * 0.08 + aSeed * 4.0) * 0.06;
+          vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
+          vDepth = clamp((-mvPosition.z - 2.0) / 28.0, 0.0, 1.0);
+          vSeed = aSeed;
+          float focusDistance = abs(vDepth - uFocus);
+          float opticalBlur = smoothstep(0.04, 0.75, focusDistance);
+          gl_PointSize = (aSize * (1.0 + opticalBlur * 2.5) * uPixelRatio) * (42.0 / max(-mvPosition.z, 1.0));
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `;
+
+      const dustFragmentShader = `
+        uniform float uTime;
+        uniform vec3 uColorA;
+        uniform vec3 uColorB;
+        uniform float uOpacity;
+        uniform float uFocus;
+        varying float vDepth;
+        varying float vSeed;
+        void main() {
+          vec2 p = gl_PointCoord - 0.5;
+          float radius = length(p);
+          if (radius > 0.5) discard;
+          float focusDistance = abs(vDepth - uFocus);
+          float blur = smoothstep(0.03, 0.76, focusDistance);
+          float bokeh = pow(1.0 - smoothstep(0.04, 0.5, radius), mix(2.5, 0.65, blur));
+          float shimmer = 0.68 + 0.32 * sin(uTime * 0.9 + vSeed * 31.0);
+          vec3 color = mix(uColorA, uColorB, 0.5 + 0.5 * sin(vSeed * 11.0 + uTime * 0.18));
+          gl_FragColor = vec4(color, bokeh * uOpacity * shimmer * (0.58 + blur * 0.55));
+        }
+      `;
+
+      const lensVertexShader = `
+        uniform float uTime;
+        uniform vec2 uPointer;
+        uniform float uPulse;
+        varying vec3 vNormal;
+        varying vec3 vWorldPosition;
+        varying float vDisplacement;
+        void main() {
+          vec3 n = normalize(normal);
+          float waveA = sin(position.x * 2.8 + uTime * 1.2) * 0.035;
+          float waveB = sin(position.y * 4.0 - uTime * 0.8 + position.z * 1.7) * 0.025;
+          float pointerWave = dot(n.xy, uPointer) * 0.12;
+          float displacement = waveA + waveB + pointerWave + uPulse * 0.07;
+          vec3 displaced = position + n * displacement;
+          vec4 worldPosition = modelMatrix * vec4(displaced, 1.0);
+          vWorldPosition = worldPosition.xyz;
+          vNormal = normalize(mat3(modelMatrix) * n);
+          vDisplacement = displacement;
+          gl_Position = projectionMatrix * viewMatrix * worldPosition;
+        }
+      `;
+
+      const lensFragmentShader = `
+        uniform float uTime;
+        uniform float uOpacity;
+        uniform float uPulse;
+        uniform vec3 uCyan;
+        uniform vec3 uViolet;
+        uniform vec3 uWarm;
+        varying vec3 vNormal;
+        varying vec3 vWorldPosition;
+        varying float vDisplacement;
+        void main() {
+          vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
+          float facing = max(dot(normalize(vNormal), viewDirection), 0.0);
+          float fresnel = pow(1.0 - facing, 3.0);
+          float longitude = atan(vNormal.z, vNormal.x);
+          float latitude = asin(clamp(vNormal.y, -1.0, 1.0));
+          float spectralWave = 0.5 + 0.5 * sin(longitude * 7.0 + latitude * 10.0 + uTime * 1.45 + vDisplacement * 28.0);
+          vec3 spectral = mix(uCyan, uViolet, spectralWave);
+          spectral = mix(spectral, uWarm, smoothstep(0.68, 1.0, spectralWave) * 0.62);
+          vec3 refractedDirection = refract(-viewDirection, normalize(vNormal), 0.83);
+          float manifoldLight = pow(max(dot(refractedDirection, normalize(vec3(0.3, 0.8, 0.5))), 0.0), 4.0);
+          float glint = pow(max(dot(reflect(-viewDirection, normalize(vNormal)), normalize(vec3(-0.4, 0.55, 0.7))), 0.0), 18.0);
+          vec3 color = spectral * (0.28 + fresnel * 1.38 + manifoldLight * 0.78) + vec3(1.0) * glint * 1.55;
+          float alpha = uOpacity * (0.24 + fresnel * 0.74 + glint * 0.48 + uPulse * 0.12);
+          gl_FragColor = vec4(color, alpha);
+        }
+      `;
+
+      const ringVertexShader = `
+        uniform float uTime;
+        varying vec3 vNormal;
+        void main() {
+          vec3 transformed = position;
+          transformed += normal * sin(position.x * 3.0 + uTime * 1.1) * 0.008;
+          vNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
+        }
+      `;
+
+      const ringFragmentShader = `
+        uniform float uTime;
+        uniform vec3 uColor;
+        varying vec3 vNormal;
+        void main() {
+          float shimmer = 0.65 + 0.35 * sin(uTime * 1.5 + vNormal.y * 7.0);
+          float edge = 0.38 + 0.62 * abs(vNormal.z);
+          gl_FragColor = vec4(uColor * shimmer, edge * 0.78);
+        }
+      `;
+
+      function makeTextureMaterial(texture, opacity, mediaAspect) {
+        const material = new THREE.ShaderMaterial({
+          vertexShader: mediaVertexShader,
+          fragmentShader: mediaFragmentShader,
+          uniforms: {
+            uTexture: { value: texture },
+            uOpacity: { value: opacity },
+            uMediaAspect: { value: mediaAspect },
+            uViewportAspect: { value: 1 }
+          },
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.NormalBlending
+        });
+        disposableResources.push(material);
+        return material;
+      }
+
+      function createMediaLayer() {
+        const video = document.createElement("video");
+        video.className = "media-video";
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.preload = "metadata";
+        video.setAttribute("aria-hidden", "true");
+        stage.appendChild(video);
+        return { video, index: -1, ready: false, opacity: 0 };
+      }
+
+      function setVideoSource(slot, index) {
+        if (!mediaSlots[slot]) return;
+        const layer = mediaSlots[slot];
+        const source = MEDIA[index];
+        layer.ready = false;
+        layer.index = index;
+        layer.video.pause();
+        layer.video.src = MEDIA_ROOT + source.file;
+        layer.video.load();
+        const onMetadata = () => {
+          layer.ready = true;
+          layer.video.play().catch(() => {
+            showNotice("Click once to activate local video playback");
+          });
+          if (slot === activeSlot) updateMediaReadout(index);
+        };
+        layer.video.addEventListener("loadedmetadata", onMetadata, { once: true });
+        layer.video.addEventListener("error", () => {
+          layer.ready = false;
+          showNotice("Media unavailable — optical layer remains active");
+        }, { once: true });
+      }
+
+      function updateMediaReadout(index) {
+        const source = MEDIA[index];
+        if (!source) return;
+        mediaName.textContent = source.label;
+        cycleValue.textContent = String(index + 1).padStart(2, "0") + " / " + String(MEDIA.length).padStart(2, "0");
+      }
+
+      function createDust(count, near = false) {
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(count * 3);
+        const sizes = new Float32Array(count);
+        const seeds = new Float32Array(count);
+        for (let i = 0; i < count; i += 1) {
+          const radius = near ? 2.5 + Math.random() * 7 : 4.4 + Math.random() * 17;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          const offset = i * 3;
+          positions[offset] = Math.sin(phi) * Math.cos(theta) * radius + (Math.random() - 0.5) * 3.5;
+          positions[offset + 1] = Math.cos(phi) * radius * 0.67 + (Math.random() - 0.5) * 2.5;
+          positions[offset + 2] = Math.sin(phi) * Math.sin(theta) * radius - 4;
+          sizes[i] = near ? 1.2 + Math.random() * 2.8 : 0.55 + Math.random() * 2.2;
+          seeds[i] = Math.random();
+        }
+        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute("aSize", new THREE.BufferAttribute(sizes, 1));
+        geometry.setAttribute("aSeed", new THREE.BufferAttribute(seeds, 1));
+        const material = makeShaderMaterial(dustVertexShader, dustFragmentShader, {
+          uTime: { value: 0 },
+          uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, 1.75) },
+          uFocus: { value: near ? 0.34 : 0.64 },
+          uColorA: { value: new THREE.Color(0x63dfff) },
+          uColorB: { value: near ? new THREE.Color(0xffd3ad) : new THREE.Color(0xb990ff) },
+          uOpacity: { value: near ? 0.34 : 0.28 }
+        });
+        const points = new THREE.Points(geometry, material);
+        points.frustumCulled = false;
+        disposableResources.push(geometry);
+        return { points, material };
+      }
+
+      function createNetwork() {
+        const group = new THREE.Group();
+        const nodes = [];
+        const nodeCount = 22;
+        for (let i = 0; i < nodeCount; i += 1) {
+          const angle = (i / nodeCount) * Math.PI * 2;
+          const radius = 1.0 + (i % 5) * 0.22;
+          const node = new THREE.Mesh(
+            new THREE.SphereGeometry(i % 4 === 0 ? 0.07 : 0.045, 12, 8),
+            new THREE.MeshBasicMaterial({
+              color: i % 5 === 0 ? 0xffd6a9 : 0x75e5ff,
+              transparent: true,
+              opacity: 0.82
+            })
+          );
+          node.position.set(
+            Math.cos(angle) * radius,
+            Math.sin(angle * 1.7) * 0.7,
+            Math.sin(angle) * radius * 0.8
+          );
+          group.add(node);
+          nodes.push(node);
+          disposableResources.push(node.geometry, node.material);
+        }
+
+        const linePositions = [];
+        for (let i = 0; i < nodeCount; i += 1) {
+          const next = (i + 1) % nodeCount;
+          const cross = (i + 5) % nodeCount;
+          [nodes[i], nodes[next], nodes[i], nodes[cross]].forEach((node) => {
+            linePositions.push(node.position.x, node.position.y, node.position.z);
+          });
+        }
+        const lineGeometry = new THREE.BufferGeometry();
+        lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+        const lineMaterial = new THREE.LineBasicMaterial({
+          color: 0x79dff4,
+          transparent: true,
+          opacity: 0.22,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false
+        });
+        const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+        group.add(lines);
+        disposableResources.push(lineGeometry, lineMaterial);
+        group.position.set(-2.55, 0.55, -0.1);
+        group.scale.setScalar(1.22);
+        return group;
+      }
+
+      function init() {
+        if (!window.THREE) {
+          stage.classList.add("fallback");
+          setStatus("Three.js could not be loaded. Poster fallback is active.");
+          showNotice("Three.js unavailable — poster fallback active");
+          return;
+        }
+
+        pointerTarget = new THREE.Vector2(0, 0);
+        pointer = new THREE.Vector2(0, 0);
+
+        renderer = new THREE.WebGLRenderer({
+          canvas,
+          alpha: true,
+          antialias: true,
+          powerPreference: "high-performance"
+        });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, window.innerWidth < 680 ? 1.25 : 1.75));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.08;
+        renderer.setClearColor(0x000000, 0);
+
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(44, 1, 0.1, 100);
+        camera.position.set(0, 0.15, 8.3);
+        clock = new THREE.Clock();
+
+        mediaSlots = [createMediaLayer(), createMediaLayer()];
+        setVideoSource(0, 0);
+        setVideoSource(1, 1);
+
+        lensGroup = new THREE.Group();
+        lensGroup.position.set(1.05, 0.08, 0.35);
+        scene.add(lensGroup);
+
+        lensMaterial = makeShaderMaterial(lensVertexShader, lensFragmentShader, {
+          uTime: { value: 0 },
+          uPointer: { value: new THREE.Vector2() },
+          uPulse: { value: 0 },
+          uOpacity: { value: 0.92 },
+          uCyan: { value: new THREE.Color(0x70e9ff) },
+          uViolet: { value: new THREE.Color(0xb68bff) },
+          uWarm: { value: new THREE.Color(0xffcba6) }
+        }, { side: THREE.DoubleSide });
+        const lens = new THREE.Mesh(new THREE.IcosahedronGeometry(1.48, 6), lensMaterial);
+        lensGroup.add(lens);
+        disposableResources.push(lens.geometry);
+
+        innerMaterial = makeShaderMaterial(lensVertexShader, lensFragmentShader, {
+          uTime: { value: 0 },
+          uPointer: { value: new THREE.Vector2() },
+          uPulse: { value: 0 },
+          uOpacity: { value: 0.42 },
+          uCyan: { value: new THREE.Color(0x47c5ff) },
+          uViolet: { value: new THREE.Color(0x8265e9) },
+          uWarm: { value: new THREE.Color(0xffd2af) }
+        }, { side: THREE.BackSide });
+        const innerLens = new THREE.Mesh(new THREE.SphereGeometry(1.32, 64, 48), innerMaterial);
+        innerLens.scale.set(1.04, 0.98, 1.02);
+        lensGroup.add(innerLens);
+        disposableResources.push(innerLens.geometry);
+
+        haloMaterial = makeShaderMaterial(ringVertexShader, ringFragmentShader, {
+          uTime: { value: 0 },
+          uColor: { value: new THREE.Color(0x70dfff) }
+        });
+        const haloRing = new THREE.Mesh(new THREE.TorusGeometry(1.82, 0.026, 8, 160), haloMaterial);
+        haloRing.rotation.x = Math.PI * 0.41;
+        haloRing.rotation.y = Math.PI * 0.16;
+        lensGroup.add(haloRing);
+        disposableResources.push(haloRing.geometry);
+
+        manifoldGroup = new THREE.Group();
+        lensGroup.add(manifoldGroup);
+        const manifoldColors = [0x79e5ff, 0xb48dff, 0xffd2a6, 0x7bd6ff];
+        for (let i = 0; i < 4; i += 1) {
+          const mat = makeShaderMaterial(ringVertexShader, ringFragmentShader, {
+            uTime: { value: 0 },
+            uColor: { value: new THREE.Color(manifoldColors[i]) }
+          });
+          const ring = new THREE.Mesh(new THREE.TorusGeometry(1.92 + i * 0.17, 0.012 + i * 0.005, 8, 150), mat);
+          ring.rotation.set(i * 0.52, i * 0.37, i * 0.2);
+          manifoldGroup.add(ring);
+          disposableResources.push(ring.geometry);
+        }
+
+        pulseRing = new THREE.Mesh(
+          new THREE.TorusGeometry(1.64, 0.008, 6, 120),
+          new THREE.MeshBasicMaterial({ color: 0x9aeaff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false })
+        );
+        pulseRing.rotation.x = Math.PI * 0.48;
+        lensGroup.add(pulseRing);
+        disposableResources.push(pulseRing.geometry, pulseRing.material);
+
+        networkGroup = createNetwork();
+        scene.add(networkGroup);
+
+        const dustLayer = createDust(DUST_COUNT, false);
+        dust = dustLayer.points;
+        dustMaterial = dustLayer.material;
+        scene.add(dust);
+
+        const nearDustLayer = createDust(150, true);
+        nearDust = nearDustLayer.points;
+        scene.add(nearDust);
+
+        const backGlow = new THREE.Mesh(
+          new THREE.SphereGeometry(2.45, 32, 24),
+          new THREE.MeshBasicMaterial({ color: 0x173259, transparent: true, opacity: 0.10, blending: THREE.AdditiveBlending, depthWrite: false })
+        );
+        backGlow.position.copy(lensGroup.position);
+        backGlow.position.z -= 0.9;
+        scene.add(backGlow);
+        disposableResources.push(backGlow.geometry, backGlow.material);
+
+        bindEvents();
+        resize();
+        setStatus("Three.js scene ready. Pointer movement bends the optical field.");
+        updateMediaReadout(0);
+        startLoop();
+      }
+
+      function bindEvents() {
+        window.addEventListener("resize", resize, { passive: true });
+        window.addEventListener("pointermove", (event) => {
+          pointerTarget.x = (event.clientX / window.innerWidth) * 2 - 1;
+          pointerTarget.y = -((event.clientY / window.innerHeight) * 2 - 1);
+        }, { passive: true });
+        window.addEventListener("pointerdown", () => {
+          pulse = 1;
+        }, { passive: true });
+        window.addEventListener("keydown", (event) => {
+          if (event.key === " " || event.key.toLowerCase() === "p") {
+            event.preventDefault();
+            togglePause();
+          }
+          if (event.key.toLowerCase() === "r") resetLoop();
+        });
+        document.addEventListener("visibilitychange", () => {
+          pageVisible = !document.hidden;
+          if (pageVisible && !pausedByUser) startLoop();
+          else stopLoop();
+        });
+        playButton.addEventListener("click", togglePause);
+        resetButton.addEventListener("click", resetLoop);
+        motionButton.addEventListener("click", () => {
+          manualReducedMotion = !manualReducedMotion;
+          motionButton.setAttribute("aria-pressed", String(manualReducedMotion));
+          motionButton.textContent = manualReducedMotion ? "Still" : "Motion";
+          showNotice(manualReducedMotion ? "Reduced motion enabled" : "Full motion enabled");
+        });
+      }
+
+      function togglePause() {
+        pausedByUser = !pausedByUser;
+        playButton.setAttribute("aria-pressed", String(pausedByUser));
+        playButton.textContent = pausedByUser ? "Play" : "Pause";
+        if (pausedByUser) {
+          pauseStartedAt = performance.now();
+          stopLoop();
+          mediaSlots.forEach((slot) => slot.video.pause());
+          showNotice("Loop paused");
+        } else {
+          const now = performance.now();
+          loopEpoch += now - pauseStartedAt;
+          mediaSlots.forEach((slot) => slot.video.play().catch(() => {}));
+          showNotice("Loop resumed");
+          startLoop();
+        }
+      }
+
+      function resetLoop() {
+        loopEpoch = performance.now();
+        nextMediaSwap = LOOP_MS;
+        cycleIndex = 0;
+        activeSlot = 0;
+        mediaSlots.forEach((slot, slotIndex) => {
+          setVideoSource(slotIndex, slotIndex);
+          slot.opacity = slotIndex === 0 ? 0.2 : 0;
+          slot.video.style.opacity = String(slot.opacity);
+        });
+        updateMediaReadout(0);
+        pulse = 1;
+        if (pausedByUser) togglePause();
+        else startLoop();
+        showNotice("Optical cycle reset");
+      }
+
+      function swapMedia() {
+        cycleIndex = (cycleIndex + 1) % MEDIA.length;
+        const nextSlot = activeSlot === 0 ? 1 : 0;
+        setVideoSource(nextSlot, cycleIndex);
+        const oldSlot = activeSlot;
+        activeSlot = nextSlot;
+        updateMediaReadout(cycleIndex);
+        mediaSlots[nextSlot].opacity = 0.22;
+        mediaSlots[oldSlot].opacity = 0.04;
+        nextMediaSwap += LOOP_MS;
+      }
+
+      function startLoop() {
+        if (running || !pageVisible || pausedByUser || !renderer) return;
+        running = true;
+        lastTime = performance.now();
+        animationFrame = requestAnimationFrame(render);
+      }
+
+      function stopLoop() {
+        running = false;
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+      }
+
+      function resize() {
+        if (!renderer || !camera) return;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height, false);
+        if (dustMaterial) dustMaterial.uniforms.uPixelRatio.value = Math.min(window.devicePixelRatio || 1, width < 680 ? 1.25 : 1.75);
+      }
+
+      function render(now) {
+        if (!running) return;
+        animationFrame = requestAnimationFrame(render);
+        const delta = Math.min((now - lastTime) / 1000, 0.05);
+        lastTime = now;
+        const elapsed = Math.max(0, now - loopEpoch);
+        const loopTime = elapsed % LOOP_MS;
+        const progress = loopTime / LOOP_MS;
+        if (elapsed >= nextMediaSwap) swapMedia();
+
+        const t = clock.getElapsedTime();
+        const motion = isReducedMotion() ? 0.18 : 1;
+        pointer.lerp(pointerTarget, 1 - Math.pow(0.0001, delta));
+        pulse = Math.max(0, pulse - delta * (isReducedMotion() ? 2.3 : 1.6));
+
+        const orbit = progress * Math.PI * 2;
+        const cameraX = Math.sin(orbit) * 0.28 * motion + pointer.x * 0.18;
+        const cameraY = Math.cos(orbit * 2) * 0.13 * motion + pointer.y * 0.12;
+        camera.position.x = lerp(camera.position.x, cameraX, 0.035);
+        camera.position.y = lerp(camera.position.y, cameraY + 0.15, 0.035);
+        camera.lookAt(0.05 + pointer.x * 0.18, pointer.y * 0.08, 0);
+
+        lensGroup.rotation.y += delta * 0.17 * motion;
+        lensGroup.rotation.x = Math.sin(orbit) * 0.08 * motion + pointer.y * 0.07;
+        lensGroup.position.x = 1.05 + pointer.x * 0.17;
+        lensGroup.position.y = 0.08 + pointer.y * 0.12;
+        manifoldGroup.rotation.z += delta * 0.24 * motion;
+        manifoldGroup.rotation.y -= delta * 0.12 * motion;
+        networkGroup.rotation.y -= delta * 0.10 * motion;
+        networkGroup.rotation.x = Math.sin(t * 0.22) * 0.12 * motion;
+        networkGroup.position.x = -2.55 + pointer.x * 0.12;
+        dust.rotation.y += delta * 0.012 * motion;
+        nearDust.rotation.y -= delta * 0.028 * motion;
+
+        const pulseValue = pulse * pulse;
+        lensMaterial.uniforms.uTime.value = t;
+        lensMaterial.uniforms.uPointer.value.copy(pointer);
+        lensMaterial.uniforms.uPulse.value = pulseValue;
+        innerMaterial.uniforms.uTime.value = t * 0.84;
+        innerMaterial.uniforms.uPointer.value.copy(pointer).multiplyScalar(0.8);
+        innerMaterial.uniforms.uPulse.value = pulseValue;
+        haloMaterial.uniforms.uTime.value = t;
+        pulseRing.scale.setScalar(1 + (1 - pulse) * 0.12 + pulseValue * 0.35);
+        pulseRing.material.opacity = pulseValue * 0.85;
+        dustMaterial.uniforms.uTime.value = t;
+        dustMaterial.uniforms.uFocus.value = 0.48 + Math.sin(orbit) * 0.13;
+
+        mediaSlots.forEach((slot, slotIndex) => {
+          const target = slotIndex === activeSlot ? 0.20 : 0;
+          slot.opacity = lerp(slot.opacity, target, delta * 0.7);
+          slot.video.style.opacity = slot.opacity.toFixed(3);
+        });
+
+        progressBar.style.width = (progress * 100).toFixed(2) + "%";
+        timeValue.textContent = formatSeconds(loopTime / 1000) + " / 08.00";
+        renderer.render(scene, camera);
+      }
+
+      function formatSeconds(seconds) {
+        return seconds.toFixed(2).padStart(5, "0");
+      }
+
+      function cleanup() {
+        stopLoop();
+        window.removeEventListener("resize", resize);
+        mediaSlots.forEach((slot) => {
+          slot.video.pause();
+          slot.video.removeAttribute("src");
+          slot.video.load();
+          slot.video.remove();
+        });
+        disposableResources.forEach(dispose);
+        if (renderer) {
+          renderer.renderLists.dispose();
+          renderer.dispose();
+        }
+      }
+
+      window.addEventListener("beforeunload", cleanup, { once: true });
+      init();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+/**
+ * StudentHub AI — Zero-Trust Security Fabric
+ * SecurityContext V1
+ * 
+ * Manages request-scoped security context, correlation tracking,
+ * client metadata, and security event correlation.
+ */
+
+import { AsyncLocalStorage } from "node:async_hooks";
+import { SecurityPrincipal } from "./SecurityPrincipal.js";
+import { createCorrelationId } from "../secureId.js";
+
+const asyncLocalStorage = new AsyncLocalStorage();
+
+function safeHeaderValue(value, fallback, maxLength, pattern = /[^A-Za-z0-9_.:@/,+ -]/g) {
+  const clean = String(value || "").replace(pattern, "_").trim().slice(0, maxLength);
+  return clean || fallback;
+}
+
+function safeCorrelationId(value) {
+  const candidate = String(value || "").trim();
+  return /^[A-Za-z0-9_.:-]{1,128}$/.test(candidate)
+    ? candidate
+    : createCorrelationId("sec");
+}
+
+export class SecurityContext {
+  #correlationId;
+  #principal;
+  #clientIp;
+  #userAgent;
+  #purpose;
+  #timestamp;
+  #auditEvents;
+
+  /**
+   * @param {object} params
+   * @param {string} [params.correlationId]
+   * @param {SecurityPrincipal} [params.principal]
+   * @param {string} [params.clientIp]
+   * @param {string} [params.userAgent]
+   * @param {string} [params.purpose]
+   * @param {string} [params.timestamp]
+   */
+  constructor({
+    correlationId = null,
+    principal = null,
+    clientIp = "127.0.0.1",
+    userAgent = "Unknown",
+    purpose = "GENERAL_OPERATION",
+    timestamp = new Date().toISOString()
+  } = {}) {
+    this.#correlationId = safeCorrelationId(correlationId);
+    this.#principal = principal instanceof SecurityPrincipal ? principal : SecurityPrincipal.anonymous();
+    this.#clientIp = safeHeaderValue(clientIp, "127.0.0.1", 64, /[^A-Fa-f0-9:.,%_-]/g);
+    this.#userAgent = safeHeaderValue(userAgent, "Unknown", 256);
+    this.#purpose = safeHeaderValue(purpose, "GENERAL_OPERATION", 80, /[^A-Za-z0-9_.:-]/g).toUpperCase();
+    this.#timestamp = timestamp;
+    this.#auditEvents = [];
+  }
+
+  get correlationId() { return this.#correlationId; }
+  get principal() { return this.#principal; }
+  get clientIp() { return this.#clientIp; }
+  get userAgent() { return this.#userAgent; }
+  get purpose() { return this.#purpose; }
+  get timestamp() { return this.#timestamp; }
+  get auditEvents() { return Object.freeze([...this.#auditEvents]); }
+
+  /**
+   * Appends an audit event to the context
+   * @param {object} event 
+   */
+  recordAuditEvent(event) {
+    if (!event || typeof event !== "object") return;
+    this.#auditEvents.push({
+      ...event,
+      correlationId: this.#correlationId,
+      subjectId: this.#principal.subjectId,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  /**
+   * Executes an asynchronous function within this security context
+   * @param {Function} callback 
+   * @returns {Promise<any>}
+   */
+  run(callback) {
+    return asyncLocalStorage.run(this, callback);
+  }
+
+  /**
+   * Retrieves current security context from AsyncLocalStorage if active
+   * @returns {SecurityContext|null}
+   */
+  static current() {
+    return asyncLocalStorage.getStore() || null;
+  }
+
+  /**
+   * Creates a context from an incoming HTTP Request
+   * @param {Request} request 
+   * @param {SecurityPrincipal} [principal]
+   * @returns {SecurityContext}
+   */
+  static fromRequest(request, principal = null) {
+    const headers = request?.headers;
+    const correlationId = safeCorrelationId(headers?.get("x-correlation-id") ||
+                          headers?.get("x-request-id"));
+    
+    const clientIp = safeHeaderValue(headers?.get("x-forwarded-for")?.split(",")[0] ||
+                     headers?.get("x-real-ip"), "127.0.0.1", 64, /[^A-Fa-f0-9:.,%_-]/g);
+                     
+    const userAgent = safeHeaderValue(headers?.get("user-agent"), "Unknown", 256);
+    const purpose = safeHeaderValue(headers?.get("x-security-purpose"), "GENERAL_OPERATION", 80, /[^A-Za-z0-9_.:-]/g);
+
+    return new SecurityContext({
+      correlationId,
+      principal: principal || SecurityPrincipal.anonymous(),
+      clientIp,
+      userAgent,
+      purpose
+    });
+  }
+}

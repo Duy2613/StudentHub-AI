@@ -1,0 +1,150 @@
+{
+  "schema_version": "v9.0.0",
+  "constitution_level": "EXTREME_REALITY_FIRST_V9",
+  "updated_at": "2026-08-26T13:30:00.000Z",
+  "model_slots": {
+    "champion": {
+      "model_id": "MOD_FRAUD_MULTIHEAD_V1_4",
+      "name": "StudentHub Multi-Head Neural Trust Engine (Champion)",
+      "version": "1.4.2",
+      "slot": "CHAMPION",
+      "architecture": "Multi-Head Feed-Forward Neural Network with Shared Backbone & Calibrated Sigmoid/Softmax Heads",
+      "base_model": "Custom Dense-160 TF-IDF Character & Subword N-gram Embedder",
+      "parameters_count": 284500,
+      "training_dataset_versions": [
+        "DS_FRAUD_NCSC_VN_v2.1",
+        "DS_APWG_QUISHING_v1.8",
+        "DS_FTC_SENTINEL_v3.0",
+        "DS_HCMUTE_ACADEMIC_SCAM_v1.2"
+      ],
+      "training_config": {
+        "epochs": 150,
+        "batch_size": 32,
+        "learning_rate": 0.0015,
+        "optimizer": "AdamW",
+        "weight_decay": 0.0001,
+        "temperature_scaling": 1.15
+      },
+      "locked_benchmark_metrics": {
+        "f1_score": 0.9412,
+        "precision": 0.9620,
+        "recall": 0.9213,
+        "pr_auc": 0.9580,
+        "false_negative_rate": 0.0787,
+        "false_positive_rate": 0.0380,
+        "ece": 0.042,
+        "brier_score": 0.061,
+        "latency_ms": 1.82,
+        "cost_per_query_usd": 0.000000
+      },
+      "generalization_benchmarks": {
+        "temporal_holdout_2026h2_f1": 0.9125,
+        "unseen_campaign_holdout_f1": 0.8840,
+        "hard_negatives_accuracy": 0.9850,
+        "ood_abstention_accuracy": 0.9620
+      },
+      "deployment_status": "PRODUCTION_ACTIVE",
+      "limitations": [
+        "Cannot detect zero-day stenography in audio streams without multimodal transcriber",
+        "Relies on deterministic pre-filter for raw IP spoofing"
+      ]
+    },
+    "challengers": [
+      {
+        "model_id": "MOD_FRAUD_TRANSFORMER_ADAPTER_V1_5",
+        "name": "PhoBERT-Mini Fraud Adapter (Challenger 1)",
+        "version": "1.5.0-rc2",
+        "slot": "CHALLENGER",
+        "architecture": "PhoBERT-Mini with LoRA Rank-8 Multi-Task Classification Heads",
+        "base_model": "vinai/phobert-base-v2",
+        "parameters_count": 8420000,
+        "training_dataset_versions": [
+          "DS_FRAUD_NCSC_VN_v2.1",
+          "DS_APWG_QUISHING_v1.8",
+          "DS_FTC_SENTINEL_v3.0",
+          "DS_HCMUTE_ACADEMIC_SCAM_v1.2",
+          "DS_AUGMENTED_VIETNAMESE_SLANG_v1.0"
+        ],
+        "training_config": {
+          "epochs": 20,
+          "batch_size": 16,
+          "learning_rate": 0.00005,
+          "lora_r": 8,
+          "lora_alpha": 16
+        },
+        "locked_benchmark_metrics": {
+          "f1_score": 0.9520,
+          "precision": 0.9680,
+          "recall": 0.9365,
+          "pr_auc": 0.9650,
+          "false_negative_rate": 0.0635,
+          "false_positive_rate": 0.0320,
+          "ece": 0.038,
+          "brier_score": 0.054,
+          "latency_ms": 14.5,
+          "cost_per_query_usd": 0.000012
+        },
+        "generalization_benchmarks": {
+          "temporal_holdout_2026h2_f1": 0.9310,
+          "unseen_campaign_holdout_f1": 0.9150,
+          "hard_negatives_accuracy": 0.9900,
+          "ood_abstention_accuracy": 0.9410
+        },
+        "deployment_status": "EVALUATION_GATE_TESTING",
+        "limitations": [
+          "Higher latency (14.5ms vs 1.82ms) requires edge GPU or WebGPU WASM acceleration"
+        ]
+      },
+      {
+        "model_id": "MOD_FRAUD_ENSEMBLE_GRAPH_V2_0",
+        "name": "Graph-Neural Fusion Hybrid (Challenger 2)",
+        "version": "2.0.0-alpha",
+        "slot": "CHALLENGER",
+        "architecture": "Heterogeneous Graph Neural Network + Neural Multi-Head Co-Attention",
+        "base_model": "Custom HGNN + Dense Backbone",
+        "parameters_count": 1200000,
+        "training_dataset_versions": [
+          "DS_FRAUD_NCSC_VN_v2.1",
+          "DS_EVIDENCE_GRAPH_CORPUS_v1.0"
+        ],
+        "training_config": {
+          "epochs": 50,
+          "batch_size": 64,
+          "learning_rate": 0.0008
+        },
+        "locked_benchmark_metrics": {
+          "f1_score": 0.9380,
+          "precision": 0.9710,
+          "recall": 0.9070,
+          "pr_auc": 0.9490,
+          "false_negative_rate": 0.0930,
+          "false_positive_rate": 0.0290,
+          "ece": 0.051,
+          "brier_score": 0.068,
+          "latency_ms": 6.8,
+          "cost_per_query_usd": 0.000000
+        },
+        "generalization_benchmarks": {
+          "temporal_holdout_2026h2_f1": 0.9050,
+          "unseen_campaign_holdout_f1": 0.8720,
+          "hard_negatives_accuracy": 0.9920,
+          "ood_abstention_accuracy": 0.9750
+        },
+        "deployment_status": "BENCHMARK_BELOW_CHAMPION_F1",
+        "limitations": [
+          "Currently falls short of Champion F1 on temporal holdout (0.9050 vs 0.9125). Blocked from promotion."
+        ]
+      }
+    ],
+    "experimental": [
+      {
+        "model_id": "MOD_ZERO_SHOT_REASONER_V3_EXP",
+        "name": "Self-Calibrating Multi-Agent Arbiter",
+        "version": "3.0.0-exp",
+        "slot": "EXPERIMENTAL",
+        "architecture": "Hierarchical Neuro-Symbolic Agent Network",
+        "deployment_status": "RESEARCH_LAB_ONLY"
+      }
+    ]
+  }
+}

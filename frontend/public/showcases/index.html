@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudentHub AI — Creative Engineering & 3D Web Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #05070f;
+      --card-bg: rgba(13, 17, 30, 0.7);
+      --border: rgba(255, 255, 255, 0.1);
+      --accent: #6366f1;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15), transparent 60%),
+                        radial-gradient(circle at 100% 100%, rgba(52, 232, 154, 0.08), transparent 50%);
+    }
+    header {
+      padding: 2.5rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: linear-gradient(135deg, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+      width: 100%;
+      flex: 1;
+    }
+    .hero-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+    .hero-desc {
+      font-size: 1.125rem;
+      color: var(--muted);
+      max-width: 680px;
+      line-height: 1.6;
+      margin-bottom: 3.5rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 768px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s, box-shadow 0.4s;
+      backdrop-filter: blur(16px);
+      text-decoration: none;
+      color: inherit;
+    }
+    .card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(99, 102, 241, 0.5);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+    .preview-box {
+      height: 220px;
+      width: 100%;
+      position: relative;
+      background: #02040a;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .preview-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      pointer-events: none;
+      transform: scale(0.9);
+      transform-origin: center center;
+    }
+    .card-body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      flex: 1;
+    }
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .tag {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+    }
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .card-summary {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .card-action {
+      margin-top: auto;
+      padding-top: 1rem;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #a5b4fc;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .card:hover .card-action { color: #818cf8; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+      <span>StudentHub AI // Lab</span>
+    </div>
+    <span class="badge">Experimental Showcases</span>
+  </header>
+
+  <main>
+    <h1 class="hero-title">Creative Web & 3D Engineering Lab</h1>
+    <p class="hero-desc">
+      A collection of high-fidelity standalone creative web experiences, interactive 3D simulations, and procedural GLSL shader engines integrated into StudentHub AI.
+    </p>
+
+    <div class="grid">
+      <!-- Lumora Studio -->
+      <a href="./lumora/index.html" class="card" target="_blank">
+        <div class="preview-box">
+          <iframe class="preview-iframe" src="./lumora/index.html" loading="lazy"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-tags">
+            <span class="tag">Adaptive Grid</span>
+            <span class="tag">Lenis</span>
+            <span class="tag">Liquid Reveal</span>
+          </div>
+          <h2 class="card-title">Lumora — Design & Engineering Studio</h2>
+          <p class="card-summary">Single-file adaptive rem-based studio landing page with 000-100 dark intro loader, dual-layer liquid cursor brush reveal, animated portfolio cards, and interactive request modal.</p>
+          <div class="card-action">Launch Fullscreen Experience →</div>
+        </div>
+      </a>
+
+      <!-- Soda 3D -->
+      <a href="./soda/index.html" class="card" target="_blank">
+        <div class="preview-box">
+          <iframe class="preview-iframe" src="./soda/index.html" loading="lazy"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-tags">
+            <span class="tag">Google Model-Viewer</span>
+            <span class="tag">GSAP</span>
+            <span class="tag">Force Field</span>
+          </div>
+          <h2 class="card-title">Soda — Pure Zero 3D Interactive Landing</h2>
+          <p class="card-summary">Full-viewport 3D beverage landing page with cursor-tilt tracking, cursor-repelled floating berry force fields, rising alpha bubbles, and flavor-switching 720° spin choreography.</p>
+          <div class="card-action">Launch Fullscreen Experience →</div>
+        </div>
+      </a>
+
+      <!-- Flow Wave Three.js -->
+      <a href="./flow-wave/index.html" class="card" target="_blank">
+        <div class="preview-box">
+          <iframe class="preview-iframe" src="./flow-wave/index.html" loading="lazy"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-tags">
+            <span class="tag">Three.js r0.143</span>
+            <span class="tag">Simplex Noise</span>
+            <span class="tag">Bloom Pass</span>
+          </div>
+          <h2 class="card-title">Flow Wave — Three.js Procedural Shader Sea</h2>
+          <p class="card-summary">Glowing particle sea driven by 3D Simplex noise with 3-composer UnrealBloom postprocessing, scroll-driven 620vh camera flight dive, and cursor vertex repulsion.</p>
+          <div class="card-action">Launch Fullscreen Experience →</div>
+        </div>
+      </a>
+
+      <!-- Cosmic Dust Three.js -->
+      <a href="./cosmic-dust/index.html" class="card" target="_blank">
+        <div class="preview-box">
+          <iframe class="preview-iframe" src="./cosmic-dust/index.html" loading="lazy"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-tags">
+            <span class="tag">Three.js Shader</span>
+            <span class="tag">Warp3D</span>
+            <span class="tag">Fract-Wrapping</span>
+          </div>
+          <h2 class="card-title">Cosmic Dust — Three.js Particle Universe</h2>
+          <p class="card-summary">Deep void fly-through with 940 warm amber and rust-red glowing ember motes, seamless fract-wrapping camera drift, corner flame composite shader, and smootherstep fade-in.</p>
+          <div class="card-action">Launch Fullscreen Experience →</div>
+        </div>
+      </a>
+    </div>
+  </main>
+</body>
+</html>

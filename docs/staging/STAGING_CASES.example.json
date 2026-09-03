@@ -1,0 +1,26 @@
+{
+  "suspicious": {
+    "type": "text",
+    "value": "STUDENTHUB_STAGING_FIXTURE:SUSPICIOUS_V1"
+  },
+  "benign": {
+    "type": "text",
+    "value": "STUDENTHUB_STAGING_FIXTURE:BENIGN_V1"
+  },
+  "invalid": {
+    "type": "url",
+    "value": "not-a-valid-url"
+  },
+  "partial": {
+    "type": "text",
+    "value": "STUDENTHUB_STAGING_FIXTURE:PARTIAL_V1"
+  },
+  "insufficient": {
+    "type": "text",
+    "value": "STUDENTHUB_STAGING_FIXTURE:INSUFFICIENT_EVIDENCE_V1"
+  },
+  "failure": {
+    "type": "text",
+    "value": "STUDENTHUB_STAGING_FIXTURE:FAILURE_V1"
+  }
+}

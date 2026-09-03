@@ -1,0 +1,197 @@
+{
+  "fixtureVersion": "friend-contract-fixtures.v1",
+  "sourceCommit": "0625b1b950f29edd714507e485284208207039fb",
+  "disclosure": "Sanitized deterministic contract fixtures. No provider keys, database credentials, private user data, or production URLs are present.",
+  "layer2": [
+    {
+      "id": "url-no-known-threat",
+      "request": { "type": "url", "content": "https://example.test/no-known-threat" },
+      "legacyResponse": { "verdict": "SAFE", "confidence": 0.95, "reason": "No known Safe Browsing threat was returned.", "providers": [{ "provider": "Google Safe Browsing", "success": true, "verdict": "SAFE", "confidence": 0.95, "message": "No known threat match." }] },
+      "expectedCanonical": { "providerState": "READY", "finding": "NO_KNOWN_THREAT", "isSafetyProof": false }
+    },
+    {
+      "id": "url-dangerous",
+      "request": { "type": "url", "content": "https://example.test/dangerous" },
+      "legacyResponse": { "verdict": "DANGEROUS", "confidence": 0.99, "reason": "Threat match returned.", "providers": [{ "provider": "Google Safe Browsing", "success": true, "verdict": "DANGEROUS", "confidence": 0.99, "message": "Threat detected: SOCIAL_ENGINEERING." }] },
+      "expectedCanonical": { "providerState": "READY", "finding": "THREAT_MATCH", "isSafetyProof": false }
+    },
+    {
+      "id": "malformed-url",
+      "request": { "type": "url", "content": "not-a-url" },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "reason": "Invalid URL.", "providers": [{ "provider": "Google Safe Browsing", "success": false, "verdict": "UNKNOWN", "confidence": 0, "message": "URL must start with http:// or https://." }] },
+      "expectedCanonical": { "providerState": "INVALID_INPUT", "finding": "UNKNOWN" }
+    },
+    {
+      "id": "unsupported-image",
+      "request": { "type": "image", "content": "data:image/png;base64,sanitized-fixture" },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "reason": "No Layer 2 provider is configured for type 'image'.", "providers": [] },
+      "expectedCanonical": { "providerState": "UNAVAILABLE", "finding": "UNKNOWN" }
+    },
+    {
+      "id": "unsupported-text",
+      "request": { "type": "text", "content": "A sanitized claim" },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "reason": "No Layer 2 provider is configured for type 'text'.", "providers": [] },
+      "expectedCanonical": { "providerState": "UNAVAILABLE", "finding": "UNKNOWN" }
+    },
+    {
+      "id": "missing-provider-key",
+      "request": { "type": "url", "content": "https://example.test/missing-key" },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "reason": "Google Safe Browsing API key is not configured.", "providers": [{ "provider": "Google Safe Browsing", "success": false, "verdict": "UNKNOWN", "confidence": 0, "message": "API key is missing." }] },
+      "expectedCanonical": { "providerState": "NOT_CONFIGURED", "finding": "UNKNOWN" }
+    },
+    {
+      "id": "upstream-4xx",
+      "upstream": { "status": 400, "body": "sanitized" },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "reason": "Google Safe Browsing request failed.", "providers": [{ "provider": "Google Safe Browsing", "success": false, "verdict": "UNKNOWN", "confidence": 0, "message": "HTTP 400: [redacted upstream body]" }] },
+      "expectedCanonical": { "providerState": "UNAVAILABLE", "finding": "UNKNOWN" }
+    },
+    {
+      "id": "upstream-429",
+      "upstream": { "status": 429, "body": "sanitized" },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "reason": "Google Safe Browsing request failed.", "providers": [{ "provider": "Google Safe Browsing", "success": false, "verdict": "UNKNOWN", "confidence": 0, "message": "HTTP 429: [redacted upstream body]" }] },
+      "expectedCanonical": { "providerState": "RATE_LIMITED", "finding": "UNKNOWN" }
+    },
+    {
+      "id": "upstream-5xx",
+      "upstream": { "status": 503, "body": "sanitized" },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "reason": "Google Safe Browsing request failed.", "providers": [{ "provider": "Google Safe Browsing", "success": false, "verdict": "UNKNOWN", "confidence": 0, "message": "HTTP 503: [redacted upstream body]" }] },
+      "expectedCanonical": { "providerState": "UNAVAILABLE", "finding": "UNKNOWN" }
+    },
+    {
+      "id": "malformed-provider-body",
+      "upstream": { "status": 200, "body": { "matches": "not-an-array" } },
+      "legacyResponse": { "verdict": "SAFE", "confidence": 0.95, "reason": "No known Safe Browsing threat was returned.", "providers": [{ "provider": "Google Safe Browsing", "success": true, "verdict": "SAFE", "confidence": 0.95, "message": "No known threat match." }] },
+      "expectedCanonical": { "providerState": "MALFORMED", "finding": "UNKNOWN", "isSafetyProof": false }
+    }
+  ],
+  "layer3": [
+    {
+      "id": "evidence-found",
+      "request": { "type": "text", "content": "A sanitized claim" },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0.5, "stop": false, "canContinueToLayer4": true, "reason": "Web evidence was collected for later analysis.", "evidence": [{ "title": "Example source", "url": "https://example.test/source-a", "content": "Bounded source excerpt." }], "sources": [{ "title": "Example source", "url": "https://example.test/source-a" }] },
+      "expectedCanonical": { "providerState": "READY", "status": "PARTIAL", "truth": "UNKNOWN", "continue": "POLICY_CONTROLLED" }
+    },
+    {
+      "id": "no-sources",
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "stop": false, "canContinueToLayer4": true, "reason": "Tavily returned no usable web sources.", "evidence": [], "sources": [] },
+      "expectedCanonical": { "providerState": "READY", "status": "INSUFFICIENT_EVIDENCE", "truth": "UNKNOWN" }
+    },
+    {
+      "id": "unknown",
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "stop": false, "canContinueToLayer4": true, "reason": "Not enough evidence.", "evidence": [], "sources": [] },
+      "expectedCanonical": { "providerState": "READY", "status": "INSUFFICIENT_EVIDENCE", "truth": "UNKNOWN" }
+    },
+    {
+      "id": "fake-legacy-heuristic",
+      "legacyResponse": { "verdict": "FAKE", "confidence": 0.9, "stop": true, "canContinueToLayer4": false, "reason": "Multiple lexical signals were found.", "evidence": [{ "title": "Example source", "url": "https://example.test/debunk", "content": "Bounded excerpt." }], "sources": [{ "title": "Example source", "url": "https://example.test/debunk" }] },
+      "expectedCanonical": { "providerState": "READY", "status": "PARTIAL", "truth": "UNKNOWN", "signal": "LEGACY_HEURISTIC_SIGNAL" }
+    },
+    {
+      "id": "provider-unavailable",
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "stop": false, "canContinueToLayer4": true, "reason": "TAVILY_API_KEY is not configured.", "evidence": [], "sources": [] },
+      "expectedCanonical": { "providerState": "NOT_CONFIGURED", "status": "PARTIAL", "truth": "UNKNOWN", "continue": "POLICY_CONTROLLED" }
+    },
+    {
+      "id": "timeout",
+      "upstream": { "status": "TIMEOUT" },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "stop": false, "canContinueToLayer4": true, "reason": "Tavily request timed out. Layer 3 is temporarily unavailable.", "evidence": [], "sources": [] },
+      "expectedCanonical": { "providerState": "TIMEOUT", "status": "PARTIAL", "truth": "UNKNOWN" }
+    },
+    {
+      "id": "http-429",
+      "upstream": { "status": 429, "body": "sanitized" },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "stop": false, "canContinueToLayer4": true, "reason": "Tavily request failed: HTTP 429.", "evidence": [], "sources": [] },
+      "expectedCanonical": { "providerState": "RATE_LIMITED", "status": "PARTIAL", "truth": "UNKNOWN" }
+    },
+    {
+      "id": "malformed-result",
+      "upstream": { "status": 200, "body": { "results": "not-an-array" } },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "stop": false, "canContinueToLayer4": true, "reason": "Tavily returned no usable web sources.", "evidence": [], "sources": [] },
+      "expectedCanonical": { "providerState": "MALFORMED", "status": "PARTIAL", "truth": "UNKNOWN" }
+    },
+    {
+      "id": "oversized-source-content",
+      "upstream": { "status": 200, "sourceContentLength": 5001 },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0.5, "stop": false, "canContinueToLayer4": true, "reason": "Web evidence was collected for later analysis.", "evidence": [{ "title": "Example source", "url": "https://example.test/large", "content": "[fixture content bounded by adapter]" }], "sources": [{ "title": "Example source", "url": "https://example.test/large" }] },
+      "expectedCanonical": { "providerState": "READY", "status": "PARTIAL", "contentPolicy": "BOUNDED" }
+    }
+  ],
+  "layer4": [
+    {
+      "id": "user-mode",
+      "request": { "type": "text", "content": "A sanitized claim", "mode": "user", "layer3": { "verdict": "UNKNOWN", "confidence": 0.5, "reason": "Evidence requires further assessment.", "evidence": [], "sources": [] } },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0.73, "evidenceAgreement": 0.7, "sourceQuality": 0.65, "stop": false, "canContinueToLayer4": true, "mode": "user", "geminiModel": "none", "groqModel": "openai/gpt-oss-120b", "reason": "Evidence remains insufficient.", "contradictoryEvidence": [], "sources": [] },
+      "expectedCanonical": { "providerState": "READY", "assessment": "ADVISORY", "modelCapability": "FAST_EVIDENCE_ANALYSIS" }
+    },
+    {
+      "id": "pro-mode",
+      "request": { "type": "text", "content": "A sanitized claim", "mode": "pro", "layer3": { "verdict": "UNKNOWN", "confidence": 0.5, "reason": "Evidence requires further assessment.", "evidence": [], "sources": [] } },
+      "legacyResponse": { "verdict": "TRUE", "confidence": 0.82, "evidenceAgreement": 0.8, "sourceQuality": 0.75, "stop": false, "canContinueToLayer4": true, "mode": "pro", "geminiModel": "gemini-3.7-flash", "groqModel": null, "reason": "Supplied evidence supports the claim with limitations.", "contradictoryEvidence": [], "sources": [] },
+      "expectedCanonical": { "providerState": "READY", "assessment": "ADVISORY", "modelCapability": "DEEP_EVIDENCE_ANALYSIS" }
+    },
+    {
+      "id": "expert-mode",
+      "request": { "type": "text", "content": "A sanitized claim", "mode": "expert", "layer3": { "verdict": "UNKNOWN", "confidence": 0.5, "reason": "Evidence requires further assessment.", "evidence": [], "sources": [] } },
+      "legacyResponse": { "verdict": "MISLEADING", "confidence": 0.78, "evidenceAgreement": 0.74, "sourceQuality": 0.8, "stop": false, "canContinueToLayer4": true, "mode": "expert", "geminiModel": "gemini-3.6-flash", "groqModel": null, "reason": "The wording omits relevant context.", "contradictoryEvidence": [], "sources": [] },
+      "expectedCanonical": { "providerState": "READY", "assessment": "ADVISORY", "modelCapability": "CONTRADICTION_REVIEW" }
+    },
+    {
+      "id": "contradictory-evidence",
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0.4, "evidenceAgreement": 0.2, "sourceQuality": 0.6, "stop": false, "canContinueToLayer4": true, "mode": "pro", "geminiModel": "gemini-3.6-flash", "groqModel": null, "reason": "Sources disagree.", "contradictoryEvidence": ["Source observations conflict."], "sources": [{ "title": "Example source A", "url": "https://example.test/source-a" }, { "title": "Example source B", "url": "https://example.test/source-b" }] },
+      "expectedCanonical": { "providerState": "READY", "assessment": "CONFLICTING_EVIDENCE", "finalTruth": "UNKNOWN" }
+    },
+    {
+      "id": "independent-layer4-research",
+      "request": { "type": "url", "content": "https://example.test/claim", "mode": "pro", "layer3": { "verdict": "UNKNOWN", "confidence": 0.5, "reason": "Layer 3 observation.", "evidence": [{ "title": "Layer 3 source", "url": "https://example.test/shared", "content": "Layer 3 excerpt" }], "sources": [{ "title": "Layer 3 source", "url": "https://example.test/shared" }] } },
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0.5, "evidenceAgreement": 0.5, "sourceQuality": 0.5, "stop": false, "canContinueToLayer4": true, "mode": "pro", "geminiModel": "gemini-3.6-flash", "groqModel": null, "reason": "Independent research was attempted.", "contradictoryEvidence": [], "sources": [{ "title": "[Layer 3] Shared source", "url": "https://example.test/shared" }, { "title": "[Layer 4 Research] Shared source", "url": "https://example.test/shared" }] },
+      "expectedCanonical": { "providerState": "READY", "assessment": "ADVISORY", "sameSourceDocument": true, "separateObservationsRequired": true }
+    },
+    {
+      "id": "missing-layer3-object",
+      "request": { "type": "text", "content": "A sanitized claim", "mode": "user" },
+      "expectedHttp": 400,
+      "expectedCanonical": { "providerState": "INVALID_INPUT", "assessment": "NONE" }
+    },
+    {
+      "id": "malformed-layer3-evidence",
+      "request": { "type": "text", "content": "A sanitized claim", "mode": "user", "layer3": { "verdict": "UNKNOWN", "confidence": 0.5, "reason": "Malformed fixture.", "evidence": [null], "sources": [] } },
+      "expectedHttp": 500,
+      "expectedCanonical": { "providerState": "MALFORMED", "assessment": "NONE" }
+    },
+    {
+      "id": "provider-missing-key",
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "evidenceAgreement": 0, "sourceQuality": 0, "stop": false, "canContinueToLayer4": false, "mode": "user", "geminiModel": "none", "groqModel": "none", "reason": "GROQ_API_KEY is not configured.", "contradictoryEvidence": [], "sources": [] },
+      "expectedCanonical": { "providerState": "NOT_CONFIGURED", "assessment": "NONE" }
+    },
+    {
+      "id": "model-unavailable",
+      "legacyResponse": { "verdict": "UNKNOWN", "confidence": 0, "evidenceAgreement": 0, "sourceQuality": 0, "stop": false, "canContinueToLayer4": false, "mode": "pro", "geminiModel": "none", "groqModel": null, "reason": "Gemini models were unavailable.", "contradictoryEvidence": [], "sources": [] },
+      "expectedCanonical": { "providerState": "UNAVAILABLE", "assessment": "NONE" }
+    },
+    {
+      "id": "http-400",
+      "upstream": { "status": 400, "body": "sanitized" },
+      "expectedCanonical": { "providerState": "UNAVAILABLE", "assessment": "NONE" }
+    },
+    {
+      "id": "http-401-403",
+      "upstream": { "status": 401, "body": "sanitized" },
+      "expectedCanonical": { "providerState": "AUTH_FAILED", "assessment": "NONE" }
+    },
+    {
+      "id": "http-429",
+      "upstream": { "status": 429, "body": "sanitized" },
+      "expectedCanonical": { "providerState": "RATE_LIMITED", "assessment": "NONE" }
+    },
+    {
+      "id": "http-500-503",
+      "upstream": { "status": 503, "body": "sanitized" },
+      "expectedCanonical": { "providerState": "UNAVAILABLE", "assessment": "NONE" }
+    },
+    {
+      "id": "malformed-result",
+      "upstream": { "status": 200, "body": { "candidates": "not-an-array" } },
+      "expectedCanonical": { "providerState": "MALFORMED", "assessment": "NONE" }
+    }
+  ]
+}

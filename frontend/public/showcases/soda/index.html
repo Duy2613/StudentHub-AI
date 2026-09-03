@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diet Soda | Pure Zero Refreshment</title>
+  <meta name="description" content="Experience the crisp, clean taste of Diet Soda. Zero sugar, zero compromise.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Inter:wght@400;500&family=Manrope:wght@400;700&family=Galada&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --text-color: #ffffff;
+      --accent-color: #ffffff;
+      --muted-color: rgba(255, 255, 255, 0.7);
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --font-main: 'Inter', sans-serif;
+      --font-heading: 'Galada', cursive;
+
+      /* Dynamic Background Variables */
+      --bg-inner: #0b8a78;
+      --bg-mid: #044e3b;
+      --bg-outer: #011411;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at center, var(--bg-inner) 0%, var(--bg-mid) 50%, var(--bg-outer) 100%);
+      color: var(--text-color);
+      font-family: var(--font-main);
+      overflow: hidden; /* Remove scroll */
+      height: 100vh;
+      width: 100vw;
+      transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+
+    body.blue-theme {
+      --bg-inner: #0b4f8a;
+      --bg-mid: #04294e;
+      --bg-outer: #010c14;
+    }
+
+    /* Bubbles Background */
+    #bubbles-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .bubble-img {
+      position: absolute;
+      pointer-events: none;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.7), rgba(255,255,255,0.1) 60%, rgba(255,255,255,0.02) 100%);
+      box-shadow: inset 0 0 8px rgba(255,255,255,0.4), 0 0 12px rgba(255,255,255,0.15);
+      backdrop-filter: blur(1px);
+    }
+
+    @keyframes floatUpImg {
+      0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
+      100% {
+        transform: translateY(-110vh) translateX(30px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 4%;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 700;
+      font-size: 1.5rem;
+      font-family: var(--font-heading);
+      color: #ffffff;
+    }
+
+    .nav {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--glass-bg);
+      padding: 0.4rem;
+      border-radius: 100px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .nav.glass {
+      position: relative;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .nav-item {
+      font-family: 'Manrope', sans-serif;
+      color: var(--muted-color);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.5rem 1.2rem;
+      border-radius: 100px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: #fbcfe8;
+      color: #011d17;
+    }
+
+    .contact-btn {
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      padding: 0.9rem 2rem;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: none;
+      backdrop-filter: blur(8px);
+    }
+
+    .contact-btn:hover {
+      background: rgba(0, 0, 0, 0.7);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4%;
+      padding-top: 5rem;
+      position: relative;
+    }
+
+    .hero-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      width: 100%;
+      max-width: 100%;
+      padding: 0;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Typography */
+    .main-title,
+    .side-title {
+      font-family: var(--font-heading);
+      font-size: clamp(4.5rem, 9vw, 11rem);
+      line-height: 0.85;
+      font-weight: 400;
+      text-transform: none;
+      white-space: nowrap;
+      color: white;
+      letter-spacing: normal;
+      text-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+
+    .outline {
+      color: var(--text-color);
+      opacity: 0.95;
+    }
+
+    /* Leaves Container */
+    .leaves-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      transition: transform 0.1s ease-out;
+    }
+
+    .leaf {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      pointer-events: none;
+      z-index: -1;
+      filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+    }
+
+    .l1 { top: 10%; left: 15%; }
+    .l2 { top: 40%; left: 80%; width: 140px; height: 140px; opacity: 0.4; }
+    .l3 { top: 70%; left: 75%; width: 80px; height: 80px; }
+    .l4 { top: 85%; left: 20%; width: 120px; height: 120px; opacity: 0.3; }
+
+    /* Left Column */
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 6rem 0;
+      gap: 2rem;
+      z-index: 100;
+    }
+
+    .description {
+      color: var(--muted-color);
+      font-size: 1.1rem;
+      line-height: 1.6;
+      max-width: 400px;
+    }
+
+    .primary-btn {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      padding: 0.4rem 0.4rem 0.4rem 1.5rem;
+      border-radius: 100px;
+      font-weight: 700;
+      cursor: pointer;
+      width: fit-content;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .primary-btn:hover {
+      background: rgba(0, 0, 0, 0.7);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .plus-icon {
+      background: #fbcfe8;
+      color: #011d17;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      font-weight: 900;
+      line-height: 1;
+      padding-bottom: 2px;
+      border: none;
+    }
+
+    .award-badge {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: auto;
+    }
+
+    .award-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fbcfe8;
+      backdrop-filter: blur(10px);
+    }
+
+    .award-text { display: flex; flex-direction: column; }
+    .award-title { font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted-color); }
+    .award-subtitle { font-size: 0.85rem; font-weight: 600; color: #fff; }
+
+    /* Center Product (3D Can) */
+    .hero-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      opacity: 0;
+      animation: fadeIn 1.5s ease-out 0.3s forwards, float 6s ease-in-out infinite;
+      pointer-events: none;
+      background: radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+    }
+
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .main-product-3d {
+      width: 75vw;
+      height: 75vh;
+      max-width: 800px;
+      max-height: 800px;
+      outline: none;
+      --progress-bar-color: transparent;
+      --poster-color: transparent;
+      z-index: 1;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(25deg);
+      pointer-events: none;
+      filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.6));
+    }
+
+    .main-product-3d[camera-controls] { pointer-events: auto; }
+
+    /* 3D Model Fallback / Custom 3D Can Representation */
+    .can-visual-fallback {
+      width: 320px;
+      height: 520px;
+      border-radius: 40px;
+      position: relative;
+      background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 20%, rgba(0,0,0,0.4) 70%, rgba(255,255,255,0.3) 100%),
+                  radial-gradient(ellipse at top, #10b981 0%, #064e3b 80%);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 2px 10px rgba(255,255,255,0.8), inset 0 -4px 20px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      border: 1px solid rgba(255,255,255,0.3);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body.blue-theme .can-visual-fallback {
+      background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 20%, rgba(0,0,0,0.4) 70%, rgba(255,255,255,0.3) 100%),
+                  radial-gradient(ellipse at top, #3b82f6 0%, #1e3a8a 80%);
+    }
+
+    /* Berries Containers */
+    .berries-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 110; /* Above text (100) and can (50) */
+      transition: transform 0.1s ease-out;
+    }
+
+    .berries-container-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0; /* Behind everything */
+      transition: transform 0.1s ease-out;
+    }
+
+    .berry {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      outline: none;
+      --progress-bar-color: transparent;
+      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.45));
+      transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .berry.no-animation { animation: none !important; }
+
+    /* SVG 3D Berry / Cherry Graphic */
+    .berry-graphic {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #ff4d6d, #c9184a 55%, #590d22 95%);
+      box-shadow: inset -4px -4px 10px rgba(0,0,0,0.5), inset 4px 4px 10px rgba(255,255,255,0.6), 0 10px 20px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .berry-graphic::after {
+      content: '';
+      position: absolute;
+      top: 15%;
+      left: 25%;
+      width: 25%;
+      height: 15%;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.7);
+      transform: rotate(-30deg);
+      filter: blur(1px);
+    }
+    body.blue-theme .berry-graphic {
+      background: radial-gradient(circle at 35% 35%, #60a5fa, #2563eb 55%, #1e3a8a 95%);
+    }
+
+    .b1 { top: 25%; left: 30%; width: 220px; height: 220px; }
+    .b2 { top: 60%; left: 42%; width: 100px; height: 100px; }
+    .b3 { top: 30%; left: 62%; width: 250px; height: 250px; }
+    .b4 { top: 15%; left: 48%; width: 140px; height: 140px; }
+    .b5 { top: 75%; left: 20%; width: 120px; height: 120px; }
+    .b6 { top: 45%; left: 75%; width: 180px; height: 180px; }
+    .b7 { top: 15%; left: 40%; width: 80px; height: 80px; opacity: 0.7; }
+    .b8 { top: 50%; left: 55%; width: 70px; height: 70px; opacity: 0.6; }
+    .b9 { top: 80%; left: 35%; width: 75px; height: 75px; opacity: 0.7; }
+
+    /* Right Column (Flavor Carousel + Side Title) */
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: flex-end;
+      text-align: right;
+      height: 100%;
+      padding: 6rem 0;
+      z-index: 100;
+      width: 450px;
+      pointer-events: none;
+    }
+
+    .product-carousel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: flex-end;
+      pointer-events: auto;
+    }
+
+    .carousel-cards { display: flex; gap: 1rem; }
+
+    .card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 1rem;
+      padding-top: 5rem;
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      width: 135px;
+      position: relative;
+      backdrop-filter: blur(10px);
+      text-align: center;
+    }
+
+    .card:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .card.active {
+      border-color: #fbcfe8;
+      border-width: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 25px rgba(251, 207, 232, 0.2);
+    }
+
+    .card-can-thumb {
+      width: 70px;
+      height: 110px;
+      border-radius: 16px;
+      margin-top: -6rem;
+      filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      will-change: transform;
+      pointer-events: none;
+      border: 1px solid rgba(255,255,255,0.4);
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: #fff;
+    }
+    .thumb-classic {
+      background: linear-gradient(135deg, #10b981 0%, #064e3b 100%);
+    }
+    .thumb-blue {
+      background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
+    }
+
+    .card:hover .card-can-thumb {
+      transform: translateY(-20px) rotate(-12deg) scale(1.15) !important;
+    }
+
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.75rem;
+      width: 100%;
+      word-wrap: break-word;
+      gap: 0.25rem;
+    }
+
+    .card-info span:first-child { font-weight: 600; color: #fff; }
+    .card-info span:last-child { color: var(--muted-color); }
+
+    .carousel-nav { display: flex; gap: 1rem; }
+
+    .nav-arrow {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .nav-arrow:hover { background: rgba(255, 255, 255, 0.2); transform: scale(1.08); }
+
+    .side-title { align-self: flex-end; text-align: right; }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Bubbles Container -->
+  <div id="bubbles-container"></div>
+
+  <!-- 2. Header (Glass Nav) -->
+  <header class="header">
+    <div class="logo">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+        <path d="M12 8V16M8 12H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      <span>Soda</span>
+    </div>
+
+    <nav class="nav glass">
+      <a href="#" class="nav-item active">Home</a>
+      <a href="#" class="nav-item">Ingredients</a>
+      <a href="#" class="nav-item">Taste</a>
+      <a href="#" class="nav-item">Eco</a>
+      <a href="#" class="nav-item">Reviews</a>
+    </nav>
+
+    <button class="contact-btn">Contact Us</button>
+  </header>
+
+  <!-- 3. Main Hero -->
+  <main class="hero">
+    <div class="hero-content">
+      <!-- 3a. Floating Leaves (Far Background) -->
+      <div class="leaves-container" id="leaves-wrap">
+        <div class="leaf l1" style="transform: rotate(25deg); opacity: 0.5;">
+          <svg viewBox="0 0 100 100" fill="#34d399"><path d="M50 0 C70 30 90 60 50 100 C10 60 30 30 50 0 Z"/></svg>
+        </div>
+        <div class="leaf l2" style="transform: rotate(-45deg);">
+          <svg viewBox="0 0 100 100" fill="#10b981"><path d="M50 0 C70 30 90 60 50 100 C10 60 30 30 50 0 Z"/></svg>
+        </div>
+        <div class="leaf l3" style="transform: rotate(60deg); opacity: 0.6;">
+          <svg viewBox="0 0 100 100" fill="#059669"><path d="M50 0 C70 30 90 60 50 100 C10 60 30 30 50 0 Z"/></svg>
+        </div>
+        <div class="leaf l4" style="transform: rotate(-15deg);">
+          <svg viewBox="0 0 100 100" fill="#34d399"><path d="M50 0 C70 30 90 60 50 100 C10 60 30 30 50 0 Z"/></svg>
+        </div>
+      </div>
+
+      <!-- 3b. Left Column -->
+      <div class="hero-left">
+        <h1 class="main-title large-animation-1">
+          <span class="outline">Pure</span><br>
+          Zero
+        </h1>
+        <p class="description">
+          Unleash the crisp taste of zero sugar. <br>
+          Refreshment redefined in every bubble — <br>
+          all in one sleek design.
+        </p>
+        <div class="cta-group">
+          <button class="primary-btn">
+            Shop Now
+            <span class="plus-icon">+</span>
+          </button>
+        </div>
+        <div class="award-badge">
+          <div class="award-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 15L15 18L19 14" />
+              <path d="M7 10L12 15L17 10" />
+            </svg>
+          </div>
+          <div class="award-text">
+            <span class="award-title">DESIGN AWARDS</span>
+            <span class="award-subtitle">PREMIUM BEVERAGE 2025</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3c. Background Berries (Behind Can) -->
+      <div class="berries-container-bg" id="berries-bg">
+        <div class="berry b7" data-orig-x="40" data-orig-y="15"><div class="berry-graphic"></div></div>
+        <div class="berry b8" data-orig-x="55" data-orig-y="50"><div class="berry-graphic"></div></div>
+        <div class="berry b9" data-orig-x="35" data-orig-y="80"><div class="berry-graphic"></div></div>
+      </div>
+
+      <!-- 3d. Center Product (3D Can) -->
+      <div class="hero-center" id="hero-can-center">
+        <model-viewer id="product-model"
+          src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+          alt="Diet Soda 3D Model"
+          camera-controls
+          disable-zoom
+          shadow-intensity="0"
+          environment-image="neutral"
+          exposure="1.5"
+          interaction-prompt="none"
+          camera-orbit="0deg 90deg 380%"
+          field-of-view="30deg"
+          class="main-product-3d"
+          style="display:none;">
+        </model-viewer>
+
+        <!-- Rich Visual 3D Can Representation -->
+        <div class="can-visual-fallback" id="can-visual" style="transform: rotate(20deg);">
+          <div style="font-family:var(--font-heading); font-size:3.5rem; color:#fff; text-shadow:0 4px 15px rgba(0,0,0,0.4); line-height:1;">Soda</div>
+          <div style="font-size:0.875rem; letter-spacing:0.2em; font-weight:700; color:#fbcfe8; margin-top:0.5rem; text-transform:uppercase;" id="can-flavor-label">Pure Zero Classic</div>
+          <div style="margin-top:auto; font-size:0.75rem; color:rgba(255,255,255,0.7);">330 ML • ZERO SUGAR</div>
+        </div>
+      </div>
+
+      <!-- 3e. Foreground Berries (Above Text & Can) -->
+      <div class="berries-container" id="berries-fg">
+        <div class="berry b1" data-orig-x="30" data-orig-y="25"><div class="berry-graphic"></div></div>
+        <div class="berry b2" data-orig-x="42" data-orig-y="60"><div class="berry-graphic"></div></div>
+        <div class="berry b3" data-orig-x="62" data-orig-y="30"><div class="berry-graphic"></div></div>
+        <div class="berry b4" data-orig-x="48" data-orig-y="15"><div class="berry-graphic"></div></div>
+        <div class="berry b5" data-orig-x="20" data-orig-y="75"><div class="berry-graphic"></div></div>
+        <div class="berry b6" data-orig-x="75" data-orig-y="45"><div class="berry-graphic"></div></div>
+      </div>
+
+      <!-- 3f. Right Column -->
+      <div class="hero-right">
+        <div class="product-carousel">
+          <div class="carousel-cards">
+            <div class="card active" data-flavor="classic">
+              <div class="card-can-thumb thumb-classic">Classic</div>
+              <div class="card-info">
+                <span>Diet Classic</span>
+                <span>$2.99</span>
+              </div>
+            </div>
+            <div class="card" data-flavor="blue">
+              <div class="card-can-thumb thumb-blue">Zero Lime</div>
+              <div class="card-info">
+                <span>Zero Lime</span>
+                <span>$2.99</span>
+              </div>
+            </div>
+          </div>
+          <div class="carousel-nav">
+            <button class="nav-arrow" id="prev-flavor-btn">←</button>
+            <button class="nav-arrow" id="next-flavor-btn">→</button>
+          </div>
+        </div>
+
+        <h2 class="side-title large-animation-1">
+          <span class="outline">Refreshingly</span><br>
+          Clean
+        </h2>
+      </div>
+    </div>
+  </main>
+
+  <!-- 4. Script Logic (GSAP + Interactive Forces) -->
+  <script>
+    // 1. Generate Ambient Rising Bubbles
+    const bubblesContainer = document.getElementById('bubbles-container');
+    const bubbleCount = 28;
+
+    for (let i = 0; i < bubbleCount; i++) {
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble-img';
+      const size = Math.random() * 26 + 8;
+      bubble.style.width = size + 'px';
+      bubble.style.height = size + 'px';
+      bubble.style.left = Math.random() * 100 + 'vw';
+      bubble.style.top = Math.random() * 100 + 100 + 'vh';
+      const duration = Math.random() * 10 + 8;
+      const delay = Math.random() * 8;
+      bubble.style.animation = `floatUpImg ${duration}s linear ${delay}s infinite`;
+      bubblesContainer.appendChild(bubble);
+    }
+
+    // 2. Realtime 3D Can Cursor Tilt
+    const canVisual = document.getElementById('can-visual');
+    let targetTiltX = 0, targetTiltY = 0, currentTiltX = 0, currentTiltY = 0;
+
+    window.addEventListener('mousemove', (e) => {
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      targetTiltX = ((e.clientY - cy) / cy) * -18;
+      targetTiltY = ((e.clientX - cx) / cx) * 22;
+    });
+
+    function tiltLoop() {
+      currentTiltX += (targetTiltX - currentTiltX) * 0.08;
+      currentTiltY += (targetTiltY - currentTiltY) * 0.08;
+      if (canVisual) {
+        canVisual.style.transform = `perspective(1000px) rotateX(${currentTiltX}deg) rotateY(${currentTiltY}deg) rotateZ(18deg)`;
+      }
+      requestAnimationFrame(tiltLoop);
+    }
+    tiltLoop();
+
+    // 3. Pointer Force Field for Floating Berries & Leaves
+    const allBerries = document.querySelectorAll('.berry');
+    const leavesWrap = document.getElementById('leaves-wrap');
+
+    window.addEventListener('mousemove', (e) => {
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+
+      allBerries.forEach(berry => {
+        const rect = berry.getBoundingClientRect();
+        const bx = rect.left + rect.width / 2;
+        const by = rect.top + rect.height / 2;
+        const dist = Math.hypot(mouseX - bx, mouseY - by);
+        const maxDist = 240;
+
+        if (dist < maxDist) {
+          const force = (1 - dist / maxDist) * 55;
+          const angle = Math.atan2(by - mouseY, bx - mouseX);
+          const pushX = Math.cos(angle) * force;
+          const pushY = Math.sin(angle) * force;
+          gsap.to(berry, {
+            x: pushX,
+            y: pushY,
+            scale: 1.12,
+            duration: 0.5,
+            ease: "power2.out"
+          });
+        } else {
+          gsap.to(berry, {
+            x: 0,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            ease: "elastic.out(1, 0.4)"
+          });
+        }
+      });
+
+      // Parallax drift on leaves
+      if (leavesWrap) {
+        const lx = (mouseX / window.innerWidth - 0.5) * 30;
+        const ly = (mouseY / window.innerHeight - 0.5) * 30;
+        gsap.to(leavesWrap, { x: lx, y: ly, duration: 0.6, ease: "power1.out" });
+      }
+    });
+
+    // 4. Flavor Switching & 720° Can Spin Choreography
+    const cards = document.querySelectorAll('.card');
+    const canFlavorLabel = document.getElementById('can-flavor-label');
+    let currentFlavor = 'classic';
+
+    function setFlavor(flavor) {
+      if (flavor === currentFlavor) return;
+      currentFlavor = flavor;
+
+      cards.forEach(c => {
+        c.classList.toggle('active', c.dataset.flavor === flavor);
+      });
+
+      // Background transition
+      document.body.classList.toggle('blue-theme', flavor === 'blue');
+
+      // 720° Can Spin with Motion Blur & Flavor Label Swap
+      if (canVisual) {
+        gsap.to(canVisual, {
+          rotation: "+=720",
+          scale: 1.18,
+          duration: 0.9,
+          ease: "power3.inOut",
+          onComplete: () => {
+            gsap.to(canVisual, { scale: 1, duration: 0.4, ease: "back.out(1.7)" });
+          }
+        });
+      }
+
+      setTimeout(() => {
+        if (canFlavorLabel) {
+          canFlavorLabel.textContent = flavor === 'blue' ? 'Zero Lime Flavor' : 'Pure Zero Classic';
+        }
+      }, 450);
+
+      // Berries Implosion & Explosion Sequence
+      gsap.to(allBerries, {
+        scale: 0,
+        opacity: 0.3,
+        duration: 0.35,
+        ease: "power2.in",
+        onComplete: () => {
+          allBerries.forEach(b => {
+            const rx = (Math.random() - 0.5) * 40;
+            const ry = (Math.random() - 0.5) * 40;
+            b.style.transform = `translate(${rx}px, ${ry}px)`;
+          });
+          gsap.to(allBerries, {
+            scale: 1,
+            opacity: 1,
+            duration: 0.6,
+            stagger: 0.04,
+            ease: "back.out(1.8)"
+          });
+        }
+      });
+    }
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        setFlavor(card.dataset.flavor);
+      });
+    });
+
+    document.getElementById('prev-flavor-btn')?.addEventListener('click', () => {
+      setFlavor(currentFlavor === 'classic' ? 'blue' : 'classic');
+    });
+    document.getElementById('next-flavor-btn')?.addEventListener('click', () => {
+      setFlavor(currentFlavor === 'classic' ? 'blue' : 'classic');
+    });
+  </script>
+</body>
+</html>
