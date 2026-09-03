@@ -298,7 +298,7 @@ function retryAfterMilliseconds(value, now) {
 }
 
 const LEGACY_LAYER3_INPUT_TYPES = new Set(["url", "text"]);
-const LEGACY_LAYER4_MODES = new Set(["user", "pro", "expert"]);
+const LEGACY_LAYER4_MODES = new Set(["user", "pro", "expert", "unknown"]);
 
 function normalizedInputType(input, allowedTypes, fallback = "text") {
   const value = safeText(input?.type, 40).toLowerCase();
