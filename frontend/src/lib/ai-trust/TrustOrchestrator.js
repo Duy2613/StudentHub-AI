@@ -1,21 +1,18 @@
-/**
- * Canonical server-side Trust entrypoint.
+﻿/**
+ * Standalone Sequential Trust Orchestrator.
  *
- * Implements the FriendBackendAdapter as the PRIMARY execution path when configured,
- * sequentially calling:
+ * Implements the FriendBackendAdapter as the EXCLUSIVE execution path,
+ * sequentially executing:
  *   - Layer 1: Local screen / offline regex (Layer1ScreenService)
  *   - Layer 2: POST /api/verify/layer2 (Google Safe Browsing)
  *   - Layer 3: POST /api/verify/layer3 (Tavily Search Web Evidence)
  *   - Layer 4: POST /api/verify/layer4 (Groq/Gemini Final AI Verification)
  *
- * If the friend backend adapter is not configured, it preserves and falls back
- * cleanly to the native StudentHub trust.v5 pipeline (super.run).
+ * If the friend backend adapter is not configured, it fails fast with
+ * FRIEND_BACKEND_NOT_CONFIGURED rather than falling back to any native engine.
  */
 
 import { createFriendBackendAdapter } from "./integrations/friendBackend/FriendBackendAdapter.js";
-import { createLegacyVerificationAdapter } from "./integrations/legacyVerification/LegacyVerificationAdapter.js";
-import { createProviderGateway } from "./providerGateway/ProviderGateway.js";
-import { TrustPipelineOrchestrator, TrustPipelineCancelledError } from "./v5/TrustPipelineOrchestrator.js";
 import { Layer1ScreenService } from "./layer1/Layer1ScreenService.js";
 import { stageFromL1 } from "./v5/stageAdapters.js";
 import {
@@ -26,6 +23,23 @@ import {
   toPublicPipelineResult,
 } from "./v5/contracts.js";
 import { createSecureId } from "../security/secureId.js";
+
+export class TrustPipelineCancelledError extends Error {
+  constructor(message = "Trust pipeline was cancelled.") {
+    super(message);
+    this.name = "TrustPipelineCancelledError";
+    this.code = "CANCELLED";
+  }
+}
+
+export class FriendBackendNotConfiguredError extends Error {
+  constructor(message = "FRIEND_BACKEND_NOT_CONFIGURED: Friend backend integration is required for this sequential variant.") {
+    super(message);
+    this.name = "FriendBackendNotConfiguredError";
+    this.code = "FRIEND_BACKEND_NOT_CONFIGURED";
+    this.statusCode = 503;
+  }
+}
 
 function signal(type, details, source = "friend_backend", severity = "INFO") {
   return { type, details, source, severity };
@@ -39,25 +53,38 @@ function cloneSafe(value) {
   }
 }
 
-export class TrustOrchestrator extends TrustPipelineOrchestrator {
+export class TrustOrchestrator {
   constructor(options = {}) {
-    const friendBackendAdapter = options.friendBackendAdapter || options.legacyVerificationAdapter || createFriendBackendAdapter();
-    const legacyVerificationAdapter = friendBackendAdapter;
-    const providerGateway = options.providerGateway || createProviderGateway({ legacyVerificationAdapter, friendBackendAdapter });
-    super({
-      ...options,
-      providerGateway,
+    this.friendBackendAdapter = options.friendBackendAdapter || createFriendBackendAdapter();
+  }
+
+  _setStage(pipeline, stageId, patch) {
+    pipeline.stages[stageId] = createStageEnvelope({
+      ...pipeline.stages[stageId],
+      ...patch,
+      stageId,
+      requestId: pipeline.requestId,
     });
-    this.friendBackendAdapter = friendBackendAdapter;
+  }
+
+  async _emit(pipeline, event, onTransition) {
+    if (typeof onTransition !== "function") return;
+    try {
+      await onTransition({
+        event,
+        stageId: pipeline.currentStage,
+        pipeline: toPublicPipelineResult(cloneSafe(pipeline)),
+      });
+    } catch {
+      // Observability/stream listeners must never change a policy result.
+    }
   }
 
   async run(rawInput = {}, options = {}) {
-    // If friend backend is configured and enabled, execute the friend's 4-layer sequential pipeline as PRIMARY
     if (this.friendBackendAdapter && this.friendBackendAdapter.isConfigured) {
       return this.runFriendSequentialPipeline(rawInput, options);
     }
-    // Otherwise fallback cleanly to native StudentHub trust.v5
-    return super.run(rawInput, options);
+    throw new FriendBackendNotConfiguredError();
   }
 
   async runFriendSequentialPipeline(rawInput = {}, options = {}) {

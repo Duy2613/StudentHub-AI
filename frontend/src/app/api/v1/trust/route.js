@@ -1,11 +1,10 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { Layer1ScreenService } from "@/lib/ai-trust/layer1/Layer1ScreenService.js";
-import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticService.js";
-import { Layer2AReputationService } from "@/lib/ai-trust/layer2a/Layer2AReputationService.js";
-import { Layer3EvidenceService } from "@/lib/ai-trust/layer3/Layer3EvidenceService.js";
-import { Layer4TrustService } from "@/lib/ai-trust/layer4/Layer4TrustService.js";
-import { TrustPipelineCancelledError } from "@/lib/ai-trust/v5/TrustPipelineOrchestrator.js";
-import { createTrustOrchestrator } from "@/lib/ai-trust/TrustOrchestrator.js";
+import {
+  createTrustOrchestrator,
+  TrustPipelineCancelledError,
+  FriendBackendNotConfiguredError,
+} from "@/lib/ai-trust/TrustOrchestrator.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
 export const runtime = "nodejs";
@@ -61,14 +60,24 @@ function streamV5Pipeline(request, input, requestId) {
           stageId: transition.stageId,
           data: transition.pipeline,
         }),
-        }).then((result) => {
-          send({ type: "complete", event: "PIPELINE_COMPLETED", stageId: "l5", data: result });
-          close();
-        }).catch((error) => {
-          if (!(error instanceof TrustPipelineCancelledError)) {
-            send({ type: "error", event: "PIPELINE_FAILED", error: { code: "PIPELINE_FAILED", message: "Trust pipeline không thể hoàn tất." } });
-          }
-          close();
+      }).then((result) => {
+        send({ type: "complete", event: "PIPELINE_COMPLETED", stageId: "l5", data: result });
+        close();
+      }).catch((error) => {
+        if (!(error instanceof TrustPipelineCancelledError)) {
+          const isNotConfigured = error instanceof FriendBackendNotConfiguredError || error.code === "FRIEND_BACKEND_NOT_CONFIGURED";
+          send({
+            type: "error",
+            event: "PIPELINE_FAILED",
+            error: {
+              code: isNotConfigured ? "FRIEND_BACKEND_NOT_CONFIGURED" : (error.code || "PIPELINE_FAILED"),
+              message: isNotConfigured
+                ? "FRIEND_BACKEND_NOT_CONFIGURED: Friend backend integration is required."
+                : (error.message || "Trust pipeline không thể hoàn tất."),
+            },
+          });
+        }
+        close();
       }).finally(() => request.signal.removeEventListener("abort", forwardAbort));
     },
     cancel() {
@@ -114,8 +123,10 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
 
   const requestId = securityContext.correlationId;
   const input = { type, content, metadata };
-  if (body?.version === "v5") {
-    if (wantsV5Stream(request, body)) return streamV5Pipeline(request, input, requestId);
+
+  if (wantsV5Stream(request, body)) return streamV5Pipeline(request, input, requestId);
+
+  try {
     const pipeline = await createTrustOrchestrator().run(input, { requestId, signal: request.signal });
     return NextResponse.json({
       success: true,
@@ -133,51 +144,18 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
         "X-AI-Trust-Request-Id": requestId,
       },
     });
+  } catch (error) {
+    if (error instanceof FriendBackendNotConfiguredError || error.code === "FRIEND_BACKEND_NOT_CONFIGURED") {
+      return NextResponse.json({
+        success: false,
+        error: {
+          code: "FRIEND_BACKEND_NOT_CONFIGURED",
+          userMessage: "Friend backend chưa được cấu hình cho phiên bản tuần tự này.",
+        },
+      }, { status: 503 });
+    }
+    throw error;
   }
-  const layer1 = await Layer1ScreenService.screen({ ...input, options: { requestId } });
-  const depth = body?.depth === "full" ? "full" : "screen";
-  if (depth === "screen") {
-    return NextResponse.json({ success: true, contractVersion: "trust.v1", requestId, depth, demo: false, data: { input: { type }, layer1 } });
-  }
-
-  const useAIGateway = body?.useAIGateway === true;
-  const urlTarget = type === "url" ? (content || metadata.url || "") : "";
-  const layer2A = type === "url"
-    ? await Layer2AReputationService.verify({
-      // The Layer 2A service applies the disclosure policy independently.
-      // A local hard block must not blanket-suppress a valid public target,
-      // while private/metadata/SSRF targets are still skipped before any
-      // provider receives them.
-      url: urlTarget,
-      requestId,
-    })
-    : await Layer2AReputationService.verify({ url: "", requestId });
-  const layer2 = layer1.status === "BLOCK" ? null : await Layer2SemanticService.verify({
-    ...input,
-    layer1Result: layer1,
-    options: { requestId, useAIGateway },
-  });
-  const layer3 = layer1.status === "BLOCK" || !layer2 ? null : await Layer3EvidenceService.verify({
-    claims: layer2.claims,
-    layer2Result: layer2,
-    options: { requestId },
-  });
-  const layer4 = await Layer4TrustService.evaluate({
-    layer1Result: layer1,
-    layer2Result: layer2,
-    layer2AResult: layer2A,
-    layer3Result: layer3,
-    options: { requestId, useAIGateway },
-  });
-
-  return NextResponse.json({
-    success: true,
-    contractVersion: "trust.v1",
-    requestId,
-    depth,
-    demo: false,
-    data: { input: { type }, layer1, layer2A, layer2, layer3, layer4 },
-  });
 }
 
 export const POST = SecurityFabric.wrapHandler({
