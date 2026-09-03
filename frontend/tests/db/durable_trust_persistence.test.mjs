@@ -41,6 +41,27 @@ test("Option B: Anonymous caller is strictly ephemeral (zero DB mapping)", () =>
   assert.equal(resultAnon, null, "Anonymous principal without id must return null mapping");
 });
 
+test("Option B: SecurityPrincipal with subjectId (user:uuid) resolves ownerId", () => {
+  const userId = crypto.randomUUID();
+  const mockPipeline = {
+    verificationId: crypto.randomUUID(),
+    contractVersion: "trust.v5",
+    state: "SUSPICIOUS",
+    decision: { verdict: "SUSPICIOUS", confidence: 0.85 },
+  };
+  const input = { type: "text", content: "Check link" };
+
+  const dto = TrustPersistenceMapper.mapPipelineToDurableRecord({
+    pipelineResult: mockPipeline,
+    input,
+    principal: { subjectId: `user:${userId}`, principalType: "STUDENT" },
+    requestId: "req_subject_test",
+  });
+
+  assert.ok(dto, "DTO must be generated when principal has valid UUID in subjectId");
+  assert.equal(dto.caseRecord.ownerId, userId);
+});
+
 test("Option B: DurableTrustRepository rejects persistence without ownerId", async () => {
   await assert.rejects(
     async () => {

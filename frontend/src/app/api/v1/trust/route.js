@@ -64,7 +64,7 @@ function streamV5Pipeline(request, input, requestId, principal) {
           data: transition.pipeline,
         }),
       }).then((result) => {
-        if (principal?.id) {
+        if (principal) {
           try {
             const durableDto = TrustPersistenceMapper.mapPipelineToDurableRecord({
               pipelineResult: result,
@@ -138,7 +138,7 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
     const pipeline = await createTrustOrchestrator().run(input, { requestId, signal: request.signal });
     let caseId = pipeline.verificationId || null;
 
-    if (principal?.id) {
+    if (principal) {
       try {
         const durableDto = TrustPersistenceMapper.mapPipelineToDurableRecord({
           pipelineResult: pipeline,

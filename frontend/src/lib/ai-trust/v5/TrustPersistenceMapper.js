@@ -19,6 +19,13 @@ function ensureUuid(candidate) {
   return crypto.randomUUID();
 }
 
+function resolveOwnerId(principal) {
+  if (!principal) return null;
+  const raw = principal.id || principal.subjectId || "";
+  const cleaned = String(raw).replace(/^(student|expert|user):/, "").trim();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cleaned) ? cleaned : null;
+}
+
 export class TrustPersistenceMapper {
   /**
    * Maps a Trust V5 execution result into durable persistence DTOs.
@@ -37,7 +44,7 @@ export class TrustPersistenceMapper {
     principal = null,
     requestId = "",
   }) {
-    const ownerId = principal?.id;
+    const ownerId = resolveOwnerId(principal);
     // OPTION B: Anonymous callers remain strictly ephemeral
     if (!ownerId) {
       return null;
