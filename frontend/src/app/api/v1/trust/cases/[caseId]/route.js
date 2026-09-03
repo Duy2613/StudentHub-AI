@@ -48,8 +48,10 @@ async function handleGetCase(request, routeParams, principal) {
   }
 }
 
-export const GET = SecurityFabric.wrapApiHandler(handleGetCase, {
-  resource: "TRUST_CASE_DETAIL",
-  action: "READ",
-  allowAnonymous: false,
-});
+export const GET = SecurityFabric.wrapHandler(
+  {
+    action: "READ_TRUST_CASE_DETAIL",
+    allowAnonymous: false,
+  },
+  handleGetCase
+);
