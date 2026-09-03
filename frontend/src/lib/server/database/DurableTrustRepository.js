@@ -11,6 +11,8 @@
 
 import crypto from "node:crypto";
 import { getPostgresPool } from "./PostgresPool.js";
+import { SecurityOutboxTransformer } from "../outbox/SecurityOutboxTransformer.js";
+import { SecurityOutboxRepository } from "../outbox/SecurityOutboxRepository.js";
 
 function computeSha256(val) {
   return crypto.createHash("sha256").update(String(val).trim().toLowerCase()).digest();
@@ -188,6 +190,40 @@ export class DurableTrustRepository {
            VALUES ($1, $2, 'TRUST_CASE', $3, $4, now(), $5)`,
           [eventType, actorId, caseId, reqId, JSON.stringify(meta)]
         );
+      }
+
+      // 7. Atomic Security Outbox Enqueue (Cross-System Assurance I1)
+      try {
+        const outboxEnvelope = SecurityOutboxTransformer.createEnvelope({
+          eventId: `evt-${crypto.randomUUID()}`,
+          eventType: "security.studenthub.trust_decision.v1",
+          schemaVersion: "studenthub-security-event-v1",
+          classification: "INTERNAL",
+          correlationId: audit?.requestId || null,
+          subject: "studenthub-trust-engine",
+          occurredAt: new Date().toISOString(),
+          payload: {
+            case_id: caseId,
+            verdict: state,
+            visibility,
+            input_type: inputType,
+            evidence_count: counts.evidence,
+            claim_count: counts.claims,
+            evaluated_at: new Date().toISOString(),
+          },
+        });
+
+        await SecurityOutboxRepository.insertInTransaction({
+          client,
+          envelope: outboxEnvelope,
+          maxAttempts: 5,
+        });
+      } catch (outboxErr) {
+        if (outboxErr.code === "42P01") {
+          console.warn("[DurableTrustRepository] security_outbox table not found, skipping outbox enqueue.");
+        } else {
+          throw outboxErr;
+        }
       }
 
       await client.query("COMMIT");
