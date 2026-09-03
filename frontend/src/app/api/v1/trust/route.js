@@ -7,6 +7,8 @@ import { Layer4TrustService } from "@/lib/ai-trust/layer4/Layer4TrustService.js"
 import { TrustPipelineCancelledError } from "@/lib/ai-trust/v5/TrustPipelineOrchestrator.js";
 import { createTrustOrchestrator } from "@/lib/ai-trust/TrustOrchestrator.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { DurableTrustRepository } from "@/lib/server/database/DurableTrustRepository.js";
+import { TrustPersistenceMapper } from "@/lib/ai-trust/v5/TrustPersistenceMapper.js";
 
 export const runtime = "nodejs";
 
@@ -32,7 +34,7 @@ function sseChunk(event) {
   return `event: ${event.type || "trust"}\ndata: ${JSON.stringify(event)}\n\n`;
 }
 
-function streamV5Pipeline(request, input, requestId) {
+function streamV5Pipeline(request, input, requestId, principal) {
   const encoder = new TextEncoder();
   const abortController = new AbortController();
   const forwardAbort = () => abortController.abort(request.signal.reason || "client-disconnected");
@@ -61,14 +63,31 @@ function streamV5Pipeline(request, input, requestId) {
           stageId: transition.stageId,
           data: transition.pipeline,
         }),
-        }).then((result) => {
-          send({ type: "complete", event: "PIPELINE_COMPLETED", stageId: "l5", data: result });
-          close();
-        }).catch((error) => {
-          if (!(error instanceof TrustPipelineCancelledError)) {
-            send({ type: "error", event: "PIPELINE_FAILED", error: { code: "PIPELINE_FAILED", message: "Trust pipeline không thể hoàn tất." } });
+      }).then((result) => {
+        if (principal?.id) {
+          try {
+            const durableDto = TrustPersistenceMapper.mapPipelineToDurableRecord({
+              pipelineResult: result,
+              input,
+              principal,
+              requestId,
+            });
+            if (durableDto) {
+              DurableTrustRepository.persistTrustRecord(durableDto).catch((err) => {
+                console.error("[TrustPersistence] Stream background persistence error:", err.message);
+              });
+            }
+          } catch (mapErr) {
+            console.error("[TrustPersistence] Stream mapping error:", mapErr.message);
           }
-          close();
+        }
+        send({ type: "complete", event: "PIPELINE_COMPLETED", stageId: "l5", data: result });
+        close();
+      }).catch((error) => {
+        if (!(error instanceof TrustPipelineCancelledError)) {
+          send({ type: "error", event: "PIPELINE_FAILED", error: { code: "PIPELINE_FAILED", message: "Trust pipeline không thể hoàn tất." } });
+        }
+        close();
       }).finally(() => request.signal.removeEventListener("abort", forwardAbort));
     },
     cancel() {
@@ -115,12 +134,34 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
   const requestId = securityContext.correlationId;
   const input = { type, content, metadata };
   if (body?.version === "v5") {
-    if (wantsV5Stream(request, body)) return streamV5Pipeline(request, input, requestId);
+    if (wantsV5Stream(request, body)) return streamV5Pipeline(request, input, requestId, principal);
     const pipeline = await createTrustOrchestrator().run(input, { requestId, signal: request.signal });
+    let caseId = pipeline.verificationId || null;
+
+    if (principal?.id) {
+      try {
+        const durableDto = TrustPersistenceMapper.mapPipelineToDurableRecord({
+          pipelineResult: pipeline,
+          input,
+          principal,
+          requestId,
+        });
+        if (durableDto) {
+          caseId = durableDto.caseRecord.id;
+          DurableTrustRepository.persistTrustRecord(durableDto).catch((err) => {
+            console.error("[TrustPersistence] Background persistence error:", err.message);
+          });
+        }
+      } catch (err) {
+        console.error("[TrustPersistence] Mapping error:", err.message);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       contractVersion: "trust.v5",
       requestId,
+      caseId,
       version: "v5",
       demo: false,
       data: pipeline,
