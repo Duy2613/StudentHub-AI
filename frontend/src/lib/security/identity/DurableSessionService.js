@@ -42,6 +42,15 @@ export class DurableSessionService {
       expiresAt,
       userAgentHash: metadata.userAgent ? this.hashSecret(`ua:${metadata.userAgent}`) : null,
     });
+    if (this.repository.appendAudit) {
+      await this.repository.appendAudit({
+        eventType: "SESSION_CREATED",
+        actorId: identity.userId,
+        targetType: "SESSION",
+        targetId: identity.userId,
+        metadata: { authProvider: identity.authProvider || "supabase" },
+      });
+    }
     return { secret, expiresAt, userId: identity.userId };
   }
 
@@ -56,7 +65,19 @@ export class DurableSessionService {
 
   async revokeSession(secret, reason = "LOGOUT") {
     if (!secret) return false;
-    return this.repository.revoke(this.hashSecret(secret), reason);
+    const tokenHash = this.hashSecret(secret);
+    const active = await this.repository.findActive(tokenHash, this.now()).catch(() => null);
+    const revoked = await this.repository.revoke(tokenHash, reason);
+    if (revoked && this.repository.appendAudit) {
+      await this.repository.appendAudit({
+        eventType: "SESSION_REVOKED",
+        actorId: active?.user_id || null,
+        targetType: "SESSION",
+        targetId: active?.user_id || null,
+        metadata: { reason },
+      });
+    }
+    return revoked;
   }
 
   serializeCookie(secret, expiresAt, { secure = process.env.NODE_ENV === "production" } = {}) {
