@@ -5,9 +5,7 @@ import { PostgresSessionRepository } from "../../src/lib/security/identity/Postg
 import { DurableSessionService } from "../../src/lib/security/identity/DurableSessionService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
-after(async () => {
-  await getPostgresPool().end();
-});
+
 
 test("PostgresSessionRepository: Live durable session create, validate, update last_seen, and revoke in private.server_sessions", async () => {
   const pool = getPostgresPool();
@@ -24,10 +22,12 @@ test("PostgresSessionRepository: Live durable session create, validate, update l
 
   let secret = null;
 
+  const testJti = `jti_test_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
   try {
     // 1. Create Session
     const sessionRes = await service.createSession(
-      { userId: realUserId, authProvider: "supabase", jti: `jti_test_${Date.now()}` },
+      { userId: realUserId, authProvider: "supabase", jti: testJti },
       { userAgent: "Mozilla/5.0 Test Suite Runner" }
     );
     assert.ok(sessionRes.secret, "Session secret generated");
@@ -67,7 +67,7 @@ test("PostgresSessionRepository: Live durable session create, validate, update l
     if (secret) {
       const tokenHash = service.hashSecret(secret);
       await pool.query(`DELETE FROM private.server_sessions WHERE token_hash = $1`, [tokenHash]);
-      await pool.query(`DELETE FROM private.audit_events WHERE actor_id = $1 AND target_type = 'SESSION'`, [realUserId]);
     }
+    await pool.query(`DELETE FROM private.audit_events WHERE metadata->>'jti' = $1`, [testJti]);
   }
 });

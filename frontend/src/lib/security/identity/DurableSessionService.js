@@ -48,7 +48,7 @@ export class DurableSessionService {
         actorId: identity.userId,
         targetType: "SESSION",
         targetId: identity.userId,
-        metadata: { authProvider: identity.authProvider || "supabase" },
+        metadata: { authProvider: identity.authProvider || "supabase", jti: identity.jti || null },
       });
     }
     return { secret, expiresAt, userId: identity.userId };
