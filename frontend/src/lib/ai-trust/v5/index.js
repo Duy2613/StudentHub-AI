@@ -15,6 +15,8 @@ export {
   toPublicPipelineResult,
 } from "./contracts.js";
 export { TrustPipelineOrchestrator, TrustPipelineCancelledError, createTrustPipelineOrchestrator, isRetryEligible } from "./TrustPipelineOrchestrator.js";
+export { ProviderGateway, createProviderGateway, PROVIDER_CAPABILITY, PROVIDER_HEALTH_STATUS } from "../providerGateway/index.js";
+export { InvestigationBudgetExceededError, INVESTIGATION_BUDGET_DEFAULTS, createInvestigationBudget } from "./investigationBudget.js";
 export { StudentDomainRiskModel, analyzeStudentDomainRisk, STUDENT_DOMAIN_MODEL_VERSION, STUDENT_DOMAIN_MODEL_TYPE } from "./l2c/StudentDomainRiskModel.js";
 export { STUDENT_DOMAIN_TAXONOMY, STUDENT_DOMAIN_TAXONOMY_VERSION } from "./l2c/taxonomy.js";
 export { sanitizeStudentDomainCase, validateStudentDomainCase, isEligibleForFineTuning, STUDENT_DOMAIN_DATASET_VERSION } from "./l2c/datasetSchema.js";

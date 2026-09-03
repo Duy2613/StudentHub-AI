@@ -8,13 +8,15 @@ import {
 import { createLayer2AResult } from "../../src/lib/ai-trust/layer2a/types.js";
 import { buildCanonicalEvidence, buildPassportProjection, buildTrustGraph } from "../../src/lib/ai-trust/integrations/canonicalTrustProjection.js";
 
-function responseFor(payload, status = 200, contentType = "application/json") {
+function responseFor(payload, status = 200, contentType = "application/json", extraHeaders = {}) {
   const bytes = new TextEncoder().encode(JSON.stringify(payload));
   return {
     ok: status >= 200 && status < 300,
     status,
     headers: {
       get(name) {
+        const extra = extraHeaders[String(name).toLowerCase()];
+        if (extra !== undefined) return String(extra);
         if (name === "content-type") return contentType;
         if (name === "content-length") return String(bytes.byteLength);
         return null;
@@ -24,11 +26,13 @@ function responseFor(payload, status = 200, contentType = "application/json") {
   };
 }
 
-function adapterWith(handler) {
+function adapterWith(handler, options = {}) {
+  const { env = {}, ...adapterOptions } = options;
   return new LegacyVerificationAdapter({
-    env: { STUDENTHUB_LEGACY_VERIFICATION_BASE_URL: "https://legacy.example.test", STUDENTHUB_LEGACY_VERIFICATION_RESOLVE_DNS: "false" },
+    env: { STUDENTHUB_LEGACY_VERIFICATION_BASE_URL: "https://legacy.example.test", STUDENTHUB_LEGACY_VERIFICATION_RESOLVE_DNS: "false", ...env },
     fetchImpl: handler,
     resolveDns: false,
+    ...adapterOptions,
   });
 }
 
@@ -44,6 +48,27 @@ describe("legacy four-layer anti-corruption adapter", () => {
     assert.equal(result.finding, "NO_KNOWN_THREAT");
     assert.equal(result.provenance.noMatchIsSafetyProof, false);
     assert.equal(result.securityClassification, "NO_KNOWN_THREAT");
+  });
+
+  it("redacts provider diagnostics before they enter the Layer 2 DTO", async () => {
+    const adapter = adapterWith(async () => responseFor({
+      verdict: "UNKNOWN",
+      reason: "provider token=upstream-secret connectionString=postgres://user:pw@db.example.test/app",
+      providers: [{
+        provider: "legacy-provider",
+        success: false,
+        verdict: "UNKNOWN",
+        message: "api_key=provider-secret password=another-secret",
+      }],
+    }));
+    const result = await adapter.verifyLayer2({ url: "https://example.com/provider-diagnostics" });
+    const serialized = JSON.stringify(result);
+    assert.equal(serialized.includes("upstream-secret"), false);
+    assert.equal(serialized.includes("provider-secret"), false);
+    assert.equal(serialized.includes("another-secret"), false);
+    assert.equal(serialized.includes("postgres://"), false);
+    assert.match(result.message, /token=\[REDACTED\]/);
+    assert.match(result.providerResults[0].message, /api_key=\[REDACTED\]/);
   });
 
   it("retains Layer 2 DANGEROUS and UNKNOWN as distinct findings", async () => {
@@ -88,8 +113,11 @@ describe("legacy four-layer anti-corruption adapter", () => {
     assert.equal(request.init.method, "POST");
     assert.equal(request.init.redirect, "error");
     assert.equal(request.init.headers["X-Request-ID"], "legacy-transport-contract");
-    assert.equal(JSON.parse(request.init.body).requestId, "legacy-transport-contract");
-    assert.equal(JSON.parse(request.init.body).content, "A bounded claim");
+    const body = JSON.parse(request.init.body);
+    assert.deepEqual(Object.keys(body).sort(), ["content", "type"]);
+    assert.equal(body.requestId, undefined);
+    assert.equal(body.type, "text");
+    assert.equal(body.content, "A bounded claim");
   });
 
   it("redacts sensitive URL query material before the Layer 2 provider boundary", async () => {
@@ -109,7 +137,139 @@ describe("legacy four-layer anti-corruption adapter", () => {
     assert.equal(result.finding, "NO_KNOWN_THREAT");
     assert.equal(body.content, "https://example.com/login");
     assert.equal(body.content.includes("do-not-send"), false);
+    assert.deepEqual(Object.keys(body).sort(), ["content", "type"]);
     assert.equal(result.reputationLookupStatus, "LOOKUP_REDACTED");
+  });
+
+  it("emits the exact pinned Layer 4 DTO and keeps provider observations bounded", async () => {
+    let request;
+    const adapter = adapterWith(async (endpoint, init) => {
+      request = { endpoint, init };
+      return responseFor({ verdict: "UNKNOWN", confidence: 0.5, evidenceAgreement: 0.5, sourceQuality: 0.5, stop: false, canContinueToLayer4: true, mode: "user", geminiModel: "none", groqModel: "openai/gpt-oss-120b", reason: "Bounded provider result.", contradictoryEvidence: [], sources: [] });
+    });
+    const result = await adapter.verifyLayer4({
+      input: { type: "url", content: "https://example.com/claim" },
+      layer3Result: {
+        legacyIntegration: { rawVerdict: "TRUE", legacyAssessmentConfidence: 0.91, reason: "Provider observation" },
+        evidence: [
+          { evidenceId: "l3-evidence", sourceUrl: "https://example.com/source", sourceTitle: "Example source", excerpt: "Bounded excerpt" },
+          { evidenceId: "private-evidence", sourceUrl: "http://127.0.0.1/private", sourceTitle: "Must be dropped", excerpt: "Do not send" },
+        ],
+        sources: [{ sourceId: "l3-source", url: "https://example.com/source", title: "Example source" }],
+      },
+      requestId: "legacy-layer4-dto",
+    });
+    const body = JSON.parse(request.init.body);
+    assert.equal(result.status, "COMPLETED");
+    assert.equal(request.endpoint, "https://legacy.example.test/api/verify/layer4");
+    assert.deepEqual(Object.keys(body).sort(), ["content", "layer3", "mode", "type"]);
+    assert.deepEqual(Object.keys(body.layer3).sort(), ["confidence", "evidence", "reason", "sources", "verdict"]);
+    assert.equal(body.type, "url");
+    assert.equal(body.content, "https://example.com/claim");
+    assert.equal(body.mode, "user");
+    assert.equal(body.layer3.verdict, "TRUE");
+    assert.equal(body.layer3.confidence, 0.91);
+    assert.equal(body.layer3.evidence.length, 1);
+    assert.equal(body.layer3.evidence[0].url, "https://example.com/source");
+    assert.equal(body.layer3.sources.length, 1);
+    assert.equal("requestId" in body, false);
+    assert.equal("layers" in body, false);
+  });
+
+  it("retries transient legacy responses with bounded jittered backoff", async () => {
+    let calls = 0;
+    const delays = [];
+    const adapter = adapterWith(async () => {
+      calls += 1;
+      return calls === 1
+        ? responseFor({ error: "temporary" }, 503)
+        : responseFor({ verdict: "SAFE", confidence: 0.7, providers: [{ provider: "bounded", success: true, verdict: "SAFE", confidence: 0.7 }] });
+    }, {
+      sleep: async (milliseconds) => { delays.push(milliseconds); },
+      random: () => 0,
+    });
+    const result = await adapter.verifyLayer2({ url: "https://example.com/retry", requestId: "legacy-retry" });
+    assert.equal(result.finding, "NO_KNOWN_THREAT");
+    assert.equal(calls, 2);
+    assert.deepEqual(delays, [150]);
+    assert.equal(adapter.describe().resilience.circuitState, "CLOSED");
+  });
+
+  it("honors a bounded Retry-After response header", async () => {
+    let calls = 0;
+    const delays = [];
+    const adapter = adapterWith(async () => {
+      calls += 1;
+      return calls === 1
+        ? responseFor({ error: "rate limited" }, 429, "application/json", { "retry-after": "3" })
+        : responseFor({ verdict: "SAFE", confidence: 0.7, providers: [{ provider: "bounded", success: true, verdict: "SAFE", confidence: 0.7 }] });
+    }, {
+      env: {
+        STUDENTHUB_LEGACY_VERIFICATION_RETRY_BASE_DELAY_MS: "10",
+        STUDENTHUB_LEGACY_VERIFICATION_RETRY_MAX_DELAY_MS: "5000",
+      },
+      sleep: async (milliseconds) => { delays.push(milliseconds); },
+      random: () => 0,
+    });
+    const result = await adapter.verifyLayer2({ url: "https://example.com/rate", requestId: "legacy-retry-after" });
+    assert.equal(result.finding, "NO_KNOWN_THREAT");
+    assert.equal(calls, 2);
+    assert.deepEqual(delays, [3000]);
+  });
+
+  it("opens a circuit after repeated provider failures and probes after cooldown", async () => {
+    let now = 0;
+    let calls = 0;
+    const adapter = adapterWith(async () => {
+      calls += 1;
+      if (calls < 3) throw new Error("provider unavailable");
+      return responseFor({ verdict: "SAFE", confidence: 0.7, providers: [{ provider: "bounded", success: true, verdict: "SAFE", confidence: 0.7 }] });
+    }, {
+      env: {
+        STUDENTHUB_LEGACY_VERIFICATION_MAX_ATTEMPTS: "1",
+        STUDENTHUB_LEGACY_VERIFICATION_CIRCUIT_FAILURE_THRESHOLD: "2",
+        STUDENTHUB_LEGACY_VERIFICATION_CIRCUIT_COOLDOWN_MS: "1000",
+      },
+      clock: () => now,
+    });
+    const first = await adapter.verifyLayer2({ url: "https://example.com/circuit-1" });
+    const second = await adapter.verifyLayer2({ url: "https://example.com/circuit-2" });
+    const blocked = await adapter.verifyLayer2({ url: "https://example.com/circuit-3" });
+    assert.equal(first.providerStatus, "UNAVAILABLE");
+    assert.equal(second.providerStatus, "UNAVAILABLE");
+    assert.equal(blocked.providerStatus, "CIRCUIT_OPEN");
+    assert.equal(calls, 2);
+    assert.equal(adapter.describe().resilience.circuitState, "OPEN");
+
+    now = 1000;
+    const recovered = await adapter.verifyLayer2({ url: "https://example.com/circuit-recovery" });
+    assert.equal(recovered.finding, "NO_KNOWN_THREAT");
+    assert.equal(calls, 3);
+    assert.equal(adapter.describe().resilience.circuitState, "CLOSED");
+  });
+
+  it("rejects work above the legacy bulkhead without queueing or fallback", async () => {
+    let calls = 0;
+    let release;
+    const pending = new Promise((resolve) => { release = resolve; });
+    const adapter = adapterWith(async () => {
+      calls += 1;
+      await pending;
+      return responseFor({ verdict: "SAFE", confidence: 0.7, providers: [{ provider: "bounded", success: true, verdict: "SAFE", confidence: 0.7 }] });
+    }, {
+      env: {
+        STUDENTHUB_LEGACY_VERIFICATION_BULKHEAD_MAX_CONCURRENCY: "1",
+        STUDENTHUB_LEGACY_VERIFICATION_MAX_ATTEMPTS: "1",
+      },
+    });
+    const firstPromise = adapter.verifyLayer2({ url: "https://example.com/bulkhead-1" });
+    await Promise.resolve();
+    const second = await adapter.verifyLayer2({ url: "https://example.com/bulkhead-2" });
+    assert.equal(second.providerStatus, "UNAVAILABLE");
+    assert.equal(calls, 1);
+    release();
+    const first = await firstPromise;
+    assert.equal(first.finding, "NO_KNOWN_THREAT");
   });
 
   it("rejects oversized responses before JSON parsing", async () => {
@@ -125,15 +285,17 @@ describe("legacy four-layer anti-corruption adapter", () => {
     assert.equal(result.errorCode, "LEGACY_RESPONSE_TOO_LARGE");
   });
 
-  it("times out a hanging legacy request without retrying or substituting demo data", async () => {
+  it("times out a hanging legacy request after bounded retries without substituting demo data", async () => {
     let calls = 0;
     const adapter = new LegacyVerificationAdapter({
       env: {
         STUDENTHUB_LEGACY_VERIFICATION_BASE_URL: "https://legacy.example.test",
         STUDENTHUB_LEGACY_VERIFICATION_RESOLVE_DNS: "false",
         STUDENTHUB_LEGACY_VERIFICATION_TIMEOUT_MS: "300",
+        STUDENTHUB_LEGACY_VERIFICATION_RETRY_BASE_DELAY_MS: "0",
       },
       resolveDns: false,
+      sleep: async () => {},
       fetchImpl: async (_endpoint, { signal }) => {
         calls += 1;
         return await new Promise((resolve, reject) => {
@@ -145,12 +307,12 @@ describe("legacy four-layer anti-corruption adapter", () => {
         });
       },
     });
-    const result = await adapter.verifyLayer3({ claims, requestId: "legacy-timeout" });
+    const result = await adapter.verifyLayer3({ input: { type: "text", content: "A bounded claim" }, claims, requestId: "legacy-timeout" });
     assert.equal(result.legacyIntegration.providerStatus, "TIMEOUT");
     assert.equal(result.legacyIntegration.status, "UNAVAILABLE");
     assert.equal(result.legacyIntegration.canContinueToLayer4, false);
     assert.equal(result.legacyIntegration.rawVerdict, null);
-    assert.equal(calls, 1);
+    assert.equal(calls, 2);
   });
 
   it("propagates caller cancellation instead of converting it to provider outage", async () => {
@@ -164,7 +326,7 @@ describe("legacy four-layer anti-corruption adapter", () => {
       controller.abort("stale-run");
     }));
     await assert.rejects(
-      adapter.verifyLayer3({ claims, requestId: "legacy-cancelled", signal: controller.signal }),
+      adapter.verifyLayer3({ input: { type: "text", content: "A bounded claim" }, claims, requestId: "legacy-cancelled", signal: controller.signal }),
       (error) => error?.name === "AbortError",
     );
   });
@@ -235,10 +397,10 @@ describe("legacy four-layer anti-corruption adapter", () => {
   it("rejects malformed Layer 3 continuation and maps it to unavailable", async () => {
     const malformed = normalizeLegacyLayer3Payload({ verdict: "TRUE", stop: true, canContinueToLayer4: true }, { claims, requestId: "legacy-l3-malformed" });
     assert.equal(malformed.ok, false);
-    const adapter = adapterWith(async () => responseFor({ verdict: "TRUE", stop: true, canContinueToLayer4: true }));
-    const result = await adapter.verifyLayer3({ claims, requestId: "legacy-l3-malformed-adapter" });
+    const adapter = adapterWith(async () => responseFor({ verdict: "TRUE", confidence: 0.9, stop: true, canContinueToLayer4: true, reason: "Contradictory continuation.", evidence: [], sources: [] }));
+    const result = await adapter.verifyLayer3({ input: { type: "text", content: "A bounded claim" }, claims, requestId: "legacy-l3-malformed-adapter" });
     assert.equal(result.legacyIntegration.status, "UNAVAILABLE");
-    assert.equal(result.legacyIntegration.providerStatus, "INVALID_RESPONSE");
+    assert.equal(result.legacyIntegration.providerStatus, "MALFORMED");
   });
 
   it("normalizes Layer 4 TRUE/FALSE/UNKNOWN, contradictions, and model confidence separately", () => {
@@ -264,7 +426,7 @@ describe("legacy four-layer anti-corruption adapter", () => {
   it("returns explicit NOT_CONFIGURED without a demo fallback", async () => {
     let calls = 0;
     const adapter = new LegacyVerificationAdapter({ env: {}, fetchImpl: async () => { calls += 1; } });
-    const result = await adapter.verifyLayer3({ claims, requestId: "legacy-not-configured" });
+    const result = await adapter.verifyLayer3({ input: { type: "text", content: "A bounded claim" }, claims, requestId: "legacy-not-configured" });
     assert.equal(result.legacyIntegration.status, "UNAVAILABLE");
     assert.equal(result.legacyIntegration.providerStatus, "NOT_CONFIGURED");
     assert.equal(calls, 0);

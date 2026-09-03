@@ -151,7 +151,11 @@ export class Layer4TrustService {
     let assessment = deterministicAssessment;
     try {
       if (narrativeProvider && typeof narrativeProvider.reason === "function") {
-        const candidate = await narrativeProvider.reason(fusedGraph);
+        const candidate = await narrativeProvider.reason(fusedGraph, {
+          requestId: layer1Result?.requestId || layer2Result?.requestId || layer2AResult?.requestId || layer3Result?.requestId,
+          signal: options.signal,
+          budget: options.budget,
+        });
         // Preserve every security/truth/action/confidence field from the
         // deterministic result. Only a bounded narrative may cross this
         // optional boundary.
@@ -161,6 +165,10 @@ export class Layer4TrustService {
           aiNarrativeStatus: candidate?.aiNarrativeStatus || "provider_output_ignored_for_policy",
           aiNarrativeProvider: typeof candidate?.aiNarrativeProvider === "string" ? candidate.aiNarrativeProvider.slice(0, 120) : undefined,
           aiNarrativeModel: typeof candidate?.aiNarrativeModel === "string" ? candidate.aiNarrativeModel.slice(0, 120) : undefined,
+          aiNarrativeUsage: candidate?.aiNarrativeUsage || null,
+          aiNarrativeEstimatedCostCents: Number.isFinite(Number(candidate?.aiNarrativeEstimatedCostCents))
+            ? Math.max(0, Math.min(1_000_000, Math.floor(Number(candidate.aiNarrativeEstimatedCostCents))))
+            : null,
         };
       }
     } catch (err) {

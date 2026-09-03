@@ -12,6 +12,20 @@ export const PASSPORT_STATUS = Object.freeze({
 
 export const PASSPORT_EVENT_TYPE = Object.freeze({
   CREATED: "CREATED",
+  CASE_CREATED: "CASE_CREATED",
+  INPUT_NORMALIZED: "INPUT_NORMALIZED",
+  INVESTIGATION_STARTED: "INVESTIGATION_STARTED",
+  LAYER_STARTED: "LAYER_STARTED",
+  PROVIDER_CALLED: "PROVIDER_CALLED",
+  PROVIDER_FAILED: "PROVIDER_FAILED",
+  PROVIDER_UNAVAILABLE: "PROVIDER_UNAVAILABLE",
+  EVIDENCE_OBSERVED: "EVIDENCE_OBSERVED",
+  CONTRADICTION_FOUND: "CONTRADICTION_FOUND",
+  VERDICT_COMPOSED: "VERDICT_COMPOSED",
+  DECISION_REVISED: "DECISION_REVISED",
+  INVESTIGATION_COMPLETED: "INVESTIGATION_COMPLETED",
+  COMMUNITY_SIGNAL_ADDED: "COMMUNITY_SIGNAL_ADDED",
+  EXPERT_REVIEW_ADDED: "EXPERT_REVIEW_ADDED",
   USER_NOTE: "USER_NOTE",
   TRUST_RESULT: "TRUST_RESULT",
   COMMUNITY_UPDATE: "COMMUNITY_UPDATE",
@@ -39,6 +53,8 @@ const STATUS_CHANGING_EVENTS = new Set([
   PASSPORT_EVENT_TYPE.TRUST_RESULT,
   PASSPORT_EVENT_TYPE.OFFICIAL_UPDATE,
   PASSPORT_EVENT_TYPE.RESULT_CHANGED,
+  PASSPORT_EVENT_TYPE.VERDICT_COMPOSED,
+  PASSPORT_EVENT_TYPE.DECISION_REVISED,
   PASSPORT_EVENT_TYPE.RESOLVED,
 ]);
 
@@ -161,6 +177,38 @@ export function appendEvidenceEvent(passport, rawEvent, options = {}) {
     updatedAt: occurredAt,
     events: [...(passport.events || []), event],
   };
+}
+
+function idempotentEventMatches(existing, rawEvent) {
+  if (!existing || !rawEvent) return false;
+  if (existing.type !== rawEvent.type || existing.provenanceClass !== rawEvent.provenanceClass) return false;
+  const expectedStatus = rawEvent.newStatus || existing.previousStatus || null;
+  if (existing.summary !== rawEvent.summary || (existing.newStatus || null) !== expectedStatus) return false;
+  if ((existing.changeReason || null) !== (rawEvent.changeReason || null)) return false;
+  const existingReferences = (existing.references || []).map((reference) => reference.id).sort();
+  const rawReferences = (rawEvent.references || []).map((reference) => reference.id).sort();
+  return JSON.stringify(existingReferences) === JSON.stringify(rawReferences);
+}
+
+/**
+ * Append an event with idempotent retry semantics. The strict append function
+ * intentionally rejects duplicates; this wrapper is for a retried operation
+ * whose first response may have been lost after the server committed it.
+ */
+export function appendEvidenceEventIdempotent(passport, rawEvent, options = {}) {
+  const operationId = rawEvent?.operationId || rawEvent?.metadata?.operationId || null;
+  const existing = passport?.events?.find((event) => (
+    (rawEvent?.id && event.id === rawEvent.id) ||
+    (operationId && event.metadata?.operationId === operationId)
+  ));
+  if (existing) {
+    if (idempotentEventMatches(existing, rawEvent)) return passport;
+    throw new EvidencePassportValidationError("Idempotency key was reused for a different Passport event.", "IDEMPOTENCY_KEY_REUSED");
+  }
+  const event = operationId
+    ? { ...rawEvent, metadata: { ...(rawEvent.metadata || {}), operationId } }
+    : rawEvent;
+  return appendEvidenceEvent(passport, event, options);
 }
 
 export function passportChangeSummary(passport) {

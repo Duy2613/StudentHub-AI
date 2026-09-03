@@ -7,11 +7,27 @@
  * - Strictly rejects wildcard Access-Control-Allow-Origin on authenticated endpoints
  */
 
-export const TRUSTED_ORIGINS = Object.freeze([
-  "http://localhost:3000",
-  "https://studenthub-ai.vercel.app",
-  "https://studenthub.ai"
-]);
+export const TRUSTED_ORIGINS = Object.freeze(["http://localhost:3000"]);
+
+function configuredAllowedOrigins() {
+  const origins = new Set(TRUSTED_ORIGINS);
+  const values = [
+    typeof process !== "undefined" ? process.env.STUDENTHUB_ALLOWED_ORIGINS : "",
+    typeof process !== "undefined" ? process.env.NEXT_PUBLIC_SITE_URL : "",
+    typeof process !== "undefined" ? process.env.NEXT_PUBLIC_APP_URL : "",
+  ];
+  for (const value of values) {
+    for (const rawOrigin of String(value || "").split(",")) {
+      try {
+        const parsed = new URL(rawOrigin.trim());
+        if (parsed.protocol === "http:" || parsed.protocol === "https:") origins.add(parsed.origin);
+      } catch {
+        // Invalid or empty configuration is never treated as an allowed origin.
+      }
+    }
+  }
+  return origins;
+}
 
 function configuredConnectOrigins() {
   const values = [
@@ -75,12 +91,8 @@ export class SecurityHeaders {
     headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(self)");
 
     // 7. Strict CORS Origin Matching (Never wildcard * for credentials)
-    const configuredOrigins = String(process.env.STUDENTHUB_ALLOWED_ORIGINS || "")
-      .split(",")
-      .map(origin => origin.trim())
-      .filter(Boolean);
-    const isPreviewOrigin = /^https:\/\/studenthub-ai(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(requestOrigin || "");
-    if (requestOrigin && (TRUSTED_ORIGINS.includes(requestOrigin) || configuredOrigins.includes(requestOrigin) || isPreviewOrigin)) {
+    const configuredOrigins = configuredAllowedOrigins();
+    if (requestOrigin && configuredOrigins.has(requestOrigin)) {
       headers.set("Access-Control-Allow-Origin", requestOrigin);
       headers.set("Access-Control-Allow-Credentials", "true");
       headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");

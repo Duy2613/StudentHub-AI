@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { attachProvenanceToEvidence, buildProvenanceBundle, contentFingerprint } from "../provenance/ProvenanceModel.js";
 
 const MAX_EVIDENCE = 240;
 const MAX_NODES = 120;
@@ -65,6 +66,7 @@ function canonicalEvidenceItem(input = {}) {
     },
     provider: safeText(input.provider, 160) || null,
     retrievedAt: typeof input.retrievedAt === "string" ? input.retrievedAt : null,
+    contentFingerprint: contentFingerprint(input.observation || input.claim),
     provenance: {
       origin,
       sourceMode: safeText(input.provenance?.sourceMode, 40) || "LIVE",
@@ -230,17 +232,19 @@ export function buildCanonicalEvidence({ requestId, layers = {}, input = {} } = 
   for (const item of layer2Evidence(layers.layer2A, requestId)) pushEvidence(result, item);
   for (const item of layer3Evidence(layers.layer3)) pushEvidence(result, item);
   for (const item of layer4Evidence(layers.layer4)) pushEvidence(result, item);
-  return result.slice(0, MAX_EVIDENCE).map((item) => ({
+  const bounded = result.slice(0, MAX_EVIDENCE).map((item) => ({
     ...item,
     caseId: safeText(input.caseId, 160) || null,
   }));
+  const provenance = buildProvenanceBundle({ requestId, input, layers, evidence: bounded });
+  return attachProvenanceToEvidence(bounded, provenance);
 }
 
 function nodeLabelForEvidence(item) {
   return item.source.title || item.source.id || item.provider || item.type;
 }
 
-export function buildTrustGraph({ requestId, input = {}, layers = {}, evidence = [] } = {}) {
+export function buildTrustGraph({ requestId, input = {}, layers = {}, evidence = [], provenance = null } = {}) {
   const nodes = [];
   const edges = [];
   const nodeIds = new Set();
@@ -267,6 +271,102 @@ export function buildTrustGraph({ requestId, input = {}, layers = {}, evidence =
     addNode({ id, kind: "CLAIM", label: safeText(claim.rawText || claim.text || claim.claim || claim.statement, 240) || claimId, detail: "Candidate claim extracted by semantic analysis; not yet truth.", origin: "LAYER_1_INTERNAL", rawReference: claimId });
     addEdge(inputId, id, "contains");
   }
+
+  // Provenance entities are first-class graph records. They are derived only
+  // from the normalized provenance bundle; no visual node is created for an
+  // absent source, observation, provider, or decision revision.
+  const sourceDocumentNodes = new Map();
+  for (const document of safeArray(provenance?.sourceDocuments, 240)) {
+    const documentId = safeText(document?.sourceDocumentId, 180);
+    if (!documentId) continue;
+    const nodeId = `source_document:${documentId}`;
+    sourceDocumentNodes.set(documentId, nodeId);
+    addNode({
+      id: nodeId,
+      kind: "SOURCE_DOCUMENT",
+      label: safeText(document.title || document.canonicalUrl || document.url, 240) || documentId,
+      detail: "Canonical source document shared by one or more observations.",
+      origin: "PROVENANCE",
+      sourceDocumentId: documentId,
+      canonicalUrl: safeText(document.canonicalUrl, 4096) || null,
+    });
+  }
+
+  const retrievalRunNodes = new Map();
+  for (const retrievalRun of safeArray(provenance?.retrievalRuns, 240)) {
+    const retrievalRunId = safeText(retrievalRun?.retrievalRunId, 180);
+    if (!retrievalRunId) continue;
+    const nodeId = `retrieval_run:${retrievalRunId}`;
+    retrievalRunNodes.set(retrievalRunId, nodeId);
+    addNode({
+      id: nodeId,
+      kind: "RETRIEVAL_RUN",
+      label: safeText(retrievalRun.capability, 120) || "Retrieval run",
+      detail: `${safeText(retrievalRun.origin, 80) || "UNKNOWN"} · ${safeText(retrievalRun.status, 80) || "UNKNOWN"}`,
+      origin: "PROVENANCE",
+      retrievalRunId,
+    });
+  }
+
+  const providerObservationNodes = new Map();
+  for (const providerObservation of safeArray(provenance?.providerObservations, 120)) {
+    const providerObservationId = safeText(providerObservation?.providerObservationId, 180);
+    if (!providerObservationId) continue;
+    const nodeId = `provider:${providerObservationId}`;
+    providerObservationNodes.set(providerObservationId, nodeId);
+    addNode({
+      id: nodeId,
+      kind: "PROVIDER",
+      label: safeText(providerObservation.providerId, 160) || "Provider",
+      detail: `${safeText(providerObservation.capability, 120) || "UNKNOWN"} · ${safeText(providerObservation.status, 80) || "UNKNOWN"}`,
+      origin: "PROVENANCE",
+      providerObservationId,
+    });
+  }
+
+  for (const observation of safeArray(provenance?.evidenceObservations, 240)) {
+    const observationId = safeText(observation?.observationId, 180);
+    if (!observationId) continue;
+    const nodeId = `observation:${observationId}`;
+    addNode({
+      id: nodeId,
+      kind: "OBSERVATION",
+      label: safeText(observation.content, 240) || safeText(observation.relation, 100) || observationId,
+      detail: `${safeText(observation.origin, 80) || "UNKNOWN"} · ${safeText(observation.providerStatus, 80) || "UNKNOWN"}`,
+      origin: observation.origin,
+      observationId,
+      sourceDocumentId: observation.sourceDocumentId,
+      retrievalRunId: observation.retrievalRunId,
+    });
+    if (observation.sourceDocumentId && sourceDocumentNodes.has(observation.sourceDocumentId)) addEdge(sourceDocumentNodes.get(observation.sourceDocumentId), nodeId, "observed_as");
+    if (observation.retrievalRunId && retrievalRunNodes.has(observation.retrievalRunId)) addEdge(retrievalRunNodes.get(observation.retrievalRunId), nodeId, "retrieved_as");
+    const providerObservationId = safeText(provenance?.providerObservations?.find((item) => item.providerId === observation.providerId && item.origin === observation.origin)?.providerObservationId, 180);
+    if (providerObservationId && providerObservationNodes.has(providerObservationId)) addEdge(providerObservationNodes.get(providerObservationId), nodeId, "reported_by");
+    const claimNodeId = observation.claimId ? `claim:${safeText(observation.claimId, 180)}` : null;
+    if (claimNodeId && nodeIds.has(claimNodeId)) {
+      const relation = safeText(observation.relation, 100).toUpperCase();
+      addEdge(claimNodeId, nodeId, relation.includes("CONTRADICT") ? "contradicted_by" : relation.includes("SUPPORT") ? "supported_by" : "observed_by");
+    }
+  }
+
+  for (const revision of safeArray(provenance?.decisionRevisions, 40)) {
+    const revisionId = safeText(revision?.revisionId, 180);
+    if (!revisionId) continue;
+    const nodeId = `decision_revision:${revisionId}`;
+    addNode({
+      id: nodeId,
+      kind: "DECISION_REVISION",
+      label: safeText(revision.nextDecision, 120) || "Decision revision",
+      detail: safeText(revision.reason, 700) || "Canonical decision revision.",
+      origin: "PROVENANCE",
+      revisionId,
+    });
+    for (const observationId of safeArray(revision.evidenceObservationIds, 40)) {
+      const observationNodeId = `observation:${safeText(observationId, 180)}`;
+      addEdge(observationNodeId, nodeId, "informs");
+    }
+  }
+
   for (const item of safeArray(evidence, MAX_EVIDENCE)) {
     const sourceId = safeText(item.source?.id, 180) || safeText(item.provider, 180) || safeText(item.id, 180);
     if (!sourceId) continue;
@@ -281,8 +381,10 @@ export function buildTrustGraph({ requestId, input = {}, layers = {}, evidence =
     } else {
       addEdge(inputId, id, "reported_by");
     }
+    const observationNodeId = item.observationId ? `observation:${safeText(item.observationId, 180)}` : null;
+    if (observationNodeId && nodeIds.has(observationNodeId)) addEdge(id, observationNodeId, "represents");
   }
-  return { schemaVersion: "trust.graph.v1", nodes, edges, source: "CANONICAL_NORMALIZED_RECORDS" };
+  return { schemaVersion: "trust.graph.v1", nodes, edges, source: "CANONICAL_NORMALIZED_RECORDS", provenanceSchemaVersion: provenance?.schemaVersion || "trust.provenance.v1" };
 }
 
 function passportEvent(id, type, status, references = [], metadata = {}) {
@@ -321,7 +423,8 @@ export function buildPassportProjection({ requestId, pipelineStatus, stages = {}
 
 export function buildCanonicalTrustProjection({ requestId, input, pipeline, layers, finalDecision } = {}) {
   const evidence = buildCanonicalEvidence({ requestId, input, layers });
-  const graph = buildTrustGraph({ requestId, input, layers, evidence });
+  const provenance = buildProvenanceBundle({ requestId, input, layers, evidence, finalDecision });
+  const graph = buildTrustGraph({ requestId, input, layers, evidence, provenance });
   const passport = buildPassportProjection({ requestId, pipelineStatus: pipeline?.pipelineStatus, stages: pipeline?.stages, finalDecision, evidence });
   const layer3 = asRecord(layers?.layer3);
   const layer4 = asRecord(layers?.layer4);
@@ -361,6 +464,7 @@ export function buildCanonicalTrustProjection({ requestId, input, pipeline, laye
     },
     evidence,
     graph,
+    provenance,
     passport,
   };
 }

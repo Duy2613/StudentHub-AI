@@ -513,6 +513,7 @@ export function createInitialPipeline({ requestId, startedAt } = {}) {
       policyVersion: V5_POLICY_VERSION,
       assuranceVersion: V5_AUDIT_VERSION,
       inputFingerprint: null,
+      budget: null,
     },
   };
 }
@@ -553,6 +554,12 @@ export function toPublicPipelineResult(result) {
       hardNegativePropagation: Array.isArray(result.audit?.hardNegativePropagation) ? result.audit.hardNegativePropagation.slice(0, 40).map((item) => publicRecord(item, ["source", "finding", "destination", "expected"])).filter(Boolean) : [],
       policyVersion: publicText(result.audit?.policyVersion, 160) || V5_POLICY_VERSION,
       assuranceVersion: publicText(result.audit?.assuranceVersion, 160) || V5_AUDIT_VERSION,
+      budget: result.audit?.budget && typeof result.audit.budget === "object" ? {
+        limits: publicRecord(result.audit.budget.limits, ["maxElapsedMs", "maxProviderCalls", "maxSearchRequests", "maxResults", "maxEvidenceBytes", "maxAiTokens", "maxRetries", "maxEstimatedCostCents"]),
+        usage: publicRecord(result.audit.budget.usage, ["providerCalls", "searchRequests", "results", "evidenceBytes", "aiTokens", "retries", "estimatedCostCents", "aiCalls", "legacyCalls", "googleThreatCalls", "tavilyCalls"]),
+        elapsedMs: Number.isFinite(result.audit.budget.elapsedMs) ? Math.max(0, Math.round(result.audit.budget.elapsedMs)) : 0,
+        blockedBy: publicText(result.audit.budget.blockedBy, 120) || null,
+      } : null,
     },
   };
 }

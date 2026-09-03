@@ -13,6 +13,7 @@ import {
   createLayer2AResult,
   LAYER_2A_FINDING,
   LAYER_2A_PROVIDER_STATUS,
+  redactProviderText,
 } from "./types.js";
 
 const ALLOWED_VERDICTS = new Set(["SAFE", "DANGEROUS", "UNKNOWN"]);
@@ -30,6 +31,10 @@ function validConfidence(value) {
   return value === undefined || value === null || (
     typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 1
   );
+}
+
+function providerText(value, maxLength) {
+  return redactProviderText(value, maxLength);
 }
 
 function extractThreatTypes(...values) {
@@ -61,7 +66,7 @@ function normalizeProviderEntry(entry) {
 
   const message = entry.message === undefined || entry.message === null
     ? null
-    : boundedText(entry.message, 500);
+    : providerText(entry.message, 500);
   if (entry.message !== undefined && entry.message !== null && message === null) {
     return { ok: false, code: "PROVIDER_CONTRACT_VIOLATION" };
   }
@@ -100,7 +105,7 @@ export function normalizeLayer2AProviderPayload(payload) {
   const topVerdict = typeof payload.verdict === "string" ? payload.verdict.trim().toUpperCase() : null;
   const topReason = payload.reason === undefined || payload.reason === null
     ? null
-    : boundedText(payload.reason, 500);
+    : providerText(payload.reason, 500);
   if (!ALLOWED_VERDICTS.has(topVerdict) || topReason === null && payload.reason !== undefined && payload.reason !== null) {
     return { ok: false, code: "PROVIDER_CONTRACT_VIOLATION" };
   }
@@ -353,6 +358,7 @@ export class RenderLayer2AProvider {
     if (error?.name === "AbortError") return LAYER_2A_PROVIDER_STATUS.TIMEOUT;
     if (error instanceof ProviderHttpError) {
       if (error.status === 429) return LAYER_2A_PROVIDER_STATUS.RATE_LIMITED;
+      if ([401, 403].includes(error.status)) return LAYER_2A_PROVIDER_STATUS.AUTH_FAILED;
       if (error.status >= 500) return LAYER_2A_PROVIDER_STATUS.UNAVAILABLE;
       return LAYER_2A_PROVIDER_STATUS.ERROR;
     }

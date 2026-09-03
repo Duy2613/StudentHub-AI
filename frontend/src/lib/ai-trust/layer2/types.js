@@ -146,6 +146,24 @@ function safeArray(value, maxLength) {
   return Array.isArray(value) ? value.slice(0, maxLength) : [];
 }
 
+function normalizeGatewayUsage(value) {
+  const source = safeRecord(value);
+  const boundedCount = (item) => {
+    const number = Number(item);
+    return Number.isFinite(number) && number >= 0 ? Math.min(1_000_000, Math.floor(number)) : null;
+  };
+  const inputTokens = boundedCount(source.inputTokens);
+  const outputTokens = boundedCount(source.outputTokens);
+  const totalTokens = boundedCount(source.totalTokens);
+  if (inputTokens === null && outputTokens === null && totalTokens === null) return null;
+  return {
+    inputTokens: inputTokens ?? 0,
+    outputTokens: outputTokens ?? 0,
+    totalTokens: totalTokens ?? Math.min(1_000_000, (inputTokens ?? 0) + (outputTokens ?? 0)),
+    source: ["provider", "estimated", "mixed"].includes(source.source) ? source.source : "estimated",
+  };
+}
+
 function safeEvidenceRecord(value) {
   const source = safeRecord(value);
   const output = {};
@@ -409,6 +427,10 @@ export function createLayer2Result(params = {}) {
       errorType: boundedText(attempt.errorType, 80),
     };
   }).filter(Boolean);
+  const safeGatewayUsage = normalizeGatewayUsage(safeDetails.gatewayUsage);
+  const safeGatewayEstimatedCostCents = Number.isFinite(Number(safeDetails.gatewayEstimatedCostCents))
+    ? Math.max(0, Math.min(1_000_000, Math.floor(Number(safeDetails.gatewayEstimatedCostCents))))
+    : null;
   const safeManipulationResult = safeDetails.manipulationResult && typeof safeDetails.manipulationResult === "object" && !Array.isArray(safeDetails.manipulationResult)
     ? {
       urgencyScore: boundedUnit(safeDetails.manipulationResult.urgencyScore, 0),
@@ -472,6 +494,8 @@ export function createLayer2Result(params = {}) {
       modelUsed: safeModelUsed,
       fallbackReason: safeFallbackReason,
       gatewayAttempts: safeGatewayAttempts,
+      gatewayUsage: safeGatewayUsage,
+      gatewayEstimatedCostCents: safeGatewayEstimatedCostCents,
       promptInjectionDetected: safeDetails.promptInjectionDetected === true,
       candidateClassification: safeCandidateClassification,
       confidenceKind: safeConfidenceKind,

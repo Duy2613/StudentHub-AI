@@ -49,6 +49,24 @@ function isPlainObject(value) {
   return prototype === Object.prototype || prototype === null;
 }
 
+function normalizeGatewayUsage(value) {
+  if (!isPlainObject(value)) return null;
+  const boundedCount = (item) => {
+    const number = Number(item);
+    return Number.isFinite(number) && number >= 0 ? Math.min(1_000_000, Math.floor(number)) : null;
+  };
+  const inputTokens = boundedCount(value.inputTokens);
+  const outputTokens = boundedCount(value.outputTokens);
+  const totalTokens = boundedCount(value.totalTokens);
+  if (inputTokens === null && outputTokens === null && totalTokens === null) return null;
+  return {
+    inputTokens: inputTokens ?? 0,
+    outputTokens: outputTokens ?? 0,
+    totalTokens: totalTokens ?? Math.min(1_000_000, (inputTokens ?? 0) + (outputTokens ?? 0)),
+    source: ["provider", "estimated", "mixed"].includes(value.source) ? value.source : "estimated",
+  };
+}
+
 export function boundedString(value, maxLength, fallback = "") {
   if (typeof value !== "string") return fallback;
   return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "").slice(0, maxLength);
@@ -245,6 +263,10 @@ export function normalizeSemanticAnalysis(value, { source = "provider" } = {}) {
         ok: attempt.ok === true,
         errorType: boundedString(attempt.errorType, 80),
       } : null).filter(Boolean),
+    gatewayUsage: normalizeGatewayUsage(value.gatewayUsage),
+    gatewayEstimatedCostCents: Number.isFinite(Number(value.gatewayEstimatedCostCents))
+      ? Math.max(0, Math.min(1_000_000, Math.floor(Number(value.gatewayEstimatedCostCents))))
+      : null,
     providerId: boundedString(value.providerId, 120) || source,
     modelUsed: boundedString(value.modelUsed, 120) || null,
     modelProvider: boundedString(value.modelProvider, 120) || null,

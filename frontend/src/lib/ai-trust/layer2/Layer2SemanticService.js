@@ -113,7 +113,7 @@ export class Layer2SemanticService {
       ocrText: boundedString(metadata.ocrText, SEMANTIC_BOUNDARY_LIMITS.OCR),
       qrPayload: boundedString(metadata.qrContent || metadata.qrPayload, SEMANTIC_BOUNDARY_LIMITS.QR),
       layer1Result,
-      options: { requestId, signal: options.signal },
+      options: { requestId, signal: options.signal, budget: options.budget },
     };
 
     let provider = options.provider;
@@ -208,6 +208,8 @@ export class Layer2SemanticService {
         candidateClassification: semanticAnalysis.candidateClassification || null,
         confidenceKind: semanticAnalysis.confidenceKind || "semantic_candidate_only",
         confidenceSource: semanticAnalysis.confidenceSource || semanticAnalysis.providerId,
+        gatewayUsage: semanticAnalysis.gatewayUsage || null,
+        gatewayEstimatedCostCents: semanticAnalysis.gatewayEstimatedCostCents ?? null,
         providerIndependent: semanticAnalysis.providerIndependent !== false,
         aiCannotOverrideSecurity: true,
         inputTrust: "UNTRUSTED_CONTENT_ISOLATED",

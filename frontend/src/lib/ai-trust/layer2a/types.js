@@ -23,6 +23,7 @@ export const LAYER_2A_PROVIDER_STATUS = {
   SUCCESS: "SUCCESS",
   TIMEOUT: "TIMEOUT",
   RATE_LIMITED: "RATE_LIMITED",
+  AUTH_FAILED: "AUTH_FAILED",
   NOT_CONFIGURED: "NOT_CONFIGURED",
   UNAVAILABLE: "UNAVAILABLE",
   INVALID_RESPONSE: "INVALID_RESPONSE",
@@ -42,6 +43,22 @@ export const LAYER_2A_FINDING = {
 
 function boundedString(value, maxLength) {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+/**
+ * Provider prose is untrusted data. Keep diagnostics useful while ensuring
+ * credentials accidentally echoed by an upstream service cannot cross the
+ * Layer 2A DTO boundary.
+ */
+export function redactProviderText(value, maxLength) {
+  if (typeof value !== "string" || value.length > maxLength) return null;
+  return value
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .trim()
+    .replace(/(api[_-]?key|password|secret|token|authorization|bearer|connection(?:string)?|postgres(?:ql)?)[\s:=]+[^\s,;]+/gi, "$1=[REDACTED]")
+    .replace(/\b(?:sk|gsk|key|tok)_[A-Za-z0-9_-]{12,}\b/g, "[REDACTED]")
+    .slice(0, maxLength)
+    .trim() || null;
 }
 
 function optionalProviderConfidence(value) {
@@ -96,12 +113,12 @@ function normalizeProviderResult(value) {
     : "UNKNOWN";
   const message = value.message === undefined || value.message === null
     ? null
-    : boundedString(value.message, 500) || null;
+    : redactProviderText(value.message, 500);
   const threatTypes = Array.from(new Set(
-    (Array.isArray(value.threatTypes) ? value.threatTypes : [])
-      .filter((item) => typeof item === "string")
-      .map((item) => item.trim().toUpperCase().slice(0, 80))
-      .filter(Boolean)
+      (Array.isArray(value.threatTypes) ? value.threatTypes : [])
+        .filter((item) => typeof item === "string")
+        .map((item) => redactProviderText(item, 80)?.toUpperCase() || "")
+        .filter(Boolean)
   )).slice(0, 20);
   return {
     provider,
@@ -158,7 +175,7 @@ export function createLayer2AResult(input = {}) {
     threatTypes: Array.from(new Set(
       (Array.isArray(threatTypes) ? threatTypes : [])
         .filter((item) => typeof item === "string")
-        .map((item) => item.trim().toUpperCase().slice(0, 80))
+        .map((item) => redactProviderText(item, 80)?.toUpperCase() || "")
         .filter(Boolean)
     )).slice(0, 20),
     rawVerdict: typeof rawVerdict === "string" ? rawVerdict.trim().toUpperCase().slice(0, 40) : null,
@@ -176,7 +193,7 @@ export function createLayer2AResult(input = {}) {
     providerResults: Array.isArray(providerResults)
       ? providerResults.slice(0, 20).map(normalizeProviderResult).filter(Boolean)
       : [],
-    message: boundedString(message, 500) || null,
+    message: redactProviderText(message, 500),
     errorCode: boundedString(errorCode, 120) || null,
     contractViolation: boundedString(contractViolation, 120) || null,
     notApplicable: Boolean(notApplicable),

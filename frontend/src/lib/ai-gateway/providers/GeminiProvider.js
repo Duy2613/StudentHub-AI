@@ -9,7 +9,7 @@
  */
 
 import { IModelProvider } from "./IModelProvider.js";
-import { PROVIDER_FAMILY, GATEWAY_ERROR_TYPE } from "../types.js";
+import { PROVIDER_FAMILY, GATEWAY_ERROR_TYPE, normalizeModelUsage } from "../types.js";
 
 const GEMINI_ENDPOINT_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 const MAX_PROVIDER_RESPONSE_BYTES = 2 * 1024 * 1024;
@@ -112,7 +112,7 @@ export class GeminiProvider extends IModelProvider {
         throw err;
       }
 
-      return { text };
+      return { text, usage: normalizeModelUsage(json?.usageMetadata) };
     } catch (err) {
       if (signal?.aborted) throw createAbortError(signal.reason);
       if (err.name === "AbortError") {

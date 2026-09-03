@@ -1,11 +1,11 @@
 # API Authorization Inventory
 
-Generated from source by `npm run audit:api-auth` on 2026-09-01T13:52:27.319Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
+Generated from source by `npm run audit:api-auth` on 2026-09-02T10:52:31.409Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
 
-- Route files: 110
-- HTTP handlers: 137
+- Route files: 112
+- HTTP handlers: 139
 - Authentication required by Security Fabric: 70
-- Explicit anonymous access: 61
+- Explicit anonymous access: 63
 - No visible Security Fabric wrapper: 6
 - Unprotected mutations requiring P0 review: 0
 
@@ -58,6 +58,8 @@ Generated from source by `npm run audit:api-auth` on 2026-09-01T13:52:27.319Z. T
 | /api/forum/posts | PATCH | AUTHENTICATED | required | INTERACT_WITH_COMMUNITY_POST | COMMUNITY.POST | authenticated principal | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/forum/posts | POST | AUTHENTICATED | required | CREATE_COMMUNITY_POST | COMMUNITY.POST | authenticated principal | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/forum/vote | POST | AUTHENTICATED | required | VOTE_ON_COMMUNITY_POST | COMMUNITY.POST | authenticated principal | default/configured | 16 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/health/live | GET | PUBLIC | anonymous allowed | HEALTH_LIVE | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/health/ready | GET | PUBLIC | anonymous allowed | HEALTH_READY | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/claims/[claimId] | GET | PUBLIC | anonymous allowed | READ_CLAIM_DETAIL | TRUST.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | contract conflict |
 | /api/intelligence/community/consensus | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_CONSENSUS | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/community/evaluate | POST | PUBLIC | anonymous allowed | ANALYZE_COMMUNITY_POSTS | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |

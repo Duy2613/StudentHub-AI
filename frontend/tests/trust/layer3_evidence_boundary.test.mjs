@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { Layer3EvidenceService } from "../../src/lib/ai-trust/layer3/Layer3EvidenceService.js";
 import { markNetworkGuardedRetriever } from "../../src/lib/ai-trust/layer3/retrieval/NetworkGuard.js";
+import { createInvestigationBudget } from "../../src/lib/ai-trust/v5/investigationBudget.js";
 
 const TEST_URL = process.env.TRUST_ENGINE_TEST_TARGET || "https://example.invalid/resource";
 
@@ -151,5 +152,21 @@ describe("Layer 3 evidence and provenance boundary", () => {
     assert.equal(result.status, "INSUFFICIENT_EVIDENCE");
     assert.equal(result.claimStatuses["fixture-claim-1"], "OUTDATED_EVIDENCE");
     assert.equal(result.externalEvidence, true);
+  });
+
+  it("records bounded search, result, and evidence-byte usage", async () => {
+    const budget = createInvestigationBudget({
+      limits: { maxSearchRequests: 1, maxResults: 1, maxEvidenceBytes: 10_000 },
+    });
+    const result = await Layer3EvidenceService.verify({
+      claims: [claim()],
+      options: { retriever: sourceFixture(), budget },
+    });
+
+    const usage = budget.snapshot().usage;
+    assert.equal(result.status, "VERIFIED");
+    assert.equal(usage.searchRequests, 1);
+    assert.equal(usage.results, 1);
+    assert.ok(usage.evidenceBytes > 0);
   });
 });

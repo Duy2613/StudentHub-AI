@@ -14,7 +14,7 @@ test.describe("Trust flagship flow", () => {
     await expect(page.getByText("Google Safe Browsing")).toBeVisible();
     await expect(page.getByText("VirusTotal")).toBeVisible();
     await expect(page.getByText("Không đủ dữ liệu để kết luận sạch.")).toBeVisible();
-    await expect(page.getByText("Giả mạo phòng đào tạo")).toBeVisible();
+    await expect(page.locator(".related-case-list").getByText("Giả mạo phòng đào tạo", { exact: true })).toBeVisible();
     await expect(page.getByText("91% tương đồng")).toBeVisible();
   });
 

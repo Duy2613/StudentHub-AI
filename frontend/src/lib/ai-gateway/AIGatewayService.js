@@ -48,6 +48,7 @@ export class AIGatewayService {
       timeoutMs: options.timeoutMs,
       maxOutputTokens: options.maxOutputTokens,
       signal: options.signal,
+      budget: options.budget,
     });
 
     const totalLatencyMs = Date.now() - startedAt;
@@ -61,6 +62,8 @@ export class AIGatewayService {
         errorMessage: routed.errorMessage,
         requestId: options.requestId,
         totalLatencyMs,
+        usage: routed.usage,
+        estimatedCostCents: routed.estimatedCostCents,
       });
     }
 
@@ -73,6 +76,8 @@ export class AIGatewayService {
       attempts: routed.attempts,
       requestId: options.requestId,
       totalLatencyMs,
+      usage: routed.usage,
+      estimatedCostCents: routed.estimatedCostCents,
     });
   }
 
@@ -107,6 +112,7 @@ export class AIGatewayService {
       timeoutMs: options.timeoutMs,
       maxOutputTokens: options.maxOutputTokens,
       signal: options.signal,
+      budget: options.budget,
       parseResponse: (text) => JSON.parse(text),
       validateResponse: validate,
     });
@@ -122,6 +128,8 @@ export class AIGatewayService {
         errorMessage: routed.errorMessage,
         requestId: options.requestId,
         totalLatencyMs,
+        usage: routed.usage,
+        estimatedCostCents: routed.estimatedCostCents,
       });
     }
 
@@ -135,6 +143,8 @@ export class AIGatewayService {
       attempts: routed.attempts,
       requestId: options.requestId,
       totalLatencyMs,
+      usage: routed.usage,
+      estimatedCostCents: routed.estimatedCostCents,
     });
   }
 

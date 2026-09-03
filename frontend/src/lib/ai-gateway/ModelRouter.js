@@ -14,7 +14,16 @@
  */
 
 import { AI_GATEWAY_CONFIG } from "./config/AIGatewayConfig.js";
-import { PROVIDER_FAMILY, GATEWAY_ERROR_TYPE, createAttemptRecord, sanitizeGatewayError } from "./types.js";
+import {
+  PROVIDER_FAMILY,
+  GATEWAY_ERROR_TYPE,
+  createAttemptRecord,
+  estimateModelUsage,
+  estimatedCostCentsFor,
+  mergeModelUsage,
+  normalizeModelUsage,
+  sanitizeGatewayError,
+} from "./types.js";
 import { OpenAICompatibleProvider } from "./providers/OpenAICompatibleProvider.js";
 import { GeminiProvider } from "./providers/GeminiProvider.js";
 
@@ -22,6 +31,22 @@ const PROVIDER_INSTANCES = {
   [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: new OpenAICompatibleProvider(),
   [PROVIDER_FAMILY.GEMINI]: new GeminiProvider(),
 };
+
+function consumeBudget(budget, operations) {
+  if (!budget) return { allowed: true, code: null };
+  if (typeof budget.tryConsumeMany === "function") return budget.tryConsumeMany(operations);
+  if (typeof budget.tryConsume !== "function") return { allowed: true, code: null };
+  for (const operation of operations) {
+    const result = budget.tryConsume(operation.kind, operation.amount);
+    if (!result?.allowed) return result;
+  }
+  return { allowed: true, code: null };
+}
+
+function recordBudgetUsage(budget, kind, amount = 1) {
+  if (typeof budget?.recordUsage !== "function") return;
+  budget.recordUsage(kind, amount);
+}
 
 export class ModelRouter {
   /**
@@ -70,6 +95,7 @@ export class ModelRouter {
    * @param {boolean} [params.jsonMode]
    * @param {number} [params.timeoutMs]
    * @param {number} [params.maxOutputTokens]
+   * @param {object} [params.budget] - request-scoped investigation budget
    * @param {(text: string) => unknown} [params.parseResponse] - optional structured parser
    * @param {(value: unknown) => boolean} [params.validateResponse] - optional structured validator
    * @returns {Promise<{ ok: boolean, provider?: string, model?: string, text?: string, attempts: object[], errorType?: string, errorMessage?: string }>}
@@ -82,6 +108,7 @@ export class ModelRouter {
     timeoutMs = AI_GATEWAY_CONFIG.SLA.DEFAULT_TIMEOUT_MS,
     maxOutputTokens = AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS,
     signal,
+    budget = null,
     parseResponse = null,
     validateResponse = null,
   }) {
@@ -100,6 +127,8 @@ export class ModelRouter {
     const boundedOutputTokens = Number.isFinite(requestedOutputTokens)
       ? Math.min(Math.max(Math.floor(requestedOutputTokens), 1), AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS)
       : AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS;
+    let aggregateUsage = null;
+    let aggregateEstimatedCostCents = 0;
 
     if (chain.length === 0) {
       return {
@@ -111,6 +140,7 @@ export class ModelRouter {
     }
 
     let lastError = null;
+    let budgetBlocked = false;
 
     for (const entryId of chain) {
       if (signal?.aborted) {
@@ -159,8 +189,51 @@ export class ModelRouter {
           throw error;
         }
         const startedAt = Date.now();
+        const admissionUsage = estimateModelUsage({
+          systemPrompt: boundedSystemPrompt,
+          userPrompt: boundedUserPrompt,
+          maxOutputTokens: boundedOutputTokens,
+        });
+        const admissionCost = estimatedCostCentsFor({ costClass: catalogEntry.costClass, usage: admissionUsage });
+        const budgetResult = consumeBudget(budget, [
+          { kind: "aiTokens", amount: admissionUsage.totalTokens },
+          { kind: "estimatedCostCents", amount: admissionCost },
+          ...(attemptIndex > 0 ? [{ kind: "retries", amount: 1 }] : []),
+        ]);
+        if (budgetResult && budgetResult.allowed === false) {
+          const errorType = GATEWAY_ERROR_TYPE.BUDGET_EXCEEDED;
+          const errorMessage = "The investigation budget refused another AI provider call";
+          lastError = { errorType, errorMessage };
+          attempts.push(createAttemptRecord({
+            provider: catalogEntry.provider,
+            model: catalogEntry.model,
+            ok: false,
+            errorType,
+            errorMessage,
+            latencyMs: 0,
+          }));
+          budgetBlocked = true;
+          break;
+        }
+        recordBudgetUsage(budget, "aiCalls");
+        let providerUsage = null;
+        const recordProviderAttempt = ({ ok, errorType = null, errorMessage = null, latencyMs = 0 }) => {
+          const usage = normalizeModelUsage(providerUsage) || admissionUsage;
+          aggregateUsage = mergeModelUsage(aggregateUsage, usage);
+          aggregateEstimatedCostCents += admissionCost;
+          attempts.push(createAttemptRecord({
+            provider: catalogEntry.provider,
+            model: catalogEntry.model,
+            ok,
+            errorType,
+            errorMessage,
+            latencyMs,
+            usage,
+            estimatedCostCents: admissionCost,
+          }));
+        };
         try {
-          const { text } = await provider.generate({
+          const generated = await provider.generate({
             catalogEntry,
             systemPrompt: boundedSystemPrompt,
             userPrompt: boundedUserPrompt,
@@ -169,6 +242,8 @@ export class ModelRouter {
             maxOutputTokens: boundedOutputTokens,
             signal,
           });
+          const text = generated?.text;
+          providerUsage = normalizeModelUsage(generated?.usage);
 
           let parsedResponse;
           if (typeof parseResponse === "function") {
@@ -178,16 +253,7 @@ export class ModelRouter {
               const errorType = GATEWAY_ERROR_TYPE.INVALID_JSON;
               const errorMessage = "Model output was not valid JSON";
               lastError = { errorType, errorMessage };
-              attempts.push(
-                createAttemptRecord({
-                  provider: catalogEntry.provider,
-                  model: catalogEntry.model,
-                  ok: false,
-                  errorType,
-                  errorMessage,
-                  latencyMs: Date.now() - startedAt,
-                })
-              );
+              recordProviderAttempt({ ok: false, errorType, errorMessage, latencyMs: Date.now() - startedAt });
               // Parsing is deterministic for this response. Do not retry the
               // same candidate; continue with the next configured model.
               break;
@@ -205,30 +271,14 @@ export class ModelRouter {
               const errorType = GATEWAY_ERROR_TYPE.SCHEMA_VALIDATION_FAILED;
               const errorMessage = "Model output failed schema validation";
               lastError = { errorType, errorMessage };
-              attempts.push(
-                createAttemptRecord({
-                  provider: catalogEntry.provider,
-                  model: catalogEntry.model,
-                  ok: false,
-                  errorType,
-                  errorMessage,
-                  latencyMs: Date.now() - startedAt,
-                })
-              );
+              recordProviderAttempt({ ok: false, errorType, errorMessage, latencyMs: Date.now() - startedAt });
               // Schema validation is deterministic for this response. Do not
               // retry the same candidate; continue with the next configured model.
               break;
             }
           }
 
-          attempts.push(
-            createAttemptRecord({
-              provider: catalogEntry.provider,
-              model: catalogEntry.model,
-              ok: true,
-              latencyMs: Date.now() - startedAt,
-            })
-          );
+          recordProviderAttempt({ ok: true, latencyMs: Date.now() - startedAt });
 
           return {
             ok: true,
@@ -237,6 +287,8 @@ export class ModelRouter {
             text: String(text ?? ""),
             ...(typeof parseResponse === "function" ? { json: parsedResponse } : {}),
             attempts,
+            usage: aggregateUsage,
+            estimatedCostCents: aggregateEstimatedCostCents,
           };
         } catch (err) {
           if (signal?.aborted) throw err;
@@ -244,16 +296,7 @@ export class ModelRouter {
           const errorType = err.gatewayErrorType || GATEWAY_ERROR_TYPE.NETWORK_ERROR;
           lastError = { errorType, errorMessage: sanitizeGatewayError(errorType, err.message) };
 
-          attempts.push(
-            createAttemptRecord({
-              provider: catalogEntry.provider,
-              model: catalogEntry.model,
-              ok: false,
-              errorType,
-              errorMessage: err.message,
-              latencyMs,
-            })
-          );
+          recordProviderAttempt({ ok: false, errorType, errorMessage: err.message, latencyMs });
 
           const isRetryable =
             errorType === GATEWAY_ERROR_TYPE.TIMEOUT ||
@@ -264,6 +307,7 @@ export class ModelRouter {
           }
         }
       }
+      if (budgetBlocked) break;
     }
 
     return {
@@ -274,6 +318,8 @@ export class ModelRouter {
         lastError?.errorType || GATEWAY_ERROR_TYPE.NOT_CONFIGURED,
         lastError?.errorMessage
       ),
+      usage: aggregateUsage,
+      estimatedCostCents: aggregateEstimatedCostCents,
     };
   }
 }

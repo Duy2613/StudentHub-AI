@@ -25,11 +25,12 @@
 
 import { ITrustReasoningModel } from "./ITrustReasoningModel.js";
 import { DeterministicTrustPolicyProvider } from "./DeterministicTrustPolicyProvider.js";
-import { AIGatewayService, AI_CAPABILITY } from "../../../ai-gateway/index.js";
+import { AIGatewayService, AI_CAPABILITY, validateEvidenceReferences } from "../../../ai-gateway/index.js";
 
 function isValidNarrativeShape(json) {
   return Boolean(json && typeof json === "object" && !Array.isArray(json) &&
-    typeof json.why === "string" && json.why.trim().length > 0 && json.why.length <= 1200);
+    typeof json.why === "string" && json.why.trim().length > 0 && json.why.length <= 1200 &&
+    validateEvidenceReferences(json, { knownEvidenceIds: [], knownSourceIds: [] }).ok);
 }
 
 function boundedJson(value, maxLength = 16_000) {
@@ -47,7 +48,7 @@ export class AIGatewayReasoningProvider extends ITrustReasoningModel {
     this.deterministicProvider = new DeterministicTrustPolicyProvider();
   }
 
-  async reason(fusedGraph = {}) {
+  async reason(fusedGraph = {}, options = {}) {
     // 1. Authoritative deterministic verdict — never bypassed.
     const deterministic = await this.deterministicProvider.reason(fusedGraph);
 
@@ -100,6 +101,11 @@ export class AIGatewayReasoningProvider extends ITrustReasoningModel {
       systemPrompt,
       userPrompt,
       validate: isValidNarrativeShape,
+      options: {
+        requestId: options.requestId,
+        signal: options.signal,
+        budget: options.budget,
+      },
     });
 
     if (!enrichment.ok) {
@@ -119,6 +125,8 @@ export class AIGatewayReasoningProvider extends ITrustReasoningModel {
       aiNarrativeStatus: "ai_gateway_enriched",
       aiNarrativeProvider: enrichment.provider,
       aiNarrativeModel: enrichment.model,
+      aiNarrativeUsage: enrichment.usage,
+      aiNarrativeEstimatedCostCents: enrichment.estimatedCostCents,
     };
   }
 }

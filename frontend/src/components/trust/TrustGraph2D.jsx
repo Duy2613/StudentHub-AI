@@ -7,6 +7,11 @@ const nodeTone = {
   INPUT: "var(--accent-primary)",
   CLAIM: "var(--ai)",
   SOURCE: "var(--info)",
+  SOURCE_DOCUMENT: "var(--info)",
+  OBSERVATION: "var(--ai)",
+  PROVIDER: "var(--warning)",
+  RETRIEVAL_RUN: "var(--text-muted)",
+  DECISION_REVISION: "var(--warning)",
   COMMUNITY: "var(--community)",
   EXPERT: "var(--expert)",
   PASSPORT: "var(--warning)",
@@ -23,6 +28,10 @@ const relationshipLabel = {
   reported_by: "được báo cáo bởi",
   reviewed_by: "được rà soát bởi",
   related_case: "case liên quan",
+  observed_as: "là tài liệu nguồn của",
+  retrieved_as: "được thu thập trong",
+  represents: "đại diện cho",
+  informs: "đóng góp vào",
 };
 
 export default function TrustGraph2D({ graph }) {
@@ -64,7 +73,7 @@ export default function TrustGraph2D({ graph }) {
       <div className="graph-toolbar">
         <label className="graph-search"><Search size={15} /><span className="sr-only">Tìm node</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm claim hoặc nguồn" /></label>
         <div className="flex gap-2 overflow-x-auto">
-          {["ALL", "INPUT", "CLAIM", "SOURCE", "CASE", "COMMUNITY", "EXPERT", "PASSPORT"].map((item) => <button type="button" key={item} aria-pressed={kind === item} onClick={() => setKind(item)} className={`filter-chip ${kind === item ? "is-active" : ""}`}>{item === "ALL" ? "Tất cả" : item}</button>)}
+          {["ALL", "INPUT", "CLAIM", "SOURCE", "SOURCE_DOCUMENT", "OBSERVATION", "PROVIDER", "RETRIEVAL_RUN", "DECISION_REVISION", "CASE", "COMMUNITY", "EXPERT", "PASSPORT"].map((item) => <button type="button" key={item} aria-pressed={kind === item} onClick={() => setKind(item)} className={`filter-chip ${kind === item ? "is-active" : ""}`}>{item === "ALL" ? "Tất cả" : item}</button>)}
         </div>
       </div>
       <div className="graph-legend" aria-label="Chú giải loại node">{visibleKinds.map((item) => <span key={item}><i style={{ "--node-color": nodeTone[item] || "var(--text-muted)" }} />{item}</span>)}</div>

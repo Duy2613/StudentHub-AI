@@ -53,7 +53,79 @@ export const GATEWAY_ERROR_TYPE = {
   INVALID_JSON: "INVALID_JSON",       // structured output could not be parsed
   SCHEMA_VALIDATION_FAILED: "SCHEMA_VALIDATION_FAILED", // parsed JSON failed the caller schema
   EMPTY_RESPONSE: "EMPTY_RESPONSE",   // provider returned no usable content
+  BUDGET_EXCEEDED: "BUDGET_EXCEEDED", // request-scoped investigation budget refused a call
 };
+
+const MAX_SAFE_MODEL_TOKENS = 1_000_000;
+const COST_CLASS_MULTIPLIER = Object.freeze({ LOW: 1, MEDIUM: 3, HIGH: 8 });
+
+function boundedTokenCount(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0
+    ? Math.min(MAX_SAFE_MODEL_TOKENS, Math.floor(number))
+    : null;
+}
+
+/**
+ * Normalizes vendor-specific usage metadata without allowing prompts,
+ * responses, headers, or provider request bodies to cross the gateway.
+ */
+export function normalizeModelUsage(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const inputTokens = boundedTokenCount(value.inputTokens ?? value.input_tokens ?? value.prompt_tokens);
+  const outputTokens = boundedTokenCount(value.outputTokens ?? value.output_tokens ?? value.completion_tokens);
+  const totalTokens = boundedTokenCount(value.totalTokens ?? value.total_tokens);
+  if (inputTokens === null && outputTokens === null && totalTokens === null) return null;
+  const safeInput = inputTokens ?? 0;
+  const safeOutput = outputTokens ?? 0;
+  const safeTotal = totalTokens ?? Math.min(MAX_SAFE_MODEL_TOKENS, safeInput + safeOutput);
+  return {
+    inputTokens: safeInput,
+    outputTokens: safeOutput,
+    totalTokens: safeTotal,
+    source: ["estimated", "mixed"].includes(value.source) ? value.source : "provider",
+  };
+}
+
+/**
+ * Conservative token estimate used for budget admission when a provider does
+ * not return usage metadata. It is intentionally approximate and never a
+ * billing claim.
+ */
+export function estimateModelUsage({ systemPrompt = "", userPrompt = "", text = "", maxOutputTokens = 0 } = {}) {
+  const inputCharacters = String(systemPrompt || "").length + String(userPrompt || "").length;
+  const outputCharacters = String(text || "").length;
+  const inputTokens = Math.min(MAX_SAFE_MODEL_TOKENS, Math.ceil(inputCharacters / 4));
+  const outputTokens = outputCharacters > 0
+    ? Math.min(MAX_SAFE_MODEL_TOKENS, Math.ceil(outputCharacters / 4))
+    : Math.min(MAX_SAFE_MODEL_TOKENS, Math.max(0, Math.floor(Number(maxOutputTokens) || 0)));
+  return {
+    inputTokens,
+    outputTokens,
+    totalTokens: Math.min(MAX_SAFE_MODEL_TOKENS, inputTokens + outputTokens),
+    source: "estimated",
+  };
+}
+
+export function mergeModelUsage(left, right) {
+  const first = normalizeModelUsage(left);
+  const second = normalizeModelUsage(right);
+  if (!first) return second;
+  if (!second) return first;
+  return {
+    inputTokens: Math.min(MAX_SAFE_MODEL_TOKENS, first.inputTokens + second.inputTokens),
+    outputTokens: Math.min(MAX_SAFE_MODEL_TOKENS, first.outputTokens + second.outputTokens),
+    totalTokens: Math.min(MAX_SAFE_MODEL_TOKENS, first.totalTokens + second.totalTokens),
+    source: first.source === second.source ? first.source : "mixed",
+  };
+}
+
+/** Relative cost units for admission/observability only; not provider price. */
+export function estimatedCostCentsFor({ costClass = "LOW", usage = null } = {}) {
+  const safeUsage = normalizeModelUsage(usage) || { totalTokens: 0 };
+  const multiplier = COST_CLASS_MULTIPLIER[String(costClass || "LOW").toUpperCase()] || COST_CLASS_MULTIPLIER.LOW;
+  return Math.max(1, Math.ceil(safeUsage.totalTokens / 1_000) * multiplier);
+}
 
 /** Public-safe error text. Provider response bodies, URLs and stack details
  * must never cross the gateway boundary or be persisted in attempt telemetry. */
@@ -73,6 +145,8 @@ export function sanitizeGatewayError(errorType, _errorMessage = "") {
       return "The AI response did not match the required structured format.";
     case GATEWAY_ERROR_TYPE.EMPTY_RESPONSE:
       return "The AI provider returned an empty response.";
+    case GATEWAY_ERROR_TYPE.BUDGET_EXCEEDED:
+      return "The investigation budget does not allow another AI provider call.";
     default:
       return "The AI request could not be completed.";
   }
@@ -89,6 +163,8 @@ export function createAttemptRecord({
   errorType = null,
   errorMessage = null,
   latencyMs = 0,
+  usage = null,
+  estimatedCostCents = null,
 }) {
   return {
     provider,
@@ -97,6 +173,10 @@ export function createAttemptRecord({
     errorType,
     errorMessage: ok ? null : sanitizeGatewayError(errorType, errorMessage),
     latencyMs: Number(latencyMs.toFixed?.(2) ?? latencyMs),
+    usage: normalizeModelUsage(usage),
+    estimatedCostCents: Number.isFinite(Number(estimatedCostCents))
+      ? Math.max(0, Math.floor(Number(estimatedCostCents)))
+      : null,
   };
 }
 
@@ -119,6 +199,8 @@ export function createGatewayResult({
   errorMessage = null,
   requestId = null,
   totalLatencyMs = 0,
+  usage = null,
+  estimatedCostCents = 0,
 }) {
   return {
     ok,
@@ -132,6 +214,10 @@ export function createGatewayResult({
     errorMessage: ok ? null : sanitizeGatewayError(errorType, errorMessage),
     requestId: requestId || createSecureId("req_gw"),
     totalLatencyMs: Number(totalLatencyMs.toFixed?.(2) ?? totalLatencyMs),
+    usage: normalizeModelUsage(usage),
+    estimatedCostCents: Number.isFinite(Number(estimatedCostCents))
+      ? Math.max(0, Math.floor(Number(estimatedCostCents)))
+      : 0,
     timestamp: Date.now(),
     schemaVersion: "ai-gateway-v1",
   };

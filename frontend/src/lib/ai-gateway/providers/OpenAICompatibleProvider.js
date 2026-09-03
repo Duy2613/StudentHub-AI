@@ -11,7 +11,7 @@
  */
 
 import { IModelProvider } from "./IModelProvider.js";
-import { PROVIDER_FAMILY, GATEWAY_ERROR_TYPE } from "../types.js";
+import { PROVIDER_FAMILY, GATEWAY_ERROR_TYPE, normalizeModelUsage } from "../types.js";
 import { validateRemoteUrlSync } from "../../security/hardening/SafeRemoteUrl.js";
 
 const MAX_PROVIDER_RESPONSE_BYTES = 2 * 1024 * 1024;
@@ -111,7 +111,7 @@ export class OpenAICompatibleProvider extends IModelProvider {
         throw err;
       }
 
-      return { text };
+      return { text, usage: normalizeModelUsage(json?.usage) };
     } catch (err) {
       if (signal?.aborted) throw createAbortError(signal.reason);
       if (err.name === "AbortError") {

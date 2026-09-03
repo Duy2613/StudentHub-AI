@@ -15,8 +15,8 @@ import { decideReputationLookup, REPUTATION_LOOKUP_POLICY, REPUTATION_LOOKUP_REA
 import { LEGACY_VERIFICATION_CONFIG, getLegacyVerificationConfig } from "./config.js";
 
 const LEGACY_LAYER2_VERDICTS = new Set(["SAFE", "DANGEROUS", "UNKNOWN"]);
-const LEGACY_LAYER3_VERDICTS = new Set(["TRUE", "FALSE", "UNKNOWN", "SUPPORTED", "CONTRADICTED", "MIXED", "UNVERIFIED", "INSUFFICIENT_EVIDENCE", "UNAVAILABLE"]);
-const LEGACY_LAYER4_VERDICTS = new Set(["TRUE", "FALSE", "UNKNOWN", "SAFE", "DANGEROUS", "SUSPICIOUS", "SUPPORTED", "CONTRADICTED", "MIXED", "UNVERIFIED", "INSUFFICIENT_EVIDENCE"]);
+const LEGACY_LAYER3_VERDICTS = new Set(["TRUE", "FALSE", "FAKE", "UNKNOWN", "SUPPORTED", "CONTRADICTED", "MIXED", "UNVERIFIED", "INSUFFICIENT_EVIDENCE", "UNAVAILABLE"]);
+const LEGACY_LAYER4_VERDICTS = new Set(["TRUE", "FALSE", "FAKE", "MISLEADING", "UNKNOWN", "SAFE", "DANGEROUS", "SUSPICIOUS", "SUPPORTED", "CONTRADICTED", "MIXED", "UNVERIFIED", "INSUFFICIENT_EVIDENCE"]);
 function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
@@ -29,6 +29,12 @@ function safeText(value, max = 700) {
   return typeof value === "string"
     ? value.replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, max)
     : "";
+}
+
+function redactedProviderText(value, max = 700) {
+  return safeText(value, max)
+    .replace(/(api[_-]?key|password|secret|token|authorization|bearer|connection(?:string)?|postgres(?:ql)?)[\s:=]+[^\s,;]+/gi, "$1=[REDACTED]")
+    .replace(/\b(?:sk|gsk|key|tok)_[A-Za-z0-9_-]{12,}\b/g, "[REDACTED]");
 }
 
 function optionalText(value, max = 700) {
@@ -195,7 +201,7 @@ function normalizeEvidence(raw, index, claims, sourceMap, origin, providerStatus
     sourceId: sourceId || linkedSource?.sourceId || `legacy-${origin.toLowerCase()}-source-${index + 1}`,
     sourceUrl,
     sourceTitle: safeText(evidence.sourceTitle || evidence.title || linkedSource?.title, 240),
-    excerpt: safeText(evidence.excerpt || evidence.observation || evidence.summary || evidence.quote || evidence.text, 400),
+    excerpt: redactedProviderText(evidence.excerpt || evidence.observation || evidence.summary || evidence.quote || evidence.text, 400),
     relation: relationFor(evidence, safeText(evidence.verdict, 40).toUpperCase()),
     relevance: unit(evidence.relevance) ?? 0,
     strength: unit(evidence.strength) ?? 0,
@@ -240,7 +246,10 @@ function statusForLayer3Verdict(verdict, { evidenceCount = 0, validLiveEvidence 
 
 function statusForTransport(result) {
   if (result?.kind === "timeout") return "TIMEOUT";
+  if (result?.kind === "http" && [401, 403].includes(result.status)) return "AUTH_FAILED";
   if (result?.kind === "http" && result.status === 429) return "RATE_LIMITED";
+  if (result?.kind === "circuit") return "CIRCUIT_OPEN";
+  if (result?.kind === "bulkhead") return "UNAVAILABLE";
   if (result?.kind === "invalid") return "INVALID_RESPONSE";
   if (result?.kind === "config") return "NOT_CONFIGURED";
   if (result?.kind === "http" || result?.kind === "failure") return "UNAVAILABLE";
@@ -250,9 +259,138 @@ function statusForTransport(result) {
 function safeTransportMessage(result) {
   if (result?.kind === "config") return result.code || "LEGACY_BACKEND_NOT_CONFIGURED";
   if (result?.kind === "timeout") return "Legacy verification backend timed out.";
+  if (result?.kind === "circuit") return "Legacy verification backend circuit is open.";
+  if (result?.kind === "bulkhead") return "Legacy verification backend concurrency limit was reached.";
   if (result?.kind === "invalid") return result.code || "LEGACY_INVALID_RESPONSE";
   if (result?.kind === "http") return `Legacy verification backend returned HTTP ${result.status || 0}.`;
   return "Legacy verification backend is unavailable.";
+}
+
+function safeStatusMessage(status, code) {
+  if (status === "TIMEOUT") return "Legacy verification backend timed out.";
+  if (status === "RATE_LIMITED") return "Legacy verification backend rate limit was reached.";
+  if (status === "AUTH_FAILED") return "Legacy verification backend authentication failed.";
+  if (status === "CIRCUIT_OPEN") return "Legacy verification backend circuit is open.";
+  if (status === "INVALID_INPUT") return "Legacy verification input did not match the approved contract.";
+  if (status === "INVALID_RESPONSE") return "Legacy verification backend returned an invalid response.";
+  if (status === "NOT_CONFIGURED") return code || "LEGACY_BACKEND_NOT_CONFIGURED";
+  return "Legacy verification backend is unavailable.";
+}
+
+function providerStatusFromLegacyReason(reason) {
+  const value = safeText(reason, 1_200).toLowerCase();
+  if (!value) return EVIDENCE_PROVIDER_STATUS.SUCCESS;
+  if (/not configured|missing .*key|api key/.test(value)) return EVIDENCE_PROVIDER_STATUS.NOT_CONFIGURED;
+  if (/timed out|timeout/.test(value)) return EVIDENCE_PROVIDER_STATUS.TIMEOUT;
+  if (/429|rate limit|too many requests/.test(value)) return EVIDENCE_PROVIDER_STATUS.RATE_LIMITED;
+  if (/401|403|unauthorized|forbidden|authentication/.test(value)) return EVIDENCE_PROVIDER_STATUS.AUTH_FAILED;
+  if (/unavailable|failed|error/.test(value)) return EVIDENCE_PROVIDER_STATUS.UNAVAILABLE;
+  return EVIDENCE_PROVIDER_STATUS.SUCCESS;
+}
+
+function retryAfterMilliseconds(value, now) {
+  const raw = safeText(value, 120);
+  if (!raw) return 0;
+  const seconds = Number(raw);
+  if (Number.isFinite(seconds) && seconds >= 0) return Math.min(30_000, Math.floor(seconds * 1_000));
+  const timestamp = Date.parse(raw);
+  return Number.isFinite(timestamp) ? Math.min(30_000, Math.max(0, timestamp - now)) : 0;
+}
+
+const LEGACY_LAYER3_INPUT_TYPES = new Set(["url", "text"]);
+const LEGACY_LAYER4_MODES = new Set(["user", "pro", "expert"]);
+
+function normalizedInputType(input, allowedTypes, fallback = "text") {
+  const value = safeText(input?.type, 40).toLowerCase();
+  return allowedTypes.has(value) ? value : fallback;
+}
+
+function legacyLayer4Mode(input) {
+  const value = safeText(input?.mode || input?.metadata?.legacyLayer4Mode || input?.metadata?.layer4Mode, 40).toLowerCase();
+  return LEGACY_LAYER4_MODES.has(value) ? value : "user";
+}
+
+function legacyLayer3ForLayer4(layer3Result) {
+  const integration = asRecord(layer3Result?.legacyIntegration);
+  const verdict = safeText(integration.rawVerdict || layer3Result?.verdict, 80).toUpperCase() || "UNKNOWN";
+  const confidence = unit(integration.legacyAssessmentConfidence ?? layer3Result?.evidenceConfidence) ?? 0;
+  const reason = redactedProviderText(integration.reason, 1_200) || "Evidence requires further assessment.";
+  const evidence = boundedArray(layer3Result?.evidence, LEGACY_VERIFICATION_CONFIG.MAX_EVIDENCE)
+    .map((item) => {
+      const record = asRecord(item);
+      const url = safeHttpUrl(record.sourceUrl || record.url);
+      if (!url) return null;
+      return {
+        title: safeText(record.sourceTitle || record.title, 240) || "Legacy source observation",
+        url,
+        content: optionalText(redactedProviderText(record.excerpt || record.content || record.observation || record.summary, 4_000), 4_000),
+      };
+    })
+    .filter(Boolean);
+  const sources = boundedArray(layer3Result?.sources, LEGACY_VERIFICATION_CONFIG.MAX_SOURCES)
+    .map((item) => {
+      const record = asRecord(item);
+      const url = safeHttpUrl(record.url || record.sourceUrl || record.link);
+      if (!url) return null;
+      return {
+        title: safeText(record.title || record.name, 240) || "Legacy source",
+        url,
+      };
+    })
+    .filter(Boolean);
+  return { verdict, confidence, reason, evidence, sources };
+}
+
+function validateLegacyLayer3WireResponse(payload) {
+  const raw = unwrapPayload(payload);
+  if (!raw) return { ok: false, code: "LEGACY_LAYER3_PAYLOAD_NOT_OBJECT" };
+  const verdict = safeText(raw.verdict, 80).toUpperCase();
+  if (!LEGACY_LAYER3_VERDICTS.has(verdict)) return { ok: false, code: "LEGACY_LAYER3_VERDICT_INVALID" };
+  if (unit(raw.confidence) === null) return { ok: false, code: "LEGACY_CONFIDENCE_INVALID" };
+  if (typeof raw.stop !== "boolean") return { ok: false, code: "LEGACY_STOP_MUST_BE_BOOLEAN" };
+  if (typeof raw.canContinueToLayer4 !== "boolean") return { ok: false, code: "LEGACY_CONTINUATION_MUST_BE_BOOLEAN" };
+  if (raw.stop === true && raw.canContinueToLayer4 === true) return { ok: false, code: "LEGACY_LAYER3_CONTINUATION_CONTRADICTION" };
+  if (typeof raw.reason !== "string" || raw.reason.length > 1_200) return { ok: false, code: "LEGACY_REASON_INVALID" };
+  if (!Array.isArray(raw.evidence) || raw.evidence.length > LEGACY_VERIFICATION_CONFIG.MAX_EVIDENCE) return { ok: false, code: "LEGACY_LAYER3_EVIDENCE_INVALID" };
+  if (!Array.isArray(raw.sources) || raw.sources.length > LEGACY_VERIFICATION_CONFIG.MAX_SOURCES) return { ok: false, code: "LEGACY_LAYER3_SOURCES_INVALID" };
+  for (const item of raw.evidence) {
+    if (!isRecord(item) || typeof item.title !== "string" || !safeText(item.title, 240) || item.title.length > 240 || typeof item.url !== "string" || !safeHttpUrl(item.url)) {
+      return { ok: false, code: "LEGACY_LAYER3_EVIDENCE_INVALID" };
+    }
+    if (item.content !== null && item.content !== undefined && (typeof item.content !== "string" || item.content.length > 4_000)) {
+      return { ok: false, code: "LEGACY_LAYER3_EVIDENCE_CONTENT_TOO_LARGE" };
+    }
+  }
+  for (const item of raw.sources) {
+    if (!isRecord(item) || typeof item.title !== "string" || !safeText(item.title, 240) || item.title.length > 240 || typeof item.url !== "string" || !safeHttpUrl(item.url)) {
+      return { ok: false, code: "LEGACY_LAYER3_SOURCE_INVALID" };
+    }
+  }
+  return { ok: true };
+}
+
+function validateLegacyLayer4WireResponse(payload) {
+  const raw = unwrapPayload(payload);
+  if (!raw) return { ok: false, code: "LEGACY_LAYER4_PAYLOAD_NOT_OBJECT" };
+  const verdict = safeText(raw.verdict, 80).toUpperCase();
+  if (!LEGACY_LAYER4_VERDICTS.has(verdict)) return { ok: false, code: "LEGACY_LAYER4_VERDICT_INVALID" };
+  for (const field of ["confidence", "evidenceAgreement", "sourceQuality"]) {
+    if (unit(raw[field]) === null) return { ok: false, code: `LEGACY_${field.toUpperCase()}_INVALID` };
+  }
+  if (typeof raw.stop !== "boolean") return { ok: false, code: "LEGACY_STOP_MUST_BE_BOOLEAN" };
+  if (typeof raw.canContinueToLayer4 !== "boolean") return { ok: false, code: "LEGACY_CONTINUATION_MUST_BE_BOOLEAN" };
+  if (typeof raw.mode !== "string" || !LEGACY_LAYER4_MODES.has(safeText(raw.mode, 40).toLowerCase())) return { ok: false, code: "LEGACY_MODE_INVALID" };
+  if (typeof raw.geminiModel !== "string" || raw.geminiModel.length > 160) return { ok: false, code: "LEGACY_GEMINI_MODEL_INVALID" };
+  if (raw.groqModel !== null && raw.groqModel !== undefined && (typeof raw.groqModel !== "string" || raw.groqModel.length > 160)) return { ok: false, code: "LEGACY_GROQ_MODEL_INVALID" };
+  if (typeof raw.reason !== "string" || raw.reason.length > 1_200) return { ok: false, code: "LEGACY_REASON_INVALID" };
+  if (!Array.isArray(raw.contradictoryEvidence) || raw.contradictoryEvidence.length > 40 || raw.contradictoryEvidence.some((item) => typeof item !== "string" || item.length > 700)) return { ok: false, code: "LEGACY_CONTRADICTIONS_INVALID" };
+  if (!Array.isArray(raw.sources) || raw.sources.length > LEGACY_VERIFICATION_CONFIG.MAX_SOURCES) return { ok: false, code: "LEGACY_LAYER4_SOURCES_INVALID" };
+  for (const item of raw.sources) {
+    if (!isRecord(item) || typeof item.title !== "string" || !safeText(item.title, 240) || item.title.length > 240 || typeof item.url !== "string" || !safeHttpUrl(item.url)) {
+      return { ok: false, code: "LEGACY_LAYER4_SOURCE_INVALID" };
+    }
+  }
+  return { ok: true };
 }
 
 function missingLayer3Result(requestId, status, code, latencyMs = 0) {
@@ -263,7 +401,9 @@ function missingLayer3Result(requestId, status, code, latencyMs = 0) {
     evidence: [],
     limitations: ["Legacy Layer 3 evidence is unavailable; no local or demo evidence was substituted."],
     requestId,
-    retrievalStatus: status === "NOT_CONFIGURED" ? EVIDENCE_PROVIDER_STATUS.NOT_CONFIGURED : EVIDENCE_PROVIDER_STATUS.UNAVAILABLE,
+    retrievalStatus: Object.values(EVIDENCE_PROVIDER_STATUS).includes(status)
+      ? status
+      : EVIDENCE_PROVIDER_STATUS.UNAVAILABLE,
     retrievalMode: "LEGACY_VERIFICATION_UNAVAILABLE",
     externalEvidence: false,
     auditEvents: [{ type: "LEGACY_LAYER3_UNAVAILABLE", code, at: new Date().toISOString() }],
@@ -283,7 +423,7 @@ function missingLayer3Result(requestId, status, code, latencyMs = 0) {
       providerStatus: status,
       rawVerdict: null,
       legacyAssessmentConfidence: null,
-      reason: safeTransportMessage({ kind: status === "TIMEOUT" ? "timeout" : "failure", code }),
+      reason: safeStatusMessage(status, code),
       stop: null,
       canContinueToLayer4: false,
       continuationDerived: true,
@@ -310,6 +450,7 @@ export function normalizeLegacyLayer3Payload(payload, { claims = [], requestId, 
   if (!raw) return { ok: false, code: "LEGACY_LAYER3_PAYLOAD_NOT_OBJECT" };
   const verdict = safeText(raw.verdict, 80).toUpperCase();
   if (!LEGACY_LAYER3_VERDICTS.has(verdict)) return { ok: false, code: "LEGACY_LAYER3_VERDICT_INVALID" };
+  const providerStatus = providerStatusFromLegacyReason(raw.reason);
   const confidence = optionalUnit(raw, "confidence");
   if (!confidence.ok) return confidence;
   const stop = optionalBoolean(raw, "stop");
@@ -320,11 +461,11 @@ export function normalizeLegacyLayer3Payload(payload, { claims = [], requestId, 
 
   const normalizedClaims = normalizeClaims(claims);
   const sourceRecords = boundedArray(raw.sources, LEGACY_VERIFICATION_CONFIG.MAX_SOURCES)
-    .map((source, index) => normalizeSource(source, index, "LAYER_3_WEB_EVIDENCE"))
+    .map((source, index) => normalizeSource(source, index, "LAYER_3_WEB_EVIDENCE", providerStatus))
     .filter(Boolean);
   const sourceMap = new Map(sourceRecords.map((source) => [source.sourceId, source]));
   const evidenceRecords = boundedArray(raw.evidence, LEGACY_VERIFICATION_CONFIG.MAX_EVIDENCE)
-    .map((evidence, index) => normalizeEvidence(evidence, index, normalizedClaims, sourceMap, "LAYER_3_WEB_EVIDENCE"))
+    .map((evidence, index) => normalizeEvidence(evidence, index, normalizedClaims, sourceMap, "LAYER_3_WEB_EVIDENCE", providerStatus))
     .filter(Boolean);
   const validLiveEvidence = evidenceRecords.some((item) => item.liveEvidence === true && item.providerStatus === EVIDENCE_PROVIDER_STATUS.SUCCESS && item.retrievalOutcome === "SUCCESS" && item.sourceFingerprint);
   const rawExternalEvidence = raw.externalEvidence === true;
@@ -356,14 +497,14 @@ export function normalizeLegacyLayer3Payload(payload, { claims = [], requestId, 
       ...(rawExternalEvidence && !validLiveEvidence ? ["Legacy response asserted external evidence without independently verifiable live-evidence markers."] : []),
     ],
     requestId,
-    retrievalStatus: EVIDENCE_PROVIDER_STATUS.SUCCESS,
+    retrievalStatus: providerStatus,
     retrievalMode: "LEGACY_VERIFICATION",
     externalEvidence: validLiveEvidence,
     auditEvents: [{ type: "LEGACY_LAYER3_NORMALIZED", code: null, at: new Date().toISOString() }],
     metrics: {
       executionTimeMs: latencyMs,
       retrievalProvider: "legacy_verification_layer3",
-      retrievalStatus: EVIDENCE_PROVIDER_STATUS.SUCCESS,
+      retrievalStatus: providerStatus,
       retrievalMode: "LEGACY_VERIFICATION",
       externalEvidence: validLiveEvidence,
       providerIndependent: true,
@@ -375,11 +516,11 @@ export function normalizeLegacyLayer3Payload(payload, { claims = [], requestId, 
     sources: result.sources.map((source) => ({ ...source, origin: "LAYER_3_WEB_EVIDENCE", provider: sourceMap.get(source.sourceId)?.provider || "legacy_verification_layer3" })),
     evidence: result.evidence.map((evidence) => ({ ...evidence, origin: "LAYER_3_WEB_EVIDENCE", provider: evidenceRecords.find((item) => item.evidenceId === evidence.evidenceId)?.provider || "legacy_verification_layer3" })),
     legacyIntegration: {
-      status: "COMPLETED",
-      providerStatus: EVIDENCE_PROVIDER_STATUS.SUCCESS,
+      status: providerStatus === EVIDENCE_PROVIDER_STATUS.SUCCESS ? "COMPLETED" : "PARTIAL",
+      providerStatus,
       rawVerdict: verdict,
       legacyAssessmentConfidence: confidence.value,
-      reason: optionalText(raw.reason, 1200),
+      reason: optionalText(redactedProviderText(raw.reason, 1200), 1200),
       stop: stop.value === null ? false : stop.value,
       canContinueToLayer4,
       continuationDerived: continuation.value === null,
@@ -398,40 +539,45 @@ export function normalizeLegacyLayer4Payload(payload, { requestId, latencyMs = 0
   if (!raw) return { ok: false, code: "LEGACY_LAYER4_PAYLOAD_NOT_OBJECT" };
   const verdict = safeText(raw.verdict, 80).toUpperCase();
   if (!LEGACY_LAYER4_VERDICTS.has(verdict)) return { ok: false, code: "LEGACY_LAYER4_VERDICT_INVALID" };
+  const providerStatus = providerStatusFromLegacyReason(raw.reason);
   const confidence = optionalUnit(raw, "confidence");
   if (!confidence.ok) return confidence;
+  const evidenceAgreement = optionalUnit(raw, "evidenceAgreement");
+  if (!evidenceAgreement.ok) return evidenceAgreement;
+  const sourceQuality = optionalUnit(raw, "sourceQuality");
+  if (!sourceQuality.ok) return sourceQuality;
   const stop = optionalBoolean(raw, "stop");
   const continuation = optionalBoolean(raw, "canContinueToLayer4");
   if (!stop.ok) return stop;
   if (!continuation.ok) return continuation;
 
   const sourceRecords = boundedArray(raw.sources, LEGACY_VERIFICATION_CONFIG.MAX_SOURCES)
-    .map((source, index) => normalizeSource(source, index, "LAYER_4_INDEPENDENT_RESEARCH"))
+    .map((source, index) => normalizeSource(source, index, "LAYER_4_INDEPENDENT_RESEARCH", providerStatus))
     .filter(Boolean);
   const contradictoryEvidence = boundedArray(raw.contradictoryEvidence, 40).map((item) => {
     if (typeof item === "string") return safeText(item, 700);
     const record = asRecord(item);
-    return optionalText(record.details || record.observation || record.claim || record.reason, 700);
+    return optionalText(redactedProviderText(record.details || record.observation || record.claim || record.reason, 700), 700);
   }).filter(Boolean);
 
   return {
     ok: true,
     result: {
-      status: "COMPLETED",
-      providerStatus: "SUCCESS",
+      status: providerStatus === EVIDENCE_PROVIDER_STATUS.SUCCESS ? "COMPLETED" : "PARTIAL",
+      providerStatus,
       providerId: "legacy_verification_layer4",
       requestId,
       latencyMs,
       rawVerdict: verdict,
       assessmentConfidence: confidence.value,
-      evidenceAgreement: scalar(raw.evidenceAgreement),
-      sourceQuality: scalar(raw.sourceQuality),
+      evidenceAgreement: evidenceAgreement.value,
+      sourceQuality: sourceQuality.value,
       stop: stop.value === null ? false : stop.value,
       canContinueToLayer4: continuation.value,
       mode: optionalText(raw.mode, 80),
       geminiModel: optionalText(raw.geminiModel, 160),
       groqModel: optionalText(raw.groqModel, 160),
-      reason: optionalText(raw.reason, 1200),
+      reason: optionalText(redactedProviderText(raw.reason, 1200), 1200),
       contradictoryEvidence,
       sources: sourceRecords,
       sourceOrigin: "LAYER_4_INDEPENDENT_RESEARCH",
@@ -449,11 +595,18 @@ export class LegacyVerificationAdapter {
     fetchImpl = globalThis.fetch,
     clock = () => Date.now(),
     resolveDns = null,
+    sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
+    random = Math.random,
   } = {}) {
     this.config = getLegacyVerificationConfig(env);
     this.fetchImpl = fetchImpl;
     this.clock = clock;
     this.resolveDns = typeof resolveDns === "boolean" ? resolveDns : this.config.resolveDns;
+    this.sleep = typeof sleep === "function" ? sleep : async () => {};
+    this.random = typeof random === "function" ? random : () => 0;
+    this.inFlight = 0;
+    this.consecutiveFailures = 0;
+    this.circuitOpenedAt = null;
     this.providerId = "legacy_verification_backend";
   }
 
@@ -472,6 +625,16 @@ export class LegacyVerificationAdapter {
       dependency: this.providerId,
       configError: this.config.enabled ? null : this.config.configError,
       endpoints: { ...this.config.ENDPOINTS },
+      resilience: {
+        maxAttempts: this.config.maxAttempts,
+        retryBaseDelayMs: this.config.retryBaseDelayMs,
+        retryMaxDelayMs: this.config.retryMaxDelayMs,
+        circuitFailureThreshold: this.config.circuitFailureThreshold,
+        circuitCooldownMs: this.config.circuitCooldownMs,
+        circuitState: this.#circuitState(),
+        bulkheadMaxConcurrency: this.config.bulkheadMaxConcurrency,
+        inFlight: this.inFlight,
+      },
     };
   }
 
@@ -479,11 +642,94 @@ export class LegacyVerificationAdapter {
     return { providerId: "legacy_verification_layer2", check: (params) => this.verifyLayer2(params) };
   }
 
-  async #post(path, body, requestId, signal) {
+  #circuitState() {
+    if (this.circuitOpenedAt === null) return "CLOSED";
+    if (this.clock() - this.circuitOpenedAt >= this.config.circuitCooldownMs) {
+      this.circuitOpenedAt = null;
+      this.consecutiveFailures = 0;
+      return "CLOSED";
+    }
+    return "OPEN";
+  }
+
+  #isCircuitOpen() {
+    return this.#circuitState() === "OPEN";
+  }
+
+  #isRetryable(result) {
+    if (result?.kind === "timeout" || result?.kind === "failure") return true;
+    return result?.kind === "http" && [408, 425, 429, 500, 502, 503, 504].includes(result.status);
+  }
+
+  #countsAsCircuitFailure(result) {
+    return this.#isRetryable(result) || result?.kind === "invalid";
+  }
+
+  #recordSuccess() {
+    this.consecutiveFailures = 0;
+    this.circuitOpenedAt = null;
+  }
+
+  #recordFailure(result) {
+    if (!this.#countsAsCircuitFailure(result)) return;
+    this.consecutiveFailures += 1;
+    if (this.consecutiveFailures >= this.config.circuitFailureThreshold) this.circuitOpenedAt = this.clock();
+  }
+
+  #retryDelay(result, attempt) {
+    const exponential = Math.min(
+      this.config.retryMaxDelayMs,
+      this.config.retryBaseDelayMs * (2 ** Math.max(0, attempt - 1)),
+    );
+    const retryAfter = Number.isFinite(result?.retryAfterMs) ? result.retryAfterMs : 0;
+    const jitterRange = Math.max(1, Math.floor(exponential * 0.25));
+    const jitter = Math.floor(Math.max(0, Math.min(1, Number(this.random()) || 0)) * jitterRange);
+    return Math.min(this.config.retryMaxDelayMs, Math.max(exponential, retryAfter) + jitter);
+  }
+
+  async #waitBeforeRetry(milliseconds, signal) {
+    if (milliseconds <= 0) return;
+    if (signal?.aborted) {
+      const error = new Error("Legacy request cancelled");
+      error.name = "AbortError";
+      throw error;
+    }
+    await new Promise((resolve, reject) => {
+      let settled = false;
+      const cleanup = () => signal?.removeEventListener?.("abort", onAbort);
+      const onAbort = () => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        const error = new Error("Legacy request cancelled");
+        error.name = "AbortError";
+        reject(error);
+      };
+      signal?.addEventListener?.("abort", onAbort, { once: true });
+      Promise.resolve(this.sleep(milliseconds)).then(() => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        resolve();
+      }, (error) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(error);
+      });
+    });
+  }
+
+  async #post(path, body, requestId, signal, budget = null) {
     if (!this.config.enabled) return { kind: "config", code: this.config.configError || "LEGACY_BACKEND_NOT_CONFIGURED" };
     if (typeof this.fetchImpl !== "function") return { kind: "failure", code: "FETCH_UNAVAILABLE" };
 
-    const bodyText = JSON.stringify(body);
+    let bodyText;
+    try {
+      bodyText = JSON.stringify(body);
+    } catch {
+      return { kind: "invalid", code: "LEGACY_REQUEST_SERIALIZATION_FAILED" };
+    }
     const bodyBytes = new TextEncoder().encode(bodyText).byteLength;
     if (bodyBytes > this.config.MAX_REQUEST_BYTES) return { kind: "invalid", code: "LEGACY_REQUEST_TOO_LARGE" };
 
@@ -492,7 +738,38 @@ export class LegacyVerificationAdapter {
       : validateRemoteUrlSync(this.config.baseUrl);
     if (!baseValidation.ok) return { kind: "config", code: baseValidation.code };
 
+    if (this.#isCircuitOpen()) return { kind: "circuit", code: "LEGACY_CIRCUIT_OPEN" };
+    if (this.inFlight >= this.config.bulkheadMaxConcurrency) return { kind: "bulkhead", code: "LEGACY_BULKHEAD_FULL" };
+
     const endpoint = `${this.config.baseUrl}${path}`;
+    this.inFlight += 1;
+    try {
+      let result = null;
+      for (let attempt = 1; attempt <= this.config.maxAttempts; attempt += 1) {
+        if (attempt > 1 && typeof budget?.tryConsume === "function") {
+          const retryBudget = budget.tryConsume("retries");
+          if (!retryBudget?.allowed) return { kind: "budget", code: retryBudget.code || "BUDGET_EXCEEDED", attempts: attempt - 1 };
+        }
+        if (typeof budget?.recordUsage === "function") budget.recordUsage("legacyCalls");
+        result = await this.#postAttempt(endpoint, bodyText, requestId, signal);
+        if (result.kind === "ok") {
+          this.#recordSuccess();
+          return { ...result, attempts: attempt };
+        }
+        if (!this.#isRetryable(result) || attempt >= this.config.maxAttempts) {
+          this.#recordFailure(result);
+          return { ...result, attempts: attempt };
+        }
+        await this.#waitBeforeRetry(this.#retryDelay(result, attempt), signal);
+      }
+      this.#recordFailure(result);
+      return { ...(result || { kind: "failure", code: "LEGACY_RETRY_EXHAUSTED" }), attempts: this.config.maxAttempts };
+    } finally {
+      this.inFlight = Math.max(0, this.inFlight - 1);
+    }
+  }
+
+  async #postAttempt(endpoint, bodyText, requestId, signal) {
     const controller = new AbortController();
     let timedOut = false;
     const onAbort = () => controller.abort(signal?.reason || "caller-aborted");
@@ -510,10 +787,18 @@ export class LegacyVerificationAdapter {
           Accept: "application/json",
           "Content-Type": "application/json",
           "X-Request-ID": requestId,
+          ...(this.config.apiKey ? { Authorization: `Bearer ${this.config.apiKey}` } : {}),
         },
         body: bodyText,
       });
-      if (!response?.ok) return { kind: "http", status: Number(response?.status) || 0, latencyMs: this.clock() - startedAt };
+      if (!response?.ok) {
+        return {
+          kind: "http",
+          status: Number(response?.status) || 0,
+          retryAfterMs: retryAfterMilliseconds(response?.headers?.get?.("retry-after") || response?.headers?.get?.("Retry-After"), this.clock()),
+          latencyMs: this.clock() - startedAt,
+        };
+      }
       const contentType = safeText(response?.headers?.get?.("content-type"), 120).toLowerCase();
       if (contentType && !contentType.includes("json")) return { kind: "invalid", code: "LEGACY_UNEXPECTED_CONTENT_TYPE", latencyMs: this.clock() - startedAt };
       const contentLength = Number(response?.headers?.get?.("content-length") || 0);
@@ -538,7 +823,7 @@ export class LegacyVerificationAdapter {
     }
   }
 
-  async verifyLayer2({ url = "", requestId = null, signal } = {}) {
+  async verifyLayer2({ url = "", requestId = null, signal, budget = null } = {}) {
     const id = requestIdFor(requestId);
     const normalizedUrl = safeText(url, 2048);
     const guard = validateRemoteUrlSync(normalizedUrl);
@@ -562,10 +847,14 @@ export class LegacyVerificationAdapter {
       });
     }
     const disclosedUrl = lookup.lookupUrl || guard.url;
-    const response = await this.#post(this.config.ENDPOINTS.layer2, { type: "url", content: disclosedUrl, requestId: id }, id, signal);
+    const response = await this.#post(this.config.ENDPOINTS.layer2, { type: "url", content: disclosedUrl }, id, signal, budget);
     if (response.kind !== "ok") {
       const providerStatus = response.kind === "timeout"
         ? LAYER_2A_PROVIDER_STATUS.TIMEOUT
+        : response.kind === "circuit"
+          ? LAYER_2A_PROVIDER_STATUS.CIRCUIT_OPEN
+        : response.kind === "http" && [401, 403].includes(response.status)
+          ? LAYER_2A_PROVIDER_STATUS.AUTH_FAILED
         : response.kind === "http" && response.status === 429
           ? LAYER_2A_PROVIDER_STATUS.RATE_LIMITED
           : response.kind === "invalid"
@@ -601,42 +890,59 @@ export class LegacyVerificationAdapter {
     });
   }
 
-  async verifyLayer3({ input = {}, claims = [], candidateSources = [], layer2Result = null, layer2CResult = null, requestId = null, signal } = {}) {
+  async verifyLayer3({ input = {}, claims = [], requestId = null, signal, budget = null } = {}) {
     const id = requestIdFor(requestId);
+    const type = safeText(input.type, 40).toLowerCase();
+    const content = safeText(input.content, this.config.MAX_CONTENT_CHARS);
+    if (this.config.enabled && (!LEGACY_LAYER3_INPUT_TYPES.has(type) || !content)) {
+      return missingLayer3Result(id, "INVALID_INPUT", "LEGACY_LAYER3_INPUT_INVALID", 0);
+    }
     const payload = {
-      requestId: id,
-      type: safeText(input.type, 40) || "text",
-      content: safeText(input.content, this.config.MAX_CONTENT_CHARS),
-      claims: normalizeClaims(claims),
-      candidateSources: boundedArray(candidateSources, 40).map((item) => {
-        const record = asRecord(item);
-        return { id: safeText(record.id || record.sourceId, 160) || null, url: safeHttpUrl(record.url), title: safeText(record.title, 240) || null };
-      }),
-      layer2Result: { status: safeText(layer2Result?.status, 80) || null, finding: safeText(layer2Result?.finding, 80) || null },
-      layer2CResult: { classification: safeText(layer2CResult?.classification, 120) || null },
+      type: LEGACY_LAYER3_INPUT_TYPES.has(type) ? type : normalizedInputType(input, LEGACY_LAYER3_INPUT_TYPES),
+      content,
     };
-    const response = await this.#post(this.config.ENDPOINTS.layer3, payload, id, signal);
+    const response = await this.#post(this.config.ENDPOINTS.layer3, payload, id, signal, budget);
     if (response.kind !== "ok") return missingLayer3Result(id, statusForTransport(response), response.code || safeTransportMessage(response), response.latencyMs || 0);
+    const wire = validateLegacyLayer3WireResponse(response.payload);
+    if (!wire.ok) return missingLayer3Result(id, "MALFORMED", wire.code, response.latencyMs || 0);
     const normalized = normalizeLegacyLayer3Payload(response.payload, { claims, requestId: id, latencyMs: response.latencyMs || 0 });
-    if (!normalized.ok) return missingLayer3Result(id, "INVALID_RESPONSE", normalized.code, response.latencyMs || 0);
+    if (!normalized.ok) return missingLayer3Result(id, "MALFORMED", normalized.code, response.latencyMs || 0);
     return normalized.result;
   }
 
-  async verifyLayer4({ input = {}, layer1Result = null, layer2AResult = null, layer2Result = null, layer2CResult = null, layer3Result = null, unresolvedSignals = [], requestId = null, signal } = {}) {
+  async verifyLayer4({ input = {}, layer3Result = null, requestId = null, signal, budget = null } = {}) {
     const id = requestIdFor(requestId);
+    const type = safeText(input.type, 40).toLowerCase() || "text";
+    const content = safeText(input.content, this.config.MAX_CONTENT_CHARS);
+    if (this.config.enabled && !content) {
+      return {
+        status: "UNAVAILABLE",
+        providerStatus: "INVALID_INPUT",
+        providerId: "legacy_verification_layer4",
+        requestId: id,
+        latencyMs: 0,
+        rawVerdict: null,
+        assessmentConfidence: null,
+        evidenceAgreement: null,
+        sourceQuality: null,
+        stop: true,
+        canContinueToLayer4: false,
+        reason: "Legacy Layer 4 input did not match the approved contract.",
+        contradictoryEvidence: [],
+        sources: [],
+        sourceOrigin: "LAYER_4_INDEPENDENT_RESEARCH",
+        limitations: ["Invalid legacy input was discarded and did not affect the deterministic policy."],
+        errorCode: "LEGACY_LAYER4_INPUT_INVALID",
+      };
+    }
+    const layer3 = legacyLayer3ForLayer4(layer3Result);
     const payload = {
-      requestId: id,
-      input: { type: safeText(input.type, 40) || "text", content: safeText(input.content, this.config.MAX_CONTENT_CHARS) },
-      layers: {
-        layer1: { status: safeText(layer1Result?.status, 80) || null, signals: boundedArray(layer1Result?.signals, 20) },
-        layer2: { finding: safeText(layer2AResult?.finding, 80) || null, status: safeText(layer2AResult?.providerStatus, 80) || null, verdict: safeText(layer2AResult?.rawVerdict, 80) || null },
-        layer2Semantic: { status: safeText(layer2Result?.status, 80) || null },
-        layer2Domain: { classification: safeText(layer2CResult?.classification, 120) || null },
-        layer3: { status: safeText(layer3Result?.status, 100) || null, verdict: safeText(layer3Result?.legacyIntegration?.rawVerdict, 80) || null, evidence: boundedArray(layer3Result?.evidence, 40).map((item) => ({ evidenceId: safeText(item?.evidenceId, 160), relation: safeText(item?.relation, 80), sourceId: safeText(item?.sourceId, 160) })) },
-      },
-      unresolvedSignals: boundedArray(unresolvedSignals, 30).map((item) => safeText(item, 300)).filter(Boolean),
+      type,
+      content,
+      mode: legacyLayer4Mode(input),
+      layer3,
     };
-    const response = await this.#post(this.config.ENDPOINTS.layer4, payload, id, signal);
+    const response = await this.#post(this.config.ENDPOINTS.layer4, payload, id, signal, budget);
     if (response.kind !== "ok") {
       return {
         status: "UNAVAILABLE",
@@ -658,11 +964,12 @@ export class LegacyVerificationAdapter {
         errorCode: safeText(response.code || `LEGACY_LAYER4_HTTP_${response.status || 0}`, 120),
       };
     }
+    const wire = validateLegacyLayer4WireResponse(response.payload);
     const normalized = normalizeLegacyLayer4Payload(response.payload, { requestId: id, latencyMs: response.latencyMs || 0 });
-    if (!normalized.ok) {
+    if (!wire.ok || !normalized.ok) {
       return {
         status: "UNAVAILABLE",
-        providerStatus: "INVALID_RESPONSE",
+        providerStatus: "MALFORMED",
         providerId: "legacy_verification_layer4",
         requestId: id,
         latencyMs: response.latencyMs || 0,
@@ -677,7 +984,7 @@ export class LegacyVerificationAdapter {
         sources: [],
         sourceOrigin: "LAYER_4_INDEPENDENT_RESEARCH",
         limitations: ["Malformed legacy synthesis was discarded and did not affect the deterministic policy."],
-        errorCode: normalized.code,
+        errorCode: wire.code || normalized.code,
       };
     }
     return normalized.result;

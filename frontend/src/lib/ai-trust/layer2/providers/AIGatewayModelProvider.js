@@ -19,7 +19,7 @@
 
 import { ISemanticVerificationProvider } from "./ISemanticVerificationProvider.js";
 import { DeterministicSemanticProvider } from "./DeterministicSemanticProvider.js";
-import { AIGatewayService, AI_CAPABILITY } from "../../../ai-gateway/index.js";
+import { AIGatewayService, AI_CAPABILITY, validateEvidenceReferences } from "../../../ai-gateway/index.js";
 import { AdversarialTrustGuard } from "../../../intelligence/trust/adversarialTrustGuard.js";
 import {
   SEMANTIC_BOUNDARY_LIMITS,
@@ -54,6 +54,7 @@ function isValidLayer2Shape(json) {
   if (!Array.isArray(json.contextSignals) || json.contextSignals.length > SEMANTIC_BOUNDARY_LIMITS.SIGNALS) return false;
   if (!Array.isArray(json.consistencyFindings || []) || (json.consistencyFindings || []).length > SEMANTIC_BOUNDARY_LIMITS.FINDINGS) return false;
   if (!Array.isArray(json.crossModalFindings || []) || (json.crossModalFindings || []).length > SEMANTIC_BOUNDARY_LIMITS.FINDINGS) return false;
+  if (!validateEvidenceReferences(json, { knownEvidenceIds: [], knownSourceIds: [] }).ok) return false;
   return true;
 }
 
@@ -141,6 +142,7 @@ export class AIGatewayModelProvider extends ISemanticVerificationProvider {
         options: {
           requestId: safeParams.options?.requestId,
           signal: safeParams.options?.signal,
+          budget: safeParams.options?.budget,
         },
       });
     } catch (error) {
@@ -170,6 +172,8 @@ export class AIGatewayModelProvider extends ISemanticVerificationProvider {
       modelUsed: result.model,
       modelProvider: result.provider,
       gatewayAttempts: result.attempts,
+      gatewayUsage: result.usage,
+      gatewayEstimatedCostCents: result.estimatedCostCents,
     }, { source: "ai_candidate" });
     if (!candidate) {
       return {
@@ -185,6 +189,8 @@ export class AIGatewayModelProvider extends ISemanticVerificationProvider {
     return {
       ...mergeSemanticCandidates(baseline, candidate),
       gatewayAttempts: result.attempts,
+      gatewayUsage: result.usage,
+      gatewayEstimatedCostCents: result.estimatedCostCents,
       modelStatus: "AI_ENRICHMENT_UNTRUSTED",
       providerIndependent: true,
       aiCannotOverrideSecurity: true,

@@ -6,15 +6,21 @@
  * route handlers never need to know legacy endpoint names or response shapes.
  */
 
+import { createFriendBackendAdapter } from "./integrations/friendBackend/FriendBackendAdapter.js";
 import { createLegacyVerificationAdapter } from "./integrations/legacyVerification/LegacyVerificationAdapter.js";
+import { createProviderGateway } from "./providerGateway/ProviderGateway.js";
 import { TrustPipelineOrchestrator } from "./v5/TrustPipelineOrchestrator.js";
 
 export class TrustOrchestrator extends TrustPipelineOrchestrator {
   constructor(options = {}) {
+    const friendBackendAdapter = options.friendBackendAdapter || options.legacyVerificationAdapter || createFriendBackendAdapter();
+    const legacyVerificationAdapter = friendBackendAdapter;
+    const providerGateway = options.providerGateway || createProviderGateway({ legacyVerificationAdapter, friendBackendAdapter });
     super({
       ...options,
-      legacyVerificationAdapter: options.legacyVerificationAdapter || createLegacyVerificationAdapter(),
+      providerGateway,
     });
+    this.friendBackendAdapter = friendBackendAdapter;
   }
 }
 

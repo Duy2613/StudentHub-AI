@@ -34,7 +34,7 @@ function assurance() {
   };
 }
 
-function createFixtureAdapter({ continueToLayer4 = true, layer4Result = null, calls }) {
+function createFixtureAdapter({ continueToLayer4 = true, layer3ProviderStatus = "SUCCESS", layer4Result = null, calls }) {
   return {
     enabled: true,
     layer2Provider() {
@@ -48,7 +48,10 @@ function createFixtureAdapter({ continueToLayer4 = true, layer4Result = null, ca
     async verifyLayer3({ claims, requestId }) {
       calls.push("l3");
       const normalized = normalizeLegacyLayer3Payload({ verdict: "UNKNOWN", stop: !continueToLayer4, canContinueToLayer4: continueToLayer4, reason: "Needs corroboration" }, { claims, requestId });
-      return normalized.result;
+      return {
+        ...normalized.result,
+        legacyIntegration: { ...normalized.result.legacyIntegration, providerStatus: layer3ProviderStatus },
+      };
     },
     async verifyLayer4({ requestId }) {
       calls.push("l4");
@@ -140,5 +143,31 @@ describe("canonical Trust orchestrator and legacy layer boundary", () => {
     assert.equal(result.stages.l4.operationStatus, "PARTIAL");
     assert.equal(result.finalDecision.action, "REVIEW");
     assert.equal(result.layerResults.layer4.legacyIntegration.status, "UNAVAILABLE");
+  });
+
+  it("does not treat a legacy Layer 3 provider outage as permission for Layer 4", async () => {
+    const calls = [];
+    const result = await orchestrator(createFixtureAdapter({ calls, layer3ProviderStatus: "UNAVAILABLE" })).run({ type: "url", content: "https://example.com" }, { requestId: "orchestrator-provider-unavailable" });
+    assert.deepEqual(calls, ["l2", "l3"]);
+    assert.equal(result.layerResults.layer3.legacyIntegration.canContinueToLayer4, true);
+    assert.equal(result.layerResults.layer4.legacyIntegration.status, "SKIPPED");
+    assert.equal(result.finalDecision.action, "REVIEW");
+  });
+
+  it("does not auto-continue when Layer 3 has no concrete result", async () => {
+    const calls = [];
+    const adapter = createFixtureAdapter({ calls });
+    adapter.verifyLayer3 = async () => {
+      calls.push("l3");
+      const error = new Error("layer 3 unavailable");
+      error.code = "L3_UNAVAILABLE";
+      throw error;
+    };
+    const result = await orchestrator(adapter).run({ type: "url", content: "https://example.com/missing-l3" }, { requestId: "orchestrator-missing-l3" });
+    assert.deepEqual(calls, ["l2", "l3"]);
+    assert.equal(result.stages.l3.operationStatus, "FAILED");
+    assert.equal(result.layerResults.layer3, null);
+    assert.equal(result.layerResults.layer4.legacyIntegration.status, "SKIPPED");
+    assert.equal(result.finalDecision.action, "REVIEW");
   });
 });

@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 
 import {
   appendEvidenceEvent,
+  appendEvidenceEventIdempotent,
   createEvidencePassport,
   PASSPORT_EVENT_TYPE,
   PROVENANCE_CLASS,
@@ -99,6 +100,24 @@ describe("Living Evidence Passport", () => {
       summary: "Late-arriving write with an older append time.",
       occurredAt: "2026-08-28T23:59:00.000Z",
     }), (error) => error.code === "NON_MONOTONIC_EVENT");
+  });
+
+  it("makes a retried Passport append idempotent without duplicating history", () => {
+    const event = {
+      id: "provider-event-1",
+      operationId: "provider-operation-1",
+      type: PASSPORT_EVENT_TYPE.EVIDENCE_OBSERVED,
+      provenanceClass: PROVENANCE_CLASS.TRUST_ENGINE,
+      summary: "Provider evidence observation recorded.",
+      occurredAt: "2026-08-29T00:01:00.000Z",
+      references: [{ id: "observation-1", label: "Evidence observation", sourceType: "TRUST_ENGINE" }],
+    };
+    const first = appendEvidenceEventIdempotent(livePassport(), event);
+    const retried = appendEvidenceEventIdempotent(first, event);
+    assert.equal(retried, first);
+    assert.equal(retried.events.length, 2);
+    assert.equal(retried.events.at(-1).metadata.operationId, "provider-operation-1");
+    assert.throws(() => appendEvidenceEventIdempotent(first, { ...event, summary: "Different operation" }), (error) => error.code === "IDEMPOTENCY_KEY_REUSED");
   });
 });
 

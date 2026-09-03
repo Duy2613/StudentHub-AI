@@ -30,6 +30,7 @@ import {
   EVIDENCE_PROVIDER_STATUS,
 } from "./types.js";
 import { LAYER_3_CONFIG } from "./config/Layer3Config.js";
+import { InvestigationBudgetExceededError } from "../v5/investigationBudget.js";
 import { VERIFICATION_TASK_TYPES } from "../layer2/types.js";
 import {
   L2C_VERIFICATION_TASK_TYPES,
@@ -225,6 +226,22 @@ function isSuccessfulFetch(fetchResult) {
   return Boolean(fetchResult && fetchResult.status === 200 && typeof fetchResult.textContent === "string" && fetchResult.textContent.trim());
 }
 
+function consumeBudgetOrThrow(budget, kind, amount = 1) {
+  if (!budget || typeof budget.tryConsume !== "function") return;
+  const result = budget.tryConsume(kind, amount);
+  if (!result?.allowed) throw new InvestigationBudgetExceededError(result?.code || "BUDGET_EXCEEDED", result?.snapshot || null);
+}
+
+function serializedByteCount(value) {
+  try {
+    const serialized = JSON.stringify(value);
+    if (typeof TextEncoder !== "undefined") return new TextEncoder().encode(serialized).byteLength;
+    return serialized.length;
+  } catch {
+    return 0;
+  }
+}
+
 function safeFetchResult(value) {
   if (!value || typeof value !== "object") return { html: "", textContent: "", status: 502, error: "INVALID_RETRIEVER_RESPONSE" };
   const textContent = typeof value.textContent === "string" ? value.textContent.slice(0, MAX_TEXT_LENGTH) : "";
@@ -295,25 +312,31 @@ export class Layer3EvidenceService {
     try {
       throwIfAborted(safeOptions.signal);
       if (typeof retriever.search !== "function") throw new Error("RETRIEVER_SEARCH_UNAVAILABLE");
-      const searchResult = await retriever.search(boundedQueries, { requestId, signal: safeOptions.signal });
+      consumeBudgetOrThrow(safeOptions.budget, "searchRequests");
+      const searchResult = await retriever.search(boundedQueries, { requestId, signal: safeOptions.signal, budget: safeOptions.budget });
       throwIfAborted(safeOptions.signal);
       retrievedSources = asArray(searchResult).map(safeCandidate).filter(Boolean).slice(0, MAX_RETRIEVED_SOURCES);
+      consumeBudgetOrThrow(safeOptions.budget, "results", retrievedSources.length);
       if (retrieverId.includes("knowledge_base") || retrievedSources.some((src) => src.sourceType === SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE)) {
         retrievalMode = "LOCAL_KNOWLEDGE_BASE";
         retrievalStatus = EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY;
       }
     } catch (err) {
       if (safeOptions.signal?.aborted || err?.name === "AbortError") throw err;
+      if (err instanceof InvestigationBudgetExceededError) throw err;
       retrievalStatus = EVIDENCE_PROVIDER_STATUS.UNAVAILABLE;
       retrievalMode = "LOCAL_FALLBACK";
       auditEvents.push({ type: "RETRIEVER_FAILURE", code: boundedString(err?.message, 120) || "RETRIEVER_FAILURE", at: new Date().toISOString() });
       try {
         const fallback = new KnowledgeBaseRetriever();
         fetchRetriever = fallback;
-        retrievedSources = asArray(await fallback.search(boundedQueries, { requestId, signal: safeOptions.signal }))
+        consumeBudgetOrThrow(safeOptions.budget, "searchRequests");
+        retrievedSources = asArray(await fallback.search(boundedQueries, { requestId, signal: safeOptions.signal, budget: safeOptions.budget }))
           .map(safeCandidate).filter(Boolean).slice(0, MAX_RETRIEVED_SOURCES);
+        consumeBudgetOrThrow(safeOptions.budget, "results", retrievedSources.length);
       } catch (fallbackError) {
         if (safeOptions.signal?.aborted || fallbackError?.name === "AbortError") throw fallbackError;
+        if (fallbackError instanceof InvestigationBudgetExceededError) throw fallbackError;
         retrievedSources = [];
         auditEvents.push({ type: "LOCAL_FALLBACK_FAILURE", code: boundedString(fallbackError?.message, 120) || "LOCAL_FALLBACK_FAILURE", at: new Date().toISOString() });
       }
@@ -333,7 +356,7 @@ export class Layer3EvidenceService {
       let fetchResult;
       try {
         if (typeof fetchRetriever.fetch !== "function") throw new Error("RETRIEVER_FETCH_UNAVAILABLE");
-        fetchResult = safeFetchResult(await fetchRetriever.fetch(urlGuard.url, { requestId, signal: safeOptions.signal }));
+        fetchResult = safeFetchResult(await fetchRetriever.fetch(urlGuard.url, { requestId, signal: safeOptions.signal, budget: safeOptions.budget }));
       } catch (err) {
         if (safeOptions.signal?.aborted || err?.name === "AbortError") throw err;
         fetchResult = { html: "", textContent: "", status: 502, error: boundedString(err?.message, 120) || "FETCH_FAILURE" };
@@ -393,7 +416,7 @@ export class Layer3EvidenceService {
           ? "INSUFFICIENT"
           : matchResult.relation;
 
-        evidenceItems.push(createEvidence({
+        const evidence = createEvidence({
           claimId: claim.claimId,
           sourceId: sourceDto.sourceId,
           sourceUrl: sourceDto.url,
@@ -412,7 +435,9 @@ export class Layer3EvidenceService {
           sourceFingerprint: sourceDto.sourceFingerprint,
           contentFingerprint: sourceDto.contentFingerprint,
           retrievalOutcome: sourceDto.retrievalOutcome,
-        }));
+        });
+        consumeBudgetOrThrow(safeOptions.budget, "evidenceBytes", serializedByteCount(evidence));
+        evidenceItems.push(evidence);
       }
     }
 

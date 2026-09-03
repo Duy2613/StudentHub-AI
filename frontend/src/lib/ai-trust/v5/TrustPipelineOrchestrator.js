@@ -18,9 +18,13 @@ import {
 import { decideReputationLookup } from "../layer2a/ReputationLookupPolicy.js";
 import { failedStage, stageFromL1, stageFromL2A, stageFromL2B, stageFromL2C, stageFromL3, stageFromL4, stageFromL5 } from "./stageAdapters.js";
 import { buildCanonicalTrustProjection } from "../integrations/canonicalTrustProjection.js";
+import { PROVIDER_CAPABILITY } from "../providerGateway/types.js";
+import { createInvestigationBudget } from "./investigationBudget.js";
 
 const TRANSIENT_L2A_STATUSES = new Set(["TIMEOUT", "RATE_LIMITED", "UNAVAILABLE", "CIRCUIT_OPEN", "ERROR"]);
 const TRANSIENT_L3_STATUSES = new Set(["TIMEOUT", "UNAVAILABLE", "ERROR", "NOT_CONFIGURED"]);
+const NON_CONTINUABLE_PROVIDER_STATES = new Set(["TIMEOUT", "UNAVAILABLE", "NOT_CONFIGURED", "RATE_LIMITED", "AUTH_FAILED", "MALFORMED", "INVALID_RESPONSE", "CIRCUIT_OPEN"]);
+const BUDGETED_STAGES = new Set(["l2a", "l2b", "l2c", "l3", "l4", "l5"]);
 
 export class TrustPipelineCancelledError extends Error {
   constructor() {
@@ -99,6 +103,41 @@ function adapterIsEnabled(adapter) {
   }
 }
 
+function capabilityIsEnabled(provider, capability, method) {
+  if (!provider) return false;
+  if (typeof provider.isCapabilityConfigured === "function") {
+    try {
+      return provider.isCapabilityConfigured(capability) === true;
+    } catch {
+      return false;
+    }
+  }
+  return adapterIsEnabled(provider) && typeof provider[method] === "function";
+}
+
+function canContinueToIndependentResearch(layer3Result) {
+  const layer3 = asObject(layer3Result);
+  const legacy = asObject(layer3.legacyIntegration);
+  // An absent Layer 3 result is an outage/failed stage, not permission to
+  // continue into an independent research provider. The continuation decision
+  // must be derived from a concrete Layer 3 observation or an explicit typed
+  // provider state.
+  if (!layer3Result || Object.keys(layer3).length === 0) return false;
+  const providerStatus = String(legacy.providerStatus || layer3.retrievalStatus || layer3.metrics?.retrievalStatus || "").toUpperCase();
+  if (NON_CONTINUABLE_PROVIDER_STATES.has(providerStatus)) return false;
+  if (legacy.status && String(legacy.status).toUpperCase() !== "COMPLETED") return false;
+  if (legacy.stop === true || legacy.canContinueToLayer4 === false) return false;
+  const canonicalStatus = String(layer3.status || "").toUpperCase();
+  const hasCanonicalInvestigationState = [
+    "VERIFIED",
+    "CONTESTED",
+    "UNVERIFIED",
+    "INSUFFICIENT_EVIDENCE",
+    "PARTIAL",
+  ].includes(canonicalStatus);
+  return hasCanonicalInvestigationState || !canonicalStatus;
+}
+
 export function isRetryEligible(stageId, result = {}) {
   return ["l2a", "l3"].includes(stageId) && isTransient(stageId, result);
 }
@@ -134,8 +173,10 @@ export class TrustPipelineOrchestrator {
       l2b: options.semanticProvider || null,
       l3: options.retriever || null,
     };
+    this.providerGateway = options.providerGateway || null;
     this.legacyVerificationAdapter = options.legacyVerificationAdapter || null;
-    this.legacyVerificationEnabled = adapterIsEnabled(this.legacyVerificationAdapter);
+    this.legacyVerificationProvider = this.providerGateway || this.legacyVerificationAdapter;
+    this.legacyVerificationEnabled = adapterIsEnabled(this.legacyVerificationProvider);
     this.maxRetriesPerStage = Number.isInteger(options.maxRetriesPerStage) ? Math.max(0, Math.min(1, options.maxRetriesPerStage)) : 1;
     this._activeController = null;
     this._lastRun = null;
@@ -180,7 +221,7 @@ export class TrustPipelineOrchestrator {
     });
   }
 
-  async _stageWorker(stageId, input, rawResults, requestId, signal) {
+  async _stageWorker(stageId, input, rawResults, requestId, signal, budget = null) {
     if (stageId === "l1") {
       return this.services.l1({ ...input, options: { requestId, signal } });
     }
@@ -191,19 +232,19 @@ export class TrustPipelineOrchestrator {
       // lookup. L1's hard negative remains authoritative regardless.
       const url = input.type === "url" ? input.content || input.metadata.url || "" : "";
       const reputationProvider = this.providers.l2a || (
-        this.legacyVerificationEnabled && typeof this.legacyVerificationAdapter?.layer2Provider === "function"
-          ? this.legacyVerificationAdapter.layer2Provider()
+        capabilityIsEnabled(this.legacyVerificationProvider, PROVIDER_CAPABILITY.URL_THREAT, "layer2Provider") && typeof this.legacyVerificationProvider?.layer2Provider === "function"
+          ? this.legacyVerificationProvider.layer2Provider()
           : null
       );
       return this.services.l2a({
         url,
         reputationLookup: decideReputationLookup(url),
         requestId,
-        options: reputationProvider ? { provider: reputationProvider, signal } : { signal },
+        options: reputationProvider ? { provider: reputationProvider, signal, budget } : { signal, budget },
       });
     }
     if (stageId === "l2b") {
-      return this.services.l2b({ ...input, layer1Result: rawResults.l1, options: this.providers.l2b ? { provider: this.providers.l2b, requestId, signal } : { requestId, signal } });
+      return this.services.l2b({ ...input, layer1Result: rawResults.l1, options: this.providers.l2b ? { provider: this.providers.l2b, requestId, signal, budget } : { requestId, signal, budget } });
     }
     if (stageId === "l2c") {
       return this.services.l2c({ content: input.content || input.metadata.ocrText || input.metadata.qrContent || "", inputType: input.type, context: { inputType: input.type, institutionContext: input.metadata.institutionContext }, layer1Result: rawResults.l1, layer2BResult: rawResults.l2b, signal });
@@ -218,10 +259,10 @@ export class TrustPipelineOrchestrator {
         input,
         requestId,
         signal,
-        options: { requestId, signal, ...(this.providers.l3 ? { retriever: this.providers.l3 } : {}) },
+        options: { requestId, signal, budget, ...(this.providers.l3 ? { retriever: this.providers.l3 } : {}) },
       };
-      if (this.legacyVerificationEnabled && typeof this.legacyVerificationAdapter?.verifyLayer3 === "function") {
-        return this.legacyVerificationAdapter.verifyLayer3(layer3Params);
+      if (capabilityIsEnabled(this.legacyVerificationProvider, PROVIDER_CAPABILITY.WEB_EVIDENCE, "verifyLayer3") && typeof this.legacyVerificationProvider?.verifyLayer3 === "function") {
+        return this.legacyVerificationProvider.verifyLayer3(layer3Params);
       }
       return this.services.l3(layer3Params);
     }
@@ -233,16 +274,11 @@ export class TrustPipelineOrchestrator {
         layer2CResult: rawResults.l2c || null,
         layer3Result: rawResults.l3 || null,
         input,
-        options: { requestId, signal },
+        options: { requestId, signal, budget },
       });
-      if (!this.legacyVerificationEnabled || typeof this.legacyVerificationAdapter?.verifyLayer4 !== "function") return localResult;
+      if (!capabilityIsEnabled(this.legacyVerificationProvider, PROVIDER_CAPABILITY.INDEPENDENT_RESEARCH, "verifyLayer4") || typeof this.legacyVerificationProvider?.verifyLayer4 !== "function") return localResult;
 
-      const legacyLayer3 = rawResults.l3?.legacyIntegration;
-      const canRunIndependentSynthesis = !legacyLayer3 || (
-        legacyLayer3.status === "COMPLETED" &&
-        legacyLayer3.stop !== true &&
-        legacyLayer3.canContinueToLayer4 !== false
-      );
+      const canRunIndependentSynthesis = canContinueToIndependentResearch(rawResults.l3);
       if (!canRunIndependentSynthesis) {
         return {
           ...localResult,
@@ -266,7 +302,7 @@ export class TrustPipelineOrchestrator {
         };
       }
 
-      const independent = await this.legacyVerificationAdapter.verifyLayer4({
+      const independent = await this.legacyVerificationProvider.verifyLayer4({
         input,
         layer1Result: rawResults.l1 || null,
         layer2AResult: rawResults.l2a || null,
@@ -276,6 +312,7 @@ export class TrustPipelineOrchestrator {
         unresolvedSignals: rawResults.l3?.legacyIntegration?.unresolvedSignals || [],
         requestId,
         signal,
+        budget,
       });
       return {
         ...localResult,
@@ -361,7 +398,16 @@ export class TrustPipelineOrchestrator {
       this._assertActive(signal);
       const attemptTiming = attempt === startAttempt ? runningTiming : stageTiming();
       try {
-        const raw = await this._stageWorker(stageId, input, rawResults, pipeline.requestId, signal);
+        if (BUDGETED_STAGES.has(stageId) && options.budget) {
+          const budgetResult = options.budget.tryConsume("providerCalls");
+          if (!budgetResult.allowed) {
+            const failureCode = `INVESTIGATION_BUDGET_${boundedString(budgetResult.code, 80) || "EXCEEDED"}`;
+            finalStage = failedStage(stageId, pipeline.requestId, failureCode, { startedAt: attemptTiming.startedAt, completedAt: nowIso() });
+            this._recordAttempt(pipeline, stageId, attempt, finalStage, failureCode);
+            break;
+          }
+        }
+        const raw = await this._stageWorker(stageId, input, rawResults, pipeline.requestId, signal, options.budget);
         this._assertActive(signal);
         lastRaw = raw;
         const retryable = isRetryEligible(stageId, raw) && attempt < startAttempt + this.maxRetriesPerStage;
@@ -372,6 +418,11 @@ export class TrustPipelineOrchestrator {
         finalStage = this._adapt(stageId, raw || {}, pipeline.requestId, attemptTiming, operationStatus, attempt);
         this._recordAttempt(pipeline, stageId, attempt, finalStage);
         if (retryable) {
+          const retryBudget = options.budget?.tryConsume?.("retries");
+          if (retryBudget && !retryBudget.allowed) {
+            pipeline.audit.stageAttempts.push({ stageId, attempt, status: "RETRY_BLOCKED_BY_BUDGET", finding: finalStage.finding, errorCode: `INVESTIGATION_BUDGET_${boundedString(retryBudget.code, 80) || "EXCEEDED"}`, startedAt: finalStage.startedAt, completedAt: finalStage.completedAt });
+            break;
+          }
           pipeline.audit.stageAttempts.push({ stageId, attempt, status: "RETRY_SCHEDULED", finding: finalStage.finding, errorCode: "TRANSIENT_PROVIDER", startedAt: finalStage.startedAt, completedAt: finalStage.completedAt });
           await this._emit(pipeline, "STAGE_RETRY_SCHEDULED", onTransition);
           continue;
@@ -385,6 +436,11 @@ export class TrustPipelineOrchestrator {
         finalStage = failedStage(stageId, pipeline.requestId, failureCode, { startedAt: attemptTiming.startedAt, completedAt: nowIso() });
         this._recordAttempt(pipeline, stageId, attempt, finalStage, failureCode);
         if (retryable) {
+          const retryBudget = options.budget?.tryConsume?.("retries");
+          if (retryBudget && !retryBudget.allowed) {
+            pipeline.audit.stageAttempts.push({ stageId, attempt, status: "RETRY_BLOCKED_BY_BUDGET", finding: finalStage.finding, errorCode: `INVESTIGATION_BUDGET_${boundedString(retryBudget.code, 80) || "EXCEEDED"}`, startedAt: finalStage.startedAt, completedAt: finalStage.completedAt });
+            break;
+          }
           pipeline.audit.stageAttempts.push({ stageId, attempt, status: "RETRY_SCHEDULED", finding: finalStage.finding, errorCode: failureCode, startedAt: finalStage.startedAt, completedAt: finalStage.completedAt });
           await this._emit(pipeline, "STAGE_RETRY_SCHEDULED", onTransition);
           continue;
@@ -418,10 +474,14 @@ export class TrustPipelineOrchestrator {
 
     const input = normalizeInput(rawInput);
     const requestId = boundedString(options.requestId, 160) || createSecureId("req_v5");
+    const budget = options.investigationBudget && typeof options.investigationBudget.tryConsume === "function"
+      ? options.investigationBudget
+      : createInvestigationBudget({ limits: options.budgetLimits, clock: options.budgetClock });
     const startedAt = nowIso();
     let pipeline = createInitialPipeline({ requestId, startedAt });
     pipeline.pipelineStatus = PIPELINE_STATUS.RUNNING;
     pipeline.audit.inputFingerprint = fingerprint(input);
+    pipeline.audit.budget = budget.snapshot();
     const rawResults = {};
     const onTransition = options.onTransition;
     const retryStageId = STAGE_IDS.includes(options.retryStageId) ? options.retryStageId : null;
@@ -448,7 +508,9 @@ export class TrustPipelineOrchestrator {
         rawResults._pipeline = pipeline;
         const stageStatus = await this._executeStage(stageId, pipeline, input, rawResults, controller.signal, onTransition, {
           startAttempt: retryStageId === stageId && retrySource ? (Number(pipeline.stages[stageId]?.audit?.attemptCount) || 0) + 1 : 1,
+          budget,
         });
+        pipeline.audit.budget = budget.snapshot();
         if (stageStatus === PIPELINE_STATUS.PARTIAL) partial = true;
 
         // L5 audits the completed upstream result. It is not allowed to audit a
@@ -473,6 +535,7 @@ export class TrustPipelineOrchestrator {
       };
       pipeline.pipelineStatus = partial ? PIPELINE_STATUS.PARTIAL : PIPELINE_STATUS.COMPLETED;
       pipeline.completedAt = nowIso();
+      pipeline.audit.budget = budget.snapshot();
       const projection = buildCanonicalTrustProjection({
         requestId,
         input,
@@ -510,6 +573,7 @@ export class TrustPipelineOrchestrator {
       }
       pipeline.pipelineStatus = PIPELINE_STATUS.FAILED;
       pipeline.completedAt = nowIso();
+      pipeline.audit.budget = budget.snapshot();
       await this._emit(pipeline, "PIPELINE_FAILED", onTransition);
       throw error;
     } finally {

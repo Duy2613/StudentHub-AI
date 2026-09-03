@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,6 +14,12 @@ import SourceDisclosure from "@/components/ui/SourceDisclosure";
 import { getRuntimeProviderBundle } from "@/lib/backend/runtimeProvider";
 import TrustSectionBoundary from "./TrustSectionBoundary";
 import TrustPipelineTimeline from "./TrustPipelineTimeline";
+import SequentialFourLayerHUD from "./SequentialFourLayerHUD";
+import {
+  SEQUENTIAL_STATE,
+  createInitialSequentialState,
+  sequentialStateReducer,
+} from "@/lib/ai-trust/sequential/SequentialTrustStateMachine";
 
 const TrustGraph2D = dynamic(() => import("./TrustGraph2D"), {
   ssr: false,
@@ -304,6 +310,7 @@ export function AiTrustStudioView() {
   const [pipeline, setPipeline] = useState(EMPTY_PIPELINE);
   const [v5Pipeline, setV5Pipeline] = useState(null);
   const [layers, setLayers] = useState({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null });
+  const [seqState, dispatchSeq] = useReducer(sequentialStateReducer, undefined, createInitialSequentialState);
   const [timeline, setTimeline] = useState([]);
   const [demoCaseId, setDemoCaseId] = useState(null);
   const [providerResult, setProviderResult] = useState(null);
@@ -340,6 +347,7 @@ export function AiTrustStudioView() {
     if (preview) URL.revokeObjectURL(preview);
     scanSequence.current += 1;
     activeScan.current?.abort("reset");
+    dispatchSeq({ type: "RESET" });
     setFile(null); setPreview(null); setContent(""); setError(null); setOcr(null); setConfirmedEntities([]); setDemoCaseId(null); setProviderResult(null); setSourceProvenance(null);
     setPipeline(EMPTY_PIPELINE); setV5Pipeline(null); setLayers({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null }); setTimeline([]);
   };
@@ -351,14 +359,44 @@ export function AiTrustStudioView() {
     const scanId = ++scanSequence.current;
     setError(null); setProcessing(true); setPipeline(EMPTY_PIPELINE); setV5Pipeline(null); setProviderResult(null); setSourceProvenance(null); setTimeline([]);
     setLayers({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null });
+    dispatchSeq({ type: "START", payload: { requestId: `scan-${scanId}` } });
     let extracted = content.trim();
     try {
       const demoCase = demoEnabled ? COMPETITION_DEMO_CASES.find((item) => item.id === demoCaseId) : null;
       if (demoCase) {
         updateStep("input", "done", "CHẾ ĐỘ TRÌNH DIỄN"); record("Đầu vào demo đã được nạp", "DEMO DATA");
+        dispatchSeq({ type: "START", payload: { requestId: "demo-" + demoCase.id } });
+        await new Promise((r) => setTimeout(r, 300));
+        if (controller.signal.aborted || scanId !== scanSequence.current) return;
+
         updateStep("local", "done", readable(demoCase.layers.layer1.status)); record("Phân tích rủi ro cục bộ", readable(demoCase.layers.layer1.status));
+        dispatchSeq({ type: "L1_SUCCESS", payload: { result: demoCase.layers.layer1 } });
+        await new Promise((r) => setTimeout(r, 400));
+        if (controller.signal.aborted || scanId !== scanSequence.current) return;
+
+        dispatchSeq({ type: "START_L2" });
+        await new Promise((r) => setTimeout(r, 300));
+        if (controller.signal.aborted || scanId !== scanSequence.current) return;
+        const l2Result = demoCase.layers.layer2A || demoCase.layers.layer2 || { finding: "NO_KNOWN_THREAT", status: "PASS" };
+        dispatchSeq({ type: "L2_SUCCESS", payload: { result: l2Result } });
+        await new Promise((r) => setTimeout(r, 400));
+        if (controller.signal.aborted || scanId !== scanSequence.current) return;
+
         updateStep("external", demoCase.layers.layer3.status === "PARTIAL" ? "partial" : "done", readable(demoCase.layers.layer3.status)); record("Đối soát bằng chứng", readable(demoCase.layers.layer3.status));
+        dispatchSeq({ type: "START_L3" });
+        await new Promise((r) => setTimeout(r, 300));
+        if (controller.signal.aborted || scanId !== scanSequence.current) return;
+        dispatchSeq({ type: "L3_SUCCESS", payload: { result: demoCase.layers.layer3 } });
+        await new Promise((r) => setTimeout(r, 400));
+        if (controller.signal.aborted || scanId !== scanSequence.current) return;
+
         updateStep("reasoning", "done", readable(demoCase.layers.layer4.status)); record("Phán quyết demo được tổng hợp", readable(demoCase.layers.layer4.status));
+        dispatchSeq({ type: "START_L4" });
+        await new Promise((r) => setTimeout(r, 300));
+        if (controller.signal.aborted || scanId !== scanSequence.current) return;
+        dispatchSeq({ type: "L4_SUCCESS", payload: { result: demoCase.layers.layer4 } });
+        dispatchSeq({ type: "FINAL_VERDICT", payload: { verdict: demoCase.layers.layer4 } });
+
         setLayers(demoCase.layers);
         setSourceProvenance({ requestedMode: "DEMO", sourceMode: "DEMO", kind: "DEMO_FIXTURE", label: "Deterministic competition demo case", fixtureId: demoCase.id, fixtureVersion: "competition-v1", disclosure: "Case được chọn chủ động từ fixture trình diễn; không phải xác minh live." });
         return;
@@ -405,6 +443,18 @@ export function AiTrustStudioView() {
         if (event.event === "STAGE_STARTED" || event.event === "STAGE_COMPLETED" || event.event === "STAGE_RETRY_SCHEDULED") {
           record(`V5 ${String(event.stageId || "stage").toUpperCase()}`, readable(event.event));
         }
+        if (event.event === "STAGE_STARTED") {
+          if (event.stageId === "l1") dispatchSeq({ type: "START", payload: { requestId: identity.requestId } });
+          else if (["l2a", "l2b", "l2c"].includes(event.stageId)) dispatchSeq({ type: "START_L2" });
+          else if (event.stageId === "l3") dispatchSeq({ type: "START_L3" });
+          else if (["l4", "l5"].includes(event.stageId)) dispatchSeq({ type: "START_L4" });
+        }
+        if (event.event === "STAGE_COMPLETED") {
+          if (event.stageId === "l1") dispatchSeq({ type: "L1_SUCCESS", payload: { result: event.data?.layerResults?.layer1 || {} } });
+          else if (["l2a", "l2b", "l2c"].includes(event.stageId)) dispatchSeq({ type: "L2_SUCCESS", payload: { result: event.data?.layerResults?.layer2B || event.data?.layerResults?.layer2A || {} } });
+          else if (event.stageId === "l3") dispatchSeq({ type: "L3_SUCCESS", payload: { result: event.data?.layerResults?.layer3 || {} } });
+          else if (["l4", "l5"].includes(event.stageId)) dispatchSeq({ type: "L4_SUCCESS", payload: { result: event.data?.layerResults?.layer4 || {} } });
+        }
         const eventLayers = event.data.layerResults;
         if (eventLayers) setLayers({
           layer1: eventLayers.layer1 || null,
@@ -422,10 +472,23 @@ export function AiTrustStudioView() {
         const safeMessage = response.error?.userMessage || (response.state === "UNAVAILABLE" ? "Nguồn live chưa khả dụng; không có dữ liệu demo thay thế." : response.state === "CANCELLED" ? "Yêu cầu đã được dừng." : "Trust Engine chưa trả về kết quả hợp lệ.");
         if (response.state !== "CANCELLED") setError({ message: safeMessage, code: response.error?.code || response.state, traceId: response.error?.details?.traceId || response.error?.requestId || null });
         setPipeline((items) => items.map((item) => item.status === "running" ? { ...item, status: response.state === "CANCELLED" ? "waiting" : "error", detail: safeMessage } : item));
+        if (response.state === "CANCELLED") {
+          dispatchSeq({ type: "CANCEL" });
+        } else {
+          dispatchSeq({
+            type: "FAIL_LAYER",
+            payload: {
+              layer: seqState.activeLayer || 2,
+              code: response.error?.code || response.state,
+              message: safeMessage,
+            },
+          });
+        }
         return;
       }
       if (!response.data) {
         setError({ message: "Trust Engine chưa trả về dữ liệu đủ để hiển thị.", code: "INVALID_RESPONSE", traceId: response.requestId || null });
+        dispatchSeq({ type: "FAIL_LAYER", payload: { layer: 4, code: "INVALID_RESPONSE", message: "Trust Engine chưa trả về dữ liệu đủ để hiển thị." } });
         return;
       }
       const displayPipeline = streamedPipeline || (response.data && response.data.layerResults ? response.data : null);
@@ -438,19 +501,35 @@ export function AiTrustStudioView() {
       const layer3 = resultLayers.layer3 || null;
       const layer4 = resultLayers.layer4 || null;
       setLayers({ layer1, layer2A, layer2, layer2C, layer3, layer4 });
+      if (layer1) dispatchSeq({ type: "L1_SUCCESS", payload: { result: layer1 } });
+      if (layer2A || layer2) dispatchSeq({ type: "L2_SUCCESS", payload: { result: layer2A || layer2 } });
+      if (layer3) dispatchSeq({ type: "L3_SUCCESS", payload: { result: layer3 } });
+      if (layer4) dispatchSeq({ type: "L4_SUCCESS", payload: { result: layer4 } });
+      dispatchSeq({ type: "FINAL_VERDICT", payload: { verdict: displayPipeline?.finalDecision || response.data } });
       setPipeline((items) => displayPipeline ? legacyPipelineFromV5(displayPipeline, items) : items.map((item) => item.status === "running" ? { ...item, status: "done", detail: "Canonical result" } : item));
       record("Trust provider hoàn tất", readable(response.state));
     } catch (caught) {
-      if (caught instanceof ApiError && caught.code === "ABORTED" && scanId !== scanSequence.current) return;
+      if (caught instanceof ApiError && caught.code === "ABORTED" && scanId !== scanSequence.current) {
+        dispatchSeq({ type: "CANCEL" });
+        return;
+      }
       const message = caught instanceof ApiError ? apiErrorMessage(caught) : "Pipeline gặp lỗi ngoài dự kiến.";
       setError({ message, code: caught instanceof ApiError ? caught.code : "SERVER_ERROR", traceId: caught instanceof ApiError ? caught.traceId : null });
       setPipeline((items) => items.map((item) => item.status === "running" ? { ...item, status: "error", detail: message } : item));
+      dispatchSeq({
+        type: "FAIL_LAYER",
+        payload: {
+          layer: seqState.activeLayer || 1,
+          code: caught instanceof ApiError ? caught.code : "SERVER_ERROR",
+          message,
+        },
+      });
     } finally { if (scanId === scanSequence.current) setProcessing(false); }
   };
 
   const hasNativeV5 = Boolean(v5Pipeline && v5Pipeline.pipelineVersion !== "trust-v5-compatibility");
   const canonicalResult = providerResult?.data || null;
-  const hasResult = Boolean(layers.layer4 || v5Pipeline?.finalDecision || canonicalResult);
+  const hasResult = Boolean(layers.layer4 || v5Pipeline?.finalDecision || canonicalResult || seqState.state === SEQUENTIAL_STATE.FINAL);
   const risk = readable(layers.layer4?.riskAssessment?.level || layers.layer4?.riskLevel || (hasNativeV5 ? v5Pipeline?.finalDecision?.security : null) || layers.layer1?.riskLevel || canonicalResult?.metrics?.risk || canonicalResult?.decision?.security, "CHƯA XÁC ĐỊNH");
   const verdict = hasNativeV5 ? v5VerdictTitle(v5Pipeline?.finalDecision) : layers.layer4?.userExplanation?.verdictTitle || (canonicalResult ? v5VerdictTitle(canonicalResult.decision) : readable(layers.layer4?.status, "Đang chờ phân tích"));
   const reasons = deriveReasons(layers, canonicalResult);
@@ -528,6 +607,16 @@ export function AiTrustStudioView() {
       <aside className="intelligence-panel pipeline-panel"><div className="panel-heading"><div><p className="product-kicker">Live pipeline</p><h2 className="product-section-title">Dấu vết xử lý</h2></div><span className={`live-indicator ${processing ? "is-live" : ""}`}>{processing ? "RUNNING" : hasResult ? "COMPLETE" : "READY"}</span></div><ol className="pipeline-list">{pipeline.map((step, index) => <li key={step.id} data-status={step.status}><span className="pipeline-index">{step.status === "done" ? <Check size={14} /> : index + 1}</span><div><strong>{step.label}</strong><small>{step.detail || (step.status === "waiting" ? "Chờ bước trước" : readable(step.status))}</small></div></li>)}</ol>{ocr && <><div className="ocr-readout"><div><FileImage size={15} /><span>OCR trong trình duyệt</span><strong>{ocr.authority}</strong></div><p>{String(ocr.text || ocr.qrContent || "").slice(0, 180)}{String(ocr.text || ocr.qrContent || "").length > 180 ? "..." : ""}</p></div><div className="entity-inspector" aria-label="Các thực thể trích xuất"><div className="panel-heading"><span className="data-label">Entity inspector</span><span className="metadata-chip">HINT · không thẩm quyền</span></div><p className="entity-disclosure">Chọn thực thể để gửi kèm như một gợi ý có xác nhận. Việc chọn không biến OCR cục bộ thành bằng chứng.</p>{Object.entries(ocr.entities || {}).filter(([, values]) => Array.isArray(values) && values.length).map(([type, values]) => <div className="entity-row" key={type}><strong>{type.replaceAll(/([A-Z])/g, " $1")}</strong><div className="entity-values">{values.map((value) => <label key={value}><input type="checkbox" checked={confirmedEntities.includes(value)} onChange={() => setConfirmedEntities((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value].slice(0, 50))} /><span>{value}</span></label>)}</div></div>)}</div></>}</aside>
     </section>
     {providerResult && providerResult.state !== "SUCCESS" && <StateBoundary envelope={providerResult} onAction={handleTrustStateAction} />}
+    {seqState.state !== SEQUENTIAL_STATE.IDLE && (
+      <SequentialFourLayerHUD
+        sequentialState={seqState}
+        onToggleCollapse={(layer) => dispatchSeq({ type: "TOGGLE_COLLAPSE", payload: { layer } })}
+        onRetry={() => {
+          dispatchSeq({ type: "RETRY" });
+          analyze();
+        }}
+      />
+    )}
     <TrustPipelineTimeline pipeline={v5Pipeline} processing={processing} />
     {hasResult && <div className="result-stack">
       <section className="verdict-panel" aria-labelledby="verdict-title"><div className="verdict-main"><div className="flex items-center justify-between gap-3"><p className="product-kicker">02 · Verdict</p><button type="button" className="text-link print-trigger" onClick={() => window.print()}><Printer size={14} /> In báo cáo</button></div><div className="verdict-icon"><ShieldAlert size={24} /></div><h2 id="verdict-title">{verdict}</h2><p>{layers.layer4?.userExplanation?.recommendedActionNote || canonicalResult?.recommendedAction || "Đọc các lý do và bằng chứng trước khi thực hiện hành động tiếp theo."}</p></div></section>

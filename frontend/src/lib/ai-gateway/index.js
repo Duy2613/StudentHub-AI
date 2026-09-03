@@ -14,7 +14,17 @@ export {
   GATEWAY_ERROR_TYPE,
   createAttemptRecord,
   createGatewayResult,
+  estimateModelUsage,
+  estimatedCostCentsFor,
+  mergeModelUsage,
+  normalizeModelUsage,
 } from "./types.js";
 export { IModelProvider } from "./providers/IModelProvider.js";
 export { OpenAICompatibleProvider } from "./providers/OpenAICompatibleProvider.js";
 export { GeminiProvider } from "./providers/GeminiProvider.js";
+export {
+  evidenceIdsFromRecords,
+  sourceIdsFromRecords,
+  validateEvidenceReferences,
+  createEvidenceReferenceValidator,
+} from "./evidenceBindings.js";
