@@ -23,13 +23,14 @@ import {
   SecurityOutboxRepository,
   OUTBOX_STATE,
   assertValidTransition,
+  resetResolvedOutboxSchema,
 } from "../../src/lib/server/outbox/SecurityOutboxRepository.js";
 import { SecurityOutboxTransformer } from "../../src/lib/server/outbox/SecurityOutboxTransformer.js";
-import { DurableTrustRepository } from "../../src/lib/server/database/DurableTrustRepository.js";
 import { DatabaseAdapter } from "../../src/lib/db/DatabaseAdapter.js";
 
 describe("Security Outbox Hardening & Boundary Assurances (I1)", () => {
   beforeEach(async () => {
+    resetResolvedOutboxSchema();
     try {
       const adapter = new DatabaseAdapter("security_outbox");
       await adapter.clear();
@@ -166,6 +167,7 @@ describe("Security Outbox Hardening & Boundary Assurances (I1)", () => {
         executedQueries.push({ queryStr, params });
 
         if (/^BEGIN/i.test(queryStr)) return { rows: [] };
+        if (/information_schema\.tables/i.test(queryStr)) return { rows: [{ table_schema: "private" }] };
         if (/INSERT INTO public\.trust_cases/i.test(queryStr)) return { rows: [] };
         if (/INSERT INTO public\.case_inputs/i.test(queryStr)) return { rows: [] };
 
