@@ -1,4 +1,4 @@
-﻿/**
+/**
  * StudentHub AI — DatabaseAdapter V2 (Production-Hardened)
  * 
  * Unified Data Access Interface supporting:
@@ -69,7 +69,7 @@ export class DatabaseAdapter {
     if (configuredMode === ADAPTER_MODE.POSTGRES_SUPABASE) {
       this.#mode = ADAPTER_MODE.POSTGRES_SUPABASE;
     } else if (configuredMode === ADAPTER_MODE.DURABLE_FILE || configuredMode === ADAPTER_MODE.MEMORY) {
-      if (isProduction() && !process.env.ALLOW_LOCAL_DB_IN_PRODUCTION) {
+      if (isProduction()) {
         this.#mode = ADAPTER_MODE.NOT_CONFIGURED;
       } else {
         this.#mode = ADAPTER_MODE.DURABLE_FILE;

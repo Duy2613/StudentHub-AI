@@ -99,4 +99,20 @@ describe("DatabaseAdapter Hardening & Production Guardrails", () => {
       process.env.NODE_ENV = origEnv;
     }
   });
+
+  it("production guardrail: configuredMode=DURABLE_FILE in production is rejected and set to NOT_CONFIGURED", async () => {
+    const origEnv = process.env.NODE_ENV;
+    try {
+      process.env.NODE_ENV = "production";
+      const adapter = new DatabaseAdapter("prod_reject_local", { mode: ADAPTER_MODE.DURABLE_FILE });
+      assert.equal(adapter.mode, ADAPTER_MODE.NOT_CONFIGURED);
+
+      await assert.rejects(
+        async () => adapter.findAll(),
+        (err) => err instanceof DatabaseNotConfiguredError
+      );
+    } finally {
+      process.env.NODE_ENV = origEnv;
+    }
+  });
 });
