@@ -18,6 +18,8 @@ export function getPostgresPool() {
   if (!sharedPool) {
     const configuredPoolMax = Number(process.env.DATABASE_POOL_MAX);
     const boundedPoolMax = Math.min(50, Math.max(1, Math.floor(Number.isFinite(configuredPoolMax) ? configuredPoolMax : 10)));
+    const caRaw = process.env.DATABASE_SSL_CA;
+    const ca = caRaw ? caRaw.replace(/\\n/g, "\n") : undefined;
     sharedPool = new Pool({
       connectionString,
       max: boundedPoolMax,
@@ -25,7 +27,10 @@ export function getPostgresPool() {
       connectionTimeoutMillis: 5_000,
       ssl: process.env.DATABASE_SSL === "disable"
         ? false
-        : { rejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== "false" },
+        : {
+            rejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== "false",
+            ...(ca ? { ca } : {})
+          },
     });
   }
   return sharedPool;
