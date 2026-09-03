@@ -7,9 +7,7 @@ import { Layer4TrustService } from "@/lib/ai-trust/layer4/Layer4TrustService.js"
 import { TrustPipelineCancelledError } from "@/lib/ai-trust/v5/TrustPipelineOrchestrator.js";
 import { createTrustOrchestrator } from "@/lib/ai-trust/TrustOrchestrator.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
-import { DurableTrustRepository } from "@/lib/server/database/DurableTrustRepository.js";
-import { TrustPersistenceMapper } from "@/lib/ai-trust/v5/TrustPersistenceMapper.js";
-import { TrustCasePassportBinder } from "@/lib/intelligence/passport/TrustCasePassportBinder.js";
+import { TrustPersistenceService } from "@/lib/server/database/TrustPersistenceService.js";
 
 export const runtime = "nodejs";
 
@@ -66,25 +64,14 @@ function streamV5Pipeline(request, input, requestId, principal) {
         }),
       }).then((result) => {
         if (principal) {
-          try {
-            const durableDto = TrustPersistenceMapper.mapPipelineToDurableRecord({
-              pipelineResult: result,
-              input,
-              principal,
-              requestId,
-            });
-            if (durableDto) {
-              const caseId = durableDto.caseRecord.id;
-              const ownerId = durableDto.caseRecord.ownerId;
-              DurableTrustRepository.persistTrustRecord(durableDto)
-                .then(() => TrustCasePassportBinder.bindCaseToPassport({ caseId, ownerId, pipelineResult: result, input }))
-                .catch((err) => {
-                  console.error("[TrustPersistence] Stream background persistence error:", err.message);
-                });
-            }
-          } catch (mapErr) {
-            console.error("[TrustPersistence] Stream mapping error:", mapErr.message);
-          }
+          TrustPersistenceService.recordTrustExecution({
+            pipelineResult: result,
+            input,
+            principal,
+            requestId,
+          }).catch((err) => {
+            console.error("[TrustPersistence] Stream background persistence error:", err.message);
+          });
         }
         send({ type: "complete", event: "PIPELINE_COMPLETED", stageId: "l5", data: result });
         close();
@@ -145,23 +132,16 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
 
     if (principal) {
       try {
-        const durableDto = TrustPersistenceMapper.mapPipelineToDurableRecord({
+        TrustPersistenceService.recordTrustExecution({
           pipelineResult: pipeline,
           input,
           principal,
           requestId,
+        }).catch((err) => {
+          console.error("[TrustPersistence] Background persistence error:", err.message);
         });
-        if (durableDto) {
-          caseId = durableDto.caseRecord.id;
-          const ownerId = durableDto.caseRecord.ownerId;
-          DurableTrustRepository.persistTrustRecord(durableDto)
-            .then(() => TrustCasePassportBinder.bindCaseToPassport({ caseId, ownerId, pipelineResult: pipeline, input }))
-            .catch((err) => {
-              console.error("[TrustPersistence] Background persistence/passport error:", err.message);
-            });
-        }
       } catch (err) {
-        console.error("[TrustPersistence] Mapping error:", err.message);
+        console.error("[TrustPersistence] Dispatch error:", err.message);
       }
     }
 

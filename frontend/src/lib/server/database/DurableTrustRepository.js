@@ -73,7 +73,7 @@ export class DurableTrustRepository {
       const inputId = input.id || crypto.randomUUID();
       const inputType = String(input.type || "text").toLowerCase();
       const contentHash = input.content ? computeSha256(input.content) : null;
-      const objectKey = input.metadata?.objectKey || input.metadata?.url || null;
+      const objectKey = input.metadata?.objectKey || input.metadata?.url || (inputType.toUpperCase() === "URL" ? input.content : null);
 
       await client.query(
         `INSERT INTO public.case_inputs (id, case_id, input_type, object_key, content_hash, created_at)
@@ -240,5 +240,57 @@ export class DurableTrustRepository {
       evidence: evidenceRes.rows,
       claims: claimsRes.rows,
     };
+  }
+
+  /**
+   * Lists paginated trust cases for an authenticated owner.
+   * 
+   * @param {string} ownerId 
+   * @param {object} options 
+   * @returns {Promise<Array<object>>}
+   */
+  static async listCasesByOwner(ownerId, { limit = 20, offset = 0 } = {}) {
+    if (!ownerId) return [];
+    const pool = getPostgresPool();
+    const res = await pool.query(
+      `SELECT c.id, c.state, c.visibility, c.created_at, c.updated_at,
+              i.input_type, i.object_key, i.content_hash
+       FROM public.trust_cases c
+       LEFT JOIN LATERAL (
+         SELECT input_type, object_key, content_hash
+         FROM public.case_inputs
+         WHERE case_id = c.id
+         ORDER BY created_at ASC
+         LIMIT 1
+       ) i ON true
+       WHERE c.owner_id = $1
+       ORDER BY c.created_at DESC
+       LIMIT $2 OFFSET $3`,
+      [ownerId, Math.min(limit, 100), Math.max(offset, 0)]
+    );
+    return res.rows;
+  }
+
+  /**
+   * Checks for an existing case by owner and input content hash for idempotency.
+   * 
+   * @param {string} ownerId 
+   * @param {Buffer|string} contentHash 
+   * @returns {Promise<string|null>} caseId if found
+   */
+  static async findCaseByInputHash(ownerId, contentHash) {
+    if (!ownerId || !contentHash) return null;
+    const pool = getPostgresPool();
+    const hashBuf = Buffer.isBuffer(contentHash) ? contentHash : computeSha256(contentHash);
+    const res = await pool.query(
+      `SELECT c.id
+       FROM public.trust_cases c
+       JOIN public.case_inputs i ON c.id = i.case_id
+       WHERE c.owner_id = $1 AND i.content_hash = $2
+       ORDER BY c.created_at DESC
+       LIMIT 1`,
+      [ownerId, hashBuf]
+    );
+    return res.rows[0]?.id || null;
   }
 }
