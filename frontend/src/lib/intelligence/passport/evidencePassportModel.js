@@ -1,3 +1,5 @@
+import crypto from "node:crypto";
+
 export const PASSPORT_STATUS = Object.freeze({
   UNKNOWN: "UNKNOWN",
   INSUFFICIENT_EVIDENCE: "INSUFFICIENT_EVIDENCE",
@@ -154,6 +156,9 @@ export function appendEvidenceEvent(passport, rawEvent, options = {}) {
     metadata: rawEvent.metadata && typeof rawEvent.metadata === "object" ? { ...rawEvent.metadata } : {},
   };
 
+  const prevHash = lastEvent?.metadata?.hash || "GENESIS";
+  event.metadata.hash = computeEventHash(prevHash, event);
+
   return {
     ...passport,
     currentStatus: requestedStatus,
@@ -161,6 +166,42 @@ export function appendEvidenceEvent(passport, rawEvent, options = {}) {
     updatedAt: occurredAt,
     events: [...(passport.events || []), event],
   };
+}
+
+export function computeEventHash(prevHash, event) {
+  const payload = [
+    prevHash || "GENESIS",
+    event.id,
+    event.type,
+    event.provenanceClass,
+    event.previousStatus,
+    event.newStatus,
+    event.occurredAt,
+  ].join("|");
+  return crypto.createHash("sha256").update(payload).digest("hex");
+}
+
+export function verifyPassportIntegrity(passport) {
+  if (!passport || !Array.isArray(passport.events) || passport.events.length === 0) {
+    return { valid: false, reason: "EMPTY_PASSPORT" };
+  }
+
+  let expectedPrevHash = "GENESIS";
+  for (let i = 0; i < passport.events.length; i += 1) {
+    const event = passport.events[i];
+    const eventHash = event.metadata?.hash;
+    const computed = computeEventHash(expectedPrevHash, event);
+    if (eventHash && eventHash !== computed) {
+      return {
+        valid: false,
+        reason: "TAMPER_DETECTED",
+        tamperedEventId: event.id,
+        tamperedRevision: i + 1,
+      };
+    }
+    expectedPrevHash = computed;
+  }
+  return { valid: true, eventCount: passport.events.length };
 }
 
 export function passportChangeSummary(passport) {
