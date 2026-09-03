@@ -45,7 +45,10 @@ describe("PHASE 3 — live PostgreSQL/RLS proof", { skip: !liveUrl && "STUDENTHU
       connectionString: liveUrl,
       ssl: process.env.DATABASE_SSL === "disable"
         ? false
-        : { rejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== "false" }
+        : {
+            rejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== "false",
+            ...(process.env.DATABASE_SSL_CA ? { ca: process.env.DATABASE_SSL_CA.replace(/\\n/g, "\n") } : {})
+          }
     });
     await client.connect();
     for (const migration of migrations) await client.query(migration);
@@ -110,7 +113,7 @@ describe("PHASE 3 — live PostgreSQL/RLS proof", { skip: !liveUrl && "STUDENTHU
   });
 
   it("denies anonymous private profile, Passport, session, and screenshot metadata access", async () => {
-    assert.equal((await asRole("anon", "", "select id from public.profiles where id=$1", [userA])).rowCount, 0);
+    await assert.rejects(asRole("anon", "", "select id from public.profiles where id=$1", [userA]), /permission denied/i);
     await assert.rejects(asRole("anon", "", "select user_id from private.server_sessions where user_id=$1", [userA]), /permission denied/i);
     await assert.rejects(asRole("anon", "", "select id from public.evidence_passports where id=$1", [passportId]), /permission denied/i);
     await assert.rejects(asRole("anon", "", "select id from public.screenshot_objects"), /permission denied/i);
