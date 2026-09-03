@@ -6,9 +6,7 @@ import { DurableSessionService } from "../../src/lib/security/identity/DurableSe
 import { TrustPersistenceService } from "../../src/lib/server/database/TrustPersistenceService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
-after(async () => {
-  await getPostgresPool().end();
-});
+
 
 test("PHASE 6 LIVE GATE: Auth session lifecycle, revocation, cross-user denial, and private boundaries", async () => {
   const pool = getPostgresPool();
@@ -27,17 +25,20 @@ test("PHASE 6 LIVE GATE: Auth session lifecycle, revocation, cross-user denial, 
   let secretA = null;
   let secretB = null;
 
+  const jtiA = `jti_p6a_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  const jtiB = `jti_p6b_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
   try {
     // 1. Login / Session Creation for User A and User B
     const sessionA = await service.createSession(
-      { userId: userA, authProvider: "supabase", jti: `jti_a_${Date.now()}` },
+      { userId: userA, authProvider: "supabase", jti: jtiA },
       { userAgent: "Mozilla/5.0 User A Browser" }
     );
     secretA = sessionA.secret;
     assert.ok(secretA, "Session A secret generated");
 
     const sessionB = await service.createSession(
-      { userId: userB, authProvider: "supabase", jti: `jti_b_${Date.now()}` },
+      { userId: userB, authProvider: "supabase", jti: jtiB },
       { userAgent: "Mozilla/5.0 User B Browser" }
     );
     secretB = sessionB.secret;
@@ -70,7 +71,6 @@ test("PHASE 6 LIVE GATE: Auth session lifecycle, revocation, cross-user denial, 
     assert.equal(stillActiveB.user_id, userB, "Session B remains completely unaffected");
 
     // 6. Private Schema Inaccessibility
-    // Standard authenticated/anon role in PostgreSQL cannot select from private.*
     const anonCheck = await pool.query(
       `SELECT has_schema_privilege('anon', 'private', 'USAGE') as anon_usage,
               has_schema_privilege('authenticated', 'private', 'USAGE') as auth_usage`
@@ -81,27 +81,24 @@ test("PHASE 6 LIVE GATE: Auth session lifecycle, revocation, cross-user denial, 
     // 7. Privacy APIs: User Trust History is strictly owner-scoped
     const casesForA = await TrustPersistenceService.listCasesForOwner(userA);
     const casesForB = await TrustPersistenceService.listCasesForOwner(userB);
-    // Any case in casesForA must not belong to User B
     for (const c of casesForA) {
       assert.notEqual(c.owner_id, userB, "User A cases must never include User B records");
     }
 
-    // 8. Audit Trail Verification
+    // 8. Audit Trail Verification (isolated by unique jti)
     const auditRes = await pool.query(
-      `SELECT event_type FROM private.audit_events WHERE actor_id = $1 AND target_type = 'SESSION' ORDER BY occurred_at DESC LIMIT 5`,
-      [userA]
+      `SELECT event_type FROM private.audit_events WHERE metadata->>'jti' = $1`,
+      [jtiA]
     );
-    const eventTypes = auditRes.rows.map((r) => r.event_type);
-    assert.ok(eventTypes.includes("SESSION_REVOKED") || eventTypes.includes("SESSION_CREATED"), "Audit trail logged session lifecycle");
+    assert.equal(auditRes.rows[0]?.event_type, "SESSION_CREATED", "Audit trail logged session lifecycle");
 
   } finally {
     if (secretA) {
       await pool.query(`DELETE FROM private.server_sessions WHERE token_hash = $1`, [service.hashSecret(secretA)]);
-      await pool.query(`DELETE FROM private.audit_events WHERE actor_id = $1 AND target_type = 'SESSION'`, [userA]);
     }
     if (secretB) {
       await pool.query(`DELETE FROM private.server_sessions WHERE token_hash = $1`, [service.hashSecret(secretB)]);
-      await pool.query(`DELETE FROM private.audit_events WHERE actor_id = $1 AND target_type = 'SESSION'`, [userB]);
     }
+    await pool.query(`DELETE FROM private.audit_events WHERE metadata->>'jti' IN ($1, $2)`, [jtiA, jtiB]);
   }
 });
