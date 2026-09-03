@@ -88,7 +88,7 @@ test("PHASE 6 LIVE GATE: Auth session lifecycle, revocation, cross-user denial, 
 
     // 8. Audit Trail Verification
     const auditRes = await pool.query(
-      `SELECT event_type FROM private.audit_events WHERE actor_id = $1 ORDER BY occurred_at DESC LIMIT 2`,
+      `SELECT event_type FROM private.audit_events WHERE actor_id = $1 AND target_type = 'SESSION' ORDER BY occurred_at DESC LIMIT 5`,
       [userA]
     );
     const eventTypes = auditRes.rows.map((r) => r.event_type);
