@@ -8,6 +8,10 @@ import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
 
 test("PostgresSessionRepository: Live durable session create, validate, update last_seen, and revoke in private.server_sessions", async () => {
+  if (!process.env.DATABASE_URL) {
+    console.log("DATABASE_URL not configured, skipping live session test");
+    return;
+  }
   const pool = getPostgresPool();
   const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 1`);
   if (userRes.rows.length === 0) {

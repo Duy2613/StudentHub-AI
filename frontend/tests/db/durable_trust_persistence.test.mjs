@@ -6,7 +6,11 @@ import { DurableTrustRepository } from "../../src/lib/server/database/DurableTru
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
 after(async () => {
-  await getPostgresPool().end();
+  if (process.env.DATABASE_URL) {
+    try {
+      await getPostgresPool().end();
+    } catch {}
+  }
 });
 
 test("Option B: Anonymous caller is strictly ephemeral (zero DB mapping)", () => {
@@ -180,6 +184,10 @@ test("TrustPersistenceMapper maps authenticated pipeline result to relational DT
 });
 
 test("Live Database: End-to-end atomic persistence & entity deduplication (Option B)", async () => {
+  if (!process.env.DATABASE_URL) {
+    console.log("DATABASE_URL not configured, skipping live DB roundtrip test");
+    return;
+  }
   const pool = getPostgresPool();
 
   // Find a real existing user in auth.users
