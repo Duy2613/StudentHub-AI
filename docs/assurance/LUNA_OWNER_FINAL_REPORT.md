@@ -6,6 +6,7 @@ Audit date: 2026-09-04 (Asia/Bangkok)
 
 - Branch: `luna/studenthub-owner-final-staging-hardening`.
 - Base SHA: `3084f9fa4fc188a7421fb0db03686d6d2749f791`.
+- Final pushed HEAD: `143a9827c295b702ea701750602fe86c27e3aef3`.
 - `frontend/.env.local` remains production-bound and untouched.
 - `frontend/.env.staging.local` is ignored, operator-provided, and was never
   printed, committed, or copied. No URL, password, service key, session
@@ -76,8 +77,8 @@ assertions passed after the repair.
 - API authorization inventory: PASS, `143` handlers; `0` unprotected mutations
   requiring P0 review.
 - Environment safety contracts and synthetic production rejection: PASS.
-- Remote GitHub Actions Competition Quality Gate: PASS for commit `89d956f`
-  (run `33879162100`), including lint, build, regression, security/API,
+- Remote GitHub Actions Competition Quality Gate: PASS for final HEAD
+  `143a9827` (run `33879663048`), including lint, build, regression, security/API,
   dependency, bundle, and Chromium/Firefox browser checks.
 
 ## Production impact audit
