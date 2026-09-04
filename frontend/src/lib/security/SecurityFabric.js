@@ -44,6 +44,8 @@ export class SecurityFabric {
     const usesEmbeddedHandler = typeof handler !== "function" && typeof embeddedHandler === "function";
     const {
       action = "GENERAL_OPERATION",
+      authMode = null,
+      verifier = null,
       requiredPermission = null,
       requiredScopes = [],
       allowAnonymous = false,
@@ -76,7 +78,11 @@ export class SecurityFabric {
         }
 
         // 2. Authentication & Identity Resolution
-        const principal = await IdentityResolver.resolvePrincipal(request, { allowAnonymous });
+        const principal = await IdentityResolver.resolvePrincipal(request, {
+          allowAnonymous,
+          authMode,
+          verifier,
+        });
         const usesBearer = request.headers.get("authorization")?.startsWith("Bearer ");
         // Treat both the durable StudentHub session and the Supabase access
         // cookie as browser credentials.  Mutations authenticated by either

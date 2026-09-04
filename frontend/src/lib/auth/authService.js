@@ -382,16 +382,28 @@ export async function registerBackend(email, password, fullName) {
 }
 
 /**
- * Đồng bộ người dùng với ASP.NET Core Backend: POST /api/auth/sync
+ * Đồng bộ người dùng với StudentHub Backend: POST /api/auth/sync
  * BẮT BUỘC gửi Bearer Token để Backend phân giải và nhận diện
  */
 export async function syncBackendUser(userData = {}, explicitToken = null) {
-  const activeToken = explicitToken || getStoredToken();
+  let activeToken = explicitToken || getStoredToken();
+  if (!activeToken && typeof window !== "undefined") {
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (sessionData?.session?.access_token) {
+        activeToken = sessionData.session.access_token;
+      }
+    } catch {
+      // Ignore transient storage read error
+    }
+  }
+
   logAuthInfo("syncBackendUser", `Đang gọi POST /api/auth/sync cho: ${userData?.email || userData?.id}`);
 
   try {
     const res = await fetch(`${API_BASE}/api/auth/sync`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
@@ -408,12 +420,18 @@ export async function syncBackendUser(userData = {}, explicitToken = null) {
     });
 
     if (!res.ok) {
-      logAuthError("syncBackendUser", new Error(`Sync HTTP ${res.status}: ${res.statusText}`));
+      const errPayload = await res.json().catch(() => null);
+      const errCode = errPayload?.error?.code || `HTTP_${res.status}`;
+      logAuthError("syncBackendUser", new Error(`Sync HTTP ${res.status} (${errCode}): ${res.statusText}`));
       return null;
     }
 
     const data = await res.json().catch(() => null);
-    logAuthInfo("syncBackendUser", "Đồng bộ ASP.NET Core thành công.");
+    if (activeToken && data?.session) {
+      lastExchangedToken = activeToken;
+      lastExchangeResult = { success: true, session: data.session };
+    }
+    logAuthInfo("syncBackendUser", "Đồng bộ xác thực StudentHub thành công.");
     return data;
   } catch (error) {
     logAuthError("syncBackendUser", error);

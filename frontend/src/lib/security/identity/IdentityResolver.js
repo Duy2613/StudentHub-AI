@@ -12,6 +12,7 @@ import { SecurityPrincipal, PRINCIPAL_TYPE, AUTH_ASSURANCE_LEVEL } from "../core
 import { TokenValidator } from "./TokenValidator.js";
 import { SessionManager } from "./SessionManager.js";
 import { getDurableSessionService } from "./DurableSessionService.js";
+import { createSupabaseTokenVerifier } from "./OidcTokenVerifier.js";
 import { StudentIdentityStore } from "../../intelligence/academic/studentIdentityStore.js";
 import { SecurityError } from "../core/SecurityErrorEnvelope.js";
 
@@ -23,9 +24,11 @@ export class IdentityResolver {
    * @param {Request} request 
    * @param {object} [options]
    * @param {boolean} [options.allowAnonymous] - If true, returns anonymous principal instead of throwing 401
-   * @returns {SecurityPrincipal}
+   * @param {string} [options.authMode] - e.g. "AUTH_BOOTSTRAP_SUPABASE"
+   * @param {object} [options.verifier] - Optional custom OidcTokenVerifier
+   * @returns {Promise<SecurityPrincipal>}
    */
-  static async resolvePrincipal(request, { allowAnonymous = false } = {}) {
+  static async resolvePrincipal(request, { allowAnonymous = false, authMode = null, verifier = null } = {}) {
     if (!request) {
       if (allowAnonymous) return SecurityPrincipal.anonymous();
       throw SecurityError.unauthorized("Missing HTTP request context.");
@@ -34,6 +37,27 @@ export class IdentityResolver {
     const headers = request.headers;
     const authHeader = headers?.get("authorization") || headers?.get("Authorization");
     const cookieHeader = headers?.get("cookie") || "";
+
+    // 0. AUTH_BOOTSTRAP_SUPABASE: Specialized bootstrap authorization boundary
+    // Accepts verified upstream Supabase Bearer token before a StudentHub durable session exists.
+    if (authMode === "AUTH_BOOTSTRAP_SUPABASE") {
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        throw new SecurityError({
+          code: "AUTH_BOOTSTRAP_TOKEN_MISSING",
+          message: "Authorization Bearer token is required for auth bootstrap.",
+          statusCode: 401
+        });
+      }
+      const rawToken = authHeader.slice(7).trim();
+      if (!rawToken) {
+        throw new SecurityError({
+          code: "AUTH_BOOTSTRAP_TOKEN_MISSING",
+          message: "Authorization Bearer token is required for auth bootstrap.",
+          statusCode: 401
+        });
+      }
+      return await this.resolveFromSupabaseBootstrap(rawToken, { verifier });
+    }
 
     // 1. The server-owned session cookie is authoritative whenever present.
     // Never let a second credential override a valid/revoked cookie, and never
@@ -82,6 +106,58 @@ export class IdentityResolver {
     }
 
     throw SecurityError.unauthorized("Authentication token or session cookie is required.");
+  }
+
+  /**
+   * Resolves a bootstrap principal from a verified Supabase bearer token
+   * @param {string} tokenString
+   * @param {object} [options]
+   * @param {object} [options.verifier]
+   * @returns {Promise<SecurityPrincipal>}
+   */
+  static async resolveFromSupabaseBootstrap(tokenString, { verifier = null } = {}) {
+    const activeVerifier = verifier || createSupabaseTokenVerifier();
+    const identity = await activeVerifier.verify(tokenString);
+
+    let roles = ["STUDENT"];
+    try {
+      const { getPostgresPool } = await import("../../server/database/PostgresPool.js");
+      const pool = getPostgresPool();
+      const roleRes = await pool.query(`
+        select coalesce(array_agg(r.code order by r.code), array['STUDENT']::text[]) as roles
+        from private.user_roles ur join private.roles r on r.id=ur.role_id
+        where ur.user_id=$1 and ur.revoked_at is null
+      `, [identity.userId]);
+      if (roleRes.rows[0]?.roles?.length) {
+        roles = roleRes.rows[0].roles;
+      }
+    } catch {
+      // Safe fallback if database pool is unavailable in unit test harness
+    }
+
+    let principalType = PRINCIPAL_TYPE.STUDENT;
+    if (roles.includes("ADMIN")) principalType = PRINCIPAL_TYPE.ADMIN;
+    else if (roles.includes("MODERATOR")) principalType = PRINCIPAL_TYPE.MODERATOR;
+    else if (roles.includes("EXPERT")) principalType = PRINCIPAL_TYPE.EXPERT;
+    else if (roles.includes("SERVICE")) principalType = PRINCIPAL_TYPE.SYSTEM;
+
+    return new SecurityPrincipal({
+      subjectId: String(identity.userId),
+      principalType,
+      email: identity.email || "",
+      roles,
+      permissions: this.#deriveDefaultPermissions(principalType),
+      scopes: ["auth:bootstrap", "academic:read", "academic:plan", "community:read", "trust:read"],
+      sessionId: null,
+      assuranceLevel: AUTH_ASSURANCE_LEVEL.AAL1_NORMAL,
+      attributes: {
+        authProvider: "supabase",
+        emailVerified: identity.emailVerified === true,
+        rawToken: tokenString,
+        jti: identity.jti,
+        amr: identity.amr,
+      }
+    });
   }
 
   /**

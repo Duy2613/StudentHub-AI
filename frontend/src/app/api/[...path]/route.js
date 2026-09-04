@@ -14,7 +14,6 @@ const MAX_PROXY_RESPONSE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_AUTH_PROXY_CONTRACTS = new Map([
   ["auth/login", new Set(["POST"])],
   ["auth/register", new Set(["POST"])],
-  ["auth/sync", new Set(["POST"])],
   ["auth/me", new Set(["GET"])],
 ]);
 

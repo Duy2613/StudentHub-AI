@@ -45,7 +45,13 @@ export const SECURITY_ERROR_CODE = Object.freeze({
   REQUEST_TOO_LARGE: "REQUEST_TOO_LARGE",
   RESOURCE_EXHAUSTED: "RESOURCE_EXHAUSTED",
   HARD_SAFETY_VIOLATION: "HARD_SAFETY_VIOLATION",
-  INTERNAL_SECURITY_ERROR: "INTERNAL_SECURITY_ERROR"
+  INTERNAL_SECURITY_ERROR: "INTERNAL_SECURITY_ERROR",
+
+  AUTH_BOOTSTRAP_TOKEN_MISSING: "AUTH_BOOTSTRAP_TOKEN_MISSING",
+  AUTH_BOOTSTRAP_TOKEN_INVALID: "AUTH_BOOTSTRAP_TOKEN_INVALID",
+  AUTH_BOOTSTRAP_ISSUER_INVALID: "AUTH_BOOTSTRAP_ISSUER_INVALID",
+  AUTH_USER_SYNC_FAILED: "AUTH_USER_SYNC_FAILED",
+  AUTH_SESSION_CREATE_FAILED: "AUTH_SESSION_CREATE_FAILED"
 });
 
 const PUBLIC_ERROR_MESSAGES = Object.freeze({
@@ -74,7 +80,13 @@ const PUBLIC_ERROR_MESSAGES = Object.freeze({
   REQUEST_TOO_LARGE: "The request exceeds the permitted size.",
   RESOURCE_EXHAUSTED: "The requested resource limit was exceeded.",
   HARD_SAFETY_VIOLATION: "The request was blocked by a safety policy.",
-  INTERNAL_SECURITY_ERROR: "The request could not be completed securely."
+  INTERNAL_SECURITY_ERROR: "The request could not be completed securely.",
+
+  AUTH_BOOTSTRAP_TOKEN_MISSING: "Authentication token is required for session bootstrap.",
+  AUTH_BOOTSTRAP_TOKEN_INVALID: "Supplied bootstrap token is invalid or expired.",
+  AUTH_BOOTSTRAP_ISSUER_INVALID: "Bootstrap token issuer is untrusted or mismatched for this environment.",
+  AUTH_USER_SYNC_FAILED: "Failed to synchronize user identity profile.",
+  AUTH_SESSION_CREATE_FAILED: "Failed to establish durable server session."
 });
 
 export class SecurityError extends Error {

@@ -40,3 +40,7 @@ export async function closePostgresPoolForTests() {
   if (sharedPool) await sharedPool.end();
   sharedPool = undefined;
 }
+
+export function setPostgresPoolForTests(pool) {
+  sharedPool = pool;
+}
