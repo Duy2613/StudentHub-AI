@@ -76,6 +76,9 @@ assertions passed after the repair.
 - API authorization inventory: PASS, `143` handlers; `0` unprotected mutations
   requiring P0 review.
 - Environment safety contracts and synthetic production rejection: PASS.
+- Remote GitHub Actions Competition Quality Gate: PASS for commit `89d956f`
+  (run `33879162100`), including lint, build, regression, security/API,
+  dependency, bundle, and Chromium/Firefox browser checks.
 
 ## Production impact audit
 
@@ -94,8 +97,8 @@ creation on production or unknown targets.
 
 ## Remaining evidence boundary
 
-- Remote GitHub Actions has not yet completed; the quality workflow now also
-  triggers for `luna/**` so the pushed branch can receive the same gate.
+- Remote GitHub Actions is green for the pushed branch. The quality workflow
+  now also triggers for `luna/**` so future Luna commits receive the same gate.
 - Staging browser E2E, Axe/accessibility, performance, and observability proof
   remain pending because no approved staging case file/deployment evidence was
   supplied for those surfaces.
