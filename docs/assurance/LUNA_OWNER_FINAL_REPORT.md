@@ -14,6 +14,27 @@ Audit date: 2026-09-04 (Asia/Bangkok)
 - No production connection, migration rerun, Citadel change, main merge,
   branch reset, discard, or production deployment was performed.
 
+## Current-head closure evidence
+
+- Current branch HEAD: `5ced206aadd2b7f8f5c53dee1e3f260e48b1639b`.
+- Current-head GitHub Actions Competition Quality Gate: PASS, run
+  `33880306784`, for the exact HEAD SHA above.
+- Vercel Preview deployment: READY at the platform level for the exact branch
+  and SHA; deployment `dpl_33SVhjjCKMN13JtzDTBZWsW3bpqD`, URL
+  `student-hub-ai-weje-gi4wxuoei-vi-be-city.vercel.app`.
+- Current Preview `/api/health/live`: HTTP 200, `LIVE`.
+- Current Preview `/api/health/ready`: HTTP 503, `NOT_READY`; database and
+  durable-session checks report `NOT_CONFIGURED`.
+- Redacted Preview/Production Vercel env metadata contains only
+  `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and
+  `NEXT_PUBLIC_SUPABASE_URL`; no database or durable-session configuration is
+  present. The served CSP advertises noncanonical Supabase ref
+  `yeoxxbmufgbsikytr` and the legacy Render host.
+- Result: current Preview identity and readiness are `BLOCKED_BY_ENV`.
+  Authenticated browser onboarding, trust, cross-user, storage, admin, mobile,
+  Axe, performance, and browser-observability closure were not attempted after
+  this failed environment gate.
+
 ## Exact TLS unblock sequence
 
 The operator corrected only `DATABASE_SSL_CA` in the staging env file to one
@@ -38,7 +59,9 @@ value containing literal backslash-n escapes. The required sequence then passed:
   role assignment from the database, and exact cleanup.
 - Private screenshot storage gate: PASS for owner access and foreign/anonymous
   denial.
-- Health live gate: PASS for `/api/health/live` and `/api/health/ready`.
+- Local/live staging health gate: PASS for `/api/health/live` and
+  `/api/health/ready` under the guarded staging launcher. The separate current
+  Vercel Preview readiness result is recorded above as `BLOCKED_BY_ENV`.
 - Controlled live phase gates recorded as passing: phases 2, 3, 5, 6, 7, and 8.
 - No blind migration was run. The additive profile-onboarding migration was
   applied once in staging inside a guarded transaction and then exercised by
@@ -77,9 +100,10 @@ assertions passed after the repair.
 - API authorization inventory: PASS, `143` handlers; `0` unprotected mutations
   requiring P0 review.
 - Environment safety contracts and synthetic production rejection: PASS.
-- Remote GitHub Actions Competition Quality Gate: PASS for final HEAD
-  `143a9827` (run `33879663048`), including lint, build, regression, security/API,
-  dependency, bundle, and Chromium/Firefox browser checks.
+- Remote GitHub Actions Competition Quality Gate: PASS for the current exact
+  HEAD `5ced206a` (run `33880306784`), including lint, build, regression,
+  security/API, dependency, bundle, and Chromium/Firefox browser checks. The
+  application-hardening ancestor `143a9827` also passed run `33879663048`.
 
 ## Production impact audit
 
@@ -96,14 +120,20 @@ and provider variables. The live launcher loads only the explicit staging file,
 checks both Supabase and database metadata, and fails closed before connection
 creation on production or unknown targets.
 
-## Remaining evidence boundary
+## Evidence status and remaining boundary
 
-- Remote GitHub Actions is green for the pushed branch. The quality workflow
-  now also triggers for `luna/**` so future Luna commits receive the same gate.
-- Staging browser E2E, Axe/accessibility, performance, and observability proof
-  remain pending because no approved staging case file/deployment evidence was
-  supplied for those surfaces.
-- No production deployment or promotion is authorized by this report.
+- `VERIFIED_LOCAL`: guarded staging TLS, live DB/onboarding gates, pure suite,
+  build, lint, audit, and authorization inventory.
+- `VERIFIED_CI`: current exact-head GitHub Actions quality gate run
+  `33880306784`.
+- `VERIFIED_STAGING`: canonical staging DB and controlled live phase gates.
+- `BLOCKED_BY_ENV`: current Vercel Preview identity/readiness and all dependent
+  authenticated browser, trust, cross-user, storage, admin, mobile, Axe,
+  performance, CSP/console, and runtime-observability evidence.
+- `HISTORICAL_INCONCLUSIVE`: production impact remains unresolved as described
+  below; no production deployment or promotion is authorized by this report.
+- The quality workflow now also triggers for `luna/**` so future Luna commits
+  receive the same gate.
 
 ## Final verdict
 
