@@ -24,6 +24,8 @@ import { RuleDependencyDAG, RULE_LIFECYCLE_STATES } from "../../src/lib/intellig
 import { ParserIntegrityGuard, INGESTION_SAFETY_STATES } from "../../src/lib/intelligence/academic/parserIntegrityGuard.js";
 import { AcademicDigitalTwin } from "../../src/lib/intelligence/academic/academicDigitalTwin.js";
 
+const liveExternalIntegrationEnabled = process.env.STUDENTHUB_LIVE_STAGING_TESTS === "1";
+
 console.log("======================================================================");
 console.log("🚀 STUDENTHUB AI — ACADEMIC LIVE-SYNC PRODUCTION DRILL (HCMUTE)");
 console.log("======================================================================");
@@ -50,7 +52,9 @@ function fetchLiveUrl(url) {
   });
 }
 
-describe("Drill Protocol 1: Real External Source Retrieval Evidence", () => {
+describe("Drill Protocol 1: Real External Source Retrieval Evidence", {
+  skip: !liveExternalIntegrationEnabled && "LIVE_EXTERNAL_SOURCE_OPT_IN_REQUIRED",
+}, () => {
   it("should perform a real HTTP request to https://hcmute.edu.vn and capture live evidence", async () => {
     try {
       const response = await fetchLiveUrl("https://hcmute.edu.vn");

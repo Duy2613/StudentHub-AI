@@ -5,16 +5,16 @@
 // Trình xử lý Callback OAuth (Google / GitHub qua Supabase Auth):
 // - Loại bỏ hoàn toàn lệch pha đồng bộ (Async Mismatch) bằng chuỗi thực thi tuần tự:
 //   1. Trực tiếp giải mã Session từ URL qua supabase.auth.getSession()
-//   2. Dùng Bearer proof tạm thời để đồng bộ và trao đổi phiên một lần
+//   2. Dùng Bearer proof tạm thời để trao đổi phiên một lần
 //   3. Nhận opaque HttpOnly application session từ máy chủ
-//   4. Phân luồng an toàn: Chưa Onboarded -> /onboarding | Đã Onboarded -> /dashboard
+//   4. Đọc trạng thái onboarding server-owned rồi phân luồng an toàn
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import {
   exchangeApplicationSession,
-  syncBackendUser,
+  getOwnProfile,
   signOutSupabase,
   logAuthError,
   logAuthInfo,
@@ -82,7 +82,7 @@ export default function AuthCallbackPage() {
       const accessToken = currentSession.access_token;
       logAuthInfo("OAuthCallback", `Xác thực thành công cho user: ${user.email}`);
 
-      setStatusMessage("Đang đồng bộ dữ liệu với máy chủ ASP.NET Core...");
+      setStatusMessage("Đang tạo phiên đăng nhập an toàn...");
 
       // 3. Kiểm tra xem tài khoản có bị xung đột (ban đầu đăng ký email/mật khẩu)
       const identities = user.identities || [];
@@ -99,27 +99,7 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      // 4. Đồng bộ Bearer Token sang ASP.NET Core Backend
-      const fullName =
-        user.user_metadata?.full_name ||
-        user.user_metadata?.name ||
-        user.user_metadata?.user_name ||
-        user.email?.split("@")[0] ||
-        "";
-
-      await syncBackendUser(
-        {
-          id: user.id,
-          email: user.email,
-          fullName: fullName,
-          role: user.user_metadata?.role || "student",
-          avatarUrl: user.user_metadata?.avatar_url,
-          githubUsername: user.user_metadata?.user_name || user.user_metadata?.preferred_username,
-        },
-        accessToken
-      );
-
-      // 5. Exchange the transient provider proof for the server-owned opaque
+      // 4. Exchange the transient provider proof for the server-owned opaque
       // session. Failure is terminal: the UI must not claim authentication
       // when durable session persistence is unavailable.
       setStatusMessage("Đang tạo phiên đăng nhập an toàn...");
@@ -133,13 +113,13 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      // 6. Kiểm tra Onboarding và điều hướng
-      const isOnboarded = user.user_metadata?.onboarded === true;
-      const role = user.user_metadata?.role;
+      // 5. Read onboarding state from the server-owned profile projection.
+      const ownProfile = await getOwnProfile();
+      const isOnboarded = ownProfile.success && ownProfile.profile?.onboardingCompleted === true;
 
       setStatusMessage("Hoàn tất! Đang chuyển hướng...");
 
-      if (!isOnboarded || !role) {
+      if (!isOnboarded) {
         logAuthInfo("OAuthCallback", "Chưa hoàn tất onboarding -> Chuyển về /onboarding");
         router.replace("/onboarding");
       } else {

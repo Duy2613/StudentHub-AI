@@ -110,6 +110,21 @@ describe("HttpOnly application session boundary (Finding E)", () => {
     assert.match(authContextSource, /_event === "INITIAL_SESSION" && applicationSessionReadyRef\.current/);
   });
 
+  it("keeps canonical auth independent from the legacy OWNER_COMPAT backend", () => {
+    const authSource = readFileSync(new URL("../../src/lib/auth/authService.js", import.meta.url), "utf8");
+    const callbackSource = readFileSync(new URL("../../src/app/callback/page.jsx", import.meta.url), "utf8");
+    const proxySource = readFileSync(new URL("../../src/app/api/[...path]/route.js", import.meta.url), "utf8");
+
+    assert.doesNotMatch(authSource, /https:\/\/studenthub-api-8fqp\.onrender\.com/);
+    assert.doesNotMatch(proxySource, /https:\/\/studenthub-api-8fqp\.onrender\.com/);
+    assert.doesNotMatch(callbackSource, /user_metadata\?\.role|user_metadata\?\.onboarded/);
+
+    const signInStart = authSource.indexOf("export async function signInWithPassword");
+    const signInEnd = authSource.indexOf("/**", signInStart + 1);
+    assert.ok(signInStart >= 0 && signInEnd > signInStart);
+    assert.doesNotMatch(authSource.slice(signInStart, signInEnd), /syncBackendUser/);
+  });
+
   it("exchanges a transient proof with credentials included and exposes no returned secret", async () => {
     const previousWindow = globalThis.window;
     const previousFetch = globalThis.fetch;

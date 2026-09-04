@@ -29,13 +29,20 @@ export class PostgresSessionRepository {
 
   async findActive(tokenHash, now) {
     const result = await this.pool.query(`
-      update private.server_sessions s
-      set last_seen_at=$2, idle_expires_at=least($2 + interval '30 minutes', s.expires_at)
-      where s.token_hash=$1 and s.revoked_at is null and s.expires_at>$2 and s.idle_expires_at>$2
-      returning s.user_id, s.created_at, s.last_seen_at, s.expires_at, s.session_version,
-        coalesce((select array_agg(r.code order by r.code)
-          from private.user_roles ur join private.roles r on r.id=ur.role_id
-          where ur.user_id=s.user_id and ur.revoked_at is null), array['STUDENT']::text[]) roles
+      with touched as (
+        update private.server_sessions s
+        set last_seen_at=$2, idle_expires_at=least($2 + interval '30 minutes', s.expires_at)
+        where s.token_hash=$1 and s.revoked_at is null and s.expires_at>$2 and s.idle_expires_at>$2
+        returning s.user_id, s.created_at, s.last_seen_at, s.expires_at, s.session_version,
+          coalesce((select array_agg(r.code order by r.code)
+            from private.user_roles ur join private.roles r on r.id=ur.role_id
+            where ur.user_id=s.user_id and ur.revoked_at is null), array['STUDENT']::text[]) roles
+      )
+      select touched.user_id, touched.created_at, touched.last_seen_at, touched.expires_at,
+        touched.session_version, touched.roles, u.email,
+        (u.email_confirmed_at is not null or u.confirmed_at is not null) as email_verified
+      from touched
+      join auth.users u on u.id=touched.user_id
     `, [tokenHash, now]);
     return result.rows[0] || null;
   }

@@ -14,6 +14,7 @@ import { supabase } from "@/lib/supabase/client";
 import {
   exchangeApplicationSession,
   getApplicationSession,
+  getOwnProfile,
   signOutSupabase,
   updateUserProfile as updateUserProfileService,
   syncBackendUser,
@@ -122,7 +123,7 @@ function isRememberedSession() {
 /**
  * Định dạng Profile chuẩn hóa an toàn từ User Object
  */
-function formatProfile(user) {
+function formatProfile(user, serverProfile = null) {
   if (!user) return null;
 
   let cached = {};
@@ -137,61 +138,73 @@ function formatProfile(user) {
     }
   }
 
-  const meta = user.user_metadata || {};
-  const email = user.email || user.Email || cached.email || "";
-  const fullName = user.fullName || user.FullName || meta.full_name || meta.name || cached.fullName || "Người dùng StudentHub";
-  const rawRole = (user.role || user.Role || meta.role || cached.role || "student").toLowerCase();
+  const authoritativeProfile = serverProfile || user.serverProfile || {};
+  const roles = Array.isArray(user.roles)
+    ? user.roles.map((value) => String(value).toUpperCase())
+    : [];
+  const rawRole = roles.includes("ADMIN")
+    ? "admin"
+    : roles.includes("EXPERT")
+      ? "expert"
+      : "student";
   const isExpert = rawRole === "expert";
-  // An email suffix is only a candidate for verification. It is not proof and
-  // must never grant a verified-student label or a reputation score.
-  const isEdu = user.universityEmailVerified === true
-    || user.UniversityEmailVerified === true
-    || meta.verified_student === true;
+  // Provider metadata and browser cache are presentation hints only. The
+  // server profile projection supplies mutable fields; role and verification
+  // remain derived from the server-owned session/profile contract.
+  const email = user.email || user.Email || "";
+  const fullName = authoritativeProfile.fullName || user.displayName || user.fullName || cached.fullName || "Người dùng StudentHub";
+  const isEdu = authoritativeProfile.universityEmailVerified === true;
   const explicitTrustScore = [
-    user.reputation_score,
-    user.reputationScore,
-    user.trustScore,
-    user.TrustScore,
-    meta.reputation_score,
-    meta.trust_score,
-  ].find((value) => Number.isFinite(Number(value)));
+    authoritativeProfile.reputationScore,
+    authoritativeProfile.trustScore,
+  ].find((value) => typeof value === "number" && Number.isFinite(value));
 
   return {
-    id: String(user.id || user.Id || cached.id || "user-1"),
+    id: String(user.id || user.userId || cached.id || "user-1"),
     email: email,
     fullName: fullName,
-    role: isExpert ? "expert" : "student",
-    avatarId: cached.avatarId || meta.avatar_id || (isExpert ? "expert-ai" : "student-tech"),
-    avatarUrl: cached.avatarUrl || meta.avatar_url || null,
-    university: cached.university || meta.university || (isEdu ? "Đã xác minh theo nguồn tổ chức" : "Chưa cập nhật"),
-    major: cached.major || meta.major || "Khoa học & Kỹ thuật",
-    academicYear: cached.academicYear || meta.academic_year || "2024-2028",
-    expertTitle: cached.expertTitle || meta.expert_title || "Chuyên gia Tư vấn & Nghiên cứu",
-    expertField: cached.expertField || meta.expert_field || "Trí tuệ nhân tạo (AI & Machine Learning)",
-    experienceYears: cached.experienceYears || meta.experience_years || "3+ năm kinh nghiệm",
-    bio: cached.bio || meta.bio || (isExpert ? "Chuyên gia giải đáp học thuật và định hướng nghiên cứu cho sinh viên." : "Sinh viên đam mê học tập, khám phá công nghệ và AI."),
-    trustScore: explicitTrustScore ?? 50,
-    reputationScore: explicitTrustScore ?? 50,
-    githubUsername: cached.github_username || cached.githubUsername || meta.github_username || meta.user_name || null,
-    topRepos: cached.top_repos || cached.topRepos || meta.top_repos || [],
+    role: rawRole,
+    emailVerified: user.emailVerified === true,
+    avatarId: authoritativeProfile.avatarId || cached.avatarId || (isExpert ? "expert-ai" : "student-tech"),
+    avatarUrl: authoritativeProfile.avatarUrl || cached.avatarUrl || null,
+    university: authoritativeProfile.university || cached.university || (isEdu ? "Đã xác minh theo nguồn tổ chức" : "Chưa cập nhật"),
+    major: authoritativeProfile.major || cached.major || "Khoa học & Kỹ thuật",
+    academicYear: authoritativeProfile.academicYear || cached.academicYear || "2024-2028",
+    expertTitle: authoritativeProfile.expertTitle || cached.expertTitle || "Chuyên gia Tư vấn & Nghiên cứu",
+    expertField: authoritativeProfile.expertField || cached.expertField || "Trí tuệ nhân tạo (AI & Machine Learning)",
+    experienceYears: authoritativeProfile.experienceYears || cached.experienceYears || "3+ năm kinh nghiệm",
+    bio: authoritativeProfile.bio || cached.bio || (isExpert ? "Chuyên gia giải đáp học thuật và định hướng nghiên cứu cho sinh viên." : "Sinh viên đam mê học tập, khám phá công nghệ và AI."),
+    trustScore: explicitTrustScore ?? null,
+    reputationScore: explicitTrustScore ?? null,
+    githubUsername: cached.github_username || cached.githubUsername || null,
+    topRepos: cached.top_repos || cached.topRepos || [],
     verifiedStudent: isEdu,
-    verifiedExpert: isExpert || meta.verified_expert === true,
-    onboarded: cached.onboarded === true || meta.onboarded === true,
-    badges: cached.badges || meta.badges || (isExpert ? ["⭐ Chuyên Gia Uy Tín", "Cố Vấn Xuất Sắc", "Top Người Giải Đáp"] : ["Sinh Viên Tiên Phong", "Học Giả Tích Cực"]),
-    rating: cached.rating || meta.rating || 4.95,
-    answersCount: cached.answersCount || meta.answers_count || (isExpert ? 24 : 3),
-    questionsCount: cached.questionsCount || meta.questions_count || (isExpert ? 2 : 8),
+    verifiedExpert: isExpert,
+    onboarded: authoritativeProfile.onboardingCompleted === true || authoritativeProfile.onboarded === true,
+    badges: cached.badges || (isExpert ? ["⭐ Chuyên Gia Uy Tín", "Cố Vấn Xuất Sắc", "Top Người Giải Đáp"] : ["Sinh Viên Tiên Phong", "Học Giả Tích Cực"]),
+    rating: cached.rating || 4.95,
+    answersCount: cached.answersCount || (isExpert ? 24 : 3),
+    questionsCount: cached.questionsCount || (isExpert ? 2 : 8),
   };
 }
 
 function normalizeApplicationUser(user) {
-  const roles = Array.isArray(user?.roles) ? user.roles : [];
-  const primaryRole = String(roles[0] || user?.role || "student").toLowerCase();
+  const roles = Array.isArray(user?.roles)
+    ? user.roles.map((value) => String(value).toUpperCase())
+    : [];
+  const primaryRole = roles.includes("ADMIN")
+    ? "admin"
+    : roles.includes("EXPERT")
+      ? "expert"
+      : "student";
   return {
-    ...user,
     id: String(user?.id || user?.userId || ""),
+    userId: String(user?.userId || user?.id || ""),
+    email: String(user?.email || "").trim().toLowerCase(),
+    emailVerified: user?.emailVerified === true,
     role: primaryRole,
     roles,
+    authProvider: user?.authProvider || "supabase",
   };
 }
 
@@ -222,8 +235,9 @@ export function AuthProvider({ children }) {
         if (applicationState.authenticated && applicationState.user && mounted) {
           applicationSessionReadyRef.current = true;
           const applicationUser = normalizeApplicationUser(applicationState.user);
+          const ownProfile = await getOwnProfile();
           setSession({ user: applicationUser, authority: "APPLICATION_SESSION" });
-          setProfile(formatProfile(applicationUser));
+          setProfile(formatProfile(applicationUser, ownProfile.profile));
           setIsDemoMode(false);
           setIsLoading(false);
           logAuthInfo("AuthProvider", "Đã nạp phiên HttpOnly do máy chủ quản lý.");
@@ -245,8 +259,19 @@ export function AuthProvider({ children }) {
           const exchanged = await exchangeApplicationSession(currentSession.access_token);
           if (exchanged.success && mounted) {
             applicationSessionReadyRef.current = true;
-            setSession({ user: currentSession.user, authority: "APPLICATION_SESSION" });
-            setProfile(formatProfile(currentSession.user));
+            const refreshedApplicationState = await getApplicationSession();
+            const applicationUser = refreshedApplicationState.authenticated && refreshedApplicationState.user
+              ? normalizeApplicationUser(refreshedApplicationState.user)
+              : normalizeApplicationUser({
+                id: exchanged.session?.userId || currentSession.user.id,
+                userId: exchanged.session?.userId || currentSession.user.id,
+                email: exchanged.session?.email || currentSession.user.email,
+                emailVerified: exchanged.session?.emailVerified === true,
+                roles: ["STUDENT"],
+              });
+            const ownProfile = await getOwnProfile();
+            setSession({ user: applicationUser, authority: "APPLICATION_SESSION" });
+            setProfile(formatProfile(applicationUser, ownProfile.profile));
             setIsDemoMode(false);
             setIsLoading(false);
             logAuthInfo("AuthProvider", "Đã trao đổi proof Supabase sang phiên HttpOnly.");
@@ -320,8 +345,19 @@ export function AuthProvider({ children }) {
           if (!mounted) return;
           if (exchanged.success) {
             applicationSessionReadyRef.current = true;
-            setSession({ user: newSession.user, authority: "APPLICATION_SESSION" });
-            setProfile(formatProfile(newSession.user));
+            const refreshedApplicationState = await getApplicationSession();
+            const applicationUser = refreshedApplicationState.authenticated && refreshedApplicationState.user
+              ? normalizeApplicationUser(refreshedApplicationState.user)
+              : normalizeApplicationUser({
+                id: exchanged.session?.userId || newSession.user?.id,
+                userId: exchanged.session?.userId || newSession.user?.id,
+                email: exchanged.session?.email || newSession.user?.email,
+                emailVerified: exchanged.session?.emailVerified === true,
+                roles: ["STUDENT"],
+              });
+            const ownProfile = await getOwnProfile();
+            setSession({ user: applicationUser, authority: "APPLICATION_SESSION" });
+            setProfile(formatProfile(applicationUser, ownProfile.profile));
             setIsDemoMode(false);
           } else {
             applicationSessionReadyRef.current = false;
@@ -361,7 +397,7 @@ export function AuthProvider({ children }) {
         }
         const payload = {
           ...session.user,
-          fullName: fullName || session.user.user_metadata?.full_name || session.user.email,
+          fullName: fullName || profile?.fullName || session.user.email,
         };
         const synced = await syncBackendUser(payload, token);
         return synced
@@ -406,22 +442,23 @@ export function AuthProvider({ children }) {
    */
   const updateProfile = useCallback(
     async (profileUpdates) => {
-      logAuthInfo("updateProfile", "Bắt đầu cập nhật thông tin hồ sơ:", profileUpdates);
+      logAuthInfo("updateProfile", "Bắt đầu cập nhật thông tin hồ sơ.");
       try {
-        const merged = { ...(profile || {}), ...profileUpdates };
-        setProfile(merged);
-        if (typeof window !== "undefined") {
-          const storageName = isRememberedSession() ? "localStorage" : "sessionStorage";
-          writeClientStorage(storageName, "studenthub_user_profile", JSON.stringify(merged));
+        if (isDemoMode) {
+          const merged = { ...(profile || {}), ...profileUpdates };
+          setProfile(merged);
+          return merged;
         }
-        await updateUserProfileService(profileUpdates);
-        return merged;
+        const savedProfile = await updateUserProfileService(profileUpdates);
+        const nextProfile = formatProfile(session?.user, savedProfile);
+        setProfile(nextProfile);
+        return nextProfile;
       } catch (err) {
         logAuthError("updateProfile", err);
-        return profile;
+        throw err;
       }
     },
-    [profile]
+    [isDemoMode, profile, session]
   );
 
   /**
@@ -456,9 +493,10 @@ export function AuthProvider({ children }) {
         ensureSynced,
         signOut,
         updateProfile,
-        refreshProfile: () => {
+        refreshProfile: async () => {
           if (session?.user) {
-            setProfile(formatProfile(session.user));
+            const ownProfile = await getOwnProfile();
+            if (ownProfile.success) setProfile(formatProfile(session.user, ownProfile.profile));
           }
         },
       }}

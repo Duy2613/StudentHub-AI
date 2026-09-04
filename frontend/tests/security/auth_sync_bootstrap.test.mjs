@@ -10,7 +10,7 @@ import { OidcTokenVerifier, setSupabaseTokenVerifierForTests } from "../../src/l
 import { DurableJsonSessionTestRepository } from "../support/DurableJsonTestRepositories.mjs";
 import { POST } from "../../src/app/api/auth/sync/route.js";
 
-const STAGING_ISSUER = "https://bniwtkitramgaozrrtrk.supabase.co/auth/v1";
+const STAGING_ISSUER = "https://bniwtkjtramqaozrrtrk.supabase.co/auth/v1";
 const PROD_ISSUER = "https://kytdomflmjytzyaabogi.supabase.co/auth/v1";
 const AUDIENCE = "authenticated";
 

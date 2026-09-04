@@ -1,5 +1,5 @@
-import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
-import { SecurityError } from "@/lib/security/core/SecurityErrorEnvelope.js";
+import { SecurityFabric } from "../../../../lib/security/SecurityFabric.js";
+import { SecurityError } from "../../../../lib/security/core/SecurityErrorEnvelope.js";
 
 // Comprehensive Vietnamese & Global Higher-Education Domain Mapping
 const KNOWN_EDU_DOMAINS = [
@@ -35,6 +35,7 @@ const KNOWN_EDU_DOMAINS = [
 export const POST = SecurityFabric.wrapHandler(
   {
     action: "VERIFY_INSTITUTIONAL_EMAIL",
+    requiredPermission: "IDENTITY.VERIFY_OWN",
     allowAnonymous: false
   },
   async (request, routeParams, principal, secContext) => {

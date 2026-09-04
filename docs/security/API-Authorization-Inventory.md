@@ -1,10 +1,10 @@
 # API Authorization Inventory
 
-Generated from source by `npm run audit:api-auth` on 2026-09-03T19:21:01.615Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
+Generated from source by `npm run audit:api-auth` on 2026-09-04T13:19:02.255Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
 
-- Route files: 115
-- HTTP handlers: 142
-- Authentication required by Security Fabric: 73
+- Route files: 116
+- HTTP handlers: 143
+- Authentication required by Security Fabric: 74
 - Explicit anonymous access: 63
 - No visible Security Fabric wrapper: 6
 - Unprotected mutations requiring P0 review: 0
@@ -47,6 +47,7 @@ Generated from source by `npm run audit:api-auth` on 2026-09-03T19:21:01.615Z. T
 | /api/auth/session/exchange | POST | AUTHENTICATED | required | UPSTREAM_OIDC_EXCHANGE | — | public or domain-defined | 20/minute declared | 65536 bytes | manual/none | state mutation | explicit bootstrap/session contract |
 | /api/auth/session/logout | POST | AUTHENTICATED | required | SESSION_LOGOUT | — | public or domain-defined | 60/minute declared | 0 bytes | manual/none | state mutation | explicit bootstrap/session contract |
 | /api/auth/session | GET | AUTHENTICATED | required | SESSION_READ | — | authenticated principal | 120/minute declared | 0 bytes | manual/none | public/read-only candidate | explicit bootstrap/session contract |
+| /api/auth/sync | POST | AUTHENTICATED | required | AUTH_BOOTSTRAP_SYNC | — | authenticated principal | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/chat | POST | AUTHENTICATED | required | CREATE_AI_CHAT_RESPONSE | — | public or domain-defined | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/community/experience/evaluate | POST | PUBLIC | anonymous allowed | ANALYZE_COMMUNITY_EXPERIENCE | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/community/experiences | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_EXPERIENCES | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
@@ -130,9 +131,9 @@ Generated from source by `npm run audit:api-auth` on 2026-09-03T19:21:01.615Z. T
 | /api/tuition-radar/verify | GET | PUBLIC | anonymous allowed | READ_TUITION_REGISTRY | — | public or domain-defined | default/configured | 262144 bytes | manual/none | potential sensitive data | policy declared |
 | /api/tuition-radar/verify | POST | PUBLIC | anonymous allowed | VERIFY_TUITION_DESTINATION | — | public or domain-defined | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/users/leaderboard | GET | PUBLIC | anonymous allowed | READ_LEADERBOARD | — | client field / review required | default/configured | 262144 bytes | manual/none | potential sensitive data | policy declared |
-| /api/users/profile | GET | AUTHENTICATED | required | READ_OWN_PROFILE | — | authenticated principal | default/configured | 262144 bytes | manual/none | private/user data | policy declared |
-| /api/users/profile | PUT | AUTHENTICATED | required | UPDATE_OWN_PROFILE | — | authenticated principal | default/configured | 262144 bytes | manual/none | private/user data | policy declared |
-| /api/users/verify-edu | POST | AUTHENTICATED | required | VERIFY_INSTITUTIONAL_EMAIL | — | client field / review required | default/configured | 262144 bytes | manual/none | state mutation | policy declared |
+| /api/users/profile | GET | AUTHENTICATED | required | READ_OWN_PROFILE | PROFILE.READ_OWN | authenticated principal | default/configured | 262144 bytes | manual/none | private/user data | policy declared |
+| /api/users/profile | PUT | AUTHENTICATED | required | UPDATE_OWN_PROFILE | PROFILE.WRITE_OWN | authenticated principal | default/configured | 262144 bytes | manual/none | private/user data | policy declared |
+| /api/users/verify-edu | POST | AUTHENTICATED | required | VERIFY_INSTITUTIONAL_EMAIL | IDENTITY.VERIFY_OWN | client field / review required | default/configured | 262144 bytes | manual/none | state mutation | policy declared |
 | /api/v1/academic | GET | AUTHENTICATED | required | READ_CANONICAL_ACADEMIC | ACADEMIC.READ_OWN | client field / review required | default/configured | 0 bytes | manual/none | private/user data | policy declared |
 | /api/v1/community | GET | PUBLIC | anonymous allowed | READ_CANONICAL_COMMUNITY | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/v1/community | POST | PUBLIC | anonymous allowed | QUERY_CANONICAL_COMMUNITY | — | public or domain-defined | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |

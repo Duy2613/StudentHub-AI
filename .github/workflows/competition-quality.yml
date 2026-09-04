@@ -6,6 +6,7 @@ on:
     branches:
       - develop
       - 'integration/**'
+      - 'luna/**'
 
 concurrency:
   group: competition-quality-${{ github.ref }}

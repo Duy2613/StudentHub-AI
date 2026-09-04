@@ -1,15 +1,34 @@
-import test, { after } from "node:test";
+import test, { after, before } from "node:test";
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import { TrustPersistenceService } from "../../src/lib/server/database/TrustPersistenceService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
+let pool;
+let userA;
+let userB;
+
+before(async () => {
+  if (!process.env.DATABASE_URL) return;
+  pool = getPostgresPool();
+  userA = crypto.randomUUID();
+  userB = crypto.randomUUID();
+  await pool.query(
+    "insert into auth.users(id, aud, role, email, created_at, updated_at) values " +
+      "($1,'authenticated','authenticated',$2,now(),now())," +
+      "($3,'authenticated','authenticated',$4,now(),now())",
+    [userA, `phase2-a-${userA}@example.test`, userB, `phase2-b-${userB}@example.test`],
+  );
+});
+
 after(async () => {
-  if (process.env.DATABASE_URL) {
-    try {
-      await getPostgresPool().end();
-    } catch {}
-  }
+  if (!pool) return;
+  try {
+    await pool.query("delete from auth.users where id=any($1::uuid[])", [[userA, userB]]);
+  } catch {}
+  try {
+    await pool.end();
+  } catch {}
 });
 
 test("PHASE 2 LIVE GATE: End-to-end Trust persistence, retrieval, cross-user denial, and idempotency", async () => {
@@ -17,14 +36,10 @@ test("PHASE 2 LIVE GATE: End-to-end Trust persistence, retrieval, cross-user den
     console.log("DATABASE_URL not configured, skipping live gate test");
     return;
   }
-  const pool = getPostgresPool();
-  const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 2`);
-  if (userRes.rows.length === 0) {
-    console.log("No users in auth.users, skipping live gate test");
+  if (!userA || !userB) {
+    console.log("Synthetic staging identities were not provisioned, skipping live gate test");
     return;
   }
-  const userA = userRes.rows[0].id;
-  const userB = userRes.rows[1]?.id || crypto.randomUUID();
 
   const caseId = crypto.randomUUID();
   const requestId = `req_gate_${Date.now()}`;
@@ -104,6 +119,16 @@ test("PHASE 2 LIVE GATE: End-to-end Trust persistence, retrieval, cross-user den
     assert.equal(caseInDb.rows[0].state, "BLOCK", "Final decision state persisted");
     assert.equal(caseInDb.rows[0].owner_id, userA, "Case owner strictly User A");
 
+    const outboxInDb = await pool.query(
+      `SELECT event_id, delivery_state, payload_hash
+       FROM private.security_outbox
+       WHERE payload->>'case_id' = $1`,
+      [createdCaseId],
+    );
+    assert.equal(outboxInDb.rows.length, 1, "Exactly one security outbox event is atomically bound to the Trust case");
+    assert.equal(outboxInDb.rows[0].delivery_state, "PENDING", "New security outbox event starts in PENDING state");
+    assert.match(outboxInDb.rows[0].payload_hash, /^[0-9a-f]{64}$/, "Outbox payload hash is canonical SHA-256");
+
     const inputInDb = await pool.query(`SELECT * FROM public.case_inputs WHERE case_id = $1`, [createdCaseId]);
     assert.equal(inputInDb.rows.length, 1, "Input persisted");
     assert.equal(inputInDb.rows[0].object_key, inputUrl, "Object key matches input URL");
@@ -158,6 +183,7 @@ test("PHASE 2 LIVE GATE: End-to-end Trust persistence, retrieval, cross-user den
   } finally {
     if (createdCaseId) {
       await pool.query(`DELETE FROM public.evidence_passports WHERE subject_id = $1`, [createdCaseId]);
+      await pool.query(`DELETE FROM private.security_outbox WHERE payload->>'case_id' = $1`, [createdCaseId]);
       await pool.query(`DELETE FROM private.audit_events WHERE target_id = $1`, [createdCaseId]);
       await pool.query(`DELETE FROM public.case_inputs WHERE case_id = $1`, [createdCaseId]);
       await pool.query(`DELETE FROM public.evidence WHERE case_id = $1`, [createdCaseId]);

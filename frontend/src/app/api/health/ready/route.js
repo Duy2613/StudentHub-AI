@@ -1,5 +1,5 @@
-import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
-import { checkReadiness } from "@/lib/server/health/readiness.js";
+import { SecurityFabric } from "../../../../lib/security/SecurityFabric.js";
+import { checkReadiness } from "../../../../lib/server/health/readiness.js";
 
 export const runtime = "nodejs";
 

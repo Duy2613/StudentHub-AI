@@ -261,12 +261,16 @@ export class IdentityResolver {
     return new SecurityPrincipal({
       subjectId: String(session.user_id || session.userId),
       principalType,
+      email: session.email || "",
       roles,
       permissions: this.#deriveDefaultPermissions(principalType),
       scopes: ["academic:read", "academic:plan", "community:read", "trust:read"],
       sessionId: "opaque-cookie",
       assuranceLevel: AUTH_ASSURANCE_LEVEL.AAL1_NORMAL,
-      attributes: { authProvider: "supabase" }
+      attributes: {
+        authProvider: "supabase",
+        emailVerified: session.email_verified === true,
+      }
     });
   }
 
@@ -292,7 +296,10 @@ export class IdentityResolver {
           "ACADEMIC.PLAN_OWN",
           "COMMUNITY.READ",
           "COMMUNITY.POST",
-          "TRUST.READ"
+          "TRUST.READ",
+          "PROFILE.READ_OWN",
+          "PROFILE.WRITE_OWN",
+          "IDENTITY.VERIFY_OWN"
         ];
     }
   }

@@ -1,4 +1,4 @@
-import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { SecurityFabric } from "../../../../lib/security/SecurityFabric.js";
 
 export const runtime = "nodejs";
 

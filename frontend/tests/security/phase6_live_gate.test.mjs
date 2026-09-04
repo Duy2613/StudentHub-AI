@@ -1,10 +1,39 @@
-import test, { after } from "node:test";
+import test, { after, before } from "node:test";
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import { PostgresSessionRepository } from "../../src/lib/security/identity/PostgresSessionRepository.js";
 import { DurableSessionService } from "../../src/lib/security/identity/DurableSessionService.js";
 import { TrustPersistenceService } from "../../src/lib/server/database/TrustPersistenceService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
+
+let pool;
+let userA;
+let userB;
+
+before(async () => {
+  if (!process.env.DATABASE_URL) return;
+  pool = getPostgresPool();
+  userA = crypto.randomUUID();
+  userB = crypto.randomUUID();
+  await pool.query(
+    "insert into auth.users(id, aud, role, email, created_at, updated_at) values " +
+      "($1,'authenticated','authenticated',$2,now(),now())," +
+      "($3,'authenticated','authenticated',$4,now(),now())",
+    [userA, `phase6-a-${userA}@example.test`, userB, `phase6-b-${userB}@example.test`],
+  );
+});
+
+after(async () => {
+  if (!pool) return;
+  try {
+    await pool.query("delete from private.server_sessions where user_id=any($1::uuid[])", [[userA, userB]]);
+    await pool.query("delete from private.audit_events where actor_id=any($1::uuid[])", [[userA, userB]]);
+    await pool.query("delete from auth.users where id=any($1::uuid[])", [[userA, userB]]);
+  } catch {}
+  try {
+    await pool.end();
+  } catch {}
+});
 
 
 
@@ -13,14 +42,11 @@ test("PHASE 6 LIVE GATE: Auth session lifecycle, revocation, cross-user denial, 
     console.log("DATABASE_URL not configured, skipping live gate test");
     return;
   }
-  const pool = getPostgresPool();
-  const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 2`);
-  if (userRes.rows.length === 0) {
-    console.log("No users in auth.users, skipping live gate test");
+  if (!userA || !userB) {
+    console.log("Synthetic staging identities were not provisioned, skipping live gate test");
     return;
   }
-  const userA = userRes.rows[0].id;
-  const userB = userRes.rows[1]?.id || crypto.randomUUID();
+  const pool = getPostgresPool();
 
   const pepper = process.env.STUDENTHUB_SESSION_PEPPER || "test-pepper-that-is-longer-than-thirty-two-characters-minimum-len";
   const repo = new PostgresSessionRepository(pool);

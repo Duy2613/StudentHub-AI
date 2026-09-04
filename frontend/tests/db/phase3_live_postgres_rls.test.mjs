@@ -1,18 +1,52 @@
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { after, before, describe, it } from "node:test";
 import pg from "pg";
+import { assertStagingEnvironment } from "../../src/lib/security/environment/stagingEnvironment.js";
 
-const liveUrl = process.env.STUDENTHUB_RLS_TEST_DATABASE_URL;
-const repositoryRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
-const migrations = [
-  readFileSync(join(repositoryRoot, "database", "migrations", "202608270001_v2_authority_foundation.sql"), "utf8"),
-  readFileSync(join(repositoryRoot, "database", "migrations", "202608290001_feature_freeze_cross_system.sql"), "utf8"),
-  readFileSync(join(repositoryRoot, "database", "migrations", "202609010001_private_screenshot_storage.sql"), "utf8")
-];
+const liveDatabaseEnvName = process.env.STUDENTHUB_RLS_TEST_DATABASE_URL
+  ? "STUDENTHUB_RLS_TEST_DATABASE_URL"
+  : "DATABASE_URL";
+const liveUrl = process.env[liveDatabaseEnvName];
+if (liveUrl) {
+  assertStagingEnvironment({
+    databaseEnvNames: [liveDatabaseEnvName],
+    requireDatabase: true,
+    requireLiveOptIn: true,
+    command: "phase 3 live RLS test",
+  });
+}
+const requiredTables = Object.freeze([
+  "private.audit_events",
+  "private.expert_domains",
+  "private.expert_verifications",
+  "private.reputation_events",
+  "private.roles",
+  "private.security_outbox",
+  "private.server_sessions",
+  "private.user_roles",
+  "public.case_entities",
+  "public.case_follows",
+  "public.case_inputs",
+  "public.claim_sources",
+  "public.claims",
+  "public.comments",
+  "public.decision_options",
+  "public.decision_scenarios",
+  "public.entities",
+  "public.evidence",
+  "public.evidence_passport_events",
+  "public.evidence_passports",
+  "public.expert_assessments",
+  "public.expert_profiles",
+  "public.institutions",
+  "public.notifications",
+  "public.posts",
+  "public.profiles",
+  "public.screenshot_objects",
+  "public.trust_cases",
+  "public.votes",
+]);
 
 const userA = crypto.randomUUID();
 const userB = crypto.randomUUID();
@@ -39,6 +73,38 @@ async function asRole(role, subject, sql, values = []) {
   }
 }
 
+async function assertAppliedSchema() {
+  const tables = await client.query(
+    "select table_schema || '.' || table_name as qualified_name " +
+    "from information_schema.tables " +
+    "where table_schema in ('public','private') " +
+    "and (table_schema || '.' || table_name) = any($1::text[]) " +
+    "order by qualified_name",
+    [requiredTables],
+  );
+  assert.deepEqual(
+    tables.rows.map((row) => row.qualified_name),
+    [...requiredTables].sort(),
+    "canonical staging schema is incomplete; no migrations are executed by this test",
+  );
+
+  const bucket = await client.query(
+    "select id, public from storage.buckets where id=$1",
+    ["trust-screenshots-private"],
+  );
+  assert.deepEqual(bucket.rows, [{ id: "trust-screenshots-private", public: false }]);
+
+  const trigger = await client.query(
+    "select 1 " +
+    "from pg_trigger t " +
+    "join pg_class c on c.oid=t.tgrelid " +
+    "join pg_namespace n on n.oid=c.relnamespace " +
+    "where n.nspname='private' and c.relname='security_outbox' " +
+    "and t.tgname='trg_security_outbox_state_transition' and not t.tgisinternal",
+  );
+  assert.equal(trigger.rowCount, 1, "canonical security outbox trigger is missing");
+}
+
 describe("PHASE 3 — live PostgreSQL/RLS proof", { skip: !liveUrl && "STUDENTHUB_RLS_TEST_DATABASE_URL is not configured" }, () => {
   before(async () => {
     client = new pg.Client({
@@ -51,7 +117,7 @@ describe("PHASE 3 — live PostgreSQL/RLS proof", { skip: !liveUrl && "STUDENTHU
           }
     });
     await client.connect();
-    for (const migration of migrations) await client.query(migration);
+    await assertAppliedSchema();
     await client.query(
       "insert into auth.users(id, aud, role, email, created_at, updated_at) values " +
       "($1,'authenticated','authenticated',$2,now(),now())," +

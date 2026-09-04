@@ -9,9 +9,12 @@
 
 import { supabase } from "../supabase/client.js";
 
+// Canonical browser auth is same-origin. The optional base is retained only
+// for explicitly invoked OWNER_COMPAT adapters; there is no implicit remote
+// fallback that can become an authentication prerequisite.
 const API_BASE = typeof window !== "undefined"
-  ? "" // Sử dụng Next.js Route Proxy cùng origin để triệt tiêu lỗi CORS Preflight
-  : (process.env.NEXT_PUBLIC_API_URL || "https://studenthub-api-8fqp.onrender.com");
+  ? ""
+  : (process.env.NEXT_PUBLIC_API_URL || process.env.STUDENTHUB_BACKEND_URL || "");
 
 let volatileToken = null;
 let exchangeInFlight = null;
@@ -179,7 +182,7 @@ export function translateAuthError(error) {
     lower.includes("cold start") ||
     lower.includes("timeout")
   ) {
-    return "Đang kết nối tới máy chủ Backend (Render Cold Start). Vui lòng thử lại sau vài giây...";
+    return "Đang kết nối tới máy chủ xác thực. Vui lòng thử lại sau vài giây.";
   }
 
   return rawMsg || "Đã xảy ra lỗi trong quá trình xác thực. Vui lòng thử lại.";
@@ -307,11 +310,12 @@ export async function getApplicationSession() {
 }
 
 // =========================================================================
-// 3. ASP.NET CORE BACKEND API AUTH & SYNC
+// 3. OWNER_COMPAT ADAPTERS (NON-CANONICAL)
 // =========================================================================
 
 /**
- * Đăng nhập Backend ASP.NET Core: POST /api/auth/login
+ * Legacy OWNER_COMPAT login: POST /api/auth/login.
+ * Canonical browser auth never calls this adapter.
  */
 export async function loginBackend(email, password, rememberMe = false) {
   const cleanEmail = (email || "").trim();
@@ -348,7 +352,8 @@ export async function loginBackend(email, password, rememberMe = false) {
 }
 
 /**
- * Đăng ký Backend ASP.NET Core: POST /api/auth/register
+ * Legacy OWNER_COMPAT registration: POST /api/auth/register.
+ * Canonical signup never calls this adapter.
  */
 export async function registerBackend(email, password, fullName) {
   const cleanEmail = (email || "").trim();
@@ -382,8 +387,9 @@ export async function registerBackend(email, password, fullName) {
 }
 
 /**
- * Đồng bộ người dùng với StudentHub Backend: POST /api/auth/sync
- * BẮT BUỘC gửi Bearer Token để Backend phân giải và nhận diện
+ * Legacy-compatible metadata sync: POST /api/auth/sync.
+ * The route is same-origin and is not a prerequisite for canonical session
+ * exchange; callers must treat its result as best-effort compatibility data.
  */
 export async function syncBackendUser(userData = {}, explicitToken = null) {
   let activeToken = explicitToken || getStoredToken();
@@ -398,7 +404,7 @@ export async function syncBackendUser(userData = {}, explicitToken = null) {
     }
   }
 
-  logAuthInfo("syncBackendUser", `Đang gọi POST /api/auth/sync cho: ${userData?.email || userData?.id}`);
+  logAuthInfo("syncBackendUser", "Đang gọi POST /api/auth/sync với metadata hiển thị an toàn.");
 
   try {
     const res = await fetch(`${API_BASE}/api/auth/sync`, {
@@ -409,13 +415,8 @@ export async function syncBackendUser(userData = {}, explicitToken = null) {
         ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
       },
       body: JSON.stringify({
-        id: userData.id || userData.Id,
-        email: userData.email || userData.Email,
         fullName: userData.fullName || userData.full_name || userData.name || userData.FullName,
-        role: userData.role || userData.Role || "student",
         avatarUrl: userData.avatarUrl || userData.avatar_url || userData.AvatarUrl,
-        githubUsername: userData.githubUsername || userData.github_username || userData.GithubUsername,
-        reputationScore: userData.reputationScore || userData.reputation_score || userData.ReputationScore || 50,
       }),
     });
 
@@ -474,6 +475,37 @@ export async function getMeBackend() {
   }
 }
 
+/**
+ * Reads the server-owned profile projection. The response is the only source
+ * used by the application for onboarding state and profile authority.
+ */
+export async function getOwnProfile() {
+  if (typeof window === "undefined") {
+    return { success: false, profile: null, code: "BROWSER_CONTEXT_REQUIRED" };
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users/profile`, {
+      method: "GET",
+      credentials: "include",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+    const data = await res.json().catch(() => null);
+    if (res.ok && data?.success === true && data?.profile) {
+      return { success: true, profile: data.profile, code: null };
+    }
+    return {
+      success: false,
+      profile: null,
+      code: data?.error?.code || `PROFILE_READ_HTTP_${res.status}`,
+    };
+  } catch (error) {
+    logAuthError("getOwnProfile", error);
+    return { success: false, profile: null, code: "PROFILE_READ_NETWORK_FAILURE" };
+  }
+}
+
 // =========================================================================
 // 4. SUPABASE AUTH INTEGRATION (EMAIL, OTP, GOOGLE, GITHUB)
 // =========================================================================
@@ -483,7 +515,6 @@ export async function getMeBackend() {
  */
 export async function signUpWithEmail(email, password, fullName) {
   const cleanEmail = (email || "").trim();
-  const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(cleanEmail);
   logAuthInfo("signUpWithEmail", `Bắt đầu đăng ký cho email: ${cleanEmail}`);
 
   try {
@@ -493,11 +524,7 @@ export async function signUpWithEmail(email, password, fullName) {
       options: {
         data: {
           full_name: fullName,
-          role: "student",
           avatar_id: "student-tech",
-          trust_score: isEdu ? 80 : 50,
-          verified_student: isEdu,
-          onboarded: false,
         },
       },
     });
@@ -519,9 +546,6 @@ export async function signUpWithEmail(email, password, fullName) {
         throw err;
       }
     }
-
-    // Tự động đồng bộ trước sang Backend ASP.NET Core DB
-    registerBackend(cleanEmail, password, fullName).catch(() => {});
 
     logAuthInfo("signUpWithEmail", "Đã gửi mã OTP 6 số thành công.");
     return data;
@@ -560,7 +584,6 @@ export async function verifySignupOtp(email, token) {
 
     if (data?.session?.access_token) {
       setStoredToken(data.session.access_token, true);
-      await syncBackendUser(data.user, data.session.access_token);
       const exchanged = await exchangeApplicationSession(data.session.access_token);
       if (!exchanged.success) {
         const exchangeError = new Error("Không thể tạo phiên đăng nhập an toàn. Vui lòng thử lại.");
@@ -627,8 +650,6 @@ export async function signInWithPassword(email, password, rememberMe = false) {
 
     if (data?.session?.access_token) {
       setStoredToken(data.session.access_token, rememberMe);
-      // Gọi đồng bộ sang ASP.NET Core Backend
-      await syncBackendUser(data.user, data.session.access_token);
       const exchanged = await exchangeApplicationSession(data.session.access_token);
       if (!exchanged.success) {
         const exchangeError = new Error("Không thể tạo phiên đăng nhập an toàn. Vui lòng thử lại.");
@@ -742,30 +763,46 @@ export async function signOutSupabase() {
  * Cập nhật hồ sơ người dùng
  */
 export async function updateUserProfile(profileData) {
-  logAuthInfo("updateUserProfile", "Cập nhật thông tin hồ sơ:", profileData);
+  const safeFields = {};
+  for (const field of ["fullName", "avatarId", "avatarUrl", "university", "major", "academicYear", "bio", "onboardingCompleted"]) {
+    if (Object.hasOwn(profileData || {}, field)) safeFields[field] = profileData[field];
+  }
+  logAuthInfo("updateUserProfile", "Cập nhật hồ sơ qua API sở hữu máy chủ.");
+
   try {
-    if (typeof window !== "undefined") {
-      const storageName = isRememberedSession() ? "localStorage" : "sessionStorage";
-      const cached = readBrowserStorage(storageName, "studenthub_user_profile");
-      let current = {};
-      try {
-        current = cached ? JSON.parse(cached) : {};
-      } catch (error) {
-        logAuthError("updateUserProfile:parseCache", error);
-      }
-      writeBrowserStorage(storageName, "studenthub_user_profile", JSON.stringify({ ...current, ...profileData }));
+    if (typeof window === "undefined") {
+      throw new Error("BROWSER_CONTEXT_REQUIRED");
     }
 
-    const { data } = await supabase.auth.updateUser({
-      data: profileData,
-    }).catch(() => ({ data: { user: null } }));
+    const res = await fetch(`${API_BASE}/api/users/profile`, {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(safeFields),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok || data?.success !== true || !data?.profile) {
+      const error = new Error(data?.error?.message || `Profile update failed (HTTP ${res.status}).`);
+      error.code = data?.error?.code || `PROFILE_UPDATE_HTTP_${res.status}`;
+      error.status = res.status;
+      throw error;
+    }
 
-    // Đồng bộ sang ASP.NET Core Backend
-    await syncBackendUser(profileData);
+    // Cache only non-authoritative display fields for fast paint. Role,
+    // verification, reputation, and onboarding state are never read from it.
+    const cacheFields = Object.fromEntries(
+      ["fullName", "avatarId", "avatarUrl", "university", "major", "academicYear", "bio"]
+        .filter((field) => Object.hasOwn(data.profile, field))
+        .map((field) => [field, data.profile[field]])
+    );
+    if (typeof window !== "undefined") {
+      const storageName = isRememberedSession() ? "localStorage" : "sessionStorage";
+      writeBrowserStorage(storageName, "studenthub_user_profile", JSON.stringify(cacheFields));
+    }
 
-    return data?.user || profileData;
+    return data.profile;
   } catch (error) {
     logAuthError("updateUserProfile", error);
-    return profileData;
+    throw error;
   }
 }

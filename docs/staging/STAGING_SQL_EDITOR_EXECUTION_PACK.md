@@ -1,7 +1,7 @@
 # STUDENTHUB AI — STAGING SQL EDITOR MANUAL EXECUTION PACK
 **Target Staging Project**: `StudentHub-AI-Staging`  
-**Project Ref**: `bniwtkitramgaozrrtrk`  
-**Strict Safety Directive**: **DO NOT execute against Production (`kytdomflmjytzyaabogi`)**. Execution is strictly manual via the Supabase Dashboard SQL Editor for staging project `bniwtkitramgaozrrtrk`.
+**Project Ref**: `bniwtkjtramqaozrrtrk`
+**Strict Safety Directive**: **DO NOT execute against Production (`kytdomflmjytzyaabogi`)**. Execution is strictly manual via the Supabase Dashboard SQL Editor for staging project `bniwtkjtramqaozrrtrk`.
 
 ---
 
@@ -26,7 +26,7 @@ All migrations must be executed sequentially in **5 distinct steps**. Do not exe
 ### Step 1: V2 Authority Foundation
 - **Source File**: `database/migrations/202608270001_v2_authority_foundation.sql`
 - **Preconditions**:
-  - Connected to Supabase Project `bniwtkitramgaozrrtrk` in the SQL Editor.
+  - Connected to Supabase Project `bniwtkjtramqaozrrtrk` in the SQL Editor.
   - Supabase default schemas (`auth`, `storage`, `extensions`, `public`) exist.
   - Project is a newly initialized staging database or existing staging baseline.
 - **Action**: Copy the entire text of `database/migrations/202608270001_v2_authority_foundation.sql` and run it in the Supabase SQL Editor.
@@ -191,7 +191,7 @@ Run the following complete, safe, read-only diagnostic SQL block in the Supabase
 ```sql
 -- ==============================================================================
 -- STUDENTHUB AI — POST-MIGRATION COMPLETE READ-ONLY VERIFICATION SUITE
--- Target: Staging project bniwtkitramgaozrrtrk
+-- Target: Staging project bniwtkjtramqaozrrtrk
 -- Safe, non-destructive audit queries.
 -- ==============================================================================
 

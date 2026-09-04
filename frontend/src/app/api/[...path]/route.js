@@ -8,7 +8,7 @@ import { RateLimiter } from "@/lib/security/hardening/RateLimiter.js";
 
 const BACKEND_URL = process.env.STUDENTHUB_BACKEND_URL
   || process.env.NEXT_PUBLIC_API_URL
-  || "https://studenthub-api-8fqp.onrender.com";
+  || null;
 const MAX_PROXY_BODY_BYTES = 64 * 1024;
 const MAX_PROXY_RESPONSE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_AUTH_PROXY_CONTRACTS = new Map([
@@ -28,6 +28,9 @@ async function proxyRequest(req, context) {
       return NextResponse.json({ message: "API route not found." }, { status: 404 });
     }
 
+    if (!BACKEND_URL) {
+      return NextResponse.json({ error: { code: "AUTH_BACKEND_UNAVAILABLE", userMessage: "Dịch vụ xác thực hiện chưa khả dụng." } }, { status: 503 });
+    }
     const backendGuard = validateRemoteUrlSync(BACKEND_URL);
     if (!backendGuard.ok) {
       return NextResponse.json({ error: { code: "AUTH_BACKEND_UNAVAILABLE", userMessage: "Dịch vụ xác thực hiện chưa khả dụng." } }, { status: 503 });
@@ -57,7 +60,7 @@ async function proxyRequest(req, context) {
     }
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout cho Render cold start
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
 
     const backendRes = await fetch(targetUrl, {
       method,

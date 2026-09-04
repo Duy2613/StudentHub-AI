@@ -14,6 +14,7 @@ import { Eye, EyeOff, ArrowRight, ArrowLeft, Sparkles, ShieldCheck, GraduationCa
 import {
   signInWithPassword,
   signUpWithEmail,
+  getOwnProfile,
   verifySignupOtp,
   resendSignupOtp,
   signInWithGoogle,
@@ -109,9 +110,10 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
     setIsLoading(true);
 
     try {
-      const { user } = await signInWithPassword(email, password, rememberMe);
+      await signInWithPassword(email, password, rememberMe);
       saffronAudio.playSuccessChime();
-      const isOnboarded = user?.user_metadata?.onboarded;
+      const ownProfile = await getOwnProfile();
+      const isOnboarded = ownProfile.success && ownProfile.profile?.onboardingCompleted === true;
       if (!isOnboarded) {
         router.push("/onboarding");
       } else {

@@ -1,9 +1,36 @@
-import test, { after } from "node:test";
+import test, { after, before } from "node:test";
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import { CommunityRepository } from "../../src/lib/server/database/CommunityRepository.js";
 import { ExpertRepository } from "../../src/lib/server/database/ExpertRepository.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
+
+let pool;
+let userA;
+let userB;
+
+before(async () => {
+  if (!process.env.DATABASE_URL) return;
+  pool = getPostgresPool();
+  userA = crypto.randomUUID();
+  userB = crypto.randomUUID();
+  await pool.query(
+    "insert into auth.users(id, aud, role, email, created_at, updated_at) values " +
+      "($1,'authenticated','authenticated',$2,now(),now())," +
+      "($3,'authenticated','authenticated',$4,now(),now())",
+    [userA, `phase8-a-${userA}@example.test`, userB, `phase8-b-${userB}@example.test`],
+  );
+});
+
+after(async () => {
+  if (!pool) return;
+  try {
+    await pool.query("delete from auth.users where id=any($1::uuid[])", [[userA, userB]]);
+  } catch {}
+  try {
+    await pool.end();
+  } catch {}
+});
 
 after(async () => {
   if (process.env.DATABASE_URL) {
@@ -18,14 +45,11 @@ test("PHASE 8 LIVE GATE: Community & Expert scoped authority, verification, and 
     console.log("DATABASE_URL not configured, skipping live gate test");
     return;
   }
-  const pool = getPostgresPool();
-  const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 2`);
-  if (userRes.rows.length === 0) {
-    console.log("No users in auth.users, skipping live gate test");
+  if (!userA || !userB) {
+    console.log("Synthetic staging identities were not provisioned, skipping live gate test");
     return;
   }
-  const userA = userRes.rows[0].id;
-  const userB = userRes.rows[1]?.id || crypto.randomUUID();
+  const pool = getPostgresPool();
 
   const caseId = crypto.randomUUID();
   let postId = null;
