@@ -6,7 +6,7 @@ Audit date: 2026-09-04 (Asia/Bangkok)
 
 - Branch: `luna/studenthub-owner-final-staging-hardening`.
 - Base SHA: `3084f9fa4fc188a7421fb0db03686d6d2749f791`.
-- Final pushed HEAD: `143a9827c295b702ea701750602fe86c27e3aef3`.
+- Application hardening commit: `143a9827c295b702ea701750602fe86c27e3aef3`.
 - `frontend/.env.local` remains production-bound and untouched.
 - `frontend/.env.staging.local` is ignored, operator-provided, and was never
   printed, committed, or copied. No URL, password, service key, session
