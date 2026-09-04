@@ -1,0 +1,34 @@
+{
+  "fixtureMetadata": {
+    "fixtureType": "GOLDEN",
+    "contractVersion": "SECURITY_EVENT_CONTRACT_V1",
+    "targetFamily": "security.studenthub.trust_decision.v1",
+    "canonicalByteRule": "RFC_8785_JCS",
+    "unicodeNormalization": "NONE",
+    "expectedPayloadHash": "7152c882d0bcf47d8daf3cf1470e95915182b3fb87977f2aa98ed2ae8e916608",
+    "expectedCitadelAcceptance": "ACCEPTED",
+    "utf8ByteLength": 234,
+    "utf8HexRepresentation": "7b22636f6d706f7365645f6e6663223a225469e1babf6e67205669e1bb8774222c226465636f6d706f7365645f6e6664223a22546965cc82cc816e6720566965cca3cc8274222c226e6f726d616c697a6174696f6e5f72756c65223a224e4f4e45222c2272756c655f726174696f6e616c65223a2252464320383738352053656374696f6e20332e312070726f68696269747320696d706c69636974206e6f726d616c697a6174696f6e2e20436f6d706f73656420616e64206465636f6d706f73656420666f726d732070726f647563652064697374696e637420627974652073747265616d732e227d"
+  },
+  "canonicalPayloadJson": "{\"composed_nfc\":\"Tiếng Việt\",\"decomposed_nfd\":\"Tiếng Việt\",\"normalization_rule\":\"NONE\",\"rule_rationale\":\"RFC 8785 Section 3.1 prohibits implicit normalization. Composed and decomposed forms produce distinct byte streams.\"}",
+  "inputEnvelope": {
+    "eventId": "evt-golden-norm-006",
+    "eventType": "security.studenthub.trust_decision.v1",
+    "schemaVersion": "studenthub-security-event-v1",
+    "occurredAt": "2026-09-04T00:00:00.000Z",
+    "producedAt": "2026-09-04T00:00:00.000Z",
+    "producer": "StudentHub-AI",
+    "environment": "production",
+    "correlationId": "corr-golden-norm-006",
+    "causationId": null,
+    "subject": "studenthub-trust-engine",
+    "classification": "INTERNAL",
+    "payload": {
+      "composed_nfc": "Tiếng Việt",
+      "decomposed_nfd": "Tiếng Việt",
+      "normalization_rule": "NONE",
+      "rule_rationale": "RFC 8785 Section 3.1 prohibits implicit normalization. Composed and decomposed forms produce distinct byte streams."
+    },
+    "payloadHash": "7152c882d0bcf47d8daf3cf1470e95915182b3fb87977f2aa98ed2ae8e916608"
+  }
+}

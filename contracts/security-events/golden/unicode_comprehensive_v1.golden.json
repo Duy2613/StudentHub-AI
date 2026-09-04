@@ -1,0 +1,57 @@
+{
+  "fixtureMetadata": {
+    "fixtureType": "GOLDEN",
+    "contractVersion": "SECURITY_EVENT_CONTRACT_V1",
+    "targetFamily": "security.studenthub.trust_decision.v1",
+    "canonicalByteRule": "RFC_8785_JCS",
+    "unicodeNormalization": "NONE",
+    "expectedPayloadHash": "58a74d5493eda41e80ef87b020da7bf955f6056c90fefaee1a424888bbf984be",
+    "expectedCitadelAcceptance": "ACCEPTED",
+    "utf8ByteLength": 540,
+    "utf8HexRepresentation": "7b2261727261795f76616c756573223a5b312c2274776f222c6e756c6c2c66616c73652c7b226e65737465645f6b6579223a226e65737465645f76616c227d5d2c226261636b736c6173685f70617468223a22433a5c5c55736572735c5c4475795c5c50726f6a656374735c5c53747564656e744875622d4149222c22626f6f6c65616e5f66616c7365223a66616c73652c22626f6f6c65616e5f74727565223a747275652c22636f6e74726f6c5f65736361706573223a22436f6e74726f6c3a5c625c665c6e5c725c745c75303030305c7530303166222c22646563696d616c5f7069223a332e31343135392c22646563696d616c5f71756172746572223a302e3132352c22656d6f6a695f626164676573223a22f09f9ba1efb88f20f09f8e9320f09f9a80222c22696e74656765725f626f756e646172795f6d6178223a393030373139393235343734303939312c22696e74656765725f626f756e646172795f6d696e223a2d393030373139393235343734303939312c22696e74656765725f7a65726f223a302c226e65737465645f6f626a656374223a7b22696e6e65725f61223a3130302c22696e6e65725f62223a7b22646565705f6c656166223a227665726966696564227d7d2c226e756c6c5f76616c7565223a6e756c6c2c2271756f7465645f737472696e67223a22536169643a205c2243616e6f6e6963616c2073657269616c697a6174696f6e206d6174746572735c22227d"
+  },
+  "canonicalPayloadJson": "{\"array_values\":[1,\"two\",null,false,{\"nested_key\":\"nested_val\"}],\"backslash_path\":\"C:\\\\Users\\\\Duy\\\\Projects\\\\StudentHub-AI\",\"boolean_false\":false,\"boolean_true\":true,\"control_escapes\":\"Control:\\b\\f\\n\\r\\t\\u0000\\u001f\",\"decimal_pi\":3.14159,\"decimal_quarter\":0.125,\"emoji_badges\":\"🛡️ 🎓 🚀\",\"integer_boundary_max\":9007199254740991,\"integer_boundary_min\":-9007199254740991,\"integer_zero\":0,\"nested_object\":{\"inner_a\":100,\"inner_b\":{\"deep_leaf\":\"verified\"}},\"null_value\":null,\"quoted_string\":\"Said: \\\"Canonical serialization matters\\\"\"}",
+  "inputEnvelope": {
+    "eventId": "evt-golden-comp-005",
+    "eventType": "security.studenthub.trust_decision.v1",
+    "schemaVersion": "studenthub-security-event-v1",
+    "occurredAt": "2026-09-04T00:00:00.000Z",
+    "producedAt": "2026-09-04T00:00:00.000Z",
+    "producer": "StudentHub-AI",
+    "environment": "production",
+    "correlationId": "corr-golden-comp-005",
+    "causationId": null,
+    "subject": "studenthub-trust-engine",
+    "classification": "INTERNAL",
+    "payload": {
+      "array_values": [
+        1,
+        "two",
+        null,
+        false,
+        {
+          "nested_key": "nested_val"
+        }
+      ],
+      "backslash_path": "C:\\Users\\Duy\\Projects\\StudentHub-AI",
+      "boolean_false": false,
+      "boolean_true": true,
+      "control_escapes": "Control:\b\f\n\r\t\u0000\u001f",
+      "decimal_pi": 3.14159,
+      "decimal_quarter": 0.125,
+      "emoji_badges": "🛡️ 🎓 🚀",
+      "integer_boundary_max": 9007199254740991,
+      "integer_boundary_min": -9007199254740991,
+      "integer_zero": 0,
+      "nested_object": {
+        "inner_a": 100,
+        "inner_b": {
+          "deep_leaf": "verified"
+        }
+      },
+      "null_value": null,
+      "quoted_string": "Said: \"Canonical serialization matters\""
+    },
+    "payloadHash": "58a74d5493eda41e80ef87b020da7bf955f6056c90fefaee1a424888bbf984be"
+  }
+}

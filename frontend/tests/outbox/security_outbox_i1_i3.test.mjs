@@ -1,4 +1,4 @@
-﻿/**
+/**
  * StudentHub AI — Security Outbox & Citadel Integration Test Suite (I1 & I3)
  * 
  * Tests:
@@ -10,12 +10,13 @@
  * 6. SSRF & Egress Protection
  */
 
-import { describe, it, beforeEach } from "node:test";
+import { describe, it, beforeEach, after } from "node:test";
 import assert from "node:assert/strict";
 
 import { SecurityOutboxTransformer } from "../../src/lib/server/outbox/SecurityOutboxTransformer.js";
-import { SecurityOutboxRepository, OUTBOX_STATE } from "../../src/lib/server/outbox/SecurityOutboxRepository.js";
+import { SecurityOutboxRepository } from "../../src/lib/server/outbox/SecurityOutboxRepository.js";
 import { SecurityOutboxWorker } from "../../src/lib/server/outbox/SecurityOutboxWorker.js";
+import { closePostgresPoolForTests } from "../../src/lib/server/database/PostgresPool.js";
 
 describe("Security Outbox & Citadel Integration (I1 — I3)", () => {
   beforeEach(async () => {
@@ -24,6 +25,10 @@ describe("Security Outbox & Citadel Integration (I1 — I3)", () => {
       const adapter = new DatabaseAdapter('security_outbox');
       await adapter.clear();
     } catch {}
+  });
+
+  after(async () => {
+    await closePostgresPoolForTests();
   });
 
   it("should sanitize secrets and strip raw screenshot images from event payload", () => {
@@ -131,6 +136,7 @@ describe("Security Outbox & Citadel Integration (I1 — I3)", () => {
     assert.equal(summary.claimed, 1);
     assert.equal(summary.delivered, 1);
     assert.equal(summary.failed, 0);
+    assert.ok(calledUrl.includes("/events"));
     assert.equal(calledBody.event_id, envelope.eventId);
     assert.equal(calledBody.producer, "StudentHub-AI");
   });

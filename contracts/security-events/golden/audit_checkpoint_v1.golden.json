@@ -3,9 +3,12 @@
     "fixtureType": "GOLDEN",
     "contractVersion": "SECURITY_EVENT_CONTRACT_V1",
     "targetFamily": "security.studenthub.audit_checkpoint.v1",
-    "canonicalByteRule": "RFC_8259_CANONICAL_UTF8",
+    "canonicalByteRule": "RFC_8785_JCS",
+    "unicodeNormalization": "NONE",
     "expectedPayloadHash": "d89d192c1d1b36ddcd838c12f5500670de08bc62ad2c03d180a23e2ff76b3df3",
-    "expectedCitadelAcceptance": "ACCEPTED"
+    "expectedCitadelAcceptance": "ACCEPTED",
+    "utf8ByteLength": 212,
+    "utf8HexRepresentation": "7b22636865636b706f696e745f6964223a2263686b2d636f6d706c69616e63652d373839222c22636865636b706f696e745f74797065223a2253455353494f4e5f4155444954222c227265636f72645f636f756e74223a34322c22736e617073686f745f68617368223a2261316232633364346535663630373138323933613462356336643765386639306131623263336434653566363037313832393361346235633664376538663930222c2274696d657374616d70223a22323032362d30392d30345430303a30303a30302e3030305a227d"
   },
   "canonicalPayloadJson": "{\"checkpoint_id\":\"chk-compliance-789\",\"checkpoint_type\":\"SESSION_AUDIT\",\"record_count\":42,\"snapshot_hash\":\"a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90\",\"timestamp\":\"2026-09-04T00:00:00.000Z\"}",
   "inputEnvelope": {

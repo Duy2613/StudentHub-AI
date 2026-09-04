@@ -10,7 +10,7 @@
  * 6. Private Schema Boundary: Server-internal isolation from anon/authenticated Supabase roles.
  */
 
-import { describe, it, beforeEach } from "node:test";
+import { describe, it, beforeEach, after } from "node:test";
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -27,6 +27,7 @@ import {
 } from "../../src/lib/server/outbox/SecurityOutboxRepository.js";
 import { SecurityOutboxTransformer } from "../../src/lib/server/outbox/SecurityOutboxTransformer.js";
 import { DatabaseAdapter } from "../../src/lib/db/DatabaseAdapter.js";
+import { closePostgresPoolForTests } from "../../src/lib/server/database/PostgresPool.js";
 
 describe("Security Outbox Hardening & Boundary Assurances (I1)", () => {
   beforeEach(async () => {
@@ -35,6 +36,10 @@ describe("Security Outbox Hardening & Boundary Assurances (I1)", () => {
       const adapter = new DatabaseAdapter("security_outbox");
       await adapter.clear();
     } catch {}
+  });
+
+  after(async () => {
+    await closePostgresPoolForTests();
   });
 
   it("enforces strict state machine transitions and blocks illegal mutations", () => {

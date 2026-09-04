@@ -1,0 +1,35 @@
+{
+  "fixtureMetadata": {
+    "fixtureType": "GOLDEN",
+    "contractVersion": "SECURITY_EVENT_CONTRACT_V1",
+    "targetFamily": "security.studenthub.trust_decision.v1",
+    "canonicalByteRule": "RFC_8785_JCS",
+    "unicodeNormalization": "NONE",
+    "expectedPayloadHash": "e98d54988b9379d4dc7fbea4b3de04c1485ef21e819d7ca2c158e2dbb5786947",
+    "expectedCitadelAcceptance": "ACCEPTED",
+    "utf8ByteLength": 274,
+    "utf8HexRepresentation": "7b22636173655f6964223a22636173652d766e2d7363686f6c6172736869702d303031222c2263617465676f7279223a226ce1bbab6120c491e1baa36f2068e1bb8d632062e1bb956e67222c22696e737469747574696f6e223a22c490e1baa1692068e1bb8d63205175e1bb916320676961205468c3a06e68207068e1bb912048e1bb93204368c3ad204d696e68222c227265706f72745f73756d6d617279223a225068c3a174206869e1bb876e2064e1baa575206869e1bb8775206ce1bbab6120c491e1baa36f2068e1bb8d632062e1bb956e6720717561206de1baa16e672078c3a32068e1bb99692074e1baa1692054502e48434d222c22737461747573223a22494e5645535449474154494e47227d"
+  },
+  "canonicalPayloadJson": "{\"case_id\":\"case-vn-scholarship-001\",\"category\":\"lừa đảo học bổng\",\"institution\":\"Đại học Quốc gia Thành phố Hồ Chí Minh\",\"report_summary\":\"Phát hiện dấu hiệu lừa đảo học bổng qua mạng xã hội tại TP.HCM\",\"status\":\"INVESTIGATING\"}",
+  "inputEnvelope": {
+    "eventId": "evt-golden-vn-004",
+    "eventType": "security.studenthub.trust_decision.v1",
+    "schemaVersion": "studenthub-security-event-v1",
+    "occurredAt": "2026-09-04T00:00:00.000Z",
+    "producedAt": "2026-09-04T00:00:00.000Z",
+    "producer": "StudentHub-AI",
+    "environment": "production",
+    "correlationId": "corr-golden-vn-004",
+    "causationId": null,
+    "subject": "studenthub-trust-engine",
+    "classification": "INTERNAL",
+    "payload": {
+      "case_id": "case-vn-scholarship-001",
+      "category": "lừa đảo học bổng",
+      "institution": "Đại học Quốc gia Thành phố Hồ Chí Minh",
+      "report_summary": "Phát hiện dấu hiệu lừa đảo học bổng qua mạng xã hội tại TP.HCM",
+      "status": "INVESTIGATING"
+    },
+    "payloadHash": "e98d54988b9379d4dc7fbea4b3de04c1485ef21e819d7ca2c158e2dbb5786947"
+  }
+}

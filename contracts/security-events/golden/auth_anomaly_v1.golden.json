@@ -3,9 +3,12 @@
     "fixtureType": "GOLDEN",
     "contractVersion": "SECURITY_EVENT_CONTRACT_V1",
     "targetFamily": "security.studenthub.auth_anomaly.v1",
-    "canonicalByteRule": "RFC_8259_CANONICAL_UTF8",
+    "canonicalByteRule": "RFC_8785_JCS",
+    "unicodeNormalization": "NONE",
     "expectedPayloadHash": "3a3d02a489049ef79b9092d625cb2d4d335e25f4fff3a99ee57c0dbd1fa0dc7c",
-    "expectedCitadelAcceptance": "ACCEPTED"
+    "expectedCitadelAcceptance": "ACCEPTED",
+    "utf8ByteLength": 185,
+    "utf8HexRepresentation": "7b22616374696f6e223a22535553504943494f55535f544f4b454e5f5245504c4159222c226163746f725f6964223a22757365722d616e6f6e2d343536222c22636c69656e745f6970223a223139322e302e322e31222c2264657465637465645f6174223a22323032362d30392d30345430303a30303a30302e3030305a222c227365766572697479223a2248494748222c2276696f6c6174696f6e5f636f6465223a22415554485f414e4f4d414c595f5245504c4159227d"
   },
   "canonicalPayloadJson": "{\"action\":\"SUSPICIOUS_TOKEN_REPLAY\",\"actor_id\":\"user-anon-456\",\"client_ip\":\"192.0.2.1\",\"detected_at\":\"2026-09-04T00:00:00.000Z\",\"severity\":\"HIGH\",\"violation_code\":\"AUTH_ANOMALY_REPLAY\"}",
   "inputEnvelope": {

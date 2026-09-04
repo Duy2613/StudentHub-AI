@@ -1,4 +1,4 @@
-﻿/**
+/**
  * StudentHub AI — SecurityOutboxWorker
  * 
  * Bounded asynchronous export worker delivering security events to GovSec Citadel.
@@ -12,6 +12,7 @@
 
 import { SecurityOutboxRepository, OUTBOX_STATE } from "./SecurityOutboxRepository.js";
 import { SecurityAuditLogger } from "../../security/audit/SecurityAuditLogger.js";
+import { CitadelIntegrationConfig } from "../citadel/CitadelIntegrationConfig.js";
 
 const DEFAULT_CITADEL_URL = "http://127.0.0.1:8000/api/v1/integrations/studenthub/events";
 const DEFAULT_WORKLOAD_TOKEN = process.env.CITADEL_WORKLOAD_TOKEN || "synthetic-studenthub-workload-token";
@@ -27,18 +28,23 @@ export class SecurityOutboxWorker {
   #fetchFn;
 
   constructor({
-    citadelUrl = process.env.CITADEL_INGESTION_URL || DEFAULT_CITADEL_URL,
-    workloadToken = process.env.CITADEL_WORKLOAD_TOKEN || DEFAULT_WORKLOAD_TOKEN,
+    citadelUrl,
+    workloadToken,
     batchSize = 10,
     pollIntervalMs = 5000,
-    retryBaseDelayMs = 1000,
+    retryBaseDelayMs,
     fetchFn = globalThis.fetch,
   } = {}) {
-    this.#citadelUrl = citadelUrl;
-    this.#workloadToken = workloadToken;
+    let config = null;
+    try {
+      config = CitadelIntegrationConfig.getConfiguration();
+    } catch {}
+
+    this.#citadelUrl = citadelUrl || config?.ingestionUrl || process.env.CITADEL_INGESTION_URL || DEFAULT_CITADEL_URL;
+    this.#workloadToken = workloadToken || config?.workloadToken || process.env.CITADEL_WORKLOAD_TOKEN || DEFAULT_WORKLOAD_TOKEN;
     this.#batchSize = batchSize;
     this.#pollIntervalMs = pollIntervalMs;
-    this.#retryBaseDelayMs = retryBaseDelayMs;
+    this.#retryBaseDelayMs = retryBaseDelayMs !== undefined ? retryBaseDelayMs : (config?.retryBaseDelayMs ?? 1000);
     this.#fetchFn = fetchFn;
   }
 

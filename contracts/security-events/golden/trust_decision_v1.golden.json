@@ -3,9 +3,12 @@
     "fixtureType": "GOLDEN",
     "contractVersion": "SECURITY_EVENT_CONTRACT_V1",
     "targetFamily": "security.studenthub.trust_decision.v1",
-    "canonicalByteRule": "RFC_8259_CANONICAL_UTF8",
+    "canonicalByteRule": "RFC_8785_JCS",
+    "unicodeNormalization": "NONE",
     "expectedPayloadHash": "29e3f88e2f51cbaca2ebed2f0b48df998ada1ea3c3db2bbb5cf9719205ae8dba",
-    "expectedCitadelAcceptance": "ACCEPTED"
+    "expectedCitadelAcceptance": "ACCEPTED",
+    "utf8ByteLength": 170,
+    "utf8HexRepresentation": "7b22636173655f6964223a22636173652d676f6c64656e2d303031222c22636c61696d5f636f756e74223a332c226576616c75617465645f6174223a22323032362d30392d30345430303a30303a30302e3030305a222c2265766964656e63655f636f756e74223a352c22696e7075745f74797065223a2274657874222c2276657264696374223a225645524946494544222c227669736962696c697479223a2250524956415445227d"
   },
   "canonicalPayloadJson": "{\"case_id\":\"case-golden-001\",\"claim_count\":3,\"evaluated_at\":\"2026-09-04T00:00:00.000Z\",\"evidence_count\":5,\"input_type\":\"text\",\"verdict\":\"VERIFIED\",\"visibility\":\"PRIVATE\"}",
   "inputEnvelope": {

@@ -85,10 +85,96 @@ const goldenFixtures = [
     },
     citadelAcceptance: "ACCEPTED",
   },
+  {
+    name: "unicode_vietnamese_v1",
+    envelope: {
+      eventId: "evt-golden-vn-004",
+      eventType: "security.studenthub.trust_decision.v1",
+      schemaVersion: "studenthub-security-event-v1",
+      occurredAt: "2026-09-04T00:00:00.000Z",
+      producedAt: "2026-09-04T00:00:00.000Z",
+      producer: "StudentHub-AI",
+      environment: "production",
+      correlationId: "corr-golden-vn-004",
+      causationId: null,
+      subject: "studenthub-trust-engine",
+      classification: "INTERNAL",
+      payload: {
+        case_id: "case-vn-scholarship-001",
+        category: "lừa đảo học bổng",
+        institution: "Đại học Quốc gia Thành phố Hồ Chí Minh",
+        report_summary: "Phát hiện dấu hiệu lừa đảo học bổng qua mạng xã hội tại TP.HCM",
+        status: "INVESTIGATING",
+      },
+    },
+    citadelAcceptance: "ACCEPTED",
+  },
+  {
+    name: "unicode_comprehensive_v1",
+    envelope: {
+      eventId: "evt-golden-comp-005",
+      eventType: "security.studenthub.trust_decision.v1",
+      schemaVersion: "studenthub-security-event-v1",
+      occurredAt: "2026-09-04T00:00:00.000Z",
+      producedAt: "2026-09-04T00:00:00.000Z",
+      producer: "StudentHub-AI",
+      environment: "production",
+      correlationId: "corr-golden-comp-005",
+      causationId: null,
+      subject: "studenthub-trust-engine",
+      classification: "INTERNAL",
+      payload: {
+        array_values: [1, "two", null, false, { nested_key: "nested_val" }],
+        backslash_path: "C:\\Users\\Duy\\Projects\\StudentHub-AI",
+        boolean_false: false,
+        boolean_true: true,
+        control_escapes: "Control:\b\f\n\r\t\u0000\u001f",
+        decimal_pi: 3.14159,
+        decimal_quarter: 0.125,
+        emoji_badges: "🛡️ 🎓 🚀",
+        integer_boundary_max: 9007199254740991,
+        integer_boundary_min: -9007199254740991,
+        integer_zero: 0,
+        nested_object: {
+          inner_a: 100,
+          inner_b: {
+            deep_leaf: "verified",
+          },
+        },
+        null_value: null,
+        quoted_string: "Said: \"Canonical serialization matters\"",
+      },
+    },
+    citadelAcceptance: "ACCEPTED",
+  },
+  {
+    name: "unicode_normalization_nfc_nfd_v1",
+    envelope: {
+      eventId: "evt-golden-norm-006",
+      eventType: "security.studenthub.trust_decision.v1",
+      schemaVersion: "studenthub-security-event-v1",
+      occurredAt: "2026-09-04T00:00:00.000Z",
+      producedAt: "2026-09-04T00:00:00.000Z",
+      producer: "StudentHub-AI",
+      environment: "production",
+      correlationId: "corr-golden-norm-006",
+      causationId: null,
+      subject: "studenthub-trust-engine",
+      classification: "INTERNAL",
+      payload: {
+        composed_nfc: "Tiếng Việt",
+        decomposed_nfd: "Tiếng Việt".normalize("NFD"),
+        normalization_rule: "NONE",
+        rule_rationale: "RFC 8785 Section 3.1 prohibits implicit normalization. Composed and decomposed forms produce distinct byte streams.",
+      },
+    },
+    citadelAcceptance: "ACCEPTED",
+  },
 ];
 
 for (const g of goldenFixtures) {
   const canonicalJson = SecurityOutboxTransformer.toCanonicalJson(g.envelope.payload);
+  const utf8Bytes = Buffer.from(canonicalJson, "utf8");
   const expectedHash = SecurityOutboxTransformer.computePayloadHash(g.envelope.payload);
   g.envelope.payloadHash = expectedHash;
 
@@ -97,9 +183,12 @@ for (const g of goldenFixtures) {
       fixtureType: "GOLDEN",
       contractVersion: "SECURITY_EVENT_CONTRACT_V1",
       targetFamily: g.envelope.eventType,
-      canonicalByteRule: "RFC_8259_CANONICAL_UTF8",
+      canonicalByteRule: "RFC_8785_JCS",
+      unicodeNormalization: "NONE",
       expectedPayloadHash: expectedHash,
       expectedCitadelAcceptance: g.citadelAcceptance,
+      utf8ByteLength: utf8Bytes.length,
+      utf8HexRepresentation: utf8Bytes.toString("hex"),
     },
     canonicalPayloadJson: canonicalJson,
     inputEnvelope: g.envelope,
@@ -107,7 +196,7 @@ for (const g of goldenFixtures) {
 
   const outPath = join(goldenDir, `${g.name}.golden.json`);
   writeFileSync(outPath, JSON.stringify(fixtureContent, null, 2), "utf8");
-  console.log(`Wrote golden fixture: ${outPath} (hash: ${expectedHash})`);
+  console.log(`Wrote golden fixture: ${outPath} (hash: ${expectedHash}, bytes: ${utf8Bytes.length})`);
 }
 
 // 2. Negative Fixtures

@@ -34,6 +34,8 @@ const DEFAULT_CITADEL_ASSURANCE_URL = "http://127.0.0.1:8000/api/v1/integrations
 const MAX_RESPONSE_BYTES = 128 * 1024; // 128 KB
 const DEFAULT_TIMEOUT_MS = 5000;
 
+import { CitadelIntegrationConfig } from "./CitadelIntegrationConfig.js";
+
 export class CitadelAssuranceClient {
   #baseUrl;
   #workloadToken;
@@ -48,14 +50,19 @@ export class CitadelAssuranceClient {
    * @param {Function} [options.fetchFn=globalThis.fetch]
    */
   constructor({
-    baseUrl = process.env.CITADEL_ASSURANCE_URL || DEFAULT_CITADEL_ASSURANCE_URL,
-    workloadToken = process.env.CITADEL_WORKLOAD_TOKEN,
-    timeoutMs = DEFAULT_TIMEOUT_MS,
+    baseUrl,
+    workloadToken,
+    timeoutMs,
     fetchFn = globalThis.fetch,
   } = {}) {
-    this.#baseUrl = baseUrl;
-    this.#workloadToken = workloadToken;
-    this.#timeoutMs = timeoutMs;
+    let config = null;
+    try {
+      config = CitadelIntegrationConfig.getConfiguration();
+    } catch {}
+
+    this.#baseUrl = baseUrl || config?.assuranceUrl || process.env.CITADEL_ASSURANCE_URL || DEFAULT_CITADEL_ASSURANCE_URL;
+    this.#workloadToken = workloadToken !== undefined ? workloadToken : (config?.workloadToken || process.env.CITADEL_WORKLOAD_TOKEN);
+    this.#timeoutMs = timeoutMs || config?.timeoutMs || DEFAULT_TIMEOUT_MS;
     this.#fetchFn = fetchFn;
   }
 
