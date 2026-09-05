@@ -27,6 +27,8 @@ export const FULL_STACK_LAYERS = [
     macro: "APPLICATION",
     icon: Globe,
     summary: "React 19, Next.js App Router, Turbopack, Tailwind v4, WebGL canvas progressive enhancement.",
+    curriculumScope: "React 19 Server Components, micro-frontends, WebGL rendering pipelines, WCAG 2.2 AA accessibility architecture.",
+    platformScope: "Triển khai trên StudentHub: Next.js 16 App Router, Turbopack, Vanilla CSS Design System, Three.js 3D Universe.",
     lessonCount: 24,
     practiceCount: 16,
     status: "READY",
@@ -37,6 +39,8 @@ export const FULL_STACK_LAYERS = [
     macro: "APPLICATION",
     icon: Server,
     summary: "Edge runtime routes, ProviderGateway architecture, typed request envelopes, idempotent handlers.",
+    curriculumScope: "Kiến trúc ProviderGateway, typed envelopes, RPC patterns, idempotent API request handlers.",
+    platformScope: "Triển khai trên StudentHub: Edge Runtime Handlers, Next.js API Proxy, Type-safe Payload validation.",
     lessonCount: 28,
     practiceCount: 20,
     status: "READY",
@@ -49,6 +53,8 @@ export const FULL_STACK_LAYERS = [
     macro: "DATA & IDENTITY",
     icon: Database,
     summary: "PostgreSQL pools, RLS policies, durable transactional outbox, WAL journal & schema migrations.",
+    curriculumScope: "Mô hình hóa dữ liệu, B-Trees indexing, WAL journal internals, database replication topologies.",
+    platformScope: "Triển khai trên StudentHub: PostgreSQL trên Supabase với Row Level Security (RLS) và transactional durability.",
     lessonCount: 22,
     practiceCount: 14,
     status: "READY",
@@ -59,6 +65,8 @@ export const FULL_STACK_LAYERS = [
     macro: "DATA & IDENTITY",
     icon: Lock,
     summary: "Supabase JWT/JWKS verification, durable session exchange, zero-trust role-based authorization.",
+    curriculumScope: "Chuẩn OAuth2/OIDC, Zero-Trust authorization, RBAC/ABAC matrices, cryptographic session proofs.",
+    platformScope: "Triển khai trên StudentHub: Supabase JWT/JWKS verification, HttpOnly durable cookie exchange, Role-based guard.",
     lessonCount: 18,
     practiceCount: 12,
     status: "READY",
@@ -71,6 +79,8 @@ export const FULL_STACK_LAYERS = [
     macro: "DELIVERY & PLATFORM",
     icon: Globe,
     summary: "Vercel production preview bindings, edge CDN distribution, immutable deployment hashing.",
+    curriculumScope: "Anycast routing, immutable deployment hashing, edge CDN distribution, atomic instant rollbacks.",
+    platformScope: "Triển khai trên StudentHub: Vercel Edge Network, preview build isolation, Git-driven CI deployment.",
     lessonCount: 12,
     practiceCount: 8,
     status: "READY",
@@ -81,6 +91,8 @@ export const FULL_STACK_LAYERS = [
     macro: "DELIVERY & PLATFORM",
     icon: Cpu,
     summary: "Serverless execution budgets, isolated worker runtimes, bounded memory lifecycle management.",
+    curriculumScope: "Kubernetes container orchestration, serverless execution budgets, isolated worker threads, memory caps.",
+    platformScope: "Triển khai trên StudentHub: Vercel Serverless Function runtimes với giới hạn memory & timeout nghiêm ngặt.",
     lessonCount: 16,
     practiceCount: 10,
     status: "READY",
@@ -91,6 +103,8 @@ export const FULL_STACK_LAYERS = [
     macro: "DELIVERY & PLATFORM",
     icon: Terminal,
     summary: "Discovered quality gates, Playwright browser test matrices, automated bundle size regression checks.",
+    curriculumScope: "Trunk-based development, multi-stage test pipelines, automated bundle size regression & Playwright suites.",
+    platformScope: "Triển khai trên StudentHub: GitHub Actions CI workflow, strict Typecheck, ESLint, Security Fabric regression gates.",
     lessonCount: 14,
     practiceCount: 9,
     status: "READY",
@@ -103,6 +117,8 @@ export const FULL_STACK_LAYERS = [
     macro: "PRODUCTION RELIABILITY",
     icon: ShieldAlert,
     summary: "BOLA/PII protection, 10-vector attack simulation, tool firewall, client-side secret exposure guards.",
+    curriculumScope: "Phòng chống BOLA/IDOR, 10-vector attack simulation, tool firewalls, secret leakage prevention.",
+    platformScope: "Triển khai trên StudentHub: StudentHub SecurityFabric edge interceptor, PII redaction, CSP strict headers.",
     lessonCount: 20,
     practiceCount: 15,
     status: "READY",
@@ -113,6 +129,8 @@ export const FULL_STACK_LAYERS = [
     macro: "PRODUCTION RELIABILITY",
     icon: Zap,
     summary: "Sliding window rate limiters, client IP & subject throttling, burst quota defense.",
+    curriculumScope: "Thuật toán Token Bucket, Leaky Bucket, Sliding Window phân tán trên Redis/Upstash cluster.",
+    platformScope: "Triển khai trên StudentHub: Sliding window in-memory limiter theo client IP & user subject tại SecurityFabric.",
     lessonCount: 10,
     practiceCount: 6,
     status: "READY",
@@ -123,6 +141,8 @@ export const FULL_STACK_LAYERS = [
     macro: "PRODUCTION RELIABILITY",
     icon: HardDrive,
     summary: "Stale-While-Revalidate headers, Redis mutex locking, cache stampede prevention.",
+    curriculumScope: "Mô hình Multi-tier cache, Redis distributed mutex lock, chống cache stampede & thundering herd.",
+    platformScope: "Triển khai trên StudentHub: Next.js Cache, Vercel Edge CDN Stale-While-Revalidate headers.",
     lessonCount: 12,
     practiceCount: 8,
     status: "READY",
@@ -133,6 +153,8 @@ export const FULL_STACK_LAYERS = [
     macro: "PRODUCTION RELIABILITY",
     icon: Radio,
     summary: "Connection pooling, backpressure handling, graceful degradation, circuit breaker patterns.",
+    curriculumScope: "Layer 4 vs Layer 7 Load Balancing, Consistent Hashing, Circuit Breaker state machines, Backpressure.",
+    platformScope: "Triển khai trên StudentHub: Vercel Edge Anycast routing toàn cầu kết hợp graceful degradation phía client.",
     lessonCount: 14,
     practiceCount: 8,
     status: "READY",
@@ -143,6 +165,8 @@ export const FULL_STACK_LAYERS = [
     macro: "PRODUCTION RELIABILITY",
     icon: Activity,
     summary: "Structured security audit events, correlation IDs, OpenTelemetry traces, non-blocking telemetry.",
+    curriculumScope: "OpenTelemetry distributed tracing spans, log aggregation pipelines dung lượng lớn, MTTR alerting.",
+    platformScope: "Triển khai trên StudentHub: Security Audit Event Ledger lưu vết giao dịch nhạy cảm với Correlation ID.",
     lessonCount: 16,
     practiceCount: 10,
     status: "READY",
@@ -153,6 +177,8 @@ export const FULL_STACK_LAYERS = [
     macro: "PRODUCTION RELIABILITY",
     icon: CheckCircle2,
     summary: "Failover strategies, point-in-time database restore, immutable audit logs, disaster drills.",
+    curriculumScope: "Kiến trúc Active-Active Multi-Region, Chaos Engineering drills, tự động hóa failover database qua DNS.",
+    platformScope: "Triển khai trên StudentHub: Sao lưu định kỳ tự động cơ sở dữ liệu Supabase, kịch bản khôi phục và preview cô lập.",
     lessonCount: 15,
     practiceCount: 8,
     status: "READY",
@@ -287,9 +313,31 @@ export default function FullStackLayersSection() {
 
           <h3 className="text-2xl font-bold text-text-primary">{activeLayer.name}</h3>
 
-          <p className="text-sm text-text-secondary leading-relaxed">{activeLayer.summary}</p>
+          <div className="space-y-3">
+            {/* Epistemic Split 1: Curriculum / Educational Scope */}
+            <div className="p-3 rounded-xl bg-surface-elevated/60 border border-border-subtle text-xs">
+              <div className="flex items-center gap-2 text-accent-knowledge font-mono font-semibold uppercase tracking-wider mb-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent-knowledge" />
+                <span>Chuyên đề đào tạo (Learn / Concept)</span>
+              </div>
+              <p className="text-text-secondary leading-relaxed">
+                {activeLayer.curriculumScope || activeLayer.summary}
+              </p>
+            </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-2 text-xs font-mono">
+            {/* Epistemic Split 2: Live Platform Implementation */}
+            <div className="p-3 rounded-xl bg-surface-elevated/30 border border-border-subtle text-xs">
+              <div className="flex items-center gap-2 text-emerald-400 font-mono font-semibold uppercase tracking-wider mb-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>Thực thi trên nền tảng (Current Implementation)</span>
+              </div>
+              <p className="text-text-muted leading-relaxed">
+                {activeLayer.platformScope || "Tương thích kiến trúc sản xuất StudentHub."}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 pt-1 text-xs font-mono">
             <div className="p-3 rounded-xl bg-surface-elevated border border-border-subtle">
               <div className="text-text-muted">Bài giảng lý thuyết</div>
               <div className="text-lg font-bold text-text-primary mt-1">
