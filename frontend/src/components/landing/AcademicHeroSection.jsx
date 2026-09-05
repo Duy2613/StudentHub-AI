@@ -10,7 +10,20 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
-import KnowledgeUniverse3D, { KNOWLEDGE_DOMAINS } from "../canvas/KnowledgeUniverse3D";
+import dynamic from "next/dynamic";
+import { KNOWLEDGE_DOMAINS } from "../canvas/KnowledgeUniverse3D";
+
+const KnowledgeUniverse3D = dynamic(
+  () => import("../canvas/KnowledgeUniverse3D"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center bg-surface-primary/20" aria-hidden="true">
+        <div className="w-8 h-8 rounded-full border-2 border-accent-primary/30 border-t-accent-primary animate-spin" />
+      </div>
+    ),
+  }
+);
 
 export default function AcademicHeroSection() {
   const [activeNode, setActiveNode] = useState("backend");

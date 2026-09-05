@@ -158,24 +158,17 @@ export function BackgroundProvider({ children }) {
         setIsStudioOpen,
       }}
     >
-      {/* Fixed Fullscreen Background Crossfader with Vibrant Visibility & Cinematic Morph */}
+      {/* Fixed Fullscreen Background with Cinematic Atmosphere */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
-        {WALLPAPERS.map((wp) => {
-          const isCurrent = activeWallpaper.id === wp.id;
-          return (
-            <div
-              key={wp.id}
-              className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform ${
-                isCurrent
-                  ? "opacity-65 sm:opacity-75 scale-100 filter blur-0"
-                  : "opacity-0 scale-105 filter blur-sm"
-              }`}
-              style={{
-                backgroundImage: `url(${wp.src})`,
-              }}
-            />
-          );
-        })}
+        {(ROUTE_WALLPAPERS[pathname] || isManualOverride) && activeWallpaper && (
+          <div
+            key={activeWallpaper.id}
+            className="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform opacity-65 sm:opacity-75 scale-100 filter blur-0"
+            style={{
+              backgroundImage: `url(${activeWallpaper.src})`,
+            }}
+          />
+        )}
 
         {/* Morph Shockwave Pulse on Scene Switch */}
         <div

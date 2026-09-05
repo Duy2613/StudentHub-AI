@@ -20,44 +20,50 @@ const beVietnamPro = Be_Vietnam_Pro({
     subsets: ["latin", "vietnamese"],
     weight: ["400", "500", "600", "700"],
     display: "swap",
+    preload: true,
 });
 
 const lora = Lora({
     variable: "--font-lora",
     subsets: ["latin", "vietnamese"],
-    weight: ["400", "500", "600"],
-    style: ["normal", "italic"],
+    weight: ["400", "600"],
+    style: ["normal"],
     display: "swap",
+    preload: true,
 });
 
 const plusJakartaSans = Plus_Jakarta_Sans({
     variable: "--font-plus-jakarta",
     subsets: ["latin", "vietnamese"],
-    weight: ["400", "500", "600", "700", "800"],
+    weight: ["400", "600"],
     display: "swap",
+    preload: false,
 });
 
 // Machine Interface: JetBrains Mono (AI output, data, alerts, OCR)
 const jetbrainsMono = JetBrains_Mono({
     variable: "--font-jetbrains-mono",
     subsets: ["latin"],
-    weight: ["400", "500", "700"],
+    weight: ["400", "600"],
     display: "swap",
+    preload: true,
 });
 
 const instrumentSerif = Instrument_Serif({
     variable: "--font-instrument-serif",
     subsets: ["latin"],
     weight: "400",
-    style: ["normal", "italic"],
+    style: ["normal"],
     display: "swap",
+    preload: false,
 });
 
 const interTight = Inter_Tight({
     variable: "--font-inter-tight",
     subsets: ["latin", "vietnamese"],
-    weight: ["400", "500", "600"],
+    weight: ["400", "600"],
     display: "swap",
+    preload: false,
 });
 
 export const metadata: Metadata = {

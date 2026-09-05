@@ -1,16 +1,7 @@
 "use client";
 
-import dynamic from "next/dynamic";
-
-const TrustWorkspace = dynamic(() => import("./AiTrustStudioView").then((module) => ({ default: module.AiTrustStudioView })), {
-  ssr: false,
-  loading: () => (
-    <div className="workspace-loading" role="status" aria-live="polite">
-      Đang tải Trust Engine…
-    </div>
-  ),
-});
+import { AiTrustStudioView } from "./AiTrustStudioView";
 
 export default function TrustWorkspaceClient() {
-  return <TrustWorkspace />;
+  return <AiTrustStudioView />;
 }
