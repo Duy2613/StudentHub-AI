@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import {
+    Be_Vietnam_Pro,
     Instrument_Serif,
     Inter_Tight,
     JetBrains_Mono,
+    Lora,
     Plus_Jakarta_Sans,
 } from "next/font/google";
 import "./globals.css";
@@ -12,6 +14,21 @@ import { BackgroundProvider } from "@/components/providers/BackgroundContext";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import KnowledgeCursor from "@/components/ui/KnowledgeCursor";
 import { ReducedMotionBoundary } from "@/components/visual/ReducedMotionBoundary";
+
+const beVietnamPro = Be_Vietnam_Pro({
+    variable: "--font-be-vietnam-pro",
+    subsets: ["latin", "vietnamese"],
+    weight: ["400", "500", "600", "700"],
+    display: "swap",
+});
+
+const lora = Lora({
+    variable: "--font-lora",
+    subsets: ["latin", "vietnamese"],
+    weight: ["400", "500", "600"],
+    style: ["normal", "italic"],
+    display: "swap",
+});
 
 const plusJakartaSans = Plus_Jakarta_Sans({
     variable: "--font-plus-jakarta",
@@ -53,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html
             lang="vi"
             data-paper="night"
-            className={`${plusJakartaSans.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable} ${interTight.variable} h-full antialiased`}
+            className={`${beVietnamPro.variable} ${lora.variable} ${plusJakartaSans.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable} ${interTight.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col bg-space-950 text-gray-100 selection:bg-teal-400 selection:text-space-950">
                 <AuthProvider>
