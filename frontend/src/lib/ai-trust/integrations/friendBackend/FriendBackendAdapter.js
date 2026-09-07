@@ -17,6 +17,7 @@ import {
   normalizeLegacyLayer4Payload,
 } from "../legacyVerification/LegacyVerificationAdapter.js";
 import { getLegacyVerificationConfig } from "../legacyVerification/config.js";
+import { createLayer2AResult, LAYER_2A_FINDING, LAYER_2A_PROVIDER_STATUS } from "../../layer2a/types.js";
 
 export class FriendBackendAdapter extends LegacyVerificationAdapter {
   constructor(options = {}) {
@@ -39,45 +40,19 @@ export class FriendBackendAdapter extends LegacyVerificationAdapter {
    * Maps to POST /api/verify/layer2
    */
   async verifyLayer2({ url, input, requestId, signal, budget } = {}) {
-    const candidateUrl = url || (input?.type === "url" ? input?.content : null) || input?.metadata?.url;
+    const inputType = String(input?.type || "").toLowerCase();
+    const candidateUrl = url || (inputType === "url" ? input?.content : null) || input?.metadata?.url;
     if (candidateUrl) {
       return super.verifyLayer2({ url: candidateUrl, requestId, signal, budget });
     }
-    if (this.config.enabled) {
-      try {
-        const textContent = input?.content || "";
-        const endpoint = `${this.config.baseUrl}${this.config.ENDPOINTS.layer2}`;
-        const startedAt = this.clock();
-        const response = await this.fetchImpl(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(this.config.apiKey ? { Authorization: `Bearer ${this.config.apiKey}` } : {}),
-            "X-Request-ID": requestId || "req_l2_text",
-          },
-          body: JSON.stringify({ type: "text", content: textContent }),
-          signal,
-        });
-        const latencyMs = Math.max(0, this.clock() - startedAt);
-        if (response?.ok) {
-          const payload = await response.json();
-          return {
-            provider: "google-safe-browsing",
-            providerStatus: "SUCCESS",
-            finding: "NOT_APPLICABLE_URL_ONLY",
-            rawVerdict: payload.verdict || "UNKNOWN",
-            confidence: payload.confidence || 0,
-            reason: payload.reason || "Layer 2 only supports URL scanning at this time.",
-            providers: payload.providers || [],
-            latencyMs,
-            requestId,
-          };
-        }
-      } catch (err) {
-        if (signal?.aborted) throw err;
-      }
-    }
-    return super.verifyLayer2({ url: "", requestId, signal, budget });
+    return createLayer2AResult({
+      provider: "google-safe-browsing",
+      providerStatus: LAYER_2A_PROVIDER_STATUS.NOT_APPLICABLE,
+      finding: LAYER_2A_FINDING.NOT_APPLICABLE,
+      notApplicable: true,
+      requestId,
+      message: "Layer 2 URL reputation is not applicable to non-URL input; later layers evaluate the supplied content.",
+    });
   }
 
   /**
@@ -85,7 +60,11 @@ export class FriendBackendAdapter extends LegacyVerificationAdapter {
    * Maps to POST /api/verify/layer3
    */
   async verifyLayer3({ input, claims = [], requestId, signal, budget } = {}) {
-    return super.verifyLayer3({ input, claims, requestId, signal, budget });
+    const inputType = String(input?.type || "").toLowerCase();
+    const layer3Input = inputType === "url" || inputType === "text"
+      ? input
+      : { ...input, type: "text" };
+    return super.verifyLayer3({ input: layer3Input, claims, requestId, signal, budget });
   }
 
   /**

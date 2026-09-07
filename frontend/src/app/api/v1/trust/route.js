@@ -1,5 +1,4 @@
-﻿import { NextResponse } from "next/server";
-import { Layer1ScreenService } from "@/lib/ai-trust/layer1/Layer1ScreenService.js";
+import { NextResponse } from "next/server";
 import {
   createTrustOrchestrator,
   TrustPipelineCancelledError,
@@ -14,7 +13,7 @@ const MAX_CONTENT_CHARS = 160_000;
 
 function safeMetadata(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "extractionAuthority", "institutionContext"];
+  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "fileType", "inputKind", "extractionAuthority", "institutionContext"];
   return Object.fromEntries(allowed.filter((key) => Object.hasOwn(value, key)).map((key) => {
     const item = value[key];
     if (typeof item === "string") return [key, item.slice(0, 32_000)];
@@ -29,6 +28,50 @@ function wantsV5Stream(request, body) {
 
 function sseChunk(event) {
   return `event: ${event.type || "trust"}\ndata: ${JSON.stringify(event)}\n\n`;
+}
+
+function safeProviderError(error) {
+  const rawCode = typeof error?.code === "string" ? error.code.toUpperCase() : "PROVIDER_ERROR";
+  if (error instanceof FriendBackendNotConfiguredError || rawCode === "FRIEND_BACKEND_NOT_CONFIGURED" || rawCode === "LEGACY_BACKEND_NOT_CONFIGURED") {
+    return {
+      code: "FRIEND_BACKEND_NOT_CONFIGURED",
+      message: "FRIEND_BACKEND_NOT_CONFIGURED: Chưa cấu hình FRIEND_BACKEND_API_URL.",
+      status: 503,
+    };
+  }
+  if (rawCode.includes("ECONNREFUSED") || rawCode.includes("ENOTFOUND") || rawCode === "LEGACY_NETWORK_ERROR") {
+    return {
+      code: "FRIEND_BACKEND_UNREACHABLE",
+      message: "FRIEND_BACKEND_UNREACHABLE: Không thể kết nối tới máy chủ Friend Backend.",
+      status: 502,
+    };
+  }
+  if (rawCode.includes("ETIMEDOUT") || rawCode === "LEGACY_TIMEOUT" || rawCode === "TIMEOUT") {
+    return {
+      code: "FRIEND_BACKEND_TIMEOUT",
+      message: "FRIEND_BACKEND_TIMEOUT: Kết nối tới Friend Backend quá thời gian chờ.",
+      status: 504,
+    };
+  }
+  if (rawCode === "LEGACY_AUTH_FAILED" || rawCode === "AUTH_FAILED" || rawCode === "401" || rawCode === "403") {
+    return {
+      code: "FRIEND_BACKEND_AUTH_FAILED",
+      message: "FRIEND_BACKEND_AUTH_FAILED: Xác thực với Friend Backend thất bại.",
+      status: 502,
+    };
+  }
+  if (rawCode === "LEGACY_INVALID_JSON" || rawCode === "SCHEMA_MISMATCH" || rawCode.includes("MALFORMED")) {
+    return {
+      code: "FRIEND_BACKEND_CONTRACT_MISMATCH",
+      message: "FRIEND_BACKEND_CONTRACT_MISMATCH: Dữ liệu từ Friend Backend không khớp hợp đồng.",
+      status: 502,
+    };
+  }
+  return {
+    code: "PROVIDER_ERROR",
+    message: "PROVIDER_ERROR: Trust pipeline không thể hoàn tất từ nguồn live.",
+    status: 502,
+  };
 }
 
 function streamV5Pipeline(request, input, requestId) {
@@ -65,15 +108,14 @@ function streamV5Pipeline(request, input, requestId) {
         close();
       }).catch((error) => {
         if (!(error instanceof TrustPipelineCancelledError)) {
-          const isNotConfigured = error instanceof FriendBackendNotConfiguredError || error.code === "FRIEND_BACKEND_NOT_CONFIGURED";
+          const safeError = safeProviderError(error);
+
           send({
             type: "error",
             event: "PIPELINE_FAILED",
             error: {
-              code: isNotConfigured ? "FRIEND_BACKEND_NOT_CONFIGURED" : (error.code || "PIPELINE_FAILED"),
-              message: isNotConfigured
-                ? "FRIEND_BACKEND_NOT_CONFIGURED: Friend backend integration is required."
-                : (error.message || "Trust pipeline không thể hoàn tất."),
+              code: safeError.code,
+              message: safeError.message,
             },
           });
         }
@@ -145,6 +187,12 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
       },
     });
   } catch (error) {
+    if (error instanceof TrustPipelineCancelledError) {
+      return NextResponse.json({
+        success: false,
+        error: { code: "CANCELLED", userMessage: "Yêu cầu đã được dừng." },
+      }, { status: 499 });
+    }
     if (error instanceof FriendBackendNotConfiguredError || error.code === "FRIEND_BACKEND_NOT_CONFIGURED") {
       return NextResponse.json({
         success: false,
@@ -154,7 +202,14 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
         },
       }, { status: 503 });
     }
-    throw error;
+    const safeError = safeProviderError(error);
+    return NextResponse.json({
+      success: false,
+      error: {
+        code: safeError.code,
+        userMessage: safeError.message,
+      },
+    }, { status: safeError.status });
   }
 }
 

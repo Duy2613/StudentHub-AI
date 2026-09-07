@@ -39,6 +39,24 @@ function softmax(arr) {
   return exps.map((e) => e / (sum || 1));
 }
 
+function unavailablePrediction() {
+  // The sequential checkout intentionally ships without the proprietary
+  // single-head weight matrix. Return a neutral model observation so the
+  // deterministic analyzers can still run; this is not a semantic verdict.
+  return {
+    primaryCategory: "AUTHENTIC_ACADEMIC",
+    threatScore: 0,
+    confidence: null,
+    riskLevel: "UNKNOWN",
+    recommendedAction: "REVIEW",
+    urgencyScore: 0,
+    probabilities: {},
+    detectedKeywords: [],
+    latencyMs: null,
+    modelStatus: "WEIGHTS_NOT_SHIPPED",
+  };
+}
+
 export class StudentHubNeuralModel {
   static modelData = trainedModelData;
 
@@ -66,9 +84,24 @@ export class StudentHubNeuralModel {
       };
     }
 
-    const { vocab, idf, vocabSize } = this.modelData.vectorizer;
-    const { W1, b1, W2, b2 } = this.modelData.weights;
-    const categories = this.modelData.metadata.categories;
+    const modelData = this.modelData;
+    if (
+      !modelData?.vectorizer?.vocab ||
+      !modelData?.vectorizer?.idf ||
+      !Number.isInteger(modelData?.vectorizer?.vocabSize) ||
+      !modelData?.weights?.W1 ||
+      !modelData?.weights?.b1 ||
+      !modelData?.weights?.W2 ||
+      !modelData?.weights?.b2 ||
+      !Array.isArray(modelData?.metadata?.categories) ||
+      modelData.metadata.categories.length === 0
+    ) {
+      return unavailablePrediction();
+    }
+
+    const { vocab, idf, vocabSize } = modelData.vectorizer;
+    const { W1, b1, W2, b2 } = modelData.weights;
+    const categories = modelData.metadata.categories;
     const numClasses = categories.length;
     const hiddenDim = b1.length;
 

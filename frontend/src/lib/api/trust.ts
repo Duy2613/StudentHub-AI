@@ -1,5 +1,5 @@
 import { apiRequest } from "./client";
-import { ApiError } from "./errors";
+import { ApiError, API_ERROR_CODE_VALUES, type ApiErrorCode } from "./errors";
 import { canonicalTrustResponseSchema, trustEvidenceResultSchema, trustReasoningResultSchema, trustScreenResultSchema, trustSemanticResultSchema, trustV5ResponseSchema, type CanonicalTrustResponse, type TrustLayerResult, type TrustV5Pipeline, type TrustV5Response } from "./schemas/trust";
 
 export type { ExpertConsensus, RelatedCase, ThreatProviderResult, TrustLayerResult } from "./schemas/trust";
@@ -215,7 +215,15 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
       let event: TrustV5Event;
       try { event = JSON.parse(dataLines.join("\n")) as TrustV5Event; } catch { throw new ApiError("Streaming response contained malformed event data.", "INVALID_RESPONSE", { requestId }); }
       onEvent?.(event);
-      if (event.type === "error") throw new ApiError("Trust pipeline failed.", "SERVER_ERROR", { requestId: event.requestId || requestId });
+      if (event.type === "error") {
+        const rawCode = event.error?.code || "PROVIDER_ERROR";
+        const knownCode: ApiErrorCode = (API_ERROR_CODE_VALUES as readonly string[]).includes(rawCode)
+          ? (rawCode as ApiErrorCode)
+          : "PROVIDER_ERROR";
+        const message = event.error?.message || "Trust pipeline failed.";
+        const details = event.error?.code ? { dependency: event.error.code } : undefined;
+        throw new ApiError(message, knownCode, { requestId: event.requestId || requestId, details });
+      }
       if (event.type === "complete" && event.data) completed = parseV5Response({ success: true, contractVersion: "trust.v5", requestId: event.requestId || event.data.requestId, version: "v5", demo: false, data: event.data });
     };
     while (true) {

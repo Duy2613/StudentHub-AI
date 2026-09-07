@@ -6,7 +6,7 @@ const route = (name) => readFileSync(new URL(`../../src/app/api/v1/${name}/route
 
 test("canonical v1 product façades expose versioned, Security Fabric-wrapped contracts", () => {
   const expected = {
-    trust: ["trust.v1", "RUN_CANONICAL_TRUST_PIPELINE", "allowAnonymous: true"],
+    trust: ["trust.v5", "RUN_CANONICAL_TRUST_PIPELINE", "allowAnonymous: true"],
     community: ["community.v1", "READ_CANONICAL_COMMUNITY", "QUERY_CANONICAL_COMMUNITY"],
     experts: ["experts.v1", "DISCOVER_CANONICAL_EXPERTS", "EXPERT.READ"],
     academic: ["academic.v1", "READ_CANONICAL_ACADEMIC", "allowAnonymous: false"],
@@ -26,9 +26,8 @@ test("canonical Trust accepts only server-composed evidence inputs", () => {
   const source = route("trust");
   assert.match(source, /const INPUT_TYPES = new Set\(\["text", "url", "image", "file"\]\)/);
   assert.match(source, /safeMetadata/);
-  assert.match(source, /Layer1ScreenService\.screen/);
-  assert.match(source, /Layer2SemanticService\.verify/);
-  assert.match(source, /Layer3EvidenceService\.verify/);
-  assert.match(source, /Layer4TrustService\.evaluate/);
+  assert.match(source, /createTrustOrchestrator/);
+  assert.match(source, /FriendBackendNotConfiguredError/);
+  assert.match(source, /wantsV5Stream/);
   assert.doesNotMatch(source, /body\?\.(evidence|candidates|sources)\b/, "browser must not provide candidate evidence authority");
 });

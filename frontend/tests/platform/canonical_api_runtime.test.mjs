@@ -34,7 +34,7 @@ async function waitForServer(baseUrl, output) {
   throw new Error(`Canonical API smoke server did not become ready.\n${output()}`);
 }
 
-test("canonical v1 APIs expose honest public contracts and fail closed for personal data", { timeout: 90_000 }, async () => {
+test("canonical APIs expose honest public contracts and fail closed for personal data", { timeout: 90_000 }, async () => {
   const port = await reservePort();
   const baseUrl = `http://127.0.0.1:${port}`;
   const output = [];
@@ -85,10 +85,12 @@ test("canonical v1 APIs expose honest public contracts and fail closed for perso
       body: JSON.stringify({ type: "text", content: "Kiểm tra nội dung trước khi tin." }),
     });
     const trustBody = await trustResponse.json();
-    assert.equal(trustResponse.status, 200);
-    assert.equal(trustBody.contractVersion, "trust.v1");
-    assert.equal(trustBody.demo, false);
-    assert.ok(trustBody.data.layer1);
+    // The sequential variant requires the Friend Backend for live L2-L4.
+    // With no provider secret/URL in this isolated runtime, the truthful
+    // contract is a typed 503 rather than a fabricated v1/demo result.
+    assert.equal(trustResponse.status, 503);
+    assert.equal(trustBody.success, false);
+    assert.equal(trustBody.error?.code, "FRIEND_BACKEND_NOT_CONFIGURED");
 
     const legacyReasoningResponse = await fetch(`${baseUrl}/api/ai-trust/reasoning`, {
       method: "POST",

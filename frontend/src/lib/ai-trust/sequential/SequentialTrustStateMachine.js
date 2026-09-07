@@ -40,6 +40,7 @@ export const LAYER_STATUS = Object.freeze({
   PENDING: "PENDING",     // ○ Pending
   RUNNING: "RUNNING",     // ● Running
   COMPLETED: "COMPLETED", // ✓ Completed
+  SKIPPED: "SKIPPED",     // — Skipped by server policy or input boundary
   ERROR: "ERROR",         // ✕ Failed
 });
 
@@ -48,6 +49,7 @@ export function createInitialSequentialState() {
     state: SEQUENTIAL_STATE.IDLE,
     activeLayer: null,
     collapsedLayers: Object.freeze({ 1: false, 2: false, 3: false, 4: false }),
+    skippedLayers: Object.freeze({ 1: false, 2: false, 3: false, 4: false }),
     layerResults: Object.freeze({
       layer1: null,
       layer2: null,
@@ -75,7 +77,7 @@ export function isLayerActive(state, layer) {
  * Get compact display status for a layer.
  * Returns: PENDING (○), RUNNING (●), COMPLETED (✓), or ERROR (✕)
  */
-export function getLayerDisplayStatus(state, layer, layerResults = {}) {
+export function getLayerDisplayStatus(state, layer, layerResults = {}, skippedLayers = {}) {
   // Check if this layer has an error
   if (
     (layer === 1 && state === SEQUENTIAL_STATE.L1_ERROR) ||
@@ -84,6 +86,13 @@ export function getLayerDisplayStatus(state, layer, layerResults = {}) {
     (layer === 4 && state === SEQUENTIAL_STATE.L4_ERROR)
   ) {
     return LAYER_STATUS.ERROR;
+  }
+
+  // A skipped layer is different from a clean/completed layer. The server
+  // explicitly records this when a hard stop or continuation policy prevents
+  // the next provider call.
+  if (skippedLayers[layer] || layerResults[`layer${layer}`]?.operationStatus === "SKIPPED") {
+    return LAYER_STATUS.SKIPPED;
   }
 
   // Check if this layer is currently running
@@ -218,6 +227,17 @@ export function sequentialStateReducer(current, action) {
         // previous details are collapsed by default so user can inspect final verdict
         collapsedLayers: { 1: true, 2: true, 3: true, 4: true },
         finalVerdict: payload.verdict || payload.result || null,
+        error: null,
+      };
+    }
+
+    case "SKIP_LAYER": {
+      const layer = Number(payload.layer);
+      if (![1, 2, 3, 4].includes(layer)) return current;
+      return {
+        ...current,
+        skippedLayers: { ...current.skippedLayers, [layer]: true },
+        activeLayer: current.activeLayer === layer ? null : current.activeLayer,
         error: null,
       };
     }

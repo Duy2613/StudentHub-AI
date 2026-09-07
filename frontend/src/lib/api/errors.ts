@@ -16,7 +16,16 @@ export type ApiErrorCode =
   | "ABORTED"
   | "INVALID_RESPONSE"
   | "SCHEMA_MISMATCH"
-  | "PROVIDER_PARTIAL";
+  | "PROVIDER_PARTIAL"
+  | "FRIEND_BACKEND_NOT_CONFIGURED"
+  | "FRIEND_BACKEND_UNREACHABLE"
+  | "FRIEND_BACKEND_TIMEOUT"
+  | "FRIEND_BACKEND_AUTH_FAILED"
+  | "FRIEND_BACKEND_CONTRACT_MISMATCH"
+  | "GOOGLE_SAFE_BROWSING_NOT_CONFIGURED"
+  | "TAVILY_NOT_CONFIGURED"
+  | "GROQ_GEMINI_NOT_CONFIGURED"
+  | "PROVIDER_ERROR";
 
 export const API_ERROR_CODE_VALUES = [
   "UNAUTHORIZED",
@@ -35,6 +44,15 @@ export const API_ERROR_CODE_VALUES = [
   "INVALID_RESPONSE",
   "SCHEMA_MISMATCH",
   "PROVIDER_PARTIAL",
+  "FRIEND_BACKEND_NOT_CONFIGURED",
+  "FRIEND_BACKEND_UNREACHABLE",
+  "FRIEND_BACKEND_TIMEOUT",
+  "FRIEND_BACKEND_AUTH_FAILED",
+  "FRIEND_BACKEND_CONTRACT_MISMATCH",
+  "GOOGLE_SAFE_BROWSING_NOT_CONFIGURED",
+  "TAVILY_NOT_CONFIGURED",
+  "GROQ_GEMINI_NOT_CONFIGURED",
+  "PROVIDER_ERROR",
 ] as const satisfies readonly ApiErrorCode[];
 
 export const apiErrorCodeSchema = z.enum(API_ERROR_CODE_VALUES);
@@ -97,6 +115,15 @@ const SAFE_MESSAGES: Record<ApiErrorCode, string> = {
   INVALID_RESPONSE: "Máy chủ trả về dữ liệu không hợp lệ.",
   SCHEMA_MISMATCH: "Dữ liệu trả về không khớp hợp đồng an toàn của giao diện.",
   PROVIDER_PARTIAL: "Một phần nguồn dữ liệu chưa hoàn tất.",
+  FRIEND_BACKEND_NOT_CONFIGURED: "Chưa cấu hình FRIEND_BACKEND_API_URL trong .env.local.",
+  FRIEND_BACKEND_UNREACHABLE: "Không thể kết nối tới máy chủ Friend Backend. Vui lòng kiểm tra địa chỉ mạng.",
+  FRIEND_BACKEND_TIMEOUT: "Kết nối tới Friend Backend quá thời gian chờ (timeout).",
+  FRIEND_BACKEND_AUTH_FAILED: "Xác thực với Friend Backend thất bại (kiểm tra lại FRIEND_BACKEND_API_KEY).",
+  FRIEND_BACKEND_CONTRACT_MISMATCH: "Dữ liệu trả về từ Friend Backend không khớp với hợp đồng định dạng.",
+  GOOGLE_SAFE_BROWSING_NOT_CONFIGURED: "Google Safe Browsing API key chưa được cấu hình trên backend bạn bè.",
+  TAVILY_NOT_CONFIGURED: "TAVILY_API_KEY chưa được cấu hình trên backend bạn bè.",
+  GROQ_GEMINI_NOT_CONFIGURED: "Mô hình suy luận Groq/Gemini API key chưa được cấu hình trên backend bạn bè.",
+  PROVIDER_ERROR: "Dịch vụ đối soát gặp sự cố ngoài dự kiến.",
 };
 
 const RETRYABLE_CODES = new Set<ApiErrorCode>([
@@ -106,6 +133,9 @@ const RETRYABLE_CODES = new Set<ApiErrorCode>([
   "NETWORK_ERROR",
   "TIMEOUT",
   "PROVIDER_PARTIAL",
+  "FRIEND_BACKEND_UNREACHABLE",
+  "FRIEND_BACKEND_TIMEOUT",
+  "PROVIDER_ERROR",
 ]);
 
 function boundedRequestId(value: string | null | undefined): string | null {

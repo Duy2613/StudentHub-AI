@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ApiError } from "../../api/errors";
+import { ApiError, type ApiErrorCode } from "../../api/errors";
 import { apiRequest } from "../../api/client";
 import {
   communityExperienceResponseSchema,
@@ -152,6 +152,7 @@ function statusForStage(operationStatus: string): "AVAILABLE" | "PARTIAL" | "UNK
   if (operationStatus === "PARTIAL") return "PARTIAL";
   if (operationStatus === "FAILED") return "ERROR";
   if (operationStatus === "RUNNING" || operationStatus === "QUEUED") return "UNKNOWN";
+  if (operationStatus === "SKIPPED" || operationStatus === "BLOCKED") return "UNKNOWN";
   return "UNAVAILABLE";
 }
 
@@ -240,13 +241,20 @@ function trustResultFromResponse(input: TrustInvestigationInput, raw: unknown): 
   const layer4Explanation = asRecord(layer4.userExplanation);
 
   const stageValues = Object.values(pipeline.stages);
-  const stages = stageValues.map((stage) => ({
-    stageId: stage.stageId,
-    status: statusForStage(stage.operationStatus),
-    finding: stage.finding,
-    summary: stage.summary,
-    missingScope: statusForStage(stage.operationStatus) === "AVAILABLE" ? [] : [stage.stageId],
-  }));
+  const stages = stageValues.map((stage) => {
+    const status = statusForStage(stage.operationStatus);
+    const policySkipped = stage.operationStatus === "SKIPPED" || stage.operationStatus === "BLOCKED";
+    return {
+      stageId: stage.stageId,
+      status,
+      finding: stage.finding,
+      summary: stage.summary,
+      // Out-of-scope policy skips are disclosed by the pipeline itself; they
+      // are not missing live provider evidence and must not make every result
+      // look PARTIAL.
+      missingScope: status === "AVAILABLE" || policySkipped ? [] : [stage.stageId],
+    };
+  });
   const provenance = {
     requestedMode: "LIVE" as const,
     sourceMode: "LIVE" as const,
@@ -292,7 +300,13 @@ function trustResultFromResponse(input: TrustInvestigationInput, raw: unknown): 
       runId: input.runId,
       unknowns: incompleteUnknowns,
       missing: resolvedMissing.length ? resolvedMissing : ["trust-final-decision"],
-      ...(incompleteState === "ERROR" ? { error: new ApiError("The Trust pipeline failed.", "SERVER_ERROR", { retryable: true }).toSafeError() } : {}),
+      ...(incompleteState === "ERROR" ? {
+        error: new ApiError(
+          String((asRecord(pipeline).error as Record<string, unknown> | undefined)?.message || "The Trust pipeline failed."),
+          ((asRecord(pipeline).error as Record<string, unknown> | undefined)?.code as ApiErrorCode) || "PROVIDER_ERROR",
+          { retryable: true }
+        ).toSafeError()
+      } : {}),
       retryable: incompleteState === "ERROR" || incompleteState === "PARTIAL" || incompleteState === "LOADING",
       nextActions: incompleteState === "CANCELLED" ? [{ id: "START_OVER", label: "Bắt đầu lại" }] : incompleteState === "LOADING" ? [{ id: "CANCEL", label: "Dừng kiểm tra" }] : [{ id: "RETRY", label: "Thử lại" }],
     });
@@ -367,7 +381,10 @@ function trustResultFromResponse(input: TrustInvestigationInput, raw: unknown): 
     return createProviderResult({
       ...base,
       state: "ERROR",
-      error: new ApiError("The Trust pipeline failed.", "SERVER_ERROR").toSafeError(),
+      error: new ApiError(
+        String((asRecord(pipeline).error as Record<string, unknown> | undefined)?.message || "The Trust pipeline failed."),
+        ((asRecord(pipeline).error as Record<string, unknown> | undefined)?.code as ApiErrorCode) || "PROVIDER_ERROR"
+      ).toSafeError(),
       nextActions: [{ id: "RETRY", label: "Thử lại" }],
     });
   }

@@ -1,22 +1,14 @@
-﻿/**
- * In the standalone Sequential variant, the native StudentHub owner pipeline
- * has been replaced by the Friend Backend 4-layer sequential pipeline.
+/**
+ * Backward-compatible V5 orchestration entrypoint.
+ *
+ * The production sequential route uses TrustOrchestrator.js, whose Friend
+ * Backend path is explicit and fail-closed. This compatibility export keeps
+ * the original V5 service-injection contract available to existing modules
+ * and regression tests; it is not a silent provider fallback for the route.
  */
-import { FriendBackendNotConfiguredError, TrustPipelineCancelledError } from "../TrustOrchestrator.js";
-
-export { TrustPipelineCancelledError };
-
-export class TrustPipelineOrchestrator {
-  constructor() {}
-  async run() {
-    throw new FriendBackendNotConfiguredError("Native StudentHub trust pipeline is not included in this sequential variant.");
-  }
-}
-
-export function createTrustPipelineOrchestrator() {
-  return new TrustPipelineOrchestrator();
-}
-
-export function isRetryEligible() {
-  return false;
-}
+export {
+  TrustPipelineOrchestrator,
+  TrustPipelineCancelledError,
+  createTrustPipelineOrchestrator,
+  isRetryEligible,
+} from "./TrustPipelineOrchestratorLegacy.js";

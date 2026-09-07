@@ -361,6 +361,7 @@ function publicLayerResult(value, layerId) {
     "semanticSummary", "sourceAgreement", "verificationCompleteness", "evidenceCompleteness", "externalEvidence", "retrievalMode",
     "retrievalStatus", "hardRuleTriggered", "classificationSource", "inputLength",
     "reputationLookupPolicy", "reputationLookupReason", "reputationLookupStatus", "reputationLookupTargetClass", "reputationLookupDisclosed",
+    "stop", "canContinueToLayer4", "reason", "assessmentConfidence", "evidenceAgreement", "sourceQuality", "geminiModel", "groqModel", "mode",
   ]) || {};
 
   if (["l1", "l2b", "l2c"].includes(layerId)) base.signals = publicSignals(value.signals || value.riskSignals || value.contextSignals);
@@ -413,7 +414,10 @@ function publicLayerResult(value, layerId) {
     base.metrics = publicRecord(value.metrics, ["modelUsed", "ruleVersion", "providerStatus", "latencyMs"]);
     base.relatedCases = publicRelatedCases(value.relatedCases);
     base.legacyIntegration = publicLegacyIntegration(value.legacyIntegration);
-    base.independentResearchSources = publicSources(value.independentResearchSources);
+    base.sources = publicSources(value.sources);
+    base.evidence = publicSources(value.evidence);
+    base.contradictoryEvidence = publicStringList(value.contradictoryEvidence, 20, 700);
+    base.independentResearchSources = publicSources(value.independentResearchSources || value.sources);
   }
   return base;
 }

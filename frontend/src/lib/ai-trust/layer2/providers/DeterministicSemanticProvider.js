@@ -39,6 +39,7 @@ export class DeterministicSemanticProvider extends ISemanticVerificationProvider
     // 0. StudentHub Multi-Head & Single-Head Neural Model Prediction
     const neuralPrediction = StudentHubNeuralModel.predict(combinedText, { url: safeUrl, ocrText: safeOcrText, qrPayload: safeQrPayload });
     const multiLabelPrediction = StudentHubMultiLabelNeuralModel.predict(combinedText, { url: safeUrl, ocrText: safeOcrText, qrPayload: safeQrPayload });
+    const neuralModelAvailable = neuralPrediction.modelStatus !== "WEIGHTS_NOT_SHIPPED";
 
     // 1. Intent Analysis
     const intent = IntentAnalyzer.analyze(combinedText, { url: safeUrl, qrPayload: safeQrPayload });
@@ -142,7 +143,7 @@ export class DeterministicSemanticProvider extends ISemanticVerificationProvider
       semanticSummary = "Nội dung mạo danh đơn vị uy tín nhằm yêu cầu cung cấp thông tin bảo mật / mã OTP.";
     } else if (contextSignals.some((s) => s.type === "financial_scam_context")) {
       semanticSummary = "Nội dung tuyển dụng / cộng tác viên yêu cầu nạp tiền đặt cọc kèm cam kết hoa hồng bất thường.";
-    } else if (contextSignals.some((s) => s.type === "educational_discussion") || neuralPrediction.primaryCategory === "AUTHENTIC_ACADEMIC") {
+    } else if (contextSignals.some((s) => s.type === "educational_discussion") || (neuralModelAvailable && neuralPrediction.primaryCategory === "AUTHENTIC_ACADEMIC")) {
       semanticSummary = "Văn bản thông tin chính thống / thảo luận học thuật an toàn, không phát hiện dấu hiệu gian lận.";
     } else if (claims.length > 0) {
       semanticSummary = `Phát hiện ${claims.length} phát ngôn / tuyên bố sự kiện cần kiểm chứng nguồn tin chính thức tại Layer 3.`;
@@ -160,7 +161,7 @@ export class DeterministicSemanticProvider extends ISemanticVerificationProvider
       classification = SEMANTIC_CLASSIFICATION.MISLEADING;
     } else if (claims.some((c) => c.verificationRequired)) {
       classification = SEMANTIC_CLASSIFICATION.UNVERIFIED;
-    } else if (contextSignals.some((s) => s.type === "educational_discussion") || neuralPrediction.primaryCategory === "AUTHENTIC_ACADEMIC") {
+    } else if (contextSignals.some((s) => s.type === "educational_discussion") || (neuralModelAvailable && neuralPrediction.primaryCategory === "AUTHENTIC_ACADEMIC")) {
       classification = SEMANTIC_CLASSIFICATION.INFORMATIVE;
     }
 
