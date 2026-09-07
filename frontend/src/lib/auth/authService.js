@@ -7,7 +7,11 @@
 //   server-issued HttpOnly cookie before the UI claims an authenticated session.
 // - "Remember Me" stores preferences/demo data only, never credentials.
 
-import { supabase } from "../supabase/client.js";
+import {
+  createSupabaseConfigurationError,
+  isSupabaseConfigured,
+  supabase,
+} from "../supabase/client.js";
 
 const API_BASE = typeof window !== "undefined"
   ? "" // Sử dụng Next.js Route Proxy cùng origin để triệt tiêu lỗi CORS Preflight
@@ -103,6 +107,14 @@ export function translateAuthError(error) {
     : error?.message || error?.error_description || error?.code || "";
     
   const lower = rawMsg.toLowerCase();
+
+  if (
+    lower.includes("supabase_not_configured") ||
+    lower.includes("supabase auth chưa được cấu hình") ||
+    lower.includes("next_public_supabase_url")
+  ) {
+    return "Google/Email Auth chưa hoạt động: hãy cấu hình NEXT_PUBLIC_SUPABASE_URL và NEXT_PUBLIC_SUPABASE_ANON_KEY trong frontend/.env.local rồi khởi động lại frontend.";
+  }
 
   // Đã đăng ký qua Google OAuth trước đó
   if (lower.includes("đã được đăng ký thông qua tài khoản google") || lower.includes("tiếp tục với google")) {
@@ -469,6 +481,8 @@ export async function signUpWithEmail(email, password, fullName) {
   logAuthInfo("signUpWithEmail", `Bắt đầu đăng ký cho email: ${cleanEmail}`);
 
   try {
+    if (!isSupabaseConfigured) throw createSupabaseConfigurationError();
+
     const { data, error } = await supabase.auth.signUp({
       email: cleanEmail,
       password,
@@ -529,6 +543,8 @@ export async function verifySignupOtp(email, token) {
   logAuthInfo("verifySignupOtp", `Đang xác thực OTP cho: ${cleanEmail}`);
 
   try {
+    if (!isSupabaseConfigured) throw createSupabaseConfigurationError();
+
     const { data, error } = await supabase.auth.verifyOtp({
       email: cleanEmail,
       token: cleanToken,
@@ -567,6 +583,8 @@ export async function resendSignupOtp(email) {
   logAuthInfo("resendSignupOtp", `Gửi lại mã OTP cho: ${cleanEmail}`);
 
   try {
+    if (!isSupabaseConfigured) throw createSupabaseConfigurationError();
+
     const { data, error } = await supabase.auth.resend({
       type: "signup",
       email: cleanEmail,
@@ -594,6 +612,8 @@ export async function signInWithPassword(email, password, rememberMe = false) {
   logAuthInfo("signInWithPassword", `Bắt đầu đăng nhập: ${cleanEmail} (Remember: ${rememberMe})`);
 
   try {
+    if (!isSupabaseConfigured) throw createSupabaseConfigurationError();
+
     // Supabase/OIDC is the sole end-user identity authority. The external
     // ASP.NET service remains a profile-sync compatibility dependency and may
     // not independently establish an authenticated application session.
@@ -633,6 +653,8 @@ export async function signInWithPassword(email, password, rememberMe = false) {
 export async function signInWithGoogle() {
   logAuthInfo("signInWithGoogle", "Khởi tạo luồng Google OAuth.");
   try {
+    if (!isSupabaseConfigured) throw createSupabaseConfigurationError();
+
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -657,6 +679,8 @@ export async function signInWithGoogle() {
 export async function signInWithGitHub() {
   logAuthInfo("signInWithGitHub", "Khởi tạo luồng GitHub OAuth.");
   try {
+    if (!isSupabaseConfigured) throw createSupabaseConfigurationError();
+
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "github",
@@ -710,6 +734,9 @@ export async function signOutSupabase() {
       removeBrowserStorage("localStorage", "studenthub_remember_me");
     }
 
+    // Keep the provider sign-out call for compatibility with an in-memory
+    // client/session and test doubles. With no configured provider session,
+    // Supabase resolves this locally; auth entry points are guarded above.
     const { error } = await supabase.auth.signOut().catch(() => ({ error: null }));
     if (error) {
       logAuthError("signOutSupabase", error);
@@ -738,9 +765,11 @@ export async function updateUserProfile(profileData) {
       writeBrowserStorage(storageName, "studenthub_user_profile", JSON.stringify({ ...current, ...profileData }));
     }
 
-    const { data } = await supabase.auth.updateUser({
-      data: profileData,
-    }).catch(() => ({ data: { user: null } }));
+    const { data } = isSupabaseConfigured
+      ? await supabase.auth.updateUser({
+          data: profileData,
+        }).catch(() => ({ data: { user: null } }))
+      : { data: { user: null } };
 
     // Đồng bộ sang ASP.NET Core Backend
     await syncBackendUser(profileData);

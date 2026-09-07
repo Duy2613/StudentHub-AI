@@ -10,7 +10,7 @@
 // - Tự động định dạng Profile với đầy đủ thuộc tính an toàn (Zero undefined crash)
 
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import {
   exchangeApplicationSession,
   getApplicationSession,
@@ -234,10 +234,17 @@ export function AuthProvider({ children }) {
         }
 
         // 2. A current Supabase proof is accepted only long enough to create
-        // the opaque application session.
-        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) {
-          logAuthError("AuthProvider:getSession", sessionError);
+        // the opaque application session. A guest/demo build must not call a
+        // placeholder Supabase host while credentials are absent.
+        let currentSession = null;
+        if (isSupabaseConfigured) {
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          currentSession = session;
+          if (sessionError) {
+            logAuthError("AuthProvider:getSession", sessionError);
+          }
+        } else {
+          logAuthInfo("AuthProvider", "Supabase Auth chưa cấu hình; bỏ qua provider session và giữ chế độ khách/demo.");
         }
 
         if (currentSession?.user && mounted) {
@@ -298,7 +305,7 @@ export function AuthProvider({ children }) {
     // completes. This prevents Supabase's INITIAL_SESSION callback from
     // racing the cookie restore and replaying a one-time provider proof.
     const subscribeToAuthChanges = () => {
-      if (!mounted) return;
+      if (!mounted || !isSupabaseConfigured) return;
       const { data } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
         if (!mounted) return;
 

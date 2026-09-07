@@ -10,7 +10,28 @@ import { createClient } from "@supabase/supabase-js";
 const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const envAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!envUrl || !envAnonKey) {
+// Never let an absent local configuration silently become a real network
+// request to a fake Supabase host. The fallback client below is retained for
+// compatibility with existing imports/tests, while auth flows use this
+// explicit readiness flag before calling Supabase.
+const hasUsableSupabaseUrl = Boolean(
+  envUrl && !/placeholder|your[-_ ]?project|example\.com/i.test(envUrl)
+);
+const hasUsableSupabaseAnonKey = Boolean(
+  envAnonKey && !/placeholder|your[-_ ]?anon|change[-_ ]?me/i.test(envAnonKey)
+);
+
+export const isSupabaseConfigured = hasUsableSupabaseUrl && hasUsableSupabaseAnonKey;
+
+export function createSupabaseConfigurationError() {
+  const error = new Error(
+    "Supabase Auth chưa được cấu hình. Hãy điền NEXT_PUBLIC_SUPABASE_URL và NEXT_PUBLIC_SUPABASE_ANON_KEY trong frontend/.env.local rồi khởi động lại frontend."
+  );
+  error.code = "SUPABASE_NOT_CONFIGURED";
+  return error;
+}
+
+if (!isSupabaseConfigured) {
   if (typeof window !== "undefined") {
     console.warn(
       "[Supabase] NEXT_PUBLIC_SUPABASE_URL hoặc NEXT_PUBLIC_SUPABASE_ANON_KEY chưa được cấu hình. Sử dụng chế độ demo và in-memory auth."

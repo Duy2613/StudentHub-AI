@@ -11,7 +11,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 import {
   exchangeApplicationSession,
   syncBackendUser,
@@ -34,6 +34,12 @@ export default function AuthCallbackPage() {
       logAuthInfo("OAuthCallback", "Bắt đầu phân giải OAuth callback.");
 
       try {
+        if (!isSupabaseConfigured) {
+          logAuthError("OAuthCallback", { code: "SUPABASE_NOT_CONFIGURED" });
+          router.replace("/login?error=supabase_not_configured");
+          return;
+        }
+
         // 1. Lấy session từ Supabase (tự động phân giải hash fragment / code)
         const { data: { session }, error } = await supabase.auth.getSession();
 

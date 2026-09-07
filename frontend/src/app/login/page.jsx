@@ -48,6 +48,8 @@ const LoginPage = () => {
       const urlError = params.get("error");
       if (urlError === "google_login_failed" || urlError === "oauth_failed") {
         setError("Đăng nhập bằng OAuth không thành công hoặc đã bị hủy. Vui lòng thử lại.");
+      } else if (urlError === "supabase_not_configured") {
+        setError("Google/Email Auth chưa hoạt động: hãy cấu hình NEXT_PUBLIC_SUPABASE_URL và NEXT_PUBLIC_SUPABASE_ANON_KEY trong frontend/.env.local rồi khởi động lại frontend.");
       } else if (urlError === "session_unavailable") {
         setError("Dịch vụ phiên đăng nhập an toàn đang tạm thời không khả dụng. Vui lòng thử lại sau.");
       } else if (urlError === "email_registered_use_password") {
