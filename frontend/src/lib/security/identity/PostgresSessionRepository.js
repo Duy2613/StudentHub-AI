@@ -31,8 +31,16 @@ export class PostgresSessionRepository {
     const result = await this.pool.query(`
       update private.server_sessions s
       set last_seen_at=$2, idle_expires_at=least($2 + interval '30 minutes', s.expires_at)
+      from auth.users u
       where s.token_hash=$1 and s.revoked_at is null and s.expires_at>$2 and s.idle_expires_at>$2
+        and u.id=s.user_id
       returning s.user_id, s.created_at, s.last_seen_at, s.expires_at, s.session_version,
+        s.auth_provider,
+        u.email,
+        (u.email_confirmed_at is not null) as email_verified,
+        nullif(u.raw_user_meta_data->>'full_name', '') as full_name,
+        case when u.raw_user_meta_data->>'onboarded' in ('true', 'false')
+          then (u.raw_user_meta_data->>'onboarded')::boolean else false end as onboarded,
         coalesce((select array_agg(r.code order by r.code)
           from private.user_roles ur join private.roles r on r.id=ur.role_id
           where ur.user_id=s.user_id and ur.revoked_at is null), array['STUDENT']::text[]) roles

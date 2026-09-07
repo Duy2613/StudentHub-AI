@@ -29,11 +29,19 @@ function wantsV5Stream(request, body) {
   return body?.stream === true || request.headers.get("accept")?.toLowerCase().includes("text/event-stream");
 }
 
+function idempotencyKeyFor(request, principal, requestId) {
+  const supplied = request.headers.get("Idempotency-Key");
+  if (supplied !== null && !/^[A-Za-z0-9._:-]{1,160}$/.test(supplied.trim())) {
+    return { error: NextResponse.json({ success: false, error: { code: "TRUST_IDEMPOTENCY_KEY_INVALID", userMessage: "Idempotency-Key không hợp lệ." } }, { status: 400 }) };
+  }
+  return { value: principal?.isAuthenticated ? supplied?.trim() || `request:${requestId}` : null };
+}
+
 function sseChunk(event) {
   return `event: ${event.type || "trust"}\ndata: ${JSON.stringify(event)}\n\n`;
 }
 
-function streamV5Pipeline(request, input, requestId, principal) {
+function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) {
   const encoder = new TextEncoder();
   const abortController = new AbortController();
   const forwardAbort = () => abortController.abort(request.signal.reason || "client-disconnected");
@@ -62,18 +70,39 @@ function streamV5Pipeline(request, input, requestId, principal) {
           stageId: transition.stageId,
           data: transition.pipeline,
         }),
-      }).then((result) => {
-        if (principal) {
-          TrustPersistenceService.recordTrustExecution({
-            pipelineResult: result,
-            input,
-            principal,
-            requestId,
-          }).catch((err) => {
-            console.error("[TrustPersistence] Stream background persistence error:", err.message);
-          });
+      }).then(async (result) => {
+        let persistence = { persisted: false, caseId: null };
+        if (principal?.isAuthenticated) {
+          try {
+            persistence = await TrustPersistenceService.recordTrustExecution({
+              pipelineResult: result,
+              input,
+              principal,
+              requestId,
+              idempotencyKey,
+            });
+          } catch (error) {
+            console.error("[TrustPersistence] Stream terminal commit failed:", error.message);
+            send({ type: "error", event: "TRUST_PERSISTENCE_FAILED", error: { code: error.code === "TRUST_IDEMPOTENCY_CONFLICT" ? error.code : "TRUST_PERSISTENCE_UNAVAILABLE", message: error.code === "TRUST_IDEMPOTENCY_CONFLICT" ? "Idempotency-Key đã được dùng cho input khác." : "Trust result could not be committed." } });
+            close();
+            return;
+          }
+          if (!persistence.persisted) {
+            send({ type: "error", event: "TRUST_PERSISTENCE_FAILED", error: { code: "TRUST_PERSISTENCE_UNAVAILABLE", message: "Trust result could not be committed." } });
+            close();
+            return;
+          }
         }
-        send({ type: "complete", event: "PIPELINE_COMPLETED", stageId: "l5", data: result });
+         send({
+           type: "complete",
+           event: "PIPELINE_COMPLETED",
+           stageId: "l5",
+           caseId: persistence.caseId || result.verificationId || null,
+           caseRevision: persistence.caseRevision || null,
+           runId: persistence.runId || null,
+           persistence: { persisted: Boolean(persistence.persisted), idempotent: Boolean(persistence.idempotent) },
+           data: result,
+         });
         close();
       }).catch((error) => {
         if (!(error instanceof TrustPipelineCancelledError)) {
@@ -126,30 +155,41 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
   const requestId = securityContext.correlationId;
   const input = { type, content, metadata };
   if (body?.version === "v5") {
-    if (wantsV5Stream(request, body)) return streamV5Pipeline(request, input, requestId, principal);
+    const idempotency = idempotencyKeyFor(request, principal, requestId);
+    if (idempotency.error) return idempotency.error;
+    if (wantsV5Stream(request, body)) return streamV5Pipeline(request, input, requestId, principal, idempotency.value);
     const pipeline = await createTrustOrchestrator().run(input, { requestId, signal: request.signal });
-    let caseId = pipeline.verificationId || null;
-
-    if (principal) {
+    let persistence = { persisted: false, caseId: null };
+    if (principal?.isAuthenticated) {
       try {
-        TrustPersistenceService.recordTrustExecution({
+        persistence = await TrustPersistenceService.recordTrustExecution({
           pipelineResult: pipeline,
           input,
           principal,
           requestId,
-        }).catch((err) => {
-          console.error("[TrustPersistence] Background persistence error:", err.message);
+          idempotencyKey: idempotency.value,
         });
-      } catch (err) {
-        console.error("[TrustPersistence] Dispatch error:", err.message);
+      } catch (error) {
+        console.error("[TrustPersistence] Terminal commit failed:", error.message);
+        const status = error.code === "TRUST_IDEMPOTENCY_CONFLICT" ? 409 : 503;
+        const code = error.code === "TRUST_IDEMPOTENCY_CONFLICT" ? error.code : "TRUST_PERSISTENCE_UNAVAILABLE";
+        const userMessage = error.code === "TRUST_IDEMPOTENCY_CONFLICT" ? "Idempotency-Key đã được dùng cho input khác." : "Kết quả Trust chưa thể ghi nhận bền vững. Vui lòng thử lại.";
+        return NextResponse.json({ success: false, error: { code, userMessage } }, { status });
+      }
+      if (!persistence.persisted) {
+        return NextResponse.json({ success: false, error: { code: "TRUST_PERSISTENCE_UNAVAILABLE", userMessage: "Kết quả Trust chưa thể ghi nhận bền vững. Vui lòng thử lại." } }, { status: 503 });
       }
     }
+    const caseId = persistence.caseId || pipeline.verificationId || null;
 
     return NextResponse.json({
       success: true,
       contractVersion: "trust.v5",
       requestId,
       caseId,
+      caseRevision: persistence.caseRevision || null,
+      runId: persistence.runId || null,
+      persistence: { persisted: Boolean(persistence.persisted), idempotent: Boolean(persistence.idempotent) },
       version: "v5",
       demo: false,
       data: pipeline,

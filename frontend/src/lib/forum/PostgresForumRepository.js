@@ -33,12 +33,19 @@ export class PostgresForumRepository {
   }
 
   async list({ category = "", q = "", locationTag = "", sortBy = "ranking" } = {}) {
-    const orderBy = sortBy === "newest" ? "p.created_at desc" : sortBy === "likes" ? "like_count desc, p.created_at desc" : "(trust_votes-distrust_votes) desc, p.created_at desc";
+    // Keep ordering expressions at the same query level as the aggregates.
+    // PostgreSQL cannot resolve the trust/distrust aliases inside the
+    // arithmetic expression used by the old ranking query.
+    const orderBy = sortBy === "newest"
+      ? "p.created_at desc, p.id desc"
+      : sortBy === "likes"
+        ? "like_count desc, p.created_at desc, p.id desc"
+        : "(count(*) filter (where v.value=1) - count(*) filter (where v.value=-1)) desc, p.created_at desc, p.id desc";
     const result = await this.pool.query(`
       select p.*, pr.display_name,
         count(*) filter (where v.value=1) trust_votes,
         count(*) filter (where v.value=-1) distrust_votes,
-        0::bigint like_count
+        count(*) filter (where v.value=1) like_count
       from public.posts p
       left join public.profiles pr on pr.id=p.author_id
       left join public.votes v on v.post_id=p.id

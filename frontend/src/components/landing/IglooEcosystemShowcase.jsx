@@ -22,7 +22,7 @@ export default function IglooEcosystemShowcase() {
     <section className="py-24 relative z-10 overflow-hidden" id="ecosystem">
       <div className="layout-safe-container space-y-16">
         
-        {/* Section Header with Dual Typography: Inter (Human) + JetBrains Mono (Machine) */}
+        {/* Section Header with Dual Typography: Be Vietnam Pro (Human) + JetBrains Mono (Machine) */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/10">
           <div className="space-y-3 max-w-2xl text-left">
             <div className="inline-flex items-center gap-2">

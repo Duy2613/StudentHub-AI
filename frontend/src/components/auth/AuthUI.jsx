@@ -7,6 +7,7 @@
 // GeometricConstellationCanvas, Robin Payot Fluid waves, and Astrolabe Rings.
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { Eye, EyeOff, Lock, Loader2, ArrowRight, AlertCircle, GraduationCap, CheckCircle2 } from "lucide-react";
 import AuthSurroundings from "@/components/auth/AuthSurroundings";
 import { Meteors } from "@/components/ui/meteors";
@@ -212,32 +213,43 @@ export const Button = ({ children, isLoading, disabled, ...props }) => (
   </div>
 );
 
-export const GoogleButton = ({ isLoading, isDisabled, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={isLoading || isDisabled}
-    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-space-950/70 border border-white/15 backdrop-blur-2xl text-sm font-medium text-gray-200 shadow-sm hover:bg-space-900/80 hover:text-white hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-teal-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
-      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-space-950/70 hover:border-white/15 hover:text-gray-200" : ""
-    }`}
-  >
-    {isLoading ? (
-      <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
-    ) : (
-      <>
-        <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-          <g transform="matrix(1, 0, 0, 1, 0, 0)">
+export const GoogleButton = ({ isLoading, isDisabled, onClick, capability }) => {
+  const isGoogleDisabled = Boolean(capability && capability.google !== "READY");
+  const effectivelyDisabled = isLoading || isDisabled || isGoogleDisabled;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={effectivelyDisabled}
+      title={isGoogleDisabled ? capability?.googleMessage || "Google OAuth chưa được kích hoạt trên hệ thống máy chủ" : "Đăng nhập bằng tài khoản Google"}
+      className={`relative w-full inline-flex flex-col sm:flex-row justify-center items-center py-3 px-3 rounded-xl bg-space-950/70 border border-white/15 backdrop-blur-2xl text-xs font-medium text-gray-200 shadow-sm transition-all duration-300 ease-premium group ${
+        effectivelyDisabled
+          ? "opacity-60 cursor-not-allowed hover:bg-space-950/70 hover:border-white/15 text-gray-400"
+          : "hover:bg-space-900/80 hover:text-white hover:border-white/30 hover:-translate-y-0.5 cursor-pointer"
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        {isLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin text-gray-300" />
+        ) : (
+          <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" width="24" height="24">
             <path d="M 22.56 12.25 C 22.56 11.47 22.49 10.72 22.36 10 L 12 10 L 12 14.26 L 17.92 14.26 C 17.66 15.63 16.88 16.79 15.71 17.57 L 15.71 20.34 L 19.28 20.34 C 21.36 18.42 22.56 15.6 22.56 12.25 Z" fill="#4285F4" />
             <path d="M 12 23 C 14.97 23 17.46 22.02 19.28 20.34 L 15.71 17.57 C 14.73 18.23 13.48 18.63 12 18.63 C 9.14 18.63 6.71 16.7 5.84 14.1 L 2.18 14.1 L 2.18 16.94 C 3.99 20.53 7.7 23 12 23 Z" fill="#34A853" />
             <path d="M 5.84 14.1 C 5.62 13.44 5.49 12.74 5.49 12 C 5.49 11.26 5.62 10.56 5.84 9.9 L 5.84 7.07 L 2.18 7.07 C 1.43 8.55 1 10.22 1 12 C 1 13.78 1.43 15.45 2.18 16.94 L 5.84 14.1 Z" fill="#FBBC05" />
             <path d="M 12 5.38 C 13.62 5.38 15.06 5.94 16.21 7.02 L 19.36 3.87 C 17.45 2.09 14.97 1 12 1 C 7.7 1 3.99 3.47 2.18 7.07 L 5.84 9.9 C 6.71 7.3 9.14 5.38 12 5.38 Z" fill="#EA4335" />
-          </g>
-        </svg>
-        Continue with Google
-      </>
-    )}
-  </button>
-);
+          </svg>
+        )}
+        <span className="truncate">Google</span>
+      </div>
+      {isGoogleDisabled && (
+        <span className="text-[10px] font-mono text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 sm:ml-2 mt-1 sm:mt-0">
+          Chưa kích hoạt
+        </span>
+      )}
+    </button>
+  );
+};
 
 export const GithubIcon = ({ className = "w-5 h-5" }) => (
   <svg className={`fill-current ${className}`} viewBox="0 0 24 24" width="24" height="24">
@@ -270,7 +282,12 @@ export const ErrorMessage = ({ message }) => {
   return (
     <div className="rounded-xl bg-red-500/15 border border-red-500/30 p-3 flex items-start animate-in fade-in slide-in-from-top-1 duration-300">
       <AlertCircle className="h-5 w-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" />
-      <p className="text-sm text-red-200">{message}</p>
+      <div className="min-w-0">
+        <p className="text-sm text-red-200">{message}</p>
+        <Link href="/" className="mt-2 inline-block text-xs font-semibold text-teal-300 hover:text-teal-200 underline underline-offset-2">
+          Trang chủ
+        </Link>
+      </div>
     </div>
   );
 };

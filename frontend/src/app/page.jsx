@@ -16,9 +16,9 @@ import { ShieldCheck } from "lucide-react";
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
-  title: "StudentHub AI — Learn Beyond The Classroom",
+  title: "StudentHub AI — Hiểu đúng. Đi xa.",
   description:
-    "An intelligent learning environment that turns knowledge, practice, projects and people into one connected journey.",
+    "Hệ điều hành học tập biết kiểm chứng trước khi khuyên bạn — kết nối nguồn chính thức, trải nghiệm cộng đồng và chuyên gia đúng phạm vi.",
 };
 
 export default function HomePage() {
@@ -31,35 +31,16 @@ export default function HomePage() {
         {/* 2. Cinematic Hero */}
         <AcademicHeroSection />
 
-        {/* 3. Continue Learning Bar */}
-        <ContinueLearningBar />
-
-        {/* 4. Knowledge Atlas */}
-        <InteractiveKnowledgeAtlas />
-
-        {/* 5. Learning Domains */}
-        <LearningDomainsSection />
-
-        {/* 6. Full-Stack Production Layers */}
-        <FullStackLayersSection />
-
-        {/* 7. Featured Courses */}
-        <FeaturedCoursesSection />
-
-        {/* 8. AI Tutor Showcase */}
-        <AiTutorSection />
-
-        {/* 9. Practice & Project Lab */}
-        <PracticeProjectLabSection />
-
-        {/* 10. Community & Experts Pillars */}
-        <CommunityExpertsSection />
-
-        {/* 11. Outcomes & Transformation */}
-        <OutcomesSection />
-
-        {/* 12. Final Cinematic CTA */}
-        <FinalCtaSection />
+        <div className="landing-deferred-section"><ContinueLearningBar /></div>
+        <div className="landing-deferred-section"><InteractiveKnowledgeAtlas /></div>
+        <div className="landing-deferred-section"><LearningDomainsSection /></div>
+        <div className="landing-deferred-section"><FullStackLayersSection /></div>
+        <div className="landing-deferred-section"><FeaturedCoursesSection /></div>
+        <div className="landing-deferred-section"><AiTutorSection /></div>
+        <div className="landing-deferred-section"><PracticeProjectLabSection /></div>
+        <div className="landing-deferred-section"><CommunityExpertsSection /></div>
+        <div className="landing-deferred-section"><OutcomesSection /></div>
+        <div className="landing-deferred-section"><FinalCtaSection /></div>
       </main>
 
       {/* 13. Global Academic Footer */}
@@ -72,19 +53,7 @@ export default function HomePage() {
             <span>Academic Operating System</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-6">
-            <Link href="/learn" className="hover:text-text-primary transition-colors">
-              Learn
-            </Link>
-            <Link href="/roadmap" className="hover:text-text-primary transition-colors">
-              Roadmap
-            </Link>
-            <Link href="/practice" className="hover:text-text-primary transition-colors">
-              Practice
-            </Link>
-            <Link href="/projects" className="hover:text-text-primary transition-colors">
-              Projects
-            </Link>
+          <nav className="flex flex-wrap items-center justify-center gap-6" aria-label="Điều hướng chân trang">
             <Link href="/trust" className="hover:text-text-primary transition-colors">
               Trust Engine
             </Link>
@@ -94,7 +63,13 @@ export default function HomePage() {
             <Link href="/expert" className="hover:text-text-primary transition-colors">
               Experts
             </Link>
-          </div>
+            <Link href="/learn" className="hover:text-text-primary transition-colors">
+              Học tập
+            </Link>
+            <Link href="/cases" className="hover:text-text-primary transition-colors">
+              Case Lab
+            </Link>
+          </nav>
 
           <div>© 2026 StudentHub AI. Chuẩn học thuật & Kiểm chứng thực tế.</div>
         </div>

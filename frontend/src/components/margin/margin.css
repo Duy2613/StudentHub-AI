@@ -32,7 +32,7 @@
 .margin-chapter strong {
   grid-row: span 2;
   color: var(--text-primary);
-  font: italic 2.65rem/0.85 var(--font-instrument-serif), Georgia, "Times New Roman", serif;
+  font: italic 2.65rem/0.85 var(--font-lora), Georgia, "Times New Roman", serif;
   letter-spacing: -0.06em;
   background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 50%, #94a3b8 100%);
   -webkit-background-clip: text;
@@ -145,7 +145,7 @@
 .margin-annotation h3 {
   margin: 0;
   color: var(--text-primary);
-  font: italic 0.84rem/1.2 var(--font-instrument-serif), Georgia, "Times New Roman", serif;
+  font: italic 0.84rem/1.2 var(--font-lora), Georgia, "Times New Roman", serif;
 }
 
 .margin-annotation p {
@@ -156,7 +156,7 @@
 
 .margin-annotation.is-human h3,
 .margin-annotation.is-human p {
-  font-family: "Caveat", var(--font-instrument-serif), cursive;
+  font-family: var(--font-lora), Georgia, serif;
 }
 
 .margin-ordinal {
@@ -277,7 +277,7 @@
   .margin-mobile-strip summary strong {
     overflow: hidden;
     color: var(--text-primary);
-    font: italic 0.9rem var(--font-instrument-serif), Georgia, "Times New Roman", serif;
+    font: italic 0.9rem var(--font-lora), Georgia, "Times New Roman", serif;
     text-overflow: ellipsis;
     white-space: nowrap;
   }

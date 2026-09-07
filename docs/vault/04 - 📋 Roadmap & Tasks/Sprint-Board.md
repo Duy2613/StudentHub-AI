@@ -5,6 +5,36 @@
 
 ## 🚀 Sprint Hiện Tại (Q3/2026 — StudentHub AI v9 Reality-First Transition)
 
+### Core system master prompt implementation (2026-09-06)
+
+- [x] M0 runtime truth: bỏ fake realtime metrics/events, thêm readiness model tách liveness/platform/capability/run status.
+- [x] M1 Trust UX: một stage panel tại một thời điểm, tabs/keyboard/follow current, không rerun/scroll/focus steal khi đổi lớp.
+- [x] M2 durable Trust core: persist case/run/stage/revision trong PostgreSQL cùng terminal commit; khóa idempotency và ownership conflict. Queue worker/restart/cluster gate còn mở.
+- [x] M3 Community/realtime hardening slice: sửa forum ranking SQL; SSE scope/replay/rate/payload boundary; broadcast admin-only; notification không phải source of truth. Full private multi-instance fan-out còn mở.
+- [x] M3 durable realtime event-log slice (2026-09-07): PostgreSQL append-only sequence/cursor replay, idempotency, subject filtering và production fail-closed fallback; live two-instance fan-out vẫn mở.
+- [x] M4 Expert qualification slice: profile → identity review → server quiz → domain review → human activation/appeal với deadline, attempt limit và answer key protection. Assignment/assessment/reputation end-to-end còn mở.
+- [x] M5 AI evidence boundary: Trust revision/provenance mapping và redaction đã có; training chưa mở rộng khi corpus chưa qua dedupe/label/eval gates.
+- [x] M6 Labbe bridge foundation: mode gate, minimal hashed event, transactional outbox lease/retry/idempotency; writeback bị khóa. Shadow assurance đã verified; staging network/receiver gate còn mở.
+- [x] Labbe assurance closure pass: Node/Python canonical vectors, payload minimization, lease-token worker recovery, timeout/duplicate/conflict drills, read-only assurance freshness and evidence report.
+- [ ] Labbe staging gate: requires approved HTTPS URL, workload token/scope, disposable PostgreSQL, real TLS/auth/classification/timeout/outage/catch-up proof; final verdict remains `LABBE_STAGING_BLOCKED_BY_ENV` until then.
+- [x] Live verification: phase 2 Trust `1/1`, report snapshot `1/1`, phase 3 PostgreSQL/RLS `8/8`, core contract suite `94/94`, Trust V5 `64/64`, Security `18/18`.
+- [ ] M7 operability: report Trust JSON snapshot đã có; vẫn cần export worker/PDF, staging provider, multi-instance broker, load/soak/failure-injection, restore/restart và observability evidence.
+- [ ] M8 graph/3D: chỉ triển khai sau khi read-only projection, fallback, bundle/GPU budget và authority boundary được nghiệm thu.
+- [x] Báo cáo triển khai: `docs/reports/CORE-SYSTEM-IMPLEMENTATION-2026-09-06.md`; Labbe runbook: `docs/integrations/STUDENTHUB-LABBE-BRIDGE.md`.
+
+### Academic Cinematic Evolution performance remediation (2026-09-06)
+
+- [x] Hoàn thành critical-path audit cho Landing, Quiet Lesson, Roadmap và Trust bằng Lighthouse mobile DevTools; fresh final sample đã khóa theo candidate và phase arithmetic khớp `TTFB + render delay = LCP`.
+- [x] Quiet Lesson tiếp tục giữ shell interaction-only với `LessonCompanionPanel`; final n=1 LCP là `2,630.2 ms` và được ghi nhận là vượt target, không che khuất bằng chứng.
+- [x] Giảm font runtime về Be Vietnam Pro/Lora/JetBrains Mono; bỏ Instrument Serif, Plus Jakarta Sans và Inter Tight; chỉ giữ weight cần thiết và `font-display: optional`.
+- [x] Tách Command Palette, Lenis, auth/Supabase, Trust analysis, Quiet Lesson companion và WebGL thành các enhancement island có trigger/fallback rõ ràng.
+- [x] Thêm Trust SSR shell, Knowledge Universe SVG fallback, landing below-fold `content-visibility`, và bundle audit cho sáu route.
+- [x] Local evidence: build `135/135`, bundle budget pass (`/` 204,993 B; lesson 129,995 B; roadmap 140,563 B; trust 142,244 B), deterministic suite `521/521`, Chromium/WebKit closure `37/37` mỗi engine, axe/keyboard `14/14` mỗi engine, lint `0 errors / 404 warnings`.
+- [ ] Chạy cùng profile trên canonical Preview với Firefox, thiết bị thật/field CWV và sửa Lighthouse Windows `EPERM`; WebKit local đã đóng `37/37` nhưng Preview vẫn chưa có.
+- [ ] Chạy staging provider, PostgreSQL/RLS clean database, session restart, rollback và observability proof; chỉ sau đó mới đổi release verdict.
+- [x] Báo cáo remediation historical: `docs/reports/ACADEMIC-CINEMATIC-EVOLUTION-REMEDIATION.md`; final assurance: `docs/reports/STUDENTHUB-AI-RELEASE-ASSURANCE-REPORT.md`.
+- [x] Lưu audit/prompt/kế hoạch tham chiếu USAvionix và showcase `cogni:wave` trong `docs/reports/USAVIONIX-STUDENTHUB-INTEGRATION-REPORT.md`, `docs/frontend/USAVIONIX-STUDENTHUB-INTEGRATION-PROMPT.md`, và `docs/references/usavionix-2026-09-06/`; chỉ là tài liệu, không mở feature trong feature freeze.
+
 ### Feature Freeze integration (2026-08-29)
 
 - [x] Hoàn thiện Living Evidence Passport: immutable revision, old/new result, material change, provenance và chặn demo vào live.

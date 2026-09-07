@@ -14,6 +14,10 @@ type TrustV5Event = {
   type?: string;
   event?: string;
   stageId?: string | null;
+  caseId?: string | null;
+  caseRevision?: number | null;
+  runId?: string | null;
+  persistence?: { persisted?: boolean; idempotent?: boolean };
   requestId?: string;
   data?: TrustV5Pipeline;
   error?: { code?: string; message?: string };
@@ -169,7 +173,7 @@ async function readJsonOrNull(response: Response): Promise<unknown> {
   }
 }
 
-async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | undefined, onEvent?: (event: TrustV5Event) => void, requestId?: string): Promise<TrustV5Response> {
+async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | undefined, onEvent?: (event: TrustV5Event) => void, requestId?: string, idempotencyKey?: string): Promise<TrustV5Response> {
   const controller = new AbortController();
   let timedOut = false;
   const abortFromCaller = () => controller.abort(callerSignal?.reason);
@@ -184,7 +188,12 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
         body: JSON.stringify({ ...input, depth: "full", version: "v5", stream: true }),
         signal: controller.signal,
         credentials: "include",
-        headers: { Accept: "text/event-stream, application/json", "Content-Type": "application/json", ...(requestId ? { "X-Request-ID": requestId.slice(0, 120) } : {}) },
+        headers: {
+          Accept: "text/event-stream, application/json",
+          "Content-Type": "application/json",
+          ...(requestId ? { "X-Request-ID": requestId.slice(0, 120) } : {}),
+          ...(idempotencyKey && /^[A-Za-z0-9._:-]{1,160}$/.test(idempotencyKey.trim()) ? { "Idempotency-Key": idempotencyKey.trim().slice(0, 160) } : {}),
+        },
       });
     } catch {
       if (controller.signal.aborted) throw new ApiError(timedOut ? "Request timed out." : "Request aborted.", timedOut ? "TIMEOUT" : "ABORTED", { requestId });
@@ -216,7 +225,18 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
       try { event = JSON.parse(dataLines.join("\n")) as TrustV5Event; } catch { throw new ApiError("Streaming response contained malformed event data.", "INVALID_RESPONSE", { requestId }); }
       onEvent?.(event);
       if (event.type === "error") throw new ApiError("Trust pipeline failed.", "SERVER_ERROR", { requestId: event.requestId || requestId });
-      if (event.type === "complete" && event.data) completed = parseV5Response({ success: true, contractVersion: "trust.v5", requestId: event.requestId || event.data.requestId, version: "v5", demo: false, data: event.data });
+      if (event.type === "complete" && event.data) completed = parseV5Response({
+        success: true,
+        contractVersion: "trust.v5",
+        requestId: event.requestId || event.data.requestId,
+        caseId: event.caseId || null,
+        caseRevision: event.caseRevision ?? null,
+        runId: event.runId || null,
+        persistence: event.persistence,
+        version: "v5",
+        demo: false,
+        data: event.data,
+      });
     };
     while (true) {
       const { value, done } = await reader.read();
@@ -289,8 +309,8 @@ export const trustApi = {
       schema: trustReasoningResultSchema,
     });
   },
-  sequential(input: TrustInput, signal?: AbortSignal, onEvent?: (event: TrustV5Event) => void, requestId?: string) {
-    return sequentialRequest(input, signal, onEvent, requestId);
+  sequential(input: TrustInput, signal?: AbortSignal, onEvent?: (event: TrustV5Event) => void, requestId?: string, idempotencyKey?: string) {
+    return sequentialRequest(input, signal, onEvent, requestId, idempotencyKey);
   },
 };
 

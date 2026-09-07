@@ -19,8 +19,21 @@ test("PHASE 2 LIVE GATE: End-to-end Trust persistence, retrieval, cross-user den
   const userB = userRes.rows[1]?.id || crypto.randomUUID();
 
   const caseId = crypto.randomUUID();
+  const idempotencyCaseId = crypto.randomUUID();
   const requestId = `req_gate_${Date.now()}`;
   const inputUrl = `https://gate-verify-test-${Date.now()}.edu.vn`;
+  const idempotencyInput = {
+    type: "url",
+    content: `https://idempotency-gate-${Date.now()}.edu.vn/path?Case=Sensitive`,
+    metadata: { url: `https://idempotency-gate-${Date.now()}.edu.vn/path?Case=Sensitive` },
+  };
+  const idempotencyKey = `trust-live-${crypto.randomUUID()}`;
+  const idempotencyPipeline = (verificationId, runId) => ({
+    ...mockPipelineResult,
+    verificationId,
+    runId,
+    layers: Object.fromEntries(Object.entries(mockPipelineResult.layers).map(([layerId, layer]) => [layerId, { ...layer, id: crypto.randomUUID() }])),
+  });
 
   const mockPipelineResult = {
     verificationId: caseId,
@@ -132,7 +145,38 @@ test("PHASE 2 LIVE GATE: End-to-end Trust persistence, retrieval, cross-user den
     const countRes = await pool.query(`SELECT count(*)::int as c FROM public.trust_cases WHERE id = $1`, [createdCaseId]);
     assert.equal(countRes.rows[0].c, 1, "Exactly one case exists in DB");
 
-    // 6. Record failure state
+    // 6. Durable idempotency: a new execution with the same key and payload
+    // resolves to the first case, while a different payload conflicts.
+    const firstIdempotent = await TrustPersistenceService.recordTrustExecution({
+      pipelineResult: idempotencyPipeline(idempotencyCaseId, crypto.randomUUID()),
+      input: idempotencyInput,
+      principal: { subjectId: `user:${userA}` },
+      requestId: `req_idempotency_first_${Date.now()}`,
+      idempotencyKey,
+    });
+    const retryIdempotent = await TrustPersistenceService.recordTrustExecution({
+      pipelineResult: idempotencyPipeline(crypto.randomUUID(), crypto.randomUUID()),
+      input: idempotencyInput,
+      principal: { subjectId: `user:${userA}` },
+      requestId: `req_idempotency_retry_${Date.now()}`,
+      idempotencyKey,
+    });
+    assert.equal(firstIdempotent.caseId, idempotencyCaseId, "The first idempotent command persists its case");
+    assert.equal(retryIdempotent.caseId, idempotencyCaseId, "A retried execution resolves to the durable case");
+    assert.equal(retryIdempotent.idempotent, true, "A retried execution is marked idempotent");
+    await assert.rejects(
+      () => TrustPersistenceService.recordTrustExecution({
+        pipelineResult: idempotencyPipeline(crypto.randomUUID(), crypto.randomUUID()),
+        input: { ...idempotencyInput, content: `${idempotencyInput.content}/different` },
+        principal: { subjectId: `user:${userA}` },
+        requestId: `req_idempotency_conflict_${Date.now()}`,
+        idempotencyKey,
+      }),
+      (error) => error?.code === "TRUST_IDEMPOTENCY_CONFLICT" && error?.statusCode === 409,
+      "A reused key with a different payload must conflict"
+    );
+
+    // 7. Record failure state
     const failRes = await TrustPersistenceService.recordTrustFailure({
       error: new Error("Simulated pipeline network timeout"),
       input,
@@ -157,5 +201,8 @@ test("PHASE 2 LIVE GATE: End-to-end Trust persistence, retrieval, cross-user den
       await pool.query(`DELETE FROM public.trust_cases WHERE id = $1`, [createdCaseId]);
       await pool.query(`DELETE FROM public.claims WHERE creator_id = $1`, [userA]);
     }
+    await pool.query(`DELETE FROM public.evidence_passports WHERE subject_id = $1`, [idempotencyCaseId]);
+    await pool.query(`DELETE FROM private.audit_events WHERE target_id = $1`, [idempotencyCaseId]);
+    await pool.query(`DELETE FROM public.trust_cases WHERE id = $1`, [idempotencyCaseId]);
   }
 });

@@ -76,7 +76,7 @@ export default function HeroSection() {
               Bảo vệ sinh viên Việt Nam trước bẫy lừa đảo việc làm, học bổng giả mạo, trọ ảo và deepfake bằng <strong className="text-white">Động cơ AI 4 Lớp</strong> kết hợp <strong className="text-teal-300">Mạng lưới Chuyên gia Uy tín</strong>.
             </p>
 
-            {/* Action CTAs with Inter + JetBrains Mono Tech Suffixes */}
+            {/* Action CTAs with Be Vietnam Pro + JetBrains Mono Tech Suffixes */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <TactileButton
                 variant="primary"

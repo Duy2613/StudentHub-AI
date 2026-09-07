@@ -65,6 +65,27 @@ function isRememberedSession() {
   return readBrowserStorage("localStorage", "studenthub_remember_me") === "true";
 }
 
+const SAFE_PROFILE_FIELDS = new Set([
+  "fullName",
+  "full_name",
+  "avatarId",
+  "avatar_id",
+  "avatarUrl",
+  "avatar_url",
+  "university",
+  "major",
+  "academicYear",
+  "academic_year",
+  "bio",
+  "githubUsername",
+  "github_username",
+]);
+
+export function sanitizeProfileUpdates(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value).filter(([key]) => SAFE_PROFILE_FIELDS.has(key)));
+}
+
 // =========================================================================
 // 1. CHUẨN HÓA LOGGING & INTERCEPTOR DỊCH MÃ LỖI (DIAGNOSTIC LOGGING)
 // =========================================================================
@@ -92,21 +113,88 @@ export function logAuthInfo(functionName, message, data = null) {
   console.log(`[AUTH_INFO] - [${redactAuthLogText(functionName)}] - ${redactAuthLogText(message)}`, safeData);
 }
 
+import {
+  AUTH_CAPABILITY_STATE,
+  AUTH_CONFIGURATION_MESSAGE,
+  getAuthCapabilities,
+  markAuthProviderDegraded,
+  GOOGLE_AUTH_DISABLED_MESSAGE,
+} from "./authCapabilities.js";
+import { AUTH_LOGOUT_CHANNEL, AUTH_LOGOUT_SIGNAL_KEY } from "./authStateMachine.js";
+
+export { getAuthCapabilities } from "./authCapabilities.js";
+export { AUTH_LOGOUT_SIGNAL_KEY } from "./authStateMachine.js";
+
+function extractAuthErrorText(error) {
+  const candidate = typeof error === "string"
+    ? error
+    : error?.message || error?.error_description || error?.code || "";
+  const text = String(candidate || "").trim();
+  if (!text) return "";
+
+  // Supabase and proxy layers sometimes put a JSON envelope inside message.
+  // Parse it only for classification; never return the raw envelope to UI.
+  if ((text.startsWith("{") && text.endsWith("}")) || (text.startsWith("[") && text.endsWith("]"))) {
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        // Keep only a stable machine code for classification. A nested
+        // provider message may contain secrets or internal implementation
+        // details and is never promoted to the fallback UI text.
+        return String(parsed.code || parsed.error_code || parsed.error || "").trim();
+      }
+      return "";
+    } catch {
+      return "";
+    }
+  }
+  return text;
+}
+
+function isSafeUserMessage(text) {
+  return Boolean(text)
+    && text.length <= 180
+    && !/[{}[\]]/.test(text)
+    && !/bearer\s|authorization\s*:|access[_ -]?token|refresh[_ -]?token|supabase/i.test(text);
+}
+
 /**
- * Interceptor dịch mã lỗi Supabase & ASP.NET Core API sang tiếng Việt chuẩn xác
+ * Interceptor dịch mã lỗi Supabase & API sang tiếng Việt chuẩn xác.
+ * Unknown JSON/provider envelopes are classified but never rendered verbatim.
  */
 export function translateAuthError(error) {
   if (!error) return "Đã xảy ra lỗi, vui lòng thử lại.";
-  
-  const rawMsg = typeof error === "string" 
-    ? error 
+
+  const candidate = typeof error === "string"
+    ? error
     : error?.message || error?.error_description || error?.code || "";
+  const candidateText = String(candidate || "").trim();
+  const structuredEnvelope = (candidateText.startsWith("{") && candidateText.endsWith("}"))
+    || (candidateText.startsWith("[") && candidateText.endsWith("]"));
+  const rawMsg = extractAuthErrorText(error);
     
   const lower = rawMsg.toLowerCase();
 
+  if (lower.includes("supabase_auth_env_missing") || lower.includes("legacy_auth_disabled")) {
+    return AUTH_CONFIGURATION_MESSAGE;
+  }
+  if (lower.includes("google_auth_configuration_unattested")) {
+    return "Google OAuth chưa được xác nhận cấu hình trong Supabase Dashboard.";
+  }
+
+  // Lỗi provider chưa được bật hoặc cấu hình thiếu (Google OAuth 400 validation_failed: Unsupported provider)
+  if (
+    lower.includes("unsupported provider") ||
+    lower.includes("provider is not enabled") ||
+    lower.includes("validation_failed") ||
+    lower.includes("provider_not_enabled")
+  ) {
+    return GOOGLE_AUTH_DISABLED_MESSAGE;
+  }
+
   // Đã đăng ký qua Google OAuth trước đó
   if (lower.includes("đã được đăng ký thông qua tài khoản google") || lower.includes("tiếp tục với google")) {
-    return rawMsg;
+    return isSafeUserMessage(rawMsg) ? rawMsg : "Tài khoản này đã liên kết với Google. Vui lòng chọn đúng phương thức đăng nhập.";
   }
 
   // Lỗi trùng lặp email / tài khoản
@@ -118,7 +206,12 @@ export function translateAuthError(error) {
     lower.includes("identity_already_exists") ||
     lower.includes("đã tồn tại")
   ) {
-    return "Email này đã được sử dụng. Vui lòng chuyển sang Đăng nhập hoặc sử dụng 'Continue with Google'.";
+    return "Email này đã được sử dụng. Vui lòng chuyển sang Đăng nhập hoặc sử dụng Email/Mật khẩu.";
+  }
+
+  // Lỗi không tìm thấy tài khoản
+  if (lower.includes("user not found") || lower.includes("user_not_found")) {
+    return "Không tìm thấy tài khoản với email này.";
   }
 
   // Lỗi sai thông tin đăng nhập
@@ -129,7 +222,7 @@ export function translateAuthError(error) {
     lower.includes("wrong password") ||
     lower.includes("không chính xác")
   ) {
-    return "Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.";
+    return "Email hoặc mật khẩu không chính xác.";
   }
 
   // Lỗi mật khẩu yếu
@@ -144,7 +237,7 @@ export function translateAuthError(error) {
 
   // Lỗi Email chưa được xác thực
   if (lower.includes("email not confirmed") || lower.includes("email_not_confirmed")) {
-    return "Email của bạn chưa được xác thực qua mã OTP. Vui lòng hoàn tất bước nhập mã OTP.";
+    return "Email chưa được xác thực. Vui lòng kiểm tra hộp thư của bạn.";
   }
 
   // Lỗi gửi email / giới hạn tần suất gửi (Rate Limit)
@@ -155,7 +248,7 @@ export function translateAuthError(error) {
     lower.includes("over_request_rate_limit") ||
     lower.includes("too many requests")
   ) {
-    return "Hệ thống đang quá tải yêu cầu gửi mã. Vui lòng thử lại sau 60 giây hoặc sử dụng Đăng nhập Google.";
+    return "Hệ thống đang quá tải hoặc bạn đã thử quá nhiều lần (Rate Limit). Vui lòng đợi trong giây lát rồi thử lại.";
   }
 
   // Lỗi OTP hết hạn hoặc không đúng
@@ -182,7 +275,9 @@ export function translateAuthError(error) {
     return "Đang kết nối tới máy chủ Backend (Render Cold Start). Vui lòng thử lại sau vài giây...";
   }
 
-  return rawMsg || "Đã xảy ra lỗi trong quá trình xác thực. Vui lòng thử lại.";
+  return !structuredEnvelope && isSafeUserMessage(rawMsg)
+    ? rawMsg
+    : "Đã xảy ra lỗi trong quá trình xác thực. Vui lòng thử lại.";
 }
 
 // =========================================================================
@@ -307,153 +402,50 @@ export async function getApplicationSession() {
 }
 
 // =========================================================================
-// 3. ASP.NET CORE BACKEND API AUTH & SYNC
+// 3. APPLICATION SESSION ONLY
 // =========================================================================
 
-/**
- * Đăng nhập Backend ASP.NET Core: POST /api/auth/login
- */
-export async function loginBackend(email, password, rememberMe = false) {
-  const cleanEmail = (email || "").trim();
-  logAuthInfo("loginBackend", `Đang đăng nhập ASP.NET Core cho: ${cleanEmail}`);
-
-  try {
-    const res = await fetch(`${API_BASE}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: cleanEmail,
-        password: password,
-      }),
-    });
-
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok) {
-      const err = new Error(data?.message || `Đăng nhập Backend thất bại (HTTP ${res.status})`);
-      logAuthError("loginBackend", err);
-      throw err;
-    }
-
-    if (data?.token) {
-      setStoredToken(data.token, rememberMe);
-      logAuthInfo("loginBackend", "Đã giữ JWT tạm thời trong bộ nhớ cho luồng tương thích.");
-    }
-
-    return data;
-  } catch (error) {
-    logAuthError("loginBackend", error);
-    throw error;
-  }
+function legacyAuthDisabled() {
+  const error = new Error("Legacy backend authentication is disabled.");
+  error.code = "LEGACY_AUTH_DISABLED";
+  return error;
 }
 
-/**
- * Đăng ký Backend ASP.NET Core: POST /api/auth/register
- */
-export async function registerBackend(email, password, fullName) {
-  const cleanEmail = (email || "").trim();
-  logAuthInfo("registerBackend", `Đang đăng ký ASP.NET Core cho: ${cleanEmail}`);
-
+function notifyAuthLogout() {
+  if (typeof window === "undefined") return;
   try {
-    const res = await fetch(`${API_BASE}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: cleanEmail,
-        password: password,
-        fullName: fullName,
-      }),
-    });
-
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok) {
-      const err = new Error(data?.message || `Đăng ký Backend thất bại (HTTP ${res.status})`);
-      logAuthError("registerBackend", err);
-      throw err;
+    if (typeof BroadcastChannel === "function") {
+      const channel = new BroadcastChannel(AUTH_LOGOUT_CHANNEL);
+      channel.postMessage({ type: "SIGNED_OUT" });
+      channel.close();
     }
-
-    logAuthInfo("registerBackend", "Tạo tài khoản ASP.NET Core thành công.");
-    return data;
   } catch (error) {
-    logAuthError("registerBackend", error);
-    throw error;
+    logAuthError("logout:broadcast", error);
   }
+  // Timestamp-only fallback is not a credential and gives older browsers a
+  // cross-tab signal through the storage event.
+  writeBrowserStorage("localStorage", AUTH_LOGOUT_SIGNAL_KEY, String(Date.now()));
 }
 
-/**
- * Đồng bộ người dùng với ASP.NET Core Backend: POST /api/auth/sync
- * BẮT BUỘC gửi Bearer Token để Backend phân giải và nhận diện
- */
-export async function syncBackendUser(userData = {}, explicitToken = null) {
-  const activeToken = explicitToken || getStoredToken();
-  logAuthInfo("syncBackendUser", `Đang gọi POST /api/auth/sync cho: ${userData?.email || userData?.id}`);
-
-  try {
-    const res = await fetch(`${API_BASE}/api/auth/sync`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
-      },
-      body: JSON.stringify({
-        id: userData.id || userData.Id,
-        email: userData.email || userData.Email,
-        fullName: userData.fullName || userData.full_name || userData.name || userData.FullName,
-        role: userData.role || userData.Role || "student",
-        avatarUrl: userData.avatarUrl || userData.avatar_url || userData.AvatarUrl,
-        githubUsername: userData.githubUsername || userData.github_username || userData.GithubUsername,
-        reputationScore: userData.reputationScore || userData.reputation_score || userData.ReputationScore || 50,
-      }),
-    });
-
-    if (!res.ok) {
-      logAuthError("syncBackendUser", new Error(`Sync HTTP ${res.status}: ${res.statusText}`));
-      return null;
-    }
-
-    const data = await res.json().catch(() => null);
-    logAuthInfo("syncBackendUser", "Đồng bộ ASP.NET Core thành công.");
-    return data;
-  } catch (error) {
-    logAuthError("syncBackendUser", error);
-    return null;
-  }
+// These names remain exported for old callers, but they deliberately cannot
+// send passwords or independently establish an identity outside Supabase.
+export async function loginBackend() {
+  throw legacyAuthDisabled();
 }
 
-/**
- * Resolves the current user from the opaque application session first, with a
- * page-memory-only legacy backend bearer fallback during migration.
- */
+export async function registerBackend() {
+  throw legacyAuthDisabled();
+}
+
+export async function syncBackendUser() {
+  logAuthInfo("syncBackendUser", "Bỏ qua legacy profile sync; application session là nguồn danh tính duy nhất.");
+  return null;
+}
+
+/** Resolves the current user from the server-owned application session only. */
 export async function getMeBackend() {
   const applicationSession = await getApplicationSession();
-  if (applicationSession.authenticated) return applicationSession.user;
-
-  const token = getStoredToken();
-  if (!token) return null;
-
-  try {
-    const res = await fetch(`${API_BASE}/api/auth/me`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) {
-      if (res.status === 401) {
-        setStoredToken(null);
-      }
-      return null;
-    }
-
-    const data = await res.json().catch(() => null);
-    return data?.user || data;
-  } catch (error) {
-    logAuthError("getMeBackend", error);
-    return null;
-  }
+  return applicationSession.authenticated ? applicationSession.user : null;
 }
 
 // =========================================================================
@@ -465,20 +457,28 @@ export async function getMeBackend() {
  */
 export async function signUpWithEmail(email, password, fullName) {
   const cleanEmail = (email || "").trim();
-  const isEdu = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i.test(cleanEmail);
   logAuthInfo("signUpWithEmail", `Bắt đầu đăng ký cho email: ${cleanEmail}`);
 
   try {
+    const capabilities = getAuthCapabilities();
+    if (capabilities.emailPassword !== AUTH_CAPABILITY_STATE.READY) {
+      const error = new Error(capabilities.emailPasswordMessage);
+      error.code = capabilities.emailPasswordReason || "EMAIL_PASSWORD_UNAVAILABLE";
+      throw error;
+    }
+    if (String(password || "").length < 6) {
+      const error = new Error("Password should be at least 6 characters");
+      error.code = "weak_password";
+      throw new Error(translateAuthError(error));
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email: cleanEmail,
       password,
       options: {
         data: {
           full_name: fullName,
-          role: "student",
           avatar_id: "student-tech",
-          trust_score: isEdu ? 80 : 50,
-          verified_student: isEdu,
           onboarded: false,
         },
       },
@@ -501,9 +501,6 @@ export async function signUpWithEmail(email, password, fullName) {
         throw err;
       }
     }
-
-    // Tự động đồng bộ trước sang Backend ASP.NET Core DB
-    registerBackend(cleanEmail, password, fullName).catch(() => {});
 
     logAuthInfo("signUpWithEmail", "Đã gửi mã OTP 6 số thành công.");
     return data;
@@ -529,6 +526,12 @@ export async function verifySignupOtp(email, token) {
   logAuthInfo("verifySignupOtp", `Đang xác thực OTP cho: ${cleanEmail}`);
 
   try {
+    const capabilities = getAuthCapabilities();
+    if (capabilities.emailPassword !== AUTH_CAPABILITY_STATE.READY) {
+      const error = new Error(capabilities.emailPasswordMessage);
+      error.code = capabilities.emailPasswordReason || "EMAIL_PASSWORD_UNAVAILABLE";
+      throw error;
+    }
     const { data, error } = await supabase.auth.verifyOtp({
       email: cleanEmail,
       token: cleanToken,
@@ -542,13 +545,23 @@ export async function verifySignupOtp(email, token) {
 
     if (data?.session?.access_token) {
       setStoredToken(data.session.access_token, true);
-      await syncBackendUser(data.user, data.session.access_token);
       const exchanged = await exchangeApplicationSession(data.session.access_token);
       if (!exchanged.success) {
         const exchangeError = new Error("Không thể tạo phiên đăng nhập an toàn. Vui lòng thử lại.");
         exchangeError.code = exchanged.code;
         throw exchangeError;
       }
+      const applicationState = await getApplicationSession();
+      if (!applicationState.authenticated || !applicationState.user) {
+        const sessionError = new Error("Không thể xác nhận application session an toàn.");
+        sessionError.code = applicationState.code || "APPLICATION_SESSION_NOT_CONFIRMED";
+        throw sessionError;
+      }
+      data.applicationUser = applicationState.user;
+    } else {
+      const sessionError = new Error("Email đã xác thực nhưng chưa tạo được phiên đăng nhập an toàn.");
+      sessionError.code = "APPLICATION_SESSION_NOT_CREATED";
+      throw sessionError;
     }
 
     logAuthInfo("verifySignupOtp", "Xác thực OTP thành công.");
@@ -567,6 +580,12 @@ export async function resendSignupOtp(email) {
   logAuthInfo("resendSignupOtp", `Gửi lại mã OTP cho: ${cleanEmail}`);
 
   try {
+    const capabilities = getAuthCapabilities();
+    if (capabilities.emailPassword !== AUTH_CAPABILITY_STATE.READY) {
+      const error = new Error(capabilities.emailPasswordMessage);
+      error.code = capabilities.emailPasswordReason || "EMAIL_PASSWORD_UNAVAILABLE";
+      throw error;
+    }
     const { data, error } = await supabase.auth.resend({
       type: "signup",
       email: cleanEmail,
@@ -594,6 +613,12 @@ export async function signInWithPassword(email, password, rememberMe = false) {
   logAuthInfo("signInWithPassword", `Bắt đầu đăng nhập: ${cleanEmail} (Remember: ${rememberMe})`);
 
   try {
+    const capabilities = getAuthCapabilities();
+    if (capabilities.emailPassword !== AUTH_CAPABILITY_STATE.READY) {
+      const error = new Error(capabilities.emailPasswordMessage);
+      error.code = capabilities.emailPasswordReason || "EMAIL_PASSWORD_UNAVAILABLE";
+      throw error;
+    }
     // Supabase/OIDC is the sole end-user identity authority. The external
     // ASP.NET service remains a profile-sync compatibility dependency and may
     // not independently establish an authenticated application session.
@@ -609,14 +634,23 @@ export async function signInWithPassword(email, password, rememberMe = false) {
 
     if (data?.session?.access_token) {
       setStoredToken(data.session.access_token, rememberMe);
-      // Gọi đồng bộ sang ASP.NET Core Backend
-      await syncBackendUser(data.user, data.session.access_token);
       const exchanged = await exchangeApplicationSession(data.session.access_token);
       if (!exchanged.success) {
         const exchangeError = new Error("Không thể tạo phiên đăng nhập an toàn. Vui lòng thử lại.");
         exchangeError.code = exchanged.code;
         throw exchangeError;
       }
+      const applicationState = await getApplicationSession();
+      if (!applicationState.authenticated || !applicationState.user) {
+        const sessionError = new Error("Không thể xác nhận application session an toàn.");
+        sessionError.code = applicationState.code || "APPLICATION_SESSION_NOT_CONFIRMED";
+        throw sessionError;
+      }
+      data.applicationUser = applicationState.user;
+    } else {
+      const sessionError = new Error("Không thể tạo phiên đăng nhập an toàn. Vui lòng thử lại.");
+      sessionError.code = "APPLICATION_SESSION_NOT_CREATED";
+      throw sessionError;
     }
 
     logAuthInfo("signInWithPassword", "Đăng nhập Supabase thành công.");
@@ -632,6 +666,14 @@ export async function signInWithPassword(email, password, rememberMe = false) {
  */
 export async function signInWithGoogle() {
   logAuthInfo("signInWithGoogle", "Khởi tạo luồng Google OAuth.");
+  const capabilities = getAuthCapabilities();
+  if (capabilities.google !== AUTH_CAPABILITY_STATE.READY) {
+    const disabledError = new Error(capabilities.googleMessage);
+    disabledError.code = capabilities.googleReason || "GOOGLE_AUTH_BLOCKED_BY_PROVIDER_CONFIGURATION";
+    logAuthError("signInWithGoogle:capabilityGuard", disabledError);
+    throw disabledError;
+  }
+
   try {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -641,13 +683,19 @@ export async function signInWithGoogle() {
 
     if (error) {
       logAuthError("signInWithGoogle", error);
+      if (/unsupported provider|provider is not enabled|validation_failed/i.test(String(error.message || error.code || ""))) {
+        markAuthProviderDegraded("google", "GOOGLE_AUTH_BLOCKED_BY_PROVIDER_CONFIGURATION");
+      }
       throw new Error(translateAuthError(error));
     }
 
     return data;
   } catch (error) {
     logAuthError("signInWithGoogle", error);
-    throw error;
+    if (/unsupported provider|provider is not enabled|validation_failed/i.test(String(error?.message || error?.code || ""))) {
+      markAuthProviderDegraded("google", "GOOGLE_AUTH_BLOCKED_BY_PROVIDER_CONFIGURATION");
+    }
+    throw new Error(translateAuthError(error));
   }
 }
 
@@ -656,6 +704,12 @@ export async function signInWithGoogle() {
  */
 export async function signInWithGitHub() {
   logAuthInfo("signInWithGitHub", "Khởi tạo luồng GitHub OAuth.");
+  const capabilities = getAuthCapabilities();
+  if (capabilities.github !== AUTH_CAPABILITY_STATE.READY) {
+    const disabledError = new Error(capabilities.githubMessage);
+    disabledError.code = capabilities.githubReason || "GITHUB_AUTH_UNAVAILABLE";
+    throw disabledError;
+  }
   try {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -708,6 +762,7 @@ export async function signOutSupabase() {
       removeBrowserStorage("localStorage", "studenthub_demo_user");
       removeBrowserStorage("localStorage", "studenthub_jwt_token");
       removeBrowserStorage("localStorage", "studenthub_remember_me");
+      notifyAuthLogout();
     }
 
     const { error } = await supabase.auth.signOut().catch(() => ({ error: null }));
@@ -724,7 +779,8 @@ export async function signOutSupabase() {
  * Cập nhật hồ sơ người dùng
  */
 export async function updateUserProfile(profileData) {
-  logAuthInfo("updateUserProfile", "Cập nhật thông tin hồ sơ:", profileData);
+  const safeProfileData = sanitizeProfileUpdates(profileData);
+  logAuthInfo("updateUserProfile", "Cập nhật các trường hồ sơ không đặc quyền.");
   try {
     if (typeof window !== "undefined") {
       const storageName = isRememberedSession() ? "localStorage" : "sessionStorage";
@@ -735,19 +791,16 @@ export async function updateUserProfile(profileData) {
       } catch (error) {
         logAuthError("updateUserProfile:parseCache", error);
       }
-      writeBrowserStorage(storageName, "studenthub_user_profile", JSON.stringify({ ...current, ...profileData }));
+      writeBrowserStorage(storageName, "studenthub_user_profile", JSON.stringify({ ...current, ...safeProfileData }));
     }
 
     const { data } = await supabase.auth.updateUser({
-      data: profileData,
+      data: safeProfileData,
     }).catch(() => ({ data: { user: null } }));
 
-    // Đồng bộ sang ASP.NET Core Backend
-    await syncBackendUser(profileData);
-
-    return data?.user || profileData;
+    return data?.user || safeProfileData;
   } catch (error) {
     logAuthError("updateUserProfile", error);
-    return profileData;
+    return safeProfileData;
   }
 }

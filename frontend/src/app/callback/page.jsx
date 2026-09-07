@@ -14,7 +14,8 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import {
   exchangeApplicationSession,
-  syncBackendUser,
+  getApplicationSession,
+  getAuthCapabilities,
   signOutSupabase,
   logAuthError,
   logAuthInfo,
@@ -33,7 +34,32 @@ export default function AuthCallbackPage() {
     const processOAuthCallback = async () => {
       logAuthInfo("OAuthCallback", "Bắt đầu phân giải OAuth callback.");
 
+      // 0. Bắt lỗi trả về qua URL Query hoặc Hash Fragment từ OAuth Provider (ví dụ: validation_failed: Unsupported provider)
+      if (typeof window !== "undefined") {
+        const searchParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+        const rawError = searchParams.get("error") || hashParams.get("error") || "";
+        const rawDesc = searchParams.get("error_description") || hashParams.get("error_description") || "";
+        const combined = `${rawError} ${rawDesc}`.toLowerCase();
+
+        if (combined.includes("unsupported provider") || combined.includes("validation_failed")) {
+          logAuthError("OAuthCallback:unsupportedProvider", new Error(rawDesc || rawError));
+          router.replace("/login?error=google_unsupported_provider");
+          return;
+        }
+
+        if (rawError || rawDesc) {
+          logAuthError("OAuthCallback:urlError", new Error(rawDesc || rawError));
+          router.replace("/login?error=oauth_failed");
+          return;
+        }
+      }
+
       try {
+        if (!getAuthCapabilities().supabaseConfigured) {
+          router.replace("/login?error=auth_misconfigured");
+          return;
+        }
         // 1. Lấy session từ Supabase (tự động phân giải hash fragment / code)
         const { data: { session }, error } = await supabase.auth.getSession();
 
@@ -82,7 +108,7 @@ export default function AuthCallbackPage() {
       const accessToken = currentSession.access_token;
       logAuthInfo("OAuthCallback", `Xác thực thành công cho user: ${user.email}`);
 
-      setStatusMessage("Đang đồng bộ dữ liệu với máy chủ ASP.NET Core...");
+      setStatusMessage("Đang tạo phiên đăng nhập an toàn...");
 
       // 3. Kiểm tra xem tài khoản có bị xung đột (ban đầu đăng ký email/mật khẩu)
       const identities = user.identities || [];
@@ -99,27 +125,7 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      // 4. Đồng bộ Bearer Token sang ASP.NET Core Backend
-      const fullName =
-        user.user_metadata?.full_name ||
-        user.user_metadata?.name ||
-        user.user_metadata?.user_name ||
-        user.email?.split("@")[0] ||
-        "";
-
-      await syncBackendUser(
-        {
-          id: user.id,
-          email: user.email,
-          fullName: fullName,
-          role: user.user_metadata?.role || "student",
-          avatarUrl: user.user_metadata?.avatar_url,
-          githubUsername: user.user_metadata?.user_name || user.user_metadata?.preferred_username,
-        },
-        accessToken
-      );
-
-      // 5. Exchange the transient provider proof for the server-owned opaque
+      // 4. Exchange the transient provider proof for the server-owned opaque
       // session. Failure is terminal: the UI must not claim authentication
       // when durable session persistence is unavailable.
       setStatusMessage("Đang tạo phiên đăng nhập an toàn...");
@@ -133,13 +139,20 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      // 6. Kiểm tra Onboarding và điều hướng
-      const isOnboarded = user.user_metadata?.onboarded === true;
-      const role = user.user_metadata?.role;
+      // 5. Read onboarding from the server-owned application session. Provider
+      // metadata is never used to grant roles or access.
+      const applicationState = await getApplicationSession();
+      if (!applicationState.authenticated || !applicationState.user) {
+        logAuthError("OAuthCallback:applicationSession", new Error(applicationState.code || "APPLICATION_SESSION_NOT_CONFIRMED"));
+        await signOutSupabase();
+        router.replace("/login?error=session_unavailable");
+        return;
+      }
+      const isOnboarded = applicationState.user.onboarded === true;
 
       setStatusMessage("Hoàn tất! Đang chuyển hướng...");
 
-      if (!isOnboarded || !role) {
+      if (!isOnboarded) {
         logAuthInfo("OAuthCallback", "Chưa hoàn tất onboarding -> Chuyển về /onboarding");
         router.replace("/onboarding");
       } else {

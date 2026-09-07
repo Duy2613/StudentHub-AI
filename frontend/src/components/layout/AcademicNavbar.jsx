@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
 import {
   BookOpen,
   BrainCircuit,
+  ChevronDown,
   Compass,
   FolderKanban,
   LayoutDashboard,
@@ -17,31 +19,65 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
-import AcademicCommandPalette from "../command/AcademicCommandPalette";
+import { markAssurance, measureAssurance } from "@/lib/performance/assurance";
+
+const AcademicCommandPalette = dynamic(() => import("../command/AcademicCommandPalette"), {
+  ssr: false,
+});
 
 export const PRIMARY_NAV_ITEMS = [
   { id: "home", label: "Home", href: "/", icon: null },
-  { id: "learn", label: "Learn", href: "/learn", icon: BookOpen },
-  { id: "roadmap", label: "Roadmap", href: "/roadmap", icon: Compass },
-  { id: "practice", label: "Practice", href: "/practice", icon: BrainCircuit },
-  { id: "projects", label: "Projects", href: "/projects", icon: FolderKanban },
   { id: "trust", label: "Trust", href: "/trust", icon: ShieldCheck },
   { id: "community", label: "Community", href: "/community", icon: Users },
   { id: "expert", label: "Experts", href: "/expert", icon: UserRoundCheck },
 ];
+
+export const LEARNING_NAV_ITEMS = [
+  { id: "learn", label: "Learn", href: "/learn", icon: BookOpen },
+  { id: "roadmap", label: "Roadmap", href: "/roadmap", icon: Compass },
+  { id: "practice", label: "Practice", href: "/practice", icon: BrainCircuit },
+  { id: "projects", label: "Projects", href: "/projects", icon: FolderKanban },
+];
+
+export const ALL_NAV_ITEMS = [...PRIMARY_NAV_ITEMS, ...LEARNING_NAV_ITEMS];
 
 export default function AcademicNavbar() {
   const pathname = usePathname();
   const { session, profile } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [commandPaletteMounted, setCommandPaletteMounted] = useState(false);
+  const commandPaletteTriggerRef = useRef(null);
+
+  const openCommandPalette = () => {
+    markAssurance("command-palette-request");
+    setCommandPaletteMounted(true);
+    setCommandPaletteOpen(true);
+  };
+
+  const toggleMobileNavigation = () => {
+    markAssurance("mobile-navigation-request");
+    setMobileOpen((previous) => !previous);
+  };
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    markAssurance("mobile-navigation-interactive");
+    measureAssurance("mobile-navigation-open-duration", "mobile-navigation-request", "mobile-navigation-interactive");
+  }, [mobileOpen]);
 
   // Keyboard shortcut Cmd/Ctrl + K
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setCommandPaletteOpen((prev) => !prev);
+        setCommandPaletteOpen((prev) => {
+          if (!prev) {
+            markAssurance("command-palette-request");
+            setCommandPaletteMounted(true);
+          }
+          return !prev;
+        });
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -55,6 +91,28 @@ export default function AcademicNavbar() {
     if (href === "/") return pathname === "/";
     return pathname === href || pathname.startsWith(`${href}/`);
   };
+  const learningActive = LEARNING_NAV_ITEMS.some((item) => isActive(item.href));
+
+  const renderNavLink = (item, { mobile = false } = {}) => {
+    const Icon = item.icon;
+    const active = isActive(item.href);
+    return (
+      <Link
+        key={item.id}
+        href={item.href}
+        onClick={mobile ? () => setMobileOpen(false) : undefined}
+        className={`${mobile ? "flex items-center gap-3 p-3 rounded-xl text-base" : "px-3 py-1.5 rounded-lg text-sm"} font-medium transition-colors ${
+          active
+            ? "text-text-primary bg-surface-primary border border-border-strong shadow-sm"
+            : "text-text-secondary hover:text-text-primary hover:bg-surface-primary/50"
+        } focus:outline-none focus:ring-2 focus:ring-accent-primary`}
+        aria-current={active ? "page" : undefined}
+      >
+        {Icon && <Icon size={mobile ? 18 : 15} className={mobile ? "text-accent-knowledge" : undefined} aria-hidden="true" />}
+        <span>{item.label}</span>
+      </Link>
+    );
+  };
 
   return (
     <>
@@ -64,7 +122,7 @@ export default function AcademicNavbar() {
           <div className="flex items-center gap-4">
             <button
               type="button"
-              onClick={() => setMobileOpen((prev) => !prev)}
+              onClick={toggleMobileNavigation}
               aria-label={mobileOpen ? "Đóng menu điều hướng" : "Mở menu điều hướng"}
               aria-expanded={mobileOpen}
               className="lg:hidden p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-primary focus:outline-none focus:ring-2 focus:ring-accent-primary"
@@ -88,23 +146,23 @@ export default function AcademicNavbar() {
 
           {/* Desktop Primary Navigation Links */}
           <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Điều hướng chính">
-            {PRIMARY_NAV_ITEMS.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    active
-                      ? "text-text-primary bg-surface-primary border border-border-strong shadow-sm"
-                      : "text-text-secondary hover:text-text-primary hover:bg-surface-primary/50"
-                  } focus:outline-none focus:ring-2 focus:ring-accent-primary`}
-                  aria-current={active ? "page" : undefined}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
+            {PRIMARY_NAV_ITEMS.map((item) => renderNavLink(item))}
+            <details className="relative group">
+              <summary
+                className={`flex cursor-pointer list-none items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors [&::-webkit-details-marker]:hidden ${
+                  learningActive
+                    ? "text-text-primary bg-surface-primary border border-border-strong shadow-sm"
+                    : "text-text-secondary hover:text-text-primary hover:bg-surface-primary/50"
+                } focus:outline-none focus:ring-2 focus:ring-accent-primary`}
+              >
+                <BookOpen size={15} aria-hidden="true" />
+                <span>Học tập</span>
+                <ChevronDown size={14} className="transition-transform group-open:rotate-180" aria-hidden="true" />
+              </summary>
+              <div className="absolute left-0 top-full z-50 mt-2 grid min-w-48 gap-1 rounded-xl border border-border-subtle bg-bg-primary/95 p-2 shadow-xl backdrop-blur-xl">
+                {LEARNING_NAV_ITEMS.map((item) => renderNavLink(item))}
+              </div>
+            </details>
           </nav>
 
           {/* Right Action Controls */}
@@ -112,7 +170,8 @@ export default function AcademicNavbar() {
             {/* Command Palette Trigger */}
             <button
               type="button"
-              onClick={() => setCommandPaletteOpen(true)}
+              ref={commandPaletteTriggerRef}
+              onClick={openCommandPalette}
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-primary border border-border-subtle hover:border-border-strong text-text-muted text-xs font-mono transition-all focus:outline-none focus:ring-2 focus:ring-accent-primary"
               aria-label="Tìm kiếm toàn hệ thống (Ctrl K)"
             >
@@ -156,9 +215,10 @@ export default function AcademicNavbar() {
               <div>
                 <button
                   type="button"
+                  ref={commandPaletteTriggerRef}
                   onClick={() => {
                     setMobileOpen(false);
-                    setCommandPaletteOpen(true);
+                    openCommandPalette();
                   }}
                   className="w-full flex items-center justify-between p-3 rounded-xl bg-surface-primary border border-border-subtle text-text-secondary text-sm font-mono"
                 >
@@ -172,27 +232,18 @@ export default function AcademicNavbar() {
 
               <div className="space-y-1">
                 <div className="text-xs font-mono uppercase tracking-wider text-text-muted px-3 mb-2">
-                  Trục học tập & Thực hành
+                  Điều hướng chính
                 </div>
                 {PRIMARY_NAV_ITEMS.map((item) => {
-                  const Icon = item.icon;
-                  const active = isActive(item.href);
-                  return (
-                    <Link
-                      key={item.id}
-                      href={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className={`flex items-center gap-3 p-3 rounded-xl text-base font-medium transition-colors ${
-                        active
-                          ? "bg-surface-elevated text-text-primary border border-accent-primary"
-                          : "text-text-secondary hover:text-text-primary hover:bg-surface-primary"
-                      }`}
-                    >
-                      {Icon && <Icon size={18} className="text-accent-knowledge" />}
-                      <span>{item.label}</span>
-                    </Link>
-                  );
+                  return renderNavLink(item, { mobile: true });
                 })}
+              </div>
+
+              <div className="space-y-1 border-t border-border-subtle pt-4">
+                <div className="text-xs font-mono uppercase tracking-wider text-text-muted px-3 mb-2">
+                  Học tập & thực hành
+                </div>
+                {LEARNING_NAV_ITEMS.map((item) => renderNavLink(item, { mobile: true }))}
               </div>
 
               <div className="pt-4 border-t border-border-subtle space-y-1">
@@ -222,10 +273,13 @@ export default function AcademicNavbar() {
       </header>
 
       {/* Global Command Palette */}
-      <AcademicCommandPalette
-        isOpen={commandPaletteOpen}
-        onClose={() => setCommandPaletteOpen(false)}
-      />
+      {commandPaletteMounted && (
+        <AcademicCommandPalette
+          isOpen={commandPaletteOpen}
+          onClose={() => setCommandPaletteOpen(false)}
+          restoreFocusRef={commandPaletteTriggerRef}
+        />
+      )}
     </>
   );
 }

@@ -65,7 +65,7 @@ import {
   type TrustProvider,
 } from "../ports";
 
-type TrustTransport = (input: TrustInput, signal?: AbortSignal, onEvent?: (event: TrustV5Event) => void, requestId?: string) => Promise<unknown>;
+type TrustTransport = (input: TrustInput, signal?: AbortSignal, onEvent?: (event: TrustV5Event) => void, requestId?: string, idempotencyKey?: string) => Promise<unknown>;
 type CommunityTransport = (options?: CommunityPostsOptions) => Promise<unknown>;
 type CommunityCreateTransport = (input: { content: string; evidenceRefs: readonly string[]; caseScope: { caseId: string; caseRevision: number } }, signal?: AbortSignal, requestId?: string) => Promise<unknown>;
 type CommunityReadTransport = (observationId: string, signal?: AbortSignal, requestId?: string) => Promise<unknown>;
@@ -95,7 +95,7 @@ const passportListResponseSchema = z.object({ success: z.literal(true), passport
 const passportResponseSchema = z.object({ success: z.literal(true), passport: z.unknown() }).passthrough();
 
 const DEFAULT_TRANSPORT: ApiProviderTransport = {
-  trustInvestigate: (input, signal, onEvent, requestId) => trustApi.sequential(input, signal, onEvent, requestId),
+  trustInvestigate: (input, signal, onEvent, requestId, idempotencyKey) => trustApi.sequential(input, signal, onEvent, requestId, idempotencyKey),
   listCommunityPosts: (options) => getCommunityPosts(options),
   createCommunityPost: (input, signal, requestId) => createCommunityPost(input, signal, requestId),
   readCommunityObservation: (observationId, signal, requestId) => getCommunityExperience(observationId, signal, requestId),
@@ -229,6 +229,9 @@ function trustResultFromResponse(input: TrustInvestigationInput, raw: unknown): 
   if (!parsed.success) return invalidResponse(input.requestId, input.runId, errorIssues(parsed.error));
 
   const pipeline = parsed.data.data;
+  const durableCaseId = parsed.data.caseId || input.scope?.caseId || null;
+  const durableCaseRevision = parsed.data.caseRevision ?? input.scope?.caseRevision ?? null;
+  const serverRunId = parsed.data.runId || input.runId;
   const pipelineRecord = pipeline as unknown as Record<string, unknown>;
   const finalDecision = pipeline.finalDecision;
   const providerObservations = providerObservationsFromPipeline(pipelineRecord);
@@ -289,7 +292,7 @@ function trustResultFromResponse(input: TrustInvestigationInput, raw: unknown): 
       provenance,
       ...(incompleteState === "PARTIAL" ? { data: null } : {}),
       requestId: input.requestId,
-      runId: input.runId,
+       runId: serverRunId,
       unknowns: incompleteUnknowns,
       missing: resolvedMissing.length ? resolvedMissing : ["trust-final-decision"],
       ...(incompleteState === "ERROR" ? { error: new ApiError("The Trust pipeline failed.", "SERVER_ERROR", { retryable: true }).toSafeError() } : {}),
@@ -312,9 +315,9 @@ function trustResultFromResponse(input: TrustInvestigationInput, raw: unknown): 
     : [`Trust decision is ${state}; no stronger conclusion is supported by this response.`];
   const data: TrustInvestigationResult = {
     contractVersion: parsed.data.contractVersion,
-    caseId: input.scope?.caseId || null,
-    caseRevision: input.scope?.caseRevision ?? null,
-    runId: input.runId,
+     caseId: durableCaseId,
+     caseRevision: durableCaseRevision,
+     runId: serverRunId,
     generatedAt: pipeline.completedAt,
     decision: {
       security: finalDecision.security,
@@ -359,7 +362,7 @@ function trustResultFromResponse(input: TrustInvestigationInput, raw: unknown): 
     provenance,
     data: contract.data,
     requestId: input.requestId,
-    runId: input.runId,
+     runId: serverRunId,
     unknowns,
     missing: resolvedMissing,
   };
@@ -602,7 +605,7 @@ export class ApiProviderAdapter implements TrustProvider, CommunityProvider, Exp
     const request = transportInput(parsed.data);
     if (!request) return unavailableResult({ requestedMode: "LIVE", dependency: "trust-qr-transport", reason: "NOT_CONFIGURED", requestId: parsed.data.requestId, runId: parsed.data.runId, phase: "QR_TRANSPORT_NOT_CONFIGURED" });
     try {
-      return trustResultFromResponse(parsed.data, await this.transport.trustInvestigate(request, signal, onEvent, parsed.data.requestId));
+      return trustResultFromResponse(parsed.data, await this.transport.trustInvestigate(request, signal, onEvent, parsed.data.requestId, parsed.data.runId));
     } catch (error) {
       return providerFailure({ requestedMode: "LIVE", dependency: "trust-api", error, requestId: parsed.data.requestId, runId: parsed.data.runId });
     }

@@ -3,24 +3,42 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
 import { Menu, Search, ShieldCheck, X } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import MarginRail from "@/components/margin/MarginRail";
-import AcademicCommandPalette from "@/components/command/AcademicCommandPalette";
 import { CANONICAL_NAV_GROUPS, chapterForPath } from "./navigationConfig";
+import { markAssurance } from "@/lib/performance/assurance";
+
+const AcademicCommandPalette = dynamic(() => import("@/components/command/AcademicCommandPalette"), {
+  ssr: false,
+});
 
 export default function UnifiedAppShell({ children }) {
   const pathname = usePathname();
   const { session, profile } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchMounted, setSearchMounted] = useState(false);
   const searchButtonRef = useRef(null);
+
+  const openSearch = () => {
+    markAssurance("command-palette-request");
+    setSearchMounted(true);
+    setSearchOpen(true);
+  };
 
   useEffect(() => {
     const onKeyDown = (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        setSearchOpen((value) => !value);
+        setSearchOpen((value) => {
+          if (!value) {
+            markAssurance("command-palette-request");
+            setSearchMounted(true);
+          }
+          return !value;
+        });
       }
       if (event.key === "Escape") {
         setSearchOpen(false);
@@ -60,7 +78,7 @@ export default function UnifiedAppShell({ children }) {
         <button
           ref={searchButtonRef}
           type="button"
-          onClick={() => setSearchOpen(true)}
+          onClick={openSearch}
           className="command-search hidden md:flex"
           aria-haspopup="dialog"
           aria-label="Tìm kiếm trên StudentHub (Ctrl+K)"
@@ -96,7 +114,13 @@ export default function UnifiedAppShell({ children }) {
           <div className="app-content">{children}</div>
         </main>
       </div>
-      <AcademicCommandPalette isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      {searchMounted && (
+        <AcademicCommandPalette
+          isOpen={searchOpen}
+          onClose={() => setSearchOpen(false)}
+          restoreFocusRef={searchButtonRef}
+        />
+      )}
     </div>
   );
 }

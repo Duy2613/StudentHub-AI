@@ -106,7 +106,7 @@ describe("HttpOnly application session boundary (Finding E)", () => {
 
   it("serializes Supabase auth subscription after initial session reconciliation", () => {
     const authContextSource = readFileSync(new URL("../../src/lib/auth/AuthContext.jsx", import.meta.url), "utf8");
-    assert.match(authContextSource, /initAuth\(\)\.finally\(subscribeToAuthChanges\);/);
+    assert.match(authContextSource, /await\s+initAuth\(\);\s*(?:if\s*\(mounted\)\s*)?subscribeToAuthChanges\(\);/);
     assert.match(authContextSource, /_event === "INITIAL_SESSION" && applicationSessionReadyRef\.current/);
   });
 

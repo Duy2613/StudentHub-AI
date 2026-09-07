@@ -6,7 +6,7 @@ import { LAYER_1_STATUS } from "@/lib/ai-trust/layer1/types";
 
 /**
  * High-precision Telemetry HUD for Layer 1 Fast & Deterministic Screening
- * Adheres to Saffron Swiss Grid + Igloo Dual Typography (Inter & JetBrains Mono)
+ * Adheres to Saffron Swiss Grid + Igloo Dual Typography (Be Vietnam Pro & JetBrains Mono)
  */
 export default function Layer1TelemetryHUD({ result, isScanning = false, className = "" }) {
   if (isScanning) {

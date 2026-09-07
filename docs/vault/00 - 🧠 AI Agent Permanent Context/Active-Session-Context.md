@@ -1,6 +1,70 @@
 # ⚡ Active Session Context & Working State
 > **Vault Node**: `Active-Session-Context` | **Tags**: `#active-session` `#state` `#v9-reality-first` `#mlops`
 
+## 2026-09-07 — Durable realtime event-log slice
+
+- Auth/identity closure remains the authoritative prior checkpoint; Labbe stays
+  frozen at `LABBE_STAGING_BLOCKED_BY_ENV`.
+- Added a PostgreSQL service-only append-only `private.realtime_events` log,
+  cursor replay, idempotency/content conflict handling, subject filtering and
+  a production fail-closed rule for missing shared realtime state.
+- Trust terminal events are projected only after the existing durable commit;
+  the local in-memory SSE adapter remains explicitly non-authoritative.
+- Local contracts pass, but two-instance fan-out, reconnect/slow-consumer,
+  restart, RLS and staging provider evidence still require an owned environment.
+- Canonical slice report: `docs/reports/REALTIME-MULTI-INSTANCE-CLOSURE-2026-09-07.md`.
+
+## 2026-09-06 — Final release assurance closure (authoritative)
+
+- Final candidate-bound report: `docs/reports/STUDENTHUB-AI-RELEASE-ASSURANCE-REPORT.md`.
+- Current evidence supersedes earlier same-day checkpoints: Chromium 37/37 and WebKit 37/37; fresh Lighthouse n=1 LCP is 2,572.1–2,771.6 ms, with valid JSON and Windows Chrome-profile teardown `EPERM`.
+- Verdict remains `ACADEMIC_CINEMATIC_EVOLUTION_NOT_RELEASE_READY`. Firefox is `BLOCKED_BY_ENVIRONMENT`; real-device/field CWV, staging provider, live PostgreSQL/RLS, rollback execution, and external observability remain unverified.
+- Current performance and bundle evidence: `docs/frontend/PERFORMANCE.md`.
+
+## 2026-09-06 — Realtime Ambient Video Background Matrix & Telemetry Hub Architecture
+
+- Thay thế hoàn toàn khung trình chiếu video player cục bộ bằng hệ thống **Realtime Looping Ambient Video Background Matrix** phủ toàn bộ nền tảng.
+- **Nâng Cấp Độc Quyền Bộ 8 Video 3D Animation Điện Ảnh** (1280x720, 24FPS, loop chuẩn 8.00s = 192 frames mỗi video, 88MB tổng dung lượng assets):
+  * **Kiến Trúc 3D Engine (`scripts/render_3d_cinematic_films.py`)**: Sử dụng bản đồ độ sâu không gian thực (`compute_depth_map`) kết hợp quỹ đạo camera 3D (`apply_3d_camera_warp` với dao động điều hòa Lissajous) tạo hiệu ứng thị sai (3D parallax) chân thực — các vật thể tiền cảnh chuyển động nhanh hơn hậu cảnh vòm kiến trúc.
+  * **Hệ Thống Mô Phỏng Đa Tầng Riêng Biệt Cho Từng Film**:
+    1. Trang Chủ & Cổng Tri Thức (`/`, `/academic-showcase`, `/c9`): Film 01 (`The Living Campus Atlas`) — Xung ánh sáng cáp quang 3D chạy dọc theo các gian triển lãm mô hình sa bàn khuôn viên.
+    2. Thẩm Định Bằng Chứng & Chống Gian Lận (`/trust`, `/scam-check`, `/cases`, `/contract-check`): Film 02 (`The Trust Engine`) — Mặt phẳng quét laser ngọc lục bảo 3D quét qua bản thảo cổ da cừu với nón tán xạ caustics và hạt ánh sáng audit lơ lửng.
+    3. Diễn Đàn & Chia Sẻ Tri Thức (`/forum`, `/community`): Film 03 (`Collective Intelligence`) — Bầy hạt trí tuệ boids 70+ hạt quay theo hình xuyến 3D với mạng liên kết synap phát sáng.
+    4. Mạng Lưới Chuyên Gia & Đánh Giá Giảng Viên (`/expert`, `/prof-rating`): Film 04 (`Expert Trust Network`) — Dải sáng caustics quét qua hành lang kính học giả với điểm phản chiếu specular.
+    5. Trung Tâm Luyện Tập & Quests (`/learn`, `/practice`, `/quests`): Film 05 (`From Question to Understanding`) — Xung năng lượng lan tỏa dọc các cầu nối sinh thái biophilic và hồ nước dạ quang dưới bầu trời sao.
+    6. Kế Hoạch Học Tập & Deep Work (`/academic`, `/academic/*`, `/roadmap`, `/credit-scheduler`): Film 06 (`Academic Deep Work`) — Vệt mưa 3D trượt trên kính sân trong, đèn bàn vonfram phát sáng thể tích.
+    7. Kho Dữ Liệu Học Thuật & Radar Học Phí (`/intelligence`, `/intelligence/*`, `/tuition-radar`, `/scholarships`, `/marketplace`, `/safety-map`): Film 07 (`Knowledge Through Time`) — Luồng sáng god-rays 3D chiếu xuyên qua các tầng sách xoắn ốc thư viện với bụi vàng bay lơ lửng.
+    8. Bảng Điều Khiển Cá Nhân (`/dashboard`, `/onboarding`, `/profile`, `/settings`, `/cinema`): Film 08 (`The Knowledge Horizon`) — Bình minh lan tỏa trên hàng cột vòm và gợn sóng phản chiếu mặt nước.
+  * **Định Dạng Kép & Tối Ưu Hardware Codec**: Xuất song song định dạng MP4 24fps chuẩn chất lượng cao và WebP động (96 frames @ 12fps) lưu tại `frontend/public/videos/academic/` cùng 8 master posters tại `frontend/public/images/academic/`.
+  * **Zero-Flicker Hardware Detection**: `UniversalCinematicBackground.jsx` tự động dò quét codec của trình duyệt (`canPlayType`) ngay khi mount để kích hoạt giải mã tối ưu tức thì, không giật đen khung hình.
+- Phủ lớp **Architectural Legibility Veil** đa tầng (radial gradients + backdrop-blur-md/xl) đảm bảo độ tương phản đạt chuẩn WCAG AAA trên mọi trang.
+- Tích hợp hệ thống Realtime SSE Streaming (`GET /api/realtime/stream`, `POST /api/realtime/broadcast`, `RealtimeHub.js`, `RealtimeContext.jsx`, `RealtimeLiveConsole.jsx`, `RealtimeNotificationToasts.jsx`).
+- Nâng cấp toàn diện phân hệ `/trust` (Trust Engine) theo chuẩn Senior System Design:
+  * Cho phép video nền Film 02 (The Trust Engine - 3D Prism & Laser Scanning Plane) hiển thị thấu kính với hiệu ứng Glassmorphism xuyên thấu (`backdrop-filter: blur(24px) saturate(160%)`, `bg-transparent` trên body, `bg-app-canvas: rgba(6, 8, 19, 0.65)`).
+  * Khắc phục triệt để lỗi CSP dev mode trong `SecurityHeaders.js` (`'unsafe-eval'`, `media-src`), xóa hoàn toàn nút đỏ `1 Issue`.
+  * Tích hợp thanh Realtime Telemetry HUD Bar (12ms latency, SHA-256 Zero-Trust).
+  * Tích hợp bộ 3 Trụ Cột Đối Soát Tam Giác (Chính Thống 🏛️ · Cộng Đồng 👥 · Chuyên Gia 👨‍🏫).
+  * Bổ sung bảng 3 Án Lệ Điển Hình (1-Click Trial Cards) nạp dữ liệu và kiểm thử tức thì luồng 4 tầng bằng chứng (`Input -> Local -> External -> Reasoning`).
+- Đã xác thực trên trình duyệt tự động và kiểm tra ESLint (0 errors, 394 warnings trong test files).
+
+
+- Giữ feature freeze: không thêm feature, không redesign, không sửa backend/database/auth contract/RLS/storage/security contract.
+- Đã xử lý critical path cho bốn route mobile canonical: canonical fonts (Be Vietnam Pro/Lora/JetBrains Mono), optional font preload và weight reduction; Command Palette, Lenis, auth/Supabase và Trust analysis chuyển sang lazy/idle/on-interaction; Knowledge Universe có SVG fallback trước WebGL; landing below-fold dùng `content-visibility`; Trust có SSR critical shell; Quiet Lesson AI Tutor và ghi chú được tách thành `LessonCompanionPanel` chỉ tải khi người dùng mở.
+- Production build pass `135/135` pages. Bundle audit pass: `/` 204,993 B, Quiet Lesson 129,995 B, Roadmap 140,563 B, Trust 142,244 B (cùng Community/Expert dưới 500 KB).
+- Fresh Lighthouse mobile DevTools n=1/route: Landing 2,771.6 ms; Quiet Lesson 2,630.2 ms; Roadmap 2,572.1 ms; Trust 2,706.8 ms. CLS 0; TBT 76.8/131.1/37.2/166.6 ms. JSON hợp lệ nhưng runner thoát `1` khi Windows dọn Chrome profile với `EPERM`; LCP target chưa đạt.
+- Verification: `npm run test:all` pass `521/521`; Chromium/WebKit closure `37/37` mỗi engine; axe/keyboard `14/14` mỗi engine; lint `0 errors / 404 warnings`; `git diff --check` pass. Raw production HTML có `h1` trên cả bốn route.
+- Verdict trung thực vẫn `ACADEMIC_CINEMATIC_EVOLUTION_NOT_RELEASE_READY`: Firefox/WebKit, field/real-device CWV, canonical Preview, staging provider, PostgreSQL/RLS clean DB, restart/rollback và Lighthouse CI runner chưa có bằng chứng. Lighthouse CLI ghi JSON nhưng thoát `1` do Windows temp-profile `EPERM`.
+- Báo cáo đầy đủ: `docs/reports/ACADEMIC-CINEMATIC-EVOLUTION-REMEDIATION.md`; số liệu bundle/runtime: `docs/frontend/PERFORMANCE.md`.
+
+## 2026-09-06 — USAvionix / cogni:wave reference synthesis (documentation only)
+
+- Đã lưu gói bằng chứng local tại `docs/references/usavionix-2026-09-06/`: metadata/hash MP4, contact sheet, frame samples, và ảnh chụp các chương USAvionix desktop/mobile.
+- MP4 người dùng gửi là showcase `cogni:wave` mental wellness, không phải USAvionix; chỉ dùng làm tham chiếu bố cục/chuyển cảnh. Website USAvionix là nguồn tham chiếu chính.
+- Đã viết `docs/reports/USAVIONIX-STUDENTHUB-INTEGRATION-REPORT.md` và `docs/frontend/USAVIONIX-STUDENTHUB-INTEGRATION-PROMPT.md` với mapping Specs/Swarm/Mission/Sync/Detection/Coordination/Response → Source/Lenses/Case/Freshness/Trust/Next Action/Outcome.
+- `/` đang chạy `AcademicNavbar` + `AcademicHeroSection` trong `frontend/src/app/page.jsx`; `LivingCampusAtlas` là implementation thay thế/legacy đã được vault ghi nhận, không phải import active hiện tại.
+- `frontend/src/components/auth/UAvionixTelemetryHUD.jsx` là legacy visual có synthetic/random telemetry; không được dùng làm nguồn dữ liệu cho Trust, học vụ, hoặc metric người dùng.
+- Không có code/backend/auth/database/RLS/storage/security contract nào được sửa. Feature freeze và các blocker field/Firefox/WebKit/Preview/staging/live DB vẫn giữ nguyên.
+
 ## 2026-08-29 - Feature freeze cross-system completion
 
 - Student Decision Twin and Living Evidence Passport are now production domain contracts with PostgreSQL schema/repository, RLS policies, owner-bound API v1 routes, immutable Passport revisions, deterministic decision factors, and demo/live separation.
@@ -434,3 +498,25 @@
 - `agent-browser` was unavailable; Playwright was the local browser fallback. Field CWV/Lighthouse was not executed.
 - ASP.NET collaborator/live backend, Supabase/PostgreSQL/RLS clean-database proof, production provider credentials/observability/deployment, and final Antigravity visual acceptance remain `BLOCKED_BY_ENV` or `NOT_EXECUTED`.
 - Handoff index: `docs/visual-contracts/GLOBAL_VISUAL_SYSTEM.md` plus the feature contracts for App Shell, Trust Input/Report, Multimodal, TrustGraph, Evidence Passport, Community, Expert, and Landing.
+
+## 16. Core system master prompt implementation — 2026-09-06
+
+- Đã thực hiện master prompt theo audit và master plan: Trust, Community và Experts vẫn là đúng ba trụ cột; cinematic/3D chỉ là enhancement.
+- Trust V5 giữ đủ `L1, L2A, L2B, L2C, L3, L4, L5`; UI chuyển stage bằng tab/panel một lớp, không rerun request, không scroll ngoài ý muốn và có keyboard/reduced-motion behavior.
+- Durable Trust đã có `trust_runs`, `trust_stage_runs`, `trust_case_revisions`, `trust_verdict_revisions`; terminal response chờ transaction commit. Case/run/input/evidence/claim ownership conflict bị fail closed.
+- Expert qualification đã có profile application, identity review, server quiz version/deadline/attempt/answer idempotency, domain review, human activation và appeal state; client không được tự nâng quyền.
+- Realtime đã bỏ telemetry/mock event giả, áp channel/scope/rate/payload/replay boundary và báo rõ `PROCESS_LOCAL_SSE`, `authoritative: false` trong readiness. Forum ranking dùng aggregate vote hợp lệ.
+- Labbe bridge có `DISABLED → SHADOW → STAGING → CONTROLLED`, minimal hashed event, transactional outbox, lease/retry/idempotency và writeback disabled.
+- PostgreSQL migrations `202609060001`–`202609060004` đã chạy ở local database. Live gates: phase 2 Trust `1/1`, report snapshot `1/1`, phase 3 RLS `8/8`.
+- Trust report vertical slice đã có snapshot theo revision, artifact JSON hash, owner scope, idempotency và API `POST/GET /api/v1/reports`, `GET /api/v1/reports/{reportId}`; export worker/PDF và các loại report khác còn ở M7.
+- Báo cáo triển khai: `docs/reports/CORE-SYSTEM-IMPLEMENTATION-2026-09-06.md`; hướng dẫn Labbe: `docs/integrations/STUDENTHUB-LABBE-BRIDGE.md`.
+- Chưa tuyên bố production complete: Labbe đang disabled, realtime chưa là cluster authority, load/soak/failure-injection chưa chạy, model chưa retrain vì corpus còn duplicate, 3D chưa tham gia authority path.
+
+## 17. Labbe staging assurance closure — 2026-09-06
+
+- Đã reconcile mode semantics: `DISABLED` không tạo outbox; `SHADOW` tạo canonical event/hash, persist outbox và exercise lease không network; `STAGING` chỉ delivery HTTPS; `CONTROLLED` vẫn bị khóa.
+- Đã siết event allowlist còn `case_id`, `case_revision`, `run_id`, `pipeline_status`, `security`, `truth`, `action`; raw screenshot/OCR/private evidence/provider token/session token/credentials bị reject trước network.
+- Đã thêm canonical JSON UTF-8 vectors dùng chung cho Node StudentHub và Python Labbe reference, gồm Unicode tiếng Việt, null, boolean, numbers, nested objects, arrays và khác thứ tự key.
+- Đã thêm lease token chống stale worker completion, `SHADOW`/`CONFLICT` outbox states, catch-up từ Shadow sang Staging, retry/backoff và read-only assurance projection với authorization `ADMIN.SECURITY` + freshness 5 phút.
+- Local closure: `npm run test:labbe` `19/19` PASS; targeted ESLint `0` errors/`0` warnings. Real staging gate hiện `LABBE_STAGING_BLOCKED_BY_ENV` vì thiếu HTTPS URL, workload token, scope và disposable Labbe database.
+- Evidence: `docs/reports/LABBE-STAGING-ASSURANCE-CLOSURE-2026-09-06.md`; không commit/push/deploy/remote migration/automatic writeback.

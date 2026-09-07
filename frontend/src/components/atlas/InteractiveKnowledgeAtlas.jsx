@@ -4,21 +4,18 @@ import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  BookOpen,
   BrainCircuit,
   CheckCircle2,
   Clock,
   Compass,
-  FileCode2,
-  FolderKanban,
-  Layers,
   ListTree,
   Lock,
   Network,
   Sparkles,
-  X,
 } from "lucide-react";
-import KnowledgeUniverse3D, { KNOWLEDGE_DOMAINS } from "../canvas/KnowledgeUniverse3D";
+import ProgressiveKnowledgeUniverse from "../canvas/ProgressiveKnowledgeUniverse";
+import { KNOWLEDGE_DOMAINS } from "../canvas/knowledgeUniverseData";
+import { markAssurance, measureAssurance } from "@/lib/performance/assurance";
 
 /**
  * Authoritative learning graph ontology details for each node
@@ -175,6 +172,24 @@ export default function InteractiveKnowledgeAtlas({ className = "" }) {
   const [activeTab, setActiveTab] = useState("spatial"); // "spatial" | "semantic"
   const [filterDomain, setFilterDomain] = useState("Tất cả");
 
+  const handleTabChange = (nextTab) => {
+    markAssurance("atlas-tab-request", { tab: nextTab });
+    setActiveTab(nextTab);
+    window.requestAnimationFrame(() => {
+      markAssurance("atlas-tab-interactive", { tab: nextTab });
+      measureAssurance("atlas-tab-duration", "atlas-tab-request", "atlas-tab-interactive");
+    });
+  };
+
+  const handleFilterChange = (nextDomain) => {
+    markAssurance("atlas-filter-request", { domain: nextDomain });
+    setFilterDomain(nextDomain);
+    window.requestAnimationFrame(() => {
+      markAssurance("atlas-filter-interactive", { domain: nextDomain });
+      measureAssurance("atlas-filter-duration", "atlas-filter-request", "atlas-filter-interactive");
+    });
+  };
+
   const selectedNode = selectedNodeId ? ATLAS_NODE_DATA[selectedNodeId] : null;
 
   const filteredNodes = useMemo(() => {
@@ -210,7 +225,7 @@ export default function InteractiveKnowledgeAtlas({ className = "" }) {
         <div className="flex items-center gap-2 bg-surface-primary border border-border-subtle p-1.5 rounded-xl self-start md:self-auto">
           <button
             type="button"
-            onClick={() => setActiveTab("spatial")}
+            onClick={() => handleTabChange("spatial")}
             className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
               activeTab === "spatial"
                 ? "bg-accent-primary text-white shadow-sm"
@@ -223,7 +238,7 @@ export default function InteractiveKnowledgeAtlas({ className = "" }) {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab("semantic")}
+            onClick={() => handleTabChange("semantic")}
             className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
               activeTab === "semantic"
                 ? "bg-accent-primary text-white shadow-sm"
@@ -249,7 +264,7 @@ export default function InteractiveKnowledgeAtlas({ className = "" }) {
             type="button"
             role="tab"
             aria-selected={filterDomain === cat}
-            onClick={() => setFilterDomain(cat)}
+            onClick={() => handleFilterChange(cat)}
             className={`px-3.5 py-1.5 rounded-full text-xs font-mono whitespace-nowrap transition-all border ${
               filterDomain === cat
                 ? "bg-surface-elevated border-accent-knowledge text-accent-knowledge"
@@ -266,10 +281,11 @@ export default function InteractiveKnowledgeAtlas({ className = "" }) {
         {/* Left / Center Viewport (Spatial or Semantic List) */}
         <div className="lg:col-span-8 bg-surface-primary border border-border-subtle rounded-2xl overflow-hidden shadow-2xl relative min-h-[480px]">
           {activeTab === "spatial" ? (
-            <KnowledgeUniverse3D
+            <ProgressiveKnowledgeUniverse
               activeNodeId={selectedNodeId}
               onSelectNode={(id) => setSelectedNodeId(id)}
               className="w-full h-full"
+              loadStrategy="visible"
             />
           ) : (
             /* Semantic Tree / List Representation for full keyboard and screen-reader accessibility */

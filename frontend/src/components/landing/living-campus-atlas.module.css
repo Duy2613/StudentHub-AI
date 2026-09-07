@@ -8,7 +8,7 @@
   overflow: clip;
   color: var(--atlas-ivory);
   background: var(--atlas-ink);
-  font-family: var(--font-plus-jakarta), Arial, sans-serif;
+  font-family: var(--font-be-vietnam-pro), Arial, sans-serif;
 }
 
 .page :is(a, button) { outline-offset: 5px; }

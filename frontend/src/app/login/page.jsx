@@ -28,11 +28,13 @@ import {
   translateAuthError,
   setRememberMePreference,
 } from "@/lib/auth/authService";
+import { getAuthCapabilities } from "@/lib/auth/authCapabilities";
 import { useAuth } from "@/lib/auth/AuthContext";
 
 const LoginPage = () => {
   const router = useRouter();
   const { loginAsDemo } = useAuth();
+  const capabilities = getAuthCapabilities();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,7 +48,11 @@ const LoginPage = () => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const urlError = params.get("error");
-      if (urlError === "google_login_failed" || urlError === "oauth_failed") {
+      if (urlError === "auth_misconfigured") {
+        setError(capabilities.emailPasswordMessage);
+      } else if (urlError === "google_unsupported_provider") {
+        setError(capabilities.googleMessage);
+      } else if (urlError === "google_login_failed" || urlError === "oauth_failed") {
         setError("Đăng nhập bằng OAuth không thành công hoặc đã bị hủy. Vui lòng thử lại.");
       } else if (urlError === "session_unavailable") {
         setError("Dịch vụ phiên đăng nhập an toàn đang tạm thời không khả dụng. Vui lòng thử lại sau.");
@@ -56,21 +62,22 @@ const LoginPage = () => {
         );
       }
     }
-  }, []);
+  }, [capabilities.googleMessage]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
     try {
-      const { user } = await signInWithPassword(email, password, rememberMe);
+      const { applicationUser } = await signInWithPassword(email, password, rememberMe);
 
-      const isOnboarded = user?.user_metadata?.onboarded;
-      if (!isOnboarded) {
-        router.push("/onboarding");
-      } else {
-        router.push("/dashboard");
-      }
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      const returnUrl = params?.get("next") || params?.get("returnPath");
+      const safeNext = (returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("/login"))
+        ? returnUrl
+        : (applicationUser?.onboarded ? "/dashboard" : "/onboarding");
+
+      router.push(safeNext);
     } catch (err) {
       setError(translateAuthError(err));
     } finally {
@@ -81,6 +88,10 @@ const LoginPage = () => {
   const handleGoogleLogin = useCallback(async () => {
     if (isOAuthLoading || isLoading) return;
     setError(null);
+    if (capabilities.google !== "READY") {
+      setError(capabilities.googleMessage);
+      return;
+    }
     setIsOAuthLoading(true);
     setRememberMePreference(rememberMe);
     try {
@@ -89,7 +100,7 @@ const LoginPage = () => {
       setError(translateAuthError(err));
       setIsOAuthLoading(false);
     }
-  }, [isOAuthLoading, isLoading, rememberMe]);
+  }, [isOAuthLoading, isLoading, rememberMe, capabilities]);
 
   const handleGitHubLogin = useCallback(async () => {
     if (isOAuthLoading || isLoading) return;
@@ -125,7 +136,12 @@ const LoginPage = () => {
 
       {/* Social OAuth Actions (Google & GitHub) */}
       <div className="grid grid-cols-2 gap-3 relative z-10">
-        <GoogleButton isLoading={isOAuthLoading} isDisabled={isLoading} onClick={handleGoogleLogin} />
+        <GoogleButton
+          isLoading={isOAuthLoading}
+          isDisabled={isLoading}
+          onClick={handleGoogleLogin}
+          capability={capabilities}
+        />
         <GithubButton isLoading={isOAuthLoading} isDisabled={isLoading} onClick={handleGitHubLogin} />
       </div>
 

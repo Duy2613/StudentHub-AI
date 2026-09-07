@@ -17,12 +17,19 @@ import {
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { motion, AnimatePresence } from "motion/react";
+import { markAssurance, measureAssurance } from "@/lib/performance/assurance";
 
 export default function UserDropdownMenu({ className = "" }) {
   const router = useRouter();
   const { session, profile, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    markAssurance("profile-menu-interactive");
+    measureAssurance("profile-menu-open-duration", "profile-menu-request", "profile-menu-interactive");
+  }, [isOpen]);
 
   // Close when clicking outside
   useEffect(() => {
@@ -65,7 +72,10 @@ export default function UserDropdownMenu({ className = "" }) {
       {/* Trigger Button */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          markAssurance("profile-menu-request");
+          setIsOpen((previous) => !previous);
+        }}
         className="flex items-center gap-2 p-1.5 pr-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-teal-500/40 transition-all group focus:outline-none shadow-sm"
       >
         <AvatarDisplay

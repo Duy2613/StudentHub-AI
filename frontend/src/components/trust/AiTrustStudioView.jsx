@@ -14,6 +14,7 @@ import SourceDisclosure from "@/components/ui/SourceDisclosure";
 import { getRuntimeProviderBundle } from "@/lib/backend/runtimeProvider";
 import TrustSectionBoundary from "./TrustSectionBoundary";
 import TrustPipelineTimeline from "./TrustPipelineTimeline";
+import { markAssurance, measureAssurance } from "@/lib/performance/assurance";
 
 const TrustGraph2D = dynamic(() => import("./TrustGraph2D"), {
   ssr: false,
@@ -290,10 +291,10 @@ function v5VerdictTitle(decision) {
   }
 }
 
-export function AiTrustStudioView() {
+export function AiTrustStudioView({ initialMode = "image", initialContent = "" }) {
   const demoEnabled = process.env.NEXT_PUBLIC_COMPETITION_DEMO === "true";
-  const [mode, setMode] = useState("image");
-  const [content, setContent] = useState("");
+  const [mode, setMode] = useState(initialMode);
+  const [content, setContent] = useState(initialContent);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [dragging, setDragging] = useState(false);
@@ -310,12 +311,27 @@ export function AiTrustStudioView() {
   const [sourceProvenance, setSourceProvenance] = useState(null);
   const [passportQuery, setPassportQuery] = useState(null);
   const [passportRetryKey, setPassportRetryKey] = useState(0);
+  const [composerCollapsed, setComposerCollapsed] = useState(false);
+  const [analyzedSummary, setAnalyzedSummary] = useState(null);
+  const [, setReportState] = useState({ status: "IDLE", report: null, message: null });
   const fileInput = useRef(null);
+  const contentRef = useRef(initialContent);
   const activeScan = useRef(null);
   const scanSequence = useRef(0);
 
   const updateStep = (id, status, detail = "") => setPipeline((items) => items.map((item) => item.id === id ? { ...item, status, detail } : item));
   const record = (label, status) => setTimeline((items) => [...items, { id: `${Date.now()}-${items.length}`, label, status, at: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) }]);
+
+  const selectTrustMode = (nextMode) => {
+    markAssurance("trust-workspace-request", { mode: nextMode });
+    setDemoCaseId(null);
+    setConfirmedEntities([]);
+    setMode(nextMode);
+    window.requestAnimationFrame(() => {
+      markAssurance("trust-workspace-interactive", { mode: nextMode });
+      measureAssurance("trust-workspace-open-duration", "trust-workspace-request", "trust-workspace-interactive");
+    });
+  };
 
   const acceptFile = useCallback((nextFile) => {
     setError(null);
@@ -336,25 +352,69 @@ export function AiTrustStudioView() {
     return () => window.removeEventListener("paste", onPaste);
   }, [acceptFile]);
 
+  const startNewAnalysis = () => {
+    if (preview) URL.revokeObjectURL(preview);
+    setComposerCollapsed(false);
+    setMode("text");
+    setContent("");
+    contentRef.current = "";
+    setFile(null);
+    setPreview(null);
+    setError(null);
+    setOcr(null);
+    setConfirmedEntities([]);
+    setDemoCaseId(null);
+  };
+
   const reset = () => {
     if (preview) URL.revokeObjectURL(preview);
     scanSequence.current += 1;
     activeScan.current?.abort("reset");
-    setFile(null); setPreview(null); setContent(""); setError(null); setOcr(null); setConfirmedEntities([]); setDemoCaseId(null); setProviderResult(null); setSourceProvenance(null);
+    setComposerCollapsed(false);
+    setAnalyzedSummary(null);
+    setFile(null); setPreview(null); setContent(""); contentRef.current = ""; setError(null); setOcr(null); setConfirmedEntities([]); setDemoCaseId(null); setProviderResult(null); setSourceProvenance(null); setReportState({ status: "IDLE", report: null, message: null });
     setPipeline(EMPTY_PIPELINE); setV5Pipeline(null); setLayers({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null }); setTimeline([]);
   };
 
   const analyze = async () => {
+    markAssurance("trust-analysis-request", { mode });
     activeScan.current?.abort("superseded-by-new-scan");
     const controller = new AbortController();
     activeScan.current = controller;
     const scanId = ++scanSequence.current;
-    setError(null); setProcessing(true); setPipeline(EMPTY_PIPELINE); setV5Pipeline(null); setProviderResult(null); setSourceProvenance(null); setTimeline([]);
+    const submittedContent = content.trim();
+    setError(null); setProcessing(true); setComposerCollapsed(false); setPipeline(EMPTY_PIPELINE); setV5Pipeline(null); setProviderResult(null); setSourceProvenance(null); setTimeline([]); setReportState({ status: "IDLE", report: null, message: null });
     setLayers({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null });
+
+    let acceptedDurable = false;
+    const markAccepted = (summaryText) => {
+      if (scanId !== scanSequence.current) return;
+      if (!acceptedDurable) {
+        acceptedDurable = true;
+        const draftElement = typeof document !== "undefined" ? document.querySelector(".trust-text-field textarea") : null;
+        const currentDraft = typeof draftElement?.value === "string" ? draftElement.value.trim() : contentRef.current.trim();
+        const userChangedInput = currentDraft !== submittedContent;
+        setAnalyzedSummary({
+          type: mode === "url" ? "URL" : mode === "image" ? "ẢNH" : mode === "qr" ? "QR" : "VĂN BẢN",
+          label: summaryText || (mode === "url" ? content.trim() : mode === "image" || mode === "qr" ? (file?.name || "Tập tin") : content.trim().slice(0, 80))
+        });
+        if (!userChangedInput) {
+          if (preview) URL.revokeObjectURL(preview);
+          setFile(null);
+          setPreview(null);
+          setContent("");
+          contentRef.current = "";
+          setOcr(null);
+          setConfirmedEntities([]);
+        }
+      }
+    };
+
     let extracted = content.trim();
     try {
       const demoCase = demoEnabled ? COMPETITION_DEMO_CASES.find((item) => item.id === demoCaseId) : null;
       if (demoCase) {
+        markAccepted(demoCase.label);
         updateStep("input", "done", "CHẾ ĐỘ TRÌNH DIỄN"); record("Đầu vào demo đã được nạp", "DEMO DATA");
         updateStep("local", "done", readable(demoCase.layers.layer1.status)); record("Phân tích rủi ro cục bộ", readable(demoCase.layers.layer1.status));
         updateStep("external", demoCase.layers.layer3.status === "PARTIAL" ? "partial" : "done", readable(demoCase.layers.layer3.status)); record("Đối soát bằng chứng", readable(demoCase.layers.layer3.status));
@@ -399,6 +459,7 @@ export function AiTrustStudioView() {
       const provider = getRuntimeProviderBundle();
       const response = await provider.trust.investigate(input, controller.signal, (event) => {
         if (scanId !== scanSequence.current || !event?.data) return;
+        markAccepted(mode === "url" ? extracted : extracted.slice(0, 80));
         streamedPipeline = event.data;
         setV5Pipeline(event.data);
         setPipeline((items) => legacyPipelineFromV5(event.data, items));
@@ -416,6 +477,7 @@ export function AiTrustStudioView() {
         });
       });
       if (scanId !== scanSequence.current) return;
+      markAccepted(mode === "url" ? extracted : extracted.slice(0, 80));
       setProviderResult(response);
       setSourceProvenance(response.provenance);
       if (["ERROR", "UNAVAILABLE", "OFFLINE", "AUTH_REQUIRED", "FORBIDDEN", "CANCELLED"].includes(response.state)) {
@@ -442,10 +504,21 @@ export function AiTrustStudioView() {
       record("Trust provider hoàn tất", readable(response.state));
     } catch (caught) {
       if (caught instanceof ApiError && caught.code === "ABORTED" && scanId !== scanSequence.current) return;
+      setComposerCollapsed(false);
       const message = caught instanceof ApiError ? apiErrorMessage(caught) : "Pipeline gặp lỗi ngoài dự kiến.";
       setError({ message, code: caught instanceof ApiError ? caught.code : "SERVER_ERROR", traceId: caught instanceof ApiError ? caught.traceId : null });
       setPipeline((items) => items.map((item) => item.status === "running" ? { ...item, status: "error", detail: message } : item));
-    } finally { if (scanId === scanSequence.current) setProcessing(false); }
+    } finally {
+      if (scanId === scanSequence.current) {
+        setProcessing(false);
+        const draftElement = typeof document !== "undefined" ? document.querySelector(".trust-text-field textarea") : null;
+        const draftStillPresent = typeof draftElement?.value === "string" && draftElement.value.trim().length > 0;
+        const inputStillFocused = typeof document !== "undefined" && Boolean(document.activeElement?.closest(".trust-text-field"));
+        if (acceptedDurable && !draftStillPresent && !inputStillFocused) setComposerCollapsed(true);
+        markAssurance("trust-analysis-interactive", { mode });
+        measureAssurance("trust-analysis-duration", "trust-analysis-request", "trust-analysis-interactive");
+      }
+    }
   };
 
   const hasNativeV5 = Boolean(v5Pipeline && v5Pipeline.pipelineVersion !== "trust-v5-compatibility");
@@ -517,20 +590,44 @@ export function AiTrustStudioView() {
 
   return <div className="product-workspace">
     <header className="product-hero"><div><p className="product-kicker">AI × Community × Human expertise</p><h1>Kiểm tra trước khi bạn tin.</h1><p>Đưa ảnh chụp, đường dẫn hoặc nội dung khả nghi vào một luồng phân tích có thể truy vết. AI phát hiện, cộng đồng bổ sung bằng chứng, chuyên gia xác minh.</p><SourceDisclosure provenance={sourceProvenance} sourceMode={sourceProvenance?.sourceMode || (demoEnabled ? "DEMO" : "LIVE")} /></div><div className="hero-seal"><ShieldCheck size={20} /><span>TRUST ENGINE</span><strong>Evidence first</strong></div></header>
-    <section className="trust-input-grid" aria-labelledby="trust-input-title">
-      <div className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">01 · Input</p><h2 id="trust-input-title" className="product-section-title">Bạn muốn kiểm tra gì?</h2></div>{(file || content) && <button className="text-link" onClick={reset}>Làm mới</button>}</div>
-        {demoEnabled && <div className="demo-mode-panel" role="group" aria-label="Ba case trình diễn"><div><span className="signal-badge">CHẾ ĐỘ TRÌNH DIỄN</span><p>Dữ liệu xác định, chỉ dùng khi người vận hành chủ động chọn case.</p></div><div className="flex flex-wrap gap-2">{COMPETITION_DEMO_CASES.map((item) => <button type="button" key={item.id} className={`filter-chip ${demoCaseId === item.id ? "is-active" : ""}`} aria-pressed={demoCaseId === item.id} onClick={() => { setDemoCaseId(item.id); setMode("text"); setContent(item.input); setFile(null); setConfirmedEntities([]); if (preview) URL.revokeObjectURL(preview); setPreview(null); }}>{item.label}</button>)}</div></div>}
-         <div className="mode-switch" role="tablist" aria-label="Loại đầu vào"><button role="tab" aria-selected={mode === "image"} onClick={() => { setDemoCaseId(null); setConfirmedEntities([]); setMode("image"); }}><ImageIcon size={15} /> Ảnh chụp</button><button role="tab" aria-selected={mode === "qr"} onClick={() => { setDemoCaseId(null); setConfirmedEntities([]); setMode("qr"); }}><ScanSearch size={15} /> QR</button><button role="tab" aria-selected={mode === "text"} onClick={() => { setDemoCaseId(null); setConfirmedEntities([]); setMode("text"); }}><ClipboardPaste size={15} /> Văn bản</button><button role="tab" aria-selected={mode === "url"} onClick={() => { setDemoCaseId(null); setConfirmedEntities([]); setMode("url"); }}><Globe2 size={15} /> URL</button></div>
-         {mode === "image" || mode === "qr" ? <div className={`upload-zone ${dragging ? "is-dragging" : ""} ${preview ? "has-preview" : ""}`} onDragEnter={(event) => { event.preventDefault(); setDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); setDemoCaseId(null); acceptFile(event.dataTransfer.files[0]); }}>{preview ? <><div className="ocr-preview-wrap"><Image src={preview} alt={mode === "qr" ? "Ảnh mã QR sẽ được phân tích" : "Ảnh sẽ được phân tích"} width={1200} height={800} unoptimized />{ocr?.regions?.map((region) => <span key={region.id} className="ocr-region" style={{ left: `${region.x}%`, top: `${region.y}%`, width: `${region.width}%`, height: `${region.height}%` }} aria-label={`${region.label} overlay`} />)}</div><button type="button" className="remove-upload" onClick={() => { if (preview) URL.revokeObjectURL(preview); setFile(null); setPreview(null); setOcr(null); }} aria-label="Xóa ảnh"><X size={16} /></button></> : <button type="button" className="upload-prompt" onClick={() => fileInput.current?.click()}><span>{mode === "qr" ? <ScanSearch size={22} /> : <Upload size={22} />}</span><strong>{mode === "qr" ? "Thả hoặc chọn ảnh mã QR" : "Thả hoặc chọn ảnh chụp"}</strong><small>PNG, JPG, WEBP · tối đa 8 MB · có thể dán từ clipboard</small></button>}<input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" aria-label={mode === "qr" ? "Chọn ảnh mã QR cần phân tích" : "Chọn ảnh chụp cần phân tích"} className="sr-only" onChange={(event) => { setDemoCaseId(null); acceptFile(event.target.files?.[0]); }} /></div> : <label className="trust-text-field"><span>{mode === "url" ? "Đường dẫn cần kiểm tra" : "Nội dung tin nhắn hoặc thông báo"}</span><textarea value={content} onChange={(event) => { setDemoCaseId(null); setContent(event.target.value); }} rows={7} placeholder={mode === "url" ? "https://..." : "Dán nội dung khả nghi tại đây..."} /></label>}
-        <div className="truth-note"><AlertTriangle size={15} /><span><strong>Ranh giới OCR:</strong> ảnh được đọc cục bộ trong trình duyệt và chỉ là <code>CLIENT_OCR_HINT</code>, không phải OCR máy chủ có thẩm quyền.</span></div>{error && <div className="error-callout" role="alert"><ShieldAlert size={17} /><span>{error.message}{error.traceId && <small>Reference: {error.traceId}</small>}</span></div>}
-         <button type="button" className="primary-action trust-submit" disabled={((mode !== "image" && mode !== "qr") && !content.trim()) || ((mode === "image" || mode === "qr") && !file)} onClick={analyze}>{processing ? <LoaderCircle className="animate-spin" size={17} /> : <ScanSearch size={17} />}{processing ? "Chạy lại với dữ liệu mới" : "Phân tích rủi ro"}<ArrowRight size={16} /></button>
+    {composerCollapsed && (processing || hasResult) ? (
+      <div className="intelligence-panel compact-active-banner col-span-full mb-6 p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-3">
+          <span className={`w-3 h-3 rounded-full flex-shrink-0 ${processing ? "bg-amber-400 animate-pulse" : "bg-emerald-400"}`} />
+          <div>
+            <p className="text-xs font-mono uppercase tracking-wider text-slate-400">
+              {processing ? "Đang phân tích" : "Phân tích hoàn tất"} · {analyzedSummary?.type || mode.toUpperCase()}
+            </p>
+            <p className="text-sm font-medium text-slate-200 line-clamp-1">
+              {analyzedSummary?.label || "Nội dung đã gửi"}
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 transition-all flex items-center gap-2"
+          onClick={startNewAnalysis}
+        >
+          <ScanSearch size={14} />
+          Kiểm tra nội dung khác
+        </button>
       </div>
-      <aside className="intelligence-panel pipeline-panel"><div className="panel-heading"><div><p className="product-kicker">Live pipeline</p><h2 className="product-section-title">Dấu vết xử lý</h2></div><span className={`live-indicator ${processing ? "is-live" : ""}`}>{processing ? "RUNNING" : hasResult ? "COMPLETE" : "READY"}</span></div><ol className="pipeline-list">{pipeline.map((step, index) => <li key={step.id} data-status={step.status}><span className="pipeline-index">{step.status === "done" ? <Check size={14} /> : index + 1}</span><div><strong>{step.label}</strong><small>{step.detail || (step.status === "waiting" ? "Chờ bước trước" : readable(step.status))}</small></div></li>)}</ol>{ocr && <><div className="ocr-readout"><div><FileImage size={15} /><span>OCR trong trình duyệt</span><strong>{ocr.authority}</strong></div><p>{String(ocr.text || ocr.qrContent || "").slice(0, 180)}{String(ocr.text || ocr.qrContent || "").length > 180 ? "..." : ""}</p></div><div className="entity-inspector" aria-label="Các thực thể trích xuất"><div className="panel-heading"><span className="data-label">Entity inspector</span><span className="metadata-chip">HINT · không thẩm quyền</span></div><p className="entity-disclosure">Chọn thực thể để gửi kèm như một gợi ý có xác nhận. Việc chọn không biến OCR cục bộ thành bằng chứng.</p>{Object.entries(ocr.entities || {}).filter(([, values]) => Array.isArray(values) && values.length).map(([type, values]) => <div className="entity-row" key={type}><strong>{type.replaceAll(/([A-Z])/g, " $1")}</strong><div className="entity-values">{values.map((value) => <label key={value}><input type="checkbox" checked={confirmedEntities.includes(value)} onChange={() => setConfirmedEntities((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value].slice(0, 50))} /><span>{value}</span></label>)}</div></div>)}</div></>}</aside>
-    </section>
+    ) : (
+      <section className="trust-input-grid" aria-labelledby="trust-input-title">
+        <div className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">01 · Input</p><h2 id="trust-input-title" className="product-section-title">Bạn muốn kiểm tra gì?</h2></div>{(file || content) && <button className="text-link" onClick={reset}>Làm mới</button>}</div>
+           {demoEnabled && <div className="demo-mode-panel" role="group" aria-label="Ba case trình diễn"><div><span className="signal-badge">CHẾ ĐỘ TRÌNH DIỄN</span><p>Dữ liệu xác định, chỉ dùng khi người vận hành chủ động chọn case.</p></div><div className="flex flex-wrap gap-2">{COMPETITION_DEMO_CASES.map((item) => <button type="button" key={item.id} className={`filter-chip ${demoCaseId === item.id ? "is-active" : ""}`} aria-pressed={demoCaseId === item.id} onClick={() => { setDemoCaseId(item.id); setMode("text"); contentRef.current = item.input; setContent(item.input); setFile(null); setConfirmedEntities([]); if (preview) URL.revokeObjectURL(preview); setPreview(null); }}>{item.label}</button>)}</div></div>}
+           <div className="mode-switch" role="tablist" aria-label="Loại đầu vào"><button role="tab" aria-selected={mode === "image"} onClick={() => selectTrustMode("image")}><ImageIcon size={15} /> Ảnh chụp</button><button role="tab" aria-selected={mode === "qr"} onClick={() => selectTrustMode("qr")}><ScanSearch size={15} /> QR</button><button role="tab" aria-selected={mode === "text"} onClick={() => selectTrustMode("text")}><ClipboardPaste size={15} /> Văn bản</button><button role="tab" aria-selected={mode === "url"} onClick={() => selectTrustMode("url")}><Globe2 size={15} /> URL</button></div>
+           {mode === "image" || mode === "qr" ? <div className={`upload-zone ${dragging ? "is-dragging" : ""} ${preview ? "has-preview" : ""}`} onDragEnter={(event) => { event.preventDefault(); setDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); setDemoCaseId(null); acceptFile(event.dataTransfer.files[0]); }}>{preview ? <><div className="ocr-preview-wrap"><Image src={preview} alt={mode === "qr" ? "Ảnh mã QR sẽ được phân tích" : "Ảnh sẽ được phân tích"} width={1200} height={800} unoptimized />{ocr?.regions?.map((region) => <span key={region.id} className="ocr-region" style={{ left: `${region.x}%`, top: `${region.y}%`, width: `${region.width}%`, height: `${region.height}%` }} aria-label={`${region.label} overlay`} />)}</div><button type="button" className="remove-upload" onClick={() => { if (preview) URL.revokeObjectURL(preview); setFile(null); setPreview(null); setOcr(null); }} aria-label="Xóa ảnh"><X size={16} /></button></> : <button type="button" className="upload-prompt" onClick={() => fileInput.current?.click()}><span>{mode === "qr" ? <ScanSearch size={22} /> : <Upload size={22} />}</span><strong>{mode === "qr" ? "Thả hoặc chọn ảnh mã QR" : "Thả hoặc chọn ảnh chụp"}</strong><small>PNG, JPG, WEBP · tối đa 8 MB · có thể dán từ clipboard</small></button>}<input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" aria-label={mode === "qr" ? "Chọn ảnh mã QR cần phân tích" : "Chọn ảnh chụp cần phân tích"} className="sr-only" onChange={(event) => { setDemoCaseId(null); acceptFile(event.target.files?.[0]); }} /></div> : <label className="trust-text-field"><span>{mode === "url" ? "Đường dẫn cần kiểm tra" : "Nội dung tin nhắn hoặc thông báo"}</span><textarea value={content} onChange={(event) => { setDemoCaseId(null); contentRef.current = event.target.value; setContent(event.target.value); }} rows={7} placeholder={mode === "url" ? "https://..." : "Dán nội dung khả nghi tại đây..."} /></label>}
+          <div className="truth-note"><AlertTriangle size={15} /><span><strong>Ranh giới OCR:</strong> ảnh được đọc cục bộ trong trình duyệt và chỉ là <code>CLIENT_OCR_HINT</code>, không phải OCR máy chủ có thẩm quyền.</span></div>{error && <div className="error-callout" role="alert"><ShieldAlert size={17} /><span>{error.message}{error.traceId && <small>Reference: {error.traceId}</small>}</span></div>}
+           <button type="button" className="primary-action trust-submit" disabled={((mode !== "image" && mode !== "qr") && !content.trim()) || ((mode === "image" || mode === "qr") && !file)} onClick={analyze}>{processing ? <LoaderCircle className="animate-spin" size={17} /> : <ScanSearch size={17} />}{processing || hasResult ? "Chạy lại với dữ liệu mới" : "Phân tích rủi ro"}<ArrowRight size={16} /></button>
+        </div>
+        <aside className="intelligence-panel pipeline-panel"><div className="panel-heading"><div><p className="product-kicker">Live pipeline</p><h2 className="product-section-title">Dấu vết xử lý</h2></div><span className={`live-indicator ${processing ? "is-live" : ""}`}>{processing ? "RUNNING" : hasResult ? "COMPLETE" : "READY"}</span></div><ol className="pipeline-list">{pipeline.map((step, index) => <li key={step.id} data-status={step.status}><span className="pipeline-index">{step.status === "done" ? <Check size={14} /> : index + 1}</span><div><strong>{step.label}</strong><small>{step.detail || (step.status === "waiting" ? "Chờ bước trước" : readable(step.status))}</small></div></li>)}</ol>{ocr && <><div className="ocr-readout"><div><FileImage size={15} /><span>OCR trong trình duyệt</span><strong>{ocr.authority}</strong></div><p>{String(ocr.text || ocr.qrContent || "").slice(0, 180)}{String(ocr.text || ocr.qrContent || "").length > 180 ? "..." : ""}</p></div><div className="entity-inspector" aria-label="Các thực thể trích xuất"><div className="panel-heading"><span className="data-label">Entity inspector</span><span className="metadata-chip">HINT · không thẩm quyền</span></div><p className="entity-disclosure">Chọn thực thể để gửi kèm như một gợi ý có xác nhận. Việc chọn không biến OCR cục bộ thành bằng chứng.</p>{Object.entries(ocr.entities || {}).filter(([, values]) => Array.isArray(values) && values.length).map(([type, values]) => <div className="entity-row" key={type}><strong>{type.replaceAll(/([A-Z])/g, " $1")}</strong><div className="entity-values">{values.map((value) => <label key={value}><input type="checkbox" checked={confirmedEntities.includes(value)} onChange={() => setConfirmedEntities((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value].slice(0, 50))} /><span>{value}</span></label>)}</div></div>)}</div></>}</aside>
+      </section>
+    )}
     {providerResult && providerResult.state !== "SUCCESS" && <StateBoundary envelope={providerResult} onAction={handleTrustStateAction} />}
     <TrustPipelineTimeline pipeline={v5Pipeline} processing={processing} />
     {hasResult && <div className="result-stack">
-      <section className="verdict-panel" aria-labelledby="verdict-title"><div className="verdict-main"><div className="flex items-center justify-between gap-3"><p className="product-kicker">02 · Verdict</p><button type="button" className="text-link print-trigger" onClick={() => window.print()}><Printer size={14} /> In báo cáo</button></div><div className="verdict-icon"><ShieldAlert size={24} /></div><h2 id="verdict-title">{verdict}</h2><p>{layers.layer4?.userExplanation?.recommendedActionNote || canonicalResult?.recommendedAction || "Đọc các lý do và bằng chứng trước khi thực hiện hành động tiếp theo."}</p></div></section>
+      <section className="verdict-panel" aria-labelledby="verdict-title"><div className="verdict-main"><div className="flex items-center justify-between gap-3 flex-wrap"><p className="product-kicker">02 · Verdict</p><div className="flex items-center gap-3"><button type="button" className="text-link" onClick={startNewAnalysis}><ScanSearch size={14} /> Kiểm tra nội dung khác</button><button type="button" className="text-link print-trigger" onClick={() => window.print()}><Printer size={14} /> In báo cáo</button></div></div><div className="verdict-icon"><ShieldAlert size={24} /></div><h2 id="verdict-title">{verdict}</h2><p>{layers.layer4?.userExplanation?.recommendedActionNote || canonicalResult?.recommendedAction || "Đọc các lý do và bằng chứng trước khi thực hiện hành động tiếp theo."}</p></div></section>
       <section className="intelligence-panel safety-actions" aria-labelledby="safety-actions-title"><div className="panel-heading"><div><p className="product-kicker">Hành động an toàn · Quy tắc xác định</p><h2 id="safety-actions-title" className="product-section-title">Bạn nên làm gì?</h2></div><ShieldCheck size={18} /></div><ol className="reason-list">{safetyActions.map((action, index) => <li key={action}><span>{index + 1}</span><p>{action}</p></li>)}</ol><p className="product-copy mt-3">Khuyến nghị này được chọn theo loại tín hiệu, không phải nội dung sinh ngẫu nhiên.</p></section>
       <section className="result-grid"><div className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">03 · Level 1 · Top reasons</p><h2 className="product-section-title">Vì sao có phán quyết này?</h2></div><span className="signal-badge">{reasons.length} tín hiệu</span></div>{reasons.length ? <ol className="reason-list">{reasons.map((reason, index) => <li key={reason}><span>{String(index + 1).padStart(2, "0")}</span><p>{reason}</p></li>)}</ol> : <div className="empty-state">Pipeline chưa trả về diễn giải đủ để hiển thị. StudentHub không tự tạo lý do thay thế.</div>}</div><div className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">Level 1 · Unknowns</p><h2 className="product-section-title">Điều còn chưa biết</h2></div><span className="signal-badge">{unresolvedSignals.length}</span></div>{unresolvedSignals.length ? <ul className="report-unknown-list">{unresolvedSignals.map((signal) => <li key={signal}>{signal}</li>)}</ul> : <div className="empty-state">Phản hồi không công bố unresolved signal nào; điều này không chứng minh an toàn.</div>}</div></section>
       <section className="intelligence-panel report-metrics" aria-labelledby="report-metrics-title"><div className="panel-heading"><div><p className="product-kicker">Level 1 · Independent measures</p><h2 id="report-metrics-title" className="product-section-title">Đọc các chỉ số riêng biệt</h2></div><span className="metadata-chip">Không có điểm an toàn tổng hợp</span></div><dl className="verdict-metrics"><div><dt>Rủi ro</dt><dd data-risk={risk}>{risk}</dd><dd className="metric-note">Mức tác hại tiềm năng</dd></div><div><dt>Độ chắc quyết định</dt><dd>{confidenceLevel(layers.layer4, canonicalResult?.metrics?.confidence)}</dd><dd className="metric-note">Không phải bằng chứng an toàn</dd></div><div><dt>Bằng chứng</dt><dd>{evidenceLevel(layers.layer3, canonicalResult?.metrics?.evidenceCoverage)}</dd><dd className="metric-note">Mức đủ của nguồn</dd></div><div><dt>Source agreement</dt><dd>{readable(layers.layer3?.sourceAgreement || layers.layer3?.status || canonicalResult?.metrics?.sourceAgreement, "CHƯA CÓ")}</dd><dd className="metric-note">Mức đồng thuận nguồn</dd></div></dl></section>

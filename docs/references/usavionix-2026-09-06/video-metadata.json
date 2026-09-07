@@ -1,0 +1,32 @@
+{
+  "source": "C:\\Users\\Duy\\AppData\\Local\\Packages\\Microsoft.ScreenSketch_8wekyb3d8bbwe\\TempState\\Recordings\\20260906-0256-57.1295221.mp4",
+  "bytes": 6795519,
+  "sha256": "09fa2c0b837a3b3d032fef65661ffb5835f96ec94f889440ff00497364b28f51",
+  "fps": 30.0,
+  "frame_count": 461,
+  "duration_seconds": 15.366666666666667,
+  "width": 1024,
+  "height": 752,
+  "sample_timestamps_seconds": [
+    0.0,
+    0.8,
+    1.61,
+    2.41,
+    3.21,
+    4.02,
+    4.82,
+    5.62,
+    6.43,
+    7.23,
+    8.04,
+    8.84,
+    9.64,
+    10.45,
+    11.25,
+    12.05,
+    12.86,
+    13.66,
+    14.46,
+    15.27
+  ]
+}

@@ -7,7 +7,12 @@ import { SecurityError } from "@/lib/security/core/SecurityErrorEnvelope.js";
 
 function cookieValue(header, name) {
   const match = header.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`));
-  return match ? decodeURIComponent(match[1]) : "";
+  if (!match) return "";
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return "";
+  }
 }
 
 export async function POST(request) {
@@ -17,9 +22,15 @@ export async function POST(request) {
     if (!origin || origin !== new URL(request.url).origin) {
       throw new SecurityError({ code: "CSRF_ORIGIN_REJECTED", message: "Cross-origin logout rejected.", statusCode: 403 });
     }
-    const sessions = getDurableSessionService();
     const secret = cookieValue(request.headers.get("cookie") || "", SESSION_COOKIE_NAME);
-    if (secret) await sessions.revokeSession(secret, "LOGOUT");
+    if (!secret) {
+      const response = NextResponse.json({ success: true });
+      response.headers.set("set-cookie", clearSessionCookie());
+      response.headers.set("cache-control", "no-store");
+      return response;
+    }
+    const sessions = getDurableSessionService();
+    await sessions.revokeSession(secret, "LOGOUT");
     const response = NextResponse.json({ success: true });
     response.headers.set("set-cookie", sessions.clearCookie());
     response.headers.set("cache-control", "no-store");

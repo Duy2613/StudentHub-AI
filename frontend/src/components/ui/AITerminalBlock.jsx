@@ -3,7 +3,7 @@
  *
  * Dùng cho tất cả kết quả AI output, OCR data, security scanner results.
  * Font: JetBrains Mono (--font-machine)
- * Contrast với body text dùng Inter (--font-human)
+ * Contrast với body text dùng Be Vietnam Pro (--font-human)
  *
  * @example
  * <AITerminalBlock

@@ -14,6 +14,7 @@ import { SessionManager } from "./SessionManager.js";
 import { getDurableSessionService } from "./DurableSessionService.js";
 import { StudentIdentityStore } from "../../intelligence/academic/studentIdentityStore.js";
 import { SecurityError } from "../core/SecurityErrorEnvelope.js";
+import { normalizeSubjectId } from "./normalizeSubjectId.js";
 
 const tokenValidator = new TokenValidator();
 
@@ -133,7 +134,7 @@ export class IdentityResolver {
     }
 
     return new SecurityPrincipal({
-      subjectId: sub,
+      subjectId: normalizeSubjectId(sub),
       principalType,
       email,
       roles,
@@ -175,7 +176,11 @@ export class IdentityResolver {
 
   static async resolveFromDurableSession(sessionSecret) {
     const session = await getDurableSessionService().validateSession(sessionSecret);
-    const roles = Array.isArray(session.roles) && session.roles.length ? session.roles : ["STUDENT"];
+    const roles = Array.isArray(session.roles) && session.roles.length
+      ? [...new Set(session.roles.map((role) => String(role).trim().toUpperCase()).filter(Boolean))]
+      : ["STUDENT"];
+    const subjectId = normalizeSubjectId(session.user_id || session.userId);
+    if (!subjectId) throw SecurityError.unauthorized("Session subject is invalid.");
     let principalType = PRINCIPAL_TYPE.STUDENT;
     if (roles.includes("ADMIN")) principalType = PRINCIPAL_TYPE.ADMIN;
     else if (roles.includes("MODERATOR")) principalType = PRINCIPAL_TYPE.MODERATOR;
@@ -183,14 +188,20 @@ export class IdentityResolver {
     else if (roles.includes("SERVICE")) principalType = PRINCIPAL_TYPE.SYSTEM;
 
     return new SecurityPrincipal({
-      subjectId: String(session.user_id || session.userId),
+      subjectId,
       principalType,
+      email: session.email || "",
       roles,
       permissions: this.#deriveDefaultPermissions(principalType),
       scopes: ["academic:read", "academic:plan", "community:read", "trust:read"],
       sessionId: "opaque-cookie",
       assuranceLevel: AUTH_ASSURANCE_LEVEL.AAL1_NORMAL,
-      attributes: { authProvider: "supabase" }
+      attributes: {
+        authProvider: session.auth_provider || "supabase",
+        emailVerified: session.email_verified === true,
+        fullName: session.full_name || null,
+        onboarded: session.onboarded === true,
+      }
     });
   }
 

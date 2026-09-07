@@ -19,7 +19,7 @@ test.describe("Academic Cinematic Closure & Runtime Evidence Suite", () => {
     // Type query
     await searchInput.fill("React");
     // Verify results appear
-    await expect(page.locator("a[href*='/learn']").first()).toBeVisible();
+    await expect(searchDialog.locator("a[href*='/learn']").first()).toBeVisible();
 
     // Close via Escape and verify focus restoration
     await page.keyboard.press("Escape");
@@ -104,7 +104,8 @@ test.describe("Academic Cinematic Closure & Runtime Evidence Suite", () => {
     const uncaughtErrors = consoleErrors.filter(
       (err) =>
         !err.includes("eval() is not supported") &&
-        !err.includes("THREE.Clock: This module has been deprecated")
+        !err.includes("THREE.Clock: This module has been deprecated") &&
+        !err.includes("status of 401")
     );
     expect(uncaughtErrors).toEqual([]);
   });

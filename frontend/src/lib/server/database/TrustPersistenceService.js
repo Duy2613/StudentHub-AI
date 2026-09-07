@@ -11,15 +11,44 @@ import { DurableTrustRepository } from "./DurableTrustRepository.js";
 import { TrustPersistenceMapper } from "../../ai-trust/v5/TrustPersistenceMapper.js";
 import { TrustCasePassportBinder } from "../../intelligence/passport/TrustCasePassportBinder.js";
 import { getPostgresPool } from "./PostgresPool.js";
+import { computeTrustInputHash } from "./TrustInputHash.js";
+import { buildTrustDecisionEvent, getLabbeConfig } from "../integrations/LabbeBridge.js";
+import { LabbeOutboxService } from "../integrations/LabbeOutboxService.js";
+import { publishRealtimeEvent } from "../realtime/RealtimePublisher.js";
 
 function resolveOwnerId(principal) {
   if (!principal) return null;
   const rawId = principal.id || principal.subjectId || principal.userId || null;
   if (!rawId || typeof rawId !== "string") return null;
+  const cleaned = rawId.replace(/^(student|expert|user):/, "").trim();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cleaned)
+    ? cleaned
+    : null;
+}
 
-  const uuidRegex = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
-  const match = rawId.match(uuidRegex);
-  return match ? match[0] : null;
+function normalizeIdempotencyKey(value) {
+  if (value === null || value === undefined || value === "") return null;
+  if (typeof value !== "string" || !/^[A-Za-z0-9._:-]{1,160}$/.test(value.trim())) {
+    const error = new Error("TRUST_IDEMPOTENCY_KEY_INVALID: idempotency key is outside the allowed format.");
+    error.code = "TRUST_IDEMPOTENCY_KEY_INVALID";
+    error.statusCode = 400;
+    throw error;
+  }
+  return value.trim();
+}
+
+function sameDigest(left, right) {
+  if (!left || !right) return false;
+  const toBuffer = (value) => {
+    if (Buffer.isBuffer(value)) return value;
+    if (value instanceof Uint8Array) return Buffer.from(value);
+    if (typeof value === "string" && /^\\x[0-9a-f]+$/i.test(value)) return Buffer.from(value.slice(2), "hex");
+    if (typeof value === "string" && /^[0-9a-f]{64}$/i.test(value)) return Buffer.from(value, "hex");
+    return null;
+  };
+  const a = toBuffer(left);
+  const b = toBuffer(right);
+  return Boolean(a && b && a.length === b.length && crypto.timingSafeEqual(a, b));
 }
 
 export class TrustPersistenceService {
@@ -39,6 +68,8 @@ export class TrustPersistenceService {
     input,
     principal,
     requestId,
+    idempotencyKey = null,
+    labbeEnv = process.env,
   }) {
     const ownerId = resolveOwnerId(principal);
     if (!ownerId) {
@@ -46,14 +77,14 @@ export class TrustPersistenceService {
       return { caseId: null, persisted: false };
     }
 
+    const normalizedIdempotencyKey = normalizeIdempotencyKey(idempotencyKey);
+
     try {
       // 1. Idempotency Check: if identical content hash exists recently, check if retry
-      const contentHash = crypto.createHash("sha256")
-        .update(String(input.content || "").trim().toLowerCase())
-        .digest();
+      const contentHash = computeTrustInputHash(input);
 
       const existingCaseId = await DurableTrustRepository.findCaseByInputHash(ownerId, contentHash);
-      if (existingCaseId && input.metadata?.isRetry) {
+      if (existingCaseId && input.metadata?.isRetry && !normalizedIdempotencyKey) {
         return { caseId: existingCaseId, persisted: true, idempotent: true };
       }
 
@@ -63,14 +94,81 @@ export class TrustPersistenceService {
         input,
         principal,
         requestId,
+        idempotencyKey: normalizedIdempotencyKey,
       });
 
       if (!durableDto) {
         return { caseId: null, persisted: false };
       }
 
+      const labbeConfig = getLabbeConfig(labbeEnv);
+      const labbeEvent = ["SHADOW", "STAGING"].includes(labbeConfig.mode)
+        ? buildTrustDecisionEvent({
+            caseId: durableDto.caseRecord.id,
+            caseRevision: 1,
+            runId: durableDto.runRecord.id,
+            pipelineResult,
+            correlationId: requestId,
+            env: labbeEnv,
+          })
+        : null;
+
       // 3. Persist atomically in short transaction
-      const { caseId } = await DurableTrustRepository.persistTrustRecord(durableDto);
+      let caseId;
+      try {
+        ({ caseId } = await DurableTrustRepository.persistTrustRecord({
+          ...durableDto,
+          outboxEvents: labbeEvent ? [{ ...labbeEvent, aggregateType: "TRUST_CASE", aggregateId: durableDto.caseRecord.id }] : [],
+        }));
+      } catch (error) {
+        if (normalizedIdempotencyKey && error?.code === "23505") {
+          const existingRun = await DurableTrustRepository.findRunByIdempotencyKey(ownerId, normalizedIdempotencyKey);
+          if (existingRun) {
+            if (!sameDigest(existingRun.input_fingerprint, durableDto.runRecord.inputFingerprint)) {
+              const conflict = new Error("TRUST_IDEMPOTENCY_CONFLICT: the key is already bound to a different input.");
+              conflict.code = "TRUST_IDEMPOTENCY_CONFLICT";
+              conflict.statusCode = 409;
+              throw conflict;
+            }
+            return { caseId: existingRun.case_id, caseRevision: 1, runId: existingRun.id, persisted: true, idempotent: true, passportId: null, labbeQueued: false };
+          }
+        }
+        throw error;
+      }
+
+      // Delivery is deliberately after COMMIT.  If the process stops here,
+      // the outbox row remains available for a later worker retry.
+      if (labbeEvent) {
+        LabbeOutboxService.dispatchOne({ env: labbeEnv }).catch((outboxError) => {
+          console.error("[TrustPersistenceService] Labbe outbox dispatch deferred:", outboxError.message);
+        });
+      }
+
+      // Realtime is a projection of the committed Trust revision.  The
+      // durable event log is written only after the case/outbox transaction
+      // returned successfully; a publication outage cannot roll back the
+      // business result and is recoverable by the domain outbox.
+      const decision = pipelineResult?.finalDecision || pipelineResult?.decision || {};
+      void publishRealtimeEvent({
+        channel: "trust",
+        eventType: "trust:revision",
+        subjectId: ownerId,
+        classification: "RESTRICTED",
+        producer: "StudentHub-AI",
+        environment: process.env.NODE_ENV || "development",
+        correlationId: requestId || `trust-${caseId}`,
+        causationId: durableDto.runRecord?.id || caseId,
+        idempotencyKey: `trust:${durableDto.runRecord?.id || caseId}:revision:1`,
+        data: {
+          caseId,
+          caseRevision: 1,
+          runId: durableDto.runRecord?.id || null,
+          status: durableDto.runRecord?.status || "COMPLETED",
+          security: String(decision.security || "UNKNOWN").slice(0, 80),
+          truth: String(decision.truth || "UNKNOWN").slice(0, 80),
+          action: String(decision.action || "UNKNOWN").slice(0, 80),
+        },
+      }).catch(() => {});
 
       // 4. Bind to Living Evidence Passport
       let passportId = null;
@@ -86,9 +184,11 @@ export class TrustPersistenceService {
         console.error("[TrustPersistenceService] Passport binding non-fatal error:", passportErr.message);
       }
 
-      return { caseId, persisted: true, passportId };
+      return { caseId, caseRevision: 1, runId: durableDto.runRecord.id, persisted: true, passportId, labbeQueued: Boolean(labbeEvent) };
     } catch (err) {
-      console.error("[TrustPersistenceService] Persistence failure:", err.message);
+      if (err?.code !== "TRUST_IDEMPOTENCY_CONFLICT") {
+        console.error("[TrustPersistenceService] Persistence failure:", err.message);
+      }
       throw err;
     }
   }
@@ -98,7 +198,6 @@ export class TrustPersistenceService {
    */
   static async recordTrustFailure({
     error,
-    input,
     principal,
     requestId,
   }) {
@@ -107,24 +206,31 @@ export class TrustPersistenceService {
 
     const pool = getPostgresPool();
     const caseId = crypto.randomUUID();
+    let client = null;
 
     try {
-      await pool.query(
+      client = await pool.connect();
+      await client.query("BEGIN");
+      await client.query(
         `INSERT INTO public.trust_cases (id, owner_id, state, visibility, created_at, updated_at)
          VALUES ($1, $2, 'FAILED', 'PRIVATE', now(), now())`,
         [caseId, ownerId]
       );
 
-      await pool.query(
+      await client.query(
         `INSERT INTO private.audit_events (event_type, actor_id, target_type, target_id, request_id, occurred_at, metadata)
          VALUES ('TRUST_CASE_FAILED', $1, 'TRUST_CASE', $2, $3, now(), $4)`,
-        [ownerId, caseId, requestId || null, JSON.stringify({ error: error?.message || "UNKNOWN_ERROR" })]
+        [ownerId, caseId, requestId || null, JSON.stringify({ error: String(error?.message || "UNKNOWN_ERROR").slice(0, 500) })]
       );
+      await client.query("COMMIT");
 
       return { caseId, persisted: true };
     } catch (err) {
+      await client.query("ROLLBACK").catch(() => {});
       console.error("[TrustPersistenceService] Failure logging error:", err.message);
       return { persisted: false };
+    } finally {
+      client?.release();
     }
   }
 

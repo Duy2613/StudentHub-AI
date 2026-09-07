@@ -1,6 +1,6 @@
 # Authentication Dependency Map
 
-Updated: 2026-08-27
+Updated: 2026-09-06
 
 ## Target flow
 
@@ -19,7 +19,7 @@ Supabase Auth access proof (transient)
 | Caller | Current authority path | Migration state |
 | --- | --- | --- |
 | `src/lib/supabase/client.js` | Supabase provider session held in page memory only; application auth is server-cookie based | Browser Web Storage credential persistence removed; live refresh/E2E proof remains external |
-| `src/lib/auth/authService.js` | Transient Supabase proof -> same-origin session exchange; ASP.NET bearer retained only for compatibility sync/me | Canonical login uses the server-owned session boundary; legacy compatibility is not an authority |
+| `src/lib/auth/authService.js` | Transient Supabase proof -> same-origin session exchange; legacy login/register/sync/me exports fail closed or read the application session only | Canonical login uses the server-owned session boundary; legacy compatibility is not an authority |
 | `src/lib/auth/AuthContext.jsx` | Restores durable cookie session first, then exchanges a current provider proof | UI auth state is established only after application-session success |
 | `src/app/callback/page.jsx` | Reads transient OAuth proof, syncs, then exchanges it for an opaque cookie | No durable browser bearer storage; exchange failure routes to signed-out state |
 | `src/app/login/page.jsx` | Password/OAuth plus visible demo identities | Demo remains non-production only; canonical password flow uses Supabase then exchange |
@@ -35,4 +35,4 @@ Harmless Web Storage callers such as audio mute and sidebar preferences are outs
 
 ## Removal gate
 
-Browser bearer persistence has been removed locally. A dedicated environment must still prove login/exchange, refresh or re-auth, cookie-authenticated protected access, logout, restart durability, and regression coverage before claiming the migration operationally complete. The remaining ASP.NET bearer calls are compatibility-only sync/me calls and do not establish browser UI authority.
+Browser bearer persistence has been removed locally. A dedicated environment must still prove login/exchange, refresh or re-auth, cookie-authenticated protected access, logout, restart durability, and regression coverage before claiming the migration operationally complete. Legacy ASP.NET auth exports remain only as fail-closed compatibility symbols and do not establish browser UI authority.

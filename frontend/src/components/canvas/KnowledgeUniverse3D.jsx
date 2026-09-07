@@ -2,37 +2,11 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { KNOWLEDGE_DOMAINS, KNOWLEDGE_RELATIONS } from "./knowledgeUniverseData";
 
-/**
- * Domain nodes representing connected knowledge areas
- */
-export const KNOWLEDGE_DOMAINS = [
-  { id: "frontend", label: "Frontend", x: -2.2, y: 1.4, z: 0.2, color: "#65D8FF", domain: "Application" },
-  { id: "backend", label: "Backend", x: 0.0, y: 1.8, z: -0.4, color: "#756BFF", domain: "Application" },
-  { id: "database", label: "Database", x: 1.8, y: 1.2, z: 0.5, color: "#45D69A", domain: "Data & Storage" },
-  { id: "security", label: "Security", x: 2.2, y: -0.5, z: -0.2, color: "#FF6377", domain: "Reliability" },
-  { id: "ai", label: "AI Systems", x: -1.6, y: -0.8, z: 0.6, color: "#A78BFA", domain: "Intelligence" },
-  { id: "system-design", label: "System Design", x: 0.5, y: -1.6, z: -0.5, color: "#FFB66D", domain: "Architecture" },
-  { id: "cloud", label: "Cloud", x: 1.6, y: -1.8, z: 0.3, color: "#38BDF8", domain: "Platform" },
-  { id: "devops", label: "DevOps", x: -0.8, y: -1.9, z: 0.4, color: "#FFCC66", domain: "Reliability" },
-  { id: "embedded", label: "Embedded", x: -2.6, y: 0.2, z: -0.6, color: "#34E7C4", domain: "Hardware" },
-];
-
-/**
- * Domain edges showing prerequisite and architectural relationships
- */
-export const KNOWLEDGE_RELATIONS = [
-  ["frontend", "backend"],
-  ["backend", "database"],
-  ["backend", "security"],
-  ["database", "system-design"],
-  ["backend", "ai"],
-  ["backend", "cloud"],
-  ["cloud", "devops"],
-  ["security", "system-design"],
-  ["embedded", "backend"],
-  ["frontend", "ai"],
-];
+// Preserve the existing import surface for callers that only need the graph
+// ontology. The data module remains free of the WebGL dependency.
+export { KNOWLEDGE_DOMAINS, KNOWLEDGE_RELATIONS } from "./knowledgeUniverseData";
 
 /**
  * Device Quality Tier evaluation
@@ -56,12 +30,13 @@ export default function KnowledgeUniverse3D({
 }) {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
-  const [qualityTier, setQualityTier] = useState("medium");
+  const activeNodeIdRef = useRef(activeNodeId);
+  const [qualityTier] = useState(getDeviceQualityTier);
   const [webglSupported, setWebglSupported] = useState(true);
 
   useEffect(() => {
-    setQualityTier(getDeviceQualityTier());
-  }, []);
+    activeNodeIdRef.current = activeNodeId;
+  }, [activeNodeId]);
 
   useEffect(() => {
     // If reduced-motion or low-tier or WebGL unsupported, use crisp SVG fallback
@@ -82,7 +57,7 @@ export default function KnowledgeUniverse3D({
         powerPreference: "high-performance",
       });
     } catch {
-      setWebglSupported(false);
+      queueMicrotask(() => setWebglSupported(false));
       return undefined;
     }
 
@@ -164,7 +139,7 @@ export default function KnowledgeUniverse3D({
     const sphereGeo = new THREE.SphereGeometry(0.12, 16, 16);
 
     KNOWLEDGE_DOMAINS.forEach((domain) => {
-      const isSelected = domain.id === activeNodeId;
+      const isSelected = domain.id === activeNodeIdRef.current;
       const mat = new THREE.MeshBasicMaterial({
         color: new THREE.Color(domain.color),
         transparent: true,
@@ -215,13 +190,22 @@ export default function KnowledgeUniverse3D({
     };
     window.addEventListener("resize", handleResize);
 
-    let clock = new THREE.Clock();
+    const timer = new THREE.Timer();
+    timer.connect(document);
 
-    const renderLoop = () => {
+    const renderLoop = (time) => {
       animId = requestAnimationFrame(renderLoop);
       if (!isVisible) return;
 
-      const elapsed = clock.getElapsedTime();
+      timer.update(time);
+      const elapsed = timer.getElapsed();
+
+      // Selecting a node only updates material opacity; it must not tear down
+      // and recreate the renderer, listeners, and GPU resources.
+      const selectedId = activeNodeIdRef.current;
+      nodeMeshes.forEach(({ domain, mat }) => {
+        mat.opacity = domain.id === selectedId ? 1.0 : 0.85;
+      });
 
       // Smooth camera orientation lerp
       mouseX += (targetX - mouseX) * 0.05;
@@ -254,8 +238,9 @@ export default function KnowledgeUniverse3D({
       sphereGeo.dispose();
       nodeMeshes.forEach(({ mat }) => mat.dispose());
       renderer.dispose();
+      timer.dispose();
     };
-  }, [qualityTier, activeNodeId]);
+  }, [qualityTier]);
 
   return (
     <div
@@ -271,10 +256,10 @@ export default function KnowledgeUniverse3D({
         <div className="absolute w-60 h-60 lg:w-80 lg:h-80 rounded-full bg-cyan-500/10 blur-2xl pointer-events-none" />
 
         <svg
-          className="w-full h-full max-w-[580px] max-h-[520px] p-6"
+          className="pointer-events-auto w-full h-full max-w-[580px] max-h-[520px] p-6"
           viewBox="-3 -2.5 6 5"
           preserveAspectRatio="xMidYMid meet"
-          aria-hidden="true"
+          aria-label="Sơ đồ quan hệ các lĩnh vực tri thức"
         >
           {/* Relational edges */}
           {KNOWLEDGE_RELATIONS.map(([fromId, toId], idx) => {
@@ -303,8 +288,17 @@ export default function KnowledgeUniverse3D({
             return (
               <g
                 key={domain.id}
-                className="pointer-events-none group"
+                role="button"
+                tabIndex={0}
+                aria-label={`${domain.label} (${domain.domain})`}
+                className="pointer-events-auto cursor-pointer outline-none group"
                 onClick={() => onSelectNode(domain.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelectNode(domain.id);
+                  }
+                }}
               >
                 {/* Node halo */}
                 <circle

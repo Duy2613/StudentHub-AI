@@ -1,6 +1,11 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import { markAssurance, measureAssurance } from "@/lib/performance/assurance";
+
+// Module evaluation is the first client-side signal available for the root
+// app bundle. The effect below records the completed hydration boundary.
+markAssurance("app-hydration-start");
 
 export default function KnowledgeCursor() {
   const [isHovered, setIsHovered] = useState(false);
@@ -10,6 +15,9 @@ export default function KnowledgeCursor() {
   const glowRef = useRef(null);
 
   useEffect(() => {
+    markAssurance("app-hydration-ready");
+    measureAssurance("app-hydration-duration", "app-hydration-start", "app-hydration-ready");
+
     // Only enable on desktop with fine pointer
     if (
       typeof window === "undefined" ||

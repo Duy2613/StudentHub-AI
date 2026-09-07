@@ -5,32 +5,17 @@ import Link from "next/link";
 import {
   ArrowRight,
   Compass,
-  FileCheck2,
-  Layers,
-  ShieldCheck,
-  Sparkles,
+  ScanSearch,
 } from "lucide-react";
-import dynamic from "next/dynamic";
-import { KNOWLEDGE_DOMAINS } from "../canvas/KnowledgeUniverse3D";
-
-const KnowledgeUniverse3D = dynamic(
-  () => import("../canvas/KnowledgeUniverse3D"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-full flex items-center justify-center bg-surface-primary/20" aria-hidden="true">
-        <div className="w-8 h-8 rounded-full border-2 border-accent-primary/30 border-t-accent-primary animate-spin" />
-      </div>
-    ),
-  }
-);
+import ProgressiveKnowledgeUniverse from "../canvas/ProgressiveKnowledgeUniverse";
+import { KNOWLEDGE_DOMAINS } from "../canvas/knowledgeUniverseData";
 
 export default function AcademicHeroSection() {
   const [activeNode, setActiveNode] = useState("backend");
 
   return (
     <section
-      className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden border-b border-border-subtle bg-bg-primary"
+      className="relative min-h-[calc(100dvh-4rem)] flex items-center justify-center overflow-hidden border-b border-border-subtle bg-bg-primary"
       aria-labelledby="hero-title"
     >
       {/* Background ambient gradient aura */}
@@ -43,7 +28,7 @@ export default function AcademicHeroSection() {
           {/* Canonical Eyebrow Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider bg-surface-primary border border-border-strong text-accent-knowledge w-fit">
             <span className="w-2 h-2 rounded-full bg-accent-primary animate-pulse" />
-            <span>Academic Operating System</span>
+            <span>Trust-first learning system</span>
           </div>
 
           {/* Canonical Hero Headline */}
@@ -51,50 +36,52 @@ export default function AcademicHeroSection() {
             id="hero-title"
             className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-text-primary leading-[1.08]"
           >
-            LEARN BEYOND <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-accent-knowledge">
-              THE CLASSROOM.
-            </span>
+            HIỂU ĐÚNG. <br />
+            <span className="text-accent-knowledge">ĐI XA.</span>
           </h1>
 
           {/* Supporting Copy */}
           <p className="text-base sm:text-lg lg:text-xl text-text-secondary leading-relaxed max-w-xl">
-            An intelligent learning environment that turns knowledge, practice, projects and
-            people into one connected journey.
+            Trước khi học, ký, trả tiền hoặc chia sẻ, hãy biết nội dung đang dựa trên nguồn nào,
+            còn thiếu điều gì và bước tiếp theo an toàn là gì.
           </p>
 
           {/* Call to Actions */}
           <div className="flex flex-wrap items-center gap-4 pt-2">
             <Link
-              href="/learn"
+              href="/trust"
               className="px-6 py-3.5 rounded-xl bg-accent-primary hover:bg-accent-primary/90 text-white font-medium text-sm sm:text-base flex items-center gap-2.5 transition-all shadow-lg shadow-accent-primary/25 hover:shadow-accent-primary/40 focus:outline-none focus:ring-2 focus:ring-accent-primary"
             >
-              <span>Start Learning</span>
+              <ScanSearch size={17} aria-hidden="true" />
+              <span>Kiểm tra trước khi tin</span>
               <ArrowRight size={17} />
             </Link>
 
-            <a
-              href="#knowledge-atlas"
+            <Link
+              href="/learn"
               className="px-6 py-3.5 rounded-xl bg-surface-primary hover:bg-surface-elevated text-text-primary border border-border-strong font-medium text-sm sm:text-base flex items-center gap-2.5 transition-all hover:border-accent-knowledge/40 focus:outline-none focus:ring-2 focus:ring-accent-knowledge"
             >
-              <Compass size={17} className="text-accent-knowledge" />
-              <span>Explore the Atlas</span>
-            </a>
+              <Compass size={17} className="text-accent-knowledge" aria-hidden="true" />
+              <span>Khám phá lộ trình học</span>
+            </Link>
           </div>
 
-          {/* Architectural Trust Pillars metadata chips */}
+          {/* Product principles — static meaning, not fabricated live metrics. */}
           <div className="pt-6 border-t border-border-subtle grid grid-cols-3 gap-4 text-left">
             <div>
-              <div className="text-lg sm:text-xl font-mono font-bold text-text-primary">13</div>
-              <div className="text-xs text-text-muted mt-0.5">Full-Stack Layers</div>
+              <div className="text-lg sm:text-xl font-mono font-bold text-text-primary">01</div>
+              <div className="text-xs text-text-muted mt-0.5">Nguồn</div>
+              <p className="mt-1 text-[11px] leading-relaxed text-text-muted">Biết thông tin đến từ đâu.</p>
             </div>
             <div>
-              <div className="text-lg sm:text-xl font-mono font-bold text-accent-knowledge">100%</div>
-              <div className="text-xs text-text-muted mt-0.5">Verified Evidence</div>
+              <div className="text-lg sm:text-xl font-mono font-bold text-accent-knowledge">02</div>
+              <div className="text-xs text-text-muted mt-0.5">Bối cảnh</div>
+              <p className="mt-1 text-[11px] leading-relaxed text-text-muted">Đọc đúng thời điểm và phạm vi.</p>
             </div>
             <div>
-              <div className="text-lg sm:text-xl font-mono font-bold text-status-success">4-Layer</div>
-              <div className="text-xs text-text-muted mt-0.5">Reality Alignment</div>
+              <div className="text-lg sm:text-xl font-mono font-bold text-status-success">03</div>
+              <div className="text-xs text-text-muted mt-0.5">Bước tiếp</div>
+              <p className="mt-1 text-[11px] leading-relaxed text-text-muted">Hành động dựa trên điều đã biết.</p>
             </div>
           </div>
         </div>
@@ -103,7 +90,7 @@ export default function AcademicHeroSection() {
         <div className="lg:col-span-6 xl:col-span-6 relative w-full h-[400px] sm:h-[480px] lg:h-[580px] flex items-center justify-center">
           <div className="w-full h-full rounded-2xl bg-surface-primary/40 border border-border-subtle/50 backdrop-blur-sm overflow-hidden relative shadow-2xl">
             {/* 3D Knowledge Universe with progressive enhancement and fallback */}
-            <KnowledgeUniverse3D
+            <ProgressiveKnowledgeUniverse
               activeNodeId={activeNode}
               onSelectNode={(id) => setActiveNode(id)}
               className="w-full h-full"

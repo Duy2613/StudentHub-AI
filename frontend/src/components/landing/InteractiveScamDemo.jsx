@@ -47,7 +47,7 @@ export default function InteractiveScamDemo() {
     <section className="py-24 relative z-10" id="demo">
       <div className="layout-safe-container space-y-12">
         
-        {/* Section Title with Inter (Human) + Serif */}
+        {/* Section Title with Be Vietnam Pro (Human) + Serif */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2">
             <span className="igloo-pill-badge warn">

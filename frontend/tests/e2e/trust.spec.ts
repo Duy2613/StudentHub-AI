@@ -8,13 +8,13 @@ test.describe("Trust flagship flow", () => {
 
     await expect(page.getByText("Rủi ro", { exact: true })).toBeVisible();
     await expect(page.getByText("Độ chắc quyết định", { exact: true })).toBeVisible();
-    await expect(page.getByText("Bằng chứng", { exact: true })).toBeVisible();
+    await expect(page.getByRole("region", { name: "Đọc các chỉ số riêng biệt" }).getByText("Bằng chứng", { exact: true })).toBeVisible();
     await expect(page.getByText("Source agreement", { exact: true })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Tình trạng nguồn đối soát" })).toBeVisible();
     await expect(page.getByText("Google Safe Browsing")).toBeVisible();
     await expect(page.getByText("VirusTotal")).toBeVisible();
     await expect(page.getByText("Không đủ dữ liệu để kết luận sạch.")).toBeVisible();
-    await expect(page.getByText("Giả mạo phòng đào tạo")).toBeVisible();
+    await expect(page.locator(".related-case-list").getByText("Giả mạo phòng đào tạo", { exact: true })).toBeVisible();
     await expect(page.getByText("91% tương đồng")).toBeVisible();
   });
 

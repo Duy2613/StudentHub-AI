@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { searchCanonicalProduct, STATIC_SEARCH_INDEX } from "@/lib/search/searchProviders";
+import { markAssurance, measureAssurance } from "@/lib/performance/assurance";
 
 const CATEGORY_ICONS = {
   Courses: BookOpen,
@@ -29,14 +30,24 @@ const CATEGORY_ICONS = {
   Navigation: Compass,
 };
 
-export default function AcademicCommandPalette({ isOpen, onClose }) {
+export default function AcademicCommandPalette({ isOpen, onClose, restoreFocusRef = null }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState({});
+  const [asyncResults, setAsyncResults] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
   const dialogRef = useRef(null);
   const previousActiveElement = useRef(null);
+
+  const defaultResults = useMemo(() => ({
+    Navigation: STATIC_SEARCH_INDEX.filter((item) => item.category === "Navigation").slice(0, 3),
+    Courses: STATIC_SEARCH_INDEX.filter((item) => item.category === "Courses").slice(0, 2),
+    Trust: STATIC_SEARCH_INDEX.filter((item) => item.category === "Trust").slice(0, 2),
+  }), []);
+  const results = useMemo(
+    () => (query.trim() ? (asyncResults || {}) : defaultResults),
+    [asyncResults, defaultResults, query],
+  );
 
   // Flattened list for keyboard up/down navigation
   const flatResults = useMemo(() => {
@@ -47,32 +58,38 @@ export default function AcademicCommandPalette({ isOpen, onClose }) {
 
   useEffect(() => {
     if (isOpen) {
-      previousActiveElement.current = document.activeElement;
-      setTimeout(() => inputRef.current?.focus(), 50);
-      setQuery("");
-      setSelectedIndex(0);
+      markAssurance("command-palette-request");
+      // The palette is mounted lazily. On WebKit, the click that opened it can
+      // finish before this effect runs, leaving document.activeElement on the
+      // body. Prefer the trigger ref captured by the owning shell so Escape
+      // always returns focus to the control that opened the dialog.
+      previousActiveElement.current = restoreFocusRef?.current || document.activeElement;
+      const resetTimer = setTimeout(() => {
+        inputRef.current?.focus();
+        setQuery("");
+        setAsyncResults(null);
+        setSelectedIndex(0);
+        markAssurance("command-palette-interactive");
+        measureAssurance("command-palette-open-duration", "command-palette-request", "command-palette-interactive");
+      }, 50);
+      return () => clearTimeout(resetTimer);
     } else if (previousActiveElement.current) {
-      previousActiveElement.current.focus?.({ preventScroll: true });
+      if (previousActiveElement.current.isConnected !== false) {
+        previousActiveElement.current.focus?.({ preventScroll: true });
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, restoreFocusRef]);
 
   // Perform search
   useEffect(() => {
     if (!query.trim()) {
-      // Default grouped suggestions
-      const defaultGroups = {
-        Navigation: STATIC_SEARCH_INDEX.filter((i) => i.category === "Navigation").slice(0, 3),
-        Courses: STATIC_SEARCH_INDEX.filter((i) => i.category === "Courses").slice(0, 2),
-        Trust: STATIC_SEARCH_INDEX.filter((i) => i.category === "Trust").slice(0, 2),
-      };
-      setResults(defaultGroups);
       return;
     }
 
     let active = true;
     searchCanonicalProduct(query).then((res) => {
       if (active) {
-        setResults(res);
+        setAsyncResults(res);
         setSelectedIndex(0);
       }
     });

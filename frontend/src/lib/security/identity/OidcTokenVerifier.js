@@ -1,5 +1,6 @@
 import { createLocalJWKSet, createRemoteJWKSet, jwtVerify } from "jose";
 import { validateRemoteUrlSync } from "../hardening/SafeRemoteUrl.js";
+import { normalizeUuidSubjectId } from "./normalizeSubjectId.js";
 
 export class OidcTokenVerifier {
   constructor({ issuer, audience = "authenticated", jwksUrl, jwks, algorithms = ["ES256", "RS256"] } = {}) {
@@ -30,9 +31,10 @@ export class OidcTokenVerifier {
       algorithms: this.algorithms,
       requiredClaims: ["sub", "exp", "iss", "aud"],
     });
-    if (!payload.sub) throw new Error("OIDC subject is required.");
+    const userId = normalizeUuidSubjectId(payload.sub);
+    if (!userId) throw new Error("OIDC subject must be a UUID.");
     return {
-      userId: payload.sub,
+      userId,
       email: typeof payload.email === "string" ? payload.email : "",
       emailVerified: payload.email_verified === true,
       authProvider: "supabase",

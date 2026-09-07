@@ -1,0 +1,413 @@
+{
+  "schemaVersion": "studenthub.core-audit.v1",
+  "auditId": "core-audit-2026-09-06",
+  "auditDate": "2026-09-06",
+  "timezone": "Asia/Bangkok",
+  "scope": "READ_ONLY_AUDIT_AND_PROPOSED_ARCHITECTURE",
+  "productVerdict": "CORE_NOT_READY_FOR_SCALE",
+  "implementationStatus": "NOT_STARTED_THIS_TURN",
+  "authorization": {
+    "userConfirmedAuditOnly": true,
+    "labbeLocationConfirmed": true
+  },
+  "changesThisTurn": {
+    "applicationCode": false,
+    "migrations": false,
+    "configuration": false,
+    "modelTraining": false,
+    "deployment": false,
+    "reportArtifacts": true
+  },
+  "methodology": {
+    "inspected": [
+      "current working trees",
+      "vault",
+      "runtime GET endpoints",
+      "live PostgreSQL schema in READ ONLY transactions",
+      "existing isolated fixture tests",
+      "dataset exact-text duplication",
+      "official architecture references"
+    ],
+    "didNotPerform": [
+      "mutating business queries against live PostgreSQL",
+      "posting events to the running broadcast endpoint",
+      "training",
+      "full build/lint suite",
+      "production load or chaos tests",
+      "browser visual validation",
+      "real cross-service StudentHub-to-Citadel transport test",
+      "live role-isolation mutation tests"
+    ],
+    "workingTree": "Both repositories contained pre-existing tracked and untracked changes; findings apply to the observed working-tree snapshot."
+  },
+  "verified": {
+    "studenthubTrustContracts": {
+      "runtime": "Node 24.19.0",
+      "command": "node --test --test-reporter=spec frontend/tests/trust/trust_engine_v5_sequential.test.mjs frontend/tests/trust/trust_engine_high_assurance.test.mjs",
+      "runtimePath": "C:/Users/Duy/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "cwd": "C:/Users/Duy/Projects/MyProj/StudentHub-AI",
+      "passed": 64,
+      "failed": 0,
+      "skipped": 0,
+      "exitCode": 0,
+      "artifact": "trust-contract-tests.txt",
+      "proves": "Fixture-level contract and deterministic policy behavior, not empirical model quality or throughput."
+    },
+    "labbeIntegrationContracts": {
+      "command": ".venv/Scripts/python.exe -m pytest -p no:cacheprovider tests/test_studenthub_i5_staging.py tests/test_studenthub_inbox.py tests/test_studenthub_assurance_api.py -q",
+      "cwd": "C:/Users/Duy/OneDrive/Documents/ChatGPT/labbe",
+      "passed": 28,
+      "failed": 0,
+      "exitCode": 0,
+      "artifact": "labbe-integration-tests.txt",
+      "dataBoundary": "FastAPI TestClient with temporary SQLite fixture databases; no real StudentHub-to-Labbe network integration.",
+      "warning": "Starlette TestClient dependency deprecation."
+    },
+    "postgres": {
+      "configSource": "frontend/.env.local (values never exported)",
+      "mode": "BEGIN READ ONLY; statement_timeout=5s; ROLLBACK",
+      "connected": true,
+      "serverVersionNum": 170006,
+      "version": "17.6",
+      "connectionRoleCapabilities": {
+        "rolsuper": false,
+        "rolbypassrls": true
+      },
+      "inspectedTables": [
+        "private.audit_events",
+        "private.expert_domains",
+        "private.expert_verifications",
+        "private.server_sessions",
+        "public.case_inputs",
+        "public.comments",
+        "public.evidence_passports",
+        "public.expert_assessments",
+        "public.expert_profiles",
+        "public.posts",
+        "public.trust_cases",
+        "public.votes"
+      ],
+      "allInspectedTablesHaveRls": true,
+      "allInspectedTablesHaveForceRls": false,
+      "roleIsolationVerified": false,
+      "caveat": "RLS table flags do not enforce row isolation for a connection role with BYPASSRLS."
+    },
+    "runtimeHttp": {
+      "base": "http://127.0.0.1:3000",
+      "sampleCountPerRoute": 1,
+      "benchmark": false,
+      "probes": [
+        {
+          "path": "/api/health/ready",
+          "status": 200,
+          "elapsedMs": 1231,
+          "readiness": {
+            "status": "READY",
+            "ready": true,
+            "checkedAt": "2026-09-06T08:06:18.657Z",
+            "checks": {
+              "runtime": {
+                "status": "AVAILABLE",
+                "configured": true
+              },
+              "database": {
+                "status": "AVAILABLE",
+                "configured": true
+              },
+              "supabaseAuth": {
+                "status": "AVAILABLE",
+                "configured": true
+              },
+              "durableSession": {
+                "status": "AVAILABLE",
+                "configured": true
+              },
+              "liveProviders": {
+                "status": "NOT_REQUIRED",
+                "configured": false,
+                "required": false
+              },
+              "screenshotStorage": {
+                "status": "NOT_REQUIRED",
+                "configured": true,
+                "required": false
+              }
+            }
+          }
+        },
+        {
+          "path": "/api/v1/experts",
+          "status": 200,
+          "elapsedMs": 58,
+          "contract": "experts.v1",
+          "count": 6,
+          "topLevelProvenance": null,
+          "sampleStatus": "VERIFIED_EXPERT"
+        },
+        {
+          "path": "/api/forum/posts",
+          "status": 500,
+          "elapsedMs": 1700,
+          "errorCode": "INTERNAL_SERVER_ERROR"
+        },
+        {
+          "path": "/trust",
+          "status": 200,
+          "elapsedMs": 787,
+          "hasStaticLatencyLabel": true,
+          "responseBytes": 82735
+        }
+      ]
+    },
+    "forumSortReadOnly": [
+      {
+        "sortBy": "ranking",
+        "ok": false,
+        "sqlstate": "42703",
+        "message": "column \"trust_votes\" does not exist"
+      },
+      {
+        "sortBy": "newest",
+        "ok": true
+      },
+      {
+        "sortBy": "likes",
+        "ok": true
+      }
+    ],
+    "localCapabilityConfiguration": {
+      "providerMode": "LIVE",
+      "liveProvidersRequired": false,
+      "databaseConfigured": true,
+      "supabaseConfigured": true,
+      "sessionPepperConfigured": true,
+      "geminiKeyNonempty": false,
+      "openaiKeyNonempty": false,
+      "layer2BaseUrlNonempty": false,
+      "legacyVerificationBaseUrlNonempty": false,
+      "caveat": "Configuration presence is not a provider health probe; values and remote hostnames intentionally omitted."
+    },
+    "datasets": {
+      "normalization": "String(text).trim().normalize('NFC').toLowerCase()",
+      "scope": "Exact normalized duplicates only; no near-duplicate, label-conflict or campaign-provenance audit.",
+      "entries": [
+        {
+          "path": "ai/dataset/scam_knowledge_dataset.json",
+          "rows": 6982,
+          "uniqueTexts": 3231,
+          "duplicateExcess": 3751,
+          "duplicateExcessPercent": 53.72
+        },
+        {
+          "path": "ai/dataset/multilabel_scam_dataset.json",
+          "rows": 23455,
+          "uniqueTexts": 2784,
+          "duplicateExcess": 20671,
+          "duplicateExcessPercent": 88.13
+        }
+      ],
+      "multiLabelArtifactTrainingSamplesCount": 5695,
+      "freshEmpiricalModelMetricsComputed": false
+    }
+  },
+  "findings": [
+    {
+      "id": "CORE-01",
+      "priority": "P0",
+      "status": "OPEN",
+      "basis": "STATIC",
+      "summary": "Realtime publish/read routes lack principal and channel authorization at the handler."
+    },
+    {
+      "id": "CORE-02",
+      "priority": "P1",
+      "status": "OPEN",
+      "basis": "STATIC_AND_HTTP",
+      "summary": "Random simulated realtime metrics and hard-coded hero latency presented as active."
+    },
+    {
+      "id": "CORE-03",
+      "priority": "P1",
+      "status": "OPEN",
+      "basis": "HTTP_AND_READ_ONLY_SQL",
+      "summary": "Default forum ranking query fails with SQLSTATE 42703."
+    },
+    {
+      "id": "CORE-04",
+      "priority": "P1",
+      "status": "OPEN",
+      "basis": "STATIC",
+      "summary": "Forum comment/reaction mutation workflow returns 503 outside memory adapter."
+    },
+    {
+      "id": "CORE-05",
+      "priority": "P1",
+      "status": "OPEN",
+      "basis": "STATIC_AND_HTTP",
+      "summary": "Expert/community file-backed stores and seeded directory are not a completed durable expert quiz workflow."
+    },
+    {
+      "id": "CORE-06",
+      "priority": "P1",
+      "status": "OPEN",
+      "basis": "STATIC",
+      "summary": "Trust completion is sent before persistence resolves and its case/passport identifiers are ignored."
+    },
+    {
+      "id": "CORE-07",
+      "priority": "P1",
+      "status": "OPEN",
+      "basis": "STATIC",
+      "summary": "Trust content-hash retry lookup is not atomic, revision-scoped idempotency."
+    },
+    {
+      "id": "CORE-08",
+      "priority": "P1",
+      "status": "OPEN",
+      "basis": "STATIC",
+      "summary": "Unused expert repository can award repeated reputation on assessment upsert; writes are not atomic."
+    },
+    {
+      "id": "CORE-09",
+      "priority": "P1",
+      "status": "OPEN",
+      "basis": "READ_ONLY_SQL",
+      "summary": "Configured PostgreSQL connection role bypasses RLS; runtime isolation still needs negative verification."
+    },
+    {
+      "id": "CORE-10",
+      "priority": "P1",
+      "status": "OPEN",
+      "basis": "STATIC",
+      "summary": "Trainer emits fixed benchmark metrics without corresponding measured holdout predictions."
+    },
+    {
+      "id": "CORE-11",
+      "priority": "P1",
+      "status": "OPEN",
+      "basis": "DATA_INVENTORY_AND_STATIC",
+      "summary": "High dataset duplication; V5 L2C is an uncalibrated rule baseline."
+    },
+    {
+      "id": "CORE-12",
+      "priority": "P1",
+      "status": "OPEN",
+      "basis": "STATIC",
+      "summary": "Realtime history and concurrency/rate controls are process-local; durable replay and cross-replica capacity unverified."
+    },
+    {
+      "id": "CORE-13",
+      "priority": "P2",
+      "status": "OPEN",
+      "basis": "STATIC",
+      "summary": "Trust renders seven full stage cards and an additional long result stack."
+    },
+    {
+      "id": "CORE-14",
+      "priority": "P2",
+      "status": "OPEN",
+      "basis": "STATIC_AND_HTTP",
+      "summary": "Readiness can be READY with live providers not configured and not required."
+    }
+  ],
+  "sourceHashes": {
+    "studenthubRoot": "C:/Users/Duy/Projects/MyProj/StudentHub-AI",
+    "studenthub": [
+      {
+        "path": "frontend/src/components/trust/TrustWorkspaceClient.jsx",
+        "sha256": "d733db24adc60868d84a843f5d2cf88f67d2fdde65372443a6ac87762a461b5a"
+      },
+      {
+        "path": "frontend/src/components/trust/TrustPipelineTimeline.jsx",
+        "sha256": "f96e6a1d68c5c654c86a124a646be16c66c9433c36726bbc1a2b0700be093523"
+      },
+      {
+        "path": "frontend/src/components/trust/AiTrustStudioView.jsx",
+        "sha256": "d53702de9aca0578bcbd4a158c509c8f55a5ab2f77d780749eac0816747957ba"
+      },
+      {
+        "path": "frontend/src/lib/realtime/RealtimeHub.js",
+        "sha256": "b034327ddb508cbcda09d5e87875b504d57e16540e3c63db48bc95473568a7a9"
+      },
+      {
+        "path": "frontend/src/app/api/realtime/broadcast/route.js",
+        "sha256": "c51f8b67efb937ebb54cb1c4791868e5787436cf338546a8d959654a48207879"
+      },
+      {
+        "path": "frontend/src/app/api/realtime/stream/route.js",
+        "sha256": "e7f11178e27eea78322a30c45969e5516e541909d2051f77d44ad4d340481f61"
+      },
+      {
+        "path": "frontend/src/app/api/v1/trust/route.js",
+        "sha256": "e806816eddf282cc29737181fab7e4b507d7f0b311d6792a93e8bbe4c01e9f79"
+      },
+      {
+        "path": "frontend/src/lib/server/database/TrustPersistenceService.js",
+        "sha256": "defb4883935aca16025f608dd22a4c48fe3265e8b4755bbae5d03f9012e72143"
+      },
+      {
+        "path": "frontend/src/lib/server/database/ExpertRepository.js",
+        "sha256": "61ea183a94297520d2cb517923b5470360a13e67fd4095e04b4ecc1996618b63"
+      },
+      {
+        "path": "frontend/src/lib/forum/PostgresForumRepository.js",
+        "sha256": "d0462ce2276297071c9a260946e548e684049c7916d15e6422a9ab2b63e088a7"
+      },
+      {
+        "path": "frontend/src/lib/intelligence/expert/expertStore.js",
+        "sha256": "9bd04b45b2aef1b7fa3c4dabfb00f08cd62b954bfdf300ed0f52b89c43db19e3"
+      },
+      {
+        "path": "frontend/src/lib/intelligence/community/communityStore.js",
+        "sha256": "951a9c161d3b8cb13b6c105dc7fe005a5fb3c15400eba391f21b37742a841429"
+      },
+      {
+        "path": "ai/trainer/train_multilabel_model.mjs",
+        "sha256": "0d03dc2e87256a16ff411df9a586f84a61954a76e42ce2fc297f4726ec7ab338"
+      },
+      {
+        "path": "ai/dataset/scam_knowledge_dataset.json",
+        "sha256": "01463b9871fce48e49aa6b9fd9adf6c7bc6c3591bbac7e308ce261c0f06b6e7e"
+      },
+      {
+        "path": "ai/dataset/multilabel_scam_dataset.json",
+        "sha256": "3ccd950f802d2be853188e45e900e56ab2641b991e8f24332da325f0f77010cc"
+      },
+      {
+        "path": "database/migrations/202608270001_v2_authority_foundation.sql",
+        "sha256": "3e6e5bc0cb4cc6895f485140d4f0c67f240305421f8c47e69fd0e2de6a0024a7"
+      }
+    ],
+    "labbeRoot": "C:/Users/Duy/OneDrive/Documents/ChatGPT/labbe",
+    "labbe": [
+      {
+        "path": "app/main.py",
+        "sha256": "da1541e3c75267113d275703aa0457c361db18c1b8cf30ccf63a8a9e54281a7d"
+      },
+      {
+        "path": "app/integration_i5.py",
+        "sha256": "3c6361ae6b5533b2e333bad190d5444512026c828b3e769976c52c207f33c711"
+      },
+      {
+        "path": "app/security_worker.py",
+        "sha256": "0d809ba7718500ab85a7dab149c5c7649edd5e10b2dbff62617b2004a7d8b94e"
+      },
+      {
+        "path": "app/config.py",
+        "sha256": "0fc5855cb621e2dd436915432b7b98d7cb3fd3d7f31084dd70b0de62ae5a7b7c"
+      },
+      {
+        "path": "tests/test_studenthub_i5_staging.py",
+        "sha256": "10dd6b8406818e9fd207090306c6456d5ef82b5d010f843874bb9c0c65e9a6bd"
+      }
+    ]
+  },
+  "primaryReferences": [
+    "https://www.w3.org/WAI/ARIA/apg/patterns/tabs/",
+    "https://supabase.com/docs/guides/realtime/subscribing-to-database-changes",
+    "https://supabase.com/docs/guides/realtime/postgres-changes",
+    "https://supabase.com/docs/guides/realtime/authorization",
+    "https://www.postgresql.org/docs/17/ddl-rowsecurity.html",
+    "https://www.postgresql.org/docs/17/sql-select.html"
+  ]
+}

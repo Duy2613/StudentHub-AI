@@ -37,6 +37,11 @@ or raw storage URL belongs in a `NEXT_PUBLIC_*` variable.
 | `STUDENTHUB_SCREENSHOT_STORAGE_BUCKET` | Yes when screenshot storage is enabled | Example defaults to `trust-screenshots-private` | Must match the private bucket migration |
 | `STUDENTHUB_READINESS_REQUIRE_LIVE_PROVIDERS` | Staging gate | Example defaults to `false` | Set `true` only after Layer 2/3/4 are contract-verified |
 | `STUDENTHUB_READINESS_REQUIRE_SCREENSHOT_STORAGE` | Staging gate | Example defaults to `false` | Set `true` only after the private bucket and access tests pass |
+| `STUDENTHUB_LABBE_MODE` | Labbe gate | `DISABLED` | Use `STAGING` only for the controlled non-production assurance run; `CONTROLLED` remains disabled |
+| `STUDENTHUB_LABBE_BASE_URL` | Labbe gate | Blank | Approved Labbe staging HTTPS origin only; no credentials/query/fragment |
+| `STUDENTHUB_LABBE_TOKEN` | Labbe gate | Blank | Server-only workload token; never commit or expose in logs/client code |
+| `STUDENTHUB_LABBE_SCOPE` | Labbe gate | Blank | Explicit receiver ingest scope, e.g. `labbe.events.ingest` |
+| `STUDENTHUB_LABBE_CLASSIFICATION` | Labbe gate | `INTERNAL` | Classification sent in the minimal event and transport header |
 
 Layer 2 has its own base URL. The current legacy compatibility adapter keeps
 Layer 3 and Layer 4 as distinct endpoint paths under one server-only legacy
@@ -51,6 +56,9 @@ invented until the provider owner supplies that contract.
 | `STUDENTHUB_STAGING_BASE_URL` | Current Trust v5 staging origin | Do not use the stale preview URL |
 | `STUDENTHUB_STAGING_CASES_PATH` | Local/CI path to non-secret staging cases | Generated or controlled artifact; no credentials |
 | `STUDENTHUB_STAGING_STORAGE_STATE` | Optional Playwright auth state | Generated, ignored, access-restricted, and deleted after its TTL |
+| `STUDENTHUB_LABBE_TEST_DATABASE_URL` | Disposable PostgreSQL target for Labbe transactional outbox/restart tests | Never point at production; do not commit |
+| `STUDENTHUB_LABBE_TIMEOUT_URL` | Optional operator-controlled Labbe timeout probe | Must be an approved non-production endpoint; never infer a timeout from an outage |
+| `STUDENTHUB_LABBE_OUTAGE_URL` | Optional operator-controlled Labbe outage probe | Must be an approved non-production endpoint; no production egress |
 
 ## Provisioning rule
 

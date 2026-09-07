@@ -102,5 +102,14 @@ graph TD
 - [[Sprint-Board|Sprint Tasks & Tiến Độ]]: Danh sách tính năng đang làm, hoàn tất, backlog v9.
 - [[Architecture-Decisions-ADR|Architecture Decisions (ADR)]]: Ghi lại các quyết định kỹ thuật quan trọng.
 
+### 6. External Reference Synthesis
+- [StudentHub AI release assurance report](../reports/STUDENTHUB-AI-RELEASE-ASSURANCE-REPORT.md): Final candidate-bound gate matrix, fresh browser/Lighthouse evidence, fixes, blockers, and release decision.
+- [Frontend performance verification](../frontend/PERFORMANCE.md): Current production bundle, CSS, font, Lighthouse, and interaction evidence.
+- [Core system implementation report](../reports/CORE-SYSTEM-IMPLEMENTATION-2026-09-06.md): Master prompt implementation evidence, verification gates, and remaining external blockers.
+- [StudentHub AI ↔ Labbe bridge](../integrations/STUDENTHUB-LABBE-BRIDGE.md): Mode gate, event contract, environment variables, and release checks.
+- [USAvionix → StudentHub AI Integration Report](../reports/USAVIONIX-STUDENTHUB-INTEGRATION-REPORT.md): Audit website/video, source-vs-instruction distinction, current codebase fit, acceptance matrix, and feature-freeze-safe integration plan.
+- [USAvionix-inspired StudentHub Integration Prompt](../frontend/USAVIONIX-STUDENTHUB-INTEGRATION-PROMPT.md): Copy-paste prompt with chapter mapping, truth/performance boundaries, and future implementation gates.
+- [USAvionix / cogni:wave Reference Pack](../references/usavionix-2026-09-06/README.md): Capture manifest, screenshots, sampled frames, and evidence limitations.
+
 ---
 *Cập nhật tự động bởi Antigravity & AI Agents.*

@@ -1,26 +1,67 @@
 "use client";
 
-import React, { use, useEffect, useState } from "react";
+import React, { use, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   ArrowLeft,
   ArrowRight,
-  BookOpen,
   BrainCircuit,
-  CheckCircle2,
   ChevronLeft,
-  ChevronRight,
   Copy,
-  FileCode2,
-  HelpCircle,
-  Lightbulb,
-  MessageSquareCode,
   NotebookPen,
   PanelRightClose,
   PanelRightOpen,
   Sparkles,
 } from "lucide-react";
 import AcademicNavbar from "@/components/layout/AcademicNavbar";
+import { markAssurance, measureAssurance } from "@/lib/performance/assurance";
+
+const LessonCompanionPanel = dynamic(() => import("@/components/lesson/LessonCompanionPanel"), {
+  ssr: false,
+  loading: () => (
+    <aside className="lg:col-span-3 sticky top-24 bg-surface-primary border border-border-subtle rounded-2xl p-4 shadow-xl">
+      <p className="text-xs text-text-muted">Đang mở AI Tutor & ghi chú…</p>
+    </aside>
+  ),
+});
+
+function LessonCompanionPlaceholder({ onLoad }) {
+  return (
+    <aside className="lg:col-span-3 sticky top-24 bg-surface-primary border border-border-subtle rounded-2xl p-4 shadow-xl space-y-4">
+      <div className="flex items-center border-b border-border-subtle pb-3 gap-2">
+        <button
+          type="button"
+          onClick={() => onLoad("ai")}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-surface-elevated text-accent-knowledge border border-accent-knowledge/30"
+        >
+          <BrainCircuit size={14} />
+          <span>AI Tutor</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => onLoad("notes")}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-text-secondary hover:text-text-primary"
+        >
+          <NotebookPen size={14} />
+          <span>Ghi chú bài học</span>
+        </button>
+      </div>
+      <div className="space-y-3">
+        <p className="text-xs text-text-muted leading-relaxed">
+          Bộ công cụ AI và ghi chú chỉ mở khi bạn cần, để nội dung bài học được ưu tiên tải trước.
+        </p>
+        <button
+          type="button"
+          onClick={() => onLoad("ai")}
+          className="w-full px-3 py-2 rounded-lg bg-surface-elevated border border-border-subtle text-xs text-text-secondary hover:text-text-primary"
+        >
+          Mở AI Tutor
+        </button>
+      </div>
+    </aside>
+  );
+}
 
 const SAMPLE_LESSON_CONTENT = {
   title: "Modern State Architectures & Concurrent React",
@@ -89,50 +130,40 @@ export default function QuietLessonPage({ params }) {
   const resolvedParams = use(params);
   const [activeSectionId, setActiveSectionId] = useState("state-colocation");
   const [rightPanelOpen, setRightPanelOpen] = useState(true);
-  const [activePanelTab, setActivePanelTab] = useState("ai"); // "ai" | "notes"
-  const [notes, setNotes] = useState("");
   const [copied, setCopied] = useState(false);
-  const [aiQuestion, setAiQuestion] = useState("");
-  const [aiResponses, setAiResponses] = useState([
-    {
-      role: "assistant",
-      text: "Xin chào! Tôi là AI Tutor đồng hành cùng bài học này. Bạn có thể hỏi tôi về cú pháp useTransition, cách áp dụng State Colocation vào dự án thực tế, hoặc các cạm bẫy hiệu năng thường gặp.",
-    },
-  ]);
+  const [companionMounted, setCompanionMounted] = useState(false);
+  const [companionTab, setCompanionTab] = useState("ai");
 
   const storageKey = `studenthub.lessonNotes.v1.${resolvedParams.courseId || "full-stack"}.${resolvedParams.lessonId || "lesson-1"}`;
 
-  // Load saved notes locally without leaking sensitive data
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) setNotes(saved);
-    } catch {
-      // safe fallback
-    }
-  }, [storageKey]);
-
-  const handleSaveNotes = (value) => {
-    setNotes(value);
-    try {
-      localStorage.setItem(storageKey, value);
-    } catch {
-      // safe fallback
-    }
+  const loadCompanion = (tab = "ai") => {
+    markAssurance("ai-drawer-request", { tab });
+    setCompanionTab(tab === "notes" ? "notes" : "ai");
+    setCompanionMounted(true);
   };
 
-  const handleAskAi = (question) => {
-    if (!question.trim()) return;
-    const q = question.trim();
-    setAiQuestion("");
-    setAiResponses((prev) => [
-      ...prev,
-      { role: "user", text: q },
-      {
-        role: "assistant",
-        text: `[Góc nhìn học thuật]: Về câu hỏi "${q}" — Trong React 19, cốt lõi là không để tính toán dữ liệu lớn chặn UI phản hồi. Bằng cách tách biệt urgent input và concurrent transition, trình duyệt luôn ưu tiên frame người dùng đang tương tác.`,
-      },
-    ]);
+  const toggleCompanionPanel = () => {
+    if (rightPanelOpen) {
+      markAssurance("ai-drawer-close-request");
+      setRightPanelOpen(false);
+      window.requestAnimationFrame(() => {
+        markAssurance("ai-drawer-closed");
+        measureAssurance("ai-drawer-close-duration", "ai-drawer-close-request", "ai-drawer-closed");
+      });
+      return;
+    }
+
+    markAssurance("ai-drawer-shell-request");
+    setRightPanelOpen(true);
+  };
+
+  const handleTocActivate = (sectionId) => {
+    markAssurance("toc-interaction-start", { sectionId });
+    setActiveSectionId(sectionId);
+    window.requestAnimationFrame(() => {
+      markAssurance("toc-interaction-settled", { sectionId });
+      measureAssurance("toc-interaction-duration", "toc-interaction-start", "toc-interaction-settled");
+    });
   };
 
   return (
@@ -153,7 +184,7 @@ export default function QuietLessonPage({ params }) {
           <span className="text-text-muted hidden sm:inline">{SAMPLE_LESSON_CONTENT.readTime}</span>
           <button
             type="button"
-            onClick={() => setRightPanelOpen((prev) => !prev)}
+            onClick={toggleCompanionPanel}
             aria-label={rightPanelOpen ? "Đóng bảng AI & Ghi chú" : "Mở bảng AI & Ghi chú"}
             className="p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-primary border border-border-subtle"
           >
@@ -174,7 +205,7 @@ export default function QuietLessonPage({ params }) {
               <a
                 key={section.id}
                 href={`#${section.id}`}
-                onClick={() => setActiveSectionId(section.id)}
+                onClick={() => handleTocActivate(section.id)}
                 className={`block px-3 py-2 rounded-lg transition-colors leading-snug ${
                   activeSectionId === section.id
                     ? "bg-surface-primary text-accent-knowledge border-l-2 border-accent-knowledge"
@@ -269,114 +300,12 @@ export default function QuietLessonPage({ params }) {
           </div>
         </article>
 
-        {/* Right Column: AI Context Panel & Local Notes (Collapsible) */}
-        {rightPanelOpen && (
-          <aside className="lg:col-span-3 sticky top-24 bg-surface-primary border border-border-subtle rounded-2xl p-4 shadow-xl space-y-4">
-            {/* Panel Tabs */}
-            <div className="flex items-center border-b border-border-subtle pb-3 gap-2">
-              <button
-                type="button"
-                onClick={() => setActivePanelTab("ai")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  activePanelTab === "ai"
-                    ? "bg-surface-elevated text-accent-knowledge border border-accent-knowledge/30"
-                    : "text-text-secondary hover:text-text-primary"
-                }`}
-              >
-                <BrainCircuit size={14} />
-                <span>AI Tutor</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActivePanelTab("notes")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  activePanelTab === "notes"
-                    ? "bg-surface-elevated text-accent-human border border-accent-human/30"
-                    : "text-text-secondary hover:text-text-primary"
-                }`}
-              >
-                <NotebookPen size={14} />
-                <span>Ghi chú bài học</span>
-              </button>
-            </div>
-
-            {/* AI Tutor Chat Tab */}
-            {activePanelTab === "ai" ? (
-              <div className="space-y-4">
-                <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1 text-xs">
-                  {aiResponses.map((msg, idx) => (
-                    <div
-                      key={idx}
-                      className={`p-3 rounded-xl ${
-                        msg.role === "assistant"
-                          ? "bg-surface-elevated text-text-primary border border-border-subtle leading-relaxed"
-                          : "bg-indigo-600/20 text-indigo-200 border border-indigo-500/30 font-medium"
-                      }`}
-                    >
-                      {msg.text}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="pt-2 border-t border-border-subtle space-y-2">
-                  <div className="flex gap-1.5 overflow-x-auto pb-1 text-[11px] font-mono text-text-muted">
-                    <button
-                      type="button"
-                      onClick={() => handleAskAi("Giải thích đơn giản hơn cho người mới?")}
-                      className="whitespace-nowrap px-2 py-0.5 rounded bg-surface-elevated hover:text-text-primary border border-border-subtle"
-                    >
-                      Giải thích đơn giản
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleAskAi("Lỗi phổ biến nhất khi dùng useTransition?")}
-                      className="whitespace-nowrap px-2 py-0.5 rounded bg-surface-elevated hover:text-text-primary border border-border-subtle"
-                    >
-                      Cạm bẫy phổ biến
-                    </button>
-                  </div>
-
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleAskAi(aiQuestion);
-                    }}
-                    className="flex gap-2"
-                  >
-                    <input
-                      type="text"
-                      value={aiQuestion}
-                      onChange={(e) => setAiQuestion(e.target.value)}
-                      placeholder="Hỏi AI về bài học này..."
-                      className="w-full bg-surface-elevated px-3 py-2 rounded-lg text-xs text-text-primary placeholder:text-text-muted focus:outline-none border border-border-subtle focus:border-accent-primary"
-                    />
-                    <button
-                      type="submit"
-                      className="px-3 py-2 rounded-lg bg-accent-primary text-white text-xs font-medium hover:bg-accent-primary/90 flex-shrink-0"
-                    >
-                      Gửi
-                    </button>
-                  </form>
-                </div>
-              </div>
-            ) : (
-              /* Local Notes Tab */
-              <div className="space-y-3">
-                <p className="text-xs text-text-muted leading-relaxed">
-                  Ghi chú lưu trực tiếp trên trình duyệt của bạn cho bài học này.
-                </p>
-                <textarea
-                  value={notes}
-                  onChange={(e) => handleSaveNotes(e.target.value)}
-                  placeholder="Viết ghi chú, công thức hoặc câu hỏi cần xem lại..."
-                  aria-label="Ghi chú bài học cá nhân"
-                  rows={14}
-                  className="w-full bg-surface-elevated p-3 rounded-xl text-xs font-mono text-text-primary border border-border-subtle focus:outline-none focus:border-accent-human resize-none"
-                />
-              </div>
-            )}
-          </aside>
-        )}
+        {/* Right Column: AI Context Panel & Local Notes (loaded on demand) */}
+        {rightPanelOpen && (companionMounted ? (
+          <LessonCompanionPanel key={storageKey} storageKey={storageKey} initialTab={companionTab} />
+        ) : (
+          <LessonCompanionPlaceholder onLoad={loadCompanion} />
+        ))}
       </div>
     </div>
   );

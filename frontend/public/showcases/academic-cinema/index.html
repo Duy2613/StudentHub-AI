@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudentHub AI — Academic Cinema Universe (8 Master Films)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #060813;
+      color: #f6f3eb;
+    }
+    .font-serif { font-family: 'Cinzel', serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-[#060813] text-white min-h-screen flex flex-col antialiased selection:bg-amber-400 selection:text-black">
+  
+  <!-- Header Navigation -->
+  <header class="w-full border-b border-white/10 bg-[#080a0f]/90 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="h-2.5 w-2.5 rounded-full bg-amber-400 animate-pulse"></div>
+      <span class="font-mono text-xs font-bold tracking-widest text-white">STUDENTHUB AI</span>
+      <span class="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-mono text-zinc-400">
+        CINEMATIC ARCHIVE (8.00s @ 24FPS)
+      </span>
+    </div>
+
+    <div class="flex items-center gap-3 text-xs font-mono">
+      <a href="/academic-showcase" class="text-zinc-400 hover:text-white transition-colors bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
+        ← Return to Showcase
+      </a>
+      <span class="hidden md:inline-block px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-300 border border-amber-500/20">
+        16:9 UHD Master
+      </span>
+    </div>
+  </header>
+
+  <!-- Hero Cinema Stage -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-12">
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-xs font-mono text-amber-300 mb-3">
+        ACADEMIC CINEMATIC × HUMAN INTELLIGENCE × TRUST
+      </div>
+      <h1 class="text-3xl md:text-5xl font-serif tracking-tight text-[#f6f3eb]">
+        The 8-Film Cinematic Collection
+      </h1>
+      <p class="text-sm md:text-base text-zinc-400 mt-2 max-w-2xl mx-auto font-light">
+        Bộ sưu tập 8 tác phẩm điện ảnh thị giác độc quyền của StudentHub AI. Mỗi phim dài chính xác 8 giây (192 frames @ 24fps) với triết lý thẩm mỹ hàn lâm cao cấp.
+      </p>
+    </div>
+
+    <!-- Theater Container -->
+    <div class="rounded-3xl border border-white/15 bg-black overflow-hidden shadow-2xl shadow-black/90">
+      <!-- Player Header Info -->
+      <div class="p-4 md:p-6 bg-gradient-to-b from-black/90 to-transparent flex items-center justify-between border-b border-white/10">
+        <div class="flex items-center gap-3">
+          <span id="filmBadge" class="font-mono text-xs px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+            FILM 01 / 08
+          </span>
+          <h2 id="filmTitle" class="font-serif text-lg md:text-xl text-[#f6f3eb]">
+            The Living Campus Atlas
+          </h2>
+        </div>
+
+        <div class="flex items-center gap-4 text-xs font-mono text-zinc-400">
+          <span id="frameCounter">FRAME 000 / 192</span>
+          <span class="text-amber-400 font-bold">24 FPS</span>
+        </div>
+      </div>
+
+      <!-- Video Screen -->
+      <div class="relative w-full aspect-video bg-[#080a0f] flex items-center justify-center overflow-hidden">
+        <video id="cinemaVideo" autoplay loop muted playsinline class="w-full h-full object-cover">
+          <source src="/videos/academic/film01_campus_atlas.mp4" type="video/mp4">
+        </video>
+
+        <!-- Editorial Safe Zone Overlay (Toggled) -->
+        <div id="safeZoneOverlay" class="hidden absolute inset-0 pointer-events-none border-2 border-dashed border-sky-400/40 bg-sky-950/10">
+          <div class="absolute top-1/3 inset-x-0 h-px border-t border-dashed border-white/30"></div>
+          <div class="absolute top-2/3 inset-x-0 h-px border-t border-dashed border-white/30"></div>
+          <div class="absolute left-1/3 inset-y-0 w-px border-l border-dashed border-white/30"></div>
+          <div class="absolute left-2/3 inset-y-0 w-px border-l border-dashed border-white/30"></div>
+          <div class="absolute bottom-12 left-6 p-3 rounded-xl bg-black/85 border border-sky-400 text-xs text-sky-300 font-mono">
+            SAFE EDITORIAL READING ZONE
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls & Scrub Bar -->
+      <div class="p-4 md:p-6 bg-[#0e1118] border-t border-white/10">
+        <!-- Progress Bar -->
+        <div id="timelineTrack" class="w-full h-2 bg-white/10 rounded-full cursor-pointer overflow-hidden mb-4 relative">
+          <div id="timelineProgress" class="h-full bg-gradient-to-r from-sky-400 via-cyan-300 to-amber-400 w-0"></div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <button id="playBtn" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono font-bold transition-all">
+              PAUSE
+            </button>
+            <span id="timeDisplay" class="font-mono text-xs text-zinc-300">
+              <span class="text-sky-400 font-bold">00:00.00</span> / 00:08.00
+            </span>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button id="toggleSafeBtn" class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-zinc-400 hover:text-white">
+              Safe Zones
+            </button>
+            <button id="toggleWebpBtn" class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-mono text-zinc-400 hover:text-white">
+              WebP Loop
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 Film Selector Grid -->
+    <div class="mt-8 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3" id="filmGrid"></div>
+  </main>
+
+  <script>
+    const films = [
+      { id: "01", title: "The Living Campus Atlas", src: "/videos/academic/film01_campus_atlas.mp4", webp: "/videos/academic/film01_campus_atlas.webp" },
+      { id: "02", title: "The Trust Engine", src: "/videos/academic/film02_trust_engine.mp4", webp: "/videos/academic/film02_trust_engine.webp" },
+      { id: "03", title: "Collective Intelligence", src: "/videos/academic/film03_collective_intelligence.mp4", webp: "/videos/academic/film03_collective_intelligence.webp" },
+      { id: "04", title: "Expert Trust Network", src: "/videos/academic/film04_expert_network.mp4", webp: "/videos/academic/film04_expert_network.webp" },
+      { id: "05", title: "Question to Understanding", src: "/videos/academic/film05_question_understanding.mp4", webp: "/videos/academic/film05_question_understanding.webp" },
+      { id: "06", title: "Academic Deep Work", src: "/videos/academic/film06_deep_work.mp4", webp: "/videos/academic/film06_deep_work.webp" },
+      { id: "07", title: "Knowledge Through Time", src: "/videos/academic/film07_knowledge_time.mp4", webp: "/videos/academic/film07_knowledge_time.webp" },
+      { id: "08", title: "The Knowledge Horizon", src: "/videos/academic/film08_knowledge_horizon.mp4", webp: "/videos/academic/film08_knowledge_horizon.webp" }
+    ];
+
+    let currentIdx = 0;
+    const video = document.getElementById('cinemaVideo');
+    const playBtn = document.getElementById('playBtn');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const timelineProgress = document.getElementById('timelineProgress');
+    const frameCounter = document.getElementById('frameCounter');
+    const filmBadge = document.getElementById('filmBadge');
+    const filmTitle = document.getElementById('filmTitle');
+    const safeOverlay = document.getElementById('safeZoneOverlay');
+    const grid = document.getElementById('filmGrid');
+
+    function renderGrid() {
+      grid.innerHTML = '';
+      films.forEach((f, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `p-3 rounded-xl border text-left transition-all ${idx === currentIdx ? 'border-amber-400 bg-amber-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`;
+        btn.innerHTML = `
+          <div class="text-[10px] font-mono text-amber-400 font-bold">FILM ${f.id}</div>
+          <div class="text-xs font-serif text-white mt-1 line-clamp-2">${f.title}</div>
+        `;
+        btn.onclick = () => selectFilm(idx);
+        grid.appendChild(btn);
+      });
+    }
+
+    function selectFilm(idx) {
+      currentIdx = idx;
+      const f = films[idx];
+      filmBadge.innerText = `FILM ${f.id} / 08`;
+      filmTitle.innerText = f.title;
+      video.src = f.src;
+      video.play();
+      renderGrid();
+    }
+
+    video.ontimeupdate = () => {
+      const cur = video.currentTime;
+      const pct = (cur / 8.0) * 100;
+      timelineProgress.style.width = pct + '%';
+      timeDisplay.innerHTML = `<span class="text-sky-400 font-bold">00:0${cur.toFixed(2)}</span> / 00:08.00`;
+      frameCounter.innerText = `FRAME ${String(Math.floor((cur/8.0)*192)).padStart(3, '0')} / 192`;
+    };
+
+    playBtn.onclick = () => {
+      if (video.paused) {
+        video.play();
+        playBtn.innerText = 'PAUSE';
+      } else {
+        video.pause();
+        playBtn.innerText = 'PLAY';
+      }
+    };
+
+    document.getElementById('toggleSafeBtn').onclick = () => {
+      safeOverlay.classList.toggle('hidden');
+    };
+
+    renderGrid();
+  </script>
+</body>
+</html>

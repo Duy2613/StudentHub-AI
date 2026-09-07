@@ -8,8 +8,9 @@
 // - Tích hợp Radar phát hiện email trường học (.edu), Thước đo Entropy mật khẩu, Settigation Orbit OTP v3
 
 import React, { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, ArrowRight, ArrowLeft, Sparkles, ShieldCheck, GraduationCap, Star, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, ArrowLeft, Sparkles, ShieldCheck, GraduationCap, Star, CheckCircle2, AlertCircle, Loader2, LogIn, UserPlus } from "lucide-react";
 
 import {
   signInWithPassword,
@@ -21,6 +22,7 @@ import {
   translateAuthError,
   setRememberMePreference,
 } from "@/lib/auth/authService";
+import { getAuthCapabilities } from "@/lib/auth/authCapabilities";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 import MohsinCurtainTransition from "@/components/ui/MohsinCurtainTransition";
@@ -31,6 +33,7 @@ import OtpVerificationOrbit from "@/components/ui/otp-verification-orbit";
 export default function SaffronAuthDeck({ initialMode = "register" }) {
   const router = useRouter();
   const { loginAsDemo } = useAuth();
+  const capabilities = getAuthCapabilities();
 
   // Mode: "login" | "register"
   const [mode, setMode] = useState(initialMode);
@@ -76,15 +79,21 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const urlError = params.get("error");
-      if (urlError === "google_login_failed" || urlError === "oauth_failed") {
-        setError("Đăng nhập bằng tài khoản liên kết không thành công hoặc đã bị hủy. Vui lòng thử lại.");
+      if (urlError === "auth_misconfigured") {
+        setError(capabilities.emailPasswordMessage);
+      } else if (urlError === "google_unsupported_provider") {
+        setError(capabilities.googleMessage);
+      } else if (urlError === "google_login_failed" || urlError === "oauth_failed") {
+        setError("Đăng nhập bằng OAuth không thành công hoặc đã bị hủy. Vui lòng thử lại.");
+      } else if (urlError === "session_unavailable") {
+        setError("Dịch vụ phiên đăng nhập an toàn đang tạm thời không khả dụng. Vui lòng thử lại sau.");
       } else if (urlError === "email_registered_use_password") {
         setError(
-          "Tài khoản này đã được đăng ký bằng Email & Mật khẩu từ trước. Vui lòng nhập Mật khẩu để đăng nhập."
+          "Tài khoản này đã được đăng ký bằng Email & Mật khẩu từ trước. Vui lòng đăng nhập bằng mật khẩu."
         );
       }
     }
-  }, []);
+  }, [capabilities.googleMessage]);
 
   // Switch between Login & Register with 5-Bar Shutter Curtain
   const handleSwitchMode = (targetMode) => {
@@ -109,9 +118,9 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
     setIsLoading(true);
 
     try {
-      const { user } = await signInWithPassword(email, password, rememberMe);
+      const { applicationUser } = await signInWithPassword(email, password, rememberMe);
       saffronAudio.playSuccessChime();
-      const isOnboarded = user?.user_metadata?.onboarded;
+      const isOnboarded = applicationUser?.onboarded === true;
       if (!isOnboarded) {
         router.push("/onboarding");
       } else {
@@ -195,6 +204,11 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
     if (isLoading || isOAuthLoading) return;
     saffronAudio.playHardwareKey();
     setError(null);
+    if (capabilities.google !== "READY") {
+      saffronAudio.playAlertBuzz();
+      setError(capabilities.googleMessage);
+      return;
+    }
     setIsOAuthLoading(true);
     setRememberMePreference(rememberMe);
     try {
@@ -204,7 +218,7 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
       setError(translateAuthError(err));
       setIsOAuthLoading(false);
     }
-  }, [isLoading, isOAuthLoading, rememberMe]);
+  }, [isLoading, isOAuthLoading, rememberMe, capabilities]);
 
   const handleGitHubOAuth = useCallback(async () => {
     if (isLoading || isOAuthLoading) return;
@@ -278,12 +292,12 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
             onClick={() => handleSwitchMode("login")}
             className={`relative py-2.5 px-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
               mode === "login"
-                ? "bg-gradient-to-r from-[#ffbc09] to-[#f59e0b] text-[#150604] shadow-[0_0_20px_rgba(255,188,9,0.35)]"
-                : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
+                ? "bg-[#ffbc09] text-[#150604] shadow-[0_2px_10px_rgba(255,188,9,0.3)]"
+                : "text-[#ece7e0]/60 hover:text-[#ece7e0] hover:bg-[#2f0e09]/50"
             }`}
           >
-            <span className="font-mono text-[10px] opacity-75">01</span>
-            <span>Đăng Nhập</span>
+            <LogIn className="w-3.5 h-3.5" />
+            <span>ĐĂNG NHẬP</span>
           </button>
 
           <button
@@ -291,16 +305,16 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
             onClick={() => handleSwitchMode("register")}
             className={`relative py-2.5 px-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer ${
               mode === "register"
-                ? "bg-gradient-to-r from-[#ffbc09] to-[#f59e0b] text-[#150604] shadow-[0_0_20px_rgba(255,188,9,0.35)]"
-                : "text-[#ece7e0]/70 hover:text-white hover:bg-white/5"
+                ? "bg-[#ffbc09] text-[#150604] shadow-[0_2px_10px_rgba(255,188,9,0.3)]"
+                : "text-[#ece7e0]/60 hover:text-[#ece7e0] hover:bg-[#2f0e09]/50"
             }`}
           >
-            <span className="font-mono text-[10px] opacity-75">02</span>
-            <span>Đăng Ký Mới</span>
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>ĐĂNG KÝ MỚI</span>
           </button>
         </div>
 
-        {/* 3. Fast OAuth Login Keys (Google & GitHub) */}
+        {/* 3. Social Hardware Keys (OAuth Buttons) */}
         {regStep === "FORM" && (
           <div className="space-y-3 mb-6">
             <div className="grid grid-cols-2 gap-3">
@@ -308,8 +322,13 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
               <button
                 type="button"
                 onClick={handleGoogleOAuth}
-                disabled={isAnyLoading}
-                className="group relative py-3 px-3.5 rounded-xl bg-[#210a07]/90 hover:bg-[#2f0e09] border border-[#47140b] hover:border-[#ffbc09]/60 text-xs font-semibold text-[#ece7e0] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2.5 shadow-sm cursor-pointer disabled:opacity-50 font-human"
+                disabled={isAnyLoading || capabilities.google !== "READY"}
+                title={capabilities.google !== "READY" ? capabilities.googleMessage : "Đăng nhập bằng tài khoản Google"}
+                className={`group relative py-3 px-3 rounded-xl bg-[#210a07]/90 border border-[#47140b] text-xs font-semibold text-[#ece7e0] transition-all flex items-center justify-center gap-2 shadow-sm font-human ${
+                  capabilities.google !== "READY"
+                    ? "opacity-60 cursor-not-allowed hover:bg-[#210a07]/90"
+                    : "hover:bg-[#2f0e09] hover:border-[#ffbc09]/60 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                }`}
               >
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -317,7 +336,12 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
                   <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
                   <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
                 </svg>
-                <span className="truncate">Google Account</span>
+                <span className="truncate">Google</span>
+                {capabilities.google !== "READY" && (
+                  <span className="text-[9px] font-mono text-amber-400 bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/20">
+                    Chưa bật
+                  </span>
+                )}
               </button>
 
               {/* GitHub Hardware Key */}
@@ -348,7 +372,12 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
         {error && (
           <div className="mb-4 p-3 rounded-xl bg-red-950/40 border border-red-500/40 text-red-300 text-xs flex items-start gap-2.5 animate-in fade-in duration-300 font-human">
             <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-            <span className="leading-relaxed">{error}</span>
+            <div className="min-w-0">
+              <span className="leading-relaxed">{error}</span>
+              <Link href="/" className="mt-2 block w-fit font-semibold text-amber-300 hover:text-amber-200 underline underline-offset-2">
+                Trang chủ
+              </Link>
+            </div>
           </div>
         )}
         {notice && (

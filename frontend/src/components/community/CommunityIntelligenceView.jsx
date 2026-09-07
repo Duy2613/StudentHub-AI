@@ -8,6 +8,7 @@ import SourceDisclosure from "@/components/ui/SourceDisclosure";
 import { createErrorState, createStateEnvelope, createWorkIdentity } from "@/lib/ui-state/model";
 import { getRuntimeProviderBundle, RUNTIME_PROVIDER_MODE } from "@/lib/backend/runtimeProvider";
 import { ApiError } from "@/lib/api/errors";
+import { aggregateObservations } from "@/lib/community/CanonicalAnnouncementService";
 
 function titleFor(post) {
   return post.title || String(post.topic || "Chia sẻ cộng đồng").replaceAll("_", " ");
@@ -124,15 +125,21 @@ export function CommunityIntelligenceView() {
     if (action.id === "RETRY" && selectedObservation) openObservation(selectedObservation);
   };
 
-  const topics = useMemo(() => [...new Set(observations.map((post) => post.topic).filter(Boolean))], [observations]);
-  const posts = observations.filter((post) => {
-    const text = `${post.title || ""} ${post.statement || ""} ${post.topic || ""} ${post.context || ""}`.toLowerCase();
+  const [expandedClusters, setExpandedClusters] = useState({});
+  const toggleClusterExpand = (canonicalId) => {
+    setExpandedClusters((prev) => ({ ...prev, [canonicalId]: !prev[canonicalId] }));
+  };
+
+  const aggregatedItems = useMemo(() => aggregateObservations(observations), [observations]);
+  const topics = useMemo(() => [...new Set(aggregatedItems.map((post) => post.topic).filter(Boolean))], [aggregatedItems]);
+  const posts = aggregatedItems.filter((post) => {
+    const text = `${post.title || ""} ${post.statement || ""} ${post.topic || ""}`.toLowerCase();
     return (topic === "ALL" || post.topic === topic) && text.includes(query.toLowerCase());
   });
   const sourceMode = providerResult?.provenance?.sourceMode || (RUNTIME_PROVIDER_MODE === "DEMO" ? "DEMO" : "LIVE");
 
   return <div className="product-workspace">
-    <header className="product-hero"><div><p className="product-kicker">Student collective intelligence</p><h1>Trải nghiệm thật, được đặt trong ngữ cảnh.</h1><p>Cộng đồng không phải bảng tin giải trí. Đây là lớp bằng chứng thực tế giúp phát hiện khoảng cách giữa quy định chính thức và điều sinh viên đang gặp.</p><SourceDisclosure provenance={providerResult?.provenance} sourceMode={sourceMode} /></div><div className="hero-seal"><Users size={20} /><span>COMMUNITY</span><strong>{observations.length} báo cáo hiện có</strong></div></header>
+    <header className="product-hero"><div><p className="product-kicker">Student collective intelligence</p><h1>Trải nghiệm thật, được đặt trong ngữ cảnh.</h1><p>Cộng đồng không phải bảng tin giải trí. Đây là lớp bằng chứng thực tế giúp phát hiện khoảng cách giữa quy định chính thức và điều sinh viên đang gặp.</p><SourceDisclosure provenance={providerResult?.provenance} sourceMode={sourceMode} /></div><div className="hero-seal"><Users size={20} /><span>COMMUNITY</span><strong>{observations.length} báo cáo ({aggregatedItems.length} sự kiện đối soát)</strong></div></header>
 
     <section className="collective-toolbar intelligence-panel">
       <label className="product-search"><Search size={17} /><span className="sr-only">Tìm trong cộng đồng</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm vấn đề, quy trình hoặc bằng chứng..." /></label>
@@ -147,10 +154,72 @@ export function CommunityIntelligenceView() {
     </section>
 
     <section className="collective-layout">
-      <div className="space-y-4"><div className="section-heading"><div><p className="product-kicker">Live evidence stream</p><h2 className="product-section-title">Tín hiệu từ sinh viên</h2></div><span className="signal-badge">{posts.length} kết quả</span></div>
+      <div className="space-y-4"><div className="section-heading"><div><p className="product-kicker">Live evidence stream</p><h2 className="product-section-title">Tín hiệu từ sinh viên (Đã chuẩn hoá & gom nhóm)</h2></div><span className="signal-badge">{posts.length} sự kiện</span></div>
         {providerResult && !["SUCCESS", "EMPTY"].includes(providerResult.state) && <StateBoundary envelope={providerResult} onAction={handleStateAction} />}
         {!providerResult && <StateBoundary state="LOADING" />}
-        {posts.length ? posts.map((post) => <article key={post.observationId} className="intelligence-panel community-report"><div className="report-rail"><span>SV</span></div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><span className="signal-badge"><MessageSquareText size={12} /> {statusFor(post)}</span>{post.evidenceRefs?.length ? <span className="metadata-chip">{post.evidenceRefs.length} evidence refs</span> : null}</div><h3>{titleFor(post)}</h3><p>{post.statement}</p>{post.context && <p className="product-copy">{post.context}</p>}<footer><span><Clock3 size={13} /> {post.submittedAt || post.observedAt ? new Date(post.submittedAt || post.observedAt).toLocaleDateString("vi-VN") : "Không có thời gian"}</span><span><ShieldCheck size={13} /> Nguồn: cộng đồng</span><button type="button" className="text-link" onClick={() => openObservation(post)}>Xem detail <ArrowRight size={14} /></button></footer></div></article>) : (providerResult?.state === "SUCCESS" || providerResult?.state === "EMPTY") && <div className="intelligence-panel empty-state">Không có báo cáo phù hợp với bộ lọc hiện tại.</div>}
+        {posts.length ? posts.map((post) => {
+          const isExpanded = !!expandedClusters[post.canonicalId];
+          const hasMultipleReports = post.relatedReportCount > 1;
+
+          return (
+            <article key={post.canonicalId} className="intelligence-panel community-report">
+              <div className="report-rail"><span>SV</span></div>
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="signal-badge"><MessageSquareText size={12} /> {statusFor(post)}</span>
+                  {hasMultipleReports && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                      <Users size={12} /> {post.aggregationLabel}
+                    </span>
+                  )}
+                  {post.cohorts?.length > 0 && (
+                    <span className="metadata-chip text-xs font-mono">Khoá: {post.cohorts.join(", ")}</span>
+                  )}
+                  {post.evidenceRefs?.length ? (
+                    <span className="metadata-chip">{post.evidenceRefs.length} evidence refs</span>
+                  ) : null}
+                </div>
+                <h3 className="text-base font-semibold text-app-foreground">{titleFor(post)}</h3>
+                <p className="text-sm text-app-muted leading-relaxed">{post.statement}</p>
+
+                {hasMultipleReports && (
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => toggleClusterExpand(post.canonicalId)}
+                      className="text-xs font-medium text-amber-500 hover:text-amber-400 underline decoration-amber-500/30 underline-offset-4"
+                    >
+                      {isExpanded ? "Thu gọn danh sách phản ánh" : `Xem chi tiết ${post.relatedReportCount} phản ánh tương tự`}
+                    </button>
+                    {isExpanded && (
+                      <div className="mt-2 pl-3 border-l-2 border-amber-500/30 space-y-2 py-1">
+                        {post.relatedReports.map((rep, idx) => (
+                          <div key={rep.observationId || idx} className="text-xs text-app-muted/90 bg-neutral-900/40 p-2 rounded">
+                            <div className="flex items-center justify-between text-[11px] text-app-muted/60 mb-1">
+                              <span>{rep.authorName}</span>
+                              <span>{new Date(rep.submittedAt).toLocaleDateString("vi-VN")}</span>
+                            </div>
+                            <p>{rep.statement}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <footer className="flex flex-wrap items-center justify-between pt-2 border-t border-white/5 text-xs text-app-muted">
+                  <span className="flex items-center gap-1">
+                    <Clock3 size={13} /> {post.lastReportedAt ? new Date(post.lastReportedAt).toLocaleDateString("vi-VN") : "Không có thời gian"}
+                  </span>
+                  <span className="flex items-center gap-1"><ShieldCheck size={13} /> Nguồn: đối soát cộng đồng</span>
+                  <button type="button" className="text-link inline-flex items-center gap-1 text-app-primary" onClick={() => openObservation(post)}>
+                    Xem case scope <ArrowRight size={14} />
+                  </button>
+                </footer>
+              </div>
+            </article>
+          );
+        }) : (providerResult?.state === "SUCCESS" || providerResult?.state === "EMPTY") && <div className="intelligence-panel empty-state">Không có báo cáo phù hợp với bộ lọc hiện tại.</div>}
       </div>
       <aside className="space-y-4"><div className="intelligence-panel sticky-insight"><p className="product-kicker">How to read</p><h2 className="product-section-title">Không đánh đồng số đông với sự thật</h2><ul className="reading-rules"><li><CheckCircle2 /> Trải nghiệm trực tiếp cho biết điều đã xảy ra.</li><li><AlertTriangle /> Cảnh báo cần được đối chiếu thêm nguồn độc lập.</li><li><ShieldCheck /> Quy định chính thức vẫn là nguồn thẩm quyền.</li></ul></div><div className="intelligence-panel network-bridge"><p className="product-kicker">Connected by TrustGraph</p><h3>Đưa tín hiệu vào một case kiểm chứng</h3><p>Trust Engine sẽ phân tách rủi ro, confidence và mức đủ bằng chứng.</p><Link href="/trust" className="text-link">Mở Trust Engine <ArrowRight size={14} /></Link></div></aside>
     </section>

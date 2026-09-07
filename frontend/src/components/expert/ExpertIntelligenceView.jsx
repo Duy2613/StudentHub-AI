@@ -6,6 +6,7 @@ import { AlertTriangle, ArrowRight, Award, BookOpenCheck, Building2, CheckCircle
 import { ApiError, apiErrorMessage } from "@/lib/api/errors";
 import StateBoundary from "@/components/ui/StateBoundary";
 import SourceDisclosure from "@/components/ui/SourceDisclosure";
+import ExpertQualificationPanel from "@/components/expert/ExpertQualificationPanel";
 import { createErrorState, createWorkIdentity } from "@/lib/ui-state/model";
 import { getRuntimeProviderBundle, RUNTIME_PROVIDER_MODE } from "@/lib/backend/runtimeProvider";
 
@@ -89,6 +90,7 @@ export function ExpertIntelligenceView() {
         <div className="claim-review"><p className="product-kicker">Independent assessment</p><h3>Kiểm tra một phát ngôn theo phạm vi</h3><label><span>Nội dung cần thẩm định</span><textarea rows={3} value={claimText} onChange={(event) => setClaimText(event.target.value)} placeholder="Nhập phát ngôn cần kiểm tra..." /></label><label><span>Lĩnh vực</span><select value={domain} onChange={(event) => setDomain(event.target.value)}>{(selected.scopes || []).map((scope) => <option key={scope.domain} value={scope.domain}>{scope.domain.replaceAll("_", " ")}</option>)}{!selected.scopes?.length && <option value="AI_ML">AI ML</option>}</select></label><button className="primary-action" disabled={loading || !claimText.trim()} onClick={inspect}>{loading ? <LoaderCircle size={16} className="animate-spin" /> : <Search size={16} />} Thẩm định phạm vi</button>{error && <div className="error-callout" role="alert">{error}</div>}{assessmentResult && assessmentResult.state !== "SUCCESS" && <StateBoundary envelope={assessmentResult} onAction={handleAssessmentAction} />}{evaluation && <div className="assessment-result"><span className="signal-badge">{String(evaluation.claimStatus || "RESULT").replaceAll("_", " ")}</span><p>{evaluation.explanation || "API đã trả về kết quả nhưng không có diễn giải."}</p></div>}</div>
       </div> : <div className="intelligence-panel empty-state">Chưa có hồ sơ chuyên gia khả dụng.</div>}</div>
     </section>
+    <ExpertQualificationPanel />
     <section className="network-bridge intelligence-panel"><p className="product-kicker">Connected by TrustGraph</p><h3>Đưa thẩm định vào case đang phân tích</h3><p>Ý kiến chuyên gia chỉ là một lớp bằng chứng, luôn được đặt cạnh nguồn và cộng đồng.</p><Link href="/trust" className="text-link">Quay lại Trust Engine <ArrowRight size={14} /></Link></section>
   </div>;
 }
