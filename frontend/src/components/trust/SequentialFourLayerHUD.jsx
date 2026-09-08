@@ -197,7 +197,7 @@ export default function SequentialFourLayerHUD({
 
   // Derive consolidated results
   const l1Result = layerResults.layer1 || layers.layer1;
-  const l2Result = layerResults.layer2 || layers.layer2B || layers.layer2A;
+  const l2Result = layerResults.layer2 || layers.layer2;
   const l3Result = layerResults.layer3 || layers.layer3;
   const l4Result = layerResults.layer4 || layers.layer4 || finalVerdict;
 

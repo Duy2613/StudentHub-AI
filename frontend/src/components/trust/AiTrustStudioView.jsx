@@ -22,7 +22,6 @@ import StateBoundary from "@/components/ui/StateBoundary";
 import SourceDisclosure from "@/components/ui/SourceDisclosure";
 import { getRuntimeProviderBundle } from "@/lib/backend/runtimeProvider";
 import SequentialFourLayerHUD from "./SequentialFourLayerHUD";
-import LegacyV5SequentialReport from "./LegacyV5SequentialReport";
 import {
   SEQUENTIAL_STATE,
   createInitialSequentialState,
@@ -38,6 +37,8 @@ function stageWasSkipped(pipeline, stageId) {
   return status === "SKIPPED" || status === "BLOCKED";
 }
 
+const EMPTY_LAYERS = Object.freeze({ layer1: null, layer2: null, layer3: null, layer4: null });
+
 export function AiTrustStudioView() {
   const demoEnabled = process.env.NEXT_PUBLIC_COMPETITION_DEMO === "true";
   const [mode, setMode] = useState("url");
@@ -49,12 +50,11 @@ export function AiTrustStudioView() {
   const [error, setError] = useState(null);
   const [ocr, setOcr] = useState(null);
   const [confirmedEntities, setConfirmedEntities] = useState([]);
-  const [layers, setLayers] = useState({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null });
+  const [layers, setLayers] = useState(EMPTY_LAYERS);
   const [seqState, dispatchSeq] = useReducer(sequentialStateReducer, undefined, createInitialSequentialState);
   const [demoCaseId, setDemoCaseId] = useState(null);
   const [providerResult, setProviderResult] = useState(null);
   const [sourceProvenance, setSourceProvenance] = useState(null);
-  const [pipeline, setPipeline] = useState(null);
 
   const fileInput = useRef(null);
   const activeScan = useRef(null);
@@ -100,8 +100,7 @@ export function AiTrustStudioView() {
     setDemoCaseId(null);
     setProviderResult(null);
     setSourceProvenance(null);
-    setPipeline(null);
-    setLayers({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null });
+    setLayers({ ...EMPTY_LAYERS });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -114,8 +113,7 @@ export function AiTrustStudioView() {
     setProcessing(true);
     setProviderResult(null);
     setSourceProvenance(null);
-    setPipeline(null);
-    setLayers({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null });
+    setLayers({ ...EMPTY_LAYERS });
     dispatchSeq({ type: "START", payload: { requestId: `scan-${scanId}` } });
 
     let extracted = content.trim();
@@ -136,7 +134,7 @@ export function AiTrustStudioView() {
         await new Promise((r) => setTimeout(r, 250));
         if (controller.signal.aborted || scanId !== scanSequence.current) return;
 
-        const l2Result = demoCase.layers.layer2A || demoCase.layers.layer2 || { finding: "NO_KNOWN_THREAT", status: "PASS" };
+        const l2Result = demoCase.layers.layer2 || { finding: "NO_KNOWN_THREAT", status: "PASS" };
         dispatchSeq({ type: "L2_SUCCESS", payload: { result: l2Result } });
         await new Promise((r) => setTimeout(r, 350));
         if (controller.signal.aborted || scanId !== scanSequence.current) return;
@@ -219,18 +217,15 @@ export function AiTrustStudioView() {
       };
 
       const provider = getRuntimeProviderBundle();
-      let latestPipeline = null;
       const response = await provider.trust.investigate(input, controller.signal, (event) => {
         if (scanId !== scanSequence.current || !event?.data) return;
 
-        latestPipeline = event.data;
-        setPipeline(event.data);
         const eventPipeline = event.data;
         const eventSkipped = stageWasSkipped(eventPipeline, event.stageId);
 
         if (event.event === "STAGE_STARTED") {
           if (event.stageId === "l1") dispatchSeq({ type: "START", payload: { requestId: identity.requestId } });
-          else if (["l2a", "l2b", "l2c"].includes(event.stageId)) dispatchSeq({ type: "START_L2" });
+          else if (event.stageId?.startsWith("l2")) dispatchSeq({ type: "START_L2" });
           else if (event.stageId === "l3") dispatchSeq({ type: "START_L3" });
           else if (event.stageId === "l4") dispatchSeq({ type: "START_L4" });
         }
@@ -239,8 +234,8 @@ export function AiTrustStudioView() {
           if (event.stageId === "l1") {
             if (eventSkipped) dispatchSeq({ type: "SKIP_LAYER", payload: { layer: 1 } });
             else if (event.data?.layerResults?.layer1) dispatchSeq({ type: "L1_SUCCESS", payload: { result: event.data.layerResults.layer1 } });
-          } else if (event.stageId === "l2a" && !eventSkipped) {
-            const layer2Result = event.data?.layerResults?.layer2B ?? event.data?.layerResults?.layer2A;
+          } else if (event.stageId?.startsWith("l2") && !eventSkipped) {
+            const layer2Result = event.data?.layerResults?.layer2 ?? event.data?.layerResults?.layer2B ?? event.data?.layerResults?.layer2A;
             if (layer2Result) dispatchSeq({ type: "L2_SUCCESS", payload: { result: layer2Result } });
           } else if (event.stageId === "l3") {
             if (eventSkipped) dispatchSeq({ type: "SKIP_LAYER", payload: { layer: 3 } });
@@ -255,9 +250,7 @@ export function AiTrustStudioView() {
         if (eventLayers) {
           setLayers({
             layer1: eventLayers.layer1 ?? null,
-            layer2A: eventLayers.layer2A ?? null,
-            layer2: eventLayers.layer2B ?? null,
-            layer2C: eventLayers.layer2C ?? null,
+            layer2: eventLayers.layer2 ?? eventLayers.layer2B ?? eventLayers.layer2A ?? null,
             layer3: eventLayers.layer3 ?? null,
             layer4: eventLayers.layer4 ?? null,
           });
@@ -267,10 +260,6 @@ export function AiTrustStudioView() {
       if (scanId !== scanSequence.current) return;
       setProviderResult(response);
       setSourceProvenance(response.provenance);
-      // Keep the raw V5 pipeline emitted by the stream. `response.data` is the
-      // normalized provider contract and intentionally does not contain the
-      // legacy stage map needed by the V5 report below.
-      setPipeline(latestPipeline);
 
       if (["ERROR", "UNAVAILABLE", "OFFLINE", "AUTH_REQUIRED", "FORBIDDEN", "CANCELLED"].includes(response.state)) {
         const safeMessage =
@@ -307,20 +296,18 @@ export function AiTrustStudioView() {
       const displayPipeline = response.data;
       const resultLayers = displayPipeline?.layerResults || {};
       const layer1 = resultLayers.layer1 || null;
-      const layer2A = resultLayers.layer2A || null;
-      const layer2 = resultLayers.layer2B || null;
-      const layer2C = resultLayers.layer2C || null;
+      const layer2 = resultLayers.layer2 || resultLayers.layer2B || resultLayers.layer2A || null;
       const layer3 = resultLayers.layer3 || null;
       const layer4 = resultLayers.layer4 || null;
 
-      setLayers({ layer1, layer2A, layer2, layer2C, layer3, layer4 });
+      setLayers({ layer1, layer2, layer3, layer4 });
 
       // Hydrate the reducer for JSON responses and for hard-stop/continuation
       // paths where later layers are explicitly SKIPPED by the server.
       if (layer1) dispatchSeq({ type: "L1_SUCCESS", payload: { result: layer1 } });
-      if (layer2A || layer2) {
+      if (layer2) {
         dispatchSeq({ type: "START_L2" });
-        dispatchSeq({ type: "L2_SUCCESS", payload: { result: layer2A || layer2 } });
+        dispatchSeq({ type: "L2_SUCCESS", payload: { result: layer2 } });
       }
       if (stageWasSkipped(displayPipeline, "l3")) {
         dispatchSeq({ type: "SKIP_LAYER", payload: { layer: 3 } });
@@ -577,7 +564,6 @@ export function AiTrustStudioView() {
             }}
             onReset={reset}
           />
-          <LegacyV5SequentialReport pipeline={pipeline || providerResult?.data} layers={layers} processing={processing} />
         </div>
       )}
     </div>
