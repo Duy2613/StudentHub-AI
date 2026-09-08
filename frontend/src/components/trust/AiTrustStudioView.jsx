@@ -3,7 +3,6 @@
 import React, { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import Image from "next/image";
 import {
-  AlertTriangle,
   ArrowRight,
   ClipboardPaste,
   FileImage,
@@ -23,6 +22,7 @@ import StateBoundary from "@/components/ui/StateBoundary";
 import SourceDisclosure from "@/components/ui/SourceDisclosure";
 import { getRuntimeProviderBundle } from "@/lib/backend/runtimeProvider";
 import SequentialFourLayerHUD from "./SequentialFourLayerHUD";
+import LegacyV5SequentialReport from "./LegacyV5SequentialReport";
 import {
   SEQUENTIAL_STATE,
   createInitialSequentialState,
@@ -54,6 +54,7 @@ export function AiTrustStudioView() {
   const [demoCaseId, setDemoCaseId] = useState(null);
   const [providerResult, setProviderResult] = useState(null);
   const [sourceProvenance, setSourceProvenance] = useState(null);
+  const [pipeline, setPipeline] = useState(null);
 
   const fileInput = useRef(null);
   const activeScan = useRef(null);
@@ -99,6 +100,7 @@ export function AiTrustStudioView() {
     setDemoCaseId(null);
     setProviderResult(null);
     setSourceProvenance(null);
+    setPipeline(null);
     setLayers({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -112,6 +114,7 @@ export function AiTrustStudioView() {
     setProcessing(true);
     setProviderResult(null);
     setSourceProvenance(null);
+    setPipeline(null);
     setLayers({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null });
     dispatchSeq({ type: "START", payload: { requestId: `scan-${scanId}` } });
 
@@ -216,9 +219,12 @@ export function AiTrustStudioView() {
       };
 
       const provider = getRuntimeProviderBundle();
+      let latestPipeline = null;
       const response = await provider.trust.investigate(input, controller.signal, (event) => {
         if (scanId !== scanSequence.current || !event?.data) return;
 
+        latestPipeline = event.data;
+        setPipeline(event.data);
         const eventPipeline = event.data;
         const eventSkipped = stageWasSkipped(eventPipeline, event.stageId);
 
@@ -261,6 +267,10 @@ export function AiTrustStudioView() {
       if (scanId !== scanSequence.current) return;
       setProviderResult(response);
       setSourceProvenance(response.provenance);
+      // Keep the raw V5 pipeline emitted by the stream. `response.data` is the
+      // normalized provider contract and intentionally does not contain the
+      // legacy stage map needed by the V5 report below.
+      setPipeline(latestPipeline);
 
       if (["ERROR", "UNAVAILABLE", "OFFLINE", "AUTH_REQUIRED", "FORBIDDEN", "CANCELLED"].includes(response.state)) {
         const safeMessage =
@@ -567,6 +577,7 @@ export function AiTrustStudioView() {
             }}
             onReset={reset}
           />
+          <LegacyV5SequentialReport pipeline={pipeline || providerResult?.data} layers={layers} processing={processing} />
         </div>
       )}
     </div>
