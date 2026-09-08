@@ -35,6 +35,11 @@ export const LEGACY_VERIFICATION_CONFIG = Object.freeze({
   }),
 });
 
+// The sequential Trust flow has a known public Friend Backend deployment.
+// Environment configuration still wins, but local/deployed runs should not
+// fail merely because the optional env file was not loaded by the host.
+const DEFAULT_FRIEND_BACKEND_URL = "https://studenthub-api-8fqp.onrender.com";
+
 function envString(env, key) {
   return typeof env?.[key] === "string" ? env[key].trim() : "";
 }
@@ -70,7 +75,7 @@ export function getLegacyVerificationConfig(env = process.env) {
   const friendBaseUrl = envString(env, LEGACY_VERIFICATION_CONFIG.FRIEND_BASE_URL_ENV);
   const preferred = friendBaseUrl || envString(env, LEGACY_VERIFICATION_CONFIG.BASE_URL_ENV);
   const fallback = envString(env, LEGACY_VERIFICATION_CONFIG.FALLBACK_BASE_URL_ENV);
-  const rawBaseUrl = preferred || fallback;
+  const rawBaseUrl = preferred || fallback || DEFAULT_FRIEND_BACKEND_URL;
   const apiKey = envString(env, LEGACY_VERIFICATION_CONFIG.FRIEND_API_KEY_ENV) || null;
   const base = normalizedBaseUrl(rawBaseUrl);
   const timeoutMs = boundedTimeout(envString(env, LEGACY_VERIFICATION_CONFIG.TIMEOUT_ENV));
