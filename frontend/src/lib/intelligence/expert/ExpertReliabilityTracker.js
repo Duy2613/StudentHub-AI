@@ -77,11 +77,13 @@ export class ExpertReliabilityTracker {
       return {
         expertId,
         totalClaims: 0,
-        historicalAccuracy: 0.90, // Baseline prior for unobserved expert
+        historicalAccuracy: null,
         confirmedClaims: 0,
         disputedClaims: 0,
         retractedClaims: 0,
-        reliabilityLabel: "CHƯA ĐỦ LỊCH SỬ ĐÁNH GIÁ (MẶC ĐỊNH CAO)"
+        sampleSize: 0,
+        uncertainty: "HIGH",
+        reliabilityLabel: "INSUFFICIENT_DATA"
       };
     }
 
@@ -94,9 +96,9 @@ export class ExpertReliabilityTracker {
     const score = (confirmed * 1.0 + activeNeutral * 0.7 - disputed * 0.5 - retracted * 0.8) / claims.length;
     const historicalAccuracy = Math.max(0.1, Math.min(1.0, Number(score.toFixed(3))));
 
-    let reliabilityLabel = "ĐỘ TIN CẬY RẤT CAO";
-    if (historicalAccuracy < 0.5) reliabilityLabel = "ĐỘ TIN CẬY CẦN THẬN TRỌNG";
-    else if (historicalAccuracy < 0.75) reliabilityLabel = "ĐỘ TIN CẬY TRUNG BÌNH";
+    let reliabilityLabel = claims.length < 20 ? "INSUFFICIENT_DATA" : "ĐỘ TIN CẬY RẤT CAO";
+    if (claims.length >= 20 && historicalAccuracy < 0.5) reliabilityLabel = "ĐỘ TIN CẬY CẦN THẬN TRỌNG";
+    else if (claims.length >= 20 && historicalAccuracy < 0.75) reliabilityLabel = "ĐỘ TIN CẬY TRUNG BÌNH";
 
     return {
       expertId,
@@ -105,6 +107,8 @@ export class ExpertReliabilityTracker {
       confirmedClaims: confirmed,
       disputedClaims: disputed,
       retractedClaims: retracted,
+      sampleSize: claims.length,
+      uncertainty: claims.length < 20 ? "HIGH" : claims.length < 50 ? "MEDIUM" : "LOW",
       reliabilityLabel,
       claimHistory: [...claims]
     };

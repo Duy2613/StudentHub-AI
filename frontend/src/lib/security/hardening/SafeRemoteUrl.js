@@ -88,14 +88,39 @@ export function isPrivateAddress(hostname) {
   return ipVersion === 4 ? isPrivateIpv4(normalized) : ipVersion === 6 ? isPrivateIpv6(normalized) : false;
 }
 
+const DNS_REBIND_DOMAINS = [
+  "nip.io",
+  "sslip.io",
+  "localtest.me",
+  "vcap.me",
+  "xip.io",
+  "traefik.me",
+  "lvh.me"
+];
+
 export function isBlockedHostname(hostname) {
   const normalized = normalizeHostname(hostname);
-  return !normalized || BLOCKED_HOSTNAMES.has(normalized) ||
+  if (!normalized || BLOCKED_HOSTNAMES.has(normalized) ||
     normalized === "0.0.0.0" ||
     normalized.endsWith(".localhost") ||
     normalized.endsWith(".internal") ||
     normalized.endsWith(".local") ||
-    isPrivateAddress(normalized);
+    isPrivateAddress(normalized)) {
+    return true;
+  }
+
+  // Block DNS rebinding wildcards
+  if (DNS_REBIND_DOMAINS.some(d => normalized === d || normalized.endsWith("." + d))) {
+    return true;
+  }
+
+  // Block embedded private/loopback IPv4 in subdomain strings (e.g. rebind.127.0.0.1.nip.io or 192-168-1-1)
+  const embeddedIpMatch = normalized.match(/(?:^|\.)(?:127\.\d+\.\d+\.\d+|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(?:1[6-9]|2\d|3[0-1])\.\d+\.\d+|169\.254\.\d+\.\d+)(?:\.|$)/);
+  if (embeddedIpMatch) {
+    return true;
+  }
+
+  return false;
 }
 
 export function validateRemoteUrlSync(value) {

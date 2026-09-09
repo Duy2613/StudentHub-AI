@@ -5,11 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
-  BookOpen,
-  BrainCircuit,
-  Compass,
-  FileCode2,
-  FolderKanban,
+  FileClock,
   Search,
   ShieldCheck,
   UserRoundCheck,
@@ -20,10 +16,7 @@ import { searchCanonicalProduct, STATIC_SEARCH_INDEX } from "@/lib/search/search
 import { markAssurance, measureAssurance } from "@/lib/performance/assurance";
 
 const CATEGORY_ICONS = {
-  Courses: BookOpen,
-  Lessons: FileCode2,
-  Practice: BrainCircuit,
-  Projects: FolderKanban,
+  Cases: FileClock,
   Trust: ShieldCheck,
   Community: Users,
   Experts: UserRoundCheck,
@@ -41,7 +34,7 @@ export default function AcademicCommandPalette({ isOpen, onClose, restoreFocusRe
 
   const defaultResults = useMemo(() => ({
     Navigation: STATIC_SEARCH_INDEX.filter((item) => item.category === "Navigation").slice(0, 3),
-    Courses: STATIC_SEARCH_INDEX.filter((item) => item.category === "Courses").slice(0, 2),
+    Cases: STATIC_SEARCH_INDEX.filter((item) => item.category === "Cases").slice(0, 2),
     Trust: STATIC_SEARCH_INDEX.filter((item) => item.category === "Trust").slice(0, 2),
   }), []);
   const results = useMemo(
@@ -154,7 +147,7 @@ export default function AcademicCommandPalette({ isOpen, onClose, restoreFocusRe
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm kiếm môn học, bài giảng, thử thách, bằng chứng, chuyên gia..."
+            placeholder="Tìm kiếm tình huống, bằng chứng, chuyên gia..."
             className="w-full bg-transparent text-sm sm:text-base text-text-primary placeholder:text-text-muted focus:outline-none"
             aria-autocomplete="list"
           />

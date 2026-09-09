@@ -5,7 +5,7 @@
 
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { ConfidenceCalibrationEngine } from "@/lib/intelligence/fusion/ConfidenceCalibrationEngine.js";
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore.js";
+import { ExpertStore, isExpertDemoMode } from "@/lib/intelligence/expert/expertStore.js";
 
 export const GET = SecurityFabric.wrapHandler(
   {
@@ -15,6 +15,9 @@ export const GET = SecurityFabric.wrapHandler(
     allowAnonymous: true
   },
   async (request, routeParams, principal, secContext) => {
+    if (!isExpertDemoMode()) {
+      return Response.json({ success: true, state: "UNAVAILABLE", data: null, meta: { correlationId: secContext.correlationId, reason: "LIVE_METRICS_NOT_CONFIGURED" }, sourceState: "UNAVAILABLE", isAuthoritative: false, dataNotice: "Live intelligence metrics require measured production telemetry; no fixture values are presented as evidence." });
+    }
     const brierReport = ConfidenceCalibrationEngine.calculateBrierScore();
     const allExperts = ExpertStore.getAllExperts ? ExpertStore.getAllExperts() : [];
     const verifiedCount = allExperts.filter(e => e.verificationStatus === "VERIFIED_EXPERT" || e.verificationStatus === "VERIFIED").length;

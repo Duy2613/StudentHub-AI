@@ -408,9 +408,10 @@ export class FraudRiskEngine {
       /(?:mã|ma)?\s*(?:smart\s*)?otp\s+(?:không được|khong duoc)\s+(?:chia sẻ|chia se|cung cấp|cung cap|gửi|gui|tiết lộ|tiet lo)/i.test(text);
 
     const otpDemandPatterns = [
-      /(?:gửi|gui|nhập|nhap|cung cấp|cung cap|forward|chuyển tiếp|chuyen tiep|chia sẻ|chia se|đọc|doc|nhắn|nhan)\s*(?:lại\s*)?(?:mã|ma)?\s*(?:smart\s*)?otp/i,
+      /(?:gửi|gui|nhập|nhap|cung cấp|cung cap|forward|chuyển tiếp|chuyen tiep|chia sẻ|chia se|đọc|doc|nhắn|nhan)[\s\S]{0,50}(?:mã|ma)?\s*(?:smart\s*)?otp/i,
       /(?:xác thực|xac thuc|bảo mật|bao mat)\s*otp/i,
-      /(?:mã|ma)\s*(?:smart\s*)?otp\s*(?:về\s*(?:số|so)|của\s*bạn|cua\s*ban)/i
+      /(?:mã|ma)\s*(?:smart\s*)?otp\s*(?:về\s*(?:số|so)|của\s*bạn|cua\s*ban)/i,
+      /(?:google\s*form|biểu mẫu|bieu mau|link)[\s\S]{0,50}(?:otp|tài khoản|tai khoan|mật khẩu|mat khau)/i
     ];
 
     if (!isNegativeOtpWarning && otpDemandPatterns.some(k => k.test(text))) {
@@ -465,8 +466,9 @@ export class FraudRiskEngine {
 
     const personalPaymentPatterns = [
       /(?:momo|zalopay|viettelpay|shopeepay)[\s\S]{0,20}\d{9,11}/i,
-      /(?:stk|tài khoản|tai khoan|so tai khoan|số tài khoản)\s*(?:cá nhân|ca nhan)/i,
-      /(?:stk cá nhân|stk ca nhan|tài khoản cá nhân|tai khoan ca nhan)/i
+      /(?:stk|tài khoản|tai khoan|so tai khoan|số tài khoản|ví điện tử|vi dien tu)\s*(?:cá nhân|ca nhan)/i,
+      /(?:stk cá nhân|stk ca nhan|tài khoản cá nhân|tai khoan ca nhan|ví điện tử cá nhân|vi dien tu ca nhan)/i,
+      /(?:chuyển|chuyen|nộp|nop|nạp|nap)[\s\S]{0,30}(?:ví điện tử|vi dien tu|tài khoản|tai khoan|stk)?\s*(?:cá nhân|ca nhan)/i
     ];
 
     // Check "chủ tài khoản:" / "chu tai khoan:" with programmatic beneficiary validation

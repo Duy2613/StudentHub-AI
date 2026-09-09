@@ -5,11 +5,15 @@ import { TrustCasePassportBinder } from "../../src/lib/intelligence/passport/Tru
 import { PostgresCrossSystemRepository } from "../../src/lib/intelligence/crossSystem/PostgresCrossSystemRepository.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
+const liveGate = {
+  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
+};
+
 after(async () => {
-  await getPostgresPool().end();
+  if (process.env.DATABASE_URL) await getPostgresPool().end();
 });
 
-test("TrustCasePassportBinder: Creates durable Passport bound to Trust Case for authenticated owner", async () => {
+test("TrustCasePassportBinder: Creates durable Passport bound to Trust Case for authenticated owner", liveGate, async () => {
   const pool = getPostgresPool();
   const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 1`);
   if (userRes.rows.length === 0) {

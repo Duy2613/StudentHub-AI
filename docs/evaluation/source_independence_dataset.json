@@ -1,0 +1,2312 @@
+{
+  "version": "1.0.0-gold",
+  "totalUnits": 60,
+  "createdAt": "2026-09-09T10:46:38.184Z",
+  "description": "Gold dataset for source independence, same-origin detection, and syndication collapse benchmark",
+  "units": [
+    {
+      "unitId": "IND-01",
+      "scenario": "Chính sách học phí đại học mới năm 2026",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-01-a",
+          "domain": "baotintuc.vn",
+          "publisher": "Báo Tin Tức",
+          "content": "Theo TTXVN, Bộ GD&ĐT vừa ban hành quy chế khung học phí đại học mới áp dụng từ năm 2026 nhằm bảo đảm quyền lợi người học.",
+          "contentDigest": "hash-ttxvn-hocphi-2026"
+        },
+        {
+          "sourceId": "s-01-b",
+          "domain": "vietnamplus.vn",
+          "publisher": "VietnamPlus",
+          "content": "Theo TTXVN, Bộ GD&ĐT vừa ban hành quy chế khung học phí đại học mới áp dụng từ năm 2026 nhằm bảo đảm quyền lợi người học.",
+          "contentDigest": "hash-ttxvn-hocphi-2026"
+        },
+        {
+          "sourceId": "s-01-c",
+          "domain": "dantri.com.vn",
+          "publisher": "Dân Trí",
+          "content": "Theo Thông tấn xã Việt Nam (TTXVN), Bộ GD&ĐT vừa ban hành quy chế khung học phí đại học mới áp dụng từ năm 2026.",
+          "contentDigest": "hash-ttxvn-dantri-2026"
+        },
+        {
+          "sourceId": "s-01-d",
+          "domain": "vtv.vn",
+          "publisher": "VTV",
+          "content": "Nguồn tin từ TTXVN cho biết Bộ GD&ĐT đã hoàn tất quy chế khung học phí đại học mới cho năm học 2026.",
+          "contentDigest": "hash-ttxvn-vtv-2026"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-01-a",
+            "s-01-b",
+            "s-01-c",
+            "s-01-d"
+          ],
+          "originType": "NEWS_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-02",
+      "scenario": "Học bổng tài năng ĐH Bách khoa TP.HCM",
+      "expectedIndependentOriginsCount": 3,
+      "sources": [
+        {
+          "sourceId": "s-02-a",
+          "domain": "hcmut.edu.vn",
+          "publisher": "ĐH Bách khoa ĐHQG-HCM",
+          "content": "Phòng Đào tạo thông báo chương trình học bổng tài năng OISP 2026 dành cho sinh viên xuất sắc, miễn giảm 100% học phí.",
+          "contentDigest": "hash-hcmut-oisp-official"
+        },
+        {
+          "sourceId": "s-02-b",
+          "domain": "tuoitre.vn",
+          "publisher": "Báo Tuổi Trẻ",
+          "content": "Phóng viên Tuổi Trẻ ghi nhận nhiều sinh viên Bách khoa hào hứng nộp hồ sơ xin học bổng OISP với tiêu chuẩn khắt khe về nghiên cứu khoa học.",
+          "contentDigest": "hash-tuoitre-oisp-report"
+        },
+        {
+          "sourceId": "s-02-c",
+          "domain": "facebook.com",
+          "publisher": "Diễn đàn Sinh viên Bách khoa",
+          "content": "Mọi người ơi cho mình hỏi điểm IELTS 7.5 có đủ điều kiện nộp học bổng OISP đợt này không nhỉ?",
+          "contentDigest": "hash-fb-oisp-discussion"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-02-a"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-02-b"
+          ],
+          "originType": "INDEPENDENT_JOURNALISM"
+        },
+        {
+          "clusterId": "gold-c3",
+          "memberSourceIds": [
+            "s-02-c"
+          ],
+          "originType": "COMMUNITY"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-03",
+      "scenario": "Tuyển dụng cộng tác viên online nạp tiền xử lý đơn hàng",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-03-a",
+          "domain": "vieclam24h-fake.net",
+          "publisher": "Tuyển dụng 24h",
+          "content": "Tuyển CTV xử lý đơn hàng Shopee tại nhà, lương 500k-1 triệu/ngày, liên hệ Telegram @tuyendungshopee2026 nạp tiền tạm ứng.",
+          "contentDigest": "hash-scam-ctv-shopee"
+        },
+        {
+          "sourceId": "s-03-b",
+          "domain": "timviecnhanh-scam.xyz",
+          "publisher": "Tìm Việc Nhanh",
+          "content": "Tuyển CTV xử lý đơn hàng Shopee tại nhà, lương 500k-1 triệu/ngày, liên hệ Telegram @tuyendungshopee2026 nạp tiền tạm ứng.",
+          "contentDigest": "hash-scam-ctv-shopee"
+        },
+        {
+          "sourceId": "s-03-c",
+          "domain": "jobvn-tuyendung.online",
+          "publisher": "Job VN",
+          "content": "Cần gấp 10 bạn CTV online xử lý đơn hàng Shopee lương 500k/ngày, liên hệ Telegram @tuyendungshopee2026 nạp tiền tạm ứng.",
+          "contentDigest": "hash-scam-ctv-shopee-variant"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-03-a",
+            "s-03-b",
+            "s-03-c"
+          ],
+          "originType": "SCAM_CAMPAIGN"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-04",
+      "scenario": "Quy định học phí của 2 trường khác nhau",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-04-a",
+          "domain": "hcmute.edu.vn",
+          "publisher": "HCMUTE",
+          "content": "Trường Đại học Sư phạm Kỹ thuật TP.HCM thông báo mức học phí khóa 2026 dao động từ 19.5 đến 22 triệu đồng/học kỳ.",
+          "contentDigest": "hash-hcmute-tuition"
+        },
+        {
+          "sourceId": "s-04-b",
+          "domain": "hust.edu.vn",
+          "publisher": "HUST",
+          "content": "Đại học Bách khoa Hà Nội công bố biểu mức học phí chương trình chuẩn năm học 2026 từ 24 đến 28 triệu đồng/năm.",
+          "contentDigest": "hash-hust-tuition"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-04-a"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-04-b"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-05",
+      "scenario": "Cảnh báo thủ đoạn lừa đảo gọi điện giả danh công an",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-05-a",
+          "domain": "bocongan.gov.vn",
+          "publisher": "Bộ Công an",
+          "content": "Cục An ninh mạng Bộ Công an cảnh báo thủ đoạn giả danh điều tra viên yêu cầu chuyển tiền vào tài khoản an toàn để xác minh.",
+          "contentDigest": "hash-bca-scam-warning"
+        },
+        {
+          "sourceId": "s-05-b",
+          "domain": "congan.com.vn",
+          "publisher": "Báo Công an TP.HCM",
+          "content": "Theo Bộ Công an, cơ quan công an không bao giờ làm việc qua điện thoại hay yêu cầu người dân chuyển tiền vào tài khoản cá nhân.",
+          "contentDigest": "hash-catp-scam-warning"
+        },
+        {
+          "sourceId": "s-05-c",
+          "domain": "vnexpress.net",
+          "publisher": "VnExpress",
+          "content": "Nguồn từ Bộ Công an: Người dân tuyệt đối không cung cấp mã OTP hoặc chuyển tiền cho người tự xưng là cán bộ công an qua điện thoại.",
+          "contentDigest": "hash-vnexpress-bca-warning"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-05-a",
+            "s-05-b",
+            "s-05-c"
+          ],
+          "originType": "MINISTRY_WARNING_SYNDICATION"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-06",
+      "scenario": "Thông cáo báo chí số 6 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-6-1",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 6/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-6"
+        },
+        {
+          "sourceId": "s-6-2",
+          "domain": "tuoitre.vn",
+          "publisher": "tuoitre.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 6/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-6"
+        },
+        {
+          "sourceId": "s-6-3",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 6/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-6-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-6-1",
+            "s-6-2",
+            "s-6-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-07",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa FTU và VNUHN",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-7-1",
+          "domain": "ftu.edu.vn",
+          "publisher": "ĐH Ngoại thương",
+          "content": "ĐH Ngoại thương công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-FTU-7"
+        },
+        {
+          "sourceId": "s-7-2",
+          "domain": "vnu.edu.vn",
+          "publisher": "ĐHQG Hà Nội",
+          "content": "ĐHQG Hà Nội thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-VNUHN-7"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-7-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-7-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-08",
+      "scenario": "Thông cáo báo chí số 8 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-8-1",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 8/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-8"
+        },
+        {
+          "sourceId": "s-8-2",
+          "domain": "dantri.com.vn",
+          "publisher": "dantri.com.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 8/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-8"
+        },
+        {
+          "sourceId": "s-8-3",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 8/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-8-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-8-1",
+            "s-8-2",
+            "s-8-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-09",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa VNUHCM và UEH",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-9-1",
+          "domain": "vnuhcm.edu.vn",
+          "publisher": "ĐHQG TP.HCM",
+          "content": "ĐHQG TP.HCM công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-VNUHCM-9"
+        },
+        {
+          "sourceId": "s-9-2",
+          "domain": "ueh.edu.vn",
+          "publisher": "ĐH Kinh tế TP.HCM",
+          "content": "ĐH Kinh tế TP.HCM thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-UEH-9"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-9-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-9-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-10",
+      "scenario": "Thông cáo báo chí số 10 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-10-1",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 10/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-10"
+        },
+        {
+          "sourceId": "s-10-2",
+          "domain": "tienphong.vn",
+          "publisher": "tienphong.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 10/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-10"
+        },
+        {
+          "sourceId": "s-10-3",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 10/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-10-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-10-1",
+            "s-10-2",
+            "s-10-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-11",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa NEU và FTU",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-11-1",
+          "domain": "neu.edu.vn",
+          "publisher": "ĐH Kinh tế Quốc dân",
+          "content": "ĐH Kinh tế Quốc dân công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-NEU-11"
+        },
+        {
+          "sourceId": "s-11-2",
+          "domain": "ftu.edu.vn",
+          "publisher": "ĐH Ngoại thương",
+          "content": "ĐH Ngoại thương thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-FTU-11"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-11-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-11-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-12",
+      "scenario": "Thông cáo báo chí số 12 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-12-1",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 12/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-12"
+        },
+        {
+          "sourceId": "s-12-2",
+          "domain": "tuoitre.vn",
+          "publisher": "tuoitre.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 12/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-12"
+        },
+        {
+          "sourceId": "s-12-3",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 12/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-12-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-12-1",
+            "s-12-2",
+            "s-12-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-13",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa VNUHN và VNUHCM",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-13-1",
+          "domain": "vnu.edu.vn",
+          "publisher": "ĐHQG Hà Nội",
+          "content": "ĐHQG Hà Nội công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-VNUHN-13"
+        },
+        {
+          "sourceId": "s-13-2",
+          "domain": "vnuhcm.edu.vn",
+          "publisher": "ĐHQG TP.HCM",
+          "content": "ĐHQG TP.HCM thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-VNUHCM-13"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-13-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-13-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-14",
+      "scenario": "Thông cáo báo chí số 14 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-14-1",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 14/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-14"
+        },
+        {
+          "sourceId": "s-14-2",
+          "domain": "dantri.com.vn",
+          "publisher": "dantri.com.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 14/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-14"
+        },
+        {
+          "sourceId": "s-14-3",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 14/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-14-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-14-1",
+            "s-14-2",
+            "s-14-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-15",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa UEH và NEU",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-15-1",
+          "domain": "ueh.edu.vn",
+          "publisher": "ĐH Kinh tế TP.HCM",
+          "content": "ĐH Kinh tế TP.HCM công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-UEH-15"
+        },
+        {
+          "sourceId": "s-15-2",
+          "domain": "neu.edu.vn",
+          "publisher": "ĐH Kinh tế Quốc dân",
+          "content": "ĐH Kinh tế Quốc dân thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-NEU-15"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-15-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-15-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-16",
+      "scenario": "Thông cáo báo chí số 16 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-16-1",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 16/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-16"
+        },
+        {
+          "sourceId": "s-16-2",
+          "domain": "tienphong.vn",
+          "publisher": "tienphong.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 16/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-16"
+        },
+        {
+          "sourceId": "s-16-3",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 16/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-16-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-16-1",
+            "s-16-2",
+            "s-16-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-17",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa FTU và VNUHN",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-17-1",
+          "domain": "ftu.edu.vn",
+          "publisher": "ĐH Ngoại thương",
+          "content": "ĐH Ngoại thương công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-FTU-17"
+        },
+        {
+          "sourceId": "s-17-2",
+          "domain": "vnu.edu.vn",
+          "publisher": "ĐHQG Hà Nội",
+          "content": "ĐHQG Hà Nội thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-VNUHN-17"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-17-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-17-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-18",
+      "scenario": "Thông cáo báo chí số 18 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-18-1",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 18/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-18"
+        },
+        {
+          "sourceId": "s-18-2",
+          "domain": "tuoitre.vn",
+          "publisher": "tuoitre.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 18/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-18"
+        },
+        {
+          "sourceId": "s-18-3",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 18/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-18-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-18-1",
+            "s-18-2",
+            "s-18-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-19",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa VNUHCM và UEH",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-19-1",
+          "domain": "vnuhcm.edu.vn",
+          "publisher": "ĐHQG TP.HCM",
+          "content": "ĐHQG TP.HCM công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-VNUHCM-19"
+        },
+        {
+          "sourceId": "s-19-2",
+          "domain": "ueh.edu.vn",
+          "publisher": "ĐH Kinh tế TP.HCM",
+          "content": "ĐH Kinh tế TP.HCM thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-UEH-19"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-19-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-19-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-20",
+      "scenario": "Thông cáo báo chí số 20 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-20-1",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 20/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-20"
+        },
+        {
+          "sourceId": "s-20-2",
+          "domain": "dantri.com.vn",
+          "publisher": "dantri.com.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 20/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-20"
+        },
+        {
+          "sourceId": "s-20-3",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 20/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-20-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-20-1",
+            "s-20-2",
+            "s-20-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-21",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa NEU và FTU",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-21-1",
+          "domain": "neu.edu.vn",
+          "publisher": "ĐH Kinh tế Quốc dân",
+          "content": "ĐH Kinh tế Quốc dân công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-NEU-21"
+        },
+        {
+          "sourceId": "s-21-2",
+          "domain": "ftu.edu.vn",
+          "publisher": "ĐH Ngoại thương",
+          "content": "ĐH Ngoại thương thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-FTU-21"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-21-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-21-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-22",
+      "scenario": "Thông cáo báo chí số 22 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-22-1",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 22/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-22"
+        },
+        {
+          "sourceId": "s-22-2",
+          "domain": "tienphong.vn",
+          "publisher": "tienphong.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 22/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-22"
+        },
+        {
+          "sourceId": "s-22-3",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 22/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-22-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-22-1",
+            "s-22-2",
+            "s-22-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-23",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa VNUHN và VNUHCM",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-23-1",
+          "domain": "vnu.edu.vn",
+          "publisher": "ĐHQG Hà Nội",
+          "content": "ĐHQG Hà Nội công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-VNUHN-23"
+        },
+        {
+          "sourceId": "s-23-2",
+          "domain": "vnuhcm.edu.vn",
+          "publisher": "ĐHQG TP.HCM",
+          "content": "ĐHQG TP.HCM thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-VNUHCM-23"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-23-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-23-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-24",
+      "scenario": "Thông cáo báo chí số 24 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-24-1",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 24/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-24"
+        },
+        {
+          "sourceId": "s-24-2",
+          "domain": "tuoitre.vn",
+          "publisher": "tuoitre.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 24/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-24"
+        },
+        {
+          "sourceId": "s-24-3",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 24/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-24-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-24-1",
+            "s-24-2",
+            "s-24-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-25",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa UEH và NEU",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-25-1",
+          "domain": "ueh.edu.vn",
+          "publisher": "ĐH Kinh tế TP.HCM",
+          "content": "ĐH Kinh tế TP.HCM công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-UEH-25"
+        },
+        {
+          "sourceId": "s-25-2",
+          "domain": "neu.edu.vn",
+          "publisher": "ĐH Kinh tế Quốc dân",
+          "content": "ĐH Kinh tế Quốc dân thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-NEU-25"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-25-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-25-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-26",
+      "scenario": "Thông cáo báo chí số 26 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-26-1",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 26/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-26"
+        },
+        {
+          "sourceId": "s-26-2",
+          "domain": "dantri.com.vn",
+          "publisher": "dantri.com.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 26/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-26"
+        },
+        {
+          "sourceId": "s-26-3",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 26/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-26-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-26-1",
+            "s-26-2",
+            "s-26-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-27",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa FTU và VNUHN",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-27-1",
+          "domain": "ftu.edu.vn",
+          "publisher": "ĐH Ngoại thương",
+          "content": "ĐH Ngoại thương công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-FTU-27"
+        },
+        {
+          "sourceId": "s-27-2",
+          "domain": "vnu.edu.vn",
+          "publisher": "ĐHQG Hà Nội",
+          "content": "ĐHQG Hà Nội thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-VNUHN-27"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-27-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-27-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-28",
+      "scenario": "Thông cáo báo chí số 28 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-28-1",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 28/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-28"
+        },
+        {
+          "sourceId": "s-28-2",
+          "domain": "tienphong.vn",
+          "publisher": "tienphong.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 28/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-28"
+        },
+        {
+          "sourceId": "s-28-3",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 28/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-28-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-28-1",
+            "s-28-2",
+            "s-28-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-29",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa VNUHCM và UEH",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-29-1",
+          "domain": "vnuhcm.edu.vn",
+          "publisher": "ĐHQG TP.HCM",
+          "content": "ĐHQG TP.HCM công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-VNUHCM-29"
+        },
+        {
+          "sourceId": "s-29-2",
+          "domain": "ueh.edu.vn",
+          "publisher": "ĐH Kinh tế TP.HCM",
+          "content": "ĐH Kinh tế TP.HCM thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-UEH-29"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-29-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-29-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-30",
+      "scenario": "Thông cáo báo chí số 30 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-30-1",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 30/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-30"
+        },
+        {
+          "sourceId": "s-30-2",
+          "domain": "tuoitre.vn",
+          "publisher": "tuoitre.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 30/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-30"
+        },
+        {
+          "sourceId": "s-30-3",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 30/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-30-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-30-1",
+            "s-30-2",
+            "s-30-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-31",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa NEU và FTU",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-31-1",
+          "domain": "neu.edu.vn",
+          "publisher": "ĐH Kinh tế Quốc dân",
+          "content": "ĐH Kinh tế Quốc dân công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-NEU-31"
+        },
+        {
+          "sourceId": "s-31-2",
+          "domain": "ftu.edu.vn",
+          "publisher": "ĐH Ngoại thương",
+          "content": "ĐH Ngoại thương thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-FTU-31"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-31-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-31-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-32",
+      "scenario": "Thông cáo báo chí số 32 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-32-1",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 32/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-32"
+        },
+        {
+          "sourceId": "s-32-2",
+          "domain": "dantri.com.vn",
+          "publisher": "dantri.com.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 32/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-32"
+        },
+        {
+          "sourceId": "s-32-3",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 32/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-32-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-32-1",
+            "s-32-2",
+            "s-32-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-33",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa VNUHN và VNUHCM",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-33-1",
+          "domain": "vnu.edu.vn",
+          "publisher": "ĐHQG Hà Nội",
+          "content": "ĐHQG Hà Nội công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-VNUHN-33"
+        },
+        {
+          "sourceId": "s-33-2",
+          "domain": "vnuhcm.edu.vn",
+          "publisher": "ĐHQG TP.HCM",
+          "content": "ĐHQG TP.HCM thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-VNUHCM-33"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-33-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-33-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-34",
+      "scenario": "Thông cáo báo chí số 34 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-34-1",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 34/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-34"
+        },
+        {
+          "sourceId": "s-34-2",
+          "domain": "tienphong.vn",
+          "publisher": "tienphong.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 34/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-34"
+        },
+        {
+          "sourceId": "s-34-3",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 34/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-34-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-34-1",
+            "s-34-2",
+            "s-34-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-35",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa UEH và NEU",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-35-1",
+          "domain": "ueh.edu.vn",
+          "publisher": "ĐH Kinh tế TP.HCM",
+          "content": "ĐH Kinh tế TP.HCM công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-UEH-35"
+        },
+        {
+          "sourceId": "s-35-2",
+          "domain": "neu.edu.vn",
+          "publisher": "ĐH Kinh tế Quốc dân",
+          "content": "ĐH Kinh tế Quốc dân thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-NEU-35"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-35-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-35-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-36",
+      "scenario": "Thông cáo báo chí số 36 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-36-1",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 36/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-36"
+        },
+        {
+          "sourceId": "s-36-2",
+          "domain": "tuoitre.vn",
+          "publisher": "tuoitre.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 36/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-36"
+        },
+        {
+          "sourceId": "s-36-3",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 36/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-36-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-36-1",
+            "s-36-2",
+            "s-36-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-37",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa FTU và VNUHN",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-37-1",
+          "domain": "ftu.edu.vn",
+          "publisher": "ĐH Ngoại thương",
+          "content": "ĐH Ngoại thương công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-FTU-37"
+        },
+        {
+          "sourceId": "s-37-2",
+          "domain": "vnu.edu.vn",
+          "publisher": "ĐHQG Hà Nội",
+          "content": "ĐHQG Hà Nội thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-VNUHN-37"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-37-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-37-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-38",
+      "scenario": "Thông cáo báo chí số 38 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-38-1",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 38/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-38"
+        },
+        {
+          "sourceId": "s-38-2",
+          "domain": "dantri.com.vn",
+          "publisher": "dantri.com.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 38/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-38"
+        },
+        {
+          "sourceId": "s-38-3",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 38/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-38-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-38-1",
+            "s-38-2",
+            "s-38-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-39",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa VNUHCM và UEH",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-39-1",
+          "domain": "vnuhcm.edu.vn",
+          "publisher": "ĐHQG TP.HCM",
+          "content": "ĐHQG TP.HCM công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-VNUHCM-39"
+        },
+        {
+          "sourceId": "s-39-2",
+          "domain": "ueh.edu.vn",
+          "publisher": "ĐH Kinh tế TP.HCM",
+          "content": "ĐH Kinh tế TP.HCM thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-UEH-39"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-39-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-39-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-40",
+      "scenario": "Thông cáo báo chí số 40 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-40-1",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 40/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-40"
+        },
+        {
+          "sourceId": "s-40-2",
+          "domain": "tienphong.vn",
+          "publisher": "tienphong.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 40/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-40"
+        },
+        {
+          "sourceId": "s-40-3",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 40/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-40-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-40-1",
+            "s-40-2",
+            "s-40-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-41",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa NEU và FTU",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-41-1",
+          "domain": "neu.edu.vn",
+          "publisher": "ĐH Kinh tế Quốc dân",
+          "content": "ĐH Kinh tế Quốc dân công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-NEU-41"
+        },
+        {
+          "sourceId": "s-41-2",
+          "domain": "ftu.edu.vn",
+          "publisher": "ĐH Ngoại thương",
+          "content": "ĐH Ngoại thương thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-FTU-41"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-41-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-41-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-42",
+      "scenario": "Thông cáo báo chí số 42 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-42-1",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 42/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-42"
+        },
+        {
+          "sourceId": "s-42-2",
+          "domain": "tuoitre.vn",
+          "publisher": "tuoitre.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 42/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-42"
+        },
+        {
+          "sourceId": "s-42-3",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 42/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-42-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-42-1",
+            "s-42-2",
+            "s-42-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-43",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa VNUHN và VNUHCM",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-43-1",
+          "domain": "vnu.edu.vn",
+          "publisher": "ĐHQG Hà Nội",
+          "content": "ĐHQG Hà Nội công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-VNUHN-43"
+        },
+        {
+          "sourceId": "s-43-2",
+          "domain": "vnuhcm.edu.vn",
+          "publisher": "ĐHQG TP.HCM",
+          "content": "ĐHQG TP.HCM thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-VNUHCM-43"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-43-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-43-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-44",
+      "scenario": "Thông cáo báo chí số 44 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-44-1",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 44/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-44"
+        },
+        {
+          "sourceId": "s-44-2",
+          "domain": "dantri.com.vn",
+          "publisher": "dantri.com.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 44/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-44"
+        },
+        {
+          "sourceId": "s-44-3",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 44/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-44-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-44-1",
+            "s-44-2",
+            "s-44-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-45",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa UEH và NEU",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-45-1",
+          "domain": "ueh.edu.vn",
+          "publisher": "ĐH Kinh tế TP.HCM",
+          "content": "ĐH Kinh tế TP.HCM công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-UEH-45"
+        },
+        {
+          "sourceId": "s-45-2",
+          "domain": "neu.edu.vn",
+          "publisher": "ĐH Kinh tế Quốc dân",
+          "content": "ĐH Kinh tế Quốc dân thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-NEU-45"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-45-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-45-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-46",
+      "scenario": "Thông cáo báo chí số 46 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-46-1",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 46/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-46"
+        },
+        {
+          "sourceId": "s-46-2",
+          "domain": "tienphong.vn",
+          "publisher": "tienphong.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 46/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-46"
+        },
+        {
+          "sourceId": "s-46-3",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 46/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-46-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-46-1",
+            "s-46-2",
+            "s-46-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-47",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa FTU và VNUHN",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-47-1",
+          "domain": "ftu.edu.vn",
+          "publisher": "ĐH Ngoại thương",
+          "content": "ĐH Ngoại thương công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-FTU-47"
+        },
+        {
+          "sourceId": "s-47-2",
+          "domain": "vnu.edu.vn",
+          "publisher": "ĐHQG Hà Nội",
+          "content": "ĐHQG Hà Nội thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-VNUHN-47"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-47-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-47-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-48",
+      "scenario": "Thông cáo báo chí số 48 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-48-1",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 48/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-48"
+        },
+        {
+          "sourceId": "s-48-2",
+          "domain": "tuoitre.vn",
+          "publisher": "tuoitre.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 48/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-48"
+        },
+        {
+          "sourceId": "s-48-3",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 48/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-48-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-48-1",
+            "s-48-2",
+            "s-48-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-49",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa VNUHCM và UEH",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-49-1",
+          "domain": "vnuhcm.edu.vn",
+          "publisher": "ĐHQG TP.HCM",
+          "content": "ĐHQG TP.HCM công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-VNUHCM-49"
+        },
+        {
+          "sourceId": "s-49-2",
+          "domain": "ueh.edu.vn",
+          "publisher": "ĐH Kinh tế TP.HCM",
+          "content": "ĐH Kinh tế TP.HCM thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-UEH-49"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-49-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-49-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-50",
+      "scenario": "Thông cáo báo chí số 50 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-50-1",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 50/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-50"
+        },
+        {
+          "sourceId": "s-50-2",
+          "domain": "dantri.com.vn",
+          "publisher": "dantri.com.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 50/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-50"
+        },
+        {
+          "sourceId": "s-50-3",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 50/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-50-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-50-1",
+            "s-50-2",
+            "s-50-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-51",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa NEU và FTU",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-51-1",
+          "domain": "neu.edu.vn",
+          "publisher": "ĐH Kinh tế Quốc dân",
+          "content": "ĐH Kinh tế Quốc dân công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-NEU-51"
+        },
+        {
+          "sourceId": "s-51-2",
+          "domain": "ftu.edu.vn",
+          "publisher": "ĐH Ngoại thương",
+          "content": "ĐH Ngoại thương thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-FTU-51"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-51-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-51-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-52",
+      "scenario": "Thông cáo báo chí số 52 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-52-1",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 52/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-52"
+        },
+        {
+          "sourceId": "s-52-2",
+          "domain": "tienphong.vn",
+          "publisher": "tienphong.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 52/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-52"
+        },
+        {
+          "sourceId": "s-52-3",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 52/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-52-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-52-1",
+            "s-52-2",
+            "s-52-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-53",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa VNUHN và VNUHCM",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-53-1",
+          "domain": "vnu.edu.vn",
+          "publisher": "ĐHQG Hà Nội",
+          "content": "ĐHQG Hà Nội công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-VNUHN-53"
+        },
+        {
+          "sourceId": "s-53-2",
+          "domain": "vnuhcm.edu.vn",
+          "publisher": "ĐHQG TP.HCM",
+          "content": "ĐHQG TP.HCM thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-VNUHCM-53"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-53-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-53-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-54",
+      "scenario": "Thông cáo báo chí số 54 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-54-1",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 54/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-54"
+        },
+        {
+          "sourceId": "s-54-2",
+          "domain": "tuoitre.vn",
+          "publisher": "tuoitre.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 54/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-54"
+        },
+        {
+          "sourceId": "s-54-3",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 54/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-54-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-54-1",
+            "s-54-2",
+            "s-54-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-55",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa UEH và NEU",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-55-1",
+          "domain": "ueh.edu.vn",
+          "publisher": "ĐH Kinh tế TP.HCM",
+          "content": "ĐH Kinh tế TP.HCM công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-UEH-55"
+        },
+        {
+          "sourceId": "s-55-2",
+          "domain": "neu.edu.vn",
+          "publisher": "ĐH Kinh tế Quốc dân",
+          "content": "ĐH Kinh tế Quốc dân thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-NEU-55"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-55-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-55-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-56",
+      "scenario": "Thông cáo báo chí số 56 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-56-1",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 56/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-56"
+        },
+        {
+          "sourceId": "s-56-2",
+          "domain": "dantri.com.vn",
+          "publisher": "dantri.com.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 56/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-56"
+        },
+        {
+          "sourceId": "s-56-3",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 56/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-56-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-56-1",
+            "s-56-2",
+            "s-56-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-57",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa FTU và VNUHN",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-57-1",
+          "domain": "ftu.edu.vn",
+          "publisher": "ĐH Ngoại thương",
+          "content": "ĐH Ngoại thương công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-FTU-57"
+        },
+        {
+          "sourceId": "s-57-2",
+          "domain": "vnu.edu.vn",
+          "publisher": "ĐHQG Hà Nội",
+          "content": "ĐHQG Hà Nội thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-VNUHN-57"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-57-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-57-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-58",
+      "scenario": "Thông cáo báo chí số 58 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-58-1",
+          "domain": "vietnamnet.vn",
+          "publisher": "vietnamnet.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 58/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-58"
+        },
+        {
+          "sourceId": "s-58-2",
+          "domain": "tienphong.vn",
+          "publisher": "tienphong.vn",
+          "content": "Theo VGP, chính phủ ban hành quy định mới số 58/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-VGP-58"
+        },
+        {
+          "sourceId": "s-58-3",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Nguồn tin từ VGP cho biết nghị định số 58/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-VGP-58-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-58-1",
+            "s-58-2",
+            "s-58-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-59",
+      "scenario": "Thông báo tuyển sinh sau đại học giữa VNUHCM và UEH",
+      "expectedIndependentOriginsCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-59-1",
+          "domain": "vnuhcm.edu.vn",
+          "publisher": "ĐHQG TP.HCM",
+          "content": "ĐHQG TP.HCM công bố đề án tuyển sinh thạc sĩ và tiến sĩ năm học 2026 với 15 chuyên ngành đào tạo trọng điểm.",
+          "contentDigest": "digest-uni-VNUHCM-59"
+        },
+        {
+          "sourceId": "s-59-2",
+          "domain": "ueh.edu.vn",
+          "publisher": "ĐH Kinh tế TP.HCM",
+          "content": "ĐH Kinh tế TP.HCM thông báo điều kiện ứng tuyển cao học chuyên ngành Quản trị và Kinh tế số đợt 2 năm 2026.",
+          "contentDigest": "digest-uni-UEH-59"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-59-1"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        },
+        {
+          "clusterId": "gold-c2",
+          "memberSourceIds": [
+            "s-59-2"
+          ],
+          "originType": "OFFICIAL_PORTAL"
+        }
+      ]
+    },
+    {
+      "unitId": "IND-60",
+      "scenario": "Thông cáo báo chí số 60 về đổi mới giáo dục đại học",
+      "expectedIndependentOriginsCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-60-1",
+          "domain": "thanhnien.vn",
+          "publisher": "thanhnien.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 60/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-60"
+        },
+        {
+          "sourceId": "s-60-2",
+          "domain": "tuoitre.vn",
+          "publisher": "tuoitre.vn",
+          "content": "Theo TTXVN, chính phủ ban hành quy định mới số 60/2026/NĐ-CP về chính sách hỗ trợ tín dụng học tập cho sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-60"
+        },
+        {
+          "sourceId": "s-60-3",
+          "domain": "vnexpress.net",
+          "publisher": "vnexpress.net",
+          "content": "Nguồn tin từ TTXVN cho biết nghị định số 60/2026/NĐ-CP vừa được phê duyệt về tín dụng học sinh sinh viên.",
+          "contentDigest": "digest-wire-TTXVN-60-var"
+        }
+      ],
+      "goldClusters": [
+        {
+          "clusterId": "gold-c1",
+          "memberSourceIds": [
+            "s-60-1",
+            "s-60-2",
+            "s-60-3"
+          ],
+          "originType": "GOVERNMENT_WIRE_SYNDICATE"
+        }
+      ]
+    }
+  ]
+}

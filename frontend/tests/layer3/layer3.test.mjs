@@ -16,6 +16,42 @@ import { Layer3EvidenceService } from "../../src/lib/ai-trust/layer3/Layer3Evide
 import { WebSearchRetriever } from "../../src/lib/ai-trust/layer3/retrieval/WebSearchRetriever.js";
 import { LAYER_3_STATUS, CLAIM_EVIDENCE_RELATION } from "../../src/lib/ai-trust/layer3/types.js";
 
+function syndicatedFixtureRetriever() {
+  const sources = [
+    {
+      sourceId: "fixture-dantri-ai-major",
+      url: "https://dantri.com.vn/giao-duc/hcmute-mo-nganh-tri-tue-nhan-tao",
+      domain: "dantri.com.vn",
+      title: "HCMUTE mở ngành Trí tuệ Nhân tạo năm 2026",
+      publisher: "Dân Trí",
+      publishedAt: "2026-04-10T10:00:00Z",
+      sourceType: "SEARCH_RETRIEVAL",
+      clusterId: "fixture-lineage-press-release-ai-2026",
+    },
+    {
+      sourceId: "fixture-thanhnien-ai-major",
+      url: "https://thanhnien.vn/giao-duc/hcmute-mo-nganh-tri-tue-nhan-tao",
+      domain: "thanhnien.vn",
+      title: "HCMUTE mở ngành Trí tuệ Nhân tạo năm 2026",
+      publisher: "Thanh Niên",
+      publishedAt: "2026-04-10T10:15:00Z",
+      sourceType: "SEARCH_RETRIEVAL",
+      clusterId: "fixture-lineage-press-release-ai-2026",
+    },
+  ];
+  const text = "Theo thông cáo báo chí từ HCMUTE, nhà trường chính thức mở thêm ngành đào tạo Kỹ thuật Trí tuệ Nhân tạo từ năm 2026.";
+  return {
+    retrieverId: "fixture_syndication_retriever",
+    async search() {
+      return sources;
+    },
+    async fetch(url) {
+      const source = sources.find((item) => item.url === url);
+      return source ? { status: 200, textContent: text, publishedAt: source.publishedAt } : { status: 404, textContent: "" };
+    },
+  };
+}
+
 export const LAYER_3_TEST_CASES = [
   {
     id: "case-a-strong-official",
@@ -96,6 +132,7 @@ export const LAYER_3_TEST_CASES = [
     candidateSources: [{ officialDomains: ["dantri.com.vn", "thanhnien.vn"] }],
     expectedStatus: LAYER_3_STATUS.PARTIAL,
     expectedClusterCount: 1, // Must be clustered into 1 lineage, not 2 independent sources
+    options: { retriever: syndicatedFixtureRetriever() },
   },
   {
     id: "case-f-partial-support",
@@ -127,6 +164,7 @@ async function runLayer3Tests() {
     const result = await Layer3EvidenceService.verify({
       claims: test.claims,
       candidateSources: test.candidateSources,
+      options: test.options,
     });
 
     totalLatency += result.metrics.executionTimeMs;

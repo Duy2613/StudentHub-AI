@@ -56,7 +56,9 @@ function resolveChannels(principal, parsed) {
 function parseCursor(request) {
   const { searchParams } = new URL(request.url);
   const raw = request.headers.get("last-event-id") || searchParams.get("cursor") || "0";
-  const cursor = Number.parseInt(String(raw).trim(), 10);
+  const text = String(raw).trim();
+  if (!/^\d+$/.test(text)) return 0;
+  const cursor = Number(text);
   return Number.isSafeInteger(cursor) && cursor >= 0 ? cursor : 0;
 }
 
@@ -126,6 +128,7 @@ export const GET = SecurityFabric.wrapHandler(
       let stopped = false;
       let pollTimer = null;
       let lastSequence = parseCursor(request);
+      let lastHeartbeatAt = Date.now();
       const stop = () => {
         stopped = true;
         if (pollTimer) clearTimeout(pollTimer);
@@ -158,6 +161,10 @@ export const GET = SecurityFabric.wrapHandler(
                 if (Number.isSafeInteger(event.sequence) && event.sequence > lastSequence) {
                   lastSequence = event.sequence;
                 }
+              }
+              if (Date.now() - lastHeartbeatAt >= 15_000) {
+                enqueue(": heartbeat\n\n");
+                lastHeartbeatAt = Date.now();
               }
             } catch {
               enqueue(durableErrorFrame("REALTIME_DURABLE_UNAVAILABLE"));
@@ -219,6 +226,7 @@ export const GET = SecurityFabric.wrapHandler(
         "Cache-Control": "no-cache, no-transform, must-revalidate",
         Connection: "keep-alive",
         "X-Accel-Buffering": "no",
+        "X-Realtime-Transport": "PROCESS_LOCAL_SSE",
       },
     });
   },

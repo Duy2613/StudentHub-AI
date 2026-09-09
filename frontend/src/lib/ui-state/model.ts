@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { safeFrontendErrorSchema, type ApiErrorCode, type SafeFrontendError } from "../api/errors";
+import { safeFrontendErrorSchema, type ApiErrorCode, type SafeFrontendError } from "../api/errors.ts";
 
 export const UI_STATE_VALUES = [
   "IDLE",

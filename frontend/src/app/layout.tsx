@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import {
     Be_Vietnam_Pro,
+    Cormorant_Garamond,
     JetBrains_Mono,
     Lora,
+    Newsreader,
 } from "next/font/google";
 import "./globals.css";
 import "@/components/margin/margin.css";
@@ -10,49 +12,59 @@ import { AuthProvider } from "@/lib/auth/AuthContext";
 import { BackgroundProvider } from "@/components/providers/BackgroundContext";
 import { RealtimeProvider } from "@/components/providers/RealtimeContext";
 import RealtimeNotificationToasts from "@/components/realtime/RealtimeNotificationToasts";
-import RealtimeLiveConsole from "@/components/realtime/RealtimeLiveConsole";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
-import KnowledgeCursor from "@/components/ui/KnowledgeCursor";
 import { ReducedMotionBoundary } from "@/components/visual/ReducedMotionBoundary";
 
 const beVietnamPro = Be_Vietnam_Pro({
     variable: "--font-be-vietnam-pro",
     subsets: ["latin", "vietnamese"],
-    // Keep only body and display weights on the critical shared font. Intermediate
-    // weights are synthesized by the browser so below-the-fold cards do not add
-    // twelve extra font requests to every route.
-    weight: ["400", "700"],
-    // Avoid late font swaps invalidating the LCP candidate on slow mobile links.
-    // Fast clients still use Be Vietnam Pro; slower clients keep the metric-safe
-    // system fallback until the next navigation.
-    display: "optional",
-    // Let the browser fetch only the glyph/weight actually used above the fold.
-    // Preloading every weight and subset creates eight high-priority requests.
+    weight: ["400", "500", "600", "700"],
+    display: "swap",
+    preload: true,
+});
+
+// Monumental & Editorial Display: Cormorant Garamond (Classical tension, academic authority)
+const cormorantGaramond = Cormorant_Garamond({
+    variable: "--font-cormorant-garamond",
+    subsets: ["latin", "vietnamese"],
+    weight: ["400", "500", "600", "700"],
+    style: ["normal", "italic"],
+    display: "swap",
+    preload: true,
+});
+
+// Editorial Reading & Quotes: Newsreader
+const newsreader = Newsreader({
+    variable: "--font-newsreader",
+    subsets: ["latin", "vietnamese"],
+    weight: ["400", "500", "600"],
+    style: ["normal", "italic"],
+    display: "swap",
     preload: false,
 });
 
 const lora = Lora({
     variable: "--font-lora",
     subsets: ["latin", "vietnamese"],
-    weight: ["400", "600"],
-    style: ["normal"],
-    display: "optional",
+    weight: ["500", "600"],
+    style: ["normal", "italic"],
+    display: "swap",
     preload: false,
 });
 
-// Machine Interface: JetBrains Mono (AI output, data, alerts, OCR)
+// Machine Interface: JetBrains Mono (Data, code, hash, timestamps, alerts, OCR)
 const jetbrainsMono = JetBrains_Mono({
     variable: "--font-jetbrains-mono",
     subsets: ["latin"],
-    weight: ["400", "600"],
-    display: "optional",
+    weight: ["400", "500"],
+    display: "swap",
     preload: false,
 });
 
 
 export const metadata: Metadata = {
-    title: "StudentHub AI | Academic operating system",
-    description: "Theo dõi học vụ, kiểm tra rủi ro và ra quyết định dựa trên nguồn tin rõ ràng dành cho sinh viên.",
+    title: "StudentHub AI | Hiểu đúng. Đi xa.",
+    description: "Kiểm tra nguồn tin, đối chiếu bối cảnh và xem điều còn thiếu trước khi bạn quyết định.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -60,17 +72,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <html
             lang="vi"
             data-paper="night"
-            className={`${beVietnamPro.variable} ${lora.variable} ${jetbrainsMono.variable} h-full antialiased`}
+            className={`${beVietnamPro.variable} ${cormorantGaramond.variable} ${newsreader.variable} ${lora.variable} ${jetbrainsMono.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col bg-transparent text-gray-100 selection:bg-teal-400 selection:text-space-950">
+                <div className="analog-grain-overlay" aria-hidden="true" />
                 <AuthProvider>
                     <BackgroundProvider>
                         <RealtimeProvider>
                             <ReducedMotionBoundary>
                                 <SmoothScrollProvider>
-                                    <KnowledgeCursor />
                                     <RealtimeNotificationToasts />
-                                    <RealtimeLiveConsole />
                                     {children}
                                 </SmoothScrollProvider>
                             </ReducedMotionBoundary>

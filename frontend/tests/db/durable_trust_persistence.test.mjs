@@ -5,8 +5,12 @@ import { TrustPersistenceMapper } from "../../src/lib/ai-trust/v5/TrustPersisten
 import { DurableTrustRepository } from "../../src/lib/server/database/DurableTrustRepository.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
+const liveGate = {
+  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
+};
+
 after(async () => {
-  await getPostgresPool().end();
+  if (process.env.DATABASE_URL) await getPostgresPool().end();
 });
 
 test("Option B: Anonymous caller is strictly ephemeral (zero DB mapping)", () => {
@@ -179,7 +183,7 @@ test("TrustPersistenceMapper maps authenticated pipeline result to relational DT
   assert.equal(dto.audit.requestId, "req_auth_test_1");
 });
 
-test("Live Database: End-to-end atomic persistence & entity deduplication (Option B)", async () => {
+test("Live Database: End-to-end atomic persistence & entity deduplication (Option B)", liveGate, async () => {
   const pool = getPostgresPool();
 
   // Find a real existing user in auth.users

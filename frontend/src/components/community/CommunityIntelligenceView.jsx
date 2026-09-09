@@ -2,25 +2,32 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { AlertTriangle, ArrowRight, CheckCircle2, Clock3, Filter, MessageSquareText, Plus, Search, Send, ShieldCheck, Users, X } from "lucide-react";
 import StateBoundary from "@/components/ui/StateBoundary";
 import SourceDisclosure from "@/components/ui/SourceDisclosure";
-import { createErrorState, createStateEnvelope, createWorkIdentity } from "@/lib/ui-state/model";
-import { getRuntimeProviderBundle, RUNTIME_PROVIDER_MODE } from "@/lib/backend/runtimeProvider";
-import { ApiError } from "@/lib/api/errors";
-import { aggregateObservations } from "@/lib/community/CanonicalAnnouncementService";
+import ReferenceBirdStamp from "@/components/media/ReferenceBirdStamp";
+import { createErrorState, createStateEnvelope, createWorkIdentity } from "@/lib/ui-state/clientModel";
+import { getCommunityRuntimeProvider, SCOPED_PROVIDER_MODE } from "@/lib/backend/scopedRuntimeProvider";
+import { ApiError } from "@/lib/api/runtimeError";
+import { aggregateObservationsForPresentation } from "@/lib/community/observationAggregation";
 
 function titleFor(post) {
   return post.title || String(post.topic || "Chia sẻ cộng đồng").replaceAll("_", " ");
 }
 
 function statusFor(post) {
+  if (post.evidenceState) return `${post.evidenceState} · ${post.reviewState || "UNASSIGNED"}`.replaceAll("_", " ");
   if (post.moderationStatus) return String(post.moderationStatus).replaceAll("_", " ");
   if (post.freshnessStatus) return String(post.freshnessStatus).replaceAll("_", " ");
   return "TÍN HIỆU CỘNG ĐỒNG";
 }
 
 export function CommunityIntelligenceView() {
+  const searchParams = useSearchParams();
+  const queryCaseId = searchParams.get("caseId") || "";
+  const queryCaseRevision = searchParams.get("caseRevision") || "";
+  const queryClaimId = searchParams.get("claimId") || "";
   const [query, setQuery] = useState("");
   const [topic, setTopic] = useState("ALL");
   const [observations, setObservations] = useState([]);
@@ -30,9 +37,11 @@ export function CommunityIntelligenceView() {
   const [detailResult, setDetailResult] = useState(null);
   const [selectedObservation, setSelectedObservation] = useState(null);
   const [statement, setStatement] = useState("");
-  const [caseId, setCaseId] = useState("");
-  const [caseRevision, setCaseRevision] = useState("1");
+  const [caseId, setCaseId] = useState(() => queryCaseId);
+  const [caseRevision, setCaseRevision] = useState(() => queryCaseRevision || "1");
+  const [claimId, setClaimId] = useState(() => queryClaimId);
   const [evidenceRefs, setEvidenceRefs] = useState("");
+  const [contributionType, setContributionType] = useState("DIRECT_EXPERIENCE");
   const requestSequence = useRef(0);
   const activeSubmission = useRef(null);
   const activeDetail = useRef(null);
@@ -42,7 +51,7 @@ export function CommunityIntelligenceView() {
     const sequence = ++requestSequence.current;
     const identity = createWorkIdentity("community");
     let active = true;
-    getRuntimeProviderBundle().community.listObservations({ limit: 50, requestId: identity.requestId }, controller.signal).then((result) => {
+    getCommunityRuntimeProvider().listObservations({ limit: 50, requestId: identity.requestId }, controller.signal).then((result) => {
       if (!active || sequence !== requestSequence.current) return;
       setProviderResult(result);
       setObservations(Array.isArray(result.data) ? result.data : []);
@@ -63,7 +72,9 @@ export function CommunityIntelligenceView() {
   };
 
   const submitObservation = async () => {
-    if (!statement.trim() || !caseId.trim() || !/^[A-Za-z0-9._:-]{1,160}$/.test(caseId.trim()) || !/^\d+$/.test(caseRevision) || Number(caseRevision) < 0) {
+    const canonicalUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const requiresClaim = ["DIRECT_EXPERIENCE", "FOUND_SOURCE", "NEEDS_VERIFICATION", "SUPPORTING_EVIDENCE", "CONTRADICTING_EVIDENCE"].includes(contributionType);
+    if (!statement.trim() || !caseId.trim() || !canonicalUuid.test(caseId.trim()) || !/^\d+$/.test(caseRevision) || Number(caseRevision) < 1 || (requiresClaim && !canonicalUuid.test(claimId.trim()))) {
       setSubmissionResult(createErrorState(new ApiError("Hãy nhập nội dung và một case scope hợp lệ trước khi gửi.", "VALIDATION").toSafeError(), { phase: "COMMUNITY_INPUT_INVALID", retryable: false, nextActions: [] }));
       return;
     }
@@ -73,10 +84,12 @@ export function CommunityIntelligenceView() {
     const identity = createWorkIdentity("community-submit");
     setSubmissionResult(createStateEnvelope({ state: "SUBMITTING", phase: "COMMUNITY_OBSERVATION_SUBMITTING", requestId: identity.requestId, runId: identity.runId, retryable: false, nextActions: [] }));
     try {
-      const result = await getRuntimeProviderBundle().community.submitObservation({
+      const result = await getCommunityRuntimeProvider().submitObservation({
         scope: { caseId: caseId.trim(), caseRevision: Number(caseRevision) },
+        claimId: claimId.trim() || null,
         statement: statement.trim(),
         evidenceRefs: evidenceRefs.split(",").map((item) => item.trim()).filter(Boolean).slice(0, 50),
+        contributionType,
         requestId: identity.requestId,
         idempotencyKey: identity.runId,
       }, controller.signal);
@@ -105,7 +118,7 @@ export function CommunityIntelligenceView() {
     const identity = createWorkIdentity("community-detail");
     setDetailResult(createStateEnvelope({ state: "LOADING", phase: "COMMUNITY_DETAIL_LOADING", requestId: identity.requestId, retryable: true, nextActions: [] }));
     try {
-      const result = await getRuntimeProviderBundle().community.getObservation(observation.observationId, observation.caseScope, identity.requestId, controller.signal);
+      const result = await getCommunityRuntimeProvider().getObservation(observation.observationId, observation.caseScope, identity.requestId, controller.signal);
       if (!controller.signal.aborted) setDetailResult(result);
     } catch (caught) {
       if (!controller.signal.aborted) setDetailResult(createErrorState(caught instanceof ApiError ? caught.toSafeError() : new ApiError("Community detail failed.", "SERVER_ERROR").toSafeError(), { phase: "COMMUNITY_DETAIL_FAILED", requestId: identity.requestId, retryable: true, nextActions: [{ id: "RETRY", label: "Thử đọc lại" }] }));
@@ -130,16 +143,16 @@ export function CommunityIntelligenceView() {
     setExpandedClusters((prev) => ({ ...prev, [canonicalId]: !prev[canonicalId] }));
   };
 
-  const aggregatedItems = useMemo(() => aggregateObservations(observations), [observations]);
+  const aggregatedItems = useMemo(() => aggregateObservationsForPresentation(observations), [observations]);
   const topics = useMemo(() => [...new Set(aggregatedItems.map((post) => post.topic).filter(Boolean))], [aggregatedItems]);
   const posts = aggregatedItems.filter((post) => {
     const text = `${post.title || ""} ${post.statement || ""} ${post.topic || ""}`.toLowerCase();
     return (topic === "ALL" || post.topic === topic) && text.includes(query.toLowerCase());
   });
-  const sourceMode = providerResult?.provenance?.sourceMode || (RUNTIME_PROVIDER_MODE === "DEMO" ? "DEMO" : "LIVE");
+  const sourceMode = providerResult?.provenance?.sourceMode || SCOPED_PROVIDER_MODE;
 
-  return <div className="product-workspace">
-    <header className="product-hero"><div><p className="product-kicker">Student collective intelligence</p><h1>Trải nghiệm thật, được đặt trong ngữ cảnh.</h1><p>Cộng đồng không phải bảng tin giải trí. Đây là lớp bằng chứng thực tế giúp phát hiện khoảng cách giữa quy định chính thức và điều sinh viên đang gặp.</p><SourceDisclosure provenance={providerResult?.provenance} sourceMode={sourceMode} /></div><div className="hero-seal"><Users size={20} /><span>COMMUNITY</span><strong>{observations.length} báo cáo ({aggregatedItems.length} sự kiện đối soát)</strong></div></header>
+  return <div className="product-workspace vnext-secondary-workspace vnext-community-workspace">
+    <header className="product-hero swiss-crosshair-card hover-perspective-sheen relative"><ReferenceBirdStamp className="vnext-secondary-hero-bird" /><div><p className="product-kicker">Student collective intelligence</p><h1>Trải nghiệm thật, <em>được đặt trong ngữ cảnh</em>.</h1><p>Cộng đồng không phải bảng tin giải trí. Đây là lớp bằng chứng thực tế giúp phát hiện khoảng cách giữa quy định chính thức và điều sinh viên đang gặp.</p><SourceDisclosure provenance={providerResult?.provenance} sourceMode={sourceMode} /></div><div className="hero-seal"><Users size={20} /><span>COMMUNITY</span><strong>{observations.length} báo cáo ({aggregatedItems.length} sự kiện đối soát)</strong></div></header>
 
     <section className="collective-toolbar intelligence-panel">
       <label className="product-search"><Search size={17} /><span className="sr-only">Tìm trong cộng đồng</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm vấn đề, quy trình hoặc bằng chứng..." /></label>
@@ -149,7 +162,7 @@ export function CommunityIntelligenceView() {
     <section className="intelligence-panel community-contribution" aria-labelledby="community-contribution-title">
       <div className="panel-heading"><div><p className="product-kicker">Contribute an observation</p><h2 id="community-contribution-title" className="product-section-title">Thêm trải nghiệm có thể đối soát</h2></div><Plus size={18} /></div>
       <p className="product-copy">Một observation phải gắn với case và revision cụ thể. Gửi thành công chỉ có nghĩa là hệ thống đã nhận sự kiện, không biến trải nghiệm thành sự thật chính thức.</p>
-      <div className="community-form-grid"><label><span>Nội dung quan sát</span><textarea value={statement} onChange={(event) => setStatement(event.target.value)} rows={4} maxLength={12000} placeholder="Bạn đã thấy điều gì, ở đâu và khi nào?" /></label><div className="space-y-3"><label><span>Case ID</span><input value={caseId} onChange={(event) => setCaseId(event.target.value)} placeholder="case_..." maxLength={160} /></label><label><span>Case revision</span><input value={caseRevision} onChange={(event) => setCaseRevision(event.target.value)} inputMode="numeric" pattern="[0-9]+" /></label><label><span>Evidence refs (phân tách bằng dấu phẩy)</span><input value={evidenceRefs} onChange={(event) => setEvidenceRefs(event.target.value)} placeholder="url hoặc evidence id" /></label></div></div>
+      <div className="community-form-grid"><label><span>Nội dung quan sát</span><textarea value={statement} onChange={(event) => setStatement(event.target.value)} rows={4} maxLength={12000} placeholder="Bạn đã thấy điều gì, ở đâu và khi nào?" /><small className="text-app-muted">Hệ thống sẽ quét PII và cho xem bản xem trước đã khử nhận diện trước khi đăng.</small></label><div className="space-y-3"><label><span>Loại đóng góp</span><select value={contributionType} onChange={(event) => setContributionType(event.target.value)}><option value="DIRECT_EXPERIENCE">Trải nghiệm trực tiếp</option><option value="FOUND_SOURCE">Tìm thấy nguồn</option><option value="NEEDS_VERIFICATION">Cần xác minh</option><option value="SUPPORTING_EVIDENCE">Bằng chứng hỗ trợ</option><option value="CONTRADICTING_EVIDENCE">Bằng chứng mâu thuẫn</option><option value="CONTEXT">Bối cảnh</option><option value="CRITIQUE">Phản biện</option></select></label><label><span>Case ID</span><input value={caseId} onChange={(event) => setCaseId(event.target.value)} placeholder="UUID case…" maxLength={160} /></label><label><span>Case revision</span><input value={caseRevision} onChange={(event) => setCaseRevision(event.target.value)} inputMode="numeric" pattern="[0-9]+" /></label><label><span>Claim ID {!["CONTEXT", "CRITIQUE"].includes(contributionType) ? "(bắt buộc)" : "(tuỳ chọn)"}</span><input value={claimId} onChange={(event) => setClaimId(event.target.value)} placeholder="UUID claim…" maxLength={160} /></label><label><span>Evidence refs (phân tách bằng dấu phẩy)</span><input value={evidenceRefs} onChange={(event) => setEvidenceRefs(event.target.value)} placeholder="url hoặc evidence id" /></label></div></div>
       <div className="mt-4 flex flex-wrap items-center gap-3"><button type="button" className="primary-action" disabled={!statement.trim() || !caseId.trim()} onClick={submitObservation}><Send size={15} /> Gửi observation</button>{submissionResult && submissionResult.state !== "SUCCESS" && <StateBoundary envelope={submissionResult} onAction={handleSubmissionAction} />}{submissionResult?.state === "SUCCESS" && <span className="metadata-chip">Đã nhận · chưa phải phán quyết</span>}</div>
     </section>
 

@@ -7,11 +7,12 @@
 
 import { NextResponse } from "next/server";
 import { CommunityExperienceEngine } from "@/lib/intelligence/community/communityExperienceEngine";
-import { CommunityStore } from "@/lib/intelligence/community/communityStore";
+import { CommunityStore, isCommunityDemoMode } from "@/lib/intelligence/community/communityStore";
 import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
-async function evaluateCommunityExperience(req) {
+async function evaluateCommunityExperience(req, _routeParams, _principal, securityContext) {
   try {
+    if (!isCommunityDemoMode()) return NextResponse.json({ success: false, error: { code: "COMMUNITY_ANALYTICS_WORKFLOW_NOT_MIGRATED", userMessage: "Consensus evaluation requires the durable Promax projection.", correlationId: securityContext.correlationId } }, { status: 503 });
     const body = await req.json().catch(() => ({}));
     const { topic, customPosts } = body;
 

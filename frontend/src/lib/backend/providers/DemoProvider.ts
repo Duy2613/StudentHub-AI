@@ -1,4 +1,4 @@
-import { ApiError } from "../../api/errors";
+import { ApiError } from "../../api/errors.ts";
 import {
   caseScopeSchema,
   communityObservationCommandSchema,
@@ -34,7 +34,7 @@ import {
   type TrustProvider,
   trustInvestigationInputSchema,
   trustInvestigationResultSchema,
-} from "../ports";
+} from "../ports.ts";
 
 const FIXTURE_ID = "f02-foundation";
 const FIXTURE_VERSION = "f02.1";

@@ -5,9 +5,11 @@ import { PostgresSessionRepository } from "../../src/lib/security/identity/Postg
 import { DurableSessionService } from "../../src/lib/security/identity/DurableSessionService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
+const liveGate = {
+  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
+};
 
-
-test("PostgresSessionRepository: Live durable session create, validate, update last_seen, and revoke in private.server_sessions", async () => {
+test("PostgresSessionRepository: Live durable session create, validate, update last_seen, and revoke in private.server_sessions", liveGate, async () => {
   const pool = getPostgresPool();
   const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 1`);
   if (userRes.rows.length === 0) {

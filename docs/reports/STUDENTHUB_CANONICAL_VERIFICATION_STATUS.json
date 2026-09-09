@@ -1,0 +1,158 @@
+{
+  "candidateId": "studenthub-v5-pilot-rc5",
+  "updatedAt": "2026-09-09T22:14:12+07:00",
+  "overallVerdict": "PILOT_BACKEND_PARTIAL",
+  "convergenceVerdict": "NON_DB_GENERALIZATION_NOT_CONVERGED",
+  "historicalCandidatePreserved": "studenthub-v5-pilot-rc4",
+  "historicalCandidatesPreserved": [
+    "studenthub-v5-pilot-rc3",
+    "studenthub-v5-pilot-rc4"
+  ],
+  "frozenDatabaseGates": {
+    "G1_cleanMigration": "BLOCKED_BY_ENV",
+    "G2_liveMultiRoleRLS": "RLS_STATIC_ONLY",
+    "G4_physicalRestore": "RESTORE_BLOCKED_BY_ENV",
+    "database": "PARTIAL",
+    "recovery": "PARTIAL"
+  },
+  "subsystems": {
+    "metrics": {
+      "status": "IMPLEMENTATION_VERIFIED",
+      "report": "docs/reports/STUDENTHUB_METRIC_FORENSICS.md"
+    },
+    "retrieval": {
+      "status": "RETRIEVAL_TARGETS_NOT_ESTABLISHED",
+      "evidenceClass": "RETRIEVAL_VALIDATION_V1",
+      "sampleSize": 165,
+      "metrics": {
+        "staticRecallAt5": "21.2%",
+        "liveRecallAt5": "9.1%",
+        "hybridRecallAt5": "21.2%",
+        "hybridNDCGAt5": "19.7%",
+        "hybridPrecisionAt5": "12.5%",
+        "entityResolution": "93.3%",
+        "officialTop5Hit": "100.0%",
+        "irrelevantTop1": "0.6%",
+        "hybridMinusLiveRecallDelta": "+12.1pp"
+      },
+      "report": "docs/reports/STUDENTHUB_RETRIEVAL_HOLDOUT_V3.md",
+      "rootCauseReport": "docs/reports/STUDENTHUB_HYBRID_RETRIEVAL_ROOT_CAUSE.md",
+      "rc3HoldoutV4": {
+        "status": "RETRIEVAL_HOLDOUT_V4_TARGETS_NOT_ESTABLISHED",
+        "sampleSize": 150,
+        "hybridRecallAt5": "17.3%",
+        "hybridNDCGAt5": "17.0%",
+        "entityResolution": "92.7%",
+        "officialSourceHit": "17.3%",
+        "hybridMinusLiveRecallDelta": "+10.7pp",
+        "report": "docs/reports/STUDENTHUB_RETRIEVAL_HOLDOUT_V4.md"
+      },
+      "rc5HoldoutV5": {
+        "status": "POST_REMEDIATION_RERUN_PENDING_PROVIDER_QUOTA_RESET",
+        "sampleSize": 150,
+        "hybridRecallAt5Diagnostic": "11.3%",
+        "hybridNDCGAt5Diagnostic": "10.8%",
+        "entityResolutionDiagnostic": "80.0%",
+        "publicApiCandidatesDiagnostic": 108,
+        "publicApiTargetHitDiagnostic": "0.0%",
+        "diagnosticCodeBoundary": "PRE_REFINEMENT_RESULT_NOT_CURRENT_CODE_EVIDENCE",
+        "providerBlocker": "OPENALEX_429_DAILY_BUDGET_EXHAUSTED",
+        "report": "docs/reports/STUDENTHUB_RETRIEVAL_HOLDOUT_V5.md"
+      }
+    },
+    "privacy": {
+      "status": "PRIVACY_VALIDATION_V2_VERIFIED",
+      "evidenceClass": "PRIVACY_VALIDATION_V1",
+      "sampleSize": 420,
+      "metrics": {
+        "recall": "100.0%",
+        "precision": "100.0%",
+        "criticalLeakage": "0/300; CP95 upper 1.22%",
+        "metamorphicChecks": "840/840",
+        "fullPipelinePostScanFailures": 0
+      },
+      "report": "docs/reports/STUDENTHUB_PRIVACY_HOLDOUT_V2.md"
+    },
+    "security": {
+      "status": "SECURITY_VALIDATION_V2_VERIFIED",
+      "evidenceClass": "SECURITY_VALIDATION_V1",
+      "sampleSize": 105,
+      "metrics": {
+        "neutralized": "105/105",
+        "breachRateCP95": "0.00%–3.45%"
+      },
+      "report": "docs/reports/STUDENTHUB_SECURITY_HOLDOUT_V2.md"
+    },
+    "sourceIndependence": {
+      "status": "SOURCE_INDEPENDENCE_VALIDATION_V2_VERIFIED",
+      "evidenceClass": "SOURCE_INDEPENDENCE_VALIDATION_V1",
+      "sampleSize": 150,
+      "metrics": {
+        "pairwiseF1": "100.0%",
+        "falseMerge": "0.0%",
+        "falseSplit": "0.0%",
+        "originCountAccuracy": "100.0%"
+      },
+      "report": "docs/reports/STUDENTHUB_SOURCE_INDEPENDENCE_HOLDOUT_V2.md"
+    },
+    "aiEvaluation": {
+      "status": "CONTROLLED_SYNTHETIC_AI_TEVV_VERIFIED",
+      "finalHoldoutStatus": "NOT_ESTABLISHED",
+      "sampleSize": 210,
+      "metrics": {
+        "fullAccuracy": "100.0%",
+        "fullMacroF1": "100.0%",
+        "fullFalseReassurance": "0/25; CP95 upper 13.72%",
+        "fullCitationValidity": "100.0%",
+        "fullMinusCriticAccuracy": "88.1%",
+        "criticDelta": "+11.9pp",
+        "pairedMcNemarPValue": "5.960e-8"
+      },
+      "productionPathReport": "docs/reports/STUDENTHUB_AI_PRODUCTION_PATH_AUDIT.md",
+      "report": "docs/reports/STUDENTHUB_AI_HOLDOUT_V2.md"
+    },
+    "calibration": {
+      "status": "VALIDATION_ONLY",
+      "metrics": {
+        "ece": 0.0719,
+        "brier": 0.0055
+      },
+      "report": "docs/reports/STUDENTHUB_CALIBRATION_EVALUATION.md"
+    },
+    "provider": {
+      "status": "COST_ESTIMATE_ONLY",
+      "failureMatrix": "LOCAL_MOCK_5_OF_5",
+      "liveProviderEvidence": "NOT_ESTABLISHED",
+      "report": "docs/reports/STUDENTHUB_LIVE_PROVIDER_EVIDENCE.md"
+    },
+    "caseReplay": {
+      "status": "HISTORICAL_VALIDATION_PRESERVED",
+      "newRC2Run": "NOT_EXECUTED"
+    }
+  },
+  "publicApiHub": {
+    "status": "PUBLIC_API_ADAPTERS_IMPLEMENTED",
+    "evidenceClass": "CONTEXT_ONLY",
+    "providers": [
+      "OPENALEX",
+      "CROSSREF",
+      "OPEN_METEO_GEOCODING",
+      "OPEN_METEO_FORECAST",
+      "GDELT_DOC"
+    ],
+    "contractTests": "12/12",
+    "liveCallEvidence": "PARTIAL_DIAGNOSTIC; CURRENT_RERUN_QUOTA_BLOCKED",
+    "officialSourceAdapter": "OPT_IN_MINIMAL_LINK_METADATA_ONLY",
+    "institutionDiscovery": "OPENALEX_OPT_IN; DISCOVERY_ONLY; POST_REFINEMENT_RERUN_PENDING",
+    "authorityBoundary": "PUBLIC_METADATA_AND_DISCOVERY_ONLY; isAuthoritative=false; no direct Trust promotion",
+    "report": "docs/integrations/STUDENTHUB-PUBLIC-API-MODEL-TOPIC-PLAN.md"
+  },
+  "officialDiscovery": {
+    "status": "PUBLIC_DISCOVERY_SIGNAL_AVAILABLE",
+    "hardBlocker": false,
+    "source": "https://vqa.moet.gov.vn/vi/thong-bao-quan-ly-bao-dam/thong-bao/danh-sach-cac-co-so-giao-duc-chuong-trinh-dao-tao-giao-duc-dai-hoc-va-cao-dang-su-pham-duoc-cong-nhan-dat-tieu-chuan-chat-luong-giao-duc-cap-nhat-den-ngay-31-7-2026-93.html",
+    "legalAndProvenance": "SEPARATE_REVIEW_REQUIRED"
+  },
+  "nextGate": "RC5_POST_REMEDIATION_RETRIEVAL_HOLDOUT_AFTER_PROVIDER_QUOTA_RESET",
+  "candidateManifest": "artifacts/candidate/STUDENTHUB_V5_CANDIDATE_RC5_MANIFEST.json"
+}

@@ -1,7 +1,7 @@
 import type { ZodType } from "zod";
-import { ApiError, type ApiErrorCode } from "./errors";
+import { ApiError, type ApiErrorCode } from "./errors.ts";
 
-export { ApiError } from "./errors";
+export { ApiError } from "./errors.ts";
 
 export type ApiRequestOptions<T> = RequestInit & {
   timeoutMs?: number;

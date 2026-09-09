@@ -28,7 +28,7 @@ import {
   type TrustInvestigationInput,
   type TrustInvestigationResult,
   type TrustProvider,
-} from "../ports";
+} from "../ports.ts";
 
 const LIVE_DEPENDENCY = "live-provider";
 

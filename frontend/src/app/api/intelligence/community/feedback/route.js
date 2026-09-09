@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
-import { CommunityStore } from "@/lib/intelligence/community/communityStore.js";
+import { CommunityStore, isCommunityDemoMode } from "@/lib/intelligence/community/communityStore.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
 async function createCommunityFeedback(request, routeParams, principal) {
   try {
+    if (!isCommunityDemoMode()) {
+      return NextResponse.json({ success: false, error: { code: "DISCUSSION_WORKFLOW_NOT_MIGRATED", userMessage: "Unlinked discussion feedback requires the durable discussion workflow." } }, { status: 503 });
+    }
     const body = await request.json();
     if (!body || !body.topic) {
       return NextResponse.json(

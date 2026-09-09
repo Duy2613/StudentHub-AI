@@ -6,7 +6,7 @@
  * - SEC-02: Sensitive PII (Phone, Personal Email, CCCD) leakage on expert endpoints
  */
 
-import { describe, it, beforeEach } from "node:test";
+import { describe, it, before, beforeEach, after } from "node:test";
 import assert from "node:assert/strict";
 
 import { GET as getProfile360 } from "../../src/app/api/academic/me/profile-360/route.js";
@@ -20,12 +20,24 @@ import { StudentProfile360Store } from "../../src/lib/intelligence/academic/stud
 
 describe("P0 Security Regression — BOLA & PII Protection", () => {
   const tokenValidator = new TokenValidator();
+  const previousExpertDemoMode = process.env.STUDENTHUB_EXPERT_DEMO;
 
   const tokenStudentA = tokenValidator.signToken({
     sub: "student:24110001",
     email: "24110001@student.hcmute.edu.vn",
     roles: ["student"],
     scopes: ["academic:read"]
+  });
+
+  // These route assertions exercise the seeded public DTO boundary. Production
+  // routes remain durable-only; the fixture adapter must be explicit in tests.
+  before(() => {
+    process.env.STUDENTHUB_EXPERT_DEMO = "true";
+  });
+
+  after(() => {
+    if (previousExpertDemoMode === undefined) delete process.env.STUDENTHUB_EXPERT_DEMO;
+    else process.env.STUDENTHUB_EXPERT_DEMO = previousExpertDemoMode;
   });
 
   beforeEach(() => {

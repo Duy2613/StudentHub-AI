@@ -4,23 +4,8 @@ import React from "react";
 import Link from "next/link";
 import { ChevronRight, Menu } from "lucide-react";
 import Annotation from "./Annotation";
-import CinematicTaskBackdrop from "@/components/ui/CinematicTaskBackdrop";
 
 const ROMAN = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
-
-const TOOL_FILM_MAP = Object.freeze({
-  "/trust": { id: "film02_trust_engine", num: "02", name: "Trust Engine" },
-  "/community": { id: "film03_collective_intelligence", num: "03", name: "Community" },
-  "/expert": { id: "film04_expert_network", num: "04", name: "Experts" },
-  "/cases": { id: "film07_knowledge_time", num: "07", name: "Evidence Lab" },
-  "/learn": { id: "film05_question_understanding", num: "05", name: "Learn" },
-  "/roadmap": { id: "film06_deep_work", num: "06", name: "Roadmap" },
-  "/practice": { id: "film05_question_understanding", num: "05", name: "Practice" },
-  "/projects": { id: "film01_campus_atlas", num: "01", name: "Projects" },
-  "/dashboard": { id: "film08_knowledge_horizon", num: "08", name: "Dashboard" },
-  "/profile": { id: "film08_knowledge_horizon", num: "08", name: "Profile" },
-  "/settings": { id: "film08_knowledge_horizon", num: "08", name: "Settings" },
-});
 
 const DEFAULT_ANNOTATIONS = Object.freeze([
   { mark: "[n]", title: "Nguồn trước lời khuyên", body: "Mỗi kết luận bắt đầu từ một nguồn có thể mở lại." },
@@ -64,27 +49,18 @@ export default function MarginRail({
             {group.items.map((item) => {
               const Icon = item.icon;
               const active = isCurrent(pathname, item.href);
-              const filmInfo = TOOL_FILM_MAP[item.href] || TOOL_FILM_MAP["/dashboard"];
               return (
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={false}
                   onClick={() => { if (compact) onNavigate?.(); }}
                   className={`margin-nav-link relative group overflow-hidden ${active ? "is-active" : ""}`}
                   aria-current={active ? "page" : undefined}
                 >
-                  <CinematicTaskBackdrop
-                    filmId={filmInfo.id}
-                    opacity={active ? 0.32 : 0.0}
-                    hoverOpacity={0.45}
-                    rounded="rounded-lg"
-                  />
                   <span className="relative z-10 flex items-center gap-2 w-full">
                     {Icon ? <Icon size={compact ? 16 : 15} aria-hidden="true" /> : null}
                     <span>{item.label}</span>
-                    <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-black/50 border border-white/10 text-slate-400 group-hover:text-emerald-300 ml-auto mr-0.5 transition-colors">
-                      {filmInfo.num}
-                    </span>
                     {active ? <ChevronRight size={13} className="margin-nav-chevron shrink-0" aria-hidden="true" /> : null}
                   </span>
                 </Link>

@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-09-09T10:22:33.064Z",
+  "providers": {
+    "openai": {
+      "requestedModel": "gpt-5.6-luna",
+      "actualReturnedModel": "gpt-5.6-luna",
+      "fallbackChain": [
+        "gemini-flash-lite-latest",
+        "gpt-5.1",
+        "deterministic-policy"
+      ],
+      "nSamples": 5,
+      "successCount": 5,
+      "successRate": "100%",
+      "p50Ms": 892,
+      "p95Ms": 1059,
+      "status": "VERIFIED"
+    },
+    "gemini": {
+      "requestedModel": "gemini-3.8-flash (configured in .env)",
+      "actualReturnedModel": "gemini-flash-lite-latest (live fallback candidate)",
+      "fallbackChain": [
+        "gemini-3.8-flash",
+        "gemini-flash-lite-latest",
+        "gpt-5-mini"
+      ],
+      "resolutionNotes": "gemini-3.8-flash hit HTTP 429 quota exhaustion; gemini-flash-lite-latest is active and callable on free tier.",
+      "nSamples": 5,
+      "successCount": 5,
+      "successRate": "100%",
+      "p50Ms": 723,
+      "p95Ms": 860,
+      "status": "VERIFIED"
+    },
+    "customModel": {
+      "modelId": "MOD_FRAUD_MULTIHEAD_V1_4",
+      "runtime": "LOCAL_IN_PROCESS_CPU",
+      "role": "DOMAIN_SPECIALIST_ADVISORY",
+      "nSamples": 5,
+      "p50Ms": 1.94,
+      "p95Ms": 21.98,
+      "status": "VERIFIED"
+    }
+  }
+}

@@ -149,7 +149,7 @@ function normalizeEvent(input = {}, { environment = process.env.NODE_ENV || "dev
     subjectId,
     classification,
     producer,
-    environment: bounded(input.environment, 80, environment),
+    environment: bounded(input.environment, 80, environment || "development"),
     correlationId,
     causationId: normalizedCausation,
     payload,
@@ -171,6 +171,31 @@ function sameHash(left, right) {
   const a = hashBuffer(left);
   const b = hashBuffer(right);
   return Boolean(a && b && a.length === 32 && b.length === 32 && crypto.timingSafeEqual(a, b));
+}
+
+function sameNullable(left, right) {
+  const normalizedLeft = left === null || left === undefined ? null : String(left);
+  const normalizedRight = right === null || right === undefined ? null : String(right);
+  return normalizedLeft === normalizedRight;
+}
+
+function sameEventEnvelope(row, event, { includeOccurredAt = false } = {}) {
+  if (!row || !event) return false;
+  const sameFields = sameNullable(row.channel, event.channel)
+    && sameNullable(row.event_type, event.eventType)
+    && sameNullable(row.subject_id, event.subjectId)
+    && sameNullable(row.classification, event.classification)
+    && sameNullable(row.producer, event.producer)
+    && sameNullable(row.environment, event.environment)
+    && sameNullable(row.correlation_id, event.correlationId)
+    && sameNullable(row.causation_id, event.causationId)
+    && sameNullable(row.idempotency_key, event.idempotencyKey)
+    && sameHash(row.payload_hash, event.payloadHash);
+  if (!sameFields) return false;
+  if (!includeOccurredAt) return true;
+  const rowTime = new Date(row.occurred_at).getTime();
+  const eventTime = new Date(event.occurredAt).getTime();
+  return Number.isFinite(rowTime) && rowTime === eventTime;
 }
 
 function rowToEvent(row, deduplicated = false) {
@@ -244,7 +269,7 @@ export class DurableRealtimeRepository {
           [event.eventId],
         );
         const row = existingById.rows[0];
-        if (row && sameHash(row.payload_hash, event.payloadHash)) return rowToEvent(row, true);
+        if (row && sameEventEnvelope(row, event, { includeOccurredAt: true })) return rowToEvent(row, true);
         const conflict = new Error("Realtime event id is bound to different content.");
         conflict.code = "REALTIME_EVENT_ID_CONFLICT";
         conflict.statusCode = 409;
@@ -269,7 +294,7 @@ export class DurableRealtimeRepository {
       [event.channel, event.idempotencyKey],
     );
     const row = existing.rows[0];
-    if (!row || !sameHash(row.payload_hash, event.payloadHash)) {
+    if (!row || !sameEventEnvelope(row, event)) {
       const error = new Error("Realtime idempotency key is bound to different content.");
       error.code = "REALTIME_IDEMPOTENCY_CONFLICT";
       error.statusCode = 409;
@@ -295,7 +320,8 @@ export class DurableRealtimeRepository {
          from private.realtime_events
         where channel = any($1::text[])
           and sequence > $2
-          and (channel = any($4::text[]) or ($3::uuid is not null and subject_id = $3::uuid))
+          and ((channel = any($4::text[]) and subject_id is null)
+            or ($3::uuid is not null and subject_id = $3::uuid))
           and (expires_at is null or expires_at > now())
         order by sequence asc
         limit $5`,

@@ -7,7 +7,10 @@ import dynamic from "next/dynamic";
 import { Menu, Search, ShieldCheck, X } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import MarginRail from "@/components/margin/MarginRail";
+import ContextBar from "@/components/ui/ContextBar";
+import RealtimeLiveConsole from "@/components/realtime/RealtimeLiveConsole";
 import { CANONICAL_NAV_GROUPS, chapterForPath } from "./navigationConfig";
+import { getReferenceRouteProfile } from "./referenceRouteConfig";
 import { markAssurance } from "@/lib/performance/assurance";
 
 const AcademicCommandPalette = dynamic(() => import("@/components/command/AcademicCommandPalette"), {
@@ -51,9 +54,20 @@ export default function UnifiedAppShell({ children }) {
 
   const displayName = profile?.fullName || session?.user?.email?.split("@")[0] || "Sinh viên";
   const handleNavigate = () => setMobileOpen(false);
+  const routeProfile = getReferenceRouteProfile(pathname || "/");
+  const contextItems = pathname && pathname !== "/dashboard"
+    ? [
+      { id: "route", label: "Phạm vi", value: pathname },
+      { id: "signal", label: routeProfile.label, value: routeProfile.signal },
+    ]
+    : [];
 
   return (
-    <div className="app-shell min-h-screen bg-app-canvas text-app-primary">
+    <div
+      className="app-shell min-h-screen bg-app-canvas text-app-primary"
+      data-reference-route={routeProfile.id}
+      data-reference-surface={routeProfile.surface}
+    >
       <a href="#main-content" className="skip-link">Bỏ qua đến nội dung chính</a>
       <header className="app-header">
         <div className="flex items-center gap-3">
@@ -71,7 +85,7 @@ export default function UnifiedAppShell({ children }) {
             <span className="brand-mark-icon"><ShieldCheck size={18} /></span>
             <span>
               <span className="brand-name">StudentHub <em>AI</em></span>
-              <span className="brand-subtitle">Academic operating system</span>
+              <span className="brand-subtitle">Kiểm chứng trước quyết định</span>
             </span>
           </Link>
         </div>
@@ -85,7 +99,7 @@ export default function UnifiedAppShell({ children }) {
         >
           <span className="flex items-center gap-2">
             <Search size={15} aria-hidden="true" />
-            <span>Tìm kiếm khóa học, bài học, Trust, chuyên gia...</span>
+            <span>Tìm kiếm tình huống, Trust, chuyên gia...</span>
           </span>
           <kbd>Ctrl K</kbd>
         </button>
@@ -93,7 +107,7 @@ export default function UnifiedAppShell({ children }) {
           <span className="trust-status hidden sm:inline-flex">
             <span className="status-dot" /> Bảo vệ đang bật
           </span>
-          <Link href="/settings" className="profile-chip" aria-label="Hồ sơ và Cài đặt">
+          <Link href="/settings" prefetch={false} className="profile-chip" aria-label="Hồ sơ và Cài đặt">
             <span className="profile-avatar">{displayName.slice(0, 1).toUpperCase()}</span>
             <span className="hidden lg:block max-w-32 truncate">{displayName}</span>
           </Link>
@@ -104,16 +118,20 @@ export default function UnifiedAppShell({ children }) {
           groups={CANONICAL_NAV_GROUPS}
           pathname={pathname}
           chapter={chapterForPath(pathname)}
-          chapterLabel={pathname === "/dashboard" ? "Personal command center" : "StudentHub / Margin"}
+          chapterLabel={pathname === "/dashboard" ? "Trung tâm cá nhân" : "StudentHub / Lề ghi chú"}
           displayName={displayName}
           mobileOpen={mobileOpen}
           onMobileToggle={setMobileOpen}
           onNavigate={handleNavigate}
         />
         <main id="main-content" className="app-main">
-          <div className="app-content">{children}</div>
+          <div className="app-content">
+            <ContextBar items={contextItems} className="mb-6" />
+            {children}
+          </div>
         </main>
       </div>
+      <RealtimeLiveConsole />
       {searchMounted && (
         <AcademicCommandPalette
           isOpen={searchOpen}

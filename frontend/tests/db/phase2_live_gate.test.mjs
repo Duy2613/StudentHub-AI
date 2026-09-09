@@ -4,11 +4,15 @@ import crypto from "node:crypto";
 import { TrustPersistenceService } from "../../src/lib/server/database/TrustPersistenceService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
+const liveGate = {
+  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
+};
+
 after(async () => {
-  await getPostgresPool().end();
+  if (process.env.DATABASE_URL) await getPostgresPool().end();
 });
 
-test("PHASE 2 LIVE GATE: End-to-end Trust persistence, retrieval, cross-user denial, and idempotency", async () => {
+test("PHASE 2 LIVE GATE: End-to-end Trust persistence, retrieval, cross-user denial, and idempotency", liveGate, async () => {
   const pool = getPostgresPool();
   const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 2`);
   if (userRes.rows.length === 0) {

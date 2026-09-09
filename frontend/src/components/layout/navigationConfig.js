@@ -1,9 +1,5 @@
 import {
-  BookOpen,
-  BrainCircuit,
-  Compass,
   FileClock,
-  FolderKanban,
   LayoutDashboard,
   Settings,
   ShieldCheck,
@@ -25,16 +21,6 @@ export const CANONICAL_NAV_GROUPS = Object.freeze([
       Object.freeze({ id: "community", label: "Community", href: "/community", icon: Users, pillar: "COMMUNITY" }),
       Object.freeze({ id: "expert", label: "Experts", href: "/expert", icon: UserRoundCheck, pillar: "EXPERT" }),
       Object.freeze({ id: "cases", label: "Evidence Case Lab", href: "/cases", icon: FileClock, pillar: "TRUST_SUPPORT" }),
-    ]),
-  }),
-  Object.freeze({
-    id: "learning",
-    label: "Học tập & Thực hành",
-    items: Object.freeze([
-      Object.freeze({ id: "learn", label: "Learn", href: "/learn", icon: BookOpen, pillar: "LEARN" }),
-      Object.freeze({ id: "roadmap", label: "Roadmap", href: "/roadmap", icon: Compass, pillar: "ROADMAP" }),
-      Object.freeze({ id: "practice", label: "Practice", href: "/practice", icon: BrainCircuit, pillar: "PRACTICE" }),
-      Object.freeze({ id: "projects", label: "Projects", href: "/projects", icon: FolderKanban, pillar: "PROJECTS" }),
     ]),
   }),
   Object.freeze({

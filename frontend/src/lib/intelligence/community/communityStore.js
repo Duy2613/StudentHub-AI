@@ -20,6 +20,14 @@ import { createSecureId } from "../../security/secureId.js";
 const DEFAULT_STORE_DIR = path.resolve(process.cwd(), ".data");
 const DEFAULT_STORE_FILE = path.join(DEFAULT_STORE_DIR, "community_intelligence_store_v2.json");
 
+/** The file store is a fixture adapter, never a production authority. */
+export function isCommunityDemoMode() {
+  return process.env.NODE_ENV !== "production" && (
+    process.env.STUDENTHUB_PERSISTENCE_ADAPTER === "memory" ||
+    process.env.STUDENTHUB_COMMUNITY_DEMO === "true"
+  );
+}
+
 export class CommunityStore {
   static #storageFilePath = DEFAULT_STORE_FILE;
   static #postsById = new Map();

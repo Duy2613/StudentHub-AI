@@ -2,6 +2,14 @@ import { readdirSync } from "node:fs";
 import { join, relative } from "node:path";
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
+import { createRequire } from "node:module";
+
+const frontendDir = join(process.cwd(), "frontend");
+const frontendRequire = createRequire(join(frontendDir, "package.json"));
+try {
+  const { loadEnvConfig } = frontendRequire("@next/env");
+  loadEnvConfig(frontendDir);
+} catch {}
 
 const root = join(process.cwd(), "frontend", "tests");
 
@@ -46,7 +54,31 @@ const inheritedNodeOptions = process.env.NODE_OPTIONS || "";
 const childNodeOptions = inheritedNodeOptions.includes("ts-extension-loader.mjs")
   ? inheritedNodeOptions
   : `${inheritedNodeOptions} --loader ${extensionLoader}`.trim();
+
+// The discovered suite is a hermetic software/validation gate. It may load
+// `.env` to exercise local configuration parsing, but it must never inherit
+// live provider/database/remote-service credentials. Otherwise a synthetic
+// benchmark can turn into hundreds of external LLM requests, or a DB gate can
+// mutate a non-disposable environment. Provider behavior is covered by
+// injected fakes; explicitly-scoped live evidence uses a separate command and
+// report.
 const childEnv = { ...process.env, NODE_OPTIONS: childNodeOptions };
+for (const key of [
+  "OPENAI_API_KEY",
+  "OPENAI_BASE_URL",
+  "GEMINI_API_KEY",
+  "GOOGLE_GENERATIVE_AI_API_KEY",
+  "DATABASE_URL",
+  "STUDENTHUB_RLS_TEST_DATABASE_URL",
+  "STUDENTHUB_LABBE_TEST_DATABASE_URL",
+  "SUPABASE_URL",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "STUDENTHUB_LABBE_BASE_URL",
+  "STUDENTHUB_LABBE_TOKEN",
+  "STUDENTHUB_LABBE_SCOPE",
+]) {
+  delete childEnv[key];
+}
 
 for (const test of tests) {
   const label = relative(process.cwd(), test);

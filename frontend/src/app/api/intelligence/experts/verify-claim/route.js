@@ -6,13 +6,14 @@
  */
 
 import { NextResponse } from "next/server";
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import { ExpertStore, isExpertDemoMode } from "@/lib/intelligence/expert/expertStore";
 import { ExpertScopeEngine } from "@/lib/intelligence/expert/expertScopeEngine";
 import { ExpertContextEngine } from "@/lib/intelligence/expert/expertContextEngine";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
 async function verifyExpertClaim(req) {
   try {
+    if (!isExpertDemoMode()) return NextResponse.json({ success: false, error: { code: "EXPERT_ASSESSMENT_WORKFLOW_REQUIRED", userMessage: "Use the revision-bound Promax assessment endpoint for live expert review." } }, { status: 503 });
     const body = await req.json().catch(() => ({}));
     const { expertId, statement, text, domain, claimType, claimJurisdiction, isCommercialEndorsement } = body;
 

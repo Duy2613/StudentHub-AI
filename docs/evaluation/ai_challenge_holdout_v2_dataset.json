@@ -1,0 +1,4013 @@
+{
+  "version": "HOLDOUT_V2_UNTOUCHED",
+  "candidateTarget": "studenthub-v5-pilot-rc2",
+  "generatedAt": "2026-09-09T12:06:15.813Z",
+  "totalCases": 210,
+  "categoryBreakdown": {
+    "CONFLICTED_EVIDENCE": 25,
+    "MISSING_EVIDENCE_ABSTENTION": 25,
+    "STALE_SUPERSEDED_POLICY": 25,
+    "SYNDICATED_CONSENSUS_TRAP": 25,
+    "NOVEL_SUBTLE_SCAM": 25,
+    "BENIGN_LEGITIMATE_TRANSACTION": 25,
+    "AMBIGUOUS_ABBREVIATION_DISAGREEMENT": 25,
+    "STANDARD_VERIFIED_NOTICE": 35
+  },
+  "cases": [
+    {
+      "caseId": "AI-V2-0001",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #1",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-1-1",
+          "url": "https://hcmute.edu.vn/quy-che/1",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-1-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/1",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0002",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #2",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-2-1",
+          "url": "https://hcmute.edu.vn/quy-che/2",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-2-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/2",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0003",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #3",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-3-1",
+          "url": "https://hcmute.edu.vn/quy-che/3",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-3-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/3",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0004",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #4",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-4-1",
+          "url": "https://hcmute.edu.vn/quy-che/4",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-4-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/4",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0005",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #5",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-5-1",
+          "url": "https://hcmute.edu.vn/quy-che/5",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-5-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/5",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0006",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #6",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-6-1",
+          "url": "https://hcmute.edu.vn/quy-che/6",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-6-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/6",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0007",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #7",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-7-1",
+          "url": "https://hcmute.edu.vn/quy-che/7",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-7-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/7",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0008",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #8",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-8-1",
+          "url": "https://hcmute.edu.vn/quy-che/8",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-8-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/8",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0009",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #9",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-9-1",
+          "url": "https://hcmute.edu.vn/quy-che/9",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-9-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/9",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0010",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #10",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-10-1",
+          "url": "https://hcmute.edu.vn/quy-che/10",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-10-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/10",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0011",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #11",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-11-1",
+          "url": "https://hcmute.edu.vn/quy-che/11",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-11-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/11",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0012",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #12",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-12-1",
+          "url": "https://hcmute.edu.vn/quy-che/12",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-12-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/12",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0013",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #13",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-13-1",
+          "url": "https://hcmute.edu.vn/quy-che/13",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-13-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/13",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0014",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #14",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-14-1",
+          "url": "https://hcmute.edu.vn/quy-che/14",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-14-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/14",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0015",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #15",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-15-1",
+          "url": "https://hcmute.edu.vn/quy-che/15",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-15-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/15",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0016",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #16",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-16-1",
+          "url": "https://hcmute.edu.vn/quy-che/16",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-16-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/16",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0017",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #17",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-17-1",
+          "url": "https://hcmute.edu.vn/quy-che/17",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-17-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/17",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0018",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #18",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-18-1",
+          "url": "https://hcmute.edu.vn/quy-che/18",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-18-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/18",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0019",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #19",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-19-1",
+          "url": "https://hcmute.edu.vn/quy-che/19",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-19-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/19",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0020",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #20",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-20-1",
+          "url": "https://hcmute.edu.vn/quy-che/20",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-20-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/20",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0021",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #21",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-21-1",
+          "url": "https://hcmute.edu.vn/quy-che/21",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-21-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/21",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0022",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #22",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-22-1",
+          "url": "https://hcmute.edu.vn/quy-che/22",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-22-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/22",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0023",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #23",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-23-1",
+          "url": "https://hcmute.edu.vn/quy-che/23",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-23-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/23",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0024",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #24",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-24-1",
+          "url": "https://hcmute.edu.vn/quy-che/24",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-24-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/24",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0025",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "goldLabel": "CONFLICTED_EVIDENCE",
+      "claim": "Sinh viên đại học chính quy được bảo lưu kết quả học tập tối đa 4 học kỳ theo hướng dẫn mới #25",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-25-1",
+          "url": "https://hcmute.edu.vn/quy-che/25",
+          "domain": "hcmute.edu.vn",
+          "title": "Quy chế đào tạo chính quy",
+          "relevantSnippet": "Sinh viên được xin tạm nghỉ học tối đa không quá 2 học kỳ liên tiếp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        },
+        {
+          "sourceId": "s-AI-V2-25-2",
+          "url": "https://daotao.hcmute.edu.vn/huong-dan/25",
+          "domain": "daotao.hcmute.edu.vn",
+          "title": "Hướng dẫn tạm thời đăng ký bảo lưu",
+          "relevantSnippet": "Trong giai đoạn thí điểm, sinh viên có thể gia hạn thời gian bảo lưu tối đa 4 học kỳ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-15"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0026",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #1",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #2",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0028",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #3",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0029",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #4",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0030",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #5",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0031",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #6",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0032",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #7",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0033",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #8",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0034",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #9",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0035",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #10",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0036",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #11",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0037",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #12",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0038",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #13",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0039",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #14",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0040",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #15",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0041",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #16",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0042",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #17",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0043",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #18",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0044",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #19",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0045",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #20",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0046",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #21",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0047",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #22",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0048",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #23",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0049",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #24",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0050",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Bộ Giáo dục và Đào tạo dự kiến bãi bỏ hoàn toàn kỳ thi tốt nghiệp THPT từ năm học sau #25",
+      "sources": []
+    },
+    {
+      "caseId": "AI-V2-0051",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #1",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-1",
+          "url": "https://moet.gov.vn/van-ban-cu/1",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0052",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #2",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-2",
+          "url": "https://moet.gov.vn/van-ban-cu/2",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0053",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #3",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-3",
+          "url": "https://moet.gov.vn/van-ban-cu/3",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0054",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #4",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-4",
+          "url": "https://moet.gov.vn/van-ban-cu/4",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0055",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #5",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-5",
+          "url": "https://moet.gov.vn/van-ban-cu/5",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0056",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #6",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-6",
+          "url": "https://moet.gov.vn/van-ban-cu/6",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0057",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #7",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-7",
+          "url": "https://moet.gov.vn/van-ban-cu/7",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0058",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #8",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-8",
+          "url": "https://moet.gov.vn/van-ban-cu/8",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0059",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #9",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-9",
+          "url": "https://moet.gov.vn/van-ban-cu/9",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0060",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #10",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-10",
+          "url": "https://moet.gov.vn/van-ban-cu/10",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0061",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #11",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-11",
+          "url": "https://moet.gov.vn/van-ban-cu/11",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0062",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #12",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-12",
+          "url": "https://moet.gov.vn/van-ban-cu/12",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0063",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #13",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-13",
+          "url": "https://moet.gov.vn/van-ban-cu/13",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0064",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #14",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-14",
+          "url": "https://moet.gov.vn/van-ban-cu/14",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0065",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #15",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-15",
+          "url": "https://moet.gov.vn/van-ban-cu/15",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0066",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #16",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-16",
+          "url": "https://moet.gov.vn/van-ban-cu/16",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0067",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #17",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-17",
+          "url": "https://moet.gov.vn/van-ban-cu/17",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0068",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #18",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-18",
+          "url": "https://moet.gov.vn/van-ban-cu/18",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0069",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #19",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-19",
+          "url": "https://moet.gov.vn/van-ban-cu/19",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0070",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #20",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-20",
+          "url": "https://moet.gov.vn/van-ban-cu/20",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0071",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #21",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-21",
+          "url": "https://moet.gov.vn/van-ban-cu/21",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0072",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #22",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-22",
+          "url": "https://moet.gov.vn/van-ban-cu/22",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0073",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #23",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-23",
+          "url": "https://moet.gov.vn/van-ban-cu/23",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0074",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #24",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-24",
+          "url": "https://moet.gov.vn/van-ban-cu/24",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0075",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "goldLabel": "CONTRADICTED",
+      "claim": "Quy chế cộng điểm ưu tiên khu vực thi đại học vẫn áp dụng vô thời hạn theo quy định cũ #25",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-STALE-25",
+          "url": "https://moet.gov.vn/van-ban-cu/25",
+          "domain": "moet.gov.vn",
+          "title": "Thông tư số 08/2022/TT-BGDĐT",
+          "relevantSnippet": "Văn bản này đã hết hiệu lực và bị thay thế bởi quy chế tuyển sinh hiện hành năm 2026.",
+          "isOfficial": true,
+          "publishedAt": "2020-05-10"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0076",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #1",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-1-1",
+          "url": "https://kenhtre.vn/tin/1",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-1-2",
+          "url": "https://diendanit.com/post/1",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0077",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #2",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-2-1",
+          "url": "https://kenhtre.vn/tin/2",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-2-2",
+          "url": "https://diendanit.com/post/2",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0078",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #3",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-3-1",
+          "url": "https://kenhtre.vn/tin/3",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-3-2",
+          "url": "https://diendanit.com/post/3",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0079",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #4",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-4-1",
+          "url": "https://kenhtre.vn/tin/4",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-4-2",
+          "url": "https://diendanit.com/post/4",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0080",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #5",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-5-1",
+          "url": "https://kenhtre.vn/tin/5",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-5-2",
+          "url": "https://diendanit.com/post/5",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0081",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #6",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-6-1",
+          "url": "https://kenhtre.vn/tin/6",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-6-2",
+          "url": "https://diendanit.com/post/6",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0082",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #7",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-7-1",
+          "url": "https://kenhtre.vn/tin/7",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-7-2",
+          "url": "https://diendanit.com/post/7",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0083",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #8",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-8-1",
+          "url": "https://kenhtre.vn/tin/8",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-8-2",
+          "url": "https://diendanit.com/post/8",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0084",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #9",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-9-1",
+          "url": "https://kenhtre.vn/tin/9",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-9-2",
+          "url": "https://diendanit.com/post/9",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0085",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #10",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-10-1",
+          "url": "https://kenhtre.vn/tin/10",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-10-2",
+          "url": "https://diendanit.com/post/10",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0086",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #11",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-11-1",
+          "url": "https://kenhtre.vn/tin/11",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-11-2",
+          "url": "https://diendanit.com/post/11",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0087",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #12",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-12-1",
+          "url": "https://kenhtre.vn/tin/12",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-12-2",
+          "url": "https://diendanit.com/post/12",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0088",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #13",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-13-1",
+          "url": "https://kenhtre.vn/tin/13",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-13-2",
+          "url": "https://diendanit.com/post/13",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0089",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #14",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-14-1",
+          "url": "https://kenhtre.vn/tin/14",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-14-2",
+          "url": "https://diendanit.com/post/14",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0090",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #15",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-15-1",
+          "url": "https://kenhtre.vn/tin/15",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-15-2",
+          "url": "https://diendanit.com/post/15",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0091",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #16",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-16-1",
+          "url": "https://kenhtre.vn/tin/16",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-16-2",
+          "url": "https://diendanit.com/post/16",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0092",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #17",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-17-1",
+          "url": "https://kenhtre.vn/tin/17",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-17-2",
+          "url": "https://diendanit.com/post/17",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0093",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #18",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-18-1",
+          "url": "https://kenhtre.vn/tin/18",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-18-2",
+          "url": "https://diendanit.com/post/18",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0094",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #19",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-19-1",
+          "url": "https://kenhtre.vn/tin/19",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-19-2",
+          "url": "https://diendanit.com/post/19",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0095",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #20",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-20-1",
+          "url": "https://kenhtre.vn/tin/20",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-20-2",
+          "url": "https://diendanit.com/post/20",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0096",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #21",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-21-1",
+          "url": "https://kenhtre.vn/tin/21",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-21-2",
+          "url": "https://diendanit.com/post/21",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0097",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #22",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-22-1",
+          "url": "https://kenhtre.vn/tin/22",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-22-2",
+          "url": "https://diendanit.com/post/22",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0098",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #23",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-23-1",
+          "url": "https://kenhtre.vn/tin/23",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-23-2",
+          "url": "https://diendanit.com/post/23",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0099",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #24",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-24-1",
+          "url": "https://kenhtre.vn/tin/24",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-24-2",
+          "url": "https://diendanit.com/post/24",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0100",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "goldLabel": "INSUFFICIENT_EVIDENCE",
+      "claim": "Toàn bộ sinh viên đạt TOEIC 500 trở lên sẽ được nhà trường tặng laptop trị giá 20 triệu đồng #25",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SYN-25-1",
+          "url": "https://kenhtre.vn/tin/25",
+          "domain": "kenhtre.vn",
+          "title": "Tin tức sinh viên lan truyền",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        },
+        {
+          "sourceId": "s-AI-V2-SYN-25-2",
+          "url": "https://diendanit.com/post/25",
+          "domain": "diendanit.com",
+          "title": "Chia sẻ thông tin học bổng",
+          "relevantSnippet": "Nhiều trang mạng xã hội lan truyền thông tin sinh viên đạt điểm TOEIC cao sẽ được tặng laptop.",
+          "isOfficial": false,
+          "publishedAt": "2026-02-18"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0101",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #1",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-1",
+          "url": "https://tinnhiemmang.vn/canh-bao/1",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0102",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #2",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-2",
+          "url": "https://tinnhiemmang.vn/canh-bao/2",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0103",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #3",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-3",
+          "url": "https://tinnhiemmang.vn/canh-bao/3",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0104",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #4",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-4",
+          "url": "https://tinnhiemmang.vn/canh-bao/4",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0105",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #5",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-5",
+          "url": "https://tinnhiemmang.vn/canh-bao/5",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0106",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #6",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-6",
+          "url": "https://tinnhiemmang.vn/canh-bao/6",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0107",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #7",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-7",
+          "url": "https://tinnhiemmang.vn/canh-bao/7",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0108",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #8",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-8",
+          "url": "https://tinnhiemmang.vn/canh-bao/8",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0109",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #9",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-9",
+          "url": "https://tinnhiemmang.vn/canh-bao/9",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0110",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #10",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-10",
+          "url": "https://tinnhiemmang.vn/canh-bao/10",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0111",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #11",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-11",
+          "url": "https://tinnhiemmang.vn/canh-bao/11",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0112",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #12",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-12",
+          "url": "https://tinnhiemmang.vn/canh-bao/12",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0113",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #13",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-13",
+          "url": "https://tinnhiemmang.vn/canh-bao/13",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0114",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #14",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-14",
+          "url": "https://tinnhiemmang.vn/canh-bao/14",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0115",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #15",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-15",
+          "url": "https://tinnhiemmang.vn/canh-bao/15",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0116",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #16",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-16",
+          "url": "https://tinnhiemmang.vn/canh-bao/16",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0117",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #17",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-17",
+          "url": "https://tinnhiemmang.vn/canh-bao/17",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0118",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #18",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-18",
+          "url": "https://tinnhiemmang.vn/canh-bao/18",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0119",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #19",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-19",
+          "url": "https://tinnhiemmang.vn/canh-bao/19",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0120",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #20",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-20",
+          "url": "https://tinnhiemmang.vn/canh-bao/20",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0121",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #21",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-21",
+          "url": "https://tinnhiemmang.vn/canh-bao/21",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0122",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #22",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-22",
+          "url": "https://tinnhiemmang.vn/canh-bao/22",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0123",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #23",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-23",
+          "url": "https://tinnhiemmang.vn/canh-bao/23",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0124",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #24",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-24",
+          "url": "https://tinnhiemmang.vn/canh-bao/24",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0125",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "goldLabel": "HIGH_RISK",
+      "claim": "Sinh viên cần truy cập biểu mẫu Google Form cung cấp thông tin tài khoản ngân hàng và mã OTP để nhận tiền trợ cấp #25",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-SCAM-25",
+          "url": "https://tinnhiemmang.vn/canh-bao/25",
+          "domain": "tinnhiemmang.vn",
+          "title": "Cảnh báo bẫy lừa đảo thu thập mã OTP",
+          "relevantSnippet": "Không một cơ quan quản lý hay trường đại học nào yêu cầu sinh viên cung cấp mã OTP ngân hàng để nhận trợ cấp.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-25"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0126",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #1",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-1",
+          "url": "https://hcmute.edu.vn/hoc-phi/1",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0127",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #2",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-2",
+          "url": "https://hcmute.edu.vn/hoc-phi/2",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0128",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #3",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-3",
+          "url": "https://hcmute.edu.vn/hoc-phi/3",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0129",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #4",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-4",
+          "url": "https://hcmute.edu.vn/hoc-phi/4",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0130",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #5",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-5",
+          "url": "https://hcmute.edu.vn/hoc-phi/5",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0131",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #6",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-6",
+          "url": "https://hcmute.edu.vn/hoc-phi/6",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0132",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #7",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-7",
+          "url": "https://hcmute.edu.vn/hoc-phi/7",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0133",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #8",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-8",
+          "url": "https://hcmute.edu.vn/hoc-phi/8",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0134",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #9",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-9",
+          "url": "https://hcmute.edu.vn/hoc-phi/9",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0135",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #10",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-10",
+          "url": "https://hcmute.edu.vn/hoc-phi/10",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0136",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #11",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-11",
+          "url": "https://hcmute.edu.vn/hoc-phi/11",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0137",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #12",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-12",
+          "url": "https://hcmute.edu.vn/hoc-phi/12",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0138",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #13",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-13",
+          "url": "https://hcmute.edu.vn/hoc-phi/13",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0139",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #14",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-14",
+          "url": "https://hcmute.edu.vn/hoc-phi/14",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0140",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #15",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-15",
+          "url": "https://hcmute.edu.vn/hoc-phi/15",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0141",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #16",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-16",
+          "url": "https://hcmute.edu.vn/hoc-phi/16",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0142",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #17",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-17",
+          "url": "https://hcmute.edu.vn/hoc-phi/17",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0143",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #18",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-18",
+          "url": "https://hcmute.edu.vn/hoc-phi/18",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0144",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #19",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-19",
+          "url": "https://hcmute.edu.vn/hoc-phi/19",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0145",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #20",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-20",
+          "url": "https://hcmute.edu.vn/hoc-phi/20",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0146",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #21",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-21",
+          "url": "https://hcmute.edu.vn/hoc-phi/21",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0147",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #22",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-22",
+          "url": "https://hcmute.edu.vn/hoc-phi/22",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0148",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #23",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-23",
+          "url": "https://hcmute.edu.vn/hoc-phi/23",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0149",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #24",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-24",
+          "url": "https://hcmute.edu.vn/hoc-phi/24",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0150",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "goldLabel": "SUPPORTED",
+      "claim": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường #25",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-BENIGN-25",
+          "url": "https://hcmute.edu.vn/hoc-phi/25",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo thu học phí học kỳ 2",
+          "relevantSnippet": "Sinh viên nộp học phí học kỳ 2 qua cổng thanh toán trực tuyến chính thức của nhà trường tại daotao.hcmute.edu.vn.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0151",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #1",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-1-1",
+          "url": "https://hust.edu.vn/hoc-bong/1",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-1-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/1",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0152",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #2",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-2-1",
+          "url": "https://hust.edu.vn/hoc-bong/2",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-2-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/2",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0153",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #3",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-3-1",
+          "url": "https://hust.edu.vn/hoc-bong/3",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-3-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/3",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0154",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #4",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-4-1",
+          "url": "https://hust.edu.vn/hoc-bong/4",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-4-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/4",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0155",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #5",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-5-1",
+          "url": "https://hust.edu.vn/hoc-bong/5",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-5-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/5",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0156",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #6",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-6-1",
+          "url": "https://hust.edu.vn/hoc-bong/6",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-6-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/6",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0157",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #7",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-7-1",
+          "url": "https://hust.edu.vn/hoc-bong/7",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-7-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/7",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0158",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #8",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-8-1",
+          "url": "https://hust.edu.vn/hoc-bong/8",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-8-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/8",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0159",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #9",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-9-1",
+          "url": "https://hust.edu.vn/hoc-bong/9",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-9-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/9",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0160",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #10",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-10-1",
+          "url": "https://hust.edu.vn/hoc-bong/10",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-10-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/10",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0161",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #11",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-11-1",
+          "url": "https://hust.edu.vn/hoc-bong/11",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-11-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/11",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0162",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #12",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-12-1",
+          "url": "https://hust.edu.vn/hoc-bong/12",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-12-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/12",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0163",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #13",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-13-1",
+          "url": "https://hust.edu.vn/hoc-bong/13",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-13-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/13",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0164",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #14",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-14-1",
+          "url": "https://hust.edu.vn/hoc-bong/14",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-14-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/14",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0165",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #15",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-15-1",
+          "url": "https://hust.edu.vn/hoc-bong/15",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-15-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/15",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0166",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #16",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-16-1",
+          "url": "https://hust.edu.vn/hoc-bong/16",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-16-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/16",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0167",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #17",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-17-1",
+          "url": "https://hust.edu.vn/hoc-bong/17",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-17-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/17",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0168",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #18",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-18-1",
+          "url": "https://hust.edu.vn/hoc-bong/18",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-18-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/18",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0169",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #19",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-19-1",
+          "url": "https://hust.edu.vn/hoc-bong/19",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-19-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/19",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0170",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #20",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-20-1",
+          "url": "https://hust.edu.vn/hoc-bong/20",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-20-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/20",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0171",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #21",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-21-1",
+          "url": "https://hust.edu.vn/hoc-bong/21",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-21-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/21",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0172",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #22",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-22-1",
+          "url": "https://hust.edu.vn/hoc-bong/22",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-22-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/22",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0173",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #23",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-23-1",
+          "url": "https://hust.edu.vn/hoc-bong/23",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-23-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/23",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0174",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #24",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-24-1",
+          "url": "https://hust.edu.vn/hoc-bong/24",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-24-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/24",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0175",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "goldLabel": "NEEDS_EXPERT_REVIEW",
+      "claim": "ĐHBK công bố chính sách miễn 100% học phí cho tân thủ khoa khối A00 năm 2026 áp dụng toàn quốc #25",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-AMB-25-1",
+          "url": "https://hust.edu.vn/hoc-bong/25",
+          "domain": "hust.edu.vn",
+          "title": "HUST công bố học bổng tài năng thủ khoa",
+          "relevantSnippet": "Đại học Bách khoa Hà Nội trao học bổng toàn phần cho thủ khoa đầu vào các tổ hợp xét tuyển.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        },
+        {
+          "sourceId": "s-AI-V2-AMB-25-2",
+          "url": "https://hcmut.edu.vn/hoc-bong/25",
+          "domain": "hcmut.edu.vn",
+          "title": "HCMUT công bố chính sách học bổng đầu vào",
+          "relevantSnippet": "Trường Đại học Bách khoa TP.HCM có quy định học bổng riêng theo nguồn quỹ OISP và doanh nghiệp tài trợ.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0176",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #1",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-1",
+          "url": "https://hcmute.edu.vn/tuyensinh/1",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0177",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #2",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-2",
+          "url": "https://hcmute.edu.vn/tuyensinh/2",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0178",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #3",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-3",
+          "url": "https://hcmute.edu.vn/tuyensinh/3",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0179",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #4",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-4",
+          "url": "https://hcmute.edu.vn/tuyensinh/4",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0180",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #5",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-5",
+          "url": "https://hcmute.edu.vn/tuyensinh/5",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0181",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #6",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-6",
+          "url": "https://hcmute.edu.vn/tuyensinh/6",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0182",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #7",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-7",
+          "url": "https://hcmute.edu.vn/tuyensinh/7",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0183",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #8",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-8",
+          "url": "https://hcmute.edu.vn/tuyensinh/8",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0184",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #9",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-9",
+          "url": "https://hcmute.edu.vn/tuyensinh/9",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0185",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #10",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-10",
+          "url": "https://hcmute.edu.vn/tuyensinh/10",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0186",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #11",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-11",
+          "url": "https://hcmute.edu.vn/tuyensinh/11",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0187",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #12",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-12",
+          "url": "https://hcmute.edu.vn/tuyensinh/12",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0188",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #13",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-13",
+          "url": "https://hcmute.edu.vn/tuyensinh/13",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0189",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #14",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-14",
+          "url": "https://hcmute.edu.vn/tuyensinh/14",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0190",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #15",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-15",
+          "url": "https://hcmute.edu.vn/tuyensinh/15",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0191",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #16",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-16",
+          "url": "https://hcmute.edu.vn/tuyensinh/16",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0192",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #17",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-17",
+          "url": "https://hcmute.edu.vn/tuyensinh/17",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0193",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #18",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-18",
+          "url": "https://hcmute.edu.vn/tuyensinh/18",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0194",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #19",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-19",
+          "url": "https://hcmute.edu.vn/tuyensinh/19",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0195",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #20",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-20",
+          "url": "https://hcmute.edu.vn/tuyensinh/20",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0196",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #21",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-21",
+          "url": "https://hcmute.edu.vn/tuyensinh/21",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0197",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #22",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-22",
+          "url": "https://hcmute.edu.vn/tuyensinh/22",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0198",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #23",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-23",
+          "url": "https://hcmute.edu.vn/tuyensinh/23",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0199",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #24",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-24",
+          "url": "https://hcmute.edu.vn/tuyensinh/24",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0200",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #25",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-25",
+          "url": "https://hcmute.edu.vn/tuyensinh/25",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0201",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #26",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-26",
+          "url": "https://hcmute.edu.vn/tuyensinh/26",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0202",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #27",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-27",
+          "url": "https://hcmute.edu.vn/tuyensinh/27",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0203",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #28",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-28",
+          "url": "https://hcmute.edu.vn/tuyensinh/28",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0204",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #29",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-29",
+          "url": "https://hcmute.edu.vn/tuyensinh/29",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0205",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #30",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-30",
+          "url": "https://hcmute.edu.vn/tuyensinh/30",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0206",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #31",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-31",
+          "url": "https://hcmute.edu.vn/tuyensinh/31",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0207",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #32",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-32",
+          "url": "https://hcmute.edu.vn/tuyensinh/32",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0208",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #33",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-33",
+          "url": "https://hcmute.edu.vn/tuyensinh/33",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0209",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #34",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-34",
+          "url": "https://hcmute.edu.vn/tuyensinh/34",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V2-0210",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "goldLabel": "SUPPORTED",
+      "claim": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 #35",
+      "sources": [
+        {
+          "sourceId": "s-AI-V2-NOTICE-35",
+          "url": "https://hcmute.edu.vn/tuyensinh/35",
+          "domain": "hcmute.edu.vn",
+          "title": "Thông báo tuyển sinh đại học chính quy năm 2026",
+          "relevantSnippet": "Trường Đại học Sư phạm Kỹ thuật TP.HCM công bố thời gian đăng ký xét tuyển học bạ đợt 1 năm 2026 từ ngày 01/03/2026.",
+          "isOfficial": true,
+          "publishedAt": "2026-02-20"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3966 @@
+{
+  "holdoutVersion": "SOURCE_INDEPENDENCE_HOLDOUT_V3",
+  "count": 160,
+  "clusters": [
+    {
+      "clusterId": "IND-V3-001",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #1",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-001-1",
+          "url": "https://vtv.vn/giao-duc/tin-1",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #1",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-001-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-1",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #1",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-002",
+      "name": "Thông cáo báo chí lan truyền #2",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-002-1",
+          "url": "https://techz.vn/pr-2",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #2",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-002-2",
+          "url": "https://genk.vn/pr-2",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #2",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-003",
+      "name": "Thông cáo báo chí lan truyền #3",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-003-1",
+          "url": "https://techz.vn/pr-3",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #3",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-003-2",
+          "url": "https://genk.vn/pr-3",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #3",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-004",
+      "name": "Thông cáo báo chí lan truyền #4",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-004-1",
+          "url": "https://techz.vn/pr-4",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #4",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-004-2",
+          "url": "https://genk.vn/pr-4",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #4",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-005",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #5",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-005-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-5",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #5",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-005-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-5",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #5",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-006",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #6",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-006-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-6",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 6",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-006-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-6",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 6",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-007",
+      "name": "Mạng lưới sao chép cổng thông tin #7",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-007-1",
+          "url": "https://moet.gov.vn/thong-bao-7",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #7",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-007-2",
+          "url": "https://gddt-mirror.vn/thong-bao-7",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #7",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-008",
+      "name": "Thông cáo báo chí lan truyền #8",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-008-1",
+          "url": "https://techz.vn/pr-8",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #8",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-008-2",
+          "url": "https://genk.vn/pr-8",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #8",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-009",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #9",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-009-1",
+          "url": "https://vtv.vn/giao-duc/tin-9",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #9",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-009-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-9",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #9",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-010",
+      "name": "Thông cáo báo chí lan truyền #10",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-010-1",
+          "url": "https://techz.vn/pr-10",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #10",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-010-2",
+          "url": "https://genk.vn/pr-10",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #10",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-011",
+      "name": "Thông cáo báo chí lan truyền #11",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-011-1",
+          "url": "https://techz.vn/pr-11",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #11",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-011-2",
+          "url": "https://genk.vn/pr-11",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #11",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-012",
+      "name": "Thông cáo báo chí lan truyền #12",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-012-1",
+          "url": "https://techz.vn/pr-12",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #12",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-012-2",
+          "url": "https://genk.vn/pr-12",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #12",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-013",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #13",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-013-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-13",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #13",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-013-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-13",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #13",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-014",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #14",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-014-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-14",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 14",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-014-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-14",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 14",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-015",
+      "name": "Mạng lưới sao chép cổng thông tin #15",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-015-1",
+          "url": "https://moet.gov.vn/thong-bao-15",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #15",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-015-2",
+          "url": "https://gddt-mirror.vn/thong-bao-15",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #15",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-016",
+      "name": "Thông cáo báo chí lan truyền #16",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-016-1",
+          "url": "https://techz.vn/pr-16",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #16",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-016-2",
+          "url": "https://genk.vn/pr-16",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #16",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-017",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #17",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-017-1",
+          "url": "https://vtv.vn/giao-duc/tin-17",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #17",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-017-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-17",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #17",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-018",
+      "name": "Thông cáo báo chí lan truyền #18",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-018-1",
+          "url": "https://techz.vn/pr-18",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #18",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-018-2",
+          "url": "https://genk.vn/pr-18",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #18",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-019",
+      "name": "Thông cáo báo chí lan truyền #19",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-019-1",
+          "url": "https://techz.vn/pr-19",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #19",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-019-2",
+          "url": "https://genk.vn/pr-19",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #19",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-020",
+      "name": "Thông cáo báo chí lan truyền #20",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-020-1",
+          "url": "https://techz.vn/pr-20",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #20",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-020-2",
+          "url": "https://genk.vn/pr-20",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #20",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-021",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #21",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-021-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-21",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #21",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-021-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-21",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #21",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-022",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #22",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-022-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-22",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 22",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-022-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-22",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 22",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-023",
+      "name": "Mạng lưới sao chép cổng thông tin #23",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-023-1",
+          "url": "https://moet.gov.vn/thong-bao-23",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #23",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-023-2",
+          "url": "https://gddt-mirror.vn/thong-bao-23",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #23",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-024",
+      "name": "Thông cáo báo chí lan truyền #24",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-024-1",
+          "url": "https://techz.vn/pr-24",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #24",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-024-2",
+          "url": "https://genk.vn/pr-24",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #24",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-025",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #25",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-025-1",
+          "url": "https://vtv.vn/giao-duc/tin-25",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #25",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-025-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-25",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #25",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-026",
+      "name": "Thông cáo báo chí lan truyền #26",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-026-1",
+          "url": "https://techz.vn/pr-26",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #26",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-026-2",
+          "url": "https://genk.vn/pr-26",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #26",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-027",
+      "name": "Thông cáo báo chí lan truyền #27",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-027-1",
+          "url": "https://techz.vn/pr-27",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #27",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-027-2",
+          "url": "https://genk.vn/pr-27",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #27",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-028",
+      "name": "Thông cáo báo chí lan truyền #28",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-028-1",
+          "url": "https://techz.vn/pr-28",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #28",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-028-2",
+          "url": "https://genk.vn/pr-28",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #28",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-029",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #29",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-029-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-29",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #29",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-029-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-29",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #29",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-030",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #30",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-030-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-30",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 30",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-030-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-30",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 30",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-031",
+      "name": "Mạng lưới sao chép cổng thông tin #31",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-031-1",
+          "url": "https://moet.gov.vn/thong-bao-31",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #31",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-031-2",
+          "url": "https://gddt-mirror.vn/thong-bao-31",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #31",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-032",
+      "name": "Thông cáo báo chí lan truyền #32",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-032-1",
+          "url": "https://techz.vn/pr-32",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #32",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-032-2",
+          "url": "https://genk.vn/pr-32",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #32",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-033",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #33",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-033-1",
+          "url": "https://vtv.vn/giao-duc/tin-33",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #33",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-033-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-33",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #33",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-034",
+      "name": "Thông cáo báo chí lan truyền #34",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-034-1",
+          "url": "https://techz.vn/pr-34",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #34",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-034-2",
+          "url": "https://genk.vn/pr-34",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #34",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-035",
+      "name": "Thông cáo báo chí lan truyền #35",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-035-1",
+          "url": "https://techz.vn/pr-35",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #35",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-035-2",
+          "url": "https://genk.vn/pr-35",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #35",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-036",
+      "name": "Thông cáo báo chí lan truyền #36",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-036-1",
+          "url": "https://techz.vn/pr-36",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #36",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-036-2",
+          "url": "https://genk.vn/pr-36",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #36",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-037",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #37",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-037-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-37",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #37",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-037-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-37",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #37",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-038",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #38",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-038-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-38",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 38",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-038-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-38",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 38",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-039",
+      "name": "Mạng lưới sao chép cổng thông tin #39",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-039-1",
+          "url": "https://moet.gov.vn/thong-bao-39",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #39",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-039-2",
+          "url": "https://gddt-mirror.vn/thong-bao-39",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #39",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-040",
+      "name": "Thông cáo báo chí lan truyền #40",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-040-1",
+          "url": "https://techz.vn/pr-40",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #40",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-040-2",
+          "url": "https://genk.vn/pr-40",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #40",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-041",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #41",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-041-1",
+          "url": "https://vtv.vn/giao-duc/tin-41",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #41",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-041-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-41",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #41",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-042",
+      "name": "Thông cáo báo chí lan truyền #42",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-042-1",
+          "url": "https://techz.vn/pr-42",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #42",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-042-2",
+          "url": "https://genk.vn/pr-42",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #42",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-043",
+      "name": "Thông cáo báo chí lan truyền #43",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-043-1",
+          "url": "https://techz.vn/pr-43",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #43",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-043-2",
+          "url": "https://genk.vn/pr-43",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #43",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-044",
+      "name": "Thông cáo báo chí lan truyền #44",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-044-1",
+          "url": "https://techz.vn/pr-44",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #44",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-044-2",
+          "url": "https://genk.vn/pr-44",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #44",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-045",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #45",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-045-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-45",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #45",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-045-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-45",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #45",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-046",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #46",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-046-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-46",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 46",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-046-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-46",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 46",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-047",
+      "name": "Mạng lưới sao chép cổng thông tin #47",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-047-1",
+          "url": "https://moet.gov.vn/thong-bao-47",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #47",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-047-2",
+          "url": "https://gddt-mirror.vn/thong-bao-47",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #47",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-048",
+      "name": "Thông cáo báo chí lan truyền #48",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-048-1",
+          "url": "https://techz.vn/pr-48",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #48",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-048-2",
+          "url": "https://genk.vn/pr-48",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #48",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-049",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #49",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-049-1",
+          "url": "https://vtv.vn/giao-duc/tin-49",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #49",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-049-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-49",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #49",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-050",
+      "name": "Thông cáo báo chí lan truyền #50",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-050-1",
+          "url": "https://techz.vn/pr-50",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #50",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-050-2",
+          "url": "https://genk.vn/pr-50",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #50",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-051",
+      "name": "Thông cáo báo chí lan truyền #51",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-051-1",
+          "url": "https://techz.vn/pr-51",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #51",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-051-2",
+          "url": "https://genk.vn/pr-51",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #51",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-052",
+      "name": "Thông cáo báo chí lan truyền #52",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-052-1",
+          "url": "https://techz.vn/pr-52",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #52",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-052-2",
+          "url": "https://genk.vn/pr-52",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #52",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-053",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #53",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-053-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-53",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #53",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-053-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-53",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #53",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-054",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #54",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-054-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-54",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 54",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-054-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-54",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 54",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-055",
+      "name": "Mạng lưới sao chép cổng thông tin #55",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-055-1",
+          "url": "https://moet.gov.vn/thong-bao-55",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #55",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-055-2",
+          "url": "https://gddt-mirror.vn/thong-bao-55",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #55",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-056",
+      "name": "Thông cáo báo chí lan truyền #56",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-056-1",
+          "url": "https://techz.vn/pr-56",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #56",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-056-2",
+          "url": "https://genk.vn/pr-56",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #56",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-057",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #57",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-057-1",
+          "url": "https://vtv.vn/giao-duc/tin-57",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #57",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-057-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-57",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #57",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-058",
+      "name": "Thông cáo báo chí lan truyền #58",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-058-1",
+          "url": "https://techz.vn/pr-58",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #58",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-058-2",
+          "url": "https://genk.vn/pr-58",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #58",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-059",
+      "name": "Thông cáo báo chí lan truyền #59",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-059-1",
+          "url": "https://techz.vn/pr-59",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #59",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-059-2",
+          "url": "https://genk.vn/pr-59",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #59",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-060",
+      "name": "Thông cáo báo chí lan truyền #60",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-060-1",
+          "url": "https://techz.vn/pr-60",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #60",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-060-2",
+          "url": "https://genk.vn/pr-60",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #60",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-061",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #61",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-061-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-61",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #61",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-061-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-61",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #61",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-062",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #62",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-062-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-62",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 62",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-062-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-62",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 62",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-063",
+      "name": "Mạng lưới sao chép cổng thông tin #63",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-063-1",
+          "url": "https://moet.gov.vn/thong-bao-63",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #63",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-063-2",
+          "url": "https://gddt-mirror.vn/thong-bao-63",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #63",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-064",
+      "name": "Thông cáo báo chí lan truyền #64",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-064-1",
+          "url": "https://techz.vn/pr-64",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #64",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-064-2",
+          "url": "https://genk.vn/pr-64",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #64",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-065",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #65",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-065-1",
+          "url": "https://vtv.vn/giao-duc/tin-65",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #65",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-065-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-65",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #65",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-066",
+      "name": "Thông cáo báo chí lan truyền #66",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-066-1",
+          "url": "https://techz.vn/pr-66",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #66",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-066-2",
+          "url": "https://genk.vn/pr-66",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #66",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-067",
+      "name": "Thông cáo báo chí lan truyền #67",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-067-1",
+          "url": "https://techz.vn/pr-67",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #67",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-067-2",
+          "url": "https://genk.vn/pr-67",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #67",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-068",
+      "name": "Thông cáo báo chí lan truyền #68",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-068-1",
+          "url": "https://techz.vn/pr-68",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #68",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-068-2",
+          "url": "https://genk.vn/pr-68",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #68",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-069",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #69",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-069-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-69",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #69",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-069-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-69",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #69",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-070",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #70",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-070-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-70",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 70",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-070-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-70",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 70",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-071",
+      "name": "Mạng lưới sao chép cổng thông tin #71",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-071-1",
+          "url": "https://moet.gov.vn/thong-bao-71",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #71",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-071-2",
+          "url": "https://gddt-mirror.vn/thong-bao-71",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #71",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-072",
+      "name": "Thông cáo báo chí lan truyền #72",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-072-1",
+          "url": "https://techz.vn/pr-72",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #72",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-072-2",
+          "url": "https://genk.vn/pr-72",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #72",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-073",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #73",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-073-1",
+          "url": "https://vtv.vn/giao-duc/tin-73",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #73",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-073-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-73",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #73",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-074",
+      "name": "Thông cáo báo chí lan truyền #74",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-074-1",
+          "url": "https://techz.vn/pr-74",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #74",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-074-2",
+          "url": "https://genk.vn/pr-74",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #74",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-075",
+      "name": "Thông cáo báo chí lan truyền #75",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-075-1",
+          "url": "https://techz.vn/pr-75",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #75",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-075-2",
+          "url": "https://genk.vn/pr-75",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #75",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-076",
+      "name": "Thông cáo báo chí lan truyền #76",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-076-1",
+          "url": "https://techz.vn/pr-76",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #76",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-076-2",
+          "url": "https://genk.vn/pr-76",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #76",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-077",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #77",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-077-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-77",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #77",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-077-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-77",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #77",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-078",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #78",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-078-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-78",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 78",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-078-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-78",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 78",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-079",
+      "name": "Mạng lưới sao chép cổng thông tin #79",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-079-1",
+          "url": "https://moet.gov.vn/thong-bao-79",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #79",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-079-2",
+          "url": "https://gddt-mirror.vn/thong-bao-79",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #79",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-080",
+      "name": "Thông cáo báo chí lan truyền #80",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-080-1",
+          "url": "https://techz.vn/pr-80",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #80",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-080-2",
+          "url": "https://genk.vn/pr-80",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #80",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-081",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #81",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-081-1",
+          "url": "https://vtv.vn/giao-duc/tin-81",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #81",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-081-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-81",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #81",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-082",
+      "name": "Thông cáo báo chí lan truyền #82",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-082-1",
+          "url": "https://techz.vn/pr-82",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #82",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-082-2",
+          "url": "https://genk.vn/pr-82",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #82",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-083",
+      "name": "Thông cáo báo chí lan truyền #83",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-083-1",
+          "url": "https://techz.vn/pr-83",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #83",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-083-2",
+          "url": "https://genk.vn/pr-83",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #83",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-084",
+      "name": "Thông cáo báo chí lan truyền #84",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-084-1",
+          "url": "https://techz.vn/pr-84",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #84",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-084-2",
+          "url": "https://genk.vn/pr-84",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #84",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-085",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #85",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-085-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-85",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #85",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-085-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-85",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #85",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-086",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #86",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-086-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-86",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 86",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-086-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-86",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 86",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-087",
+      "name": "Mạng lưới sao chép cổng thông tin #87",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-087-1",
+          "url": "https://moet.gov.vn/thong-bao-87",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #87",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-087-2",
+          "url": "https://gddt-mirror.vn/thong-bao-87",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #87",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-088",
+      "name": "Thông cáo báo chí lan truyền #88",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-088-1",
+          "url": "https://techz.vn/pr-88",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #88",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-088-2",
+          "url": "https://genk.vn/pr-88",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #88",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-089",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #89",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-089-1",
+          "url": "https://vtv.vn/giao-duc/tin-89",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #89",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-089-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-89",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #89",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-090",
+      "name": "Thông cáo báo chí lan truyền #90",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-090-1",
+          "url": "https://techz.vn/pr-90",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #90",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-090-2",
+          "url": "https://genk.vn/pr-90",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #90",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-091",
+      "name": "Thông cáo báo chí lan truyền #91",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-091-1",
+          "url": "https://techz.vn/pr-91",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #91",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-091-2",
+          "url": "https://genk.vn/pr-91",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #91",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-092",
+      "name": "Thông cáo báo chí lan truyền #92",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-092-1",
+          "url": "https://techz.vn/pr-92",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #92",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-092-2",
+          "url": "https://genk.vn/pr-92",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #92",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-093",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #93",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-093-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-93",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #93",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-093-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-93",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #93",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-094",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #94",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-094-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-94",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 94",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-094-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-94",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 94",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-095",
+      "name": "Mạng lưới sao chép cổng thông tin #95",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-095-1",
+          "url": "https://moet.gov.vn/thong-bao-95",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #95",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-095-2",
+          "url": "https://gddt-mirror.vn/thong-bao-95",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #95",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-096",
+      "name": "Thông cáo báo chí lan truyền #96",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-096-1",
+          "url": "https://techz.vn/pr-96",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #96",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-096-2",
+          "url": "https://genk.vn/pr-96",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #96",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-097",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #97",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-097-1",
+          "url": "https://vtv.vn/giao-duc/tin-97",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #97",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-097-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-97",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #97",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-098",
+      "name": "Thông cáo báo chí lan truyền #98",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-098-1",
+          "url": "https://techz.vn/pr-98",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #98",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-098-2",
+          "url": "https://genk.vn/pr-98",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #98",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-099",
+      "name": "Thông cáo báo chí lan truyền #99",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-099-1",
+          "url": "https://techz.vn/pr-99",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #99",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-099-2",
+          "url": "https://genk.vn/pr-99",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #99",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-100",
+      "name": "Thông cáo báo chí lan truyền #100",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-100-1",
+          "url": "https://techz.vn/pr-100",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #100",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-100-2",
+          "url": "https://genk.vn/pr-100",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #100",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-101",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #101",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-101-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-101",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #101",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-101-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-101",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #101",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-102",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #102",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-102-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-102",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 102",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-102-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-102",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 102",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-103",
+      "name": "Mạng lưới sao chép cổng thông tin #103",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-103-1",
+          "url": "https://moet.gov.vn/thong-bao-103",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #103",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-103-2",
+          "url": "https://gddt-mirror.vn/thong-bao-103",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #103",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-104",
+      "name": "Thông cáo báo chí lan truyền #104",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-104-1",
+          "url": "https://techz.vn/pr-104",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #104",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-104-2",
+          "url": "https://genk.vn/pr-104",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #104",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-105",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #105",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-105-1",
+          "url": "https://vtv.vn/giao-duc/tin-105",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #105",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-105-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-105",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #105",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-106",
+      "name": "Thông cáo báo chí lan truyền #106",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-106-1",
+          "url": "https://techz.vn/pr-106",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #106",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-106-2",
+          "url": "https://genk.vn/pr-106",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #106",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-107",
+      "name": "Thông cáo báo chí lan truyền #107",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-107-1",
+          "url": "https://techz.vn/pr-107",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #107",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-107-2",
+          "url": "https://genk.vn/pr-107",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #107",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-108",
+      "name": "Thông cáo báo chí lan truyền #108",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-108-1",
+          "url": "https://techz.vn/pr-108",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #108",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-108-2",
+          "url": "https://genk.vn/pr-108",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #108",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-109",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #109",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-109-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-109",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #109",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-109-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-109",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #109",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-110",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #110",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-110-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-110",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 110",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-110-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-110",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 110",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-111",
+      "name": "Mạng lưới sao chép cổng thông tin #111",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-111-1",
+          "url": "https://moet.gov.vn/thong-bao-111",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #111",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-111-2",
+          "url": "https://gddt-mirror.vn/thong-bao-111",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #111",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-112",
+      "name": "Thông cáo báo chí lan truyền #112",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-112-1",
+          "url": "https://techz.vn/pr-112",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #112",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-112-2",
+          "url": "https://genk.vn/pr-112",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #112",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-113",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #113",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-113-1",
+          "url": "https://vtv.vn/giao-duc/tin-113",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #113",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-113-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-113",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #113",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-114",
+      "name": "Thông cáo báo chí lan truyền #114",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-114-1",
+          "url": "https://techz.vn/pr-114",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #114",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-114-2",
+          "url": "https://genk.vn/pr-114",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #114",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-115",
+      "name": "Thông cáo báo chí lan truyền #115",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-115-1",
+          "url": "https://techz.vn/pr-115",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #115",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-115-2",
+          "url": "https://genk.vn/pr-115",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #115",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-116",
+      "name": "Thông cáo báo chí lan truyền #116",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-116-1",
+          "url": "https://techz.vn/pr-116",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #116",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-116-2",
+          "url": "https://genk.vn/pr-116",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #116",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-117",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #117",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-117-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-117",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #117",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-117-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-117",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #117",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-118",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #118",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-118-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-118",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 118",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-118-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-118",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 118",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-119",
+      "name": "Mạng lưới sao chép cổng thông tin #119",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-119-1",
+          "url": "https://moet.gov.vn/thong-bao-119",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #119",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-119-2",
+          "url": "https://gddt-mirror.vn/thong-bao-119",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #119",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-120",
+      "name": "Thông cáo báo chí lan truyền #120",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-120-1",
+          "url": "https://techz.vn/pr-120",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #120",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-120-2",
+          "url": "https://genk.vn/pr-120",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #120",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-121",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #121",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-121-1",
+          "url": "https://vtv.vn/giao-duc/tin-121",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #121",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-121-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-121",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #121",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-122",
+      "name": "Thông cáo báo chí lan truyền #122",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-122-1",
+          "url": "https://techz.vn/pr-122",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #122",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-122-2",
+          "url": "https://genk.vn/pr-122",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #122",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-123",
+      "name": "Thông cáo báo chí lan truyền #123",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-123-1",
+          "url": "https://techz.vn/pr-123",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #123",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-123-2",
+          "url": "https://genk.vn/pr-123",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #123",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-124",
+      "name": "Thông cáo báo chí lan truyền #124",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-124-1",
+          "url": "https://techz.vn/pr-124",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #124",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-124-2",
+          "url": "https://genk.vn/pr-124",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #124",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-125",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #125",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-125-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-125",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #125",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-125-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-125",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #125",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-126",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #126",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-126-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-126",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 126",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-126-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-126",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 126",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-127",
+      "name": "Mạng lưới sao chép cổng thông tin #127",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-127-1",
+          "url": "https://moet.gov.vn/thong-bao-127",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #127",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-127-2",
+          "url": "https://gddt-mirror.vn/thong-bao-127",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #127",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-128",
+      "name": "Thông cáo báo chí lan truyền #128",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-128-1",
+          "url": "https://techz.vn/pr-128",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #128",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-128-2",
+          "url": "https://genk.vn/pr-128",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #128",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-129",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #129",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-129-1",
+          "url": "https://vtv.vn/giao-duc/tin-129",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #129",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-129-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-129",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #129",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-130",
+      "name": "Thông cáo báo chí lan truyền #130",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-130-1",
+          "url": "https://techz.vn/pr-130",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #130",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-130-2",
+          "url": "https://genk.vn/pr-130",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #130",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-131",
+      "name": "Thông cáo báo chí lan truyền #131",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-131-1",
+          "url": "https://techz.vn/pr-131",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #131",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-131-2",
+          "url": "https://genk.vn/pr-131",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #131",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-132",
+      "name": "Thông cáo báo chí lan truyền #132",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-132-1",
+          "url": "https://techz.vn/pr-132",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #132",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-132-2",
+          "url": "https://genk.vn/pr-132",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #132",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-133",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #133",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-133-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-133",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #133",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-133-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-133",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #133",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-134",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #134",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-134-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-134",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 134",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-134-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-134",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 134",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-135",
+      "name": "Mạng lưới sao chép cổng thông tin #135",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-135-1",
+          "url": "https://moet.gov.vn/thong-bao-135",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #135",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-135-2",
+          "url": "https://gddt-mirror.vn/thong-bao-135",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #135",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-136",
+      "name": "Thông cáo báo chí lan truyền #136",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-136-1",
+          "url": "https://techz.vn/pr-136",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #136",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-136-2",
+          "url": "https://genk.vn/pr-136",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #136",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-137",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #137",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-137-1",
+          "url": "https://vtv.vn/giao-duc/tin-137",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #137",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-137-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-137",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #137",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-138",
+      "name": "Thông cáo báo chí lan truyền #138",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-138-1",
+          "url": "https://techz.vn/pr-138",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #138",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-138-2",
+          "url": "https://genk.vn/pr-138",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #138",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-139",
+      "name": "Thông cáo báo chí lan truyền #139",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-139-1",
+          "url": "https://techz.vn/pr-139",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #139",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-139-2",
+          "url": "https://genk.vn/pr-139",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #139",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-140",
+      "name": "Thông cáo báo chí lan truyền #140",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-140-1",
+          "url": "https://techz.vn/pr-140",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #140",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-140-2",
+          "url": "https://genk.vn/pr-140",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #140",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-141",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #141",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-141-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-141",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #141",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-141-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-141",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #141",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-142",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #142",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-142-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-142",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 142",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-142-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-142",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 142",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-143",
+      "name": "Mạng lưới sao chép cổng thông tin #143",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-143-1",
+          "url": "https://moet.gov.vn/thong-bao-143",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #143",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-143-2",
+          "url": "https://gddt-mirror.vn/thong-bao-143",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #143",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-144",
+      "name": "Thông cáo báo chí lan truyền #144",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-144-1",
+          "url": "https://techz.vn/pr-144",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #144",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-144-2",
+          "url": "https://genk.vn/pr-144",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #144",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-145",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #145",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-145-1",
+          "url": "https://vtv.vn/giao-duc/tin-145",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #145",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-145-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-145",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #145",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-146",
+      "name": "Thông cáo báo chí lan truyền #146",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-146-1",
+          "url": "https://techz.vn/pr-146",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #146",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-146-2",
+          "url": "https://genk.vn/pr-146",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #146",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-147",
+      "name": "Thông cáo báo chí lan truyền #147",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-147-1",
+          "url": "https://techz.vn/pr-147",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #147",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-147-2",
+          "url": "https://genk.vn/pr-147",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #147",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-148",
+      "name": "Thông cáo báo chí lan truyền #148",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-148-1",
+          "url": "https://techz.vn/pr-148",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #148",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-148-2",
+          "url": "https://genk.vn/pr-148",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #148",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-149",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #149",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-149-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-149",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #149",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-149-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-149",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #149",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-150",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #150",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-150-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-150",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 150",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-150-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-150",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 150",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-151",
+      "name": "Mạng lưới sao chép cổng thông tin #151",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-151-1",
+          "url": "https://moet.gov.vn/thong-bao-151",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #151",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-151-2",
+          "url": "https://gddt-mirror.vn/thong-bao-151",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #151",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-152",
+      "name": "Thông cáo báo chí lan truyền #152",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-152-1",
+          "url": "https://techz.vn/pr-152",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #152",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-152-2",
+          "url": "https://genk.vn/pr-152",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #152",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-153",
+      "name": "Sao chép bản tin thông tấn xã TTXVN #153",
+      "challengeType": "WIRE_COPY_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-153-1",
+          "url": "https://vtv.vn/giao-duc/tin-153",
+          "domain": "vtv.vn",
+          "title": "Bộ GD&ĐT công bố lịch thi tốt nghiệp #153",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        },
+        {
+          "sourceId": "s-IND-V3-153-2",
+          "url": "https://vietnamnet.vn/tin-tuc/lich-thi-153",
+          "domain": "vietnamnet.vn",
+          "title": "Lịch thi tốt nghiệp 2026 mới nhất #153",
+          "text": "Theo TTXVN, Bộ Giáo dục và Đào tạo công bố quyết định điều chỉnh lịch thi tốt nghiệp THPT năm 2026 trên toàn quốc.",
+          "wireAttribution": "TTXVN",
+          "claimedOrigin": "TTXVN"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-154",
+      "name": "Thông cáo báo chí lan truyền #154",
+      "challengeType": "TRANSLATION_REPOST",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-154-1",
+          "url": "https://techz.vn/pr-154",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #154",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-154-2",
+          "url": "https://genk.vn/pr-154",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #154",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-155",
+      "name": "Thông cáo báo chí lan truyền #155",
+      "challengeType": "PARTIAL_REWRITE_PARAPHRASE",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-155-1",
+          "url": "https://techz.vn/pr-155",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #155",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-155-2",
+          "url": "https://genk.vn/pr-155",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #155",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-156",
+      "name": "Thông cáo báo chí lan truyền #156",
+      "challengeType": "SAME_PRIMARY_SOURCE_CHAIN",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-156-1",
+          "url": "https://techz.vn/pr-156",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #156",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-156-2",
+          "url": "https://genk.vn/pr-156",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #156",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-157",
+      "name": "Điều tra độc lập hai báo về cùng sự việc #157",
+      "challengeType": "INDEPENDENT_INVESTIGATION_SAME_EVENT",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-157-1",
+          "url": "https://tuoitre.vn/dieu-tra-rieng-157",
+          "domain": "tuoitre.vn",
+          "title": "Phóng sự điều tra Báo Tuổi Trẻ #157",
+          "text": "Phóng viên Tuổi Trẻ đã trực tiếp tiếp cận hiện trường và phỏng vấn 5 nạn nhân bị dụ nạp tiền vào app kiếm hoa hồng. Thủ đoạn diễn ra rất tinh vi qua mạng Telegram.",
+          "claimedOrigin": "tuoitre.vn",
+          "publishedAt": "2026-02-10T10:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-157-2",
+          "url": "https://thanhnien.vn/goc-nhin-phap-ly-157",
+          "domain": "thanhnien.vn",
+          "title": "Góc nhìn pháp lý Báo Thanh Niên #157",
+          "text": "Theo luật sư Nguyễn Văn A đoàn luật sư TP.HCM trả lời Báo Thanh Niên, các đối tượng sử dụng hợp đồng giả mạo có thể đối mặt mức án từ 12 đến 20 năm tù về tội lừa đảo.",
+          "claimedOrigin": "thanhnien.vn",
+          "publishedAt": "2026-02-11T14:30:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-158",
+      "name": "Hai quyết định quy chế khác nhau cùng trường #158",
+      "challengeType": "SAME_DOMAIN_DISTINCT_OFFICIAL_DOCS",
+      "trueOriginCount": 2,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-158-1",
+          "url": "https://hust.edu.vn/dao-tao/quy-che-hoc-vu-158",
+          "domain": "hust.edu.vn",
+          "title": "Quy chế đào tạo tín chỉ đại học đợt 158",
+          "text": "Quy chế đào tạo đại học quy định sinh viên được tạm hoãn tiến độ học tập tối đa 2 học kỳ chính quy và phải nộp đơn minh chứng trước tuần thứ 4.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2024-09-01T08:00:00Z"
+        },
+        {
+          "sourceId": "s-IND-V3-158-2",
+          "url": "https://hust.edu.vn/hoc-bong/chinh-sach-khen-thuong-158",
+          "domain": "hust.edu.vn",
+          "title": "Quy định xét cấp học bổng tài năng đợt 158",
+          "text": "Đại học Bách khoa Hà Nội dành 20 tỷ đồng mỗi năm học để khen thưởng sinh viên đạt thành tích nghiên cứu khoa học xuất sắc và giải thưởng quốc tế.",
+          "claimedOrigin": "hust.edu.vn",
+          "publishedAt": "2026-01-15T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-159",
+      "name": "Mạng lưới sao chép cổng thông tin #159",
+      "challengeType": "CROSS_DOMAIN_MIRROR",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-159-1",
+          "url": "https://moet.gov.vn/thong-bao-159",
+          "domain": "moet.gov.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT #159",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-159-2",
+          "url": "https://gddt-mirror.vn/thong-bao-159",
+          "domain": "gddt-mirror.vn",
+          "title": "Thông cáo chính thức Bộ GD&ĐT sao chép #159",
+          "text": "Bộ Giáo dục và Đào tạo công bố quyết định chuẩn kiểm định chất lượng các trường đại học năm 2026.",
+          "claimedOrigin": "moet.gov.vn"
+        }
+      ]
+    },
+    {
+      "clusterId": "IND-V3-160",
+      "name": "Thông cáo báo chí lan truyền #160",
+      "challengeType": "PRESS_RELEASE_SYNDICATION",
+      "trueOriginCount": 1,
+      "sources": [
+        {
+          "sourceId": "s-IND-V3-160-1",
+          "url": "https://techz.vn/pr-160",
+          "domain": "techz.vn",
+          "title": "Viettel công bố học bổng số #160",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        },
+        {
+          "sourceId": "s-IND-V3-160-2",
+          "url": "https://genk.vn/pr-160",
+          "domain": "genk.vn",
+          "title": "Chương trình thực tập sinh tài năng Viettel #160",
+          "text": "Tập đoàn Công nghiệp - Viễn thông Quân đội Viettel chính thức khởi động chương trình học bổng Viettel Digital Talent 2026 dành cho sinh viên xuất sắc toàn quốc.",
+          "claimedOrigin": "viettel.com.vn"
+        }
+      ]
+    }
+  ]
+}

@@ -8,7 +8,7 @@ import React from "react";
  * visual state while still exposing useful semantics to assistive technology.
  */
 export const MARGIN_MARKS = Object.freeze({
-  "[n]": { label: "Trích dẫn", role: "doc-noteref", tone: "verified" },
+  "[n]": { label: "Trích dẫn", role: "note", tone: "verified" },
   "✻": { label: "AI ghi chú", role: "note", tone: "correction" },
   "!!": { label: "Người đã đọc", role: "mark", tone: "correction" },
   "?": { label: "Chưa chắc", role: "mark", tone: "uncertain" },

@@ -23,7 +23,7 @@ function createAbortError(reason) {
 }
 
 function bindAbortSignal(controller, signal) {
-  if (!signal || typeof signal.addEventListener !== "function") return () => {};
+  if (!signal || typeof signal.addEventListener !== "function") return () => { };
   const onAbort = () => controller.abort(signal.reason);
   if (signal.aborted) onAbort();
   else signal.addEventListener("abort", onAbort, { once: true });

@@ -1,0 +1,128 @@
+import fs from "fs";
+
+const categories = [
+  "scholarship", "admissions", "tuition", "university_notices",
+  "internships", "recruitment", "housing", "phishing",
+  "payment_scams", "fake_organizations", "expired_policies", "contradictory_notices"
+];
+
+const benchmarkQueries = [
+  // 1. Scholarship (7 queries)
+  { id: "RET-01", category: "scholarship", query: "Học bổng khuyến khích học tập trường Đại học Bách khoa TP.HCM", entityId: "HCMUT_VNUHCM", expectedDomain: "hcmut.edu.vn", intent: "OFFICIAL_POLICY", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-02", category: "scholarship", query: "Điều kiện xét học bổng doanh nghiệp HCMUTE kỳ 1 năm 2026", entityId: "HCMUTE", expectedDomain: "hcmute.edu.vn", intent: "OFFICIAL_NOTICE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-03", category: "scholarship", query: "Học bổng tài năng UEH dành cho sinh viên xuất sắc", entityId: "UEH", expectedDomain: "ueh.edu.vn", intent: "OFFICIAL_POLICY", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-04", category: "scholarship", query: "Học bổng trao đổi sinh viên quốc tế ĐHQG TP.HCM", entityId: "VNUHCM", expectedDomain: "vnuhcm.edu.vn", intent: "OFFICIAL_PROGRAM", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-05", category: "scholarship", query: "Học bổng trợ cấp khó khăn ĐH Bách khoa Hà Nội", entityId: "HUST", expectedDomain: "hust.edu.vn", intent: "OFFICIAL_POLICY", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-06", category: "scholarship", query: "Thông báo học bổng thủ khoa đầu vào ĐH Ngoại thương", entityId: "FTU", expectedDomain: "ftu.edu.vn", intent: "OFFICIAL_NOTICE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-07", category: "scholarship", query: "Quy chế chi trả học bổng Bộ Giáo dục và Đào tạo", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "GOVERNMENT_CIRCULAR", expectedTier: "GOVERNMENT_REGULATOR" },
+
+  // 2. Admissions (7 queries)
+  { id: "RET-08", category: "admissions", query: "Phương thức xét tuyển kết hợp trường ĐH Bách khoa ĐHQG-HCM 2026", entityId: "HCMUT_VNUHCM", expectedDomain: "hcmut.edu.vn", intent: "OFFICIAL_ADMISSION_GUIDE", expectedTier: "EXACT_OFFICIAL_DOCUMENT" },
+  { id: "RET-09", category: "admissions", query: "Chỉ tiêu tuyển sinh đại học chính quy HCMUTE", entityId: "HCMUTE", expectedDomain: "hcmute.edu.vn", intent: "OFFICIAL_ADMISSION_GUIDE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-10", category: "admissions", query: "Đề án tuyển sinh cử nhân quốc tế UEH", entityId: "UEH", expectedDomain: "ueh.edu.vn", intent: "OFFICIAL_ADMISSION_GUIDE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-11", category: "admissions", query: "Quy định tuyển thẳng và ưu tiên xét tuyển ĐHQG Hà Nội", entityId: "VNUHN", expectedDomain: "vnu.edu.vn", intent: "OFFICIAL_POLICY", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-12", category: "admissions", query: "Kỳ thi đánh giá tư duy ĐH Bách khoa Hà Nội", entityId: "HUST", expectedDomain: "hust.edu.vn", intent: "OFFICIAL_EXAM_GUIDE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-13", category: "admissions", query: "Quy chế tuyển sinh đại học của Bộ GD&ĐT mới nhất", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "GOVERNMENT_CIRCULAR", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-14", category: "admissions", query: "Thông tin tuyển sinh ngành Kinh doanh quốc tế NEU", entityId: "NEU", expectedDomain: "neu.edu.vn", intent: "OFFICIAL_ADMISSION_GUIDE", expectedTier: "OFFICIAL_INSTITUTION" },
+
+  // 3. Tuition (7 queries)
+  { id: "RET-15", category: "tuition", query: "Mức thu học phí hệ đại trà trường Đại học Bách khoa TP.HCM", entityId: "HCMUT_VNUHCM", expectedDomain: "hcmut.edu.vn", intent: "OFFICIAL_TUITION_SCHEDULE", expectedTier: "EXACT_OFFICIAL_DOCUMENT" },
+  { id: "RET-16", category: "tuition", query: "Cổng thanh toán học phí trực tuyến HCMUTE qua ngân hàng", entityId: "HCMUTE", expectedDomain: "hcmute.edu.vn", intent: "OFFICIAL_PAYMENT_PORTAL", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-17", category: "tuition", query: "Chính sách miễn giảm học phí cho con thương binh liệt sĩ UEH", entityId: "UEH", expectedDomain: "ueh.edu.vn", intent: "OFFICIAL_POLICY", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-18", category: "tuition", query: "Thời hạn nộp học phí học kỳ hè ĐH Bách khoa Hà Nội", entityId: "HUST", expectedDomain: "hust.edu.vn", intent: "OFFICIAL_NOTICE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-19", category: "tuition", query: "Nghị định quy định về cơ chế thu quản lý học phí cơ sở giáo dục", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "GOVERNMENT_CIRCULAR", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-20", category: "tuition", query: "Quy định gia hạn thời gian đóng học phí NEU", entityId: "NEU", expectedDomain: "neu.edu.vn", intent: "OFFICIAL_NOTICE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-21", category: "tuition", query: "Số tài khoản ngân hàng chính thức thu học phí FTU", entityId: "FTU", expectedDomain: "ftu.edu.vn", intent: "OFFICIAL_ACCOUNT_NOTICE", expectedTier: "EXACT_OFFICIAL_DOCUMENT" },
+
+  // 4. University Notices (7 queries)
+  { id: "RET-22", category: "university_notices", query: "Lịch thi kết thúc học phần học kỳ 2 trường ĐH Bách khoa TP.HCM", entityId: "HCMUT_VNUHCM", expectedDomain: "hcmut.edu.vn", intent: "OFFICIAL_ACADEMIC_CALENDAR", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-23", category: "university_notices", query: "Thông báo xét công nhận tốt nghiệp đợt 1 HCMUTE", entityId: "HCMUTE", expectedDomain: "hcmute.edu.vn", intent: "OFFICIAL_NOTICE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-24", category: "university_notices", query: "Chuẩn đầu ra ngoại ngữ TOEIC IELTS trường UEH", entityId: "UEH", expectedDomain: "ueh.edu.vn", intent: "OFFICIAL_REGULATION", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-25", category: "university_notices", query: "Kế hoạch đăng ký môn học trực tuyến ĐHQG Hà Nội", entityId: "VNUHN", expectedDomain: "vnu.edu.vn", intent: "OFFICIAL_NOTICE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-26", category: "university_notices", query: "Quy định cảnh báo học vụ và buộc thôi học ĐH Bách khoa Hà Nội", entityId: "HUST", expectedDomain: "hust.edu.vn", intent: "OFFICIAL_REGULATION", expectedTier: "EXACT_OFFICIAL_DOCUMENT" },
+  { id: "RET-27", category: "university_notices", query: "Biểu mẫu xin hoãn thi vì lý do sức khỏe NEU", entityId: "NEU", expectedDomain: "neu.edu.vn", intent: "OFFICIAL_FORM", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-28", category: "university_notices", query: "Thông báo nghỉ Tết nguyên đán chính thức của Bộ GD&ĐT", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "GOVERNMENT_NOTICE", expectedTier: "GOVERNMENT_REGULATOR" },
+
+  // 5. Internships (7 queries)
+  { id: "RET-29", category: "internships", query: "Quy trình thực tập tốt nghiệp khoa Khoa học Máy tính Bách khoa TP.HCM", entityId: "HCMUT_VNUHCM", expectedDomain: "hcmut.edu.vn", intent: "OFFICIAL_GUIDELINE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-30", category: "internships", query: "Danh sách doanh nghiệp liên kết thực tập hưởng lương HCMUTE", entityId: "HCMUTE", expectedDomain: "hcmute.edu.vn", intent: "OFFICIAL_PARTNERSHIP", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-31", category: "internships", query: "Xác nhận thực tập doanh nghiệp bắt buộc của trường UEH", entityId: "UEH", expectedDomain: "ueh.edu.vn", intent: "OFFICIAL_GUIDELINE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-32", category: "internships", query: "Chương trình thực tập hè sinh viên kỹ thuật HUST", entityId: "HUST", expectedDomain: "hust.edu.vn", intent: "OFFICIAL_NOTICE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-33", category: "internships", query: "Mẫu đơn xin thực tập tại các cơ quan ban ngành Bộ GD&ĐT", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "OFFICIAL_FORM", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-34", category: "internships", query: "Quy định tín chỉ môn thực tập doanh nghiệp NEU", entityId: "NEU", expectedDomain: "neu.edu.vn", intent: "OFFICIAL_CURRICULUM", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-35", category: "internships", query: "Cảnh báo lừa đảo thực tập đa cấp nộp tiền thế chân", entityId: "NCSC_VN", expectedDomain: "tinnhiemmang.vn", intent: "SCAM_WARNING", expectedTier: "AUTHORIZED_ORGANIZATION" },
+
+  // 6. Recruitment / Part-time Job Scams (7 queries)
+  { id: "RET-36", category: "recruitment", query: "Cảnh báo việc làm online thanh toán đơn hàng ảo Shopee Lazada", entityId: "NCSC_VN", expectedDomain: "tinnhiemmang.vn", intent: "SCAM_WARNING", expectedTier: "AUTHORIZED_ORGANIZATION" },
+  { id: "RET-37", category: "recruitment", query: "Trung tâm hỗ trợ sinh viên và việc làm ĐH Bách khoa TP.HCM", entityId: "HCMUT_VNUHCM", expectedDomain: "hcmut.edu.vn", intent: "OFFICIAL_JOB_PORTAL", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-38", category: "recruitment", query: "Lừa đảo tuyển gia sư tiếng Anh yêu cầu đóng tiền cọc nhận lớp", entityId: "MPS_VN", expectedDomain: "bocongan.gov.vn", intent: "SCAM_WARNING", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-39", category: "recruitment", query: "Cổng thông tin việc làm bán thời gian HCMUTE", entityId: "HCMUTE", expectedDomain: "hcmute.edu.vn", intent: "OFFICIAL_JOB_PORTAL", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-40", category: "recruitment", query: "Tuyển cộng tác viên chốt đơn nhận hoa hồng theo ngày cảnh báo", entityId: "NCSC_VN", expectedDomain: "tinnhiemmang.vn", intent: "SCAM_WARNING", expectedTier: "AUTHORIZED_ORGANIZATION" },
+  { id: "RET-41", category: "recruitment", query: "Ngày hội việc làm và kết nối doanh nghiệp UEH Career Fair", entityId: "UEH", expectedDomain: "ueh.edu.vn", intent: "OFFICIAL_EVENT", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-42", category: "recruitment", query: "Chiêu trò tuyển mẫu ảnh sinh viên yêu cầu chụp ảnh nhạy cảm lừa tiền", entityId: "MPS_VN", expectedDomain: "bocongan.gov.vn", intent: "SCAM_WARNING", expectedTier: "GOVERNMENT_REGULATOR" },
+
+  // 7. Housing / Dormitory (7 queries)
+  { id: "RET-43", category: "housing", query: "Đăng ký lưu trú Ký túc xá Đại học Quốc gia TP.HCM", entityId: "VNUHCM", expectedDomain: "vnuhcm.edu.vn", intent: "OFFICIAL_HOUSING_PORTAL", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-44", category: "housing", query: "Lừa đảo đặt cọc thuê phòng trọ qua Zalo Momo sinh viên", entityId: "MPS_VN", expectedDomain: "bocongan.gov.vn", intent: "SCAM_WARNING", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-45", category: "housing", query: "Biểu phí phòng ở Ký túc xá khu A và khu B ĐHQG-HCM", entityId: "VNUHCM", expectedDomain: "vnuhcm.edu.vn", intent: "OFFICIAL_PRICE_LIST", expectedTier: "EXACT_OFFICIAL_DOCUMENT" },
+  { id: "RET-46", category: "housing", query: "Thủ tục xét duyệt ưu tiên phòng ở ký túc xá HCMUTE", entityId: "HCMUTE", expectedDomain: "hcmute.edu.vn", intent: "OFFICIAL_GUIDELINE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-47", category: "housing", query: "Nhận diện thủ đoạn đăng ảnh phòng trọ giả mạo chiếm đoạt tiền cọc", entityId: "NCSC_VN", expectedDomain: "tinnhiemmang.vn", intent: "SCAM_WARNING", expectedTier: "AUTHORIZED_ORGANIZATION" },
+  { id: "RET-48", category: "housing", query: "Quy chế quản lý nội trú Ký túc xá sinh viên ĐH Bách khoa Hà Nội", entityId: "HUST", expectedDomain: "hust.edu.vn", intent: "OFFICIAL_REGULATION", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-49", category: "housing", query: "Danh sách nhà trọ an toàn được Đoàn trường Đại học Kinh tế TP.HCM xác thực", entityId: "UEH", expectedDomain: "ueh.edu.vn", intent: "OFFICIAL_LIST", expectedTier: "OFFICIAL_INSTITUTION" },
+
+  // 8. Phishing & Credential Theft (7 queries)
+  { id: "RET-50", category: "phishing", query: "Cảnh báo link giả mạo cổng thông tin đào tạo sinh viên đánh cắp mật khẩu", entityId: "NCSC_VN", expectedDomain: "tinnhiemmang.vn", intent: "PHISHING_ALERT", expectedTier: "AUTHORIZED_ORGANIZATION" },
+  { id: "RET-51", category: "phishing", query: "Tin nhắn SMS Brandname ngân hàng giả mạo gửi đường link lạ", entityId: "MPS_VN", expectedDomain: "bocongan.gov.vn", intent: "PHISHING_ALERT", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-52", category: "phishing", query: "Cổng xác thực website chính thống Tín nhiệm mạng", entityId: "NCSC_VN", expectedDomain: "tinnhiemmang.vn", intent: "OFFICIAL_DIRECTORY", expectedTier: "AUTHORIZED_ORGANIZATION" },
+  { id: "RET-53", category: "phishing", query: "Cách nhận biết website lừa đảo mạo danh ngân hàng Vietcombank BIDV", entityId: "NCSC_VN", expectedDomain: "tinnhiemmang.vn", intent: "SECURITY_GUIDE", expectedTier: "AUTHORIZED_ORGANIZATION" },
+  { id: "RET-54", category: "phishing", query: "Thông báo của ĐHBK TP.HCM về email giả danh ban giám hiệu khảo sát học tập", entityId: "HCMUT_VNUHCM", expectedDomain: "hcmut.edu.vn", intent: "SECURITY_NOTICE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-55", category: "phishing", query: "Giả mạo nhân viên nhà mạng yêu cầu nâng cấp SIM 4G 5G chiếm mã OTP", entityId: "MPS_VN", expectedDomain: "bocongan.gov.vn", intent: "SCAM_WARNING", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-56", category: "phishing", query: "Quy định bảo mật thông tin tài khoản sinh viên cổng myBK", entityId: "HCMUT_VNUHCM", expectedDomain: "hcmut.edu.vn", intent: "OFFICIAL_POLICY", expectedTier: "EXACT_OFFICIAL_DOCUMENT" },
+
+  // 9. Payment Scams & Money Extraction (7 queries)
+  { id: "RET-57", category: "payment_scams", query: "Cảnh báo thủ đoạn gọi điện dọa nợ tiền điện thoại ma túy yêu cầu chuyển tiền", entityId: "MPS_VN", expectedDomain: "bocongan.gov.vn", intent: "CRIME_WARNING", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-58", category: "payment_scams", query: "Học bổng toàn phần có yêu cầu đóng phí giữ chỗ 2 triệu không", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "POLICY_CLARIFICATION", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-59", category: "payment_scams", query: "Chiêu trò cho thuê tài khoản ngân hàng sinh viên hoa hồng 500k bị phạt tù", entityId: "MPS_VN", expectedDomain: "bocongan.gov.vn", intent: "LEGAL_WARNING", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-60", category: "payment_scams", query: "Bẫy vay tiền nhanh sinh viên online lãi suất cắt cổ giải ngân 15 phút", entityId: "MPS_VN", expectedDomain: "bocongan.gov.vn", intent: "CRIME_WARNING", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-61", category: "payment_scams", query: "Quy định thu phí xét tuyển hồ sơ nhập học của Bộ Giáo dục", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "GOVERNMENT_REGULATION", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-62", category: "payment_scams", query: "Cảnh báo chuyển nhượng điểm danh tín chỉ bằng tiền mặt", entityId: "HCMUTE", expectedDomain: "hcmute.edu.vn", intent: "DISCIPLINARY_NOTICE", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-63", category: "payment_scams", query: "Thủ đoạn giả mạo cán bộ phòng khảo thí thu tiền thi lại", entityId: "HUST", expectedDomain: "hust.edu.vn", intent: "SCAM_WARNING", expectedTier: "OFFICIAL_INSTITUTION" },
+
+  // 10. Fake Organizations & Counterfeit Clubs (7 queries)
+  { id: "RET-64", category: "fake_organizations", query: "Danh sách các Câu lạc bộ sinh viên chính thức trực thuộc Đoàn trường Bách khoa", entityId: "HCMUT_VNUHCM", expectedDomain: "hcmut.edu.vn", intent: "OFFICIAL_DIRECTORY", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-65", category: "fake_organizations", query: "Cảnh báo Fanpage giả mạo Hội sinh viên HCMUTE tuyển tình nguyện viên đóng phí", entityId: "HCMUTE", expectedDomain: "hcmute.edu.vn", intent: "OFFICIAL_WARNING", expectedTier: "EXACT_OFFICIAL_DOCUMENT" },
+  { id: "RET-66", category: "fake_organizations", query: "Nhận diện trang tin giả mạo Đại học Quốc gia Hà Nội bán chứng chỉ tin học", entityId: "VNUHN", expectedDomain: "vnu.edu.vn", intent: "OFFICIAL_WARNING", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-67", category: "fake_organizations", query: "Hội chợ việc làm giả mạo thương hiệu doanh nghiệp lớn FPT Viettel lừa đảo", entityId: "NCSC_VN", expectedDomain: "tinnhiemmang.vn", intent: "SCAM_WARNING", expectedTier: "AUTHORIZED_ORGANIZATION" },
+  { id: "RET-68", category: "fake_organizations", query: "Cổng thông tin Đoàn Thanh niên - Hội Sinh viên UEH", entityId: "UEH", expectedDomain: "ueh.edu.vn", intent: "OFFICIAL_PORTAL", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-69", category: "fake_organizations", query: "Cảnh báo tổ chức hội thảo giả danh Bộ GD&ĐT cấp chứng nhận có thu phí", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "GOVERNMENT_WARNING", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-70", category: "fake_organizations", query: "Phòng Công tác Chính trị và Học sinh Sinh viên ĐH Ngoại thương thông báo", entityId: "FTU", expectedDomain: "ftu.edu.vn", intent: "OFFICIAL_DIRECTORY", expectedTier: "OFFICIAL_INSTITUTION" },
+
+  // 11. Expired Policies & Outdated Directives (7 queries)
+  { id: "RET-71", category: "expired_policies", query: "Quy chế đào tạo đại học năm 2020 còn hiệu lực cho sinh viên khóa 2026 không", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "TEMPORAL_VALIDITY", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-72", category: "expired_policies", query: "Thông tư 08 năm 2021 Bộ GD&ĐT về quy chế đào tạo đại học", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "REGULATORY_FRAMEWORK", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-73", category: "expired_policies", query: "Quyết định học phí năm học 2022-2023 của HCMUTE đã hết hiệu lực", entityId: "HCMUTE", expectedDomain: "hcmute.edu.vn", intent: "SUPERSEDED_DOCUMENT", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-74", category: "expired_policies", query: "Chuẩn tiếng Anh đầu vào Bách khoa TP.HCM theo khung cũ đã hủy bỏ", entityId: "HCMUT_VNUHCM", expectedDomain: "hcmut.edu.vn", intent: "SUPERSEDED_DOCUMENT", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-75", category: "expired_policies", query: "Văn bản hướng dẫn thi tuyển sinh năm 2023 áp dụng cho kỳ thi năm 2026", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "TEMPORAL_VALIDITY", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-76", category: "expired_policies", query: "Quy định nộp chứng chỉ Vstep năm 2024 của trường NEU", entityId: "NEU", expectedDomain: "neu.edu.vn", intent: "TEMPORAL_VALIDITY", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-77", category: "expired_policies", query: "Chính sách học bổng khuyến khích theo thông tư cũ đã được thay thế", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "SUPERSEDED_DOCUMENT", expectedTier: "GOVERNMENT_REGULATOR" },
+
+  // 12. Contradictory Notices & Conflicted Evidence (7 queries)
+  { id: "RET-78", category: "contradictory_notices", query: "Fanpage trường thông báo nợ học phí bị đình chỉ thi nhưng web trường không có", entityId: "HCMUT_VNUHCM", expectedDomain: "hcmut.edu.vn", intent: "CONFLICT_VERIFICATION", expectedTier: "EXACT_OFFICIAL_DOCUMENT" },
+  { id: "RET-79", category: "contradictory_notices", query: "Thông báo tuyển sinh hai thời gian nộp hồ sơ khác nhau của cùng một khoa", entityId: "HCMUTE", expectedDomain: "hcmute.edu.vn", intent: "CONFLICT_VERIFICATION", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-80", category: "contradictory_notices", query: "Giảng viên gửi link form yêu cầu chuyển tiền làm đề tài NCKH", entityId: "HUST", expectedDomain: "hust.edu.vn", intent: "ETHICS_CONFLICT", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-81", category: "contradictory_notices", query: "Báo chí đăng tin trường tăng học phí 30% nhưng trường ra văn bản phủ nhận", entityId: "UEH", expectedDomain: "ueh.edu.vn", intent: "MEDIA_DISCREPANCY", expectedTier: "OFFICIAL_INSTITUTION" },
+  { id: "RET-82", category: "contradictory_notices", query: "Văn bản đóng dấu đỏ lan truyền trên mạng xã hội không có trên cổng thông tin điện tử", entityId: "MOET_VN", expectedDomain: "moet.gov.vn", intent: "FORGERY_VERIFICATION", expectedTier: "GOVERNMENT_REGULATOR" },
+  { id: "RET-83", category: "contradictory_notices", query: "Số tài khoản nhận học phí trên tin nhắn SMS khác số tài khoản trên sổ tay sinh viên", entityId: "FTU", expectedDomain: "ftu.edu.vn", intent: "SECURITY_DISCREPANCY", expectedTier: "EXACT_OFFICIAL_DOCUMENT" },
+  { id: "RET-84", category: "contradictory_notices", query: "Thông báo thay đổi phòng thi sát giờ thi không có chữ ký của hội đồng thi", entityId: "NEU", expectedDomain: "neu.edu.vn", intent: "AUTHENTICITY_CHECK", expectedTier: "OFFICIAL_INSTITUTION" }
+];
+
+fs.mkdirSync("docs/evaluation", { recursive: true });
+fs.writeFileSync("docs/evaluation/retrieval_benchmark_dataset.json", JSON.stringify({
+  version: "1.0.0-human-gold",
+  totalQueries: benchmarkQueries.length,
+  categoriesCount: categories.length,
+  createdAt: new Date().toISOString(),
+  queries: benchmarkQueries
+}, null, 2));
+
+console.log(`Generated docs/evaluation/retrieval_benchmark_dataset.json with ${benchmarkQueries.length} queries across ${categories.length} categories.`);

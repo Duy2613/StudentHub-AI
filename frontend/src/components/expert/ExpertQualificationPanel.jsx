@@ -2,9 +2,9 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight, ClipboardCheck, Clock3, LockKeyhole, Send, ShieldCheck, UserRound } from "lucide-react";
-import { ApiError, apiErrorMessage } from "@/lib/api/errors";
-import { apiRequest } from "@/lib/api/client";
+import { AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight, ClipboardCheck, Clock3, LockKeyhole, Send, ShieldCheck, Star, UserRound } from "lucide-react";
+import { ApiError, apiErrorMessage } from "@/lib/api/runtimeError";
+import { apiRequest } from "@/lib/api/runtimeClient";
 import { createSecureId } from "@/lib/security/secureId";
 
 const DOMAIN_OPTIONS = [
@@ -42,15 +42,24 @@ function statusDataFrom(data) {
     state: data?.state || "NOT_APPLIED",
     application: data?.application || null,
     latestAttempt: data?.latestAttempt || null,
+    practiceReviews: Array.isArray(data?.practiceReviews) ? data.practiceReviews : [],
   };
 }
 
 export default function ExpertQualificationPanel() {
   const [qualification, setQualification] = useState(null);
+  const [trackRecord, setTrackRecord] = useState(null);
+  const [trackRecordError, setTrackRecordError] = useState("");
   const [attempt, setAttempt] = useState(null);
   const [result, setResult] = useState(null);
   const [profile, setProfile] = useState({ displayName: "", institution: "", bio: "", credentials: "" });
   const [domains, setDomains] = useState(["AI_ML"]);
+  const [practiceDomain, setPracticeDomain] = useState("AI_ML");
+  const [practiceConclusion, setPracticeConclusion] = useState("");
+  const [practiceUncertainty, setPracticeUncertainty] = useState("");
+  const [practiceNextAction, setPracticeNextAction] = useState("");
+  const [practiceEvidence, setPracticeEvidence] = useState("");
+  const [practiceBusy, setPracticeBusy] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -75,6 +84,7 @@ export default function ExpertQualificationPanel() {
     }
     if (Array.isArray(next.application?.requestedDomains) && next.application.requestedDomains.length) {
       setDomains(next.application.requestedDomains);
+      setPracticeDomain((current) => next.application.requestedDomains.includes(current) ? current : next.application.requestedDomains[0]);
     }
   }, []);
 
@@ -82,8 +92,19 @@ export default function ExpertQualificationPanel() {
     setLoading(true);
     setError("");
     try {
-      const response = await apiRequest("/api/expert/qualification", { signal, requestId: createSecureId("qualification-read") });
-      syncQualification(response?.data);
+      const [qualificationResult, trackResult] = await Promise.allSettled([
+        apiRequest("/api/expert/qualification", { signal, requestId: createSecureId("qualification-read") }),
+        apiRequest("/api/intelligence/community/track-record", { signal, requestId: createSecureId("community-track-record-read") }),
+      ]);
+      if (qualificationResult.status === "rejected") throw qualificationResult.reason;
+      syncQualification(qualificationResult.value?.data);
+      if (trackResult.status === "fulfilled") {
+        setTrackRecord(trackResult.value?.data || null);
+        setTrackRecordError("");
+      } else if (!(trackResult.reason instanceof ApiError && trackResult.reason.code === "ABORTED")) {
+        setTrackRecord(null);
+        setTrackRecordError(errorText(trackResult.reason));
+      }
       setAuthRequired(false);
     } catch (caught) {
       if (caught instanceof ApiError && caught.code === "ABORTED") return;
@@ -96,8 +117,13 @@ export default function ExpertQualificationPanel() {
 
   useEffect(() => {
     const controller = new AbortController();
-    loadStatus(controller.signal);
-    return () => controller.abort("qualification-panel-unmounted");
+    const scheduleId = window.setTimeout(() => {
+      void loadStatus(controller.signal);
+    }, 0);
+    return () => {
+      window.clearTimeout(scheduleId);
+      controller.abort("qualification-panel-unmounted");
+    };
   }, [loadStatus]);
 
   useEffect(() => {
@@ -116,6 +142,9 @@ export default function ExpertQualificationPanel() {
   const applicationStatus = qualification?.state || "NOT_APPLIED";
   const canStartQuiz = applicationStatus === "QUIZ_ELIGIBLE";
   const isQuizOpen = applicationStatus === "QUIZ_IN_PROGRESS" && attempt?.status === "IN_PROGRESS" && remainingSeconds > 0;
+  const practiceReviews = qualification?.practiceReviews || [];
+  const submittedPracticeDomains = new Set(practiceReviews.map((practice) => practice.domainCode));
+  const practiceEligible = ["DOMAIN_REVIEW", "APPEALED"].includes(applicationStatus);
 
   const toggleDomain = (domain) => {
     setDomains((current) => current.includes(domain)
@@ -213,6 +242,44 @@ export default function ExpertQualificationPanel() {
     }
   };
 
+  const submitPractice = async (event) => {
+    event.preventDefault();
+    const evidenceRevisionIds = practiceEvidence.split(",").map((value) => value.trim()).filter(Boolean).slice(0, 20);
+    if (!practiceDomain || !practiceConclusion.trim() || !practiceUncertainty.trim() || !practiceNextAction.trim() || evidenceRevisionIds.length === 0) {
+      setError("Practice cần kết luận, điều chưa chắc chắn, bước tiếp theo và ít nhất một evidence revision.");
+      return;
+    }
+    setPracticeBusy(true);
+    setError("");
+    try {
+      const response = await apiRequest("/api/expert/qualification/practice", {
+        method: "POST",
+        body: JSON.stringify({
+          domainCode: practiceDomain,
+          response: {
+            conclusion: practiceConclusion.trim(),
+            uncertainty: practiceUncertainty.trim(),
+            nextAction: practiceNextAction.trim(),
+          },
+          evidenceRevisionIds,
+        }),
+        requestId: createSecureId("qualification-practice"),
+        headers: { "Idempotency-Key": createSecureId("qualification-practice-write") },
+      });
+      const practice = response?.data?.practice;
+      if (practice) setQualification((current) => ({ ...(current || {}), practiceReviews: [...(current?.practiceReviews || []).filter((item) => item.practiceId !== practice.practiceId), practice] }));
+      setPracticeConclusion("");
+      setPracticeUncertainty("");
+      setPracticeNextAction("");
+      setPracticeEvidence("");
+      void loadStatus();
+    } catch (caught) {
+      setError(errorText(caught));
+    } finally {
+      setPracticeBusy(false);
+    }
+  };
+
   const statusLabel = STATUS_COPY[applicationStatus] || "Chưa bắt đầu";
   const resultLabel = useMemo(() => {
     if (!result) return "";
@@ -227,7 +294,14 @@ export default function ExpertQualificationPanel() {
       </div>
       <span className="signal-badge"><LockKeyhole size={13} /> Server controlled</span>
     </div>
-    <p className="product-copy qualification-lead">Quiz chỉ tạo điều kiện cho bước review. Quyền chuyên gia và domain hoạt động chỉ được cấp bởi human reviewer sau khi kiểm tra hồ sơ.</p>
+    <p className="product-copy qualification-lead">Track record cộng đồng chỉ mở cửa ứng viên. Quiz chỉ tạo điều kiện cho bước review; quyền chuyên gia và domain hoạt động chỉ được cấp bởi human reviewer sau khi kiểm tra hồ sơ.</p>
+
+    {!loading && !authRequired && trackRecord && <div className="qualification-status-row" aria-label="Community contribution track record">
+      <div className="qualification-status-icon"><Star size={18} /></div>
+      <div><span className="data-label">Contribution track record · {trackRecord.policyVersion}</span><strong>{trackRecord.points}/{trackRecord.maxPoints} điểm · {trackRecord.stars}/5 sao</strong><small>{trackRecord.expertCandidate ? "Đủ ngưỡng ứng viên — vẫn bắt buộc identity, quiz, practice và human activation." : "Chưa đủ ngưỡng ứng viên; phản ứng cộng đồng không phải phán quyết Trust."}</small></div>
+      <span className="metadata-chip">{trackRecord.qualificationGate}</span>
+    </div>}
+    {!loading && !authRequired && !trackRecord && trackRecordError && <div className="qualification-state"><AlertTriangle size={17} /><div><strong>Track record live chưa khả dụng.</strong><p>{trackRecordError}</p></div></div>}
 
     {loading && <div className="qualification-state" role="status"><ClipboardCheck size={17} /> Đang đọc trạng thái qualification từ server…</div>}
     {!loading && authRequired && <div className="qualification-state qualification-auth"><UserRound size={18} /><div><strong>Cần đăng nhập để bắt đầu hồ sơ chuyên gia.</strong><p>Qualification gắn với danh tính bền vững của tài khoản.</p><Link href="/login" className="text-link">Đăng nhập <ChevronRight size={14} /></Link></div></div>}
@@ -261,6 +335,18 @@ export default function ExpertQualificationPanel() {
       {applicationStatus === "QUIZ_IN_PROGRESS" && !isQuizOpen && <div className="qualification-state"><Clock3 size={18} /><div><strong>Thời hạn quiz đã hết hoặc phiên chưa còn hiệu lực.</strong><p>Server sẽ đánh dấu attempt hết hạn khi đọc lại trạng thái. Hãy tải lại để xem bước tiếp theo.</p><button className="secondary-action" type="button" onClick={() => loadStatus()} disabled={loading}>Tải lại trạng thái</button></div></div>}
 
       {applicationStatus === "DOMAIN_REVIEW" && !result && <div className="qualification-state qualification-success"><CheckCircle2 size={18} /><div><strong>Quiz đã đạt.</strong><p>Hồ sơ đang chờ reviewer xác nhận domain. AI không thể tự kích hoạt quyền.</p></div></div>}
+      {practiceEligible && <div className="qualification-practice">
+        <div className="qualification-quiz-intro"><div><span className="data-label">Supervised practice · private evidence</span><h3>Ca thực hành theo domain</h3><p>Viết kết luận trong phạm vi, nêu rõ điều chưa chắc chắn và bước kiểm tra tiếp theo. Reviewer sẽ xem nguồn trước khi cấp quyền; bài gửi không tự kích hoạt chuyên gia.</p></div><ClipboardCheck size={19} /></div>
+        {domains.filter((domainCode) => !submittedPracticeDomains.has(domainCode)).length > 0 && <form className="qualification-form" onSubmit={submitPractice}>
+          <label><span>Domain</span><select value={practiceDomain} onChange={(event) => setPracticeDomain(event.target.value)}>{domains.filter((domainCode) => !submittedPracticeDomains.has(domainCode)).map((domainCode) => <option key={domainCode} value={domainCode}>{domainCode.replaceAll("_", " ")}</option>)}</select></label>
+          <label><span>Kết luận trong phạm vi</span><textarea rows={3} value={practiceConclusion} onChange={(event) => setPracticeConclusion(event.target.value)} maxLength={3000} placeholder="Điều gì có thể nói dựa trên các evidence revision đã dẫn?" required /></label>
+          <label><span>Điều chưa chắc chắn</span><textarea rows={2} value={practiceUncertainty} onChange={(event) => setPracticeUncertainty(event.target.value)} maxLength={2000} placeholder="Nguồn nào còn thiếu hoặc có thể đã cũ?" required /></label>
+          <label><span>Bước tiếp theo</span><textarea rows={2} value={practiceNextAction} onChange={(event) => setPracticeNextAction(event.target.value)} maxLength={1200} placeholder="Người dùng nên xác minh hoặc làm gì tiếp?" required /></label>
+          <label><span>Evidence revision IDs</span><input value={practiceEvidence} onChange={(event) => setPracticeEvidence(event.target.value)} placeholder="UUID hoặc mã revision, phân tách bằng dấu phẩy" required /></label>
+          <button className="primary-action" type="submit" disabled={practiceBusy}>{practiceBusy ? <ClipboardCheck size={16} className="animate-spin" /> : <Send size={16} />} Gửi practice để reviewer chấm</button>
+        </form>}
+        {practiceReviews.length > 0 && <div className="qualification-state"><ClipboardCheck size={18} /><div><strong>Lịch sử practice theo domain</strong>{practiceReviews.map((practice) => <p key={practice.practiceId}><span className="metadata-chip">{practice.domainCode}</span> {practice.state} · gửi {practice.createdAt ? new Date(practice.createdAt).toLocaleDateString("vi-VN") : "chưa có ngày"}{practice.reviewedAt ? ` · reviewer đã xử lý ${new Date(practice.reviewedAt).toLocaleDateString("vi-VN")}` : " · đang chờ reviewer độc lập"}</p>)}</div></div>}
+      </div>}
       {applicationStatus === "ACTIVE" && <div className="qualification-state qualification-success"><CheckCircle2 size={18} /><div><strong>Hồ sơ đã hoạt động theo domain được duyệt.</strong><p>Authority vẫn bị giới hạn bởi các domain đã được reviewer ghi nhận.</p></div></div>}
       {result && <div className={`qualification-result ${result.passed ? "is-passed" : "is-failed"}`}><div><span className="data-label">Kết quả server</span><strong>{resultLabel}</strong><p>Điểm: {Math.round(result.score * 100)}% · {result.points}/{result.maxScore} điểm</p></div><span className="qualification-result-mark">{result.passed ? <CheckCircle2 size={20} /> : <AlertTriangle size={20} />}</span></div>}
     </>}

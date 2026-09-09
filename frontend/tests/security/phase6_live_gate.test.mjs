@@ -6,9 +6,11 @@ import { DurableSessionService } from "../../src/lib/security/identity/DurableSe
 import { TrustPersistenceService } from "../../src/lib/server/database/TrustPersistenceService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
+const liveGate = {
+  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
+};
 
-
-test("PHASE 6 LIVE GATE: Auth session lifecycle, revocation, cross-user denial, and private boundaries", async () => {
+test("PHASE 6 LIVE GATE: Auth session lifecycle, revocation, cross-user denial, and private boundaries", liveGate, async () => {
   const pool = getPostgresPool();
   const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 2`);
   if (userRes.rows.length === 0) {

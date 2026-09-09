@@ -13,11 +13,15 @@ import { TrustPersistenceService } from "../../src/lib/server/database/TrustPers
 import { TrustGraphService } from "../../src/lib/server/database/TrustGraphService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
+const liveGate = {
+  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
+};
+
 after(async () => {
-  await getPostgresPool().end();
+  if (process.env.DATABASE_URL) await getPostgresPool().end();
 });
 
-test("PHASE 5 LIVE GATE: Evidence Passport hash integrity, tamper detection, and deterministic TrustGraph", async () => {
+test("PHASE 5 LIVE GATE: Evidence Passport hash integrity, tamper detection, and deterministic TrustGraph", liveGate, async () => {
   const pool = getPostgresPool();
   const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 2`);
   if (userRes.rows.length === 0) {

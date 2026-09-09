@@ -4,7 +4,7 @@
  * Retrieves claims history and evaluates new claims against expert authority & scope.
  */
 
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import { ExpertStore, isExpertDemoMode } from "@/lib/intelligence/expert/expertStore";
 import { ExpertScopeEngine } from "@/lib/intelligence/expert/expertScopeEngine";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { SecurityError } from "@/lib/security/core/SecurityErrorEnvelope.js";
@@ -23,6 +23,7 @@ export const GET = SecurityFabric.wrapHandler({
       retryable: false
     } }, { status: 400 });
   }
+  if (!isExpertDemoMode()) return Response.json({ success: false, error: { code: "EXPERT_CLAIMS_WORKFLOW_NOT_MIGRATED", userMessage: "Expert claims require the durable assessment workflow.", requestId: secContext.correlationId, retryable: false } }, { status: 503 });
 
   if (!ExpertStore.getExpert(expertId, { redactPrivate: true })) {
     return Response.json({ success: false, error: {
@@ -81,6 +82,7 @@ async function evaluateExpertClaim(req, { params }, principal, secContext) {
       } }, { status: 400 });
     }
 
+    if (!isExpertDemoMode()) return Response.json({ success: false, error: { code: "EXPERT_ASSESSMENT_WORKFLOW_REQUIRED", userMessage: "Submit a revision-bound assessment through the Promax assessment endpoint.", requestId: secContext.correlationId, retryable: false } }, { status: 503 });
     const expert = ExpertStore.getExpert(expertId, { redactPrivate: false });
     if (!expert) {
       return Response.json({ success: false, error: {

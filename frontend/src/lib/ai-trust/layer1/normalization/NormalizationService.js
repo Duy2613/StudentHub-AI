@@ -12,6 +12,23 @@ const ZERO_WIDTH_REGEX = /[\u200B-\u200D\uFEFF\u2060\u00AD\u180E]/g;
 const ZERO_WIDTH_TEST_REGEX = /[\u200B-\u200D\uFEFF\u2060\u00AD\u180E]/u;
 const URL_SCHEME_REGEX = /^([a-z][a-z0-9+.-]*):/i;
 
+function decodeHtmlEntities(value) {
+  return String(value || "").replace(/&(#(?:x[0-9a-f]+|[0-9]+)|(?:nbsp|amp|quot|lt|gt));/gi, (full, entity) => {
+    const lower = entity.toLowerCase();
+    if (lower === "nbsp") return " ";
+    if (lower === "amp") return "&";
+    if (lower === "quot") return '"';
+    if (lower === "lt") return "<";
+    if (lower === "gt") return ">";
+    const numeric = lower.startsWith("#x")
+      ? Number.parseInt(lower.slice(2), 16)
+      : Number.parseInt(lower.slice(1), 10);
+    return Number.isFinite(numeric) && numeric >= 0 && numeric <= 0x10ffff
+      ? String.fromCodePoint(numeric)
+      : full;
+  });
+}
+
 // Leet-speak mapping table for secondary normalized stream
 const LEET_MAP = {
   "@": "a",
@@ -122,7 +139,22 @@ export class NormalizationService {
     const hasZeroWidthChars = ZERO_WIDTH_TEST_REGEX.test(original);
 
     // 1. Replace zero-width characters with spaces if between words, or strip them
-    const normalized = original.replace(ZERO_WIDTH_REGEX, " ").normalize("NFKC");
+    let normalized = decodeHtmlEntities(original.replace(ZERO_WIDTH_REGEX, " ").normalize("NFKC"));
+
+    // Sanitize active content (HTML script tags, event handlers, javascript URIs, data: URIs, iframes, objects)
+    normalized = normalized
+      .replace(/<!--[\s\S]*?-->/g, " ") // strip comments
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "[BLOCKED_SCRIPT]")
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "[BLOCKED_IFRAME]")
+      .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, "[BLOCKED_OBJECT]")
+      .replace(/<embed\b[^>]*>/gi, "[BLOCKED_EMBED]")
+      .replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, "[BLOCKED_SVG]")
+      .replace(/<svg\b[^>]*>/gi, "[BLOCKED_SVG]")
+      .replace(/<style\b[\s\S]*?<\/style>/gi, "[BLOCKED_STYLE]")
+      .replace(/<template\b[\s\S]*?<\/template>/gi, "[BLOCKED_TEMPLATE]")
+      .replace(/\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "data-blocked-event=1")
+      .replace(/\bjavascript:\s*[^"'\s>)]+/gi, "about:blank#blocked")
+      .replace(/data:text\/html[^"'\s>)]+/gi, "about:blank#blocked");
 
     // 2. Anti-Evasion De-obfuscation Stream:
     // a) Collapse single-letter spaced words: e.g. "p a s s w o r d" -> "password", "N h ậ p" -> "Nhập"

@@ -143,3 +143,40 @@
 - Verification: discovered `265/265`, Chromium `67` passed + `3` explicit-demo skips, build `117/117`, lint `0` errors/`332` warnings, bundle budgets pass, API authorization inventory `137` handlers, dependency audit `0` vulnerabilities.
 - Exact `agent-browser` execution is unavailable in this environment; Playwright fallback is the recorded browser evidence. No commit, push, or merge performed.
 - Antigravity handoff package: `docs/visual-contracts/`; Luna completion report: `docs/reports/LUNA_FULL_COMPLETION_REPORT.md`.
+
+### Trust V5 RC2 forensic continuation — 2026-09-09
+
+- [x] Bảo toàn candidate `studenthub-v5-pilot-rc1`; tạo manifest/registry cho RC2, không ghi đè artifact lịch sử.
+- [x] Chuẩn hóa metric forensic: exact Clopper–Pearson, query-specific NDCG, Recall@K/Precision@K/MRR/Macro-F1/Brier/ECE và test regression riêng.
+- [x] Sửa hybrid retrieval thành `SAFE_DEDUP(STATIC ∪ LIVE ∪ OFFICIAL_DISCOVERY)`, giữ candidate `UNKNOWN` để rank mềm và trace đầy đủ static/live/entity/merge/dedup/authority/topK.
+- [x] Chạy retrieval validation V3 bằng runtime thật; kết quả hiện `TARGETS_NOT_ESTABLISHED` (HYBRID Recall@5 `21.2%`, NDCG@5 `19.7%`). MOET directory là discovery signal, không phải hard blocker.
+- [x] Chạy privacy V2 (`420` cases + `840` metamorphic), security V2 (`105` production-boundary vectors), source-independence V2 (`150` cases); các local validation gate tương ứng verified.
+- [x] Audit AI production path, blind DTO và critic attribution; controlled synthetic AI TEVV V2 (`N=210`) verified, chưa claim live/human generalization.
+- [x] Tách provider evidence thành mocked failure coverage, synthetic latency và `COST_ESTIMATE_ONLY`; chưa claim live p95/billing.
+- [ ] Independent official-source adapter và retrieval final holdout mới.
+- [x] Implement `OfficialDiscoveryAdapter` opt-in: minimal link metadata, digest/provenance, không lưu HTML thô và không cấp authority.
+- [x] RC3 code snapshot: tích hợp adapter vào retrieval với boundary discovery-only và tạo manifest RC3; V3 chỉ giữ làm regression evidence, không tái dùng như untouched proof.
+- [x] RC3 V4 validation: holdout mới `N=150` đã chạy với official discovery fetch; pool/monotonic pass, nhưng Recall@5/NDCG@5/official hit chưa đạt target.
+- [x] RC4/RC5 remediation: xây institution/entity discovery lane chuyên dụng từ OpenAlex, nối safe pool/ranking discovery-only, thêm query dedupe/SSRF boundary và tạo holdout V5 `N=150`.
+- [ ] RC5 final: chạy lại holdout V5 sau khi OpenAlex quota reset; diagnostic trước refinement không được dùng làm final proof.
+- [ ] Final privacy/security/source/AI holdouts với untouched/OOD boundary; không dùng validation set để claim final generalization.
+- [ ] Live PostgreSQL/RLS, restore, provider credentials/observability và deployment vẫn environment-gated; DB gates không thay đổi.
+
+### Public Source Hub continuation — 2026-09-09
+
+- [x] Bổ sung server-side public API registry/client cho OpenAlex, Crossref, Open-Meteo và GDELT với allowlist, cache, timeout, size/rate-limit boundary.
+- [x] Bổ sung research metadata, weather context, news discovery, MOET soft seeds và 13-topic taxonomy qua `PublicSourceHub`.
+- [x] Bổ sung routes `/api/public/catalog`, `/api/public/research`, `/api/public/discovery`, `/api/public/weather` và contract tests `8/8`; official-page fetch chỉ bật opt-in `official=1`.
+- [x] Bổ sung `OfficialDiscoveryAdapter` với minimal link metadata, digest/provenance, no raw HTML và no-authority invariant.
+- [x] Ghi rõ model capability policy: AI Gateway hiện hữu là authority; `EMBEDDING` chưa cấu hình; không expose credential.
+- [x] Official-source extraction adapter đã có ở chế độ opt-in; legal/provenance review và RC3 final holdout vẫn chưa hoàn tất.
+- [ ] Live provider smoke/uptime/cost/p95 evidence chưa có; public outputs không được dùng trực tiếp cho Trust verdict.
+- [ ] Retrieval RC5 final OOD holdout, live PostgreSQL/RLS/restore và deployment gates vẫn giữ nguyên trạng thái chưa đóng; live provider quota hiện là blocker bên ngoài.
+
+### Community × Expert Promax reality pass — 2026-09-09
+
+- [x] Trust result gateways đọc Community signals/Expert assessments từ API live theo immutable case scope; bỏ toàn bộ fixture presentation khỏi các panel liên quan.
+- [x] Contributor track record `0–100 + ★` và append-only quality-event ledger đã có contract, self-reaction protection và human qualification gate.
+- [x] Live expert directory có compatibility read-only cho schema cũ; không suy diễn `DOMAIN_VERIFIED` khi Promax columns chưa có.
+- [x] Local proof cuối: Promax/domain/route/migration/Trust V5 `27/27`, ESLint error-only pass, production build `150/150` pages, HTTP smoke xác nhận page boundary và durable-empty Expert projection.
+- [ ] Apply migration `202609090001_community_expert_promax.sql` vào database disposable/staging được phê duyệt, sau đó chạy RLS/readback/concurrency gates. Chưa apply vào Supabase chính trong pass này.

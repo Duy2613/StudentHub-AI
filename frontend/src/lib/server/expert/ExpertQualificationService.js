@@ -1,5 +1,6 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { getPostgresPool } from "../database/PostgresPool.js";
+import { detectPII, redactText } from "../../communityExpert/promaxDomain.js";
 import {
   QUIZ_DURATION_SECONDS,
   QUIZ_MAX_ATTEMPTS,
@@ -22,6 +23,9 @@ const APPLICATION_STATUSES = new Set([
   "APPEALED",
 ]);
 const REVIEW_DECISIONS = new Set(["APPROVE_QUIZ", "ACTIVATE", "REJECT", "APPEAL_REVIEW"]);
+const PRACTICE_DECISIONS = new Set(["PASS", "FAIL", "REQUEST_REVISION"]);
+const PRACTICE_PROMPT_VERSION = "expert-practice.v1";
+const PRACTICE_RUBRIC_VERSION = "expert-practice-rubric.v1";
 
 export class ExpertQualificationError extends Error {
   constructor(code, message, statusCode = 400) {
@@ -62,6 +66,19 @@ async function transaction(operation) {
   } finally {
     client.release();
   }
+}
+
+async function appendQualificationOutbox(client, { eventType, aggregateType, aggregateId, subject, payload, correlationId = "expert-qualification" }) {
+  await client.query(
+    `INSERT INTO private.integration_outbox
+      (event_id, integration, aggregate_type, aggregate_id, event_type,
+       schema_version, occurred_at, produced_at, producer, environment,
+       correlation_id, subject, classification, payload, payload_hash, status)
+     VALUES ($1, 'INTERNAL', $2, $3, $4, 'expert-qualification.v1',
+             now(), now(), 'studenthub-qualification', $5, $6, $7, 'INTERNAL', $8::jsonb, $9, 'PENDING')
+     ON CONFLICT (event_id) DO NOTHING`,
+    [randomUUID(), aggregateType, aggregateId, eventType, process.env.NODE_ENV || "development", correlationId, subject, JSON.stringify(payload), digest(payload)]
+  );
 }
 
 function normalizeUuid(value, label) {
@@ -147,6 +164,32 @@ function jsonObject(value) {
   return {};
 }
 
+function digest(value) {
+  return createHash("sha256").update(JSON.stringify(value)).digest();
+}
+
+function sanitizePractice(value, depth = 0) {
+  if (depth > 4) return null;
+  if (typeof value === "string") return redactText(value).slice(0, 12_000);
+  if (Array.isArray(value)) return value.slice(0, 50).map((entry) => sanitizePractice(entry, depth + 1));
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).slice(0, 80).map(([key, entry]) => [String(key).slice(0, 100), sanitizePractice(entry, depth + 1)]));
+  return value;
+}
+
+function practicePrompt(domainCode) {
+  return {
+    promptVersion: PRACTICE_PROMPT_VERSION,
+    domain: String(domainCode).toUpperCase(),
+    scenario: "Một thông báo học bổng yêu cầu người nhận chuyển tiền trước khi xác nhận hồ sơ.",
+    claims: [
+      "Chương trình học bổng có tồn tại hay không?",
+      "Yêu cầu chuyển tiền có được nguồn chính thức hỗ trợ hay không?",
+    ],
+    instructions: "Nêu phạm vi kết luận, nguồn cần đối chiếu, điều chưa biết, cách khai báo xung đột lợi ích và bước tiếp theo an toàn.",
+    rubricVersion: PRACTICE_RUBRIC_VERSION,
+  };
+}
+
 function applicationDTO(row) {
   if (!row) return null;
   return {
@@ -185,6 +228,23 @@ function attemptDTO(row, answerRows = []) {
     submittedAt: row.submitted_at ? new Date(row.submitted_at).toISOString() : null,
     score: row.score === null || row.score === undefined ? null : Number(row.score),
     maxScore: Number(row.max_score || 0),
+  };
+}
+
+function practiceDTO(row) {
+  if (!row) return null;
+  return {
+    practiceId: row.id,
+    applicationId: row.application_id,
+    domainCode: row.domain_code,
+    promptVersion: row.prompt_version,
+    prompt: jsonObject(row.prompt_snapshot),
+    response: jsonObject(row.response),
+    evidenceRevisionIds: jsonArray(row.evidence_revision_ids),
+    state: String(row.state || "SUBMITTED"),
+    reviewedAt: row.reviewed_at ? new Date(row.reviewed_at).toISOString() : null,
+    createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
+    updatedAt: row.updated_at ? new Date(row.updated_at).toISOString() : null,
   };
 }
 
@@ -262,10 +322,20 @@ export class ExpertQualificationService {
         if (previousStatus !== attempt.status && attempt.status === "EXPIRED") application.status = "QUIZ_ELIGIBLE";
       }
       const answers = attempt ? await answersFor(client, attempt.id) : [];
+      const practiceResult = await client.query(
+        `SELECT id, application_id, user_id, domain_code, prompt_version,
+                prompt_snapshot, response, evidence_revision_ids, state,
+                reviewed_by, reviewed_at, created_at, updated_at
+           FROM private.expert_practice_submissions
+          WHERE application_id = $1 AND user_id = $2
+          ORDER BY created_at ASC`,
+        [application.id, normalizedUserId]
+      );
       return {
         state: application.status,
         application: applicationDTO(application),
         latestAttempt: attemptDTO(attempt, answers),
+        practiceReviews: practiceResult.rows.map(practiceDTO),
       };
     }));
   }
@@ -425,6 +495,19 @@ export class ExpertQualificationService {
         `UPDATE public.expert_applications SET status = $2, updated_at = now() WHERE id = $1`,
         [attempt.application_id, nextState]
       );
+      if (grade.passed) {
+        const applicationDomains = await client.query(`SELECT requested_domains FROM public.expert_applications WHERE id = $1`, [attempt.application_id]);
+        for (const domain of jsonArray(applicationDomains.rows[0]?.requested_domains).map((value) => String(value).toUpperCase())) {
+          await client.query(
+            `INSERT INTO private.expert_verifications AS ev (user_id, domain_code, status, qualification_state, verified_at)
+             VALUES ($1, $2, 'PENDING', 'PRACTICE_REVIEW', NULL)
+             ON CONFLICT (user_id, domain_code) DO UPDATE
+               SET status = CASE WHEN ev.status = 'VERIFIED' THEN ev.status ELSE 'PENDING' END,
+                   qualification_state = CASE WHEN ev.status = 'VERIFIED' THEN ev.qualification_state ELSE 'PRACTICE_REVIEW' END`,
+            [normalizedUserId, domain]
+          );
+        }
+      }
       const updatedAttempt = { ...attempt, status: finalStatus, submitted_at: new Date(), score: grade.score };
       return {
         state: nextState,
@@ -438,6 +521,179 @@ export class ExpertQualificationService {
           results: grade.results,
           nextState,
         },
+      };
+    }));
+  }
+
+  static async submitPractice({ userId, domainCode, response, evidenceRevisionIds = [], idempotencyKey, correlationId = "expert-practice" }) {
+    const normalizedUserId = normalizeUuid(userId, "user");
+    const domains = normalizeDomains([domainCode]);
+    const normalizedDomain = domains[0];
+    if (!response || typeof response !== "object" || Array.isArray(response)) throw new ExpertQualificationError("PRACTICE_INPUT_INVALID", "A structured practice response is required.", 400);
+    if (!Array.isArray(evidenceRevisionIds) || evidenceRevisionIds.length > 50 || evidenceRevisionIds.some((value) => typeof value !== "string" || value.trim().length < 1 || value.trim().length > 240)) throw new ExpertQualificationError("PRACTICE_EVIDENCE_INVALID", "Practice evidence references must be a bounded list.", 400);
+    if (!evidenceRevisionIds.length) throw new ExpertQualificationError("PRACTICE_EVIDENCE_REQUIRED", "A practice response must cite at least one evidence reference.", 400);
+    if (!idempotencyKey || String(idempotencyKey).length > 180) throw new ExpertQualificationError("PRACTICE_IDEMPOTENCY_REQUIRED", "A stable Idempotency-Key is required for practice submission.", 400);
+    const scan = detectPII(JSON.stringify(response));
+    if (scan.blocked) throw new ExpertQualificationError("PRIVACY_SCAN_BLOCKED", "The practice response contains identifying content and cannot be stored.", 422);
+    const sanitizedResponse = sanitizePractice(response);
+    const prompt = practicePrompt(normalizedDomain);
+    const requestDigest = digest({ normalizedUserId, normalizedDomain, response: sanitizedResponse, evidenceRevisionIds, promptVersion: prompt.promptVersion });
+    return withStorageErrors(() => transaction(async (client) => {
+      await client.query(`SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, [`practice:${normalizedUserId}:${idempotencyKey}`]);
+      const existing = await client.query(
+        `SELECT * FROM private.expert_practice_submissions WHERE user_id = $1 AND idempotency_key = $2 LIMIT 1`,
+        [normalizedUserId, idempotencyKey]
+      );
+      if (existing.rows[0]) {
+        if (!Buffer.from(existing.rows[0].request_digest).equals(requestDigest)) throw new ExpertQualificationError("IDEMPOTENCY_CONFLICT", "The same practice key was used for a different response.", 409);
+        return { state: existing.rows[0].state, practice: practiceDTO(existing.rows[0]), idempotent: true };
+      }
+      const applicationResult = await client.query(
+        `SELECT id, user_id, status, requested_domains
+           FROM public.expert_applications
+          WHERE user_id = $1
+          FOR UPDATE`,
+        [normalizedUserId]
+      );
+      const application = applicationResult.rows[0];
+      if (!application) throw new ExpertQualificationError("QUALIFICATION_NOT_FOUND", "Submit an expert profile before the practice review.", 404);
+      if (!['DOMAIN_REVIEW', 'APPEALED'].includes(application.status)) throw new ExpertQualificationError("PRACTICE_NOT_ELIGIBLE", "A passed quiz and identity review are required before practice.", 409);
+      if (!jsonArray(application.requested_domains).map((value) => String(value).toUpperCase()).includes(normalizedDomain)) throw new ExpertQualificationError("PRACTICE_DOMAIN_INVALID", "The practice domain was not requested in the application.", 400);
+      const prior = await client.query(`SELECT * FROM private.expert_practice_submissions WHERE application_id = $1 AND domain_code = $2 FOR UPDATE`, [application.id, normalizedDomain]);
+      if (prior.rows[0]) throw new ExpertQualificationError("PRACTICE_ALREADY_SUBMITTED", "A practice response already exists for this domain.", 409);
+      const inserted = await client.query(
+        `INSERT INTO private.expert_practice_submissions
+          (application_id, user_id, domain_code, prompt_version, prompt_snapshot,
+           response, evidence_revision_ids, state, idempotency_key, request_digest,
+           created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, $7::jsonb, 'SUBMITTED', $8, $9, now(), now())
+         RETURNING id, application_id, user_id, domain_code, prompt_version,
+                   prompt_snapshot, response, evidence_revision_ids, state,
+                   reviewed_by, reviewed_at, created_at, updated_at`,
+        [application.id, normalizedUserId, normalizedDomain, prompt.promptVersion, JSON.stringify(prompt), JSON.stringify(sanitizedResponse), JSON.stringify(evidenceRevisionIds.map((value) => String(value).trim()).slice(0, 50)), idempotencyKey, requestDigest]
+      );
+      await client.query(
+        `INSERT INTO private.expert_verifications AS ev (user_id, domain_code, status, qualification_state, verified_at)
+         VALUES ($1, $2, 'PENDING', 'PRACTICE_REVIEW', NULL)
+         ON CONFLICT (user_id, domain_code) DO UPDATE
+           SET status = CASE WHEN ev.status = 'VERIFIED' THEN ev.status ELSE 'PENDING' END,
+               qualification_state = CASE WHEN ev.status = 'VERIFIED' THEN ev.qualification_state ELSE 'PRACTICE_REVIEW' END`,
+        [normalizedUserId, normalizedDomain]
+      );
+      await appendQualificationOutbox(client, {
+        eventType: "EXPERT_PRACTICE_SUBMITTED",
+        aggregateType: "EXPERT_PRACTICE_SUBMISSION",
+        aggregateId: inserted.rows[0].id,
+        subject: normalizedUserId,
+        correlationId,
+        payload: {
+          practiceId: inserted.rows[0].id,
+          applicationId: application.id,
+          domainCode: normalizedDomain,
+          promptVersion: prompt.promptVersion,
+          evidenceRevisionIds,
+          state: "SUBMITTED",
+        },
+      });
+      return { state: "SUBMITTED", practice: practiceDTO(inserted.rows[0]), idempotent: false };
+    }));
+  }
+
+  static async reviewPractice({ reviewerId, practiceId, decision, reason, idempotencyKey, rubricVersion = PRACTICE_RUBRIC_VERSION, correlationId = "expert-practice-review" }) {
+    const normalizedReviewerId = normalizeUuid(reviewerId, "reviewer");
+    const normalizedPracticeId = normalizeUuid(practiceId, "practice");
+    const normalizedDecision = String(decision || "").trim().toUpperCase();
+    if (!PRACTICE_DECISIONS.has(normalizedDecision)) throw new ExpertQualificationError("PRACTICE_DECISION_INVALID", "Practice review decision is invalid.", 400);
+    const normalizedReason = boundedText(reason, { field: "reason", min: 20, max: 4000 });
+    if (!idempotencyKey || String(idempotencyKey).length > 180) throw new ExpertQualificationError("PRACTICE_IDEMPOTENCY_REQUIRED", "A stable Idempotency-Key is required for practice review.", 400);
+    const scan = detectPII(normalizedReason);
+    if (scan.blocked) throw new ExpertQualificationError("PRIVACY_SCAN_BLOCKED", "The practice review contains identifying content and cannot be stored.", 422);
+    return withStorageErrors(() => transaction(async (client) => {
+      const role = await client.query(
+        `SELECT 1 FROM private.user_roles ur JOIN private.roles r ON r.id = ur.role_id
+          WHERE ur.user_id = $1 AND ur.revoked_at IS NULL AND r.code = 'ADMIN'`,
+        [normalizedReviewerId]
+      );
+      if (!role.rows[0]) throw new ExpertQualificationError("COORDINATOR_REQUIRED", "An authorized reviewer is required for supervised practice.", 403);
+      const submissionResult = await client.query(
+        `SELECT id, application_id, user_id, domain_code, prompt_version,
+                prompt_snapshot, response, evidence_revision_ids, state,
+                reviewed_by, reviewed_at, created_at, updated_at
+           FROM private.expert_practice_submissions
+          WHERE id = $1
+          FOR UPDATE`,
+        [normalizedPracticeId]
+      );
+      const submission = submissionResult.rows[0];
+      if (!submission) throw new ExpertQualificationError("PRACTICE_NOT_FOUND", "Practice submission is not available.", 404);
+      if (String(submission.user_id).toLowerCase() === normalizedReviewerId) throw new ExpertQualificationError("REVIEWER_CANNOT_SELF_APPROVE", "A reviewer cannot evaluate their own practice response.", 403);
+      const requestDigest = digest({ normalizedReviewerId, normalizedPracticeId, decision: normalizedDecision, reason: normalizedReason, rubricVersion });
+      const existing = await client.query(`SELECT * FROM private.expert_practice_decisions WHERE reviewer_id = $1 AND idempotency_key = $2 LIMIT 1`, [normalizedReviewerId, idempotencyKey]);
+      if (existing.rows[0]) {
+        if (!Buffer.from(existing.rows[0].request_digest).equals(requestDigest)) throw new ExpertQualificationError("IDEMPOTENCY_CONFLICT", "The same practice review key was used for a different decision.", 409);
+        return { state: submission.state, practice: practiceDTO(submission), idempotent: true };
+      }
+      const decisionRow = await client.query(
+        `SELECT id FROM private.expert_practice_decisions WHERE reviewer_id = $1 AND submission_id = $2 LIMIT 1`,
+        [normalizedReviewerId, normalizedPracticeId]
+      );
+      if (decisionRow.rows[0]) throw new ExpertQualificationError("PRACTICE_REVIEW_ALREADY_RECORDED", "This reviewer has already reviewed the practice response.", 409);
+      const inserted = await client.query(
+        `INSERT INTO private.expert_practice_decisions
+          (submission_id, application_id, user_id, reviewer_id, decision,
+           rubric_version, reason, idempotency_key, request_digest, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, now())
+         RETURNING id, submission_id, reviewer_id, decision, rubric_version, reason, created_at`,
+        [normalizedPracticeId, submission.application_id, submission.user_id, normalizedReviewerId, normalizedDecision, rubricVersion, redactText(normalizedReason), idempotencyKey, requestDigest]
+      );
+      const nextState = normalizedDecision === "PASS" ? "PASSED" : normalizedDecision === "FAIL" ? "FAILED" : "UNDER_REVIEW";
+      const updated = await client.query(
+        `UPDATE private.expert_practice_submissions
+            SET state = $2, reviewed_by = $3, reviewed_at = now(), updated_at = now()
+          WHERE id = $1
+          RETURNING id, application_id, user_id, domain_code, prompt_version,
+                    prompt_snapshot, response, evidence_revision_ids, state,
+                    reviewed_by, reviewed_at, created_at, updated_at`,
+        [normalizedPracticeId, nextState, normalizedReviewerId]
+      );
+      await client.query(
+        `UPDATE private.expert_verifications
+            SET qualification_state = $3,
+                status = CASE WHEN $3 = 'TRAINEE' THEN 'PENDING' ELSE status END,
+                suspended_at = CASE WHEN $3 = 'SUSPENDED' THEN now() ELSE suspended_at END
+          WHERE user_id = $1 AND domain_code = $2`,
+        [submission.user_id, submission.domain_code, normalizedDecision === "PASS" ? "TRAINEE" : normalizedDecision === "FAIL" ? "SUSPENDED" : "PRACTICE_REVIEW"]
+      );
+      if (normalizedDecision === "FAIL") await client.query(`UPDATE public.expert_applications SET status = 'REJECTED', updated_at = now() WHERE id = $1 AND status IN ('DOMAIN_REVIEW','APPEALED')`, [submission.application_id]);
+      await client.query(`INSERT INTO private.expert_qualification_reviews (application_id, user_id, reviewer_id, decision, approved_domains, reason, created_at) VALUES ($1, $2, $3, $4, '[]'::jsonb, $5, now())`, [submission.application_id, submission.user_id, normalizedReviewerId, `PRACTICE_${normalizedDecision}`, redactText(normalizedReason)]);
+      await appendQualificationOutbox(client, {
+        eventType: "EXPERT_PRACTICE_REVIEWED",
+        aggregateType: "EXPERT_PRACTICE_SUBMISSION",
+        aggregateId: normalizedPracticeId,
+        subject: submission.user_id,
+        correlationId,
+        payload: {
+          practiceId: normalizedPracticeId,
+          applicationId: submission.application_id,
+          domainCode: submission.domain_code,
+          reviewerId: normalizedReviewerId,
+          decision: normalizedDecision,
+          state: nextState,
+          rubricVersion,
+        },
+      });
+      return {
+        state: nextState,
+        practice: practiceDTO(updated.rows[0]),
+        decision: {
+          decisionId: inserted.rows[0].id,
+          submissionId: inserted.rows[0].submission_id,
+          decision: inserted.rows[0].decision,
+          rubricVersion: inserted.rows[0].rubric_version,
+          reason: inserted.rows[0].reason,
+          createdAt: inserted.rows[0].created_at ? new Date(inserted.rows[0].created_at).toISOString() : null,
+        },
+        idempotent: false,
       };
     }));
   }
@@ -495,6 +751,17 @@ export class ExpertQualificationService {
         );
         if (!passed.rows[0]) throw new ExpertQualificationError("QUIZ_PASS_REQUIRED", "A passed quiz is required before activation.", 409);
         if (domains.length === 0) throw new ExpertQualificationError("REVIEW_DOMAINS_REQUIRED", "At least one approved domain is required for activation.", 400);
+        const practice = await client.query(
+          `SELECT domain_code, count(*) filter (where state = 'PASSED')::int AS passed
+             FROM private.expert_practice_submissions
+            WHERE application_id = $1 AND domain_code = ANY($2::text[])
+            GROUP BY domain_code`,
+          [application.id, domains]
+        );
+        const passedByDomain = new Map(practice.rows.map((row) => [String(row.domain_code).toUpperCase(), Number(row.passed)]));
+        if (domains.some((domain) => (passedByDomain.get(domain) || 0) < 1)) {
+          throw new ExpertQualificationError("PRACTICE_REVIEW_REQUIRED", "An evidence-based practice review must pass before domain activation.", 409);
+        }
         const expertRole = await client.query(
           `INSERT INTO private.user_roles (user_id, role_id, granted_by, granted_at, revoked_at)
            SELECT $1, r.id, $2, now(), NULL
@@ -519,10 +786,11 @@ export class ExpertQualificationService {
         for (const domain of domains) {
           await client.query(
             `INSERT INTO private.expert_verifications
-              (user_id, domain_code, status, verified_by, verified_at, evidence_ref)
-             VALUES ($1, $2, 'VERIFIED', $3, now(), $4)
+              (user_id, domain_code, status, qualification_state, verified_by, verified_at, evidence_ref)
+             VALUES ($1, $2, 'VERIFIED', 'DOMAIN_VERIFIED', $3, now(), $4)
              ON CONFLICT (user_id, domain_code) DO UPDATE
-               SET status = 'VERIFIED', verified_by = EXCLUDED.verified_by,
+               SET status = 'VERIFIED', qualification_state = 'DOMAIN_VERIFIED',
+                   suspended_at = NULL, verified_by = EXCLUDED.verified_by,
                    verified_at = now(), evidence_ref = EXCLUDED.evidence_ref`,
             [application.user_id, domain, normalizedReviewerId, `expert-qualification:${application.id}`]
           );

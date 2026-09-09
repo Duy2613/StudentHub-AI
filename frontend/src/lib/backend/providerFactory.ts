@@ -1,17 +1,17 @@
 import {
   createDemoProviderBundle,
   DemoProvider,
-} from "./providers/DemoProvider";
+} from "./providers/DemoProvider.ts";
 import {
   createFutureLiveProviderBundle,
   FutureLiveProvider,
-} from "./providers/FutureLiveProvider";
+} from "./providers/FutureLiveProvider.ts";
 import {
   PROVIDER_MODE_VALUES,
   type ProviderBundle,
   type ProviderMode,
-} from "./ports";
-import { ApiProviderAdapter, type ApiProviderTransport } from "./adapters/ApiProviderAdapter";
+} from "./ports.ts";
+import { ApiProviderAdapter, type ApiProviderTransport } from "./adapters/ApiProviderAdapter.ts";
 
 export type ProviderFactoryOptions = Readonly<{
   demoProvider?: ProviderBundle;

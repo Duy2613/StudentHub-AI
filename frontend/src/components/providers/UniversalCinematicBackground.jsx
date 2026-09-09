@@ -1,221 +1,138 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useBackground } from "@/components/providers/BackgroundContext";
 
 /**
- * UniversalCinematicBackground: Master Fullscreen Video Background Engine
- * - Fixed across entire viewport (z-0)
- * - Dual-layer seamless crossfading between 8 cinematic films
- * - Hybrid MP4 <video> + WebP animated fallback
- * - Adaptive WCAG AAA legibility veil (obsidian gradient + vignette)
- * - Battery & GPU friendly (pauses when document is hidden)
+ * Route-aware enhancement layer.
+ * Static poster is the first render. Video is a desktop-only enhancement for
+ * the landing policy and pauses when hidden/offscreen. Static product routes
+ * return null so the shell owns the reading surface.
  */
 export default function UniversalCinematicBackground() {
-  const {
-    activeFilm,
-    bgOpacity = 0.55,
-    isBgPaused = false,
-  } = useBackground();
-
-  // Pure React pattern for tracking previous render state without useEffect setState
-  const [filmState, setFilmState] = useState({
-    current: activeFilm,
-    prev: null,
-    isCrossfading: false,
-  });
-
-  if (activeFilm && activeFilm.id !== filmState.current?.id) {
-    setFilmState({
-      current: activeFilm,
-      prev: filmState.current,
-      isCrossfading: true,
-    });
-  }
-
-  // Clear previous layer after crossfade transition completes
-  useEffect(() => {
-    if (filmState.isCrossfading) {
-      const timer = setTimeout(() => {
-        setFilmState((s) => ({
-          ...s,
-          prev: null,
-          isCrossfading: false,
-        }));
-      }, 1050);
-      return () => clearTimeout(timer);
-    }
-  }, [filmState.isCrossfading]);
-
-  const videoRefA = useRef(null);
-  const videoRefB = useRef(null);
-  const [useWebpFallback, setUseWebpFallback] = useState(false);
+  const { activeMedia, routeMediaPolicy, bgOpacity = 0, isBgPaused = false } = useBackground();
+  const containerRef = useRef(null);
+  const videoRef = useRef(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [mediaReady, setMediaReady] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
-  // Keep cinematic media out of the first paint. The background is decorative,
-  // while the page content is the LCP candidate; loading multi-megabyte films
-  // during hydration makes every route compete with its real content. Enable
-  // the selected film once the browser has had an idle window (with a bounded
-  // timeout for throttled devices).
   useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mobileQuery = window.matchMedia("(max-width: 768px)");
+    const sync = () => {
+      setReducedMotion(reducedQuery.matches);
+      setIsMobile(mobileQuery.matches);
+    };
+    sync();
+    reducedQuery.addEventListener("change", sync);
+    mobileQuery.addEventListener("change", sync);
+    return () => {
+      reducedQuery.removeEventListener("change", sync);
+      mobileQuery.removeEventListener("change", sync);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !routeMediaPolicy.videoEligible || reducedMotion || isMobile) return undefined;
     let idleId;
     let timeoutId;
-    const enableMedia = () => {
-      setMediaReady(true);
-      try {
-        window.performance?.mark?.("cinematic-media-ready");
-      } catch {
-        // Performance marks are evidence only and must never affect rendering.
-      }
-    };
-
+    const enable = () => setMediaReady(true);
     if (typeof window.requestIdleCallback === "function") {
-      idleId = window.requestIdleCallback(enableMedia, { timeout: 1800 });
+      idleId = window.requestIdleCallback(enable, { timeout: 1800 });
     } else {
-      timeoutId = window.setTimeout(enableMedia, 1200);
+      timeoutId = window.setTimeout(enable, 1200);
     }
-
     return () => {
       if (idleId !== undefined) window.cancelIdleCallback?.(idleId);
       if (timeoutId !== undefined) window.clearTimeout(timeoutId);
     };
+  }, [isMobile, reducedMotion, routeMediaPolicy.videoEligible]);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element || typeof IntersectionObserver === "undefined") return undefined;
+    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), { threshold: 0.01 });
+    observer.observe(element);
+    return () => observer.disconnect();
   }, []);
 
-  // Proactive hardware & browser codec detection for instantaneous zero-flicker rendering
+  const shouldRenderVideo = Boolean(
+    activeMedia?.video &&
+    routeMediaPolicy.videoEligible &&
+    mediaReady &&
+    isVisible &&
+    !isMobile &&
+    !reducedMotion &&
+    !isBgPaused,
+  );
+
   useEffect(() => {
-    try {
-      const vid = document.createElement("video");
-      const canPlay = vid.canPlayType('video/mp4; codecs="mp4v.20.8"') || vid.canPlayType('video/mp4; codecs="mp4v"');
-      if (!canPlay) {
-        setUseWebpFallback(true);
-      }
-    } catch {
-      setUseWebpFallback(true);
+    const video = videoRef.current;
+    if (!video) return undefined;
+    if (shouldRenderVideo && !document.hidden) {
+      video.play().catch(() => {});
+    } else {
+      video.pause();
     }
-  }, []);
+    return undefined;
+  }, [shouldRenderVideo, activeMedia?.id]);
 
-  // Tab visibility pause to save GPU/CPU
   useEffect(() => {
-    const handleVisibility = () => {
-      const isHidden = document.hidden;
-      [videoRefA.current, videoRefB.current].forEach((vid) => {
-        if (vid) {
-          if (isHidden || isBgPaused) {
-            vid.pause();
-          } else {
-            vid.play().catch(() => {});
-          }
-        }
-      });
+    const onVisibilityChange = () => {
+      const video = videoRef.current;
+      if (!video) return;
+      if (document.hidden || !shouldRenderVideo) video.pause();
+      else video.play().catch(() => {});
     };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [shouldRenderVideo]);
 
-    document.addEventListener("visibilitychange", handleVisibility);
-    return () => document.removeEventListener("visibilitychange", handleVisibility);
-  }, [isBgPaused]);
+  if (!activeMedia || routeMediaPolicy.presentation === "static" || !activeMedia.desktopPoster) return null;
 
-  // Pause / Play toggle reaction
-  useEffect(() => {
-    [videoRefA.current, videoRefB.current].forEach((vid) => {
-      if (vid) {
-        if (isBgPaused) {
-          vid.pause();
-        } else {
-          vid.play().catch(() => {});
-        }
-      }
-    });
-  }, [isBgPaused]);
-
-  const currentFilm = filmState.current || activeFilm;
-  const prevFilm = filmState.prev;
-  const isCrossfading = filmState.isCrossfading;
-
-  if (!currentFilm) return null;
+  const opacity = Math.max(0, Math.min(0.3, Number(bgOpacity) || routeMediaPolicy.opacity || 0));
 
   return (
     <div
-      className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden select-none bg-[#060813]"
+      ref={containerRef}
       aria-hidden="true"
+      className="vnext-media-atmosphere"
+      data-media-route={routeMediaPolicy.id}
+      data-media-mode={shouldRenderVideo ? "video" : "poster"}
+      style={{ opacity }}
     >
-      {/* Layer 1: Previous Film (fades out during crossfade) */}
-      {mediaReady && prevFilm && (
-        <div
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            isCrossfading ? "opacity-0" : "opacity-100"
-          }`}
-          style={{ opacity: isCrossfading ? 0 : bgOpacity }}
-        >
-          {useWebpFallback ? (
-            <div className="relative w-full h-full scale-105 filter blur-[0.5px]">
-              <Image
-                src={prevFilm.webp}
-                alt=""
-                fill
-                unoptimized
-                className="object-cover object-center"
-              />
-            </div>
-          ) : (
-            <video
-              ref={videoRefB}
-              src={prevFilm.mp4}
-              poster={prevFilm.poster}
-              autoPlay
-              preload="none"
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover object-center scale-105 filter blur-[0.5px]"
-            />
-          )}
-        </div>
+      <picture className="vnext-media-poster">
+        <source media="(prefers-reduced-motion: reduce)" srcSet={activeMedia.reducedMotionAsset} />
+        <source media="(max-width: 768px)" srcSet={activeMedia.mobilePoster} />
+        <Image
+          src={activeMedia.desktopPoster}
+          alt=""
+          fill
+          unoptimized
+          priority={routeMediaPolicy.load === "INITIAL"}
+          sizes="100vw"
+          className="vnext-media-poster"
+        />
+      </picture>
+      {shouldRenderVideo && (
+        <video
+          ref={videoRef}
+          key={activeMedia.id}
+          src={activeMedia.video}
+          poster={activeMedia.desktopPoster}
+          autoPlay
+          preload="none"
+          loop
+          muted
+          playsInline
+          className="vnext-media-video"
+        />
       )}
-
-      {/* Layer 2: Current Active Film (fades in) */}
-      <div
-        className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-        style={{ opacity: bgOpacity }}
-      >
-        {mediaReady && useWebpFallback ? (
-          <div className="relative w-full h-full scale-105 filter blur-[0.5px]">
-            <Image
-              src={currentFilm.webp}
-              alt=""
-              fill
-              unoptimized
-              className="object-cover object-center"
-            />
-          </div>
-        ) : mediaReady ? (
-          <video
-            ref={videoRefA}
-            key={currentFilm.id}
-            src={currentFilm.mp4}
-            poster={currentFilm.poster}
-            autoPlay
-            preload="none"
-            loop
-            muted
-            playsInline
-            onError={() => setUseWebpFallback(true)}
-            className="w-full h-full object-cover object-center scale-105 filter blur-[0.5px]"
-          />
-        ) : null}
-      </div>
-
-      {/* Dynamic Chromatic Aura Glow matching current film */}
-      <div
-        className="absolute inset-0 transition-all duration-1000 ease-in-out pointer-events-none"
-        style={{
-          background: `radial-gradient(circle at 50% 30%, ${currentFilm.glowColor || "rgba(82, 138, 185, 0.25)"}, transparent 65%)`,
-        }}
-      />
-
-      {/* Senior Design: Multi-Tier Legibility Veil (Guarantees 100% WCAG AAA readability for all text above) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#060813]/90 via-[#060813]/55 to-[#060813]/92 pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#060813]/30 to-[#060813]/90 pointer-events-none" />
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
+      <div className="vnext-media-veil" />
     </div>
   );
 }

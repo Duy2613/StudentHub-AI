@@ -58,14 +58,49 @@ const INJECTION_PATTERNS = [
     severity: "high",
   },
   {
+    pattern: /(?:mark|classify|declare|set)\s+(?:this\s+)?(?:claim\s+)?(?:as\s+)?(?:true|safe|verified|legitimate|passed)/gi,
+    label: "FORCED_VERDICT_INJECTION",
+    severity: "high",
+  },
+  {
+    pattern: /(?:send|print|reveal|output|display|show|leak)\s+(?:me\s+)?(?:the\s+)?(?:database_url|api[_\s-]*key|secret|service[_\s-]*role|credentials?|env|token)/gi,
+    label: "SECRET_EXFILTRATION_INJECTION",
+    severity: "critical",
+  },
+  {
+    pattern: /(?:fetch|call|curl|wget|get|request)\s+(?:https?:\/\/)?(?:localhost|127\.0\.0\.1|169\.254\.169\.254|metadata\.google\.internal)/gi,
+    label: "SSRF_METADATA_INJECTION",
+    severity: "critical",
+  },
+  {
     pattern: /override\s+(safety|filter|detection|scam|trust)/gi,
     label: "FILTER_OVERRIDE_ATTEMPT",
+    severity: "critical",
+  },
+  {
+    pattern: /(?:tất cả|mọi|previous|prior)\s+(?:previous\s+)?(?:instructions?|chỉ thị|hướng dẫn)\s+(?:are|bị)?\s*(?:void|vô hiệu|hủy|bỏ)/gi,
+    label: "MULTILINGUAL_INSTRUCTION_OVERRIDE",
+    severity: "critical",
+  },
+  {
+    pattern: /bỏ\s+qua\s+(?:toàn bộ|tất cả|các)?\s*(?:ch[ỉi]\s*th[ịi]|hướng dẫn|quy định|yêu cầu|kiểm tra)/gi,
+    label: "VIETNAMESE_DIRECT_JAILBREAK",
+    severity: "critical",
+  },
+  {
+    pattern: /bỏ\s+qua\s+(?:toàn bộ|tất cả|mọi|các)?\s*(?:quy\s+tắc|luật\s+lệ|bộ\s+l[ọo]c|an\s+toàn)/gi,
+    label: "VIETNAMESE_RULE_BYPASS",
     severity: "critical",
   },
   {
     pattern: /disregard\s+(the\s+)?(above|previous|prior|all)/gi,
     label: "DISREGARD_INJECTION",
     severity: "high",
+  },
+  {
+    pattern: /(?:forget|ignore|override|bypass)\s+(?:all\s+)?(?:previous\s+)?(?:rules?|safety|filters?|instructions?)/gi,
+    label: "ENGLISH_RULE_BYPASS",
+    severity: "critical",
   },
 
   // Assistant/AI impersonation
@@ -92,6 +127,16 @@ const INJECTION_PATTERNS = [
     severity: "high",
   },
   {
+    pattern: /(?:giả\s+sử|đóng\s+vai|hãy\s+đóng\s+vai)\s+(?:bạn\s+)?(?:là|một|một\s+ai|hacker)/gi,
+    label: "VIETNAMESE_ROLEPLAY_JAILBREAK",
+    severity: "high",
+  },
+  {
+    pattern: /(?:không\s+có|không\s+bị|vượt\s+qua)\s+(?:bất\s+kỳ\s+)?(?:bộ\s+lọc|kiểm\s+duyệt|bộ\s+l[ọo]c\s+an\s+toàn|giới\s+hạn\s+an\s+toàn)/gi,
+    label: "SAFETY_BOUNDARY_BYPASS",
+    severity: "critical",
+  },
+  {
     pattern: /dan\s+mode|jailbreak|DAN\b/g,
     label: "KNOWN_JAILBREAK_KEYWORD",
     severity: "high",
@@ -102,6 +147,31 @@ const INJECTION_PATTERNS = [
     pattern: /\]\s*\(\s*https?:\/\/[^\s)]+\s*\)/g,
     label: "MARKDOWN_LINK_INJECTION",
     severity: "medium",
+  },
+  {
+    pattern: /(?:prompt\s+hệ\s+thống|system\s+prompt|khóa\s+bí\s+mật|secret\s+key|api\s+keys?)/gi,
+    label: "SECRET_OR_SYSTEM_PROMPT_REQUEST",
+    severity: "high",
+  },
+  {
+    pattern: /(?:vô\s+hiệu\s+hóa|disable|deactivate)\s+(?:bộ\s+lọc|an\s+toàn|security|filter|kiểm\s+duyệt)/gi,
+    label: "SECURITY_CONTROL_DISABLE_REQUEST",
+    severity: "critical",
+  },
+  {
+    pattern: /(?:drop\s+table|rm\s+-rf|cat\s+\/etc\/passwd|\.\.\/\.\.\/|directory\s+traversal|shell\s+command)/gi,
+    label: "COMMAND_OR_PATH_PAYLOAD",
+    severity: "high",
+  },
+  {
+    pattern: /(?:\"role\"\s*:\s*\"system\"|override\s*:\s*true|sourceId\s*:\s*fake)/gi,
+    label: "STRUCTURED_PROMPT_OVERRIDE",
+    severity: "high",
+  },
+  {
+    pattern: /(?:thực\s+thi|làm\s+theo|chấp\s+nhận)\s+(?:lệnh|chỉ\s+thị|hướng\s+dẫn)\s+(?:ngược|bất\s+kỳ|mọi)/gi,
+    label: "LOGICAL_INSTRUCTION_OVERRIDE",
+    severity: "high",
   },
 ];
 
@@ -143,23 +213,55 @@ export class PromptInjectionGuard {
     }
 
     const detections = [];
+    // Strip zero-width, BiDi control & invisible Unicode for anti-evasion scanning
+    const deobfuscated = content.replace(/[\u200B-\u200F\uFEFF\u2060\u00AD\u180E\u202A-\u202E]/g, "").normalize("NFKC");
+    let decoded = deobfuscated;
+    for (let pass = 0; pass < 2; pass++) {
+      try {
+        const next = decodeURIComponent(decoded);
+        if (next === decoded) break;
+        decoded = next;
+      } catch {
+        break;
+      }
+    }
 
     for (const { pattern, label, severity } of INJECTION_PATTERNS) {
       // Reset lastIndex for global flags
-      pattern.lastIndex = 0;
-      let match;
-      while ((match = pattern.exec(content)) !== null) {
-        detections.push({
-          label,
-          severity,
-          matchedText: match[0].slice(0, 80), // truncate long matches
-          position: match.index,
-          source,
-        });
-        // Prevent infinite loops on zero-length matches
-        if (match.index === pattern.lastIndex) {
-          pattern.lastIndex++;
+      for (const stream of [deobfuscated, decoded]) {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(stream)) !== null) {
+          detections.push({
+            label,
+            severity,
+            matchedText: match[0].slice(0, 80), // truncate long matches
+            position: match.index,
+            source,
+          });
+          if (match.index === pattern.lastIndex) {
+            pattern.lastIndex++;
+          }
         }
+      }
+    }
+
+    // Inspect Base64 encoded payload blocks
+    const b64Matches = content.match(/[A-Za-z0-9+/]{20,}={0,2}/g);
+    if (b64Matches) {
+      for (const b64 of b64Matches) {
+        try {
+          const decoded = Buffer.from(b64, "base64").toString("utf8");
+          if (/ignore|instructions?|override|system|verify/i.test(decoded)) {
+            detections.push({
+              label: "BASE64_ENCODED_INJECTION",
+              severity: "critical",
+              matchedText: b64,
+              position: content.indexOf(b64),
+              source,
+            });
+          }
+        } catch {}
       }
     }
 
@@ -196,11 +298,37 @@ export class PromptInjectionGuard {
    */
   static _sanitize(content) {
     if (!content) return "";
-    let result = content;
+    let result = String(content)
+      .replace(/[\u200B-\u200F\uFEFF\u2060\u00AD\u180E\u202A-\u202E]/g, " ")
+      .normalize("NFKC");
+
+    for (let pass = 0; pass < 2; pass++) {
+      try {
+        const decoded = decodeURIComponent(result);
+        if (decoded === result) break;
+        result = decoded;
+      } catch {
+        break;
+      }
+    }
+
+    result = result
+      .replace(/<!--[\s\S]*?-->/g, "[BLOCKED_COMMENT]")
+      .replace(/<script\b[\s\S]*?<\/script>/gi, "[BLOCKED_HTML]")
+      .replace(/<svg\b[\s\S]*?<\/svg>/gi, "[BLOCKED_HTML]")
+      .replace(/\bon\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "data-blocked-event=1")
+      .replace(/\b(?:javascript|vbscript|data):/gi, "blocked:")
+      .replace(/(?:\.\.\/){2,}/g, "[BLOCKED_PATH]");
 
     // Apply token replacements
     for (const { pattern, replacement } of SANITIZATION_REPLACEMENTS) {
+      pattern.lastIndex = 0;
       result = result.replace(pattern, replacement);
+    }
+
+    for (const { pattern } of INJECTION_PATTERNS) {
+      pattern.lastIndex = 0;
+      result = result.replace(pattern, "[BLOCKED_INSTRUCTION]");
     }
 
     // Wrap content in explicit data markers (helps LLMs treat it as data, not instruction)

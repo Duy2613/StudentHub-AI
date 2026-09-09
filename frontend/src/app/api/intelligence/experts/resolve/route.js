@@ -6,11 +6,12 @@
  */
 
 import { NextResponse } from "next/server";
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import { ExpertStore, isExpertDemoMode } from "@/lib/intelligence/expert/expertStore";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
 async function resolveExpertEntity(req) {
   try {
+    if (!isExpertDemoMode()) return NextResponse.json({ success: false, error: { code: "EXPERT_ENTITY_WORKFLOW_NOT_MIGRATED", userMessage: "Expert identity resolution requires the durable verification workflow." } }, { status: 503 });
     const body = await req.json().catch(() => ({}));
     const resolution = ExpertStore.resolveEntity(body);
 

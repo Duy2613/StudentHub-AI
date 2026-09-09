@@ -22,7 +22,7 @@ export default function RealtimeLiveConsole() {
   });
 
   return (
-    <aside aria-label="Console truyền dẫn thời gian thực" className="fixed bottom-4 left-4 z-40 flex flex-col items-start gap-2 pointer-events-auto">
+    <aside aria-label="Console truyền dẫn thời gian thực" className="fixed bottom-4 left-4 z-40 hidden sm:flex flex-col items-start gap-2 pointer-events-auto">
       {/* Expanded Live Streaming Console Tray */}
       {isOpen && (
         <div className="w-[360px] sm:w-[460px] max-h-[460px] rounded-2xl bg-[#080a0f]/95 border border-white/15 shadow-2xl shadow-black/90 backdrop-blur-xl text-white flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-3 duration-200">

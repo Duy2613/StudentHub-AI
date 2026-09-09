@@ -10,8 +10,10 @@ import { IEvidenceRetriever } from "./IEvidenceRetriever.js";
 import { SourceAuthorityRegistry } from "../registry/SourceAuthorityRegistry.js";
 import { createSource, FRESHNESS_STATUS, SOURCE_TYPE, EVIDENCE_PROVIDER_STATUS } from "../types.js";
 import { markNetworkGuardedRetriever } from "./NetworkGuard.js";
+import { ENRICHED_INSTITUTIONAL_DOCS } from "./EnrichedInstitutionalKnowledgeBase.js";
 
 export const INSTITUTIONAL_KNOWLEDGE_BASE = [
+  ...ENRICHED_INSTITUTIONAL_DOCS,
   // Official HCMUTE Tuition Policy (Verified Official Document)
   {
     id: "kb-hcmute-tuition-2026",

@@ -4,7 +4,7 @@
  * Retrieves topic consensus, operational friction hotspots and matching posts.
  */
 
-import { CommunityStore } from "@/lib/intelligence/community/communityStore.js";
+import { CommunityStore, isCommunityDemoMode } from "@/lib/intelligence/community/communityStore.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
 export const GET = SecurityFabric.wrapHandler({
@@ -21,6 +21,7 @@ export const GET = SecurityFabric.wrapHandler({
       retryable: false
     } }, { status: 400 });
   }
+  if (!isCommunityDemoMode()) return Response.json({ success: false, error: { code: "COMMUNITY_ANALYTICS_WORKFLOW_NOT_MIGRATED", userMessage: "Topic analytics are available only from the durable Promax projection." } }, { status: 503 });
   const consensus = CommunityStore.getConsensus(topicId);
   const posts = CommunityStore.getPostsByTopic(topicId, { redactPrivate: true });
   return Response.json({

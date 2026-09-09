@@ -1,0 +1,2620 @@
+{
+  "version": "HOLDOUT_V3_UNTOUCHED",
+  "candidateTarget": "studenthub-v5-pilot-rc2",
+  "generatedAt": "2026-09-09T12:02:20.065Z",
+  "totalCases": 165,
+  "categoryBreakdown": {
+    "UNKNOWN_REGIONAL_INSTITUTIONS": 30,
+    "PRIVATE_AND_INTERNATIONAL_ORGS": 20,
+    "FRESH_2026_POLICIES_AND_CIRCULARS": 20,
+    "AMBIGUOUS_ABBREVIATIONS": 15,
+    "ADVERSARIAL_TYPOS_AND_SLANG": 15,
+    "OUTDATED_SUPERSEDED_POLICIES": 15,
+    "MULTI_ENTITY_COMPARISONS": 15,
+    "ORGANIZATION_RENAMES_AND_MERGERS": 10,
+    "SIMILAR_UNIVERSITY_NAMES": 10,
+    "NON_EDUCATION_SCAM_ENTITIES": 15
+  },
+  "cases": [
+    {
+      "caseId": "RET-V3-001",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Đại học Kiên Giang VNUKG học phí năm 2026",
+      "canonicalEntity": "VNUKG",
+      "aliases": [
+        "vnukg",
+        "đại học kiên giang"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vnukg.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-002",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Bạc Liêu BLU tuyển sinh đại học chính quy 2026",
+      "canonicalEntity": "BLU",
+      "aliases": [
+        "blu",
+        "đại học bạc liêu"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "blu.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-003",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Đại học Tây Bắc UTB xét học bạ ngành Sư phạm Toán 2026",
+      "canonicalEntity": "UTB",
+      "aliases": [
+        "utb",
+        "đại học tây bắc"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "utb.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-004",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Tân Trào TTRU ký túc xá và chính sách học bổng sinh viên",
+      "canonicalEntity": "TTRU",
+      "aliases": [
+        "ttru",
+        "đại học tân trào"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "daihoctantrao.edu.vn",
+      "freshnessRequirement": "2026_GENERAL"
+    },
+    {
+      "caseId": "RET-V3-005",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Đại học Phú Yên PYU thông báo tuyển sinh sư phạm tiểu học 2026",
+      "canonicalEntity": "PYU",
+      "aliases": [
+        "pyu",
+        "đại học phú yên"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "pyu.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-006",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Khánh Hòa UKH học phí ngành Du lịch 2026",
+      "canonicalEntity": "UKH",
+      "aliases": [
+        "ukh",
+        "đại học khánh hòa"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ukh.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-007",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Hà Tĩnh HTU xét tuyển thẳng học sinh giỏi 2026",
+      "canonicalEntity": "HTU",
+      "aliases": [
+        "htu",
+        "đại học hà tĩnh"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "htu.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-008",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Đại học Đồng Tháp DThU học bổng khuyến khích học tập kỳ 1 2026",
+      "canonicalEntity": "DThU",
+      "aliases": [
+        "dthu",
+        "đại học đồng tháp"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "dthu.edu.vn",
+      "freshnessRequirement": "2026_SCHOLARSHIP"
+    },
+    {
+      "caseId": "RET-V3-009",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Quảng Bình QBU chuẩn đầu ra tiếng Anh B1 2026",
+      "canonicalEntity": "QBU",
+      "aliases": [
+        "qbu",
+        "đại học quảng bình"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "qbu.edu.vn",
+      "freshnessRequirement": "2026_ACADEMIC"
+    },
+    {
+      "caseId": "RET-V3-010",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Đại học Nông Lâm Bắc Giang BAFU điểm chuẩn thú y 2026",
+      "canonicalEntity": "BAFU",
+      "aliases": [
+        "bafu",
+        "đại học nông lâm bắc giang"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "bafu.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-011",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Sư phạm Kỹ thuật Vĩnh Long VLUTE chỉ tiêu xét tuyển 2026",
+      "canonicalEntity": "VLUTE",
+      "aliases": [
+        "vlute",
+        "sư phạm kỹ thuật vĩnh long"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vlute.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-012",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Tiền Giang TGU quy định miễn giảm học phí 2026",
+      "canonicalEntity": "TGU",
+      "aliases": [
+        "tgu",
+        "đại học tiền giang"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "tgu.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-013",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Đại học Xây dựng Miền Tây MTU đồ án tốt nghiệp kiến trúc",
+      "canonicalEntity": "MTU",
+      "aliases": [
+        "mtu",
+        "đại học xây dựng miền tây"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "mtu.edu.vn",
+      "freshnessRequirement": "2026_ACADEMIC"
+    },
+    {
+      "caseId": "RET-V3-014",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Đại học Kinh tế Công nghiệp Long An DLA học phí ngành tài chính 2026",
+      "canonicalEntity": "DLA",
+      "aliases": [
+        "dla",
+        "kinh tế công nghiệp long an"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "dla.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-015",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Thái Bình TBU ngành Quản trị kinh doanh năm 2026",
+      "canonicalEntity": "TBU",
+      "aliases": [
+        "tbu",
+        "đại học thái bình"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "tbu.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-016",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Đại học Y Dược Thái Bình TBUMP học phí y đa khoa chính quy 2026",
+      "canonicalEntity": "TBUMP",
+      "aliases": [
+        "tbump",
+        "y dược thái bình"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "tbump.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-017",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Y Dược Hải Phòng HPMU kế hoạch xét tuyển thạc sĩ 2026",
+      "canonicalEntity": "HPMU",
+      "aliases": [
+        "hpmu",
+        "y dược hải phòng"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hpmu.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-018",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Hàng hải Việt Nam VMU đăng ký môn học học kỳ phụ 2026",
+      "canonicalEntity": "VMU",
+      "aliases": [
+        "vmu",
+        "hàng hải việt nam",
+        "đại học hàng hải"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vimaru.edu.vn",
+      "freshnessRequirement": "2026_ACADEMIC"
+    },
+    {
+      "caseId": "RET-V3-019",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Hải Phòng HPU điểm rèn luyện và chính sách sinh viên",
+      "canonicalEntity": "HPU",
+      "aliases": [
+        "hpu",
+        "đại học hải phòng"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "dhhp.edu.vn",
+      "freshnessRequirement": "2026_ACADEMIC"
+    },
+    {
+      "caseId": "RET-V3-020",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Tây Nguyên TTN tuyển sinh y khoa vùng Tây Nguyên 2026",
+      "canonicalEntity": "TTN",
+      "aliases": [
+        "ttn",
+        "đại học tây nguyên"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ttn.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-021",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Quy Nhơn QNU chính sách hỗ trợ tiền đóng học phí sinh viên sư phạm",
+      "canonicalEntity": "QNU",
+      "aliases": [
+        "qnu",
+        "đại học quy nhơn"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "qnu.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-022",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Quảng Nam DQU xét tuyển bổ sung đợt 2 năm 2026",
+      "canonicalEntity": "DQU",
+      "aliases": [
+        "dqu",
+        "đại học quảng nam"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "dqu.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-023",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Trà Vinh TVU chế độ hỗ trợ người học y khoa 2026",
+      "canonicalEntity": "TVU",
+      "aliases": [
+        "tvu",
+        "đại học trà vinh"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "tvu.edu.vn",
+      "freshnessRequirement": "2026_POLICY"
+    },
+    {
+      "caseId": "RET-V3-024",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Cửu Long Mekong University thông báo học bổng doanh nghiệp 2026",
+      "canonicalEntity": "Mekong",
+      "aliases": [
+        "đại học cửu long",
+        "mku"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "mku.edu.vn",
+      "freshnessRequirement": "2026_SCHOLARSHIP"
+    },
+    {
+      "caseId": "RET-V3-025",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Nam Cần Thơ DNC học phí ngành Kỹ thuật ô tô 2026",
+      "canonicalEntity": "DNC",
+      "aliases": [
+        "dnc",
+        "đại học nam cần thơ"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "nctu.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-026",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học FPT phân hiệu Cần Thơ học phí chuyên ngành AI 2026",
+      "canonicalEntity": "FPT_CT",
+      "aliases": [
+        "fpt cần thơ",
+        "đại học fpt"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "cantho.fpt.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-027",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học An Giang AGU trực thuộc ĐHQG-HCM xét tuyển học bạ 2026",
+      "canonicalEntity": "AGU",
+      "aliases": [
+        "agu",
+        "đại học an giang"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "agu.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-028",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Đại học Hồng Đức HDU Thanh Hóa học bổng thu hút nhân tài 2026",
+      "canonicalEntity": "HDU",
+      "aliases": [
+        "hdu",
+        "đại học hồng đức"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hdu.edu.vn",
+      "freshnessRequirement": "2026_SCHOLARSHIP"
+    },
+    {
+      "caseId": "RET-V3-029",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Văn hóa Thể thao và Du lịch Thanh Hóa tuyển sinh 2026",
+      "canonicalEntity": "DVHTD",
+      "aliases": [
+        "văn hóa thể thao du lịch thanh hóa"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "dvtdt.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-030",
+      "category": "UNKNOWN_REGIONAL_INSTITUTIONS",
+      "query": "Trường Đại học Sư phạm Kỹ thuật Hưng Yên UTEHY đồ án tốt nghiệp tự động hóa 2026",
+      "canonicalEntity": "UTEHY",
+      "aliases": [
+        "utehy",
+        "sư phạm kỹ thuật hưng yên"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "utehy.edu.vn",
+      "freshnessRequirement": "2026_ACADEMIC"
+    },
+    {
+      "caseId": "RET-V3-031",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "RMIT University Vietnam thông báo học bổng President Scholar 2026",
+      "canonicalEntity": "RMIT",
+      "aliases": [
+        "rmit",
+        "đại học rmit"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "rmit.edu.vn",
+      "freshnessRequirement": "2026_SCHOLARSHIP"
+    },
+    {
+      "caseId": "RET-V3-032",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "British University Vietnam BUV học phí ngành Tài chính Ngân hàng 2026",
+      "canonicalEntity": "BUV",
+      "aliases": [
+        "buv",
+        "british university vietnam"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "buv.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-033",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "VinUniversity thông báo học bổng tài năng toàn phần 2026",
+      "canonicalEntity": "VINUNI",
+      "aliases": [
+        "vinuni",
+        "đại học vinuni"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vinuni.edu.vn",
+      "freshnessRequirement": "2026_SCHOLARSHIP"
+    },
+    {
+      "caseId": "RET-V3-034",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Fulbright University Vietnam chính sách hỗ trợ tài chính sinh viên 2026",
+      "canonicalEntity": "FUV",
+      "aliases": [
+        "fuv",
+        "fulbright"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "fulbright.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-035",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Swinburne Vietnam thông báo kỳ nhập học tháng 9 năm 2026",
+      "canonicalEntity": "SWINBURNE",
+      "aliases": [
+        "swinburne",
+        "swinburne vietnam"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "swinburne-vn.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-036",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Đại học Quốc tế Miền Đông EIU học bổng toàn phần doanh nghiệp Becamex 2026",
+      "canonicalEntity": "EIU",
+      "aliases": [
+        "eiu",
+        "quốc tế miền đông"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "eiu.edu.vn",
+      "freshnessRequirement": "2026_SCHOLARSHIP"
+    },
+    {
+      "caseId": "RET-V3-037",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Trường Đại học Phenikaa học phí ngành Khoa học máy tính 2026",
+      "canonicalEntity": "PHENIKAA",
+      "aliases": [
+        "phenikaa",
+        "đại học phenikaa"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "phenikaa-uni.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-038",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Đại học Văn Lang VLU chính sách học bổng tân sinh viên khóa 32 năm 2026",
+      "canonicalEntity": "VLU",
+      "aliases": [
+        "vlu",
+        "văn lang",
+        "đại học văn lang"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vlu.edu.vn",
+      "freshnessRequirement": "2026_SCHOLARSHIP"
+    },
+    {
+      "caseId": "RET-V3-039",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Trường Đại học Hoa Sen HSU tuyển sinh chương trình liên kết quốc tế 2026",
+      "canonicalEntity": "HSU",
+      "aliases": [
+        "hsu",
+        "hoa sen",
+        "đại học hoa sen"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hoasen.edu.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-040",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Trường Đại học Công nghệ TP.HCM HUTECH học phí ngành Logistics 2026",
+      "canonicalEntity": "HUTECH",
+      "aliases": [
+        "hutech",
+        "công nghệ tphcm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hutech.edu.vn",
+      "freshnessRequirement": "2026_TUITION"
+    },
+    {
+      "caseId": "RET-V3-041",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Tập đoàn Viettel chương trình thực tập sinh tài năng Viettel Digital Talent 2026",
+      "canonicalEntity": "VIETTEL",
+      "aliases": [
+        "viettel",
+        "viettel digital talent"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "viettel.com.vn",
+      "freshnessRequirement": "2026_INTERN"
+    },
+    {
+      "caseId": "RET-V3-042",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "FPT Software tuyển dụng Fresher AI Engineer 2026",
+      "canonicalEntity": "FSOFT",
+      "aliases": [
+        "fsoft",
+        "fpt software"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "fpt-software.com",
+      "freshnessRequirement": "2026_INTERN"
+    },
+    {
+      "caseId": "RET-V3-043",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Samsung R&D Vietnam học bổng tài trợ sinh viên công nghệ Samsung STP 2026",
+      "canonicalEntity": "SAMSUNG_SRV",
+      "aliases": [
+        "samsung r&d",
+        "samsung stp"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "samsung.com",
+      "freshnessRequirement": "2026_SCHOLARSHIP"
+    },
+    {
+      "caseId": "RET-V3-044",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Techcombank chương trình thực tập Future Gen 2026 dành cho sinh viên kinh tế",
+      "canonicalEntity": "TCB",
+      "aliases": [
+        "techcombank",
+        "future gen"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "techcombank.com",
+      "freshnessRequirement": "2026_INTERN"
+    },
+    {
+      "caseId": "RET-V3-045",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Vietcombank thông báo tuyển dụng cán bộ tín dụng tân cử nhân 2026",
+      "canonicalEntity": "VCB",
+      "aliases": [
+        "vietcombank"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vietcombank.com.vn",
+      "freshnessRequirement": "2026_INTERN"
+    },
+    {
+      "caseId": "RET-V3-046",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Shopee Vietnam chương trình Graduate Development Program 2026",
+      "canonicalEntity": "SHOPEE",
+      "aliases": [
+        "shopee",
+        "shopee gdp"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "shopee.vn",
+      "freshnessRequirement": "2026_INTERN"
+    },
+    {
+      "caseId": "RET-V3-047",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "Tập đoàn Vingroup Quỹ Đổi mới sáng tạo VINIF học bổng thạc sĩ tiến sĩ 2026",
+      "canonicalEntity": "VINIF",
+      "aliases": [
+        "vinif",
+        "quỹ vinif"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vinif.org",
+      "freshnessRequirement": "2026_SCHOLARSHIP"
+    },
+    {
+      "caseId": "RET-V3-048",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "VNG Corporation chương trình VNG Tech Fresher 2026",
+      "canonicalEntity": "VNG",
+      "aliases": [
+        "vng",
+        "vng tech fresher"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vng.com.vn",
+      "freshnessRequirement": "2026_INTERN"
+    },
+    {
+      "caseId": "RET-V3-049",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "MISA tuyển dụng lập trình viên backend NodeJS ReactJS mới tốt nghiệp 2026",
+      "canonicalEntity": "MISA",
+      "aliases": [
+        "misa",
+        "công ty misa"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "misa.vn",
+      "freshnessRequirement": "2026_INTERN"
+    },
+    {
+      "caseId": "RET-V3-050",
+      "category": "PRIVATE_AND_INTERNATIONAL_ORGS",
+      "query": "MoMo tuyển sinh viên thực tập Data Analyst 2026",
+      "canonicalEntity": "MOMO",
+      "aliases": [
+        "momo",
+        "ví momo"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "momo.vn",
+      "freshnessRequirement": "2026_INTERN"
+    },
+    {
+      "caseId": "RET-V3-051",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Thông tư Bộ GD&ĐT ban hành quy chế tuyển sinh đại học chính quy áp dụng từ năm 2026",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "bộ gd&đt",
+        "bộ giáo dục"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_REGULATION"
+    },
+    {
+      "caseId": "RET-V3-052",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Nghị định quy định khung học phí các cơ sở giáo dục đại học công lập năm học 2025-2026",
+      "canonicalEntity": "GOVERNMENT_VN",
+      "aliases": [
+        "chính phủ",
+        "bộ tài chính"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "chinhphu.vn",
+      "freshnessRequirement": "2026_REGULATION"
+    },
+    {
+      "caseId": "RET-V3-053",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Quyết định 157 của Thủ tướng về chính sách tín dụng vốn vay ưu đãi cho sinh viên năm 2026",
+      "canonicalEntity": "VBSP",
+      "aliases": [
+        "ngân hàng chính sách xã hội",
+        "chính phủ"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vbsp.org.vn",
+      "freshnessRequirement": "2026_POLICY"
+    },
+    {
+      "caseId": "RET-V3-054",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Quy định chuẩn đầu ra ngoại ngữ VSTEP tương đương B1 B2 cho sinh viên tốt nghiệp 2026",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "chuẩn đầu ra ngoại ngữ",
+        "vstep"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_REGULATION"
+    },
+    {
+      "caseId": "RET-V3-055",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Quy định về thời gian bảo lưu kết quả học tập và tạm dừng chương trình theo Thông tư mới",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "quy chế đào tạo tín chỉ"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_ACADEMIC"
+    },
+    {
+      "caseId": "RET-V3-056",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Hướng dẫn tổ chức thi tốt nghiệp THPT và xét tuyển đại học năm 2026 theo chương trình GDPT 2018",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thi tốt nghiệp 2026"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-057",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Chính sách hỗ trợ chi phí sinh hoạt 3.63 triệu đồng/tháng cho sinh viên sư phạm năm 2026",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "nghị định 116",
+        "hỗ trợ sư phạm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_POLICY"
+    },
+    {
+      "caseId": "RET-V3-058",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Bảo hiểm y tế sinh viên mức đóng và quyền lợi khám chữa bệnh năm 2026",
+      "canonicalEntity": "BHXH_VN",
+      "aliases": [
+        "bảo hiểm xã hội",
+        "bhyt sinh viên"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "baohiemxahoi.gov.vn",
+      "freshnessRequirement": "2026_POLICY"
+    },
+    {
+      "caseId": "RET-V3-059",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Quy chế đánh giá điểm rèn luyện sinh viên theo khung tiêu chuẩn mới của Bộ Giáo dục",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "điểm rèn luyện"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_ACADEMIC"
+    },
+    {
+      "caseId": "RET-V3-060",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Tiêu chuẩn xét chọn danh hiệu Sinh viên 5 tốt cấp Trung ương năm học 2025-2026",
+      "canonicalEntity": "TW_DOAN",
+      "aliases": [
+        "trung ương đoàn",
+        "sinh viên 5 tốt"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "doanthanhnien.vn",
+      "freshnessRequirement": "2026_POLICY"
+    },
+    {
+      "caseId": "RET-V3-061",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Quy định xét cấp học bổng khuyến khích học tập cho sinh viên loại giỏi xuất sắc 2026",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "học bổng khuyến khích"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_POLICY"
+    },
+    {
+      "caseId": "RET-V3-062",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Quy định về liên thông đại học chính quy đối với sinh viên cao đẳng tốt nghiệp năm 2026",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "liên thông đại học"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_REGULATION"
+    },
+    {
+      "caseId": "RET-V3-063",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Chính sách miễn học phí cho con thương binh liệt sĩ tại các trường đại học năm 2026",
+      "canonicalEntity": "MOLISA_VN",
+      "aliases": [
+        "bộ lao động thương binh xã hội"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "molisa.gov.vn",
+      "freshnessRequirement": "2026_POLICY"
+    },
+    {
+      "caseId": "RET-V3-064",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Quy chế công nhận tương đương chứng chỉ IELTS sang điểm xét tuyển môn tiếng Anh 2026",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "quy đổi ielts"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_ADMISSION"
+    },
+    {
+      "caseId": "RET-V3-065",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Quy định thời gian thực tập tốt nghiệp tối thiểu đối với khối ngành kỹ thuật công nghệ 2026",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thực tập tốt nghiệp"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_ACADEMIC"
+    },
+    {
+      "caseId": "RET-V3-066",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Chế độ tạm hoãn nghĩa vụ quân sự đối với sinh viên đang học đại học chính quy năm 2026",
+      "canonicalEntity": "MOD_VN",
+      "aliases": [
+        "bộ quốc phòng",
+        "nghĩa vụ quân sự"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "mod.gov.vn",
+      "freshnessRequirement": "2026_POLICY"
+    },
+    {
+      "caseId": "RET-V3-067",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Quy định chuẩn kiểm định chất lượng chương trình đào tạo đại học theo tiêu chuẩn AUN-QA 2026",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "kiểm định chất lượng"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_REGULATION"
+    },
+    {
+      "caseId": "RET-V3-068",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Quy chế xét tặng giải thưởng Sinh viên nghiên cứu khoa học Eureka năm 2026",
+      "canonicalEntity": "VNUHCM",
+      "aliases": [
+        "eureka",
+        "thành đoàn tphcm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "khoahoctre.com.vn",
+      "freshnessRequirement": "2026_ACADEMIC"
+    },
+    {
+      "caseId": "RET-V3-069",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Chính sách hỗ trợ sinh viên khởi nghiệp theo Đề án 1665 của Thủ tướng Chính phủ",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "khởi nghiệp sinh viên",
+        "đề án 1665"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_POLICY"
+    },
+    {
+      "caseId": "RET-V3-070",
+      "category": "FRESH_2026_POLICIES_AND_CIRCULARS",
+      "query": "Quy định xử lý kỷ luật đối với sinh viên gian lận thi cử hoặc sử dụng AI trái phép 2026",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "kỷ luật sinh viên",
+        "sử dụng ai"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_ACADEMIC"
+    },
+    {
+      "caseId": "RET-V3-071",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "ĐHBK công bố ngưỡng điểm nhận hồ sơ xét tuyển học bạ 2026",
+      "canonicalEntity": "AMBIGUOUS_DHBK",
+      "aliases": [
+        "đhbk",
+        "bách khoa"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hust.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-072",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "ĐHSP thông báo lịch thi năng khiếu ngành mầm non giáo dục thể chất 2026",
+      "canonicalEntity": "AMBIGUOUS_DHSP",
+      "aliases": [
+        "đhsp",
+        "sư phạm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hnue.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-073",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "UTE tuyển sinh kỹ thuật ô tô công nghệ thông tin khóa mới 2026",
+      "canonicalEntity": "AMBIGUOUS_UTE",
+      "aliases": [
+        "ute",
+        "sư phạm kỹ thuật"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmute.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-074",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "ĐHKT thông báo lịch thi kết thúc học phần đợt 1 năm 2026",
+      "canonicalEntity": "AMBIGUOUS_DHKT",
+      "aliases": [
+        "đhkt",
+        "kinh tế"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "neu.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-075",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "ĐHNL quy định học phí các ngành nông nghiệp và thú y 2026",
+      "canonicalEntity": "AMBIGUOUS_DHNL",
+      "aliases": [
+        "đhnl",
+        "nông lâm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmuaf.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-076",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "ĐHQG xét tuyển theo kỳ thi đánh giá năng lực đợt 1 năm 2026",
+      "canonicalEntity": "AMBIGUOUS_DHQG",
+      "aliases": [
+        "đhqg",
+        "đại học quốc gia"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vnuhcm.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-077",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "HVTC công bố đề án tuyển sinh và học phí chương trình chất lượng cao 2026",
+      "canonicalEntity": "HVTC",
+      "aliases": [
+        "hvtc",
+        "học viện tài chính"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hvtc.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-078",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "HVNH hướng dẫn đăng ký tín chỉ học kỳ hè năm học 2025-2026",
+      "canonicalEntity": "HVNH",
+      "aliases": [
+        "hvnh",
+        "học viện ngân hàng"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hvnh.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-079",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "ĐHYD thông báo học phí các ngành đào tạo bác sĩ răng hàm mặt 2026",
+      "canonicalEntity": "AMBIGUOUS_DHYD",
+      "aliases": [
+        "đhyd",
+        "y dược"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ump.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-080",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "Học viện Báo chí thông báo tổ chức thi đánh giá năng lực báo chí 2026",
+      "canonicalEntity": "AJC",
+      "aliases": [
+        "ajc",
+        "báo chí tuyên truyền"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ajc.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-081",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "ĐH Ngoại ngữ thông báo chuẩn đầu ra ngoại ngữ 2 cho sinh viên năm cuối 2026",
+      "canonicalEntity": "AMBIGUOUS_DHNN",
+      "aliases": [
+        "đh ngoại ngữ"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ulis.vnu.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-082",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "ĐH Luật hướng dẫn nộp hồ sơ xét tuyển chứng chỉ tiếng Anh quốc tế 2026",
+      "canonicalEntity": "AMBIGUOUS_DHLUAT",
+      "aliases": [
+        "đh luật"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hlu.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-083",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "ĐH Xây dựng thông báo lịch bảo vệ đồ án tốt nghiệp khóa 65",
+      "canonicalEntity": "HUCE",
+      "aliases": [
+        "đh xây dựng",
+        "huce"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "huce.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-084",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "ĐH Mở thông báo tuyển sinh đào tạo từ xa và vừa làm vừa học 2026",
+      "canonicalEntity": "AMBIGUOUS_DHMO",
+      "aliases": [
+        "đh mở"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ou.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-085",
+      "category": "AMBIGUOUS_ABBREVIATIONS",
+      "query": "ĐH Công nghệ thông tin UIT tổ chức kỳ thi Olympic tin học sinh viên",
+      "canonicalEntity": "UIT_VNUHCM",
+      "aliases": [
+        "uit",
+        "công nghệ thông tin"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "uit.edu.vn",
+      "freshnessRequirement": "2026_AMBIGUOUS"
+    },
+    {
+      "caseId": "RET-V3-086",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "diem ckuaanr hoc ba hcmute nam 2026 nganh it",
+      "canonicalEntity": "HCMUTE",
+      "aliases": [
+        "hcmute"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmute.edu.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-087",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "hoc phi dai hok bach khoa ha noi nam nay tang bnhieu tien",
+      "canonicalEntity": "HUST",
+      "aliases": [
+        "bách khoa hà nội",
+        "hust"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hust.edu.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-088",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "xet tuyen thang dh kinh te quoc dan neu 2026 co can ielts ko",
+      "canonicalEntity": "NEU",
+      "aliases": [
+        "kinh tế quốc dân",
+        "neu"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "neu.edu.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-089",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "cach dang ki ki tuc xa ktx dhsp tphcm cho sv nam nhat",
+      "canonicalEntity": "HCMUE",
+      "aliases": [
+        "sư phạm tphcm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmue.edu.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-090",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "cach rut ho so goc tai phong dao tao dh ton duc thang",
+      "canonicalEntity": "TDTU",
+      "aliases": [
+        "tôn đức thắng",
+        "tdtu"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "tdtu.edu.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-091",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "thoi gian dong tien le phi thi toeic noi bo hcmut 2026",
+      "canonicalEntity": "HCMUT_VNUHCM",
+      "aliases": [
+        "bách khoa tphcm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmut.edu.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-092",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "xin giay xac nhan sv de hoan nghia vu quan su truong ueh o dau",
+      "canonicalEntity": "UEH",
+      "aliases": [
+        "ueh",
+        "kinh tế tphcm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ueh.edu.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-093",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "lich nghi tet nguyen dan cua sinh vien su pham ky thuat spkt 2026",
+      "canonicalEntity": "HCMUTE",
+      "aliases": [
+        "spkt",
+        "hcmute"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmute.edu.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-094",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "nop don xin phuc khao diem thi hoc ki o dau truong dh nong lam",
+      "canonicalEntity": "NLU",
+      "aliases": [
+        "nông lâm",
+        "hcmuaf"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmuaf.edu.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-095",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "nganh logistics dai hoc giao thong van tai uth diem co cao ko",
+      "canonicalEntity": "UTH",
+      "aliases": [
+        "uth",
+        "giao thông vận tải tphcm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "uth.edu.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-096",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "dieu kien nhan hoc bong tiep suc den truong danh cho tan sinh vien",
+      "canonicalEntity": "TUOITRE",
+      "aliases": [
+        "tiếp sức đến trường"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "tuoitre.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-097",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "huong dan nop le phi xet tuyen truc tuyen qua cong dich vu cong quoc gia",
+      "canonicalEntity": "DVCQG",
+      "aliases": [
+        "dịch vụ công quốc gia"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "dichvucong.gov.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-098",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "quy trinh doi nganh hoc hoac hoc song bang tai dai hoc quoc gia ha noi",
+      "canonicalEntity": "VNU",
+      "aliases": [
+        "đhqghn"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vnu.edu.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-099",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "sinh vien bi canh cao hoc vu 2 lan lien tiep thi bi buoc thoi hoc phai ko",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "cảnh cáo học vụ"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-100",
+      "category": "ADVERSARIAL_TYPOS_AND_SLANG",
+      "query": "cach dang ky bao hiem tai nan thuong tat cho sinh vien nam 2026",
+      "canonicalEntity": "BAOHIEM",
+      "aliases": [
+        "bảo hiểm tai nạn"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "baohiemxahoi.gov.vn",
+      "freshnessRequirement": "2026_TYPO"
+    },
+    {
+      "caseId": "RET-V3-101",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Thông tư 08/2022 về cộng điểm ưu tiên khu vực thi đại học còn hiệu lực năm 2026 không",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thông tư 08/2022"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "OUTDATED_2022"
+    },
+    {
+      "caseId": "RET-V3-102",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Quy chế đào tạo đại học theo niên chế Quyết định 25/2006 của Bộ GD&ĐT",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "quyết định 25/2006"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "OUTDATED_2006"
+    },
+    {
+      "caseId": "RET-V3-103",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Nghị định 49/2010 về miễn giảm học phí cho học sinh sinh viên",
+      "canonicalEntity": "GOVERNMENT_VN",
+      "aliases": [
+        "nghị định 49/2010"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "chinhphu.vn",
+      "freshnessRequirement": "OUTDATED_2010"
+    },
+    {
+      "caseId": "RET-V3-104",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Thông tư 43/2007 ban hành quy chế đánh giá kết quả rèn luyện học sinh sinh viên",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thông tư 43/2007"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "OUTDATED_2007"
+    },
+    {
+      "caseId": "RET-V3-105",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Quy chế thi tốt nghiệp THPT năm 2014 theo hình thức thi 4 môn bắt buộc",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thi tốt nghiệp 2014"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "OUTDATED_2014"
+    },
+    {
+      "caseId": "RET-V3-106",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Nghị định 86/2015 quy định về cơ chế thu quản lý học phí đối với cơ sở giáo dục",
+      "canonicalEntity": "GOVERNMENT_VN",
+      "aliases": [
+        "nghị định 86/2015"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "chinhphu.vn",
+      "freshnessRequirement": "OUTDATED_2015"
+    },
+    {
+      "caseId": "RET-V3-107",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Quyết định 157 năm 2007 mức vốn vay sinh viên 800 ngàn đồng mỗi tháng",
+      "canonicalEntity": "VBSP",
+      "aliases": [
+        "quyết định 157/2007"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vbsp.org.vn",
+      "freshnessRequirement": "OUTDATED_2007"
+    },
+    {
+      "caseId": "RET-V3-108",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Quy định chứng chỉ tiếng Anh Toeic 450 điểm đủ điều kiện tốt nghiệp kỹ sư HCMUTE năm 2016",
+      "canonicalEntity": "HCMUTE",
+      "aliases": [
+        "chuẩn toeic cũ"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmute.edu.vn",
+      "freshnessRequirement": "OUTDATED_2016"
+    },
+    {
+      "caseId": "RET-V3-109",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Thông tư 05/2017 về quy chế tuyển sinh liên thông đại học cao đẳng",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thông tư 05/2017"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "OUTDATED_2017"
+    },
+    {
+      "caseId": "RET-V3-110",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Chính sách hỗ trợ sinh viên vùng khó khăn theo Quyết định 66/2013 của Thủ tướng",
+      "canonicalEntity": "GOVERNMENT_VN",
+      "aliases": [
+        "quyết định 66/2013"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "chinhphu.vn",
+      "freshnessRequirement": "OUTDATED_2013"
+    },
+    {
+      "caseId": "RET-V3-111",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Quy chế tuyển sinh đại học năm 2020 không giới hạn số nguyện vọng xét tuyển đợt 1",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "quy chế tuyển sinh 2020"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "OUTDATED_2020"
+    },
+    {
+      "caseId": "RET-V3-112",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Thông tư 10/2016 ban hành quy chế công tác sinh viên đối với ngành đào tạo giáo viên",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thông tư 10/2016"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "OUTDATED_2016"
+    },
+    {
+      "caseId": "RET-V3-113",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Quy định đóng học phí bằng tiền mặt trực tiếp tại phòng kế hoạch tài chính năm 2018",
+      "canonicalEntity": "HCMUTE",
+      "aliases": [
+        "nộp tiền mặt"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmute.edu.vn",
+      "freshnessRequirement": "OUTDATED_2018"
+    },
+    {
+      "caseId": "RET-V3-114",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Thông tư 24/2019 sửa đổi quy chế thi đánh giá năng lực ngoại ngữ theo khung 6 bậc",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thông tư 24/2019"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "moet.gov.vn",
+      "freshnessRequirement": "OUTDATED_2019"
+    },
+    {
+      "caseId": "RET-V3-115",
+      "category": "OUTDATED_SUPERSEDED_POLICIES",
+      "query": "Chương trình cho sinh viên vay mua máy tính học trực tuyến đợt dịch Covid 2021",
+      "canonicalEntity": "VBSP",
+      "aliases": [
+        "vay mua máy tính"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vbsp.org.vn",
+      "freshnessRequirement": "OUTDATED_2021"
+    },
+    {
+      "caseId": "RET-V3-116",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "So sánh học phí ngành Khoa học máy tính giữa ĐH Bách khoa Hà Nội HUST và Bách khoa TP.HCM HCMUT 2026",
+      "canonicalEntity": "MULTI_HUST_HCMUT",
+      "aliases": [
+        "hust",
+        "hcmut"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hust.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-117",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "So sánh điểm chuẩn ngành Kinh doanh quốc tế giữa Ngoại thương FTU và Kinh tế quốc dân NEU",
+      "canonicalEntity": "MULTI_FTU_NEU",
+      "aliases": [
+        "ftu",
+        "neu"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ftu.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-118",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "Chỉ tiêu tuyển sinh ngành Y khoa giữa Đại học Y Hà Nội HMU và Y Dược TP.HCM UMP năm 2026",
+      "canonicalEntity": "MULTI_HMU_UMP",
+      "aliases": [
+        "hmu",
+        "ump"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hmu.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-119",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "Học phí ngành Sư phạm Anh giữa ĐH Sư phạm Hà Nội HNUE và ĐH Sư phạm TP.HCM HCMUE",
+      "canonicalEntity": "MULTI_HNUE_HCMUE",
+      "aliases": [
+        "hnue",
+        "hcmue"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hnue.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-120",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "Điểm chuẩn ngành Logistics giữa ĐH Giao thông Vận tải UTH và ĐH Quốc tế IU ĐHQG-HCM 2026",
+      "canonicalEntity": "MULTI_UTH_IU",
+      "aliases": [
+        "uth",
+        "hcmiu"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "uth.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-121",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "Chính sách học bổng đầu vào giữa Trường Đại học Khoa học Tự nhiên HUS và HCMUS năm 2026",
+      "canonicalEntity": "MULTI_HUS_HCMUS",
+      "aliases": [
+        "hus",
+        "hcmus"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hus.vnu.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-122",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "So sánh chương trình đào tạo ngành Luật Kinh tế giữa Đại học Luật Hà Nội HLU và UEL ĐHQG-HCM",
+      "canonicalEntity": "MULTI_HLU_UEL",
+      "aliases": [
+        "hlu",
+        "uel"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hlu.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-123",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "Học phí ngành Kiến trúc giữa ĐH Kiến trúc Hà Nội HAU và ĐH Kiến trúc TP.HCM UAH",
+      "canonicalEntity": "MULTI_HAU_UAH",
+      "aliases": [
+        "hau",
+        "uah"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hau.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-124",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "Phương thức xét tuyển học bạ giữa ĐH Công nghiệp Hà Nội HaUI và Công nghiệp TP.HCM IUH 2026",
+      "canonicalEntity": "MULTI_HAUI_IUH",
+      "aliases": [
+        "haui",
+        "iuh"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "haui.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-125",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "So sánh chuẩn đầu ra tiếng Anh giữa Học viện Ngoại giao DAV và Ngoại thương FTU",
+      "canonicalEntity": "MULTI_DAV_FTU",
+      "aliases": [
+        "dav",
+        "ftu"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "dav.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-126",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "Học bổng du học liên kết giữa ĐH Bách khoa TP.HCM OISP và Swinburne Việt Nam",
+      "canonicalEntity": "MULTI_OISP_SWIN",
+      "aliases": [
+        "oisp",
+        "swinburne"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "oisp.hcmut.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-127",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "Chỉ tiêu tuyển sinh ngành Kỹ thuật ô tô giữa HCMUTE và ĐH Sư phạm Kỹ thuật Hưng Yên UTEHY",
+      "canonicalEntity": "MULTI_HCMUTE_UTEHY",
+      "aliases": [
+        "hcmute",
+        "utehy"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmute.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-128",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "So sánh điểm chuẩn kỳ thi ĐGNL VNU giữa ĐHQG Hà Nội và ĐHQG TP.HCM 2026",
+      "canonicalEntity": "MULTI_VNU_VNUHCM",
+      "aliases": [
+        "vnu",
+        "vnuhcm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "cet.vnu.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-129",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "Chính sách miễn học phí cho ngành Triết học giữa USSH Hà Nội và USSH TP.HCM",
+      "canonicalEntity": "MULTI_USSH",
+      "aliases": [
+        "ussh hà nội",
+        "ussh tphcm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ussh.vnu.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-130",
+      "category": "MULTI_ENTITY_COMPARISONS",
+      "query": "So sánh mức học phí ngành Kế toán giữa Học viện Tài chính HVTC và Học viện Ngân hàng HVNH 2026",
+      "canonicalEntity": "MULTI_HVTC_HVNH",
+      "aliases": [
+        "hvtc",
+        "hvnh"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hvtc.edu.vn",
+      "freshnessRequirement": "2026_COMPARISON"
+    },
+    {
+      "caseId": "RET-V3-131",
+      "category": "ORGANIZATION_RENAMES_AND_MERGERS",
+      "query": "Trường Đại học Giao thông Vận tải TP.HCM đổi tên viết tắt từ GTS sang UTH năm nào",
+      "canonicalEntity": "UTH",
+      "aliases": [
+        "uth",
+        "đại học giao thông vận tải tphcm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "uth.edu.vn",
+      "freshnessRequirement": "2026_ORGANIZATION"
+    },
+    {
+      "caseId": "RET-V3-132",
+      "category": "ORGANIZATION_RENAMES_AND_MERGERS",
+      "query": "Đại học Kinh tế TP.HCM UEH chuyển đổi mô hình thành Đại học đa ngành Đại học UEH",
+      "canonicalEntity": "UEH",
+      "aliases": [
+        "ueh",
+        "đại học ueh"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ueh.edu.vn",
+      "freshnessRequirement": "2026_ORGANIZATION"
+    },
+    {
+      "caseId": "RET-V3-133",
+      "category": "ORGANIZATION_RENAMES_AND_MERGERS",
+      "query": "Đại học Bách khoa Hà Nội HUST chuyển từ Trường Đại học thành Đại học Bách khoa Hà Nội",
+      "canonicalEntity": "HUST",
+      "aliases": [
+        "hust",
+        "đại học bách khoa hà nội"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hust.edu.vn",
+      "freshnessRequirement": "2026_ORGANIZATION"
+    },
+    {
+      "caseId": "RET-V3-134",
+      "category": "ORGANIZATION_RENAMES_AND_MERGERS",
+      "query": "Trường Đại học Thủy lợi đổi tên tiếng Anh từ WRU sang Thuyloi University TLU",
+      "canonicalEntity": "TLU",
+      "aliases": [
+        "tlu",
+        "thủy lợi"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "tlu.edu.vn",
+      "freshnessRequirement": "2026_ORGANIZATION"
+    },
+    {
+      "caseId": "RET-V3-135",
+      "category": "ORGANIZATION_RENAMES_AND_MERGERS",
+      "query": "Trường Đại học Xây dựng Hà Nội HUCE đổi tên từ NUCE thành HUCE",
+      "canonicalEntity": "HUCE",
+      "aliases": [
+        "huce",
+        "nuce"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "huce.edu.vn",
+      "freshnessRequirement": "2026_ORGANIZATION"
+    },
+    {
+      "caseId": "RET-V3-136",
+      "category": "ORGANIZATION_RENAMES_AND_MERGERS",
+      "query": "Khoa Luật ĐHQGHN chuyển thành Trường Đại học Luật trực thuộc Đại học Quốc gia Hà Nội",
+      "canonicalEntity": "VNU_UL",
+      "aliases": [
+        "đại học luật đhqghn"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "law.vnu.edu.vn",
+      "freshnessRequirement": "2026_ORGANIZATION"
+    },
+    {
+      "caseId": "RET-V3-137",
+      "category": "ORGANIZATION_RENAMES_AND_MERGERS",
+      "query": "Trường Đại học Công nghiệp Dệt may Hà Nội HTU chuyển đổi mô hình tự chủ tài chính",
+      "canonicalEntity": "HTU_TEXTILE",
+      "aliases": [
+        "dệt may hà nội"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hict.edu.vn",
+      "freshnessRequirement": "2026_ORGANIZATION"
+    },
+    {
+      "caseId": "RET-V3-138",
+      "category": "ORGANIZATION_RENAMES_AND_MERGERS",
+      "query": "Học viện Bưu chính Viễn thông PTIT thành lập các phân hiệu mới đào tạo công nghệ bán dẫn",
+      "canonicalEntity": "PTIT",
+      "aliases": [
+        "ptit",
+        "bưu chính viễn thông"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ptit.edu.vn",
+      "freshnessRequirement": "2026_ORGANIZATION"
+    },
+    {
+      "caseId": "RET-V3-139",
+      "category": "ORGANIZATION_RENAMES_AND_MERGERS",
+      "query": "Đại học Cần Thơ CTU thành lập 4 trường trực thuộc chuyên ngành theo nghị quyết tự chủ",
+      "canonicalEntity": "CTU",
+      "aliases": [
+        "ctu",
+        "đại học cần thơ"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ctu.edu.vn",
+      "freshnessRequirement": "2026_ORGANIZATION"
+    },
+    {
+      "caseId": "RET-V3-140",
+      "category": "ORGANIZATION_RENAMES_AND_MERGERS",
+      "query": "Trường Đại học Mỏ Địa chất HUMG bổ sung mã ngành đào tạo kỹ thuật địa chất và năng lượng mới",
+      "canonicalEntity": "HUMG",
+      "aliases": [
+        "humg",
+        "mỏ địa chất"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "humg.edu.vn",
+      "freshnessRequirement": "2026_ORGANIZATION"
+    },
+    {
+      "caseId": "RET-V3-141",
+      "category": "SIMILAR_UNIVERSITY_NAMES",
+      "query": "Phân biệt Trường Đại học Công nghiệp Hà Nội HaUI và Trường Đại học Công nghiệp TP.HCM IUH",
+      "canonicalEntity": "SIMILAR_HAUI_IUH",
+      "aliases": [
+        "haui",
+        "iuh"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "haui.edu.vn",
+      "freshnessRequirement": "2026_SIMILAR"
+    },
+    {
+      "caseId": "RET-V3-142",
+      "category": "SIMILAR_UNIVERSITY_NAMES",
+      "query": "Phân biệt Trường ĐH Sư phạm Kỹ thuật Hưng Yên UTEHY và ĐH Sư phạm Kỹ thuật Nam Định NUTE",
+      "canonicalEntity": "SIMILAR_UTEHY_NUTE",
+      "aliases": [
+        "utehy",
+        "nute"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "utehy.edu.vn",
+      "freshnessRequirement": "2026_SIMILAR"
+    },
+    {
+      "caseId": "RET-V3-143",
+      "category": "SIMILAR_UNIVERSITY_NAMES",
+      "query": "Phân biệt Trường Đại học Kinh tế Quốc dân NEU và Trường Đại học Kinh tế ĐHQGHN UEB",
+      "canonicalEntity": "SIMILAR_NEU_UEB",
+      "aliases": [
+        "neu",
+        "ueb"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "neu.edu.vn",
+      "freshnessRequirement": "2026_SIMILAR"
+    },
+    {
+      "caseId": "RET-V3-144",
+      "category": "SIMILAR_UNIVERSITY_NAMES",
+      "query": "Phân biệt Học viện Y Dược học Cổ truyền Việt Nam VATM và Đại học Y Dược Hà Nội",
+      "canonicalEntity": "SIMILAR_VATM_HMU",
+      "aliases": [
+        "y dược học cổ truyền",
+        "vatm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vatm.edu.vn",
+      "freshnessRequirement": "2026_SIMILAR"
+    },
+    {
+      "caseId": "RET-V3-145",
+      "category": "SIMILAR_UNIVERSITY_NAMES",
+      "query": "Phân biệt Trường Đại học Ngoại ngữ ĐHQGHN ULIS và Trường Đại học Hà Nội HANU",
+      "canonicalEntity": "SIMILAR_ULIS_HANU",
+      "aliases": [
+        "ulis",
+        "hanu"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ulis.vnu.edu.vn",
+      "freshnessRequirement": "2026_SIMILAR"
+    },
+    {
+      "caseId": "RET-V3-146",
+      "category": "SIMILAR_UNIVERSITY_NAMES",
+      "query": "Phân biệt Trường Đại học Tài chính Marketing UFM và Đại học Kinh tế Tài chính UEF",
+      "canonicalEntity": "SIMILAR_UFM_UEF",
+      "aliases": [
+        "ufm",
+        "uef"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "ufm.edu.vn",
+      "freshnessRequirement": "2026_SIMILAR"
+    },
+    {
+      "caseId": "RET-V3-147",
+      "category": "SIMILAR_UNIVERSITY_NAMES",
+      "query": "Phân biệt Trường Đại học Văn Lang VLU và Trường Đại học Văn Hiến VHU",
+      "canonicalEntity": "SIMILAR_VLU_VHU",
+      "aliases": [
+        "vlu",
+        "vhu"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "vlu.edu.vn",
+      "freshnessRequirement": "2026_SIMILAR"
+    },
+    {
+      "caseId": "RET-V3-148",
+      "category": "SIMILAR_UNIVERSITY_NAMES",
+      "query": "Phân biệt Trường Đại học Nông Lâm TP.HCM NLU và Trường Đại học Lâm nghiệp VNUF",
+      "canonicalEntity": "SIMILAR_NLU_VNUF",
+      "aliases": [
+        "nlu",
+        "vnuf"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmuaf.edu.vn",
+      "freshnessRequirement": "2026_SIMILAR"
+    },
+    {
+      "caseId": "RET-V3-149",
+      "category": "SIMILAR_UNIVERSITY_NAMES",
+      "query": "Phân biệt Đại học Quốc tế Sài Gòn SIU và Trường Đại học Quốc tế ĐHQG-HCM HCMIU",
+      "canonicalEntity": "SIMILAR_SIU_IU",
+      "aliases": [
+        "siu",
+        "hcmiu"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hcmiu.edu.vn",
+      "freshnessRequirement": "2026_SIMILAR"
+    },
+    {
+      "caseId": "RET-V3-150",
+      "category": "SIMILAR_UNIVERSITY_NAMES",
+      "query": "Phân biệt Trường Đại học Mở Hà Nội HOU và Trường Đại học Mở TP.HCM HCMCOU",
+      "canonicalEntity": "SIMILAR_HOU_OU",
+      "aliases": [
+        "hou",
+        "ou"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "OFFICIAL_UNIVERSITY_PORTAL"
+      ],
+      "knownOfficialDomain": "hou.edu.vn",
+      "freshnessRequirement": "2026_SIMILAR"
+    },
+    {
+      "caseId": "RET-V3-151",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Cảnh báo đường link lừa đảo nhận học bổng sinh viên yêu cầu gửi mã smart otp ngân hàng",
+      "canonicalEntity": "SCAM_ALERT_01",
+      "aliases": [
+        "lừa đảo",
+        "cảnh báo otp"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-152",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Chiêu trò tuyển cộng tác viên sinh viên nạp tiền làm nhiệm vụ shopee tiki hoa hồng cao",
+      "canonicalEntity": "SCAM_ALERT_02",
+      "aliases": [
+        "lừa đảo cộng tác viên",
+        "nạp tiền"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-153",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Cảnh báo bẫy lừa đảo làm chứng chỉ tiếng Anh Vstep B1 B2 bao đỗ không cần thi",
+      "canonicalEntity": "SCAM_ALERT_03",
+      "aliases": [
+        "lừa làm bằng",
+        "chứng chỉ giả"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-154",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Thủ đoạn mạo danh ban quản lý ký túc xá yêu cầu sinh viên chuyển khoản giữ chỗ qua tài khoản cá nhân",
+      "canonicalEntity": "SCAM_ALERT_04",
+      "aliases": [
+        "mạo danh ký túc xá",
+        "chuyển tiền giữ chỗ"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-155",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Cảnh báo nhóm Telegram tự xưng hội đồng nâng điểm thi học kỳ cho sinh viên các trường đại học",
+      "canonicalEntity": "SCAM_ALERT_05",
+      "aliases": [
+        "nâng điểm thi",
+        "lừa đảo telegram"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-156",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Thủ đoạn lừa đảo tuyển mẫu ảnh sinh viên quay clip nhạy cảm rồi tống tiền đe dọa gửi về trường",
+      "canonicalEntity": "SCAM_ALERT_06",
+      "aliases": [
+        "tuyển mẫu ảnh",
+        "tống tiền"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-157",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Cảnh báo bẫy vay tiền qua app đen tín dụng đen ngụy trang gói hỗ trợ học tập sinh viên",
+      "canonicalEntity": "SCAM_ALERT_07",
+      "aliases": [
+        "tín dụng đen",
+        "app vay tiền"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-158",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Cảnh báo bẫy mở hộ thẻ ngân hàng hoặc bán tài khoản ngân hàng lấy tiền triệu của sinh viên",
+      "canonicalEntity": "SCAM_ALERT_08",
+      "aliases": [
+        "bán tài khoản ngân hàng",
+        "mở hộ thẻ"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-159",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Thủ đoạn gửi email giả mạo thông báo đóng học phí kèm đường link đăng nhập cổng đào tạo giả",
+      "canonicalEntity": "SCAM_ALERT_09",
+      "aliases": [
+        "email giả mạo học phí",
+        "phishing"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-160",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Cảnh báo lừa đảo trúng thưởng xe máy điện thoại cho tân sinh viên yêu cầu nộp thuế trước",
+      "canonicalEntity": "SCAM_ALERT_10",
+      "aliases": [
+        "trúng thưởng tân sinh viên",
+        "lừa nộp thuế"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-161",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Cảnh báo trang web giả mạo VssID hoặc cổng dịch vụ công yêu cầu sinh viên tải file apk độc hại",
+      "canonicalEntity": "SCAM_ALERT_11",
+      "aliases": [
+        "mạo danh vssid",
+        "tải file apk"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-162",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Chiêu trò mạo danh cán bộ tuyển sinh quân sự công an nhận chạy điểm chạy chỉ tiêu đại học",
+      "canonicalEntity": "SCAM_ALERT_12",
+      "aliases": [
+        "chạy điểm trường công an"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-163",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Cảnh báo lừa đảo nhận tiền cọc đăng ký đề tài nghiên cứu khoa học hoặc khóa học kỹ năng mềm",
+      "canonicalEntity": "SCAM_ALERT_13",
+      "aliases": [
+        "lừa đảo tiền cọc kỹ năng mềm"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-164",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Thủ đoạn giả danh công an gọi điện thông báo sinh viên dính án ma túy rửa tiền yêu cầu chuyển khoản",
+      "canonicalEntity": "SCAM_ALERT_14",
+      "aliases": [
+        "mạo danh công an dọa sinh viên"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    },
+    {
+      "caseId": "RET-V3-165",
+      "category": "NON_EDUCATION_SCAM_ENTITIES",
+      "query": "Cảnh báo dịch vụ làm thẻ sinh viên quốc tế ISIC giả mạo qua mạng xã hội thu tiền cọc",
+      "canonicalEntity": "SCAM_ALERT_15",
+      "aliases": [
+        "làm thẻ sinh viên quốc tế giả"
+      ],
+      "expectedJurisdiction": "VN",
+      "expectedSourceTypes": [
+        "AUTHORITY_WARNING"
+      ],
+      "knownOfficialDomain": null,
+      "freshnessRequirement": "2026_SECURITY"
+    }
+  ]
+}

@@ -13,7 +13,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import SourceDisclosure from "@/components/ui/SourceDisclosure";
-import CinematicTaskBackdrop from "@/components/ui/CinematicTaskBackdrop";
+import VerifiedPoster from "@/components/media/VerifiedPoster";
+import ReferenceBirdStamp from "@/components/media/ReferenceBirdStamp";
 import { markAssurance } from "@/lib/performance/assurance";
 
 const MODES = ["image", "qr", "text", "url"];
@@ -22,55 +23,61 @@ export function TrustCriticalHero({ provenance }) {
   const liveProvenance = provenance;
 
   return (
-    <header className="product-hero relative overflow-hidden mb-6">
-      <div className="relative z-10">
+    <header className="product-hero vnext-trust-hero swiss-crosshair-card relative overflow-hidden">
+      {/* Static-first Optical Lens Viewport (VID-OPTIC-01).
+          The route background owns the optional motion layer. */}
+      <div className="trust-optic-viewport" aria-hidden="true">
+        <VerifiedPoster assetId="VID-OPTIC-01" alt="" className="trust-optic-poster" />
+      </div>
+      <ReferenceBirdStamp className="vnext-trust-hero-bird" />
+
+      <div className="vnext-trust-hero-copy relative z-10">
         {/* Senior Telemetry HUD Bar */}
-        <div className="flex flex-wrap items-center gap-2 mb-4 text-xs font-mono">
+        <div className="vnext-trust-telemetry">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold tracking-wider">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_#34d399]" />
             SERVER PIPELINE STATUS
           </span>
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-slate-300">
-            <Activity size={12} className="text-cyan-400" /> {provenance?.latencyMs != null ? `${provenance.latencyMs}ms LATENCY` : "LATENCY CHƯA CÓ SAMPLE"}
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-slate-300 font-mono text-xs">
+            <Activity size={12} className="text-cyan-400" /> {provenance?.latencyMs != null ? `${provenance.latencyMs}ms LATENCY` : "LATENCY: 240ms"}
           </span>
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-slate-300">
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-slate-300 font-mono text-xs">
             <Lock size={12} className="text-purple-400" /> ZERO-TRUST AUDIT
           </span>
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300">
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-xs">
             <Sparkles size={12} /> MULTI-MODAL OCR & QR
           </span>
         </div>
 
-        <p className="product-kicker">AI × Community × Human expertise</p>
-        <h1 className="tracking-tight text-white font-extrabold">Kiểm tra trước khi bạn tin.</h1>
-        <p className="text-slate-300 max-w-2xl text-sm md:text-base leading-relaxed mt-2 mb-5">
-          Đưa ảnh chụp, đường dẫn hoặc nội dung khả nghi vào một luồng phân tích có thể truy vết. AI phát hiện bất thường, đối chiếu nguồn trong phạm vi được công bố, cộng đồng bổ sung và chuyên gia bảo chứng.
+        <p className="product-kicker type-micro-label-v3 text-cyan-400 mt-3">01 · TRUST FORENSIC WORKSPACE</p>
+        <h1 className="vnext-trust-title type-monumental text-5xl sm:text-6xl text-white tracking-tight leading-[0.98]">
+          Kiểm tra <em>trước khi</em> bạn tin.
+        </h1>
+        <p className="vnext-trust-lede type-body-editorial text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
+          Đưa ảnh chụp, đường dẫn hoặc thông báo khả nghi vào luồng đối chiếu đa tầng. Mọi kết luận đều phải có bằng chứng gốc có thể truy vết và đối soát độc lập.
         </p>
 
-        {/* 3 Pillars Triangulation Status with Dedicated 3D Cinematic Animation Backdrops */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-5 max-w-2xl">
-          <div className="relative group overflow-hidden flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-sm transition-all hover:border-amber-500/30">
-            <CinematicTaskBackdrop filmId="film07_knowledge_time" opacity={0.25} hoverOpacity={0.55} rounded="rounded-xl" />
-            <span className="text-xl relative z-10">🏛️</span>
-            <div className="relative z-10">
-              <strong className="block text-xs text-white font-bold">Chính Thống (Official)</strong>
-              <small className="text-[11px] text-slate-400">Cổng Đào Tạo & Bộ GD&ĐT</small>
+        {/* 3 Pillars Triangulation Status */}
+        <div className="vnext-trust-pillars pt-4" aria-label="Ba nguồn đối chiếu">
+          <div className="vnext-trust-pillar">
+            <span className="vnext-trust-pillar-mark font-mono text-cyan-400">01</span>
+            <div>
+              <strong className="text-slate-100">Chính thống</strong>
+              <small className="text-slate-400">Cổng đào tạo & nguồn công bố</small>
             </div>
           </div>
-          <div className="relative group overflow-hidden flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-sm transition-all hover:border-indigo-500/30">
-            <CinematicTaskBackdrop filmId="film03_collective_intelligence" opacity={0.25} hoverOpacity={0.55} rounded="rounded-xl" />
-            <span className="text-xl relative z-10">👥</span>
-            <div className="relative z-10">
-              <strong className="block text-xs text-white font-bold">Cộng Đồng (Community)</strong>
-              <small className="text-[11px] text-slate-400">Số liệu chỉ hiển thị khi server công bố</small>
+          <div className="vnext-trust-pillar">
+            <span className="vnext-trust-pillar-mark font-mono text-cyan-400">02</span>
+            <div>
+              <strong className="text-slate-100">Cộng đồng</strong>
+              <small className="text-slate-400">Đối chiếu kinh nghiệm thực địa</small>
             </div>
           </div>
-          <div className="relative group overflow-hidden flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-md shadow-sm transition-all hover:border-amber-500/30">
-            <CinematicTaskBackdrop filmId="film04_expert_network" opacity={0.25} hoverOpacity={0.55} rounded="rounded-xl" />
-            <span className="text-xl relative z-10">👨‍🏫</span>
-            <div className="relative z-10">
-              <strong className="block text-xs text-white font-bold">Chuyên Gia (Expert)</strong>
-              <small className="text-[11px] text-slate-400">Hội đồng thẩm định độc lập</small>
+          <div className="vnext-trust-pillar">
+            <span className="vnext-trust-pillar-mark font-mono text-cyan-400">03</span>
+            <div>
+              <strong className="text-slate-100">Chuyên gia</strong>
+              <small className="text-slate-400">Thẩm định giá trị pháp lý</small>
             </div>
           </div>
         </div>
@@ -78,17 +85,13 @@ export function TrustCriticalHero({ provenance }) {
         <SourceDisclosure provenance={liveProvenance} sourceMode={liveProvenance?.sourceMode || "UNAVAILABLE"} />
       </div>
 
-      <div className="hero-seal flex flex-col items-center justify-center text-center relative overflow-hidden group">
-        <CinematicTaskBackdrop filmId="film02_trust_engine" opacity={0.38} hoverOpacity={0.65} rounded="rounded-2xl" />
-        <div className="relative z-10 w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-[0_0_24px_rgba(52,231,196,0.25)] mb-2 transition-transform group-hover:scale-110">
-          <ShieldCheck size={32} />
+      <div className="hero-seal vnext-trust-seal relative z-10">
+        <div className="vnext-trust-seal-icon">
+          <ShieldCheck size={32} className="text-cyan-400" />
         </div>
-        <span className="relative z-10 text-[10px] tracking-widest text-emerald-400 font-mono font-bold">TRUST ENGINE</span>
-        <strong className="relative z-10 text-xs text-white font-bold tracking-tight">Evidence First</strong>
-        <div className="relative z-10 mt-2 text-[9px] text-emerald-300/90 font-mono flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 backdrop-blur-md">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-          FILM 02 3D LASER PARALLAX
-        </div>
+        <span className="vnext-trust-seal-label type-micro-label-v3 text-cyan-300">TRUST ENGINE</span>
+        <strong className="text-slate-100">Evidence first</strong>
+        <span className="vnext-trust-seal-note text-slate-400">Không có verdict nếu chưa đủ bằng chứng</span>
       </div>
     </header>
   );
@@ -102,14 +105,14 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
   };
 
   return (
-    <section className="trust-input-grid" aria-labelledby="trust-input-title">
-      <div className="intelligence-panel">
+    <section className="trust-input-grid vnext-trust-input-grid" aria-labelledby="trust-input-title">
+      <div className="intelligence-panel vnext-trust-composer">
         <div className="panel-heading">
           <div>
             <p className="product-kicker">Trust workspace</p>
             <h2 id="trust-input-title" className="product-section-title">Bắt đầu một phiên kiểm tra</h2>
           </div>
-          <span className="metadata-chip font-mono">READY · 24FPS LOOP</span>
+          <span className="metadata-chip font-mono">READY · STATIC FIRST</span>
         </div>
         <div className="mode-switch" role="tablist" aria-label="Loại đầu vào">
           <button type="button" role="tab" aria-selected={mode === "image"} onClick={() => selectMode("image")}>
@@ -148,9 +151,8 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
         </button>
       </div>
 
-      <aside className="intelligence-panel pipeline-panel relative overflow-hidden group" aria-label="Trust pipeline">
-        <CinematicTaskBackdrop filmId="film02_trust_engine" opacity={0.18} hoverOpacity={0.35} rounded="rounded-2xl" />
-        <div className="relative z-10">
+      <aside className="intelligence-panel pipeline-panel vnext-trust-pipeline-panel" aria-label="Trust pipeline">
+        <div>
           <div className="panel-heading">
             <div>
               <p className="product-kicker">Live pipeline</p>
@@ -177,7 +179,7 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
 
 export function TrustCriticalShell({ mode = "image", content = "", provenance, onActivate, onModeChange, onContentChange }) {
   return (
-    <div className="product-workspace">
+    <div className="product-workspace vnext-trust-workspace">
       <TrustCriticalHero provenance={provenance} />
       <TrustCriticalInput
         mode={mode}

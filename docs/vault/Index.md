@@ -103,6 +103,7 @@ graph TD
 - [[Architecture-Decisions-ADR|Architecture Decisions (ADR)]]: Ghi lại các quyết định kỹ thuật quan trọng.
 
 ### 6. External Reference Synthesis
+- [Đề án sản phẩm và năng lực dự thi — 08/09/2026](../frontend/national-experience-2026-09-08/README.md) · [Handoff Thiết Kế VNext “Khai Minh”](../frontend/national-experience-2026-09-08/DESIGN-HANDOFF.md): Đề án sản phẩm, đặc tả full-stack, kế hoạch loại bỏ khoá học và tài liệu handoff thiết kế chi tiết (70/20/10, typography, tokens, surfaces, states, accessibility WCAG AAA, verified with Playwright tests).
 - [StudentHub AI release assurance report](../reports/STUDENTHUB-AI-RELEASE-ASSURANCE-REPORT.md): Final candidate-bound gate matrix, fresh browser/Lighthouse evidence, fixes, blockers, and release decision.
 - [Frontend performance verification](../frontend/PERFORMANCE.md): Current production bundle, CSS, font, Lighthouse, and interaction evidence.
 - [Core system implementation report](../reports/CORE-SYSTEM-IMPLEMENTATION-2026-09-06.md): Master prompt implementation evidence, verification gates, and remaining external blockers.

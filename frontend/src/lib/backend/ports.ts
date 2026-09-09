@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ApiError, type ApiErrorCode, type SafeFrontendError } from "../api/errors";
+import { ApiError, type ApiErrorCode, type SafeFrontendError } from "../api/errors.ts";
 import {
   createStateEnvelope,
   sourceProvenanceSchema,
@@ -12,7 +12,7 @@ import {
   type UnavailableDependency,
   type UIState,
   type UIStateEnvelope,
-} from "../ui-state/model";
+} from "../ui-state/model.ts";
 
 export const PROVIDER_MODE_VALUES = ["DEMO", "LIVE"] as const;
 export type ProviderMode = typeof PROVIDER_MODE_VALUES[number];
@@ -43,7 +43,7 @@ const nullableTimestampSchema = z.string().datetime().nullable();
 
 export const caseScopeSchema = z.object({
   caseId: identifierSchema,
-  caseRevision: z.number().int().nonnegative(),
+  caseRevision: z.number().int().positive(),
 }).strict();
 export type CaseScope = z.infer<typeof caseScopeSchema>;
 
@@ -323,7 +323,7 @@ export const trustCrossPillarLinkSchema = z.object({
 export const trustInvestigationResultSchema = z.object({
   contractVersion: z.string().trim().min(1).max(80),
   caseId: identifierSchema.nullable(),
-  caseRevision: z.number().int().nonnegative().nullable(),
+  caseRevision: z.number().int().positive().nullable(),
   runId: identifierSchema,
   generatedAt: nullableTimestampSchema,
   decision: z.object({
@@ -395,6 +395,9 @@ export const communityObservationSchema = z.object({
   evidence: z.array(communityEvidenceSchema).max(50).optional(),
   freshnessStatus: z.string().trim().min(1).max(80).nullable(),
   moderationStatus: z.string().trim().min(1).max(80).nullable(),
+  evidenceState: z.string().trim().min(1).max(80).nullable().optional(),
+  reviewState: z.string().trim().min(1).max(80).nullable().optional(),
+  contributionType: z.string().trim().min(1).max(80).nullable().optional(),
 }).strict();
 export type CommunityObservation = z.infer<typeof communityObservationSchema>;
 
@@ -404,6 +407,9 @@ export const communityObservationCommandSchema = z.object({
   scope: caseScopeSchema,
   statement: boundedTextSchema,
   evidenceRefs: z.array(referenceSchema).max(50),
+  claimId: identifierSchema.optional(),
+  contributionType: z.string().trim().min(1).max(80).optional(),
+  source: z.record(z.string(), z.unknown()).optional(),
   requestId: identifierSchema,
   idempotencyKey: identifierSchema,
 }).strict();

@@ -160,6 +160,22 @@ export class FileDetector {
       }
     }
 
+    // Inspect the bounded prefix for active-content/polyglot markers. A valid
+    // container signature does not make an appended script safe.
+    const prefix = Buffer.from(uint8.slice(0, LAYER_1_CONFIG.LIMITS.MAGIC_BYTES_INSPECT_LENGTH)).toString("latin1");
+    if (/^#!\/|<script\b|<svg\b|javascript\s*:|on\w+\s*=/i.test(prefix)) {
+      signals.push(
+        createSignal({
+          type: /^#!\//.test(prefix) ? LAYER_1_REASONS.MALICIOUS_SHELL_PAYLOAD : LAYER_1_REASONS.MALWARE_PATTERN,
+          category: "file",
+          severity: SIGNAL_SEVERITY.CRITICAL,
+          confidence: 0.98,
+          evidence: { fileName, details: "Active-content marker found in bounded file prefix" },
+          source: "FileDetector",
+        })
+      );
+    }
+
     return { signals, detectedType };
   }
 }

@@ -223,7 +223,7 @@ test("▶ [MUTANT-08] FraudRiskEngine: Remove Userinfo Attack Detection", async 
 test("▶ [MUTANT-09] FraudRiskEngine: Disable Unaccented OTP Detection", async () => {
   const originalCode = fs.readFileSync(FRAUD_ENGINE_SRC, "utf-8");
   const mutatedCode = originalCode.replace(
-    '/(?:gửi|gui|nhập|nhap|cung cấp|cung cap|forward|chuyển tiếp|chuyen tiep|chia sẻ|chia se|đọc|doc|nhắn|nhan)\\s*(?:lại\\s*)?(?:mã|ma)?\\s*(?:smart\\s*)?otp/i,',
+    '/(?:gửi|gui|nhập|nhap|cung cấp|cung cap|forward|chuyển tiếp|chuyen tiep|chia sẻ|chia se|đọc|doc|nhắn|nhan)[\\s\\S]{0,50}(?:mã|ma)?\\s*(?:smart\\s*)?otp/i,',
     '/(?:gửi|nhập|cung cấp)\\s*mã\\s*otp/i,'
   );
 

@@ -1,0 +1,3998 @@
+{
+  "holdoutVersion": "AI_CHALLENGE_HOLDOUT_V3",
+  "count": 220,
+  "cases": [
+    {
+      "caseId": "AI-V3-001",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-002",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-003",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-004",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-005",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 5",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-006",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-007",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-008",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-009",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-010",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-011",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-012",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-013",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 13",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-014",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-015",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-016",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-017",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-018",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-019",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-020",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-021",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 21",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-022",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-023",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-024",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-025",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-026",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-027",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-028",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-029",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 29",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-030",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-031",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-032",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-033",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-034",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-035",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-036",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-037",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 37",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-038",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-039",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-040",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-041",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-042",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-043",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-044",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-045",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 45",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-046",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-047",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-048",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-049",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-050",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-051",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-052",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-053",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 53",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-054",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-055",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-056",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-057",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-058",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-059",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-060",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-061",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 61",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-062",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-063",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-064",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-065",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-066",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-067",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-068",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-069",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 69",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-070",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-071",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-072",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-073",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-074",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-075",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-076",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-077",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 77",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-078",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-079",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-080",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-081",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-082",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-083",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-084",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-085",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 85",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-086",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-087",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-088",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-089",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-090",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-091",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-092",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-093",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 93",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-094",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-095",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-096",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-097",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-098",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-099",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-100",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-101",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 101",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-102",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-103",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-104",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-105",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-106",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-107",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-108",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-109",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 109",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-110",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-111",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-112",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-113",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-114",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-115",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-116",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-117",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 117",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-118",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-119",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-120",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-121",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-122",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-123",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-124",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-125",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 125",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-126",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-127",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-128",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-129",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-130",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-131",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-132",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-133",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 133",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-134",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-135",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-136",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-137",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-138",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-139",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-140",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-141",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 141",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-142",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-143",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-144",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-145",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-146",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-147",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-148",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-149",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 149",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-150",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-151",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-152",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-153",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-154",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-155",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-156",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-157",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 157",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-158",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-159",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-160",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-161",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-162",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-163",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-164",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-165",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 165",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-166",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-167",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-168",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-169",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-170",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-171",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-172",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-173",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 173",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-174",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-175",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-176",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-177",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-178",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-179",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-180",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-181",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 181",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-182",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-183",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-184",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-185",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-186",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-187",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-188",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-189",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 189",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-190",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-191",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-192",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-193",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-194",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-195",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-196",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-197",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 197",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-198",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-199",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-200",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-201",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-202",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-203",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-204",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-205",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 205",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-206",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-207",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-208",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-209",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-210",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-211",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-212",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-213",
+      "claim": "Yêu cầu tân sinh viên gửi mã OTP ngân hàng hoặc chuyển khoản đặt cọc giữ chỗ phòng trọ vào tài khoản cá nhân Nguyễn Văn 213",
+      "hardCategory": "NOVEL_SUBTLE_SCAM",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cảnh báo lừa đảo tân sinh viên của Bộ Công an",
+          "domain": "canhsat.gov.vn",
+          "url": "https://canhsat.gov.vn/canh-bao-lua-dao",
+          "snippet": "Cảnh báo thủ đoạn lừa đảo chiếm đoạt tài sản: Tuyệt đối không cung cấp mã OTP ngân hàng hoặc chuyển tiền vào tài khoản cá nhân.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-214",
+      "claim": "Sinh viên nộp học phí học kỳ 1 năm học 2025-2026 qua tài khoản chuyên thu của Trường Đại học Bách khoa Hà Nội tại Vietcombank",
+      "hardCategory": "BENIGN_LEGITIMATE_TRANSACTION",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Thông báo nộp học phí kỳ 1 Đại học Bách khoa Hà Nội",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/hoc-phi",
+          "snippet": "Nhà trường thông báo hướng dẫn sinh viên nộp học phí học kỳ 1 qua tài khoản chuyên thu chính thức tại Ngân hàng TMCP Ngoại thương Việt Nam Vietcombank.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-215",
+      "claim": "ĐHNN thông báo dời lịch thi kết thúc học phần sang đầu tháng 7 năm 2026",
+      "hardCategory": "AMBIGUOUS_ABBREVIATION_DISAGREEMENT",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": true,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin ĐHNN",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/thong-bao",
+          "snippet": "ĐHNN thông báo kế hoạch học tập năm 2026 được điều chỉnh cho sinh viên chính quy.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-216",
+      "claim": "Bộ Giáo dục và Đào tạo công bố quy chế thi tốt nghiệp THPT năm 2026 gồm 4 môn thi",
+      "hardCategory": "STANDARD_VERIFIED_NOTICE",
+      "expectedVerdict": "SUPPORTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Quyết định phương án thi tốt nghiệp THPT 2026 - Bộ GD&ĐT",
+          "domain": "moet.gov.vn",
+          "url": "https://moet.gov.vn/quy-che-thi-2026",
+          "snippet": "Bộ Giáo dục và Đào tạo chính thức ban hành phương án thi tốt nghiệp THPT từ năm 2025-2026 gồm 2 môn bắt buộc Toán, Văn và 2 môn tự chọn.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-217",
+      "claim": "Nhà trường ra thông báo phạt 5 triệu đồng đối với sinh viên không tham gia hoạt động ngoại khóa bắt buộc",
+      "hardCategory": "CONFLICTED_EVIDENCE",
+      "expectedVerdict": "CONFLICTED_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Fanpage sinh viên lan truyền thông báo xử phạt",
+          "domain": "facebook.com",
+          "url": "https://facebook.com/group/post-1",
+          "snippet": "Nhà trường ra thông báo phạt tiền 5 triệu đồng đối với sinh viên vắng mặt.",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Phòng Công tác Sinh viên đính chính",
+          "domain": "hust.edu.vn",
+          "url": "https://hust.edu.vn/dinh-chinh",
+          "snippet": "Nhà trường bác bỏ thông tin xử phạt tiền. Đây là văn bản giả mạo.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-218",
+      "claim": "Trường đại học X chuẩn bị mở thêm phân hiệu đào tạo tại thành phố Đà Lạt năm 2027",
+      "hardCategory": "MISSING_EVIDENCE_ABSTENTION",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": []
+    },
+    {
+      "caseId": "AI-V3-219",
+      "claim": "Mức học phí đại học công lập năm học 2025-2026 áp dụng mức thu 9.8 triệu đồng/năm theo Nghị định 86/2015",
+      "hardCategory": "STALE_SUPERSEDED_POLICY",
+      "expectedVerdict": "CONTRADICTED",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Cổng thông tin Chính phủ ban hành Nghị định 97/2023",
+          "domain": "chinhphu.vn",
+          "url": "https://chinhphu.vn/nghi-dinh-97",
+          "snippet": "Nghị định 97/2023/NĐ-CP sửa đổi bổ sung Nghị định 81/2021 quy định khung học phí mới từ năm học 2023-2024 đến năm 2026-2027. Mức thu 9.8 triệu theo Nghị định 86 đã hết hiệu lực thi hành.",
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "caseId": "AI-V3-220",
+      "claim": "Tin đồn lan truyền trên mạng rằng tất cả sinh viên đều bị buộc thôi học nếu điểm rèn luyện dưới 50",
+      "hardCategory": "SYNDICATED_CONSENSUS_TRAP",
+      "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+      "expectedHasDisagreement": false,
+      "evidenceFixtures": [
+        {
+          "sourceId": "s1",
+          "title": "Blog tin tức sinh viên",
+          "domain": "tintucsv.net",
+          "url": "https://tintucsv.net/tin-1",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        },
+        {
+          "sourceId": "s2",
+          "title": "Diễn đàn giới trẻ",
+          "domain": "gioitre24h.vn",
+          "url": "https://gioitre24h.vn/tin-2",
+          "snippet": "Theo mạng xã hội chia sẻ, sinh viên điểm rèn luyện dưới 50 sẽ bị buộc thôi học.",
+          "claimedOrigin": "facebook.com",
+          "isPrimary": false
+        }
+      ]
+    }
+  ]
+}

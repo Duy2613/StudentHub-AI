@@ -5,11 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
-  BookOpen,
-  BrainCircuit,
-  ChevronDown,
-  Compass,
-  FolderKanban,
   LayoutDashboard,
   Menu,
   Search,
@@ -26,20 +21,13 @@ const AcademicCommandPalette = dynamic(() => import("../command/AcademicCommandP
 });
 
 export const PRIMARY_NAV_ITEMS = [
-  { id: "home", label: "Home", href: "/", icon: null },
-  { id: "trust", label: "Trust", href: "/trust", icon: ShieldCheck },
-  { id: "community", label: "Community", href: "/community", icon: Users },
-  { id: "expert", label: "Experts", href: "/expert", icon: UserRoundCheck },
+  { id: "home", label: "Trang chủ", href: "/", icon: null },
+  { id: "trust", label: "Kiểm chứng", href: "/trust", icon: ShieldCheck },
+  { id: "community", label: "Cộng đồng", href: "/community", icon: Users },
+  { id: "expert", label: "Chuyên gia", href: "/expert", icon: UserRoundCheck },
 ];
 
-export const LEARNING_NAV_ITEMS = [
-  { id: "learn", label: "Learn", href: "/learn", icon: BookOpen },
-  { id: "roadmap", label: "Roadmap", href: "/roadmap", icon: Compass },
-  { id: "practice", label: "Practice", href: "/practice", icon: BrainCircuit },
-  { id: "projects", label: "Projects", href: "/projects", icon: FolderKanban },
-];
-
-export const ALL_NAV_ITEMS = [...PRIMARY_NAV_ITEMS, ...LEARNING_NAV_ITEMS];
+export const ALL_NAV_ITEMS = [...PRIMARY_NAV_ITEMS];
 
 export default function AcademicNavbar() {
   const pathname = usePathname();
@@ -91,8 +79,6 @@ export default function AcademicNavbar() {
     if (href === "/") return pathname === "/";
     return pathname === href || pathname.startsWith(`${href}/`);
   };
-  const learningActive = LEARNING_NAV_ITEMS.some((item) => isActive(item.href));
-
   const renderNavLink = (item, { mobile = false } = {}) => {
     const Icon = item.icon;
     const active = isActive(item.href);
@@ -116,7 +102,7 @@ export default function AcademicNavbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-border-subtle bg-bg-primary/90 backdrop-blur-md transition-colors">
+      <header className="reference-landing-navbar sticky top-0 z-10 w-full border-b border-border-subtle bg-bg-primary/90 backdrop-blur-md transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           {/* Brand Logo */}
           <div className="flex items-center gap-4">
@@ -135,7 +121,7 @@ export default function AcademicNavbar() {
               className="flex items-center gap-2.5 text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-primary rounded-lg p-1"
               aria-label="StudentHub AI Trang chủ"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+              <div className="reference-brand-mark w-8 h-8 rounded-lg flex items-center justify-center text-white shadow-md">
                 <ShieldCheck size={18} />
               </div>
               <span className="font-semibold text-lg tracking-tight">
@@ -147,22 +133,6 @@ export default function AcademicNavbar() {
           {/* Desktop Primary Navigation Links */}
           <nav className="hidden lg:flex items-center gap-1 xl:gap-2" aria-label="Điều hướng chính">
             {PRIMARY_NAV_ITEMS.map((item) => renderNavLink(item))}
-            <details className="relative group">
-              <summary
-                className={`flex cursor-pointer list-none items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors [&::-webkit-details-marker]:hidden ${
-                  learningActive
-                    ? "text-text-primary bg-surface-primary border border-border-strong shadow-sm"
-                    : "text-text-secondary hover:text-text-primary hover:bg-surface-primary/50"
-                } focus:outline-none focus:ring-2 focus:ring-accent-primary`}
-              >
-                <BookOpen size={15} aria-hidden="true" />
-                <span>Học tập</span>
-                <ChevronDown size={14} className="transition-transform group-open:rotate-180" aria-hidden="true" />
-              </summary>
-              <div className="absolute left-0 top-full z-50 mt-2 grid min-w-48 gap-1 rounded-xl border border-border-subtle bg-bg-primary/95 p-2 shadow-xl backdrop-blur-xl">
-                {LEARNING_NAV_ITEMS.map((item) => renderNavLink(item))}
-              </div>
-            </details>
           </nav>
 
           {/* Right Action Controls */}
@@ -237,13 +207,6 @@ export default function AcademicNavbar() {
                 {PRIMARY_NAV_ITEMS.map((item) => {
                   return renderNavLink(item, { mobile: true });
                 })}
-              </div>
-
-              <div className="space-y-1 border-t border-border-subtle pt-4">
-                <div className="text-xs font-mono uppercase tracking-wider text-text-muted px-3 mb-2">
-                  Học tập & thực hành
-                </div>
-                {LEARNING_NAV_ITEMS.map((item) => renderNavLink(item, { mobile: true }))}
               </div>
 
               <div className="pt-4 border-t border-border-subtle space-y-1">

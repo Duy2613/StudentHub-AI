@@ -16,6 +16,8 @@ function toDto(row) {
     trustVoteCount: Number(row.trust_votes || 0),
     distrustVoteCount: Number(row.distrust_votes || 0),
     likeCount: Number(row.like_count || 0),
+    rankingPolicyVersion: "legacy-forum-v0",
+    trustMutation: false,
     createdAt: new Date(row.created_at).toISOString(),
   };
 }

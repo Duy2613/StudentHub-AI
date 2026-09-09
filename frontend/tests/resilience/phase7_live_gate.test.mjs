@@ -6,11 +6,15 @@ import { ProviderGateway, PROVIDER_CAPABILITY } from "../../src/lib/server/provi
 import { TokenValidator } from "../../src/lib/security/identity/TokenValidator.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
+const liveGate = {
+  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
+};
+
 after(async () => {
-  await getPostgresPool().end();
+  if (process.env.DATABASE_URL) await getPostgresPool().end();
 });
 
-test("PHASE 7 LIVE GATE: Platform Resilience, Controlled Failure, and Recovery Matrix", async () => {
+test("PHASE 7 LIVE GATE: Platform Resilience, Controlled Failure, and Recovery Matrix", liveGate, async () => {
   const pool = getPostgresPool();
 
   // 1. Live DB Health Probe

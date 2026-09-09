@@ -1,0 +1,550 @@
+{
+  "timestamp": "2026-09-09T10:18:00.321Z",
+  "expectedCount": 58,
+  "verifiedCount": 40,
+  "missingCount": 15,
+  "missingTables": [
+    {
+      "type": "TABLE",
+      "name": "private.realtime_events",
+      "migration": "202609070001_realtime_event_log.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "public.community_source_clusters",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "public.community_contributions",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "public.community_contribution_revisions",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "private.community_file_objects",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "public.community_reactions",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "private.community_reaction_events",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "private.expert_assignments",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "private.expert_practice_submissions",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "private.expert_practice_decisions",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "private.expert_quality_events",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "private.expert_review_decisions",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "public.case_appeals",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "private.case_appeal_reviews",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "public.case_corrections",
+      "migration": "202609090001_community_expert_promax.sql"
+    }
+  ],
+  "extraTables": [],
+  "detailedReport": [
+    {
+      "object": "public.institutions",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.profiles",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.roles",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": false,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.user_roles",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.server_sessions",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.audit_events",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.posts",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.comments",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.votes",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.trust_cases",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.case_inputs",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.entities",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.case_entities",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.evidence",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.claims",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.claim_sources",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.expert_profiles",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.expert_domains",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.expert_verifications",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.expert_assessments",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.reputation_events",
+      "type": "TABLE",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.handle_new_user_v2",
+      "type": "FUNCTION",
+      "migration": "202608270001_v2_authority_foundation.sql",
+      "exists": true,
+      "rlsEnabled": "N/A",
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.evidence_passports",
+      "type": "TABLE",
+      "migration": "202608290001_feature_freeze_cross_system.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.evidence_passport_events",
+      "type": "TABLE",
+      "migration": "202608290001_feature_freeze_cross_system.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.decision_scenarios",
+      "type": "TABLE",
+      "migration": "202608290001_feature_freeze_cross_system.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.decision_options",
+      "type": "TABLE",
+      "migration": "202608290001_feature_freeze_cross_system.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.case_follows",
+      "type": "TABLE",
+      "migration": "202608290001_feature_freeze_cross_system.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.notifications",
+      "type": "TABLE",
+      "migration": "202608290001_feature_freeze_cross_system.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.screenshot_objects",
+      "type": "TABLE",
+      "migration": "202609010001_private_screenshot_storage.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.expert_applications",
+      "type": "TABLE",
+      "migration": "202609060001_expert_qualification.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.expert_quiz_attempts",
+      "type": "TABLE",
+      "migration": "202609060001_expert_qualification.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.expert_quiz_answers",
+      "type": "TABLE",
+      "migration": "202609060001_expert_qualification.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.expert_qualification_reviews",
+      "type": "TABLE",
+      "migration": "202609060001_expert_qualification.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.integration_outbox",
+      "type": "TABLE",
+      "migration": "202609060002_integration_outbox.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.trust_runs",
+      "type": "TABLE",
+      "migration": "202609060003_trust_runs_revisions.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.trust_stage_runs",
+      "type": "TABLE",
+      "migration": "202609060003_trust_runs_revisions.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.trust_case_revisions",
+      "type": "TABLE",
+      "migration": "202609060003_trust_runs_revisions.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "public.trust_verdict_revisions",
+      "type": "TABLE",
+      "migration": "202609060003_trust_runs_revisions.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.report_jobs",
+      "type": "TABLE",
+      "migration": "202609060004_reports.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.report_artifacts",
+      "type": "TABLE",
+      "migration": "202609060004_reports.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.report_job_events",
+      "type": "TABLE",
+      "migration": "202609060004_reports.sql",
+      "exists": true,
+      "rlsEnabled": true,
+      "status": "VERIFIED"
+    },
+    {
+      "object": "private.realtime_events",
+      "type": "TABLE",
+      "migration": "202609070001_realtime_event_log.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "private.reject_realtime_event_mutation",
+      "type": "FUNCTION",
+      "migration": "202609070001_realtime_event_log.sql",
+      "exists": false,
+      "rlsEnabled": "N/A",
+      "status": "MISSING"
+    },
+    {
+      "object": "public.community_source_clusters",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "public.community_contributions",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "public.community_contribution_revisions",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "private.community_file_objects",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "public.community_reactions",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "private.community_reaction_events",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "private.expert_assignments",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "private.expert_practice_submissions",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "private.expert_practice_decisions",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "private.expert_quality_events",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "private.expert_review_decisions",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "public.case_appeals",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "private.case_appeal_reviews",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "public.case_corrections",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
+      "object": "private.reject_promax_history_mutation",
+      "type": "FUNCTION",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": "N/A",
+      "status": "MISSING"
+    }
+  ]
+}

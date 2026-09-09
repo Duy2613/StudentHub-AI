@@ -18,6 +18,9 @@ import { ReportService } from "../../src/lib/server/reports/ReportService.js";
 
 const USER_A = "00000000-0000-4000-a000-000000000001";
 const USER_B = "00000000-0000-4000-b000-000000000002";
+const liveGate = {
+  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
+};
 
 let pool;
 let createdCaseIds = [];
@@ -42,6 +45,7 @@ async function asRole(role, subjectId, sql, values = []) {
 }
 
 before(async () => {
+  if (!process.env.DATABASE_URL) return;
   pool = getPostgresPool();
 
   // Ensure test users exist in auth.users
@@ -81,7 +85,7 @@ after(async () => {
   await closePostgresPoolForTests();
 });
 
-test("Beta User Proof 1: USER_A creates durable trust execution with idempotency key", async () => {
+test("Beta User Proof 1: USER_A creates durable trust execution with idempotency key", liveGate, async () => {
   const idemKey = `idem-proof-${Date.now()}-1`;
   const verificationId = crypto.randomUUID();
 
@@ -168,7 +172,7 @@ test("Beta User Proof 1: USER_A creates durable trust execution with idempotency
   assert.equal(stageRows.rows[0].owner_id, USER_A);
 });
 
-test("Beta User Proof 2: Cross-Tenant Isolation & IDOR Defense (USER_B cannot read USER_A's records)", async () => {
+test("Beta User Proof 2: Cross-Tenant Isolation & IDOR Defense (USER_B cannot read USER_A's records)", liveGate, async () => {
   const caseId = createdCaseIds[0];
   const runId = createdRunIds[0];
 
@@ -193,7 +197,7 @@ test("Beta User Proof 2: Cross-Tenant Isolation & IDOR Defense (USER_B cannot re
   assert.equal(userBStages.rowCount, 0, "USER_B must receive 0 rows for USER_A's stage runs (RLS denied)");
 });
 
-test("Beta User Proof 3: Idempotency Replay Verification (Same payload returns identical result, differing payload conflicts)", async () => {
+test("Beta User Proof 3: Idempotency Replay Verification (Same payload returns identical result, differing payload conflicts)", liveGate, async () => {
   const sharedKey = `idem-replay-${Date.now()}`;
   const inputA = { type: "url", content: "https://daihoc-online.edu.vn/tra-cuu" };
 
@@ -273,7 +277,7 @@ test("Beta User Proof 3: Idempotency Replay Verification (Same payload returns i
   );
 });
 
-test("Beta User Proof 4: Durable Report Jobs Isolation & Idempotency", async () => {
+test("Beta User Proof 4: Durable Report Jobs Isolation & Idempotency", liveGate, async () => {
   const caseId = createdCaseIds[0];
   const reportKey = `rep-idem-${Date.now()}`;
 

@@ -1,0 +1,1357 @@
+{
+  "holdoutVersion": "RETRIEVAL_HOLDOUT_V5",
+  "count": 150,
+  "generatedAfter": "PUBLIC_API_INSTITUTION_DISCOVERY_LANE",
+  "cases": [
+    {
+      "caseId": "RET-V5-INST-001",
+      "query": "Đại học Bách khoa Hà Nội tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HUST",
+      "knownOfficialDomains": [
+        "hust.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-002",
+      "query": "Đại học Bách khoa Hà Nội thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HUST",
+      "knownOfficialDomains": [
+        "hust.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-003",
+      "query": "Đại học Bách khoa TP.HCM tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HCMUT",
+      "knownOfficialDomains": [
+        "hcmut.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-004",
+      "query": "Đại học Bách khoa TP.HCM thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HCMUT",
+      "knownOfficialDomains": [
+        "hcmut.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-005",
+      "query": "Đại học Kinh tế Quốc dân tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "NEU",
+      "knownOfficialDomains": [
+        "neu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-006",
+      "query": "Đại học Kinh tế Quốc dân thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "NEU",
+      "knownOfficialDomains": [
+        "neu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-007",
+      "query": "Đại học Ngoại thương tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "FTU",
+      "knownOfficialDomains": [
+        "ftu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-008",
+      "query": "Đại học Ngoại thương thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "FTU",
+      "knownOfficialDomains": [
+        "ftu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-009",
+      "query": "Đại học Kinh tế TP.HCM tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "UEH",
+      "knownOfficialDomains": [
+        "ueh.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-010",
+      "query": "Đại học Kinh tế TP.HCM thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "UEH",
+      "knownOfficialDomains": [
+        "ueh.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-011",
+      "query": "Đại học Quốc gia Hà Nội tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "VNUHN",
+      "knownOfficialDomains": [
+        "vnu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-012",
+      "query": "Đại học Quốc gia Hà Nội thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "VNUHN",
+      "knownOfficialDomains": [
+        "vnu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-013",
+      "query": "Đại học Quốc gia TP.HCM tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "VNUHCM",
+      "knownOfficialDomains": [
+        "vnuhcm.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-014",
+      "query": "Đại học Quốc gia TP.HCM thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "VNUHCM",
+      "knownOfficialDomains": [
+        "vnuhcm.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-015",
+      "query": "Đại học Cần Thơ tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "CTU",
+      "knownOfficialDomains": [
+        "ctu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-016",
+      "query": "Đại học Cần Thơ thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "CTU",
+      "knownOfficialDomains": [
+        "ctu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-017",
+      "query": "Đại học Đà Nẵng tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "UDN",
+      "knownOfficialDomains": [
+        "udn.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-018",
+      "query": "Đại học Đà Nẵng thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "UDN",
+      "knownOfficialDomains": [
+        "udn.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-019",
+      "query": "Đại học Huế tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HUEUNI",
+      "knownOfficialDomains": [
+        "hueuni.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-020",
+      "query": "Đại học Huế thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HUEUNI",
+      "knownOfficialDomains": [
+        "hueuni.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-021",
+      "query": "Học viện Công nghệ Bưu chính Viễn thông tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "PTIT",
+      "knownOfficialDomains": [
+        "ptit.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-022",
+      "query": "Học viện Công nghệ Bưu chính Viễn thông thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "PTIT",
+      "knownOfficialDomains": [
+        "ptit.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-023",
+      "query": "Học viện Ngoại giao tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "DAV",
+      "knownOfficialDomains": [
+        "dav.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-024",
+      "query": "Học viện Ngoại giao thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "DAV",
+      "knownOfficialDomains": [
+        "dav.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-025",
+      "query": "Học viện Ngân hàng tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HVNH",
+      "knownOfficialDomains": [
+        "hvnh.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-026",
+      "query": "Học viện Ngân hàng thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HVNH",
+      "knownOfficialDomains": [
+        "hvnh.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-027",
+      "query": "Đại học Y Hà Nội tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HMU",
+      "knownOfficialDomains": [
+        "hmu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-028",
+      "query": "Đại học Y Hà Nội thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HMU",
+      "knownOfficialDomains": [
+        "hmu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-029",
+      "query": "Đại học Y Dược TP.HCM tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "UMP",
+      "knownOfficialDomains": [
+        "ump.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-030",
+      "query": "Đại học Y Dược TP.HCM thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "UMP",
+      "knownOfficialDomains": [
+        "ump.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-031",
+      "query": "Đại học Y khoa Phạm Ngọc Thạch tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "PNTU",
+      "knownOfficialDomains": [
+        "pnt.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-032",
+      "query": "Đại học Y khoa Phạm Ngọc Thạch thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "PNTU",
+      "knownOfficialDomains": [
+        "pnt.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-033",
+      "query": "Đại học Luật TP.HCM tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "ULAW",
+      "knownOfficialDomains": [
+        "ulaw.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-034",
+      "query": "Đại học Luật TP.HCM thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "ULAW",
+      "knownOfficialDomains": [
+        "ulaw.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-035",
+      "query": "Đại học Luật Hà Nội tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HLU",
+      "knownOfficialDomains": [
+        "hlu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-036",
+      "query": "Đại học Luật Hà Nội thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HLU",
+      "knownOfficialDomains": [
+        "hlu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-037",
+      "query": "Đại học Sư phạm Hà Nội tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HNUE",
+      "knownOfficialDomains": [
+        "hnue.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-038",
+      "query": "Đại học Sư phạm Hà Nội thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HNUE",
+      "knownOfficialDomains": [
+        "hnue.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-039",
+      "query": "Đại học Sư phạm TP.HCM tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HCMUE",
+      "knownOfficialDomains": [
+        "hcmue.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-040",
+      "query": "Đại học Sư phạm TP.HCM thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HCMUE",
+      "knownOfficialDomains": [
+        "hcmue.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-041",
+      "query": "Đại học Công nghệ Thông tin ĐHQG TP.HCM tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "UIT",
+      "knownOfficialDomains": [
+        "uit.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-042",
+      "query": "Đại học Công nghệ Thông tin ĐHQG TP.HCM thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "UIT",
+      "knownOfficialDomains": [
+        "uit.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-043",
+      "query": "Đại học Kiến trúc Hà Nội tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HAU",
+      "knownOfficialDomains": [
+        "hau.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-044",
+      "query": "Đại học Kiến trúc Hà Nội thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HAU",
+      "knownOfficialDomains": [
+        "hau.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-045",
+      "query": "Đại học Kiến trúc TP.HCM tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "UAH",
+      "knownOfficialDomains": [
+        "uah.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-046",
+      "query": "Đại học Kiến trúc TP.HCM thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "UAH",
+      "knownOfficialDomains": [
+        "uah.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-047",
+      "query": "British University Vietnam tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "BUV",
+      "knownOfficialDomains": [
+        "buv.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-048",
+      "query": "British University Vietnam thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "BUV",
+      "knownOfficialDomains": [
+        "buv.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-049",
+      "query": "Đại học VinUni tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "VINUNI",
+      "knownOfficialDomains": [
+        "vinuni.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-050",
+      "query": "Đại học VinUni thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "VINUNI",
+      "knownOfficialDomains": [
+        "vinuni.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-051",
+      "query": "Đại học Fulbright Việt Nam tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "FUV",
+      "knownOfficialDomains": [
+        "fulbright.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-052",
+      "query": "Đại học Fulbright Việt Nam thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "FUV",
+      "knownOfficialDomains": [
+        "fulbright.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-053",
+      "query": "Đại học Quốc tế Miền Đông tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "EIU",
+      "knownOfficialDomains": [
+        "eiu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-054",
+      "query": "Đại học Quốc tế Miền Đông thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "EIU",
+      "knownOfficialDomains": [
+        "eiu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-055",
+      "query": "Đại học Văn Lang tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "VLU",
+      "knownOfficialDomains": [
+        "vlu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-056",
+      "query": "Đại học Văn Lang thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "VLU",
+      "knownOfficialDomains": [
+        "vlu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-057",
+      "query": "Đại học Thủy lợi tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "TLU",
+      "knownOfficialDomains": [
+        "tlu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-058",
+      "query": "Đại học Thủy lợi thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "TLU",
+      "knownOfficialDomains": [
+        "tlu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-059",
+      "query": "Đại học Mỏ - Địa chất tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HUMG",
+      "knownOfficialDomains": [
+        "humg.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-060",
+      "query": "Đại học Mỏ - Địa chất thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HUMG",
+      "knownOfficialDomains": [
+        "humg.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-061",
+      "query": "Đại học Công nghiệp Hà Nội tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HAUI",
+      "knownOfficialDomains": [
+        "haui.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-062",
+      "query": "Đại học Công nghiệp Hà Nội thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HAUI",
+      "knownOfficialDomains": [
+        "haui.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-063",
+      "query": "Đại học Thương mại tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "TMU",
+      "knownOfficialDomains": [
+        "tmu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-064",
+      "query": "Đại học Thương mại thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "TMU",
+      "knownOfficialDomains": [
+        "tmu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-065",
+      "query": "Đại học Điện lực tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "EPU",
+      "knownOfficialDomains": [
+        "epu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-066",
+      "query": "Đại học Điện lực thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "EPU",
+      "knownOfficialDomains": [
+        "epu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-067",
+      "query": "Đại học Dược Hà Nội tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HUP",
+      "knownOfficialDomains": [
+        "hup.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-068",
+      "query": "Đại học Dược Hà Nội thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HUP",
+      "knownOfficialDomains": [
+        "hup.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-069",
+      "query": "Đại học Tài nguyên và Môi trường Hà Nội tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HUNRE",
+      "knownOfficialDomains": [
+        "hunre.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-070",
+      "query": "Đại học Tài nguyên và Môi trường Hà Nội thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HUNRE",
+      "knownOfficialDomains": [
+        "hunre.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-071",
+      "query": "Đại học Công nghiệp TP.HCM tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "IUH",
+      "knownOfficialDomains": [
+        "iuh.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-072",
+      "query": "Đại học Công nghiệp TP.HCM thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "IUH",
+      "knownOfficialDomains": [
+        "iuh.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-073",
+      "query": "Đại học Kinh tế - Luật tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "UEL",
+      "knownOfficialDomains": [
+        "uel.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-074",
+      "query": "Đại học Kinh tế - Luật thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "UEL",
+      "knownOfficialDomains": [
+        "uel.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-075",
+      "query": "Đại học Bách khoa Đà Nẵng tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "DUT",
+      "knownOfficialDomains": [
+        "dut.udn.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-076",
+      "query": "Đại học Bách khoa Đà Nẵng thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "DUT",
+      "knownOfficialDomains": [
+        "dut.udn.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-077",
+      "query": "Đại học Sư phạm Đà Nẵng tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "UED",
+      "knownOfficialDomains": [
+        "ued.udn.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-078",
+      "query": "Đại học Sư phạm Đà Nẵng thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "UED",
+      "knownOfficialDomains": [
+        "ued.udn.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-079",
+      "query": "Đại học Kinh tế Đà Nẵng tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "DUE",
+      "knownOfficialDomains": [
+        "due.udn.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-080",
+      "query": "Đại học Kinh tế Đà Nẵng thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "DUE",
+      "knownOfficialDomains": [
+        "due.udn.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-081",
+      "query": "Đại học Nha Trang tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "NTU",
+      "knownOfficialDomains": [
+        "ntu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-082",
+      "query": "Đại học Nha Trang thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "NTU",
+      "knownOfficialDomains": [
+        "ntu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-083",
+      "query": "Đại học Đà Lạt tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "DLU",
+      "knownOfficialDomains": [
+        "dlu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-084",
+      "query": "Đại học Đà Lạt thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "DLU",
+      "knownOfficialDomains": [
+        "dlu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-085",
+      "query": "Đại học Tây Đô tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "TDU",
+      "knownOfficialDomains": [
+        "tdu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-086",
+      "query": "Đại học Tây Đô thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "TDU",
+      "knownOfficialDomains": [
+        "tdu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-087",
+      "query": "Đại học Việt Đức tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "VGU",
+      "knownOfficialDomains": [
+        "vgu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-088",
+      "query": "Đại học Việt Đức thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "VGU",
+      "knownOfficialDomains": [
+        "vgu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-089",
+      "query": "RMIT Việt Nam tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "RMIT",
+      "knownOfficialDomains": [
+        "rmit.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-090",
+      "query": "RMIT Việt Nam thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "RMIT",
+      "knownOfficialDomains": [
+        "rmit.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-091",
+      "query": "Đại học Quốc tế Sài Gòn tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "SIU",
+      "knownOfficialDomains": [
+        "siu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-092",
+      "query": "Đại học Quốc tế Sài Gòn thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "SIU",
+      "knownOfficialDomains": [
+        "siu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-093",
+      "query": "Đại học Hoa Sen tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HOASEN",
+      "knownOfficialDomains": [
+        "hoasen.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-094",
+      "query": "Đại học Hoa Sen thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HOASEN",
+      "knownOfficialDomains": [
+        "hoasen.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-095",
+      "query": "Đại học Nguyễn Tất Thành tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "NTT",
+      "knownOfficialDomains": [
+        "ntt.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-096",
+      "query": "Đại học Nguyễn Tất Thành thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "NTT",
+      "knownOfficialDomains": [
+        "ntt.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-097",
+      "query": "Đại học Văn Hiến tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "VHU",
+      "knownOfficialDomains": [
+        "vhu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-098",
+      "query": "Đại học Văn Hiến thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "VHU",
+      "knownOfficialDomains": [
+        "vhu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-099",
+      "query": "Đại học Kinh tế - Tài chính TP.HCM tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "UEF",
+      "knownOfficialDomains": [
+        "uef.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-100",
+      "query": "Đại học Kinh tế - Tài chính TP.HCM thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "UEF",
+      "knownOfficialDomains": [
+        "uef.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-101",
+      "query": "Đại học Công nghệ TP.HCM tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HUTECH",
+      "knownOfficialDomains": [
+        "hutech.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-102",
+      "query": "Đại học Công nghệ TP.HCM thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HUTECH",
+      "knownOfficialDomains": [
+        "hutech.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-103",
+      "query": "Đại học Lạc Hồng tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "LHU",
+      "knownOfficialDomains": [
+        "lhu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-104",
+      "query": "Đại học Lạc Hồng thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "LHU",
+      "knownOfficialDomains": [
+        "lhu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-105",
+      "query": "Đại học Thủ Dầu Một tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "TDMU",
+      "knownOfficialDomains": [
+        "tdmu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-106",
+      "query": "Đại học Thủ Dầu Một thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "TDMU",
+      "knownOfficialDomains": [
+        "tdmu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-107",
+      "query": "Đại học Bình Dương tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "BDU",
+      "knownOfficialDomains": [
+        "bdu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-108",
+      "query": "Đại học Bình Dương thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "BDU",
+      "knownOfficialDomains": [
+        "bdu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-109",
+      "query": "Đại học Đồng Nai tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "DNU",
+      "knownOfficialDomains": [
+        "dnu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-110",
+      "query": "Đại học Đồng Nai thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "DNU",
+      "knownOfficialDomains": [
+        "dnu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-111",
+      "query": "Đại học Sài Gòn tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "SGU",
+      "knownOfficialDomains": [
+        "sgu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-112",
+      "query": "Đại học Sài Gòn thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "SGU",
+      "knownOfficialDomains": [
+        "sgu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-113",
+      "query": "Đại học Hà Nội tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HANU",
+      "knownOfficialDomains": [
+        "hanu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-114",
+      "query": "Đại học Hà Nội thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HANU",
+      "knownOfficialDomains": [
+        "hanu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-115",
+      "query": "Đại học Giao thông Vận tải tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "UTC",
+      "knownOfficialDomains": [
+        "utc.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-116",
+      "query": "Đại học Giao thông Vận tải thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "UTC",
+      "knownOfficialDomains": [
+        "utc.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-117",
+      "query": "Học viện Tài chính tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "HVTC",
+      "knownOfficialDomains": [
+        "hvtc.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-118",
+      "query": "Học viện Tài chính thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "HVTC",
+      "knownOfficialDomains": [
+        "hvtc.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-119",
+      "query": "Đại học Khoa học Xã hội và Nhân văn ĐHQG Hà Nội tra cứu thông tin tuyển sinh và học phí năm 2026",
+      "canonicalEntity": "USSH",
+      "knownOfficialDomains": [
+        "ussh.vnu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-INST-120",
+      "query": "Đại học Khoa học Xã hội và Nhân văn ĐHQG Hà Nội thông báo đăng ký học phần học kỳ 1 năm học 2026-2027",
+      "canonicalEntity": "USSH",
+      "knownOfficialDomains": [
+        "ussh.vnu.edu.vn"
+      ],
+      "difficulty": "INSTITUTION_ENTITY_DISCOVERY"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-001",
+      "query": "Nghị định mới về khung học phí giáo dục đại học công lập năm học 2026-2027",
+      "canonicalEntity": "GOVERNMENT_VN",
+      "knownOfficialDomains": [
+        "chinhphu.vn"
+      ],
+      "difficulty": "PUBLIC_POLICY"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-002",
+      "query": "Bộ Giáo dục hướng dẫn tuyển sinh đại học và xác nhận nhập học trực tuyến 2026",
+      "canonicalEntity": "MOET",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "PUBLIC_POLICY"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-003",
+      "query": "Chính sách vay vốn ưu đãi cho sinh viên tại Ngân hàng Chính sách Xã hội 2026",
+      "canonicalEntity": "VBSP",
+      "knownOfficialDomains": [
+        "vbsp.org.vn"
+      ],
+      "difficulty": "PUBLIC_POLICY"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-004",
+      "query": "Thủ tục bảo hiểm y tế sinh viên và mức đóng năm học 2026-2027",
+      "canonicalEntity": "BHXH_VN",
+      "knownOfficialDomains": [
+        "baohiemxahoi.gov.vn"
+      ],
+      "difficulty": "PUBLIC_POLICY"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-005",
+      "query": "Sinh viên xin tạm hoãn nghĩa vụ quân sự cần giấy xác nhận nào năm 2026",
+      "canonicalEntity": "MOD_VN",
+      "knownOfficialDomains": [
+        "mod.gov.vn"
+      ],
+      "difficulty": "PUBLIC_POLICY"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-006",
+      "query": "Cảnh báo giả mạo cổng học phí yêu cầu sinh viên cung cấp mật khẩu và OTP",
+      "canonicalEntity": "NCSC",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_ALERT"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-007",
+      "query": "Cảnh báo mạo danh công an gọi điện đe dọa sinh viên chuyển tiền",
+      "canonicalEntity": "MPS",
+      "knownOfficialDomains": [
+        "mps.gov.vn"
+      ],
+      "difficulty": "SCAM_ALERT"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-008",
+      "query": "Lừa đảo cho thuê phòng trọ giá rẻ yêu cầu chuyển cọc vào tài khoản cá nhân",
+      "canonicalEntity": "CANHSAT",
+      "knownOfficialDomains": [
+        "canhsat.gov.vn"
+      ],
+      "difficulty": "SCAM_ALERT"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-009",
+      "query": "Bẫy tuyển cộng tác viên online bắt sinh viên nạp tiền làm nhiệm vụ",
+      "canonicalEntity": "NCSC",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_ALERT"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-010",
+      "query": "Cảnh báo bằng đại học giả và dịch vụ thi hộ chứng chỉ ngoại ngữ",
+      "canonicalEntity": "MOET",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "SCAM_ALERT"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-011",
+      "query": "Viettel tuyển thực tập sinh công nghệ và chương trình tài năng 2026",
+      "canonicalEntity": "VIETTEL",
+      "knownOfficialDomains": [
+        "viettel.com.vn"
+      ],
+      "difficulty": "CORPORATE"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-012",
+      "query": "FPT Software tuyển fresher AI và data cho sinh viên mới tốt nghiệp 2026",
+      "canonicalEntity": "FSOFT",
+      "knownOfficialDomains": [
+        "fptsoftware.com"
+      ],
+      "difficulty": "CORPORATE"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-013",
+      "query": "Samsung R&D Vietnam mở chương trình thực tập kỹ thuật cho sinh viên 2026",
+      "canonicalEntity": "SAMSUNG",
+      "knownOfficialDomains": [
+        "samsung.com"
+      ],
+      "difficulty": "CORPORATE"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-014",
+      "query": "Quỹ VINIF công bố học bổng nghiên cứu sau đại học năm 2026",
+      "canonicalEntity": "VINIF",
+      "knownOfficialDomains": [
+        "vinif.org"
+      ],
+      "difficulty": "CORPORATE"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-015",
+      "query": "MISA tuyển thực tập sinh phát triển phần mềm và dữ liệu năm 2026",
+      "canonicalEntity": "MISA",
+      "knownOfficialDomains": [
+        "misa.vn"
+      ],
+      "difficulty": "CORPORATE"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-016",
+      "query": "So sánh quy định xét tuyển đại học bằng học bạ và điểm thi tốt nghiệp 2026",
+      "canonicalEntity": "ADMISSIONS_POLICY",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "PUBLIC_POLICY"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-017",
+      "query": "Mức trần học phí đại học công lập tự chủ theo quy định mới",
+      "canonicalEntity": "TUITION_POLICY",
+      "knownOfficialDomains": [
+        "chinhphu.vn"
+      ],
+      "difficulty": "PUBLIC_POLICY"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-018",
+      "query": "Cổng thông tin an toàn không gian mạng cảnh báo phishing nhắm vào sinh viên",
+      "canonicalEntity": "STUDENT_SAFETY",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_ALERT"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-019",
+      "query": "Ngày hội việc làm công nghệ dành cho sinh viên và người mới tốt nghiệp 2026",
+      "canonicalEntity": "CAREER_DISCOVERY",
+      "knownOfficialDomains": [
+        "viettel.com.vn"
+      ],
+      "difficulty": "CORPORATE"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-020",
+      "query": "Thông tin học bổng nghiên cứu và tài trợ đề tài cho sinh viên Việt Nam",
+      "canonicalEntity": "RESEARCH_FUNDING",
+      "knownOfficialDomains": [
+        "vinif.org"
+      ],
+      "difficulty": "CORPORATE"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-021",
+      "query": "Hướng dẫn quyền lợi bảo hiểm y tế của sinh viên khi khám chữa bệnh",
+      "canonicalEntity": "PUBLIC_HEALTH",
+      "knownOfficialDomains": [
+        "baohiemxahoi.gov.vn"
+      ],
+      "difficulty": "PUBLIC_POLICY"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-022",
+      "query": "Mức vay tối đa và hồ sơ vay tín dụng học tập năm 2026",
+      "canonicalEntity": "STUDENT_LOAN",
+      "knownOfficialDomains": [
+        "vbsp.org.vn"
+      ],
+      "difficulty": "PUBLIC_POLICY"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-023",
+      "query": "Cảnh báo mã độc trong file học bổng và link khảo sát nhận quà cho sinh viên",
+      "canonicalEntity": "DIGITAL_SAFETY",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_ALERT"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-024",
+      "query": "Mạo danh trường đại học gửi giấy báo trúng tuyển và yêu cầu phí giữ chỗ",
+      "canonicalEntity": "ADMISSION_FRAUD",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "SCAM_ALERT"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-025",
+      "query": "Khuyến cáo phòng tránh lừa đảo đặt cọc ký túc xá và nhà trọ sinh viên",
+      "canonicalEntity": "CAMPUS_HOUSING",
+      "knownOfficialDomains": [
+        "canhsat.gov.vn"
+      ],
+      "difficulty": "SCAM_ALERT"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-026",
+      "query": "Quy định mới về chuẩn đầu ra và văn bằng giáo dục đại học năm 2026",
+      "canonicalEntity": "PUBLIC_REGULATION",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "PUBLIC_POLICY"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-027",
+      "query": "Chương trình tuyển dụng kỹ sư phần mềm cho sinh viên năm cuối 2026",
+      "canonicalEntity": "EMPLOYMENT",
+      "knownOfficialDomains": [
+        "fptsoftware.com"
+      ],
+      "difficulty": "CORPORATE"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-028",
+      "query": "Cơ hội thực tập nghiên cứu trí tuệ nhân tạo cho sinh viên Việt Nam",
+      "canonicalEntity": "RESEARCH_INTERNSHIP",
+      "knownOfficialDomains": [
+        "samsung.com"
+      ],
+      "difficulty": "CORPORATE"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-029",
+      "query": "Cảnh báo học bổng toàn phần giả yêu cầu đóng phí bảo lãnh qua tài khoản cá nhân",
+      "canonicalEntity": "SCHOLARSHIP_FRAUD",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_ALERT"
+    },
+    {
+      "caseId": "RET-V5-CONTEXT-030",
+      "query": "Thông tư hướng dẫn quản lý đào tạo và công nhận tín chỉ đại học 2026",
+      "canonicalEntity": "ACADEMIC_REGULATION",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "PUBLIC_POLICY"
+    }
+  ]
+}

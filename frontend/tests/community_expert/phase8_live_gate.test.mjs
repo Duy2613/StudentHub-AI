@@ -6,10 +6,10 @@ import { ExpertRepository } from "../../src/lib/server/database/ExpertRepository
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 
 after(async () => {
-  await getPostgresPool().end();
+  if (process.env.DATABASE_URL) await getPostgresPool().end();
 });
 
-test("PHASE 8 LIVE GATE: Community & Expert scoped authority, verification, and Trust case binding", async () => {
+test("PHASE 8 LIVE GATE: Community & Expert scoped authority, verification, and Trust case binding", { skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured" }, async () => {
   const pool = getPostgresPool();
   const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 2`);
   if (userRes.rows.length === 0) {

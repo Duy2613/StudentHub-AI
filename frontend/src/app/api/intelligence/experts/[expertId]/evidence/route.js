@@ -4,7 +4,7 @@
  * Retrieves evidence graph, publications, and provenance clusters for an expert.
  */
 
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import { ExpertStore, isExpertDemoMode } from "@/lib/intelligence/expert/expertStore";
 import { ExpertPublicDTO } from "@/lib/intelligence/expert/ExpertPublicDTO.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
@@ -22,6 +22,7 @@ export const GET = SecurityFabric.wrapHandler({
       retryable: false
     } }, { status: 400 });
   }
+  if (!isExpertDemoMode()) return Response.json({ success: false, error: { code: "EXPERT_EVIDENCE_WORKFLOW_NOT_MIGRATED", userMessage: "Expert evidence projection requires the durable evidence workflow.", requestId: secContext.correlationId, retryable: false } }, { status: 503 });
 
   const expert = ExpertStore.getExpert(expertId, { redactPrivate: true });
   if (!expert) {

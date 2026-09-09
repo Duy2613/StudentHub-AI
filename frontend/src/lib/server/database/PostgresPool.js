@@ -1,6 +1,19 @@
 import pg from "pg";
+import { resolve, join } from "node:path";
+import { createRequire } from "node:module";
 
 const { Pool } = pg;
+
+function ensureEnvLoaded() {
+  if (!process.env.DATABASE_URL) {
+    try {
+      const dir = process.cwd().endsWith("frontend") ? process.cwd() : resolve(process.cwd(), "frontend");
+      const req = createRequire(join(dir, "package.json"));
+      const { loadEnvConfig } = req("@next/env");
+      loadEnvConfig(dir);
+    } catch {}
+  }
+}
 
 export class DatabaseUnavailableError extends Error {
   constructor(message = "PostgreSQL is not configured or unavailable.") {
@@ -13,13 +26,14 @@ export class DatabaseUnavailableError extends Error {
 let sharedPool;
 
 export function getPostgresPool() {
+  ensureEnvLoaded();
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new DatabaseUnavailableError("DATABASE_URL is required for durable production state.");
   if (!sharedPool) {
     const configuredPoolMax = Number(process.env.DATABASE_POOL_MAX);
     const boundedPoolMax = Math.min(50, Math.max(1, Math.floor(Number.isFinite(configuredPoolMax) ? configuredPoolMax : 10)));
     const caRaw = process.env.DATABASE_SSL_CA;
-    const ca = caRaw ? caRaw.replace(/\\n/g, "\n") : undefined;
+    const ca = caRaw ? caRaw.replace(/^["']|["']$/g, "").replace(/\\n/g, "\n") : undefined;
     sharedPool = new Pool({
       connectionString,
       max: boundedPoolMax,

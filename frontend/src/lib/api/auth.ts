@@ -1,4 +1,4 @@
-import { apiRequest } from "./client";
+import { apiRequest } from "./client.ts";
 
 export type SessionSnapshot = {
   authenticated: boolean;

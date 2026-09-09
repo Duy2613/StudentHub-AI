@@ -1,11 +1,11 @@
 # API Authorization Inventory
 
-Generated from source by `npm run audit:api-auth` on 2026-09-05T13:40:55.320Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
+Generated from source by `npm run audit:api-auth` on 2026-09-09T10:07:00.483Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
 
-- Route files: 114
-- HTTP handlers: 141
-- Authentication required by Security Fabric: 72
-- Explicit anonymous access: 63
+- Route files: 136
+- HTTP handlers: 169
+- Authentication required by Security Fabric: 99
+- Explicit anonymous access: 64
 - No visible Security Fabric wrapper: 6
 - Unprotected mutations requiring P0 review: 0
 
@@ -51,9 +51,25 @@ Generated from source by `npm run audit:api-auth` on 2026-09-05T13:40:55.320Z. T
 | /api/community/experience/evaluate | POST | PUBLIC | anonymous allowed | ANALYZE_COMMUNITY_EXPERIENCE | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/community/experiences | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_EXPERIENCES | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/contract-check/analyze | POST | PUBLIC | anonymous allowed | ANALYZE_CONTRACT | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/expert/appeals/review | POST | ADMIN | required | REVIEW_EXPERT_APPEAL | ADMIN.SECURITY | authenticated principal | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/expert/appeals | POST | AUTHENTICATED | required | CREATE_EXPERT_APPEAL | COMMUNITY.POST | authenticated principal | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/expert/assessments | GET | AUTHENTICATED | required | READ_EXPERT_ASSESSMENTS | EXPERT.READ | authenticated principal | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/expert/assessments | POST | AUTHENTICATED | required | SUBMIT_EXPERT_ASSESSMENT | EXPERT.EVALUATE | authenticated principal | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/expert/assignments | POST | ADMIN | required | ASSIGN_EXPERT_CASE | ADMIN.SECURITY | authenticated principal | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/expert/evaluate | POST | PUBLIC | anonymous allowed | ANALYZE_EXPERT_SCOPE | — | public or domain-defined | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/expert/graph | GET | PUBLIC | anonymous allowed | READ_EXPERT_GRAPH | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/expert/profile/[expertId] | GET | PUBLIC | anonymous allowed | READ_EXPERT_PROFILE | EXPERT.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | private/user data | contract conflict |
+| /api/expert/qualification/practice/review | POST | ADMIN | required | REVIEW_EXPERT_PRACTICE | ADMIN.SECURITY | public or domain-defined | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/expert/qualification/practice | POST | AUTHENTICATED | required | SUBMIT_EXPERT_PRACTICE | EXPERT.READ | client field / review required | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/expert/qualification/quiz/answers | PUT | AUTHENTICATED | required | SAVE_EXPERT_QUALIFICATION_ANSWER | EXPERT.READ | client field / review required | default/configured | 16 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/expert/qualification/quiz | POST | AUTHENTICATED | required | START_EXPERT_QUALIFICATION_QUIZ | EXPERT.READ | public or domain-defined | default/configured | 0 bytes | manual/none | state mutation | policy declared |
+| /api/expert/qualification/quiz/submit | POST | AUTHENTICATED | required | SUBMIT_EXPERT_QUALIFICATION_QUIZ | EXPERT.READ | client field / review required | default/configured | 16 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/expert/qualification/review | POST | ADMIN | required | REVIEW_EXPERT_QUALIFICATION | ADMIN.SECURITY | public or domain-defined | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/expert/qualification | GET | AUTHENTICATED | required | READ_EXPERT_QUALIFICATION | — | client field / review required | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/expert/qualification | POST | AUTHENTICATED | required | SUBMIT_EXPERT_APPLICATION | — | client field / review required | default/configured | 262144 bytes | manual/none | state mutation | policy declared |
+| /api/expert/quality | POST | ADMIN | required | ADJUDICATE_EXPERT_QUALITY | ADMIN.SECURITY | authenticated principal | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/expert/reviews | GET | AUTHENTICATED | required | READ_EXPERT_REVIEW_CONSENSUS | EXPERT.READ | authenticated principal | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/expert/reviews | POST | AUTHENTICATED | required | RECORD_EXPERT_REVIEW_DECISION | EXPERT.EVALUATE | authenticated principal | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/forum/posts | GET | PUBLIC | anonymous allowed | READ_FORUM_POSTS | — | authenticated principal | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/forum/posts | PATCH | AUTHENTICATED | required | INTERACT_WITH_COMMUNITY_POST | COMMUNITY.POST | authenticated principal | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/forum/posts | POST | AUTHENTICATED | required | CREATE_COMMUNITY_POST | COMMUNITY.POST | authenticated principal | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
@@ -62,12 +78,16 @@ Generated from source by `npm run audit:api-auth` on 2026-09-05T13:40:55.320Z. T
 | /api/health/ready | GET | PUBLIC | anonymous allowed | HEALTH_READY | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/claims/[claimId] | GET | PUBLIC | anonymous allowed | READ_CLAIM_DETAIL | TRUST.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | contract conflict |
 | /api/intelligence/community/consensus | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_CONSENSUS | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/intelligence/community/contributions/[contributionId] | GET | AUTHENTICATED | required | READ_COMMUNITY_CONTRIBUTION_REVISIONS | COMMUNITY.READ | authenticated principal | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/intelligence/community/contributions/[contributionId] | PATCH | AUTHENTICATED | required | EDIT_COMMUNITY_CONTRIBUTION | COMMUNITY.POST | authenticated principal | default/configured | 512 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/intelligence/community/contributions/preview | POST | AUTHENTICATED | required | PREVIEW_COMMUNITY_EVIDENCE | COMMUNITY.POST | authenticated principal | default/configured | MAX_PRIVATE_FILE_BYTES + 64 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/intelligence/community/corrections | POST | AUTHENTICATED | required | CREATE_COMMUNITY_CORRECTION | COMMUNITY.POST | authenticated principal | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/intelligence/community/evaluate | POST | PUBLIC | anonymous allowed | ANALYZE_COMMUNITY_POSTS | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/intelligence/community/experiences/[experienceId] | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_EXPERIENCE | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/community/feedback | POST | AUTHENTICATED | required | CREATE_COMMUNITY_FEEDBACK | COMMUNITY.POST | authenticated principal | default/configured | 262144 bytes | manual/none | state mutation | policy declared |
 | /api/intelligence/community/friction | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_FRICTION | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/community/posts | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_INTELLIGENCE_POSTS | — | authenticated principal | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
-| /api/intelligence/community/posts | POST | AUTHENTICATED | required | CREATE_COMMUNITY_INTELLIGENCE_POST | COMMUNITY.POST | authenticated principal | default/configured | 262144 bytes | manual/none | state mutation | policy declared |
+| /api/intelligence/community/posts | POST | AUTHENTICATED | required | CREATE_COMMUNITY_INTELLIGENCE_POST | COMMUNITY.POST | authenticated principal | default/configured | 512 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/intelligence/community/query | POST | PUBLIC | anonymous allowed | QUERY_COMMUNITY_KNOWLEDGE | — | public or domain-defined | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/intelligence/community/reality-gaps | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_REALITY_GAPS | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/community/search | GET | PUBLIC | anonymous allowed | SEARCH_COMMUNITY_POSTS | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
@@ -117,6 +137,8 @@ Generated from source by `npm run audit:api-auth` on 2026-09-05T13:40:55.320Z. T
 | /api/prof-rating/reviews | POST | AUTHENTICATED | required | CREATE_PROFESSOR_REVIEW | COMMUNITY.POST | authenticated principal | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/quests/daily | GET | PUBLIC | anonymous allowed | READ_DAILY_QUESTS | — | authenticated principal | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/quests/daily | POST | AUTHENTICATED | required | SUBMIT_QUEST_COMPLETION | COMMUNITY.POST | authenticated principal | default/configured | 16 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/realtime/broadcast | POST | ADMIN | required | PUBLISH_REALTIME_EVENT | ADMIN.SECURITY | public or domain-defined | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/realtime/stream | GET | PUBLIC | anonymous allowed | READ_REALTIME_STREAM | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/safety-map/reports | GET | PUBLIC | anonymous allowed | READ_SAFETY_REPORTS | — | authenticated principal | default/configured | 262144 bytes | manual/none | potential sensitive data | policy declared |
 | /api/safety-map/reports | POST | AUTHENTICATED | required | CREATE_SAFETY_REPORT | COMMUNITY.POST | authenticated principal | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/scheduler/optimize | GET | PUBLIC | anonymous allowed | READ_SCHEDULE_BUNDLES | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
@@ -141,14 +163,20 @@ Generated from source by `npm run audit:api-auth` on 2026-09-05T13:40:55.320Z. T
 | /api/v1/demo/superflows | GET | PUBLIC | anonymous allowed | READ_COMPETITION_DEMO_SUPERFLOWS | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/v1/experts | GET | PUBLIC | anonymous allowed | DISCOVER_CANONICAL_EXPERTS | EXPERT.READ | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | contract conflict |
 | /api/v1/integrations/aidrive | GET | AUTHENTICATED | required | READ_AIDRIVE_SOURCE | INTEGRATION.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/v1/integrations/labbe | GET | AUTHENTICATED | required | READ_LABBE_INTEGRATION | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/v1/integrations/labbe | POST | AUTHENTICATED | required | DRAIN_LABBE_OUTBOX | — | public or domain-defined | default/configured | 262144 bytes | manual/none | state mutation | policy declared |
 | /api/v1/notifications | GET | AUTHENTICATED | required | READ_CANONICAL_NOTIFICATIONS | ACADEMIC.READ_OWN | client field / review required | default/configured | 0 bytes | manual/none | private/user data | policy declared |
 | /api/v1/notifications | POST | AUTHENTICATED | required | UPDATE_CANONICAL_NOTIFICATION | ACADEMIC.PLAN_OWN | client field / review required | default/configured | 64 * 1024 bytes | manual/none | private/user data | policy declared |
 | /api/v1/passports/[passportId] | GET | AUTHENTICATED | required | READ_OWN_EVIDENCE_PASSPORT | PASSPORT.READ_OWN | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/v1/passports/[passportId] | PATCH | AUTHENTICATED | required | APPEND_OWN_EVIDENCE_PASSPORT | PASSPORT.WRITE_OWN | public or domain-defined | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/v1/passports | GET | AUTHENTICATED | required | READ_OWN_EVIDENCE_PASSPORTS | PASSPORT.READ_OWN | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/v1/passports | POST | AUTHENTICATED | required | CREATE_OWN_EVIDENCE_PASSPORT | PASSPORT.WRITE_OWN | public or domain-defined | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/v1/reports/[reportId] | GET | AUTHENTICATED | required | READ_OWN_TRUST_REPORT | TRUST.READ | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/v1/reports | GET | AUTHENTICATED | required | READ_OWN_TRUST_REPORTS | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/v1/reports | POST | AUTHENTICATED | required | CREATE_OWN_TRUST_REPORT | — | public or domain-defined | default/configured | 262144 bytes | manual/none | state mutation | policy declared |
 | /api/v1/search | GET | PUBLIC | anonymous allowed | SEARCH_CANONICAL_PRODUCT | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/v1/trust/analyze | POST | PUBLIC | anonymous allowed | RUN_CANONICAL_TRUST_PIPELINE | — | public or domain-defined | default/configured | 512 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/v1/trust/cases/[caseId]/community-signals | GET | AUTHENTICATED | required | READ_TRUST_COMMUNITY_SIGNALS | TRUST.READ | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/v1/trust/cases/[caseId] | GET | AUTHENTICATED | required | READ_TRUST_CASE_DETAIL | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/v1/trust/cases | GET | AUTHENTICATED | required | READ_TRUST_CASE_HISTORY | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/v1/trust | POST | PUBLIC | anonymous allowed | RUN_CANONICAL_TRUST_PIPELINE | — | public or domain-defined | default/configured | 512 * 1024 bytes | manual/none | state mutation | policy declared |

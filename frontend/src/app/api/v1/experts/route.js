@@ -1,6 +1,7 @@
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { ExpertRepository } from "@/lib/server/database/ExpertRepository.js";
 import { ExpertDiscoveryEngine } from "@/lib/intelligence/expert/ExpertDiscoveryEngine.js";
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore.js";
+import { ExpertStore, isExpertDemoMode } from "@/lib/intelligence/expert/expertStore.js";
 import { ExpertPublicDTO } from "@/lib/intelligence/expert/ExpertPublicDTO.js";
 
 function limitValue(value) {
@@ -13,6 +14,15 @@ async function discoverExperts(request, routeParams, principal, securityContext)
   const topic = searchParams.get("topic")?.trim().slice(0, 160) || null;
   const domain = searchParams.get("domain")?.trim().slice(0, 120) || null;
   const limit = limitValue(searchParams.get("limit"));
+  if (!isExpertDemoMode()) {
+    try {
+      const experts = await ExpertRepository.listPublicProfiles({ limit, domainCode: domain });
+      const filtered = topic ? experts.filter((expert) => `${expert.name} ${expert.title || ""} ${(expert.scopes || []).map((scope) => scope.domain).join(" ")}`.toLocaleLowerCase("vi").includes(topic.toLocaleLowerCase("vi"))) : experts;
+      return Response.json({ success: true, contractVersion: "experts.v1", data: { total: filtered.length, experts: ExpertPublicDTO.toPublicList(filtered.slice(0, limit)), sourceState: "DURABLE_POSTGRES", historyConfidence: "INSUFFICIENT_DATA" }, meta: { correlationId: securityContext.correlationId } });
+    } catch {
+      return Response.json({ success: false, error: { code: "EXPERT_STORAGE_UNAVAILABLE", userMessage: "Expert profiles are temporarily unavailable.", correlationId: securityContext.correlationId } }, { status: 503 });
+    }
+  }
   if (topic) {
     const discovery = ExpertDiscoveryEngine.discoverExperts({ topic, domain, limit });
     const topMatches = discovery.topMatches.map(({ rawExpert, ...match }) => ({ ...match, profile: ExpertPublicDTO.toPublicDTO(rawExpert) }));

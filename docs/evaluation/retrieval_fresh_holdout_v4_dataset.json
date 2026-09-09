@@ -1,0 +1,1366 @@
+{
+  "holdoutVersion": "RETRIEVAL_HOLDOUT_V4",
+  "count": 150,
+  "cases": [
+    {
+      "caseId": "RET-V4-REG-001",
+      "query": "Trường Đại học Kiên Giang tuyển sinh đại học 2026 ngành sư phạm toán",
+      "canonicalEntity": "VNUKG",
+      "knownOfficialDomains": [
+        "vnukg.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-002",
+      "query": "Trường Đại học Bạc Liêu học phí đào tạo cử nhân ngôn ngữ anh 2026",
+      "canonicalEntity": "BLU",
+      "knownOfficialDomains": [
+        "blu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-003",
+      "query": "Trường Đại học Tây Bắc thông báo xét tuyển học bạ đợt 1 năm 2026",
+      "canonicalEntity": "UTB",
+      "knownOfficialDomains": [
+        "utb.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-004",
+      "query": "Trường Đại học Tân Trào chỉ tiêu tuyển sinh ngành giáo dục tiểu học 2026",
+      "canonicalEntity": "TTRU",
+      "knownOfficialDomains": [
+        "daihoctantrao.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-005",
+      "query": "Trường Đại học Phú Yên chính sách miễn giảm học phí cho con em địa phương 2026",
+      "canonicalEntity": "PYU",
+      "knownOfficialDomains": [
+        "pyu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-006",
+      "query": "Trường Đại học Khánh Hòa quy chế xét tốt nghiệp ngành quản trị du lịch 2026",
+      "canonicalEntity": "UKH",
+      "knownOfficialDomains": [
+        "ukh.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-007",
+      "query": "Trường Đại học Hà Tĩnh học phí chính quy các ngành sư phạm và kỹ thuật 2026",
+      "canonicalEntity": "HTU",
+      "knownOfficialDomains": [
+        "htu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-008",
+      "query": "Trường Đại học Đồng Tháp chương trình liên kết đào tạo thạc sĩ quản lý giáo dục 2026",
+      "canonicalEntity": "DThU",
+      "knownOfficialDomains": [
+        "dthu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-009",
+      "query": "Trường Đại học Quảng Bình thông báo thời gian đăng ký học phần hè 2026",
+      "canonicalEntity": "QBU",
+      "knownOfficialDomains": [
+        "qbu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-010",
+      "query": "Trường Đại học Nông - Lâm Bắc Giang ngành thú y và công nghệ thực phẩm điểm chuẩn 2026",
+      "canonicalEntity": "BAFU",
+      "knownOfficialDomains": [
+        "bafu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-011",
+      "query": "Trường Đại học Sư phạm Kỹ thuật Vĩnh Long ngành robot và trí tuệ nhân tạo chỉ tiêu 2026",
+      "canonicalEntity": "VLUTE",
+      "knownOfficialDomains": [
+        "vlute.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-012",
+      "query": "Trường Đại học Tiền Giang quy định xét cấp học bổng sinh viên vượt khó 2026",
+      "canonicalEntity": "TGU",
+      "knownOfficialDomains": [
+        "tgu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-013",
+      "query": "Trường Đại học Xây dựng Miền Tây ngành kiến trúc công trình học phí tín chỉ 2026",
+      "canonicalEntity": "MTU",
+      "knownOfficialDomains": [
+        "mtu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-014",
+      "query": "Trường Đại học Kinh tế Công nghiệp Long An tuyển sinh đại học chính quy 2026",
+      "canonicalEntity": "DLA",
+      "knownOfficialDomains": [
+        "dla.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-015",
+      "query": "Trường Đại học Thái Bình điểm chuẩn xét tuyển bằng điểm thi tốt nghiệp 2026",
+      "canonicalEntity": "TBU",
+      "knownOfficialDomains": [
+        "tbu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-016",
+      "query": "Trường Đại học Y Dược Thái Bình ngành y đa khoa thời gian đào tạo và học phí 2026",
+      "canonicalEntity": "TBUMP",
+      "knownOfficialDomains": [
+        "tbump.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-017",
+      "query": "Trường Đại học Y Dược Hải Phòng chỉ tiêu ngành dược học và y học cổ truyền 2026",
+      "canonicalEntity": "HPMU",
+      "knownOfficialDomains": [
+        "hpmu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-018",
+      "query": "Trường Đại học Hàng hải Việt Nam ngành điều khiển tàu biển điểm chuẩn 2026",
+      "canonicalEntity": "VMU",
+      "knownOfficialDomains": [
+        "vimaru.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-019",
+      "query": "Trường Đại học Quản lý và Công nghệ Hải Phòng thông báo xét tuyển đại học 2026",
+      "canonicalEntity": "HPU",
+      "knownOfficialDomains": [
+        "hpu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-020",
+      "query": "Trường Đại học Tây Nguyên học bổng khuyến khích học tập kỳ 2 năm học 2025-2026",
+      "canonicalEntity": "TTN",
+      "knownOfficialDomains": [
+        "ttn.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-021",
+      "query": "Trường Đại học Quy Nhơn ngành toán ứng dụng và khoa học dữ liệu tuyển sinh 2026",
+      "canonicalEntity": "QNU",
+      "knownOfficialDomains": [
+        "qnu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-022",
+      "query": "Trường Đại học Quảng Nam thời gian nhận hồ sơ xét tuyển học bạ 2026",
+      "canonicalEntity": "DQU",
+      "knownOfficialDomains": [
+        "dqu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-023",
+      "query": "Trường Đại học Trà Vinh chương trình đào tạo bác sĩ răng hàm mặt 2026",
+      "canonicalEntity": "TVU",
+      "knownOfficialDomains": [
+        "tvu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-024",
+      "query": "Trường Đại học Cửu Long học phí các ngành điều dưỡng và kỹ thuật y sinh 2026",
+      "canonicalEntity": "Mekong",
+      "knownOfficialDomains": [
+        "mku.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-025",
+      "query": "Trường Đại học Nam Cần Thơ thông báo tuyển sinh đại học chính quy đợt 1 năm 2026",
+      "canonicalEntity": "DNC",
+      "knownOfficialDomains": [
+        "nctu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-026",
+      "query": "Trường Đại học FPT Cần Thơ học phí chuyên ngành kỹ thuật phần mềm 2026",
+      "canonicalEntity": "FPT_CT",
+      "knownOfficialDomains": [
+        "cantho.fpt.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-027",
+      "query": "Trường Đại học An Giang xét tuyển theo kỳ thi đánh giá năng lực ĐHQG TP.HCM 2026",
+      "canonicalEntity": "AGU",
+      "knownOfficialDomains": [
+        "agu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-028",
+      "query": "Trường Đại học Hồng Đức ngành sư phạm lịch sử và giáo dục mầm non chỉ tiêu 2026",
+      "canonicalEntity": "HDU",
+      "knownOfficialDomains": [
+        "hdu.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-029",
+      "query": "Trường Đại học Văn hóa Thể thao và Du lịch Thanh Hóa tuyển sinh ngành du lịch và công tác xã hội 2026",
+      "canonicalEntity": "DVHTD",
+      "knownOfficialDomains": [
+        "dvhtd.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-REG-030",
+      "query": "Trường Đại học Sư phạm Kỹ thuật Hưng Yên ngành cơ điện tử và tự động hóa điểm xét tuyển 2026",
+      "canonicalEntity": "UTEHY",
+      "knownOfficialDomains": [
+        "utehy.edu.vn"
+      ],
+      "difficulty": "REGIONAL_INSTITUTION"
+    },
+    {
+      "caseId": "RET-V4-TOP-001",
+      "query": "Đại học Bách khoa Hà Nội chỉ tiêu tuyển sinh ngành Khoa học dữ liệu và AI 2026",
+      "canonicalEntity": "HUST",
+      "knownOfficialDomains": [
+        "hust.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-002",
+      "query": "Đại học Bách khoa TP.HCM học phí chương trình tiên tiến tiếng Anh 2026",
+      "canonicalEntity": "HCMUT_VNUHCM",
+      "knownOfficialDomains": [
+        "hcmut.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-003",
+      "query": "Đại học Kinh tế Quốc dân phương thức xét tuyển kết hợp chứng chỉ SAT 2026",
+      "canonicalEntity": "NEU",
+      "knownOfficialDomains": [
+        "neu.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-004",
+      "query": "Đại học Ngoại thương ngưỡng điểm trúng tuyển ngành Kinh tế đối ngoại 2026",
+      "canonicalEntity": "FTU",
+      "knownOfficialDomains": [
+        "ftu.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-005",
+      "query": "Đại học Kinh tế TP.HCM thông báo học phí các ngành kinh doanh quốc tế 2026",
+      "canonicalEntity": "UEH",
+      "knownOfficialDomains": [
+        "ueh.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-006",
+      "query": "Đại học Quốc gia Hà Nội kỳ thi đánh giá năng lực HSA đợt 2 năm 2026",
+      "canonicalEntity": "VNUHN",
+      "knownOfficialDomains": [
+        "vnu.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-007",
+      "query": "Đại học Quốc gia TP.HCM kỳ thi đánh giá năng lực đợt 1 năm 2026 địa điểm thi",
+      "canonicalEntity": "VNUHCM",
+      "knownOfficialDomains": [
+        "vnuhcm.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-008",
+      "query": "Đại học Cần Thơ chính sách học bổng khuyến khích tài năng sinh viên 2026",
+      "canonicalEntity": "CTU",
+      "knownOfficialDomains": [
+        "ctu.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-009",
+      "query": "Đại học Đà Nẵng chỉ tiêu tuyển sinh các trường thành viên năm 2026",
+      "canonicalEntity": "UDN",
+      "knownOfficialDomains": [
+        "udn.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-010",
+      "query": "Đại học Huế thông báo học bổng tài trợ cho sinh viên nghèo 2026",
+      "canonicalEntity": "HUEUNI",
+      "knownOfficialDomains": [
+        "hueuni.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-011",
+      "query": "Học viện Công nghệ Bưu chính Viễn thông học phí ngành An toàn thông tin năm học 2026",
+      "canonicalEntity": "PTIT",
+      "knownOfficialDomains": [
+        "ptit.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-012",
+      "query": "Học viện Ngoại giao chỉ tiêu ngành Truyền thông quốc tế năm 2026",
+      "canonicalEntity": "DAV",
+      "knownOfficialDomains": [
+        "dav.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-013",
+      "query": "Học viện Ngân hàng điểm chuẩn xét tuyển ngành Tài chính ngân hàng 2026",
+      "canonicalEntity": "BAV",
+      "knownOfficialDomains": [
+        "hvnh.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-014",
+      "query": "Đại học Y Hà Nội thời gian thực tập lâm sàng tại các bệnh viện trung ương 2026",
+      "canonicalEntity": "HMU",
+      "knownOfficialDomains": [
+        "hmu.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-015",
+      "query": "Đại học Y Dược TP.HCM học phí ngành Y đa khoa và Dược học khóa 2026",
+      "canonicalEntity": "UMP",
+      "knownOfficialDomains": [
+        "ump.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-016",
+      "query": "Đại học Y khoa Phạm Ngọc Thạch chỉ tiêu tuyển sinh cho thí sinh có hộ khẩu TP.HCM 2026",
+      "canonicalEntity": "PNTU",
+      "knownOfficialDomains": [
+        "pnt.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-017",
+      "query": "Đại học Luật TP.HCM bài kiểm tra năng lực xét tuyển ngành Luật thương mại 2026",
+      "canonicalEntity": "ULAW",
+      "knownOfficialDomains": [
+        "ulaw.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-018",
+      "query": "Đại học Luật Hà Nội điểm trúng tuyển các tổ hợp khối A và C năm 2026",
+      "canonicalEntity": "HLU",
+      "knownOfficialDomains": [
+        "hlu.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-019",
+      "query": "Đại học Sư phạm Hà Nội kỳ thi độc lập đánh giá năng lực xét tuyển sư phạm 2026",
+      "canonicalEntity": "HNUE",
+      "knownOfficialDomains": [
+        "hnue.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-020",
+      "query": "Đại học Sư phạm TP.HCM chính sách hỗ trợ 3.63 triệu đồng theo Nghị định 116 năm 2026",
+      "canonicalEntity": "HCMUE",
+      "knownOfficialDomains": [
+        "hcmue.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-021",
+      "query": "Đại học Công nghệ Thông tin ĐHQG TP.HCM ngành Kỹ thuật máy tính và AI học phí 2026",
+      "canonicalEntity": "UIT_VNUHCM",
+      "knownOfficialDomains": [
+        "uit.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-022",
+      "query": "Đại học Giao thông Vận tải TP.HCM học phí ngành Logistics và Quản lý chuỗi cung ứng 2026",
+      "canonicalEntity": "UTH",
+      "knownOfficialDomains": [
+        "uth.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-023",
+      "query": "Trường Đại học Kiến trúc Hà Nội lịch thi môn năng khiếu vẽ mỹ thuật năm 2026",
+      "canonicalEntity": "HAU",
+      "knownOfficialDomains": [
+        "hau.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-024",
+      "query": "Trường Đại học Kiến trúc TP.HCM thông báo nộp hồ sơ thi môn Vẽ đầu vào năm 2026",
+      "canonicalEntity": "UAH",
+      "knownOfficialDomains": [
+        "uah.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-025",
+      "query": "British University Vietnam học bổng toàn phần 100% học phí British Ambassador 2026",
+      "canonicalEntity": "BUV",
+      "knownOfficialDomains": [
+        "buv.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-026",
+      "query": "Đại học VinUni chính sách hỗ trợ tài chính cho sinh viên xuất sắc 2026",
+      "canonicalEntity": "VINUNI",
+      "knownOfficialDomains": [
+        "vinuni.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-027",
+      "query": "Đại học Fulbright Việt Nam hồ sơ xin hỗ trợ tài chính dựa trên nhu cầu năm 2026",
+      "canonicalEntity": "FUV",
+      "knownOfficialDomains": [
+        "fulbright.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-028",
+      "query": "Swinburne Vietnam chương trình chuyển tiếp sang Melbourne Australia 2026",
+      "canonicalEntity": "SWINBURNE",
+      "knownOfficialDomains": [
+        "swinburne-vn.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-029",
+      "query": "Đại học Quốc tế Miền Đông học bổng doanh nghiệp Becamex cho sinh viên kỹ thuật 2026",
+      "canonicalEntity": "EIU",
+      "knownOfficialDomains": [
+        "eiu.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-TOP-030",
+      "query": "Đại học Văn Lang học phí chính quy ngành Thiết kế đồ họa năm học 2026",
+      "canonicalEntity": "VLU",
+      "knownOfficialDomains": [
+        "vlu.edu.vn"
+      ],
+      "difficulty": "NATIONAL_KEY_UNIVERSITY"
+    },
+    {
+      "caseId": "RET-V4-AMB-001",
+      "query": "ĐHBK thông báo thời hạn nộp chứng chỉ tiếng Anh tốt nghiệp 2026",
+      "canonicalEntity": "AMBIGUOUS_DHBK",
+      "knownOfficialDomains": [
+        "hust.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-002",
+      "query": "bách khoa công bố ngưỡng điểm nhận hồ sơ xét tuyển bằng điểm thi tốt nghiệp 2026",
+      "canonicalEntity": "AMBIGUOUS_DHBK",
+      "knownOfficialDomains": [
+        "hcmut.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-003",
+      "query": "ĐHQG hướng dẫn đăng ký dự thi đánh giá năng lực đợt 1 năm 2026",
+      "canonicalEntity": "AMBIGUOUS_DHQG",
+      "knownOfficialDomains": [
+        "vnuhcm.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-004",
+      "query": "đhqg quy định chuẩn đầu ra ngoại ngữ bậc đại học 2026",
+      "canonicalEntity": "AMBIGUOUS_DHQG",
+      "knownOfficialDomains": [
+        "vnu.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-005",
+      "query": "ĐHSP chính sách cấp bù tiền đóng học phí và sinh hoạt phí theo Nghị định 116 năm 2026",
+      "canonicalEntity": "AMBIGUOUS_DHSP",
+      "knownOfficialDomains": [
+        "hnue.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-006",
+      "query": "đh sư phạm chỉ tiêu tuyển sinh ngành sư phạm ngữ văn 2026",
+      "canonicalEntity": "AMBIGUOUS_DHSP",
+      "knownOfficialDomains": [
+        "hcmue.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-007",
+      "query": "ĐHKT thông báo thời gian nộp học phí qua cổng ngân hàng kỳ 1 năm 2026",
+      "canonicalEntity": "AMBIGUOUS_DHKT",
+      "knownOfficialDomains": [
+        "neu.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-008",
+      "query": "đh kinh tế quy định đăng ký học phần song bằng quốc tế 2026",
+      "canonicalEntity": "AMBIGUOUS_DHKT",
+      "knownOfficialDomains": [
+        "ueh.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-009",
+      "query": "ĐH Luật công bố điểm chuẩn trúng tuyển ngành luật kinh tế 2026",
+      "canonicalEntity": "AMBIGUOUS_DHLUAT",
+      "knownOfficialDomains": [
+        "hlu.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-010",
+      "query": "đh luật quy chế xét tốt nghiệp sớm trước hạn năm học 2026",
+      "canonicalEntity": "AMBIGUOUS_DHLUAT",
+      "knownOfficialDomains": [
+        "ulaw.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-011",
+      "query": "ĐH Mở thông báo tuyển sinh hệ đào tạo từ xa trực tuyến 2026",
+      "canonicalEntity": "AMBIGUOUS_DHMO",
+      "knownOfficialDomains": [
+        "hou.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-012",
+      "query": "đh mở học phí chính quy tín chỉ các ngành công nghệ thông tin 2026",
+      "canonicalEntity": "AMBIGUOUS_DHMO",
+      "knownOfficialDomains": [
+        "ou.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-013",
+      "query": "ĐH Nông Lâm quy định miễn giảm học phí cho ngành nông lâm ngư nghiệp 2026",
+      "canonicalEntity": "AMBIGUOUS_DHNL",
+      "knownOfficialDomains": [
+        "hcmuaf.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-014",
+      "query": "ĐH Ngoại ngữ chuẩn đầu ra ngoại ngữ 2 cho sinh viên năm cuối 2026",
+      "canonicalEntity": "AMBIGUOUS_DHNN",
+      "knownOfficialDomains": [
+        "ulis.vnu.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-015",
+      "query": "ĐH Y Dược thời gian ôn thi tốt nghiệp chuyên khoa và bác sĩ nội trú 2026",
+      "canonicalEntity": "AMBIGUOUS_DHYD",
+      "knownOfficialDomains": [
+        "hmu.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-016",
+      "query": "đh y dược học phí đào tạo bác sĩ răng hàm mặt năm học 2026",
+      "canonicalEntity": "AMBIGUOUS_DHYD",
+      "knownOfficialDomains": [
+        "ump.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-017",
+      "query": "UTE thông báo thời hạn nộp đồ án tốt nghiệp học kỳ 2 năm 2026",
+      "canonicalEntity": "AMBIGUOUS_UTE",
+      "knownOfficialDomains": [
+        "hcmute.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-018",
+      "query": "đh spkt chỉ tiêu tuyển sinh ngành robot và tự động hóa 2026",
+      "canonicalEntity": "AMBIGUOUS_UTE",
+      "knownOfficialDomains": [
+        "utehy.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-019",
+      "query": "ĐHBK lịch thi kết thúc học phần các môn toán cao cấp kỳ 1 năm 2026",
+      "canonicalEntity": "AMBIGUOUS_DHBK",
+      "knownOfficialDomains": [
+        "hust.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-020",
+      "query": "ĐHQG chính sách cho sinh viên vay tín dụng học tập ưu đãi 2026",
+      "canonicalEntity": "AMBIGUOUS_DHQG",
+      "knownOfficialDomains": [
+        "vnuhcm.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-021",
+      "query": "ĐHSP quy định rèn luyện nghiệp vụ sư phạm thường xuyên 2026",
+      "canonicalEntity": "AMBIGUOUS_DHSP",
+      "knownOfficialDomains": [
+        "hnue.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-022",
+      "query": "ĐHKT học bổng khuyến khích học tập danh sách sinh viên loại xuất sắc 2026",
+      "canonicalEntity": "AMBIGUOUS_DHKT",
+      "knownOfficialDomains": [
+        "ueh.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-023",
+      "query": "đh luật thông báo thời gian thực tập tại các tòa án nhân dân 2026",
+      "canonicalEntity": "AMBIGUOUS_DHLUAT",
+      "knownOfficialDomains": [
+        "hlu.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-024",
+      "query": "ĐH Nông Lâm ngày hội việc làm nông nghiệp công nghệ cao 2026",
+      "canonicalEntity": "AMBIGUOUS_DHNL",
+      "knownOfficialDomains": [
+        "hcmuaf.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-AMB-025",
+      "query": "UTE chương trình trao đổi sinh viên sang Nhật Bản và Đức 2026",
+      "canonicalEntity": "AMBIGUOUS_UTE",
+      "knownOfficialDomains": [
+        "vlute.edu.vn"
+      ],
+      "difficulty": "AMBIGUOUS_ACRONYM"
+    },
+    {
+      "caseId": "RET-V4-MULTI-001",
+      "query": "So sánh học phí ngành Kỹ thuật điều khiển tự động hóa giữa ĐH Bách khoa Hà Nội HUST và Bách khoa TP.HCM HCMUT 2026",
+      "canonicalEntity": "MULTI_HUST_HCMUT",
+      "knownOfficialDomains": [
+        "hust.edu.vn",
+        "hcmut.edu.vn"
+      ],
+      "difficulty": "MULTI_ENTITY_COMPARISON"
+    },
+    {
+      "caseId": "RET-V4-MULTI-002",
+      "query": "So sánh điểm chuẩn xét tuyển khối D01 giữa Đại học Ngoại thương FTU và Kinh tế quốc dân NEU",
+      "canonicalEntity": "MULTI_FTU_NEU",
+      "knownOfficialDomains": [
+        "ftu.edu.vn",
+        "neu.edu.vn"
+      ],
+      "difficulty": "MULTI_ENTITY_COMPARISON"
+    },
+    {
+      "caseId": "RET-V4-MULTI-003",
+      "query": "Học phí đào tạo Bác sĩ Y đa khoa giữa Đại học Y Hà Nội HMU và Đại học Y Dược TP.HCM UMP năm 2026",
+      "canonicalEntity": "MULTI_HMU_UMP",
+      "knownOfficialDomains": [
+        "hmu.edu.vn",
+        "ump.edu.vn"
+      ],
+      "difficulty": "MULTI_ENTITY_COMPARISON"
+    },
+    {
+      "caseId": "RET-V4-MULTI-004",
+      "query": "Chỉ tiêu ngành Sư phạm Toán giữa ĐH Sư phạm Hà Nội HNUE và ĐH Sư phạm TP.HCM HCMUE năm 2026",
+      "canonicalEntity": "MULTI_HNUE_HCMUE",
+      "knownOfficialDomains": [
+        "hnue.edu.vn",
+        "hcmue.edu.vn"
+      ],
+      "difficulty": "MULTI_ENTITY_COMPARISON"
+    },
+    {
+      "caseId": "RET-V4-MULTI-005",
+      "query": "Học phí và chỉ tiêu ngành Kiến trúc công trình giữa ĐH Kiến trúc Hà Nội HAU và ĐH Kiến trúc TP.HCM UAH",
+      "canonicalEntity": "MULTI_HAU_UAH",
+      "knownOfficialDomains": [
+        "hau.edu.vn",
+        "uah.edu.vn"
+      ],
+      "difficulty": "MULTI_ENTITY_COMPARISON"
+    },
+    {
+      "caseId": "RET-V4-MULTI-006",
+      "query": "So sánh chuẩn đầu ra ngoại ngữ tiếng Anh IELTS giữa Học viện Ngoại giao DAV và Ngoại thương FTU",
+      "canonicalEntity": "MULTI_DAV_FTU",
+      "knownOfficialDomains": [
+        "dav.edu.vn",
+        "ftu.edu.vn"
+      ],
+      "difficulty": "MULTI_ENTITY_COMPARISON"
+    },
+    {
+      "caseId": "RET-V4-MULTI-007",
+      "query": "Kỳ thi đánh giá năng lực ĐGNL giữa ĐHQG Hà Nội VNU và ĐHQG TP.HCM VNUHCM đợt 1 năm 2026",
+      "canonicalEntity": "MULTI_VNU_VNUHCM",
+      "knownOfficialDomains": [
+        "vnu.edu.vn",
+        "vnuhcm.edu.vn"
+      ],
+      "difficulty": "MULTI_ENTITY_COMPARISON"
+    },
+    {
+      "caseId": "RET-V4-MULTI-008",
+      "query": "Điểm chuẩn ngành Logistics và Quản lý chuỗi cung ứng giữa ĐH Giao thông Vận tải UTH và ĐH Quốc tế IU 2026",
+      "canonicalEntity": "MULTI_UTH_IU",
+      "knownOfficialDomains": [
+        "uth.edu.vn",
+        "hcmiu.edu.vn"
+      ],
+      "difficulty": "MULTI_ENTITY_COMPARISON"
+    },
+    {
+      "caseId": "RET-V4-MULTI-009",
+      "query": "So sánh cơ hội thực tập và học phí giữa Học viện Tài chính HVTC và Học viện Ngân hàng HVNH 2026",
+      "canonicalEntity": "MULTI_HVTC_HVNH",
+      "knownOfficialDomains": [
+        "hvtc.edu.vn",
+        "hvnh.edu.vn"
+      ],
+      "difficulty": "MULTI_ENTITY_COMPARISON"
+    },
+    {
+      "caseId": "RET-V4-MULTI-010",
+      "query": "Chương trình đào tạo Kỹ thuật ô tô giữa ĐH Sư phạm Kỹ thuật TP.HCM HCMUTE và ĐH SPKT Hưng Yên UTEHY",
+      "canonicalEntity": "MULTI_HCMUTE_UTEHY",
+      "knownOfficialDomains": [
+        "hcmute.edu.vn",
+        "utehy.edu.vn"
+      ],
+      "difficulty": "MULTI_ENTITY_COMPARISON"
+    },
+    {
+      "caseId": "RET-V4-REGU-001",
+      "query": "Nghị định 81/2021/NĐ-CP và Nghị định 97/2023/NĐ-CP quy định khung học phí giáo dục đại học công lập 2025-2026",
+      "canonicalEntity": "GOVERNMENT_VN",
+      "knownOfficialDomains": [
+        "chinhphu.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-002",
+      "query": "Quy định trần học phí các trường đại học tự chủ nhóm 1 và nhóm 2 năm học 2026 theo Nghị định Chính phủ",
+      "canonicalEntity": "GOVERNMENT_VN",
+      "knownOfficialDomains": [
+        "chinhphu.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-003",
+      "query": "Nghị định 49/2010/NĐ-CP về chế độ miễn giảm học phí hỗ trợ chi phí học tập cho sinh viên",
+      "canonicalEntity": "GOVERNMENT_VN",
+      "knownOfficialDomains": [
+        "chinhphu.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-004",
+      "query": "Nghị định 86/2015/NĐ-CP quy định cơ chế thu quản lý học phí đối với các cơ sở giáo dục",
+      "canonicalEntity": "GOVERNMENT_VN",
+      "knownOfficialDomains": [
+        "chinhphu.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-005",
+      "query": "Quyết định 157 của Thủ tướng về chính sách tín dụng vốn vay ưu đãi cho sinh viên năm 2026",
+      "canonicalEntity": "VBSP",
+      "knownOfficialDomains": [
+        "vbsp.org.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-006",
+      "query": "Mức vay vốn sinh viên tối đa tại Ngân hàng Chính sách Xã hội VBSP năm học 2025-2026",
+      "canonicalEntity": "VBSP",
+      "knownOfficialDomains": [
+        "vbsp.org.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-007",
+      "query": "Mức đóng bảo hiểm y tế BHYT học sinh sinh viên năm học 2025-2026 và quyền lợi hưởng BHYT",
+      "canonicalEntity": "BHXH_VN",
+      "knownOfficialDomains": [
+        "baohiemxahoi.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-008",
+      "query": "Bảo hiểm y tế sinh viên thủ tục khám chữa bệnh đúng tuyến và chuyển tuyến bệnh viện 2026",
+      "canonicalEntity": "BHXH_VN",
+      "knownOfficialDomains": [
+        "baohiemxahoi.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-009",
+      "query": "Cách đăng ký bảo hiểm tai nạn thương tật tự nguyện cho tân sinh viên năm 2026",
+      "canonicalEntity": "BAOHIEM",
+      "knownOfficialDomains": [
+        "baohiemxahoi.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-010",
+      "query": "Chế độ tạm hoãn gọi nhập ngũ nghĩa vụ quân sự đối với sinh viên đang học đại học chính quy 2026",
+      "canonicalEntity": "MOD_VN",
+      "knownOfficialDomains": [
+        "mod.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-011",
+      "query": "Giấy xác nhận sinh viên nộp cho Ban chỉ huy quân sự phường xã để xin tạm hoãn nghĩa vụ quân sự",
+      "canonicalEntity": "MOD_VN",
+      "knownOfficialDomains": [
+        "mod.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-012",
+      "query": "Tiêu chuẩn xét chọn danh hiệu Sinh viên 5 tốt cấp Trung ương năm học 2025-2026",
+      "canonicalEntity": "TW_DOAN",
+      "knownOfficialDomains": [
+        "doanthanhnien.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-013",
+      "query": "Hướng dẫn hồ sơ xét giải thưởng Sao Tháng Giêng dành cho cán bộ Đoàn Hội xuất sắc 2026",
+      "canonicalEntity": "TW_DOAN",
+      "knownOfficialDomains": [
+        "doanthanhnien.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-014",
+      "query": "Thông tư 08/2021/TT-BGDĐT ban hành Quy chế đào tạo trình độ đại học chuẩn mới nhất",
+      "canonicalEntity": "MOET_VN",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-015",
+      "query": "Quy định xét cấp học bổng khuyến khích học tập cho sinh viên loại giỏi xuất sắc năm 2026",
+      "canonicalEntity": "MOET_VN",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-016",
+      "query": "Quy định chuẩn đầu ra ngoại ngữ chứng chỉ VSTEP tương đương B1 B2 cho sinh viên tốt nghiệp 2026",
+      "canonicalEntity": "MOET_VN",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-017",
+      "query": "Quy chế công nhận tương đương chứng chỉ IELTS sang điểm môn tiếng Anh xét tốt nghiệp THPT 2026",
+      "canonicalEntity": "MOET_VN",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-018",
+      "query": "Quy định điều kiện liên thông đại học chính quy đối với sinh viên cao đẳng tốt nghiệp năm 2026",
+      "canonicalEntity": "MOET_VN",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-019",
+      "query": "Quy định xử lý kỷ luật đối với sinh viên vi phạm quy chế thi gian lận hoặc sử dụng AI trái phép 2026",
+      "canonicalEntity": "MOET_VN",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-020",
+      "query": "Chính sách hỗ trợ sinh viên khởi nghiệp theo Đề án 1665 của Thủ tướng Chính phủ giao Bộ GD&ĐT",
+      "canonicalEntity": "MOET_VN",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-021",
+      "query": "Sinh viên bị cảnh cáo học vụ 2 lần liên tiếp thì bị buộc thôi học theo quy chế Bộ Giáo dục phải không",
+      "canonicalEntity": "MOET_VN",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-022",
+      "query": "Điều kiện nhận học bổng Tiếp sức đến trường dành cho tân sinh viên hoàn cảnh khó khăn 2026",
+      "canonicalEntity": "TUOITRE",
+      "knownOfficialDomains": [
+        "tuoitre.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-023",
+      "query": "Thủ tục nộp hồ sơ xin cấp lại bằng tốt nghiệp đại học online trên Cổng Dịch vụ công Quốc gia DVCQG",
+      "canonicalEntity": "DVCQG",
+      "knownOfficialDomains": [
+        "dichvucong.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-024",
+      "query": "Chính sách trợ cấp xã hội và hỗ trợ sinh viên mồ côi theo Nghị định 20/2021/NĐ-CP",
+      "canonicalEntity": "MOLISA_VN",
+      "knownOfficialDomains": [
+        "molisa.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-REGU-025",
+      "query": "Thông tư 03/2014/TT-BTTTT quy định chuẩn kỹ năng sử dụng công nghệ thông tin cơ bản cho sinh viên",
+      "canonicalEntity": "MIC_VN",
+      "knownOfficialDomains": [
+        "mic.gov.vn"
+      ],
+      "difficulty": "REGULATORY_POLICY"
+    },
+    {
+      "caseId": "RET-V4-SCAM-001",
+      "query": "Cảnh báo fanpage giả mạo trường đại học gửi link nhận học bổng yêu cầu cung cấp mã OTP ngân hàng",
+      "canonicalEntity": "SCAM_ALERT_01",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-002",
+      "query": "Chiêu trò tuyển cộng tác viên sinh viên chốt đơn Shopee Lazada kiếm hoa hồng cao nạp tiền làm nhiệm vụ",
+      "canonicalEntity": "SCAM_ALERT_02",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-003",
+      "query": "Lừa đảo cho thuê phòng trọ giá rẻ bắt sinh viên chuyển cọc giữ chân qua tài khoản cá nhân",
+      "canonicalEntity": "SCAM_ALERT_03",
+      "knownOfficialDomains": [
+        "canhsat.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-004",
+      "query": "Cảnh báo mạo danh Bộ Giáo dục yêu cầu sinh viên bấm link nộp phạt trốn nghĩa vụ quân sự 2 giờ",
+      "canonicalEntity": "SCAM_ALERT_04",
+      "knownOfficialDomains": [
+        "mps.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-005",
+      "query": "Chiêu trò quảng cáo làm bằng đại học giả hồ sơ gốc không cần học bao công chứng xin việc",
+      "canonicalEntity": "SCAM_ALERT_05",
+      "knownOfficialDomains": [
+        "canhsat.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-006",
+      "query": "Bẫy lừa đảo cho vay tiền qua app online thế chấp tài khoản iCloud chụp ảnh nhạy cảm tống tiền sinh viên",
+      "canonicalEntity": "SCAM_ALERT_06",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-007",
+      "query": "Cảnh báo tin nhắn SMS Brandname giả mạo ngân hàng thông báo tài khoản bị khóa yêu cầu nhập mật khẩu",
+      "canonicalEntity": "SCAM_ALERT_07",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-008",
+      "query": "Tuyển sinh viên làm mẫu ảnh lookbook thời trang yêu cầu cởi đồ gọi video call quét gương mặt",
+      "canonicalEntity": "SCAM_ALERT_08",
+      "knownOfficialDomains": [
+        "canhsat.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-009",
+      "query": "Lừa đảo nhận học bổng du học toàn phần yêu cầu đóng phí bảo lãnh visa 50 triệu qua tài khoản cá nhân",
+      "canonicalEntity": "SCAM_ALERT_09",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-010",
+      "query": "Cảnh báo thủ đoạn thuê sinh viên mở hộ tài khoản ngân hàng và đăng ký thẻ tín dụng để rửa tiền",
+      "canonicalEntity": "SCAM_ALERT_10",
+      "knownOfficialDomains": [
+        "mps.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-011",
+      "query": "Giả danh cán bộ Công an gọi điện dọa sinh viên liên quan đến đường dây ma túy rửa tiền yêu cầu chuyển tiền",
+      "canonicalEntity": "SCAM_ALERT_11",
+      "knownOfficialDomains": [
+        "mps.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-012",
+      "query": "Cảnh báo bẫy đa cấp bán khóa học kỹ năng mềm và tiền ảo núp bóng câu lạc bộ sinh viên",
+      "canonicalEntity": "SCAM_ALERT_12",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-013",
+      "query": "Lừa đảo thi hộ lấy chứng chỉ tiếng Anh TOEIC IELTS bao đậu tại trung tâm ngoại ngữ không phép",
+      "canonicalEntity": "SCAM_ALERT_13",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-014",
+      "query": "Cảnh báo thủ đoạn đánh cắp quyền admin nhóm Facebook sinh viên bằng file đính kèm chứa mã độc",
+      "canonicalEntity": "SCAM_ALERT_14",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-015",
+      "query": "Chiêu trò tuyển thực tập sinh IT Google Microsoft yêu cầu đóng lệ phí phỏng vấn bảo mật",
+      "canonicalEntity": "SCAM_ALERT_15",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-016",
+      "query": "Cảnh báo tin nhắn Zalo mạo danh giảng viên chủ nhiệm yêu cầu đóng tiền bảo hiểm gấp qua ví cá nhân",
+      "canonicalEntity": "SCAM_ALERT_16",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-017",
+      "query": "Bẫy lừa đảo chuyển tiền quà tặng từ nước ngoài yêu cầu sinh viên đóng phí hải quan 20 triệu",
+      "canonicalEntity": "SCAM_ALERT_17",
+      "knownOfficialDomains": [
+        "canhsat.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-018",
+      "query": "Cảnh báo app chấm điểm rèn luyện giả mạo yêu cầu cấp quyền đọc danh bạ và tin nhắn SMS",
+      "canonicalEntity": "SCAM_ALERT_18",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-019",
+      "query": "Chiêu trò dụ dỗ sinh viên nâng điểm học phần can thiệp hệ thống phòng đào tạo đóng 10 triệu",
+      "canonicalEntity": "SCAM_ALERT_19",
+      "knownOfficialDomains": [
+        "canhsat.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-020",
+      "query": "Lừa đảo xuất khẩu lao động Nhật Bản visa Tokutei thu tiền cọc 150 triệu của sinh viên tốt nghiệp",
+      "canonicalEntity": "SCAM_ALERT_20",
+      "knownOfficialDomains": [
+        "molisa.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-021",
+      "query": "Cảnh báo link khảo sát ý kiến sinh viên nhận thẻ cào 100k chứa virus chiếm đoạt tài khoản Telegram",
+      "canonicalEntity": "SCAM_ALERT_21",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-022",
+      "query": "Chiêu trò đóng học phí hộ giảm giá 20% yêu cầu sinh viên cung cấp tài khoản và mật khẩu portal",
+      "canonicalEntity": "SCAM_ALERT_22",
+      "knownOfficialDomains": [
+        "ncsc.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-023",
+      "query": "Cảnh báo mạo danh công an khu vực kiểm tra tạm trú ký túc xá yêu cầu nộp tiền phạt vi phạm",
+      "canonicalEntity": "SCAM_ALERT_23",
+      "knownOfficialDomains": [
+        "mps.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-024",
+      "query": "Lừa đảo bán đề thi kết thúc học phần và đáp án trắc nghiệm trên các nhóm kín Zalo",
+      "canonicalEntity": "SCAM_ALERT_24",
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-SCAM-025",
+      "query": "Bẫy tuyển sinh viên làm gia sư online yêu cầu đóng cọc phí nhận lớp 500k rồi chặn liên lạc",
+      "canonicalEntity": "SCAM_ALERT_25",
+      "knownOfficialDomains": [
+        "canhsat.gov.vn"
+      ],
+      "difficulty": "SCAM_FRAUD_ALERT"
+    },
+    {
+      "caseId": "RET-V4-CORP-001",
+      "query": "Viettel Digital Talent chương trình thực tập sinh tài năng dành cho sinh viên IT 2026",
+      "canonicalEntity": "VIETTEL",
+      "knownOfficialDomains": [
+        "viettel.com.vn"
+      ],
+      "difficulty": "CORPORATE_PARTNER"
+    },
+    {
+      "caseId": "RET-V4-CORP-002",
+      "query": "FPT Software tuyển dụng Fresher AI Engineer và Data Analyst sinh viên mới tốt nghiệp 2026",
+      "canonicalEntity": "FSOFT",
+      "knownOfficialDomains": [
+        "fptsoftware.com"
+      ],
+      "difficulty": "CORPORATE_PARTNER"
+    },
+    {
+      "caseId": "RET-V4-CORP-003",
+      "query": "Samsung R&D Vietnam tuyển sinh viên thực tập lập trình thuật toán GSAT năm 2026",
+      "canonicalEntity": "SAMSUNG_SRV",
+      "knownOfficialDomains": [
+        "samsung.com"
+      ],
+      "difficulty": "CORPORATE_PARTNER"
+    },
+    {
+      "caseId": "RET-V4-CORP-004",
+      "query": "Quỹ Đổi mới sáng tạo Vingroup VINIF học bổng thạc sĩ tiến sĩ cho sinh viên xuất sắc 2026",
+      "canonicalEntity": "VINIF",
+      "knownOfficialDomains": [
+        "vinif.org"
+      ],
+      "difficulty": "CORPORATE_PARTNER"
+    },
+    {
+      "caseId": "RET-V4-CORP-005",
+      "query": "Công ty Cổ phần MISA tuyển dụng thực tập sinh phát triển phần mềm kế toán 2026",
+      "canonicalEntity": "MISA",
+      "knownOfficialDomains": [
+        "misa.vn"
+      ],
+      "difficulty": "CORPORATE_PARTNER"
+    }
+  ]
+}

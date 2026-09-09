@@ -6,10 +6,11 @@
 
 import { NextResponse } from "next/server";
 import { ExpertScopeEngine } from "@/lib/intelligence/expert/expertScopeEngine";
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import { ExpertStore, isExpertDemoMode } from "@/lib/intelligence/expert/expertStore";
+import { ExpertRepository } from "@/lib/server/database/ExpertRepository.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric";
 
-async function evaluateExpertScope(req) {
+async function evaluateExpertScope(req, _routeParams, _principal, securityContext) {
   try {
     const body = await req.json().catch(() => ({}));
     const { expertId, claim } = body;
@@ -21,7 +22,7 @@ async function evaluateExpertScope(req) {
       );
     }
 
-    const expert = ExpertStore.getExpert(expertId);
+    const expert = isExpertDemoMode() ? ExpertStore.getExpert(expertId) : await ExpertRepository.getPublicProfile(expertId);
     if (!expert) {
       return NextResponse.json(
         { success: false, error: { code: "EXPERT_NOT_FOUND", userMessage: "Không tìm thấy hồ sơ chuyên gia." } },
@@ -41,10 +42,12 @@ async function evaluateExpertScope(req) {
         department: expert.department,
         hasRegistrarAuthority: expert.hasRegistrarAuthority
       },
-      evaluation
+      evaluation,
+      sourceState: isExpertDemoMode() ? "DEMO_FIXTURE" : "DURABLE_POSTGRES",
+      correlationId: securityContext.correlationId,
     });
   } catch (error) {
-    throw error;
+    return NextResponse.json({ success: false, error: { code: "EXPERT_STORAGE_UNAVAILABLE", userMessage: "Expert scope storage is temporarily unavailable.", correlationId: securityContext.correlationId } }, { status: 503 });
   }
 }
 

@@ -1,0 +1,48 @@
+{
+  "fixtureVersion": "promax-starter-v1",
+  "status": "CONTROLLED_SYNTHETIC_STARTER",
+  "authority": "TEST_ONLY",
+  "notice": "Synthetic cases for contract and evaluation harness development. They are not evidence about a real institution or event.",
+  "cases": [
+    {
+      "caseId": "10000000-0000-4000-8000-000000000001",
+      "revision": 1,
+      "scenario": "scholarship_transfer_request",
+      "claims": [
+        { "claimId": "20000000-0000-4000-8000-000000000001", "goldLabel": "UNRESOLVED", "statement": "The scholarship announcement is associated with a real programme." },
+        { "claimId": "20000000-0000-4000-8000-000000000002", "goldLabel": "CONTRADICTED", "statement": "Applicants must transfer money to receive the scholarship." }
+      ],
+      "evidence": [
+        { "evidenceId": "30000000-0000-4000-8000-000000000001", "relation": "CONTEXT", "sourceKind": "SYNTHETIC_NOTICE" },
+        { "evidenceId": "30000000-0000-4000-8000-000000000002", "relation": "CONTRADICTS", "sourceKind": "SYNTHETIC_BANK_WARNING" }
+      ],
+      "expectedSignals": ["PII_BLOCK_ON_ACCOUNT_NUMBER", "DUPLICATE_SOURCE_CLUSTER", "MINORITY_CONTRADICTION_VISIBLE", "EXPERT_SCOPE_REQUIRED"]
+    },
+    {
+      "caseId": "10000000-0000-4000-8000-000000000002",
+      "revision": 1,
+      "scenario": "internship_training_fee",
+      "claims": [
+        { "claimId": "20000000-0000-4000-8000-000000000003", "goldLabel": "UNRESOLVED", "statement": "The internship offer and its training fee have the same source and terms." }
+      ],
+      "evidence": [
+        { "evidenceId": "30000000-0000-4000-8000-000000000003", "relation": "SUPPORTS", "sourceKind": "SYNTHETIC_OFFER" },
+        { "evidenceId": "30000000-0000-4000-8000-000000000004", "relation": "CONTEXT", "sourceKind": "SYNTHETIC_POLICY" }
+      ],
+      "expectedSignals": ["NEW_USER_PRIMARY_SOURCE_CAN_RANK", "STALE_SOURCE_DEPRIORITIZED", "NEEDS_REVIEW_SORT"]
+    },
+    {
+      "caseId": "10000000-0000-4000-8000-000000000003",
+      "revision": 2,
+      "scenario": "housing_deposit_qr",
+      "claims": [
+        { "claimId": "20000000-0000-4000-8000-000000000004", "goldLabel": "INSUFFICIENT", "statement": "The housing deposit request is attributable to the advertised landlord." }
+      ],
+      "evidence": [
+        { "evidenceId": "30000000-0000-4000-8000-000000000005", "relation": "CONTEXT", "sourceKind": "SYNTHETIC_LISTING" },
+        { "evidenceId": "30000000-0000-4000-8000-000000000006", "relation": "CONTRADICTS", "sourceKind": "SYNTHETIC_QR_REPORT" }
+      ],
+      "expectedSignals": ["QR_DATA_BLOCK", "REVISION_BOUND_ASSESSMENT", "UNRESOLVED_EXPERT_DISAGREEMENT"]
+    }
+  ]
+}

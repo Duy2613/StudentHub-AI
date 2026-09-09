@@ -4,7 +4,8 @@
  * Retrieves the full Expert Knowledge Graph nodes and edges.
  */
 
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore.js";
+import { ExpertStore, isExpertDemoMode } from "@/lib/intelligence/expert/expertStore.js";
+import { ExpertRepository } from "@/lib/server/database/ExpertRepository.js";
 import { ExpertPublicDTO } from "@/lib/intelligence/expert/ExpertPublicDTO.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
@@ -12,8 +13,13 @@ export const GET = SecurityFabric.wrapHandler({
   action: "READ_EXPERT_GRAPH",
   allowAnonymous: true,
   maxRequests: 90
-}, async () => {
-    const experts = ExpertStore.getAllExperts({ redactPrivate: true });
+}, async (_request, _routeParams, _principal, securityContext) => {
+    let experts;
+    try {
+      experts = isExpertDemoMode() ? ExpertStore.getAllExperts({ redactPrivate: true }) : await ExpertRepository.listPublicProfiles({ limit: 100 });
+    } catch {
+      return Response.json({ success: false, error: { code: "EXPERT_STORAGE_UNAVAILABLE", userMessage: "Expert graph storage is temporarily unavailable.", correlationId: securityContext.correlationId } }, { status: 503 });
+    }
 
     // Construct graph nodes and edges
     const nodes = [];
@@ -57,7 +63,7 @@ export const GET = SecurityFabric.wrapHandler({
         edges,
         totalExperts: experts.length
       },
-      sourceState: "CURATED_EXPERT_GRAPH",
+      sourceState: isExpertDemoMode() ? "DEMO_FIXTURE" : "DURABLE_POSTGRES",
       isAuthoritative: false,
       dataNotice: "Đồ thị chuyên gia tham khảo; thông tin xác thực cần đối soát hồ sơ chính thức."
     });

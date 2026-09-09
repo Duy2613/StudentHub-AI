@@ -19,6 +19,7 @@ import { NormalizationService } from "./normalization/NormalizationService.js";
 import { UrlDetector } from "./detectors/UrlDetector.js";
 import { TextDetector } from "./detectors/TextDetector.js";
 import { FileDetector } from "./detectors/FileDetector.js";
+import { FileUploadSecurityBoundary } from "./security/FileUploadSecurityBoundary.js";
 import { ImageDetector } from "./detectors/ImageDetector.js";
 import { DecisionEngine } from "./engine/DecisionEngine.js";
 import { executeAuxiliaryModelSafe } from "./models/ITrustSignalModel.js";
@@ -100,11 +101,16 @@ export class Layer1ScreenService {
         forceUnknown = !normBytes.isValid;
         unknownReason = normBytes.isOverSize ? LAYER_1_REASONS.OVERSIZED_FILE : "BINARY_INPUT_UNAVAILABLE_OR_MALFORMED";
 
-        const fileRes = FileDetector.detect({
+        const fileRes = FileUploadSecurityBoundary.inspect({
           bytes: normBytes.bytes,
           fileName: metadata.fileName || "",
           mimeType: metadata.mimeType || "",
           fileSize: metadata.fileSize || 0,
+          filename: metadata.filename || metadata.fileName || "",
+          compressionRatio: metadata.compressionRatio,
+          qrText: metadata.qrContent || metadata.qrText || "",
+          exif: metadata.exif || "",
+          isXml: metadata.isXml === true || metadata.mimeType === "application/xml" || metadata.mimeType === "text/xml",
         });
         rawSignals.push(...fileRes.signals);
       } else {

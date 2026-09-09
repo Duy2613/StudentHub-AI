@@ -21,6 +21,104 @@ import { markAssurance, measureAssurance } from "@/lib/performance/assurance";
  * Authoritative learning graph ontology details for each node
  */
 export const ATLAS_NODE_DATA = {
+  "van-ban-phap-quy": {
+    id: "van-ban-phap-quy",
+    title: "Văn bản Quy phạm & Tiêu chuẩn",
+    domain: "Application",
+    status: "COMPLETED",
+    progress: 100,
+    lessonCount: 8,
+    practiceCount: 5,
+    projectCount: 2,
+    prerequisites: [],
+    dependents: ["thong-bao-hoc-vu", "tham-dinh-chung-chi"],
+    recommendedNext: "Quy chế Đào tạo & Điều lệ Đại học",
+    description: "Quy chế đào tạo Bộ GD&ĐT, điều lệ trường ĐH và hệ thống văn bản có giá trị pháp lý.",
+  },
+  "thong-bao-hoc-vu": {
+    id: "thong-bao-hoc-vu",
+    title: "Thông báo Học vụ & Tín chỉ",
+    domain: "Application",
+    status: "IN_PROGRESS",
+    progress: 75,
+    lessonCount: 6,
+    practiceCount: 4,
+    projectCount: 1,
+    prerequisites: ["van-ban-phap-quy"],
+    dependents: ["canh-bao-rui-ro", "tham-dinh-chung-chi"],
+    recommendedNext: "Quy trình Đăng ký Môn & Hạn nộp Học phí",
+    description: "Thời hạn đóng học phí, lịch đăng ký tín chỉ và quy định điều kiện tốt nghiệp.",
+  },
+  "tham-dinh-chung-chi": {
+    id: "tham-dinh-chung-chi",
+    title: "Thẩm định Chứng chỉ & Chuẩn đầu ra",
+    domain: "Intelligence",
+    status: "READY",
+    progress: 40,
+    lessonCount: 5,
+    practiceCount: 3,
+    projectCount: 1,
+    prerequisites: ["thong-bao-hoc-vu"],
+    dependents: ["hoi-dong-chuyen-gia"],
+    recommendedNext: "Bảng Quy đổi Điểm IELTS / Aptis / Vstep",
+    description: "Đối soát chuẩn ngoại ngữ, tin học và chứng chỉ quốc tế được công nhận.",
+  },
+  "canh-bao-rui-ro": {
+    id: "canh-bao-rui-ro",
+    title: "Cảnh báo Rủi ro & An toàn Sinh viên",
+    domain: "Reliability",
+    status: "READY",
+    progress: 80,
+    lessonCount: 9,
+    practiceCount: 6,
+    projectCount: 2,
+    prerequisites: ["thong-bao-hoc-vu"],
+    dependents: ["hoi-dong-chuyen-gia"],
+    recommendedNext: "Phát hiện Lừa cọc Trọ & Cổng nộp Giả mạo",
+    description: "Phát hiện link học phí giả mạo, học bổng bẫy, nhà trọ lừa cọc qua 4 lớp kiểm định.",
+  },
+  "hoi-dong-chuyen-gia": {
+    id: "hoi-dong-chuyen-gia",
+    title: "Hội đồng Chuyên gia & Cố vấn",
+    domain: "Architecture",
+    status: "RECOMMENDED",
+    progress: 30,
+    lessonCount: 7,
+    practiceCount: 4,
+    projectCount: 1,
+    prerequisites: ["canh-bao-rui-ro", "tham-dinh-chung-chi"],
+    dependents: ["cong-dong-sinh-vien"],
+    recommendedNext: "Kênh Tham vấn Cố vấn Học tập Khoa",
+    description: "Cố vấn học tập, giảng viên đầu ngành xác minh trong đúng phạm vi chuyên môn.",
+  },
+  "cong-dong-sinh-vien": {
+    id: "cong-dong-sinh-vien",
+    title: "Trí tuệ Cộng đồng & Thực địa",
+    domain: "Application",
+    status: "IN_PROGRESS",
+    progress: 60,
+    lessonCount: 11,
+    practiceCount: 8,
+    projectCount: 3,
+    prerequisites: ["hoi-dong-chuyen-gia"],
+    dependents: ["lo-trinh-phat-trien"],
+    recommendedNext: "Khảo sát Học phần & Đánh giá Minh chứng",
+    description: "Dữ liệu phản hồi học phần thực tế, đánh giá giảng viên khách quan có minh chứng.",
+  },
+  "lo-trinh-phat-trien": {
+    id: "lo-trinh-phat-trien",
+    title: "Lộ trình Tín chỉ & Tốt nghiệp",
+    domain: "Architecture",
+    status: "READY",
+    progress: 50,
+    lessonCount: 8,
+    practiceCount: 5,
+    projectCount: 2,
+    prerequisites: ["cong-dong-sinh-vien"],
+    dependents: ["van-ban-phap-quy"],
+    recommendedNext: "Dự báo Cảnh báo Học vụ & Tối ưu Tín chỉ",
+    description: "Cây môn học tiên quyết, dự báo cảnh báo học vụ và lộ trình ra trường đúng hạn.",
+  },
   frontend: {
     id: "frontend",
     title: "Frontend Engineering",
@@ -190,7 +288,22 @@ export default function InteractiveKnowledgeAtlas({ className = "" }) {
     });
   };
 
-  const selectedNode = selectedNodeId ? ATLAS_NODE_DATA[selectedNodeId] : null;
+  const selectedNode = selectedNodeId
+    ? ATLAS_NODE_DATA[selectedNodeId] || {
+        id: selectedNodeId,
+        title: selectedNodeId,
+        domain: "Application",
+        status: "READY",
+        progress: 50,
+        lessonCount: 5,
+        practiceCount: 3,
+        projectCount: 1,
+        prerequisites: [],
+        dependents: [],
+        recommendedNext: "Tìm hiểu chuyên đề",
+        description: "Thông tin đang được cập nhật.",
+      }
+    : null;
 
   const filteredNodes = useMemo(() => {
     return KNOWLEDGE_DOMAINS.filter((domain) => {
@@ -202,34 +315,34 @@ export default function InteractiveKnowledgeAtlas({ className = "" }) {
   return (
     <section
       id="knowledge-atlas"
-      className={`relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 ${className}`}
+      className={`relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 border-b border-white/[0.08] ${className}`}
       aria-label="Bản đồ tri thức liên kết (Knowledge Atlas)"
     >
-      {/* Header section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-6">
+      {/* Header section: 70% Editorial Calm */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6 text-left">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-wide uppercase bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 mb-3">
-            <Network size={13} className="text-cyan-400" />
-            <span>Learning Ontology & Dependencies</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-widest uppercase bg-[#0F1B18] text-[#7BE0B2] border border-white/[0.1] mb-3">
+            <Network size={13} className="text-[#7BE0B2]" />
+            <span>03 / Quan Hệ Tri Thức & Tiên Quyết</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-text-primary">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#F4F0E6]">
             Knowledge Atlas
           </h2>
-          <p className="mt-2 text-base sm:text-lg text-text-secondary max-w-2xl">
-            Khám phá quan hệ phụ thuộc giữa các khối kiến thức. Bạn biết mình đang ở đâu,
-            cần chuẩn bị gì và bước tiếp theo là gì.
+          <p className="mt-3 text-base sm:text-lg text-[#C3CCC6] max-w-2xl leading-relaxed">
+            Nhìn kiến thức như một hệ thống liên kết hữu cơ. Xác định vị trí hiện tại,
+            chuẩn bị điều kiện tiên quyết và chọn điểm đột phá tiếp theo.
           </p>
         </div>
 
         {/* View Mode Switcher (WCAG 2.2 AA compliant) */}
-        <div className="flex items-center gap-2 bg-surface-primary border border-border-subtle p-1.5 rounded-xl self-start md:self-auto">
+        <div className="flex items-center gap-2 bg-[#0B1412] border border-white/[0.1] p-1.5 rounded-xl self-start md:self-auto shadow-sm">
           <button
             type="button"
             onClick={() => handleTabChange("spatial")}
             className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
               activeTab === "spatial"
-                ? "bg-accent-primary text-white shadow-sm"
-                : "text-text-secondary hover:text-text-primary"
+                ? "bg-[#0F1B18] text-[#F4F0E6] border border-[#7BE0B2]/40 shadow-sm"
+                : "text-[#8A9891] hover:text-[#F4F0E6]"
             }`}
             aria-pressed={activeTab === "spatial"}
           >
@@ -241,8 +354,8 @@ export default function InteractiveKnowledgeAtlas({ className = "" }) {
             onClick={() => handleTabChange("semantic")}
             className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
               activeTab === "semantic"
-                ? "bg-accent-primary text-white shadow-sm"
-                : "text-text-secondary hover:text-text-primary"
+                ? "bg-[#0F1B18] text-[#F4F0E6] border border-[#7BE0B2]/40 shadow-sm"
+                : "text-[#8A9891] hover:text-[#F4F0E6]"
             }`}
             aria-pressed={activeTab === "semantic"}
           >
@@ -295,7 +408,20 @@ export default function InteractiveKnowledgeAtlas({ className = "" }) {
               aria-label="Danh sách các lĩnh vực tri thức"
             >
               {filteredNodes.map((item) => {
-                const node = ATLAS_NODE_DATA[item.id];
+                const node = ATLAS_NODE_DATA[item.id] || {
+                  id: item.id,
+                  title: item.label,
+                  domain: item.domain || "Application",
+                  status: "READY",
+                  progress: 50,
+                  lessonCount: 5,
+                  practiceCount: 3,
+                  projectCount: 1,
+                  prerequisites: [],
+                  dependents: [],
+                  recommendedNext: "Tìm hiểu chuyên đề",
+                  description: item.description || "Thông tin đang được cập nhật.",
+                };
                 const isSelected = item.id === selectedNodeId;
                 return (
                   <div
@@ -325,9 +451,9 @@ export default function InteractiveKnowledgeAtlas({ className = "" }) {
                         <h3 className="font-semibold text-text-primary text-base">
                           {node.title}
                         </h3>
-                        <p className="text-xs text-text-muted font-mono mt-0.5">
+                        <div className="text-[13px] text-text-muted font-mono mt-0.5">
                           {node.domain} · {node.lessonCount} bài học · {node.projectCount} đồ án
-                        </p>
+                        </div>
                       </div>
                     </div>
 
@@ -436,7 +562,7 @@ export default function InteractiveKnowledgeAtlas({ className = "" }) {
                   <span className="text-text-muted uppercase tracking-wider block mb-1">
                     Mục tiêu mở khóa tiếp theo:
                   </span>
-                  <p className="text-text-primary font-sans text-xs bg-surface-elevated/40 p-2.5 rounded-lg border border-border-subtle">
+                  <p className="text-text-primary font-sans text-sm bg-surface-elevated/40 p-2.5 rounded-lg border border-border-subtle">
                     {selectedNode.recommendedNext}
                   </p>
                 </div>

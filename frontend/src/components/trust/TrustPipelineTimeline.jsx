@@ -253,7 +253,7 @@ export default function TrustPipelineTimeline({ pipeline, processing = false, re
       </div>
 
       {/* Main Single-Panel Stage Card (Ordinary User Focus: 9 Clean Points) */}
-      <article
+      <div
         id={`trust-v5-panel-${presented.stageId}`}
         role="tabpanel"
         aria-labelledby={`trust-v5-tab-${presented.stageId}`}
@@ -486,7 +486,7 @@ export default function TrustPipelineTimeline({ pipeline, processing = false, re
             </div>
           )}
         </div>
-      </article>
+      </div>
     </section>
   );
 }

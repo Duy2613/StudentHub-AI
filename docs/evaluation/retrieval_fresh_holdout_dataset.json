@@ -1,0 +1,4632 @@
+{
+  "benchmarkVersion": "2.0.0-fresh-holdout",
+  "benchmarkType": "UNTOUCHED_FRESH_HOLDOUT_EVALUATION",
+  "createdAt": "2026-09-09T11:16:13.926Z",
+  "totalQueries": 168,
+  "categoryCounts": {
+    "UNINDEXED_INSTITUTION": 48,
+    "PRIVATE_COMPANY_ORG": 24,
+    "FRESH_2026_NOTICES": 24,
+    "AMBIGUOUS_ABBREVIATION": 18,
+    "SUPERSEDED_POLICY": 18,
+    "SCAM_PHISHING": 18,
+    "ADVERSARIAL_SLANG_TYPO": 18
+  },
+  "datasetHash": "9329872e02a402defef9fe7a36503e9ee75a1545550c1e63c6f582e22dd60cce",
+  "cases": [
+    {
+      "caseId": "RET-FRESH-0001",
+      "query": "Học phí Trường Đại học Cần Thơ năm 2026 ngành Công nghệ thông tin",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "CTU",
+      "aliases": [
+        "ctu",
+        "đại học cần thơ",
+        "đhct"
+      ],
+      "expectedJurisdiction": "ACADEMIC_SOUTHERN_REGIONAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ctu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "3c54b9fb4505b856299a280f067255381f4560f96669ed0de0353d94450a5e90"
+    },
+    {
+      "caseId": "RET-FRESH-0002",
+      "query": "Phương thức tuyển sinh Đại học Đà Nẵng 2026 hệ chính quy",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "UDN",
+      "aliases": [
+        "udn",
+        "đại học đà nẵng",
+        "đhđn"
+      ],
+      "expectedJurisdiction": "ACADEMIC_CENTRAL_REGIONAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "udn.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "8edfe90820bd0ab5ad3a24344ae2c9f5fac4045debf3801e429538428d1db6f9"
+    },
+    {
+      "caseId": "RET-FRESH-0003",
+      "query": "Học phí Trường Đại học Ngoại thương Cơ sở 2 TP.HCM năm 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "FTU_CS2",
+      "aliases": [
+        "ftu cs2",
+        "ngoại thương cơ sở 2",
+        "ftu hcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_CENTRAL_UNIVERSITY",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "cs2.ftu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "1caa4641e24b0050c04e6ed5667edaad08c964fd2a51bb5331f9907fce1de195"
+    },
+    {
+      "caseId": "RET-FRESH-0004",
+      "query": "Quy định chuẩn đầu ra ngoại ngữ Đại học Huế năm 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HUEUNI",
+      "aliases": [
+        "hueuni",
+        "đại học huế",
+        "đh huế"
+      ],
+      "expectedJurisdiction": "ACADEMIC_CENTRAL_REGIONAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hueuni.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "3bf7e317e04a9fede75a136026055835b7c4303489cc86bc7c17934235e2365e"
+    },
+    {
+      "caseId": "RET-FRESH-0005",
+      "query": "Học bổng thủ khoa đầu vào Trường Đại học FPT năm 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "FPTU",
+      "aliases": [
+        "fptu",
+        "đại học fpt",
+        "đh fpt"
+      ],
+      "expectedJurisdiction": "ACADEMIC_PRIVATE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "fpt.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "47865ff199673fa21d4a97cf65a82b46e3bb352d1168d1077caa91aaa6c1bd8d"
+    },
+    {
+      "caseId": "RET-FRESH-0006",
+      "query": "Biểu phí chương trình quốc tế Đại học RMIT Việt Nam 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "RMIT_VN",
+      "aliases": [
+        "rmit",
+        "rmit vietnam",
+        "đại học rmit"
+      ],
+      "expectedJurisdiction": "ACADEMIC_FOREIGN_BRANCH",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "rmit.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "6e0a60b489db91a671ab88a0397612e97cb13774d02128a8e6c0cd1fb1be99ce"
+    },
+    {
+      "caseId": "RET-FRESH-0007",
+      "query": "Điểm chuẩn xét học bạ Trường Đại học Phenikaa năm 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "PHENIKAA",
+      "aliases": [
+        "phenikaa",
+        "đại học phenikaa"
+      ],
+      "expectedJurisdiction": "ACADEMIC_PRIVATE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "phenikaa-uni.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "1a882a52cc422c00bb1ecbf64a89c5482bd3927f1ef67fe4451b68225e0c3a6a"
+    },
+    {
+      "caseId": "RET-FRESH-0008",
+      "query": "Quy định xét miễn học phần Giáo dục thể chất Đại học Tôn Đức Thắng",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "TDTU",
+      "aliases": [
+        "tdtu",
+        "đại học tôn đức thắng",
+        "tôn đức thắng"
+      ],
+      "expectedJurisdiction": "ACADEMIC_AUTONOMOUS",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tdtu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "1252fad7b0a4b39b1709b9dedcb7fee1951ab9d1861f5619b10b989f3466c5b0"
+    },
+    {
+      "caseId": "RET-FRESH-0009",
+      "query": "Học viện Công nghệ Bưu chính Viễn thông thông báo xét tuyển 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "PTIT",
+      "aliases": [
+        "ptit",
+        "học viện bưu chính viễn thông",
+        "hv công nghệ bưu chính viễn thông"
+      ],
+      "expectedJurisdiction": "ACADEMIC_MINISTRY_MIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ptit.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "07f3047ec13e78ac503159862505c85a675084d8fe8b054deda5b3d55d19509a"
+    },
+    {
+      "caseId": "RET-FRESH-0010",
+      "query": "Học viện Ngoại giao thông báo điều chỉnh chỉ tiêu tuyển sinh 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "DAV",
+      "aliases": [
+        "dav",
+        "học viện ngoại giao",
+        "ngoại giao"
+      ],
+      "expectedJurisdiction": "ACADEMIC_MINISTRY_MOFA",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "dav.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "091e98dd38ec3d8bc8100ee88a367d1ca723860c9afa4dae663c66689179e05f"
+    },
+    {
+      "caseId": "RET-FRESH-0011",
+      "query": "Học viện Ngân hàng quy định khung học phí năm học 2026-2027",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "BAV",
+      "aliases": [
+        "bav",
+        "học viện ngân hàng",
+        "hv ngân hàng"
+      ],
+      "expectedJurisdiction": "ACADEMIC_MINISTRY_SBV",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hvnh.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "1acfbe3d816d80f50bd348b0397ffed3da00b672c5621ffe956481821c64c4a4"
+    },
+    {
+      "caseId": "RET-FRESH-0012",
+      "query": "Trường Đại học Y Hà Nội thông báo lịch thi bác sĩ nội trú 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HMU",
+      "aliases": [
+        "hmu",
+        "đại học y hà nội",
+        "y hà nội"
+      ],
+      "expectedJurisdiction": "ACADEMIC_HEALTHCARE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hmu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "7331a7529e0fc13c18bdc1226705a8b890501b1111f3e975245de7378e3616df"
+    },
+    {
+      "caseId": "RET-FRESH-0013",
+      "query": "Đại học Y Dược TP.HCM công bố chính sách học bổng khuyến khích học tập",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "UMP",
+      "aliases": [
+        "ump",
+        "đại học y dược tphcm",
+        "y dược tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_HEALTHCARE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ump.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "429f7764674e41f4fd0c7adacbb273a61cd6472693706687cb45100fd772222d"
+    },
+    {
+      "caseId": "RET-FRESH-0014",
+      "query": "Trường Đại học Y khoa Phạm Ngọc Thạch biểu giá học phí sinh viên ngoại tỉnh",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "PNTU",
+      "aliases": [
+        "pntu",
+        "phạm ngọc thạch",
+        "y khoa phạm ngọc thạch"
+      ],
+      "expectedJurisdiction": "ACADEMIC_HEALTHCARE_MUNICIPAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "pnt.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "1550202fa95722d0b7b94072d36ceb12ef4c9daae78e8932074f88b2f43abf71"
+    },
+    {
+      "caseId": "RET-FRESH-0015",
+      "query": "Trường Đại học Luật TP.HCM quy chế đánh giá điểm rèn luyện sinh viên",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "ULAW",
+      "aliases": [
+        "ulaw",
+        "đại học luật tphcm",
+        "đh luật tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_SPECIALIZED_LAW",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmulaw.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "b4d92f560b8971f653cfc89e61cf65c98b2febe9064f70167a63fd06e54324fb"
+    },
+    {
+      "caseId": "RET-FRESH-0016",
+      "query": "Trường Đại học Luật Hà Nội công bố chương trình liên kết quốc tế 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HLU",
+      "aliases": [
+        "hlu",
+        "đại học luật hà nội",
+        "đh luật hn"
+      ],
+      "expectedJurisdiction": "ACADEMIC_SPECIALIZED_LAW",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hlu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "598bd9296eb783d403830c66b4ad0ba68ca371bbadc245c7d47ebc7a32ff2391"
+    },
+    {
+      "caseId": "RET-FRESH-0017",
+      "query": "Trường Đại học Tây Nguyên thông báo chính sách trợ cấp sinh viên dân tộc thiểu số",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "TTN",
+      "aliases": [
+        "ttn",
+        "đại học tây nguyên",
+        "đh tây nguyên"
+      ],
+      "expectedJurisdiction": "ACADEMIC_REGIONAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ttn.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "eedf4d61c1b6cc0e18600f638d62a95d1fef18f3602114ab60df571a14ddc401"
+    },
+    {
+      "caseId": "RET-FRESH-0018",
+      "query": "Trường Đại học Nha Trang quy định điều kiện tốt nghiệp chứng chỉ tin học",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "NTU",
+      "aliases": [
+        "ntu",
+        "đại học nha trang",
+        "đh nha trang"
+      ],
+      "expectedJurisdiction": "ACADEMIC_REGIONAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ntu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "2dae290f0905741a5eea276da202f147242ad9d557fd3fc909908577820e4dea"
+    },
+    {
+      "caseId": "RET-FRESH-0019",
+      "query": "Trường Đại học Quy Nhơn kế hoạch giảng dạy học kỳ hè năm 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "QNU",
+      "aliases": [
+        "qnu",
+        "đại học quy nhơn",
+        "đh quy nhơn"
+      ],
+      "expectedJurisdiction": "ACADEMIC_REGIONAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "qnu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "71d7dac5a04dbca350d20a052a679036ee5afe87e26e159727738de5d4ce1423"
+    },
+    {
+      "caseId": "RET-FRESH-0020",
+      "query": "Trường Đại học Sư phạm Hà Nội thông báo kỳ thi đánh giá năng lực 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HNUE",
+      "aliases": [
+        "hnue",
+        "đại học sư phạm hà nội",
+        "đhsp hà nội"
+      ],
+      "expectedJurisdiction": "ACADEMIC_PEDAGOGY",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hnue.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "d93499e7961eb72a0c80911758329aa313da7fe9475c8d3547b7ac310da1698d"
+    },
+    {
+      "caseId": "RET-FRESH-0021",
+      "query": "Trường Đại học Sư phạm TP.HCM quy định miễn giảm học phí ngành sư phạm",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HCMUE",
+      "aliases": [
+        "hcmue",
+        "đại học sư phạm tphcm",
+        "đhsp tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_PEDAGOGY",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmue.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "2ccf838a8519060cf0a45120c51eca368292a999edb618fdc5c47a99eddf2e1a"
+    },
+    {
+      "caseId": "RET-FRESH-0022",
+      "query": "Trường Đại học Nông Lâm TP.HCM biểu phí ký túc xá khu A năm 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "NLU",
+      "aliases": [
+        "nlu",
+        "đại học nông lâm",
+        "nông lâm tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_AGRICULTURE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmuaf.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "13b1a0de2401df321ea0c0c4a01a365c48763bf47016d01333b6c7fb60881303"
+    },
+    {
+      "caseId": "RET-FRESH-0023",
+      "query": "Trường Đại học Kiến trúc TP.HCM điều kiện dự thi môn vẽ năng khiếu 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "UAH",
+      "aliases": [
+        "uah",
+        "đại học kiến trúc tphcm",
+        "kiến trúc tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_ARTS_ARCHITECTURE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "uah.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "86fc29fb6c403c076e54d89e3df6d4bdd698f0da941afdfa6a0560e726e8a856"
+    },
+    {
+      "caseId": "RET-FRESH-0024",
+      "query": "Trường Đại học Mỹ thuật TP.HCM quy định bảo lưu kết quả học tập",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HCMUFA",
+      "aliases": [
+        "hcmufa",
+        "đại học mỹ thuật tphcm",
+        "mỹ thuật tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_ARTS",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmufa.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "581d2066ed37e3b51e8d25fa07b1d73dc77c84143fd49e27779c5579283cdc37"
+    },
+    {
+      "caseId": "RET-FRESH-0025",
+      "query": "Trường Đại học Mở Hà Nội phương thức đào tạo từ xa trực tuyến 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HOU",
+      "aliases": [
+        "hou",
+        "đại học mở hà nội",
+        "viện đại học mở"
+      ],
+      "expectedJurisdiction": "ACADEMIC_OPEN",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hou.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "6a1bd51782643dc01e521e54cf22b0deeeb1d93568fe173d674e4d8bde558b4b"
+    },
+    {
+      "caseId": "RET-FRESH-0026",
+      "query": "Trường Đại học Mở TP.HCM biểu mức học phí chương trình chất lượng cao",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "OU",
+      "aliases": [
+        "ou",
+        "đại học mở tphcm",
+        "mở tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_OPEN",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ou.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "ce89a7ab20cbd2313283122fe26e0dcaf801229e675744a95266c44336f7a6d5"
+    },
+    {
+      "caseId": "RET-FRESH-0027",
+      "query": "Học viện Tài chính kế hoạch đăng ký tín chỉ chuyên ngành năm 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "AOF",
+      "aliases": [
+        "aof",
+        "học viện tài chính",
+        "hv tài chính"
+      ],
+      "expectedJurisdiction": "ACADEMIC_MINISTRY_MOF",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hvtc.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "3be0bd4095623db9ce09e4370f0c6b254e3431dd3a2ac39c7ad5d299fb7d5cce"
+    },
+    {
+      "caseId": "RET-FRESH-0028",
+      "query": "Trường Đại học Thương mại tiêu chí xét tuyển học sinh trường chuyên 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "TMU",
+      "aliases": [
+        "tmu",
+        "đại học thương mại",
+        "thương mại"
+      ],
+      "expectedJurisdiction": "ACADEMIC_COMMERCE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tmu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "18ee373a7443dd8b985c0fca28fe8a6d42238020b439effedd3636899bf9bdea"
+    },
+    {
+      "caseId": "RET-FRESH-0029",
+      "query": "Trường Đại học Xây dựng Hà Nội quy chế thực tập doanh nghiệp bắt buộc",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HUCE",
+      "aliases": [
+        "huce",
+        "đại học xây dựng hà nội",
+        "xây dựng hà nội"
+      ],
+      "expectedJurisdiction": "ACADEMIC_ENGINEERING",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "huce.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "8c617e8350e7e7bd88510894fe49084a5e841e1d68d70aa49ee6e22cb3d930fd"
+    },
+    {
+      "caseId": "RET-FRESH-0030",
+      "query": "Trường Đại học Giao thông Vận tải cơ sở Hà Nội công bố học bổng sinh viên giỏi",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "UTC",
+      "aliases": [
+        "utc",
+        "đại học giao thông vận tải",
+        "đh gtvt"
+      ],
+      "expectedJurisdiction": "ACADEMIC_TRANSPORT",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "utc.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "9ef8d9d0ed24de3433b629ce51496ca86dffcfcddb596b5c9d671456cfca8176"
+    },
+    {
+      "caseId": "RET-FRESH-0031",
+      "query": "Trường Đại học Giao thông Vận tải Phân hiệu TP.HCM lịch học giáo dục quốc phòng",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "UTC2",
+      "aliases": [
+        "utc2",
+        "gtvt phân hiệu tphcm",
+        "utc phân hiệu tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_TRANSPORT",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "utc2.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "c7e1d9acf82b67b2f34984af2f2eb38219bbfe18373edb9937350491d544b5de"
+    },
+    {
+      "caseId": "RET-FRESH-0032",
+      "query": "Trường Đại học Thủy lợi cơ sở miền Nam quy định đăng ký môn học lại",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "TLU",
+      "aliases": [
+        "tlu",
+        "đại học thủy lợi",
+        "thủy lợi"
+      ],
+      "expectedJurisdiction": "ACADEMIC_ENGINEERING",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tlu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "a0159b507ef69854cf34ad5ac0b212d7c279975f6c779e7df979cc3cf1321311"
+    },
+    {
+      "caseId": "RET-FRESH-0033",
+      "query": "Trường Đại học Công nghiệp Hà Nội quy chế hỗ trợ việc làm sau tốt nghiệp",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HAUI",
+      "aliases": [
+        "haui",
+        "đại học công nghiệp hà nội",
+        "đh công nghiệp hà nội"
+      ],
+      "expectedJurisdiction": "ACADEMIC_MINISTRY_MOIT",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "haui.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "4ff8b54df063c3ccf90371523edb92a9a3a44ae72a5b326c6bef3992d593b2fd"
+    },
+    {
+      "caseId": "RET-FRESH-0034",
+      "query": "Trường Đại học Công Thương TP.HCM danh sách các ngành được cấp chứng nhận AUN-QA",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HUIT",
+      "aliases": [
+        "huit",
+        "đại học công thương tphcm",
+        "công nghiệp thực phẩm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_MINISTRY_MOIT",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "huit.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "f9eb0133c5a35bcbf972a649037abd503966dda49845edfd418cffe464e4ee6a"
+    },
+    {
+      "caseId": "RET-FRESH-0035",
+      "query": "Trường Đại học Tài chính - Marketing chính sách học bổng thặng dư sinh viên khá giỏi",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "UFM",
+      "aliases": [
+        "ufm",
+        "đại học tài chính marketing",
+        "tài chính marketing"
+      ],
+      "expectedJurisdiction": "ACADEMIC_MINISTRY_MOF",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ufm.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "dc5e3be2e3653b6cb66c5fc4ecee0c35acd4ebbd0dd12aed58ea71a18be8c1af"
+    },
+    {
+      "caseId": "RET-FRESH-0036",
+      "query": "Trường Đại học Sài Gòn quy định công nhận tương đương chứng chỉ tin học IC3",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "SGU",
+      "aliases": [
+        "sgu",
+        "đại học sài gòn",
+        "đh sài gòn"
+      ],
+      "expectedJurisdiction": "ACADEMIC_MUNICIPAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "sgu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "3809526b25b62c9f15b07d68271bf38625d02d6cea98bc2a617b72f6ef9db3d4"
+    },
+    {
+      "caseId": "RET-FRESH-0037",
+      "query": "Trường Đại học Văn Lang mức học phí ngành Răng Hàm Mặt khóa tuyển sinh 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "VLU",
+      "aliases": [
+        "vlu",
+        "đại học văn lang",
+        "văn lang"
+      ],
+      "expectedJurisdiction": "ACADEMIC_PRIVATE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vlu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "e5a656df40bda4fb886118a2afe1b3161e8a6ce71ee9210158b040086a9bcdbf"
+    },
+    {
+      "caseId": "RET-FRESH-0038",
+      "query": "Trường Đại học Hoa Sen chính sách học bổng tài năng doanh nhân 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HSU",
+      "aliases": [
+        "hsu",
+        "đại học hoa sen",
+        "hoa sen"
+      ],
+      "expectedJurisdiction": "ACADEMIC_PRIVATE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hoasen.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "927eed27468a26878f594e084d7ab2ee0d88cc3d1de92bb5a292dc9eab9826fc"
+    },
+    {
+      "caseId": "RET-FRESH-0039",
+      "query": "Trường Đại học Quốc tế Hồng Bàng học phí ngành Y khoa đa khoa 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HIU",
+      "aliases": [
+        "hiu",
+        "đại học quốc tế hồng bàng",
+        "hồng bàng"
+      ],
+      "expectedJurisdiction": "ACADEMIC_PRIVATE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hiu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "5ae84825cfbf5df5c1be02cdec382273a8dded687d7871501154aafb391b6358"
+    },
+    {
+      "caseId": "RET-FRESH-0040",
+      "query": "Trường Đại học HUTECH quy định mặc đồng phục và đeo thẻ sinh viên",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HUTECH",
+      "aliases": [
+        "hutech",
+        "đại học công nghệ tphcm",
+        "hutech uni"
+      ],
+      "expectedJurisdiction": "ACADEMIC_PRIVATE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hutech.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "74f7046826254d45246b87fdfda63a054f6251da81f7e12c0c889899c05f0275"
+    },
+    {
+      "caseId": "RET-FRESH-0041",
+      "query": "Trường Đại học Nguyễn Tất Thành chính sách giảm 20% học phí kỳ đầu tiên",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "NTTU",
+      "aliases": [
+        "nttu",
+        "đại học nguyễn tất thành",
+        "nguyễn tất thành"
+      ],
+      "expectedJurisdiction": "ACADEMIC_PRIVATE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ntt.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "a1c50d81a37b15e66fb76a00cc7bf7e5ecd5539dc1415354920d98ab08440339"
+    },
+    {
+      "caseId": "RET-FRESH-0042",
+      "query": "Học viện Hàng không Việt Nam tiêu chuẩn sức khỏe ngành quản lý bay",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "VAA",
+      "aliases": [
+        "vaa",
+        "học viện hàng không",
+        "hàng không việt nam"
+      ],
+      "expectedJurisdiction": "ACADEMIC_TRANSPORT",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vaa.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "c1197796b594d9a5446b5f6b743ab58d46c0072276237a88fc84522d999385f7"
+    },
+    {
+      "caseId": "RET-FRESH-0043",
+      "query": "Học viện Báo chí và Tuyên truyền thông báo thi tuyển môn Năng khiếu báo chí",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "AJC",
+      "aliases": [
+        "ajc",
+        "học viện báo chí tuyên truyền",
+        "báo chí tuyên truyền"
+      ],
+      "expectedJurisdiction": "ACADEMIC_POLITICAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ajc.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "8a994000fda360205f9cc6b33960285233a090ffce131e8c9f1faacb4088ef7a"
+    },
+    {
+      "caseId": "RET-FRESH-0044",
+      "query": "Đại học VinUni thông báo chương trình học bổng toàn phần 100% học phí",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "VINUNI",
+      "aliases": [
+        "vinuni",
+        "đại học vinuni",
+        "vinuniversity"
+      ],
+      "expectedJurisdiction": "ACADEMIC_PRIVATE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vinuni.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "ce6e1e5b3edbd3d9a5e03b99e3f48b7eea74216b6d5d83f1bbb6ca6b9d11b4a2"
+    },
+    {
+      "caseId": "RET-FRESH-0045",
+      "query": "Trường Đại học Phenikaa chính sách ký túc xá miễn phí cho tân sinh viên",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "PHENIKAA",
+      "aliases": [
+        "phenikaa",
+        "đại học phenikaa"
+      ],
+      "expectedJurisdiction": "ACADEMIC_PRIVATE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "phenikaa-uni.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "9b09f906356e52c9061557a2cd2588e00f807c90749956bac4ecd18b9e1b1f9d"
+    },
+    {
+      "caseId": "RET-FRESH-0046",
+      "query": "Trường Đại học Dược Hà Nội thông báo điều kiện cấp chứng chỉ hành nghề dược",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "HUP",
+      "aliases": [
+        "hup",
+        "đại học dược hà nội",
+        "dược hà nội"
+      ],
+      "expectedJurisdiction": "ACADEMIC_HEALTHCARE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hup.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "101bcaac3ef07094a0840d05e1de5e47c71ebdbb55085f1e378a068f1c6702a3"
+    },
+    {
+      "caseId": "RET-FRESH-0047",
+      "query": "Trường Đại học Kỹ thuật Y Dược Đà Nẵng quy chế đánh giá thực tập lâm sàng",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "DUMTP",
+      "aliases": [
+        "dumtp",
+        "kỹ thuật y dược đà nẵng"
+      ],
+      "expectedJurisdiction": "ACADEMIC_HEALTHCARE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "dhtm.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "b270637095a46d11e6445763ab62c011780e4452c9fb30f86f04521da0cb1c8e"
+    },
+    {
+      "caseId": "RET-FRESH-0048",
+      "query": "Trường Đại học Y Dược Cần Thơ quy định tuyển sinh liên thông chính quy 2026",
+      "oodCategory": "UNINDEXED_INSTITUTION",
+      "canonicalEntity": "CTUMP",
+      "aliases": [
+        "ctump",
+        "y dược cần thơ",
+        "đh y dược cần thơ"
+      ],
+      "expectedJurisdiction": "ACADEMIC_HEALTHCARE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ctump.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "22bee345ee927a566586b075ca172c222855b6dbaf7217b655ad6404fd7c506e"
+    },
+    {
+      "caseId": "RET-FRESH-0049",
+      "query": "Ví điện tử MoMo có thu phí duy trì tài khoản sinh viên hàng tháng không?",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "MOMO_VN",
+      "aliases": [
+        "momo",
+        "ví momo",
+        "công ty m-service"
+      ],
+      "expectedJurisdiction": "FINTECH_E_WALLET",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "momo.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "5617b61a1725ca15bf1ecdc30f173b31ed011adbe43481cf8cb8cd1fa8bbb134"
+    },
+    {
+      "caseId": "RET-FRESH-0050",
+      "query": "ZaloPay quy định hạn mức giao dịch chuyển tiền cho tài khoản chưa xác thực CCCD",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "ZALOPAY",
+      "aliases": [
+        "zalopay",
+        "ví zalopay",
+        "vng zalopay"
+      ],
+      "expectedJurisdiction": "FINTECH_E_WALLET",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "zalopay.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "e19a1e7ec7726b2f21895adf7ace2e2378ad0a3fb880f996fdf285afa67de91e"
+    },
+    {
+      "caseId": "RET-FRESH-0051",
+      "query": "ShopeePay liên kết ngân hàng nhận ưu đãi thanh toán học phí đại học",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "SHOPEEPAY",
+      "aliases": [
+        "shopeepay",
+        "ví shopeepay"
+      ],
+      "expectedJurisdiction": "FINTECH_E_WALLET",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "shopeepay.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "7175f243d8f50bff12b5f9fc8c1e82ba90a0955937f608cac0ceada260b8caf9"
+    },
+    {
+      "caseId": "RET-FRESH-0052",
+      "query": "Viettel Telecom thông báo gói cước 4G ưu đãi sinh viên 50k mỗi tháng",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "VIETTEL",
+      "aliases": [
+        "viettel",
+        "tập đoàn viettel",
+        "viettel telecom"
+      ],
+      "expectedJurisdiction": "TELECOM",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "viettel.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "674681d79496a015360a8bcba33e4b9df4d8aa6e4a9d5190ba41c1b29fc8963c"
+    },
+    {
+      "caseId": "RET-FRESH-0053",
+      "query": "VNPT VinaPhone hướng dẫn đăng ký sim sinh viên chính chủ online",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "VINAPHONE",
+      "aliases": [
+        "vinaphone",
+        "vnpt",
+        "mạng vinaphone"
+      ],
+      "expectedJurisdiction": "TELECOM",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vinaphone.com.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "b57f18971e0b3cf7474024a1ab2e4f3b9f05382787554d3e73a832b24329e41d"
+    },
+    {
+      "caseId": "RET-FRESH-0054",
+      "query": "MobiFone chính sách gói cước data sinh viên không giới hạn dung lượng",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "MOBIFONE",
+      "aliases": [
+        "mobifone",
+        "tổng công ty mobifone"
+      ],
+      "expectedJurisdiction": "TELECOM",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "mobifone.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "88a43b825435d14ecba58c2c95a4fa12992680df13a654660c60cca6a46f092b"
+    },
+    {
+      "caseId": "RET-FRESH-0055",
+      "query": "FPT Shop chương trình ưu đãi giảm 10% laptop tựu trường cho tân sinh viên",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "FPTSHOP",
+      "aliases": [
+        "fpt shop",
+        "hệ thống fpt shop"
+      ],
+      "expectedJurisdiction": "RETAIL_TECH",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "fptshop.com.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "d80bd36057e1146f4dbfe193090a2ccc27e948a9bd2516df5091808af23b2744"
+    },
+    {
+      "caseId": "RET-FRESH-0056",
+      "query": "Thế Giới Di Động chương trình đổi điểm thi đại học nhận voucher mua laptop",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "MWG",
+      "aliases": [
+        "thế giới di động",
+        "tgdd",
+        "mwg"
+      ],
+      "expectedJurisdiction": "RETAIL_TECH",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "thegioididong.com"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "24e2a73ca7270122028db8b2a996945eec9e6e12d00ad9a86dacf59c03c4952e"
+    },
+    {
+      "caseId": "RET-FRESH-0057",
+      "query": "Grab Vietnam chính sách mã giảm giá GrabBike sinh viên tại các làng đại học",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "GRAB_VN",
+      "aliases": [
+        "grab",
+        "grab việt nam",
+        "grabbike"
+      ],
+      "expectedJurisdiction": "RIDE_HAILING",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "grab.com"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "931646ce88b77a9c43ea54f7894fddc2c0e72a45f30b51a1f73c1f8186bca0dd"
+    },
+    {
+      "caseId": "RET-FRESH-0058",
+      "query": "Be Group chính sách đăng ký làm tài xế beBike part-time cho sinh viên",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "BE_GROUP",
+      "aliases": [
+        "be",
+        "be group",
+        "beamin"
+      ],
+      "expectedJurisdiction": "RIDE_HAILING",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "be.com.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "0632ae7a8e7e3de3e6f6b5a7fd72aae7d31312c1ff60ab83db1700d78eaa1d08"
+    },
+    {
+      "caseId": "RET-FRESH-0059",
+      "query": "Ngân hàng Vietcombank thủ tục mở thẻ tín dụng sinh viên không cần chứng minh thu nhập",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "VCB",
+      "aliases": [
+        "vietcombank",
+        "vcb",
+        "ngân hàng ngoại thương"
+      ],
+      "expectedJurisdiction": "BANKING_COMMERCIAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vietcombank.com.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "e649fd8393a2e0517931fe78e31e8d02a84ada9add8b8e999f6c1d5603a33f85"
+    },
+    {
+      "caseId": "RET-FRESH-0060",
+      "query": "Ngân hàng BIDV chính sách vay vốn học tập sinh viên theo diện bảo lãnh",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "BIDV",
+      "aliases": [
+        "bidv",
+        "ngân hàng bidv",
+        "đầu tư và phát triển việt nam"
+      ],
+      "expectedJurisdiction": "BANKING_COMMERCIAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "bidv.com.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "ca103964edd7aca6f866a31752bd3de6813e9fc17903626da3994a14f2c5e195"
+    },
+    {
+      "caseId": "RET-FRESH-0061",
+      "query": "Ngân hàng VietinBank biểu phí chuyển tiền quốc tế thanh toán học phí du học",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "CTG",
+      "aliases": [
+        "vietinbank",
+        "ngân hàng công thương"
+      ],
+      "expectedJurisdiction": "BANKING_COMMERCIAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vietinbank.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "adafc2e585baef39508afc6661557709f634962186c825034e9b431e349c1415"
+    },
+    {
+      "caseId": "RET-FRESH-0062",
+      "query": "Ngân hàng Agribank thủ tục nhận tiền kiều hối cho lưu học sinh",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "AGRIBANK",
+      "aliases": [
+        "agribank",
+        "ngân hàng nông nghiệp"
+      ],
+      "expectedJurisdiction": "BANKING_COMMERCIAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "agribank.com.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "aacf626a9a09adf8774ce58d238036c6251835e65c997b7c964020c437959a9a"
+    },
+    {
+      "caseId": "RET-FRESH-0063",
+      "query": "Ngân hàng Techcombank quy định mở tài khoản thanh toán số đẹp miễn phí cho sinh viên",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "TCB",
+      "aliases": [
+        "techcombank",
+        "kỹ thương việt nam"
+      ],
+      "expectedJurisdiction": "BANKING_COMMERCIAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "techcombank.com.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "76e69b57a2142aa72668bdf98d37da39cd024c4a9c25619463ead039a94fb78d"
+    },
+    {
+      "caseId": "RET-FRESH-0064",
+      "query": "Ngân hàng MB Bank chính sách phát hành thẻ sinh viên tích hợp thẻ ghi nợ quốc tế",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "MBB",
+      "aliases": [
+        "mb bank",
+        "ngân hàng quân đội",
+        "mbbank"
+      ],
+      "expectedJurisdiction": "BANKING_COMMERCIAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "mbbank.com.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "ebaf24e4dfe5c54def03ac15cd4726241621435ce81dd82704c0ef3e6100473b"
+    },
+    {
+      "caseId": "RET-FRESH-0065",
+      "query": "Ngân hàng VPBank điều kiện vay thấu chi tín chấp dành cho sinh viên năm cuối",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "VPB",
+      "aliases": [
+        "vpbank",
+        "ngân hàng việt nam thịnh vượng"
+      ],
+      "expectedJurisdiction": "BANKING_COMMERCIAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vpbank.com.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "13e905964d840cec8160a3eb98b9ce0310955c047ce7bd6aabe59514c0743961"
+    },
+    {
+      "caseId": "RET-FRESH-0066",
+      "query": "Ngân hàng TPBank dịch vụ mở thẻ LiveBank 24/7 lấy ngay thẻ sinh viên",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "TPB",
+      "aliases": [
+        "tpbank",
+        "tiên phong bank"
+      ],
+      "expectedJurisdiction": "BANKING_COMMERCIAL",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tpb.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "cc0a2ea03ee2015323f3499d821923e7c9b2e14f144a6269201f3c663b1eba0f"
+    },
+    {
+      "caseId": "RET-FRESH-0067",
+      "query": "Sàn thương mại Shopee Việt Nam cảnh báo thủ đoạn tuyển CTV xử lý đơn ảo",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "SHOPEE_VN",
+      "aliases": [
+        "shopee",
+        "shopee việt nam"
+      ],
+      "expectedJurisdiction": "E_COMMERCE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "shopee.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "ff7e8f3db109ab3a843142dc4638cb3efefd8bc3552d49eef51e6b5157cecccd"
+    },
+    {
+      "caseId": "RET-FRESH-0068",
+      "query": "Sàn Lazada Việt Nam quy định về tài khoản gian hàng chính hãng LazMall cho trường đại học",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "LAZADA_VN",
+      "aliases": [
+        "lazada",
+        "lazada việt nam"
+      ],
+      "expectedJurisdiction": "E_COMMERCE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "lazada.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "153a164944454e3f1fc1d0cb44da4454198015b2269d71abf6b17f50e74fb71c"
+    },
+    {
+      "caseId": "RET-FRESH-0069",
+      "query": "TikTok Shop Việt Nam chính sách kiểm duyệt livestream bán sách giáo trình đại học",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "TIKTOK_VN",
+      "aliases": [
+        "tiktok shop",
+        "tiktok việt nam"
+      ],
+      "expectedJurisdiction": "SOCIAL_COMMERCE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tiktok.com"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "3792597f37c35a590a5a909d4625069850884deab0cd1fdcc84b31aa478615e0"
+    },
+    {
+      "caseId": "RET-FRESH-0070",
+      "query": "Tập đoàn VNG thông báo chương trình thực tập sinh VNG Fresher 2026",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "VNG",
+      "aliases": [
+        "vng",
+        "tập đoàn vng",
+        "vinagame"
+      ],
+      "expectedJurisdiction": "TECH_ENTERPRISE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vng.com.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "7cccc28cef06ca601a647e4952deb5000f60ca99af7d6552eb0d57d4e43e7611"
+    },
+    {
+      "caseId": "RET-FRESH-0071",
+      "query": "Viettel Post dịch vụ giao nhận hồ sơ thi chuyển phát nhanh bảo đảm cho thí sinh",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "VTP",
+      "aliases": [
+        "viettel post",
+        "chuyển phát viettel"
+      ],
+      "expectedJurisdiction": "LOGISTICS",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "viettelpost.com.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "99c0818ecc8c426a6dfff8dbc71e3391a5dfc50ffe4bc61d2ed5b2e3daccfc0d"
+    },
+    {
+      "caseId": "RET-FRESH-0072",
+      "query": "Bưu điện Việt Nam VNPost dịch vụ nhận đăng ký nguyện vọng đại học tại bưu cục",
+      "oodCategory": "PRIVATE_COMPANY_ORG",
+      "canonicalEntity": "VNPOST",
+      "aliases": [
+        "vnpost",
+        "bưu điện việt nam"
+      ],
+      "expectedJurisdiction": "LOGISTICS",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vnpost.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "7a1b32d274040cb8d8434e8ee2407207a7fe29e7e248d929a69b14b2373bbf1d"
+    },
+    {
+      "caseId": "RET-FRESH-0073",
+      "query": "Lịch nghỉ Tết Nguyên đán 2026 của sinh viên ĐHQG TP.HCM",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "VNUHCM",
+      "aliases": [
+        "vnuhcm",
+        "đhqg-hcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_NATIONAL_UNIVERSITY",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vnuhcm.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "922252deced1c7363a087c9b7d02db9aef8a93995b47d5b3e7cd984f7db75d82"
+    },
+    {
+      "caseId": "RET-FRESH-0074",
+      "query": "Thời hạn nộp hồ sơ xét tốt nghiệp đợt tháng 3 năm 2026 Bách khoa TP.HCM",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "HCMUT_VNUHCM",
+      "aliases": [
+        "hcmut",
+        "bách khoa tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_MEMBER_UNIVERSITY",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmut.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "310670f5d0249b6b59a81b8d4bb078c1e00f0f43c8d55e2d9c9eb271b17096b8"
+    },
+    {
+      "caseId": "RET-FRESH-0075",
+      "query": "Kế hoạch tổ chức kỳ thi Đánh giá năng lực đợt 1 năm 2026 ĐHQG TP.HCM",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "VNUHCM",
+      "aliases": [
+        "vnuhcm",
+        "đánh giá năng lực đhqg"
+      ],
+      "expectedJurisdiction": "ACADEMIC_TESTING",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "cete.vnuhcm.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "30de348cfebff3b18a8d7a2e039efb02ab19b078afb0491501ebd2b9b1c96c55"
+    },
+    {
+      "caseId": "RET-FRESH-0076",
+      "query": "Lịch thi Đánh giá tư duy TSA năm 2026 của Đại học Bách khoa Hà Nội",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "HUST",
+      "aliases": [
+        "hust",
+        "bách khoa hà nội",
+        "đhbk hà nội"
+      ],
+      "expectedJurisdiction": "ACADEMIC_TESTING",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hust.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "45c2355dd7c0d55164e24971ac4367aa40dcf575deae9608469844e90963aba5"
+    },
+    {
+      "caseId": "RET-FRESH-0077",
+      "query": "Thông báo tuyển sinh đào tạo thạc sĩ đợt 1 năm 2026 Đại học Kinh tế TP.HCM",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "UEH",
+      "aliases": [
+        "ueh",
+        "đại học kinh tế tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_POSTGRADUATE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ueh.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "c5955db5673a40ca7066efc842c3b463b8584abb88eef4ed2af11994ee030486"
+    },
+    {
+      "caseId": "RET-FRESH-0078",
+      "query": "Trường Đại học Kinh tế Quốc dân thông báo xét tuyển kết hợp chứng chỉ SAT 2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "NEU",
+      "aliases": [
+        "neu",
+        "kinh tế quốc dân"
+      ],
+      "expectedJurisdiction": "ACADEMIC_NATIONAL_UNIVERSITY",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "neu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "7fad74518a4a4b69e9f050d4d13b9954630fa09b2e1b08fd24e8edbc41155f3c"
+    },
+    {
+      "caseId": "RET-FRESH-0079",
+      "query": "Thời gian đóng học phí học kỳ 2 năm học 2025-2026 HCMUTE",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "HCMUTE",
+      "aliases": [
+        "hcmute",
+        "sư phạm kỹ thuật tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_AUTONOMOUS",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmute.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "ff86cd6ba64ae2050322ff1587f3adfe276031c56e92ae65c26d0c5b44b896e3"
+    },
+    {
+      "caseId": "RET-FRESH-0080",
+      "query": "Lịch đăng ký đề tài khóa luận tốt nghiệp ngành Kế toán UEH năm 2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "UEH",
+      "aliases": [
+        "ueh",
+        "kinh tế tphcm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_UNDERGRADUATE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ueh.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "344cc8b80353a96a959c53abb655510023784c36d952c95be2230620780b948d"
+    },
+    {
+      "caseId": "RET-FRESH-0081",
+      "query": "Quy định mức thu học phí khóa tuyển sinh năm 2026 Đại học Ngoại thương",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "FTU",
+      "aliases": [
+        "ftu",
+        "ngoại thương"
+      ],
+      "expectedJurisdiction": "ACADEMIC_CENTRAL_UNIVERSITY",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ftu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "918ee00cece25b4d7f7fb58bc1dbeb028aab7388b690a1bd981456fad9c72c1c"
+    },
+    {
+      "caseId": "RET-FRESH-0082",
+      "query": "Thông báo gia hạn đăng ký học phần giáo dục thể chất học kỳ 2 ĐHQGHN 2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "VNUHN",
+      "aliases": [
+        "vnuhn",
+        "đhqghn"
+      ],
+      "expectedJurisdiction": "ACADEMIC_NATIONAL_UNIVERSITY",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vnu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "0c980154088cfe4ee250a8c4bb497f617e2f987744e0b2d11d2d75c0647485e1"
+    },
+    {
+      "caseId": "RET-FRESH-0083",
+      "query": "Hội đồng tuyển sinh Quân sự Bộ Quốc phòng thông báo chỉ tiêu tuyển sinh 2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "MOD_VN",
+      "aliases": [
+        "bộ quốc phòng",
+        "tuyển sinh quân sự"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_DEFENSE",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "mod.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "820fca64e47e4a0e189e862d73c991ce42c5dbb3ca260e1c731e449ba3cef129"
+    },
+    {
+      "caseId": "RET-FRESH-0084",
+      "query": "Bộ Công an công bố phương thức thi đánh giá năng lực tuyển sinh công an nhân dân 2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "MPS_VN",
+      "aliases": [
+        "bộ công an",
+        "a05",
+        "tuyển sinh candoan"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_PUBLIC_SECURITY",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "bocongan.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "200a84a79fa7cf8e362291c687d5a35f6cbe14891f4bb0e05fe114fa8adb0a8f"
+    },
+    {
+      "caseId": "RET-FRESH-0085",
+      "query": "Lịch tổ chức thi tốt nghiệp trung học phổ thông năm 2026 của Bộ Giáo dục",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "moet",
+        "bộ giáo dục"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "e2379a4143e6edd16573a2b6e0bd653078a1be0a680ac7881ef79f5bf7798f04"
+    },
+    {
+      "caseId": "RET-FRESH-0086",
+      "query": "Trung tâm Giám sát an toàn không gian mạng quốc gia cảnh báo thủ đoạn lừa đảo mới tháng 2/2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "ncsc",
+        "tinnhiemmang"
+      ],
+      "expectedJurisdiction": "CYBER_SECURITY",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "3410446ec0cee5a07e6e1e24b9b41ea6059877019b892e5b40a9b8dd83f45b71"
+    },
+    {
+      "caseId": "RET-FRESH-0087",
+      "query": "Quy định mới về tổ chức thực tập lâm sàng ngành Y khoa có hiệu lực từ 01/01/2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "MOH_VN",
+      "aliases": [
+        "bộ y tế",
+        "moh"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_HEALTH",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moh.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "4970497ab95bdca2eed3038e4f46845fd7e776102e723d54452ebbcb25c0a8ee"
+    },
+    {
+      "caseId": "RET-FRESH-0088",
+      "query": "Bộ Lao động Thương binh và Xã hội lịch nghỉ lễ Quốc khánh 02/09/2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "MOLISA_VN",
+      "aliases": [
+        "bộ lđtbxh",
+        "molisa"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_LABOR",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "molisa.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "7b42f81655ac2fa85f2ca9a510438d5822621b444d92834a2149e563d3ff8e17"
+    },
+    {
+      "caseId": "RET-FRESH-0089",
+      "query": "Ngân hàng Chính sách xã hội nâng mức cho vay học sinh sinh viên năm học 2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "VBSP",
+      "aliases": [
+        "ngân hàng chính sách xã hội",
+        "vbsp"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_BANKING",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vbsp.org.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "a74934fb409c870a838212bb380b9b60d481abbce66151eef78d6171a3b325de"
+    },
+    {
+      "caseId": "RET-FRESH-0090",
+      "query": "Lịch bảo vệ đồ án tốt nghiệp kỹ sư ngành Cơ điện tử HUST đợt xuân 2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "HUST",
+      "aliases": [
+        "hust",
+        "bách khoa hà nội"
+      ],
+      "expectedJurisdiction": "ACADEMIC_ENGINEERING",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hust.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "d3021023565ca1b6df7a386ada8c81e19ff48654547b744c757e104060777368"
+    },
+    {
+      "caseId": "RET-FRESH-0091",
+      "query": "Thời hạn đăng ký ở ký túc xá khu B ĐHQG TP.HCM học kỳ 2 năm học 2025-2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "KTX_VNUHCM",
+      "aliases": [
+        "ktx khu b",
+        "ký túc xá đhqg"
+      ],
+      "expectedJurisdiction": "STUDENT_SERVICES",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ktxb.vnuhcm.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "b90e9385b2f7ea897321f9ad48027e7c0c6acd8f14b945d449e84360f5f70551"
+    },
+    {
+      "caseId": "RET-FRESH-0092",
+      "query": "Ký túc xá Mễ Trì Đại học Quốc gia Hà Nội thông báo gia hạn lưu trú 2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "KTX_VNUHN",
+      "aliases": [
+        "ktx mễ trì",
+        "ký túc xá mễ trì"
+      ],
+      "expectedJurisdiction": "STUDENT_SERVICES",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "cssv.vnu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "a335d7cd759104e09ac76c00950ff945a13aeef0b6f749178362f4283872af5d"
+    },
+    {
+      "caseId": "RET-FRESH-0093",
+      "query": "Thông báo tuyển dụng trợ giảng và cộng tác viên nghiên cứu Viện Nghiên cứu ĐHQGHN 2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "VNUHN",
+      "aliases": [
+        "đhqghn",
+        "vnu"
+      ],
+      "expectedJurisdiction": "ACADEMIC_RESEARCH",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vnu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "e7fbf98672bbaeb1ad048e1634244ae9f17bb4f1fb8c2285fae87193bd09fa6f"
+    },
+    {
+      "caseId": "RET-FRESH-0094",
+      "query": "Trường Đại học Bách khoa TP.HCM thông báo nhận hồ sơ học bổng OISP Alumni 2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "HCMUT_VNUHCM",
+      "aliases": [
+        "oisp",
+        "hcmut"
+      ],
+      "expectedJurisdiction": "ACADEMIC_SCHOLARSHIP",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "oisp.hcmut.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "690b5587a27cf5ed30dc05b9874fa72fc98447f3625b0ec79f4ab8d7178f2061"
+    },
+    {
+      "caseId": "RET-FRESH-0095",
+      "query": "Chính sách học bổng khuyến khích phát triển tài năng năm học 2026 ĐH Bách khoa Hà Nội",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "HUST",
+      "aliases": [
+        "hust",
+        "học bổng tài năng"
+      ],
+      "expectedJurisdiction": "ACADEMIC_SCHOLARSHIP",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hust.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "4fcc237a7adeeca2bd3ff9afc0b734031ed9f7aac4bc81d543236f98d23cc17e"
+    },
+    {
+      "caseId": "RET-FRESH-0096",
+      "query": "Lịch khám sức khỏe định kỳ cho toàn thể sinh viên Trường Đại học Sư phạm Kỹ thuật TP.HCM 2026",
+      "oodCategory": "FRESH_2026_NOTICES",
+      "canonicalEntity": "HCMUTE",
+      "aliases": [
+        "hcmute",
+        "trạm y tế hcmute"
+      ],
+      "expectedJurisdiction": "STUDENT_HEALTH",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmute.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "YEAR_2026",
+      "caseHash": "ae42cc3f1c874fc28492a4251929cd54b1b23b72d3566eed6947eedd92d447cf"
+    },
+    {
+      "caseId": "RET-FRESH-0097",
+      "query": "ĐHBK thông báo tuyển sinh năm 2026 (Phân biệt BK Hà Nội vs BK TP.HCM)",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_DHBK",
+      "aliases": [
+        "đhbk",
+        "bách khoa"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hust.edu.vn",
+        "hcmut.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "1fed1eb5b3af52b0db45c741403f20ca4c0bcf1a9ed8765d2727f2b7d1e8a5e5"
+    },
+    {
+      "caseId": "RET-FRESH-0098",
+      "query": "Học phí ngành Khoa học máy tính tại ĐHBK năm 2026 là bao nhiêu?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_DHBK",
+      "aliases": [
+        "đhbk",
+        "bách khoa"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hust.edu.vn",
+        "hcmut.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "5fd1433cfdcdd86d1256f53563f72a6e40b4799b6147f4b0173ac2c185ddc2d1"
+    },
+    {
+      "caseId": "RET-FRESH-0099",
+      "query": "ĐHQG công bố lịch thi đánh giá năng lực năm 2026 (Hà Nội hay TP.HCM)",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_DHQG",
+      "aliases": [
+        "đhqg"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vnu.edu.vn",
+        "vnuhcm.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "28de614d21c1d444e59ab80d82c32c6a797e27486500102c1c55e92f8b858e82"
+    },
+    {
+      "caseId": "RET-FRESH-0100",
+      "query": "Điểm chuẩn xét tuyển kỳ thi ĐGNL vào các trường thành viên ĐHQG 2026",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_DHQG",
+      "aliases": [
+        "đhqg"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vnu.edu.vn",
+        "vnuhcm.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "00b2c0f97e06df65088542096c055f48cfa3de4d322d75ae6d332068fc800ae2"
+    },
+    {
+      "caseId": "RET-FRESH-0101",
+      "query": "ĐHSP thông báo chế độ trợ cấp sinh hoạt phí theo Nghị định 116 (Hà Nội vs TP.HCM)",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_DHSP",
+      "aliases": [
+        "đhsp",
+        "sư phạm"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hnue.edu.vn",
+        "hcmue.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "9684aec6fd9dfa0877580fae8f248b65cde0c7de6202a43f7fc8f859e40ea423"
+    },
+    {
+      "caseId": "RET-FRESH-0102",
+      "query": "FTU cơ sở 1 và cơ sở 2 có áp dụng chung một mức học phí không?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "FTU",
+      "aliases": [
+        "ftu",
+        "ngoại thương"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ftu.edu.vn",
+        "cs2.ftu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "dcd3168d10b3377c1bebce8f270bdd53799865aa821024dac389764d5e8066ee"
+    },
+    {
+      "caseId": "RET-FRESH-0103",
+      "query": "UEH và UEL khác nhau như thế nào về chương trình đào tạo Luật kinh tế?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_UEH_UEL",
+      "aliases": [
+        "ueh",
+        "uel"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ueh.edu.vn",
+        "uel.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "791fdb30c43d23c711ddcd77eb0c31d4872f16c533c3cc8cbaa626ff92a4ea05"
+    },
+    {
+      "caseId": "RET-FRESH-0104",
+      "query": "Trường UTE ở TP.HCM và trường UTE ở Hưng Yên có phải là một trường không?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_UTE",
+      "aliases": [
+        "ute",
+        "spkt"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmute.edu.vn",
+        "utehy.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "36b9e9127b03af06cb5f143fe180ae577e02b7853f16c211af7cf7fe093442bd"
+    },
+    {
+      "caseId": "RET-FRESH-0105",
+      "query": "Ký hiệu PTIT đại diện cho cơ sở đào tạo nào tại Hà Nội và TP.HCM?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "PTIT",
+      "aliases": [
+        "ptit"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ptit.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "61be6d68146cc1a6da26d90efba196763dd9d522de0cb6a7eeb2c32d4356c4cc"
+    },
+    {
+      "caseId": "RET-FRESH-0106",
+      "query": "DAV và BAV có trực thuộc cùng một bộ chủ quản không?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_DAV_BAV",
+      "aliases": [
+        "dav",
+        "bav"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "dav.edu.vn",
+        "hvnh.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "387b69909fe43579d619bebb20a75bef6e90496ea1c189012fd60d7b67d0c7b7"
+    },
+    {
+      "caseId": "RET-FRESH-0107",
+      "query": "ĐH Kinh tế là UEH tại TP.HCM hay UEL thuộc ĐHQG-HCM?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_DHKT",
+      "aliases": [
+        "đh kinh tế",
+        "đại học kinh tế"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ueh.edu.vn",
+        "uel.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "cff7c05e1a64deaaa6bd11047e7e60018ebcdf9378bd435a20020fb4c78fab44"
+    },
+    {
+      "caseId": "RET-FRESH-0108",
+      "query": "ĐH Luật Hà Nội (HLU) và ĐH Luật TP.HCM (ULAW) có trực thuộc Bộ Tư pháp không?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_LUAT",
+      "aliases": [
+        "hlu",
+        "ulaw"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hlu.edu.vn",
+        "hcmulaw.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "3092c9c23e172e387eaa2485c4e9b13b6d251261430a4dd5c5446984e4831d16"
+    },
+    {
+      "caseId": "RET-FRESH-0109",
+      "query": "Trường Đại học Bách khoa Đà Nẵng (DUT) có trực thuộc ĐHQG không?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "DUT",
+      "aliases": [
+        "dut",
+        "bách khoa đà nẵng"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "dut.udn.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "d64483d2ad140ef220c41673156b2baaf738dba86dc421a941435687f7311066"
+    },
+    {
+      "caseId": "RET-FRESH-0110",
+      "query": "Học viện Ngân hàng cơ sở Bắc Ninh và cơ sở Phú Yên cấp bằng có khác nhau không?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "BAV",
+      "aliases": [
+        "bav",
+        "học viện ngân hàng"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hvnh.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "2b0db7c4539db04cf9eee2b41e09518f021516d4cb4f6e5f92f894097b3b3a42"
+    },
+    {
+      "caseId": "RET-FRESH-0111",
+      "query": "Khoa Y ĐHQG TP.HCM đã đổi tên thành Trường Đại học Khoa học Sức khỏe chưa?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "UHS_VNUHCM",
+      "aliases": [
+        "khoa y",
+        "đại học khoa học sức khỏe"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "medvnu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "5d087da749684802d0fb23d176acbdb6cf3531fac868e0b1d7b176b663f1007d"
+    },
+    {
+      "caseId": "RET-FRESH-0112",
+      "query": "Trường Đại học Quốc tế IU có phải toàn bộ môn học đều dạy bằng tiếng Anh không?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "HCMIU_VNUHCM",
+      "aliases": [
+        "iu",
+        "đại học quốc tế"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmiu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "95a70a363591d0b27e9106b68de93c4b8e2211c4d9e07a3bdae005467bd8bbc2"
+    },
+    {
+      "caseId": "RET-FRESH-0113",
+      "query": "Trường Đại học Khoa học Tự nhiên viết tắt là HUS hay HCMUS?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_KHTN",
+      "aliases": [
+        "hus",
+        "hcmus",
+        "tự nhiên"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hus.vnu.edu.vn",
+        "hcmus.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "3d538e956dcf039335fcf3595f364a00977bec7086d40a995d04ee9d9a37a1e3"
+    },
+    {
+      "caseId": "RET-FRESH-0114",
+      "query": "Trường Đại học Khoa học Xã hội và Nhân văn viết tắt là USSH Hà Nội hay USSH TP.HCM?",
+      "oodCategory": "AMBIGUOUS_ABBREVIATION",
+      "canonicalEntity": "AMBIGUOUS_KHXHNV",
+      "aliases": [
+        "ussh",
+        "nhân văn"
+      ],
+      "expectedJurisdiction": "AMBIGUOUS_ACADEMIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ussh.vnu.edu.vn",
+        "hcmussh.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "065e8dc685460ef80836c824bf7246e269cb0f915f052c3a13066baeb5ea8c11"
+    },
+    {
+      "caseId": "RET-FRESH-0115",
+      "query": "Nghị định 81/2021/NĐ-CP về trần học phí đại học còn hiệu lực nguyên vẹn hay đã sửa đổi?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "nghị định 81",
+        "nghị định 97"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "443106f544d7fe97df90385ecfef75e6993f098166fca32fb1587b4763599ee5"
+    },
+    {
+      "caseId": "RET-FRESH-0116",
+      "query": "Nghị định 97/2023/NĐ-CP đã lùi lộ trình tăng học phí đại học công lập như thế nào?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "nghị định 97",
+        "học phí đại học"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "chinhphu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "0719e67332c39975d2296be1f3555814adb273944f349fd6a0faae2c392f228c"
+    },
+    {
+      "caseId": "RET-FRESH-0117",
+      "query": "Thông tư 08/2022/TT-BGDĐT ban hành Quy chế tuyển sinh đại học có còn áp dụng cho năm 2026?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thông tư 08",
+        "quy chế tuyển sinh"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "dfd1557bb5a56be6bfc96b79421269ffd8b715ebf212867291ddb93c33fb9769"
+    },
+    {
+      "caseId": "RET-FRESH-0118",
+      "query": "Quy chế đào tạo đại học theo Thông tư 47/2014 đã bị thay thế bởi Thông tư 08/2021 chưa?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thông tư 08/2021",
+        "quy chế đào tạo"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "4ef0c2041349f4fb29f20e25f751460cd58b344fbd8338536bbb928c15253672"
+    },
+    {
+      "caseId": "RET-FRESH-0119",
+      "query": "Nghị định 116/2020/NĐ-CP về hỗ trợ tiền đóng học phí cho sinh viên sư phạm có quy định bồi hoàn kinh phí không?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "nghị định 116",
+        "sinh viên sư phạm"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "chinhphu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "ff4ae7418995037de6e4c61ebef62fd42f64c89b0afb9fbece6620f2bc33a1de"
+    },
+    {
+      "caseId": "RET-FRESH-0120",
+      "query": "Quyết định số 157/2007/QĐ-TTg về tín dụng sinh viên đã được sửa đổi mức vay tối đa bao nhiêu?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "VBSP",
+      "aliases": [
+        "quyết định 157",
+        "vay vốn sinh viên"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_BANKING",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "vbsp.org.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "341b81311006413ddf6f2a3863b10a53566c98cf228d8716c1ecf840056bc610"
+    },
+    {
+      "caseId": "RET-FRESH-0121",
+      "query": "Quy định cộng điểm ưu tiên khu vực trong tuyển sinh đại học chỉ có hiệu lực 2 năm đúng không?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "điểm ưu tiên",
+        "ưu tiên khu vực"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "5dcd859162b473ef43ed047fd092e8b57579eb72f9e294bcf03519e0ccfcd3dd"
+    },
+    {
+      "caseId": "RET-FRESH-0122",
+      "query": "Chính sách miễn giảm học phí cho con thương binh liệt sĩ quy định tại văn bản nào mới nhất?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOLISA_VN",
+      "aliases": [
+        "miễn giảm học phí",
+        "chính sách ưu đãi"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_LABOR",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "molisa.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "ca3baaf804169e9241a2187d91a63ada9bbd9c3a75a16355113781d3d1cb2f58"
+    },
+    {
+      "caseId": "RET-FRESH-0123",
+      "query": "Thông tư 22/2019/TT-BGDĐT quy định về hội thi giáo viên dạy giỏi có áp dụng cho giảng viên đại học không?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thông tư 22"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "e0594c4d77771734b6aa122376334fc2858253fffa39dcf8719cabd605ef1dd8"
+    },
+    {
+      "caseId": "RET-FRESH-0124",
+      "query": "Quy định về chuẩn chức danh giảng viên đại học hạng III theo Thông tư 40/2020/TT-BGDĐT",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thông tư 40",
+        "chức danh giảng viên"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "2017d3c28a0e204c9254394f40a83f217ea52a27daed969c93b4ee92531c7ee0"
+    },
+    {
+      "caseId": "RET-FRESH-0125",
+      "query": "Sinh viên có được xét miễn học phần tiếng Anh nếu chứng chỉ IELTS hết hạn 2 năm không?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "HCMUT_VNUHCM",
+      "aliases": [
+        "chuẩn tiếng anh",
+        "ielts 2 năm"
+      ],
+      "expectedJurisdiction": "ACADEMIC_REGULATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmut.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "f97cc51242bd8b2361fbaa7b57c307d2ff37ba1814ef61296187323f860333c4"
+    },
+    {
+      "caseId": "RET-FRESH-0126",
+      "query": "Quy chế bảo lưu kết quả thi tốt nghiệp THPT qua các năm được quy định như thế nào?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "bảo lưu thpt",
+        "thi tốt nghiệp"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "f9b0c667121a23712f3aeee7a49772b03981098e8e08df47652ca0de04eacbd2"
+    },
+    {
+      "caseId": "RET-FRESH-0127",
+      "query": "Nghị quyết 35/NQ-CP năm 2019 về tăng cường huy động các nguồn lực cho giáo dục có cho phép tăng học phí tự do không?",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "GOV_VN",
+      "aliases": [
+        "nghị quyết 35"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_POLICY",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "chinhphu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "bbde23ea1a31d46b13c9ea90ffb4431fa12496d4bdcf3ee82a96201243522500"
+    },
+    {
+      "caseId": "RET-FRESH-0128",
+      "query": "Quy định về thời gian đào tạo tối đa của sinh viên đại học hệ chính quy theo hệ thống tín chỉ",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thời gian tối đa",
+        "đào tạo tín chỉ"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "f8fa7640e5998479e8bbe4439052e09aa080c933d92fdf4bcb402c4813a7ee22"
+    },
+    {
+      "caseId": "RET-FRESH-0129",
+      "query": "Thông tư liên tịch số 20/2014 về chế độ phụ cấp độc hại cho nhân viên phòng thí nghiệm trường học",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "phụ cấp độc hại"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "6ec4c4148117fcfc2aa9fd871196426b1e5f26d02dc722bbd7c973676e2bd850"
+    },
+    {
+      "caseId": "RET-FRESH-0130",
+      "query": "Quy định thi chuẩn đầu ra Tin học ứng dụng công nghệ thông tin cơ bản theo Thông tư 03/2014/TT-BTTTT",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MIC_VN",
+      "aliases": [
+        "thông tư 03",
+        "tin học cơ bản"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_MIC",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "mic.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "3e233c9a03a904ebc0eaf25f6a109c9ffb7a22d7377c67f5ae77d245abd0aa89"
+    },
+    {
+      "caseId": "RET-FRESH-0131",
+      "query": "Chính sách trợ cấp xã hội cho sinh viên mồ côi cả cha lẫn mẹ theo Nghị định 20/2021/NĐ-CP",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOLISA_VN",
+      "aliases": [
+        "nghị định 20",
+        "trợ cấp xã hội"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_LABOR",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "molisa.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "6de048f42b212b6bea31a50a482ee2636ed26a2353de53e4fbf38a01b3626bed"
+    },
+    {
+      "caseId": "RET-FRESH-0132",
+      "query": "Quy chế đánh giá công nhận trường đại học đạt tiêu chuẩn chất lượng giáo dục theo Thông tư 12/2017",
+      "oodCategory": "SUPERSEDED_POLICY",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "thông tư 12",
+        "kiểm định chất lượng"
+      ],
+      "expectedJurisdiction": "GOVERNMENT_EDUCATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "3ddb78ef72f515ebf28363bfdd8a61fb581fd2df92229ee3c8594355279714e7"
+    },
+    {
+      "caseId": "RET-FRESH-0133",
+      "query": "Nhận tin nhắn yêu cầu nộp 3 triệu phí giữ chỗ học bổng trao đổi Nhật Bản có phải lừa đảo?",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "học bổng nhật bản",
+        "phí giữ chỗ"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "ebb86c015faa44f31e134444cca72588905ef49b12aeecfd70f30633372d2390"
+    },
+    {
+      "caseId": "RET-FRESH-0134",
+      "query": "Fanpage ĐH Bách khoa tuyển cộng tác viên dịch thuật tài liệu nhận 500k/trang yêu cầu nạp cọc",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "HCMUT_VNUHCM",
+      "aliases": [
+        "cộng tác viên dịch thuật",
+        "nạp cọc"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmut.edu.vn",
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "c1929a76c084711107302f87dda054ccf73d34f97976acdc00e272c21b1be93a"
+    },
+    {
+      "caseId": "RET-FRESH-0135",
+      "query": "Email từ đuôi @gmail.com mạo danh phòng đào tạo yêu cầu chuyển khoản học phí lại do lỗi hệ thống",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "HCMUTE",
+      "aliases": [
+        "chuyển khoản học phí",
+        "mạo danh phòng đào tạo"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmute.edu.vn",
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "a1fc9d68686c610cb8fa07ebc5d227d7f02391130343d3f36ed3d0174a5203d5"
+    },
+    {
+      "caseId": "RET-FRESH-0136",
+      "query": "Cảnh báo trang web ký túc xá giả mạo thu tiền đặt cọc phòng trọ của tân sinh viên qua ví Momo",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "KTX_VNUHCM",
+      "aliases": [
+        "lừa cọc phòng trọ",
+        "web giả mạo"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ktxb.vnuhcm.edu.vn",
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "65f9c02653ac71c735498f40982453843cf58ba6417cddbdf8a71a58288e02c8"
+    },
+    {
+      "caseId": "RET-FRESH-0137",
+      "query": "Sinh viên nhận cuộc gọi tự xưng công an quận thông báo liên quan đường dây rửa tiền yêu cầu kê khai tài khoản",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "MPS_VN",
+      "aliases": [
+        "cuộc gọi lừa đảo",
+        "công an giả mạo"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "bocongan.gov.vn",
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "5f3d60f9bc83bcb1f7db4acfe30d92db04b6651763d7fefa742b4cb0075c1bd9"
+    },
+    {
+      "caseId": "RET-FRESH-0138",
+      "query": "Hội nhóm sinh viên chia sẻ link tải phần mềm bẻ khóa SPSS dính mã độc đánh cắp mật khẩu Facebook",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "mã độc spss",
+        "đánh cắp tài khoản"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "b90fd4f229e7df9be83b2cb4ec4e70c6cf3eaf413e317de93cf45f0733ace963"
+    },
+    {
+      "caseId": "RET-FRESH-0139",
+      "query": "App chấm điểm thi đại học yêu cầu cấp quyền truy cập danh bạ và hình ảnh trên điện thoại",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "app lừa đảo",
+        "quyền danh bạ"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "c606838e66a9e59278a39c296570c1faf007bfe950a799ef64beec1687937c44"
+    },
+    {
+      "caseId": "RET-FRESH-0140",
+      "query": "Nhận thông báo trúng học bổng toàn phần du học Úc nhưng phải đóng 10 triệu lệ phí visa trước",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "học bổng úc lừa đảo",
+        "lệ phí visa"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "2e28940bbdebdb4887dcbfb3ff36c25b7b83c6bbac8c600f61545acab3b14701"
+    },
+    {
+      "caseId": "RET-FRESH-0141",
+      "query": "Dịch vụ làm bằng đại học chính quy có hồ sơ gốc tại trường thật giá 5 triệu đồng",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "làm bằng giả",
+        "hồ sơ gốc"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn",
+        "bocongan.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "2c70790556f1e47149cd94ad57f34267f9284b2efe5d0e54cf2bb4fef8992d2e"
+    },
+    {
+      "caseId": "RET-FRESH-0142",
+      "query": "Dịch vụ nâng điểm thi đại học và sửa điểm tín chỉ trong hệ thống quản lý đào tạo",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "nâng điểm tín chỉ",
+        "sửa điểm portal"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "moet.gov.vn",
+        "bocongan.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "989044dd5b327741a7359a99aebf27c19184ebbcf83457f63661df77a2fd6bb6"
+    },
+    {
+      "caseId": "RET-FRESH-0143",
+      "query": "Tuyển sinh viên tham gia khảo sát nhận 200k qua link rút gọn chứa trang đăng nhập Google giả",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "phishing google",
+        "khảo sát 200k"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "e0633b287e71a9f3b2e2e12fe47a95e95e5a12684062f6b11629d2a6d65a222b"
+    },
+    {
+      "caseId": "RET-FRESH-0144",
+      "query": "Nhắn tin Zalo tự xưng giảng viên hướng dẫn yêu cầu sinh viên chuyển 1 triệu tiền quà chấm luận văn",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "HCMUT_VNUHCM",
+      "aliases": [
+        "mạo danh giảng viên",
+        "tiền chấm luận văn"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmut.edu.vn",
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "b441e18691c645a7547517135cdb5211be761e208d37298f8062c70b98bcc1b3"
+    },
+    {
+      "caseId": "RET-FRESH-0145",
+      "query": "SMS Brandname ngân hàng giả mạo gửi đường link lạ yêu cầu đăng nhập huỷ dịch vụ học phí tự động",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "sms brandname giả",
+        "link lạ huỷ dịch vụ"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "bf2db15f904aa578194befb55bd6ee5ac59c6d44c78edd39c6009b3b0acb249a"
+    },
+    {
+      "caseId": "RET-FRESH-0146",
+      "query": "Cảnh báo trang web bình chọn cuộc thi Nét đẹp sinh viên yêu cầu quét mã QR đăng nhập Zalo",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "bình chọn thi ảnh",
+        "quét qr hack zalo"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "de40aaf0693bc1ec5e9d40b70bcdbd4f56871b7838e44c3c8c96542710fbc307"
+    },
+    {
+      "caseId": "RET-FRESH-0147",
+      "query": "Học bổng trợ cấp khó khăn yêu cầu sinh viên gửi hình ảnh CCCD hai mặt và video quét gương mặt",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "lừa đảo cccd",
+        "video quét mặt sinh trắc"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "35e6439ef08691bfdd9fbd4dc5c7a7f13b1edb42f39a8d1531edbc9d70bbad25"
+    },
+    {
+      "caseId": "RET-FRESH-0148",
+      "query": "Cho vay tiền sinh viên bằng thế chấp tài khoản iCloud với lãi suất cắt cổ",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "MPS_VN",
+      "aliases": [
+        "vay icloud",
+        "tín dụng đen sinh viên"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "bocongan.gov.vn",
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "b9d3daf41ce04dae8f01604888a031c8eefa316cf7b7c33f6274029558824231"
+    },
+    {
+      "caseId": "RET-FRESH-0149",
+      "query": "Tuyển người mẫu ảnh sinh viên chụp lookbook yêu cầu cởi đồ quay video phỏng vấn online",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "MPS_VN",
+      "aliases": [
+        "tuyển mẫu ảnh lừa đảo",
+        "tống tiền video"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "bocongan.gov.vn",
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "9afc2fe1cd9ac35812287a6e6f2a4b5b0fc1281526d598c1d223d33926c01a24"
+    },
+    {
+      "caseId": "RET-FRESH-0150",
+      "query": "Thư điện tử thông báo trúng tuyển chương trình thực tập Google tại Singapore nhưng bắt nộp phí bảo lãnh",
+      "oodCategory": "SCAM_PHISHING",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "thực tập google giả",
+        "phí bảo lãnh"
+      ],
+      "expectedJurisdiction": "CYBER_FRAUD",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "6fd850c648be997eb4e0bff745d0efa4804bc6b098cd44338b1221385ad8b9d6"
+    },
+    {
+      "caseId": "RET-FRESH-0151",
+      "query": "check giùm e cái mail trúng tuyển bk tphcm này real hay fake ạ mn",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "HCMUT_VNUHCM",
+      "aliases": [
+        "bk tphcm",
+        "bách khoa"
+      ],
+      "expectedJurisdiction": "SLANG_VERIFICATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmut.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "680fbd20830349fdfbb266bb7bc8eab2b1c7cf3d017610f7dc7495739aa462eb"
+    },
+    {
+      "caseId": "RET-FRESH-0152",
+      "query": "học bổng này bảo nạp 5 củ giữ slot có legit k hay lừa đảo zậy",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "học bổng",
+        "nạp củ giữ slot"
+      ],
+      "expectedJurisdiction": "SLANG_VERIFICATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "f4eb5f8022ce6450efd4eefb1b6eb47bd5b9d13a9481d1a16cd3d8ea126732e5"
+    },
+    {
+      "caseId": "RET-FRESH-0153",
+      "query": "spkt có cho nợ chuẩn đầu ra toeic để nhận bằng k mn ơi",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "HCMUTE",
+      "aliases": [
+        "spkt",
+        "chuẩn toeic"
+      ],
+      "expectedJurisdiction": "SLANG_VERIFICATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmute.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "d115b4d369c6b3183168556c824a5cb1d2f44f3487b8e939c0e090c09e028ddb"
+    },
+    {
+      "caseId": "RET-FRESH-0154",
+      "query": "bên kinh tế ueh học phí tín chỉ năm nay tăng bnhiu % v mn",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "UEH",
+      "aliases": [
+        "ueh",
+        "học phí tín chỉ"
+      ],
+      "expectedJurisdiction": "SLANG_VERIFICATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ueh.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "87b9758eeeffbf6081b63c29946f9615b085ac1a5f7e50986ef934d21de6ba15"
+    },
+    {
+      "caseId": "RET-FRESH-0155",
+      "query": "nghe đồn uel sắp sáp nhập vào ueh có đúng k v mn",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "AMBIGUOUS_UEH_UEL",
+      "aliases": [
+        "uel",
+        "ueh",
+        "sáp nhập"
+      ],
+      "expectedJurisdiction": "SLANG_VERIFICATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ueh.edu.vn",
+        "uel.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "3a00352906bba61d805d6284a2b8fc7467437e691850ddf328668ba130b6a0a0"
+    },
+    {
+      "caseId": "RET-FRESH-0156",
+      "query": "điểm rèn luyện dưới 50 có bị đình chỉ học tập ở hust k zậy",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "HUST",
+      "aliases": [
+        "hust",
+        "điểm rèn luyện"
+      ],
+      "expectedJurisdiction": "SLANG_VERIFICATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hust.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "37a9b878d079ffb3fb01e0ad5b776aeed5efb3a9a185031ec754468acfc7e2b9"
+    },
+    {
+      "caseId": "RET-FRESH-0157",
+      "query": "xin rv ktx khu b phòng dịch vụ 4 ng có máy lạnh giá bn ạ",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "KTX_VNUHCM",
+      "aliases": [
+        "ktx khu b",
+        "phòng dịch vụ 4 ng"
+      ],
+      "expectedJurisdiction": "SLANG_VERIFICATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ktxb.vnuhcm.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "db19b7649b608f6264d0da8ac987ad96ecc86875a3de84f9fb906a8a7ab70b6a"
+    },
+    {
+      "caseId": "RET-FRESH-0158",
+      "query": "neu năm nay có xét học bạ k hay chỉ xét đgnl vs ielts v mn",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "NEU",
+      "aliases": [
+        "neu",
+        "xét học bạ"
+      ],
+      "expectedJurisdiction": "SLANG_VERIFICATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "neu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "2bd5021687de2e0db58249966aa7e0aff4eeedb0a92635ee59dcbb03ca58010f"
+    },
+    {
+      "caseId": "RET-FRESH-0159",
+      "query": "ftu cs2 có ktx riêng cho sv ngoại tỉnh k hay phải thuê trọ ngoài",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "FTU_CS2",
+      "aliases": [
+        "ftu cs2",
+        "ktx ftu"
+      ],
+      "expectedJurisdiction": "SLANG_VERIFICATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "cs2.ftu.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "a466465abc91550747f771a58b005b3d1d9f9c50932ea540fb2de87368411016"
+    },
+    {
+      "caseId": "RET-FRESH-0160",
+      "query": "e lỡ bấm vào link lạ trên fb giờ mất quyền admin page khoa thì làm s",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "mất page khoa",
+        "link lạ fb"
+      ],
+      "expectedJurisdiction": "SLANG_VERIFICATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "b77113d17f955d9d7708a7ebd7756d258b3c2382691ff0875fa991eb8075ea34"
+    },
+    {
+      "caseId": "RET-FRESH-0161",
+      "query": "trường dại hoc bach khoa tp hcm hoc phi nam 2026 (typo không dấu)",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "HCMUT_VNUHCM",
+      "aliases": [
+        "hcmut",
+        "đại học bách khoa"
+      ],
+      "expectedJurisdiction": "TYPO_NON_ACCENT",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmut.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "6b75566c355aed15aafa04e0812e28485d36671cfbcafb0d80549818cbbfe83b"
+    },
+    {
+      "caseId": "RET-FRESH-0162",
+      "query": "truong dh su pham ky thuat tp hcm tuyen sinh 2026 nganh oto (typo)",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "HCMUTE",
+      "aliases": [
+        "hcmute",
+        "sư phạm kỹ thuật"
+      ],
+      "expectedJurisdiction": "TYPO_NON_ACCENT",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmute.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "875c5dcd5a5e96e406cd9277f8a0a6c830bc24c376915fab6e93b7fbe1ae7549"
+    },
+    {
+      "caseId": "RET-FRESH-0163",
+      "query": "hoc vien buu chinh vien thong diem chuan 2026 khoi a00 (typo)",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "PTIT",
+      "aliases": [
+        "ptit",
+        "bưu chính viễn thông"
+      ],
+      "expectedJurisdiction": "TYPO_NON_ACCENT",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ptit.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "428f85da47948c7a37edd2e6c8fabae468486d8f68a681d14cfc1f31358972cf"
+    },
+    {
+      "caseId": "RET-FRESH-0164",
+      "query": "dai hoc y duoc can tho co xet tuyen thang hs gioi quoc gia k (typo)",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "CTUMP",
+      "aliases": [
+        "ctump",
+        "y dược cần thơ"
+      ],
+      "expectedJurisdiction": "TYPO_NON_ACCENT",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ctump.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "748410de5eb654b4ae45740d8504f79243863e7adfe29f26ee9479920e97a051"
+    },
+    {
+      "caseId": "RET-FRESH-0165",
+      "query": "Học pнí Ɖại нọc Bácн Kнoa тp.нcм (ký tự teen code / homoglyphs)",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "HCMUT_VNUHCM",
+      "aliases": [
+        "hcmut",
+        "bách khoa tphcm"
+      ],
+      "expectedJurisdiction": "HOMOGLYPH_EVASION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "hcmut.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "c3d71c7c356bfe3d68042122a1c319a5c774cb6976f5c62902fe5f1ae018aac7"
+    },
+    {
+      "caseId": "RET-FRESH-0166",
+      "query": "Tнông вáo тuyển ѕinн ƉH Kịnн тế тpнcм 2026 (teen code / homoglyphs)",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "UEH",
+      "aliases": [
+        "ueh",
+        "kinh tế tphcm"
+      ],
+      "expectedJurisdiction": "HOMOGLYPH_EVASION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "ueh.edu.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "d2645844b80b9d9d218c442425fb8eb9e1e082cfb96d0728699e7062f690cc93"
+    },
+    {
+      "caseId": "RET-FRESH-0167",
+      "query": "cảnh вáo lừa đảo nạp тiền giữ ѕuấт нọc вổng (teen code / homoglyphs)",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "NCSC_VN",
+      "aliases": [
+        "lừa đảo học bổng",
+        "nạp tiền"
+      ],
+      "expectedJurisdiction": "HOMOGLYPH_EVASION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "tinnhiemmang.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "5e1ab23585eda184568f7b380901bf3ed23549a72fe24cc7c7e4510924fd82a6"
+    },
+    {
+      "caseId": "RET-FRESH-0168",
+      "query": "sinh viên có bắt buộc phải tham gia bảo hiểm y tế tại trường k ạ mn",
+      "oodCategory": "ADVERSARIAL_SLANG_TYPO",
+      "canonicalEntity": "MOET_VN",
+      "aliases": [
+        "bảo hiểm y tế",
+        "bhyt bắt buộc"
+      ],
+      "expectedJurisdiction": "SLANG_VERIFICATION",
+      "relevantSourceTypes": [
+        "OFFICIAL_PORTAL",
+        "GOVERNMENT_CIRCULAR",
+        "CYBER_BULLETIN"
+      ],
+      "knownOfficialDomains": [
+        "baohiemxahoi.gov.vn",
+        "moet.gov.vn"
+      ],
+      "relevanceGrades": {
+        "EXACT_OFFICIAL": 3,
+        "OFFICIAL_RELATED": 2,
+        "REPUTABLE_NEWS": 1,
+        "UNVERIFIED": 0
+      },
+      "freshnessRequirement": "CURRENT_ACTIVE",
+      "caseHash": "17a7605122d9f81f2ac71cbb51137349170369dcda20358e667d051dcd40b7d2"
+    }
+  ]
+}

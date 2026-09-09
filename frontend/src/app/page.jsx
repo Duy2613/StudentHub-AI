@@ -1,77 +1,36 @@
 import React from "react";
-import AcademicNavbar from "@/components/layout/AcademicNavbar";
-import AcademicHeroSection from "@/components/landing/AcademicHeroSection";
-import ContinueLearningBar from "@/components/landing/ContinueLearningBar";
-import InteractiveKnowledgeAtlas from "@/components/atlas/InteractiveKnowledgeAtlas";
-import LearningDomainsSection from "@/components/landing/LearningDomainsSection";
-import FullStackLayersSection from "@/components/landing/FullStackLayersSection";
-import FeaturedCoursesSection from "@/components/landing/FeaturedCoursesSection";
-import AiTutorSection from "@/components/landing/AiTutorSection";
-import PracticeProjectLabSection from "@/components/landing/PracticeProjectLabSection";
-import CommunityExpertsSection from "@/components/landing/CommunityExpertsSection";
-import OutcomesSection from "@/components/landing/OutcomesSection";
-import FinalCtaSection from "@/components/landing/FinalCtaSection";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
+import AcademicNavbar from "@/components/layout/AcademicNavbar";
+import VNextLanding from "@/components/landing/VNextLanding";
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
-  title: "StudentHub AI — Hiểu đúng. Đi xa.",
-  description:
-    "Hệ điều hành học tập biết kiểm chứng trước khi khuyên bạn — kết nối nguồn chính thức, trải nghiệm cộng đồng và chuyên gia đúng phạm vi.",
+  title: "StudentHub AI | Hiểu đúng. Đi xa.",
+  description: "Kiểm tra nguồn tin, đối chiếu bối cảnh và xem điều còn thiếu trước khi bạn quyết định.",
 };
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary flex flex-col antialiased">
-      {/* 1. Navigation */}
+    <div className="vnext-landing-page">
       <AcademicNavbar />
-
-      <main className="flex-1 w-full">
-        {/* 2. Cinematic Hero */}
-        <AcademicHeroSection />
-
-        <div className="landing-deferred-section"><ContinueLearningBar /></div>
-        <div className="landing-deferred-section"><InteractiveKnowledgeAtlas /></div>
-        <div className="landing-deferred-section"><LearningDomainsSection /></div>
-        <div className="landing-deferred-section"><FullStackLayersSection /></div>
-        <div className="landing-deferred-section"><FeaturedCoursesSection /></div>
-        <div className="landing-deferred-section"><AiTutorSection /></div>
-        <div className="landing-deferred-section"><PracticeProjectLabSection /></div>
-        <div className="landing-deferred-section"><CommunityExpertsSection /></div>
-        <div className="landing-deferred-section"><OutcomesSection /></div>
-        <div className="landing-deferred-section"><FinalCtaSection /></div>
+      <main id="main-content" className="vnext-landing-main">
+        <VNextLanding />
       </main>
-
-      {/* 13. Global Academic Footer */}
-      <footer className="border-t border-border-subtle bg-bg-primary py-12 px-4 sm:px-6 lg:px-8 text-xs font-mono text-text-muted">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2 text-text-secondary">
-            <ShieldCheck size={16} className="text-accent-knowledge" />
-            <span className="font-semibold text-text-primary">StudentHub AI</span>
-            <span>·</span>
-            <span>Academic Operating System</span>
+      <footer className="vnext-landing-footer">
+        <div className="vnext-landing-footer-inner">
+          <div className="vnext-landing-footer-brand">
+            <ShieldCheck size={18} aria-hidden="true" />
+            <span>StudentHub AI</span>
+            <span className="type-technical">Nguồn trước quyết định</span>
           </div>
-
-          <nav className="flex flex-wrap items-center justify-center gap-6" aria-label="Điều hướng chân trang">
-            <Link href="/trust" className="hover:text-text-primary transition-colors">
-              Trust Engine
-            </Link>
-            <Link href="/community" className="hover:text-text-primary transition-colors">
-              Community
-            </Link>
-            <Link href="/expert" className="hover:text-text-primary transition-colors">
-              Experts
-            </Link>
-            <Link href="/learn" className="hover:text-text-primary transition-colors">
-              Học tập
-            </Link>
-            <Link href="/cases" className="hover:text-text-primary transition-colors">
-              Case Lab
-            </Link>
+          <nav aria-label="Điều hướng chân trang" className="vnext-landing-footer-nav">
+            <Link href="/trust">Kiểm chứng</Link>
+            <Link href="/community">Cộng đồng</Link>
+            <Link href="/expert">Chuyên gia</Link>
+            <Link href="/cases">Tình huống</Link>
           </nav>
-
-          <div>© 2026 StudentHub AI. Chuẩn học thuật & Kiểm chứng thực tế.</div>
+          <span className="type-technical">Bản địa hóa tiếng Việt · poster-first</span>
         </div>
       </footer>
     </div>

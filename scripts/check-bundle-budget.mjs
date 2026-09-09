@@ -16,18 +16,6 @@ const routes = [
     entry: "[project]/src/app/page",
   },
   {
-    path: "/learn/cs101/fullstack-intro",
-    manifest: ["server", "app", "learn", "[courseId]", "[lessonId]", "page_client-reference-manifest.js"],
-    assignment: "/learn/[courseId]/[lessonId]/page",
-    entry: "[project]/src/app/learn/[courseId]/[lessonId]/page",
-  },
-  {
-    path: "/roadmap",
-    manifest: ["server", "app", "roadmap", "page_client-reference-manifest.js"],
-    assignment: "/roadmap/page",
-    entry: "[project]/src/app/roadmap/page",
-  },
-  {
     path: "/trust",
     manifest: ["server", "app", "trust", "page_client-reference-manifest.js"],
     assignment: "/trust/page",
@@ -44,6 +32,12 @@ const routes = [
     manifest: ["server", "app", "expert", "page_client-reference-manifest.js"],
     assignment: "/expert/page",
     entry: "[project]/src/app/expert/page",
+  },
+  {
+    path: "/cases",
+    manifest: ["server", "app", "cases", "page_client-reference-manifest.js"],
+    assignment: "/cases/page",
+    entry: "[project]/src/app/cases/page",
   },
 ];
 

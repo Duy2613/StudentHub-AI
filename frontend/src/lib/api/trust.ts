@@ -1,8 +1,8 @@
-import { apiRequest } from "./client";
-import { ApiError } from "./errors";
-import { canonicalTrustResponseSchema, trustEvidenceResultSchema, trustReasoningResultSchema, trustScreenResultSchema, trustSemanticResultSchema, trustV5ResponseSchema, type CanonicalTrustResponse, type TrustLayerResult, type TrustV5Pipeline, type TrustV5Response } from "./schemas/trust";
+import { apiRequest } from "./client.ts";
+import { ApiError } from "./errors.ts";
+import { canonicalTrustResponseSchema, trustEvidenceResultSchema, trustReasoningResultSchema, trustScreenResultSchema, trustSemanticResultSchema, trustV5ResponseSchema, type CanonicalTrustResponse, type TrustLayerResult, type TrustV5Pipeline, type TrustV5Response } from "./schemas/trust.ts";
 
-export type { ExpertConsensus, RelatedCase, ThreatProviderResult, TrustLayerResult } from "./schemas/trust";
+export type { ExpertConsensus, RelatedCase, ThreatProviderResult, TrustLayerResult } from "./schemas/trust.ts";
 
 export type TrustInput = {
   type: "text" | "url" | "image" | "file";

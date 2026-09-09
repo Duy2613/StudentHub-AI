@@ -108,6 +108,8 @@ function toPublicForumPost(post) {
   });
   safe.sourceState = safe.sourceState || "COMMUNITY_SIGNAL";
   safe.isAuthoritative = false;
+  safe.rankingPolicyVersion = safe.rankingPolicyVersion || "legacy-forum-v0";
+  safe.trustMutation = false;
   return safe;
 }
 
@@ -295,7 +297,7 @@ async function createForumPost(request, routeParams, principal) {
       authorTrustScore: 50,
       trustScoreSource: "SERVER_UNASSESSED_BASELINE",
       authorVerificationState: principal.attributes?.emailVerified ? "VERIFIED_IDENTITY" : "KNOWN_ACCOUNT",
-      trustVoteCount: 1, // Tác giả tự vote khởi điểm
+      trustVoteCount: 0,
       distrustVoteCount: 0,
       likeCount: 0,
       createdAt: new Date().toISOString(),

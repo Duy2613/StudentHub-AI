@@ -49,6 +49,10 @@ export class ExpertDiscoveryEngine {
         const verificationScore = isVerified ? 1.0 : (isPartiallyVerified ? 0.7 : 0.4);
 
         // 3. Historical Accuracy (Separate from Domain Scope!)
+        // A neutral ranking prior keeps discovery deterministic, but it is not
+        // exposed as evidence of reliability; the label remains insufficient
+        // until independent adjudications exist.
+        const hasHistory = expert.historicalAccuracy !== undefined || expert.metrics?.historicalAccuracy !== undefined;
         const historicalAccuracy = this.#clampMetric(
           expert.historicalAccuracy ?? expert.metrics?.historicalAccuracy ?? 0.55
         );
@@ -89,9 +93,10 @@ export class ExpertDiscoveryEngine {
             domainMatchPercentage: Math.round(domainRelevance * 100),
             verificationLabel: isVerified ? "Đã kiểm định chính quy" : (isPartiallyVerified ? "Xác nhận một phần" : "Chưa đủ xác minh"),
             historicalAccuracyPercentage: Math.round(historicalAccuracy * 100),
-            historyConfidenceLabel: expert.historicalAccuracy !== undefined || expert.metrics?.historicalAccuracy !== undefined
+            historyConfidenceLabel: hasHistory
               ? "Có dữ liệu lịch sử"
               : "Chưa đủ lịch sử đánh giá",
+            historyConfidenceCode: hasHistory ? "OBSERVED" : "INSUFFICIENT_DATA",
             evidenceQualityPercentage: Math.round(evidenceQuality * 100),
             freshnessLabel: freshnessScore >= 0.8 ? "MỚI" : "BÌNH THƯỜNG",
             hasConflictOfInterest: hasConflict

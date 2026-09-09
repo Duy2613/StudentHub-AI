@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ApiError } from "../../api/errors";
-import { apiRequest } from "../../api/client";
+import { ApiError } from "../../api/errors.ts";
+import { apiRequest } from "../../api/client.ts";
 import {
   communityExperienceResponseSchema,
   communityPostSchema,
@@ -9,7 +9,7 @@ import {
   getCommunityExperience,
   getCommunityPosts,
   type CommunityPostsOptions,
-} from "../../api/community";
+} from "../../api/community.ts";
 import {
   evaluateExpertClaim,
   expertDetailResponseSchema,
@@ -19,9 +19,9 @@ import {
   getExpert as getExpertProfile,
   type ExpertClaimInput,
   type ExpertListQuery,
-} from "../../api/experts";
-import { trustApi, type TrustInput, type TrustV5Event } from "../../api/trust";
-import { trustV5ResponseSchema } from "../../api/schemas/trust";
+} from "../../api/experts.ts";
+import { trustApi, type TrustInput, type TrustV5Event } from "../../api/trust.ts";
+import { trustV5ResponseSchema } from "../../api/schemas/trust.ts";
 import {
   caseScopeSchema,
   communityEvidenceSchema,
@@ -63,11 +63,11 @@ import {
   type TrustInvestigationInput,
   type TrustInvestigationResult,
   type TrustProvider,
-} from "../ports";
+} from "../ports.ts";
 
 type TrustTransport = (input: TrustInput, signal?: AbortSignal, onEvent?: (event: TrustV5Event) => void, requestId?: string, idempotencyKey?: string) => Promise<unknown>;
 type CommunityTransport = (options?: CommunityPostsOptions) => Promise<unknown>;
-type CommunityCreateTransport = (input: { content: string; evidenceRefs: readonly string[]; caseScope: { caseId: string; caseRevision: number } }, signal?: AbortSignal, requestId?: string) => Promise<unknown>;
+type CommunityCreateTransport = (input: { content: string; evidenceRefs: readonly string[]; caseScope: { caseId: string; caseRevision: number }; claimId?: string; contributionType?: string; source?: Record<string, unknown> }, signal?: AbortSignal, requestId?: string) => Promise<unknown>;
 type CommunityReadTransport = (observationId: string, signal?: AbortSignal, requestId?: string) => Promise<unknown>;
 type ExpertListTransport = (query?: ExpertListQuery, signal?: AbortSignal) => Promise<unknown>;
 type ExpertReadTransport = (expertId: string, signal?: AbortSignal, requestId?: string) => Promise<unknown>;
@@ -451,6 +451,9 @@ function observationFromPost(post: Record<string, unknown>): CommunityObservatio
     evidence: evidenceFromApi(post.evidence),
     freshnessStatus: typeof post.freshnessStatus === "string" ? post.freshnessStatus : typeof post.recency === "string" ? post.recency : null,
     moderationStatus: typeof post.moderationStatus === "string" ? post.moderationStatus : typeof post.moderationState === "string" ? post.moderationState : typeof post.status === "string" && post.status.trim() ? post.status : null,
+    evidenceState: typeof post.evidenceState === "string" ? post.evidenceState : null,
+    reviewState: typeof post.reviewState === "string" ? post.reviewState : null,
+    contributionType: typeof post.contributionType === "string" ? post.contributionType : null,
   };
   const parsed = communityObservationSchema.safeParse(candidate);
   return parsed.success ? parsed.data : null;
@@ -687,6 +690,9 @@ export class ApiProviderAdapter implements TrustProvider, CommunityProvider, Exp
         content: parsed.data.statement,
         evidenceRefs: parsed.data.evidenceRefs,
         caseScope: parsed.data.scope,
+        claimId: parsed.data.claimId,
+        contributionType: parsed.data.contributionType,
+        source: parsed.data.source,
       }, signal, parsed.data.requestId);
       const response = communityPostResponseSchema.safeParse(raw);
       const observation = response.success ? observationFromPost(response.data.post) : null;

@@ -5,7 +5,8 @@
  */
 
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore.js";
+import { ExpertStore, isExpertDemoMode } from "@/lib/intelligence/expert/expertStore.js";
+import { ExpertRepository } from "@/lib/server/database/ExpertRepository.js";
 import { ExpertPublicDTO } from "@/lib/intelligence/expert/ExpertPublicDTO.js";
 
 export const GET = SecurityFabric.wrapHandler({
@@ -28,7 +29,12 @@ export const GET = SecurityFabric.wrapHandler({
     }, { status: 400 });
   }
 
-  const rawExpert = ExpertStore.getExpert(expertId, { redactPrivate: true });
+  let rawExpert;
+  try {
+    rawExpert = isExpertDemoMode() ? ExpertStore.getExpert(expertId, { redactPrivate: true }) : await ExpertRepository.getPublicProfile(expertId);
+  } catch {
+    return Response.json({ success: false, error: { code: "EXPERT_STORAGE_UNAVAILABLE", userMessage: "Expert profile storage is temporarily unavailable.", requestId: secContext.correlationId, retryable: true } }, { status: 503 });
+  }
   if (!rawExpert) {
     return Response.json({
       success: false,
@@ -46,6 +52,6 @@ export const GET = SecurityFabric.wrapHandler({
   return Response.json({
     success: true,
     expert: ExpertPublicDTO.toPublicDTO(rawExpert),
-    meta: { requestId: secContext.correlationId }
+    meta: { requestId: secContext.correlationId, sourceState: isExpertDemoMode() ? "DEMO_FIXTURE" : "DURABLE_POSTGRES", historyConfidence: "INSUFFICIENT_DATA" }
   });
 });

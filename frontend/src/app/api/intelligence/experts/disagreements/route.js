@@ -4,7 +4,7 @@
  * Returns peer disagreement mappings between experts across domains without reputation bias.
  */
 
-import { ExpertStore } from "@/lib/intelligence/expert/expertStore";
+import { ExpertStore, isExpertDemoMode } from "@/lib/intelligence/expert/expertStore";
 import { ExpertDisagreementMap } from "@/lib/intelligence/expert/expertDisagreementMap";
 import { DISAGREEMENT_REASON } from "@/lib/intelligence/expert/expertIntelligenceModel";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
@@ -14,6 +14,7 @@ export const GET = SecurityFabric.wrapHandler({
   allowAnonymous: true,
   maxRequests: 60
 }, async (req, _routeParams, _principal, secContext) => {
+  if (!isExpertDemoMode()) return Response.json({ success: false, error: { code: "EXPERT_DISAGREEMENT_WORKFLOW_NOT_MIGRATED", userMessage: "Live disagreement mapping requires persisted assessments and third review.", requestId: secContext.correlationId } }, { status: 503 });
   const { searchParams } = new URL(req.url);
   const domain = (searchParams.get("domain") || "AI_ML").trim().slice(0, 60).toUpperCase();
   if (domain !== "AI_ML") {

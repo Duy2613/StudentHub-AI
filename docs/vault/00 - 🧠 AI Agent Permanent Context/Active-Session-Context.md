@@ -10,6 +10,12 @@
   a production fail-closed rule for missing shared realtime state.
 - Trust terminal events are projected only after the existing durable commit;
   the local in-memory SSE adapter remains explicitly non-authoritative.
+- Follow-up hardening binds idempotency to the complete event envelope, keeps
+  subject-bound events private even on nominally public channels, validates
+  numeric reconnect cursors strictly, and emits durable SSE idle heartbeats.
+- Realtime regression evidence is now **7/7 pass** (six durable event-log
+  contracts plus the existing transport contract); production build remains
+  green.
 - Local contracts pass, but two-instance fan-out, reconnect/slow-consumer,
   restart, RLS and staging provider evidence still require an owned environment.
 - Canonical slice report: `docs/reports/REALTIME-MULTI-INSTANCE-CLOSURE-2026-09-07.md`.
@@ -520,3 +526,51 @@
 - Đã thêm lease token chống stale worker completion, `SHADOW`/`CONFLICT` outbox states, catch-up từ Shadow sang Staging, retry/backoff và read-only assurance projection với authorization `ADMIN.SECURITY` + freshness 5 phút.
 - Local closure: `npm run test:labbe` `19/19` PASS; targeted ESLint `0` errors/`0` warnings. Real staging gate hiện `LABBE_STAGING_BLOCKED_BY_ENV` vì thiếu HTTPS URL, workload token, scope và disposable Labbe database.
 - Evidence: `docs/reports/LABBE-STAGING-ASSURANCE-CLOSURE-2026-09-06.md`; không commit/push/deploy/remote migration/automatic writeback.
+
+## 18. Trust V5 RC2 — Metric Forensics & Generalization Boundary — 2026-09-09
+
+- Đã tiếp tục thực thi prompt forensic theo candidate mới `studenthub-v5-pilot-rc2`; candidate RC1 và artifact lịch sử được giữ nguyên, không overwrite.
+- Metric layer đã dùng exact Clopper–Pearson cho tỷ lệ nhị phân, query-specific ideal ranking cho NDCG và test riêng cho Recall@K/Precision@K/MRR/Macro-F1/Brier/ECE.
+- Retrieval holdout V3 đã chạy bằng đường ống thật và bị đánh dấu trung thực `TARGETS_NOT_ESTABLISHED`: STATIC/HYBRID Recall@5 `21.2%`, NDCG@5 `19.7%`, LIVE `9.1%`; hybrid giữ toàn bộ candidate union và không xóa candidate vì entity `UNKNOWN`. Đây là lỗi generalization/retrieval, không phải blocker cứng do MOET directory.
+- Official discovery được tách khỏi legal/provenance authority; nguồn công khai VQA/MOET chỉ là discovery signal cho adapter kế tiếp.
+- Privacy validation V2: `420` cases, `840/840` metamorphic checks, critical leakage `0`; Security validation V2: `105/105` production-boundary checks; Source-independence validation V2: `150/150`, pairwise precision/recall/F1 `100%` trên bộ tổng hợp cục bộ.
+- AI production-path audit đã khóa stage contract và blind DTO; controlled synthetic AI TEVV V2 `N=210` đạt FULL accuracy/Macro-F1 `100%`, nhưng chưa phải human/live-provider generalization. Critic hiện được ghi đúng là deterministic policy, không giả provider LLM.
+- Provider failure matrix `5/5` là mocked failure coverage; latency là synthetic và chi phí là `COST_ESTIMATE_ONLY`, chưa có live billing/token/p95 evidence.
+- DB gates giữ nguyên: `BLOCKED_BY_ENV`, `RLS_STATIC_ONLY`, `RESTORE_BLOCKED_BY_ENV`, `DATABASE/PILOT_BACKEND_PARTIAL`. Overall status vẫn `PILOT_BACKEND_PARTIAL`; chưa tuyên bố production/final convergence.
+- Next gate: RC3 tích hợp official-source adapter vào retrieval + holdout mới, sau đó mới đánh giá tiếp privacy/security/source/AI final holdouts với boundary contamination rõ ràng.
+
+## 19. Public Source Hub continuation — 2026-09-09
+
+- Đã thêm catalog server-side có allowlist cho OpenAlex, Crossref REST, Open-Meteo Geocoding/Forecast và GDELT DOC; không thêm credential hay model trả phí mới.
+- Đã thêm `PublicApiClient` với GET-only, origin/path allowlist, timeout, response byte limit, no-follow redirect, cache và typed failure; raw upstream body/error không đi qua boundary.
+- Đã thêm adapter chuẩn hóa metadata/context/discovery và `PublicSourceHub`; mọi record và MOET seed đều `isAuthoritative: false`, không được tự nâng thành Trust evidence.
+- Đã thêm route `/api/public/catalog`, `/api/public/research`, `/api/public/discovery`, `/api/public/weather` và contract tests `8/8`; official-page fetch chỉ bật opt-in `official=1`.
+- `OfficialDiscoveryAdapter` chỉ trích xuất link text/tên miền tối thiểu, digest và provenance; không lưu HTML thô, không tự gán authority và vẫn giữ legal/provenance review riêng.
+- Topic taxonomy gồm 13 nhóm StudentHub; model routing giữ AI Gateway hiện hữu, còn `EMBEDDING` vẫn `NOT_CONFIGURED` với lexical fallback.
+- Public API Hub chỉ là `CONTEXT_ONLY`; live uptime/latency/cost/provider credential chưa được claim. Retrieval V3, official-source extraction/final holdout và DB/RLS/restore gates vẫn chưa đóng.
+
+## 20. Trust V5 RC3/RC4 public-source continuation — 2026-09-09
+
+- Đã tạo `artifacts/candidate/STUDENTHUB_V5_CANDIDATE_RC3_MANIFEST.json` cho official-discovery integration và `artifacts/candidate/STUDENTHUB_V5_CANDIDATE_RC4_MANIFEST.json` cho provider schema fixes; RC2/RC3 được giữ làm snapshot lịch sử.
+- Holdout mới V4 (`N=150`) đã chạy với real MOET discovery fetch: Hybrid Recall@5 `17.3%`, NDCG@5 `17.0%`, entity resolution `92.7%`, official-source hit `17.3%`; pool/monotonic invariants pass nhưng target chưa đạt.
+- Kết quả V4 chỉ là validation evidence, không phải untouched final proof sau các thay đổi tiếp theo; chưa claim retrieval convergence, live provider evidence hoặc production completion.
+- Next gate: `RC4_DEDICATED_INSTITUTION_DISCOVERY_AND_NEW_FINAL_HOLDOUT`.
+
+## 21. Trust V5 RC5 — Public API institution discovery continuation — 2026-09-09
+
+- Đã nối `PublicApiInstitutionDiscoveryAdapter` vào `EvidenceDiscoveryService` và `TrustV5Engine` ở chế độ opt-in; candidate pool hiện là `SAFE_DEDUP(STATIC ∪ LIVE ∪ OFFICIAL_DISCOVERY ∪ PUBLIC_API_DISCOVERY)`.
+- OpenAlex institution lane chỉ lấy title/homepage/domain/digest tối thiểu, dedupe query trùng, tách tối đa 3 entity query cho claim multi-entity, bỏ qua claim không có institution signal và kiểm tra SSRF cho homepage.
+- Discovery candidate khớp entity đã resolve chỉ nhận ordering boost hẹp; `authorityTier` vẫn `UNKNOWN`, `isPrimary=false`, `isAuthoritative=false`, `allowedUse=ENTITY_DISCOVERY_ONLY`.
+- Contract/integration tests public API hiện `12/12`; live V5 holdout mới `N=150` đã tạo và chạy diagnostic đầu tiên, có `108` candidate OpenAlex nhưng kết quả trước refinement chưa được dùng làm current proof.
+- Post-refinement live rerun đang bị OpenAlex quota thật chặn (`429`, retry-after khoảng `31607s`, daily budget `0`); test V5 đã chuyển sang opt-in để full suite không tự ghi đè artifact.
+- RC5 manifest/canonical status đã ghi rõ `POST_REMEDIATION_RERUN_PENDING_PROVIDER_QUOTA_RESET`; RC3/RC4/V4 artifacts vẫn được giữ nguyên.
+- DB gates không đổi: `BLOCKED_BY_ENV`, `RLS_STATIC_ONLY`, `RESTORE_BLOCKED_BY_ENV`, `DATABASE/PILOT_BACKEND_PARTIAL`. Chưa claim retrieval convergence, live p95/cost, hay production completion.
+
+## 22. Community × Expert Promax reality pass — 2026-09-09
+
+- Đã loại fixture nhìn như dữ liệu thật khỏi Trust result: Community/Expert gateways chỉ đọc record live theo `caseId + caseRevision`; không có record thì hiển thị `EMPTY/UNKNOWN`, không dựng tên người, số thảo luận, quote, thời gian SLA hay source citation thay thế.
+- Evidence constellation, source inspector và expert scope panel đều phân biệt rõ `scope check` không lưu với `expert_assessment` bền vững; assessment thật vẫn bắt buộc assignment, COI, evidence revision và server authority.
+- Đã thêm contributor track record server-owned `0–100 + ★`, quality-event ledger append-only, self-reaction block và route `/api/intelligence/community/track-record`; candidate chỉ mở `HUMAN_QUALIFICATION_REQUIRED`, không tự cấp role và không mutate Trust.
+- Đã thêm compatibility read-only cho live expert schema cũ: directory chỉ chiếu rows có `status='VERIFIED'`, không suy diễn qualification/domain authority; Promax assignment/assessment vẫn fail closed cho đến khi migration live được apply.
+- Local proof sau pass: Promax/domain/route/migration/Trust V5 `27/27`, ESLint error-only `0 errors`, production build `150/150` pages pass; smoke HTTP `/`, `/community`, `/expert` `200`, Expert directory `200` với durable empty projection, Community Promax `503` khi migration chưa apply, unauthenticated track record/qualification `401`. `agent-browser` không có trong PATH nên chưa có browser harness evidence.
+- Live read-only discovery xác nhận Supabase hiện thiếu `community_expert_promax` và live `private.expert_verifications` chưa có `suspended_at`/`qualification_state`; không chạy migration, không ghi dữ liệu, không commit/push/deploy.

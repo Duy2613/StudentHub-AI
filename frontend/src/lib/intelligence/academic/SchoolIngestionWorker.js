@@ -7,6 +7,7 @@
 // - Exponential backoff with jitter on errors & 429/503 rate limits
 // - Bounded per-host rate limiting
 
+import { randomInt } from "node:crypto";
 import { defaultSchoolSourceRegistry, SOURCE_HEALTH } from "./DurableSchoolSourceRegistry.js";
 
 export class SchoolIngestionWorker {
@@ -25,7 +26,7 @@ export class SchoolIngestionWorker {
   calculateBackoff(attempt) {
     const exponential = Math.min(this.maxBackoffMs, this.baseBackoffMs * Math.pow(2, attempt));
     // Full jitter: random value between 0 and exponential
-    return Math.floor(Math.random() * exponential);
+    return randomInt(Math.max(1, exponential));
   }
 
   /**

@@ -22,6 +22,14 @@ import { ExpertEntityResolver } from "./expertEntityResolver.js";
 const DEFAULT_STORE_DIR = path.resolve(process.cwd(), ".data");
 const DEFAULT_STORE_FILE = path.join(DEFAULT_STORE_DIR, "expert_intelligence_store.json");
 
+/** Curated expert graph is a fixture adapter, never production authority. */
+export function isExpertDemoMode() {
+  return process.env.NODE_ENV !== "production" && (
+    process.env.STUDENTHUB_PERSISTENCE_ADAPTER === "memory" ||
+    process.env.STUDENTHUB_EXPERT_DEMO === "true"
+  );
+}
+
 export class ExpertStore {
   static #storageFilePath = DEFAULT_STORE_FILE;
   static #expertsById = new Map();

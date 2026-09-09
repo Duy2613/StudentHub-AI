@@ -1,99 +1,64 @@
-# 🌌 StudentHub OS — Personal Academic Operating System
+# StudentHub AI — Kiểm chứng trước khi tin
 
-> **A release-candidate, multi-audience, evidence-aware, zero-trust Personal Academic Operating System for university students, verified faculty, and academic moderators.**
+> Giúp sinh viên kiểm tra thông tin qua nguồn, bối cảnh, trải nghiệm cộng đồng và nhận định chuyên gia đúng phạm vi.
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.3.0_Turbopack-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![Node.js 24](https://img.shields.io/badge/Node.js-24.x-green?style=flat&logo=node.js)](https://nodejs.org/)
 [![Zero-Trust Security](https://img.shields.io/badge/Security-Zero--Trust_Fabric-emerald?style=flat&logo=shield)](https://github.com/Duy2613/StudentHub-AI)
-[![Tests Passing](https://img.shields.io/badge/Tests-250%2F250_Local-brightgreen?style=flat)](https://github.com/Duy2613/StudentHub-AI)
 
 ---
 
-## Release candidate status
+## Hướng sản phẩm và trạng thái bằng chứng — 08/09/2026
 
-The current source base is frozen for competition release review. The local candidate is **`STUDENTHUBAI RC READY WITH EXTERNAL LIMITATIONS`** on `develop` at `5aeaf71870d63f3c8e06a7d8b95148ce109d3e72`.
+Định hướng mới tập trung **Trust → Community → Expert → hồ sơ bằng chứng → bước tiếp theo**. Khóa học và các phần quảng bá catalog/lesson/practice được đưa vào kế hoạch loại khỏi sản phẩm đích. Đây là thay đổi trong đề án; code của các phần đó chưa được gỡ ở phiên viết tài liệu.
 
-- 250/250 discovered test files pass; final audit hardening is 6/6.
-- Production build generates 115/115 routes; typecheck passes.
-- Chromium, WebKit, mobile Chromium, and current visual baselines pass their documented local gates.
-- Dependency audit reports 0 vulnerabilities; lint exits with 0 errors and 359 legacy warnings.
-- Live PostgreSQL/RLS, staging, fresh provider credentials/terms, rollback rehearsal, and Firefox on this Windows host remain external blockers. See [`FINAL-AUDIT-REPORT.md`](FINAL-AUDIT-REPORT.md), [`docs/RELEASE-CHECKLIST.md`](docs/RELEASE-CHECKLIST.md), and [`docs/KNOWN-LIMITATIONS.md`](docs/KNOWN-LIMITATIONS.md).
+| Nội dung | Tài liệu có phạm vi/ngày kiểm chứng |
+| --- | --- |
+| Đề án frontend + backend + năng lực dự thi | [README đề án](docs/frontend/national-experience-2026-09-08/README.md) |
+| Điểm /10, giới hạn dự báo giải Nhất | [REPORT](docs/frontend/national-experience-2026-09-08/REPORT.md) |
+| Roadmap và cắt tính năng | [PLAN](docs/frontend/national-experience-2026-09-08/PLAN.md), [SCOPE-REDUCTION](docs/frontend/national-experience-2026-09-08/SCOPE-REDUCTION.md) |
+| Yêu cầu và kiểm chứng | [SPEC](docs/frontend/national-experience-2026-09-08/SPEC.md), [ACCEPTANCE](docs/frontend/national-experience-2026-09-08/ACCEPTANCE.md) |
+| Prompt thiết kế, asset, engineering | [PROMPTS](docs/frontend/national-experience-2026-09-08/PROMPTS.md) |
+| Release assurance lịch sử 06/09 | [Báo cáo release](docs/reports/STUDENTHUB-AI-RELEASE-ASSURANCE-REPORT.md): `ACADEMIC_CINEMATIC_EVOLUTION_NOT_RELEASE_READY` |
+| Auth/session local | [Auth closure](docs/reports/AUTH-SESSION-CLOSURE-2026-09-06.md) |
+| Realtime local 07/09 | [Realtime closure](docs/reports/REALTIME-MULTI-INSTANCE-CLOSURE-2026-09-07.md) |
+| Labbe shadow / staging chưa đủ môi trường | [Labbe closure](docs/reports/LABBE-STAGING-ASSURANCE-CLOSURE-2026-09-06.md) |
 
-The worktree is intentionally preserved without a commit or push. Do not treat local fixture data or synthetic Observatory metrics as live production evidence.
+Mỗi PASS chỉ áp dụng cho candidate và điều kiện trong báo cáo gốc. Không có đợt test toàn hệ thống mới trong phiên lập đề án 08/09. Không dùng fixture, synthetic telemetry hoặc metric chưa gắn model/dataset để tuyên bố kết quả thực tế. Không có tuyên bố production readiness hay khả năng phục vụ toàn quốc đã được kiểm chứng.
 
 ---
 
-## 🏛️ System Architecture
+## Kiến trúc và ranh giới trách nhiệm
 
 ```text
-                                STUDENTHUB OS
-                                     │
-                ┌────────────────────┴────────────────────┐
-                │                                         │
-          SECURITY FABRIC                         INTELLIGENCE FABRIC
-                │                                         │
-        Identity / Session                       Source Intelligence
-        Authorization                            T1 Trust & Topic Reputation
-        Capability                               T2 Verified Expert Network
-        Purpose                                  T3 Community Claims & Consensus
-        Risk & Step-up                           T4 Dual-Layer Evidence Fusion
-        Durable Audit Log                        Provenance & Graph
-                │                                         │
-                └───────────────────┬─────────────────────┘
-                                    ▼
-                           DATABASE REPOSITORY LAYER
-                                    │
-                           PERSONAL DIGITAL TWIN
-                                    │
-                           PERSONALIZATION ENGINE
-                                    │
-               ┌────────────────────┼────────────────────┐
-               ▼                    ▼                    ▼
-            ACADEMIC             PLANNER                 AI
-               │                    │                    │
-               └────────────────────┼────────────────────┘
-                                    ▼
-                            PERSONAL COMMAND CENTER
-                                    │
-                      ┌─────────────┼─────────────┐
-                      ▼             ▼             ▼
-                     WEB          MOBILE        TABLET
+Browser → identity / authorization / input validation
+        → Trust orchestration → nguồn và provider có giới hạn
+        → repository / PostgreSQL: case, run, revision, outbox
+        → read/report projection theo owner → UI
+
+Community và Expert: bổ sung căn cứ đúng scope
+Realtime: thông báo/projection, không là nguồn quyết định
+Labbe: quan sát và assurance tùy mode, không writeback
 ```
 
----
+Repository có nhiều module học vụ, planner và showcase từ các phiên trước. Chúng không tự động trở thành phạm vi sản phẩm dự thi. Việc cắt bề mặt, giữ dữ liệu và phân tích dependency được mô tả trong SCOPE-REDUCTION; mức độ kiểm chứng từng đường xử lý nằm trong các báo cáo có ngày ở trên.
 
-## 🚀 Key Subsystems & Workspaces
+## Trải nghiệm trọng tâm
 
-1. **⚡ Personal Command Center (`/`)**:
-   - Adaptive Academic Briefing ("What Changed Since Last Visit?").
-   - Urgent operational early warnings banner.
-   - Grounded Next Best Actions with 1-click explainability (`Why me?`, `Why now?`, `Căn cứ pháp lý`).
+| Surface | Vai trò | Ranh giới |
+| --- | --- | --- |
+| `/` | Lời hứa sản phẩm và điểm vào kiểm chứng | Không dùng số liệu hoặc đối tác giả để quảng bá |
+| `/trust` | Nhập thông tin, xem nguồn, bối cảnh, điều chưa biết và next action | Verdict do pipeline/policy tạo; UI không tự gán an toàn |
+| `/community` | Trải nghiệm và đối chiếu có xuất xứ | Số vote không là điểm sự thật |
+| `/expert` | Nhận định theo domain, credential và COI | Presence/quiz không đủ để tự cấp quyền chuyên gia |
+| `/cases` | Case mẫu để hiểu sản phẩm | Fixture phải có nhãn, không là dữ liệu live |
+| Account / report / Passport | Quyền, case history và snapshot theo revision | Chỉ đọc/lưu/xuất khi được phép; không giả persisted state |
 
-2. **🎓 Academic 360 Workspace (`/academic`)**:
-   - Full authoritative transcript, GPA progression, and prerequisite mapping.
-   - Graduation criteria reconciliation under university regulations (QĐ 1422/QĐ-ĐHSPKT).
-
-3. **🧠 Connected Intelligence Fabric (`/intelligence`)**:
-   - **T1**: Multidimensional Trust & Topic Reputation with half-life decay.
-   - **T2**: Verified Faculty Network with PII-sanitized public DTOs.
-   - **T3**: Student-reported claims, consensus metrics, and proposed corrections.
-   - **T4**: Dual-layer evidence fusion resolving statutory rules against operational reality.
-
-4. **✨ Grounded AI Studio (`/ai`)**:
-   - Multi-mode AI research, planning, and explainability with explicit confidence bands and uncertainty boundaries.
-
-5. **🛡️ Privacy, Security & Sources Center (`/settings`)**:
-   - Multi-device management and remote session revocation.
-   - AI Memory audit and personal data vault export controls.
-   - Transparent source connector health status matrix.
-
----
-
-## 🛠️ Quick Start & Local Development
+## Local development
 
 ### 1. Prerequisites
-- Node.js >= 20.x (Recommended: Node.js 24.x)
-- npm >= 10.x
+- Node.js 24.x (`>=24 <25`, theo `package.json`)
+- npm 11.x (`>=11 <12`)
 
 ### 2. Installation
 ```bash
@@ -103,6 +68,7 @@ cd StudentHub-AI
 
 # Install dependencies
 npm ci
+npm ci --prefix frontend
 ```
 
 ### 3. Running the Development Server
@@ -110,6 +76,8 @@ npm ci
 npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) with your browser.
+
+Tham khảo `frontend/.env.local.example` và các hướng dẫn môi trường trước khi bật provider/database. File ví dụ không chứa credential hoạt động; đưa secret vào môi trường local phù hợp. Không bật Labbe STAGING/CONTROLLED hoặc chạy live database gate chỉ để xem giao diện.
 
 ---
 

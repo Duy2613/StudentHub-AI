@@ -6,106 +6,158 @@ import {
   ArrowRight,
   Compass,
   ScanSearch,
+  ShieldCheck,
+  FileCheck,
+  Building2,
 } from "lucide-react";
 import ProgressiveKnowledgeUniverse from "../canvas/ProgressiveKnowledgeUniverse";
-import { KNOWLEDGE_DOMAINS } from "../canvas/knowledgeUniverseData";
+import { OBSERVATORY_LAYERS } from "../canvas/knowledgeUniverseData";
 
+/**
+ * AcademicHeroSection — "Hiên Tri Thức"
+ * StudentHub Visual System VNext — "Khai Minh"
+ * - 70% Editorial Calm + 20% Product Precision + 10% Cinematic Wonder
+ * - Master Headline: "HIỂU ĐÚNG. Đi xa." (Be Vietnam Pro 700 + Lora Italic Serif)
+ * - Signature Button-in-Button Primary Action
+ * - Knowledge Observatory with converging academic trust layers
+ * - Body copy ≥16px, principles ≥14px, zero clipped diacritics
+ */
 export default function AcademicHeroSection() {
-  const [activeNode, setActiveNode] = useState("backend");
+  const [activeNode, setActiveNode] = useState("van-ban-phap-quy");
+
+  const currentNode =
+    OBSERVATORY_LAYERS.find((d) => d.id === activeNode) || OBSERVATORY_LAYERS[0];
 
   return (
     <section
-      className="relative min-h-[calc(100dvh-4rem)] flex items-center justify-center overflow-hidden border-b border-border-subtle bg-bg-primary"
+      className="relative min-h-[calc(100dvh-4rem)] flex items-center justify-center overflow-hidden border-b border-white/[0.08] bg-[#08110F]"
       aria-labelledby="hero-title"
     >
-      {/* Background ambient gradient aura */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-indigo-600/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[420px] h-[420px] rounded-full bg-cyan-500/10 blur-[140px] pointer-events-none" />
+      {/* Calm Mineral Ambient Aura (No neon, gentle jade & ivory glow) */}
+      <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-[#7BE0B2]/[0.05] blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-[420px] h-[420px] rounded-full bg-[#8EC5FF]/[0.04] blur-[140px] pointer-events-none" />
 
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-        {/* Left Column: Editorial Headline & Copy (45-50%) */}
-        <div className="lg:col-span-6 xl:col-span-6 flex flex-col justify-center text-left space-y-6 lg:pr-6 z-10">
-          {/* Canonical Eyebrow Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider bg-surface-primary border border-border-strong text-accent-knowledge w-fit">
-            <span className="w-2 h-2 rounded-full bg-accent-primary animate-pulse" />
-            <span>Trust-first learning system</span>
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-24 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+        {/* Left Column: 70% Editorial Calm Narrative */}
+        <div className="lg:col-span-6 xl:col-span-6 flex flex-col justify-center text-left space-y-7 z-10">
+          {/* Eyebrow Chip */}
+          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wider bg-[#0F1B18] border border-white/[0.12] text-[#7BE0B2] w-fit shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#7BE0B2] animate-pulse" />
+            <span className="font-medium uppercase tracking-widest text-[11px]">
+              Hệ điều hành học thuật & Khảo chứng số
+            </span>
           </div>
 
-          {/* Canonical Hero Headline */}
+          {/* Master Hero Headline */}
           <h1
             id="hero-title"
-            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-text-primary leading-[1.08]"
+            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-[#F4F0E6] leading-[1.18] py-1"
           >
             HIỂU ĐÚNG. <br />
-            <span className="text-accent-knowledge">ĐI XA.</span>
+            <span className="font-serif italic font-medium text-[#7BE0B2] tracking-normal">
+              Đi xa.
+            </span>
           </h1>
 
-          {/* Supporting Copy */}
-          <p className="text-base sm:text-lg lg:text-xl text-text-secondary leading-relaxed max-w-xl">
-            Trước khi học, ký, trả tiền hoặc chia sẻ, hãy biết nội dung đang dựa trên nguồn nào,
-            còn thiếu điều gì và bước tiếp theo an toàn là gì.
+          {/* Supporting Copy (Max 2-3 lines, 17px body, relaxed spacing) */}
+          <p className="text-base sm:text-lg text-[#C3CCC6] leading-relaxed max-w-xl font-normal">
+            Trước khi học, ký, trả tiền hoặc chia sẻ, hãy biết nội dung đang dựa
+            trên nguồn nào, còn thiếu điều gì và bước tiếp theo an toàn là gì.
           </p>
 
           {/* Call to Actions */}
           <div className="flex flex-wrap items-center gap-4 pt-2">
+            {/* Primary Action: Signature Button-in-Button */}
             <Link
               href="/trust"
-              className="px-6 py-3.5 rounded-xl bg-accent-primary hover:bg-accent-primary/90 text-white font-medium text-sm sm:text-base flex items-center gap-2.5 transition-all shadow-lg shadow-accent-primary/25 hover:shadow-accent-primary/40 focus:outline-none focus:ring-2 focus:ring-accent-primary"
+              className="btn-primary-action group"
             >
-              <ScanSearch size={17} aria-hidden="true" />
+              <ScanSearch size={18} className="text-[#08110F]" aria-hidden="true" />
               <span>Kiểm tra trước khi tin</span>
-              <ArrowRight size={17} />
+              <span className="btn-icon-bubble" aria-hidden="true">
+                <ArrowRight size={15} />
+              </span>
             </Link>
 
+            {/* Secondary Action: Calm Outline */}
             <Link
               href="/learn"
-              className="px-6 py-3.5 rounded-xl bg-surface-primary hover:bg-surface-elevated text-text-primary border border-border-strong font-medium text-sm sm:text-base flex items-center gap-2.5 transition-all hover:border-accent-knowledge/40 focus:outline-none focus:ring-2 focus:ring-accent-knowledge"
+              className="px-5 py-3.5 rounded-full bg-[#0F1B18] hover:bg-[#13221E] text-[#F4F0E6] border border-white/[0.12] hover:border-[#7BE0B2]/40 font-medium text-sm sm:text-base flex items-center gap-2.5 transition-all focus:outline-none focus:ring-2 focus:ring-[#7BE0B2]"
             >
-              <Compass size={17} className="text-accent-knowledge" aria-hidden="true" />
-              <span>Khám phá lộ trình học</span>
+              <Compass size={17} className="text-[#7BE0B2]" aria-hidden="true" />
+              <span>Khám phá cách hoạt động</span>
             </Link>
           </div>
 
-          {/* Product principles — static meaning, not fabricated live metrics. */}
-          <div className="pt-6 border-t border-border-subtle grid grid-cols-3 gap-4 text-left">
-            <div>
-              <div className="text-lg sm:text-xl font-mono font-bold text-text-primary">01</div>
-              <div className="text-xs text-text-muted mt-0.5">Nguồn</div>
-              <p className="mt-1 text-[11px] leading-relaxed text-text-muted">Biết thông tin đến từ đâu.</p>
+          {/* 3 Core Academic Principles (≥14px readable, generous rhythm) */}
+          <div className="pt-8 border-t border-white/[0.08] grid grid-cols-1 sm:grid-cols-3 gap-5 text-left">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-bold text-sm text-[#7BE0B2]">01</span>
+                <span className="text-sm font-semibold text-[#F4F0E6]">Nguồn chuẩn</span>
+              </div>
+              <p className="text-sm text-[#C3CCC6] leading-relaxed">
+                Đối chiếu quy chế ĐH & văn bản Bộ GD&ĐT.
+              </p>
             </div>
-            <div>
-              <div className="text-lg sm:text-xl font-mono font-bold text-accent-knowledge">02</div>
-              <div className="text-xs text-text-muted mt-0.5">Bối cảnh</div>
-              <p className="mt-1 text-[11px] leading-relaxed text-text-muted">Đọc đúng thời điểm và phạm vi.</p>
+
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-bold text-sm text-[#F3C56B]">02</span>
+                <span className="text-sm font-semibold text-[#F4F0E6]">Bối cảnh thực</span>
+              </div>
+              <p className="text-sm text-[#C3CCC6] leading-relaxed">
+                Đọc đúng thời điểm và phạm vi áp dụng.
+              </p>
             </div>
-            <div>
-              <div className="text-lg sm:text-xl font-mono font-bold text-status-success">03</div>
-              <div className="text-xs text-text-muted mt-0.5">Bước tiếp</div>
-              <p className="mt-1 text-[11px] leading-relaxed text-text-muted">Hành động dựa trên điều đã biết.</p>
+
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-bold text-sm text-[#8EC5FF]">03</span>
+                <span className="text-sm font-semibold text-[#F4F0E6]">Hành động</span>
+              </div>
+              <p className="text-sm text-[#C3CCC6] leading-relaxed">
+                Ra quyết định học vụ trên căn cứ vững vàng.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Knowledge Universe Spatial View (50-55%) */}
-        <div className="lg:col-span-6 xl:col-span-6 relative w-full h-[400px] sm:h-[480px] lg:h-[580px] flex items-center justify-center">
-          <div className="w-full h-full rounded-2xl bg-surface-primary/40 border border-border-subtle/50 backdrop-blur-sm overflow-hidden relative shadow-2xl">
-            {/* 3D Knowledge Universe with progressive enhancement and fallback */}
-            <ProgressiveKnowledgeUniverse
-              activeNodeId={activeNode}
-              onSelectNode={(id) => setActiveNode(id)}
-              className="w-full h-full"
-            />
+        {/* Right Column: 20% Precision — Knowledge Observatory Spatial View */}
+        <div className="lg:col-span-6 xl:col-span-6 relative w-full h-[420px] sm:h-[480px] lg:h-[580px] flex items-center justify-center">
+          {/* Double-Bezel Outer Shell for the Instrument */}
+          <div className="w-full h-full rounded-2xl bg-white/[0.02] border border-white/[0.08] p-2.5 shadow-2xl relative">
+            <div className="w-full h-full rounded-xl bg-[#0B1412] border border-white/[0.06] overflow-hidden relative flex items-center justify-center">
+              {/* Progressive Knowledge Observatory (SVG Fallback + WebGL Enhancement) */}
+              <ProgressiveKnowledgeUniverse
+                activeNodeId={activeNode}
+                onSelectNode={(id) => setActiveNode(id)}
+                className="w-full h-full"
+              />
 
-            {/* Subtle active domain indicator pill */}
-            <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-20 flex items-center justify-between gap-3 px-3.5 py-2 rounded-xl bg-surface-primary/80 border border-border-strong backdrop-blur-md text-xs font-mono">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-accent-knowledge" />
-                <span className="text-text-muted">Node đang kích hoạt:</span>
-                <span className="text-text-primary font-semibold uppercase">
-                  {KNOWLEDGE_DOMAINS.find((d) => d.id === activeNode)?.label || activeNode}
-                </span>
+              {/* Active Layer Inspector Pill */}
+              <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-20 flex flex-col gap-1 p-3.5 rounded-xl bg-[#0F1B18]/95 border border-white/[0.14] backdrop-blur-md max-w-sm text-left shadow-lg">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: currentNode.color || "#7BE0B2" }}
+                    />
+                    <span className="text-xs font-mono uppercase tracking-wider text-[#8A9891]">
+                      {currentNode.domain}
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-mono text-[#7BE0B2]">
+                    Hội tụ tri thức
+                  </span>
+                </div>
+                <div className="text-sm font-bold text-[#F4F0E6]">
+                  {currentNode.label}
+                </div>
+                <p className="text-sm text-[#C3CCC6] leading-snug line-clamp-2">
+                  {currentNode.description}
+                </p>
               </div>
-              <span className="text-text-muted text-[11px] hidden sm:inline">Tương tác 3D / Chạm</span>
             </div>
           </div>
         </div>

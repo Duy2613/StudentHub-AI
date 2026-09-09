@@ -17,9 +17,10 @@ PostgreSQL event log is configured.
 1. Added the private append-only `realtime_events` table with sequence,
    payload hash, idempotency key, classification, subject binding and RLS /
    service-role grants.
-2. Added a PostgreSQL repository that appends immutable events, detects
-   idempotency/content conflicts, and replays by sequence while filtering
-   private rows to the authenticated subject.
+2. Added a PostgreSQL repository that appends immutable events, binds
+   idempotency to the complete envelope, detects event/content conflicts, and
+   replays by sequence while filtering private rows to the authenticated
+   subject (including subject-bound events on nominally public channels).
 3. Updated SSE to use the durable repository when `DATABASE_URL` is present,
    emit `id` cursors, resume from `Last-Event-ID`/`cursor`, and fail closed in
    production when the shared event log is unavailable.
@@ -33,7 +34,7 @@ PostgreSQL event log is configured.
 
 | Check | Result |
 | --- | --- |
-| Durable repository + migration tests | 4/4 pass |
+| Durable repository + migration tests | 6/6 pass |
 | Existing realtime transport test | 1/1 pass |
 | Auth/session contracts | 23/23 pass |
 | PostgreSQL/RLS migration contract | pass; live test skipped without DSN |

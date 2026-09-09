@@ -46,11 +46,20 @@ class FakePool {
   async query(sql, params = []) {
     const statement = sql.replace(/\s+/g, " ").trim().toLowerCase();
     if (statement.startsWith("insert into private.realtime_events")) {
+      const duplicateById = this.rows.find((row) => row.event_id === params[0]);
+      if (duplicateById) {
+        const error = new Error("duplicate event_id");
+        error.code = "23505";
+        throw error;
+      }
       const duplicate = params[11] && this.rows.find((row) => row.channel === params[1] && row.idempotency_key === params[11]);
       if (duplicate) return { rows: [] };
       const row = rowFrom(params, this.rows.length + 1);
       this.rows.push(row);
       return { rows: [row] };
+    }
+    if (statement.startsWith("select sequence, event_id") && statement.includes("where event_id = $1")) {
+      return { rows: this.rows.filter((row) => row.event_id === params[0]).slice(0, 1) };
     }
     if (statement.startsWith("select sequence, event_id") && statement.includes("where channel = $1 and idempotency_key")) {
       return { rows: this.rows.filter((row) => row.channel === params[0] && row.idempotency_key === params[1]).slice(0, 1) };
@@ -59,7 +68,7 @@ class FakePool {
       const [channels, after, subject, publicChannels, limit] = params;
       const rows = this.rows.filter((row) => channels.includes(row.channel)
         && Number(row.sequence) > Number(after)
-        && (publicChannels.includes(row.channel) || (subject && row.subject_id === subject)))
+        && ((publicChannels.includes(row.channel) && !row.subject_id) || (subject && row.subject_id === subject)))
         .slice(0, limit);
       return { rows };
     }
@@ -132,9 +141,41 @@ test("durable append deduplicates identical idempotency and rejects content conf
   assert.equal(duplicate.sequence, first.sequence);
   assert.equal(duplicate.deduplicated, true);
   await assert.rejects(
-    repository.append({ ...request, data: { revision: 2, state: "FAILED" } }),
+    repository.append({ ...request, eventId: "77777777-7777-4777-8777-777777777777", data: { revision: 2, state: "FAILED" } }),
     (error) => error.code === "REALTIME_IDEMPOTENCY_CONFLICT" && error.statusCode === 409,
   );
+  await assert.rejects(
+    repository.append({ ...request, eventId: "88888888-8888-4888-8888-888888888888", eventType: "trust:state" }),
+    (error) => error.code === "REALTIME_IDEMPOTENCY_CONFLICT" && error.statusCode === 409,
+  );
+});
+
+test("event ids are immutable and subject-bound public events stay private", async () => {
+  const repository = new DurableRealtimeRepository(new FakePool());
+  const request = {
+    eventId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    channel: "system",
+    eventType: "system:notice",
+    subjectId: USER_A,
+    data: { n: 7 },
+    idempotencyKey: "system-a-1",
+    occurredAt: "2026-09-07T00:00:00.000Z",
+  };
+  const first = await repository.append(request);
+  const same = await repository.append(request);
+  assert.equal(same.deduplicated, true);
+  await assert.rejects(
+    repository.append({ ...request, eventType: "system:ping", idempotencyKey: "system-a-2" }),
+    (error) => error.code === "REALTIME_EVENT_ID_CONFLICT" && error.statusCode === 409,
+  );
+
+  const anonymous = await repository.replay({ channels: ["system"], afterSequence: 0 });
+  const userA = await repository.replay({ channels: ["system"], subjectId: USER_A, afterSequence: 0 });
+  const userB = await repository.replay({ channels: ["system"], subjectId: USER_B, afterSequence: 0 });
+  assert.deepEqual(anonymous, []);
+  assert.deepEqual(userA.map((event) => event.data.n), [7]);
+  assert.deepEqual(userB, []);
+  assert.equal(first.subjectId, USER_A);
 });
 
 test("replay uses a cursor and never returns another subject's private events", async () => {
@@ -148,4 +189,36 @@ test("replay uses a cursor and never returns another subject's private events", 
   const resumed = await repository.replay({ channels: ["trust", "system"], subjectId: USER_A, afterSequence: first[0].sequence });
   assert.deepEqual(resumed.map((event) => event.data.n), [3]);
   assert.equal(first.some((event) => event.data.n === 2), false);
+});
+
+test("separate repository instances observe one committed log and resume by cursor", async () => {
+  const pool = new FakePool();
+  const publisher = new DurableRealtimeRepository(pool);
+  const replica = new DurableRealtimeRepository(pool);
+  const event = await publisher.append({
+    eventId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+    channel: "trust",
+    eventType: "trust:revision",
+    subjectId: USER_A,
+    data: { revision: 4 },
+    idempotencyKey: "shared-revision-4",
+  });
+  const firstRead = await replica.replay({ channels: ["trust"], subjectId: USER_A, afterSequence: 0 });
+  assert.deepEqual(firstRead.map((item) => item.eventId), [event.eventId]);
+
+  const retry = await publisher.append({
+    eventId: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+    channel: "trust",
+    eventType: "trust:revision",
+    subjectId: USER_A,
+    data: { revision: 4 },
+    idempotencyKey: "shared-revision-4",
+  });
+  assert.equal(retry.deduplicated, true);
+  const resumedRead = await replica.replay({
+    channels: ["trust"],
+    subjectId: USER_A,
+    afterSequence: firstRead.at(-1).sequence,
+  });
+  assert.deepEqual(resumedRead, []);
 });

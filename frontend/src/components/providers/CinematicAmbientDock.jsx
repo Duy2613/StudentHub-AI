@@ -22,7 +22,7 @@ export default function CinematicAmbientDock() {
 
   if (isMinimized) {
     return (
-      <div className="fixed bottom-4 right-4 z-40">
+      <div className="fixed bottom-4 right-4 z-30 hidden sm:block">
         <button
           onClick={() => setIsMinimized(false)}
           className="w-10 h-10 rounded-full bg-[#0e1118]/90 border border-amber-400/40 text-amber-300 shadow-xl shadow-black/80 flex items-center justify-center hover:scale-110 transition-all backdrop-blur-md"
@@ -35,7 +35,7 @@ export default function CinematicAmbientDock() {
   }
 
   return (
-    <aside aria-label="Bộ điều khiển hình nền điện ảnh" className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2 pointer-events-auto">
+    <aside aria-label="Bộ điều khiển hình nền điện ảnh" className="fixed bottom-4 right-4 z-30 hidden sm:flex flex-col items-end gap-2 pointer-events-auto">
       {/* Expanded Film Picker & Setting Tray */}
       {isExpanded && (
         <div className="w-80 rounded-2xl bg-[#0e1118]/95 border border-white/15 p-4 shadow-2xl shadow-black/90 backdrop-blur-xl text-white mb-2 animate-in fade-in slide-in-from-bottom-3 duration-200">

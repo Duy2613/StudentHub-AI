@@ -12,19 +12,24 @@ reconnect can resume with `Last-Event-ID` or the explicit `cursor` query value.
 ## Invariants
 
 - Every durable private event is bound to one canonical `auth.users` UUID.
-- `channel + idempotency_key` is unique; same content is deduplicated and a
-  different payload returns `REALTIME_IDEMPOTENCY_CONFLICT`.
+- `channel + idempotency_key` is unique; the complete event envelope is
+  deduplicated and a changed payload or metadata returns
+  `REALTIME_IDEMPOTENCY_CONFLICT`.
 - Payloads are canonical JSON, bounded to 64 KiB, and stored with a SHA-256
   digest. Raw credentials and provider tokens are outside the event contract.
 - The event table is service-role-only and append-only. Update/delete attempts
   are rejected by database triggers.
 - Replay applies channel scope and subject filtering before data reaches SSE;
-  an authenticated user cannot receive another user's private event.
+  an authenticated user cannot receive another user's private event. A
+  subject-bound event remains private even when its channel is nominally
+  public.
 - Production refuses the process-local fallback. Development/test may use the
   explicitly non-authoritative in-memory adapter while the database is absent.
 - Trust terminal publication is attempted only after the durable Trust
   transaction returns successfully. A publication outage does not rewrite the
   committed business result.
+- Durable SSE sends periodic comment heartbeats so an idle connection is not
+  mistaken for a dead stream by an intermediary.
 
 ## Implementation
 
@@ -40,7 +45,7 @@ reconnect can resume with `Last-Event-ID` or the explicit `cursor` query value.
 
 ## Verification
 
-- Durable event-log contracts: **4/4 pass**.
+- Durable event-log contracts: **6/6 pass**.
 - Existing realtime transport contract: **1/1 pass**.
 - Auth/session regression used by the realtime provider: **23/23 pass**.
 - PostgreSQL/RLS test now includes the event-log migration and private-table
