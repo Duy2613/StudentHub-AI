@@ -40,7 +40,7 @@ export default function PrimaryNavbar() {
             {NAV_ITEMS.map((item) => {
               const isActive =
                 pathname === item.href ||
-                (item.href !== '/dashboard' && pathname.startsWith(item.href));
+                (item.href !== '/dashboard' && (pathname || '').startsWith(item.href));
 
               return (
                 <Link

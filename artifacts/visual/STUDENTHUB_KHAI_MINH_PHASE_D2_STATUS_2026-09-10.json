@@ -1,0 +1,91 @@
+{
+  "status": "KHAI_MINH_PHASE_D2_FINAL_RELEASE_GATE_READY",
+  "generatedAt": "2026-09-10T23:55:00+07:00",
+  "worktree": "C:/Users/Duy/Projects/MyProj/StudentHub-AI-KhaiMinh-Visual",
+  "branch": "design/khai-minh-visual-phase-a",
+  "head": "637bb195f7b77af8eaa71a22795bac8d698513ac",
+  "runtimeIsolation": "PASS (real local directory, zero symlinks, primary preserved)",
+  "build": "PASS (Turbopack production build 150/150 pages generated)",
+  "typecheck": "PASS (0 errors)",
+  "lint": {
+    "status": "PASS",
+    "errors": 0,
+    "warnings": 461
+  },
+  "historicalBudgetMetric": "PREINTERACTION_CLIENT_RSC_ENTRY_JS",
+  "budgetLimitBytes": 500000,
+  "bundleBudgetGate": "PASS",
+  "routeBudgetResults": {
+    "/": {
+      "bytes": 272997,
+      "kb": 266.6,
+      "limit": 500000,
+      "margin": 227003,
+      "pct": 54.6,
+      "status": "PASS"
+    },
+    "/trust": {
+      "bytes": 160216,
+      "kb": 156.5,
+      "limit": 500000,
+      "margin": 339784,
+      "pct": 32.0,
+      "status": "PASS"
+    },
+    "/community": {
+      "bytes": 126130,
+      "kb": 123.2,
+      "limit": 500000,
+      "margin": 373870,
+      "pct": 25.2,
+      "status": "PASS"
+    },
+    "/expert": {
+      "bytes": 126124,
+      "kb": 123.2,
+      "limit": 500000,
+      "margin": 373876,
+      "pct": 25.2,
+      "status": "PASS"
+    },
+    "/cases": {
+      "bytes": 278829,
+      "kb": 272.3,
+      "limit": 500000,
+      "margin": 221171,
+      "pct": 55.8,
+      "status": "PASS"
+    },
+    "/dashboard": {
+      "bytes": 158772,
+      "kb": 155.1,
+      "limit": 500000,
+      "margin": 341228,
+      "pct": 31.8,
+      "status": "PASS"
+    },
+    "/settings": {
+      "bytes": 454682,
+      "kb": 444.0,
+      "limit": 500000,
+      "margin": 45318,
+      "pct": 90.9,
+      "status": "PASS"
+    }
+  },
+  "hardwareClaimsRemaining": 0,
+  "storageHermetic": "PASS",
+  "storageLiveLocal": "NOT_ESTABLISHED",
+  "memoryLeakVerdict": "PARTIAL",
+  "backendRegressionScope": "REPRESENTATIVE_CRITICAL_BACKEND_REGRESSION_PASS",
+  "accessibilityScope": "wcag2a_wcag2aa_wcag21a_wcag21aa_WHOLE_SITE_WCAG_2_2_NOT_CLAIMED",
+  "lighthouse": "NOT_ESTABLISHED",
+  "fieldCwv": "NOT_ESTABLISHED",
+  "evidenceConsistencyValidator": "PASS",
+  "mainWrites": 0,
+  "commit": "NO",
+  "push": "NO",
+  "merge": "NO",
+  "deploy": "NO",
+  "phaseEReady": true
+}

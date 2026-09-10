@@ -1,0 +1,129 @@
+{
+  "status": "KHAI_MINH_PHASE_B1_CONTRACT_CLOSURE_READY",
+  "program": "StudentHub AI Khai Minh Visual Program",
+  "phase": "PHASE B / B.1 — MOTION & INTERACTION ARCHITECTURE (CONTRACT RECONCILIATION COMPLETE)",
+  "worktree": "C:\\Users\\Duy\\Projects\\MyProj\\StudentHub-AI-KhaiMinh-Visual",
+  "branch": "design/khai-minh-visual-phase-a",
+  "baselineHead": "637bb195f7b77af8eaa71a22795bac8d698513ac",
+  "timestamp": "2026-09-10T20:55:00+07:00",
+  "effectsSpecified": 12,
+  "effectsPrototyped": 12,
+  "effectsApproved": 9,
+  "effectsLimited": 3,
+  "effectsRejected": 0,
+  "limitedEffectsBreakdown": {
+    "FX02_DEPTH_PARALLAX": {
+      "status": "LIMITED",
+      "scope": "Landing Desktop Hero Only",
+      "rationale": "Desktop hero background depth layer only; disabled on touch/mobile and all interior routes to eliminate motion sickness and preserve reading comfort."
+    },
+    "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY": {
+      "status": "LIMITED",
+      "scope": "Landing Narrative + Optional Cases Desktop",
+      "rationale": "Landing single narrative section and optional archival timeline; strictly unpinned vertical stack on mobile. Native scroll preserved (zero wheel hijacking)."
+    },
+    "FX07_AMBIENT_FIELD": {
+      "status": "LIMITED",
+      "scope": "Landing Hero Only (Max 3 Nodes)",
+      "rationale": "Landing hero background only, bounded to max 3 drifting SVG particles, desktop only, offscreen pause active. Strictly disabled on mobile, reduced motion, and all interior routes."
+    }
+  },
+  "technologyDecisions": {
+    "cssSvgFirst": "Approved as primary engine (10 of 12 effects).",
+    "gsapRequired": false,
+    "gsapJustification": "CSS sticky and requestAnimationFrame provide identical narrative fidelity without 60kB bundle overhead. GSAP is rejected for Phase C.",
+    "canvasRequired": false,
+    "webglRequired": false,
+    "canvasWebglJustification": "Zero measured requirement. High-fidelity SVG and GPU-composited CSS deliver 60 FPS without GPU context depletion risks.",
+    "framerMotionPolicy": "Approved solely for declarative React view transitions where already present in existing frontend codebase."
+  },
+  "artifactsGenerated": {
+    "motionTokens": "artifacts/visual/STUDENTHUB_KHAI_MINH_MOTION_TOKENS_2026-09-10.json",
+    "routeMotionMatrix": "artifacts/visual/STUDENTHUB_KHAI_MINH_ROUTE_MOTION_MATRIX_2026-09-10.json",
+    "effectContracts": "artifacts/visual/STUDENTHUB_KHAI_MINH_EFFECT_CONTRACTS_2026-09-10.json",
+    "phaseCHandoff": "artifacts/visual/STUDENTHUB_KHAI_MINH_PHASE_C_MOTION_HANDOFF_2026-09-10.json",
+    "techDecisions": "docs/design/STUDENTHUB_KHAI_MINH_MOTION_TECH_DECISIONS_2026-09-10.md",
+    "prototypeHarness": "tests/visual-motion/harness.html",
+    "benchmarkResults": "artifacts/visual/motion-harness/benchmark-results.json",
+    "prototypeReport": "docs/reports/STUDENTHUB_KHAI_MINH_PHASE_B_PROTOTYPE_REPORT_2026-09-10.md",
+    "performanceReport": "docs/reports/STUDENTHUB_KHAI_MINH_PHASE_B_MOTION_PERFORMANCE_2026-09-10.md",
+    "accessibilityReport": "docs/reports/STUDENTHUB_KHAI_MINH_PHASE_B_MOTION_ACCESSIBILITY_2026-09-10.md",
+    "phaseB1ContractClosure": "artifacts/visual/STUDENTHUB_KHAI_MINH_PHASE_B1_CONTRACT_CLOSURE_2026-09-10.json",
+    "phaseB1ReconciliationReport": "docs/reports/STUDENTHUB_KHAI_MINH_PHASE_B1_CONTRACT_RECONCILIATION_2026-09-10.md"
+  },
+  "selfAuditScores": {
+    "contractConsistency": 9.9,
+    "evidenceTruth": 9.9,
+    "prototypeAccounting": 9.8,
+    "performanceClaimIntegrity": 9.9,
+    "accessibilityClaimIntegrity": 9.8,
+    "routeCoverage": 9.9,
+    "phaseCHandoffCompleteness": 9.9,
+    "dataReality": 9.9,
+    "phaseCReadiness": 9.9
+  },
+  "safetyChecks": {
+    "productionUiChanged": false,
+    "productionLayoutChanged": false,
+    "backendAuthorityChanged": false,
+    "databaseAccessedOrMutated": false,
+    "gitCommitExecuted": false,
+    "gitPushExecuted": false,
+    "productionDeployExecuted": false
+  },
+  "nextPhase": "PHASE C — FULL VISUAL INTEGRATION",
+  "accounting": {
+    "effectsSpecified": 12,
+    "effectsWithVisualPrototype": 12,
+    "effectsWithAutomatedBehaviorEvidence": 12,
+    "effectsWithPerformanceMeasurement": 12,
+    "effectsWithAccessibilityInteractionEvidence": 12
+  },
+  "empiricalPerformanceEvidence": {
+    "cumulativeLayoutShift": 0.0,
+    "clsStatus": "MEASURED (0.0000 via PerformanceObserver)",
+    "measuredFps": 60,
+    "avgFrameIntervalMs": 16.67,
+    "p50FrameIntervalMs": 16.7,
+    "p95FrameIntervalMs": 16.8,
+    "worstLongFrameMs": 16.8,
+    "longTasksCount": 0,
+    "mobileHorizontalLeak": false
+  },
+  "accessibilityEvidence": {
+    "harnessAxeViolations": 0,
+    "harnessAxePasses": 20,
+    "motionHarnessStatus": "MOTION_HARNESS_ACCESSIBILITY_VERIFIED",
+    "wcagWholeSiteClaim": "NOT_CLAIMED"
+  },
+  "routeCoverage": {
+    "routesCovered": [
+      "/",
+      "/trust",
+      "/community",
+      "/expert",
+      "/cases",
+      "/dashboard",
+      "/settings"
+    ],
+    "allRoutesHaveDataRealityRule": true
+  },
+  "approvedEffectIds": [
+    "FX01_CINEMATIC_REVEAL",
+    "FX03_PRISM_LIGHT_SWEEP",
+    "FX04_KNOWLEDGE_GLASS",
+    "FX06_DISCOVERY_MARKERS",
+    "FX08_MAGNETIC_CTA_CONTEXT",
+    "FX09_EDITORIAL_MEDIA_FRAME",
+    "FX10_NOISE_TO_KNOWLEDGE",
+    "FX11_HUMAN_IN_THE_LOOP_PROOF",
+    "FX12_KNOWLEDGE_ATLAS"
+  ],
+  "limitedEffectIds": [
+    "FX02_DEPTH_PARALLAX",
+    "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+    "FX07_AMBIENT_FIELD"
+  ],
+  "rejectedEffectIds": [],
+  "productionRoutePerformanceClaim": "NOT_YET_ESTABLISHED"
+}

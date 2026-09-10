@@ -1,0 +1,181 @@
+{
+  "$schema": "https://studenthub.vn/schemas/route-motion-matrix.v1.json",
+  "version": "1.0.0",
+  "releaseDate": "2026-09-10",
+  "system": "StudentHub AI — Route Motion Ownership & Ceilings",
+  "routes": {
+    "/": {
+      "name": "Landing (Master Brand Showcase)",
+      "role": "Intellectual Orientation & Academic Monument",
+      "allowedEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX02_DEPTH_PARALLAX",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX08_MAGNETIC_CTA_CONTEXT",
+        "FX09_EDITORIAL_MEDIA_FRAME",
+        "FX10_NOISE_TO_KNOWLEDGE",
+        "FX07_AMBIENT_FIELD"
+      ],
+      "forbiddenEffects": [
+        "FX06_DISCOVERY_MARKERS",
+        "FX11_HUMAN_IN_THE_LOOP_PROOF",
+        "FX12_KNOWLEDGE_ATLAS"
+      ],
+      "maxIntensityDesktop": 4,
+      "maxIntensityMobile": 2,
+      "maxConcurrentEffects": 3,
+      "reducedMotionMode": "INSTANT_FADE_NO_TRANSFORM",
+      "notes": "Hero showcase route with signature optical prism; FX07 allowed for hero background only (max 3 nodes, desktop only); FX05 limited to single narrative section."
+    },
+    "/trust": {
+      "name": "Trust Engine (Verification & Evidence System)",
+      "role": "Rigorous Epistemic Transparency",
+      "allowedEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX04_KNOWLEDGE_GLASS",
+        "FX09_EDITORIAL_MEDIA_FRAME",
+        "FX10_NOISE_TO_KNOWLEDGE",
+        "FX11_HUMAN_IN_THE_LOOP_PROOF"
+      ],
+      "forbiddenEffects": [
+        "FX02_DEPTH_PARALLAX",
+        "FX06_DISCOVERY_MARKERS",
+        "FX07_AMBIENT_FIELD",
+        "FX08_MAGNETIC_CTA_CONTEXT",
+        "FX12_KNOWLEDGE_ATLAS"
+      ],
+      "maxIntensityDesktop": 3,
+      "maxIntensityMobile": 1,
+      "maxConcurrentEffects": 2,
+      "reducedMotionMode": "STATIC_EVIDENCE_SPLIT",
+      "notes": "FX03 must be subtle (low glow, no cursor tracking). FX11 focuses on transparent audit trails."
+    },
+    "/community": {
+      "name": "Community (Curiosity & Connection Network)",
+      "role": "Human Academic Exchange & Exploration",
+      "allowedEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX04_KNOWLEDGE_GLASS",
+        "FX06_DISCOVERY_MARKERS",
+        "FX09_EDITORIAL_MEDIA_FRAME",
+        "FX12_KNOWLEDGE_ATLAS"
+      ],
+      "forbiddenEffects": [
+        "FX02_DEPTH_PARALLAX",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX07_AMBIENT_FIELD",
+        "FX08_MAGNETIC_CTA_CONTEXT",
+        "FX10_NOISE_TO_KNOWLEDGE",
+        "FX11_HUMAN_IN_THE_LOOP_PROOF"
+      ],
+      "maxIntensityDesktop": 3,
+      "maxIntensityMobile": 1,
+      "maxConcurrentEffects": 2,
+      "reducedMotionMode": "STATIC_LIST_SNAPPING",
+      "notes": "FX12 owns the knowledge constellation. FX06 owns the interactive hotspot markers."
+    },
+    "/expert": {
+      "name": "Expert Network (Human Judgment & Peer Review)",
+      "role": "Academic Authority & Review Transparency",
+      "allowedEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX04_KNOWLEDGE_GLASS",
+        "FX09_EDITORIAL_MEDIA_FRAME",
+        "FX11_HUMAN_IN_THE_LOOP_PROOF"
+      ],
+      "forbiddenEffects": [
+        "FX02_DEPTH_PARALLAX",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX06_DISCOVERY_MARKERS",
+        "FX07_AMBIENT_FIELD",
+        "FX08_MAGNETIC_CTA_CONTEXT",
+        "FX10_NOISE_TO_KNOWLEDGE",
+        "FX12_KNOWLEDGE_ATLAS"
+      ],
+      "maxIntensityDesktop": 2,
+      "maxIntensityMobile": 1,
+      "maxConcurrentEffects": 2,
+      "reducedMotionMode": "STATIC_STEP_EXPAND",
+      "notes": "Strictly calm operational tone. FX11 visualizes human audit sign-off with clear provenance."
+    },
+    "/cases": {
+      "name": "Cases (Investigation & Archival History)",
+      "role": "Historical Inquiry & Dossier Examination",
+      "allowedEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX06_DISCOVERY_MARKERS",
+        "FX09_EDITORIAL_MEDIA_FRAME",
+        "FX04_KNOWLEDGE_GLASS"
+      ],
+      "forbiddenEffects": [
+        "FX02_DEPTH_PARALLAX",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX07_AMBIENT_FIELD",
+        "FX08_MAGNETIC_CTA_CONTEXT",
+        "FX10_NOISE_TO_KNOWLEDGE",
+        "FX11_HUMAN_IN_THE_LOOP_PROOF",
+        "FX12_KNOWLEDGE_ATLAS"
+      ],
+      "maxIntensityDesktop": 2,
+      "maxIntensityMobile": 1,
+      "maxConcurrentEffects": 2,
+      "reducedMotionMode": "NATIVE_DOCUMENT_FLOW",
+      "notes": "Archival evidence dossier; FX05 limited to optional desktop timeline; FX04 approved for case evidence cards; fake case rows in art remain background illustration only."
+    },
+    "/dashboard": {
+      "name": "Dashboard (Personal Academic Workspace)",
+      "role": "Operational Focus & Student Productivity",
+      "allowedEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX04_KNOWLEDGE_GLASS",
+        "FX09_EDITORIAL_MEDIA_FRAME"
+      ],
+      "forbiddenEffects": [
+        "FX02_DEPTH_PARALLAX",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX06_DISCOVERY_MARKERS",
+        "FX07_AMBIENT_FIELD",
+        "FX08_MAGNETIC_CTA_CONTEXT",
+        "FX10_NOISE_TO_KNOWLEDGE",
+        "FX11_HUMAN_IN_THE_LOOP_PROOF",
+        "FX12_KNOWLEDGE_ATLAS"
+      ],
+      "maxIntensityDesktop": 1,
+      "maxIntensityMobile": 0,
+      "maxConcurrentEffects": 1,
+      "reducedMotionMode": "ZERO_MOTION",
+      "notes": "Quiet surface. FX01 micro-reveal on mount (150ms opacity only). No continuous animation."
+    },
+    "/settings": {
+      "name": "Settings (Privacy & System Control)",
+      "role": "Quiet Confidence, Clarity & User Control",
+      "allowedEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX09_EDITORIAL_MEDIA_FRAME"
+      ],
+      "forbiddenEffects": [
+        "FX02_DEPTH_PARALLAX",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX04_KNOWLEDGE_GLASS",
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX06_DISCOVERY_MARKERS",
+        "FX07_AMBIENT_FIELD",
+        "FX08_MAGNETIC_CTA_CONTEXT",
+        "FX10_NOISE_TO_KNOWLEDGE",
+        "FX11_HUMAN_IN_THE_LOOP_PROOF",
+        "FX12_KNOWLEDGE_ATLAS"
+      ],
+      "maxIntensityDesktop": 1,
+      "maxIntensityMobile": 0,
+      "maxConcurrentEffects": 1,
+      "reducedMotionMode": "ZERO_MOTION",
+      "notes": "Minimalist static environment. Zero parallax, zero sweeps, zero continuous particle drifts."
+    }
+  }
+}

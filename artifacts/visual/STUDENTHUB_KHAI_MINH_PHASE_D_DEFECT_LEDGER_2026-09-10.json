@@ -1,0 +1,56 @@
+{
+  "generatedAt": "2026-09-10T23:45:00+07:00",
+  "auditPhase": "PHASE_D_INDEPENDENT_AUDIT",
+  "summary": {
+    "totalDefectsFound": 4,
+    "totalDefectsResolved": 4,
+    "totalDefectsRemaining": 0,
+    "p0Remaining": 0,
+    "p1Remaining": 0,
+    "p2Remaining": 0,
+    "p3Remaining": 0,
+    "status": "PASS"
+  },
+  "defects": [
+    {
+      "id": "DEF-01",
+      "severity": "P1",
+      "title": "Asset Registry Derivative Extension and Stem Inconsistency",
+      "route": "Multiple (Global Registry)",
+      "impact": "Derivative paths occasionally fell back to unoptimized formats or mismatched extensions",
+      "rootCause": "Missing explicit extension resolution in khaiMinhVisualRegistry.js",
+      "resolution": "Implemented explicit derivative stem resolver and canonical webp path mapping in khaiMinhVisualRegistry.js",
+      "verifiedStatus": "RESOLVED"
+    },
+    {
+      "id": "DEF-02",
+      "severity": "P1",
+      "title": "Knowledge Atlas Metadata Label Contrast Below WCAG AA 4.5:1",
+      "route": "/community",
+      "impact": "Muted secondary labels on dark glassmorphic cards had insufficient optical contrast",
+      "rootCause": "Color token hsl(220, 10%, 45%) used on dark container backgrounds",
+      "resolution": "Upgraded token to high-contrast hsl(220, 15%, 75%) with optical kerning in KnowledgeAtlas.tsx",
+      "verifiedStatus": "RESOLVED"
+    },
+    {
+      "id": "DEF-03",
+      "severity": "P1",
+      "title": "Settings Privacy Access Tab Button Contrast Below 4.5:1",
+      "route": "/settings",
+      "impact": "Inactive sub-tab labels failed automated axe-core color contrast checks",
+      "rootCause": "Unselected tab state used low-luminance text color without sufficient contrast against backdrop",
+      "resolution": "Updated button styling to use semantically calibrated high-contrast text color in PrivacyAccessCenter.jsx",
+      "verifiedStatus": "RESOLVED"
+    },
+    {
+      "id": "DEF-04",
+      "severity": "P2",
+      "title": "Hero Video Autoplay Transfer on Constrained Mobile Viewports",
+      "route": "/ and /community",
+      "impact": "Mobile clients (390x844) could needlessly fetch 1.25 MB and 518 KB video streams",
+      "rootCause": "Video element did not gate source on viewport width or prefers-reduced-motion media queries",
+      "resolution": "Enforced mobile poster-first fallback and responsive media gates; verified 0 video bytes on mobile and reduced-motion",
+      "verifiedStatus": "RESOLVED"
+    }
+  ]
+}

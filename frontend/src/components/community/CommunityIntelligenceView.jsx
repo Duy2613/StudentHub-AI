@@ -1,5 +1,10 @@
 "use client";
 
+import KhaiMinhMedia from "@/components/visual/KhaiMinhMedia";
+import EditorialMediaFrame from "@/components/visual/EditorialMediaFrame";
+import KnowledgeAtlas from "@/components/visual/KnowledgeAtlas";
+import KnowledgeGlass from "@/components/visual/KnowledgeGlass";
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -174,7 +179,53 @@ export function CommunityIntelligenceView() {
   const sourceMode = providerResult?.provenance?.sourceMode || SCOPED_PROVIDER_MODE;
 
   return <div className="product-workspace vnext-secondary-workspace vnext-community-workspace">
-    <header className="product-hero swiss-crosshair-card hover-perspective-sheen relative"><ReferenceBirdStamp className="vnext-secondary-hero-bird" /><div><p className="product-kicker">Student collective intelligence</p><h1>Trải nghiệm thật, <em>được đặt trong ngữ cảnh</em>.</h1><p>Cộng đồng không phải bảng tin giải trí. Đây là lớp bằng chứng thực tế giúp phát hiện khoảng cách giữa quy định chính thức và điều sinh viên đang gặp.</p><SourceDisclosure provenance={providerResult?.provenance} sourceMode={sourceMode} /></div><div className="hero-seal"><Users size={20} /><span>COMMUNITY</span><strong>{observations.length} báo cáo ({aggregatedItems.length} sự kiện đối soát)</strong></div></header>
+    <header className="product-hero swiss-crosshair-card hover-perspective-sheen relative overflow-hidden">
+      <ReferenceBirdStamp className="vnext-secondary-hero-bird" />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+        <div className="lg:col-span-7">
+          <p className="product-kicker text-cyan-400 font-mono text-xs mb-2">02 · STUDENT COLLECTIVE INTELLIGENCE</p>
+          <h1 className="type-monumental text-4xl sm:text-5xl text-white tracking-tight leading-[1.05] mb-4">
+            Trải nghiệm thật, <em className="text-cyan-200">được đặt trong ngữ cảnh</em>.
+          </h1>
+          <p className="type-body-editorial text-slate-300 text-sm sm:text-base max-w-xl leading-relaxed mb-6">
+            Cộng đồng không phải bảng tin giải trí. Đây là lớp đối chiếu thực tế giúp phát hiện khoảng cách giữa văn bản chính thức và thực tiễn thi hành.
+          </p>
+          <SourceDisclosure provenance={providerResult?.provenance} sourceMode={sourceMode} />
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono text-xs">
+              <Users size={13} /> {observations.length} báo cáo thực địa ({aggregatedItems.length} sự kiện)
+            </span>
+            <span className="text-xs text-slate-400 font-mono">
+              Dữ liệu đối chiếu thực tế được xác minh độc lập
+            </span>
+          </div>
+        </div>
+        <div className="lg:col-span-5">
+          {/* Canonical KM-ATLAS-001 Primary Visual */}
+          <EditorialMediaFrame
+            assetId="KM-ATLAS-001"
+            label="BẢN ĐỒ TRI THỨC CỘNG ĐỒNG // KHAI MINH"
+            badge="KNOWLEDGE ATLAS"
+            className="w-full"
+          >
+            <div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg">
+              <KhaiMinhMedia
+                assetId="KM-ATLAS-001"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-2 left-2 right-2 px-2.5 py-1 rounded bg-slate-950/80 text-[10px] text-slate-300 font-mono">
+                KHÔNG GIAN TRI THỨC ĐỐI CHIẾU // HỆ TRỤC LIÊN KẾT
+              </div>
+            </div>
+          </EditorialMediaFrame>
+        </div>
+      </div>
+    </header>
+
+    {/* FX12 Knowledge Atlas Constellation Section */}
+    <section className="my-6">
+      <KnowledgeAtlas />
+    </section>
 
     <section className="collective-toolbar intelligence-panel">
       <label className="product-search"><Search size={17} /><span className="sr-only">Tìm trong cộng đồng</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm vấn đề, quy trình hoặc bằng chứng..." /></label>
@@ -263,7 +314,7 @@ export function CommunityIntelligenceView() {
               </div>
             </article>
           );
-        }) : (providerResult?.state === "SUCCESS" || providerResult?.state === "EMPTY") && <div className="intelligence-panel empty-state">Không có báo cáo phù hợp với bộ lọc hiện tại.</div>}
+        }) : (providerResult?.state === "SUCCESS" || providerResult?.state === "EMPTY") && <div className="intelligence-panel empty-state">Chưa có đóng góp đã được xác minh trong lĩnh vực này. Hãy là người đầu tiên bổ sung một góc nhìn có căn cứ.</div>}
       </div>
       <aside className="space-y-4"><div className="intelligence-panel sticky-insight"><p className="product-kicker">How to read</p><h2 className="product-section-title">Không đánh đồng số đông với sự thật</h2><ul className="reading-rules"><li><CheckCircle2 /> Trải nghiệm trực tiếp cho biết điều đã xảy ra.</li><li><AlertTriangle /> Cảnh báo cần được đối chiếu thêm nguồn độc lập.</li><li><ShieldCheck /> Quy định chính thức vẫn là nguồn thẩm quyền.</li></ul></div><div className="intelligence-panel network-bridge"><p className="product-kicker">Connected by TrustGraph</p><h3>Đưa tín hiệu vào một case kiểm chứng</h3><p>Trust Engine sẽ phân tách rủi ro, confidence và mức đủ bằng chứng.</p><Link href="/trust" className="text-link">Mở Trust Engine <ArrowRight size={14} /></Link></div></aside>
     </section>

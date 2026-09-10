@@ -1,0 +1,38 @@
+{
+  "harnessUrl": "file:///C:/Users/Duy/Projects/MyProj/StudentHub-AI-KhaiMinh-Visual/tests/visual-motion/harness.html",
+  "loadDurationMs": 31,
+  "cumulativeLayoutShift": 0,
+  "clsEvaluation": "EXCELLENT_ZERO_CLS",
+  "all12EffectsPrototyped": true,
+  "fx01EntranceVerified": true,
+  "fx10ConvergenceVerified": true,
+  "fx05StickyContainerVerified": true,
+  "fx07BoundedNodesVerified": true,
+  "fx09MediaFramesVerified": true,
+  "keyboardHotspotAccessible": true,
+  "reducedMotionToggleVerified": true,
+  "mobileViewportLeak": false,
+  "overflowingElementsOnMobile": [],
+  "frameTimingEvidence": {
+    "sampleDurationMs": 1983,
+    "sampleFrames": 119,
+    "avgFrameIntervalMs": 16.67,
+    "p50FrameIntervalMs": 16.7,
+    "p95FrameIntervalMs": 16.8,
+    "worstLongFrameMs": 16.8,
+    "measuredFps": 60,
+    "longTasksCount": 0
+  },
+  "axeScanEvidence": {
+    "status": "AUTOMATED_AXE_SCAN_COMPLETED",
+    "violationsCount": 0,
+    "violations": [],
+    "passesCount": 20,
+    "incompleteCount": 2
+  },
+  "evidenceScreenshots": [
+    "artifacts/visual/motion-harness/evidence-desktop.png",
+    "artifacts/visual/motion-harness/evidence-mobile.png"
+  ],
+  "timestamp": "2026-09-10T14:06:42.792Z"
+}

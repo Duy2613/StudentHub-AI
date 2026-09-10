@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "releaseDate": "2026-09-10",
+  "system": "StudentHub AI Khai Minh Visual Program",
+  "phase": "PHASE B.2 — FINAL ACCOUNTING CLOSURE & PHASE C INPUT FREEZE",
+  "worktree": "C:\\Users\\Duy\\Projects\\MyProj\\StudentHub-AI-KhaiMinh-Visual",
+  "branch": "design/khai-minh-visual-phase-a",
+  "baselineHead": "637bb195f7b77af8eaa71a22795bac8d698513ac",
+  "canonicalTruthHierarchy": [
+    "1. MOTION_TOKENS",
+    "2. EFFECT_CONTRACTS",
+    "3. ROUTE_MOTION_MATRIX",
+    "4. PHASE_C_HANDOFF",
+    "5. STATUS_MANIFEST",
+    "6. PROSE_REPORTS"
+  ],
+  "canonicalHashes": {
+    "motionTokensSha256": "6ad22a180014bf83091afeadac3ee237354427d970b43aaeec7b7e9624d257bc",
+    "effectContractsSha256": "3bcc42c97e71bd3d0449058f8e6557254f2e2187326e66e552307595e20282a1",
+    "routeMotionMatrixSha256": "03806590ecd34c5899434633d41bb6da1443dfbc309eb732ebe01c9e9ba05fd6",
+    "phaseCHandoffSha256": "1538ad2e8549125644e3c200945c95802479153040f3861731a6c5f119e0a42c"
+  },
+  "effectAccounting": {
+    "effectsSpecified": 12,
+    "effectsApproved": 9,
+    "effectsLimited": 3,
+    "effectsRejected": 0,
+    "approvedIds": [
+      "FX01_CINEMATIC_REVEAL",
+      "FX03_PRISM_LIGHT_SWEEP",
+      "FX04_KNOWLEDGE_GLASS",
+      "FX06_DISCOVERY_MARKERS",
+      "FX08_MAGNETIC_CTA_CONTEXT",
+      "FX09_EDITORIAL_MEDIA_FRAME",
+      "FX10_NOISE_TO_KNOWLEDGE",
+      "FX11_HUMAN_IN_THE_LOOP_PROOF",
+      "FX12_KNOWLEDGE_ATLAS"
+    ],
+    "limitedIds": [
+      "FX02_DEPTH_PARALLAX",
+      "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+      "FX07_AMBIENT_FIELD"
+    ],
+    "rejectedIds": []
+  },
+  "limitedEffectScopes": {
+    "FX02_DEPTH_PARALLAX": "LIMITED (Landing Desktop Hero Only)",
+    "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY": "LIMITED (Landing Narrative + Optional Cases Desktop)",
+    "FX07_AMBIENT_FIELD": "LIMITED (Landing Hero Only, Max 3 Nodes, Desktop Only)"
+  },
+  "routeCoverage": {
+    "totalRoutes": 7,
+    "routes": [
+      "/",
+      "/trust",
+      "/community",
+      "/expert",
+      "/cases",
+      "/dashboard",
+      "/settings"
+    ],
+    "dataRealityRuleEnforced": true
+  },
+  "validatorResult": "PASS",
+  "productionRoutePerformanceClaim": "NOT_YET_ESTABLISHED",
+  "phaseCAuthorized": false,
+  "verdict": "KHAI_MINH_PHASE_B2_FINAL_CONTRACT_LOCK_READY"
+}

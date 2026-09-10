@@ -1,0 +1,83 @@
+{
+  "generatedAt": "2026-09-10T23:18:00+07:00",
+  "auditTool": "@axe-core/playwright",
+  "testedTags": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa"
+  ],
+  "wholeSiteCertification": "NOT_CLAIMED",
+  "routes": {
+    "Landing": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "minor": 0,
+      "keyboardFocus": "PASS",
+      "reducedMotion": "PASS",
+      "touchTarget": "PASS"
+    },
+    "Trust": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "minor": 0,
+      "keyboardFocus": "PASS",
+      "reducedMotion": "PASS",
+      "touchTarget": "PASS"
+    },
+    "Community": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "minor": 0,
+      "keyboardFocus": "PASS",
+      "reducedMotion": "PASS",
+      "touchTarget": "PASS"
+    },
+    "Expert": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "minor": 0,
+      "keyboardFocus": "PASS",
+      "reducedMotion": "PASS",
+      "touchTarget": "PASS"
+    },
+    "Cases": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "minor": 0,
+      "keyboardFocus": "PASS",
+      "reducedMotion": "PASS",
+      "touchTarget": "PASS"
+    },
+    "Dashboard": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "minor": 0,
+      "keyboardFocus": "PASS",
+      "reducedMotion": "PASS",
+      "touchTarget": "PASS"
+    },
+    "Settings": {
+      "critical": 0,
+      "serious": 0,
+      "moderate": 0,
+      "minor": 0,
+      "keyboardFocus": "PASS",
+      "reducedMotion": "PASS",
+      "touchTarget": "PASS"
+    }
+  },
+  "summary": {
+    "totalCritical": 0,
+    "totalSerious": 0,
+    "totalModerate": 0,
+    "totalMinor": 0,
+    "status": "PASS"
+  }
+}

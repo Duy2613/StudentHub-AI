@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudentHub AI — Khai Minh Phase B Visual Motion Harness</title>
+  <style>
+    :root {
+      --bg-primary: #0a0d14;
+      --bg-card: #121824;
+      --border-card: #1e283a;
+      --text-primary: #f0f4fa;
+      --text-secondary: #8c9eb5;
+      --accent-blue: #3b82f6;
+      --accent-gold: #f59e0b;
+      --glow-low: 0 0 12px rgba(120, 160, 255, 0.15);
+      --glow-hero: 0 0 48px rgba(140, 180, 255, 0.35);
+      --ease-standard: cubic-bezier(0.2, 0.0, 0.0, 1.0);
+      --ease-enter: cubic-bezier(0.0, 0.0, 0.2, 1.0);
+      --ease-emphasis: cubic-bezier(0.25, 1.0, 0.5, 1.0);
+      --dur-feedback: 150ms;
+      --dur-component: 220ms;
+      --dur-section: 420ms;
+      --dur-hero: 520ms;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      padding-bottom: 80px;
+    }
+
+    /* Simulation Control Banner */
+    .control-panel {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      background: rgba(14, 20, 32, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-card);
+      padding: 8px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .panel-title { font-weight: 700; font-size: 14px; letter-spacing: 0.05em; color: var(--accent-blue); }
+    .toggles { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .btn-toggle {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all var(--dur-feedback) var(--ease-standard);
+    }
+    .btn-toggle:hover { background: #334155; }
+    .btn-toggle.active { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); font-weight: 600; }
+    .metrics-pill { font-size: 11px; background: #0f172a; padding: 4px 10px; border-radius: 4px; border: 1px solid #1e293b; color: #10b981; font-family: monospace; }
+
+    /* Container */
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .prototype-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px; margin-top: 24px; }
+
+    .proto-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .proto-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .proto-id { font-size: 11px; font-weight: 700; color: var(--accent-gold); background: rgba(245, 158, 11, 0.1); padding: 2px 8px; border-radius: 4px; }
+    .proto-title { font-size: 18px; font-weight: 700; margin-top: 4px; }
+    .proto-meta { font-size: 12px; color: #94a3b8; }
+
+    /* FX01: Cinematic Reveal */
+    .fx01-box {
+      background: #182234;
+      border: 1px solid #2a3a54;
+      border-radius: 8px;
+      padding: 20px;
+      opacity: 0;
+      transform: translateY(24px) scale(0.99);
+      transition: opacity var(--dur-section) var(--ease-enter), transform var(--dur-section) var(--ease-enter);
+    }
+    .fx01-box.in-view { opacity: 1; transform: translateY(0) scale(1); }
+
+    /* FX02: Depth Parallax Demo */
+    .fx02-stage {
+      height: 160px;
+      background: #0d131f;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fx02-bg { position: absolute; font-size: 54px; opacity: 0.15; transition: transform 0.1s ease-out; }
+    .fx02-prism { position: relative; z-index: 2; width: 64px; height: 64px; background: linear-gradient(135deg, #60a5fa, #a855f7); clip-path: polygon(50% 0%, 0% 100%, 100% 100%); transition: transform 0.1s ease-out; }
+    .fx02-fg { position: absolute; bottom: 12px; font-size: 11px; color: var(--accent-gold); background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 4px; transition: transform 0.1s ease-out; }
+
+    /* FX03: Prism Light Sweep */
+    .fx03-container {
+      position: relative;
+      height: 140px;
+      background: #141c2c;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #24324a;
+    }
+    .fx03-shimmer {
+      position: absolute;
+      top: 0; left: -120%;
+      width: 80%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), rgba(168,85,247,0.25), rgba(59,130,246,0.25), transparent);
+      transform: skewX(-20deg);
+      transition: left var(--dur-hero) var(--ease-standard);
+    }
+    .fx03-container:hover .fx03-shimmer { left: 140%; }
+
+    /* FX04: Knowledge Glass */
+    .fx04-card {
+      background: rgba(26, 36, 54, 0.6);
+      border: 1px solid #2e405e;
+      border-radius: 8px;
+      padding: 16px;
+      backdrop-filter: blur(8px);
+      transition: transform var(--dur-component) var(--ease-emphasis), box-shadow var(--dur-component) var(--ease-emphasis), border-color var(--dur-component) var(--ease-emphasis);
+      cursor: pointer;
+    }
+    .fx04-card:hover, .fx04-card:focus-visible {
+      transform: translateY(-4px) scale(1.015);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.4), var(--glow-low);
+      border-color: var(--accent-blue);
+      outline: none;
+    }
+
+    /* FX06: Discovery Markers */
+    .fx06-map {
+      height: 160px;
+      background: #0d1522;
+      border-radius: 8px;
+      position: relative;
+      border: 1px dashed #22324c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fx06-hotspot {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f59e0b;
+  color: #0a0d14;
+  font-weight: 800;
+  font-size: 11px;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+  transition: transform var(--dur-feedback) var(--ease-emphasis);
+}
+    .fx06-hotspot:hover, .fx06-hotspot:focus-visible {
+      transform: scale(1.25);
+      box-shadow: 0 0 16px var(--accent-blue);
+      outline: 2px solid #fff;
+    }
+    .fx06-hotspot:nth-child(1) { top: 35%; left: 30%; }
+    .fx06-hotspot:nth-child(2) { top: 55%; left: 65%; }
+
+    /* FX08: Magnetic Button */
+    .fx08-area { display: flex; justify-content: center; padding: 20px; }
+    .fx08-btn {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 999px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform var(--dur-feedback) var(--ease-emphasis), box-shadow var(--dur-feedback) var(--ease-emphasis);
+      position: relative;
+    }
+    .fx08-btn:hover { box-shadow: 0 8px 24px rgba(37,99,235,0.4); }
+
+    /* FX10: Noise to Knowledge */
+    .fx10-stage {
+      height: 140px;
+      background: #0b111a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: relative;
+    }
+    .fx10-particle {
+      width: 8px; height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      position: absolute;
+      transition: transform 0.4s var(--ease-standard), background-color 0.4s var(--ease-standard);
+    }
+    .fx10-converged .fx10-particle {
+      transform: translate(220px, 0) !important;
+      background: #10b981;
+    }
+
+    /* FX11: Human in the loop */
+    .fx11-container {
+      background: #111a28;
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .fx11-step {
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: #1a2538;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all var(--dur-component) var(--ease-standard);
+    }
+    .fx11-step.active {
+      background: rgba(59,130,246,0.2);
+      border-left: 3px solid var(--accent-blue);
+      font-weight: 600;
+    }
+
+    /* FX12: Knowledge Atlas Orrery */
+    .fx12-orrery {
+      height: 180px;
+      background: #080c14;
+      border-radius: 8px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fx12-orbit {
+      width: 130px; height: 130px;
+      border: 1px dashed rgba(148, 163, 184, 0.2);
+      border-radius: 50%;
+      position: absolute;
+      animation: fx12-spin 20s linear infinite;
+    }
+    .fx12-sun { width: 32px; height: 32px; border-radius: 50%; background: radial-gradient(circle, #fbbf24, #d97706); box-shadow: 0 0 16px #f59e0b; }
+    .fx12-planet {
+      width: 14px; height: 14px; border-radius: 50%; background: #38bdf8;
+      position: absolute; top: -7px; left: calc(50% - 7px);
+      box-shadow: 0 0 8px #38bdf8;
+    }
+    @keyframes fx12-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    
+/* FX05: Editorial Scroll Choreography */
+.fx05-scroll-container {
+  height: 180px;
+  overflow-y: auto;
+  border-radius: 8px;
+  background: #080c14;
+  padding: 12px;
+  border: 1px solid #1e283a;
+  position: relative;
+}
+.fx05-sticky-header {
+  position: sticky;
+  top: 0;
+  background: rgba(18, 24, 36, 0.95);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  margin-bottom: 8px;
+  z-index: 2;
+}
+.fx05-step-item {
+  padding: 8px 10px;
+  background: #121824;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  color: #94a3b8;
+  border-left: 2px solid transparent;
+}
+.fx05-step-item.active {
+  border-left-color: var(--accent-blue);
+  color: var(--text-primary);
+  background: rgba(59, 130, 246, 0.08);
+}
+.mobile-view .fx05-sticky-header { position: static; }
+.reduced-motion .fx05-sticky-header { position: static; }
+
+/* FX07: Ambient Field */
+.fx07-ambient-stage {
+  height: 180px;
+  background: #070a10;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #1a2232;
+}
+.fx07-node {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.6), transparent 70%);
+  animation: fx07-drift 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+.fx07-node-1 { width: 32px; height: 32px; top: 20%; left: 25%; animation-delay: 0s; }
+.fx07-node-2 { width: 24px; height: 24px; top: 60%; left: 70%; animation-delay: -4s; }
+.fx07-node-3 { width: 18px; height: 18px; top: 35%; left: 60%; animation-delay: -8s; }
+@keyframes fx07-drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(12px, -16px); }
+}
+.mobile-view .fx07-ambient-stage .fx07-node { display: none; }
+.reduced-motion .fx07-node { display: none !important; }
+
+/* FX09: Editorial Media Frame */
+.fx09-frame-stage {
+  height: 180px;
+  background: #080c14;
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+.fx09-figure {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #1e283a;
+  background: #111827;
+  cursor: pointer;
+  margin: 0;
+}
+.fx09-figure:focus-visible { outline: 2px solid var(--accent-blue); }
+.fx09-figure-landscape { width: 55%; aspect-ratio: 16 / 10; }
+.fx09-figure-portrait { width: 38%; aspect-ratio: 3 / 4; }
+.fx09-img-mock {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 10px;
+  font-family: monospace;
+  transition: transform var(--dur-component) var(--ease-standard);
+}
+.fx09-figure:hover .fx09-img-mock,
+.fx09-figure:focus-visible .fx09-img-mock {
+  transform: scale(1.02);
+}
+.fx09-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 13, 20, 0.85);
+  font-size: 9px;
+  padding: 3px 6px;
+  color: #94a3b8;
+}
+.reduced-motion .fx09-img-mock { transform: none !important; }
+
+/* Reduced Motion Simulation Mode */
+    .reduced-motion * {
+      animation: none !important;
+      transition-duration: 0.05s !important;
+      transform: none !important;
+    }
+    .reduced-motion .fx01-box { opacity: 1 !important; }
+    .reduced-motion .fx12-orbit { animation: none !important; }
+
+    /* Mobile Viewport Simulation Mode */
+    .mobile-view { max-width: 390px !important; padding: 12px !important; width: 100% !important; overflow-x: hidden !important; }\n    .mobile-view .prototype-grid { grid-template-columns: 1fr !important; gap: 16px !important; }\n    .mobile-view .control-panel { padding: 12px !important; }
+  </style>
+</head>
+<body>
+
+  <div class="control-panel">
+    <div>
+      <h1 class="panel-title">STUDENTHUB AI — KHAI MINH MOTION HARNESS</h1>
+      <div style="font-size: 11px; color: #94a3b8;">Isolated Test Environment (Phase B Verified Prototype)</div>
+    </div>
+    <div class="toggles">
+      <button class="btn-toggle" id="btnTriggerFX01" onclick="toggleFX01()">Trigger FX01 Entrance</button>
+      <button class="btn-toggle" id="btnConvergeFX10" onclick="toggleFX10()">Scrub FX10 Convergence</button>
+      <button class="btn-toggle" id="btnReducedMotion" onclick="toggleReducedMotion()">Reduced Motion: OFF</button>
+      <button class="btn-toggle" id="btnMobileView" onclick="toggleMobileView()">Viewport: DESKTOP</button>
+      <div class="metrics-pill" id="fpsMeter">60 FPS | 0 CLS | Accessible</div>
+    </div>
+  </div>
+
+  <main id="mainContent"><div class="container" id="mainContainer">
+    <div class="prototype-grid">
+
+      <!-- FX01 -->
+      <div class="proto-card">
+        <div class="proto-header">
+          <div>
+            <span class="proto-id">FX01</span>
+            <div class="proto-title">Cinematic Reveal</div>
+          </div>
+          <span class="proto-meta">CSS + IO</span>
+        </div>
+        <p class="proto-meta">Controlled entrance hierarchy with 20px Y translation and smooth opacity settle.</p>
+        <div class="fx01-box in-view" id="fx01Demo">
+          <div style="font-weight: 700; color: #fff; margin-bottom: 6px;">Khai Minh — Hiểu Đúng. Đi Xa.</div>
+          <div style="font-size: 13px; color: #94a3b8;">Hệ thống tri thức độc lập kết nối chứng cứ học thuật và phản biện chuyên gia.</div>
+        </div>
+      </div>
+
+      <!-- FX02 -->
+      <div class="proto-card">
+        <div class="proto-header">
+          <div>
+            <span class="proto-id">FX02</span>
+            <div class="proto-title">Depth Parallax</div>
+          </div>
+          <span class="proto-meta">CSS Variables</span>
+        </div>
+        <p class="proto-meta">Bounded 2.5D separation between background mountain mist, central prism, and foreground.</p>
+        <div class="fx02-stage" id="fx02Stage" onmousemove="handleFX02Parallax(event)">
+          <div class="fx02-bg" id="fx02Bg">⛰️</div>
+          <div class="fx02-prism" id="fx02Prism"></div>
+          <div class="fx02-fg" id="fx02Fg">Chứng Cứ Học Thuật</div>
+        </div>
+      </div>
+
+      <!-- FX03 -->
+      <div class="proto-card">
+        <div class="proto-header">
+          <div>
+            <span class="proto-id">FX03</span>
+            <div class="proto-title">Prism Light Sweep</div>
+          </div>
+          <span class="proto-meta">CSS Gradient Mask</span>
+        </div>
+        <p class="proto-meta">Hover over container to trigger signature spectral caustic shimmer without WebGL overhead.</p>
+        <div class="fx03-container">
+          <div style="font-size: 36px; z-index: 2;">💎</div>
+          <div class="fx03-shimmer"></div>
+        </div>
+      </div>
+
+      <!-- FX04 -->
+      <div class="proto-card">
+        <div class="proto-header">
+          <div>
+            <span class="proto-id">FX04</span>
+            <div class="proto-title">Knowledge Glass</div>
+          </div>
+          <span class="proto-meta">CSS Backdrop Blur</span>
+        </div>
+        <p class="proto-meta">Hover or focus via Tab key. 4px elevation, blue border focus token, and tactile shadow.</p>
+        <div class="fx04-card" id="fx04Card" tabindex="0" role="button" aria-label="Hồ sơ nghiên cứu AI và chứng cứ">
+          <div style="font-weight: 600; font-size: 14px;">Báo cáo Phân tích Trích dẫn #2024</div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Độ tin cậy: 98% • Đã kiểm định độc lập</div>
+        </div>
+      </div>
+
+      <!-- FX06 -->
+      <div class="proto-card">
+        <div class="proto-header">
+          <div>
+            <span class="proto-id">FX06</span>
+            <div class="proto-title">Discovery Markers</div>
+          </div>
+          <span class="proto-meta">HTML Buttons + SVG</span>
+        </div>
+        <p class="proto-meta">Interactive keyboard-focusable hotspots revealing regional knowledge dossiers.</p>
+        <div class="fx06-map">
+          <button class="fx06-hotspot" aria-label="Hà Nội - Trung tâm Đại học" onclick="alertHotspot('Hà Nội - 12 Trung tâm Tri thức')">01</button>
+          <button class="fx06-hotspot" aria-label="Đà Nẵng - Nghiên cứu Ven biển" onclick="alertHotspot('Đà Nẵng - Nghiên cứu Môi trường')">02</button>
+          <div style="font-size: 12px; color: #94a3b8;">Bản đồ Tương tác Tri thức</div>
+        </div>
+      </div>
+
+      <!-- FX08 -->
+      <div class="proto-card">
+        <div class="proto-header">
+          <div>
+            <span class="proto-id">FX08</span>
+            <div class="proto-title">Magnetic Primary CTA</div>
+          </div>
+          <span class="proto-meta">CSS + Pointer Micro-shift</span>
+        </div>
+        <p class="proto-meta">Subtle magnetic attraction within 24px radius; instant keyboard focus compliance.</p>
+        <div class="fx08-area" onmousemove="handleFX08Magnetic(event)" onmouseleave="resetFX08()">
+          <button class="fx08-btn" id="fx08Btn">Khám Phá Khai Minh</button>
+        </div>
+      </div>
+
+      <!-- FX10 -->
+      <div class="proto-card">
+        <div class="proto-header">
+          <div>
+            <span class="proto-id">FX10</span>
+            <div class="proto-title">Noise to Knowledge</div>
+          </div>
+          <span class="proto-meta">SVG / CSS Transform</span>
+        </div>
+        <p class="proto-meta">Chaotic fragments stream into central prism and resolve into green verified beacon.</p>
+        <div class="fx10-stage" id="fx10Stage">
+          <div class="fx10-particle" style="top: 30px; left: 20px;"></div>
+          <div class="fx10-particle" style="top: 70px; left: 20px;"></div>
+          <div class="fx10-particle" style="top: 110px; left: 20px;"></div>
+          <div style="margin-left: auto; font-size: 28px;">💎</div>
+        </div>
+      </div>
+
+      <!-- FX11 -->
+      <div class="proto-card">
+        <div class="proto-header">
+          <div>
+            <span class="proto-id">FX11</span>
+            <div class="proto-title">Human in the Loop Proof</div>
+          </div>
+          <span class="proto-meta">Semantic Step State</span>
+        </div>
+        <p class="proto-meta">Transparent handoff: AI proposes -> Evidence supports -> Human judge confirms.</p>
+        <div class="fx11-container">
+          <div class="fx11-step active"><span>1. AI Trích xuất Dữ liệu</span> <span style="font-size: 11px;">Hoàn tất</span></div>
+          <div class="fx11-step active"><span>2. Đối chiếu 14 Tài liệu Nguồn</span> <span style="font-size: 11px;">Khớp 100%</span></div>
+          <div class="fx11-step active"><span>3. Phản biện & Đóng dấu Chuyên gia</span> <span style="font-size: 11px; color: #10b981;">Đạt chuẩn</span></div>
+        </div>
+      </div>
+
+      <!-- FX12 -->
+      <div class="proto-card">
+        <div class="proto-header">
+          <div>
+            <span class="proto-id">FX12</span>
+            <div class="proto-title">Knowledge Atlas Orrery (2.5D)</div>
+          </div>
+          <span class="proto-meta">Declarative SVG</span>
+        </div>
+        <p class="proto-meta">Planetary orbital motion around central Knowledge Prism; pauses cleanly offscreen.</p>
+        <div class="fx12-orrery">
+          <div class="fx12-sun"></div>
+          <div class="fx12-orbit">
+            <div class="fx12-planet"></div>
+          </div>
+        </div>
+      </div>
+
+    
+<!-- FX05: Editorial Scroll Choreography -->
+<div class="proto-card" id="cardFX05">
+  <div class="proto-header">
+    <div>
+      <span class="proto-id">FX05</span>
+      <div class="proto-title">Editorial Scroll Choreography</div>
+    </div>
+    <span class="proto-meta">CSS Sticky + DOM</span>
+  </div>
+  <p class="proto-meta">Tiến trình cuộn kể chuyện (Landing &amp; Cases desktop); bảo toàn cuộn tự nhiên, không chiếm quyền cuộn. Di động xếp khối phẳng.</p>
+  <div class="fx05-scroll-container" id="fx05Container" tabindex="0" aria-label="Khung cuộn theo dõi tiến trình kể chuyện">
+    <div class="fx05-sticky-header">Giai đoạn: Bước 1 / 3 — Khai Minh Tri thức</div>
+    <div class="fx05-step-item active">01. Tổng hợp dữ liệu nghiên cứu ban đầu từ nguồn mở.</div>
+    <div class="fx05-step-item">02. Đối chiếu đa chiều với hệ thống tiêu chuẩn kiểm định.</div>
+    <div class="fx05-step-item">03. Chuyển giao chuyên gia nhân sự thẩm định và xác nhận.</div>
+    <div class="fx05-step-item">Phần kết: Báo cáo bằng chứng hoàn chỉnh.</div>
+  </div>
+</div>
+
+<!-- FX07: Ambient Celestial Field -->
+<div class="proto-card" id="cardFX07">
+  <div class="proto-header">
+    <div>
+      <span class="proto-id">FX07</span>
+      <div class="proto-title">Ambient Celestial Field</div>
+    </div>
+    <span class="proto-meta">CSS Keyframes (Bounded)</span>
+  </div>
+  <p class="proto-meta">Tối đa 3 hạt sáng trôi nhẹ trên nền hero Landing. Tắt hoàn toàn trên thiết bị di động và chế độ giảm chuyển động.</p>
+  <div class="fx07-ambient-stage" id="fx07Stage" aria-hidden="true">
+    <div class="fx07-node fx07-node-1"></div>
+    <div class="fx07-node fx07-node-2"></div>
+    <div class="fx07-node fx07-node-3"></div>
+    <div style="position: absolute; bottom: 8px; left: 10px; font-size: 10px; color: #94a3b8;">Giới hạn: 3 nodes | Landing hero duy nhất</div>
+  </div>
+</div>
+
+<!-- FX09: Editorial Media Frame -->
+<div class="proto-card" id="cardFX09">
+  <div class="proto-header">
+    <div>
+      <span class="proto-id">FX09</span>
+      <div class="proto-title">Editorial Media Frame</div>
+    </div>
+    <span class="proto-meta">CSS Aspect Ratio + Scale(1.02)</span>
+  </div>
+  <p class="proto-meta">Khung hình chuẩn học thuật bảo toàn tỷ lệ và tiêu điểm ảnh Phase A, kèm nhãn chú thích ngữ nghĩa &lt;figcaption&gt;.</p>
+  <div class="fx09-frame-stage">
+    <figure class="fx09-figure fx09-figure-landscape" tabindex="0" aria-label="Minh họa Khai Minh Tri thức tỷ lệ ngang 16 trên 10">
+      <div class="fx09-img-mock">KM-PRISM-001 (16:10)</div>
+      <figcaption class="fx09-caption">Học thuyết Khai Minh</figcaption>
+    </figure>
+    <figure class="fx09-figure fx09-figure-portrait" tabindex="0" aria-label="Minh họa Kiểm định độc lập tỷ lệ đứng 3 trên 4">
+      <div class="fx09-img-mock">KM-EXPERT-001 (3:4)</div>
+      <figcaption class="fx09-caption">Kiểm định độc lập</figcaption>
+    </figure>
+  </div>
+</div>
+
+    </div>
+  </div></main>
+
+  <script>
+    function toggleFX01() {
+      const el = document.getElementById('fx01Demo');
+      el.classList.remove('in-view');
+      setTimeout(() => el.classList.add('in-view'), 50);
+    }
+
+    function toggleFX10() {
+      const stage = document.getElementById('fx10Stage');
+      stage.classList.toggle('fx10-converged');
+    }
+
+    function toggleReducedMotion() {
+      const b = document.body;
+      b.classList.toggle('reduced-motion');
+      const btn = document.getElementById('btnReducedMotion');
+      const isRed = b.classList.contains('reduced-motion');
+      btn.textContent = isRed ? 'Reduced Motion: ON' : 'Reduced Motion: OFF';
+      btn.classList.toggle('active', isRed);
+    }
+
+    function toggleMobileView() {
+      const c = document.getElementById('mainContainer');
+      c.classList.toggle('mobile-view');
+      const btn = document.getElementById('btnMobileView');
+      const isMob = c.classList.contains('mobile-view');
+      btn.textContent = isMob ? 'Viewport: MOBILE (390px)' : 'Viewport: DESKTOP';
+      btn.classList.toggle('active', isMob);
+    }
+
+    function handleFX02Parallax(e) {
+      if (document.body.classList.contains('reduced-motion')) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      document.getElementById('fx02Bg').style.transform = `translate(${x * -12}px, ${y * -8}px)`;
+      document.getElementById('fx02Prism').style.transform = `translate(${x * 16}px, ${y * 12}px)`;
+      document.getElementById('fx02Fg').style.transform = `translate(${x * 24}px, ${y * 18}px)`;
+    }
+
+    function handleFX08Magnetic(e) {
+      if (document.body.classList.contains('reduced-motion')) return;
+      const btn = document.getElementById('fx08Btn');
+      const rect = btn.getBoundingClientRect();
+      const btnCenterX = rect.left + rect.width / 2;
+      const btnCenterY = rect.top + rect.height / 2;
+      const distX = (e.clientX - btnCenterX) * 0.25;
+      const distY = (e.clientY - btnCenterY) * 0.25;
+      btn.style.transform = `translate(${Math.max(-6, Math.min(6, distX))}px, ${Math.max(-6, Math.min(6, distY))}px)`;
+    }
+
+    function resetFX08() {
+      document.getElementById('fx08Btn').style.transform = 'translate(0px, 0px)';
+    }
+
+    function alertHotspot(label) {
+      console.log('Hotspot selected:', label);
+    }
+  </script>
+</body>
+</html>

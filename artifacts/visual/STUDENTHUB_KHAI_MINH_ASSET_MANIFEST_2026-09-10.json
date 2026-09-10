@@ -1,0 +1,1801 @@
+{
+  "manifestVersion": "1.0.0",
+  "releaseDate": "2026-09-10",
+  "system": "StudentHub AI — Khai Minh Visual System",
+  "phase": "PHASE_A_ASSET_FORENSICS_AND_FOUNDATION",
+  "worktree": "C:\\Users\\Duy\\Projects\\MyProj\\StudentHub-AI-KhaiMinh-Visual",
+  "branch": "design/khai-minh-visual-phase-a",
+  "totals": {
+    "physicalFilesDiscovered": 21,
+    "uniqueMasters": 17,
+    "exactDuplicates": 4,
+    "contactSheets": 3,
+    "unresolved": 0
+  },
+  "assets": [
+    {
+      "assetId": "KM-SHEET-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_41_04 PM.png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_41_04 PM.png",
+      "sha256": "33b75d8c004eea887f8e705e94707af6ffda97d3829e05ce1281f2579552fde3",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2894138,
+      "width": 1536,
+      "height": 1024,
+      "aspectRatio": "1.500:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "CONTACT_SHEET",
+      "duplicateTarget": null,
+      "primaryFamily": "EDITORIAL_KNOWLEDGE",
+      "secondaryTags": [
+        "contact-sheet",
+        "storyboard",
+        "cards-02-11",
+        "hero-mobile",
+        "trust-engine",
+        "community",
+        "learning-journey"
+      ],
+      "mood": "ACADEMIC_ARCHIVE",
+      "visualDensity": "VERY_HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 15,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Never classify as real student, real expert, or real reviewer.",
+      "embeddedTextRisk": "TEXT_ROUTE_LABEL_ONLY",
+      "realityRisk": "REALITY_RISK_MEDIUM",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "safeOverlayRegions": {
+        "top": "LIMITED",
+        "left": "LIMITED",
+        "center": "UNSAFE",
+        "right": "LIMITED",
+        "bottom": "LIMITED"
+      },
+      "preferredCopyColor": "LIGHT_TEXT",
+      "routeSuitability": {
+        "LANDING": 3,
+        "TRUST": 4,
+        "COMMUNITY": 3,
+        "EXPERT": 3,
+        "CASES": 2,
+        "DASHBOARD": 1,
+        "SETTINGS": 1,
+        "ABOUT": 3,
+        "SYSTEM_STATE": 1,
+        "OG_SOCIAL": 2,
+        "BACKGROUND": 1,
+        "REFERENCE_ONLY": 5
+      },
+      "recommendedUses": [
+        "REFERENCE_ONLY",
+        "SECTION_MEDIA"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_EXPERT_PROFILE",
+        "NOT_REAL_METRIC",
+        "NOT_REAL_TRUST_EVIDENCE"
+      ],
+      "fullFrameSafety": "REFERENCE_ONLY",
+      "responsiveStrategy": "MOBILE_AVOID",
+      "mobileClassification": "MOBILE_AVOID",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "thumbnail"
+      ],
+      "lcpClass": "NEVER_PRELOAD",
+      "compatibleEffects": [
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX06_DISCOVERY_MARKERS"
+      ],
+      "preferredEffect": "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+      "maximumMotionIntensity": 2,
+      "mobileMotionMaximum": 1,
+      "reducedMotionFallback": "STATIC_GRID",
+      "notes": "10-card storyboard contact sheet containing Cards 02 through 11 (Trust Engine, Trust Graph, Community, Expert, Learning Journey, Dashboard Overview)."
+    },
+    {
+      "assetId": "KM-PRISM-002",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_41_12 PM (1).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_41_12 PM (1).png",
+      "sha256": "6e7a76e2bca63b3ba726e062f4d3a57dbb6bf484cf3b01306f05fed5ac67db38",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2104074,
+      "width": 1672,
+      "height": 941,
+      "aspectRatio": "1.777:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "EVIDENCE_PRISM",
+      "secondaryTags": [
+        "prism",
+        "refraction",
+        "dark-void",
+        "paper-torrent",
+        "caustics",
+        "monumental-hall",
+        "silhouette"
+      ],
+      "mood": "CINEMATIC_WONDER",
+      "visualDensity": "HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 1,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Lone silhouette student traveler.",
+      "embeddedTextRisk": "TEXT_NONE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.65,
+        "y": 0.55
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "SAFE",
+        "center": "LIMITED",
+        "right": "LIMITED",
+        "bottom": "LIMITED"
+      },
+      "preferredCopyColor": "LIGHT_TEXT",
+      "routeSuitability": {
+        "LANDING": 5,
+        "TRUST": 5,
+        "COMMUNITY": 2,
+        "EXPERT": 2,
+        "CASES": 3,
+        "DASHBOARD": 1,
+        "SETTINGS": 1,
+        "ABOUT": 4,
+        "SYSTEM_STATE": 3,
+        "OG_SOCIAL": 5,
+        "BACKGROUND": 5,
+        "REFERENCE_ONLY": 4
+      },
+      "recommendedUses": [
+        "PRIMARY_HERO",
+        "SECTION_BACKGROUND",
+        "TRANSITION_MEDIA",
+        "OG_IMAGE"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_METRIC",
+        "NOT_REAL_USER_PROFILE"
+      ],
+      "fullFrameSafety": "SAFE_FULL_FRAME",
+      "responsiveStrategy": "PRISM_LOCK",
+      "mobileClassification": "MOBILE_CROP_REQUIRED",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "heroDesktop",
+        "sectionDesktop",
+        "tablet",
+        "mobile",
+        "og"
+      ],
+      "lcpClass": "LCP_CANDIDATE",
+      "compatibleEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX02_DEPTH_PARALLAX",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX10_NOISE_TO_KNOWLEDGE"
+      ],
+      "preferredEffect": "FX03_PRISM_LIGHT_SWEEP",
+      "maximumMotionIntensity": 3,
+      "mobileMotionMaximum": 2,
+      "reducedMotionFallback": "STATIC_FADE",
+      "notes": "Monumental dark-to-light knowledge transformation. Massive crystalline prism refracts swirling chaotic paper stream into golden illuminated manuscript plates."
+    },
+    {
+      "assetId": "KM-PRISM-003",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_41_12 PM (2).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_41_12 PM (2).png",
+      "sha256": "9f0ed43d3feb1aa6a4dcef767f80e0f2309e21310dcc58202dce09609ce8a3ed",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2195219,
+      "width": 1672,
+      "height": 941,
+      "aspectRatio": "1.777:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "EVIDENCE_PRISM",
+      "secondaryTags": [
+        "prism",
+        "refraction",
+        "temple-hall",
+        "celestial-sphere",
+        "floating-panels",
+        "vietnamese-landscape"
+      ],
+      "mood": "CINEMATIC_WONDER",
+      "visualDensity": "HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 1,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Lone silhouette student traveler.",
+      "embeddedTextRisk": "TEXT_NONE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.6,
+        "y": 0.55
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "SAFE",
+        "center": "LIMITED",
+        "right": "LIMITED",
+        "bottom": "LIMITED"
+      },
+      "preferredCopyColor": "LIGHT_TEXT",
+      "routeSuitability": {
+        "LANDING": 5,
+        "TRUST": 5,
+        "COMMUNITY": 2,
+        "EXPERT": 2,
+        "CASES": 3,
+        "DASHBOARD": 1,
+        "SETTINGS": 1,
+        "ABOUT": 4,
+        "SYSTEM_STATE": 3,
+        "OG_SOCIAL": 5,
+        "BACKGROUND": 5,
+        "REFERENCE_ONLY": 4
+      },
+      "recommendedUses": [
+        "PRIMARY_HERO",
+        "SECTION_BACKGROUND",
+        "TRANSITION_MEDIA"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_METRIC"
+      ],
+      "fullFrameSafety": "SAFE_FULL_FRAME",
+      "responsiveStrategy": "PRISM_LOCK",
+      "mobileClassification": "MOBILE_CROP_REQUIRED",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "heroDesktop",
+        "sectionDesktop",
+        "tablet",
+        "mobile",
+        "og"
+      ],
+      "lcpClass": "LCP_CANDIDATE",
+      "compatibleEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX02_DEPTH_PARALLAX",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX04_KNOWLEDGE_GLASS"
+      ],
+      "preferredEffect": "FX04_KNOWLEDGE_GLASS",
+      "maximumMotionIntensity": 3,
+      "mobileMotionMaximum": 2,
+      "reducedMotionFallback": "STATIC_FADE",
+      "notes": "Pristine temple hall with sunbeam entering from archway. Refracted spectrum casts illuminated Vietnamese pagoda and mountain panels into the room."
+    },
+    {
+      "assetId": "KM-PRISM-004",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_41_13 PM (3).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_41_13 PM (3).png",
+      "sha256": "243f3ef34eaaef4559e7b971791f78d3a9d65b1142bf4cd80168d126f0319a6d",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2372787,
+      "width": 1672,
+      "height": 941,
+      "aspectRatio": "1.777:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "EVIDENCE_PRISM",
+      "secondaryTags": [
+        "prism",
+        "book-pedestal",
+        "marble-steps",
+        "mountain-dawn",
+        "celestial-orbs",
+        "ha-long-mountains"
+      ],
+      "mood": "CINEMATIC_WONDER",
+      "visualDensity": "MEDIUM",
+      "humanPresent": true,
+      "humanCountApprox": 1,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Traveler standing on terrace.",
+      "embeddedTextRisk": "TEXT_NONE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.65,
+        "y": 0.45
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "SAFE",
+        "center": "LIMITED",
+        "right": "LIMITED",
+        "bottom": "LIMITED"
+      },
+      "preferredCopyColor": "LIGHT_TEXT",
+      "routeSuitability": {
+        "LANDING": 5,
+        "TRUST": 4,
+        "COMMUNITY": 3,
+        "EXPERT": 2,
+        "CASES": 3,
+        "DASHBOARD": 2,
+        "SETTINGS": 1,
+        "ABOUT": 5,
+        "SYSTEM_STATE": 3,
+        "OG_SOCIAL": 5,
+        "BACKGROUND": 5,
+        "REFERENCE_ONLY": 4
+      },
+      "recommendedUses": [
+        "PRIMARY_HERO",
+        "SECONDARY_HERO",
+        "SECTION_BACKGROUND",
+        "OG_IMAGE"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_METRIC"
+      ],
+      "fullFrameSafety": "SAFE_FULL_FRAME",
+      "responsiveStrategy": "PRISM_LOCK",
+      "mobileClassification": "MOBILE_CROP_REQUIRED",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "heroDesktop",
+        "sectionDesktop",
+        "tablet",
+        "mobile",
+        "og"
+      ],
+      "lcpClass": "LCP_CANDIDATE",
+      "compatibleEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX02_DEPTH_PARALLAX",
+        "FX03_PRISM_LIGHT_SWEEP"
+      ],
+      "preferredEffect": "FX01_CINEMATIC_REVEAL",
+      "maximumMotionIntensity": 3,
+      "mobileMotionMaximum": 2,
+      "reducedMotionFallback": "STATIC_FADE",
+      "notes": "Outdoor marble observatory overlooking mist-covered Vietnamese karst mountains at golden dawn. Huge crystal pyramid on leather book plinth."
+    },
+    {
+      "assetId": "KM-PRISM-005",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_41_13 PM (4).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_41_13 PM (4).png",
+      "sha256": "97eeb7294eab3e3f34fc09b927bd0fa3d9cf8318da5276560c835cc97a734272",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2049748,
+      "width": 1672,
+      "height": 941,
+      "aspectRatio": "1.777:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "EVIDENCE_PRISM",
+      "secondaryTags": [
+        "prism",
+        "minimalist",
+        "white-hall",
+        "caustics",
+        "spectral",
+        "clean-negative-space"
+      ],
+      "mood": "EDITORIAL_CALM",
+      "visualDensity": "LOW",
+      "humanPresent": true,
+      "humanCountApprox": 1,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Silhouette at base of prism.",
+      "embeddedTextRisk": "TEXT_NONE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.6,
+        "y": 0.6
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "SAFE",
+        "center": "SAFE",
+        "right": "LIMITED",
+        "bottom": "LIMITED"
+      },
+      "preferredCopyColor": "DARK_TEXT",
+      "routeSuitability": {
+        "LANDING": 5,
+        "TRUST": 5,
+        "COMMUNITY": 3,
+        "EXPERT": 3,
+        "CASES": 4,
+        "DASHBOARD": 3,
+        "SETTINGS": 3,
+        "ABOUT": 5,
+        "SYSTEM_STATE": 4,
+        "OG_SOCIAL": 4,
+        "BACKGROUND": 5,
+        "REFERENCE_ONLY": 4
+      },
+      "recommendedUses": [
+        "PRIMARY_HERO",
+        "SECONDARY_HERO",
+        "SECTION_BACKGROUND",
+        "TRANSITION_MEDIA"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_METRIC"
+      ],
+      "fullFrameSafety": "SAFE_FULL_FRAME",
+      "responsiveStrategy": "PRISM_LOCK",
+      "mobileClassification": "MOBILE_PRIMARY",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "heroDesktop",
+        "sectionDesktop",
+        "tablet",
+        "mobile",
+        "og"
+      ],
+      "lcpClass": "LCP_CANDIDATE",
+      "compatibleEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX07_AMBIENT_FIELD"
+      ],
+      "preferredEffect": "FX03_PRISM_LIGHT_SWEEP",
+      "maximumMotionIntensity": 4,
+      "mobileMotionMaximum": 3,
+      "reducedMotionFallback": "STATIC_FADE",
+      "notes": "Minimalist high-key editorial composition. Vast soft white atmosphere with generous negative space on the left, perfect for copy overlay."
+    },
+    {
+      "assetId": "KM-DUP-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_41_17 PM (1).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_41_17 PM (1).png",
+      "sha256": "6e7a76e2bca63b3ba726e062f4d3a57dbb6bf484cf3b01306f05fed5ac67db38",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2104074,
+      "width": 1672,
+      "height": 941,
+      "aspectRatio": "1.777:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "EXACT_DUPLICATE",
+      "duplicateTarget": "KM-PRISM-002",
+      "primaryFamily": "REFERENCE_ONLY",
+      "secondaryTags": [
+        "duplicate"
+      ],
+      "mood": "CINEMATIC_WONDER",
+      "visualDensity": "HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 1,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY.",
+      "embeddedTextRisk": "TEXT_NONE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.65,
+        "y": 0.55
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "SAFE",
+        "center": "LIMITED",
+        "right": "LIMITED",
+        "bottom": "LIMITED"
+      },
+      "preferredCopyColor": "LIGHT_TEXT",
+      "routeSuitability": {
+        "LANDING": 0,
+        "TRUST": 0,
+        "COMMUNITY": 0,
+        "EXPERT": 0,
+        "CASES": 0,
+        "DASHBOARD": 0,
+        "SETTINGS": 0,
+        "ABOUT": 0,
+        "SYSTEM_STATE": 0,
+        "OG_SOCIAL": 0,
+        "BACKGROUND": 0,
+        "REFERENCE_ONLY": 5
+      },
+      "recommendedUses": [
+        "REFERENCE_ONLY"
+      ],
+      "forbiddenUses": [
+        "ALL_PRODUCTION_USE"
+      ],
+      "fullFrameSafety": "REFERENCE_ONLY",
+      "responsiveStrategy": "MOBILE_AVOID",
+      "mobileClassification": "MOBILE_AVOID",
+      "performanceClass": "SOURCE_ARCHIVE_ONLY",
+      "derivativePlan": [],
+      "lcpClass": "NEVER_PRELOAD",
+      "compatibleEffects": [],
+      "preferredEffect": "NONE",
+      "maximumMotionIntensity": 0,
+      "mobileMotionMaximum": 0,
+      "reducedMotionFallback": "NONE",
+      "notes": "Binary duplicate of KM-PRISM-002 (sha256 matches exactly 6e7a76e2bca6...)."
+    },
+    {
+      "assetId": "KM-DUP-002",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_41_17 PM (2).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_41_17 PM (2).png",
+      "sha256": "9f0ed43d3feb1aa6a4dcef767f80e0f2309e21310dcc58202dce09609ce8a3ed",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2195219,
+      "width": 1672,
+      "height": 941,
+      "aspectRatio": "1.777:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "EXACT_DUPLICATE",
+      "duplicateTarget": "KM-PRISM-003",
+      "primaryFamily": "REFERENCE_ONLY",
+      "secondaryTags": [
+        "duplicate"
+      ],
+      "mood": "CINEMATIC_WONDER",
+      "visualDensity": "HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 1,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY.",
+      "embeddedTextRisk": "TEXT_NONE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.6,
+        "y": 0.55
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "SAFE",
+        "center": "LIMITED",
+        "right": "LIMITED",
+        "bottom": "LIMITED"
+      },
+      "preferredCopyColor": "LIGHT_TEXT",
+      "routeSuitability": {
+        "LANDING": 0,
+        "TRUST": 0,
+        "COMMUNITY": 0,
+        "EXPERT": 0,
+        "CASES": 0,
+        "DASHBOARD": 0,
+        "SETTINGS": 0,
+        "ABOUT": 0,
+        "SYSTEM_STATE": 0,
+        "OG_SOCIAL": 0,
+        "BACKGROUND": 0,
+        "REFERENCE_ONLY": 5
+      },
+      "recommendedUses": [
+        "REFERENCE_ONLY"
+      ],
+      "forbiddenUses": [
+        "ALL_PRODUCTION_USE"
+      ],
+      "fullFrameSafety": "REFERENCE_ONLY",
+      "responsiveStrategy": "MOBILE_AVOID",
+      "mobileClassification": "MOBILE_AVOID",
+      "performanceClass": "SOURCE_ARCHIVE_ONLY",
+      "derivativePlan": [],
+      "lcpClass": "NEVER_PRELOAD",
+      "compatibleEffects": [],
+      "preferredEffect": "NONE",
+      "maximumMotionIntensity": 0,
+      "mobileMotionMaximum": 0,
+      "reducedMotionFallback": "NONE",
+      "notes": "Binary duplicate of KM-PRISM-003 (sha256 matches exactly 9f0ed43d3feb...)."
+    },
+    {
+      "assetId": "KM-DUP-003",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_41_17 PM (3).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_41_17 PM (3).png",
+      "sha256": "243f3ef34eaaef4559e7b971791f78d3a9d65b1142bf4cd80168d126f0319a6d",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2372787,
+      "width": 1672,
+      "height": 941,
+      "aspectRatio": "1.777:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "EXACT_DUPLICATE",
+      "duplicateTarget": "KM-PRISM-004",
+      "primaryFamily": "REFERENCE_ONLY",
+      "secondaryTags": [
+        "duplicate"
+      ],
+      "mood": "CINEMATIC_WONDER",
+      "visualDensity": "MEDIUM",
+      "humanPresent": true,
+      "humanCountApprox": 1,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY.",
+      "embeddedTextRisk": "TEXT_NONE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.65,
+        "y": 0.45
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "SAFE",
+        "center": "LIMITED",
+        "right": "LIMITED",
+        "bottom": "LIMITED"
+      },
+      "preferredCopyColor": "LIGHT_TEXT",
+      "routeSuitability": {
+        "LANDING": 0,
+        "TRUST": 0,
+        "COMMUNITY": 0,
+        "EXPERT": 0,
+        "CASES": 0,
+        "DASHBOARD": 0,
+        "SETTINGS": 0,
+        "ABOUT": 0,
+        "SYSTEM_STATE": 0,
+        "OG_SOCIAL": 0,
+        "BACKGROUND": 0,
+        "REFERENCE_ONLY": 5
+      },
+      "recommendedUses": [
+        "REFERENCE_ONLY"
+      ],
+      "forbiddenUses": [
+        "ALL_PRODUCTION_USE"
+      ],
+      "fullFrameSafety": "REFERENCE_ONLY",
+      "responsiveStrategy": "MOBILE_AVOID",
+      "mobileClassification": "MOBILE_AVOID",
+      "performanceClass": "SOURCE_ARCHIVE_ONLY",
+      "derivativePlan": [],
+      "lcpClass": "NEVER_PRELOAD",
+      "compatibleEffects": [],
+      "preferredEffect": "NONE",
+      "maximumMotionIntensity": 0,
+      "mobileMotionMaximum": 0,
+      "reducedMotionFallback": "NONE",
+      "notes": "Binary duplicate of KM-PRISM-004 (sha256 matches exactly 243f3ef34eaa...)."
+    },
+    {
+      "assetId": "KM-DUP-004",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_41_17 PM (4).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_41_17 PM (4).png",
+      "sha256": "97eeb7294eab3e3f34fc09b927bd0fa3d9cf8318da5276560c835cc97a734272",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2049748,
+      "width": 1672,
+      "height": 941,
+      "aspectRatio": "1.777:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "EXACT_DUPLICATE",
+      "duplicateTarget": "KM-PRISM-005",
+      "primaryFamily": "REFERENCE_ONLY",
+      "secondaryTags": [
+        "duplicate"
+      ],
+      "mood": "EDITORIAL_CALM",
+      "visualDensity": "LOW",
+      "humanPresent": true,
+      "humanCountApprox": 1,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY.",
+      "embeddedTextRisk": "TEXT_NONE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.6,
+        "y": 0.6
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "SAFE",
+        "center": "SAFE",
+        "right": "LIMITED",
+        "bottom": "LIMITED"
+      },
+      "preferredCopyColor": "DARK_TEXT",
+      "routeSuitability": {
+        "LANDING": 0,
+        "TRUST": 0,
+        "COMMUNITY": 0,
+        "EXPERT": 0,
+        "CASES": 0,
+        "DASHBOARD": 0,
+        "SETTINGS": 0,
+        "ABOUT": 0,
+        "SYSTEM_STATE": 0,
+        "OG_SOCIAL": 0,
+        "BACKGROUND": 0,
+        "REFERENCE_ONLY": 5
+      },
+      "recommendedUses": [
+        "REFERENCE_ONLY"
+      ],
+      "forbiddenUses": [
+        "ALL_PRODUCTION_USE"
+      ],
+      "fullFrameSafety": "REFERENCE_ONLY",
+      "responsiveStrategy": "MOBILE_AVOID",
+      "mobileClassification": "MOBILE_AVOID",
+      "performanceClass": "SOURCE_ARCHIVE_ONLY",
+      "derivativePlan": [],
+      "lcpClass": "NEVER_PRELOAD",
+      "compatibleEffects": [],
+      "preferredEffect": "NONE",
+      "maximumMotionIntensity": 0,
+      "mobileMotionMaximum": 0,
+      "reducedMotionFallback": "NONE",
+      "notes": "Binary duplicate of KM-PRISM-005 (sha256 matches exactly 97eeb7294eab...)."
+    },
+    {
+      "assetId": "KM-BRAND-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_41_25 PM.png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_41_25 PM.png",
+      "sha256": "3ea9e4601bc64a56a5dcdc762078b541787533e697f8d2cc4ea116939e105933",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2272875,
+      "width": 1536,
+      "height": 1024,
+      "aspectRatio": "1.500:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "BRAND_KHAI_MINH",
+      "secondaryTags": [
+        "brand-master",
+        "hero-landing",
+        "student-desk",
+        "hanoi-skyline",
+        "thap-rua",
+        "prism-refraction",
+        "stats-banner"
+      ],
+      "mood": "BRAND_MONUMENTAL",
+      "visualDensity": "VERY_HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 1,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Vietnamese female student at window desk.",
+      "embeddedTextRisk": "TEXT_FAKE_STATISTICS",
+      "realityRisk": "REALITY_RISK_HIGH",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.6
+      },
+      "safeOverlayRegions": {
+        "top": "UNSAFE",
+        "left": "UNSAFE",
+        "center": "UNSAFE",
+        "right": "UNSAFE",
+        "bottom": "UNSAFE"
+      },
+      "preferredCopyColor": "NO_TEXT_OVERLAY",
+      "routeSuitability": {
+        "LANDING": 5,
+        "TRUST": 3,
+        "COMMUNITY": 3,
+        "EXPERT": 2,
+        "CASES": 2,
+        "DASHBOARD": 1,
+        "SETTINGS": 1,
+        "ABOUT": 4,
+        "SYSTEM_STATE": 1,
+        "OG_SOCIAL": 4,
+        "BACKGROUND": 1,
+        "REFERENCE_ONLY": 5
+      },
+      "recommendedUses": [
+        "REFERENCE_ONLY",
+        "SECTION_MEDIA",
+        "SAFE_WITH_CROP"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_METRIC",
+        "NOT_REAL_USER_PROFILE"
+      ],
+      "fullFrameSafety": "SAFE_WITH_CROP",
+      "responsiveStrategy": "SUBJECT_LOCK",
+      "mobileClassification": "MOBILE_CROP_REQUIRED",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "heroDesktop",
+        "sectionDesktop",
+        "tablet",
+        "mobile"
+      ],
+      "lcpClass": "LCP_CANDIDATE",
+      "compatibleEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX03_PRISM_LIGHT_SWEEP"
+      ],
+      "preferredEffect": "FX01_CINEMATIC_REVEAL",
+      "maximumMotionIntensity": 2,
+      "mobileMotionMaximum": 1,
+      "reducedMotionFallback": "STATIC_FADE",
+      "notes": "Full master brand vision containing embedded UI, headline, stats banner (500K+, 1200+ Experts), student at window overlooking Hanoi Thap Rua. Must NOT show fake stats as live claims in production; crop or mask embedded UI."
+    },
+    {
+      "assetId": "KM-SHEET-002",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_49_19 PM.png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_49_19 PM.png",
+      "sha256": "14c864cc2d9394b9352b75b0a5492cc7bc6ec9ae30cf3a7419e25b716d3c1124",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2623163,
+      "width": 1536,
+      "height": 1024,
+      "aspectRatio": "1.500:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "CONTACT_SHEET",
+      "duplicateTarget": null,
+      "primaryFamily": "EDITORIAL_KNOWLEDGE",
+      "secondaryTags": [
+        "contact-sheet",
+        "storyboard",
+        "cards-12-21",
+        "expert-profile",
+        "ai-tools",
+        "dashboard",
+        "settings",
+        "mission"
+      ],
+      "mood": "ACADEMIC_ARCHIVE",
+      "visualDensity": "VERY_HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 18,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Never classify as real student, real expert, or real reviewer.",
+      "embeddedTextRisk": "TEXT_ROUTE_LABEL_ONLY",
+      "realityRisk": "REALITY_RISK_MEDIUM",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "safeOverlayRegions": {
+        "top": "LIMITED",
+        "left": "LIMITED",
+        "center": "UNSAFE",
+        "right": "LIMITED",
+        "bottom": "LIMITED"
+      },
+      "preferredCopyColor": "LIGHT_TEXT",
+      "routeSuitability": {
+        "LANDING": 3,
+        "TRUST": 3,
+        "COMMUNITY": 4,
+        "EXPERT": 4,
+        "CASES": 2,
+        "DASHBOARD": 2,
+        "SETTINGS": 2,
+        "ABOUT": 4,
+        "SYSTEM_STATE": 1,
+        "OG_SOCIAL": 2,
+        "BACKGROUND": 1,
+        "REFERENCE_ONLY": 5
+      },
+      "recommendedUses": [
+        "REFERENCE_ONLY",
+        "SECTION_MEDIA"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_EXPERT_PROFILE",
+        "NOT_REAL_METRIC"
+      ],
+      "fullFrameSafety": "REFERENCE_ONLY",
+      "responsiveStrategy": "MOBILE_AVOID",
+      "mobileClassification": "MOBILE_AVOID",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "thumbnail"
+      ],
+      "lcpClass": "NEVER_PRELOAD",
+      "compatibleEffects": [
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX06_DISCOVERY_MARKERS"
+      ],
+      "preferredEffect": "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+      "maximumMotionIntensity": 2,
+      "mobileMotionMaximum": 1,
+      "reducedMotionFallback": "STATIC_GRID",
+      "notes": "10-card storyboard contact sheet containing Cards 12 through 21 (Learning Space, Community Discussion, Expert Profile, Expert Verification, AI Tools, Personal Dashboard, Settings, Mission, Contact)."
+    },
+    {
+      "assetId": "KM-EXPERT-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_55_07 PM (1).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_55_07 PM (1).png",
+      "sha256": "4b880d8e8854843460b303efbdd197696237a5d86f314bf13b57a8fa479e583c",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2439235,
+      "width": 1448,
+      "height": 1086,
+      "aspectRatio": "1.333:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "EXPERT_HUMAN_JUDGMENT",
+      "secondaryTags": [
+        "expert",
+        "human-judgment",
+        "fountain-pen",
+        "paper-annotation",
+        "hanoi-lake",
+        "desk",
+        "final-judgment"
+      ],
+      "mood": "HUMAN_WARMTH",
+      "visualDensity": "HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 1,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Hand with fountain pen annotating draft.",
+      "embeddedTextRisk": "TEXT_FAKE_PRODUCT_UI",
+      "realityRisk": "REALITY_RISK_HIGH",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.75
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "LIMITED",
+        "center": "UNSAFE",
+        "right": "LIMITED",
+        "bottom": "UNSAFE"
+      },
+      "preferredCopyColor": "DARK_TEXT",
+      "routeSuitability": {
+        "LANDING": 4,
+        "TRUST": 5,
+        "COMMUNITY": 3,
+        "EXPERT": 5,
+        "CASES": 3,
+        "DASHBOARD": 2,
+        "SETTINGS": 1,
+        "ABOUT": 4,
+        "SYSTEM_STATE": 2,
+        "OG_SOCIAL": 4,
+        "BACKGROUND": 2,
+        "REFERENCE_ONLY": 4
+      },
+      "recommendedUses": [
+        "SECONDARY_HERO",
+        "SECTION_MEDIA",
+        "SAFE_WITH_CROP"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_EXPERT_PROFILE",
+        "NOT_REAL_TRUST_EVIDENCE"
+      ],
+      "fullFrameSafety": "SAFE_WITH_CROP",
+      "responsiveStrategy": "HUMAN_LOCK",
+      "mobileClassification": "MOBILE_CROP_REQUIRED",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "heroDesktop",
+        "sectionDesktop",
+        "tablet",
+        "mobile",
+        "thumbnail"
+      ],
+      "lcpClass": "ABOVE_FOLD_NON_LCP",
+      "compatibleEffects": [
+        "FX04_KNOWLEDGE_GLASS",
+        "FX11_HUMAN_IN_THE_LOOP_PROOF"
+      ],
+      "preferredEffect": "FX11_HUMAN_IN_THE_LOOP_PROOF",
+      "maximumMotionIntensity": 3,
+      "mobileMotionMaximum": 1,
+      "reducedMotionFallback": "STATIC_FADE",
+      "notes": "Human-in-the-loop anchor visual: 'AI proposes. Evidence supports. Humans judge.' Glass HUD floating above manuscript with sticky notes and fountain pen annotation."
+    },
+    {
+      "assetId": "KM-AI-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_55_08 PM (2).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_55_08 PM (2).png",
+      "sha256": "76fc48930db96e2a8aa0caa3bdee4c9e2e2676499762240a25b3f9ff5a1ebc50",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2711214,
+      "width": 1672,
+      "height": 941,
+      "aspectRatio": "1.777:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "AI_RESEARCH_SYNTHESIS",
+      "secondaryTags": [
+        "ai-research",
+        "citations",
+        "contradictions",
+        "pathways",
+        "hanoi-lake",
+        "desk",
+        "magnifying-glass"
+      ],
+      "mood": "FUTURE_KNOWLEDGE",
+      "visualDensity": "HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 4,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Students sitting by lake in background and illustrative expert avatars.",
+      "embeddedTextRisk": "TEXT_FAKE_CITATION",
+      "realityRisk": "REALITY_RISK_HIGH",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.55
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "LIMITED",
+        "center": "UNSAFE",
+        "right": "LIMITED",
+        "bottom": "UNSAFE"
+      },
+      "preferredCopyColor": "DARK_TEXT",
+      "routeSuitability": {
+        "LANDING": 4,
+        "TRUST": 5,
+        "COMMUNITY": 3,
+        "EXPERT": 4,
+        "CASES": 4,
+        "DASHBOARD": 3,
+        "SETTINGS": 1,
+        "ABOUT": 4,
+        "SYSTEM_STATE": 2,
+        "OG_SOCIAL": 4,
+        "BACKGROUND": 2,
+        "REFERENCE_ONLY": 4
+      },
+      "recommendedUses": [
+        "SECONDARY_HERO",
+        "SECTION_MEDIA",
+        "SAFE_WITH_CROP"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_CITATION",
+        "NOT_REAL_EXPERT_PROFILE"
+      ],
+      "fullFrameSafety": "SAFE_WITH_CROP",
+      "responsiveStrategy": "SUBJECT_LOCK",
+      "mobileClassification": "MOBILE_CROP_REQUIRED",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "heroDesktop",
+        "sectionDesktop",
+        "tablet",
+        "mobile"
+      ],
+      "lcpClass": "BELOW_FOLD",
+      "compatibleEffects": [
+        "FX04_KNOWLEDGE_GLASS",
+        "FX06_DISCOVERY_MARKERS",
+        "FX10_NOISE_TO_KNOWLEDGE"
+      ],
+      "preferredEffect": "FX04_KNOWLEDGE_GLASS",
+      "maximumMotionIntensity": 2,
+      "mobileMotionMaximum": 1,
+      "reducedMotionFallback": "STATIC_FADE",
+      "notes": "Query node 'What are the long-term impacts of urban green spaces on mental health?' branching into Citations, Related Concepts, Contradictions, and Research Pathways."
+    },
+    {
+      "assetId": "KM-ATLAS-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_55_08 PM (3).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_55_08 PM (3).png",
+      "sha256": "20efd369c5352adf4755e25c33c62cab2b91f7cded4dab681957615338b27be3",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 3102604,
+      "width": 1916,
+      "height": 821,
+      "aspectRatio": "2.334:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "KNOWLEDGE_ATLAS",
+      "secondaryTags": [
+        "knowledge-atlas",
+        "celestial-orrery",
+        "planetary-spheres",
+        "panoramic",
+        "technology",
+        "science",
+        "society",
+        "culture",
+        "economics"
+      ],
+      "mood": "CINEMATIC_WONDER",
+      "visualDensity": "VERY_HIGH",
+      "humanPresent": false,
+      "humanCountApprox": 0,
+      "humanUsagePolicy": "NONE_PRESENT",
+      "embeddedTextRisk": "TEXT_BRAND_SAFE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.55
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "LIMITED",
+        "center": "LIMITED",
+        "right": "LIMITED",
+        "bottom": "UNSAFE"
+      },
+      "preferredCopyColor": "LIGHT_TEXT",
+      "routeSuitability": {
+        "LANDING": 5,
+        "TRUST": 4,
+        "COMMUNITY": 4,
+        "EXPERT": 3,
+        "CASES": 4,
+        "DASHBOARD": 2,
+        "SETTINGS": 1,
+        "ABOUT": 5,
+        "SYSTEM_STATE": 3,
+        "OG_SOCIAL": 5,
+        "BACKGROUND": 4,
+        "REFERENCE_ONLY": 4
+      },
+      "recommendedUses": [
+        "SECONDARY_HERO",
+        "SECTION_BACKGROUND",
+        "SECTION_MEDIA",
+        "OG_IMAGE"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_METRIC"
+      ],
+      "fullFrameSafety": "SAFE_FULL_FRAME",
+      "responsiveStrategy": "PRISM_LOCK",
+      "mobileClassification": "MOBILE_CROP_REQUIRED",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "heroDesktop",
+        "sectionDesktop",
+        "tablet",
+        "mobile",
+        "og"
+      ],
+      "lcpClass": "BELOW_FOLD",
+      "compatibleEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX02_DEPTH_PARALLAX",
+        "FX06_DISCOVERY_MARKERS",
+        "FX12_KNOWLEDGE_ATLAS"
+      ],
+      "preferredEffect": "FX12_KNOWLEDGE_ATLAS",
+      "maximumMotionIntensity": 3,
+      "mobileMotionMaximum": 1,
+      "reducedMotionFallback": "STATIC_FADE",
+      "notes": "Ultrawide 21:9 panoramic constellation linking Science, Technology, Society, Culture, Economics to central Evidence Prism. Directly inspires Arstraumur 3D orrery."
+    },
+    {
+      "assetId": "KM-CRITICAL-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_55_09 PM (4).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_55_09 PM (4).png",
+      "sha256": "18512b85fa67b0491ea4028af45eff19c5cf20c52d4904b6c7933ccb98c574b4",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2721523,
+      "width": 1448,
+      "height": 1086,
+      "aspectRatio": "1.333:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "CRITICAL_THINKING_EDUCATION",
+      "secondaryTags": [
+        "critical-thinking",
+        "neural-brain",
+        "synapse",
+        "socrates",
+        "kahneman",
+        "arendt",
+        "bias-detection",
+        "philosophy"
+      ],
+      "mood": "FUTURE_KNOWLEDGE",
+      "visualDensity": "HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 5,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Historical engravings of Socrates, Arendt, Kahneman, and student group photo.",
+      "embeddedTextRisk": "TEXT_DECORATIVE_LOW_RISK",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "LIMITED",
+        "center": "UNSAFE",
+        "right": "LIMITED",
+        "bottom": "UNSAFE"
+      },
+      "preferredCopyColor": "DARK_TEXT",
+      "routeSuitability": {
+        "LANDING": 4,
+        "TRUST": 4,
+        "COMMUNITY": 3,
+        "EXPERT": 4,
+        "CASES": 3,
+        "DASHBOARD": 2,
+        "SETTINGS": 1,
+        "ABOUT": 5,
+        "SYSTEM_STATE": 2,
+        "OG_SOCIAL": 4,
+        "BACKGROUND": 2,
+        "REFERENCE_ONLY": 4
+      },
+      "recommendedUses": [
+        "SECONDARY_HERO",
+        "SECTION_MEDIA",
+        "SAFE_WITH_CROP"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_CITATION"
+      ],
+      "fullFrameSafety": "SAFE_WITH_CROP",
+      "responsiveStrategy": "SUBJECT_LOCK",
+      "mobileClassification": "MOBILE_CROP_REQUIRED",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "heroDesktop",
+        "sectionDesktop",
+        "tablet",
+        "mobile"
+      ],
+      "lcpClass": "BELOW_FOLD",
+      "compatibleEffects": [
+        "FX04_KNOWLEDGE_GLASS",
+        "FX06_DISCOVERY_MARKERS",
+        "FX07_AMBIENT_FIELD"
+      ],
+      "preferredEffect": "FX04_KNOWLEDGE_GLASS",
+      "maximumMotionIntensity": 2,
+      "mobileMotionMaximum": 1,
+      "reducedMotionFallback": "STATIC_FADE",
+      "notes": "Luminous neural brain surrounded by philosophical quotes and bias mitigation workflows (Analyze, Evaluate, Question, Synthesize). High educational depth."
+    },
+    {
+      "assetId": "KM-DASHBOARD-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_55_09 PM (5).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_55_09 PM (5).png",
+      "sha256": "c6f3e0621948b19f57055f45bae0463fc67544ca772ac10ce4b531ffee3435b4",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2038819,
+      "width": 1586,
+      "height": 992,
+      "aspectRatio": "1.599:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "DASHBOARD_WORKSPACE",
+      "secondaryTags": [
+        "dashboard",
+        "workspace",
+        "ui-mockup",
+        "good-morning",
+        "education-gap",
+        "confidence-chart",
+        "impact-metrics"
+      ],
+      "mood": "PRODUCT_PRECISION",
+      "visualDensity": "VERY_HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 5,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Fake student avatar 'Minh Nguyen' and community avatars.",
+      "embeddedTextRisk": "TEXT_FAKE_STATISTICS",
+      "realityRisk": "REALITY_RISK_CRITICAL",
+      "focalPoint": {
+        "x": 0.45,
+        "y": 0.45
+      },
+      "safeOverlayRegions": {
+        "top": "UNSAFE",
+        "left": "UNSAFE",
+        "center": "UNSAFE",
+        "right": "UNSAFE",
+        "bottom": "UNSAFE"
+      },
+      "preferredCopyColor": "NO_TEXT_OVERLAY",
+      "routeSuitability": {
+        "LANDING": 3,
+        "TRUST": 2,
+        "COMMUNITY": 2,
+        "EXPERT": 2,
+        "CASES": 3,
+        "DASHBOARD": 5,
+        "SETTINGS": 2,
+        "ABOUT": 2,
+        "SYSTEM_STATE": 1,
+        "OG_SOCIAL": 3,
+        "BACKGROUND": 1,
+        "REFERENCE_ONLY": 5
+      },
+      "recommendedUses": [
+        "REFERENCE_ONLY",
+        "SAFE_WITH_MASK"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_USER_PROFILE",
+        "NOT_REAL_METRIC",
+        "NOT_REAL_COMMUNITY_ACTIVITY",
+        "NOT_REAL_ANALYTICS_DATA"
+      ],
+      "fullFrameSafety": "REFERENCE_ONLY",
+      "responsiveStrategy": "MOBILE_AVOID",
+      "mobileClassification": "MOBILE_AVOID",
+      "performanceClass": "SOURCE_ARCHIVE_ONLY",
+      "derivativePlan": [
+        "thumbnail"
+      ],
+      "lcpClass": "NEVER_PRELOAD",
+      "compatibleEffects": [
+        "FX09_EDITORIAL_MEDIA_FRAME"
+      ],
+      "preferredEffect": "FX09_EDITORIAL_MEDIA_FRAME",
+      "maximumMotionIntensity": 1,
+      "mobileMotionMaximum": 0,
+      "reducedMotionFallback": "STATIC_FRAME",
+      "notes": "Full UI layout for Light Mode Dashboard. Contains simulated user 'Minh Nguyen', fake metric '7 Investigations', fake upvotes, fake investigation list. MUST NEVER be presented as real data."
+    },
+    {
+      "assetId": "KM-CASES-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_55_10 PM (6).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_55_10 PM (6).png",
+      "sha256": "59c2f58353d178ae4a11cb4a3cef7f587a0ac2e27f2aa62825eeac60c9dee6c4",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2766822,
+      "width": 1586,
+      "height": 992,
+      "aspectRatio": "1.599:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "INVESTIGATION_ARCHIVE",
+      "secondaryTags": [
+        "cases",
+        "archive",
+        "investigation-history",
+        "timeline-ui",
+        "story-of-a-lake",
+        "vanishing-coastlines",
+        "hanoi-coordinates"
+      ],
+      "mood": "ACADEMIC_ARCHIVE",
+      "visualDensity": "VERY_HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 10,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Archival photos of historical student movements.",
+      "embeddedTextRisk": "TEXT_FAKE_CASE_DATA",
+      "realityRisk": "REALITY_RISK_HIGH",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "safeOverlayRegions": {
+        "top": "UNSAFE",
+        "left": "UNSAFE",
+        "center": "UNSAFE",
+        "right": "UNSAFE",
+        "bottom": "UNSAFE"
+      },
+      "preferredCopyColor": "NO_TEXT_OVERLAY",
+      "routeSuitability": {
+        "LANDING": 3,
+        "TRUST": 3,
+        "COMMUNITY": 2,
+        "EXPERT": 2,
+        "CASES": 5,
+        "DASHBOARD": 2,
+        "SETTINGS": 1,
+        "ABOUT": 3,
+        "SYSTEM_STATE": 1,
+        "OG_SOCIAL": 3,
+        "BACKGROUND": 1,
+        "REFERENCE_ONLY": 5
+      },
+      "recommendedUses": [
+        "REFERENCE_ONLY",
+        "SECTION_MEDIA",
+        "SAFE_WITH_MASK"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_CASE_ROW",
+        "NOT_REAL_METRIC"
+      ],
+      "fullFrameSafety": "REFERENCE_ONLY",
+      "responsiveStrategy": "MOBILE_AVOID",
+      "mobileClassification": "MOBILE_AVOID",
+      "performanceClass": "SOURCE_ARCHIVE_ONLY",
+      "derivativePlan": [
+        "thumbnail"
+      ],
+      "lcpClass": "NEVER_PRELOAD",
+      "compatibleEffects": [
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX06_DISCOVERY_MARKERS"
+      ],
+      "preferredEffect": "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+      "maximumMotionIntensity": 1,
+      "mobileMotionMaximum": 0,
+      "reducedMotionFallback": "STATIC_FRAME",
+      "notes": "Horizontal case timeline: Case 01 Story of a Lake (Hanoi 2024), Case 02 Vanishing Coastlines (2022), Case 03 A Generation Speaks (2021). Excellent structural reference for /cases."
+    },
+    {
+      "assetId": "KM-SETTINGS-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_55_10 PM (7).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_55_10 PM (7).png",
+      "sha256": "7c137572686b6f35cba4b497f20627454bc622b10e0b95abf9c3911e43e0f557",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2029051,
+      "width": 1586,
+      "height": 992,
+      "aspectRatio": "1.599:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "SETTINGS_PRIVACY_CONTROL",
+      "secondaryTags": [
+        "settings",
+        "privacy",
+        "marble-desk",
+        "sunlit-room",
+        "data-protection",
+        "prism-crystal",
+        "hanoi-window"
+      ],
+      "mood": "EDITORIAL_CALM",
+      "visualDensity": "MEDIUM",
+      "humanPresent": false,
+      "humanCountApprox": 0,
+      "humanUsagePolicy": "NONE_PRESENT",
+      "embeddedTextRisk": "TEXT_BRAND_SAFE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.45,
+        "y": 0.55
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "LIMITED",
+        "center": "UNSAFE",
+        "right": "LIMITED",
+        "bottom": "UNSAFE"
+      },
+      "preferredCopyColor": "DARK_TEXT",
+      "routeSuitability": {
+        "LANDING": 3,
+        "TRUST": 2,
+        "COMMUNITY": 1,
+        "EXPERT": 1,
+        "CASES": 1,
+        "DASHBOARD": 2,
+        "SETTINGS": 5,
+        "ABOUT": 3,
+        "SYSTEM_STATE": 2,
+        "OG_SOCIAL": 3,
+        "BACKGROUND": 2,
+        "REFERENCE_ONLY": 4
+      },
+      "recommendedUses": [
+        "SECONDARY_HERO",
+        "SECTION_MEDIA",
+        "SAFE_WITH_CROP"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_USER_PROFILE"
+      ],
+      "fullFrameSafety": "SAFE_WITH_CROP",
+      "responsiveStrategy": "CENTER_FOCUS",
+      "mobileClassification": "MOBILE_CROP_REQUIRED",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "sectionDesktop",
+        "tablet",
+        "mobile"
+      ],
+      "lcpClass": "BELOW_FOLD",
+      "compatibleEffects": [
+        "FX04_KNOWLEDGE_GLASS",
+        "FX07_AMBIENT_FIELD"
+      ],
+      "preferredEffect": "FX04_KNOWLEDGE_GLASS",
+      "maximumMotionIntensity": 2,
+      "mobileMotionMaximum": 1,
+      "reducedMotionFallback": "STATIC_FADE",
+      "notes": "Sunlit marble desk with glass UI cards: 'Your Space. Your Learning Journey. Private. Precise. Always Yours.' High alignment with /settings and /settings/privacy."
+    },
+    {
+      "assetId": "KM-EDITORIAL-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_55_11 PM (8).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_55_11 PM (8).png",
+      "sha256": "f4bf121756f1d01ffeb3f7f383e72989f3dbd39f9143dfad8bce555b520bc20a",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 1348771,
+      "width": 1122,
+      "height": 1402,
+      "aspectRatio": "0.800:1",
+      "orientation": "portrait",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "EDITORIAL_KNOWLEDGE",
+      "secondaryTags": [
+        "typography",
+        "swiss-editorial",
+        "serif-grotesk",
+        "geometric",
+        "minimalist",
+        "khai-minh-poster"
+      ],
+      "mood": "EDITORIAL_CALM",
+      "visualDensity": "LOW",
+      "humanPresent": false,
+      "humanCountApprox": 0,
+      "humanUsagePolicy": "NONE_PRESENT",
+      "embeddedTextRisk": "TEXT_BRAND_SAFE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.4
+      },
+      "safeOverlayRegions": {
+        "top": "LIMITED",
+        "left": "LIMITED",
+        "center": "UNSAFE",
+        "right": "LIMITED",
+        "bottom": "SAFE"
+      },
+      "preferredCopyColor": "DARK_TEXT",
+      "routeSuitability": {
+        "LANDING": 5,
+        "TRUST": 4,
+        "COMMUNITY": 3,
+        "EXPERT": 3,
+        "CASES": 3,
+        "DASHBOARD": 2,
+        "SETTINGS": 3,
+        "ABOUT": 5,
+        "SYSTEM_STATE": 3,
+        "OG_SOCIAL": 5,
+        "BACKGROUND": 3,
+        "REFERENCE_ONLY": 4
+      },
+      "recommendedUses": [
+        "PRIMARY_HERO",
+        "MOBILE_POSTER",
+        "CARD_MEDIA",
+        "OG_IMAGE"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_METRIC"
+      ],
+      "fullFrameSafety": "SAFE_FULL_FRAME",
+      "responsiveStrategy": "SUBJECT_LOCK",
+      "mobileClassification": "MOBILE_PRIMARY",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "sectionDesktop",
+        "tablet",
+        "mobile",
+        "thumbnail",
+        "og"
+      ],
+      "lcpClass": "LCP_CANDIDATE",
+      "compatibleEffects": [
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX08_MAGNETIC_CTA_CONTEXT"
+      ],
+      "preferredEffect": "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+      "maximumMotionIntensity": 3,
+      "mobileMotionMaximum": 2,
+      "reducedMotionFallback": "STATIC_FRAME",
+      "notes": "Masterwork typographic poster. Huge high-contrast typography: KHAI MINH / HIỂU ĐÚNG. ĐI XA. Perfect for mobile poster and editorial branding."
+    },
+    {
+      "assetId": "KM-PRISM-001",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_55_13 PM (9).png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_55_13 PM (9).png",
+      "sha256": "58d25d8dc656ab72c0ab71243e3ed2774408e98259f95b5d2e5a152cdea65599",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2739175,
+      "width": 1672,
+      "height": 941,
+      "aspectRatio": "1.777:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "UNIQUE_MASTER",
+      "duplicateTarget": null,
+      "primaryFamily": "EVIDENCE_PRISM",
+      "secondaryTags": [
+        "prism-master",
+        "investigate-verify-synthesize-empower",
+        "rainbow-refraction",
+        "hanoi-lake",
+        "classical-library",
+        "manuscript-open"
+      ],
+      "mood": "CINEMATIC_WONDER",
+      "visualDensity": "HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 12,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Students in Hanoi lakeside park and inside grand library.",
+      "embeddedTextRisk": "TEXT_BRAND_SAFE",
+      "realityRisk": "REALITY_RISK_LOW",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.55
+      },
+      "safeOverlayRegions": {
+        "top": "SAFE",
+        "left": "LIMITED",
+        "center": "UNSAFE",
+        "right": "LIMITED",
+        "bottom": "UNSAFE"
+      },
+      "preferredCopyColor": "LIGHT_TEXT",
+      "routeSuitability": {
+        "LANDING": 5,
+        "TRUST": 5,
+        "COMMUNITY": 4,
+        "EXPERT": 4,
+        "CASES": 4,
+        "DASHBOARD": 2,
+        "SETTINGS": 1,
+        "ABOUT": 5,
+        "SYSTEM_STATE": 3,
+        "OG_SOCIAL": 5,
+        "BACKGROUND": 4,
+        "REFERENCE_ONLY": 4
+      },
+      "recommendedUses": [
+        "PRIMARY_HERO",
+        "SECTION_BACKGROUND",
+        "TRANSITION_MEDIA",
+        "OG_IMAGE"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_METRIC"
+      ],
+      "fullFrameSafety": "SAFE_FULL_FRAME",
+      "responsiveStrategy": "PRISM_LOCK",
+      "mobileClassification": "MOBILE_CROP_REQUIRED",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "heroDesktop",
+        "sectionDesktop",
+        "tablet",
+        "mobile",
+        "og"
+      ],
+      "lcpClass": "LCP_CANDIDATE",
+      "compatibleEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX02_DEPTH_PARALLAX",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX10_NOISE_TO_KNOWLEDGE"
+      ],
+      "preferredEffect": "FX03_PRISM_LIGHT_SWEEP",
+      "maximumMotionIntensity": 3,
+      "mobileMotionMaximum": 2,
+      "reducedMotionFallback": "STATIC_FADE",
+      "notes": "The definitive Evidence Prism master visual: chaotic questions enter left, base inscribed INVESTIGATE • VERIFY • SYNTHESIZE • EMPOWER, refracted rainbow rays project glass knowledge cards."
+    },
+    {
+      "assetId": "KM-SHEET-003",
+      "sourceFilename": "ChatGPT Image Sep 10, 2026, 05_59_51 PM.png",
+      "relativePath": "artifacts/source-intake/khai-minh-drive/ChatGPT Image Sep 10, 2026, 05_59_51 PM.png",
+      "sha256": "4a6e1fef88c46e86c3b53b9bcba030580a68134a4c48fb3894567b646d65115c",
+      "mimeType": "image/png",
+      "format": "PNG",
+      "byteSize": 2828400,
+      "width": 1536,
+      "height": 1024,
+      "aspectRatio": "1.500:1",
+      "orientation": "landscape",
+      "alphaChannel": false,
+      "duplicateClass": "CONTACT_SHEET",
+      "duplicateTarget": null,
+      "primaryFamily": "EDITORIAL_KNOWLEDGE",
+      "secondaryTags": [
+        "contact-sheet",
+        "storyboard",
+        "cards-22-30",
+        "pricing",
+        "stories",
+        "faq",
+        "blog",
+        "map",
+        "404",
+        "maintenance",
+        "closing"
+      ],
+      "mood": "ACADEMIC_ARCHIVE",
+      "visualDensity": "VERY_HIGH",
+      "humanPresent": true,
+      "humanCountApprox": 14,
+      "humanUsagePolicy": "ILLUSTRATIVE_ONLY. Never classify as real student, real expert, or real reviewer.",
+      "embeddedTextRisk": "TEXT_ROUTE_LABEL_ONLY",
+      "realityRisk": "REALITY_RISK_MEDIUM",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "safeOverlayRegions": {
+        "top": "LIMITED",
+        "left": "LIMITED",
+        "center": "UNSAFE",
+        "right": "LIMITED",
+        "bottom": "LIMITED"
+      },
+      "preferredCopyColor": "LIGHT_TEXT",
+      "routeSuitability": {
+        "LANDING": 3,
+        "TRUST": 3,
+        "COMMUNITY": 3,
+        "EXPERT": 3,
+        "CASES": 2,
+        "DASHBOARD": 1,
+        "SETTINGS": 1,
+        "ABOUT": 4,
+        "SYSTEM_STATE": 5,
+        "OG_SOCIAL": 2,
+        "BACKGROUND": 1,
+        "REFERENCE_ONLY": 5
+      },
+      "recommendedUses": [
+        "REFERENCE_ONLY",
+        "SECTION_MEDIA",
+        "SYSTEM_STATE"
+      ],
+      "forbiddenUses": [
+        "NOT_REAL_PRICING_DATA",
+        "NOT_REAL_TESTIMONIAL"
+      ],
+      "fullFrameSafety": "REFERENCE_ONLY",
+      "responsiveStrategy": "MOBILE_AVOID",
+      "mobileClassification": "MOBILE_AVOID",
+      "performanceClass": "DERIVATIVE_REQUIRED",
+      "derivativePlan": [
+        "thumbnail"
+      ],
+      "lcpClass": "NEVER_PRELOAD",
+      "compatibleEffects": [
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX06_DISCOVERY_MARKERS"
+      ],
+      "preferredEffect": "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+      "maximumMotionIntensity": 2,
+      "mobileMotionMaximum": 1,
+      "reducedMotionFallback": "STATIC_GRID",
+      "notes": "9-card storyboard contact sheet containing Cards 22 through 30 (Pricing, Stories, FAQ, Blog, Community Map, Expert Hub, 404, Maintenance, Closing Master)."
+    }
+  ]
+}

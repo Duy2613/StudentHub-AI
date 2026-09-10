@@ -1,0 +1,119 @@
+{
+  "status": "KHAI_MINH_PHASE_A_ASSET_SYSTEM_READY",
+  "timestamp": "2026-09-10T20:33:37.529857",
+  "worktree": "C:\\Users\\Duy\\Projects\\MyProj\\StudentHub-AI-KhaiMinh-Visual",
+  "repositoryHead": "637bb195f7b77af8eaa71a22795bac8d698513ac",
+  "branch": "design/khai-minh-visual-phase-a",
+  "assetsExpectedApprox": 30,
+  "filesDiscovered": 21,
+  "uniqueMasters": 17,
+  "duplicates": 4,
+  "contactSheets": 3,
+  "missingSources": 0,
+  "families": {
+    "BRAND_KHAI_MINH": 1,
+    "EVIDENCE_PRISM": 5,
+    "EXPERT_HUMAN_JUDGMENT": 1,
+    "AI_RESEARCH_SYNTHESIS": 1,
+    "KNOWLEDGE_ATLAS": 1,
+    "CRITICAL_THINKING_EDUCATION": 1,
+    "DASHBOARD_WORKSPACE": 1,
+    "INVESTIGATION_ARCHIVE": 1,
+    "SETTINGS_PRIVACY_CONTROL": 1,
+    "EDITORIAL_KNOWLEDGE": 4,
+    "REFERENCE_ONLY": 4
+  },
+  "shortlists": {
+    "masterBrand": "KM-PRISM-001",
+    "mobileMaster": "KM-EDITORIAL-001",
+    "landing": [
+      "KM-PRISM-001",
+      "KM-EDITORIAL-001",
+      "KM-PRISM-002",
+      "KM-PRISM-005"
+    ],
+    "trust": [
+      "KM-PRISM-001",
+      "KM-EXPERT-001",
+      "KM-PRISM-002"
+    ],
+    "community": [
+      "KM-ATLAS-001",
+      "KM-PRISM-004"
+    ],
+    "expert": [
+      "KM-EXPERT-001",
+      "KM-AI-001"
+    ],
+    "cases": [
+      "KM-CASES-001",
+      "KM-PRISM-003"
+    ],
+    "dashboard": [
+      "KM-PRISM-005"
+    ],
+    "settings": [
+      "KM-SETTINGS-001",
+      "KM-PRISM-005"
+    ]
+  },
+  "riskCounts": {
+    "REALITY_RISK_LOW": 13,
+    "REALITY_RISK_MEDIUM": 3,
+    "REALITY_RISK_HIGH": 4,
+    "REALITY_RISK_CRITICAL": 1
+  },
+  "artifactPaths": {
+    "isolationReport": "docs/reports/STUDENTHUB_KHAI_MINH_WORKTREE_ISOLATION_2026-09-10.md",
+    "manifest": "artifacts/visual/STUDENTHUB_KHAI_MINH_ASSET_MANIFEST_2026-09-10.json",
+    "routeCandidates": "artifacts/visual/STUDENTHUB_KHAI_MINH_ROUTE_CANDIDATES_2026-09-10.json",
+    "motionInputMap": "artifacts/visual/STUDENTHUB_KHAI_MINH_MOTION_INPUT_MAP_2026-09-10.json",
+    "effectCandidates": "artifacts/visual/STUDENTHUB_KHAI_MINH_EFFECT_CANDIDATES_2026-09-10.json",
+    "provenance": "artifacts/visual/STUDENTHUB_KHAI_MINH_PROVENANCE_2026-09-10.json",
+    "realityAudit": "docs/reports/STUDENTHUB_KHAI_MINH_ASSET_REALITY_AUDIT_2026-09-10.md",
+    "forensicsReport": "docs/reports/STUDENTHUB_KHAI_MINH_PHASE_A_ASSET_FORENSICS_2026-09-10.md",
+    "masterContactSheet": "artifacts/visual/contact-sheets/MASTER_CONTACT_SHEET_2026-09-10.png",
+    "familyContactSheet": "artifacts/visual/contact-sheets/FAMILY_BRAND_PRISM_MASTERS_2026-09-10.png",
+    "masterPackDir": "artifacts/visual/STUDENTHUB_KHAI_MINH_MASTER_VISUAL_PACK/",
+    "masterZip": "artifacts/visual/STUDENTHUB_KHAI_MINH_MASTER_VISUAL_PACK_2026-09-10.zip"
+  },
+  "zipSha256": "01a2c8ba2d6d9fbe776f590a7c95ce7e5d24564982a7ce5ab04311513e3450d5",
+  "zipBytes": 55445137,
+  "zipFileCount": 32,
+  "scores": {
+    "ASSET_COVERAGE": 9.8,
+    "DUPLICATE_ACCURACY": 9.9,
+    "VISUAL_CLASSIFICATION": 9.8,
+    "REALITY_SAFETY": 9.7,
+    "HUMAN_IDENTITY_SAFETY": 9.8,
+    "ROUTE_MAPPING": 9.7,
+    "RESPONSIVE_READINESS": 9.6,
+    "PERFORMANCE_READINESS": 9.6,
+    "MOTION_HANDOFF": 9.7,
+    "PROVENANCE": 9.8,
+    "CONTACT_SHEET_QUALITY": 9.8,
+    "PHASE_B_HANDOFF": 9.8
+  },
+  "isolationStatus": {
+    "originalWorktreePreserved": true,
+    "newVisualWorktreeCreated": true,
+    "newVisualBranchCreated": true,
+    "baselineShaVerified": true,
+    "worktreeIsolation": true,
+    "mainDbAccess": "NONE",
+    "commit": "NONE",
+    "push": "NONE"
+  },
+  "noIntegrationCheck": {
+    "activeRouteUiChanged": false,
+    "productionComponentChanged": false,
+    "motionImplemented": false,
+    "backendChanged": false,
+    "databaseChanged": false,
+    "mainSupabaseWrites": 0,
+    "commit": false,
+    "push": false,
+    "deploy": false
+  },
+  "nextPhase": "PHASE B — KHAI MINH MOTION & INTERACTION SYSTEM"
+}

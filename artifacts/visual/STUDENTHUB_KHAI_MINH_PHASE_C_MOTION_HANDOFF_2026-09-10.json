@@ -1,0 +1,257 @@
+{
+  "$schema": "https://studenthub.vn/schemas/phase-c-handoff.v1.json",
+  "version": "1.0.0",
+  "releaseDate": "2026-09-10",
+  "system": "StudentHub AI — Phase C Implementation Contracts",
+  "prerequisites": [
+    "Phase A approved visual assets located in artifacts/source-intake/khai-minh-drive/",
+    "Phase B motion token values and route matrix ceilings strictly enforced.",
+    "Zero new third-party animation dependencies added unless approved in tech decision record."
+  ],
+  "contracts": [
+    {
+      "route": "/",
+      "section": "Hero (Desktop & Mobile)",
+      "primaryAssetId": "KM-PRISM-001",
+      "mobileAssetId": "KM-EDITORIAL-001",
+      "effects": [
+        {
+          "effectId": "FX01_CINEMATIC_REVEAL",
+          "technology": "CSS",
+          "intensity": 4,
+          "trigger": "IntersectionObserver on mount",
+          "duration": "520ms",
+          "easing": "cubic-bezier(0.0, 0.0, 0.2, 1.0)",
+          "mobile": "Duration compressed to 280ms, 8px Y offset",
+          "reducedMotion": "150ms opacity fade only, 0px offset"
+        },
+        {
+          "effectId": "FX03_PRISM_LIGHT_SWEEP",
+          "technology": "CSS (pseudo-element gradient)",
+          "intensity": 3,
+          "trigger": "Idle sweep every 8s + subtle pointer enter",
+          "duration": "520ms",
+          "easing": "cubic-bezier(0.2, 0.0, 0.0, 1.0)",
+          "mobile": "Single static shimmer accent",
+          "reducedMotion": "Static 0.2 opacity border accent"
+        },
+        {
+          "effectId": "FX08_MAGNETIC_CTA_CONTEXT",
+          "technology": "CSS + Pointer Proximity Listener",
+          "intensity": 2,
+          "trigger": "Pointer within 24px button radius",
+          "duration": "150ms",
+          "easing": "cubic-bezier(0.25, 1.0, 0.5, 1.0)",
+          "mobile": "Disabled; standard tactile scale(0.985)",
+          "reducedMotion": "Disabled; standard CSS hover only"
+        }
+      ],
+      "implementationPriority": "HIGH",
+      "performanceBudget": "< 1.5ms main thread; 0 CLS",
+      "dataRealityRule": "Hero artwork KM-PRISM-001 is decoupled from live metrics. Any statistics displayed are static verified tier descriptions or durable counts. No simulated live activity."
+    },
+    {
+      "route": "/trust",
+      "section": "Trust Transformation Pipeline",
+      "primaryAssetId": "KM-PRISM-002",
+      "effects": [
+        {
+          "effectId": "FX10_NOISE_TO_KNOWLEDGE",
+          "technology": "CSS / SVG (Scroll-driven stroke & transform)",
+          "intensity": 3,
+          "trigger": "Scroll progress 0.0 to 1.0 through transition section",
+          "duration": "Scroll scrub linked",
+          "easing": "linear",
+          "mobile": "Static side-by-side comparison cards",
+          "reducedMotion": "Static cards with zero scrub"
+        },
+        {
+          "effectId": "FX04_KNOWLEDGE_GLASS",
+          "technology": "CSS",
+          "intensity": 2,
+          "trigger": "Hover or focus on verified citation cards",
+          "duration": "220ms",
+          "easing": "cubic-bezier(0.25, 1.0, 0.5, 1.0)",
+          "mobile": "Touch press depression",
+          "reducedMotion": "Border color transition only"
+        }
+      ],
+      "implementationPriority": "CRITICAL",
+      "performanceBudget": "< 2.0ms main thread; compositor-only execution",
+      "dataRealityRule": "Epistemic humility boundaries strictly enforced. FX10 (Noise to Knowledge) and FX11 (Human in the loop) present AI output as preliminary synthesis requiring human audit. No automated certainty claims."
+    },
+    {
+      "route": "/community",
+      "section": "Knowledge Atlas Constellation",
+      "primaryAssetId": "KM-ATLAS-001",
+      "effects": [
+        {
+          "effectId": "FX12_KNOWLEDGE_ATLAS",
+          "technology": "Declarative SVG",
+          "intensity": 3,
+          "trigger": "Continuous orbital drift with offscreen pause",
+          "duration": "30s loop",
+          "easing": "linear",
+          "mobile": "Replaced by horizontal swipeable card carousel",
+          "reducedMotion": "Static vector constellation diagram"
+        },
+        {
+          "effectId": "FX06_DISCOVERY_MARKERS",
+          "technology": "DOM (<button> elements with SVG overlay)",
+          "intensity": 2,
+          "trigger": "Hotspot click or keyboard Enter",
+          "duration": "150ms marker / 320ms drawer",
+          "easing": "cubic-bezier(0.25, 1.0, 0.5, 1.0)",
+          "mobile": "Tap hotspot or swipe card",
+          "reducedMotion": "Instant popover display without slide"
+        }
+      ],
+      "implementationPriority": "MEDIUM",
+      "performanceBudget": "< 3.0ms main thread; SVG group transforms",
+      "dataRealityRule": "Durable community contributions present -> render them. None -> honest onboarding empty state. No fake contributor avatars or fabricated activity counters."
+    },
+    {
+      "route": "/expert",
+      "section": "Human-in-the-Loop Verification Proof",
+      "primaryAssetId": "KM-EXPERT-001",
+      "effects": [
+        {
+          "effectId": "FX11_HUMAN_IN_THE_LOOP_PROOF",
+          "technology": "React / DOM Component",
+          "intensity": 2,
+          "trigger": "Stepwise tab navigation",
+          "duration": "320ms step transition",
+          "easing": "cubic-bezier(0.25, 1.0, 0.5, 1.0)",
+          "mobile": "Tabbed view with horizontal swipe",
+          "reducedMotion": "Immediate tab switch"
+        }
+      ],
+      "implementationPriority": "HIGH",
+      "performanceBudget": "< 1.0ms main thread; 0 CLS",
+      "dataRealityRule": "Durable verified expert records present -> render directory. None -> honest accreditation empty state. Faces and badge avatars inside concept art (KM-EXPERT-001) are strictly background illustration."
+    },
+    {
+      "route": "/cases",
+      "section": "Case Studies & Archival Dossiers",
+      "primaryAssetId": "KM-CASES-001",
+      "mobileAssetId": "KM-CASES-001",
+      "effects": [
+        {
+          "effectId": "FX01_CINEMATIC_REVEAL",
+          "technology": "CSS",
+          "intensity": 2,
+          "trigger": "IntersectionObserver on mount",
+          "duration": "320ms",
+          "easing": "cubic-bezier(0.0, 0.0, 0.2, 1.0)",
+          "mobile": "180ms opacity fade, 0px offset",
+          "reducedMotion": "Immediate render"
+        },
+        {
+          "effectId": "FX04_KNOWLEDGE_GLASS",
+          "technology": "CSS",
+          "intensity": 2,
+          "trigger": "Hover / Focus",
+          "duration": "180ms",
+          "easing": "cubic-bezier(0.2, 0.0, 0.0, 1.0)",
+          "mobile": "Flat surface opacity, 0px lift",
+          "reducedMotion": "Border color transition only"
+        },
+        {
+          "effectId": "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+          "technology": "CSS Sticky",
+          "intensity": 2,
+          "trigger": "Scroll inside timeline section",
+          "duration": "Section-local",
+          "easing": "Native scroll",
+          "mobile": "Strictly disabled; unpinned stacked list",
+          "reducedMotion": "Strictly unpinned standard document flow"
+        },
+        {
+          "effectId": "FX09_EDITORIAL_MEDIA_FRAME",
+          "technology": "CSS",
+          "intensity": 1,
+          "trigger": "Persistent / Card hover",
+          "duration": "220ms",
+          "easing": "cubic-bezier(0.2, 0.0, 0.0, 1.0)",
+          "mobile": "Static academic crop",
+          "reducedMotion": "Static image (no scale)"
+        }
+      ],
+      "dataRealityRule": "Durable case archives present -> render them. None -> honest archival empty state. Fake case rows inside concept art (KM-CASES-001) are strictly background illustration and must never be rendered as interactive data.",
+      "implementationPriority": "MEDIUM",
+      "performanceBudget": "< 1.0ms main thread; 0 CLS; native scroll preserved"
+    },
+    {
+      "route": "/dashboard",
+      "section": "Authenticated Student Workspace",
+      "primaryAssetId": "KM-PRISM-005",
+      "mobileAssetId": "KM-PRISM-005",
+      "effects": [
+        {
+          "effectId": "FX01_CINEMATIC_REVEAL",
+          "technology": "CSS",
+          "intensity": 1,
+          "trigger": "Mount",
+          "duration": "180ms",
+          "easing": "cubic-bezier(0.0, 0.0, 0.2, 1.0)",
+          "mobile": "Immediate render",
+          "reducedMotion": "Immediate render"
+        },
+        {
+          "effectId": "FX04_KNOWLEDGE_GLASS",
+          "technology": "CSS",
+          "intensity": 1,
+          "trigger": "Focus / Elevation",
+          "duration": "150ms",
+          "easing": "cubic-bezier(0.2, 0.0, 0.0, 1.0)",
+          "mobile": "Flat background, 0px lift",
+          "reducedMotion": "Border color transition only"
+        },
+        {
+          "effectId": "FX09_EDITORIAL_MEDIA_FRAME",
+          "technology": "CSS",
+          "intensity": 1,
+          "trigger": "Persistent",
+          "duration": "0ms",
+          "easing": "linear",
+          "mobile": "Static frame",
+          "reducedMotion": "Static frame"
+        }
+      ],
+      "dataRealityRule": "Authenticated durable student telemetry only. Zero concept art simulation. Ambient fields, orbital loops, and parallax are strictly forbidden to ensure cognitive calm and fast operational focus.",
+      "implementationPriority": "MEDIUM",
+      "performanceBudget": "< 0.5ms main thread; 0 CLS; static dashboard calmness"
+    },
+    {
+      "route": "/settings",
+      "section": "User Preferences & Account Administration",
+      "primaryAssetId": "KM-SETTINGS-001",
+      "mobileAssetId": "KM-SETTINGS-001",
+      "effects": [
+        {
+          "effectId": "FX01_CINEMATIC_REVEAL",
+          "technology": "CSS",
+          "intensity": 1,
+          "trigger": "Mount",
+          "duration": "120ms",
+          "easing": "cubic-bezier(0.0, 0.0, 0.2, 1.0)",
+          "mobile": "Immediate render",
+          "reducedMotion": "Immediate render"
+        },
+        {
+          "effectId": "FX09_EDITORIAL_MEDIA_FRAME",
+          "technology": "CSS",
+          "intensity": 1,
+          "trigger": "Persistent",
+          "duration": "0ms",
+          "easing": "linear",
+          "mobile": "Static frame",
+          "reducedMotion": "Static frame"
+        }
+      ],
+      "dataRealityRule": "Authenticated durable user preferences and privacy controls only. Zero cinematic effects, zero glass blur, zero particle drift. Immediate tactile state toggles only.",
+      "implementationPriority": "LOW",
+      "performanceBudget": "0ms continuous overhead; instant form interactions"
+    }
+  ]
+}

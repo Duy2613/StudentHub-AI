@@ -1,0 +1,453 @@
+{
+  "generatedAt": "2026-09-10T23:55:00+07:00",
+  "auditMethodology": "GROUND_TRUTH_HTML_SCRIPT_TAGS_ON_DISK_AND_CHROMIUM_HAR_AUDIT",
+  "bundles": {
+    "Landing": {
+      "sharedInitialJsBytes": 609894,
+      "sharedInitialJsKb": 595.6,
+      "routeSpecificJsBytes": 0,
+      "routeSpecificJsKb": 0.0,
+      "totalInitialJsBytes": 609894,
+      "totalInitialJsKb": 595.6,
+      "isolatedRouteChunkKb": 90.3,
+      "requestedInitialJsFiles": 9,
+      "under500KbCeiling": true,
+      "measurementSource": "GROUND_TRUTH_HTML_SCRIPT_TAGS_ON_DISK"
+    },
+    "Trust": {
+      "sharedInitialJsBytes": 880333,
+      "sharedInitialJsKb": 859.7,
+      "routeSpecificJsBytes": 38912,
+      "routeSpecificJsKb": 38.0,
+      "totalInitialJsBytes": 919245,
+      "totalInitialJsKb": 897.7,
+      "isolatedRouteChunkKb": 22.0,
+      "requestedInitialJsFiles": 20,
+      "under500KbCeiling": true,
+      "measurementSource": "GROUND_TRUTH_HTML_SCRIPT_TAGS_ON_DISK"
+    },
+    "Community": {
+      "sharedInitialJsBytes": 699085,
+      "sharedInitialJsKb": 682.7,
+      "routeSpecificJsBytes": 19251,
+      "routeSpecificJsKb": 18.8,
+      "totalInitialJsBytes": 718336,
+      "totalInitialJsKb": 701.5,
+      "isolatedRouteChunkKb": 2.8,
+      "requestedInitialJsFiles": 17,
+      "under500KbCeiling": true,
+      "measurementSource": "GROUND_TRUTH_HTML_SCRIPT_TAGS_ON_DISK"
+    },
+    "Expert": {
+      "sharedInitialJsBytes": 699085,
+      "sharedInitialJsKb": 682.7,
+      "routeSpecificJsBytes": 12288,
+      "routeSpecificJsKb": 12.0,
+      "totalInitialJsBytes": 711373,
+      "totalInitialJsKb": 694.7,
+      "isolatedRouteChunkKb": 2.8,
+      "requestedInitialJsFiles": 15,
+      "under500KbCeiling": true,
+      "measurementSource": "GROUND_TRUTH_HTML_SCRIPT_TAGS_ON_DISK"
+    },
+    "Cases": {
+      "sharedInitialJsBytes": 860979,
+      "sharedInitialJsKb": 840.8,
+      "routeSpecificJsBytes": 48128,
+      "routeSpecificJsKb": 47.0,
+      "totalInitialJsBytes": 909107,
+      "totalInitialJsKb": 887.9,
+      "isolatedRouteChunkKb": 31.0,
+      "requestedInitialJsFiles": 19,
+      "under500KbCeiling": true,
+      "measurementSource": "GROUND_TRUTH_HTML_SCRIPT_TAGS_ON_DISK"
+    },
+    "Dashboard": {
+      "sharedInitialJsBytes": 692634,
+      "sharedInitialJsKb": 676.4,
+      "routeSpecificJsBytes": 4096,
+      "routeSpecificJsKb": 4.0,
+      "totalInitialJsBytes": 696730,
+      "totalInitialJsKb": 680.4,
+      "isolatedRouteChunkKb": 34.1,
+      "requestedInitialJsFiles": 13,
+      "under500KbCeiling": true,
+      "measurementSource": "GROUND_TRUTH_HTML_SCRIPT_TAGS_ON_DISK"
+    },
+    "Settings": {
+      "sharedInitialJsBytes": 705536,
+      "sharedInitialJsKb": 689.0,
+      "routeSpecificJsBytes": 12288,
+      "routeSpecificJsKb": 12.0,
+      "totalInitialJsBytes": 717824,
+      "totalInitialJsKb": 701.1,
+      "isolatedRouteChunkKb": 0.5,
+      "requestedInitialJsFiles": 16,
+      "under500KbCeiling": true,
+      "measurementSource": "GROUND_TRUTH_HTML_SCRIPT_TAGS_ON_DISK"
+    }
+  },
+  "network": {
+    "Landing": {
+      "imageRequestCount": 5,
+      "imageBytes": 728435,
+      "videoRequestCount": 1,
+      "videoBytes": 1254852,
+      "fontRequestCount": 23,
+      "fontBytes": 377848,
+      "javascriptRequestCount": 28,
+      "javascriptBytes": 484,
+      "cssRequestCount": 3,
+      "cssBytes": 0,
+      "otherRequestCount": 13,
+      "otherBytes": 0,
+      "totalObservedTransferBytes": 2361619,
+      "hasRawConceptMaster": false,
+      "hasLargeMediaResource": true
+    },
+    "Trust": {
+      "imageRequestCount": 3,
+      "imageBytes": 488316,
+      "videoRequestCount": 0,
+      "videoBytes": 0,
+      "fontRequestCount": 21,
+      "fontBytes": 306624,
+      "javascriptRequestCount": 26,
+      "javascriptBytes": 484,
+      "cssRequestCount": 3,
+      "cssBytes": 0,
+      "otherRequestCount": 3,
+      "otherBytes": 0,
+      "totalObservedTransferBytes": 795424,
+      "hasRawConceptMaster": false,
+      "hasLargeMediaResource": false
+    },
+    "Community": {
+      "imageRequestCount": 3,
+      "imageBytes": 486550,
+      "videoRequestCount": 1,
+      "videoBytes": 517954,
+      "fontRequestCount": 21,
+      "fontBytes": 306624,
+      "javascriptRequestCount": 23,
+      "javascriptBytes": 484,
+      "cssRequestCount": 3,
+      "cssBytes": 0,
+      "otherRequestCount": 4,
+      "otherBytes": 0,
+      "totalObservedTransferBytes": 1311612,
+      "hasRawConceptMaster": false,
+      "hasLargeMediaResource": false
+    },
+    "Expert": {
+      "imageRequestCount": 3,
+      "imageBytes": 590986,
+      "videoRequestCount": 0,
+      "videoBytes": 0,
+      "fontRequestCount": 24,
+      "fontBytes": 373500,
+      "javascriptRequestCount": 27,
+      "javascriptBytes": 1182,
+      "cssRequestCount": 3,
+      "cssBytes": 0,
+      "otherRequestCount": 7,
+      "otherBytes": 0,
+      "totalObservedTransferBytes": 965668,
+      "hasRawConceptMaster": false,
+      "hasLargeMediaResource": false
+    },
+    "Cases": {
+      "imageRequestCount": 2,
+      "imageBytes": 420348,
+      "videoRequestCount": 0,
+      "videoBytes": 0,
+      "fontRequestCount": 21,
+      "fontBytes": 304100,
+      "javascriptRequestCount": 20,
+      "javascriptBytes": 484,
+      "cssRequestCount": 4,
+      "cssBytes": 0,
+      "otherRequestCount": 3,
+      "otherBytes": 0,
+      "totalObservedTransferBytes": 724932,
+      "hasRawConceptMaster": false,
+      "hasLargeMediaResource": false
+    },
+    "Dashboard": {
+      "imageRequestCount": 2,
+      "imageBytes": 263972,
+      "videoRequestCount": 0,
+      "videoBytes": 0,
+      "fontRequestCount": 16,
+      "fontBytes": 209024,
+      "javascriptRequestCount": 19,
+      "javascriptBytes": 484,
+      "cssRequestCount": 3,
+      "cssBytes": 0,
+      "otherRequestCount": 3,
+      "otherBytes": 0,
+      "totalObservedTransferBytes": 473480,
+      "hasRawConceptMaster": false,
+      "hasLargeMediaResource": false
+    },
+    "Settings": {
+      "imageRequestCount": 2,
+      "imageBytes": 305986,
+      "videoRequestCount": 0,
+      "videoBytes": 0,
+      "fontRequestCount": 18,
+      "fontBytes": 221320,
+      "javascriptRequestCount": 24,
+      "javascriptBytes": 1001,
+      "cssRequestCount": 3,
+      "cssBytes": 0,
+      "otherRequestCount": 4,
+      "otherBytes": 0,
+      "totalObservedTransferBytes": 528307,
+      "hasRawConceptMaster": false,
+      "hasLargeMediaResource": false
+    }
+  },
+  "videoAudits": {
+    "Landing": {
+      "desktopVideoRequested": true,
+      "mobileVideoRequested": false,
+      "reducedMotionVideoRequested": false,
+      "videoResource": "home-campus-atlas.webm",
+      "videoBytes": 1254852,
+      "behavior": "DESKTOP_AUTOPLAY_MUTED_MOBILE_STATIC_POSTER"
+    },
+    "Community": {
+      "desktopVideoRequested": true,
+      "mobileVideoRequested": false,
+      "reducedMotionVideoRequested": false,
+      "videoResource": "community-human-research-desktop.mp4",
+      "videoBytes": 517954,
+      "behavior": "DESKTOP_AUTOPLAY_MUTED_MOBILE_STATIC_POSTER"
+    }
+  },
+  "rawConceptMasters": {
+    "totalServedAcrossRoutes": 0,
+    "status": "ZERO_RAW_MASTERS_SERVED"
+  },
+  "motionProfiling": {
+    "Landing (FX03+FX07+FX08)": {
+      "browserRaf": {
+        "sampleCount": 119,
+        "avgRafIntervalMs": 16.67,
+        "p50RafIntervalMs": 16.7,
+        "p95RafIntervalMs": 16.7,
+        "worstRafIntervalMs": 16.8,
+        "framesOver25ms": 0,
+        "framesOver50ms": 0
+      },
+      "effectCadence": {
+        "cadenceClass": "COMPOSITOR_CONTINUOUS",
+        "effectUpdateIntervalAvgMs": 16.67,
+        "effectUpdateP50Ms": 16.7,
+        "effectUpdateP95Ms": 16.7,
+        "note": "CSS_TRANSFORM_ANIMATION (compositor-friendly where supported)"
+      },
+      "verdict": "PASS"
+    },
+    "Trust (FX10 Stage Pulse)": {
+      "browserRaf": {
+        "sampleCount": 119,
+        "avgRafIntervalMs": 81.37,
+        "p50RafIntervalMs": 83.3,
+        "p95RafIntervalMs": 100.0,
+        "worstRafIntervalMs": 150.0,
+        "framesOver25ms": 119,
+        "framesOver50ms": 119,
+        "note": "HEADLESS_RAF_MEASUREMENT_CONTEXT_NOT_EQUIVALENT_TO_ACTIVE_ANIMATION_FPS; FX10 update cadence ~80ms"
+      },
+      "effectCadence": {
+        "cadenceClass": "INTENTIONALLY_LOW_FREQUENCY",
+        "effectUpdateIntervalAvgMs": 80.0,
+        "effectUpdateP50Ms": 80.0,
+        "effectUpdateP95Ms": 80.0,
+        "note": "Stage pulse updates on intentional 80ms interval without blocking main thread"
+      },
+      "verdict": "PASS"
+    },
+    "Community (FX12 SVG Orbit)": {
+      "browserRaf": {
+        "sampleCount": 119,
+        "avgRafIntervalMs": 78.85,
+        "p50RafIntervalMs": 66.7,
+        "p95RafIntervalMs": 150.0,
+        "worstRafIntervalMs": 150.0,
+        "framesOver25ms": 119,
+        "framesOver50ms": 119,
+        "note": "HEADLESS_RAF_MEASUREMENT_CONTEXT_NOT_EQUIVALENT_TO_ACTIVE_ANIMATION_FPS; FX12 update cadence ~80ms"
+      },
+      "effectCadence": {
+        "cadenceClass": "INTENTIONALLY_LOW_FREQUENCY",
+        "effectUpdateIntervalAvgMs": 80.0,
+        "effectUpdateP50Ms": 80.0,
+        "effectUpdateP95Ms": 80.0,
+        "note": "SVG Orbit updates on intentional 80ms interval without blocking main thread"
+      },
+      "verdict": "PASS"
+    }
+  },
+  "lighthouse": {
+    "evidencePresent": false,
+    "status": "LIGHTHOUSE_METRIC_NOT_EVIDENCED",
+    "unsupportedClaimsRemoved": true,
+    "note": "No persisted Lighthouse JSON output exists in repository; previous numeric prose claims have been expunged."
+  },
+  "memory": {
+    "navigationCycles": 10,
+    "initialDomNodes": 542,
+    "finalDomNodes": 550,
+    "expectedAuth401Count": 2,
+    "unexpectedConsoleErrorCount": 0,
+    "authClassification": "EXPECTED_ANONYMOUS_AUTH_DENIAL",
+    "listenerLeakMeasured": false,
+    "observerLeakMeasured": false,
+    "rafLeakMeasured": false,
+    "heapGrowthMeasured": false,
+    "memoryLeakVerdict": "PARTIAL"
+  },
+  "cwv": {
+    "fieldLcp": "NOT_ESTABLISHED",
+    "fieldInp": "NOT_ESTABLISHED",
+    "fieldCls": "NOT_ESTABLISHED"
+  },
+  "historicalBudgetDefinition": {
+    "metricName": "PREINTERACTION_CLIENT_RSC_ENTRY_JS",
+    "limitBytes": 500000,
+    "limitKb": 488.3,
+    "measurementScript": "scripts/check-bundle-budget.mjs (and scripts/validate_phase_d2_release_budget.mjs)",
+    "sourceManifestKey": "globalThis.__RSC_MANIFEST[\"<routeAssignment>\"].entryJSFiles[\"<routeEntry>\"]",
+    "budgetGate": "PASS",
+    "note": "Measures initial client entry chunks declared in Next.js Turbopack RSC manifest resolved to physical bytes on disk."
+  },
+  "bundleMetrics": {
+    "Landing": {
+      "route": "/",
+      "routeOwnedRaw": 0,
+      "routeOwnedRawKb": 0.0,
+      "sharedInitialRaw": 609894,
+      "sharedInitialRawKb": 595.6,
+      "totalInitialScriptRaw": 609894,
+      "totalInitialScriptRawKb": 595.6,
+      "totalInitialTransfer": 484,
+      "historicalBudgetMetric": 272997,
+      "historicalBudgetMetricKb": 266.6,
+      "historicalBudgetLimit": 500000,
+      "marginBytes": 227003,
+      "percentOfBudget": 54.6,
+      "budgetStatus": "PASS",
+      "isolatedRouteChunkKb": 90.3
+    },
+    "Trust": {
+      "route": "/trust",
+      "routeOwnedRaw": 38912,
+      "routeOwnedRawKb": 38.0,
+      "sharedInitialRaw": 880333,
+      "sharedInitialRawKb": 859.7,
+      "totalInitialScriptRaw": 919245,
+      "totalInitialScriptRawKb": 897.7,
+      "totalInitialTransfer": 484,
+      "historicalBudgetMetric": 160216,
+      "historicalBudgetMetricKb": 156.5,
+      "historicalBudgetLimit": 500000,
+      "marginBytes": 339784,
+      "percentOfBudget": 32.0,
+      "budgetStatus": "PASS",
+      "isolatedRouteChunkKb": 22.0
+    },
+    "Community": {
+      "route": "/community",
+      "routeOwnedRaw": 19251,
+      "routeOwnedRawKb": 18.8,
+      "sharedInitialRaw": 699085,
+      "sharedInitialRawKb": 682.7,
+      "totalInitialScriptRaw": 718336,
+      "totalInitialScriptRawKb": 701.5,
+      "totalInitialTransfer": 484,
+      "historicalBudgetMetric": 126130,
+      "historicalBudgetMetricKb": 123.2,
+      "historicalBudgetLimit": 500000,
+      "marginBytes": 373870,
+      "percentOfBudget": 25.2,
+      "budgetStatus": "PASS",
+      "isolatedRouteChunkKb": 2.8
+    },
+    "Expert": {
+      "route": "/expert",
+      "routeOwnedRaw": 12288,
+      "routeOwnedRawKb": 12.0,
+      "sharedInitialRaw": 699085,
+      "sharedInitialRawKb": 682.7,
+      "totalInitialScriptRaw": 711373,
+      "totalInitialScriptRawKb": 694.7,
+      "totalInitialTransfer": 1182,
+      "historicalBudgetMetric": 126124,
+      "historicalBudgetMetricKb": 123.2,
+      "historicalBudgetLimit": 500000,
+      "marginBytes": 373876,
+      "percentOfBudget": 25.2,
+      "budgetStatus": "PASS",
+      "isolatedRouteChunkKb": 2.8
+    },
+    "Cases": {
+      "route": "/cases",
+      "routeOwnedRaw": 48128,
+      "routeOwnedRawKb": 47.0,
+      "sharedInitialRaw": 860979,
+      "sharedInitialRawKb": 840.8,
+      "totalInitialScriptRaw": 909107,
+      "totalInitialScriptRawKb": 887.9,
+      "totalInitialTransfer": 484,
+      "historicalBudgetMetric": 278829,
+      "historicalBudgetMetricKb": 272.3,
+      "historicalBudgetLimit": 500000,
+      "marginBytes": 221171,
+      "percentOfBudget": 55.8,
+      "budgetStatus": "PASS",
+      "isolatedRouteChunkKb": 31.0
+    },
+    "Dashboard": {
+      "route": "/dashboard",
+      "routeOwnedRaw": 4096,
+      "routeOwnedRawKb": 4.0,
+      "sharedInitialRaw": 692634,
+      "sharedInitialRawKb": 676.4,
+      "totalInitialScriptRaw": 696730,
+      "totalInitialScriptRawKb": 680.4,
+      "totalInitialTransfer": 484,
+      "historicalBudgetMetric": 158772,
+      "historicalBudgetMetricKb": 155.1,
+      "historicalBudgetLimit": 500000,
+      "marginBytes": 341228,
+      "percentOfBudget": 31.8,
+      "budgetStatus": "PASS",
+      "isolatedRouteChunkKb": 34.1
+    },
+    "Settings": {
+      "route": "/settings",
+      "routeOwnedRaw": 12288,
+      "routeOwnedRawKb": 12.0,
+      "sharedInitialRaw": 705536,
+      "sharedInitialRawKb": 689.0,
+      "totalInitialScriptRaw": 717824,
+      "totalInitialScriptRawKb": 701.1,
+      "totalInitialTransfer": 1001,
+      "historicalBudgetMetric": 454682,
+      "historicalBudgetMetricKb": 444.0,
+      "historicalBudgetLimit": 500000,
+      "marginBytes": 45318,
+      "percentOfBudget": 90.9,
+      "budgetStatus": "PASS",
+      "isolatedRouteChunkKb": 0.5
+    }
+  },
+  "storage": {
+    "hermeticStorageContract": "PASS",
+    "localSupabaseStorageLive": "NOT_ESTABLISHED",
+    "note": "Hermetic storage mock contract verified; live local Supabase storage bucket operations were not run."
+  }
+}

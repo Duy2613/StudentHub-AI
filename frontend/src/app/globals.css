@@ -8370,3 +8370,110 @@ body {
     transform: none;
   }
 }
+
+
+/* ==========================================================================
+   STUDENTHUB AI — KHAI MINH VISUAL & MOTION TOKENS (PHASE C)
+   ========================================================================== */
+:root {
+  --km-dur-instant: 120ms;
+  --km-dur-feedback: 150ms;
+  --km-dur-component: 220ms;
+  --km-dur-panel: 320ms;
+  --km-dur-section: 420ms;
+  --km-dur-hero: 520ms;
+
+  --km-ease-standard: cubic-bezier(0.2, 0.0, 0.0, 1.0);
+  --km-ease-enter: cubic-bezier(0.0, 0.0, 0.2, 1.0);
+  --km-ease-exit: cubic-bezier(0.4, 0.0, 1.0, 1.0);
+  --km-ease-emphasis: cubic-bezier(0.25, 1.0, 0.5, 1.0);
+
+  --km-blur-card: 8px;
+  --km-blur-hero-ceiling: 12px;
+  --km-blur-mobile: 4px;
+
+  --km-glow-low: 0 0 12px rgba(120, 160, 255, 0.15);
+  --km-glow-hero: 0 0 48px rgba(140, 180, 255, 0.35);
+
+  --km-bg-glass: rgba(14, 20, 32, 0.85);
+  --km-border-glass: rgba(255, 255, 255, 0.08);
+  --km-border-accent: rgba(59, 130, 246, 0.4);
+}
+
+/* FX04: Knowledge Glass Utility */
+.km-knowledge-glass {
+  background: var(--km-bg-glass);
+  backdrop-filter: blur(var(--km-blur-card));
+  -webkit-backdrop-filter: blur(var(--km-blur-card));
+  border: 1px solid var(--km-border-glass);
+  border-radius: 12px;
+  transition: transform var(--km-dur-component) var(--km-ease-standard),
+              border-color var(--km-dur-component) var(--km-ease-standard),
+              box-shadow var(--km-dur-component) var(--km-ease-standard);
+}
+.km-knowledge-glass:hover,
+.km-knowledge-glass:focus-within {
+  transform: translateY(-2px);
+  border-color: var(--km-border-accent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), var(--km-glow-low);
+}
+
+/* FX03: Signature Prism Sweep */
+.km-prism-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.km-prism-sweep::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    135deg,
+    transparent 45%,
+    rgba(255, 255, 255, 0.08) 48%,
+    rgba(96, 165, 250, 0.15) 50%,
+    rgba(168, 85, 247, 0.12) 52%,
+    transparent 55%
+  );
+  transform: rotate(25deg) translateY(-100%);
+  transition: transform 0.8s var(--km-ease-standard);
+  pointer-events: none;
+}
+.km-prism-sweep:hover::after {
+  transform: rotate(25deg) translateY(100%);
+}
+
+/* FX09: Editorial Media Frame */
+.km-media-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0d121d;
+}
+.km-media-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--km-dur-component) var(--km-ease-standard);
+}
+.km-media-frame:hover img {
+  transform: scale(1.02);
+}
+
+/* Reduced Motion Global Hard Overrides */
+@media (prefers-reduced-motion: reduce) {
+  .km-knowledge-glass,
+  .km-prism-sweep::after,
+  .km-media-frame img {
+    animation: none !important;
+    transition-duration: 0.05s !important;
+    transform: none !important;
+  }
+  .km-prism-sweep::after {
+    display: none !important;
+  }
+}

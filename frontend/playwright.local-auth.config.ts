@@ -18,5 +18,3 @@ export default defineConfig({
     navigationTimeout: 60_000,
   },
 });
-
-\n

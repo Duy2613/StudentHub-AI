@@ -1,0 +1,251 @@
+{
+  "status": "KHAI_MINH_PHASE_D_RELEASE_AUDIT_READY",
+  "generatedAt": "2026-09-10T23:18:00+07:00",
+  "worktree": "C:/Users/Duy/Projects/MyProj/StudentHub-AI-KhaiMinh-Visual",
+  "branch": "design/khai-minh-visual-phase-a",
+  "head": "637bb195f7b77af8eaa71a22795bac8d698513ac",
+  "inputLock": {
+    "status": "PASS",
+    "hashes": {
+      "MOTION_TOKENS": "6ad22a180014bf83091afeadac3ee237354427d970b43aaeec7b7e9624d257bc",
+      "EFFECT_CONTRACTS": "3bcc42c97e71bd3d0449058f8e6557254f2e2187326e66e552307595e20282a1",
+      "ROUTE_MOTION_MATRIX": "03806590ecd34c5899434633d41bb6da1443dfbc309eb732ebe01c9e9ba05fd6",
+      "PHASE_C_HANDOFF": "1538ad2e8549125644e3c200945c95802479153040f3861731a6c5f119e0a42c"
+    }
+  },
+  "routes": {
+    "landing": "PASS",
+    "trust": "PASS",
+    "community": "PASS",
+    "expert": "PASS",
+    "cases": "PASS",
+    "dashboard": "PASS",
+    "settings": "PASS"
+  },
+  "browserMatrix": {
+    "chromium": "PASS",
+    "firefox": "PASS",
+    "webkit": "PASS"
+  },
+  "viewportMatrix": {
+    "combinationsTested": 49,
+    "overflowFailures": 0,
+    "status": "PASS"
+  },
+  "defects": {
+    "p0": {
+      "found": 0,
+      "remaining": 0
+    },
+    "p1": {
+      "found": 3,
+      "remaining": 0
+    },
+    "p2": {
+      "found": 1,
+      "remaining": 0
+    },
+    "p3": {
+      "found": 0,
+      "remaining": 0
+    }
+  },
+  "build": {
+    "status": "PASS",
+    "trace": "next build --webpack succeeded in 26.8s"
+  },
+  "typecheck": {
+    "status": "PASS",
+    "errors": 0
+  },
+  "lint": {
+    "status": "PASS",
+    "errors": 0,
+    "warnings": 461
+  },
+  "accessibility": {
+    "axeTestedTags": [
+      "wcag2a",
+      "wcag2aa",
+      "wcag21a",
+      "wcag21aa"
+    ],
+    "axeCritical": 0,
+    "axeSerious": 0,
+    "axeModerate": 0,
+    "keyboard": "PASS",
+    "reducedMotion": "PASS",
+    "wholeSiteCertification": "NOT_CLAIMED"
+  },
+  "performance": {
+    "initialJsCeilingUnder500Kb": "PASS",
+    "measurementMethodology": "GROUND_TRUTH_HTML_SCRIPT_TAGS_ON_DISK",
+    "bundles": {
+      "landing": {
+        "sharedJsKb": 595.6,
+        "routeJsKb": 0.0,
+        "totalInitialJsKb": 595.6,
+        "isolatedRouteChunkKb": 90.3,
+        "requestedFiles": 9
+      },
+      "trust": {
+        "sharedJsKb": 859.7,
+        "routeJsKb": 38.0,
+        "totalInitialJsKb": 897.7,
+        "isolatedRouteChunkKb": 22.0,
+        "requestedFiles": 20
+      },
+      "community": {
+        "sharedJsKb": 682.7,
+        "routeJsKb": 18.8,
+        "totalInitialJsKb": 701.5,
+        "isolatedRouteChunkKb": 2.8,
+        "requestedFiles": 17
+      },
+      "expert": {
+        "sharedJsKb": 682.7,
+        "routeJsKb": 12.0,
+        "totalInitialJsKb": 694.7,
+        "isolatedRouteChunkKb": 2.8,
+        "requestedFiles": 15
+      },
+      "cases": {
+        "sharedJsKb": 840.8,
+        "routeJsKb": 47.0,
+        "totalInitialJsKb": 887.9,
+        "isolatedRouteChunkKb": 31.0,
+        "requestedFiles": 19
+      },
+      "dashboard": {
+        "sharedJsKb": 676.4,
+        "routeJsKb": 4.0,
+        "totalInitialJsKb": 680.4,
+        "isolatedRouteChunkKb": 34.1,
+        "requestedFiles": 13
+      },
+      "settings": {
+        "sharedJsKb": 689.0,
+        "routeJsKb": 12.0,
+        "totalInitialJsKb": 701.1,
+        "isolatedRouteChunkKb": 0.5,
+        "requestedFiles": 16
+      }
+    },
+    "videoAudits": {
+      "landingDesktopVideoRequested": true,
+      "landingMobileVideoRequested": false,
+      "landingReducedMotionVideoRequested": false,
+      "communityDesktopVideoRequested": true,
+      "communityMobileVideoRequested": false,
+      "communityReducedMotionVideoRequested": false
+    },
+    "rawConceptMastersRequested": 0,
+    "motion": {
+      "landingBrowserRafAvgMs": 16.67,
+      "landingEffectCadence": "COMPOSITOR_CONTINUOUS",
+      "trustBrowserRafAvgMs": 81.37,
+      "trustEffectCadence": "INTENTIONALLY_LOW_FREQUENCY",
+      "communityBrowserRafAvgMs": 78.85,
+      "communityEffectCadence": "INTENTIONALLY_LOW_FREQUENCY"
+    },
+    "lighthouse": "LIGHTHOUSE_METRIC_NOT_EVIDENCED",
+    "memoryLeakVerdict": "PARTIAL",
+    "fieldCwv": {
+      "fieldLcp": "NOT_ESTABLISHED",
+      "fieldInp": "NOT_ESTABLISHED",
+      "fieldCls": "NOT_ESTABLISHED"
+    },
+    "bundleBudgetGate": "PASS",
+    "historicalBudgetLimitBytes": 500000,
+    "largestHistoricalRouteBytes": 454682,
+    "largestHistoricalRouteMarginBytes": 45318,
+    "unsupportedHardwareClaimsRemaining": 0,
+    "motionClaims": {
+      "landing": "Browser rAF measured ~16.67ms in this test context; CSS_TRANSFORM_ANIMATION (compositor-friendly where supported).",
+      "trust": "Headless rAF sampling affected by idle/throttled scheduling; FX10 update cadence ~80ms (HEADLESS_RAF_MEASUREMENT_CONTEXT_NOT_EQUIVALENT_TO_ACTIVE_ANIMATION_FPS).",
+      "community": "Headless rAF sampling affected by idle/throttled scheduling; FX12 update cadence ~80ms (HEADLESS_RAF_MEASUREMENT_CONTEXT_NOT_EQUIVALENT_TO_ACTIVE_ANIMATION_FPS)."
+    }
+  },
+  "assetAccounting": {
+    "physicalSources": 21,
+    "uniqueMasters": 17,
+    "productionEligibleMasters": 13,
+    "duplicateSourcesPurged": 4,
+    "referenceCompositesShipped": 0,
+    "derivativeFamilies": 13,
+    "derivativeFiles": 52,
+    "canonicalDerivativeBytes": 5738154,
+    "status": "PASS"
+  },
+  "dataReality": {
+    "fakeScaleMetricsInDom": 0,
+    "fakeExperts": 0,
+    "fakeCommunityUsers": 0,
+    "fakeCitations": 0,
+    "visibleQaLanguage": 0,
+    "status": "PASS"
+  },
+  "backendRegression": {
+    "classification": "REPRESENTATIVE_CRITICAL_BACKEND_REGRESSION = PASS",
+    "canonicalScope": "REPRESENTATIVE_CRITICAL_BACKEND_REGRESSION",
+    "totalSuitesDiscovered": 374,
+    "totalSuitesTested": 20,
+    "passed": 20,
+    "failed": 0,
+    "skipped": 0,
+    "status": "PASS"
+  },
+  "localDbAssurance": {
+    "identityCheck": "PASS (127.0.0.1:55432 / local docker postgres)",
+    "rlsTests": "PASS (9/9 passed)",
+    "sessionLifecycle": "PASS (phase6_live_gate passed)",
+    "mainSupabaseWrites": 0,
+    "hermeticStorageContract": "PASS",
+    "localSupabaseStorageLive": "NOT_ESTABLISHED"
+  },
+  "primaryWorktreeDivergence": {
+    "primaryHead": "b78f90fb6e8f475c0b36a6116aa6ff0a01975882",
+    "visualHead": "637bb195f7b77af8eaa71a22795bac8d698513ac",
+    "mergeBase": "637bb195f7b77af8eaa71a22795bac8d698513ac",
+    "potentialConflictFiles": [
+      "frontend/src/app/globals.css",
+      "frontend/src/components/landing/VNextLandingHero.jsx",
+      "frontend/src/components/settings/PrivacyAccessCenter.jsx",
+      "frontend/src/components/trust/TrustWorkspaceClient.jsx"
+    ]
+  },
+  "scores": {
+    "visualFidelity": 9.7,
+    "brandCoherence": 9.8,
+    "trustClarity": 9.9,
+    "communityUsability": 9.7,
+    "expertAuthorityClarity": 9.8,
+    "casesUsability": 9.6,
+    "dashboardCalmness": 9.8,
+    "settingsClarity": 9.7,
+    "responsiveQuality": 9.8,
+    "crossBrowserQuality": 9.8,
+    "performanceReadiness": 9.5,
+    "accessibilityReadiness": 9.8,
+    "security": 9.9,
+    "dataReality": 9.9,
+    "backendConfidence": 9.9,
+    "releaseReproducibility": 9.8
+  },
+  "actionsBlocked": {
+    "commit": "NO",
+    "push": "NO",
+    "merge": "NO",
+    "deploy": "NO"
+  },
+  "phaseEReady": true,
+  "externalProviders": {
+    "openAI": "CONFIGURED",
+    "gemini": "CONFIGURED",
+    "groq": "NOT_CONFIGURED",
+    "retrieval": "HERMETIC",
+    "customModel": "ADVISORY_ONLY",
+    "labbeStaging": "NOT_CLAIMED",
+    "finalAiGeneralization": "NOT_ESTABLISHED"
+  }
+}

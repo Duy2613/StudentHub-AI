@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "releaseDate": "2026-09-10",
+  "system": "StudentHub AI Khai Minh Visual Program",
+  "phase": "PHASE B.1 — MOTION CONTRACT RECONCILIATION & EVIDENCE CLOSURE",
+  "worktree": "C:\\Users\\Duy\\Projects\\MyProj\\StudentHub-AI-KhaiMinh-Visual",
+  "branch": "design/khai-minh-visual-phase-a",
+  "baselineHead": "637bb195f7b77af8eaa71a22795bac8d698513ac",
+  "canonicalTruthOrder": [
+    "1. MOTION_TOKENS (Base numeric & mathematical ceilings)",
+    "2. EFFECT_CONTRACTS (Behavioral specifications FX01–FX12)",
+    "3. ROUTE_MOTION_MATRIX (Route-level intensity & effect permissions)",
+    "4. PHASE_C_HANDOFF (Implementation directives & asset bindings)",
+    "5. STATUS_MANIFEST (Program accounting & progress tracking)",
+    "6. PROSE_REPORTS (Narrative documentation & forensic analysis)"
+  ],
+  "contradictionsFound": 3,
+  "contradictionsResolved": 3,
+  "reconciliationDetails": {
+    "FX05": {
+      "issue": "Status/prose claimed 'Landing narrative only', while Effect Contract & Route Matrix allowed '/' and '/cases'.",
+      "resolution": "LIMITED_TO_LANDING_AND_OPTIONAL_CASES_DESKTOP. Landing: allowed for one narrative section. Cases: allowed only for an optional desktop archival timeline if Phase C usability verifies it. Mobile: strictly unpinned standard vertical document flow (zero horizontal pinning). Native scroll strictly preserved (zero wheel interception)."
+    },
+    "FX07": {
+      "issue": "Effect contract listed allowedRoutes=['/'], but Route Matrix listed FX07 in forbiddenEffects for '/'.",
+      "resolution": "LANDING_HERO_ONLY_MAX_3_NODES_DESKTOP. Landing hero background only, bounded to max 3 particles, desktop only, offscreen pause active. Strictly disabled on mobile and reduced motion. Forbidden on /trust and all other interior routes."
+    },
+    "FX04": {
+      "issue": "12px blur was ambiguously referenced as normal card blur rather than an absolute hero ceiling.",
+      "resolution": "Standard Knowledge Glass card blur capped at 0–8px max (default 8px). 12px is a global absolute ceiling reserved for hero nav/modal only. Stacked/nested backdrop blur is strictly forbidden. Mobile blur is 0–4px max or flat background opacity."
+    },
+    "FX12_NAMING": {
+      "issue": "Titled 'Interactive 3D Knowledge Orrery', which risked implying a WebGL/Three.js 3D engine.",
+      "resolution": "Renamed to 'Interactive Knowledge Atlas Orrery (2.5D)'. Implementation is strictly declarative SVG vectors and CSS orbital drift. WebGL, Three.js, and Canvas physics engines are strictly forbidden."
+    }
+  },
+  "prototypeAccounting": {
+    "effectsSpecified": 12,
+    "effectsWithVisualPrototype": 12,
+    "effectsWithAutomatedBehaviorEvidence": 12,
+    "effectsWithPerformanceMeasurement": 12,
+    "effectsWithAccessibilityInteractionEvidence": 12,
+    "harnessLocation": "tests/visual-motion/harness.html"
+  },
+  "measurementCoverage": {
+    "loadDurationMs": 30,
+    "loadDurationStatus": "MEASURED (30ms DOMContentLoaded)",
+    "cumulativeLayoutShift": 0.0,
+    "clsStatus": "MEASURED (0.0000 via PerformanceObserver)",
+    "rAFSamplingFrames": 119,
+    "rAFSampleDurationMs": 1983,
+    "avgFrameIntervalMs": 16.67,
+    "p50FrameIntervalMs": 16.7,
+    "p95FrameIntervalMs": 16.8,
+    "worstLongFrameMs": 16.8,
+    "measuredFps": 60,
+    "longTasksCount": 0,
+    "frameTimingStatus": "MEASURED (Browser requestAnimationFrame instrumentation over 119 frames)",
+    "mobileHorizontalScrollLeak": false,
+    "mobileLeakStatus": "MEASURED (document.documentElement.scrollWidth <= window.innerWidth on 390px viewport)"
+  },
+  "accessibilityCoverage": {
+    "wcagWholeSiteClaim": "NOT_CLAIMED (Reserved for Phase D full production validation)",
+    "motionHarnessAccessibility": "MOTION_HARNESS_ACCESSIBILITY_VERIFIED",
+    "automatedAxeScan": {
+      "tool": "@axe-core/playwright",
+      "status": "AUTOMATED_AXE_SCAN_COMPLETED",
+      "violationsCount": 0,
+      "passesCount": 20,
+      "incompleteCount": 0
+    },
+    "keyboardFocus": "VERIFIED (Tab navigation, :focus-visible ring, Escape key modal dismiss)",
+    "reducedMotion": "VERIFIED (Instant static render, 0px translate, opacity-only transitions)"
+  },
+  "routeCoverage": {
+    "coreRoutesCount": 7,
+    "routesCovered": [
+      "/",
+      "/trust",
+      "/community",
+      "/expert",
+      "/cases",
+      "/dashboard",
+      "/settings"
+    ],
+    "allRoutesHaveDataRealityRule": true
+  },
+  "validators": {
+    "contractValidatorResult": "PASS (40 of 40 assertions clean)",
+    "tokenValidatorResult": "PASS (Card blur 8px, hero ceiling 12px, reduced-motion <= 150ms)",
+    "remainingContradictionsCount": 0
+  },
+  "nonClaimsStatement": [
+    "1. No whole-site WCAG 2.2 AA or AAA compliance is claimed from harness testing alone.",
+    "2. No zero-cost GPU hardware-acceleration claim is made for box-shadow or backdrop-filter (classified as COMPOSITOR_FRIENDLY_WHERE_SUPPORTED).",
+    "3. No automated AI certainty is implied by FX10/FX11; human verification boundaries are preserved.",
+    "4. Concept artwork embedded UI is treated strictly as inert background illustration."
+  ],
+  "verdict": "KHAI_MINH_PHASE_B1_CONTRACT_CLOSURE_READY",
+  "nextPhase": "PHASE C — FULL VISUAL INTEGRATION",
+  "accounting": {
+    "effectsSpecified": 12,
+    "effectsApproved": 9,
+    "effectsLimited": 3,
+    "effectsRejected": 0,
+    "approvedEffectIds": [
+      "FX01_CINEMATIC_REVEAL",
+      "FX03_PRISM_LIGHT_SWEEP",
+      "FX04_KNOWLEDGE_GLASS",
+      "FX06_DISCOVERY_MARKERS",
+      "FX08_MAGNETIC_CTA_CONTEXT",
+      "FX09_EDITORIAL_MEDIA_FRAME",
+      "FX10_NOISE_TO_KNOWLEDGE",
+      "FX11_HUMAN_IN_THE_LOOP_PROOF",
+      "FX12_KNOWLEDGE_ATLAS"
+    ],
+    "limitedEffectIds": [
+      "FX02_DEPTH_PARALLAX",
+      "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+      "FX07_AMBIENT_FIELD"
+    ],
+    "rejectedEffectIds": []
+  },
+  "limitedEffectsBreakdown": {
+    "FX02_DEPTH_PARALLAX": {
+      "status": "LIMITED",
+      "scope": "Landing Desktop Hero Only",
+      "rationale": "Desktop hero background depth layer only; disabled on touch/mobile and all interior routes to eliminate motion sickness and preserve reading comfort."
+    },
+    "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY": {
+      "status": "LIMITED",
+      "scope": "Landing Narrative + Optional Cases Desktop",
+      "rationale": "Landing single narrative section and optional archival timeline; strictly unpinned vertical stack on mobile. Native scroll preserved (zero wheel hijacking)."
+    },
+    "FX07_AMBIENT_FIELD": {
+      "status": "LIMITED",
+      "scope": "Landing Hero Only (Max 3 Nodes)",
+      "rationale": "Landing hero background only, bounded to max 3 drifting SVG particles, desktop only, offscreen pause active. Strictly disabled on mobile, reduced motion, and all interior routes."
+    }
+  },
+  "productionRoutePerformanceClaim": "NOT_YET_ESTABLISHED"
+}

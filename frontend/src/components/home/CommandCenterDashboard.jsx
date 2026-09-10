@@ -1,5 +1,8 @@
 "use client";
 
+import KhaiMinhMedia from "@/components/visual/KhaiMinhMedia";
+import KnowledgeGlass from "@/components/visual/KnowledgeGlass";
+
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
@@ -195,7 +198,15 @@ export default function CommandCenterDashboard() {
 
   return (
     <div className="space-y-6">
-      <section className="dashboard-hero surface-card overflow-hidden p-5 sm:p-7">
+      <section className="dashboard-hero surface-card relative overflow-hidden p-5 sm:p-7">
+        {/* Canonical KM-PRISM-005 Calm Supporting Atmosphere (C60) */}
+        <div className="absolute inset-0 opacity-15 pointer-events-none" aria-hidden="true">
+          <KhaiMinhMedia
+            assetId="KM-PRISM-005"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
         <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <div className="flex flex-wrap items-center gap-2"><p className="eyebrow text-teal-300">VI · Quiet priority ledger</p><span className="metadata-chip" data-provider-status={isExplicitDemo ? "unknown" : "clean"}>{sourceLabel}</span></div>

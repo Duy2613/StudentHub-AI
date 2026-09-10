@@ -1,5 +1,10 @@
 "use client";
 
+import KhaiMinhMedia from "@/components/visual/KhaiMinhMedia";
+import EditorialMediaFrame from "@/components/visual/EditorialMediaFrame";
+import KnowledgeGlass from "@/components/visual/KnowledgeGlass";
+import PrismSweep from "@/components/visual/PrismSweep";
+
 import React, { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
@@ -27,10 +32,13 @@ export function TrustCriticalHero({ provenance }) {
 
   return (
     <header className="product-hero vnext-trust-hero swiss-crosshair-card relative overflow-hidden">
-      {/* Static-first Optical Lens Viewport (VID-OPTIC-01).
-          The route background owns the optional motion layer. */}
-      <div className="trust-optic-viewport" aria-hidden="true">
-        <VerifiedPoster assetId="VID-OPTIC-01" alt="" className="trust-optic-poster" />
+      {/* Canonical KM-PRISM-002 Trust Transformation Anchor */}
+      <div className="trust-optic-viewport opacity-30 pointer-events-none" aria-hidden="true">
+        <KhaiMinhMedia
+          assetId="KM-PRISM-002"
+          className="w-full h-full object-cover"
+        />
+        <PrismSweep intensity="subtle" />
       </div>
       <ReferenceBirdStamp className="vnext-trust-hero-bird" />
 
@@ -83,6 +91,22 @@ export function TrustCriticalHero({ provenance }) {
               <small className="text-slate-400">Thẩm định giá trị pháp lý</small>
             </div>
           </div>
+        </div>
+
+        {/* FX10 Explanatory Transition: Unstructured Input -> Organized Evidence */}
+        <div className="mt-6 mb-4 p-4 rounded-xl bg-slate-900/60 border border-cyan-500/20 backdrop-blur-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-mono text-xs font-bold">
+              FX10
+            </span>
+            <div>
+              <strong className="text-xs text-slate-200 font-mono tracking-wider block uppercase">Tiến trình khảo chứng đối soát</strong>
+              <span className="text-xs text-slate-400">Thông tin chưa kiểm chứng → Bóc tách nguồn gốc → Xác minh 5 tầng độc lập (L1–L5)</span>
+            </div>
+          </div>
+          <span className="text-[11px] font-mono text-cyan-300/80 px-2.5 py-1 rounded bg-cyan-950/50 border border-cyan-800/40 shrink-0">
+            5 MACRO LAYERS · 7 STAGES
+          </span>
         </div>
 
         <SourceDisclosure provenance={liveProvenance} sourceMode={liveProvenance?.sourceMode || "UNAVAILABLE"} />

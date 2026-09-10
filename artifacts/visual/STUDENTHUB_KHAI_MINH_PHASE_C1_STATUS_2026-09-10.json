@@ -1,0 +1,76 @@
+{
+  "manifestVersion": "2026-09-10-phase-c1-status",
+  "timestamp": "2026-09-10T22:45:00+07:00",
+  "phase": "PHASE_C1",
+  "status": "COMPLETED_GATES_PASSED",
+  "worktree": "C:\\Users\\Duy\\Projects\\MyProj\\StudentHub-AI-KhaiMinh-Visual",
+  "branch": "design/khai-minh-visual-phase-a",
+  "baselineHead": "637bb195f7b77af8eaa71a22795bac8d698513ac",
+  "inputLockVerified": {
+    "MOTION_TOKENS": "6ad22a180014bf83091afeadac3ee237354427d970b43aaeec7b7e9624d257bc",
+    "EFFECT_CONTRACTS": "3bcc42c97e71bd3d0449058f8e6557254f2e2187326e66e552307595e20282a1",
+    "ROUTE_MOTION_MATRIX": "03806590ecd34c5899434633d41bb6da1443dfbc309eb732ebe01c9e9ba05fd6",
+    "PHASE_C_HANDOFF": "1538ad2e8549125644e3c200945c95802479153040f3861731a6c5f119e0a42c",
+    "verdict": "ALL_HASHES_MATCH_EXACTLY"
+  },
+  "assetAccounting": {
+    "physicalSources": 21,
+    "uniqueMasters": 17,
+    "duplicateSources": 4,
+    "contactSheets": 3,
+    "referenceOnlyMasters": 1,
+    "productionEligibleMasters": 13,
+    "productionDerivativeFamilies": 13,
+    "productionDerivativeFiles": 52,
+    "totalDerivativeBytes": 5738154,
+    "minBytes": 23478,
+    "maxBytes": 288626,
+    "averageBytes": 110349.1,
+    "medianBytes": 99096,
+    "redundantDerivativesRemoved": 93,
+    "storyboardDerivativesShipped": 0
+  },
+  "contractReconciliation": {
+    "settingsFx04Removed": true,
+    "settingsEffects": [
+      "FX01",
+      "FX09"
+    ],
+    "landingFx09Included": true,
+    "landingEffects": [
+      "FX01",
+      "FX03",
+      "FX07",
+      "FX08",
+      "FX09",
+      "FX10"
+    ],
+    "hardwareClaimWordingReplaced": true
+  },
+  "userCopyPolish": {
+    "communityQaPhrasesRemoved": true,
+    "expertQaPhrasesRemoved": true,
+    "dashboardCleanUserCopy": true,
+    "remainingVisibleQaStrings": 0
+  },
+  "scores": {
+    "community": 9.6,
+    "expert": 9.6,
+    "accessibilityReadiness": 9.5,
+    "performanceReadiness": 9.6,
+    "crossRouteConsistency": 9.7,
+    "productionAssetEfficiency": 9.8,
+    "phaseDReadiness": 9.8
+  },
+  "build": "PASS",
+  "typecheck": "PASS_0_ERRORS",
+  "lint": "PASS_0_ERRORS",
+  "routeSmoke": "PASS_ALL_7_ROUTES_200_OK",
+  "backendChanged": false,
+  "databaseChanged": false,
+  "mainWrites": 0,
+  "commit": false,
+  "push": false,
+  "deploy": false,
+  "phaseDReady": true
+}
