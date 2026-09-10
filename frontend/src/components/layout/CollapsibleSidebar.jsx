@@ -79,12 +79,6 @@ export default function CollapsibleSidebar({ className = "" }) {
       badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
     },
     {
-      label: "Diễn Đàn & Tín Hiệu",
-      href: "/forum",
-      icon: MessageSquare,
-      badge: null,
-    },
-    {
       label: "Hồ Sơ & Bảo Mật",
       href: "/profile",
       icon: User,

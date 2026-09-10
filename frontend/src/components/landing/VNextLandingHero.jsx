@@ -4,12 +4,11 @@ import React from "react";
 import Link from "next/link";
 import { ArrowRight, ScanSearch, ShieldCheck } from "lucide-react";
 import VNextButton from "@/components/ui/VNextButton";
-import VerifiedPoster from "@/components/media/VerifiedPoster";
-import ReferenceBirdStamp from "@/components/media/ReferenceBirdStamp";
+import KhaiMinhImage from "@/components/media/KhaiMinhImage";
 
 export default function VNextLandingHero() {
   return (
-    <section className="vnext-landing-hero pt-8 pb-16 lg:py-24" aria-labelledby="hero-title">
+    <section className="vnext-landing-hero pt-8 pb-16 lg:py-24" aria-labelledby="hero-title" data-fallback-visual="VID-PRISM-01">
       <div className="vnext-landing-hero-grid max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 7 Columns Editorial Copy */}
         <div className="vnext-landing-hero-copy space-y-6">
@@ -67,15 +66,15 @@ export default function VNextLandingHero() {
 
         {/* 5 Columns Asymmetric Media Box Collision (Hobro Style) */}
         <div className="vnext-landing-hero-art">
-          <figure className="vnext-landing-hero-media" aria-label="Lăng kính bằng chứng, poster không gian">
+          <figure className="vnext-landing-hero-media" aria-label="Lăng kính bằng chứng trong một không gian học thuật">
             <div className="vnext-hero-art-frame group">
-            <VerifiedPoster
-              assetId="VID-PRISM-01"
+            <KhaiMinhImage
+              assetId="KH-LANDING-HERO-01"
               priority
-              alt="Lăng kính khúc xạ tri thức, không gian kiểm chứng"
+              alt="Minh họa lăng kính bằng chứng nối những mảnh thông tin với một hướng hiểu rõ hơn"
+              sizes="(max-width: 767px) 100vw, (max-width: 1199px) 46vw, 42rem"
               className="w-full h-full"
             />
-              <ReferenceBirdStamp className="vnext-hero-bird" />
               <span className="vnext-hero-art-sheen" aria-hidden="true" />
             </div>
 
@@ -83,7 +82,7 @@ export default function VNextLandingHero() {
               <span className="vnext-hero-media-caption-primary">
                 <ShieldCheck size={14} className="text-cyan-400" />
                 <span className="type-micro-label-v3">
-                  LĂNG KÍNH KHAI MINH · VID-PRISM-01
+                  LĂNG KÍNH KHAI MINH / KH-LANDING-HERO-01
                 </span>
               </span>
               <span className="vnext-hero-media-caption-detail">

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import pg from "pg";
 import { test, after } from "node:test";
+import { getDisposableDatabaseUrl } from "../helpers/disposableDbGuard.mjs";
 
 import {
   buildTrustDecisionEvent,
@@ -20,7 +21,8 @@ const requiredNames = [
 ];
 const missing = requiredNames.filter((name) => !process.env[name]);
 const liveEnv = { ...process.env, STUDENTHUB_LABBE_MODE: "STAGING" };
-const liveReady = missing.length === 0 && getLabbeConfig(liveEnv).remoteConfigured;
+const disposableDatabaseUrl = getDisposableDatabaseUrl({ envNames: ["STUDENTHUB_LABBE_TEST_DATABASE_URL"] });
+const liveReady = missing.length === 0 && Boolean(disposableDatabaseUrl) && getLabbeConfig(liveEnv).remoteConfigured;
 let livePool = null;
 
 function liveEvent(label, pipelineResult = {}) {
@@ -42,7 +44,7 @@ function connectPool() {
   const sslDisabled = process.env.STUDENTHUB_LABBE_TEST_DATABASE_SSL === "disable";
   const ca = process.env.STUDENTHUB_LABBE_TEST_DATABASE_SSL_CA?.replace(/\\n/g, "\n");
   return new pg.Pool({
-    connectionString: process.env.STUDENTHUB_LABBE_TEST_DATABASE_URL,
+    connectionString: disposableDatabaseUrl,
     max: 3,
     connectionTimeoutMillis: 5000,
     ssl: sslDisabled ? false : {
@@ -57,7 +59,7 @@ after(async () => {
 });
 
 test("real Labbe STAGING transport: TLS, workload auth, scope, classification, Unicode hash, duplicate, and conflict", {
-  skip: !liveReady && `LABBE_STAGING_BLOCKED_BY_ENV: missing ${missing.join(", ") || "valid HTTPS staging configuration"}`,
+  skip: !liveReady && `LABBE_STAGING_BLOCKED_BY_ENV: missing ${missing.join(", ") || "disposable database acknowledgement or valid HTTPS staging configuration"}`,
 }, async () => {
   const config = getLabbeConfig(liveEnv);
   assert.equal(config.mode, "STAGING");

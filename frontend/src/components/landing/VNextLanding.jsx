@@ -60,7 +60,7 @@ export default function VNextLanding() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="type-technical-v3 text-cyan-400">TRUST WORKSPACE // PREVIEW</span>
-                <span className="text-[10px] tracking-widest text-slate-500 font-mono">[ FORENSIC-V3 ]</span>
+                <span className="text-[10px] tracking-widest text-slate-400 font-mono">[ FORENSIC-V3 ]</span>
               </div>
               <h3 className="type-product-heading text-lg text-slate-100 mt-1 font-serif">
                 Không có phán quyết nào được tạo từ <span className="italic font-normal text-cyan-200">phỏng đoán</span>.

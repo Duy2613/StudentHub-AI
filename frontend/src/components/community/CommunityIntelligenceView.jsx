@@ -11,6 +11,7 @@ import { createErrorState, createStateEnvelope, createWorkIdentity } from "@/lib
 import { getCommunityRuntimeProvider, SCOPED_PROVIDER_MODE } from "@/lib/backend/scopedRuntimeProvider";
 import { ApiError } from "@/lib/api/runtimeError";
 import { aggregateObservationsForPresentation } from "@/lib/community/observationAggregation";
+import ForumDiscourseDrawer from "./ForumDiscourseDrawer";
 
 function titleFor(post) {
   return post.title || String(post.topic || "Chia sẻ cộng đồng").replaceAll("_", " ");
@@ -36,6 +37,7 @@ export function CommunityIntelligenceView() {
   const [submissionResult, setSubmissionResult] = useState(null);
   const [detailResult, setDetailResult] = useState(null);
   const [selectedObservation, setSelectedObservation] = useState(null);
+  const [discourseThread, setDiscourseThread] = useState(null);
   const [statement, setStatement] = useState("");
   const [caseId, setCaseId] = useState(() => queryCaseId);
   const [caseRevision, setCaseRevision] = useState(() => queryCaseRevision || "1");
@@ -143,6 +145,26 @@ export function CommunityIntelligenceView() {
     setExpandedClusters((prev) => ({ ...prev, [canonicalId]: !prev[canonicalId] }));
   };
 
+  const openDiscourse = (post) => {
+    setDiscourseThread({
+      title: titleFor(post),
+      author: post.authorName || (post.cohorts?.length ? `Sinh viên khoá ${post.cohorts.join(', ')}` : 'Sinh viên đối soát'),
+      date: post.lastReportedAt ? new Date(post.lastReportedAt).toLocaleDateString("vi-VN") : "Gần đây",
+      content: post.statement || "Nội dung phản ánh được thu thập từ cộng đồng học thuật.",
+      citations: Array.isArray(post.evidenceRefs) && post.evidenceRefs.length > 0
+        ? post.evidenceRefs.map((ref, idx) => ({
+            source: typeof ref === 'string' ? ref : `Tham chiếu #${idx + 1}`,
+            text: `Bằng chứng đối soát liên kết case scope [${post.caseScope?.caseId || post.canonicalId || 'N/A'}]`,
+          }))
+        : [
+            {
+              source: "Cộng đồng StudentHub AI",
+              text: `Ghi nhận từ báo cáo thực tế sinh viên (${post.topic || 'Chung'})`,
+            },
+          ],
+    });
+  };
+
   const aggregatedItems = useMemo(() => aggregateObservationsForPresentation(observations), [observations]);
   const topics = useMemo(() => [...new Set(aggregatedItems.map((post) => post.topic).filter(Boolean))], [aggregatedItems]);
   const posts = aggregatedItems.filter((post) => {
@@ -225,9 +247,18 @@ export function CommunityIntelligenceView() {
                     <Clock3 size={13} /> {post.lastReportedAt ? new Date(post.lastReportedAt).toLocaleDateString("vi-VN") : "Không có thời gian"}
                   </span>
                   <span className="flex items-center gap-1"><ShieldCheck size={13} /> Nguồn: đối soát cộng đồng</span>
-                  <button type="button" className="text-link inline-flex items-center gap-1 text-app-primary" onClick={() => openObservation(post)}>
-                    Xem case scope <ArrowRight size={14} />
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      className="text-link inline-flex items-center gap-1 text-[var(--accent-knowledge)] hover:underline"
+                      onClick={() => openDiscourse(post)}
+                    >
+                      Đọc chuyên sâu
+                    </button>
+                    <button type="button" className="text-link inline-flex items-center gap-1 text-app-primary" onClick={() => openObservation(post)}>
+                      Xem case scope <ArrowRight size={14} />
+                    </button>
+                  </div>
                 </footer>
               </div>
             </article>
@@ -237,5 +268,10 @@ export function CommunityIntelligenceView() {
       <aside className="space-y-4"><div className="intelligence-panel sticky-insight"><p className="product-kicker">How to read</p><h2 className="product-section-title">Không đánh đồng số đông với sự thật</h2><ul className="reading-rules"><li><CheckCircle2 /> Trải nghiệm trực tiếp cho biết điều đã xảy ra.</li><li><AlertTriangle /> Cảnh báo cần được đối chiếu thêm nguồn độc lập.</li><li><ShieldCheck /> Quy định chính thức vẫn là nguồn thẩm quyền.</li></ul></div><div className="intelligence-panel network-bridge"><p className="product-kicker">Connected by TrustGraph</p><h3>Đưa tín hiệu vào một case kiểm chứng</h3><p>Trust Engine sẽ phân tách rủi ro, confidence và mức đủ bằng chứng.</p><Link href="/trust" className="text-link">Mở Trust Engine <ArrowRight size={14} /></Link></div></aside>
     </section>
     {selectedObservation && <section className="intelligence-panel community-detail" aria-labelledby="community-detail-title"><div className="panel-heading"><div><p className="product-kicker">Observation detail</p><h2 id="community-detail-title" className="product-section-title">{titleFor(selectedObservation)}</h2></div><button type="button" className="icon-button" onClick={closeObservation} aria-label="Đóng observation detail"><X size={16} /></button></div>{detailResult?.state === "SUCCESS" && detailResult.data ? <><p className="product-copy">{detailResult.data.statement}</p><div className="detail-facts"><span>Case: {detailResult.data.caseScope?.caseId || "Chưa xác minh"}</span><span>Revision: {detailResult.data.caseScope?.caseRevision ?? "—"}</span><span>{detailResult.data.evidenceRefs?.length || 0} evidence refs</span></div></> : detailResult && <StateBoundary envelope={detailResult} onAction={handleDetailAction} />}</section>}
+    <ForumDiscourseDrawer
+      thread={discourseThread}
+      isOpen={Boolean(discourseThread)}
+      onClose={() => setDiscourseThread(null)}
+    />
   </div>;
 }

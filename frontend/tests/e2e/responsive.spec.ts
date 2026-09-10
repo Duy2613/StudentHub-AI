@@ -26,7 +26,9 @@ for (const viewport of viewports) {
     for (const [path, heading] of Object.entries(productHeadings)) {
       await page.goto(path);
       await expect(page.getByRole("heading", { name: heading })).toBeVisible();
-      await page.waitForLoadState("networkidle");
+      // The app keeps realtime/auth requests open; DOM readiness is the stable
+      // contract for layout assertions and avoids networkidle timeouts.
+      await page.waitForLoadState("domcontentloaded");
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow, `${path} horizontal overflow`).toBeLessThanOrEqual(1);
     }
@@ -49,6 +51,14 @@ for (const viewport of [{ width: 320, height: 900 }, { width: 768, height: 900 }
 test("reduced motion disables animated transitions", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/trust");
-  const duration = await page.getByRole("tab", { name: "Văn bản" }).evaluate((node) => getComputedStyle(node).transitionDuration);
-  expect(Number.parseFloat(duration)).toBeLessThanOrEqual(0.00001);
+  const transitionDurationMs = await page.getByRole("tab", { name: "Văn bản" }).evaluate((node) => {
+    const values = getComputedStyle(node).transitionDuration.split(",").map((value) => value.trim());
+    return Math.max(...values.map((value) => {
+      const match = value.match(/^([\d.e+-]+)(ms|s)$/i);
+      if (!match) return 0;
+      const amount = Number(match[1]);
+      return match[2].toLowerCase() === "s" ? amount * 1000 : amount;
+    }));
+  });
+  expect(transitionDurationMs).toBeLessThanOrEqual(0.02);
 });

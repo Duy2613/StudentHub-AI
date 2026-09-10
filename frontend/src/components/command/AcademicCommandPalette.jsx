@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
+  Compass,
   FileClock,
   Search,
   ShieldCheck,

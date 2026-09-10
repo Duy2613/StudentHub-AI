@@ -1,0 +1,63 @@
+{
+  "status": "FULL_AUTHENTICATED_EXPERT_LOCAL_E2E_VERIFIED",
+  "startedAt": "2026-09-10T10:14:52.620Z",
+  "completedAt": "2026-09-10T10:16:06.057Z",
+  "localEndpointClass": "LOCAL_LOOPBACK",
+  "localApiHost": "127.0.0.1",
+  "localApiPort": 56021,
+  "localDbHost": "127.0.0.1",
+  "localDbPort": 55432,
+  "mainApiHost": "kytdomflmjytzyaabogi.supabase.co",
+  "mainCloudHosts": [
+    "kytdomflmjytzyaabogi.supabase.co",
+    "aws-0-ap-northeast-1.pooler.supabase.com"
+  ],
+  "localAuthProbe": "HTTP_200_LOCAL_LOOPBACK",
+  "browserBaseUrl": "http://127.0.0.1:62470",
+  "userClassCount": 9,
+  "syntheticUserKinds": [
+    "candidate",
+    "reviewer",
+    "reactor",
+    "helper"
+  ],
+  "networkGuard": {
+    "server": "LOOPBACK_ONLY",
+    "browser": "CLOUD_SUPABASE_REJECTED",
+    "violations": []
+  },
+  "mainAuthWrites": 0,
+  "mainDbWrites": 0,
+  "mainStorageWrites": 0,
+  "historicalEvidencePreserved": [
+    "G1_LOCAL_CLEAN_MIGRATION_VERIFIED",
+    "RLS_LOCAL_LIVE_VERIFIED",
+    "CONCURRENCY_IDEMPOTENCY_VERIFIED",
+    "APPLICATION_SCHEMA_RESTORE_VERIFIED",
+    "LOCAL_PRIVATE_STORAGE_VERIFIED",
+    "PROMAX_LOCAL_PERSISTENCE_VERIFIED"
+  ],
+  "testExitCode": 0,
+  "runSummary": {
+    "syntheticUsers": 9,
+    "trustCases": 6,
+    "communityContributions": 6,
+    "communityReactions": 8,
+    "expertApplications": 1,
+    "expertVerifications": 1,
+    "expertPracticeSubmissions": 1,
+    "expertAssignments": 2,
+    "expertAssessments": 1,
+    "evidencePassports": 3
+  },
+  "cleanupStatus": "LOCAL_SYNTHETIC_DATA_AND_AUTH_CLEANED",
+  "cleanupStep": "verify:private.realtime_events",
+  "cleanupRemaining": {
+    "users": 0,
+    "cases": 0,
+    "contributions": 0,
+    "realtimeEvents": 0
+  },
+  "failure": null,
+  "noCommitPushDeploy": true
+}

@@ -4,30 +4,58 @@ import crypto from "node:crypto";
 import { CommunityRepository } from "../../src/lib/server/database/CommunityRepository.js";
 import { ExpertRepository } from "../../src/lib/server/database/ExpertRepository.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
+import { configureDisposableDatabase, disposableLiveGate } from "../helpers/disposableDbGuard.mjs";
+
+const disposableDatabaseUrl = configureDisposableDatabase();
+const liveGate = disposableLiveGate();
 
 after(async () => {
-  if (process.env.DATABASE_URL) await getPostgresPool().end();
+  if (disposableDatabaseUrl) await getPostgresPool().end();
 });
 
-test("PHASE 8 LIVE GATE: Community & Expert scoped authority, verification, and Trust case binding", { skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured" }, async () => {
+test("PHASE 8 LIVE GATE: Community & Expert scoped authority, verification, and Trust case binding", liveGate, async () => {
   const pool = getPostgresPool();
-  const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 2`);
-  if (userRes.rows.length === 0) {
-    console.log("No users in auth.users, skipping live gate test");
-    return;
-  }
-  const userA = userRes.rows[0].id;
-  const userB = userRes.rows[1]?.id || crypto.randomUUID();
+  const userA = crypto.randomUUID();
+  const userB = crypto.randomUUID();
 
   const caseId = crypto.randomUUID();
+  const runId = crypto.randomUUID();
+  const evidenceId = crypto.randomUUID();
   let postId = null;
 
   try {
+    await pool.query(
+      `INSERT INTO auth.users (id, aud, role, email, created_at, updated_at)
+       VALUES ($1, 'authenticated', 'authenticated', $2, now(), now()),
+              ($3, 'authenticated', 'authenticated', $4, now(), now())`,
+      [userA, `phase8-expert-${userA}@studenthub.test`, userB, `phase8-coordinator-${userB}@studenthub.test`]
+    );
+    await pool.query(
+      `INSERT INTO private.user_roles (user_id, role_id)
+       SELECT $1, id FROM private.roles WHERE code = 'ADMIN'`,
+      [userB]
+    );
+
     // 1. Create a Trust case and Evidence Passport to attach assessments and follows
     await pool.query(
       `INSERT INTO public.trust_cases (id, owner_id, state, visibility)
        VALUES ($1, $2, 'SUSPICIOUS', 'PUBLIC')`,
       [caseId, userA]
+    );
+    await pool.query(
+      `INSERT INTO public.trust_runs (id, case_id, owner_id, status, pipeline_version, started_at)
+       VALUES ($1, $2, $3, 'COMPLETED', 'trust.v5.phase8', now())`,
+      [runId, caseId, userA]
+    );
+    await pool.query(
+      `INSERT INTO public.trust_case_revisions (case_id, owner_id, revision, run_id, state, snapshot)
+       VALUES ($1, $2, 1, $3, 'SUSPICIOUS', '{"source":"phase8-live-fixture"}'::jsonb)`,
+      [caseId, userA, runId]
+    );
+    await pool.query(
+      `INSERT INTO public.evidence (id, case_id, source_type, source_identifier, observed_at, confidence, provenance)
+       VALUES ($1, $2, 'OFFICIAL_SOURCE', 'https://cert.example.org/phase8', now(), 0.95, '{"class":"OFFICIAL"}'::jsonb)`,
+      [evidenceId, caseId]
     );
 
     const passportId = crypto.randomUUID();
@@ -92,6 +120,16 @@ test("PHASE 8 LIVE GATE: Community & Expert scoped authority, verification, and 
     const verifiedDomains = await ExpertRepository.getVerifiedDomains(userA);
     assert.ok(verifiedDomains.includes("CYBERSECURITY"), "CYBERSECURITY domain verified");
 
+    const assignment = await ExpertRepository.createAssignment({
+      assignedBy: userB,
+      expertId: userA,
+      caseId,
+      caseRevision: 1,
+      domainCode: "CYBERSECURITY",
+      idempotencyKey: `phase8-assignment-${caseId}`,
+    });
+    assert.ok(assignment.id, "Case revision assigned by an independent coordinator");
+
     // 5. Scoped Authority: Submit assessment in verified domain
     const assessment = await ExpertRepository.submitAssessment({
       expertId: userA,
@@ -102,6 +140,11 @@ test("PHASE 8 LIVE GATE: Community & Expert scoped authority, verification, and 
         recommendedAction: "BLOCK",
       },
       confidence: 0.96,
+      assignmentId: assignment.id,
+      caseRevision: 1,
+      evidenceRevisionIds: [evidenceId],
+      coiDeclared: true,
+      idempotencyKey: `phase8-assessment-${caseId}`,
     });
     assert.ok(assessment.id, "Assessment successfully submitted");
 
@@ -112,8 +155,13 @@ test("PHASE 8 LIVE GATE: Community & Expert scoped authority, verification, and 
         caseId,
         domainCode: "ACADEMIC_INTEGRITY", // Not verified
         assessment: { analysis: "Unverified opinion" },
+        assignmentId: assignment.id,
+        caseRevision: 1,
+        evidenceRevisionIds: [evidenceId],
+        coiDeclared: true,
+        idempotencyKey: `phase8-unverified-${caseId}`,
       }),
-      /UNVERIFIED_EXPERT_DOMAIN/,
+      (error) => error?.code === "UNVERIFIED_EXPERT_DOMAIN",
       "Expert cannot issue assessments in unverified domains"
     );
 
@@ -130,11 +178,9 @@ test("PHASE 8 LIVE GATE: Community & Expert scoped authority, verification, and 
       await pool.query(`DELETE FROM public.posts WHERE id = $1`, [postId]);
     }
     await pool.query(`DELETE FROM public.case_follows WHERE owner_id = $1`, [userB]);
-    await pool.query(`DELETE FROM public.evidence_passports WHERE subject_id = $1`, [caseId]);
-    await pool.query(`DELETE FROM private.reputation_events WHERE user_id = $1`, [userA]);
-    await pool.query(`DELETE FROM public.expert_assessments WHERE case_id = $1`, [caseId]);
-    await pool.query(`DELETE FROM private.expert_verifications WHERE user_id = $1`, [userA]);
-    await pool.query(`DELETE FROM public.expert_profiles WHERE user_id = $1`, [userA]);
-    await pool.query(`DELETE FROM public.trust_cases WHERE id = $1`, [caseId]);
+    // The assessment, assignment, verification, and Trust lineage are
+    // intentionally immutable/append-only. Do not cascade-delete them (or
+    // their identities) during cleanup; reset the disposable database between
+    // full assurance runs when a clean fixture is required.
   }
 });

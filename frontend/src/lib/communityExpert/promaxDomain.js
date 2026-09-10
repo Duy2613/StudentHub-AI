@@ -205,7 +205,10 @@ const PII_PATTERNS = Object.freeze([
   ["BANK_ACCOUNT", /\b(?:TK|STK|ACCOUNT|BANK|T[AÀ]I\s*KHO[AẢ]N(?:\s+NG[AÂ]N\s+H[AÀ]NG)?|SỐ\s*T[AÀ]I\s*KHO[AẢ]N|SO\s+TAI\s+KHOAN)[ :#-]*\d{8,20}\b/giu],
   ["IDENTITY_DOCUMENT", /\b(?:CCCD|CMND|PASSPORT|ID\s*CARD)[ :#-]*[A-Z0-9-]{6,20}\b/gi],
   ["QR_DATA", /\b(?:QR|QRCODE|QR\s*DATA)[:=][^\s]{6,}\b/gi],
-  ["PRECISE_ADDRESS", /\b(?:số|so|street|st\.?|đường|duong|ngõ|ngo|phường|phuong|quận|quan|district)[ .:#-]*[A-Z0-9À-ỹ .,#/-]{5,80}\b/gi],
+  // Require a separator after an address marker. Without this boundary,
+  // ordinary academic words such as "scope" and "source" were interpreted
+  // as the Vietnamese/English "so" address prefix and blocked practice text.
+  ["PRECISE_ADDRESS", /\b(?:số|so|street|st\.?|đường|duong|ngõ|ngo|phường|phuong|quận|quan|district)[ .:#-]+[A-Z0-9À-ỹ .,#/-]{5,80}\b/gi],
 ]);
 
 function metadataFindings(metadata = {}) {
@@ -353,40 +356,190 @@ export function rankCommunityContribution(candidate = {}, now = Date.now()) {
 
 export const COMMUNITY_TRACK_RECORD_POLICY_VERSION = "community-track-record-v1";
 export const COMMUNITY_EXPERT_CANDIDATE_THRESHOLD = 100;
+export const COMMUNITY_TRACK_RECORD_POLICY = Object.freeze({
+  version: COMMUNITY_TRACK_RECORD_POLICY_VERSION,
+  maxPoints: 100,
+  points: Object.freeze({
+    publishedContribution: 10,
+    evidenceLinkedContribution: 5,
+    distinctCase: 2,
+    independentHelpfulReaction: 2,
+    challengePenalty: 1,
+  }),
+  stars: Object.freeze({
+    thresholds: Object.freeze([0, 20, 40, 60, 80, 100]),
+    fiveStarMinimumEvaluatedOutcomes: 3,
+    fiveStarMinimumStabilityDays: 30,
+    recentActivityWindowDays: 180,
+    sanctionsBlockFiveStars: true,
+  }),
+});
+
+function recentActivityFor(summary, now) {
+  if (typeof summary.recentActivity === "boolean") return summary.recentActivity;
+  const lastActivity = Date.parse(summary.lastActivityAt || summary.last_activity_at || "");
+  const asOf = Date.parse(summary.asOf || summary.as_of || "") || now;
+  if (!Number.isFinite(lastActivity)) return false;
+  return asOf >= lastActivity && asOf - lastActivity <= COMMUNITY_TRACK_RECORD_POLICY.stars.recentActivityWindowDays * 86_400_000;
+}
 
 /**
  * Calculates the contributor projection from server-owned counters. Reactions
  * are quality signals, never truth votes, and a candidate flag only opens the
  * human-controlled qualification path.
  */
-export function calculateCommunityTrackRecord(summary = {}) {
+export function calculateCommunityTrackRecord(summary = {}, { now = Date.now() } = {}) {
   const publishedContributions = Math.max(0, Number(summary.publishedContributions) || 0);
   const evidenceLinkedContributions = Math.max(0, Number(summary.evidenceLinkedContributions) || 0);
   const distinctCases = Math.max(0, Number(summary.distinctCases) || 0);
   const helpfulReactions = Math.max(0, Number(summary.helpfulReactions) || 0);
   const challengeReactions = Math.max(0, Number(summary.challengeReactions) || 0);
   const qualityEventCount = Math.max(0, Number(summary.qualityEventCount) || 0);
+  const evaluatedOutcomes = Math.max(0, Number(summary.evaluatedOutcomes ?? summary.evaluated_outcomes) || 0);
+  const stabilityDays = Math.max(0, Number(summary.stabilityDays ?? summary.stability_days) || 0);
+  const sanctionsActive = Boolean(summary.sanctionsActive ?? summary.sanctions_active);
+  const recentActivity = recentActivityFor(summary, now);
   const components = {
-    contribution: Math.min(50, publishedContributions * 10),
-    evidence: Math.min(25, evidenceLinkedContributions * 5),
-    breadth: Math.min(10, distinctCases * 2),
-    helpfulness: Math.min(20, helpfulReactions * 2),
-    challengePenalty: Math.min(15, challengeReactions),
+    contribution: Math.min(50, publishedContributions * COMMUNITY_TRACK_RECORD_POLICY.points.publishedContribution),
+    evidence: Math.min(25, evidenceLinkedContributions * COMMUNITY_TRACK_RECORD_POLICY.points.evidenceLinkedContribution),
+    breadth: Math.min(10, distinctCases * COMMUNITY_TRACK_RECORD_POLICY.points.distinctCase),
+    helpfulness: Math.min(20, helpfulReactions * COMMUNITY_TRACK_RECORD_POLICY.points.independentHelpfulReaction),
+    challengePenalty: Math.min(15, challengeReactions * COMMUNITY_TRACK_RECORD_POLICY.points.challengePenalty),
   };
   const points = Math.max(0, Math.min(100, components.contribution + components.evidence + components.breadth + components.helpfulness - components.challengePenalty));
-  const stars = Math.min(5, Math.floor(points / 20));
-  const expertCandidate = points >= COMMUNITY_EXPERT_CANDIDATE_THRESHOLD && stars === 5 && publishedContributions >= 3 && evidenceLinkedContributions >= 2;
+  const baseStars = Math.min(5, Math.floor(points / 20));
+  const starGateReasons = [];
+  if (baseStars >= 5 && evaluatedOutcomes < COMMUNITY_TRACK_RECORD_POLICY.stars.fiveStarMinimumEvaluatedOutcomes) starGateReasons.push("EVALUATED_OUTCOMES_REQUIRED");
+  if (baseStars >= 5 && stabilityDays < COMMUNITY_TRACK_RECORD_POLICY.stars.fiveStarMinimumStabilityDays) starGateReasons.push("STABILITY_WINDOW_REQUIRED");
+  if (baseStars >= 5 && !recentActivity) starGateReasons.push("RECENT_ACTIVITY_REQUIRED");
+  if (baseStars >= 5 && COMMUNITY_TRACK_RECORD_POLICY.stars.sanctionsBlockFiveStars && sanctionsActive) starGateReasons.push("ACTIVE_SANCTION_BLOCKS_FIVE_STARS");
+  const stars = starGateReasons.length > 0 ? Math.min(4, baseStars) : baseStars;
+  const expertCandidate = points >= COMMUNITY_EXPERT_CANDIDATE_THRESHOLD
+    && stars === 5
+    && publishedContributions >= 3
+    && evidenceLinkedContributions >= 2
+    && evaluatedOutcomes >= COMMUNITY_TRACK_RECORD_POLICY.stars.fiveStarMinimumEvaluatedOutcomes
+    && stabilityDays >= COMMUNITY_TRACK_RECORD_POLICY.stars.fiveStarMinimumStabilityDays
+    && recentActivity
+    && !sanctionsActive;
   return {
     points,
     stars,
+    baseStars,
     maxPoints: 100,
     expertCandidate,
     qualificationGate: expertCandidate ? "HUMAN_QUALIFICATION_REQUIRED" : "COMMUNITY_TRACK_RECORD_IN_PROGRESS",
     policyVersion: COMMUNITY_TRACK_RECORD_POLICY_VERSION,
     qualityEventCount,
+    evaluatedOutcomes,
+    stabilityDays,
+    sanctionsActive,
+    recentActivity,
+    starGate: {
+      eligibleForFiveStars: starGateReasons.length === 0,
+      reasons: starGateReasons,
+      policy: COMMUNITY_TRACK_RECORD_POLICY.stars,
+    },
     components,
     authority: "NON_AUTHORITATIVE",
     trustVerdictMutation: false,
+  };
+}
+
+export const COMMUNITY_REACTION_INTEGRITY_POLICY_VERSION = "community-reaction-integrity-v1";
+
+function reactionTime(row, fallback) {
+  const parsed = Date.parse(row?.createdAt || row?.created_at || "");
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+/**
+ * Detects coordinated reaction patterns as review signals. It never decides
+ * guilt, subtracts points, hides content, or creates a sanction by itself.
+ */
+export function analyzeReactionIntegrity({ reactions = [], contributions = [], actorStates = [], now = Date.now(), burstWindowMs = 3_600_000, burstThreshold = 12 } = {}) {
+  const rows = Array.isArray(reactions) ? reactions.filter((row) => row && typeof row === "object") : [];
+  const signals = [];
+  const tupleCounts = new Map();
+  const idempotencyCounts = new Map();
+  const actorTimes = new Map();
+  const contributionById = new Map((Array.isArray(contributions) ? contributions : []).filter(Boolean).map((row) => [String(row.id || row.contributionId), row]));
+  const stateByActor = new Map((Array.isArray(actorStates) ? actorStates : []).filter(Boolean).map((row) => [String(row.actorId || row.userId), row]));
+
+  for (const row of rows) {
+    const actorId = String(row.actorId || row.userId || "unknown");
+    const contributionId = String(row.contributionId || row.contribution_id || "unknown");
+    const kind = text(row.kind || "").toUpperCase();
+    const tuple = `${actorId}|${contributionId}|${kind}`;
+    tupleCounts.set(tuple, (tupleCounts.get(tuple) || 0) + 1);
+    if (row.idempotencyKey || row.idempotency_key) {
+      const key = String(row.idempotencyKey || row.idempotency_key);
+      idempotencyCounts.set(`${actorId}|${key}`, (idempotencyCounts.get(`${actorId}|${key}`) || 0) + 1);
+    }
+    const timestamp = reactionTime(row, now);
+    if (!actorTimes.has(actorId)) actorTimes.set(actorId, []);
+    actorTimes.get(actorId).push(timestamp);
+
+    const contribution = contributionById.get(contributionId);
+    const publicationState = text(contribution?.publicationState || contribution?.publication_state).toUpperCase();
+    if (contribution && publicationState && !["PUBLISHED", "EDITED"].includes(publicationState)) {
+      signals.push({ code: "REACTION_TARGET_NOT_ACTIVE", actorId, contributionId });
+    }
+    const actorState = stateByActor.get(actorId);
+    if (actorState?.suspendedAt || actorState?.suspended_at || text(actorState?.status).toUpperCase() === "SUSPENDED") {
+      signals.push({ code: "REACTION_FROM_SUSPENDED_ACTOR", actorId, contributionId });
+    }
+  }
+
+  for (const [tuple, count] of tupleCounts) {
+    if (count > 1) signals.push({ code: "DUPLICATE_REACTION_TUPLE", tuple, count });
+  }
+  for (const [key, count] of idempotencyCounts) {
+    if (count > 1) signals.push({ code: "DUPLICATE_REACTION_IDEMPOTENCY", key, count });
+  }
+
+  const actorClusters = new Map();
+  for (const row of rows) {
+    const cluster = row.identityClusterKey || row.identity_cluster_key;
+    if (!cluster) continue;
+    const actorId = String(row.actorId || row.userId || "unknown");
+    if (!actorClusters.has(String(cluster))) actorClusters.set(String(cluster), new Set());
+    actorClusters.get(String(cluster)).add(actorId);
+  }
+  for (const [identityClusterKey, actorIds] of actorClusters) {
+    if (actorIds.size > 1) signals.push({ code: "MULTIPLE_ACCOUNTS_IDENTITY_CLUSTER", identityClusterKey, actorIds: [...actorIds].sort() });
+  }
+
+  for (const [actorId, timestamps] of actorTimes) {
+    const recent = timestamps.filter((timestamp) => now - timestamp <= burstWindowMs);
+    if (recent.length > burstThreshold) signals.push({ code: "REACTION_BURST", actorId, count: recent.length, windowMs: burstWindowMs });
+  }
+
+  const helpfulEdges = new Map();
+  for (const row of rows) {
+    if (text(row.kind).toUpperCase() !== "HELPFUL") continue;
+    const actorId = String(row.actorId || row.userId || "unknown");
+    const targetAuthorId = String(row.targetAuthorId || row.target_author_id || "");
+    if (!targetAuthorId || targetAuthorId === actorId) continue;
+    const edge = `${actorId}|${targetAuthorId}`;
+    helpfulEdges.set(edge, reactionTime(row, now));
+  }
+  for (const [edge, timestamp] of helpfulEdges) {
+    const [from, to] = edge.split("|");
+    const reverse = helpfulEdges.get(`${to}|${from}`);
+    if (reverse !== undefined && Math.abs(timestamp - reverse) <= burstWindowMs) {
+      signals.push({ code: "RECIPROCAL_HELPFUL_RING_SIGNAL", actorIds: [from, to].sort() });
+    }
+  }
+
+  const uniqueSignals = [...new Map(signals.map((signal) => [JSON.stringify(signal), signal])).values()];
+  return {
+    status: uniqueSignals.length ? "ABUSE_SIGNAL" : "CLEAN",
+    abuseSignal: uniqueSignals.length > 0,
+    automaticAction: "NONE",
+    reviewRequired: uniqueSignals.length > 0,
+    signals: uniqueSignals,
+    policyVersion: COMMUNITY_REACTION_INTEGRITY_POLICY_VERSION,
   };
 }
 
@@ -481,6 +634,18 @@ export function buildAssessmentContract(input = {}) {
     uncertainty: text(input.uncertainty),
     missingEvidence: Array.isArray(input.missingEvidence || input.missing_evidence) ? [...(input.missingEvidence || input.missing_evidence)].map(text).filter(Boolean).slice(0, 50) : [],
     coiDeclared: input.coiDeclared ?? input.coi_declared ?? false,
+    coiState: text(input.coiState || input.coi_state || "LEGACY_UNKNOWN").toUpperCase(),
+    coiDeclarationRef: text(input.coiDeclarationRef || input.coi_declaration_ref) || null,
+    verificationId: text(input.verificationId || input.verification_id) || null,
+    verificationRevision: input.verificationRevision ?? input.verification_revision ?? null,
+    verificationStatus: text(input.verificationStatus || input.verification_status).toUpperCase() || null,
+    verificationQualificationState: text(input.verificationQualificationState || input.verification_qualification_state).toUpperCase() || null,
+    assignmentRevision: input.assignmentRevision ?? input.assignment_revision ?? null,
+    qualificationPolicyVersion: text(input.qualificationPolicyVersion || input.qualification_policy_version || "expert-qualification-v1"),
+    authoritySnapshotVersion: input.authoritySnapshotVersion ?? input.authority_snapshot_version ?? 0,
+    authoritySnapshotDigest: text(input.authoritySnapshotDigest || input.authority_snapshot_digest) || null,
+    authoritySnapshot: input.authoritySnapshot || input.authority_snapshot || null,
+    submittedAt: input.submittedAt || input.submitted_at || null,
     createdAt: input.createdAt || input.created_at || null,
     policyVersion: text(input.policyVersion || input.policy_version || REPUTATION_POLICY_VERSION),
   };

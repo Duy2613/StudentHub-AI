@@ -40,7 +40,10 @@ export class TrustGraphService {
       pool.query(
         `SELECT c.id, c.statement, c.status
          FROM public.claims c
-         WHERE c.creator_id = (SELECT owner_id FROM public.trust_cases WHERE id = $1)`,
+         JOIN public.claim_sources cs ON cs.claim_id = c.id
+         JOIN public.evidence e ON e.id = cs.evidence_id
+         WHERE e.case_id = $1
+         GROUP BY c.id, c.statement, c.status`,
         [caseId]
       ),
       pool.query(`SELECT id, source_type, source_identifier, observed_at, confidence, provenance FROM public.evidence WHERE case_id = $1`, [caseId]),

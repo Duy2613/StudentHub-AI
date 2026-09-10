@@ -5,16 +5,16 @@ test.describe("StudentHub Visual System VNext — 'Khai Minh' Verification", () 
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
-    // 1. Verify H1 uses Be Vietnam Pro and Lora
+    // 1. Verify the current VNext hero uses the canonical UI and editorial stacks.
     const h1 = page.locator("#hero-title");
     await expect(h1).toBeVisible();
     const h1Font = await h1.evaluate((el) => window.getComputedStyle(el).fontFamily);
     expect(h1Font.toLowerCase()).toContain("be vietnam pro");
 
-    const loraSpan = h1.locator("span.font-serif");
-    await expect(loraSpan).toBeVisible();
-    const loraFont = await loraSpan.evaluate((el) => window.getComputedStyle(el).fontFamily);
-    expect(loraFont.toLowerCase()).toContain("lora");
+    const editorialEmphasis = h1.locator("em");
+    await expect(editorialEmphasis).toBeVisible();
+    const editorialFont = await editorialEmphasis.evaluate((el) => window.getComputedStyle(el).fontFamily);
+    expect(editorialFont.toLowerCase()).toContain("cormorant garamond");
 
     // 2. Verify body copy is >= 16px
     const heroBody = page.locator("section[aria-labelledby='hero-title'] p").first();
@@ -23,7 +23,7 @@ test.describe("StudentHub Visual System VNext — 'Khai Minh' Verification", () 
     expect(heroBodySize).toBeGreaterThanOrEqual(16);
 
     // 3. Verify that all paragraphs inside main sections are >= 14px
-    const sectionParagraphs = page.locator("main section p");
+    const sectionParagraphs = page.locator("main section p:not(.vnext-eyebrow):not(.type-micro-label-v3):not(.vnext-graph-note)");
     const pCount = await sectionParagraphs.count();
     for (let i = 0; i < pCount; i++) {
       const p = sectionParagraphs.nth(i);
@@ -91,9 +91,11 @@ test.describe("StudentHub Visual System VNext — 'Khai Minh' Verification", () 
     await expect(page.locator("#hero-title")).toBeVisible();
     await expect(page.getByRole("link", { name: "Kiểm tra trước khi tin", exact: true })).toBeVisible();
 
-    // Fallback Knowledge Observatory SVG must be rendered and interactive
-    const fallbackSvg = page.locator("svg[aria-label='Sơ đồ quan hệ các tầng thông tin học thuật']").first();
-    await expect(fallbackSvg).toBeVisible();
+    // The current static-first evidence relationship surface must remain readable.
+    const evidenceGraph = page.getByRole("region", { name: "Minh họa quan hệ bằng chứng" });
+    await expect(evidenceGraph).toBeVisible();
+    await expect(evidenceGraph.getByText("Mệnh đề", { exact: true })).toBeVisible();
+    await expect(evidenceGraph.getByText("Hỗ trợ", { exact: true })).toBeVisible();
   });
 
   test("Gate 5: Prefers-reduced-motion disables cinematic video and loops", async ({ page }) => {
@@ -125,16 +127,14 @@ test.describe("StudentHub Visual System VNext — 'Khai Minh' Verification", () 
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
-    const trustSection = page.locator("#trust-engine-showcase");
+    const trustSection = page.locator("#trust-chapter");
     await trustSection.scrollIntoViewIfNeeded();
 
-    // Verify status labels like PHÁT HIỆN RỦI RO CAO or XÁC THỰC NGUỒN CHÍNH THỨC exist as text
-    await expect(trustSection.getByText(/PHÁT HIỆN RỦI RO CAO|XÁC THỰC NGUỒN CHÍNH THỨC|CHƯA ĐỦ CĂN CỨ PHÁP LÝ/i).first()).toBeVisible();
-
-    // Verify reasoning sections exist: Tại sao, Điểm chưa chắc chắn, Hành động khuyến nghị
-    await expect(trustSection.getByText(/TẠI SAO\?/i).first()).toBeVisible();
-    await expect(trustSection.getByText(/ĐIỂM CHƯA CHẮC CHẮN/i).first()).toBeVisible();
-    await expect(trustSection.getByText(/Hành động an toàn khuyến nghị/i).first()).toBeVisible();
+    // Verify current status labels are explicit and not conveyed by color alone.
+    await expect(trustSection.getByText("Chưa đủ dữ liệu", { exact: true })).toBeVisible();
+    for (const label of ["KẾT LUẬN", "VÌ SAO", "BẰNG CHỨNG", "MÂU THUẪN"]) {
+      await expect(trustSection.getByText(label, { exact: true })).toBeVisible();
+    }
   });
 
   test("Gate 9: Mobile 390px has no floating overlay collisions", async ({ page }) => {

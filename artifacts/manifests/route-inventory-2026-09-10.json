@@ -1,0 +1,2372 @@
+{
+  "generatedAt": "2026-09-10T12:02:38.129Z",
+  "sourceOfTruth": [
+    "frontend/src/app filesystem",
+    "frontend/.next/server/app-paths-manifest.json",
+    "frontend/.next/routes-manifest.json",
+    "frontend/src/proxy.js",
+    "frontend/next.config.ts"
+  ],
+  "counts": {
+    "pageRoutes": 47,
+    "apiHandlers": 174,
+    "redirects": 17
+  },
+  "redirects": [
+    {
+      "source": "/ai",
+      "destination": "/trust",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/scam-check",
+      "destination": "/trust",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/contract-check",
+      "destination": "/trust?tab=contract",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/intelligence",
+      "destination": "/trust",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/intelligence/ai-trust",
+      "destination": "/trust",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/intelligence/community",
+      "destination": "/community",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/intelligence/evidence",
+      "destination": "/trust",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/intelligence/experts",
+      "destination": "/expert",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/intelligence/knowledge",
+      "destination": "/trust",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/intelligence/trust",
+      "destination": "/trust",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/academic/profile",
+      "destination": "/profile",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/prof-rating",
+      "destination": "/academic",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/profile/:id",
+      "destination": "/profile?profileId=:id",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/marketplace",
+      "destination": "/community",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/quests",
+      "destination": "/dashboard",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/forum",
+      "destination": "/community",
+      "classification": "REDIRECT"
+    },
+    {
+      "source": "/ultra",
+      "destination": "/cases",
+      "classification": "REDIRECT"
+    }
+  ],
+  "pages": [
+    {
+      "path": "/academic",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/academic/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/academic/page.js"
+    },
+    {
+      "path": "/academic-showcase",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/academic-showcase/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/academic-showcase/page.js"
+    },
+    {
+      "path": "/academic/execution",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/academic/execution/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/academic/execution/page.js"
+    },
+    {
+      "path": "/academic/planner",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/academic/planner/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/academic/planner/page.js"
+    },
+    {
+      "path": "/academic/profile",
+      "classification": "REDIRECT",
+      "redirectTarget": "/profile",
+      "source": "frontend/src/app/academic/profile/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/academic/profile/page.js"
+    },
+    {
+      "path": "/academic/roadmap",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/academic/roadmap/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/academic/roadmap/page.js"
+    },
+    {
+      "path": "/ai",
+      "classification": "REDIRECT",
+      "redirectTarget": "/trust",
+      "source": "frontend/src/app/ai/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/ai/page.js"
+    },
+    {
+      "path": "/c9",
+      "classification": "INTERNAL/TEST",
+      "redirectTarget": null,
+      "source": "frontend/src/app/c9/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/c9/page.js"
+    },
+    {
+      "path": "/callback",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/callback/page.jsx",
+      "sourceSignals": [
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/callback/page.js"
+    },
+    {
+      "path": "/cases",
+      "classification": "ADMIN/PRIVILEGED_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/cases/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/cases/page.js"
+    },
+    {
+      "path": "/cinema",
+      "classification": "INTERNAL/TEST",
+      "redirectTarget": null,
+      "source": "frontend/src/app/cinema/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/cinema/page.js"
+    },
+    {
+      "path": "/community",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/community/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/community/page.js"
+    },
+    {
+      "path": "/contract-check",
+      "classification": "REDIRECT",
+      "redirectTarget": "/trust?tab=contract",
+      "source": "frontend/src/app/contract-check/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/contract-check/page.js"
+    },
+    {
+      "path": "/credit-scheduler",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/credit-scheduler/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/credit-scheduler/page.js"
+    },
+    {
+      "path": "/dashboard",
+      "classification": "ADMIN/PRIVILEGED_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/dashboard/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/dashboard/page.js"
+    },
+    {
+      "path": "/expert",
+      "classification": "ADMIN/PRIVILEGED_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/expert/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/expert/page.js"
+    },
+    {
+      "path": "/forum",
+      "classification": "REDIRECT",
+      "redirectTarget": "/community",
+      "source": "frontend/src/app/forum/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/forum/page.js"
+    },
+    {
+      "path": "/intelligence",
+      "classification": "REDIRECT",
+      "redirectTarget": "/trust",
+      "source": "frontend/src/app/intelligence/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/intelligence/page.js"
+    },
+    {
+      "path": "/intelligence/ai-trust",
+      "classification": "REDIRECT",
+      "redirectTarget": "/trust",
+      "source": "frontend/src/app/intelligence/ai-trust/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/intelligence/ai-trust/page.js"
+    },
+    {
+      "path": "/intelligence/community",
+      "classification": "REDIRECT",
+      "redirectTarget": "/community",
+      "source": "frontend/src/app/intelligence/community/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/intelligence/community/page.js"
+    },
+    {
+      "path": "/intelligence/evidence",
+      "classification": "REDIRECT",
+      "redirectTarget": "/trust",
+      "source": "frontend/src/app/intelligence/evidence/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/intelligence/evidence/page.js"
+    },
+    {
+      "path": "/intelligence/experts",
+      "classification": "REDIRECT",
+      "redirectTarget": "/expert",
+      "source": "frontend/src/app/intelligence/experts/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/intelligence/experts/page.js"
+    },
+    {
+      "path": "/intelligence/knowledge",
+      "classification": "REDIRECT",
+      "redirectTarget": "/trust",
+      "source": "frontend/src/app/intelligence/knowledge/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/intelligence/knowledge/page.js"
+    },
+    {
+      "path": "/intelligence/trust",
+      "classification": "REDIRECT",
+      "redirectTarget": "/trust",
+      "source": "frontend/src/app/intelligence/trust/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/intelligence/trust/page.js"
+    },
+    {
+      "path": "/learn",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/learn/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/learn/page.js"
+    },
+    {
+      "path": "/learn/[courseId]/[lessonId]",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/learn/[courseId]/[lessonId]/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/learn/[courseId]/[lessonId]/page.js"
+    },
+    {
+      "path": "/login",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/login/page.jsx",
+      "sourceSignals": [
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/login/page.js"
+    },
+    {
+      "path": "/marketplace",
+      "classification": "REDIRECT",
+      "redirectTarget": "/community",
+      "source": "frontend/src/app/marketplace/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/marketplace/page.js"
+    },
+    {
+      "path": "/onboarding",
+      "classification": "AUTHENTICATED_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/onboarding/page.jsx",
+      "sourceSignals": [
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/onboarding/page.js"
+    },
+    {
+      "path": "/page.jsx",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": null
+    },
+    {
+      "path": "/practice",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/practice/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/practice/page.js"
+    },
+    {
+      "path": "/prof-rating",
+      "classification": "REDIRECT",
+      "redirectTarget": "/academic",
+      "source": "frontend/src/app/prof-rating/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/prof-rating/page.js"
+    },
+    {
+      "path": "/profile",
+      "classification": "AUTHENTICATED_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/profile/page.jsx",
+      "sourceSignals": [
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/profile/page.js"
+    },
+    {
+      "path": "/profile/[id]",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/profile/[id]/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/profile/[id]/page.js"
+    },
+    {
+      "path": "/projects",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/projects/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/projects/page.js"
+    },
+    {
+      "path": "/quests",
+      "classification": "REDIRECT",
+      "redirectTarget": "/dashboard",
+      "source": "frontend/src/app/quests/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/quests/page.js"
+    },
+    {
+      "path": "/register",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/register/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/register/page.js"
+    },
+    {
+      "path": "/roadmap",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/roadmap/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/roadmap/page.js"
+    },
+    {
+      "path": "/safety-map",
+      "classification": "AUTHENTICATED_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/safety-map/page.jsx",
+      "sourceSignals": [
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/safety-map/page.js"
+    },
+    {
+      "path": "/scam-check",
+      "classification": "REDIRECT",
+      "redirectTarget": "/trust",
+      "source": "frontend/src/app/scam-check/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/scam-check/page.js"
+    },
+    {
+      "path": "/scholarships",
+      "classification": "AUTHENTICATED_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/scholarships/page.jsx",
+      "sourceSignals": [
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/scholarships/page.js"
+    },
+    {
+      "path": "/settings",
+      "classification": "ADMIN/PRIVILEGED_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/settings/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/settings/page.js"
+    },
+    {
+      "path": "/settings/privacy",
+      "classification": "ADMIN/PRIVILEGED_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/settings/privacy/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/settings/privacy/page.js"
+    },
+    {
+      "path": "/sos",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/sos/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/sos/page.js"
+    },
+    {
+      "path": "/trust",
+      "classification": "ADMIN/PRIVILEGED_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/trust/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/trust/page.js"
+    },
+    {
+      "path": "/tuition-radar",
+      "classification": "PUBLIC_PAGE",
+      "redirectTarget": null,
+      "source": "frontend/src/app/tuition-radar/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/tuition-radar/page.js"
+    },
+    {
+      "path": "/ultra",
+      "classification": "REDIRECT",
+      "redirectTarget": "/cases",
+      "source": "frontend/src/app/ultra/page.jsx",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/ultra/page.js"
+    }
+  ],
+  "api": [
+    {
+      "path": "/api/[...path]",
+      "method": "DELETE",
+      "classification": "SERVICE_ONLY",
+      "source": "frontend/src/app/api/[...path]/route.js",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/api/[...path]/route.js"
+    },
+    {
+      "path": "/api/[...path]",
+      "method": "GET",
+      "classification": "SERVICE_ONLY",
+      "source": "frontend/src/app/api/[...path]/route.js",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/api/[...path]/route.js"
+    },
+    {
+      "path": "/api/[...path]",
+      "method": "OPTIONS",
+      "classification": "SERVICE_ONLY",
+      "source": "frontend/src/app/api/[...path]/route.js",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/api/[...path]/route.js"
+    },
+    {
+      "path": "/api/[...path]",
+      "method": "PATCH",
+      "classification": "SERVICE_ONLY",
+      "source": "frontend/src/app/api/[...path]/route.js",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/api/[...path]/route.js"
+    },
+    {
+      "path": "/api/[...path]",
+      "method": "POST",
+      "classification": "SERVICE_ONLY",
+      "source": "frontend/src/app/api/[...path]/route.js",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/api/[...path]/route.js"
+    },
+    {
+      "path": "/api/[...path]",
+      "method": "PUT",
+      "classification": "SERVICE_ONLY",
+      "source": "frontend/src/app/api/[...path]/route.js",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/api/[...path]/route.js"
+    },
+    {
+      "path": "/api/academic/command-center",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/command-center/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/command-center/route.js"
+    },
+    {
+      "path": "/api/academic/me/decision-studio",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/me/decision-studio/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/me/decision-studio/route.js"
+    },
+    {
+      "path": "/api/academic/me/decision-studio/adopt",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/me/decision-studio/adopt/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/me/decision-studio/adopt/route.js"
+    },
+    {
+      "path": "/api/academic/me/discrepancy-report",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/me/discrepancy-report/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/me/discrepancy-report/route.js"
+    },
+    {
+      "path": "/api/academic/me/execution",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/me/execution/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/me/execution/route.js"
+    },
+    {
+      "path": "/api/academic/me/execution/reconcile",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/me/execution/reconcile/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/me/execution/reconcile/route.js"
+    },
+    {
+      "path": "/api/academic/me/planner",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/me/planner/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/me/planner/route.js"
+    },
+    {
+      "path": "/api/academic/me/profile-360",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/me/profile-360/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/me/profile-360/route.js"
+    },
+    {
+      "path": "/api/academic/me/roadmap",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/me/roadmap/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/me/roadmap/route.js"
+    },
+    {
+      "path": "/api/academic/me/simulate",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/me/simulate/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/me/simulate/route.js"
+    },
+    {
+      "path": "/api/academic/notifications",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/notifications/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/notifications/route.js"
+    },
+    {
+      "path": "/api/academic/notifications",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/notifications/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/notifications/route.js"
+    },
+    {
+      "path": "/api/academic/tasks/[taskId]",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/tasks/[taskId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/tasks/[taskId]/route.js"
+    },
+    {
+      "path": "/api/academic/tasks/[taskId]",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/academic/tasks/[taskId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/academic/tasks/[taskId]/route.js"
+    },
+    {
+      "path": "/api/ai-trust/evidence",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/ai-trust/evidence/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/ai-trust/evidence/route.js"
+    },
+    {
+      "path": "/api/ai-trust/observatory",
+      "method": "GET",
+      "classification": "ADMIN",
+      "source": "frontend/src/app/api/ai-trust/observatory/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "admin-permission"
+      ],
+      "builtManifestEntry": "app/api/ai-trust/observatory/route.js"
+    },
+    {
+      "path": "/api/ai-trust/ocr",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/ai-trust/ocr/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/ai-trust/ocr/route.js"
+    },
+    {
+      "path": "/api/ai-trust/reasoning",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/ai-trust/reasoning/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/ai-trust/reasoning/route.js"
+    },
+    {
+      "path": "/api/ai-trust/reputation",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/ai-trust/reputation/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/ai-trust/reputation/route.js"
+    },
+    {
+      "path": "/api/ai-trust/screen",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/ai-trust/screen/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/ai-trust/screen/route.js"
+    },
+    {
+      "path": "/api/ai-trust/semantic",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/ai-trust/semantic/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/ai-trust/semantic/route.js"
+    },
+    {
+      "path": "/api/ai/trust/audit/[answerId]",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/ai/trust/audit/[answerId]/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/ai/trust/audit/[answerId]/route.js"
+    },
+    {
+      "path": "/api/ai/trust/claims/[claimId]",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/ai/trust/claims/[claimId]/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/ai/trust/claims/[claimId]/route.js"
+    },
+    {
+      "path": "/api/ai/trust/evaluate",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/ai/trust/evaluate/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/ai/trust/evaluate/route.js"
+    },
+    {
+      "path": "/api/ai/trust/evaluations/[evaluationId]",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/ai/trust/evaluations/[evaluationId]/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/ai/trust/evaluations/[evaluationId]/route.js"
+    },
+    {
+      "path": "/api/ai/trust/evidence/[evidenceId]",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/ai/trust/evidence/[evidenceId]/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/ai/trust/evidence/[evidenceId]/route.js"
+    },
+    {
+      "path": "/api/ai/trust/verify-claim",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/ai/trust/verify-claim/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/ai/trust/verify-claim/route.js"
+    },
+    {
+      "path": "/api/auth/session",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/auth/session/route.js",
+      "sourceSignals": [
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/auth/session/route.js"
+    },
+    {
+      "path": "/api/auth/session/exchange",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/auth/session/exchange/route.js",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/api/auth/session/exchange/route.js"
+    },
+    {
+      "path": "/api/auth/session/logout",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/auth/session/logout/route.js",
+      "sourceSignals": [],
+      "builtManifestEntry": "app/api/auth/session/logout/route.js"
+    },
+    {
+      "path": "/api/chat",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/chat/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/chat/route.js"
+    },
+    {
+      "path": "/api/community/experience/evaluate",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/community/experience/evaluate/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/community/experience/evaluate/route.js"
+    },
+    {
+      "path": "/api/community/experiences",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/community/experiences/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/community/experiences/route.js"
+    },
+    {
+      "path": "/api/contract-check/analyze",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/contract-check/analyze/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/contract-check/analyze/route.js"
+    },
+    {
+      "path": "/api/expert/appeals",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/expert/appeals/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/expert/appeals/route.js"
+    },
+    {
+      "path": "/api/expert/appeals/review",
+      "method": "POST",
+      "classification": "ADMIN",
+      "source": "frontend/src/app/api/expert/appeals/review/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "admin-permission"
+      ],
+      "builtManifestEntry": "app/api/expert/appeals/review/route.js"
+    },
+    {
+      "path": "/api/expert/assessments",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/expert/assessments/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/expert/assessments/route.js"
+    },
+    {
+      "path": "/api/expert/assessments",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/expert/assessments/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/expert/assessments/route.js"
+    },
+    {
+      "path": "/api/expert/assignments",
+      "method": "POST",
+      "classification": "ADMIN",
+      "source": "frontend/src/app/api/expert/assignments/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "admin-permission"
+      ],
+      "builtManifestEntry": "app/api/expert/assignments/route.js"
+    },
+    {
+      "path": "/api/expert/evaluate",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/expert/evaluate/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/expert/evaluate/route.js"
+    },
+    {
+      "path": "/api/expert/graph",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/expert/graph/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/expert/graph/route.js"
+    },
+    {
+      "path": "/api/expert/profile/[expertId]",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/expert/profile/[expertId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/expert/profile/[expertId]/route.js"
+    },
+    {
+      "path": "/api/expert/qualification",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/expert/qualification/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/expert/qualification/route.js"
+    },
+    {
+      "path": "/api/expert/qualification",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/expert/qualification/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/expert/qualification/route.js"
+    },
+    {
+      "path": "/api/expert/qualification/practice",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/expert/qualification/practice/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/expert/qualification/practice/route.js"
+    },
+    {
+      "path": "/api/expert/qualification/practice/review",
+      "method": "POST",
+      "classification": "ADMIN",
+      "source": "frontend/src/app/api/expert/qualification/practice/review/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "admin-permission"
+      ],
+      "builtManifestEntry": "app/api/expert/qualification/practice/review/route.js"
+    },
+    {
+      "path": "/api/expert/qualification/quiz",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/expert/qualification/quiz/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/expert/qualification/quiz/route.js"
+    },
+    {
+      "path": "/api/expert/qualification/quiz/answers",
+      "method": "PUT",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/expert/qualification/quiz/answers/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/expert/qualification/quiz/answers/route.js"
+    },
+    {
+      "path": "/api/expert/qualification/quiz/submit",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/expert/qualification/quiz/submit/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/expert/qualification/quiz/submit/route.js"
+    },
+    {
+      "path": "/api/expert/qualification/review",
+      "method": "POST",
+      "classification": "ADMIN",
+      "source": "frontend/src/app/api/expert/qualification/review/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "admin-permission"
+      ],
+      "builtManifestEntry": "app/api/expert/qualification/review/route.js"
+    },
+    {
+      "path": "/api/expert/quality",
+      "method": "POST",
+      "classification": "ADMIN",
+      "source": "frontend/src/app/api/expert/quality/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "admin-permission"
+      ],
+      "builtManifestEntry": "app/api/expert/quality/route.js"
+    },
+    {
+      "path": "/api/expert/reviews",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/expert/reviews/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/expert/reviews/route.js"
+    },
+    {
+      "path": "/api/expert/reviews",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/expert/reviews/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/expert/reviews/route.js"
+    },
+    {
+      "path": "/api/forum/posts",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/forum/posts/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/forum/posts/route.js"
+    },
+    {
+      "path": "/api/forum/posts",
+      "method": "PATCH",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/forum/posts/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/forum/posts/route.js"
+    },
+    {
+      "path": "/api/forum/posts",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/forum/posts/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/forum/posts/route.js"
+    },
+    {
+      "path": "/api/forum/vote",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/forum/vote/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/forum/vote/route.js"
+    },
+    {
+      "path": "/api/health/live",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/health/live/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/health/live/route.js"
+    },
+    {
+      "path": "/api/health/ready",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/health/ready/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/health/ready/route.js"
+    },
+    {
+      "path": "/api/intelligence/claims/[claimId]",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/claims/[claimId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/claims/[claimId]/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/consensus",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/community/consensus/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/consensus/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/contributions/[contributionId]",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/intelligence/community/contributions/[contributionId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/contributions/[contributionId]/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/contributions/[contributionId]",
+      "method": "PATCH",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/intelligence/community/contributions/[contributionId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/contributions/[contributionId]/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/contributions/preview",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/intelligence/community/contributions/preview/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/contributions/preview/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/corrections",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/intelligence/community/corrections/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/corrections/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/evaluate",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/community/evaluate/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/evaluate/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/experiences/[experienceId]",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/community/experiences/[experienceId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/experiences/[experienceId]/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/feedback",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/intelligence/community/feedback/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/feedback/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/friction",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/community/friction/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/friction/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/posts",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/community/posts/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/posts/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/posts",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/community/posts/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/posts/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/query",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/community/query/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/query/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/reality-gaps",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/community/reality-gaps/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/reality-gaps/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/search",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/community/search/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/search/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/topics/[topicId]",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/community/topics/[topicId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/topics/[topicId]/route.js"
+    },
+    {
+      "path": "/api/intelligence/community/track-record",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/intelligence/community/track-record/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/intelligence/community/track-record/route.js"
+    },
+    {
+      "path": "/api/intelligence/contradictions/[claimId]",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/contradictions/[claimId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/contradictions/[claimId]/route.js"
+    },
+    {
+      "path": "/api/intelligence/experts",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/experts/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/experts/route.js"
+    },
+    {
+      "path": "/api/intelligence/experts/[expertId]",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/experts/[expertId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/experts/[expertId]/route.js"
+    },
+    {
+      "path": "/api/intelligence/experts/[expertId]/claims",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/experts/[expertId]/claims/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/experts/[expertId]/claims/route.js"
+    },
+    {
+      "path": "/api/intelligence/experts/[expertId]/claims",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/experts/[expertId]/claims/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/experts/[expertId]/claims/route.js"
+    },
+    {
+      "path": "/api/intelligence/experts/[expertId]/evidence",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/experts/[expertId]/evidence/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/experts/[expertId]/evidence/route.js"
+    },
+    {
+      "path": "/api/intelligence/experts/disagreements",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/experts/disagreements/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/experts/disagreements/route.js"
+    },
+    {
+      "path": "/api/intelligence/experts/resolve",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/intelligence/experts/resolve/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/intelligence/experts/resolve/route.js"
+    },
+    {
+      "path": "/api/intelligence/experts/verify-claim",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/experts/verify-claim/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/experts/verify-claim/route.js"
+    },
+    {
+      "path": "/api/intelligence/fusion/evaluate",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/intelligence/fusion/evaluate/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/intelligence/fusion/evaluate/route.js"
+    },
+    {
+      "path": "/api/intelligence/fusion/objects/[knowledgeObjectId]",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/fusion/objects/[knowledgeObjectId]/route.js"
+    },
+    {
+      "path": "/api/intelligence/fusion/objects/[knowledgeObjectId]/conflicts",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/conflicts/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/fusion/objects/[knowledgeObjectId]/conflicts/route.js"
+    },
+    {
+      "path": "/api/intelligence/fusion/objects/[knowledgeObjectId]/evidence",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/evidence/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/fusion/objects/[knowledgeObjectId]/evidence/route.js"
+    },
+    {
+      "path": "/api/intelligence/fusion/objects/[knowledgeObjectId]/history",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/history/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/fusion/objects/[knowledgeObjectId]/history/route.js"
+    },
+    {
+      "path": "/api/intelligence/fusion/objects/[knowledgeObjectId]/unknowns",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/unknowns/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/fusion/objects/[knowledgeObjectId]/unknowns/route.js"
+    },
+    {
+      "path": "/api/intelligence/health",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/health/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/health/route.js"
+    },
+    {
+      "path": "/api/intelligence/recommendations",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/intelligence/recommendations/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/intelligence/recommendations/route.js"
+    },
+    {
+      "path": "/api/intelligence/reputation/[subjectId]",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/reputation/[subjectId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/reputation/[subjectId]/route.js"
+    },
+    {
+      "path": "/api/intelligence/social/early-warnings",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/social/early-warnings/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/social/early-warnings/route.js"
+    },
+    {
+      "path": "/api/intelligence/social/signals",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/social/signals/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/social/signals/route.js"
+    },
+    {
+      "path": "/api/intelligence/social/signals",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/social/signals/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/social/signals/route.js"
+    },
+    {
+      "path": "/api/intelligence/social/sources",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/social/sources/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/social/sources/route.js"
+    },
+    {
+      "path": "/api/intelligence/social/sync",
+      "method": "POST",
+      "classification": "ADMIN",
+      "source": "frontend/src/app/api/intelligence/social/sync/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "admin-permission"
+      ],
+      "builtManifestEntry": "app/api/intelligence/social/sync/route.js"
+    },
+    {
+      "path": "/api/intelligence/trust/[subjectId]",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/intelligence/trust/[subjectId]/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/intelligence/trust/[subjectId]/route.js"
+    },
+    {
+      "path": "/api/marketplace/items",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/marketplace/items/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/marketplace/items/route.js"
+    },
+    {
+      "path": "/api/marketplace/items",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/marketplace/items/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/marketplace/items/route.js"
+    },
+    {
+      "path": "/api/personalization/briefing",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/briefing/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/briefing/route.js"
+    },
+    {
+      "path": "/api/personalization/command-center",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/command-center/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/command-center/route.js"
+    },
+    {
+      "path": "/api/personalization/devices",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/devices/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/devices/route.js"
+    },
+    {
+      "path": "/api/personalization/devices",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/devices/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/devices/route.js"
+    },
+    {
+      "path": "/api/personalization/devices/revoke",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/devices/revoke/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/devices/revoke/route.js"
+    },
+    {
+      "path": "/api/personalization/digital-twin",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/digital-twin/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/digital-twin/route.js"
+    },
+    {
+      "path": "/api/personalization/goals",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/goals/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/goals/route.js"
+    },
+    {
+      "path": "/api/personalization/goals",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/goals/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/goals/route.js"
+    },
+    {
+      "path": "/api/personalization/memory",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/memory/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/memory/route.js"
+    },
+    {
+      "path": "/api/personalization/memory",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/memory/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/memory/route.js"
+    },
+    {
+      "path": "/api/personalization/preferences",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/preferences/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/preferences/route.js"
+    },
+    {
+      "path": "/api/personalization/preferences",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/preferences/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/preferences/route.js"
+    },
+    {
+      "path": "/api/personalization/reset",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/reset/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/reset/route.js"
+    },
+    {
+      "path": "/api/personalization/search",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/personalization/search/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/personalization/search/route.js"
+    },
+    {
+      "path": "/api/prof-rating/professors",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/prof-rating/professors/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/prof-rating/professors/route.js"
+    },
+    {
+      "path": "/api/prof-rating/reviews",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/prof-rating/reviews/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/prof-rating/reviews/route.js"
+    },
+    {
+      "path": "/api/prof-rating/reviews",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/prof-rating/reviews/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/prof-rating/reviews/route.js"
+    },
+    {
+      "path": "/api/public/catalog",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/public/catalog/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/public/catalog/route.js"
+    },
+    {
+      "path": "/api/public/discovery",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/public/discovery/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/public/discovery/route.js"
+    },
+    {
+      "path": "/api/public/research",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/public/research/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/public/research/route.js"
+    },
+    {
+      "path": "/api/public/weather",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/public/weather/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/public/weather/route.js"
+    },
+    {
+      "path": "/api/quests/daily",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/quests/daily/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/quests/daily/route.js"
+    },
+    {
+      "path": "/api/quests/daily",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/quests/daily/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/quests/daily/route.js"
+    },
+    {
+      "path": "/api/realtime/broadcast",
+      "method": "POST",
+      "classification": "ADMIN",
+      "source": "frontend/src/app/api/realtime/broadcast/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "admin-permission"
+      ],
+      "builtManifestEntry": "app/api/realtime/broadcast/route.js"
+    },
+    {
+      "path": "/api/realtime/stream",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/realtime/stream/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/realtime/stream/route.js"
+    },
+    {
+      "path": "/api/safety-map/reports",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/safety-map/reports/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/safety-map/reports/route.js"
+    },
+    {
+      "path": "/api/safety-map/reports",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/safety-map/reports/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/safety-map/reports/route.js"
+    },
+    {
+      "path": "/api/scheduler/optimize",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/scheduler/optimize/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/scheduler/optimize/route.js"
+    },
+    {
+      "path": "/api/scheduler/optimize",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/scheduler/optimize/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/scheduler/optimize/route.js"
+    },
+    {
+      "path": "/api/scholarships/list",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/scholarships/list/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/scholarships/list/route.js"
+    },
+    {
+      "path": "/api/scholarships/match-profile",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/scholarships/match-profile/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/scholarships/match-profile/route.js"
+    },
+    {
+      "path": "/api/sos/bank-hotlines",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/sos/bank-hotlines/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/sos/bank-hotlines/route.js"
+    },
+    {
+      "path": "/api/sos/generate-complaint",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/sos/generate-complaint/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/sos/generate-complaint/route.js"
+    },
+    {
+      "path": "/api/student/identity",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/student/identity/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/student/identity/route.js"
+    },
+    {
+      "path": "/api/student/records",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/student/records/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/student/records/route.js"
+    },
+    {
+      "path": "/api/tuition-radar/verify",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/tuition-radar/verify/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/tuition-radar/verify/route.js"
+    },
+    {
+      "path": "/api/tuition-radar/verify",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/tuition-radar/verify/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/tuition-radar/verify/route.js"
+    },
+    {
+      "path": "/api/users/leaderboard",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/users/leaderboard/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/users/leaderboard/route.js"
+    },
+    {
+      "path": "/api/users/profile",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/users/profile/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/users/profile/route.js"
+    },
+    {
+      "path": "/api/users/profile",
+      "method": "PUT",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/users/profile/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "session-principal"
+      ],
+      "builtManifestEntry": "app/api/users/profile/route.js"
+    },
+    {
+      "path": "/api/users/verify-edu",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/users/verify-edu/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/users/verify-edu/route.js"
+    },
+    {
+      "path": "/api/v1/academic",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/academic/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/academic/route.js"
+    },
+    {
+      "path": "/api/v1/community",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/v1/community/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/v1/community/route.js"
+    },
+    {
+      "path": "/api/v1/community",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/v1/community/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/v1/community/route.js"
+    },
+    {
+      "path": "/api/v1/dashboard",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/dashboard/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/dashboard/route.js"
+    },
+    {
+      "path": "/api/v1/decisions",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/decisions/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/decisions/route.js"
+    },
+    {
+      "path": "/api/v1/demo/superflows",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/v1/demo/superflows/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/v1/demo/superflows/route.js"
+    },
+    {
+      "path": "/api/v1/experts",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/v1/experts/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/v1/experts/route.js"
+    },
+    {
+      "path": "/api/v1/integrations/aidrive",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/integrations/aidrive/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/integrations/aidrive/route.js"
+    },
+    {
+      "path": "/api/v1/integrations/labbe",
+      "method": "GET",
+      "classification": "ADMIN",
+      "source": "frontend/src/app/api/v1/integrations/labbe/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "admin-permission"
+      ],
+      "builtManifestEntry": "app/api/v1/integrations/labbe/route.js"
+    },
+    {
+      "path": "/api/v1/integrations/labbe",
+      "method": "POST",
+      "classification": "ADMIN",
+      "source": "frontend/src/app/api/v1/integrations/labbe/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "admin-permission"
+      ],
+      "builtManifestEntry": "app/api/v1/integrations/labbe/route.js"
+    },
+    {
+      "path": "/api/v1/notifications",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/notifications/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/notifications/route.js"
+    },
+    {
+      "path": "/api/v1/notifications",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/notifications/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/notifications/route.js"
+    },
+    {
+      "path": "/api/v1/passports",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/passports/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/passports/route.js"
+    },
+    {
+      "path": "/api/v1/passports",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/passports/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/passports/route.js"
+    },
+    {
+      "path": "/api/v1/passports/[passportId]",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/passports/[passportId]/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/passports/[passportId]/route.js"
+    },
+    {
+      "path": "/api/v1/passports/[passportId]",
+      "method": "PATCH",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/passports/[passportId]/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/passports/[passportId]/route.js"
+    },
+    {
+      "path": "/api/v1/reports",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/reports/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/reports/route.js"
+    },
+    {
+      "path": "/api/v1/reports",
+      "method": "POST",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/reports/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/reports/route.js"
+    },
+    {
+      "path": "/api/v1/reports/[reportId]",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/reports/[reportId]/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/reports/[reportId]/route.js"
+    },
+    {
+      "path": "/api/v1/search",
+      "method": "GET",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/v1/search/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/v1/search/route.js"
+    },
+    {
+      "path": "/api/v1/trust",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/v1/trust/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/v1/trust/route.js"
+    },
+    {
+      "path": "/api/v1/trust/analyze",
+      "method": "POST",
+      "classification": "PUBLIC",
+      "source": "frontend/src/app/api/v1/trust/analyze/route.js",
+      "sourceSignals": [
+        "security-fabric",
+        "public-contract"
+      ],
+      "builtManifestEntry": "app/api/v1/trust/analyze/route.js"
+    },
+    {
+      "path": "/api/v1/trust/cases",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/trust/cases/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/trust/cases/route.js"
+    },
+    {
+      "path": "/api/v1/trust/cases/[caseId]",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/trust/cases/[caseId]/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/trust/cases/[caseId]/route.js"
+    },
+    {
+      "path": "/api/v1/trust/cases/[caseId]/community-signals",
+      "method": "GET",
+      "classification": "AUTHENTICATED",
+      "source": "frontend/src/app/api/v1/trust/cases/[caseId]/community-signals/route.js",
+      "sourceSignals": [
+        "security-fabric"
+      ],
+      "builtManifestEntry": "app/api/v1/trust/cases/[caseId]/community-signals/route.js"
+    }
+  ],
+  "notes": [
+    "Page classification is a release inventory heuristic; server/API authorization remains authoritative.",
+    "Routes with an explicit next.config redirect are recorded as REDIRECT even when a source page file remains for compatibility.",
+    "No LEGACY RETIRED ROUTE was inferred from the current build; /learn, /practice, /projects, /roadmap remain active source routes unless redirected by the manifest."
+  ]
+}

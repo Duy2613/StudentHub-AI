@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import TrustWorkspaceClient from "@/components/trust/TrustWorkspaceClient";
 import UnifiedAppShell from "@/components/layout/UnifiedAppShell";
 
@@ -8,5 +8,11 @@ export const metadata = {
 };
 
 export default function TrustPage() {
-  return <UnifiedAppShell><TrustWorkspaceClient /></UnifiedAppShell>;
+  return (
+    <UnifiedAppShell>
+      <Suspense fallback={<div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center text-xs text-[var(--text-muted)] font-mono">LOADING TRUST ENGINE...</div>}>
+        <TrustWorkspaceClient />
+      </Suspense>
+    </UnifiedAppShell>
+  );
 }

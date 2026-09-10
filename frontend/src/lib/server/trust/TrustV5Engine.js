@@ -79,6 +79,8 @@ export class TrustV5Engine {
     publicApiDiscoverySources = [],
     publicApiDiscoveryAdapter = null,
     includePublicApiDiscovery = false,
+    expertAssessments = [],
+    issuedAt = null,
   } = {}) {
     const runId = `run-${randomUUID()}`;
     const effectiveCaseId = caseId || `case-${randomUUID()}`;
@@ -244,6 +246,8 @@ export class TrustV5Engine {
       modelTraces: multiModelResult.modelTraces,
       verdictResult: verdictAdjudication,
       decisionTwin,
+      expertAssessments,
+      issuedAt,
     });
 
     const latencyTotalMs = Date.now() - startedAt;
@@ -312,6 +316,7 @@ export class TrustV5Engine {
         revision: passport.revision,
         artifactHash: passport.artifactHash,
         issuedAt: passport.issuedAt,
+        expertAssessmentLineage: passport.expertAssessmentLineage,
       },
     };
   }

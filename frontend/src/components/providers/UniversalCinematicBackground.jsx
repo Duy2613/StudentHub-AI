@@ -60,6 +60,15 @@ export default function UniversalCinematicBackground() {
     return () => observer.disconnect();
   }, []);
 
+  const [isSaveData, setIsSaveData] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== "undefined" && navigator.connection?.saveData) {
+      setIsSaveData(true);
+    }
+  }, []);
+
   const shouldRenderVideo = Boolean(
     activeMedia?.video &&
     routeMediaPolicy.videoEligible &&
@@ -67,6 +76,8 @@ export default function UniversalCinematicBackground() {
     isVisible &&
     !isMobile &&
     !reducedMotion &&
+    !isSaveData &&
+    !videoError &&
     !isBgPaused,
   );
 
@@ -122,14 +133,17 @@ export default function UniversalCinematicBackground() {
         <video
           ref={videoRef}
           key={activeMedia.id}
-          src={activeMedia.video}
+          src={isMobile && activeMedia.mobileVideo ? activeMedia.mobileVideo : activeMedia.video}
           poster={activeMedia.desktopPoster}
           autoPlay
           preload="none"
           loop
           muted
           playsInline
+          onError={() => setVideoError(true)}
           className="vnext-media-video"
+          aria-hidden="true"
+          tabIndex={-1}
         />
       )}
       <div className="vnext-media-veil" />

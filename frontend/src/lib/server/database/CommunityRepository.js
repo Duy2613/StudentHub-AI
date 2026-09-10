@@ -11,6 +11,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { getPostgresPool } from "./PostgresPool.js";
 import { assertCaseScope, isCanonicalUuid, scopeError } from "./CommunityExpertScope.js";
 import {
+  analyzeReactionIntegrity,
   canonicalizeSource,
   calculateCommunityTrackRecord,
   canAppeal,
@@ -152,6 +153,66 @@ async function appendQualityEvent(client, {
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now())`,
     [subjectId, actorId, contributionId, caseId, caseRevision, eventType, pointDelta, String(reason || "community quality event").slice(0, 1000), idempotencyKey, requestDigest]
   );
+}
+
+async function appendAppealQualityCorrection(client, { appeal, reviewerId, review }) {
+  if (!appeal?.assessment_id || review?.decision !== "OVERTURN") return null;
+  const assessmentResult = await client.query(
+    `SELECT id, expert_id, domain_code, case_id, case_revision, claim_id,
+            evidence_revision_ids
+       FROM public.expert_assessments
+      WHERE id = $1
+      FOR SHARE`,
+    [appeal.assessment_id]
+  );
+  const assessment = assessmentResult.rows[0];
+  if (!assessment) return null;
+  const domainCode = String(assessment.domain_code || "").toUpperCase();
+  const targetResult = await client.query(
+    `SELECT id, outcome, weight
+       FROM private.expert_quality_events
+      WHERE user_id = $1 AND domain_code = $2
+        AND case_id = $3 AND case_revision = $4
+        AND event_type = 'ADJUDICATION'
+        AND supersedes_event_id IS NULL
+      ORDER BY created_at DESC
+      LIMIT 1
+      FOR SHARE`,
+    [assessment.expert_id, domainCode, assessment.case_id, assessment.case_revision]
+  );
+  const target = targetResult.rows[0] || null;
+  const eventType = target ? "REVERSE_ADJUDICATION" : "MANUAL_CORRECTION";
+  const outcome = target?.outcome || "MIXED";
+  const idempotencyKey = `appeal:${appeal.id}:quality:${review.id}`;
+  const reason = `Independent appeal ${review.id} overturned assessment ${assessment.id}; correction is append-only and does not mutate Trust.`;
+  const evidenceRevisionIds = json(assessment.evidence_revision_ids);
+  const requestDigest = digest({
+    userId: assessment.expert_id,
+    domainCode,
+    caseId: assessment.case_id,
+    caseRevision: Number(assessment.case_revision),
+    claimId: assessment.claim_id || null,
+    evidenceRevisionIds,
+    eventType,
+    outcome,
+    reviewerId,
+    appealId: appeal.id,
+    reviewId: review.id,
+    supersedesEventId: target?.id || null,
+  });
+  const inserted = await client.query(
+    `INSERT INTO private.expert_quality_events
+      (user_id, domain_code, case_id, case_revision, claim_id,
+       event_type, outcome, weight, idempotency_key, request_digest,
+       reason, policy_version, actor_id, supersedes_event_id,
+       evidence_revision_ids)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
+             'expert-quality-v1', $12, $13, $14::jsonb)
+     ON CONFLICT (user_id, domain_code, idempotency_key) DO NOTHING
+     RETURNING id, event_type, outcome, supersedes_event_id`,
+    [assessment.expert_id, domainCode, assessment.case_id, Number(assessment.case_revision), assessment.claim_id || null, eventType, outcome, Number(target?.weight || 1), idempotencyKey, requestDigest, reason, reviewerId, target?.id || null, JSON.stringify(evidenceRevisionIds)]
+  );
+  return inserted.rows[0] || { idempotent: true, eventType, outcome, supersedes_event_id: target?.id || null };
 }
 
 async function upsertSourceCluster(client, sourceData) {
@@ -574,7 +635,7 @@ export class CommunityRepository {
     const pool = getPostgresPool();
     const summaryResult = await pool.query(
       `WITH authored AS (
-         SELECT c.id, c.case_id, c.evidence_revision_ids
+         SELECT c.id, c.case_id, c.evidence_revision_ids, c.created_at, c.updated_at
            FROM public.community_contributions c
           WHERE c.author_id = $1 AND c.publication_state = 'PUBLISHED'
        ), reaction_stats AS (
@@ -589,7 +650,16 @@ export class CommunityRepository {
               count(*) filter (where jsonb_array_length(a.evidence_revision_ids) > 0)::int AS evidence_linked_contributions,
               count(distinct a.case_id)::int AS distinct_cases,
               coalesce((select sum(helpful_count) from reaction_stats), 0)::int AS helpful_reactions,
-              coalesce((select sum(challenge_count) from reaction_stats), 0)::int AS challenge_reactions
+              coalesce((select sum(challenge_count) from reaction_stats), 0)::int AS challenge_reactions,
+              min(a.created_at) AS first_activity_at,
+              max(a.updated_at) AS last_activity_at,
+              coalesce((select count(*) from private.community_quality_events qe
+                 where qe.subject_id = $1
+                   and qe.event_type in ('CORRECTION_RECORDED','MODERATION_RECORDED','MANUAL_CORRECTION')), 0)::int AS evaluated_outcomes,
+              exists (select 1 from private.community_quality_events qe
+                 where qe.subject_id = $1
+                   and qe.event_type = 'MODERATION_RECORDED'
+                   and qe.point_delta < 0) AS sanctions_active
          FROM authored a`,
       [userId]
     );
@@ -607,6 +677,12 @@ export class CommunityRepository {
       helpfulReactions: Number(row.helpful_reactions || 0),
       challengeReactions: Number(row.challenge_reactions || 0),
       qualityEventCount: Number(ledgerResult.rows[0]?.quality_event_count || 0),
+      evaluatedOutcomes: Number(row.evaluated_outcomes || 0),
+      stabilityDays: Number.isFinite(Date.parse(row.first_activity_at)) && Number.isFinite(Date.parse(row.last_activity_at))
+        ? Math.max(0, Math.floor((Date.parse(row.last_activity_at) - Date.parse(row.first_activity_at)) / 86_400_000))
+        : 0,
+      lastActivityAt: row.last_activity_at ? new Date(row.last_activity_at).toISOString() : null,
+      sanctionsActive: row.sanctions_active === true,
     };
     return {
       ...calculateCommunityTrackRecord(summary),
@@ -705,6 +781,30 @@ export class CommunityRepository {
         if (!Buffer.from(existingEvent.rows[0].request_digest).equals(requestDigest)) throw scopeError('IDEMPOTENCY_CONFLICT');
         return { reactionId: existingEvent.rows[0].event_id, idempotent: true, kind, value: Number(value) };
       }
+      const reactionHistory = await client.query(
+        `SELECT user_id AS actor_id, contribution_id, kind, value,
+                idempotency_key, created_at
+           FROM private.community_reaction_events
+          WHERE contribution_id = $1
+          ORDER BY created_at DESC
+          LIMIT 200`,
+        [contributionId]
+      );
+      const integrity = analyzeReactionIntegrity({
+        reactions: [
+          ...reactionHistory.rows,
+          {
+            actorId: userId,
+            contributionId,
+            kind: normalizedKind,
+            value: Number(value),
+            idempotencyKey,
+            targetAuthorId: row.author_id,
+            createdAt: new Date().toISOString(),
+          },
+        ],
+        contributions: [{ id: contributionId, publicationState: row.publication_state }],
+      });
       const event = await client.query(
         `INSERT INTO private.community_reaction_events
           (user_id, contribution_id, claim_id, case_revision, kind, value, idempotency_key, request_digest)
@@ -753,6 +853,9 @@ export class CommunityRepository {
           kind: normalizedKind,
           value: Number(value),
           eventId: event.rows[0].event_id,
+          integrityStatus: integrity.status,
+          integritySignals: integrity.signals,
+          automaticAction: integrity.automaticAction,
           trustMutation: false,
         },
       });
@@ -767,7 +870,7 @@ export class CommunityRepository {
         reason: `A community ${normalizedKind} reaction was recorded; reactions remain non-authoritative signals.`,
         idempotencyKey: `reaction:${event.rows[0].event_id}`,
       });
-      return { ...reaction.rows[0], eventId: event.rows[0].event_id, idempotent: false };
+      return { ...reaction.rows[0], eventId: event.rows[0].event_id, integrity, idempotent: false };
     });
   }
 
@@ -886,6 +989,11 @@ export class CommunityRepository {
           RETURNING id, case_id, case_revision, claim_id, assessment_id, requester_id, reason, status, resolution, resolution_reason, resolved_by, resolved_at, created_at, updated_at`,
         [appealId, nextStatus, reviewerId, normalizedDecision, normalizedReason]
       );
+      const qualityCorrection = await appendAppealQualityCorrection(client, {
+        appeal,
+        reviewerId,
+        review: review.rows[0],
+      });
       await appendOutbox(client, {
         eventType: "COMMUNITY_APPEAL_REVIEWED",
         aggregateId: appealId,
@@ -901,6 +1009,8 @@ export class CommunityRepository {
           claimId: appeal.claim_id,
           decision: normalizedDecision,
           status: nextStatus,
+          qualityCorrection,
+          trustMutation: false,
         },
       });
       return { appeal: updated.rows[0], review: review.rows[0], idempotent: false };
@@ -949,6 +1059,16 @@ export class CommunityRepository {
           evidenceRevisionIds,
           trustMutation: false,
         },
+      });
+      await appendQualityEvent(client, {
+        subjectId: createdBy,
+        actorId: createdBy,
+        caseId,
+        caseRevision: Number(caseRevision),
+        eventType: "CORRECTION_RECORDED",
+        pointDelta: 0,
+        reason: "A durable community correction was recorded for later quality evaluation; it does not mutate Trust.",
+        idempotencyKey: `correction:${res.rows[0].id}:quality`,
       });
       return { ...res.rows[0], idempotent: false };
     });

@@ -4,7 +4,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-import { AlertTriangle, ArrowRight, Check, ClipboardPaste, Clock3, FileImage, Globe2, Image as ImageIcon, LoaderCircle, Printer, ScanSearch, ShieldAlert, ShieldCheck, Upload, Users, UserRoundCheck, X } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { AlertTriangle, ArrowRight, Check, ClipboardPaste, Clock3, FileImage, FileText, Globe2, Image as ImageIcon, LoaderCircle, Printer, ScanSearch, ShieldAlert, ShieldCheck, Upload, Users, UserRoundCheck, X } from "lucide-react";
 import { ApiError, apiErrorMessage } from "@/lib/api/errors";
 import { deriveSafetyActions } from "@/lib/trust/safetyActions";
 import { COMPETITION_DEMO_CASES } from "@/lib/trust/competitionDemoCases";
@@ -19,6 +20,7 @@ import { useBackground } from "@/components/providers/BackgroundContext";
 import SourceInspectorDrawer from "./SourceInspectorDrawer";
 import EvidenceConstellationStage from "./EvidenceConstellationStage";
 import PostResultGateways from "./PostResultGateways";
+import ContractCheckIntakeTab from "./ContractCheckIntakeTab";
 
 const TrustGraph2D = dynamic(() => import("./TrustGraph2D"), {
   ssr: false,
@@ -351,10 +353,18 @@ function v5VerdictTitle(decision) {
 }
 
 export function AiTrustStudioView({ initialMode = "image", initialContent = "", hideHero = false, onSourceProvenanceChange }) {
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get("tab");
   const demoEnabled = process.env.NEXT_PUBLIC_COMPETITION_DEMO === "true";
   const { setRouteMediaAsset } = useBackground();
-  const [mode, setMode] = useState(initialMode);
+  const [mode, setMode] = useState(tabParam === "contract" ? "contract" : initialMode);
   const [content, setContent] = useState(initialContent);
+
+  useEffect(() => {
+    if (tabParam === "contract") {
+      setMode("contract");
+    }
+  }, [tabParam]);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [dragging, setDragging] = useState(false);
@@ -690,12 +700,102 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
         </div>
       ) : (
         <section className="trust-input-grid" aria-labelledby="trust-input-title">
-          <div className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">01 · Input</p><h2 id="trust-input-title" className="product-section-title">Bạn muốn kiểm tra gì?</h2></div>{(file || content) && <button className="text-link" onClick={reset}>Làm mới</button>}</div>
-             {demoEnabled && <div className="workbench-secondary-section" aria-hidden={processing ? "true" : "false"}><div className="demo-mode-panel" role="group" aria-label="Ba case trình diễn"><div><span className="signal-badge">CHẾ ĐỘ TRÌNH DIỄN</span><p>Dữ liệu xác định, chỉ dùng khi người vận hành chủ động chọn case.</p></div><div className="flex flex-wrap gap-2">{COMPETITION_DEMO_CASES.map((item) => <button type="button" key={item.id} className={`filter-chip ${demoCaseId === item.id ? "is-active" : ""}`} aria-pressed={demoCaseId === item.id} onClick={() => { setDemoCaseId(item.id); setMode("text"); contentRef.current = item.input; setContent(item.input); setFile(null); setConfirmedEntities([]); if (preview) URL.revokeObjectURL(preview); setPreview(null); }}>{item.label}</button>)}</div></div></div>}
-             <div className="mode-switch" role="tablist" aria-label="Loại đầu vào"><button role="tab" aria-selected={mode === "image"} onClick={() => selectTrustMode("image")}><ImageIcon size={15} /> Ảnh chụp</button><button role="tab" aria-selected={mode === "qr"} onClick={() => selectTrustMode("qr")}><ScanSearch size={15} /> QR</button><button role="tab" aria-selected={mode === "text"} onClick={() => selectTrustMode("text")}><ClipboardPaste size={15} /> Văn bản</button><button role="tab" aria-selected={mode === "url"} onClick={() => selectTrustMode("url")}><Globe2 size={15} /> URL</button></div>
-             {mode === "image" || mode === "qr" ? <div className={`upload-zone ${dragging ? "is-dragging" : ""} ${preview ? "has-preview" : ""}`} onDragEnter={(event) => { event.preventDefault(); setDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={() => setDragging(false)} onDrop={(event) => { event.preventDefault(); setDragging(false); setDemoCaseId(null); acceptFile(event.dataTransfer.files[0]); }}>{preview ? <><div className="ocr-preview-wrap"><Image src={preview} alt={mode === "qr" ? "Ảnh mã QR sẽ được phân tích" : "Ảnh sẽ được phân tích"} width={1200} height={800} unoptimized />{ocr?.regions?.map((region) => <span key={region.id} className="ocr-region" style={{ left: `${region.x}%`, top: `${region.y}%`, width: `${region.width}%`, height: `${region.height}%` }} aria-label={`${region.label} overlay`} />)}</div><button type="button" className="remove-upload" onClick={() => { if (preview) URL.revokeObjectURL(preview); setFile(null); setPreview(null); setOcr(null); }} aria-label="Xóa ảnh"><X size={16} /></button></> : <button type="button" className="upload-prompt" onClick={() => fileInput.current?.click()}><span>{mode === "qr" ? <ScanSearch size={22} /> : <Upload size={22} />}</span><strong>{mode === "qr" ? "Thả hoặc chọn ảnh mã QR" : "Thả hoặc chọn ảnh chụp"}</strong><small>PNG, JPG, WEBP · tối đa 8 MB · có thể dán từ clipboard</small></button>}<input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" aria-label={mode === "qr" ? "Chọn ảnh mã QR cần phân tích" : "Chọn ảnh chụp cần phân tích"} className="sr-only" onChange={(event) => { setDemoCaseId(null); acceptFile(event.target.files?.[0]); }} /></div> : <label className="trust-text-field"><span>{mode === "url" ? "Đường dẫn cần kiểm tra" : "Nội dung tin nhắn hoặc thông báo"}</span><textarea value={content} onChange={(event) => { setDemoCaseId(null); contentRef.current = event.target.value; setContent(event.target.value); }} rows={7} placeholder={mode === "url" ? "https://..." : "Dán nội dung khả nghi tại đây..."} /></label>}
-            <div className="truth-note"><AlertTriangle size={15} /><span><strong>Ranh giới OCR:</strong> ảnh được đọc cục bộ trong trình duyệt và chỉ là <code>CLIENT_OCR_HINT</code>, không phải OCR máy chủ có thẩm quyền.</span></div>{error && <div className="error-callout" role="alert"><ShieldAlert size={17} /><span>{error.message}{error.traceId && <small>Reference: {error.traceId}</small>}</span></div>}
-             <button type="button" className="primary-action trust-submit" disabled={((mode !== "image" && mode !== "qr") && !content.trim()) || ((mode === "image" || mode === "qr") && !file)} onClick={analyze}>{processing ? <LoaderCircle className="animate-spin" size={17} /> : <ScanSearch size={17} />}{processing || hasResult ? "Chạy lại với dữ liệu mới" : "Phân tích rủi ro"}<ArrowRight size={16} /></button>
+          <div className="intelligence-panel">
+            <div className="panel-heading">
+              <div>
+                <p className="product-kicker">01 · Input</p>
+                <h2 id="trust-input-title" className="product-section-title">Bạn muốn kiểm tra gì?</h2>
+              </div>
+              {(file || content) && (
+                <button className="text-link" onClick={reset}>Làm mới</button>
+              )}
+            </div>
+            <div className="mode-switch" role="tablist" aria-label="Loại đầu vào">
+              <button role="tab" aria-selected={mode === "image"} onClick={() => selectTrustMode("image")}><ImageIcon size={15} /> Ảnh chụp</button>
+              <button role="tab" aria-selected={mode === "qr"} onClick={() => selectTrustMode("qr")}><ScanSearch size={15} /> QR</button>
+              <button role="tab" aria-selected={mode === "text"} onClick={() => selectTrustMode("text")}><ClipboardPaste size={15} /> Văn bản</button>
+              <button role="tab" aria-selected={mode === "url"} onClick={() => selectTrustMode("url")}><Globe2 size={15} /> URL</button>
+              <button role="tab" aria-selected={mode === "contract"} onClick={() => selectTrustMode("contract")}><FileText size={15} /> Hợp đồng</button>
+            </div>
+            {mode === "contract" ? (
+              <ContractCheckIntakeTab onAnalyzeContract={(contractText) => {
+                setDemoCaseId(null);
+                setMode("text");
+                contentRef.current = contractText;
+                setContent(contractText);
+                analyze();
+              }} />
+            ) : mode === "image" || mode === "qr" ? (
+              <div
+                className={`upload-zone ${dragging ? "is-dragging" : ""} ${preview ? "has-preview" : ""}`}
+                onDragEnter={(event) => { event.preventDefault(); setDragging(true); }}
+                onDragOver={(event) => event.preventDefault()}
+                onDragLeave={() => setDragging(false)}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  setDragging(false);
+                  setDemoCaseId(null);
+                  acceptFile(event.dataTransfer.files[0]);
+                }}
+              >
+                {preview ? (
+                  <>
+                    <div className="ocr-preview-wrap">
+                      <Image src={preview} alt={mode === "qr" ? "Ảnh mã QR sẽ được phân tích" : "Ảnh sẽ được phân tích"} width={1200} height={800} unoptimized />
+                      {ocr?.regions?.map((region) => (
+                        <span key={region.id} className="ocr-region" style={{ left: `${region.x}%`, top: `${region.y}%`, width: `${region.width}%`, height: `${region.height}%` }} aria-label={`${region.label} overlay`} />
+                      ))}
+                    </div>
+                    <button type="button" className="remove-upload" onClick={() => { if (preview) URL.revokeObjectURL(preview); setFile(null); setPreview(null); setOcr(null); }} aria-label="Xóa ảnh">
+                      <X size={16} />
+                    </button>
+                  </>
+                ) : (
+                  <button type="button" className="upload-prompt" onClick={() => fileInput.current?.click()}>
+                    <span>{mode === "qr" ? <ScanSearch size={22} /> : <Upload size={22} />}</span>
+                    <strong>{mode === "qr" ? "Thả hoặc chọn ảnh mã QR" : "Thả hoặc chọn ảnh chụp"}</strong>
+                    <small>PNG, JPG, WEBP · tối đa 8 MB · có thể dán từ clipboard</small>
+                  </button>
+                )}
+                <input ref={fileInput} type="file" accept="image/png,image/jpeg,image/webp" aria-label={mode === "qr" ? "Chọn ảnh mã QR cần phân tích" : "Chọn ảnh chụp cần phân tích"} className="sr-only" onChange={(event) => { setDemoCaseId(null); acceptFile(event.target.files?.[0]); }} />
+              </div>
+            ) : (
+              <label className="trust-text-field">
+                <span>{mode === "url" ? "Đường dẫn cần kiểm tra" : "Nội dung tin nhắn hoặc thông báo"}</span>
+                <textarea
+                  value={content}
+                  onChange={(event) => {
+                    setDemoCaseId(null);
+                    contentRef.current = event.target.value;
+                    setContent(event.target.value);
+                  }}
+                  rows={7}
+                  placeholder={mode === "url" ? "https://..." : "Dán nội dung khả nghi tại đây..."}
+                />
+              </label>
+            )}
+            <div className="truth-note">
+              <AlertTriangle size={15} />
+              <span><strong>Ranh giới OCR:</strong> ảnh được đọc cục bộ trong trình duyệt và chỉ là <code>CLIENT_OCR_HINT</code>, không phải OCR máy chủ có thẩm quyền.</span>
+            </div>
+            {error && (
+              <div className="error-callout" role="alert">
+                <ShieldAlert size={17} />
+                <span>{error.message}{error.traceId && <small>Reference: {error.traceId}</small>}</span>
+              </div>
+            )}
+            {mode !== "contract" && (
+              <button
+                type="button"
+                className="primary-action trust-submit"
+                disabled={((mode !== "image" && mode !== "qr") && !content.trim()) || ((mode === "image" || mode === "qr") && !file)}
+                onClick={analyze}
+              >
+                {processing ? <LoaderCircle className="animate-spin" size={17} /> : <ScanSearch size={17} />}
+                {processing || hasResult ? "Chạy lại với dữ liệu mới" : "Phân tích rủi ro"}
+                <ArrowRight size={16} />
+              </button>
+            )}
           </div>
           <aside className="intelligence-panel pipeline-panel"><div className="panel-heading"><div><p className="product-kicker">Live pipeline</p><h2 className="product-section-title">Dấu vết xử lý</h2></div><span className={`live-indicator ${processing ? "is-live" : ""}`}>{processing ? "RUNNING" : hasResult ? "COMPLETE" : "READY"}</span></div><ol className="pipeline-list">{pipeline.map((step, index) => <li key={step.id} data-status={step.status}><span className="pipeline-index">{step.status === "done" ? <Check size={14} /> : index + 1}</span><div><strong>{step.label}</strong><small>{step.detail || (step.status === "waiting" ? "Chờ bước trước" : readable(step.status))}</small></div></li>)}</ol>{ocr && <><div className="ocr-readout"><div><FileImage size={15} /><span>OCR trong trình duyệt</span><strong>{ocr.authority}</strong></div><p>{String(ocr.text || ocr.qrContent || "").slice(0, 180)}{String(ocr.text || ocr.qrContent || "").length > 180 ? "..." : ""}</p></div><div className="entity-inspector" aria-label="Các thực thể trích xuất"><div className="panel-heading"><span className="data-label">Entity inspector</span><span className="metadata-chip">HINT · không thẩm quyền</span></div><p className="entity-disclosure">Chọn thực thể để gửi kèm như một gợi ý có xác nhận. Việc chọn không biến OCR cục bộ thành bằng chứng.</p>{Object.entries(ocr.entities || {}).filter(([, values]) => Array.isArray(values) && values.length).map(([type, values]) => <div className="entity-row" key={type}><strong>{type.replaceAll(/([A-Z])/g, " $1")}</strong><div className="entity-values">{values.map((value) => <label key={value}><input type="checkbox" checked={confirmedEntities.includes(value)} onChange={() => setConfirmedEntities((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value].slice(0, 50))} /><span>{value}</span></label>)}</div></div>)}</div></>}</aside>
         </section>

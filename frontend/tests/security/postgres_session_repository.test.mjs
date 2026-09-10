@@ -4,10 +4,10 @@ import crypto from "node:crypto";
 import { PostgresSessionRepository } from "../../src/lib/security/identity/PostgresSessionRepository.js";
 import { DurableSessionService } from "../../src/lib/security/identity/DurableSessionService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
+import { configureDisposableDatabase, disposableLiveGate } from "../helpers/disposableDbGuard.mjs";
 
-const liveGate = {
-  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
-};
+const disposableDatabaseUrl = configureDisposableDatabase();
+const liveGate = disposableLiveGate();
 
 test("PostgresSessionRepository: Live durable session create, validate, update last_seen, and revoke in private.server_sessions", liveGate, async () => {
   const pool = getPostgresPool();

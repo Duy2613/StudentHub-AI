@@ -13,7 +13,7 @@ function principalUserId(principal) {
 
 async function readCommunitySignals(request, routeParams, principal, securityContext) {
   const ownerId = principalUserId(principal);
-  const params = await routeParams;
+  const params = await routeParams?.params || {};
   const caseId = params?.caseId;
   const { searchParams } = new URL(request.url);
   const caseRevision = Number(searchParams.get("caseRevision"));

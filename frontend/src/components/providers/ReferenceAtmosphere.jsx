@@ -5,6 +5,8 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { getReferenceRouteProfile } from "@/components/layout/referenceRouteConfig";
 import { getMediaAsset } from "@/lib/media/vnextMediaRegistry";
+import { getKhaiMinhRouteVisual } from "@/lib/media/khaiMinhVisualRegistry";
+import KhaiMinhImage from "@/components/media/KhaiMinhImage";
 
 /**
  * A quiet site-wide visual grammar for the VNext shell.
@@ -14,6 +16,7 @@ export default function ReferenceAtmosphere({ routeMediaPolicy }) {
   const pathname = usePathname() || "/";
   const profile = getReferenceRouteProfile(pathname);
   const birdAsset = getMediaAsset("IMG-BIRD-01");
+  const routeVisual = getKhaiMinhRouteVisual(pathname);
 
   return (
     <div
@@ -22,8 +25,17 @@ export default function ReferenceAtmosphere({ routeMediaPolicy }) {
       data-reference-surface={profile.surface}
       data-reference-presentation={routeMediaPolicy?.presentation || "static"}
       data-reference-bird={birdAsset?.id || "none"}
+      data-khai-minh-visual={routeVisual.asset?.id || "none"}
       aria-hidden="true"
     >
+      {routeVisual.asset ? (
+        <KhaiMinhImage
+          assetId={routeVisual.asset.id}
+          alt=""
+          sizes="100vw"
+          className="reference-atmosphere-khai-image"
+        />
+      ) : null}
       {birdAsset?.image ? (
         <span className="reference-atmosphere-bird" data-asset-id={birdAsset.id}>
           <Image

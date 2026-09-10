@@ -6,6 +6,7 @@ import test from "node:test";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const sql = readFileSync(join(root, "database", "migrations", "202609090001_community_expert_promax.sql"), "utf8");
+const snapshotSql = readFileSync(join(root, "database", "migrations", "202609100001_expert_authority_snapshot.sql"), "utf8");
 
 test("Promax migration has one durable Community/Expert authority with the required state dimensions", () => {
   for (const table of ["community_contributions", "community_contribution_revisions", "community_reactions", "community_source_clusters", "case_appeals", "case_corrections"]) {
@@ -44,4 +45,28 @@ test("Promax migration preserves history and expands the existing internal outbo
   assert.match(sql, /case_appeal_reviews_no_update/i);
   assert.match(sql, /expert_qualification_reviews_decision_check/i);
   assert.match(sql, /expert_qualification_reviews_no_update/i);
+});
+
+test("authority snapshot migration is forward-only and stores verifiable lineage", () => {
+  for (const field of [
+    "verification_id",
+    "verification_revision",
+    "verified_domain",
+    "verification_status",
+    "verification_qualification_state",
+    "assignment_revision",
+    "coi_state",
+    "coi_declaration_ref",
+    "qualification_policy_version",
+    "submitted_at",
+    "authority_snapshot_version",
+    "authority_snapshot_digest",
+    "authority_snapshot",
+  ]) assert.match(snapshotSql, new RegExp(`add column if not exists ${field}`, "i"), field);
+  assert.match(snapshotSql, /bump_expert_verification_revision/);
+  assert.match(snapshotSql, /bump_expert_assignment_revision/);
+  assert.match(snapshotSql, /DECLARED_NO_CONFLICT/);
+  assert.match(snapshotSql, /authority_snapshot->>'verificationId'/);
+  assert.match(snapshotSql, /authority_snapshot_digest.*octet_length.*32/is);
+  assert.doesNotMatch(snapshotSql, /drop\s+(table|schema)\b|truncate\b|delete\s+from\b/i);
 });

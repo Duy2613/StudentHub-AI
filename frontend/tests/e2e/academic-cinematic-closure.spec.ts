@@ -13,13 +13,12 @@ test.describe("Academic Cinematic Closure & Runtime Evidence Suite", () => {
     await expect(searchDialog).toBeVisible();
 
     // Focus is trapped in input
-    const searchInput = page.getByPlaceholder("Tìm kiếm môn học, bài giảng, thử thách, bằng chứng, chuyên gia...");
+    const searchInput = page.getByPlaceholder("Tìm kiếm tình huống, bằng chứng, chuyên gia...");
     await expect(searchInput).toBeFocused();
 
-    // Type query
-    await searchInput.fill("React");
-    // Verify results appear
-    await expect(searchDialog.locator("a[href*='/learn']").first()).toBeVisible();
+    // Search the current canonical product index.
+    await searchInput.fill("Trust");
+    await expect(searchDialog.locator("a[href='/trust']").first()).toBeVisible();
 
     // Close via Escape and verify focus restoration
     await page.keyboard.press("Escape");
@@ -27,49 +26,26 @@ test.describe("Academic Cinematic Closure & Runtime Evidence Suite", () => {
     await expect(searchBtn).toBeFocused();
   });
 
-  test("Knowledge Atlas: semantic fallback and keyboard inspection", async ({ page }) => {
+  test("Evidence matrix: semantic relationship states remain readable", async ({ page }) => {
     await page.goto("/");
-    // Scroll to Knowledge Atlas section
-    const atlasHeading = page.getByRole("heading", { name: "Knowledge Atlas", level: 2 });
-    await atlasHeading.scrollIntoViewIfNeeded();
-    await expect(atlasHeading).toBeVisible();
-
-    // Check dual-view toggle exists and click semantic list view
-    const listToggle = page.getByRole("button", { name: "Danh sách ngữ nghĩa" });
-    await expect(listToggle).toBeVisible();
-    await listToggle.click();
-
-    // Verify semantic list renders domain items and node details
-    await expect(page.getByRole("heading", { name: "Frontend Engineering", level: 3 }).first()).toBeVisible();
-    await expect(page.getByText("ID: frontend")).toBeVisible();
-    await expect(page.getByText("Application").first()).toBeVisible();
+    const evidenceChapter = page.locator("#evidence-chapter");
+    await evidenceChapter.scrollIntoViewIfNeeded();
+    await expect(evidenceChapter).toBeVisible();
+    await expect(evidenceChapter.getByRole("heading", { level: 2, name: /Bằng chứng có quan hệ đa chiều/i })).toBeVisible();
+    await expect(evidenceChapter.getByRole("region", { name: "Minh họa quan hệ bằng chứng" })).toBeVisible();
+    await expect(evidenceChapter.getByText("Hỗ trợ", { exact: true })).toBeVisible();
+    await expect(evidenceChapter.getByText("Mâu thuẫn", { exact: true })).toBeVisible();
+    await expect(evidenceChapter.getByText("Chưa rõ", { exact: true })).toBeVisible();
   });
 
-  test("Quiet Lesson: zero WebGL, local notes persistence, and quiet reading layout", async ({ page }) => {
+  test("Retired learning URLs resolve to the canonical public product", async ({ page }) => {
     await page.goto("/learn/cs101/fullstack-intro");
-    await expect(
-      page.getByRole("heading", { level: 1, name: /Modern State Architectures & Concurrent React/i })
-    ).toBeVisible();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByRole("heading", { level: 1, name: /Hiểu đúng\.\s*Đi xa\./i })).toBeVisible();
 
-    // Strictly verify ZERO WebGL canvas is rendered in lesson
+    // The retired route must not reintroduce a hidden interactive runtime.
     const canvasCount = await page.locator("canvas").count();
     expect(canvasCount).toBe(0);
-
-    // Verify local notes persistence
-    const notesTab = page.getByRole("button", { name: "Ghi chú bài học" });
-    if (await notesTab.isVisible()) {
-      await notesTab.click();
-      const notesTextarea = page.getByLabel("Ghi chú bài học cá nhân");
-      await expect(notesTextarea).toBeVisible();
-      await notesTextarea.fill("Ghi chú thử nghiệm tự học kiến trúc 13 lớp.");
-
-      // Reload and verify persistence in localStorage
-      await page.reload();
-      const storedNote = await page.evaluate(() => {
-        return localStorage.getItem("studenthub.lessonNotes.v1.cs101.fullstack-intro");
-      });
-      expect(storedNote).toContain("Ghi chú thử nghiệm");
-    }
   });
 
   test("Console cleanliness and runtime stability across all primary surfaces", async ({ page }) => {
@@ -110,17 +86,16 @@ test.describe("Academic Cinematic Closure & Runtime Evidence Suite", () => {
     expect(uncaughtErrors).toEqual([]);
   });
 
-  test("WebGL Lifecycle & Monotonic Resource Cleanup Test (repeated navigation)", async ({ page }) => {
-    // Navigate between Landing (WebGL) and Lesson (Quiet, No WebGL) for 4 cycles
+  test("Public surface navigation remains stable across repeated cycles", async ({ page }) => {
+    const routes = ["/", "/trust", "/community", "/expert"];
     for (let i = 0; i < 4; i++) {
-      await page.goto("/");
-      await page.waitForLoadState("domcontentloaded");
-
-      await page.goto("/learn/cs101/fullstack-intro");
-      await page.waitForLoadState("domcontentloaded");
+      for (const route of routes) {
+        await page.goto(route);
+        await page.waitForLoadState("domcontentloaded");
+        await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      }
     }
 
-    // Final navigation to landing
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 

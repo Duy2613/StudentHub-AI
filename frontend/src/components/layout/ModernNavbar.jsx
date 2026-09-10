@@ -21,7 +21,6 @@ export default function ModernNavbar() {
     { label: "Trust Engine", href: "/trust", highlight: true, badge: "AI 4 Lớp" },
     { label: "Community", href: "/community" },
     { label: "Expert Network", href: "/expert" },
-    { label: "Diễn Đàn", href: "/forum" },
     { label: "Học Vụ 360", href: "/academic" },
     ...(session ? [
       { label: "Command Center", href: "/dashboard" },

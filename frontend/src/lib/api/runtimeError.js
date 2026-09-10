@@ -14,7 +14,10 @@ const SAFE_MESSAGES = Object.freeze({
   TIMEOUT: "Yêu cầu mất quá nhiều thời gian. Hãy thử lại.",
   ABORTED: "Yêu cầu đã được dừng.",
   INVALID_RESPONSE: "Máy chủ trả về dữ liệu không hợp lệ.",
+  PROMAX_MIGRATION_REQUIRED: "Dữ liệu Promax chưa được khởi tạo trong môi trường này; chưa có dữ liệu thay thế.",
 });
+
+export const SAFE_SERVER_ERROR_CODES = new Set(["PROMAX_MIGRATION_REQUIRED"]);
 
 export class ApiError extends Error {
   constructor(message, code = "SERVER_ERROR", options = {}) {

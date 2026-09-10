@@ -1,0 +1,18 @@
+{
+  "target": "LOCAL_DISPOSABLE_SUPABASE",
+  "sourceDatabase": "postgres",
+  "restoredDatabase": "studenthub_restore_20260910_1789037122758",
+  "serverAddress": "172.22.0.10/32",
+  "serverPort": 5432,
+  "backupFormat": "pg_dump_custom",
+  "backupBytes": 454769,
+  "backupSha256": "341e2e54d585aa43e5cb22e505dbdf72eb075ef33442c8459bf99cc4ae1ee40e",
+  "restoredReadback": {
+    "app_tables": 56,
+    "trust_cases": 14,
+    "community_contributions": 9,
+    "expert_assessments": 7,
+    "integration_outbox": 36
+  },
+  "restorePass": true
+}

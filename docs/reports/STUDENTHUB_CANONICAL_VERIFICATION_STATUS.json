@@ -1,7 +1,16 @@
 {
-  "candidateId": "studenthub-v5-pilot-rc5",
-  "updatedAt": "2026-09-09T22:14:12+07:00",
-  "overallVerdict": "PILOT_BACKEND_PARTIAL",
+  "candidateId": "STUDENTHUB_EXPERT_HYBRID_RC",
+  "updatedAt": "2026-09-10T19:02:00+07:00",
+  "currentRuntimeStatus": "LOCAL_RUNTIME_AVAILABLE_AUTHENTICATED_E2E_VERIFIED",
+  "historicalVerifiedEvidence": [
+    "G1_LOCAL_CLEAN_MIGRATION_VERIFIED",
+    "RLS_LOCAL_LIVE_VERIFIED",
+    "CONCURRENCY_IDEMPOTENCY_VERIFIED",
+    "APPLICATION_SCHEMA_RESTORE_VERIFIED",
+    "LOCAL_PRIVATE_STORAGE_VERIFIED",
+    "PROMAX_LOCAL_PERSISTENCE_VERIFIED"
+  ],
+  "overallVerdict": "FULL_AUTHENTICATED_EXPERT_LOCAL_E2E_VERIFIED",
   "convergenceVerdict": "NON_DB_GENERALIZATION_NOT_CONVERGED",
   "historicalCandidatePreserved": "studenthub-v5-pilot-rc4",
   "historicalCandidatesPreserved": [
@@ -9,11 +18,13 @@
     "studenthub-v5-pilot-rc4"
   ],
   "frozenDatabaseGates": {
-    "G1_cleanMigration": "BLOCKED_BY_ENV",
-    "G2_liveMultiRoleRLS": "RLS_STATIC_ONLY",
-    "G4_physicalRestore": "RESTORE_BLOCKED_BY_ENV",
-    "database": "PARTIAL",
-    "recovery": "PARTIAL"
+    "G1_cleanMigration": "VERIFIED_LOCAL",
+    "G2_liveMultiRoleRLS": "VERIFIED_LOCAL",
+    "G3_concurrencyIdempotency": "VERIFIED_LOCAL",
+    "G4_applicationSchemaRestore": "APPLICATION_SCHEMA_RESTORE_VERIFIED",
+    "G5_privateStorage": "VERIFIED_LOCAL",
+    "database": "LOCAL_VERIFIED_MAIN_NOT_MIGRATED",
+    "recovery": "APPLICATION_SCHEMA_RESTORE_VERIFIED_PLATFORM_RESTORE_NOT_CLAIMED"
   },
   "subsystems": {
     "metrics": {
@@ -128,7 +139,65 @@
     "caseReplay": {
       "status": "HISTORICAL_VALIDATION_PRESERVED",
       "newRC2Run": "NOT_EXECUTED"
+    },
+    "communityExpertHybrid": {
+      "status": "FULL_AUTHENTICATED_EXPERT_LOCAL_E2E_VERIFIED",
+      "localBrowserSmoke": "LOCAL_BROWSER_SMOKE_VERIFIED",
+      "livePersistence": "PROMAX_LOCAL_PERSISTENCE_VERIFIED",
+      "authenticatedJourney": "FULL_AUTHENTICATED_EXPERT_LOCAL_E2E_VERIFIED",
+      "authenticatedArtifact": "artifacts/local-authenticated-e2e-2026-09-10.json",
+      "mainWrites": {
+        "auth": 0,
+        "db": 0,
+        "storage": 0
+      },
+      "cleanup": "LOCAL_SYNTHETIC_DATA_AND_AUTH_CLEANED",
+      "historicalDockerStatus": "LOCAL_RUNTIME_CURRENTLY_BLOCKED_BY_DOCKER_HISTORICAL_ONLY; DOCKER_RECOVERED",
+      "report": "docs/reports/STUDENTHUB_EXPERT_AUTHENTICATED_LOCAL_E2E_2026-09-10.md"
+    },
+    "mainCloudPreflight": {
+      "status": "MAIN_CLOUD_MIGRATION_PREFLIGHT_VERIFIED",
+      "mode": "READ_ONLY",
+      "candidateSchemaFingerprint": "2cf6854763fc33b2251811c473c3adf5e95b892e750158d1edf7689d2a716fc8",
+      "mainSchemaFingerprint": "80952eb54c06b8da5350e3b6442ba021dbd87f625bab6c23012d7c1c8ea8e90c",
+      "artifact": "artifacts/main-cloud-readonly-preflight-2026-09-10.json",
+      "forwardMigrationRehearsal": "NOT_EXECUTED_MAIN_WRITES_FORBIDDEN",
+      "report": "docs/reports/STUDENTHUB_MAIN_CLOUD_MIGRATION_PREFLIGHT_2026-09-10.md"
     }
+  },
+  "releaseCandidate": {
+    "status": "RC_BRANCH_PUSH_READY",
+    "webVerdict": "STUDENTHUB_FULL_WEB_RC_PARTIAL",
+    "localBackendVerdict": "STUDENTHUB_LOCAL_BACKEND_RC_VERIFIED",
+    "build": "PASS",
+    "typecheck": "PASS",
+    "lint": {
+      "status": "PASS",
+      "errors": 0,
+      "warnings": 450,
+      "touchedFileWarnings": 0
+    },
+    "discoveredRegression": {
+      "totalTestFiles": 350,
+      "passedTestFiles": 348,
+      "failedTestFiles": 0,
+      "blockedByExternalGate": 2,
+      "childLiveDatabaseCases": "SKIPPED_BY_DISPOSABLE_DB_GUARD; EXPLICIT_LOCAL_LIVE_GATES_RERUN_SEPARATELY"
+    },
+    "explicitLocalLiveGates": "27/27_PASS",
+    "browserMatrix": {
+      "chromiumDesktop": "99_PASS_3_INTENTIONAL_SKIP",
+      "firefoxDesktop": "95_PASS_3_INTENTIONAL_SKIP_PLUS_ACCESSIBILITY_FOCUS_PASS",
+      "webkitDesktop": "95_PASS_3_INTENTIONAL_SKIP_PLUS_EXPERT_FOCUS_PASS",
+      "chromiumMobile": "27/27_PASS",
+      "agentBrowser": "HOME_CONTENT_AND_CONSOLE_CLEAN_PASS"
+    },
+    "performance": "BUNDLE_BUDGET_PASS",
+    "secretScan": "PASS",
+    "mainCloudWrites": 0,
+    "mainCloudMigration": "NOT_AUTHORIZED",
+    "production": "NOT_AUTHORIZED",
+    "gitRelease": "COMMIT_AND_PUSH_PENDING_AT_REPORT_GENERATION"
   },
   "publicApiHub": {
     "status": "PUBLIC_API_ADAPTERS_IMPLEMENTED",
@@ -153,6 +222,6 @@
     "source": "https://vqa.moet.gov.vn/vi/thong-bao-quan-ly-bao-dam/thong-bao/danh-sach-cac-co-so-giao-duc-chuong-trinh-dao-tao-giao-duc-dai-hoc-va-cao-dang-su-pham-duoc-cong-nhan-dat-tieu-chuan-chat-luong-giao-duc-cap-nhat-den-ngay-31-7-2026-93.html",
     "legalAndProvenance": "SEPARATE_REVIEW_REQUIRED"
   },
-  "nextGate": "RC5_POST_REMEDIATION_RETRIEVAL_HOLDOUT_AFTER_PROVIDER_QUOTA_RESET",
-  "candidateManifest": "artifacts/candidate/STUDENTHUB_V5_CANDIDATE_RC5_MANIFEST.json"
+  "nextGate": "MAIN_CLOUD_FORWARD_MIGRATION_REQUIRES_SEPARATE_EXPLICIT_AUTHORIZATION; LOCAL_AUTHENTICATED_E2E_CLOSED",
+  "candidateManifest": "artifacts/candidate/STUDENTHUB_EXPERT_HYBRID_RC_MANIFEST.json"
 }

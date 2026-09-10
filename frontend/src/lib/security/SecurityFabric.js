@@ -31,7 +31,7 @@ export class SecurityFabric {
    * @param {number} [policyConfig.maxRequests] - default 100
    * @param {Function} [handler] - async (request, routeContext, principal, secContext) => Response
    * @param {Function} [policyConfig.handler] - compatibility form receiving a named context object
-   * @returns {Function} Next.js Route Handler
+   * @returns {(request: Request, routeParams?: any) => Response | Promise<Response>} Next.js Route Handler
    */
   static wrapHandler(policyConfig = {}, handler) {
     const embeddedHandler = policyConfig.handler;

@@ -39,6 +39,7 @@ function runtimeEnvironment() {
     NEXT_PUBLIC_SUPABASE_GOOGLE_AUTH_VERIFIED: process.env.NEXT_PUBLIC_SUPABASE_GOOGLE_AUTH_VERIFIED,
     NEXT_PUBLIC_SUPABASE_GITHUB_AUTH: process.env.NEXT_PUBLIC_SUPABASE_GITHUB_AUTH,
     NEXT_PUBLIC_SUPABASE_AUTH_REDIRECT_URL: process.env.NEXT_PUBLIC_SUPABASE_AUTH_REDIRECT_URL,
+    NEXT_PUBLIC_STUDENTHUB_LOCAL_E2E: process.env.NEXT_PUBLIC_STUDENTHUB_LOCAL_E2E,
   };
 }
 
@@ -62,7 +63,10 @@ function hasUsableSupabaseConfiguration(env) {
   if (!rawUrl || !key || rawUrl.includes("placeholder") || key.includes("placeholder")) return false;
   try {
     const url = new URL(rawUrl);
-    return url.protocol === "https:" && Boolean(url.hostname);
+    const loopback = new Set(["127.0.0.1", "localhost", "::1"]).has(url.hostname.toLowerCase());
+    const localE2EHttp = isTrue(env, "NEXT_PUBLIC_STUDENTHUB_LOCAL_E2E");
+    return Boolean(url.hostname)
+      && (url.protocol === "https:" || (localE2EHttp && loopback && url.protocol === "http:"));
   } catch {
     return false;
   }

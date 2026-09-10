@@ -1,0 +1,113 @@
+{
+  "candidateId": "STUDENTHUB_EXPERT_HYBRID_RC",
+  "version": "community-expert-promax-2026-09-10",
+  "timestamp": "2026-09-10T19:02:00+07:00",
+  "currentRuntimeStatus": "LOCAL_RUNTIME_AVAILABLE_AUTHENTICATED_E2E_VERIFIED",
+  "historicalVerifiedEvidence": [
+    "G1_LOCAL_CLEAN_MIGRATION_VERIFIED",
+    "RLS_LOCAL_LIVE_VERIFIED",
+    "CONCURRENCY_IDEMPOTENCY_VERIFIED",
+    "APPLICATION_SCHEMA_RESTORE_VERIFIED",
+    "LOCAL_PRIVATE_STORAGE_VERIFIED",
+    "PROMAX_LOCAL_PERSISTENCE_VERIFIED"
+  ],
+  "freeze": {
+    "branch": "implementation/academic-cinematic-v1-f00",
+    "head": "3435dea2f594651fdb91a5695ca06aec7a9d965d",
+    "dirtyFingerprint": "sha256:a45155f4dc80d6aba9adfbcfd621551763cdf51c0bab2fa4a21f10e5dda01c98",
+    "dirtyStatusEntries": 89,
+    "preservation": "DIRTY_WORKTREE_PRESERVED",
+    "commit": "NOT_CREATED",
+    "push": "NOT_PERFORMED",
+    "deploy": "NOT_PERFORMED"
+  },
+  "versions": {
+    "next": "16.3.0",
+    "react": "19.2.8",
+    "localPostgres": "17.6",
+    "dockerDesktop": "4.88.1",
+    "localSupabaseImageTag": "NOT_CAPTURED",
+    "localSupabaseRuntime": "AVAILABLE_LOCAL_DOCKER_SUPABASE_HEALTHY"
+  },
+  "localCandidate": {
+    "target": "LOCAL_DISPOSABLE_SUPABASE",
+    "schemaFingerprint": "2cf6854763fc33b2251811c473c3adf5e95b892e750158d1edf7689d2a716fc8",
+    "schemaCounts": {
+      "tables": 58,
+      "columns": 607,
+      "constraints": 450,
+      "indexes": 159,
+      "policies": 41,
+      "triggers": 29,
+      "routines": 5
+    },
+    "inheritedLocalGates": {
+      "cleanMigration": "VERIFIED",
+      "rls": "VERIFIED",
+      "concurrencyIdempotency": "VERIFIED",
+      "applicationSchemaRestore": "VERIFIED",
+      "privateStorage": "VERIFIED",
+      "promaxPersistence": "VERIFIED",
+      "browserSmoke": "LOCAL_BROWSER_SMOKE_VERIFIED"
+    },
+    "currentPass": {
+      "fullAuthenticatedExpertE2E": "FULL_AUTHENTICATED_EXPERT_LOCAL_E2E_VERIFIED",
+      "blocker": "NONE",
+      "reason": "Docker Desktop recovered; the synthetic authenticated Community-to-Expert-to-Trust journey passed with loopback-only network isolation and cleanup verification."
+    }
+  },
+  "mainCloudReadOnlyPreflight": {
+    "status": "MAIN_CLOUD_MIGRATION_PREFLIGHT_VERIFIED",
+    "target": "MAIN_CLOUD_READ_ONLY",
+    "schemaFingerprint": "80952eb54c06b8da5350e3b6442ba021dbd87f625bab6c23012d7c1c8ea8e90c",
+    "objectCounts": {
+      "tables": 48,
+      "columns": 403,
+      "constraints": 254,
+      "indexes": 108,
+      "policies": 33,
+      "triggers": 5,
+      "routines": 18
+    },
+    "candidateDelta": {
+      "missingTables": 16,
+      "missingColumns": 248,
+      "missingConstraints": 208,
+      "missingIndexes": 62,
+      "missingPolicies": 9,
+      "missingTriggers": 24,
+      "missingRoutines": 4,
+      "changedTables": 1,
+      "changedConstraints": 3,
+      "changedIndexes": 3
+    },
+    "rowCompatibility": "NO_IMMEDIATE_NOT_NULL_BACKFILL_RISK_DETECTED",
+    "mainMutationGuard": "SELECT_ONLY",
+    "artifact": "artifacts/main-cloud-readonly-preflight-2026-09-10.json"
+  },
+  "migrationInventory": [
+    { "name": "202608270001_v2_authority_foundation.sql", "bytes": 17424, "sha256": "3e6e5bc0cb4cc6895f485140d4f0c67f240305421f8c47e69fd0e2de6a0024a7" },
+    { "name": "202608290001_feature_freeze_cross_system.sql", "bytes": 8774, "sha256": "5cb27dc79f19a4c04779e041ebc16aeefd9e9b52d336a05254c89d6ace0e33ab" },
+    { "name": "202609010001_private_screenshot_storage.sql", "bytes": 3338, "sha256": "dbbf36ded1424145125458c2f3cc9df2576ad7043e71448f20bc3061fb96c96e" },
+    { "name": "202609060001_expert_qualification.sql", "bytes": 5328, "sha256": "16b2da3119827d4b82898f0457240e180fc92e484de4190d60bf8bbeae6222e2" },
+    { "name": "202609060002_integration_outbox.sql", "bytes": 4104, "sha256": "8bfc73c0c9e8b5aa7a004c5c3bcf15a68c95b164a91a3d82cb5fc50462dbb4c6" },
+    { "name": "202609060003_trust_runs_revisions.sql", "bytes": 6328, "sha256": "eceb68be1b3451dd15c75b7770809ac2c05ce16ba493762bfc41b4304d184a51" },
+    { "name": "202609060004_reports.sql", "bytes": 3419, "sha256": "da4e31c700950a964318bfdcd41e0f54c76ea27a4d1efadd89173cf5cf1b043a" },
+    { "name": "202609070001_realtime_event_log.sql", "bytes": 3178, "sha256": "914f4120f60ebd999031caec772864f6f818ad13d68a43530627c21af4dbf024" },
+    { "name": "202609090001_community_expert_promax.sql", "bytes": 35404, "sha256": "de2761d05c8c11e2688960d5adb73d5e7c23b8c3e9054f43018715f8ec7e5bdc" },
+    { "name": "202609100001_expert_authority_snapshot.sql", "bytes": 7893, "sha256": "d94f1db628178beb8e90d62b234e8ee7ba02a8cfa8e3a547095c59f5e7e9371b" }
+  ],
+  "pendingMainCloudMigrations": [
+    "202609070001_realtime_event_log.sql",
+    "202609090001_community_expert_promax.sql",
+    "202609100001_expert_authority_snapshot.sql"
+  ],
+  "reports": {
+    "localAssuranceClosure": "docs/reports/STUDENTHUB_LOCAL_SUPABASE_ASSURANCE_CLOSURE_2026-09-10.md",
+    "mainReadOnlyPreflight": "artifacts/main-cloud-readonly-preflight-2026-09-10.json",
+    "schemaDriftInspection": "docs/reports/schema_drift_inspection.json"
+  },
+  "verdict": "FULL_AUTHENTICATED_EXPERT_LOCAL_E2E_VERIFIED",
+  "cloudVerdict": "MAIN_CLOUD_MIGRATION_PREFLIGHT_VERIFIED",
+  "productionVerdict": "NOT_CLAIMED"
+}

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Zap, Lock, CheckCircle2 } from "lucide-react";
 import LiveStudioClock from "@/components/ui/live-studio-clock";
 
@@ -89,6 +90,22 @@ export default function AuthSurroundings({ children }) {
 
       {/* 2. Main Content Area with Astrolabe Rings & Central Focused Card */}
       <div className="relative flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6">
+        {/* Approved Architectural Monolith Counterweight (Desktop atmospheric counterweight) */}
+        <div className="pointer-events-none absolute inset-0 z-0 hidden lg:flex items-center justify-center overflow-hidden opacity-[0.06]" aria-hidden="true">
+          <picture className="w-full h-full flex items-center justify-center">
+            <source media="(prefers-reduced-motion: reduce)" srcSet="/media/auth/auth-architectural-monolith.avif" />
+            <Image
+              src="/media/auth/auth-architectural-monolith.avif"
+              alt=""
+              width={1600}
+              height={2000}
+              unoptimized
+              priority
+              className="w-auto h-[85vh] max-w-none object-contain filter contrast-125 select-none"
+            />
+          </picture>
+        </div>
+
         {/* Astrolabe Orbital Rings */}
         <CosmicAstrolabeRings />
 

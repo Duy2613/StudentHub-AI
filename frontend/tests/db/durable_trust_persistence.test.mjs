@@ -4,13 +4,13 @@ import crypto from "node:crypto";
 import { TrustPersistenceMapper } from "../../src/lib/ai-trust/v5/TrustPersistenceMapper.js";
 import { DurableTrustRepository } from "../../src/lib/server/database/DurableTrustRepository.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
+import { configureDisposableDatabase, disposableLiveGate } from "../helpers/disposableDbGuard.mjs";
 
-const liveGate = {
-  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
-};
+const disposableDatabaseUrl = configureDisposableDatabase();
+const liveGate = disposableLiveGate();
 
 after(async () => {
-  if (process.env.DATABASE_URL) await getPostgresPool().end();
+  if (disposableDatabaseUrl) await getPostgresPool().end();
 });
 
 test("Option B: Anonymous caller is strictly ephemeral (zero DB mapping)", () => {

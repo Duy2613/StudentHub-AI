@@ -1,11 +1,11 @@
 # API Authorization Inventory
 
-Generated from source by `npm run audit:api-auth` on 2026-09-09T10:07:00.483Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
+Generated from source by `npm run audit:api-auth` on 2026-09-10T10:33:18.071Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
 
-- Route files: 136
-- HTTP handlers: 169
-- Authentication required by Security Fabric: 99
-- Explicit anonymous access: 64
+- Route files: 141
+- HTTP handlers: 174
+- Authentication required by Security Fabric: 100
+- Explicit anonymous access: 68
 - No visible Security Fabric wrapper: 6
 - Unprotected mutations requiring P0 review: 0
 
@@ -92,6 +92,7 @@ Generated from source by `npm run audit:api-auth` on 2026-09-09T10:07:00.483Z. T
 | /api/intelligence/community/reality-gaps | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_REALITY_GAPS | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/community/search | GET | PUBLIC | anonymous allowed | SEARCH_COMMUNITY_POSTS | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/community/topics/[topicId] | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_TOPIC | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/intelligence/community/track-record | GET | AUTHENTICATED | required | READ_COMMUNITY_TRACK_RECORD | COMMUNITY.READ | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/contradictions/[claimId] | GET | PUBLIC | anonymous allowed | READ_CONTRADICTION_ANALYSIS | TRUST.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | contract conflict |
 | /api/intelligence/experts/[expertId]/claims | GET | PUBLIC | anonymous allowed | READ_EXPERT_CLAIMS | — | authenticated principal | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/intelligence/experts/[expertId]/claims | POST | AUTHENTICATED | required | SUBMIT_EXPERT_CLAIM_ASSESSMENT | EXPERT.EVALUATE | authenticated principal | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
@@ -135,6 +136,10 @@ Generated from source by `npm run audit:api-auth` on 2026-09-09T10:07:00.483Z. T
 | /api/prof-rating/professors | GET | PUBLIC | anonymous allowed | READ_PROFESSOR_REGISTRY | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/prof-rating/reviews | GET | PUBLIC | anonymous allowed | READ_PROFESSOR_REVIEWS | — | authenticated principal | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/prof-rating/reviews | POST | AUTHENTICATED | required | CREATE_PROFESSOR_REVIEW | COMMUNITY.POST | authenticated principal | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/public/catalog | GET | PUBLIC | anonymous allowed | READ_PUBLIC_API_CATALOG | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/public/discovery | GET | PUBLIC | anonymous allowed | DISCOVER_PUBLIC_SOURCES | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/public/research | GET | PUBLIC | anonymous allowed | SEARCH_PUBLIC_RESEARCH_METADATA | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/public/weather | GET | PUBLIC | anonymous allowed | READ_PUBLIC_WEATHER_CONTEXT | — | public or domain-defined | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/quests/daily | GET | PUBLIC | anonymous allowed | READ_DAILY_QUESTS | — | authenticated principal | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/quests/daily | POST | AUTHENTICATED | required | SUBMIT_QUEST_COMPLETION | COMMUNITY.POST | authenticated principal | default/configured | 16 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/realtime/broadcast | POST | ADMIN | required | PUBLISH_REALTIME_EVENT | ADMIN.SECURITY | public or domain-defined | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |

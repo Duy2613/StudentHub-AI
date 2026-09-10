@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSessionExchangeService } from "@/lib/security/identity/SessionExchangeService.js";
 import { AuthRouteGuard } from "@/lib/security/hardening/AuthRouteGuard.js";
+import { isSameOriginRequest } from "@/lib/security/hardening/CsrfGuard.js";
 import { SecurityError } from "@/lib/security/core/SecurityErrorEnvelope.js";
 
 export const runtime = "nodejs";
@@ -9,8 +10,7 @@ export const runtime = "nodejs";
 export async function POST(request) {
   try {
     AuthRouteGuard.assertRequest(request, { action: "UPSTREAM_OIDC_EXCHANGE", maxRequests: 20, maxBodyBytes: 65_536 });
-    const origin = request.headers.get("origin");
-    if (!origin || origin !== new URL(request.url).origin) {
+    if (!isSameOriginRequest(request)) {
       throw new SecurityError({ code: "CSRF_ORIGIN_REJECTED", message: "Cross-origin session exchange rejected.", statusCode: 403 });
     }
     const authorization = request.headers.get("authorization") || "";

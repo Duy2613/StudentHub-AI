@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-09-09T10:18:00.321Z",
-  "expectedCount": 58,
+  "timestamp": "2026-09-10T09:01:25.018Z",
+  "expectedCount": 61,
   "verifiedCount": 40,
-  "missingCount": 15,
+  "missingCount": 16,
   "missingTables": [
     {
       "type": "TABLE",
@@ -32,6 +32,11 @@
     {
       "type": "TABLE",
       "name": "public.community_reactions",
+      "migration": "202609090001_community_expert_promax.sql"
+    },
+    {
+      "type": "TABLE",
+      "name": "private.community_quality_events",
       "migration": "202609090001_community_expert_promax.sql"
     },
     {
@@ -467,6 +472,14 @@
       "status": "MISSING"
     },
     {
+      "object": "private.community_quality_events",
+      "type": "TABLE",
+      "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": false,
+      "status": "MISSING"
+    },
+    {
       "object": "private.community_reaction_events",
       "type": "TABLE",
       "migration": "202609090001_community_expert_promax.sql",
@@ -542,6 +555,22 @@
       "object": "private.reject_promax_history_mutation",
       "type": "FUNCTION",
       "migration": "202609090001_community_expert_promax.sql",
+      "exists": false,
+      "rlsEnabled": "N/A",
+      "status": "MISSING"
+    },
+    {
+      "object": "private.bump_expert_verification_revision",
+      "type": "FUNCTION",
+      "migration": "202609100001_expert_authority_snapshot.sql",
+      "exists": false,
+      "rlsEnabled": "N/A",
+      "status": "MISSING"
+    },
+    {
+      "object": "private.bump_expert_assignment_revision",
+      "type": "FUNCTION",
+      "migration": "202609100001_expert_authority_snapshot.sql",
       "exists": false,
       "rlsEnabled": "N/A",
       "status": "MISSING"

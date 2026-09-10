@@ -6,10 +6,38 @@
  */
 
 import React, { useState } from "react";
-import { FileText } from "lucide-react";
+import Image from "next/image";
+import { FileText, UserCheck } from "lucide-react";
+import FacultyRubricModal from "./FacultyRubricModal";
 
 export default function AcademicWorkspace360() {
   const [activeTab, setActiveTab] = useState("transcript");
+  const [selectedFaculty, setSelectedFaculty] = useState(null);
+
+  const facultyMap = {
+    MATH1401: { name: "TS. Nguyễn Văn Toàn", department: "Toán Ứng Dụng", courseCode: "MATH1401", rubrics: [{ axis: "Phương pháp giảng dạy", score: 88 }, { axis: "Tính công bằng chấm thi", score: 92 }, { axis: "Hỗ trợ giải đáp học tập", score: 85 }, { axis: "Mức độ bám sát đề cương", score: 94 }], totalReviews: 42 },
+    PHYS1301: { name: "ThS. Lê Hoàng Nam", department: "Vật Lý Kỹ Thuật", courseCode: "PHYS1301", rubrics: [{ axis: "Phương pháp giảng dạy", score: 82 }, { axis: "Tính công bằng chấm thi", score: 86 }, { axis: "Hỗ trợ giải đáp học tập", score: 79 }, { axis: "Mức độ bám sát đề cương", score: 90 }], totalReviews: 35 },
+    COSC1301: { name: "PGS.TS. Trần Anh Tuấn", department: "Khoa Học Máy Tính", courseCode: "COSC1301", rubrics: [{ axis: "Phương pháp giảng dạy", score: 95 }, { axis: "Tính công bằng chấm thi", score: 94 }, { axis: "Hỗ trợ giải đáp học tập", score: 91 }, { axis: "Mức độ bám sát đề cương", score: 97 }], totalReviews: 58 },
+    MATH1402: { name: "TS. Đặng Thanh Tùng", department: "Toán Ứng Dụng", courseCode: "MATH1402", rubrics: [{ axis: "Phương pháp giảng dạy", score: 87 }, { axis: "Tính công bằng chấm thi", score: 89 }, { axis: "Hỗ trợ giải đáp học tập", score: 83 }, { axis: "Mức độ bám sát đề cương", score: 91 }], totalReviews: 38 },
+    COSC1402: { name: "TS. Vũ Hải Đăng", department: "Kỹ Thuật Phần Mềm", courseCode: "COSC1402", rubrics: [{ axis: "Phương pháp giảng dạy", score: 91 }, { axis: "Tính công bằng chấm thi", score: 90 }, { axis: "Hỗ trợ giải đáp học tập", score: 88 }, { axis: "Mức độ bám sát đề cương", score: 93 }], totalReviews: 49 },
+    COSC2403: { name: "TS. Phạm Minh Khôi", department: "Khoa Học Máy Tính", courseCode: "COSC2403", rubrics: [{ axis: "Phương pháp giảng dạy", score: 93 }, { axis: "Tính công bằng chấm thi", score: 92 }, { axis: "Hỗ trợ giải đáp học tập", score: 89 }, { axis: "Mức độ bám sát đề cương", score: 95 }], totalReviews: 61 }
+  };
+
+  const openFacultyRubric = (course) => {
+    const prof = facultyMap[course.code] || {
+      name: `Giảng viên phụ trách [${course.code}]`,
+      department: "Khoa Công Nghệ Thông Tin",
+      courseCode: course.code,
+      rubrics: [
+        { axis: "Phương pháp giảng dạy", score: 85 },
+        { axis: "Tính công bằng chấm thi", score: 88 },
+        { axis: "Hỗ trợ giải đáp học tập", score: 82 },
+        { axis: "Mức độ bám sát đề cương", score: 90 }
+      ],
+      totalReviews: 24
+    };
+    setSelectedFaculty(prof);
+  };
 
   const semesters = [
     {
@@ -53,7 +81,22 @@ export default function AcademicWorkspace360() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Decorative Supporting Background: Academic Course Topography */}
+      <div className="academic-topography-backdrop pointer-events-none absolute inset-0 -z-10 overflow-hidden opacity-[0.05] rounded-3xl" aria-hidden="true">
+        <picture className="block relative w-full h-full">
+          <source media="(prefers-reduced-motion: reduce)" srcSet="/media/academic/academic-course-topography.avif" />
+          <Image
+            src="/media/academic/academic-course-topography.avif"
+            alt=""
+            fill
+            unoptimized
+            priority={false}
+            className="object-cover object-center select-none"
+          />
+        </picture>
+      </div>
+
       {/* 1. Header Profile Banner */}
       <section className="p-6 rounded-3xl surface-card flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
@@ -143,6 +186,7 @@ export default function AcademicWorkspace360() {
                       <th className="pb-2">Tín Chỉ</th>
                       <th className="pb-2">Điểm TK</th>
                       <th className="pb-2">Trạng Thái</th>
+                      <th className="pb-2 text-right">Đánh Giá GV</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10">
@@ -158,6 +202,16 @@ export default function AcademicWorkspace360() {
                           }`}>
                             {c.status}
                           </span>
+                        </td>
+                        <td className="py-2.5 text-right">
+                          <button
+                            type="button"
+                            onClick={() => openFacultyRubric(c)}
+                            className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--accent-human)] hover:underline"
+                          >
+                            <UserCheck size={12} />
+                            <span>Xem rubric</span>
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -198,6 +252,13 @@ export default function AcademicWorkspace360() {
           </div>
         </div>
       )}
+
+      {/* Merged Professor Rating / Faculty Rubric Modal */}
+      <FacultyRubricModal
+        faculty={selectedFaculty}
+        isOpen={Boolean(selectedFaculty)}
+        onClose={() => setSelectedFaculty(null)}
+      />
     </div>
   );
 }

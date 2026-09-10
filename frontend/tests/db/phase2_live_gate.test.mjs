@@ -3,13 +3,13 @@ import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import { TrustPersistenceService } from "../../src/lib/server/database/TrustPersistenceService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
+import { configureDisposableDatabase, disposableLiveGate } from "../helpers/disposableDbGuard.mjs";
 
-const liveGate = {
-  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
-};
+const disposableDatabaseUrl = configureDisposableDatabase();
+const liveGate = disposableLiveGate();
 
 after(async () => {
-  if (process.env.DATABASE_URL) await getPostgresPool().end();
+  if (disposableDatabaseUrl) await getPostgresPool().end();
 });
 
 test("PHASE 2 LIVE GATE: End-to-end Trust persistence, retrieval, cross-user denial, and idempotency", liveGate, async () => {

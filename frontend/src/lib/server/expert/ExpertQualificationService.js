@@ -38,6 +38,9 @@ export class ExpertQualificationError extends Error {
 
 function storageError(error) {
   if (error instanceof ExpertQualificationError) return error;
+  if (["42P01", "42703", "3F000"].includes(error?.code)) {
+    return new ExpertQualificationError("PROMAX_MIGRATION_REQUIRED", "Expert Promax storage is not initialized in this environment; no fallback data is available.", 503);
+  }
   if (error?.code === "23505") {
     return new ExpertQualificationError("QUALIFICATION_ALREADY_EXISTS", "An expert qualification record already exists.", 409);
   }

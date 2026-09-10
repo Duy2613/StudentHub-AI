@@ -148,7 +148,7 @@ test.describe("Trust flagship flow", () => {
     await mockTrustPipeline(page);
     await completeTextScan(page);
     const printed = page.evaluate(() => new Promise((resolve) => window.addEventListener("studenthub-print", () => resolve(true), { once: true })));
-    await page.getByRole("button", { name: "In báo cáo" }).click();
+    await page.locator("button.print-trigger").click();
     await expect(printed).resolves.toBe(true);
   });
 });

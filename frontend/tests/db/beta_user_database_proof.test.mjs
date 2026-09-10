@@ -15,12 +15,12 @@ import crypto from "node:crypto";
 import { getPostgresPool, closePostgresPoolForTests } from "../../src/lib/server/database/PostgresPool.js";
 import { TrustPersistenceService } from "../../src/lib/server/database/TrustPersistenceService.js";
 import { ReportService } from "../../src/lib/server/reports/ReportService.js";
+import { configureDisposableDatabase, disposableLiveGate } from "../helpers/disposableDbGuard.mjs";
 
 const USER_A = "00000000-0000-4000-a000-000000000001";
 const USER_B = "00000000-0000-4000-b000-000000000002";
-const liveGate = {
-  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
-};
+const disposableDatabaseUrl = configureDisposableDatabase();
+const liveGate = disposableLiveGate();
 
 let pool;
 let createdCaseIds = [];
@@ -45,7 +45,7 @@ async function asRole(role, subjectId, sql, values = []) {
 }
 
 before(async () => {
-  if (!process.env.DATABASE_URL) return;
+  if (!disposableDatabaseUrl) return;
   pool = getPostgresPool();
 
   // Ensure test users exist in auth.users
@@ -77,7 +77,15 @@ after(async () => {
         await pool.query("DELETE FROM public.trust_cases WHERE id = ANY($1::uuid[])", [createdCaseIds]);
       }
       await pool.query("DELETE FROM public.profiles WHERE id IN ($1, $2)", [USER_A, USER_B]);
-      await pool.query("DELETE FROM auth.users WHERE id IN ($1, $2)", [USER_A, USER_B]);
+      // Trust execution appends realtime events. The event log is deliberately
+      // append-only, so its subject FK uses ON DELETE SET NULL and the guard
+      // trigger correctly rejects a cleanup-induced UPDATE. Keep users that
+      // still have immutable event history; the disposable DB can be reset
+      // between full assurance runs.
+      await pool.query(
+        "DELETE FROM auth.users u WHERE u.id IN ($1, $2) AND NOT EXISTS (SELECT 1 FROM private.realtime_events e WHERE e.subject_id = u.id)",
+        [USER_A, USER_B]
+      );
     } catch (cleanupErr) {
       console.error("[Cleanup Error]", cleanupErr);
     }

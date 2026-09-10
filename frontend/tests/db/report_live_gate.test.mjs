@@ -6,16 +6,19 @@ import { fileURLToPath } from "node:url";
 import { after, test } from "node:test";
 import { ReportService } from "../../src/lib/server/reports/ReportService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
+import { configureDisposableDatabase, disposableLiveGate } from "../helpers/disposableDbGuard.mjs";
 
-const liveUrl = process.env.DATABASE_URL;
+const disposableDatabaseUrl = configureDisposableDatabase();
+const liveUrl = disposableDatabaseUrl;
+const liveGate = disposableLiveGate();
 const repositoryRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const reportsMigration = readFileSync(join(repositoryRoot, "database", "migrations", "202609060004_reports.sql"), "utf8");
 
 after(async () => {
-  if (liveUrl) await getPostgresPool().end();
+  if (disposableDatabaseUrl) await getPostgresPool().end();
 });
 
-test("PHASE 2 REPORT LIVE GATE: committed Trust snapshot, hash, ownership, and idempotency", { skip: !liveUrl && "DATABASE_URL is not configured" }, async (t) => {
+test("PHASE 2 REPORT LIVE GATE: committed Trust snapshot, hash, ownership, and idempotency", liveGate, async (t) => {
   const pool = getPostgresPool();
   await pool.query(reportsMigration);
   const users = await pool.query("select id from auth.users order by created_at limit 2");

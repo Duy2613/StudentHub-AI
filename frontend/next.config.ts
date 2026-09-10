@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+  // Disposable local E2E runs can use an isolated build directory while a
+  // developer's normal `next dev` server is already running.
+  distDir: process.env.STUDENTHUB_NEXT_DIST_DIR || ".next",
   async redirects() {
     return [
       {
@@ -17,7 +20,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/contract-check",
-        destination: "/trust",
+        destination: "/trust?tab=contract",
         permanent: false,
       },
       {
@@ -61,23 +64,13 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
-        source: "/credit-scheduler",
-        destination: "/academic?view=planner",
-        permanent: false,
-      },
-      {
         source: "/prof-rating",
-        destination: "/expert",
+        destination: "/academic",
         permanent: false,
       },
       {
         source: "/profile/:id",
         destination: "/profile?profileId=:id",
-        permanent: false,
-      },
-      {
-        source: "/tuition-radar",
-        destination: "/academic",
         permanent: false,
       },
       {

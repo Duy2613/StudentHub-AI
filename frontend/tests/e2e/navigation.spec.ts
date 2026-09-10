@@ -21,7 +21,7 @@ test.describe("canonical product navigation", () => {
 
   for (const [legacyPath, canonicalPath] of [
     ["/ai", "/trust"],
-    ["/contract-check", "/trust"],
+    ["/contract-check", "/trust?tab=contract"],
     ["/intelligence", "/trust"],
     ["/intelligence/ai-trust", "/trust"],
     ["/intelligence/community", "/community"],
@@ -30,7 +30,7 @@ test.describe("canonical product navigation", () => {
     ["/intelligence/knowledge", "/trust"],
     ["/intelligence/trust", "/trust"],
     ["/academic/profile", "/profile"],
-    ["/prof-rating", "/expert"],
+    ["/prof-rating", "/academic"],
     ["/profile/demo-user", "/profile?profileId=demo-user"],
   ] as const) {
     test(`${legacyPath} resolves to its canonical surface`, async ({ page }) => {

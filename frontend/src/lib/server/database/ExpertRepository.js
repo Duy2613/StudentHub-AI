@@ -162,6 +162,7 @@ export class ExpertRepository {
   static async setDomainVerification({ userId, domainCode, status, verifiedBy = null, evidenceRef = null }) {
     if (!userId || !domainCode || !["PENDING", "VERIFIED", "REJECTED", "REVOKED"].includes(status)) throw new Error("Invalid verification parameters.");
     const pool = getPostgresPool();
+    const normalizedDomain = String(domainCode).trim().toUpperCase();
     const res = await pool.query(
       `INSERT INTO private.expert_verifications (user_id, domain_code, status, qualification_state, verified_by, verified_at, evidence_ref)
        VALUES ($1, $2, $3,
@@ -171,8 +172,8 @@ export class ExpertRepository {
        SET status = EXCLUDED.status, qualification_state = EXCLUDED.qualification_state,
            verified_by = EXCLUDED.verified_by, verified_at = now(), evidence_ref = EXCLUDED.evidence_ref,
            suspended_at = CASE WHEN EXCLUDED.status = 'REVOKED' THEN now() ELSE NULL END
-       RETURNING user_id, domain_code, status, qualification_state, verified_at`,
-      [userId, domainCode, status, verifiedBy, evidenceRef]
+       RETURNING id, user_id, domain_code, status, qualification_state, revision, verified_at, suspended_at, expires_at`,
+      [userId, normalizedDomain, status, verifiedBy, evidenceRef]
     );
     return res.rows[0];
   }
@@ -203,7 +204,7 @@ export class ExpertRepository {
       await client.query(`SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, [`assignment:${assignedBy}:${idempotencyKey}`]);
       const existing = await client.query(
         `SELECT id, expert_id, case_id, case_revision, claim_id, domain_code, status,
-                assigned_by, expires_at, idempotency_key, request_digest, created_at
+                assigned_by, expires_at, revision, idempotency_key, request_digest, created_at
            FROM private.expert_assignments
           WHERE assigned_by = $1 AND idempotency_key = $2
           LIMIT 1`,
@@ -223,7 +224,7 @@ export class ExpertRepository {
         `INSERT INTO private.expert_assignments
           (id, expert_id, case_id, case_revision, claim_id, domain_code, status, assigned_by, expires_at, idempotency_key, request_digest, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, 'ASSIGNED', $7, $8, $9, $10, now(), now())
-         RETURNING id, expert_id, case_id, case_revision, claim_id, domain_code, status, assigned_by, expires_at, idempotency_key, created_at`,
+         RETURNING id, expert_id, case_id, case_revision, claim_id, domain_code, status, assigned_by, expires_at, revision, idempotency_key, created_at`,
         [randomUUID(), expertId, caseId, caseRevision, claimId, normalizedDomain, assignedBy, expiresAt, idempotencyKey, requestDigest]
       );
       await appendOutbox(client, {
@@ -272,6 +273,8 @@ export class ExpertRepository {
     if (!expertId || !caseId || !domainCode || !assessment) throw new ExpertRepositoryError("ASSESSMENT_INPUT_INVALID", "expertId, caseId, domainCode, and assessment are required.", 400);
     if (!Number.isInteger(Number(caseRevision)) || Number(caseRevision) < 1) throw new ExpertRepositoryError("CASE_REVISION_REQUIRED", "An immutable case revision is required.", 400);
     caseRevision = Number(caseRevision);
+    const normalizedDomain = String(domainCode).trim().toUpperCase();
+    claimId = claimId ? String(claimId).trim().toLowerCase() : null;
     if (!Number.isFinite(Number(confidence)) || Number(confidence) < 0 || Number(confidence) > 1) throw new ExpertRepositoryError("ASSESSMENT_CONFIDENCE_INVALID", "Assessment confidence must be between 0 and 1.", 400);
     if (!Array.isArray(evidenceRevisionIds) || evidenceRevisionIds.length > 100) throw new ExpertRepositoryError("EVIDENCE_INPUT_INVALID", "Evidence revisions must be a bounded array.", 400);
     if (requireAssignment && !assignmentId) throw new ExpertRepositoryError("ASSIGNMENT_REQUIRED", "An assigned case revision is required before assessment.", 403);
@@ -289,7 +292,7 @@ export class ExpertRepository {
     const contract = buildAssessmentContract({
       assessmentId: null,
       expertId,
-      verifiedDomain: domainCode,
+      verifiedDomain: normalizedDomain,
       assignmentId,
       caseId,
       caseRevision,
@@ -303,36 +306,71 @@ export class ExpertRepository {
       coiDeclared,
       policyVersion,
     });
+    // This digest intentionally contains the submitted request only. A later
+    // verification change must not turn an idempotent replay of an already
+    // stored assessment into a new write or erase its historical lineage.
+    const requestDigest = digest({
+      expertId,
+      caseId,
+      domainCode: normalizedDomain,
+      assignmentId: assignmentId || null,
+      caseRevision,
+      claimId,
+      evidenceRevisionIds,
+      assessment,
+      confidence: Number(confidence),
+      contract,
+    });
     return transaction(async (client) => {
       await client.query(`SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, [`assessment:${expertId}:${idempotencyKey}`]);
-      const verified = await client.query(
-        `SELECT status, qualification_state FROM private.expert_verifications WHERE user_id = $1 AND domain_code = $2 AND status = 'VERIFIED' AND qualification_state = 'DOMAIN_VERIFIED' AND suspended_at IS NULL AND (expires_at IS NULL OR expires_at > now()) FOR UPDATE`,
-        [expertId, String(domainCode).toUpperCase()]
+      const existing = await client.query(
+        `SELECT *
+           FROM public.expert_assessments
+          WHERE expert_id = $1 AND idempotency_key = $2
+          LIMIT 1`,
+        [expertId, idempotencyKey]
       );
-      if (verified.rows.length === 0 || verified.rows[0].status !== "VERIFIED") throw new ExpertRepositoryError("UNVERIFIED_EXPERT_DOMAIN", `Expert ${expertId} is not verified for domain ${domainCode}.`, 403);
+      if (existing.rows[0]) {
+        if (existing.rows[0].request_digest && !Buffer.from(existing.rows[0].request_digest).equals(requestDigest)) throw scopeError("IDEMPOTENCY_CONFLICT");
+        await assertCaseScope(client, {
+          actorId: expertId,
+          caseId: existing.rows[0].case_id,
+          caseRevision: Number(existing.rows[0].case_revision),
+          claimId: existing.rows[0].claim_id,
+          evidenceRevisionIds: jsonArray(existing.rows[0].evidence_revision_ids),
+          publicOnly: true,
+        });
+        return { ...existing.rows[0], idempotent: true };
+      }
+      const verified = await client.query(
+        `SELECT id, user_id, domain_code, status, qualification_state,
+                revision, verified_at, expires_at, suspended_at
+           FROM private.expert_verifications
+          WHERE user_id = $1 AND domain_code = $2
+            AND status = 'VERIFIED' AND qualification_state = 'DOMAIN_VERIFIED'
+            AND suspended_at IS NULL AND (expires_at IS NULL OR expires_at > now())
+          FOR UPDATE`,
+        [expertId, normalizedDomain]
+      );
+      if (verified.rows.length === 0 || verified.rows[0].status !== "VERIFIED") throw new ExpertRepositoryError("UNVERIFIED_EXPERT_DOMAIN", `Expert ${expertId} is not verified for domain ${normalizedDomain}.`, 403);
       await assertCaseScope(client, { actorId: expertId, caseId, caseRevision, claimId, evidenceRevisionIds, publicOnly: true });
 
       let assignment = null;
       if (assignmentId) {
         const assigned = await client.query(
-          `SELECT id, expert_id, case_id, case_revision, claim_id, domain_code, status, assigned_by, conflict_of_interest, expires_at
+          `SELECT id, expert_id, case_id, case_revision, claim_id, domain_code, status,
+                  assigned_by, conflict_of_interest, expires_at, revision
              FROM private.expert_assignments
             WHERE id = $1 AND expert_id = $2 AND case_id = $3 AND domain_code = $4
             FOR UPDATE`,
-          [assignmentId, expertId, caseId, String(domainCode).toUpperCase()]
+          [assignmentId, expertId, caseId, normalizedDomain]
         );
         assignment = assigned.rows[0] || null;
         if (assignment && (Number(assignment.case_revision) !== Number(caseRevision) || (assignment.claim_id || null) !== claimId)) throw scopeError('ASSIGNMENT_SCOPE_MISMATCH');
       }
-      const requestDigest = digest({ expertId, caseId, domainCode, assignmentId, caseRevision, claimId, evidenceRevisionIds, assessment, confidence, contract });
-      const existing = await client.query(`SELECT * FROM public.expert_assessments WHERE expert_id = $1 AND idempotency_key = $2 LIMIT 1`, [expertId, idempotencyKey]);
-      if (existing.rows[0]) {
-        if (existing.rows[0].request_digest && !Buffer.from(existing.rows[0].request_digest).equals(requestDigest)) throw scopeError('IDEMPOTENCY_CONFLICT');
-        return existing.rows[0];
-      }
       const authority = canSubmitAssessment({
         expertId,
-        verifiedDomain: domainCode,
+        verifiedDomain: normalizedDomain,
         domainStatus: verified.rows[0]?.status,
         assignment,
         caseRevision,
@@ -341,20 +379,60 @@ export class ExpertRepository {
       if (!authority.ok) throw new ExpertRepositoryError(authority.code, `Assessment rejected: ${authority.code}.`, authority.code === "CONFLICT_OF_INTEREST" ? 403 : 409);
       if (assignment.expires_at && new Date(assignment.expires_at).getTime() <= Date.now()) throw new ExpertRepositoryError("ASSIGNMENT_EXPIRED", "The assessment assignment has expired.", 409);
 
+      const submittedAt = new Date().toISOString();
+      const verificationRevision = Number(verified.rows[0].revision || 1);
+      const assignmentRevision = Number(assignment.revision || 1);
+      const coiDeclarationRef = `coi-${digest({ expertId, assignmentId, caseId, caseRevision, claimId, domainCode: normalizedDomain, idempotencyKey }).toString("hex")}`;
+      const authoritySnapshot = {
+        snapshotVersion: 1,
+        expertId,
+        verificationId: verified.rows[0].id,
+        verificationRevision,
+        verifiedDomain: normalizedDomain,
+        verificationStatus: verified.rows[0].status,
+        qualificationState: verified.rows[0].qualification_state,
+        verificationExpiresAt: verified.rows[0].expires_at,
+        verificationSuspendedAt: verified.rows[0].suspended_at,
+        assignmentId: assignment.id,
+        assignmentRevision,
+        caseId,
+        caseRevision,
+        claimId,
+        evidenceRevisionIds,
+        coiState: "DECLARED_NO_CONFLICT",
+        coiDeclarationRef,
+        qualificationPolicyVersion: "expert-qualification-v1",
+        submittedAt,
+      };
+      const authoritySnapshotDigest = digest(authoritySnapshot);
+
       const inserted = await client.query(
         `INSERT INTO public.expert_assessments
           (expert_id, case_id, domain_code, assessment, confidence, assignment_id,
            case_revision, claim_id, evidence_revision_ids, assessment_state,
            conclusion_within_scope, reasoning, uncertainty, missing_evidence,
-           coi_declared, policy_version, idempotency_key, request_digest, created_at)
+           coi_declared, coi_state, coi_declaration_ref, qualification_policy_version,
+           verification_id, verification_revision, verified_domain, verification_status,
+           verification_qualification_state, verification_expires_at,
+           verification_suspended_at, assignment_revision,
+           authority_snapshot_version, authority_snapshot_digest, authority_snapshot,
+           submitted_at, policy_version, idempotency_key, request_digest, created_at)
          VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7, $8, $9::jsonb, 'SUBMITTED',
-                 $10, $11, $12, $13::jsonb, true, $14, $15, $16, now())
+                 $10, $11, $12, $13::jsonb, true, 'DECLARED_NO_CONFLICT', $14,
+                 'expert-qualification-v1', $15, $16, $17, $18, $19, $20, $21,
+                 $22, 1, $23, $24::jsonb, $25, $26, $27, $28, now())
          RETURNING id, expert_id, case_id, domain_code, assessment, confidence,
                    assignment_id, case_revision, claim_id, evidence_revision_ids,
                    assessment_state, conclusion_within_scope, reasoning,
-                   uncertainty, missing_evidence, coi_declared, policy_version,
-                   idempotency_key, created_at`,
-        [expertId, caseId, String(domainCode).toUpperCase(), JSON.stringify(assessment), Number(confidence), assignmentId, caseRevision, claimId, JSON.stringify(evidenceRevisionIds), conclusionWithinScope || contract.conclusionWithinScope || null, reasoning || contract.reasoning || null, uncertainty || null, JSON.stringify(missingEvidence), policyVersion, idempotencyKey, requestDigest]
+                   uncertainty, missing_evidence, coi_declared, coi_state,
+                   coi_declaration_ref, qualification_policy_version,
+                   verification_id, verification_revision, verified_domain,
+                   verification_status, verification_qualification_state,
+                   verification_expires_at, verification_suspended_at,
+                   assignment_revision, authority_snapshot_version,
+                   authority_snapshot_digest, authority_snapshot, submitted_at,
+                   policy_version, idempotency_key, request_digest, created_at`,
+        [expertId, caseId, normalizedDomain, JSON.stringify(assessment), Number(confidence), assignment.id, caseRevision, claimId, JSON.stringify(evidenceRevisionIds), conclusionWithinScope || contract.conclusionWithinScope || null, reasoning || contract.reasoning || null, uncertainty || null, JSON.stringify(missingEvidence), coiDeclarationRef, verified.rows[0].id, verificationRevision, normalizedDomain, verified.rows[0].status, verified.rows[0].qualification_state, verified.rows[0].expires_at, verified.rows[0].suspended_at, assignmentRevision, authoritySnapshotDigest, JSON.stringify(authoritySnapshot), submittedAt, policyVersion, idempotencyKey, requestDigest]
       );
       await client.query(`UPDATE private.expert_assignments SET status = 'COMPLETED', updated_at = now() WHERE id = $1`, [assignmentId]);
       await appendOutbox(client, {
@@ -368,7 +446,15 @@ export class ExpertRepository {
           caseRevision,
           claimId,
           evidenceRevisionIds,
-          domainCode: String(domainCode).toUpperCase(),
+          domainCode: normalizedDomain,
+          verificationId: verified.rows[0].id,
+          verificationRevision,
+          assignmentRevision,
+          authoritySnapshotVersion: 1,
+          authoritySnapshotDigest: authoritySnapshotDigest.toString("hex"),
+          coiState: "DECLARED_NO_CONFLICT",
+          coiDeclarationRef,
+          qualificationPolicyVersion: "expert-qualification-v1",
           assessmentState: "SUBMITTED",
           qualityMutation: "NONE_ON_SUBMISSION",
         },
@@ -386,8 +472,14 @@ export class ExpertRepository {
       `SELECT ea.id, ea.expert_id, ea.domain_code, ea.assessment, ea.confidence,
               ea.assignment_id, ea.case_revision, ea.claim_id, ea.evidence_revision_ids,
               ea.assessment_state, ea.conclusion_within_scope, ea.reasoning,
-              ea.uncertainty, ea.missing_evidence, ea.coi_declared, ea.policy_version,
-              ea.created_at, ep.public_title
+              ea.uncertainty, ea.missing_evidence, ea.coi_declared, ea.coi_state,
+              ea.coi_declaration_ref, ea.qualification_policy_version,
+              ea.verification_id, ea.verification_revision, ea.verified_domain,
+              ea.verification_status, ea.verification_qualification_state,
+              ea.verification_expires_at, ea.verification_suspended_at,
+              ea.assignment_revision, ea.authority_snapshot_version,
+              ea.authority_snapshot_digest, ea.authority_snapshot, ea.submitted_at,
+              ea.policy_version, ea.created_at, ep.public_title
        FROM public.expert_assessments ea
        LEFT JOIN public.expert_profiles ep ON ea.expert_id = ep.user_id
        WHERE ea.case_id = $1 AND EXISTS (SELECT 1 FROM public.trust_cases tc WHERE tc.id=ea.case_id AND tc.visibility='PUBLIC')

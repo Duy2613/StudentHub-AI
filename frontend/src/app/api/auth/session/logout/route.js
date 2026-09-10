@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { clearSessionCookie, getDurableSessionService, SESSION_COOKIE_NAME } from "@/lib/security/identity/DurableSessionService.js";
 import { AuthRouteGuard } from "@/lib/security/hardening/AuthRouteGuard.js";
+import { isSameOriginRequest } from "@/lib/security/hardening/CsrfGuard.js";
 import { SecurityError } from "@/lib/security/core/SecurityErrorEnvelope.js";
 
 // SECURITY_CONTRACT: POST AUTHENTICATED SESSION_LOGOUT 60 0
@@ -18,8 +19,7 @@ function cookieValue(header, name) {
 export async function POST(request) {
   try {
     AuthRouteGuard.assertRequest(request, { action: "SESSION_LOGOUT", maxRequests: 60, maxBodyBytes: 0 });
-    const origin = request.headers.get("origin");
-    if (!origin || origin !== new URL(request.url).origin) {
+    if (!isSameOriginRequest(request)) {
       throw new SecurityError({ code: "CSRF_ORIGIN_REJECTED", message: "Cross-origin logout rejected.", statusCode: 403 });
     }
     const secret = cookieValue(request.headers.get("cookie") || "", SESSION_COOKIE_NAME);

@@ -12,13 +12,13 @@ import { PostgresCrossSystemRepository } from "../../src/lib/intelligence/crossS
 import { TrustPersistenceService } from "../../src/lib/server/database/TrustPersistenceService.js";
 import { TrustGraphService } from "../../src/lib/server/database/TrustGraphService.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
+import { configureDisposableDatabase, disposableLiveGate } from "../helpers/disposableDbGuard.mjs";
 
-const liveGate = {
-  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
-};
+const disposableDatabaseUrl = configureDisposableDatabase();
+const liveGate = disposableLiveGate();
 
 after(async () => {
-  if (process.env.DATABASE_URL) await getPostgresPool().end();
+  if (disposableDatabaseUrl) await getPostgresPool().end();
 });
 
 test("PHASE 5 LIVE GATE: Evidence Passport hash integrity, tamper detection, and deterministic TrustGraph", liveGate, async () => {

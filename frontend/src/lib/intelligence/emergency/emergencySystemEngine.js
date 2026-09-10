@@ -51,20 +51,38 @@ export const OFFICIAL_EMERGENCY_HOTLINES = [
   },
 ];
 
-/**
- * Generates an SMS / Zalo SOS Payload with current GPS coordinates
- */
-export function generateEmergencySosPayload({ lat, lng, studentName = "Sinh viên", customNote = "" }) {
-  const mapsLink = lat && lng ? `https://maps.google.com/?q=${lat},${lng}` : "Chưa xác định tọa độ";
-  const timestamp = new Date().toLocaleString("vi-VN");
+// P0 SAFETY PATCH: Fake coordinates fallback permanently deleted.
+export function generateEmergencySosPayload(options = {}) {
+  const {
+    coords,
+    lat: rawLat,
+    lng: rawLng,
+    timestamp,
+    studentName = "Sinh viên",
+    customNote = "",
+  } = options;
 
-  const message = `[CẤP CỨU SOS TỪ STUDENTHUB AI]\n${studentName} đang cần trợ giúp khẩn cấp!\nThời gian: ${timestamp}\nVị trí GPS: ${mapsLink}\nGhi chú: ${customNote || "Đang gặp nguy hiểm/cần hỗ trợ gấp!"}`;
+  const lat = coords?.lat ?? rawLat;
+  const lng = coords?.lng ?? rawLng;
+  const timeStr = timestamp || new Date().toLocaleString("vi-VN");
+
+  let locationMessage = "Vị trí: Không thể lấy tọa độ tự động (Người dùng cần tự báo địa chỉ).";
+  let mapsUrl = "";
+
+  if (typeof lat === "number" && typeof lng === "number") {
+    mapsUrl = `https://maps.google.com/?q=${lat},${lng}`;
+    locationMessage = `Vị trí bản đồ: ${mapsUrl}`;
+  }
+
+  const message = `[CỨU NẠN KHẨN CẤP SINH VIÊN]\n${studentName} đang gặp nguy hiểm và cần trợ giúp ngay lập tức.\n${locationMessage}\nThời gian: ${timeStr}${customNote ? `\nGhi chú: ${customNote}` : ""}`;
+  const smsUrl = `sms:?body=${encodeURIComponent(message)}`;
 
   return {
     message,
-    smsUrl: `sms:?body=${encodeURIComponent(message)}`,
-    googleMapsUrl: mapsLink,
-    timestamp,
+    smsUrl,
+    mapsUrl: mapsUrl || null,
+    googleMapsUrl: mapsUrl || "Chưa xác định tọa độ",
+    timestamp: timeStr,
   };
 }
 

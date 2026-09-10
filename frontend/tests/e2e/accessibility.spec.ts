@@ -36,7 +36,9 @@ test("core Trust controls are keyboard reachable", async ({ page }) => {
   await page.keyboard.press("Tab");
   const first = page.locator(":focus");
   await expect(first).toBeVisible();
-  await page.getByRole("tab", { name: "Văn bản" }).focus();
-  await page.keyboard.press("Enter");
-  await expect(page.getByRole("tab", { name: "Văn bản" })).toHaveAttribute("aria-selected", "true");
+  const textTab = page.getByRole("tab", { name: "Văn bản" });
+  await textTab.focus();
+  await expect(textTab).toBeFocused();
+  await textTab.press("Enter");
+  await expect(textTab).toHaveAttribute("aria-selected", "true");
 });

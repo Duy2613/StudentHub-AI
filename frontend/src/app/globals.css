@@ -3,7 +3,63 @@
    stylesheet and delayed first paint without serving runtime UI. */
 @import "tailwindcss" source("../");
 
+/* ==========================================================================
+   ACADEMIC CINEMATIC 3.0 — CANONICAL DESIGN TOKENS
+   Authoritative Branch: design/academic-cinematic-product-evolution
+   Commit: 3435dea2f594651fdb91a5695ca06aec7a9d965d
+   ========================================================================== */
+@theme {
+  /* Surface Canvases */
+  --bg-primary: #070A12; /* Canvas Base (Slate Ink) */
+  --bg-secondary: #0C111C; /* Canvas Sub-layer */
+  --surface-primary: #111827; /* 1st Elevation (Hairline boundary) */
+  --surface-elevated: #171F2E; /* 2nd Elevation (Floating panels/flyouts) */
+  --surface-quiet: #090C16; /* Subdued container background */
+
+  /* Neutral Typography Scales */
+  --text-primary: #F6F7FB; /* High-contrast heading/body (17.8:1 on #070A12) */
+  --text-secondary: #A4ADBD; /* Secondary reading (9.1:1 on #070A12) */
+  --text-muted: #727C8E; /* Captions/micro-copy (5.1:1 on #070A12) */
+
+  /* Pillar / Domain Identity (Who is speaking?) */
+  --accent-primary: #756BFF; /* AI Reasoning Domain (Electric Indigo-Violet) */
+  --accent-knowledge: #65D8FF; /* Community / Collective Knowledge (Sky Cyan) */
+  --accent-human: #FFB66D; /* Human Faculty / Expert Mentorship (Warm Saffron) */
+  --accent-trust: #45D69A; /* Forensic Trust Observatory (Mineral Mint) */
+
+  /* Status / Risk Semantics (What is the truth value?) */
+  --status-success: #45D69A; /* Verified / Authentic / Low Risk */
+  --status-warning: #FFCC66; /* Caution / Unconfirmed / Ambiguous */
+  --status-danger: #FF6377; /* Predatory / Scam / Emergency Distress */
+
+  /* Hairlines & Focus Outlines */
+  --border-subtle: rgba(225, 230, 236, 0.08);
+  --border-strong: rgba(225, 230, 236, 0.16);
+  --border-focus: #45D69A;
+
+  /* Typographic Family Mapping */
+  --font-ui: var(--font-be-vietnam-pro), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-cormorant-garamond), Georgia, serif;
+  --font-editorial: var(--font-newsreader), Georgia, serif;
+  --font-technical: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+}
+
+/* ==========================================================================
+   PHASE A BACKWARD-COMPATIBILITY ALIASES
+   ========================================================================== */
 :root {
+  --aether-canvas: var(--bg-primary);
+  --aether-surface: var(--bg-secondary);
+  --aether-surface-raised: var(--surface-primary);
+  --aether-mint: var(--accent-trust);
+  --aether-violet: var(--accent-primary);
+  --aether-cyan: var(--accent-knowledge);
+  --state-success: var(--status-success);
+  --state-warning: var(--status-warning);
+  --state-danger: var(--status-danger);
+  --accent-trust: #45D69A;
+  --border-focus: #45D69A;
+
   /* ==========================================================================
      LUCID AETHER 2.0 — LIVING INTELLIGENCE UNIVERSE DESIGN TOKENS
      ========================================================================== */
@@ -61,20 +117,20 @@
   --status-warning: #FFCC66;
   --status-danger: #FF6377;
 
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
+  --border-subtle: rgba(225, 230, 236, 0.08);
+  --border-strong: rgba(225, 230, 236, 0.16);
   --glow-primary: rgba(117, 107, 255, 0.20);
   --glow-knowledge: rgba(101, 216, 255, 0.20);
 
   /* Typography tokens (Vietnamese-first) */
   --font-be-vietnam: var(--font-be-vietnam-pro), system-ui, -apple-system, sans-serif;
-  --font-editorial: var(--font-lora), Georgia, serif;
+  --font-editorial: var(--font-newsreader), Georgia, serif;
   --font-human: var(--font-be-vietnam-pro), system-ui, -apple-system, sans-serif;
   --font-machine: var(--font-jetbrains-mono), 'Geist Mono', 'Fira Code', monospace;
 
   /* VNext typography contract. These are the only product-facing families. */
   --font-ui: var(--font-be-vietnam);
-  --font-display: var(--font-editorial);
+  --font-display: var(--font-cormorant-garamond), Georgia, serif;
   --font-technical: var(--font-machine);
   --type-display-xl: clamp(3.25rem, 8vw, 7.5rem);
   --type-display-lg: clamp(2.75rem, 5vw, 5.5rem);
@@ -270,6 +326,25 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   VIETNAMESE DIACRITIC HEADROOM & TYPOGRAPHIC UTILITIES
+   ========================================================================== */
+.vn-heading-safe {
+  line-height: 1.25 !important;
+  padding-top: 0.12em;
+  padding-bottom: 0.06em;
+}
+
+.vn-body-safe {
+  line-height: 1.65;
+}
+
+/* Focus Ring Baseline */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 /* ==========================================================================
@@ -8135,5 +8210,111 @@ body {
   .reference-atmosphere-bird,
   .reference-telemetry-marquee-track {
     animation: none;
+  }
+}
+
+/* ==========================================================================\n+   KHAI MINH VISUAL INTEGRATION\n+   --------------------------------------------------------------------------\n+   Route art is atmospheric only. Product copy, states, identities, and\n+   evidence remain rendered by the live route components.\n+   ========================================================================== */
+.khai-minh-image {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.khai-minh-image-image {
+  object-fit: cover;
+  object-position: center;
+}
+
+.reference-atmosphere-khai-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: .1;
+  pointer-events: none;
+}
+
+.reference-atmosphere-khai-image::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(7, 9, 14, .96) 0%, rgba(7, 9, 14, .72) 42%, rgba(7, 9, 14, .82) 100%),
+    linear-gradient(180deg, rgba(7, 9, 14, .25), rgba(7, 9, 14, .92));
+  content: "";
+  pointer-events: none;
+}
+
+.reference-atmosphere-khai-image .khai-minh-image-image {
+  filter: saturate(.44) contrast(.9) brightness(.72) blur(.3px);
+}
+
+.reference-atmosphere[data-reference-route="landing"] .reference-atmosphere-khai-image {
+  opacity: .035;
+}
+
+.reference-atmosphere[data-reference-route="trust"] .reference-atmosphere-khai-image,
+.reference-atmosphere[data-reference-route="expert"] .reference-atmosphere-khai-image {
+  opacity: .1;
+}
+
+.reference-atmosphere[data-reference-route="community"] .reference-atmosphere-khai-image {
+  opacity: .085;
+}
+
+.reference-atmosphere[data-reference-route="cases"] .reference-atmosphere-khai-image,
+.reference-atmosphere[data-reference-route="academic"] .reference-atmosphere-khai-image {
+  opacity: .065;
+}
+
+.reference-atmosphere[data-reference-route="personal"] .reference-atmosphere-khai-image {
+  opacity: .055;
+}
+
+.vnext-hero-art-frame .khai-minh-image {
+  position: absolute;
+  inset: 0;
+}
+
+.vnext-hero-art-frame .khai-minh-image-image {
+  filter: saturate(.78) contrast(1.02);
+}
+
+.vnext-hero-art-frame::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(90deg, rgba(7, 9, 14, .14), transparent 52%, rgba(7, 9, 14, .08));
+  content: "";
+  pointer-events: none;
+}
+
+.vnext-hero-art-frame .vnext-hero-art-sheen {
+  z-index: 2;
+}
+
+.app-shell[data-reference-route="personal"] .app-main {
+  background: linear-gradient(180deg, rgba(238, 232, 219, .055), transparent 28rem);
+}
+
+.app-shell[data-reference-route="cases"] .app-main,
+.app-shell[data-reference-route="academic"] .app-main {
+  background: linear-gradient(180deg, rgba(220, 211, 193, .04), transparent 26rem);
+}
+
+@media (max-width: 767px) {
+  .reference-atmosphere-khai-image .khai-minh-image-image {
+    object-position: 68% center;
+  }
+
+  .reference-atmosphere[data-reference-route="landing"] .reference-atmosphere-khai-image {
+    opacity: .02;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reference-atmosphere-khai-image,
+  .reference-atmosphere-khai-image .khai-minh-image-image,
+  .vnext-hero-art-frame .khai-minh-image-image {
+    animation: none;
+    transform: none;
   }
 }

@@ -1,5 +1,4 @@
 import {
-  FileClock,
   LayoutDashboard,
   Settings,
   ShieldCheck,
@@ -20,7 +19,6 @@ export const CANONICAL_NAV_GROUPS = Object.freeze([
       Object.freeze({ id: "trust", label: "Trust Engine", href: "/trust", icon: ShieldCheck, pillar: "TRUST" }),
       Object.freeze({ id: "community", label: "Community", href: "/community", icon: Users, pillar: "COMMUNITY" }),
       Object.freeze({ id: "expert", label: "Experts", href: "/expert", icon: UserRoundCheck, pillar: "EXPERT" }),
-      Object.freeze({ id: "cases", label: "Evidence Case Lab", href: "/cases", icon: FileClock, pillar: "TRUST_SUPPORT" }),
     ]),
   }),
   Object.freeze({
@@ -55,4 +53,3 @@ export function chapterForPath(pathname = "") {
   if (pathname.startsWith("/cases")) return "V";
   return "VI";
 }
-

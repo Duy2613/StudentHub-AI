@@ -118,6 +118,10 @@ test("community track record is a bounded candidate signal, never expert authori
     helpfulReactions: 10,
     challengeReactions: 0,
     qualityEventCount: 19,
+    evaluatedOutcomes: 3,
+    stabilityDays: 30,
+    recentActivity: true,
+    sanctionsActive: false,
   });
   assert.equal(candidate.points, 100);
   assert.equal(candidate.stars, 5);
@@ -130,6 +134,30 @@ test("community track record is a bounded candidate signal, never expert authori
   assert.equal(incomplete.points, 50);
   assert.equal(incomplete.expertCandidate, false);
   assert.equal(incomplete.stars, 2);
+});
+
+test("five-star status requires evaluated outcomes, stability, recent activity, and no active sanction", () => {
+  const base = {
+    publishedContributions: 5,
+    evidenceLinkedContributions: 4,
+    distinctCases: 5,
+    helpfulReactions: 10,
+    challengeReactions: 0,
+    evaluatedOutcomes: 3,
+    stabilityDays: 30,
+    recentActivity: true,
+    sanctionsActive: false,
+  };
+  const missingOutcomes = calculateCommunityTrackRecord({ ...base, evaluatedOutcomes: 2 });
+  assert.equal(missingOutcomes.stars, 4);
+  assert.ok(missingOutcomes.starGate.reasons.includes("EVALUATED_OUTCOMES_REQUIRED"));
+  const unstable = calculateCommunityTrackRecord({ ...base, stabilityDays: 29 });
+  assert.ok(unstable.starGate.reasons.includes("STABILITY_WINDOW_REQUIRED"));
+  const stale = calculateCommunityTrackRecord({ ...base, recentActivity: false });
+  assert.ok(stale.starGate.reasons.includes("RECENT_ACTIVITY_REQUIRED"));
+  const sanctioned = calculateCommunityTrackRecord({ ...base, sanctionsActive: true });
+  assert.ok(sanctioned.starGate.reasons.includes("ACTIVE_SANCTION_BLOCKS_FIVE_STARS"));
+  assert.equal(sanctioned.expertCandidate, false);
 });
 
 test("assessment and appeal checks fail closed for revoked, unassigned, and self actors", () => {

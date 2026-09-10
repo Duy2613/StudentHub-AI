@@ -296,18 +296,18 @@ export default function ExpertQualificationPanel() {
     </div>
     <p className="product-copy qualification-lead">Track record cộng đồng chỉ mở cửa ứng viên. Quiz chỉ tạo điều kiện cho bước review; quyền chuyên gia và domain hoạt động chỉ được cấp bởi human reviewer sau khi kiểm tra hồ sơ.</p>
 
-    {!loading && !authRequired && trackRecord && <div className="qualification-status-row" aria-label="Community contribution track record">
-      <div className="qualification-status-icon"><Star size={18} /></div>
-      <div><span className="data-label">Contribution track record · {trackRecord.policyVersion}</span><strong>{trackRecord.points}/{trackRecord.maxPoints} điểm · {trackRecord.stars}/5 sao</strong><small>{trackRecord.expertCandidate ? "Đủ ngưỡng ứng viên — vẫn bắt buộc identity, quiz, practice và human activation." : "Chưa đủ ngưỡng ứng viên; phản ứng cộng đồng không phải phán quyết Trust."}</small></div>
+    {!loading && !authRequired && trackRecord && <div className="qualification-status-row" aria-label="Community contribution track record" role="status" aria-live="polite">
+      <div className="qualification-status-icon"><Star size={18} aria-hidden="true" /></div>
+      <div><span className="data-label">Contribution track record · {trackRecord.policyVersion}</span><strong>{trackRecord.points}/{trackRecord.maxPoints} điểm · {trackRecord.stars}/5 sao</strong><small>{trackRecord.expertCandidate ? "Đủ ngưỡng ứng viên — vẫn bắt buộc identity, quiz, practice và human activation." : "Chưa đủ ngưỡng ứng viên; phản ứng cộng đồng không phải phán quyết Trust."}</small>{trackRecord.starGate?.reasons?.length > 0 && <small>5 sao chưa mở: {trackRecord.starGate.reasons.join(" · ")}</small>}</div>
       <span className="metadata-chip">{trackRecord.qualificationGate}</span>
     </div>}
-    {!loading && !authRequired && !trackRecord && trackRecordError && <div className="qualification-state"><AlertTriangle size={17} /><div><strong>Track record live chưa khả dụng.</strong><p>{trackRecordError}</p></div></div>}
+    {!loading && !authRequired && !trackRecord && trackRecordError && <div className="qualification-state" role="alert"><AlertTriangle size={17} aria-hidden="true" /><div><strong>Track record live chưa khả dụng.</strong><p>{trackRecordError}</p></div></div>}
 
     {loading && <div className="qualification-state" role="status"><ClipboardCheck size={17} /> Đang đọc trạng thái qualification từ server…</div>}
     {!loading && authRequired && <div className="qualification-state qualification-auth"><UserRound size={18} /><div><strong>Cần đăng nhập để bắt đầu hồ sơ chuyên gia.</strong><p>Qualification gắn với danh tính bền vững của tài khoản.</p><Link href="/login" className="text-link">Đăng nhập <ChevronRight size={14} /></Link></div></div>}
     {!loading && !authRequired && <>
-      <div className="qualification-status-row">
-        <div className="qualification-status-icon"><ShieldCheck size={18} /></div>
+      <div className="qualification-status-row" role="status" aria-live="polite">
+        <div className="qualification-status-icon"><ShieldCheck size={18} aria-hidden="true" /></div>
         <div><span className="data-label">Trạng thái server</span><strong>{statusLabel}</strong></div>
         <span className="metadata-chip">{applicationStatus}</span>
       </div>
@@ -327,7 +327,7 @@ export default function ExpertQualificationPanel() {
       {canStartQuiz && <div className="qualification-quiz-intro"><div><span className="data-label">Next gate</span><h3>Quiz kiến thức về bằng chứng và thẩm quyền</h3><p>Server sẽ bốc câu hỏi theo version, giới hạn 30 phút và lưu từng câu trả lời để resume.</p></div><button className="primary-action" type="button" onClick={startQuiz} disabled={busy}><ClipboardCheck size={16} /> Bắt đầu quiz</button></div>}
 
       {isQuizOpen && currentQuestion && <div className="qualification-quiz" aria-live="polite">
-        <div className="qualification-quiz-heading"><div><span className="data-label">{attempt.quizVersion} · Câu {questionIndex + 1}/{questions.length}</span><h3>{currentQuestion.prompt}</h3></div><span className={`qualification-timer ${remainingSeconds < 120 ? "is-warning" : ""}`}><Clock3 size={15} /> {formatRemaining(remainingSeconds)}</span></div>
+        <div className="qualification-quiz-heading"><div><span className="data-label">{attempt.quizVersion} · Câu {questionIndex + 1}/{questions.length}</span><h3>{currentQuestion.prompt}</h3></div><span className={`qualification-timer ${remainingSeconds < 120 ? "is-warning" : ""}`} aria-label={`Thời gian còn lại ${formatRemaining(remainingSeconds)}`}><Clock3 size={15} aria-hidden="true" /> {formatRemaining(remainingSeconds)}</span></div>
         <div className="qualification-progress" aria-hidden="true"><span style={{ width: `${questions.length ? ((answeredCount / questions.length) * 100) : 0}%` }} /></div>
         <div className="qualification-options" role="radiogroup" aria-label="Các lựa chọn trả lời">{currentQuestion.choices.map((choice) => <button key={choice.id} type="button" role="radio" aria-checked={currentAnswer === choice.id} className={`qualification-option ${currentAnswer === choice.id ? "is-selected" : ""}`} onClick={() => saveAnswer(choice.id)} disabled={savingAnswer}><span>{choice.id.toUpperCase()}</span>{choice.label}</button>)}</div>
         <div className="qualification-quiz-actions"><button className="secondary-action" type="button" onClick={() => setQuestionIndex((index) => Math.max(0, index - 1))} disabled={questionIndex === 0}><ChevronLeft size={15} /> Câu trước</button><span>{answeredCount}/{questions.length} đã trả lời</span>{questionIndex < questions.length - 1 ? <button className="secondary-action" type="button" onClick={() => setQuestionIndex((index) => Math.min(questions.length - 1, index + 1))} disabled={!currentAnswer}><ChevronRight size={15} /> Câu tiếp</button> : <button className="primary-action" type="button" onClick={submitQuiz} disabled={busy || savingAnswer || answeredCount !== questions.length}><Send size={15} /> Nộp quiz</button>}</div>
@@ -348,7 +348,7 @@ export default function ExpertQualificationPanel() {
         {practiceReviews.length > 0 && <div className="qualification-state"><ClipboardCheck size={18} /><div><strong>Lịch sử practice theo domain</strong>{practiceReviews.map((practice) => <p key={practice.practiceId}><span className="metadata-chip">{practice.domainCode}</span> {practice.state} · gửi {practice.createdAt ? new Date(practice.createdAt).toLocaleDateString("vi-VN") : "chưa có ngày"}{practice.reviewedAt ? ` · reviewer đã xử lý ${new Date(practice.reviewedAt).toLocaleDateString("vi-VN")}` : " · đang chờ reviewer độc lập"}</p>)}</div></div>}
       </div>}
       {applicationStatus === "ACTIVE" && <div className="qualification-state qualification-success"><CheckCircle2 size={18} /><div><strong>Hồ sơ đã hoạt động theo domain được duyệt.</strong><p>Authority vẫn bị giới hạn bởi các domain đã được reviewer ghi nhận.</p></div></div>}
-      {result && <div className={`qualification-result ${result.passed ? "is-passed" : "is-failed"}`}><div><span className="data-label">Kết quả server</span><strong>{resultLabel}</strong><p>Điểm: {Math.round(result.score * 100)}% · {result.points}/{result.maxScore} điểm</p></div><span className="qualification-result-mark">{result.passed ? <CheckCircle2 size={20} /> : <AlertTriangle size={20} />}</span></div>}
+      {result && <div className={`qualification-result ${result.passed ? "is-passed" : "is-failed"}`} role="status" aria-live="polite"><div><span className="data-label">Kết quả server</span><strong>{resultLabel}</strong><p>Điểm: {Math.round(result.score * 100)}% · {result.points}/{result.maxScore} điểm</p></div><span className="qualification-result-mark" aria-hidden="true">{result.passed ? <CheckCircle2 size={20} /> : <AlertTriangle size={20} />}</span></div>}
     </>}
     {error && <div className="error-callout" role="alert"><AlertTriangle size={16} /> {error}</div>}
   </section>;

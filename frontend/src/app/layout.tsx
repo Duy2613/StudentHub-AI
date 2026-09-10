@@ -14,6 +14,8 @@ import { RealtimeProvider } from "@/components/providers/RealtimeContext";
 import RealtimeNotificationToasts from "@/components/realtime/RealtimeNotificationToasts";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import { ReducedMotionBoundary } from "@/components/visual/ReducedMotionBoundary";
+import PrimaryNavbar from "@/components/navigation/PrimaryNavbar";
+import MobileNavRail from "@/components/navigation/MobileNavRail";
 
 const beVietnamPro = Be_Vietnam_Pro({
     variable: "--font-be-vietnam-pro",
@@ -82,7 +84,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                             <ReducedMotionBoundary>
                                 <SmoothScrollProvider>
                                     <RealtimeNotificationToasts />
-                                    {children}
+                                    <PrimaryNavbar />
+                                    <div className="flex-1 pb-16 md:pb-0">
+                                        {children}
+                                    </div>
+                                    <MobileNavRail />
                                 </SmoothScrollProvider>
                             </ReducedMotionBoundary>
                         </RealtimeProvider>

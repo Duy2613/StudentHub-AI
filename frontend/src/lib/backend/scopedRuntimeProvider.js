@@ -70,21 +70,24 @@ function normalizeExpert(value) {
 }
 
 function safeError(caught) {
-  if (caught instanceof ApiError) return { error: caught.toSafeError(), state: caught.code === "UNAUTHORIZED" ? "AUTH_REQUIRED" : caught.code === "FORBIDDEN" ? "FORBIDDEN" : caught.code === "TIMEOUT" || caught.code === "SERVICE_UNAVAILABLE" ? "UNAVAILABLE" : caught.code === "NETWORK_ERROR" ? "OFFLINE" : "ERROR" };
+  if (caught instanceof ApiError) return { error: caught.toSafeError(), state: caught.code === "UNAUTHORIZED" ? "AUTH_REQUIRED" : caught.code === "FORBIDDEN" ? "FORBIDDEN" : caught.code === "TIMEOUT" || caught.code === "SERVICE_UNAVAILABLE" || caught.code === "PROMAX_MIGRATION_REQUIRED" ? "UNAVAILABLE" : caught.code === "NETWORK_ERROR" ? "OFFLINE" : "ERROR" };
   const error = new ApiError("Provider request failed.", "SERVER_ERROR", { retryable: true });
   return { error: error.toSafeError(), state: "ERROR" };
 }
 
 function providerFailure(caught, dependency, phase, requestId) {
   const failure = safeError(caught, dependency);
+  const migrationRequired = failure.error?.code === "PROMAX_MIGRATION_REQUIRED";
   return createStateEnvelope({
     state: failure.state,
     phase,
     error: failure.error,
     requestId,
     retryable: failure.error.retryable,
-    unavailable: failure.state === "UNAVAILABLE" ? { dependency, reason: "UNREACHABLE" } : undefined,
-    nextActions: [{ id: failure.state === "AUTH_REQUIRED" ? "SIGN_IN" : "RETRY", label: failure.state === "AUTH_REQUIRED" ? "Đăng nhập để tiếp tục" : "Thử lại" }],
+    unavailable: failure.state === "UNAVAILABLE" ? { dependency, reason: migrationRequired ? "MIGRATION_REQUIRED" : "UNREACHABLE" } : undefined,
+    nextActions: migrationRequired
+      ? []
+      : [{ id: failure.state === "AUTH_REQUIRED" ? "SIGN_IN" : "RETRY", label: failure.state === "AUTH_REQUIRED" ? "Đăng nhập để tiếp tục" : "Thử lại" }],
   });
 }
 

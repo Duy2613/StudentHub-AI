@@ -5,13 +5,13 @@ import { RateLimiter } from "../../src/lib/security/hardening/RateLimiter.js";
 import { ProviderGateway, PROVIDER_CAPABILITY } from "../../src/lib/server/providers/ProviderGateway.js";
 import { TokenValidator } from "../../src/lib/security/identity/TokenValidator.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
+import { configureDisposableDatabase, disposableLiveGate } from "../helpers/disposableDbGuard.mjs";
 
-const liveGate = {
-  skip: !process.env.DATABASE_URL && "DATABASE_URL is not configured",
-};
+const disposableDatabaseUrl = configureDisposableDatabase();
+const liveGate = disposableLiveGate();
 
 after(async () => {
-  if (process.env.DATABASE_URL) await getPostgresPool().end();
+  if (disposableDatabaseUrl) await getPostgresPool().end();
 });
 
 test("PHASE 7 LIVE GATE: Platform Resilience, Controlled Failure, and Recovery Matrix", liveGate, async () => {

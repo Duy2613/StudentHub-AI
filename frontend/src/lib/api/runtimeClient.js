@@ -1,4 +1,4 @@
-import { ApiError, codeForStatus } from "./runtimeError";
+import { ApiError, codeForStatus, SAFE_SERVER_ERROR_CODES } from "./runtimeError";
 
 function traceIdFrom(response, payload) {
   const record = payload && typeof payload === "object" ? payload : null;
@@ -16,6 +16,12 @@ function safeMessageFrom(payload) {
   if (!payload || typeof payload !== "object") return "Yêu cầu không thể hoàn tất.";
   const nested = payload.error && typeof payload.error === "object" ? payload.error : null;
   return String(nested?.userMessage || payload.userMessage || nested?.message || payload.error || "Yêu cầu không thể hoàn tất.").slice(0, 240);
+}
+
+function errorCodeFrom(payload, status) {
+  const nested = payload?.error && typeof payload.error === "object" ? payload.error : null;
+  const candidate = nested?.code || payload?.code;
+  return SAFE_SERVER_ERROR_CODES.has(candidate) ? candidate : codeForStatus(status);
 }
 
 export async function apiRequest(path, options = {}) {
@@ -48,7 +54,7 @@ export async function apiRequest(path, options = {}) {
     if (!response.ok) {
       const retryHeader = response.headers.get("Retry-After");
       const retryAfter = retryHeader && Number.isFinite(Number(retryHeader)) ? Number(retryHeader) : null;
-      throw new ApiError(safeMessageFrom(payload), codeForStatus(response.status), { status: response.status, retryAfter, traceId, requestId: requestId || traceId, userMessage: safeMessageFrom(payload) });
+      throw new ApiError(safeMessageFrom(payload), errorCodeFrom(payload, response.status), { status: response.status, retryAfter, traceId, requestId: requestId || traceId, userMessage: safeMessageFrom(payload) });
     }
     return payload;
   } catch (caught) {

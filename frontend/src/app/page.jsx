@@ -25,10 +25,11 @@ export default function HomePage() {
             <span className="type-technical">Nguồn trước quyết định</span>
           </div>
           <nav aria-label="Điều hướng chân trang" className="vnext-landing-footer-nav">
+            <Link href="/dashboard">Tổng quan</Link>
             <Link href="/trust">Kiểm chứng</Link>
+            <Link href="/academic">Học thuật</Link>
             <Link href="/community">Cộng đồng</Link>
             <Link href="/expert">Chuyên gia</Link>
-            <Link href="/cases">Tình huống</Link>
           </nav>
           <span className="type-technical">Bản địa hóa tiếng Việt · poster-first</span>
         </div>

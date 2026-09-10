@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Activity,
   ArrowRight,
   ClipboardPaste,
+  FileText,
   Globe2,
   ImageIcon,
   Lock,
@@ -16,8 +18,9 @@ import SourceDisclosure from "@/components/ui/SourceDisclosure";
 import VerifiedPoster from "@/components/media/VerifiedPoster";
 import ReferenceBirdStamp from "@/components/media/ReferenceBirdStamp";
 import { markAssurance } from "@/lib/performance/assurance";
+import ContractCheckIntakeTab from "./ContractCheckIntakeTab";
 
-const MODES = ["image", "qr", "text", "url"];
+const MODES = ["image", "qr", "text", "url", "contract"];
 
 export function TrustCriticalHero({ provenance }) {
   const liveProvenance = provenance;
@@ -127,8 +130,19 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
           <button type="button" role="tab" aria-selected={mode === "url"} onClick={() => selectMode("url")}>
             <Globe2 size={15} /> URL
           </button>
+          <button type="button" role="tab" aria-selected={mode === "contract"} onClick={() => selectMode("contract")}>
+            <FileText size={15} /> Hợp đồng
+          </button>
         </div>
-        {mode === "image" || mode === "qr" ? (
+        {mode === "contract" ? (
+          <ContractCheckIntakeTab
+            onAnalyzeContract={(text) => {
+              onContentChange?.(text);
+              onModeChange?.("text");
+              activate();
+            }}
+          />
+        ) : mode === "image" || mode === "qr" ? (
           <button type="button" className="upload-prompt" onClick={activate}>
             <span>{mode === "qr" ? <ScanSearch size={22} /> : <ImageIcon size={22} />}</span>
             <strong>{mode === "qr" ? "Thả hoặc chọn ảnh mã QR" : "Thả hoặc chọn ảnh chụp"}</strong>
@@ -146,9 +160,11 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
             />
           </label>
         )}
-        <button type="button" className="primary-action trust-submit" onClick={activate}>
-          <ScanSearch size={17} /> Phân tích rủi ro <ArrowRight size={16} />
-        </button>
+        {mode !== "contract" && (
+          <button type="button" className="primary-action trust-submit" onClick={activate}>
+            <ScanSearch size={17} /> Phân tích rủi ro <ArrowRight size={16} />
+          </button>
+        )}
       </div>
 
       <aside className="intelligence-panel pipeline-panel vnext-trust-pipeline-panel" aria-label="Trust pipeline">
@@ -193,10 +209,18 @@ export function TrustCriticalShell({ mode = "image", content = "", provenance, o
 }
 
 export default function TrustWorkspaceClient() {
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get("tab");
   const [TrustWorkspace, setTrustWorkspace] = useState(null);
-  const [requestedMode, setRequestedMode] = useState("image");
+  const [requestedMode, setRequestedMode] = useState(tabParam === "contract" ? "contract" : "image");
   const [draftContent, setDraftContent] = useState("");
   const [sourceProvenance, setSourceProvenance] = useState(null);
+
+  useEffect(() => {
+    if (tabParam === "contract") {
+      setRequestedMode("contract");
+    }
+  }, [tabParam]);
 
   const loadWorkspace = useCallback(() => {
     import("./AiTrustStudioView")

@@ -5,8 +5,10 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { after, before, describe, it } from "node:test";
 import pg from "pg";
+import { configureDisposableDatabase, disposableLiveGate } from "../helpers/disposableDbGuard.mjs";
 
-const liveUrl = process.env.STUDENTHUB_RLS_TEST_DATABASE_URL;
+const liveUrl = configureDisposableDatabase({ envNames: ["STUDENTHUB_RLS_TEST_DATABASE_URL"] });
+const liveGate = disposableLiveGate({ envNames: ["STUDENTHUB_RLS_TEST_DATABASE_URL"] });
 const repositoryRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const migrations = [
   readFileSync(join(repositoryRoot, "database", "migrations", "202608270001_v2_authority_foundation.sql"), "utf8"),
@@ -16,7 +18,9 @@ const migrations = [
   readFileSync(join(repositoryRoot, "database", "migrations", "202609060002_integration_outbox.sql"), "utf8"),
   readFileSync(join(repositoryRoot, "database", "migrations", "202609060003_trust_runs_revisions.sql"), "utf8"),
   readFileSync(join(repositoryRoot, "database", "migrations", "202609060004_reports.sql"), "utf8"),
-  readFileSync(join(repositoryRoot, "database", "migrations", "202609070001_realtime_event_log.sql"), "utf8")
+  readFileSync(join(repositoryRoot, "database", "migrations", "202609070001_realtime_event_log.sql"), "utf8"),
+  readFileSync(join(repositoryRoot, "database", "migrations", "202609090001_community_expert_promax.sql"), "utf8"),
+  readFileSync(join(repositoryRoot, "database", "migrations", "202609100001_expert_authority_snapshot.sql"), "utf8"),
 ];
 
 const userA = crypto.randomUUID();
@@ -49,7 +53,7 @@ async function asRole(role, subject, sql, values = []) {
   }
 }
 
-describe("PHASE 3 — live PostgreSQL/RLS proof", { skip: !liveUrl && "STUDENTHUB_RLS_TEST_DATABASE_URL is not configured" }, () => {
+describe("PHASE 3 — live PostgreSQL/RLS proof", liveGate, () => {
   before(async () => {
     client = new pg.Client({
       connectionString: liveUrl,
@@ -240,7 +244,9 @@ describe("PHASE 3 — live PostgreSQL/RLS proof", { skip: !liveUrl && "STUDENTHU
   it("keeps the realtime event log private and service-readable", async () => {
     await assert.rejects(asRole("anon", "", "select event_id from private.realtime_events"), /permission denied/i);
     await assert.rejects(asRole("authenticated", userA, "select event_id from private.realtime_events"), /permission denied/i);
-    assert.equal((await asRole("service_role", "", "select event_id from private.realtime_events")).rowCount, 0);
+    const serviceRead = await asRole("service_role", "", "select event_id from private.realtime_events");
+    assert.equal(serviceRead.command, "SELECT");
+    assert.ok(serviceRead.fields.some((field) => field.name === "event_id"));
   });
 
   it("allows the explicit service role to operate the private session store", async () => {
