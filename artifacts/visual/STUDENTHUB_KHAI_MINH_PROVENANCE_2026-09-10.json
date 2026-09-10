@@ -2,11 +2,19 @@
   "sourceClass": "OWNER_PROVIDED_GENERATED_VISUAL",
   "intakeDate": "2026-09-10",
   "intakeChannel": "Google Drive Folder 1jlgfEfqMgcwLldsfVAPsKIBf0BlvFPEw",
-  "ownerIntendedTheme": "Khai Minh — Hiểu Đúng. Đi Xa. (Evidence Prism Visual Identity)",
+  "ownerIntendedTheme": "Khai Minh \u2014 Hi\u1ec3u \u0110\u00fang. \u0110i Xa. (Evidence Prism Visual Identity)",
   "humanIdentity": "ILLUSTRATIVE_ONLY",
   "embeddedProductData": "NON_AUTHORITATIVE",
   "externalLicense": "NOT_ASSERTED",
   "usageContext": "STUDENTHUB_DESIGN_VISUAL_SOURCE",
   "immutabilityRule": "Original intake files are locked read-only. All derivatives, contact sheets, and crops reside in distinct artifact paths.",
-  "auditor": "Antigravity Principal Art Director & Forensic Systems Architect"
+  "auditor": "Antigravity Principal Art Director & Forensic Systems Architect",
+  "masterVisualPackArchive": {
+    "filename": "STUDENTHUB_KHAI_MINH_MASTER_VISUAL_PACK_2026-09-10.zip",
+    "sha256": "60fd17c66c3ea120ae2283185dc5a67ad3ed1c5e4bd58725db920d47783e46b1",
+    "sizeBytes": 55447528,
+    "sizeMB": 52.88,
+    "releaseStatus": "REMOVED_FROM_GIT_FOR_RELEASE_HYGIENE",
+    "preservationNotice": "Master ZIP archive removed from application Git release branch to prevent repository bloat (221 MB trimmed). Full binary preserved in local owner visual vault."
+  }
 }
