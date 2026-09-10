@@ -17,6 +17,7 @@ export default function ReferenceBirdStamp({ className = "" }) {
         alt=""
         fill
         unoptimized
+        loading="lazy"
         sizes="(max-width: 768px) 78vw, 28rem"
         className="reference-bird-stamp-image"
       />

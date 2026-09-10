@@ -2,9 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, ScanSearch, ShieldCheck } from "lucide-react";
+import { ArrowRight, ScanSearch } from "lucide-react";
 import VNextButton from "@/components/ui/VNextButton";
-import KhaiMinhImage from "@/components/media/KhaiMinhImage";
+import EvidencePrismHero from "@/components/visual/EvidencePrismHero";
 
 export default function VNextLandingHero() {
   return (
@@ -13,13 +13,13 @@ export default function VNextLandingHero() {
         {/* 7 Columns Editorial Copy */}
         <div className="vnext-landing-hero-copy space-y-6">
           {/* Micro Telemetry HUD Kicker */}
-          <div className="vnext-hero-kicker" aria-label="StudentHub forensic audit">
+          <div className="vnext-hero-kicker" role="group" aria-label="Khai Minh visual language">
             <span className="vnext-hero-kicker-dot" aria-hidden="true" />
             <span className="type-micro-label-v3">
-              STU-ENGINE-V3 // FORENSIC AUDIT
+              KHAI MINH / TRUST ENGINE
             </span>
             <span className="vnext-hero-kicker-divider" aria-hidden="true" />
-            <span className="vnext-hero-kicker-detail">ZERO-TRUST</span>
+            <span className="vnext-hero-kicker-detail">EVIDENCE FIRST</span>
           </div>
 
           {/* Monumental Typographic Collision */}
@@ -48,7 +48,7 @@ export default function VNextLandingHero() {
           </div>
 
           {/* Principles Row */}
-          <div className="vnext-landing-principles pt-6 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-400" aria-label="Ba nguyên tắc của StudentHub">
+          <div className="vnext-landing-principles pt-6 border-t border-white/10 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-400" role="group" aria-label="Ba nguyên tắc của StudentHub">
             <div className="flex items-center gap-2">
               <span className="font-mono text-cyan-400 font-semibold">01</span>
               <span>Nguồn trước lời khuyên</span>
@@ -66,30 +66,16 @@ export default function VNextLandingHero() {
 
         {/* 5 Columns Asymmetric Media Box Collision (Hobro Style) */}
         <div className="vnext-landing-hero-art">
-          <figure className="vnext-landing-hero-media" aria-label="Lăng kính bằng chứng trong một không gian học thuật">
-            <div className="vnext-hero-art-frame group">
-            <KhaiMinhImage
-              assetId="KH-LANDING-HERO-01"
-              priority
-              alt="Minh họa lăng kính bằng chứng nối những mảnh thông tin với một hướng hiểu rõ hơn"
-              sizes="(max-width: 767px) 100vw, (max-width: 1199px) 46vw, 42rem"
-              className="w-full h-full"
-            />
-              <span className="vnext-hero-art-sheen" aria-hidden="true" />
-            </div>
-
-            <figcaption className="vnext-hero-media-caption">
-              <span className="vnext-hero-media-caption-primary">
-                <ShieldCheck size={14} className="text-cyan-400" />
-                <span className="type-micro-label-v3">
-                  LĂNG KÍNH KHAI MINH / KH-LANDING-HERO-01
-                </span>
-              </span>
-              <span className="vnext-hero-media-caption-detail">
-                POSTER FIRST // REFRACTION
-              </span>
-            </figcaption>
-          </figure>
+          <div className="vnext-landing-hero-media">
+            <figure className="vnext-landing-hero-media-figure" aria-label="Lăng kính bằng chứng trong một không gian học thuật">
+              <EvidencePrismHero
+                assetId="KH-LANDING-HERO-01"
+                priority
+                alt="Minh họa lăng kính bằng chứng nối những mảnh thông tin với một hướng hiểu rõ hơn"
+                sizes="(max-width: 767px) 100vw, (max-width: 1199px) 46vw, 42rem"
+              />
+            </figure>
+          </div>
         </div>
       </div>
     </section>

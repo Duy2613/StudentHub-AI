@@ -364,7 +364,7 @@ export default function TrustPipelineTimeline({ pipeline, processing = false, re
 
         {/* Explicit epistemic boundary: every stage states its scope, finding,
             meaning, evidence, limits, and next hand-off in the reading path. */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 my-6" aria-label="Ranh giới bằng chứng của stage">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 my-6" role="group" aria-label="Ranh giới bằng chứng của stage">
           <div className="rounded-xl bg-white/[0.025] border border-white/[0.07] p-4 md:col-span-2 xl:col-span-2">
             <span className="text-xs font-mono uppercase tracking-wider text-purple-300 font-semibold block mb-1">Đang kiểm tra</span>
             <p className="text-sm text-slate-200 leading-relaxed">{presented.checking}</p>

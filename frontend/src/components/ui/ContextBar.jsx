@@ -5,7 +5,7 @@ export function ContextBar({ items = [], label = "Bối cảnh hiện tại", cl
   if (visibleItems.length === 0) return null;
 
   return (
-    <div className={`vnext-context-bar ${className}`.trim()} aria-label={label}>
+    <div className={`vnext-context-bar ${className}`.trim()} role="region" aria-label={label}>
       {visibleItems.map((item) => (
         <div className="vnext-context-item" key={item.id || item.label}>
           <span className="vnext-context-label">{item.label}</span>

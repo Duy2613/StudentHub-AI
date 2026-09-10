@@ -15,6 +15,7 @@ export default function VerifiedPoster({ assetId, alt = "", className = "", prio
         alt={alt}
         fill
         unoptimized
+        loading={priority ? "eager" : "lazy"}
         priority={priority}
         sizes="(max-width: 768px) 100vw, 50vw"
         className="verified-poster-image"

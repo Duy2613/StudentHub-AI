@@ -76,7 +76,7 @@ export default function MarginRail({
     <>
       <aside className="app-sidebar margin-rail hidden md:flex" aria-label="The Margin — điều hướng và chú giải">
         <div className="margin-rail-top">
-          <div className="margin-chapter" aria-label={`Chương ${chapterNumber}`}>
+          <div className="margin-chapter" role="group" aria-label={`Chương ${chapterNumber}`}>
             <span className="margin-meta">Chapter</span>
             <strong>{chapterNumber}</strong>
             <span className="margin-chapter-label">{chapterLabel}</span>
@@ -84,7 +84,7 @@ export default function MarginRail({
           {renderNavigation()}
         </div>
 
-        <div className="margin-annotations" aria-label="Chú giải The Margin">
+        <div className="margin-annotations" role="region" aria-label="Chú giải The Margin">
           <p className="margin-nav-label">Annotation lexicon</p>
           {visibleAnnotations.map((annotation, index) => (
             <Annotation key={`${annotation.mark}-${annotation.title || index}`} {...annotation} ordinal={annotation.ordinal || String(index + 1).padStart(2, "0")} />

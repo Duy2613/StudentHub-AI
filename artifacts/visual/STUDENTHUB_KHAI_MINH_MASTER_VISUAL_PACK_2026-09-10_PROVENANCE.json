@@ -1,0 +1,29 @@
+{
+  "packId": "STUDENTHUB_KHAI_MINH_MASTER_VISUAL_PACK_2026-09-10",
+  "generatedAt": "2026-09-10",
+  "sourcePolicy": "ILLUSTRATIVE_CONCEPT_ART",
+  "suppliedSources": {
+    "count": 21,
+    "location": "D:/Download",
+    "kind": "user-supplied visual references",
+    "authoritativeForProductData": false
+  },
+  "generatedReferences": [
+    {
+      "file": "exec-c1980fdb-9768-4caf-aac2-0916d4c7f054.png",
+      "location": "C:/Users/Duy/.codex/generated_images/01a08aff-9388-74b1-935e-25cb9a34ecec/",
+      "purpose": "text-free landing hero reference",
+      "authoritativeForProductData": false
+    }
+  ],
+  "derivativePipeline": {
+    "library": "sharp",
+    "format": "AVIF",
+    "variants": ["desktop", "tablet", "mobile", "og", "decorative", "crops"],
+    "originalsServedByProduct": false
+  },
+  "integrity": {
+    "sourceHashAlgorithm": "SHA-256",
+    "hashesRecordedIn": "manifest.json"
+  }
+}

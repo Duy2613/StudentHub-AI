@@ -24,7 +24,7 @@ export function MarginMark({ mark = "[n]", label, className = "" }) {
     <span
       className={`margin-mark margin-mark-${descriptor.tone} ${className}`.trim()}
       data-mark={safeMark}
-      role={descriptor.role}
+      role={descriptor.role === "mark" || descriptor.role === "deletion" ? "img" : descriptor.role}
       aria-label={label || descriptor.label}
     >
       {safeMark}

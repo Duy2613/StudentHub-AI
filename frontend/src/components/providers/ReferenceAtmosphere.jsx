@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { getReferenceRouteProfile } from "@/components/layout/referenceRouteConfig";
 import { getMediaAsset } from "@/lib/media/vnextMediaRegistry";
@@ -36,18 +35,8 @@ export default function ReferenceAtmosphere({ routeMediaPolicy }) {
           className="reference-atmosphere-khai-image"
         />
       ) : null}
-      {birdAsset?.image ? (
-        <span className="reference-atmosphere-bird" data-asset-id={birdAsset.id}>
-          <Image
-            src={birdAsset.image}
-            alt=""
-            fill
-            unoptimized
-            sizes="(max-width: 768px) 72vw, 42vw"
-            className="reference-atmosphere-bird-image"
-          />
-        </span>
-      ) : null}
+      {/* The bird remains in the legacy registry for compatibility metadata.
+          Route-specific Khai Minh visuals now own the site-wide atmosphere. */}
       <span className="reference-atmosphere-grid" />
       <span className="reference-atmosphere-orbit reference-atmosphere-orbit-one" />
       <span className="reference-atmosphere-orbit reference-atmosphere-orbit-two" />

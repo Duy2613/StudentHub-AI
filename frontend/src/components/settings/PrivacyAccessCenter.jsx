@@ -146,7 +146,7 @@ export function PrivacyAccessCenter() {
   const deviceRows = useMemo(() => deviceIsReady ? devices : [], [deviceIsReady, devices]);
 
   return (
-    <div className="space-y-6">
+    <div className="khai-minh-settings-space space-y-6">
       <section className="surface-card rounded-3xl p-6">
         <div className="flex items-center gap-3 text-cyan-400"><Shield className="w-7 h-7" /><div><h1 className="text-xl font-bold text-app-primary">Trung tâm bảo mật, thiết bị &amp; quyền riêng tư</h1><p className="mt-1 text-xs text-app-muted">Chỉ hiển thị trạng thái mà contract hiện tại có thể xác minh; nguồn chưa kết nối không được trình bày như đang hoạt động.</p></div></div>
         <SourceDisclosure sourceMode="LIVE" provenance={{ requestedMode: "LIVE", sourceMode: "LIVE", kind: "LIVE_PROVIDER", label: "Privacy API", providerId: "privacy-api", disclosure: "Trạng thái thiết bị và thao tác quyền riêng tư đến từ API cùng nguồn." }} className="mt-4" />

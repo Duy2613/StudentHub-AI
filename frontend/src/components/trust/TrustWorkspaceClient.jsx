@@ -61,7 +61,7 @@ export function TrustCriticalHero({ provenance }) {
         </p>
 
         {/* 3 Pillars Triangulation Status */}
-        <div className="vnext-trust-pillars pt-4" aria-label="Ba nguồn đối chiếu">
+        <div className="vnext-trust-pillars pt-4" role="group" aria-label="Ba nguồn đối chiếu">
           <div className="vnext-trust-pillar">
             <span className="vnext-trust-pillar-mark font-mono text-cyan-400">01</span>
             <div>

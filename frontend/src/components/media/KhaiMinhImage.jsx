@@ -15,6 +15,8 @@ export default function KhaiMinhImage({ assetId, alt = "", className = "", sizes
         alt={alt}
         fill
         unoptimized
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
         priority={priority}
         sizes={sizes}
         className="khai-minh-image-image"

@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-09-10",
+  "policy": "Route visuals are atmospheric and non-authoritative. Live route data remains the source of truth.",
+  "routes": {
+    "/": {
+      "surface": "cinematic",
+      "heroAssetId": "KH-LANDING-HERO-01",
+      "ambientAssetId": "KH-LANDING-HERO-01",
+      "usage": "Text-free hero reference with application-rendered copy and real CTA links."
+    },
+    "/trust": {
+      "surface": "instrument",
+      "ambientAssetId": "KH-TRUST-ATMOSPHERE-01",
+      "usage": "Low-opacity evidence prism atmosphere behind the live Trust workspace."
+    },
+    "/community": {
+      "surface": "instrument",
+      "ambientAssetId": "KH-COMMUNITY-ATMOSPHERE-01",
+      "usage": "Low-opacity archive atmosphere behind durable Community data and honest states."
+    },
+    "/expert": {
+      "surface": "instrument",
+      "ambientAssetId": "KH-EXPERT-ATMOSPHERE-01",
+      "usage": "Low-opacity scope atmosphere behind the durable Expert directory."
+    },
+    "/cases": {
+      "surface": "archive",
+      "ambientAssetId": "KH-CASES-ATMOSPHERE-01",
+      "usage": "Muted archive atmosphere behind real or explicitly labelled demo case content."
+    },
+    "/dashboard": {
+      "surface": "paper",
+      "ambientAssetId": "KH-DASHBOARD-ATMOSPHERE-01",
+      "usage": "Quiet personal-desk atmosphere behind live dashboard records."
+    },
+    "/settings": {
+      "surface": "paper",
+      "ambientAssetId": "KH-SETTINGS-ATMOSPHERE-01",
+      "usage": "Light paper atmosphere behind live privacy and device contracts."
+    },
+    "/academic": {
+      "surface": "archive",
+      "ambientAssetId": "KH-ACADEMIC-ATMOSPHERE-01",
+      "usage": "Quiet archive atmosphere behind live academic records."
+    },
+    "fallback": {
+      "surface": "paper",
+      "ambientAssetId": "KH-STATIC-ATMOSPHERE-01",
+      "usage": "Non-canonical reading-surface fallback."
+    }
+  }
+}
