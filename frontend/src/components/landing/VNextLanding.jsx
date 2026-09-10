@@ -18,8 +18,11 @@ import VNextLandingChapter from "@/components/landing/VNextLandingChapter";
 import VNextButton from "@/components/ui/VNextButton";
 import VNextSurface from "@/components/ui/VNextSurface";
 import EvidenceStateBadge from "@/components/ui/EvidenceStateBadge";
-import VNextMediaFrame from "@/components/media/VNextMediaFrame";
 import HobroTelemetryMarquee from "@/components/ui/HobroTelemetryMarquee";
+import KhaiMinhMedia from "@/components/visual/KhaiMinhMedia";
+import EditorialMediaFrame from "@/components/visual/EditorialMediaFrame";
+import KnowledgeGlass from "@/components/visual/KnowledgeGlass";
+import PrismSweep from "@/components/visual/PrismSweep";
 
 const ANALYSIS_STEPS = [
   ["01", "Mệnh đề", "Điều gì đang được khẳng định hoặc lan truyền?"],
@@ -34,12 +37,12 @@ export default function VNextLanding() {
     <>
       <VNextLandingHero />
 
-      {/* Hobro Digital Inspired Forensic Telemetry Marquee Ticker */}
+      {/* Forensic Telemetry Marquee Ticker */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 my-6">
         <HobroTelemetryMarquee />
       </div>
 
-      {/* Chapter 02: Trust Workspace Preview */}
+      {/* Chapter 02: Trust Workspace Preview + KM-PRISM-002 Noise-to-Knowledge */}
       <VNextLandingChapter
         id="trust-chapter"
         number="02"
@@ -55,36 +58,67 @@ export default function VNextLanding() {
         body="Trust biến một thông tin nghi vấn thành một tiến trình đối soát minh bạch: kết luận định tính, trích dẫn văn bản, đối chiếu thời hạn, và nhận diện những điểm còn chưa thể khẳng định."
         tone="instrument"
       >
-        <VNextSurface tone="instrument" className="vnext-trust-preview swiss-crosshair-card hover-perspective-sheen relative">
-          <div className="vnext-preview-header">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="type-technical-v3 text-cyan-400">TRUST WORKSPACE // PREVIEW</span>
-                <span className="text-[10px] tracking-widest text-slate-400 font-mono">[ FORENSIC-V3 ]</span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          <div className="lg:col-span-7 flex flex-col justify-between">
+            <KnowledgeGlass blur="sm" className="vnext-trust-preview p-6 h-full flex flex-col justify-between">
+              <div>
+                <div className="vnext-preview-header mb-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="type-technical-v3 text-cyan-400">TRUST WORKSPACE // PREVIEW</span>
+                      <span className="text-[10px] tracking-widest text-slate-400 font-mono">[ FORENSIC-V3 ]</span>
+                    </div>
+                    <h3 className="type-product-heading text-lg text-slate-100 mt-1 font-serif">
+                      Không có phán quyết nào được tạo từ <span className="italic font-normal text-cyan-200">phỏng đoán</span>.
+                    </h3>
+                  </div>
+                  <EvidenceStateBadge state="unknown" label="Chưa đủ dữ liệu" />
+                </div>
+                <div className="vnext-trust-hierarchy space-y-3">
+                  {[
+                    ["KẾT LUẬN", "Định tính rõ ràng, hiển thị sau khi luồng phân tích hoàn tất"],
+                    ["VÌ SAO", "Tách bạch lý do logic khỏi chỉ số chắc chắn"],
+                    ["BẰNG CHỨNG", "Mở trực tiếp liên kết nguồn gốc với mã băm SHA-256"],
+                    ["MÂU THUẪN", "Chỉ rõ điểm bất thường (như chênh lệch ngày hết hạn)"],
+                  ].map(([label, copy]) => (
+                    <div className="vnext-trust-row flex items-baseline gap-3 py-1.5 border-b border-white/5" key={label}>
+                      <span className="type-technical-v3 font-semibold text-cyan-300 text-xs w-24 shrink-0">{label}</span>
+                      <span className="text-slate-300 text-sm">{copy}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <h3 className="type-product-heading text-lg text-slate-100 mt-1 font-serif">
-                Không có phán quyết nào được tạo từ <span className="italic font-normal text-cyan-200">phỏng đoán</span>.
-              </h3>
-            </div>
-            <EvidenceStateBadge state="unknown" label="Chưa đủ dữ liệu" />
-          </div>
-          <div className="vnext-trust-hierarchy">
-            {[
-              ["KẾT LUẬN", "Định tính rõ ràng, hiển thị sau khi luồng phân tích hoàn tất"],
-              ["VÌ SAO", "Tách bạch lý do logic khỏi chỉ số chắc chắn"],
-              ["BẰNG CHỨNG", "Mở trực tiếp liên kết nguồn gốc với mã băm SHA-256"],
-              ["MÂU THUẪN", "Chỉ rõ điểm bất thường (như chênh lệch ngày hết hạn)"],
-            ].map(([label, copy]) => (
-              <div className="vnext-trust-row" key={label}>
-                <span className="type-technical-v3 font-semibold text-cyan-300">{label}</span>
-                <span className="text-slate-300">{copy}</span>
+              <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+                <Link href="/trust" className="vnext-inline-action inline-flex items-center gap-2 text-cyan-300 font-semibold text-sm hover:text-cyan-200 transition-colors">
+                  Mở Trust workspace <ArrowRight size={16} aria-hidden="true" />
+                </Link>
+                <span className="text-[11px] font-mono text-slate-400 tracking-wider">5 MACRO LAYERS · 7 STAGES</span>
               </div>
-            ))}
+            </KnowledgeGlass>
           </div>
-          <Link href="/trust" className="vnext-inline-action inline-flex items-center gap-2 text-cyan-300 font-semibold text-sm hover:text-cyan-200">
-            Mở Trust workspace <ArrowRight size={16} aria-hidden="true" />
-          </Link>
-        </VNextSurface>
+
+          <div className="lg:col-span-5 flex items-center">
+            {/* FX10 Noise-to-Knowledge Transform Anchor: KM-PRISM-002 */}
+            <EditorialMediaFrame
+              assetId="KM-PRISM-002"
+              label="KHẢO CHỨNG ĐA TẦNG // NOISE TO KNOWLEDGE"
+              badge="PRISM FORENSICS"
+              className="w-full h-full min-h-[340px]"
+            >
+              <div className="relative w-full h-full min-h-[300px] overflow-hidden rounded-lg">
+                <KhaiMinhMedia
+                  assetId="KM-PRISM-002"
+                  className="w-full h-full object-cover"
+                />
+                <PrismSweep intensity="subtle" />
+                <div className="absolute bottom-3 left-3 right-3 p-3 rounded-lg bg-slate-950/80 backdrop-blur-sm border border-cyan-500/20 text-xs text-slate-300 font-sans">
+                  <span className="text-cyan-400 font-mono font-semibold block mb-0.5 text-[10px] tracking-wider uppercase">Tiến trình chuẩn hóa</span>
+                  Thông tin nhiễu loạn được phân rã, đối chiếu nguồn gốc và tái tổ chức thành tri thức kiểm chứng.
+                </div>
+              </div>
+            </EditorialMediaFrame>
+          </div>
+        </div>
       </VNextLandingChapter>
 
       {/* Chapter 03: Evidence Relationships & Active Media */}
@@ -123,15 +157,24 @@ export default function VNextLanding() {
           </VNextSurface>
         </div>
 
-        {/* Active Editorial Media Collision: VID-HUMAN-01 */}
-        <div className="mt-8">
-          <VNextMediaFrame
-            assetId="VID-HUMAN-01"
-            alt="Bối cảnh học thuật thực địa trong không gian nghiên cứu"
-            label="BỐI CẢNH HỌC THUẬT THỰC ĐỊA · VID-HUMAN-01"
-            detail="POSTER FIRST // RESEARCH ARCHIVE"
-            className="max-w-3xl mx-auto"
-          />
+        {/* Editorial Media Collision: KM-EDITORIAL-001 */}
+        <div className="mt-8 max-w-3xl mx-auto">
+          <EditorialMediaFrame
+            assetId="KM-EDITORIAL-001"
+            label="BỐI CẢNH HỌC THUẬT THỰC ĐỊA // KHAI MINH"
+            badge="ACADEMIC OBSERVATION"
+          >
+            <div className="relative w-full aspect-video overflow-hidden rounded-lg">
+              <KhaiMinhMedia
+                assetId="KM-EDITORIAL-001"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute bottom-2 left-2 right-2 px-3 py-1.5 rounded bg-slate-950/75 text-[11px] text-slate-300 font-mono flex items-center justify-between">
+                <span>ILLUSTRATIVE SCENE // NOT AN AUTHORITATIVE RECORD</span>
+                <span className="text-cyan-400">KM-EDITORIAL-001</span>
+              </div>
+            </div>
+          </EditorialMediaFrame>
         </div>
       </VNextLandingChapter>
 

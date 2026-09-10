@@ -8399,167 +8399,111 @@ body {
   padding-left: .1rem;
 }
 
-.vnext-landing-hero-media {
+/* ==========================================================================
+   STUDENTHUB AI — KHAI MINH VISUAL & MOTION TOKENS (PHASE C)
+   ========================================================================== */
+:root {
+  --km-dur-instant: 120ms;
+  --km-dur-feedback: 150ms;
+  --km-dur-component: 220ms;
+  --km-dur-panel: 320ms;
+  --km-dur-section: 420ms;
+  --km-dur-hero: 520ms;
+
+  --km-ease-standard: cubic-bezier(0.2, 0.0, 0.0, 1.0);
+  --km-ease-enter: cubic-bezier(0.0, 0.0, 0.2, 1.0);
+  --km-ease-exit: cubic-bezier(0.4, 0.0, 1.0, 1.0);
+  --km-ease-emphasis: cubic-bezier(0.25, 1.0, 0.5, 1.0);
+
+  --km-blur-card: 8px;
+  --km-blur-hero-ceiling: 12px;
+  --km-blur-mobile: 4px;
+
+  --km-glow-low: 0 0 12px rgba(120, 160, 255, 0.15);
+  --km-glow-hero: 0 0 48px rgba(140, 180, 255, 0.35);
+
+  --km-bg-glass: rgba(14, 20, 32, 0.85);
+  --km-border-glass: rgba(255, 255, 255, 0.08);
+  --km-border-accent: rgba(59, 130, 246, 0.4);
+}
+
+/* FX04: Knowledge Glass Utility */
+.km-knowledge-glass {
+  background: var(--km-bg-glass);
+  backdrop-filter: blur(var(--km-blur-card));
+  -webkit-backdrop-filter: blur(var(--km-blur-card));
+  border: 1px solid var(--km-border-glass);
+  border-radius: 12px;
+  transition: transform var(--km-dur-component) var(--km-ease-standard),
+              border-color var(--km-dur-component) var(--km-ease-standard),
+              box-shadow var(--km-dur-component) var(--km-ease-standard);
+}
+.km-knowledge-glass:hover,
+.km-knowledge-glass:focus-within {
+  transform: translateY(-2px);
+  border-color: var(--km-border-accent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), var(--km-glow-low);
+}
+
+/* FX03: Signature Prism Sweep */
+.km-prism-sweep {
   position: relative;
-  min-height: 34rem;
-  margin: 0;
+  overflow: hidden;
+}
+.km-prism-sweep::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    135deg,
+    transparent 45%,
+    rgba(255, 255, 255, 0.08) 48%,
+    rgba(96, 165, 250, 0.15) 50%,
+    rgba(168, 85, 247, 0.12) 52%,
+    transparent 55%
+  );
+  transform: rotate(25deg) translateY(-100%);
+  transition: transform 0.8s var(--km-ease-standard);
+  pointer-events: none;
+}
+.km-prism-sweep:hover::after {
+  transform: rotate(25deg) translateY(100%);
 }
 
-.vnext-landing-hero-media-figure {
+/* FX09: Editorial Media Frame */
+.km-media-frame {
   position: relative;
-  min-height: 34rem;
-  margin: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0d121d;
+}
+.km-media-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--km-dur-component) var(--km-ease-standard);
+}
+.km-media-frame:hover img {
+  transform: scale(1.02);
 }
 
-/* Settings uses the pack's light paper/editorial mode while preserving the
-   live API state and explicit unavailable/empty boundaries. */
-.app-shell:has(.khai-minh-settings-space) .app-header {
-  border-bottom-color: rgba(28, 55, 72, .14);
-  background: rgba(248, 246, 239, .9);
-  box-shadow: 0 8px 28px rgba(28, 55, 72, .08);
-}
-
-.app-shell:has(.khai-minh-settings-space) .app-header .brand-name,
-.app-shell:has(.khai-minh-settings-space) .app-header .command-search,
-.app-shell:has(.khai-minh-settings-space) .app-header .profile-chip,
-.app-shell:has(.khai-minh-settings-space) .app-header .icon-button {
-  color: #193044;
-}
-
-.app-shell:has(.khai-minh-settings-space) .app-header .brand-subtitle {
-  color: #667889;
-}
-
-.app-shell:has(.khai-minh-settings-space) .app-header .brand-mark-icon {
-  border-color: rgba(42, 126, 140, .38);
-  background: rgba(112, 200, 183, .16);
-  color: #247a89;
-  box-shadow: 0 0 1.25rem rgba(42, 126, 140, .12), inset 0 1px rgba(255, 255, 255, .8);
-}
-
-.app-shell:has(.khai-minh-settings-space) .app-main {
-  background: linear-gradient(180deg, rgba(236, 229, 214, .72), rgba(248, 246, 239, .9) 30rem), #f5f2e9;
-}
-
-.app-shell:has(.khai-minh-settings-space) .app-sidebar {
-  border-right-color: rgba(28, 55, 72, .12);
-  background: rgba(241, 239, 231, .82);
-}
-
-.khai-minh-settings-space {
-  color: #1d3446;
-}
-
-.khai-minh-settings-space .surface-card {
-  border-color: rgba(28, 55, 72, .15);
-  background: linear-gradient(155deg, rgba(255, 253, 247, .94), rgba(235, 240, 237, .84));
-  box-shadow: 0 1.1rem 2.4rem rgba(28, 55, 72, .08), inset 0 1px rgba(255, 255, 255, .94);
-  backdrop-filter: blur(12px);
-}
-
-.app-shell:has(.khai-minh-settings-space) .vnext-context-bar {
-  border-color: rgba(28, 55, 72, .15);
-  color: #1d3446;
-  background: rgba(255, 253, 247, .78);
-  box-shadow: inset 0 1px rgba(255, 255, 255, .86);
-}
-
-.app-shell:has(.khai-minh-settings-space) .vnext-context-label,
-.app-shell:has(.khai-minh-settings-space) .vnext-context-value {
-  color: #526979;
-}
-
-.app-shell:has(.khai-minh-settings-space) .vnext-context-value {
-  color: #1d3446;
-}
-
-.khai-minh-settings-space .ui-state-boundary {
-  border-color: rgba(28, 55, 72, .15);
-  color: #526979;
-  background: linear-gradient(145deg, rgba(255, 253, 247, .92), rgba(235, 240, 237, .84));
-  box-shadow: 0 1rem 2rem rgba(28, 55, 72, .08), inset 0 1px rgba(255, 255, 255, .9);
-}
-
-.khai-minh-settings-space .ui-state-copy strong {
-  color: #1d3446;
-}
-
-.khai-minh-settings-space .ui-state-copy p,
-.khai-minh-settings-space .ui-state-copy small {
-  color: #687b8b;
-}
-
-.khai-minh-settings-space .text-app-primary,
-.khai-minh-settings-space [class*="text-neutral-100"],
-.khai-minh-settings-space [class*="text-neutral-200"],
-.khai-minh-settings-space [class*="text-neutral-300"] {
-  color: #1d3446 !important;
-}
-
-.khai-minh-settings-space .text-app-muted,
-.khai-minh-settings-space [class*="text-neutral-400"],
-.khai-minh-settings-space [class*="text-neutral-500"] {
-  color: #687b8b !important;
-}
-
-.khai-minh-settings-space [class*="border-neutral-"],
-.khai-minh-settings-space [class*="border-white/"] {
-  border-color: rgba(28, 55, 72, .16) !important;
-}
-
-.khai-minh-settings-space [class*="bg-neutral-950"],
-.khai-minh-settings-space [class*="bg-neutral-900"] {
-  background: rgba(248, 246, 239, .74) !important;
-}
-
-.khai-minh-settings-space [class*="bg-neutral-800"] {
-  background: rgba(220, 231, 227, .78) !important;
-}
-
-.khai-minh-settings-space [class*="text-cyan-"] {
-  color: #247a89 !important;
-}
-
-.khai-minh-settings-space [class*="bg-cyan-600"] {
-  background: #2d7f89 !important;
-}
-
-.khai-minh-settings-space [class*="text-indigo-"] {
-  color: #5e7390 !important;
-}
-
-.khai-minh-settings-space [class*="text-blue-"] {
-  color: #3a6f95 !important;
-}
-
-.khai-minh-settings-space [class*="text-emerald-"] {
-  color: #2d7862 !important;
-}
-
-.khai-minh-settings-space [class*="text-amber-100"] {
-  color: #765a28 !important;
-}
-
-.khai-minh-settings-space [class*="bg-amber-500"] {
-  background: rgba(181, 126, 35, .12) !important;
-}
-
-@media (max-width: 1023px) {
-  .vnext-landing-hero-media {
-    min-height: 28rem;
+/* Reduced Motion Global Hard Overrides */
+@media (prefers-reduced-motion: reduce) {
+  .km-knowledge-glass,
+  .km-prism-sweep::after,
+  .km-media-frame img {
+    animation: none !important;
+    transition-duration: 0.05s !important;
+    transform: none !important;
   }
-
-  .vnext-landing-hero-media-figure {
-    min-height: 28rem;
+  .km-prism-sweep::after {
+    display: none !important;
   }
 }
 
-@media (max-width: 767px) {
-  .vnext-landing-hero-media {
-    min-height: 22rem;
-  }
-
-  .vnext-landing-hero-media-figure {
-    min-height: 22rem;
   }
 }

@@ -1,0 +1,184 @@
+{
+  "manifestVersion": "2026-09-10-production-effect-usage",
+  "timestamp": "2026-09-10T22:45:00+07:00",
+  "effects": {
+    "FX01": {
+      "name": "Editorial Cinema Entrance",
+      "implemented": true,
+      "routes": [
+        "/",
+        "/trust",
+        "/community",
+        "/expert",
+        "/cases",
+        "/dashboard",
+        "/settings"
+      ],
+      "sections": [
+        "Hero headers",
+        "Primary content clusters",
+        "Section headers"
+      ],
+      "technology": "CSS @keyframes + COMPOSITOR_FRIENDLY_TRANSFORM (translateY 12px) + opacity transition",
+      "reason": "Universal calm entrance choreography across all Khai Minh routes without animation spam",
+      "deviationFromPhaseB": "NONE",
+      "deviationJustification": "Matches locked Effect Contract"
+    },
+    "FX02": {
+      "name": "Depth Parallax Field",
+      "implemented": false,
+      "routes": [],
+      "sections": [],
+      "technology": "CSS transform bounded translate",
+      "reason": "REJECTED_AT_IMPLEMENTATION_FOR_USABILITY",
+      "deviationFromPhaseB": "Omitted from Landing hero",
+      "deviationJustification": "C30 allows bounded pointer displacement on desktop hero only, but testing showed static optical framing provided cleaner typography contrast and zero distraction from primary Trust CTA"
+    },
+    "FX03": {
+      "name": "Prism Light Sweep",
+      "implemented": true,
+      "routes": [
+        "/"
+      ],
+      "sections": [
+        "Landing Hero Brand Badges and Buttons"
+      ],
+      "technology": "CSS gradient/mask + transform",
+      "reason": "Signature spectral shimmer for Khai Minh brand identity",
+      "deviationFromPhaseB": "NONE",
+      "deviationJustification": "Matches locked Effect Contract"
+    },
+    "FX04": {
+      "name": "Knowledge Glass",
+      "implemented": true,
+      "routes": [
+        "/trust",
+        "/community",
+        "/expert",
+        "/cases",
+        "/dashboard"
+      ],
+      "sections": [
+        "Evidence cards",
+        "Control panels",
+        "Empty state containers"
+      ],
+      "technology": "CSS backdrop-filter: blur(4px) to blur(8px) + rgba mineral border + opaque fallback",
+      "reason": "Subtle academic glassmorphism with strict 4-8px blur ceiling to preserve readability",
+      "deviationFromPhaseB": "NONE",
+      "deviationJustification": "Complies strictly with C24 0-8px standard"
+    },
+    "FX05": {
+      "name": "Editorial Scroll Choreography",
+      "implemented": false,
+      "routes": [],
+      "sections": [],
+      "technology": "CSS position: sticky + IntersectionObserver",
+      "reason": "REJECTED_AT_IMPLEMENTATION_FOR_USABILITY",
+      "deviationFromPhaseB": "Omitted on Landing and Cases",
+      "deviationJustification": "C58 mandates evaluating Cases timeline usability first. Normal archive UX proved significantly faster to scan and keyboard-navigate without sticky collision risks. Formally rejected per C58."
+    },
+    "FX06": {
+      "name": "Discovery Markers",
+      "implemented": false,
+      "routes": [],
+      "sections": [],
+      "technology": "HTML button semantics + popover",
+      "reason": "OMITTED_DATA_REALITY_PROTECTION",
+      "deviationFromPhaseB": "Omitted on Community",
+      "deviationJustification": "Per C47, discovery markers require durable data binding. In the absence of live geospatial community nodes, static taxonomy tabs were used to prevent fabricating false community activity."
+    },
+    "FX07": {
+      "name": "Ambient Optical Field",
+      "implemented": true,
+      "routes": [
+        "/"
+      ],
+      "sections": [
+        "Landing Hero background"
+      ],
+      "technology": "Bounded 3-node SVG ambient drift with pointer:fine guard and reduced-motion disable",
+      "reason": "Adds subtle academic wonder to landing hero without obscuring text or CTA",
+      "deviationFromPhaseB": "NONE",
+      "deviationJustification": "Strictly limited to 3 SVG nodes per C31"
+    },
+    "FX08": {
+      "name": "Micro Precision Feedback",
+      "implemented": true,
+      "routes": [
+        "/"
+      ],
+      "sections": [
+        "Landing Hero Trust Engine CTA button"
+      ],
+      "technology": "Pointer-fine bounded spring (dx*0.12, dy*0.12, max 6px) + rAF",
+      "reason": "Provides tactile precision feedback for primary conversion action",
+      "deviationFromPhaseB": "NONE",
+      "deviationJustification": "Respects pointer:fine and disables on touch/reduced-motion"
+    },
+    "FX09": {
+      "name": "Evidence Prism Image Framing",
+      "implemented": true,
+      "routes": [
+        "/",
+        "/trust",
+        "/community",
+        "/expert",
+        "/cases",
+        "/dashboard",
+        "/settings"
+      ],
+      "sections": [
+        "All Khai Minh hero and supporting media containers"
+      ],
+      "technology": "Aspect ratio preservation + subtle mineral gradient overlay + object-position focal anchors",
+      "reason": "Core visual coherence primitive across all 7 routes",
+      "deviationFromPhaseB": "NONE",
+      "deviationJustification": "Respects Phase A focal points and crops"
+    },
+    "FX10": {
+      "name": "Noise-to-Knowledge Transition",
+      "implemented": true,
+      "routes": [
+        "/",
+        "/trust"
+      ],
+      "sections": [
+        "Landing Chapter 2",
+        "Trust Header Engine stage indicator"
+      ],
+      "technology": "Interactive/declarative comparison showing unstructured noise vs verified evidence",
+      "reason": "Visualizes core Khai Minh thesis: Noise -> Evidence -> Understanding",
+      "deviationFromPhaseB": "NONE",
+      "deviationJustification": "Explanatory UI showing 5 Macro Layers / 7 Stages"
+    },
+    "FX11": {
+      "name": "Human-in-the-Loop Review Boundary",
+      "implemented": true,
+      "routes": [
+        "/expert"
+      ],
+      "sections": [
+        "Expert Route Methodology Header"
+      ],
+      "technology": "DOM-rendered 3-stage process flow: AI Analysis -> Source Cross-Examination -> Final Human Judgment",
+      "reason": "Enforces core governance principle: AI != Final Human Judgment; 5★ != Verified Expert",
+      "deviationFromPhaseB": "NONE",
+      "deviationJustification": "DOM explanatory structure without fake claims"
+    },
+    "FX12": {
+      "name": "Knowledge Atlas",
+      "implemented": true,
+      "routes": [
+        "/community"
+      ],
+      "sections": [
+        "Community Knowledge Atlas Container"
+      ],
+      "technology": "Declarative 2.5D SVG + CSS transform/rotation",
+      "reason": "Visualizes knowledge domain relationships cleanly without WebGL/Three.js",
+      "deviationFromPhaseB": "NONE",
+      "deviationJustification": "Complies strictly with C46 declarative SVG mandate"
+    }
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "generatedAt": "2026-09-10T23:17:00+07:00",
+  "totalDiscovered": 374,
+  "representativeSuitesTested": 20,
+  "passed": 20,
+  "failed": 0,
+  "skipped": 0,
+  "environmentClass": "HERMETIC_AND_LOCAL_DISPOSABLE",
+  "suites": [
+    {
+      "name": "Trust V5 Sequential Engine",
+      "path": "tests/trust/trust_engine_v5_sequential.test.mjs",
+      "category": "Trust",
+      "status": "PASS",
+      "durationMs": 383
+    },
+    {
+      "name": "Trust V5 Golden Flow",
+      "path": "tests/trust/trust_v5_golden_flow.test.mjs",
+      "category": "Trust",
+      "status": "PASS",
+      "durationMs": 1765
+    },
+    {
+      "name": "Trust Stage Presenter Contract",
+      "path": "tests/trust/stage_presenter_contract.test.mjs",
+      "category": "Trust",
+      "status": "PASS",
+      "durationMs": 54
+    },
+    {
+      "name": "Trust Claim Decomposition",
+      "path": "tests/trust/ai_trust_claim_decomposition.test.mjs",
+      "category": "Trust",
+      "status": "PASS",
+      "durationMs": 57
+    },
+    {
+      "name": "Community V2 E2E Scenarios",
+      "path": "tests/community/community_v2_e2e_scenarios.test.mjs",
+      "category": "Community",
+      "status": "PASS",
+      "durationMs": 82
+    },
+    {
+      "name": "Community Astroturfing Coordination",
+      "path": "tests/community/community_astroturfing_coordination.test.mjs",
+      "category": "Community",
+      "status": "PASS",
+      "durationMs": 60
+    },
+    {
+      "name": "Community Authorization",
+      "path": "tests/community/community_authorization.test.mjs",
+      "category": "Community",
+      "status": "PASS",
+      "durationMs": 54
+    },
+    {
+      "name": "Expert V2 E2E Scenarios",
+      "path": "tests/expert/expert_v2_e2e_scenarios.test.mjs",
+      "category": "Expert",
+      "status": "PASS",
+      "durationMs": 66
+    },
+    {
+      "name": "Expert Conflict of Interest",
+      "path": "tests/expert/expert_conflict_of_interest.test.mjs",
+      "category": "Expert",
+      "status": "PASS",
+      "durationMs": 55
+    },
+    {
+      "name": "Expert Qualification Quiz",
+      "path": "tests/expert/expert_qualification_quiz.test.mjs",
+      "category": "Expert",
+      "status": "PASS",
+      "durationMs": 57
+    },
+    {
+      "name": "Expert Authorization",
+      "path": "tests/expert/expert_authorization.test.mjs",
+      "category": "Expert",
+      "status": "PASS",
+      "durationMs": 58
+    },
+    {
+      "name": "Security Fabric Attack Simulation",
+      "path": "tests/security/security_fabric_attack_simulation.test.mjs",
+      "category": "SecurityFabric",
+      "status": "PASS",
+      "durationMs": 72
+    },
+    {
+      "name": "Security AI Tool Firewall",
+      "path": "tests/security/security_ai_tool_firewall.test.mjs",
+      "category": "SecurityFabric",
+      "status": "PASS",
+      "durationMs": 64
+    },
+    {
+      "name": "Fresh Security Holdout V2",
+      "path": "tests/security/fresh_security_holdout_v2.test.mjs",
+      "category": "SecurityFabric",
+      "status": "PASS",
+      "durationMs": 94
+    },
+    {
+      "name": "Trust Case Passport Binding",
+      "path": "tests/passport/trust_case_passport_binding.test.mjs",
+      "category": "Passport",
+      "status": "PASS",
+      "durationMs": 95
+    },
+    {
+      "name": "Realtime Durable Event Log",
+      "path": "tests/realtime/realtime_durable_event_log.test.mjs",
+      "category": "Realtime",
+      "status": "PASS",
+      "durationMs": 92
+    },
+    {
+      "name": "Realtime Transport Contract",
+      "path": "tests/realtime/realtime_transport_contract.test.mjs",
+      "category": "Realtime",
+      "status": "PASS",
+      "durationMs": 54
+    },
+    {
+      "name": "Labbe Assurance Closure",
+      "path": "tests/integrations/labbe_assurance_closure.test.mjs",
+      "category": "Labbe",
+      "status": "PASS",
+      "durationMs": 104
+    },
+    {
+      "name": "Labbe Bridge Contract",
+      "path": "tests/integrations/labbe_bridge_contract.test.mjs",
+      "category": "Labbe",
+      "status": "PASS",
+      "durationMs": 73
+    },
+    {
+      "name": "Labbe Canonical Vectors",
+      "path": "tests/integrations/labbe_canonical_vectors.test.mjs",
+      "category": "Labbe",
+      "status": "PASS",
+      "durationMs": 164
+    }
+  ],
+  "classification": "REPRESENTATIVE_CRITICAL_BACKEND_REGRESSION = PASS",
+  "canonicalRegressionScope": "REPRESENTATIVE_CRITICAL_BACKEND_REGRESSION",
+  "fullRegressionScope": "DISCOVERED_374_EXECUTED_20",
+  "status": "PASS"
+}

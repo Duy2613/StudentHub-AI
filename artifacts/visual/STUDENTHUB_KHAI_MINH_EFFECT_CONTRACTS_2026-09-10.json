@@ -1,0 +1,534 @@
+{
+  "system": "Khai Minh FX01–FX12 Engineering Contracts",
+  "effects": [
+    {
+      "effectId": "FX01_CINEMATIC_REVEAL",
+      "name": "Cinematic Golden Hour Horizon Reveal",
+      "purpose": "Establish visual hierarchy and emotional calm as sections enter the viewport.",
+      "trigger": "IntersectionObserver (threshold 0.15, rootMargin '0px 0px -50px 0px', triggers once).",
+      "durationToken": "duration.section (420ms)",
+      "easingToken": "ease.enter (cubic-bezier(0.0, 0.0, 0.2, 1.0))",
+      "amplitude": "translateY 20px -> 0px, opacity 0 -> 1, scale 0.99 -> 1.00",
+      "propertiesAnimated": [
+        "opacity",
+        "transform"
+      ],
+      "desktopBehavior": "Graceful staggered entrance of container elements with 50ms child offset.",
+      "tabletBehavior": "Same duration, translation reduced to 12px.",
+      "mobileBehavior": "Translation reduced to 8px, duration compressed to 280ms.",
+      "reducedMotionBehavior": "Opacity fade only (150ms) with zero translation or scaling.",
+      "accessibilityRequirements": "Content remains readable and accessible if observer is delayed. No layout shift.",
+      "performanceBudget": "Max JS execution < 1.0ms; GPU compositor-only properties.",
+      "preferredTechnology": "CSS (IntersectionObserver + CSS class toggle)",
+      "fallbackTechnology": "CSS inline transitions",
+      "forbiddenTechnology": [
+        "Framer Motion on standard text blocks, GSAP on basic sections",
+        "WebGL",
+        "Three.js",
+        "Canvas (unauthorized)"
+      ],
+      "allowedRoutes": [
+        "/",
+        "/trust",
+        "/community",
+        "/expert",
+        "/cases",
+        "/dashboard",
+        "/settings"
+      ],
+      "forbiddenRoutes": [],
+      "allowedAssets": [
+        "KM-PRISM-001",
+        "KM-PRISM-004",
+        "KM-BRAND-001",
+        "KM-EDITORIAL-001"
+      ],
+      "riskNotes": "Avoid re-triggering on small scroll oscillations. Use 'once: true'.",
+      "status": "APPROVED"
+    },
+    {
+      "effectId": "FX02_DEPTH_PARALLAX",
+      "name": "Multi-Plane Atmospheric Depth Parallax",
+      "purpose": "Create subtle optical depth between foreground manuscripts, central prism, and background mist.",
+      "trigger": "Continuous passive scroll progress within viewport bounds.",
+      "durationToken": "Synchronized to scroll velocity",
+      "easingToken": "ease.linearOptical",
+      "amplitude": "Foreground max -16px, Background max +8px",
+      "propertiesAnimated": [
+        "transform"
+      ],
+      "desktopBehavior": "Subtle 2.5D layer separation; clamped strictly to +/- 24px.",
+      "tabletBehavior": "Clamped to +/- 8px maximum.",
+      "mobileBehavior": "DISABLED. Static multi-layer composition.",
+      "reducedMotionBehavior": "DISABLED. Transform set to 0px.",
+      "accessibilityRequirements": "Never displace text layers over high-contrast edges. Headline text stays stationary.",
+      "performanceBudget": "Zero main thread layout. Transform translateY only via passive rAF.",
+      "preferredTechnology": "CSS (transform translateY via CSS variables updated in rAF)",
+      "fallbackTechnology": "Framer Motion useScroll/useTransform (desktop hero only)",
+      "forbiddenTechnology": [
+        "Three.js",
+        "Scroll-jacking, wheel interception, Three.js camera rigs",
+        "WebGL",
+        "Canvas (unauthorized)"
+      ],
+      "allowedRoutes": [
+        "/"
+      ],
+      "forbiddenRoutes": [
+        "/dashboard",
+        "/settings",
+        "/expert",
+        "/cases",
+        "/community"
+      ],
+      "allowedAssets": [
+        "KM-PRISM-001",
+        "KM-PRISM-004"
+      ],
+      "riskNotes": "Disallowed on high-density cards to prevent motion sickness.",
+      "status": "LIMITED"
+    },
+    {
+      "effectId": "FX03_PRISM_LIGHT_SWEEP",
+      "name": "Crystalline Caustic Light Sweep",
+      "purpose": "Signature optical accent reflecting light through the 4-pillar Evidence Prism facet.",
+      "trigger": "Controlled idle loop (every 8s) or subtle pointer movement over hero facet.",
+      "durationToken": "duration.hero (520ms sweep)",
+      "easingToken": "ease.standard",
+      "amplitude": "Linear gradient sweep across 120% element width; max opacity 0.35.",
+      "propertiesAnimated": [
+        "transform",
+        "opacity"
+      ],
+      "desktopBehavior": "Soft spectral sweep passes across crystal edges; pauses when pointer leaves facet.",
+      "tabletBehavior": "Single scheduled sweep on section entry; no pointer tracking.",
+      "mobileBehavior": "Single static spectral sheen on image edge; zero continuous animation.",
+      "reducedMotionBehavior": "Static spectral border accent (0.2 opacity); animation disabled.",
+      "accessibilityRequirements": "Luminance contrast ratio >= 4.5:1 preserved for all overlapping typography. No strobe risk.",
+      "performanceBudget": "Composited CSS transform on pseudo-element with will-change: transform.",
+      "preferredTechnology": "CSS (pseudo-element gradient with transform: translateX)",
+      "fallbackTechnology": "SVG linearGradient animation",
+      "forbiddenTechnology": [
+        "Three.js",
+        "WebGL",
+        "WebGL shader canvas, heavy Three.js caustics simulation",
+        "Canvas (unauthorized)"
+      ],
+      "allowedRoutes": [
+        "/",
+        "/trust"
+      ],
+      "forbiddenRoutes": [
+        "/dashboard",
+        "/settings",
+        "/community",
+        "/cases"
+      ],
+      "allowedAssets": [
+        "KM-PRISM-001",
+        "KM-PRISM-002",
+        "KM-PRISM-005"
+      ],
+      "riskNotes": "Must never obscure headline text or cause color flicker.",
+      "status": "APPROVED"
+    },
+    {
+      "effectId": "FX04_KNOWLEDGE_GLASS",
+      "name": "Frosted Knowledge Plate Reveal",
+      "purpose": "Present verified evidence cards, AI synthesis panels, and expert dossiers with tactile dignity.",
+      "trigger": "Card hover, focus-visible, or scroll entrance.",
+      "durationToken": "duration.component (220ms)",
+      "easingToken": "ease.emphasis",
+      "amplitude": "translateY -4px, scale 1.015, border-color transition",
+      "propertiesAnimated": [
+        "transform",
+        "border-color",
+        "box-shadow",
+        "backdrop-filter (0–8px max)"
+      ],
+      "desktopBehavior": "Card elevates 4px with quiet glow token enhancement and crisp border emphasis.",
+      "tabletBehavior": "Active tap elevation 2px; zero continuous perspective tilt.",
+      "mobileBehavior": "Elevation translateY(-2px), flat surface opacity rgba(18, 24, 36, 0.95), tilt disabled.",
+      "reducedMotionBehavior": "Border color and elevation shadow change without transform translation.",
+      "accessibilityRequirements": "Full keyboard focus-visible ring (2px solid #3b82f6) must remain unclipped.",
+      "performanceBudget": "Hardware-accelerated box-shadow and transform.",
+      "preferredTechnology": "CSS (standard hover & focus-visible pseudoclasses)",
+      "fallbackTechnology": "CSS module transitions",
+      "forbiddenTechnology": [
+        "Heavy JavaScript 3D perspective libraries (VanillaTilt, Tilt.js)",
+        "WebGL",
+        "Three.js",
+        "Canvas (unauthorized)"
+      ],
+      "allowedRoutes": [
+        "/trust",
+        "/community",
+        "/expert",
+        "/cases",
+        "/dashboard"
+      ],
+      "forbiddenRoutes": [
+        "/settings"
+      ],
+      "allowedAssets": [
+        "KM-PRISM-003",
+        "KM-SETTINGS-001",
+        "KM-AI-001"
+      ],
+      "riskNotes": "Overlapping backdrop-filters cause severe GPU composite thrashing. Rule: 0–8px max for cards; 12px is hero ceiling only; stacked blur is strictly forbidden.",
+      "status": "APPROVED"
+    },
+    {
+      "effectId": "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+      "name": "Editorial Scroll Choreography (Landing & Cases Desktop)",
+      "purpose": "Direct editorial focus during sequential investigation timeline reading.",
+      "trigger": "Container entering sticky scroll range.",
+      "durationToken": "Synchronized to scroll velocity (duration.section for enter)",
+      "easingToken": "ease.standard",
+      "amplitude": "Horizontal scroll translation bounded to container width (desktop only).",
+      "propertiesAnimated": [
+        "transform",
+        "opacity"
+      ],
+      "desktopBehavior": "Landing: allowed for one narrative section. Cases: allowed only for an optional desktop archival timeline if Phase C usability verifies it. Native scroll strictly preserved (zero wheel interception).",
+      "tabletBehavior": "Converts to native touch horizontal snap container.",
+      "mobileBehavior": "Strictly unpinned standard vertical document flow (position: static). Zero horizontal pinning.",
+      "reducedMotionBehavior": "Standard vertical document flow. Zero sticky pin delays.",
+      "accessibilityRequirements": "Full keyboard arrow navigation between case items; skip link to jump past pinned section.",
+      "performanceBudget": "CSS position: sticky + transform: translateX via CSS variable.",
+      "preferredTechnology": "CSS (position: sticky + CSS scroll-driven animations or light rAF)",
+      "fallbackTechnology": "GSAP ScrollTrigger (Desktop only, if complex pinning requires scrub synchronization)",
+      "forbiddenTechnology": [
+        "Wheel event hijacking, body overflow: hidden locks",
+        "WebGL",
+        "Three.js",
+        "Canvas (unauthorized)"
+      ],
+      "allowedRoutes": [
+        "/",
+        "/cases"
+      ],
+      "forbiddenRoutes": [
+        "/dashboard",
+        "/settings",
+        "/trust",
+        "/community",
+        "/expert"
+      ],
+      "allowedAssets": [
+        "KM-EDITORIAL-001",
+        "KM-CASES-001",
+        "KM-SHEET-001"
+      ],
+      "riskNotes": "Must allow rapid scroll-through without trapping the user.",
+      "status": "LIMITED"
+    },
+    {
+      "effectId": "FX06_DISCOVERY_MARKERS",
+      "name": "Draggable Spatial Exploration Markers",
+      "purpose": "Provide interactive hotspots on the Knowledge Atlas and Case Archive to explore verified dossiers.",
+      "trigger": "User pointer drag, marker click, or keyboard Enter on focused hotspot.",
+      "durationToken": "duration.feedback (150ms for marker, 320ms for dossier reveal)",
+      "easingToken": "ease.emphasis",
+      "amplitude": "Hotspot pulse 1.0 -> 1.04, dossier panel slide-in 16px.",
+      "propertiesAnimated": [
+        "transform",
+        "opacity",
+        "box-shadow"
+      ],
+      "desktopBehavior": "Markers float above canvas map; clicking marker opens side dossier card with focus lock.",
+      "tabletBehavior": "Touch drag across canvas with minimum 44x44px touch targets.",
+      "mobileBehavior": "Canvas replaced or augmented by horizontal swipeable dossier cards with indicator dots.",
+      "reducedMotionBehavior": "Immediate popover display without scale pulses or slide transitions.",
+      "accessibilityRequirements": "Hotspots are native <button> elements with aria-label, aria-expanded, and Escape key dismissal.",
+      "performanceBudget": "Zero reflow during drag. Use pointer events and CSS transform.",
+      "preferredTechnology": "DOM_INTERACTION (Native HTML buttons + SVG canvas overlay)",
+      "fallbackTechnology": "DOM + CSS transitions",
+      "forbiddenTechnology": [
+        "Canvas-only rendered hotspots (which break screen reader accessibility)",
+        "WebGL",
+        "Three.js",
+        "Canvas (unauthorized)"
+      ],
+      "allowedRoutes": [
+        "/community",
+        "/cases"
+      ],
+      "forbiddenRoutes": [
+        "/",
+        "/trust",
+        "/expert",
+        "/dashboard",
+        "/settings"
+      ],
+      "allowedAssets": [
+        "KM-ATLAS-001",
+        "KM-CASES-001"
+      ],
+      "riskNotes": "Dossier text must be real DOM, never drawn on bitmap.",
+      "status": "APPROVED"
+    },
+    {
+      "effectId": "FX07_AMBIENT_FIELD",
+      "name": "Ambient Celestial Field (Landing Hero Bounded)",
+      "purpose": "Provide contemplative atmosphere of library sunbeams and academic depth.",
+      "trigger": "Active page load when in viewport.",
+      "durationToken": "Continuous (20s cycle)",
+      "easingToken": "ease.linearOptical",
+      "amplitude": "Max particle translation 30px over 20s; opacity 0.15 -> 0.4.",
+      "propertiesAnimated": [
+        "transform",
+        "opacity"
+      ],
+      "desktopBehavior": "Landing hero background only: maximum 3 drifting SVG particles. Slow 12s keyframe drift. Pauses cleanly when offscreen via IntersectionObserver.",
+      "tabletBehavior": "6 static particles with zero animation.",
+      "mobileBehavior": "Strictly disabled (display: none).",
+      "reducedMotionBehavior": "Strictly disabled (display: none).",
+      "accessibilityRequirements": "Background elements must be aria-hidden='true' with pointer-events: none.",
+      "performanceBudget": "0 JS work / frame (CSS keyframe only); pauses when offscreen",
+      "preferredTechnology": "SVG + CSS keyframe animation",
+      "fallbackTechnology": "CSS pseudo-element background",
+      "forbiddenTechnology": [
+        "Three.js",
+        "Heavy Canvas particle physics engines, Three.js point clouds",
+        "WebGL",
+        "Canvas (unauthorized)"
+      ],
+      "allowedRoutes": [
+        "/"
+      ],
+      "forbiddenRoutes": [
+        "/trust",
+        "/community",
+        "/expert",
+        "/cases",
+        "/dashboard",
+        "/settings"
+      ],
+      "allowedAssets": [
+        "KM-PRISM-004",
+        "KM-PRISM-005"
+      ],
+      "riskNotes": "Limited to Landing hero only. Disallowed across all other surfaces.",
+      "status": "LIMITED"
+    },
+    {
+      "effectId": "FX08_MAGNETIC_CTA_CONTEXT",
+      "name": "Magnetic Tactile Buttons with Double-Line Roll",
+      "purpose": "Elevate strategic primary actions with inviting, responsive tactile feedback.",
+      "trigger": "Pointer within 24px button proximity radius.",
+      "durationToken": "duration.feedback (150ms)",
+      "easingToken": "ease.emphasis",
+      "amplitude": "Button body translates max 6px toward pointer; text shifts max 2px.",
+      "propertiesAnimated": [
+        "transform"
+      ],
+      "desktopBehavior": "Button shifts toward cursor within small bounded radius; springs back on pointer leave.",
+      "tabletBehavior": "DISABLED. Standard tap highlight only.",
+      "mobileBehavior": "DISABLED. Standard tactile press scale (0.985).",
+      "reducedMotionBehavior": "DISABLED. Standard CSS hover color transition only.",
+      "accessibilityRequirements": "Keyboard focus states completely independent of pointer tracking. Never delay click action.",
+      "performanceBudget": "Calculated via mousemove throttled to rAF; transform translated via CSS variable.",
+      "preferredTechnology": "CSS hover + optional lightweight pointer listener on single primary CTA",
+      "fallbackTechnology": "CSS standard button state",
+      "forbiddenTechnology": [
+        "Site-wide magnetic wrappers on all links/buttons",
+        "WebGL",
+        "Three.js",
+        "Canvas (unauthorized)"
+      ],
+      "allowedRoutes": [
+        "/"
+      ],
+      "forbiddenRoutes": [
+        "/dashboard",
+        "/settings",
+        "/community",
+        "/expert",
+        "/cases",
+        "/trust"
+      ],
+      "allowedAssets": [
+        "KM-EDITORIAL-001",
+        "KM-BRAND-001"
+      ],
+      "riskNotes": "Only 1 CTA per page may use magnetic effect.",
+      "status": "APPROVED"
+    },
+    {
+      "effectId": "FX09_EDITORIAL_MEDIA_FRAME",
+      "name": "Curated Archival Glass Frame",
+      "purpose": "Unify photography and concept illustrations into museum-grade academic media plates.",
+      "trigger": "DOM render and responsive container resize.",
+      "durationToken": "duration.component (220ms)",
+      "easingToken": "ease.standard",
+      "amplitude": "Subtle inner shadow and 1px crisp border token containment.",
+      "propertiesAnimated": [
+        "border-color",
+        "box-shadow"
+      ],
+      "desktopBehavior": "Framed presentation with calibrated aspect ratios and optical caption anchors.",
+      "tabletBehavior": "Same as desktop; preserves aspect ratio.",
+      "mobileBehavior": "Maintains correct focal crop (e.g. 4:5 on portrait, 16:9 on landscape).",
+      "reducedMotionBehavior": "Static layout; zero motion involved.",
+      "accessibilityRequirements": "Image has descriptive alt text; caption has proper <figcaption> semantic markup.",
+      "performanceBudget": "Pure CSS layout and borders. Zero runtime cost.",
+      "preferredTechnology": "CSS (border, aspect-ratio, object-fit)",
+      "fallbackTechnology": "CSS",
+      "forbiddenTechnology": [
+        "Heavy canvas cropping scripts",
+        "WebGL",
+        "Three.js",
+        "Canvas (unauthorized)"
+      ],
+      "allowedRoutes": [
+        "/",
+        "/trust",
+        "/community",
+        "/expert",
+        "/cases",
+        "/dashboard",
+        "/settings"
+      ],
+      "forbiddenRoutes": [],
+      "allowedAssets": [
+        "ALL_APPROVED_ASSETS"
+      ],
+      "riskNotes": "Mandatory framing wrapper across all displayed visual assets.",
+      "status": "APPROVED"
+    },
+    {
+      "effectId": "FX10_NOISE_TO_KNOWLEDGE",
+      "name": "Chaotic Stream Convergence",
+      "purpose": "Visually manifest the core thesis: chaotic data flows into the prism, resolving into verified truth.",
+      "trigger": "Scroll progress across the Trust transition section.",
+      "durationToken": "Synchronized to scroll progress (0.0 to 1.0)",
+      "easingToken": "ease.standard",
+      "amplitude": "3 distinct paper stream lines converge from -40px offset into central focal ray.",
+      "propertiesAnimated": [
+        "transform",
+        "opacity",
+        "stroke-dashoffset"
+      ],
+      "desktopBehavior": "As user scrolls, scattered fragment trajectories converge into the crystal prism vertex.",
+      "tabletBehavior": "Stepwise scroll reveal of before/after state.",
+      "mobileBehavior": "Static two-stage visual reveal (Chaotic input card -> Arrow -> Verified output card).",
+      "reducedMotionBehavior": "Static side-by-side comparison cards with zero scroll scrub animation.",
+      "accessibilityRequirements": "Semantic text explanation accompanies visual: 'Transforming chaotic questions into structured evidence.'",
+      "performanceBudget": "SVG path stroke-dashoffset or transform translateY; max 2 redraws per frame.",
+      "preferredTechnology": "CSS / SVG (Scroll-driven stroke and transform)",
+      "fallbackTechnology": "GSAP ScrollTrigger (Only if CSS scroll-driven progress fails in target browser matrix)",
+      "forbiddenTechnology": [
+        "WebGL",
+        "Canvas particle physics simulations, WebGL fluid shaders",
+        "Three.js",
+        "Canvas (unauthorized)"
+      ],
+      "allowedRoutes": [
+        "/",
+        "/trust"
+      ],
+      "forbiddenRoutes": [
+        "/dashboard",
+        "/settings",
+        "/community",
+        "/expert",
+        "/cases"
+      ],
+      "allowedAssets": [
+        "KM-PRISM-001",
+        "KM-PRISM-002"
+      ],
+      "riskNotes": "Must not lock scroll or create sluggish scroll resistance.",
+      "status": "APPROVED"
+    },
+    {
+      "effectId": "FX11_HUMAN_IN_THE_LOOP_PROOF",
+      "name": "Interactive Annotation & Verdict Stamp",
+      "purpose": "Visually reinforce that AI suggests, evidence supports, and human experts provide authoritative review.",
+      "trigger": "Stepwise tab selection or verdict interaction.",
+      "durationToken": "duration.panel (320ms)",
+      "easingToken": "ease.emphasis",
+      "amplitude": "Annotation stroke draw-in 100ms, verdict stamp scale 1.08 -> 1.00 (150ms).",
+      "propertiesAnimated": [
+        "transform",
+        "opacity",
+        "stroke-dashoffset"
+      ],
+      "desktopBehavior": "Displays document preview; clicking 'Review Step' draws annotation trail to verified seal.",
+      "tabletBehavior": "Same interactive sequence with touch targets.",
+      "mobileBehavior": "Tabbed horizontal view: Tab 1 'AI Extraction' -> Tab 2 'Evidence Links' -> Tab 3 'Human Decision'.",
+      "reducedMotionBehavior": "Instant state switch between steps; stamp appears without scale pulse.",
+      "accessibilityRequirements": "Step indicators have aria-current='step', tablist semantics, and keyboard arrow keys.",
+      "performanceBudget": "Standard DOM state transitions. JS time < 2ms.",
+      "preferredTechnology": "DOM_INTERACTION (Semantic React/JSX component + CSS transitions)",
+      "fallbackTechnology": "CSS transitions",
+      "forbiddenTechnology": [
+        "Fake handwritten SVG canvas simulations that cannot be parsed by screen readers",
+        "WebGL",
+        "Three.js",
+        "Canvas (unauthorized)"
+      ],
+      "allowedRoutes": [
+        "/trust",
+        "/expert"
+      ],
+      "forbiddenRoutes": [
+        "/",
+        "/dashboard",
+        "/settings",
+        "/community",
+        "/cases"
+      ],
+      "allowedAssets": [
+        "KM-EXPERT-001"
+      ],
+      "riskNotes": "All reviewed text in prototype must be clearly identified as synthetic illustrative examples.",
+      "status": "APPROVED"
+    },
+    {
+      "effectId": "FX12_KNOWLEDGE_ATLAS",
+      "name": "Interactive Knowledge Atlas Orrery (2.5D)",
+      "purpose": "Planetary domain constellation map rendered via 2.5D SVG vectors and CSS orbital drift.",
+      "trigger": "User exploration on /community route.",
+      "durationToken": "Continuous ambient rotation (30s cycle) + instant node hover/selection (180ms)",
+      "easingToken": "ease.standard",
+      "amplitude": "Node orbital radius 80-160px; hover node scale 1.10.",
+      "propertiesAnimated": [
+        "transform",
+        "opacity",
+        "stroke"
+      ],
+      "desktopBehavior": "5 primary domain spheres (Science, Tech, Society, Culture, Economy) orbit the central Evidence Prism.",
+      "tabletBehavior": "Static planetary alignment with touch-selectable nodes.",
+      "mobileBehavior": "Horizontal swipeable domain cards with summary metrics; orbital canvas replaced by card carousel.",
+      "reducedMotionBehavior": "Static SVG diagram showing all 5 nodes connected with clear static lines.",
+      "accessibilityRequirements": "Each node is a keyboard-focusable button (<button>); accompanied by an accessible HTML data table/list.",
+      "performanceBudget": "SVG group transform or lightweight 2D canvas (< 100 nodes). Offscreen pause mandatory.",
+      "preferredTechnology": "SVG + CSS",
+      "fallbackTechnology": "HTML5 2D Canvas (Only if dynamic node count exceeds 50 nodes)",
+      "forbiddenTechnology": [
+        "Canvas",
+        "WebGL",
+        "Three.js",
+        "Physics Engine"
+      ],
+      "allowedRoutes": [
+        "/community"
+      ],
+      "forbiddenRoutes": [
+        "/",
+        "/trust",
+        "/expert",
+        "/cases",
+        "/dashboard",
+        "/settings"
+      ],
+      "allowedAssets": [
+        "KM-ATLAS-001"
+      ],
+      "riskNotes": "Engineered as declarative 2.5D SVG graph to eliminate WebGL context crashes and excessive GPU memory pressure.",
+      "status": "APPROVED"
+    }
+  ]
+}

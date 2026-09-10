@@ -10,6 +10,9 @@ export function MagneticTarget({
   children,
   className = "",
   strength = 12,
+  maxDistance,
+  threshold,
+  intensity,
   ...props
 }) {
   const ref = useRef(null);

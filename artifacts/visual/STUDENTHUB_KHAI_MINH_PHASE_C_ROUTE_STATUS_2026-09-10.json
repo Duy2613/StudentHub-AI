@@ -1,0 +1,198 @@
+{
+  "manifestVersion": "2026-09-10-phase-c-route-status",
+  "timestamp": "2026-09-10T22:45:00+07:00",
+  "phase": "PHASE_C",
+  "routes": {
+    "/": {
+      "name": "Landing",
+      "status": "IMPLEMENTED_VERIFIED",
+      "primaryAsset": "KM-PRISM-001",
+      "assetsUsed": [
+        "KM-PRISM-001",
+        "KM-PRISM-002",
+        "KM-EDITORIAL-001"
+      ],
+      "effectsUsed": [
+        "FX01",
+        "FX03",
+        "FX07",
+        "FX08",
+        "FX09",
+        "FX10"
+      ],
+      "effectsRemoved": [
+        "FX02",
+        "FX05"
+      ],
+      "desktopScreenshot": "artifacts/visual/phase-c/after/landing/landing_desktop.png",
+      "mobileScreenshot": "artifacts/visual/phase-c/after/landing/landing_mobile.png",
+      "reducedMotionStatus": "PASS_TRANSLATIONS_OFF_PARALLAX_OFF",
+      "dataRealityStatus": "PASS_NO_FAKE_METRICS_OR_TESTIMONIALS",
+      "responsiveStatus": "PASS_NO_HORIZONTAL_OVERFLOW_390PX_TO_1440PX",
+      "accessibilitySmoke": "PASS_SEMANTIC_HEADINGS_CONTRAST_TOUCH_TARGETS",
+      "performanceObservation": "PRODUCTION_MOTION_VISUALLY_SMOOTH_OBSERVED",
+      "knownIssues": []
+    },
+    "/trust": {
+      "name": "Trust",
+      "status": "IMPLEMENTED_VERIFIED",
+      "primaryAsset": "KM-PRISM-002",
+      "assetsUsed": [
+        "KM-PRISM-002"
+      ],
+      "effectsUsed": [
+        "FX01",
+        "FX04",
+        "FX09",
+        "FX10"
+      ],
+      "effectsRemoved": [
+        "FX11"
+      ],
+      "desktopScreenshot": "artifacts/visual/phase-c/after/trust/trust_desktop.png",
+      "mobileScreenshot": "artifacts/visual/phase-c/after/trust/trust_mobile.png",
+      "reducedMotionStatus": "PASS_STATIC_TRANSITION_FALLBACK",
+      "dataRealityStatus": "PASS_RUNTIME_7_STAGES_INTACT_HONEST_EMPTY_STATE",
+      "responsiveStatus": "PASS_NO_HORIZONTAL_OVERFLOW_390PX_TO_1440PX",
+      "accessibilitySmoke": "PASS_SOURCE_LINKS_VISIBLE_PROMINENT_CONTRAST_HIGH",
+      "performanceObservation": "PRODUCTION_MOTION_VISUALLY_SMOOTH_OBSERVED",
+      "knownIssues": []
+    },
+    "/community": {
+      "name": "Community",
+      "status": "IMPLEMENTED_VERIFIED",
+      "primaryAsset": "KM-ATLAS-001",
+      "assetsUsed": [
+        "KM-ATLAS-001"
+      ],
+      "effectsUsed": [
+        "FX01",
+        "FX04",
+        "FX09",
+        "FX12"
+      ],
+      "effectsRemoved": [
+        "FX06"
+      ],
+      "desktopScreenshot": "artifacts/visual/phase-c/after/community/community_desktop.png",
+      "mobileScreenshot": "artifacts/visual/phase-c/after/community/community_mobile.png",
+      "reducedMotionStatus": "PASS_STATIC_SVG_ORBIT_FALLBACK",
+      "dataRealityStatus": "PASS_HONEST_EMPTY_OBSERVATION_ZERO_FAKE_USERS",
+      "responsiveStatus": "PASS_NO_HORIZONTAL_OVERFLOW_390PX_TO_1440PX",
+      "accessibilitySmoke": "PASS_ATLAS_DECLARATIVE_SVG_ARIA_LABELED",
+      "performanceObservation": "PRODUCTION_MOTION_VISUALLY_SMOOTH_OBSERVED",
+      "knownIssues": []
+    },
+    "/expert": {
+      "name": "Expert",
+      "status": "IMPLEMENTED_VERIFIED",
+      "primaryAsset": "KM-EXPERT-001",
+      "assetsUsed": [
+        "KM-EXPERT-001"
+      ],
+      "effectsUsed": [
+        "FX01",
+        "FX04",
+        "FX09",
+        "FX11"
+      ],
+      "effectsRemoved": [],
+      "desktopScreenshot": "artifacts/visual/phase-c/after/expert/expert_desktop.png",
+      "mobileScreenshot": "artifacts/visual/phase-c/after/expert/expert_mobile.png",
+      "reducedMotionStatus": "PASS_STATIC_PROCESS_DIAGRAM_FALLBACK",
+      "dataRealityStatus": "PASS_HONEST_COUNCIL_EMPTY_STATE_ZERO_FAKE_EXPERTS",
+      "responsiveStatus": "PASS_NO_HORIZONTAL_OVERFLOW_390PX_TO_1440PX",
+      "accessibilitySmoke": "PASS_DOMAIN_QUALIFICATION_SEMANTICS_INTACT",
+      "performanceObservation": "PRODUCTION_MOTION_VISUALLY_SMOOTH_OBSERVED",
+      "knownIssues": []
+    },
+    "/cases": {
+      "name": "Cases",
+      "status": "IMPLEMENTED_VERIFIED",
+      "primaryAsset": "KM-CASES-001",
+      "assetsUsed": [
+        "KM-CASES-001"
+      ],
+      "effectsUsed": [
+        "FX01",
+        "FX04",
+        "FX09"
+      ],
+      "effectsRemoved": [
+        "FX05"
+      ],
+      "desktopScreenshot": "artifacts/visual/phase-c/after/cases/cases_desktop.png",
+      "mobileScreenshot": "artifacts/visual/phase-c/after/cases/cases_mobile.png",
+      "reducedMotionStatus": "PASS_STATIC_DOSSIER_FALLBACK",
+      "dataRealityStatus": "PASS_DOM_SUPERFLOWS_AUTHORITATIVE_NO_FAKE_ROWS",
+      "responsiveStatus": "PASS_NO_HORIZONTAL_OVERFLOW_390PX_TO_1440PX",
+      "accessibilitySmoke": "PASS_DOSSIER_FILTERS_SEARCH_KEYBOARD_NAVIGABLE",
+      "performanceObservation": "PRODUCTION_MOTION_VISUALLY_SMOOTH_OBSERVED",
+      "knownIssues": []
+    },
+    "/dashboard": {
+      "name": "Dashboard",
+      "status": "IMPLEMENTED_VERIFIED",
+      "primaryAsset": "KM-PRISM-005",
+      "assetsUsed": [
+        "KM-PRISM-005"
+      ],
+      "effectsUsed": [
+        "FX01",
+        "FX04",
+        "FX09"
+      ],
+      "effectsRemoved": [
+        "FX02",
+        "FX03",
+        "FX05",
+        "FX06",
+        "FX07",
+        "FX08",
+        "FX10",
+        "FX11",
+        "FX12"
+      ],
+      "desktopScreenshot": "artifacts/visual/phase-c/after/dashboard/dashboard_desktop.png",
+      "mobileScreenshot": "artifacts/visual/phase-c/after/dashboard/dashboard_mobile.png",
+      "reducedMotionStatus": "PASS_STATIC_ATMOSPHERE_FALLBACK",
+      "dataRealityStatus": "PASS_HONEST_EMPTY_WORKSPACE_ZERO_FAKE_METRICS",
+      "responsiveStatus": "PASS_NO_HORIZONTAL_OVERFLOW_390PX_TO_1440PX",
+      "accessibilitySmoke": "PASS_HIGH_CONTRAST_READABILITY_MAINTAINED",
+      "performanceObservation": "PRODUCTION_MOTION_VISUALLY_SMOOTH_OBSERVED",
+      "knownIssues": []
+    },
+    "/settings": {
+      "name": "Settings",
+      "status": "IMPLEMENTED_VERIFIED",
+      "primaryAsset": "KM-SETTINGS-001",
+      "assetsUsed": [
+        "KM-SETTINGS-001"
+      ],
+      "effectsUsed": [
+        "FX01",
+        "FX09"
+      ],
+      "effectsRemoved": [
+        "FX02",
+        "FX03",
+        "FX04",
+        "FX05",
+        "FX06",
+        "FX07",
+        "FX08",
+        "FX10",
+        "FX11",
+        "FX12"
+      ],
+      "desktopScreenshot": "artifacts/visual/phase-c/after/settings/settings_desktop.png",
+      "mobileScreenshot": "artifacts/visual/phase-c/after/settings/settings_mobile.png",
+      "reducedMotionStatus": "PASS_STATIC_CONTROL_PANEL",
+      "dataRealityStatus": "PASS_ZERO_FABRICATED_SETTINGS_HONEST_LOCAL_STATE",
+      "responsiveStatus": "PASS_NO_HORIZONTAL_OVERFLOW_390PX_TO_1440PX",
+      "accessibilitySmoke": "PASS_FORM_CONTROLS_LABELS_FOCUS_RINGS_INTACT",
+      "performanceObservation": "PRODUCTION_MOTION_VISUALLY_SMOOTH_OBSERVED",
+      "knownIssues": []
+    }
+  }
+}

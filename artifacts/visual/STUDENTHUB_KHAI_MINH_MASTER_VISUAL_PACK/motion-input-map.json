@@ -1,0 +1,90 @@
+{
+  "system": "Phase B Motion Compatibility Specifications — Behavioral Requirements",
+  "assets": [
+    {
+      "assetId": "KM-PRISM-001",
+      "route": "/",
+      "supportedEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX02_DEPTH_PARALLAX",
+        "FX03_PRISM_LIGHT_SWEEP",
+        "FX10_NOISE_TO_KNOWLEDGE"
+      ],
+      "forbiddenEffects": [
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY"
+      ],
+      "recommendedEffect": "FX03_PRISM_LIGHT_SWEEP",
+      "intensity": 3,
+      "triggerConcept": "On scroll into view, prismatic light refraction tracks pointer coordinates or scroll progress across the crystal pyramid facet. Benchmark standard CSS gradient transitions before introducing scripting.",
+      "mobileSimplification": "Disable pointer coordinate tracking; apply subtle linear-gradient shimmer on page load.",
+      "reducedMotionFallback": "STATIC_OPACITY_FADE"
+    },
+    {
+      "assetId": "KM-PRISM-002",
+      "route": "/trust",
+      "supportedEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX02_DEPTH_PARALLAX",
+        "FX10_NOISE_TO_KNOWLEDGE"
+      ],
+      "forbiddenEffects": [
+        "FX06_DISCOVERY_MARKERS"
+      ],
+      "recommendedEffect": "FX10_NOISE_TO_KNOWLEDGE",
+      "intensity": 3,
+      "triggerConcept": "Chaotic particles flow into prism; refracted rays illuminate structured cards via scroll-progress-controlled convergence. Benchmark CSS scroll-driven animations before third-party libraries.",
+      "mobileSimplification": "Single static snapshot with smooth scroll entrance.",
+      "reducedMotionFallback": "STATIC_FADE"
+    },
+    {
+      "assetId": "KM-ATLAS-001",
+      "route": "/community",
+      "supportedEffects": [
+        "FX01_CINEMATIC_REVEAL",
+        "FX02_DEPTH_PARALLAX",
+        "FX06_DISCOVERY_MARKERS",
+        "FX12_KNOWLEDGE_ATLAS"
+      ],
+      "forbiddenEffects": [
+        "FX03_PRISM_LIGHT_SWEEP"
+      ],
+      "recommendedEffect": "FX12_KNOWLEDGE_ATLAS",
+      "intensity": 3,
+      "triggerConcept": "Orbital progression of planetary knowledge spheres around central prism inspired by celestial framing. Benchmark accessible SVG/CSS before Canvas.",
+      "mobileSimplification": "Horizontal scroll snap between knowledge domain cards.",
+      "reducedMotionFallback": "STATIC_PANORAMA"
+    },
+    {
+      "assetId": "KM-EXPERT-001",
+      "route": "/expert",
+      "supportedEffects": [
+        "FX04_KNOWLEDGE_GLASS",
+        "FX11_HUMAN_IN_THE_LOOP_PROOF"
+      ],
+      "forbiddenEffects": [
+        "FX02_DEPTH_PARALLAX"
+      ],
+      "recommendedEffect": "FX11_HUMAN_IN_THE_LOOP_PROOF",
+      "intensity": 2,
+      "triggerConcept": "Hover or focus on verdict highlights annotation trail from fountain pen to final verification mark. Implement via accessible DOM events.",
+      "mobileSimplification": "Tap to toggle between AI extract and Human annotation.",
+      "reducedMotionFallback": "STATIC_SPLIT"
+    },
+    {
+      "assetId": "KM-EDITORIAL-001",
+      "route": "/",
+      "supportedEffects": [
+        "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+        "FX08_MAGNETIC_CTA_CONTEXT"
+      ],
+      "forbiddenEffects": [
+        "FX03_PRISM_LIGHT_SWEEP"
+      ],
+      "recommendedEffect": "FX05_EDITORIAL_SCROLL_CHOREOGRAPHY",
+      "intensity": 3,
+      "triggerConcept": "Staggered line reveal with overflow hidden mask. Implement using native CSS transition stagger.",
+      "mobileSimplification": "Retain stagger reveal with reduced duration (0.4s).",
+      "reducedMotionFallback": "STATIC_APPEAR"
+    }
+  ]
+}

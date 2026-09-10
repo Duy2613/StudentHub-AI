@@ -1,5 +1,7 @@
 "use client";
 
+import KhaiMinhMedia from "@/components/visual/KhaiMinhMedia";
+
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -146,22 +148,41 @@ export function PrivacyAccessCenter() {
   const deviceRows = useMemo(() => deviceIsReady ? devices : [], [deviceIsReady, devices]);
 
   return (
-    <div className="khai-minh-settings-space space-y-6">
-      <section className="surface-card rounded-3xl p-6">
-        <div className="flex items-center gap-3 text-cyan-400"><Shield className="w-7 h-7" /><div><h1 className="text-xl font-bold text-app-primary">Trung tâm bảo mật, thiết bị &amp; quyền riêng tư</h1><p className="mt-1 text-xs text-app-muted">Chỉ hiển thị trạng thái mà contract hiện tại có thể xác minh; nguồn chưa kết nối không được trình bày như đang hoạt động.</p></div></div>
+    <div className="space-y-6">
+      <section className="relative overflow-hidden rounded-3xl p-6 bg-slate-900/95 border border-slate-800/90 shadow-sm">
+        {/* Canonical KM-SETTINGS-001 Quiet Visual Anchor (C64) */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
+          <KhaiMinhMedia
+            assetId="KM-SETTINGS-001"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-cyan-400">
+            <Shield className="w-7 h-7 shrink-0" />
+            <div>
+              <h1 className="text-xl font-bold text-app-primary">Trung tâm bảo mật, thiết bị &amp; quyền riêng tư</h1>
+              <p className="mt-1 text-xs text-app-muted">Chỉ hiển thị trạng thái mà contract hiện tại có thể xác minh; nguồn chưa kết nối không được trình bày như đang hoạt động.</p>
+            </div>
+          </div>
+          <span className="hidden sm:inline-block text-[11px] font-mono text-cyan-400/80 px-2.5 py-1 rounded bg-cyan-950/40 border border-cyan-800/30 shrink-0">
+            KM-SETTINGS-001 // STATIC
+          </span>
+        </div>
         <SourceDisclosure sourceMode="LIVE" provenance={{ requestedMode: "LIVE", sourceMode: "LIVE", kind: "LIVE_PROVIDER", label: "Privacy API", providerId: "privacy-api", disclosure: "Trạng thái thiết bị và thao tác quyền riêng tư đến từ API cùng nguồn." }} className="mt-4" />
         {message && <div className={`mt-4 flex items-center justify-between rounded-2xl p-3.5 text-xs ${message.type === "success" ? "border border-emerald-500/30 bg-emerald-950/40 text-emerald-300" : "border border-rose-500/30 bg-rose-950/40 text-rose-300"}`} role={message.type === "error" ? "alert" : "status"}><span>{message.text}</span><button type="button" onClick={() => setMessage(null)} className="font-bold underline">Đóng</button></div>}
       </section>
 
-      <section className="surface-card space-y-4 rounded-3xl p-6" aria-labelledby="devices-title">
+      <section className="space-y-4 rounded-3xl p-6 bg-slate-900/95 border border-slate-800/90 shadow-sm" aria-labelledby="devices-title">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><h2 id="devices-title" className="flex items-center gap-2 text-sm font-bold text-neutral-100"><Laptop className="w-4 h-4 text-cyan-400" />Thiết bị đang hoạt động ({devices.length})</h2><p className="mt-0.5 text-xs text-neutral-400">Danh sách được lấy từ session/device API. Nếu nguồn không xác minh được, hệ thống giữ trạng thái lỗi.</p></div><button type="button" onClick={handleRevokeAllOthers} disabled={!deviceRows.length} className="self-start rounded-xl border border-neutral-700/60 bg-neutral-800 px-3.5 py-1.5 text-xs font-semibold text-neutral-300 transition-all hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-50 sm:self-center">Đăng xuất thiết bị khác</button></div>
         {deviceResult && deviceResult.state !== "SUCCESS" && deviceResult.state !== "EMPTY" && <StateBoundary envelope={deviceResult} onAction={deviceAction} />}
         {deviceIsReady && <div className="space-y-3">{deviceRows.length ? deviceRows.map((device, index) => <div key={device.deviceId} className="flex flex-col justify-between gap-3 rounded-2xl border border-neutral-800/80 bg-neutral-950/60 p-4 text-xs sm:flex-row sm:items-center"><div className="flex items-start space-x-3.5"><div className="shrink-0 rounded-xl border border-neutral-800 bg-neutral-900 p-2.5">{getPlatformIcon(device.platform)}</div><div><div className="flex flex-wrap items-center gap-2"><span className="font-bold text-neutral-200">{device.deviceName}</span>{index === 0 && <span className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-bold text-cyan-400">THIẾT BỊ NÀY</span>}<span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold text-neutral-300">{device.securityStatus || "UNKNOWN"}</span></div><div className="mt-1 text-[11px] text-neutral-400">IP: {device.ipAddress || "Không công bố"} · Lần hoạt động cuối: {device.lastSeenAt ? new Date(device.lastSeenAt).toLocaleString("vi-VN") : "Không có thời điểm"}</div></div></div>{index !== 0 && <button type="button" onClick={() => handleRevokeDevice(device.deviceId)} className="flex items-center space-x-1.5 self-start rounded-xl border border-rose-500/30 bg-rose-950/30 px-3 py-1.5 text-xs font-semibold text-rose-400 transition-all hover:bg-rose-900/50 sm:self-center"><Trash2 className="w-3.5 h-3.5" />Thu hồi</button>}</div>) : <StateBoundary envelope={deviceResult} />}</div>}
       </section>
 
-      <section className="surface-card space-y-4 rounded-3xl p-6" aria-labelledby="integrations-title"><h2 id="integrations-title" className="flex items-center gap-2 text-sm font-bold text-neutral-100"><Key className="w-4 h-4 text-indigo-400" />Tài khoản và nguồn dữ liệu đã kết nối</h2><div className="rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4 text-xs text-amber-100"><strong>NOT_CONFIGURED</strong><p className="mt-1 text-amber-100/75">Contract hiện tại chưa cung cấp danh sách kết nối tài khoản giáo dục hoặc mạng xã hội. Không hiển thị các nguồn này như đã xác thực.</p></div></section>
+      <section className="space-y-4 rounded-3xl p-6 bg-slate-900/95 border border-slate-800/90 shadow-sm" aria-labelledby="integrations-title"><h2 id="integrations-title" className="flex items-center gap-2 text-sm font-bold text-neutral-100"><Key className="w-4 h-4 text-indigo-400" />Tài khoản và nguồn dữ liệu đã kết nối</h2><div className="rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4 text-xs text-amber-100"><strong>NOT_CONFIGURED</strong><p className="mt-1 text-amber-100/75">Contract hiện tại chưa cung cấp danh sách kết nối tài khoản giáo dục hoặc mạng xã hội. Không hiển thị các nguồn này như đã xác thực.</p></div></section>
 
-      <section className="surface-card space-y-4 rounded-3xl p-6" aria-labelledby="privacy-controls-title"><h2 id="privacy-controls-title" className="flex items-center gap-2 text-sm font-bold text-neutral-100"><Lock className="w-4 h-4 text-emerald-400" />Quyền sở hữu dữ liệu &amp; cá nhân hóa</h2><p className="text-xs leading-relaxed text-neutral-300">Các thao tác dưới đây chỉ báo thành công sau khi API xác nhận. StudentHub không tự tạo bản sao hoặc trạng thái quyền riêng tư thay thế khi provider không khả dụng.</p><div className="flex flex-wrap items-center gap-3 pt-2"><button type="button" onClick={handleExportData} className="flex items-center space-x-2 rounded-xl bg-cyan-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-cyan-600/20 transition-all hover:bg-cyan-500"><Download className="w-4 h-4" />Xuất dữ liệu cá nhân</button><button type="button" onClick={handleResetPersonalization} disabled={resetting} className="flex items-center space-x-2 rounded-xl border border-neutral-700/60 bg-neutral-800 px-4 py-2.5 text-xs font-bold text-neutral-300 transition-all hover:bg-neutral-700 disabled:opacity-50"><RotateCcw className={`w-4 h-4 ${resetting ? "animate-spin" : ""}`} />Đặt lại cá nhân hóa</button></div></section>
+      <section className="space-y-4 rounded-3xl p-6 bg-slate-900/95 border border-slate-800/90 shadow-sm" aria-labelledby="privacy-controls-title"><h2 id="privacy-controls-title" className="flex items-center gap-2 text-sm font-bold text-neutral-100"><Lock className="w-4 h-4 text-emerald-400" />Quyền sở hữu dữ liệu &amp; cá nhân hóa</h2><p className="text-xs leading-relaxed text-neutral-300">Các thao tác dưới đây chỉ báo thành công sau khi API xác nhận. StudentHub không tự tạo bản sao hoặc trạng thái quyền riêng tư thay thế khi provider không khả dụng.</p><div className="flex flex-wrap items-center gap-3 pt-2"><button type="button" onClick={handleExportData} className="flex items-center space-x-2 rounded-xl bg-cyan-700 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-cyan-700/20 transition-all hover:bg-cyan-600"><Download className="w-4 h-4" />Xuất dữ liệu cá nhân</button><button type="button" onClick={handleResetPersonalization} disabled={resetting} className="flex items-center space-x-2 rounded-xl border border-neutral-700/60 bg-neutral-800 px-4 py-2.5 text-xs font-bold text-neutral-300 transition-all hover:bg-neutral-700 disabled:opacity-50"><RotateCcw className={`w-4 h-4 ${resetting ? "animate-spin" : ""}`} />Đặt lại cá nhân hóa</button></div></section>
     </div>
   );
 }

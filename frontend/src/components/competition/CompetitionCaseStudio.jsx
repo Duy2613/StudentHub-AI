@@ -1,5 +1,9 @@
 "use client";
 
+import KhaiMinhMedia from "@/components/visual/KhaiMinhMedia";
+import EditorialMediaFrame from "@/components/visual/EditorialMediaFrame";
+import KnowledgeGlass from "@/components/visual/KnowledgeGlass";
+
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
@@ -82,13 +86,28 @@ export function CompetitionCaseStudio({ flows }) {
 
   return (
     <div className={styles.workspace}>
-      <header className={styles.hero}>
-        <div>
-          <div className={styles.heroLabel}><Sparkles size={14} /><span>COMPETITION DEMO · DEMO FIXTURE</span></div>
-          <h1>Một case. Toàn bộ mạng lưới bằng chứng.</h1>
-          <p>Trust, cộng đồng, chuyên gia, học vụ, Passport và Decision Twin cùng trả lời một câu hỏi: bước an toàn tiếp theo là gì?</p>
+      <header className={`${styles.hero} relative overflow-hidden rounded-2xl`}>
+        {/* Canonical KM-CASES-001 Archival Hero Background (C57: Masked/Decorative Only) */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none" aria-hidden="true">
+          <KhaiMinhMedia
+            assetId="KM-CASES-001"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
         </div>
-        <EvidenceArtifact status={active.passport.currentStatus} revision={active.passport.revision} />
+        <div className="relative z-10">
+          <div className={styles.heroLabel}><Sparkles size={14} /><span>DOSSIER ARCHIVE // KHAI MINH</span></div>
+          <h1 className="type-monumental text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight">Một case. Toàn bộ mạng lưới bằng chứng.</h1>
+          <p className="type-body-editorial text-slate-300 text-sm sm:text-base max-w-xl">Trust, cộng đồng, chuyên gia, học vụ, Passport và Decision Twin cùng trả lời một câu hỏi: bước an toàn tiếp theo là gì?</p>
+          <div className="mt-3 flex items-center gap-2 text-xs font-mono text-cyan-400/80">
+            <span>KM-CASES-001 ARCHIVAL TEXTURE</span>
+            <span>·</span>
+            <span>DOM RECORDS AUTHORITATIVE</span>
+          </div>
+        </div>
+        <div className="relative z-10">
+          <EvidenceArtifact status={active.passport.currentStatus} revision={active.passport.revision} />
+        </div>
       </header>
 
       <div className={styles.demoNotice} role="note">

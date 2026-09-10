@@ -1,0 +1,267 @@
+{
+  "$schema": "https://studenthub.vn/schemas/motion-tokens.v1.json",
+  "version": "1.0.0",
+  "releaseDate": "2026-09-10",
+  "system": "StudentHub AI — Khai Minh Motion Token Architecture",
+  "philosophy": {
+    "corePriority": "CLARITY > FEEDBACK > HIERARCHY > ORIENTATION > EMOTION > SPECTACLE",
+    "narrativeSpine": "From Noise to Knowledge (Hiểu Đúng. Đi Xa.)",
+    "principles": [
+      "Motion explains what changed, where to look, and what is interactive.",
+      "Visual density and motion density are inversely proportional.",
+      "No functional UI transition may exceed 650ms.",
+      "CSS/SVG/DOM-first implementations must precede heavier runtime abstractions."
+    ]
+  },
+  "intensityLevels": {
+    "0": {
+      "name": "STATIC",
+      "description": "Zero motion. Immediate render. Used for pure operational stability."
+    },
+    "1": {
+      "name": "MICRO",
+      "description": "Feedback states (80-150ms). Translations 2-4px. Used on Settings & Dashboard."
+    },
+    "2": {
+      "name": "SUBTLE",
+      "description": "Component transitions (180-240ms). Translations 4-8px. Used on Cards & Expert verification."
+    },
+    "3": {
+      "name": "EXPRESSIVE",
+      "description": "Section narrative flow (240-360ms). Translations 8-16px. Used on Community & Trust."
+    },
+    "4": {
+      "name": "CINEMATIC",
+      "description": "Hero & brand transition (360-520ms). Maximum 24px translation. Used exclusively on Landing Hero & Trust transition."
+    },
+    "5": {
+      "name": "HERO_ONLY_EXTREME",
+      "description": "Strictly prohibited in production to prevent visual fatigue and disorientation."
+    }
+  },
+  "tokens": {
+    "duration": {
+      "instant": {
+        "value": "100ms",
+        "ms": 100,
+        "use": "Toggle states, immediate button active press, micro-switches"
+      },
+      "feedback": {
+        "value": "150ms",
+        "ms": 150,
+        "use": "Hover entrance, focus ring expansion, tooltip appearance"
+      },
+      "component": {
+        "value": "220ms",
+        "ms": 220,
+        "use": "Dropdown reveal, modal dialog scale, tab panel switch"
+      },
+      "panel": {
+        "value": "320ms",
+        "ms": 320,
+        "use": "Drawer slide, dossier popover, sidebar expand"
+      },
+      "section": {
+        "value": "420ms",
+        "ms": 420,
+        "use": "Scroll section entry, editorial line stagger, evidence card emergence"
+      },
+      "hero": {
+        "value": "520ms",
+        "ms": 520,
+        "use": "Primary landing hero atmosphere, Evidence Prism light sweep entrance"
+      },
+      "maxAllowed": {
+        "value": "650ms",
+        "ms": 650,
+        "use": "Hard ceiling for any interactive transition"
+      }
+    },
+    "easing": {
+      "standard": {
+        "value": "cubic-bezier(0.2, 0.0, 0.0, 1.0)",
+        "name": "ease.standard",
+        "use": "Universal default for moving elements within the viewport"
+      },
+      "enter": {
+        "value": "cubic-bezier(0.0, 0.0, 0.2, 1.0)",
+        "name": "ease.enter",
+        "use": "Elements entering the viewport or appearing from transparency"
+      },
+      "exit": {
+        "value": "cubic-bezier(0.4, 0.0, 1.0, 1.0)",
+        "name": "ease.exit",
+        "use": "Elements exiting the viewport or fading to closed states"
+      },
+      "emphasis": {
+        "value": "cubic-bezier(0.25, 1.0, 0.5, 1.0)",
+        "name": "ease.emphasis",
+        "use": "Key verified stamps, focal card emphasis, high-polish moments"
+      },
+      "linearOptical": {
+        "value": "linear",
+        "name": "ease.linearOptical",
+        "use": "Constant-speed light sweep or continuous slow ambient drift"
+      }
+    },
+    "distance": {
+      "xs": {
+        "value": "4px",
+        "px": 4,
+        "use": "Hover lift on buttons, input shift"
+      },
+      "sm": {
+        "value": "8px",
+        "px": 8,
+        "use": "Card elevation, dropdown shift"
+      },
+      "md": {
+        "value": "16px",
+        "px": 16,
+        "use": "Standard section element entrance Y"
+      },
+      "lg": {
+        "value": "24px",
+        "px": 24,
+        "use": "Hero title reveal, major headline entrance"
+      },
+      "xl": {
+        "value": "40px",
+        "px": 40,
+        "use": "Full section container entrance on desktop only"
+      },
+      "heroMax": {
+        "value": "56px",
+        "px": 56,
+        "use": "Maximum displacement strictly reserved for primary hero"
+      }
+    },
+    "scale": {
+      "hover": {
+        "value": "1.015",
+        "use": "Subtle card hover highlight"
+      },
+      "active": {
+        "value": "0.985",
+        "use": "Tactile button press depression"
+      },
+      "emphasis": {
+        "value": "1.030",
+        "use": "Active selected hotspot or highlighted dossier"
+      },
+      "heroEnter": {
+        "value": "0.985 -> 1.000",
+        "use": "Cinematic hero image settlement"
+      }
+    },
+    "blur": {
+      "cardMax": {
+        "value": "8px",
+        "description": "Canonical maximum blur for standard Knowledge Glass cards and panels (0–8px range)"
+      },
+      "heroCeiling": {
+        "value": "12px",
+        "description": "Global absolute ceiling reserved exclusively for top navigation bar or isolated hero modal; never applied to standard content cards"
+      },
+      "mobileMax": {
+        "value": "4px",
+        "description": "Mobile blur limit; prefer flat opaque backgrounds (rgba(18, 24, 36, 0.95)) on low-power devices"
+      }
+    },
+    "stagger": {
+      "micro": {
+        "value": "30ms",
+        "ms": 30,
+        "use": "Character or icon series reveal"
+      },
+      "content": {
+        "value": "50ms",
+        "ms": 50,
+        "use": "Card list items, evidence citations list"
+      },
+      "hero": {
+        "value": "80ms",
+        "ms": 80,
+        "use": "Headline line sequence (maximum 3 lines)"
+      },
+      "maxSequence": {
+        "value": "380ms",
+        "ms": 380,
+        "use": "Hard ceiling for total sequenced delay"
+      }
+    },
+    "glow": {
+      "low": {
+        "value": "0 0 12px rgba(120, 160, 255, 0.15)",
+        "use": "Quiet glass card boundary highlight"
+      },
+      "medium": {
+        "value": "0 0 24px rgba(120, 160, 255, 0.25)",
+        "use": "Interactive focus and active verification state"
+      },
+      "hero": {
+        "value": "0 0 48px rgba(140, 180, 255, 0.35)",
+        "use": "Prism caustic refraction anchor only"
+      }
+    },
+    "parallax": {
+      "desktopForeground": {
+        "maxPx": 16,
+        "axis": "Y",
+        "damping": "smooth"
+      },
+      "desktopPrism": {
+        "maxPx": 24,
+        "axis": "Y",
+        "damping": "smooth"
+      },
+      "desktopBackground": {
+        "maxPx": 8,
+        "axis": "Y",
+        "damping": "smooth"
+      },
+      "mobileCap": {
+        "maxPx": 0,
+        "status": "DISABLED_ON_TOUCH"
+      }
+    }
+  },
+  "globalContracts": {
+    "reducedMotion": {
+      "trigger": "prefers-reduced-motion: reduce",
+      "enforcement": "MANDATORY",
+      "rules": [
+        "All spatial translations (translateY/translateX) force to 0px.",
+        "All continuous animations (particles, orbits, sweeps) pause immediately.",
+        "Transition durations compress to <= 150ms with opacity crossfade only.",
+        "Content remains 100% visible and interactive without animation playback.",
+        "Pointer tracking and parallax disabled completely."
+      ]
+    },
+    "mobileLowPower": {
+      "trigger": "Viewport width < 768px OR coarse pointer input",
+      "enforcement": "MANDATORY",
+      "rules": [
+        "No cursor-following or magnetic pointer attractions.",
+        "No multi-plane parallax or independent layer scroll speeds.",
+        "No persistent background particle simulations.",
+        "Max motion intensity capped at 1-2 across all routes.",
+        "Backdrop-filter stacks limited to a single layer."
+      ]
+    },
+    "frameBudget": {
+      "targetFps": 60,
+      "maxFrameTimeMs": 16.67,
+      "maxJsExecutionPerFrameMs": 4.0,
+      "offscreenPolicy": "Pause all animations via IntersectionObserver when offscreen."
+    },
+    "blurPolicy": {
+      "standardCardBlur": "0–8px max",
+      "heroCeilingBlur": "12px max",
+      "stackedBlurForbidden": true,
+      "mobilePreference": "0–4px or solid opaque layer to eliminate mobile GPU composite stalls"
+    },
+    "fx05Policy": "LIMITED_TO_LANDING_AND_OPTIONAL_CASES_DESKTOP",
+    "fx07Policy": "LANDING_HERO_ONLY_MAX_3_NODES_DESKTOP"
+  }
+}

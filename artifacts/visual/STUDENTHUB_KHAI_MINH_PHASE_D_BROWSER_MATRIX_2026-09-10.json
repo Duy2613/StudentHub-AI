@@ -1,0 +1,506 @@
+{
+  "generatedAt": "2026-09-10T23:40:00+07:00",
+  "totalStatesExecuted": 42,
+  "passedStates": 42,
+  "failedStates": 0,
+  "totalHydrationErrors": 0,
+  "totalConsoleErrors": 10,
+  "byBrowser": {
+    "chromium": {
+      "executed": 14,
+      "passed": 14
+    },
+    "firefox": {
+      "executed": 14,
+      "passed": 14
+    },
+    "webkit": {
+      "executed": 14,
+      "passed": 14
+    }
+  },
+  "executions": [
+    {
+      "browser": "chromium",
+      "route": "Landing",
+      "path": "/",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Community",
+      "path": "/community",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Landing",
+      "path": "/",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Community",
+      "path": "/community",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "chromium",
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Landing",
+      "path": "/",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [
+        "[JavaScript Error: \"Content-Security-Policy: The page’s settings blocked a JavaScript eval (script-src) from being executed because it violates the following directive: “script-src 'self' 'unsafe-inline'” (Missing 'unsafe-eval')\" {file: \"http://localhost:3008/_next/static/chunks/9720-5347dc4fad237269.js\" line: 1}]"
+      ],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Community",
+      "path": "/community",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [
+        "[JavaScript Error: \"Content-Security-Policy: The page’s settings blocked a JavaScript eval (script-src) from being executed because it violates the following directive: “script-src 'self' 'unsafe-inline'” (Missing 'unsafe-eval')\" {file: \"http://localhost:3008/_next/static/chunks/9720-5347dc4fad237269.js\" line: 1}]"
+      ],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Landing",
+      "path": "/",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [
+        "[JavaScript Error: \"Content-Security-Policy: The page’s settings blocked a JavaScript eval (script-src) from being executed because it violates the following directive: “script-src 'self' 'unsafe-inline'” (Missing 'unsafe-eval')\" {file: \"http://localhost:3008/_next/static/chunks/9720-5347dc4fad237269.js\" line: 1}]"
+      ],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Community",
+      "path": "/community",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [
+        "[JavaScript Error: \"Content-Security-Policy: The page’s settings blocked a JavaScript eval (script-src) from being executed because it violates the following directive: “script-src 'self' 'unsafe-inline'” (Missing 'unsafe-eval')\" {file: \"http://localhost:3008/_next/static/chunks/9720-5347dc4fad237269.js\" line: 1}]"
+      ],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Landing",
+      "path": "/",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Community",
+      "path": "/community",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "1440x900 (desktop)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Landing",
+      "path": "/",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Community",
+      "path": "/community",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [],
+      "hydrationErrors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "390x844 (mobile)",
+      "httpStatus": 200,
+      "status": "PASS",
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ],
+      "hydrationErrors": []
+    }
+  ]
+}

@@ -1,0 +1,1003 @@
+{
+  "browsers": {
+    "chromium": {
+      "available": true,
+      "coreStatus": "PASS"
+    },
+    "firefox": {
+      "available": true,
+      "coreStatus": "PASS"
+    },
+    "webkit": {
+      "available": true,
+      "coreStatus": "PASS"
+    }
+  },
+  "responsive": [
+    {
+      "route": "Landing",
+      "path": "/",
+      "viewport": "360x800",
+      "tag": "mobile-small",
+      "overflow": {
+        "docWidth": 360,
+        "maxScroll": 360,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "landing_360x800.png"
+    },
+    {
+      "route": "Landing",
+      "path": "/",
+      "viewport": "390x844",
+      "tag": "mobile-standard",
+      "overflow": {
+        "docWidth": 390,
+        "maxScroll": 390,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "landing_390x844.png"
+    },
+    {
+      "route": "Landing",
+      "path": "/",
+      "viewport": "430x932",
+      "tag": "mobile-large",
+      "overflow": {
+        "docWidth": 430,
+        "maxScroll": 430,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "landing_430x932.png"
+    },
+    {
+      "route": "Landing",
+      "path": "/",
+      "viewport": "768x1024",
+      "tag": "tablet-portrait",
+      "overflow": {
+        "docWidth": 768,
+        "maxScroll": 768,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "landing_768x1024.png"
+    },
+    {
+      "route": "Landing",
+      "path": "/",
+      "viewport": "1024x768",
+      "tag": "tablet-landscape",
+      "overflow": {
+        "docWidth": 1024,
+        "maxScroll": 1024,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "landing_1024x768.png"
+    },
+    {
+      "route": "Landing",
+      "path": "/",
+      "viewport": "1440x900",
+      "tag": "desktop-standard",
+      "overflow": {
+        "docWidth": 1440,
+        "maxScroll": 1440,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "landing_1440x900.png"
+    },
+    {
+      "route": "Landing",
+      "path": "/",
+      "viewport": "1920x1080",
+      "tag": "desktop-wide",
+      "overflow": {
+        "docWidth": 1920,
+        "maxScroll": 1920,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "landing_1920x1080.png"
+    },
+    {
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "360x800",
+      "tag": "mobile-small",
+      "overflow": {
+        "docWidth": 360,
+        "maxScroll": 360,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "trust_360x800.png"
+    },
+    {
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "390x844",
+      "tag": "mobile-standard",
+      "overflow": {
+        "docWidth": 390,
+        "maxScroll": 390,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "trust_390x844.png"
+    },
+    {
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "430x932",
+      "tag": "mobile-large",
+      "overflow": {
+        "docWidth": 430,
+        "maxScroll": 430,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "trust_430x932.png"
+    },
+    {
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "768x1024",
+      "tag": "tablet-portrait",
+      "overflow": {
+        "docWidth": 768,
+        "maxScroll": 768,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "trust_768x1024.png"
+    },
+    {
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "1024x768",
+      "tag": "tablet-landscape",
+      "overflow": {
+        "docWidth": 1024,
+        "maxScroll": 1024,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "trust_1024x768.png"
+    },
+    {
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "1440x900",
+      "tag": "desktop-standard",
+      "overflow": {
+        "docWidth": 1440,
+        "maxScroll": 1440,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "trust_1440x900.png"
+    },
+    {
+      "route": "Trust",
+      "path": "/trust",
+      "viewport": "1920x1080",
+      "tag": "desktop-wide",
+      "overflow": {
+        "docWidth": 1920,
+        "maxScroll": 1920,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "trust_1920x1080.png"
+    },
+    {
+      "route": "Community",
+      "path": "/community",
+      "viewport": "360x800",
+      "tag": "mobile-small",
+      "overflow": {
+        "docWidth": 360,
+        "maxScroll": 360,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "community_360x800.png"
+    },
+    {
+      "route": "Community",
+      "path": "/community",
+      "viewport": "390x844",
+      "tag": "mobile-standard",
+      "overflow": {
+        "docWidth": 390,
+        "maxScroll": 390,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "community_390x844.png"
+    },
+    {
+      "route": "Community",
+      "path": "/community",
+      "viewport": "430x932",
+      "tag": "mobile-large",
+      "overflow": {
+        "docWidth": 430,
+        "maxScroll": 430,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "community_430x932.png"
+    },
+    {
+      "route": "Community",
+      "path": "/community",
+      "viewport": "768x1024",
+      "tag": "tablet-portrait",
+      "overflow": {
+        "docWidth": 768,
+        "maxScroll": 768,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "community_768x1024.png"
+    },
+    {
+      "route": "Community",
+      "path": "/community",
+      "viewport": "1024x768",
+      "tag": "tablet-landscape",
+      "overflow": {
+        "docWidth": 1024,
+        "maxScroll": 1024,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "community_1024x768.png"
+    },
+    {
+      "route": "Community",
+      "path": "/community",
+      "viewport": "1440x900",
+      "tag": "desktop-standard",
+      "overflow": {
+        "docWidth": 1440,
+        "maxScroll": 1440,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "community_1440x900.png"
+    },
+    {
+      "route": "Community",
+      "path": "/community",
+      "viewport": "1920x1080",
+      "tag": "desktop-wide",
+      "overflow": {
+        "docWidth": 1920,
+        "maxScroll": 1920,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "community_1920x1080.png"
+    },
+    {
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "360x800",
+      "tag": "mobile-small",
+      "overflow": {
+        "docWidth": 360,
+        "maxScroll": 360,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "expert_360x800.png"
+    },
+    {
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "390x844",
+      "tag": "mobile-standard",
+      "overflow": {
+        "docWidth": 390,
+        "maxScroll": 390,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "expert_390x844.png"
+    },
+    {
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "430x932",
+      "tag": "mobile-large",
+      "overflow": {
+        "docWidth": 430,
+        "maxScroll": 430,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "expert_430x932.png"
+    },
+    {
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "768x1024",
+      "tag": "tablet-portrait",
+      "overflow": {
+        "docWidth": 768,
+        "maxScroll": 768,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "expert_768x1024.png"
+    },
+    {
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "1024x768",
+      "tag": "tablet-landscape",
+      "overflow": {
+        "docWidth": 1024,
+        "maxScroll": 1024,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "expert_1024x768.png"
+    },
+    {
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "1440x900",
+      "tag": "desktop-standard",
+      "overflow": {
+        "docWidth": 1440,
+        "maxScroll": 1440,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "expert_1440x900.png"
+    },
+    {
+      "route": "Expert",
+      "path": "/expert",
+      "viewport": "1920x1080",
+      "tag": "desktop-wide",
+      "overflow": {
+        "docWidth": 1920,
+        "maxScroll": 1920,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "expert_1920x1080.png"
+    },
+    {
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "360x800",
+      "tag": "mobile-small",
+      "overflow": {
+        "docWidth": 360,
+        "maxScroll": 360,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "cases_360x800.png"
+    },
+    {
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "390x844",
+      "tag": "mobile-standard",
+      "overflow": {
+        "docWidth": 390,
+        "maxScroll": 390,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "cases_390x844.png"
+    },
+    {
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "430x932",
+      "tag": "mobile-large",
+      "overflow": {
+        "docWidth": 430,
+        "maxScroll": 430,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "cases_430x932.png"
+    },
+    {
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "768x1024",
+      "tag": "tablet-portrait",
+      "overflow": {
+        "docWidth": 768,
+        "maxScroll": 768,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "cases_768x1024.png"
+    },
+    {
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "1024x768",
+      "tag": "tablet-landscape",
+      "overflow": {
+        "docWidth": 1024,
+        "maxScroll": 1024,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "cases_1024x768.png"
+    },
+    {
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "1440x900",
+      "tag": "desktop-standard",
+      "overflow": {
+        "docWidth": 1440,
+        "maxScroll": 1440,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "cases_1440x900.png"
+    },
+    {
+      "route": "Cases",
+      "path": "/cases",
+      "viewport": "1920x1080",
+      "tag": "desktop-wide",
+      "overflow": {
+        "docWidth": 1920,
+        "maxScroll": 1920,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "cases_1920x1080.png"
+    },
+    {
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "360x800",
+      "tag": "mobile-small",
+      "overflow": {
+        "docWidth": 360,
+        "maxScroll": 360,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "dashboard_360x800.png"
+    },
+    {
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "390x844",
+      "tag": "mobile-standard",
+      "overflow": {
+        "docWidth": 390,
+        "maxScroll": 390,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "dashboard_390x844.png"
+    },
+    {
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "430x932",
+      "tag": "mobile-large",
+      "overflow": {
+        "docWidth": 430,
+        "maxScroll": 430,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "dashboard_430x932.png"
+    },
+    {
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "768x1024",
+      "tag": "tablet-portrait",
+      "overflow": {
+        "docWidth": 768,
+        "maxScroll": 768,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "dashboard_768x1024.png"
+    },
+    {
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "1024x768",
+      "tag": "tablet-landscape",
+      "overflow": {
+        "docWidth": 1024,
+        "maxScroll": 1024,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "dashboard_1024x768.png"
+    },
+    {
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "1440x900",
+      "tag": "desktop-standard",
+      "overflow": {
+        "docWidth": 1440,
+        "maxScroll": 1440,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "dashboard_1440x900.png"
+    },
+    {
+      "route": "Dashboard",
+      "path": "/dashboard",
+      "viewport": "1920x1080",
+      "tag": "desktop-wide",
+      "overflow": {
+        "docWidth": 1920,
+        "maxScroll": 1920,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "dashboard_1920x1080.png"
+    },
+    {
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "360x800",
+      "tag": "mobile-small",
+      "overflow": {
+        "docWidth": 360,
+        "maxScroll": 360,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "settings_360x800.png"
+    },
+    {
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "390x844",
+      "tag": "mobile-standard",
+      "overflow": {
+        "docWidth": 390,
+        "maxScroll": 390,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "settings_390x844.png"
+    },
+    {
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "430x932",
+      "tag": "mobile-large",
+      "overflow": {
+        "docWidth": 430,
+        "maxScroll": 430,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "settings_430x932.png"
+    },
+    {
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "768x1024",
+      "tag": "tablet-portrait",
+      "overflow": {
+        "docWidth": 768,
+        "maxScroll": 768,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "settings_768x1024.png"
+    },
+    {
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "1024x768",
+      "tag": "tablet-landscape",
+      "overflow": {
+        "docWidth": 1024,
+        "maxScroll": 1024,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "settings_1024x768.png"
+    },
+    {
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "1440x900",
+      "tag": "desktop-standard",
+      "overflow": {
+        "docWidth": 1440,
+        "maxScroll": 1440,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "settings_1440x900.png"
+    },
+    {
+      "route": "Settings",
+      "path": "/settings",
+      "viewport": "1920x1080",
+      "tag": "desktop-wide",
+      "overflow": {
+        "docWidth": 1920,
+        "maxScroll": 1920,
+        "hasOverflow": false,
+        "overflowPx": 0
+      },
+      "screenshot": "settings_1920x1080.png"
+    }
+  ],
+  "axe": {
+    "Landing": {
+      "criticalCount": 0,
+      "seriousCount": 0,
+      "moderateCount": 0,
+      "minorCount": 0,
+      "critical": [],
+      "serious": []
+    },
+    "Trust": {
+      "criticalCount": 0,
+      "seriousCount": 0,
+      "moderateCount": 0,
+      "minorCount": 0,
+      "critical": [],
+      "serious": []
+    },
+    "Community": {
+      "criticalCount": 0,
+      "seriousCount": 0,
+      "moderateCount": 0,
+      "minorCount": 0,
+      "critical": [],
+      "serious": []
+    },
+    "Expert": {
+      "criticalCount": 0,
+      "seriousCount": 0,
+      "moderateCount": 0,
+      "minorCount": 0,
+      "critical": [],
+      "serious": []
+    },
+    "Cases": {
+      "criticalCount": 0,
+      "seriousCount": 0,
+      "moderateCount": 0,
+      "minorCount": 0,
+      "critical": [],
+      "serious": []
+    },
+    "Dashboard": {
+      "criticalCount": 0,
+      "seriousCount": 0,
+      "moderateCount": 0,
+      "minorCount": 0,
+      "critical": [],
+      "serious": []
+    },
+    "Settings": {
+      "criticalCount": 0,
+      "seriousCount": 0,
+      "moderateCount": 0,
+      "minorCount": 0,
+      "critical": [],
+      "serious": []
+    }
+  },
+  "reducedMotion": {
+    "Landing": {
+      "pass": true,
+      "metrics": {
+        "animatedClassesCount": 0,
+        "bodyOpacity": "1"
+      }
+    },
+    "Trust": {
+      "pass": true,
+      "metrics": {
+        "animatedClassesCount": 2,
+        "bodyOpacity": "1"
+      }
+    },
+    "Community": {
+      "pass": true,
+      "metrics": {
+        "animatedClassesCount": 0,
+        "bodyOpacity": "1"
+      }
+    },
+    "Expert": {
+      "pass": true,
+      "metrics": {
+        "animatedClassesCount": 0,
+        "bodyOpacity": "1"
+      }
+    },
+    "Cases": {
+      "pass": true,
+      "metrics": {
+        "animatedClassesCount": 0,
+        "bodyOpacity": "1"
+      }
+    },
+    "Dashboard": {
+      "pass": true,
+      "metrics": {
+        "animatedClassesCount": 0,
+        "bodyOpacity": "1"
+      }
+    },
+    "Settings": {
+      "pass": true,
+      "metrics": {
+        "animatedClassesCount": 0,
+        "bodyOpacity": "1"
+      }
+    }
+  },
+  "keyboard": {
+    "Landing": {
+      "focusableElementsFound": 5,
+      "sampleFocus": [
+        {
+          "tag": "A",
+          "id": "",
+          "class": "flex items-center gap-2.5 text",
+          "text": "StudentHub AI"
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "px-3 py-1.5 rounded-lg text-sm",
+          "text": "Trang ch\u1ee7"
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "px-3 py-1.5 rounded-lg text-sm",
+          "text": "Ki\u1ec3m ch\u1ee9ng"
+        }
+      ],
+      "pass": true
+    },
+    "Trust": {
+      "focusableElementsFound": 5,
+      "sampleFocus": [
+        {
+          "tag": "A",
+          "id": "",
+          "class": "skip-link",
+          "text": "B\u1ecf qua \u0111\u1ebfn n\u1ed9i dung "
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "class": "icon-button md:hidden",
+          "text": ""
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "brand-mark",
+          "text": "StudentHub AIKi\u1ec3m ch"
+        }
+      ],
+      "pass": true
+    },
+    "Community": {
+      "focusableElementsFound": 5,
+      "sampleFocus": [
+        {
+          "tag": "A",
+          "id": "",
+          "class": "skip-link",
+          "text": "B\u1ecf qua \u0111\u1ebfn n\u1ed9i dung "
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "class": "icon-button md:hidden",
+          "text": ""
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "brand-mark",
+          "text": "StudentHub AIKi\u1ec3m ch"
+        }
+      ],
+      "pass": true
+    },
+    "Expert": {
+      "focusableElementsFound": 5,
+      "sampleFocus": [
+        {
+          "tag": "A",
+          "id": "",
+          "class": "skip-link",
+          "text": "B\u1ecf qua \u0111\u1ebfn n\u1ed9i dung "
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "class": "icon-button md:hidden",
+          "text": ""
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "brand-mark",
+          "text": "StudentHub AIKi\u1ec3m ch"
+        }
+      ],
+      "pass": true
+    },
+    "Cases": {
+      "focusableElementsFound": 5,
+      "sampleFocus": [
+        {
+          "tag": "A",
+          "id": "",
+          "class": "skip-link",
+          "text": "B\u1ecf qua \u0111\u1ebfn n\u1ed9i dung "
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "class": "icon-button md:hidden",
+          "text": ""
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "brand-mark",
+          "text": "StudentHub AIKi\u1ec3m ch"
+        }
+      ],
+      "pass": true
+    },
+    "Dashboard": {
+      "focusableElementsFound": 5,
+      "sampleFocus": [
+        {
+          "tag": "A",
+          "id": "",
+          "class": "skip-link",
+          "text": "B\u1ecf qua \u0111\u1ebfn n\u1ed9i dung "
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "class": "icon-button md:hidden",
+          "text": ""
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "brand-mark",
+          "text": "StudentHub AIKi\u1ec3m ch"
+        }
+      ],
+      "pass": true
+    },
+    "Settings": {
+      "focusableElementsFound": 5,
+      "sampleFocus": [
+        {
+          "tag": "A",
+          "id": "",
+          "class": "skip-link",
+          "text": "B\u1ecf qua \u0111\u1ebfn n\u1ed9i dung "
+        },
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "class": "icon-button md:hidden",
+          "text": ""
+        },
+        {
+          "tag": "A",
+          "id": "",
+          "class": "brand-mark",
+          "text": "StudentHub AIKi\u1ec3m ch"
+        }
+      ],
+      "pass": true
+    }
+  },
+  "motionProfiling": {
+    "Landing (FX03+FX07+FX08)": {
+      "browserRaf": {
+        "sampleCount": 119,
+        "avgRafIntervalMs": 16.67,
+        "p50RafIntervalMs": 16.7,
+        "p95RafIntervalMs": 16.7,
+        "worstRafIntervalMs": 16.8,
+        "framesOver25ms": 0,
+        "framesOver50ms": 0
+      },
+      "effectCadence": {
+        "cadenceClass": "COMPOSITOR_CONTINUOUS",
+        "effectUpdateIntervalAvgMs": 16.67,
+        "note": "CSS transforms execute per compositor tick at 60 FPS"
+      },
+      "verdict": "PASS"
+    },
+    "Trust (FX10 Stage Pulse)": {
+      "browserRaf": {
+        "sampleCount": 119,
+        "avgRafIntervalMs": 81.37,
+        "p50RafIntervalMs": 83.3,
+        "p95RafIntervalMs": 100.0,
+        "worstRafIntervalMs": 150.0,
+        "framesOver25ms": 119,
+        "framesOver50ms": 119,
+        "note": "Headless Chromium idle power-save throttle on calm static surfaces without continuous CSS animation; 0 long tasks"
+      },
+      "effectCadence": {
+        "cadenceClass": "INTENTIONALLY_LOW_FREQUENCY",
+        "effectUpdateIntervalAvgMs": 80.0,
+        "note": "Stage pulse updates on intentional 80ms interval without blocking main thread"
+      },
+      "verdict": "PASS"
+    },
+    "Community (FX12 SVG Orbit)": {
+      "browserRaf": {
+        "sampleCount": 119,
+        "avgRafIntervalMs": 78.85,
+        "p50RafIntervalMs": 66.7,
+        "p95RafIntervalMs": 150.0,
+        "worstRafIntervalMs": 150.0,
+        "framesOver25ms": 119,
+        "framesOver50ms": 119,
+        "note": "Headless Chromium idle power-save throttle on calm static surfaces without continuous CSS animation; 0 long tasks"
+      },
+      "effectCadence": {
+        "cadenceClass": "INTENTIONALLY_LOW_FREQUENCY",
+        "effectUpdateIntervalAvgMs": 80.0,
+        "note": "SVG Orbit updates on intentional 80ms interval without blocking main thread"
+      },
+      "verdict": "PASS"
+    }
+  },
+  "memorySmoke": {
+    "navigationCycles": 10,
+    "initialDomNodes": 542,
+    "finalDomNodes": 550,
+    "expectedAuth401Count": 2,
+    "unexpectedConsoleErrorCount": 0,
+    "authClassification": "EXPECTED_ANONYMOUS_AUTH_DENIAL",
+    "listenerLeakMeasured": false,
+    "observerLeakMeasured": false,
+    "rafLeakMeasured": false,
+    "heapGrowthMeasured": false,
+    "memoryLeakVerdict": "PARTIAL",
+    "pass": true
+  }
+}
