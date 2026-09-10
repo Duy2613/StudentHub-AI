@@ -8291,6 +8291,54 @@ body {
   z-index: 2;
 }
 
+.vnext-media-frame {
+  margin: var(--space-8) 0 0;
+}
+
+.vnext-media-frame-shell {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  min-height: 16rem;
+  overflow: hidden;
+  border: 1px solid var(--decoration-border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-instrument);
+  box-shadow: var(--shadow-instrument);
+}
+
+.vnext-media-frame-shell .verified-poster {
+  position: absolute;
+  inset: 0;
+}
+
+.vnext-media-frame-shell .verified-poster-image {
+  filter: saturate(.68) contrast(.98);
+}
+
+.vnext-media-frame-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 32%, rgba(169, 203, 230, .12) 48%, transparent 62%);
+  opacity: .5;
+  pointer-events: none;
+}
+
+.vnext-media-frame-caption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) 0 0;
+  color: var(--text-muted-readable);
+  font-family: var(--font-technical);
+  font-size: var(--type-technical);
+  letter-spacing: .04em;
+}
+
+.vnext-media-frame-caption .type-technical {
+  color: var(--brand);
+}
+
 .app-shell[data-reference-route="personal"] .app-main {
   background: linear-gradient(180deg, rgba(238, 232, 219, .055), transparent 28rem);
 }
@@ -8307,6 +8355,10 @@ body {
 
   .reference-atmosphere[data-reference-route="landing"] .reference-atmosphere-khai-image {
     opacity: .02;
+  }
+
+  .vnext-media-frame-shell {
+    min-height: 12rem;
   }
 }
 
