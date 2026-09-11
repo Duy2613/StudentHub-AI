@@ -1,0 +1,56 @@
+﻿{
+  "matrixVersion": "phase-f-2026-09-11",
+  "authAuthority": "SUPABASE_OIDC",
+  "applicationSessionType": "HTTPONLY_DURABLE_COOKIE",
+  "cookieName": "studenthub_session",
+  "idleTimeoutMinutes": 30,
+  "absoluteMaxLifetimeHours": 24,
+  "storagePolicy": {
+    "localStorage": "ZERO_CREDENTIALS_ALLOWED",
+    "sessionStorage": "ZERO_CREDENTIALS_ALLOWED",
+    "pageMemoryOnly": true
+  },
+  "capabilities": {
+    "emailPassword": {
+      "state": "READY",
+      "verification": "LOCAL_LOOPBACK_VERIFIED",
+      "features": [
+        "SIGNUP_WITH_CONFIRMATION",
+        "PASSWORD_LOGIN",
+        "UPSTREAM_SESSION_EXCHANGE",
+        "DURABLE_POSTGRES_SESSION",
+        "PASSWORD_RECOVERY_EMAIL",
+        "PASSWORD_RESET_WITH_SESSION_REVOCATION"
+      ]
+    },
+    "googleOAuth": {
+      "state": "EXTERNAL_CONFIG_REQUIRED",
+      "serverAttestation": "DASHBOARD_PROVIDER_DISABLED",
+      "leastPrivilege": true,
+      "operatorActionRequired": [
+        "Configure Google Cloud Console OAuth 2.0 Client ID",
+        "Add Authorized Redirect URI: https://<project-ref>.supabase.co/auth/v1/callback",
+        "Enable Google Provider in Supabase Dashboard -> Authentication -> Providers",
+        "Set NEXT_PUBLIC_SUPABASE_GOOGLE_AUTH=true and NEXT_PUBLIC_SUPABASE_GOOGLE_AUTH_VERIFIED=true"
+      ]
+    },
+    "githubOAuth": {
+      "state": "EXTERNAL_CONFIG_REQUIRED",
+      "serverAttestation": "DASHBOARD_PROVIDER_DISABLED",
+      "leastPrivilegeScopes": "read:user user:email",
+      "repoScopeRemoved": true,
+      "operatorActionRequired": [
+        "Create GitHub OAuth App with Authorization callback URL: https://<project-ref>.supabase.co/auth/v1/callback",
+        "Configure Client ID and Secret in Supabase Dashboard -> Authentication -> Providers -> GitHub",
+        "Set NEXT_PUBLIC_SUPABASE_GITHUB_AUTH=true"
+      ]
+    }
+  },
+  "sessionRevocationOnPasswordReset": {
+    "implemented": true,
+    "target": "private.server_sessions",
+    "action": "REVOKE_ALL_FOR_USER",
+    "reason": "PASSWORD_RESET",
+    "verifiedByContractTest": "frontend/tests/auth/password_recovery_contract.test.mjs"
+  }
+}

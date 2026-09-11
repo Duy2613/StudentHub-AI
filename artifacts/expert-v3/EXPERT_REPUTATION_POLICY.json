@@ -1,0 +1,29 @@
+﻿{
+  "policyVersion": "expert-quality-v3",
+  "sourceOfTruth": "private.expert_quality_events",
+  "sufficiencyThreshold": {
+    "minSample": 20,
+    "unitDefinition": "INDEPENDENT_ADJUDICATED_CASE_OR_INCIDENT_CLUSTER",
+    "rationale": "Preserves statistical significance against noise and collusion; 5 units is insufficient for high-stakes academic claims."
+  },
+  "scoringFormula": {
+    "algorithm": "BAYESIAN_LAPLACE_BETA_ESTIMATE",
+    "priorAlpha": 2,
+    "priorBeta": 2,
+    "formula": "(alpha + positiveWeight) / (alpha + beta + totalWeight)",
+    "range": [0.0, 1.0]
+  },
+  "antiGamingMeasures": {
+    "idempotencyDeduplication": "Unique idempotency_key prevents re-submission pumps",
+    "clusterScaling": "Correlated claims from one incident cluster scale to 1 aggregate unit",
+    "selfReviewBan": "Evaluators cannot review their own submissions (SELF_REVIEW_FORBIDDEN)",
+    "blindAdjudication": "Initial expert assessments are blind to other evaluators"
+  },
+  "starProjections": {
+    "1": { "minScore": 0.0, "requiresSufficient": false, "label": "Khởi đầu / Tập mẫu tạm" },
+    "2": { "minScore": 0.50, "requiresSufficient": true, "label": "Chuyên môn cơ sở" },
+    "3": { "minScore": 0.70, "requiresSufficient": true, "label": "Độ tin cậy vững" },
+    "4": { "minScore": 0.85, "requiresSufficient": true, "label": "Chuyên gia ưu tú" },
+    "5": { "minScore": 0.95, "requiresSufficient": true, "label": "Thẩm định xuất sắc" }
+  }
+}

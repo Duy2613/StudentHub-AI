@@ -80,6 +80,22 @@ export class DurableSessionService {
     return revoked;
   }
 
+  async revokeAllSessions(userId, reason = "PASSWORD_RESET", exceptSecret = null) {
+    if (!userId) return 0;
+    const exceptTokenHash = exceptSecret ? this.hashSecret(exceptSecret) : null;
+    const count = await this.repository.revokeAllForUser(userId, exceptTokenHash, reason);
+    if (this.repository.appendAudit) {
+      await this.repository.appendAudit({
+        eventType: "SESSION_REVOKED_ALL",
+        actorId: userId,
+        targetType: "SESSION",
+        targetId: userId,
+        metadata: { reason, revokedCount: count },
+      });
+    }
+    return count;
+  }
+
   serializeCookie(secret, expiresAt, { secure = process.env.NODE_ENV === "production" } = {}) {
     const parts = [
       `${SESSION_COOKIE_NAME}=${encodeURIComponent(secret)}`,

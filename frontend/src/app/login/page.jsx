@@ -10,7 +10,7 @@
 
 import React, { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Sparkles, GraduationCap, Star } from "lucide-react";
+import { Mail, Sparkles, GraduationCap, Star, CheckCircle2 } from "lucide-react";
 import {
   AuthCard,
   InputField,
@@ -42,11 +42,15 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   // Kiểm tra lỗi truyền từ OAuth callback hoặc redirect
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
+      if (params.get("reset") === "success") {
+        setResetSuccess(true);
+      }
       const urlError = params.get("error");
       if (urlError === "auth_misconfigured") {
         setError(capabilities.emailPasswordMessage);
@@ -182,18 +186,30 @@ const LoginPage = () => {
           disabled={isAnyLoading}
         />
 
-        {/* Remember Me Checkbox */}
-        <div className="py-0.5">
+        {/* Remember Me Checkbox & Forgot Password Link */}
+        <div className="flex items-center justify-between py-0.5">
           <CheckboxField
             id="rememberMe"
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
             label="Ghi nhớ đăng nhập"
-            helperText={rememberMe ? "Lưu lâu dài" : "Xóa khi tắt tab"}
+            helperText={rememberMe ? "Duy trì tối đa 24 giờ" : "Xóa khi tắt tab hoặc sau 30 phút"}
             disabled={isAnyLoading}
           />
+          <a
+            href="/forgot-password"
+            className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors hover:underline whitespace-nowrap ml-2"
+          >
+            Quên mật khẩu?
+          </a>
         </div>
 
+        {resetSuccess && (
+          <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2.5">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>Mật khẩu đã được đặt lại thành công! Mọi phiên đăng nhập cũ đã được thu hồi an toàn. Vui lòng đăng nhập lại bằng mật khẩu mới.</span>
+          </div>
+        )}
         <ErrorMessage message={error} />
         <div className="pt-2">
           <Button type="submit" isLoading={isLoading} disabled={isOAuthLoading}>

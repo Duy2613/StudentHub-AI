@@ -1,0 +1,52 @@
+﻿{
+  "matrixVersion": "expert-trust-network-v3",
+  "invariants": {
+    "expertNotEqualTrustVerdict": true,
+    "starsNotEqualTruth": true,
+    "communityVotesDoNotAlterTrust": true,
+    "moderationDoesNotAlterTrust": true
+  },
+  "authorityTable": "private.expert_verifications",
+  "reputationSourceOfTruth": "private.expert_quality_events",
+  "derivedProjectionTable": "public.expert_progression_projections",
+  "rolesAndCapabilities": {
+    "STUDENT": {
+      "submitCommunityObservation": true,
+      "castCommunityPerceptionVote": true,
+      "submitContentAppeal": true,
+      "submitExpertAssessment": false,
+      "voteOnModeration": false
+    },
+    "TRAINEE_EXPERT": {
+      "submitPracticeReview": true,
+      "castCommunityPerceptionVote": true,
+      "submitAuthoritativeAssessment": false,
+      "voteOnModeration": false
+    },
+    "DOMAIN_VERIFIED_EXPERT": {
+      "assignedCaseAssessment": true,
+      "domainScopedAdjudication": true,
+      "serverDerivedExpertPerceptionFlag": true,
+      "voteOnModeration": false
+    },
+    "COORDINATOR_MODERATOR": {
+      "reviewAppeals": true,
+      "communityModerationVoting": true,
+      "resolveModerationCases": true,
+      "mutateTrustVerdict": false
+    },
+    "ADMIN": {
+      "manageRoles": true,
+      "systemAudit": true,
+      "mutateTrustVerdictDirectly": false
+    }
+  },
+  "starProjectionRules": {
+    "star1": "INSUFFICIENT_DATA or score < 0.50",
+    "star2": "SUFFICIENT (>= 20 units) and score >= 0.50",
+    "star3": "SUFFICIENT (>= 20 units) and score >= 0.70",
+    "star4": "SUFFICIENT (>= 20 units) and score >= 0.85",
+    "star5": "SUFFICIENT (>= 20 units) and score >= 0.95",
+    "authorityGrant": "NONE (Purely display projection)"
+  }
+}

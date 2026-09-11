@@ -716,7 +716,7 @@ export async function signInWithGitHub() {
       provider: "github",
       options: {
         redirectTo: `${origin}/callback`,
-        scopes: "read:user user:email repo",
+        scopes: "read:user user:email",
       },
     });
 
@@ -735,6 +735,75 @@ export async function signInWithGitHub() {
 /**
  * Đăng xuất an toàn toàn bộ phiên
  */
+/**
+ * Yêu cầu gửi email đặt lại mật khẩu
+ */
+export async function resetPasswordForEmail(email, redirectTo = null) {
+  const cleanEmail = (email || "").trim();
+  logAuthInfo("resetPasswordForEmail", `Gửi yêu cầu đặt lại mật khẩu cho: ${cleanEmail}`);
+  try {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const redirectTarget = redirectTo || `${origin}/reset-password`;
+    const { data, error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
+      redirectTo: redirectTarget,
+    });
+
+    if (error) {
+      logAuthError("resetPasswordForEmail", error);
+      throw new Error(translateAuthError(error));
+    }
+
+    logAuthInfo("resetPasswordForEmail", "Gửi email đặt lại mật khẩu thành công.");
+    return data;
+  } catch (error) {
+    logAuthError("resetPasswordForEmail", error);
+    throw error;
+  }
+}
+
+/**
+ * Cập nhật mật khẩu mới và thu hồi toàn bộ phiên đăng nhập cũ
+ */
+export async function updateUserPassword(newPassword) {
+  logAuthInfo("updateUserPassword", "Cập nhật mật khẩu mới và thu hồi các phiên làm việc hiện có.");
+  try {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      logAuthError("updateUserPassword", error);
+      throw new Error(translateAuthError(error));
+    }
+
+    // Thu hồi toàn bộ session bền vững của StudentHub trên server
+    try {
+      const token = data?.session?.access_token || getStoredToken();
+      const headers = { "Content-Type": "application/json" };
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      await fetch(`${API_BASE}/api/auth/session/revoke-all`, {
+        method: "POST",
+        credentials: "include",
+        headers,
+        body: JSON.stringify({ reason: "PASSWORD_RESET" }),
+      });
+    } catch (revokeErr) {
+      logAuthError("updateUserPassword:revokeAllSessions", revokeErr);
+    }
+
+    // Xóa session client hiện tại để bắt buộc đăng nhập lại
+    await signOutSupabase();
+
+    logAuthInfo("updateUserPassword", "Mật khẩu đã được cập nhật thành công và các phiên cũ đã bị thu hồi.");
+    return data;
+  } catch (error) {
+    logAuthError("updateUserPassword", error);
+    throw error;
+  }
+}
+
 export async function signOutSupabase() {
   logAuthInfo("signOutSupabase", "Bắt đầu đăng xuất và xóa phiên.");
   try {

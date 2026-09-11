@@ -1,0 +1,52 @@
+﻿{
+  "testRunTimestamp": "2026-09-11T12:46:08Z",
+  "summary": {
+    "totalSuites": 10,
+    "totalTests": 38,
+    "passed": 38,
+    "failed": 0,
+    "durationMs": 175.57
+  },
+  "verifiedHardContracts": {
+    "passwordRecoveryRevokesDurableSessions": {
+      "verified": true,
+      "testFile": "frontend/tests/auth/password_recovery_contract.test.mjs",
+      "proof": "Calling revokeAllSessions on password reset invalidates all active sessions for that user across all devices; subsequent session validation throws SESSION_REVOKED (401)."
+    },
+    "githubOAuthLeastPrivilege": {
+      "verified": true,
+      "testFile": "frontend/tests/auth/password_recovery_contract.test.mjs",
+      "proof": "GitHub OAuth scopes strictly limited to 'read:user user:email'; 'repo' scope is completely absent."
+    },
+    "oneHundredBelieveVotesDoNotAlterTrustVerdict": {
+      "verified": true,
+      "testFile": "frontend/tests/expert_v3/community_perception_trust_boundary.test.mjs",
+      "proof": "100 BELIEVE votes recorded across 100 students on case-alpha-001 produced 0 mutations to trust verdict ('UNVERIFIED' -> 'UNVERIFIED'), 0 mutations to confidence (0.15 -> 0.15), and 0 mutations to status."
+    },
+    "fiveStarStatusDoesNotGrantAuthority": {
+      "verified": true,
+      "testFile": "frontend/tests/expert_v3/star_authority_prohibition.test.mjs",
+      "proof": "canSubmitAssessment explicitly rejects a user holding 5-star projection if they do not possess a verified qualification domain in private.expert_verifications (DOMAIN_NOT_VERIFIED)."
+    },
+    "sufficiencyThresholdPreservesTwentyUnits": {
+      "verified": true,
+      "testFile": "frontend/tests/expert_v3/star_authority_prohibition.test.mjs",
+      "proof": "5 quality events produced INSUFFICIENT_DATA and 1 star. 19 quality events produced INSUFFICIENT_DATA and 1 star. 20 events unlocked SUFFICIENT state and higher star projections."
+    },
+    "expertQualityEventsIsSoleSourceOfTruth": {
+      "verified": true,
+      "testFile": "frontend/tests/expert_v3/star_authority_prohibition.test.mjs",
+      "proof": "Stars are calculated dynamically from private.expert_quality_events; no direct projection write can synthesize or backfill qualification records."
+    },
+    "moderationDecisionsDoNotAlterTrustVerdict": {
+      "verified": true,
+      "testFile": "frontend/tests/expert_v3/moderation_workflow_security.test.mjs",
+      "proof": "Resolving a community report with REMOVE_FROM_PUBLIC_PROJECTION soft-moderates the community contribution while the underlying Trust Case verdict ('SUPPORTED', 0.92) remains 100% untouched."
+    },
+    "moderationScopedToCommunityContentOnly": {
+      "verified": true,
+      "testFile": "frontend/tests/expert_v3/moderation_workflow_security.test.mjs",
+      "proof": "Attempting to create a moderation case targeting a TRUST_CASE throws MODERATION_TARGET_DISALLOWED exception."
+    }
+  }
+}

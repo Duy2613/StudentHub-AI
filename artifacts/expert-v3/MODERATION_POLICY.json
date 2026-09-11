@@ -1,0 +1,34 @@
+﻿{
+  "policyVersion": "community-moderation-v1",
+  "scope": {
+    "allowedTargets": [
+      "COMMUNITY_CONTRIBUTION",
+      "COMMUNITY_REACTION",
+      "COMMUNITY_PROFILE"
+    ],
+    "strictlyProhibitedTargets": [
+      "TRUST_CASE",
+      "TRUST_RUN",
+      "CLAIM",
+      "EXPERT_ASSESSMENT"
+    ],
+    "enforcement": "REJECT_WITH_EXCEPTION_IF_PROHIBITED"
+  },
+  "nonDestructiveRemediation": {
+    "databasePolicy": "NO_HARD_DELETES",
+    "softRemoval": "UPDATE publication_state = 'MODERATED' to exclude from public views",
+    "auditTrail": "All actions append to private.moderation_events"
+  },
+  "actions": {
+    "KEEP": "Content is compliant, retains standard visibility",
+    "LIMIT": "Content restricted in algorithmic distribution and discovery",
+    "REMOVE_FROM_PUBLIC_PROJECTION": "Hidden from public feeds, preserved for appeals and audit",
+    "ESCALATE": "Elevated to academic coordinator for complex institutional disputes"
+  },
+  "privacyAndTransparency": {
+    "moderatorIdentity": "PRIVATE_TO_SYSTEM",
+    "caseReports": "PRIVATE_TO_MODERATION_PANEL",
+    "appealSubmissions": "OWNER_VISIBLE_ONLY",
+    "appealOutcome": "TRANSPARENT_TO_APPELLANT_WITH_EXPLANATION"
+  }
+}
