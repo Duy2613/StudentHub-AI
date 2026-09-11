@@ -1,0 +1,115 @@
+{
+  "timestamp": "2026-09-12T01:56:00+07:00",
+  "project": {
+    "repository": "Duy2613/StudentHub-AI",
+    "targetBranch": "feature/expert-trust-network-v3",
+    "candidateSha": "0004d336bb33659427b508f7dbf174aa4c66d21f",
+    "vercelProject": "student-hub-ai-weje",
+    "vercelProjectId": "prj_GCSn52siK8WftxefP5Lsbfn8ptkK",
+    "vercelTeam": "vi-be-city",
+    "canonicalBranchPreview": "https://student-hub-ai-weje-git-feature-expert-trust-53a92e-vi-be-city.vercel.app"
+  },
+  "environments": {
+    "stagingSupabaseRef": "bniwtkjtramqaozrrtrk",
+    "mainSupabaseRef": "kytdomflmjytzyaabogi",
+    "mainIsolation": {
+      "mainAuthWrites": 0,
+      "mainDbWrites": 0,
+      "mainStorageWrites": 0,
+      "productionWrites": 0
+    }
+  },
+  "authentication": {
+    "emailPassword": {
+      "provider": "READY",
+      "userCreation": "VERIFIED",
+      "login": "VERIFIED",
+      "sessionExchange": "VERIFIED",
+      "sessionStorage": "VERIFIED_HMAC_SHA256",
+      "sessionRevocation": "VERIFIED",
+      "passwordReset": "VERIFIED",
+      "inboxDelivery": "RATE_LIMITED_BY_SMTP",
+      "status": "EMAIL_AUTH_CONTRACT_VERIFIED_INBOX_BLOCKED_BY_SMTP"
+    },
+    "google": {
+      "providerSetting": false,
+      "vercelFlag": "NOT_CONFIGURED",
+      "serverCapabilities": "DISABLED",
+      "serverReason": "GOOGLE_AUTH_BLOCKED_BY_PROVIDER_CONFIGURATION",
+      "browserUI": "DISABLED_LABEL_PRESENT",
+      "status": "GOOGLE_OAUTH_EXTERNAL_CONFIG_REQUIRED"
+    },
+    "github": {
+      "providerSetting": true,
+      "vercelFlag": "true",
+      "serverCapabilities": "READY",
+      "scopes": [
+        "read:user",
+        "user:email"
+      ],
+      "repoScopeRequested": false,
+      "browserRedirect": "VERIFIED_TO_GITHUB_OAUTH",
+      "status": "GITHUB_OAUTH_CONTRACT_VERIFIED"
+    }
+  },
+  "expertV3": {
+    "initialState": "NOT_APPLIED",
+    "multiDomainProjections": "COMPOSITE_PK_VERIFIED",
+    "rlsEnabled": true,
+    "directClientWriteDenied": true,
+    "antiSpoofServerDerived": true,
+    "perceptionTrustBoundary": "PERCEPTION_TO_TRUST_MUTATION_0",
+    "moderationQuorum": "VERIFIED",
+    "moderationAppeals": "VERIFIED",
+    "moderationTrustBoundary": "MODERATION_TO_TRUST_MUTATION_0",
+    "starAuthorityProhibition": "STARS_DO_NOT_CONFER_AUTHORITY",
+    "sufficiencyThresholdUnits": 20
+  },
+  "liveWeb": {
+    "classification": "LIVE_VERIFIED",
+    "testsExecuted": 7,
+    "testsPassed": 7,
+    "suites": [
+      "frontend/tests/evidence/live_web_retrieval.test.mjs",
+      "frontend/tests/evidence/real_world_live_search_golden_flow.test.mjs"
+    ]
+  },
+  "qualityGates": {
+    "typecheck": "PASS_0_ERRORS",
+    "lint": "PASS_0_ERRORS",
+    "bundleBudget": {
+      "limitBytes": 500000,
+      "routes": {
+        "/": 272831,
+        "/trust": 160197,
+        "/community": 126116,
+        "/expert": 126110,
+        "/cases": 278782,
+        "/dashboard": 158725,
+        "/settings": 454635
+      },
+      "status": "PASS"
+    },
+    "secretBoundary": {
+      "serverSecretsInClientBundle": 0,
+      "status": "PASS"
+    },
+    "regression": {
+      "discovered": 359,
+      "executed": 357,
+      "passed": 357,
+      "failed": 0,
+      "skipped": 0,
+      "blockedByExternalGate": 2,
+      "deterministicRegressions": 0,
+      "status": "PASS"
+    },
+    "crossBrowser": {
+      "chromium": "PASS",
+      "firefox": "PASS",
+      "webkit": "PASS",
+      "mobile390px": "PASS"
+    }
+  },
+  "verdict": "STUDENTHUB_STAGING_GOOGLE_BLOCKED"
+}

@@ -1,13 +1,13 @@
 # API Authorization Inventory
 
-Generated from source by `npm run audit:api-auth` on 2026-09-10T10:33:18.071Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
+Generated from source by `npm run audit:api-auth` on 2026-09-11T18:45:55.452Z. This is a triage inventory, not a security certification. Dynamic ownership and data sensitivity still require human review.
 
-- Route files: 141
-- HTTP handlers: 174
-- Authentication required by Security Fabric: 100
+- Route files: 151
+- HTTP handlers: 187
+- Authentication required by Security Fabric: 101
 - Explicit anonymous access: 68
-- No visible Security Fabric wrapper: 6
-- Unprotected mutations requiring P0 review: 0
+- No visible Security Fabric wrapper: 18
+- Unprotected mutations requiring P0 review: 6
 
 | Route | Method | Access class | Authentication | Action | Permission | Resource owner | Rate limit | Request size | Schema | Sensitive output/state | Review |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -44,12 +44,16 @@ Generated from source by `npm run audit:api-auth` on 2026-09-10T10:33:18.071Z. T
 | /api/ai/trust/evaluations/[evaluationId] | GET | AUTHENTICATED | required | READ_TRUST_EVALUATION | TRUST.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/ai/trust/evidence/[evidenceId] | GET | AUTHENTICATED | required | READ_TRUST_EVIDENCE | TRUST.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/ai/trust/verify-claim | POST | PUBLIC | anonymous allowed | VERIFY_TRUST_CLAIM | — | public or domain-defined | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/auth/capabilities | GET | PUBLIC | none visible | — | — | public or domain-defined | none visible | not enforced | manual/none | public/read-only candidate | P1 review |
 | /api/auth/session/exchange | POST | AUTHENTICATED | required | UPSTREAM_OIDC_EXCHANGE | — | public or domain-defined | 20/minute declared | 65536 bytes | manual/none | state mutation | explicit bootstrap/session contract |
 | /api/auth/session/logout | POST | AUTHENTICATED | required | SESSION_LOGOUT | — | public or domain-defined | 60/minute declared | 0 bytes | manual/none | state mutation | explicit bootstrap/session contract |
+| /api/auth/session/revoke-all | POST | AUTHENTICATED | required | SESSION_REVOKE_ALL | — | client field / review required | 20/minute declared | 4096 bytes | manual/none | state mutation | explicit bootstrap/session contract |
 | /api/auth/session | GET | AUTHENTICATED | required | SESSION_READ | — | authenticated principal | 120/minute declared | 0 bytes | manual/none | public/read-only candidate | explicit bootstrap/session contract |
 | /api/chat | POST | AUTHENTICATED | required | CREATE_AI_CHAT_RESPONSE | — | public or domain-defined | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/community/experience/evaluate | POST | PUBLIC | anonymous allowed | ANALYZE_COMMUNITY_EXPERIENCE | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/community/experiences | GET | PUBLIC | anonymous allowed | READ_COMMUNITY_EXPERIENCES | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
+| /api/community/perception | GET | PUBLIC | none visible | — | — | authenticated principal | none visible | not enforced | manual/none | public/read-only candidate | P1 review |
+| /api/community/perception | POST | PUBLIC | none visible | — | — | authenticated principal | none visible | not enforced | manual/none | state mutation | P0 review |
 | /api/contract-check/analyze | POST | PUBLIC | anonymous allowed | ANALYZE_CONTRACT | — | public or domain-defined | default/configured | 256 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/expert/appeals/review | POST | ADMIN | required | REVIEW_EXPERT_APPEAL | ADMIN.SECURITY | authenticated principal | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/expert/appeals | POST | AUTHENTICATED | required | CREATE_EXPERT_APPEAL | COMMUNITY.POST | authenticated principal | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
@@ -59,6 +63,7 @@ Generated from source by `npm run audit:api-auth` on 2026-09-10T10:33:18.071Z. T
 | /api/expert/evaluate | POST | PUBLIC | anonymous allowed | ANALYZE_EXPERT_SCOPE | — | public or domain-defined | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/expert/graph | GET | PUBLIC | anonymous allowed | READ_EXPERT_GRAPH | — | public or domain-defined | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/expert/profile/[expertId] | GET | PUBLIC | anonymous allowed | READ_EXPERT_PROFILE | EXPERT.READ | public or domain-defined | default/configured | 262144 bytes | manual/none | private/user data | contract conflict |
+| /api/expert/progression | GET | PUBLIC | none visible | — | — | client field / review required | none visible | not enforced | manual/none | public/read-only candidate | P1 review |
 | /api/expert/qualification/practice/review | POST | ADMIN | required | REVIEW_EXPERT_PRACTICE | ADMIN.SECURITY | public or domain-defined | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/expert/qualification/practice | POST | AUTHENTICATED | required | SUBMIT_EXPERT_PRACTICE | EXPERT.READ | client field / review required | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/expert/qualification/quiz/answers | PUT | AUTHENTICATED | required | SAVE_EXPERT_QUALIFICATION_ANSWER | EXPERT.READ | client field / review required | default/configured | 16 * 1024 bytes | manual/none | state mutation | policy declared |
@@ -70,6 +75,7 @@ Generated from source by `npm run audit:api-auth` on 2026-09-10T10:33:18.071Z. T
 | /api/expert/quality | POST | ADMIN | required | ADJUDICATE_EXPERT_QUALITY | ADMIN.SECURITY | authenticated principal | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/expert/reviews | GET | AUTHENTICATED | required | READ_EXPERT_REVIEW_CONSENSUS | EXPERT.READ | authenticated principal | default/configured | 0 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/expert/reviews | POST | AUTHENTICATED | required | RECORD_EXPERT_REVIEW_DECISION | EXPERT.EVALUATE | authenticated principal | default/configured | 32 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/expert/workbench | GET | PUBLIC | none visible | — | — | authenticated principal | none visible | not enforced | manual/none | public/read-only candidate | P1 review |
 | /api/forum/posts | GET | PUBLIC | anonymous allowed | READ_FORUM_POSTS | — | authenticated principal | default/configured | 262144 bytes | manual/none | public/read-only candidate | policy declared |
 | /api/forum/posts | PATCH | AUTHENTICATED | required | INTERACT_WITH_COMMUNITY_POST | COMMUNITY.POST | authenticated principal | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
 | /api/forum/posts | POST | AUTHENTICATED | required | CREATE_COMMUNITY_POST | COMMUNITY.POST | authenticated principal | default/configured | 128 * 1024 bytes | manual/none | state mutation | policy declared |
@@ -119,6 +125,13 @@ Generated from source by `npm run audit:api-auth` on 2026-09-10T10:33:18.071Z. T
 | /api/intelligence/trust/[subjectId] | GET | PUBLIC | anonymous allowed | READ_TRUST_PROFILE | TRUST.READ | client field / review required | default/configured | 262144 bytes | manual/none | public/read-only candidate | contract conflict |
 | /api/marketplace/items | GET | PUBLIC | anonymous allowed | READ_MARKETPLACE_ITEMS | — | authenticated principal | default/configured | 262144 bytes | manual/none | potential sensitive data | policy declared |
 | /api/marketplace/items | POST | AUTHENTICATED | required | CREATE_MARKETPLACE_ITEM | COMMUNITY.POST | authenticated principal | default/configured | 64 * 1024 bytes | manual/none | state mutation | policy declared |
+| /api/moderation/appeal/resolve | POST | PUBLIC | none visible | — | — | authenticated principal | none visible | not enforced | manual/none | state mutation | P0 review |
+| /api/moderation/appeal | GET | PUBLIC | none visible | — | — | authenticated principal | none visible | not enforced | manual/none | public/read-only candidate | P1 review |
+| /api/moderation/appeal | POST | PUBLIC | none visible | — | — | authenticated principal | none visible | not enforced | manual/none | state mutation | P0 review |
+| /api/moderation/cases | GET | PUBLIC | none visible | — | — | authenticated principal | none visible | not enforced | manual/none | public/read-only candidate | P1 review |
+| /api/moderation/cases | POST | PUBLIC | none visible | — | — | authenticated principal | none visible | not enforced | manual/none | state mutation | P0 review |
+| /api/moderation/resolve | POST | PUBLIC | none visible | — | — | authenticated principal | none visible | not enforced | manual/none | state mutation | P0 review |
+| /api/moderation/vote | POST | PUBLIC | none visible | — | — | authenticated principal | none visible | not enforced | manual/none | state mutation | P0 review |
 | /api/personalization/briefing | GET | AUTHENTICATED | required | READ_ACADEMIC_BRIEFING | — | authenticated principal | default/configured | 262144 bytes | manual/none | private/user data | policy declared |
 | /api/personalization/command-center | GET | AUTHENTICATED | required | READ_COMMAND_CENTER | ACADEMIC.PLAN_OWN | authenticated principal | default/configured | 262144 bytes | manual/none | private/user data | policy declared |
 | /api/personalization/devices/revoke | POST | AUTHENTICATED | required | REVOKE_DEVICE | ACADEMIC.PLAN_OWN | authenticated principal | default/configured | 262144 bytes | manual/none | private/user data | policy declared |
