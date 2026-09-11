@@ -1,10 +1,10 @@
 # STUDENTHUB AI — FINAL FULL STAGING ASSURANCE REPORT
 **Date:** 2026-09-12  
-**Candidate SHA:** `a7710c842839f92e24fbe04790a852d6448ff324`  
-**Remote SHA:** `a7710c842839f92e24fbe04790a852d6448ff324`  
+**Candidate SHA:** `cb609d42c649e49df6b2158cc36d2367425d760a`  
+**Remote SHA:** `cb609d42c649e49df6b2158cc36d2367425d760a`  
 **Worktree:** `C:/Users/Duy/Projects/MyProj/StudentHub-AI-Expert-V3`  
 **Canonical Preview Alias:** [https://student-hub-ai-weje-git-feature-expert-trust-53a92e-vi-be-city.vercel.app](https://student-hub-ai-weje-git-feature-expert-trust-53a92e-vi-be-city.vercel.app)  
-**Deployment ID:** `dpl_8vDjVL3pA8CetrcbkxDCqKtghS6t`  
+**Deployment ID:** `dpl_Dnuphm83vd9nrRP5nYsaxVAXK6sa`  
 **Deployment Status:** `READY`  
 
 ---

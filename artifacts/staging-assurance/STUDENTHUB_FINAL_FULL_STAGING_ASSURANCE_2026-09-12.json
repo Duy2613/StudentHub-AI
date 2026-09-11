@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-09-12T02:03:00+07:00",
-  "candidateSha": "a7710c842839f92e24fbe04790a852d6448ff324",
-  "remoteSha": "a7710c842839f92e24fbe04790a852d6448ff324",
+  "timestamp": "2026-09-12T02:05:00+07:00",
+  "candidateSha": "cb609d42c649e49df6b2158cc36d2367425d760a",
+  "remoteSha": "cb609d42c649e49df6b2158cc36d2367425d760a",
   "worktree": "C:\\Users\\Duy\\Projects\\MyProj\\StudentHub-AI-Expert-V3",
   "canonicalPreview": "https://student-hub-ai-weje-git-feature-expert-trust-53a92e-vi-be-city.vercel.app",
-  "deploymentId": "dpl_8vDjVL3pA8CetrcbkxDCqKtghS6t",
+  "deploymentId": "dpl_Dnuphm83vd9nrRP5nYsaxVAXK6sa",
   "deploymentStatus": "READY",
   "environment": {
     "stagingSupabase": "bniwtkjtramqaozrrtrk",
