@@ -114,10 +114,6 @@ export class SecurityPrincipal {
     return !this.isAuthenticated;
   }
 
-  get isAnonymous() {
-    return !this.isAuthenticated;
-  }
-
   get isAgent() {
     return this.#principalType === PRINCIPAL_TYPE.AI_AGENT || this.#agentIdentity !== null;
   }
