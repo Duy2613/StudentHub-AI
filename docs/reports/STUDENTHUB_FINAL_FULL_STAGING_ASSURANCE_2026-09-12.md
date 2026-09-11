@@ -1,20 +1,20 @@
 # STUDENTHUB AI — FINAL FULL STAGING ASSURANCE REPORT
 **Date:** 2026-09-12  
-**Candidate SHA:** `cb609d42c649e49df6b2158cc36d2367425d760a`  
-**Remote SHA:** `cb609d42c649e49df6b2158cc36d2367425d760a`  
+**Candidate SHA:** `5ec8d949f1d4a9bed50e4976a2a74ef18ffaf678`  
+**Remote SHA:** `5ec8d949f1d4a9bed50e4976a2a74ef18ffaf678`  
 **Worktree:** `C:/Users/Duy/Projects/MyProj/StudentHub-AI-Expert-V3`  
 **Canonical Preview Alias:** [https://student-hub-ai-weje-git-feature-expert-trust-53a92e-vi-be-city.vercel.app](https://student-hub-ai-weje-git-feature-expert-trust-53a92e-vi-be-city.vercel.app)  
-**Deployment ID:** `dpl_Dnuphm83vd9nrRP5nYsaxVAXK6sa`  
+**Deployment ID:** `dpl_Bdgb6yfgh2BrVmpbrsgY8s6Uud9d`  
 **Deployment Status:** `READY`  
 
 ---
 
 ## 1. Executive Summary & Verdict
 
-StudentHub AI has completed the comprehensive 90-phase end-to-end staging assurance protocol across all core modules: Auth, Trust Engine V5, Community Perception, Expert Trust Network V3, Cases, Dashboard, Settings, Security Fabric, RLS, Realtime, Cross-Browser Matrix, Mobile UX, and Accessibility.
+StudentHub AI has completed the comprehensive 90-phase end-to-end staging assurance protocol across all core modules: Auth (Email/Password, GitHub OAuth, Google OAuth), Trust Engine V5, Community Perception, Expert Trust Network V3, Cases, Dashboard, Settings, Security Fabric, RLS, Realtime, Cross-Browser Matrix, Mobile UX, and Accessibility.
 
-**Final Verdict:** **`STUDENTHUB_STAGING_GOOGLE_BLOCKED`**  
-*Rationale:* Google OAuth remains disabled in Staging Supabase authority (`external.google = false`), correctly gated by the server capabilities probe. All other subsystems (Email/Password auth contract, GitHub OAuth, Expert V3, Trust Engine V5, Community Perception, Moderation Quorum, Regression, Quality Gates) are fully verified and live on the canonical preview deployment.
+**Final Verdict:** **`STUDENTHUB_STAGING_EMAIL_DELIVERY_BLOCKED`**  
+*Rationale:* All three authentication providers (Email/Password, GitHub OAuth, Google OAuth) are fully operational and verified live on Staging Supabase and the canonical Vercel Preview. Google OAuth has been enabled on Staging Supabase (`external.google = true`), with environment flags active (`NEXT_PUBLIC_SUPABASE_GOOGLE_AUTH=true`), capabilities reporting `READY`, and live browser redirection to `accounts.google.com` confirmed. Real inbox delivery remains rate-limited upstream by Supabase SMTP (`over_email_send_rate_limit`). All other subsystems, boundaries, and quality gates are 100% verified.
 
 ---
 
@@ -51,7 +51,7 @@ StudentHub AI has completed the comprehensive 90-phase end-to-end staging assura
 
 ## 4. Auth & Session Security
 - **Email/Password:** Full cycle verified. Disposable user creation via Supabase Admin API, direct login token acquisition, durable session exchange (`POST /api/auth/session/exchange`), HMAC-SHA256 opaque hash storage in `private.server_sessions`, tamper rejection (HTTP 401), logout cookie clearance, and password-reset revocation. Inbox delivery rate-limited by upstream SMTP.
-- **Google OAuth:** Truthfully reported as `DISABLED` per authoritative Supabase `/auth/v1/settings`. Clean UI state with disabled button badge, no crashes.
+- **Google OAuth:** Verified live. Staging Supabase provider enabled (`external.google = true`), client ID `198045387532-32vphcuuff08ij3o6sfhmhsqokfuel4a.apps.googleusercontent.com`, server capabilities reporting `READY`, login UI active button, and browser redirection chain to `accounts.google.com` verified.
 - **GitHub OAuth:** Verified live. Redirect chain to Supabase and GitHub authorization confirmed; scopes strictly limited to `read:user, user:email` (no repo scope).
 - **Session Durability:** `studenthub_session` cookie verified with `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`. Opaque hash persists across page reload and route navigation.
 

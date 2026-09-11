@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-09-12T02:00:00+07:00",
-  "candidateSha": "a7710c842839f92e24fbe04790a852d6448ff324",
+  "timestamp": "2026-09-12T02:15:00+07:00",
+  "candidateSha": "5ec8d949f1d4a9bed50e4976a2a74ef18ffaf678",
   "canonicalPreview": "https://student-hub-ai-weje-git-feature-expert-trust-53a92e-vi-be-city.vercel.app",
   "stagingSupabase": {
     "ref": "bniwtkjtramqaozrrtrk",
@@ -22,13 +22,20 @@
       "verdict": "EMAIL_AUTH_CONTRACT_VERIFIED_INBOX_BLOCKED_BY_SMTP"
     },
     "google": {
-      "supabaseExternal": false,
-      "vercelPreviewFlag": "NOT_CONFIGURED",
-      "applicationCapability": "DISABLED",
-      "serverReason": "GOOGLE_AUTH_BLOCKED_BY_PROVIDER_CONFIGURATION",
-      "browserUI": "DISABLED_STATE_RENDERED",
-      "browserRoundTrip": "BLOCKED_PENDING_OPERATOR_CONFIG",
-      "verdict": "GOOGLE_OAUTH_EXTERNAL_CONFIG_REQUIRED"
+      "supabaseExternal": true,
+      "vercelPreviewFlag": "true",
+      "applicationCapability": "READY",
+      "serverReason": null,
+      "browserUI": "ENABLED_ACTIVE_STATE",
+      "browserRoundTrip": "LIVE_REDIRECT_CHAIN_VERIFIED_TO_ACCOUNTS_GOOGLE_COM",
+      "clientId": "198045387532-32vphcuuff08ij3o6sfhmhsqokfuel4a.apps.googleusercontent.com",
+      "expectedProviderCallbackUri": "https://bniwtkjtramqaozrrtrk.supabase.co/auth/v1/callback",
+      "applicationRedirectUri": "https://student-hub-ai-weje-git-feature-expert-trust-53a92e-vi-be-city.vercel.app/callback",
+      "scopes": [
+        "email",
+        "profile"
+      ],
+      "verdict": "GOOGLE_OAUTH_LIVE_REDIRECT_VERIFIED"
     },
     "github": {
       "supabaseExternal": true,
