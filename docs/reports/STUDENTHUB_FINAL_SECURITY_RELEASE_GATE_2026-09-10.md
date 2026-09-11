@@ -32,5 +32,3 @@ Privacy validation and PII/redaction suites remain `VALIDATION` evidence with no
 ## Non-claims
 
 This gate does not claim a full platform restore, a production penetration test, human external attestation, live provider security posture, or Main migration authorization.
-
-\n

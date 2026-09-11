@@ -40,5 +40,3 @@ The current UI uses honest empty/unavailable states for live Community/Expert pr
 ## Non-claims
 
 This audit does not claim production deployment, Main Supabase migration, live-provider metrics, final independent retrieval generalization, or final independent AI evaluation. The external preview QA target was not treated as a local green result.
-
-\n

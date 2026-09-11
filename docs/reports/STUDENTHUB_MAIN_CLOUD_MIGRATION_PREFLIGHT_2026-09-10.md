@@ -71,5 +71,3 @@ This is not a complete migration approval: constraints, locks, provider executio
 - Transactional rollback promise: `NOT CLAIMED`.
 - Recommended release shape: backup → read-only preflight → forward-only migration in an authorized window → post-migration schema/RLS checks → forward-fix if necessary.
 - Main migration package is prepared as metadata and verification guidance only; it is not an executable deployment action.
-
-\n

@@ -1,0 +1,377 @@
+{
+  "manifestVersion": "2026-09-11-runtime-webp-v1",
+  "generatedFrom": "frontend/public/media/khai-minh",
+  "runtimeFormat": "webp",
+  "derivativeCount": 52,
+  "publicMediaPngCount": 0,
+  "budgets": {
+    "mobileBytes": 184320,
+    "desktopBytes": 327680
+  },
+  "files": [
+    {
+      "path": "/media/khai-minh/cases/km-cases-001-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 235970,
+      "sha256": "d046ef94c3201a6cc4e40effc0162e79af73fdea2af8cc2532d9bde4924c0e5b"
+    },
+    {
+      "path": "/media/khai-minh/cases/km-cases-001-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 71642,
+      "sha256": "652ce0139a181c2fbf3563902c4fe6fb29477fff2f00b85be3cd5c28d878e503"
+    },
+    {
+      "path": "/media/khai-minh/cases/km-cases-001-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 155044,
+      "sha256": "e2791b00844a9aa48eecbe44278c3989b65ad1bfc6829dc1ed3250ec4f206f42"
+    },
+    {
+      "path": "/media/khai-minh/cases/km-cases-001-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 127458,
+      "sha256": "6f44393e058d71378b8b12fae96cd2ca41dfdaadf2eb772fb42bcb858031daba"
+    },
+    {
+      "path": "/media/khai-minh/community/km-atlas-001-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 251042,
+      "sha256": "f4a8d1f3f028a214ebb6c38f27a95180670aa432b170d312c697db3139afa8d5"
+    },
+    {
+      "path": "/media/khai-minh/community/km-atlas-001-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 73264,
+      "sha256": "b77c6b8f9dfe544b0cf97f7380b7264f57e42ccc9a1d9cb3a0953aa6e8bb2f0e"
+    },
+    {
+      "path": "/media/khai-minh/community/km-atlas-001-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 221568,
+      "sha256": "d260d1f39c74572e87e06307f9ab5ba4e646d7f29f002e933b1872cec51584a7"
+    },
+    {
+      "path": "/media/khai-minh/community/km-atlas-001-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 131748,
+      "sha256": "a3d9c7bdcac3fdd2d58b5a33d8892e52e84c85243bbea77fe5d2748c6105f2fe"
+    },
+    {
+      "path": "/media/khai-minh/dashboard/km-prism-005-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 79594,
+      "sha256": "e490ada72a6f448c0ebd6b1d1682a4fb7284731ac2c4cce92a65a7969138ff12"
+    },
+    {
+      "path": "/media/khai-minh/dashboard/km-prism-005-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 23574,
+      "sha256": "ce538a2bdcbb00137e4fa84de409807cfbc795d3521ac007385caac748596967"
+    },
+    {
+      "path": "/media/khai-minh/dashboard/km-prism-005-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 57570,
+      "sha256": "d6398e5a661be3a2919570138423891d7f5300b9a4860fcb77e08ba3082b57de"
+    },
+    {
+      "path": "/media/khai-minh/dashboard/km-prism-005-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 42280,
+      "sha256": "17b1bd22d35e2b7e6a5ea8287d5ec0fec30b78f3cec86a61ec1b0def3a71592c"
+    },
+    {
+      "path": "/media/khai-minh/expert/km-expert-001-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 212900,
+      "sha256": "cf7c48ea31e39abc65fa33fd585393b8694f0e197e73bd956ed99016f1d5ae98"
+    },
+    {
+      "path": "/media/khai-minh/expert/km-expert-001-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 75808,
+      "sha256": "0fb13e10a852f9b33345b8e65224bc7dd34bce9865bff5b394179d89352dfec5"
+    },
+    {
+      "path": "/media/khai-minh/expert/km-expert-001-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 132292,
+      "sha256": "790cf0fa0763e2616dd71b895db2f61f28faf9991e80e62b3a354859374fe55f"
+    },
+    {
+      "path": "/media/khai-minh/expert/km-expert-001-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 125768,
+      "sha256": "9dfdb702c3725bfd5e6cd49398737660f99312c35f115dd6e57896574092fa26"
+    },
+    {
+      "path": "/media/khai-minh/landing/km-editorial-001-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 64422,
+      "sha256": "8f913b2cb9957adc67999564cde61aba75226220fd52be5795fc0b4882104fe1"
+    },
+    {
+      "path": "/media/khai-minh/landing/km-editorial-001-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 35978,
+      "sha256": "642ebc339441c1775a4223132413bc696283c42e2d68ad75d872f2d2bd12237c"
+    },
+    {
+      "path": "/media/khai-minh/landing/km-editorial-001-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 28500,
+      "sha256": "c303ddef51b96a74769a0d49fde58e4679a76a18bc2d05d37c5449f7b6cea713"
+    },
+    {
+      "path": "/media/khai-minh/landing/km-editorial-001-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 53638,
+      "sha256": "8050ab603b4f95c39b8a50db88faeba2cae60d7fd3b183db04da0d150b425f50"
+    },
+    {
+      "path": "/media/khai-minh/landing/km-prism-001-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 216072,
+      "sha256": "1abd6879603637f55f115bebcbdc1975c209836f387340c8c80376af83a1a807"
+    },
+    {
+      "path": "/media/khai-minh/landing/km-prism-001-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 67082,
+      "sha256": "59956f7066a2057eaebaabd0bc5f23ab8b44017ed1afd02deecbda5918c0fd65"
+    },
+    {
+      "path": "/media/khai-minh/landing/km-prism-001-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 156118,
+      "sha256": "a11a53edb35a4dd55b93efb2c6e3d315aec036f4681d49288237b4e0b0f5a6e2"
+    },
+    {
+      "path": "/media/khai-minh/landing/km-prism-001-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 117446,
+      "sha256": "5177ab71129689e220bdeb930c484c5135d2dbb3e9c6707512e8fa6e70ebe9b2"
+    },
+    {
+      "path": "/media/khai-minh/settings/km-settings-001-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 121608,
+      "sha256": "bb3aa776d8559828a3497d0a30f11ea529db5cee29835757cb7ea1c04349cc8e"
+    },
+    {
+      "path": "/media/khai-minh/settings/km-settings-001-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 40252,
+      "sha256": "f6c4b6d032e37b91936b56c8adb8806fc31065a096f4f37ef7a79c6728bd5aa0"
+    },
+    {
+      "path": "/media/khai-minh/settings/km-settings-001-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 84088,
+      "sha256": "9508c53cb04010bcb3e6c2cc8fafa967dbff35e2e030de1c60a177bb763065bf"
+    },
+    {
+      "path": "/media/khai-minh/settings/km-settings-001-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 68998,
+      "sha256": "3aa43118f22436edae9f6cb0b6138929e6b6e5b47e0913f3dc8ed19510fd7721"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-ai-001-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 235512,
+      "sha256": "258209c7150a6afe2f2e4735a2e2140bbcbd57f1ce052a7e9bad2165c5707a7d"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-ai-001-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 76866,
+      "sha256": "3a6070cc79a726839243f58669f37d2b671451144e2acc9424f247be34a801dc"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-ai-001-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 172490,
+      "sha256": "0869ac7beb09016886f28dddff16c1139ad8208caaa4633fa08a17c292c82b09"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-ai-001-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 131842,
+      "sha256": "65f8875174596bffb3a2cc1efd7108bdb8783e5afb4c26584be878a504ba7e28"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-brand-001-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 157514,
+      "sha256": "4d860a450dcf4ff244ebec2d142d75bf7d46b2fb721a664928dc5c6fbecdff10"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-brand-001-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 53192,
+      "sha256": "1b97f5992c993c710d01f5d7de36b06080ca6c5a4f5281d77472e9a2e79923bd"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-brand-001-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 106644,
+      "sha256": "db791f0366024b3900c8c3c0d0ceb0330c5e4f3864b4138248e0e6b646eb28c1"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-brand-001-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 89780,
+      "sha256": "62adb1d7d7cc2ddd57afa3642040ce0b3d2bedbdc928d3fbfabde57dee167bad"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-critical-001-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 288626,
+      "sha256": "602f3885ed52643a77a9e9700222a0c7db67cbc5b9c20c27c521541c53051b26"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-critical-001-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 99096,
+      "sha256": "1418bd221564620f030d2dc9bb1e428052207cb70d0c7acd0f8f933c5663c201"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-critical-001-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 173698,
+      "sha256": "32761dc36cf9a73efc6fa839ed6d8e5bf5a3dbe02d3ec0b0590128ef6137fee8"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-critical-001-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 165390,
+      "sha256": "3c66175f5e8bd6e475f83adb3bd97761bfa954688359a15473a7b932c9b390d3"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-prism-003-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 100974,
+      "sha256": "1a6e6c197fd4203ec0379313a1a25af329fbc8fb7145b6facd16f92a75314c26"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-prism-003-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 23478,
+      "sha256": "17a340dc07a3436e15bf07eabc257c578f3d6cf01d3b19a0e3e6d35e7354987f"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-prism-003-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 73796,
+      "sha256": "6a255f5cd7b5fdc1cd8e79a74b8552374d6bc35b33d790a5fa629c7f0c8ab19b"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-prism-003-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 55738,
+      "sha256": "10c2c8fc4a20a00cd3e6498be523a1a756775478162e19b8ca0e1002a4179272"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-prism-004-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 142028,
+      "sha256": "5c41c2d834a82c11651c84e3c745ae973b10015ea62aba844762a65524afacd6"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-prism-004-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 46942,
+      "sha256": "fcb40b85713444bcd812ab211bc736b85a413a8f2a38a424d303d71835ec0a8b"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-prism-004-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 106864,
+      "sha256": "f72bc47ace9f20b6fa2011c907e56931798dd930603e3f6437997c0d733c5034"
+    },
+    {
+      "path": "/media/khai-minh/shared/km-prism-004-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 79602,
+      "sha256": "ea572b43d473616b2bcb0b23dcddff244a64a75ba46ec587993b222757ea33a5"
+    },
+    {
+      "path": "/media/khai-minh/trust/km-prism-002-desktop.webp",
+      "variant": "desktop",
+      "format": "webp",
+      "byteSize": 110230,
+      "sha256": "d963e626dc11732b93f23ca3d4a276d2070305fe6508e4d65b71a25660dd4be2"
+    },
+    {
+      "path": "/media/khai-minh/trust/km-prism-002-mobile.webp",
+      "variant": "mobile",
+      "format": "webp",
+      "byteSize": 34894,
+      "sha256": "bb8361e0e959ff50295cee44c851d158245781f94961d8ef46a7ae7fadd27b19"
+    },
+    {
+      "path": "/media/khai-minh/trust/km-prism-002-og.webp",
+      "variant": "og",
+      "format": "webp",
+      "byteSize": 80856,
+      "sha256": "744c86f2d405f95fd091e47802e05f4be0d0dee14fa4a69cdefe7d3ca21625b3"
+    },
+    {
+      "path": "/media/khai-minh/trust/km-prism-002-tablet.webp",
+      "variant": "tablet",
+      "format": "webp",
+      "byteSize": 60378,
+      "sha256": "a63e5ce719c6c634b0417853cf1a91ef507d9506804ae3225a58b3b31bfdcd21"
+    }
+  ]
+}

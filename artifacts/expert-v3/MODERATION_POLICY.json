@@ -1,10 +1,8 @@
 ﻿{
-  "policyVersion": "community-moderation-v1",
+  "policyVersion": "community-moderation-v2",
   "scope": {
     "allowedTargets": [
-      "COMMUNITY_CONTRIBUTION",
-      "COMMUNITY_REACTION",
-      "COMMUNITY_PROFILE"
+      "COMMUNITY_CONTRIBUTION"
     ],
     "strictlyProhibitedTargets": [
       "TRUST_CASE",
@@ -12,11 +10,39 @@
       "CLAIM",
       "EXPERT_ASSESSMENT"
     ],
-    "enforcement": "REJECT_WITH_EXCEPTION_IF_PROHIBITED"
+    "enforcement": "REJECT_WITH_EXCEPTION_IF_PROHIBITED",
+    "removedUntilProjectionExists": [
+      "COMMUNITY_REACTION",
+      "COMMUNITY_PROFILE"
+    ]
   },
+  "eligibility": {
+    "requiredRoles": ["MODERATOR", "ADMIN"],
+    "activeQualification": "private.expert_verifications.status=VERIFIED and qualification_state=DOMAIN_VERIFIED and not suspended or expired",
+    "qualitySufficiency": "at least 20 independent private.expert_quality_events in the verified domain",
+    "moderationTraining": "at least one private.expert_practice_decisions row with decision=PASS",
+    "conflictOfInterest": "clear; self, reporter, author, and conflicted assignment are denied",
+    "roleAloneIsInsufficient": true
+  },
+  "quorum": {
+    "minimumIndependentReviewers": 2,
+    "decisionThreshold": 0.67,
+    "castVoteAndFinalizeAreSeparate": true,
+    "caseStateBeforeQuorum": ["OPEN", "IN_REVIEW"]
+  },
+  "eligibilitySnapshot": [
+    "moderatorIdentity",
+    "policyVersion",
+    "qualificationState",
+    "qualitySufficiency",
+    "verificationId",
+    "verificationRevision",
+    "coiState",
+    "eligibilityResult"
+  ],
   "nonDestructiveRemediation": {
     "databasePolicy": "NO_HARD_DELETES",
-    "softRemoval": "UPDATE publication_state = 'MODERATED' to exclude from public views",
+    "softRemoval": "COMMUNITY_CONTRIBUTION only: UPDATE publication_state = 'MODERATED' to exclude from public views",
     "auditTrail": "All actions append to private.moderation_events"
   },
   "actions": {

@@ -11,8 +11,7 @@ export async function POST(request) {
   try {
     AuthRouteGuard.assertRequest(request, { action: "MODERATION_VOTE", maxRequests: 60, maxBodyBytes: 8192 });
     const principal = await IdentityResolver.resolvePrincipal(request);
-    const isModerator = principal.roles.some((r) => ["ADMIN", "MODERATOR", "EXPERT"].includes(r.toUpperCase()));
-    if (!isModerator) {
+    if (!principal || principal.isAnonymous()) {
       return NextResponse.json({ error: "FORBIDDEN: Moderator privileges required" }, { status: 403 });
     }
 
@@ -28,7 +27,7 @@ export async function POST(request) {
 
     return NextResponse.json({ success: true, action: result.action }, { headers: { "cache-control": "no-store" } });
   } catch (error) {
-    const isClientError = error.message?.includes("REQUIRED") || error.message?.includes("INVALID");
-    return NextResponse.json({ success: false, error: error.message }, { status: isClientError ? 400 : 500 });
+    const isClientError = error.statusCode || error.message?.includes("REQUIRED") || error.message?.includes("INVALID");
+    return NextResponse.json({ success: false, error: error.message }, { status: error.statusCode || (isClientError ? 400 : 500) });
   }
 }

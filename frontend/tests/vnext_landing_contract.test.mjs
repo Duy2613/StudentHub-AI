@@ -20,14 +20,16 @@ test("VNext landing is static-first, chapter-complete and route-aware", () => {
   assert.match(page, /VNextLanding/);
   assert.doesNotMatch(page, /ContinueLearningBar|InteractiveKnowledgeAtlas|\/learn/);
   assert.match(hero, /Hiểu đúng\.[\s\S]*Đi xa\./);
-  assert.match(hero, /VID-PRISM-01/);
+  assert.match(hero, /KhaiMinhMedia[\s\S]*assetId="KM-PRISM-001"/);
+  assert.match(hero, /assetId="KM-EDITORIAL-001"/);
   assert.doesNotMatch(hero, /<video/);
   assert.match(landing, /trust-chapter/);
   assert.match(landing, /evidence-chapter/);
   assert.match(landing, /ai-chapter/);
   assert.match(landing, /community-expert-chapter/);
   assert.match(landing, /safe-action-chapter/);
-  assert.match(landing, /VID-HUMAN-01/);
+  assert.match(landing, /KhaiMinhMedia[\s\S]*assetId="KM-PRISM-002"/);
+  assert.match(landing, /assetId="KM-EDITORIAL-001"/);
   assert.match(registry, /id: "landing"[\s\S]*?videoEligible: true/);
   assert.match(registry, /transitionAssetId: "VID-PRISM-03"[\s\S]*?transitionMaxPlays: 2/);
   assert.match(registry, /transitionVideoEligible: false/);

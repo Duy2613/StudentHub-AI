@@ -33,5 +33,3 @@ The required agent-browser landing capture recorded no `console.error`. Local au
 ## Scope limi
 
 This report does not claim a fresh browser crawl of every dynamic/legacy route, field Core Web Vitals, or a deployed preview/production environment. `preview-qa.spec.ts` remains an external-target check and was not converted into a local pass.
-
-\n

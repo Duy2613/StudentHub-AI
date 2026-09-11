@@ -91,4 +91,3 @@ If any gate fails, stop at the failing stage and preserve the evidence. Do not f
 - Current candidate manifest: `artifacts/candidate/STUDENTHUB_EXPERT_HYBRID_RC_MANIFEST.json`.
 
 No operation from this package was executed against Main Supabase in the current pass.
-\n

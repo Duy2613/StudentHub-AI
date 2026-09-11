@@ -18,15 +18,16 @@ export class ExpertProgressionRepository {
 
   async getProgression(userId, domainCode = "GENERAL") {
     if (!userId) return null;
+    const normalizedDomain = String(domainCode || "GENERAL").trim().toUpperCase();
     const result = await this.pool.query(
       `SELECT * FROM public.expert_progression_projections
        WHERE user_id = $1 AND domain_code = $2`,
-      [userId, domainCode]
+      [userId, normalizedDomain]
     );
 
     if (result.rows.length === 0) {
       // Lazy calculate if projection row does not exist yet
-      return await this.recalculateProgression(userId, domainCode);
+      return await this.recalculateProgression(userId, normalizedDomain);
     }
 
     const row = result.rows[0];
@@ -47,13 +48,14 @@ export class ExpertProgressionRepository {
 
   async recalculateProgression(userId, domainCode = "GENERAL") {
     if (!userId) return null;
+    const normalizedDomain = String(domainCode || "GENERAL").trim().toUpperCase();
 
     // 1. Fetch raw quality events (the immutable source of truth)
     const eventsResult = await this.pool.query(
       `SELECT * FROM private.expert_quality_events
-       WHERE user_id = $1 AND (domain_code = $2 OR $2 = 'GENERAL')
+       WHERE user_id = $1 AND domain_code = $2
        ORDER BY created_at ASC`,
-      [userId, domainCode]
+      [userId, normalizedDomain]
     );
 
     const normalizedEvents = (eventsResult.rows || []).map((r) => ({
@@ -102,8 +104,7 @@ export class ExpertProgressionRepository {
         raw_quality_score, star_level, sufficiency_state, missions_completed_count,
         last_calculated_at, updated_at
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, now(), now())
-      ON CONFLICT (user_id) DO UPDATE SET
-        domain_code = EXCLUDED.domain_code,
+      ON CONFLICT (user_id, domain_code) DO UPDATE SET
         adjudicated_count = EXCLUDED.adjudicated_count,
         upheld_count = EXCLUDED.upheld_count,
         overturned_count = EXCLUDED.overturned_count,
@@ -115,7 +116,7 @@ export class ExpertProgressionRepository {
         updated_at = now()`,
       [
         userId,
-        domainCode,
+        normalizedDomain,
         sampleSize,
         upheldCount,
         overturnedCount,
@@ -128,7 +129,7 @@ export class ExpertProgressionRepository {
 
     return {
       userId,
-      domainCode,
+      domainCode: normalizedDomain,
       adjudicatedCount: sampleSize,
       upheldCount,
       overturnedCount,
@@ -142,16 +143,17 @@ export class ExpertProgressionRepository {
 
   async getLeaderboard({ domainCode = "GENERAL", limit = 10 } = {}) {
     const safeLimit = Math.min(Math.max(1, Number(limit) || 10), 50);
+    const normalizedDomain = String(domainCode || "GENERAL").trim().toUpperCase();
     const result = await this.pool.query(
       `SELECT p.*,
               coalesce(u.raw_user_meta_data->>'full_name', 'Chuyên gia ẩn danh') as full_name
        FROM public.expert_progression_projections p
        JOIN auth.users u ON u.id = p.user_id
-       WHERE (p.domain_code = $1 OR $1 = 'GENERAL')
+       WHERE p.domain_code = $1
          AND p.sufficiency_state = 'SUFFICIENT'
        ORDER BY p.star_level DESC, p.raw_quality_score DESC, p.missions_completed_count DESC
        LIMIT $2`,
-      [domainCode, safeLimit]
+      [normalizedDomain, safeLimit]
     );
 
     return result.rows.map((r) => ({

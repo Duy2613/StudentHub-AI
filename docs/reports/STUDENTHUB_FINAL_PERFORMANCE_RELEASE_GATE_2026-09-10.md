@@ -32,5 +32,3 @@ The media contract verifies current registry IDs and files under `frontend/publi
 ## Warnings and limits
 
 ESLint completed with `0` errors and `450` non-blocking warnings. No warning was found in the final touched-file set. This report does not claim field CWV, production RUM, or real-user latency; local build/bundle measurements are the available evidence.
-
-\n

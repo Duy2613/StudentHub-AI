@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,10 +9,24 @@ import { KHAI_MINH_VISUAL_REGISTRY, getKhaiMinhRouteVisual } from "../../src/lib
 const here = path.dirname(fileURLToPath(import.meta.url));
 const frontendRoot = path.resolve(here, "../..");
 const repoRoot = path.resolve(frontendRoot, "..");
-const inventoryPath = path.join(repoRoot, "artifacts", "visual", "STUDENTHUB_KHAI_MINH_ASSET_INVENTORY_2026-09-10.json");
+const runtimeManifestPath = path.join(repoRoot, "artifacts", "visual", "STUDENTHUB_KHAI_MINH_RUNTIME_ASSET_MANIFEST_2026-09-11.json");
+const runtimeManifest = JSON.parse(fs.readFileSync(runtimeManifestPath, "utf8"));
+const derivativesByPath = new Map(runtimeManifest.files.map((item) => [item.path, item]));
+const publicMediaRoot = path.join(frontendRoot, "public", "media", "khai-minh");
 
 function publicPath(src) {
   return path.join(frontendRoot, "public", src.replace(/^\//, ""));
+}
+
+function collectPublicMediaFiles(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const target = path.join(directory, entry.name);
+    return entry.isDirectory() ? collectPublicMediaFiles(target) : [target];
+  });
+}
+
+function sha256(filePath) {
+  return crypto.createHash("sha256").update(fs.readFileSync(filePath)).digest("hex");
 }
 
 test("Khai Minh registry covers the canonical visual route set", () => {
@@ -33,25 +48,36 @@ test("Khai Minh registry covers the canonical visual route set", () => {
 });
 
 test("Khai Minh registry serves only responsive derivatives with truthful metadata", () => {
-  const inventory = JSON.parse(fs.readFileSync(inventoryPath, "utf8"));
-  const derivativesById = new Map(inventory.derivatives.map((item) => [item.id, item]));
+  assert.equal(runtimeManifest.runtimeFormat, "webp");
+  assert.equal(runtimeManifest.derivativeCount, 52);
+  assert.equal(runtimeManifest.publicMediaPngCount, 0);
 
   for (const asset of Object.values(KHAI_MINH_VISUAL_REGISTRY)) {
-    for (const source of [asset.desktopSrc, asset.tabletSrc, asset.mobileSrc, asset.ogSrc, asset.decorativeSrc]) {
-      assert.match(source, /^\/media\/khai-minh\/.+\.avif$/);
-      assert.ok(fs.existsSync(publicPath(source)), `Missing derivative: ${source}`);
+    const sources = {
+      desktop: asset.desktopSrc,
+      tablet: asset.tabletSrc,
+      mobile: asset.mobileSrc,
+      og: asset.ogSrc,
+    };
+    for (const [variant, source] of Object.entries(sources)) {
+      assert.match(source, /^\/media\/khai-minh\/.+\.webp$/);
+      const derivative = derivativesByPath.get(source);
+      assert.ok(derivative, `Missing runtime manifest entry: ${source}`);
+      assert.equal(derivative.variant, variant);
+      const derivativePath = publicPath(source);
+      assert.ok(fs.existsSync(derivativePath), `Missing derivative: ${source}`);
+      assert.equal(fs.statSync(derivativePath).size, derivative.byteSize, `Byte-size drift: ${source}`);
+      assert.equal(sha256(derivativePath), derivative.sha256, `Hash drift: ${source}`);
     }
 
-    const derivative = derivativesById.get(asset.id);
-    assert.ok(derivative, `Missing inventory entry: ${asset.id}`);
-    assert.equal(asset.provenance.sourceSha256, derivative.sourceSha256);
-    assert.ok(fs.statSync(publicPath(asset.mobileSrc)).size <= 180 * 1024, `${asset.id} mobile derivative exceeds 180KB`);
-    assert.ok(fs.statSync(publicPath(asset.desktopSrc)).size <= 320 * 1024, `${asset.id} desktop derivative exceeds 320KB`);
+    assert.ok(derivativesByPath.get(asset.mobileSrc).byteSize <= runtimeManifest.budgets.mobileBytes, `${asset.id} mobile derivative exceeds canonical budget`);
+    assert.ok(derivativesByPath.get(asset.desktopSrc).byteSize <= runtimeManifest.budgets.desktopBytes, `${asset.id} desktop derivative exceeds canonical budget`);
   }
 });
 
 test("original concept art is not exposed through the product public media folder", () => {
-  const publicMedia = fs.readdirSync(path.join(frontendRoot, "public", "media", "khai-minh"));
-  assert.equal(publicMedia.some((name) => name.toLowerCase().endsWith(".png")), false);
-  assert.equal(publicMedia.some((name) => name.toLowerCase().includes("download")), false);
+  const physicalFiles = collectPublicMediaFiles(publicMediaRoot).map((filePath) => "/" + path.relative(path.join(frontendRoot, "public"), filePath).replaceAll(path.sep, "/"));
+  assert.deepEqual(physicalFiles.sort(), runtimeManifest.files.map((item) => item.path).sort());
+  assert.equal(physicalFiles.some((source) => source.toLowerCase().endsWith(".png")), false);
+  assert.equal(physicalFiles.some((source) => source.toLowerCase().includes("download")), false);
 });

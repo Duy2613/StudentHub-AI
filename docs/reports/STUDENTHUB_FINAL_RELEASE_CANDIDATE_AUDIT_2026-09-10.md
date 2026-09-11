@@ -54,5 +54,3 @@ The hermetic runner intentionally strips database/provider credentials. Child li
 ## Git/repository safety
 
 Only reviewed candidate source, migration, test-contract, runtime-media, report, and manifest files are eligible for staging. Database dumps, test-results, browser traces, raw source-intake media, generated scratch files, and unrelated owner work remain unstaged. The commit and push are separate repository operations after this report and do not alter Main Supabase.
-
-\n

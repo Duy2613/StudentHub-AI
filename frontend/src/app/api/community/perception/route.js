@@ -101,7 +101,7 @@ export async function POST(request) {
       summary,
     }, { headers: { "cache-control": "no-store" } });
   } catch (error) {
-    const statusCode = error.message?.includes("REQUIRED") ? 400 : 500;
+    const statusCode = error.statusCode || (error.message?.includes("REQUIRED") || error.message?.includes("MISMATCH") || error.message?.includes("INVALID") ? 400 : 500);
     return NextResponse.json({
       success: false,
       error: error.message || "Failed to record perception vote"

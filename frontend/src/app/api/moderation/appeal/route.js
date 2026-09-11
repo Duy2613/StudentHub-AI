@@ -40,7 +40,7 @@ export async function POST(request) {
 
     return NextResponse.json({ success: true, appealId: result.appealId }, { headers: { "cache-control": "no-store" } });
   } catch (error) {
-    const isClientError = error.message?.includes("REQUIRED") || error.message?.includes("TOO_SHORT");
-    return NextResponse.json({ success: false, error: error.message }, { status: isClientError ? 400 : 500 });
+    const isClientError = error.statusCode || error.message?.includes("REQUIRED") || error.message?.includes("TOO_SHORT");
+    return NextResponse.json({ success: false, error: error.message }, { status: error.statusCode || (isClientError ? 400 : 500) });
   }
 }

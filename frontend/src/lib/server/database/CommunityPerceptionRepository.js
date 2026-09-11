@@ -23,6 +23,7 @@ export class CommunityPerceptionRepository {
       `SELECT 1 FROM private.expert_verifications
        WHERE user_id = $1
          AND status = 'VERIFIED'
+         AND qualification_state = 'DOMAIN_VERIFIED'
          AND suspended_at IS NULL
          AND (expires_at IS NULL OR expires_at > now())
        LIMIT 1`,
@@ -47,9 +48,19 @@ export class CommunityPerceptionRepository {
     if (!["BELIEVE", "DOUBT"].includes(upperVote)) {
       throw new Error("INVALID_VOTE_TYPE: Vote must be BELIEVE or DOUBT");
     }
-    const safeTargetType = ["CASE", "CLAIM", "CONTRIBUTION"].includes(String(targetType).toUpperCase())
-      ? String(targetType).toUpperCase()
-      : "CASE";
+    const safeTargetType = String(targetType || "CASE").toUpperCase();
+    if (!["CASE", "CLAIM", "CONTRIBUTION"].includes(safeTargetType)) {
+      throw new Error("INVALID_PERCEPTION_TARGET");
+    }
+    if (safeTargetType === "CASE" && (claimId || contributionId)) {
+      throw new Error("PERCEPTION_TARGET_MISMATCH");
+    }
+    if (safeTargetType === "CLAIM" && (!claimId || contributionId)) {
+      throw new Error("PERCEPTION_TARGET_MISMATCH");
+    }
+    if (safeTargetType === "CONTRIBUTION" && (!contributionId || claimId)) {
+      throw new Error("PERCEPTION_TARGET_MISMATCH");
+    }
 
     // BINDING AMENDMENT 4: Never trust client-provided expert status.
     const isExpert = await this.isVerifiedExpert(userId);
@@ -113,9 +124,9 @@ export class CommunityPerceptionRepository {
       await client.query(
         `INSERT INTO private.community_perception_events (
           vote_id, user_id, case_id, case_revision, claim_id, contribution_id,
-          target_type, vote, voter_is_expert, event_type, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now())`,
-        [voteId, userId, caseId, safeRevision, claimId, contributionId, safeTargetType, upperVote, isExpert, eventType]
+          target_type, vote, voter_is_expert, event_type, user_snapshot, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb, now())`,
+        [voteId, userId, caseId, safeRevision, claimId, contributionId, safeTargetType, upperVote, isExpert, eventType, JSON.stringify({ userId })]
       );
 
       await client.query("COMMIT");

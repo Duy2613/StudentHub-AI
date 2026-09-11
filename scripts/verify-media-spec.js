@@ -105,4 +105,3 @@ async function verifyAll() {
 }
 
 verifyAll();
-\n
