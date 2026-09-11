@@ -209,7 +209,16 @@ async function verifySpoofBoundary(pool) {
 const migrations = await loadMigrations();
 if (migrations.length < 12 || !migrations.at(-1).name.includes("202609110002")) throw new Error("REHEARSAL_MIGRATION_SET_INCOMPLETE");
 const sourceDatabase = decodeURIComponent(sourceUrl.pathname.replace(/^\//, "")) || "postgres";
-const adminPool = new pg.Pool({ connectionString: runtime.dbUrl, max: 1, ssl: false });
+function createRehearsalPool(options) {
+  const pool = new pg.Pool(options);
+  // Disposable database cleanup intentionally terminates any remaining idle
+  // session. Consume that expected pool event so cleanup cannot turn a
+  // verified rehearsal into an unhandled process error.
+  pool.on("error", () => {});
+  return pool;
+}
+
+const adminPool = createRehearsalPool({ connectionString: runtime.dbUrl, max: 1, ssl: false });
 const databaseA = `studenthub_f2_rc_a_${Date.now()}`;
 const databaseB = `studenthub_f2_rc_b_${Date.now()}`;
 let poolA;
@@ -227,8 +236,8 @@ try {
   if (!helperRows.rows[0]?.definition) throw new Error("REHEARSAL_PLATFORM_HELPER_MISSING");
   await createPlatformReadyDatabase(adminPool, databaseA, dump.stdout, helperRows.rows[0].definition);
   await createPlatformReadyDatabase(adminPool, databaseB, dump.stdout, helperRows.rows[0].definition);
-  poolA = new pg.Pool({ connectionString: targetConnectionString(databaseA), max: 1, ssl: false });
-  poolB = new pg.Pool({ connectionString: targetConnectionString(databaseB), max: 1, ssl: false });
+  poolA = createRehearsalPool({ connectionString: targetConnectionString(databaseA), max: 1, ssl: false });
+  poolB = createRehearsalPool({ connectionString: targetConnectionString(databaseB), max: 1, ssl: false });
 
   await applyMigrations(poolA, migrations.slice(0, -1), 0);
   const oldLikeFixture = await seedOldLikeProjection(poolA);
