@@ -1,0 +1,1100 @@
+{
+  "generatedAt": "2026-09-11T18:59:46.102Z",
+  "candidateSha": "a7710c842839f92e24fbe04790a852d6448ff324",
+  "counts": {
+    "total": 200,
+    "pages": 49,
+    "apis": 151
+  },
+  "corePages": [
+    {
+      "route": "/",
+      "exists": true,
+      "filePath": "frontend/src/app/page.jsx"
+    },
+    {
+      "route": "/login",
+      "exists": true,
+      "filePath": "frontend/src/app/login/page.jsx"
+    },
+    {
+      "route": "/register",
+      "exists": true,
+      "filePath": "frontend/src/app/register/page.jsx"
+    },
+    {
+      "route": "/forgot-password",
+      "exists": true,
+      "filePath": "frontend/src/app/forgot-password/page.jsx"
+    },
+    {
+      "route": "/reset-password",
+      "exists": true,
+      "filePath": "frontend/src/app/reset-password/page.jsx"
+    },
+    {
+      "route": "/callback",
+      "exists": true,
+      "filePath": "frontend/src/app/callback/page.jsx"
+    },
+    {
+      "route": "/trust",
+      "exists": true,
+      "filePath": "frontend/src/app/trust/page.jsx"
+    },
+    {
+      "route": "/community",
+      "exists": true,
+      "filePath": "frontend/src/app/community/page.jsx"
+    },
+    {
+      "route": "/expert",
+      "exists": true,
+      "filePath": "frontend/src/app/expert/page.jsx"
+    },
+    {
+      "route": "/cases",
+      "exists": true,
+      "filePath": "frontend/src/app/cases/page.jsx"
+    },
+    {
+      "route": "/dashboard",
+      "exists": true,
+      "filePath": "frontend/src/app/dashboard/page.jsx"
+    },
+    {
+      "route": "/settings",
+      "exists": true,
+      "filePath": "frontend/src/app/settings/page.jsx"
+    },
+    {
+      "route": "/profile",
+      "exists": true,
+      "filePath": "frontend/src/app/profile/page.jsx"
+    },
+    {
+      "route": "/academic",
+      "exists": true,
+      "filePath": "frontend/src/app/academic/page.jsx"
+    },
+    {
+      "route": "/ai",
+      "exists": true,
+      "filePath": "frontend/src/app/ai/page.jsx"
+    },
+    {
+      "route": "/safety-map",
+      "exists": true,
+      "filePath": "frontend/src/app/safety-map/page.jsx"
+    },
+    {
+      "route": "/sos",
+      "exists": true,
+      "filePath": "frontend/src/app/sos/page.jsx"
+    }
+  ],
+  "allPages": [
+    {
+      "type": "PAGE",
+      "route": "/",
+      "filePath": "frontend/src/app/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/academic",
+      "filePath": "frontend/src/app/academic/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/academic-showcase",
+      "filePath": "frontend/src/app/academic-showcase/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/academic/execution",
+      "filePath": "frontend/src/app/academic/execution/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/academic/planner",
+      "filePath": "frontend/src/app/academic/planner/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/academic/profile",
+      "filePath": "frontend/src/app/academic/profile/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/academic/roadmap",
+      "filePath": "frontend/src/app/academic/roadmap/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/ai",
+      "filePath": "frontend/src/app/ai/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/c9",
+      "filePath": "frontend/src/app/c9/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/callback",
+      "filePath": "frontend/src/app/callback/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/cases",
+      "filePath": "frontend/src/app/cases/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/cinema",
+      "filePath": "frontend/src/app/cinema/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/community",
+      "filePath": "frontend/src/app/community/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/contract-check",
+      "filePath": "frontend/src/app/contract-check/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/credit-scheduler",
+      "filePath": "frontend/src/app/credit-scheduler/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/dashboard",
+      "filePath": "frontend/src/app/dashboard/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/expert",
+      "filePath": "frontend/src/app/expert/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/forgot-password",
+      "filePath": "frontend/src/app/forgot-password/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/forum",
+      "filePath": "frontend/src/app/forum/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/intelligence",
+      "filePath": "frontend/src/app/intelligence/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/intelligence/ai-trust",
+      "filePath": "frontend/src/app/intelligence/ai-trust/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/intelligence/community",
+      "filePath": "frontend/src/app/intelligence/community/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/intelligence/evidence",
+      "filePath": "frontend/src/app/intelligence/evidence/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/intelligence/experts",
+      "filePath": "frontend/src/app/intelligence/experts/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/intelligence/knowledge",
+      "filePath": "frontend/src/app/intelligence/knowledge/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/intelligence/trust",
+      "filePath": "frontend/src/app/intelligence/trust/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/learn",
+      "filePath": "frontend/src/app/learn/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/learn/[courseId]/[lessonId]",
+      "filePath": "frontend/src/app/learn/[courseId]/[lessonId]/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/login",
+      "filePath": "frontend/src/app/login/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/marketplace",
+      "filePath": "frontend/src/app/marketplace/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/onboarding",
+      "filePath": "frontend/src/app/onboarding/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/practice",
+      "filePath": "frontend/src/app/practice/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/prof-rating",
+      "filePath": "frontend/src/app/prof-rating/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/profile",
+      "filePath": "frontend/src/app/profile/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/profile/[id]",
+      "filePath": "frontend/src/app/profile/[id]/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/projects",
+      "filePath": "frontend/src/app/projects/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/quests",
+      "filePath": "frontend/src/app/quests/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/register",
+      "filePath": "frontend/src/app/register/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/reset-password",
+      "filePath": "frontend/src/app/reset-password/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/roadmap",
+      "filePath": "frontend/src/app/roadmap/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/safety-map",
+      "filePath": "frontend/src/app/safety-map/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/scam-check",
+      "filePath": "frontend/src/app/scam-check/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/scholarships",
+      "filePath": "frontend/src/app/scholarships/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/settings",
+      "filePath": "frontend/src/app/settings/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/settings/privacy",
+      "filePath": "frontend/src/app/settings/privacy/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/sos",
+      "filePath": "frontend/src/app/sos/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/trust",
+      "filePath": "frontend/src/app/trust/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/tuition-radar",
+      "filePath": "frontend/src/app/tuition-radar/page.jsx"
+    },
+    {
+      "type": "PAGE",
+      "route": "/ultra",
+      "filePath": "frontend/src/app/ultra/page.jsx"
+    }
+  ],
+  "allApis": [
+    {
+      "type": "API",
+      "route": "/api/[...path]",
+      "filePath": "frontend/src/app/api/[...path]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/command-center",
+      "filePath": "frontend/src/app/api/academic/command-center/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/me/decision-studio",
+      "filePath": "frontend/src/app/api/academic/me/decision-studio/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/me/decision-studio/adopt",
+      "filePath": "frontend/src/app/api/academic/me/decision-studio/adopt/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/me/discrepancy-report",
+      "filePath": "frontend/src/app/api/academic/me/discrepancy-report/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/me/execution",
+      "filePath": "frontend/src/app/api/academic/me/execution/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/me/execution/reconcile",
+      "filePath": "frontend/src/app/api/academic/me/execution/reconcile/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/me/planner",
+      "filePath": "frontend/src/app/api/academic/me/planner/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/me/profile-360",
+      "filePath": "frontend/src/app/api/academic/me/profile-360/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/me/roadmap",
+      "filePath": "frontend/src/app/api/academic/me/roadmap/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/me/simulate",
+      "filePath": "frontend/src/app/api/academic/me/simulate/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/notifications",
+      "filePath": "frontend/src/app/api/academic/notifications/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/academic/tasks/[taskId]",
+      "filePath": "frontend/src/app/api/academic/tasks/[taskId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai-trust/evidence",
+      "filePath": "frontend/src/app/api/ai-trust/evidence/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai-trust/observatory",
+      "filePath": "frontend/src/app/api/ai-trust/observatory/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai-trust/ocr",
+      "filePath": "frontend/src/app/api/ai-trust/ocr/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai-trust/reasoning",
+      "filePath": "frontend/src/app/api/ai-trust/reasoning/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai-trust/reputation",
+      "filePath": "frontend/src/app/api/ai-trust/reputation/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai-trust/screen",
+      "filePath": "frontend/src/app/api/ai-trust/screen/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai-trust/semantic",
+      "filePath": "frontend/src/app/api/ai-trust/semantic/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai/trust/audit/[answerId]",
+      "filePath": "frontend/src/app/api/ai/trust/audit/[answerId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai/trust/claims/[claimId]",
+      "filePath": "frontend/src/app/api/ai/trust/claims/[claimId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai/trust/evaluate",
+      "filePath": "frontend/src/app/api/ai/trust/evaluate/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai/trust/evaluations/[evaluationId]",
+      "filePath": "frontend/src/app/api/ai/trust/evaluations/[evaluationId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai/trust/evidence/[evidenceId]",
+      "filePath": "frontend/src/app/api/ai/trust/evidence/[evidenceId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/ai/trust/verify-claim",
+      "filePath": "frontend/src/app/api/ai/trust/verify-claim/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/auth/capabilities",
+      "filePath": "frontend/src/app/api/auth/capabilities/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/auth/session",
+      "filePath": "frontend/src/app/api/auth/session/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/auth/session/exchange",
+      "filePath": "frontend/src/app/api/auth/session/exchange/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/auth/session/logout",
+      "filePath": "frontend/src/app/api/auth/session/logout/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/auth/session/revoke-all",
+      "filePath": "frontend/src/app/api/auth/session/revoke-all/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/chat",
+      "filePath": "frontend/src/app/api/chat/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/community/experience/evaluate",
+      "filePath": "frontend/src/app/api/community/experience/evaluate/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/community/experiences",
+      "filePath": "frontend/src/app/api/community/experiences/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/community/perception",
+      "filePath": "frontend/src/app/api/community/perception/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/contract-check/analyze",
+      "filePath": "frontend/src/app/api/contract-check/analyze/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/appeals",
+      "filePath": "frontend/src/app/api/expert/appeals/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/appeals/review",
+      "filePath": "frontend/src/app/api/expert/appeals/review/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/assessments",
+      "filePath": "frontend/src/app/api/expert/assessments/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/assignments",
+      "filePath": "frontend/src/app/api/expert/assignments/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/evaluate",
+      "filePath": "frontend/src/app/api/expert/evaluate/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/graph",
+      "filePath": "frontend/src/app/api/expert/graph/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/profile/[expertId]",
+      "filePath": "frontend/src/app/api/expert/profile/[expertId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/progression",
+      "filePath": "frontend/src/app/api/expert/progression/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/qualification",
+      "filePath": "frontend/src/app/api/expert/qualification/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/qualification/practice",
+      "filePath": "frontend/src/app/api/expert/qualification/practice/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/qualification/practice/review",
+      "filePath": "frontend/src/app/api/expert/qualification/practice/review/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/qualification/quiz",
+      "filePath": "frontend/src/app/api/expert/qualification/quiz/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/qualification/quiz/answers",
+      "filePath": "frontend/src/app/api/expert/qualification/quiz/answers/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/qualification/quiz/submit",
+      "filePath": "frontend/src/app/api/expert/qualification/quiz/submit/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/qualification/review",
+      "filePath": "frontend/src/app/api/expert/qualification/review/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/quality",
+      "filePath": "frontend/src/app/api/expert/quality/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/reviews",
+      "filePath": "frontend/src/app/api/expert/reviews/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/expert/workbench",
+      "filePath": "frontend/src/app/api/expert/workbench/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/forum/posts",
+      "filePath": "frontend/src/app/api/forum/posts/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/forum/vote",
+      "filePath": "frontend/src/app/api/forum/vote/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/health/live",
+      "filePath": "frontend/src/app/api/health/live/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/health/ready",
+      "filePath": "frontend/src/app/api/health/ready/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/claims/[claimId]",
+      "filePath": "frontend/src/app/api/intelligence/claims/[claimId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/consensus",
+      "filePath": "frontend/src/app/api/intelligence/community/consensus/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/contributions/[contributionId]",
+      "filePath": "frontend/src/app/api/intelligence/community/contributions/[contributionId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/contributions/preview",
+      "filePath": "frontend/src/app/api/intelligence/community/contributions/preview/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/corrections",
+      "filePath": "frontend/src/app/api/intelligence/community/corrections/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/evaluate",
+      "filePath": "frontend/src/app/api/intelligence/community/evaluate/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/experiences/[experienceId]",
+      "filePath": "frontend/src/app/api/intelligence/community/experiences/[experienceId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/feedback",
+      "filePath": "frontend/src/app/api/intelligence/community/feedback/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/friction",
+      "filePath": "frontend/src/app/api/intelligence/community/friction/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/posts",
+      "filePath": "frontend/src/app/api/intelligence/community/posts/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/query",
+      "filePath": "frontend/src/app/api/intelligence/community/query/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/reality-gaps",
+      "filePath": "frontend/src/app/api/intelligence/community/reality-gaps/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/search",
+      "filePath": "frontend/src/app/api/intelligence/community/search/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/topics/[topicId]",
+      "filePath": "frontend/src/app/api/intelligence/community/topics/[topicId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/community/track-record",
+      "filePath": "frontend/src/app/api/intelligence/community/track-record/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/contradictions/[claimId]",
+      "filePath": "frontend/src/app/api/intelligence/contradictions/[claimId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/experts",
+      "filePath": "frontend/src/app/api/intelligence/experts/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/experts/[expertId]",
+      "filePath": "frontend/src/app/api/intelligence/experts/[expertId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/experts/[expertId]/claims",
+      "filePath": "frontend/src/app/api/intelligence/experts/[expertId]/claims/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/experts/[expertId]/evidence",
+      "filePath": "frontend/src/app/api/intelligence/experts/[expertId]/evidence/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/experts/disagreements",
+      "filePath": "frontend/src/app/api/intelligence/experts/disagreements/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/experts/resolve",
+      "filePath": "frontend/src/app/api/intelligence/experts/resolve/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/experts/verify-claim",
+      "filePath": "frontend/src/app/api/intelligence/experts/verify-claim/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/fusion/evaluate",
+      "filePath": "frontend/src/app/api/intelligence/fusion/evaluate/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/fusion/objects/[knowledgeObjectId]",
+      "filePath": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/fusion/objects/[knowledgeObjectId]/conflicts",
+      "filePath": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/conflicts/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/fusion/objects/[knowledgeObjectId]/evidence",
+      "filePath": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/evidence/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/fusion/objects/[knowledgeObjectId]/history",
+      "filePath": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/history/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/fusion/objects/[knowledgeObjectId]/unknowns",
+      "filePath": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/unknowns/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/health",
+      "filePath": "frontend/src/app/api/intelligence/health/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/recommendations",
+      "filePath": "frontend/src/app/api/intelligence/recommendations/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/reputation/[subjectId]",
+      "filePath": "frontend/src/app/api/intelligence/reputation/[subjectId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/social/early-warnings",
+      "filePath": "frontend/src/app/api/intelligence/social/early-warnings/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/social/signals",
+      "filePath": "frontend/src/app/api/intelligence/social/signals/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/social/sources",
+      "filePath": "frontend/src/app/api/intelligence/social/sources/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/social/sync",
+      "filePath": "frontend/src/app/api/intelligence/social/sync/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/intelligence/trust/[subjectId]",
+      "filePath": "frontend/src/app/api/intelligence/trust/[subjectId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/marketplace/items",
+      "filePath": "frontend/src/app/api/marketplace/items/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/moderation/appeal",
+      "filePath": "frontend/src/app/api/moderation/appeal/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/moderation/appeal/resolve",
+      "filePath": "frontend/src/app/api/moderation/appeal/resolve/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/moderation/cases",
+      "filePath": "frontend/src/app/api/moderation/cases/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/moderation/resolve",
+      "filePath": "frontend/src/app/api/moderation/resolve/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/moderation/vote",
+      "filePath": "frontend/src/app/api/moderation/vote/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/personalization/briefing",
+      "filePath": "frontend/src/app/api/personalization/briefing/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/personalization/command-center",
+      "filePath": "frontend/src/app/api/personalization/command-center/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/personalization/devices",
+      "filePath": "frontend/src/app/api/personalization/devices/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/personalization/devices/revoke",
+      "filePath": "frontend/src/app/api/personalization/devices/revoke/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/personalization/digital-twin",
+      "filePath": "frontend/src/app/api/personalization/digital-twin/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/personalization/goals",
+      "filePath": "frontend/src/app/api/personalization/goals/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/personalization/memory",
+      "filePath": "frontend/src/app/api/personalization/memory/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/personalization/preferences",
+      "filePath": "frontend/src/app/api/personalization/preferences/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/personalization/reset",
+      "filePath": "frontend/src/app/api/personalization/reset/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/personalization/search",
+      "filePath": "frontend/src/app/api/personalization/search/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/prof-rating/professors",
+      "filePath": "frontend/src/app/api/prof-rating/professors/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/prof-rating/reviews",
+      "filePath": "frontend/src/app/api/prof-rating/reviews/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/public/catalog",
+      "filePath": "frontend/src/app/api/public/catalog/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/public/discovery",
+      "filePath": "frontend/src/app/api/public/discovery/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/public/research",
+      "filePath": "frontend/src/app/api/public/research/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/public/weather",
+      "filePath": "frontend/src/app/api/public/weather/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/quests/daily",
+      "filePath": "frontend/src/app/api/quests/daily/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/realtime/broadcast",
+      "filePath": "frontend/src/app/api/realtime/broadcast/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/realtime/stream",
+      "filePath": "frontend/src/app/api/realtime/stream/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/safety-map/reports",
+      "filePath": "frontend/src/app/api/safety-map/reports/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/scheduler/optimize",
+      "filePath": "frontend/src/app/api/scheduler/optimize/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/scholarships/list",
+      "filePath": "frontend/src/app/api/scholarships/list/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/scholarships/match-profile",
+      "filePath": "frontend/src/app/api/scholarships/match-profile/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/sos/bank-hotlines",
+      "filePath": "frontend/src/app/api/sos/bank-hotlines/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/sos/generate-complaint",
+      "filePath": "frontend/src/app/api/sos/generate-complaint/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/student/identity",
+      "filePath": "frontend/src/app/api/student/identity/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/student/records",
+      "filePath": "frontend/src/app/api/student/records/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/tuition-radar/verify",
+      "filePath": "frontend/src/app/api/tuition-radar/verify/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/users/leaderboard",
+      "filePath": "frontend/src/app/api/users/leaderboard/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/users/profile",
+      "filePath": "frontend/src/app/api/users/profile/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/users/verify-edu",
+      "filePath": "frontend/src/app/api/users/verify-edu/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/academic",
+      "filePath": "frontend/src/app/api/v1/academic/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/community",
+      "filePath": "frontend/src/app/api/v1/community/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/dashboard",
+      "filePath": "frontend/src/app/api/v1/dashboard/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/decisions",
+      "filePath": "frontend/src/app/api/v1/decisions/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/demo/superflows",
+      "filePath": "frontend/src/app/api/v1/demo/superflows/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/experts",
+      "filePath": "frontend/src/app/api/v1/experts/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/integrations/aidrive",
+      "filePath": "frontend/src/app/api/v1/integrations/aidrive/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/integrations/labbe",
+      "filePath": "frontend/src/app/api/v1/integrations/labbe/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/notifications",
+      "filePath": "frontend/src/app/api/v1/notifications/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/passports",
+      "filePath": "frontend/src/app/api/v1/passports/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/passports/[passportId]",
+      "filePath": "frontend/src/app/api/v1/passports/[passportId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/reports",
+      "filePath": "frontend/src/app/api/v1/reports/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/reports/[reportId]",
+      "filePath": "frontend/src/app/api/v1/reports/[reportId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/search",
+      "filePath": "frontend/src/app/api/v1/search/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/trust",
+      "filePath": "frontend/src/app/api/v1/trust/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/trust/analyze",
+      "filePath": "frontend/src/app/api/v1/trust/analyze/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/trust/cases",
+      "filePath": "frontend/src/app/api/v1/trust/cases/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/trust/cases/[caseId]",
+      "filePath": "frontend/src/app/api/v1/trust/cases/[caseId]/route.js"
+    },
+    {
+      "type": "API",
+      "route": "/api/v1/trust/cases/[caseId]/community-signals",
+      "filePath": "frontend/src/app/api/v1/trust/cases/[caseId]/community-signals/route.js"
+    }
+  ]
+}

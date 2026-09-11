@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-09-12T02:00:00+07:00",
+  "candidateSha": "a7710c842839f92e24fbe04790a852d6448ff324",
+  "hardInvariants": [
+    {
+      "boundary": "COMMUNITY_PERCEPTION_TO_TRUST",
+      "invariant": "Community perception votes MUST NEVER mutate Trust Engine verdict",
+      "testMethod": "100_BELIEVE_VOTES_INJECTION",
+      "verdictBefore": "INSUFFICIENT_EVIDENCE",
+      "verdictAfter": "INSUFFICIENT_EVIDENCE",
+      "mutationCount": 0,
+      "passed": true
+    },
+    {
+      "boundary": "MODERATION_TO_TRUST",
+      "invariant": "Moderation case resolution MUST NEVER alter Trust Engine verdict",
+      "testMethod": "MODERATION_ACTION_EXECUTION",
+      "mutationCount": 0,
+      "passed": true
+    },
+    {
+      "boundary": "EXPERT_TO_TRUST_DIRECT",
+      "invariant": "Expert assessments enter Trust as EXPERT_ASSESSMENT typed evidence only",
+      "testMethod": "EXPERT_TYPED_EVIDENCE_BOUNDARY",
+      "directVerdictMutationCount": 0,
+      "passed": true
+    },
+    {
+      "boundary": "STAR_TO_TRUST",
+      "invariant": "5-star reputation NEVER mutates Trust Engine verdict",
+      "testMethod": "STAR_AUTHORITY_PROHIBITION_CONTRACT",
+      "trustMutationCount": 0,
+      "passed": true
+    }
+  ]
+}

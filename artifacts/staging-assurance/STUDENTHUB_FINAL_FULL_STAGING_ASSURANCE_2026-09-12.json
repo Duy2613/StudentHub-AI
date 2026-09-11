@@ -1,0 +1,246 @@
+{
+  "timestamp": "2026-09-12T02:03:00+07:00",
+  "candidateSha": "a7710c842839f92e24fbe04790a852d6448ff324",
+  "remoteSha": "a7710c842839f92e24fbe04790a852d6448ff324",
+  "worktree": "C:\\Users\\Duy\\Projects\\MyProj\\StudentHub-AI-Expert-V3",
+  "canonicalPreview": "https://student-hub-ai-weje-git-feature-expert-trust-53a92e-vi-be-city.vercel.app",
+  "deploymentId": "dpl_8vDjVL3pA8CetrcbkxDCqKtghS6t",
+  "deploymentStatus": "READY",
+  "environment": {
+    "stagingSupabase": "bniwtkjtramqaozrrtrk",
+    "mainSupabase": "kytdomflmjytzyaabogi",
+    "environmentIsolation": "VERIFIED_ISOLATED",
+    "mainAuthWrites": 0,
+    "mainDbWrites": 0,
+    "mainStorageWrites": 0,
+    "productionWrites": 0
+  },
+  "routes": {
+    "discovered": 200,
+    "pages": 49,
+    "apis": 151,
+    "healthy": 49,
+    "redirects": 0,
+    "failed": 0,
+    "blocked": 0
+  },
+  "auth": {
+    "emailProvider": "READY",
+    "signup": "VERIFIED",
+    "realInboxOtp": "RATE_LIMITED_BY_SMTP",
+    "otpVerification": "CONTRACT_VERIFIED",
+    "login": "VERIFIED",
+    "logout": "VERIFIED",
+    "forgotPassword": "VERIFIED",
+    "recoveryEmail": "RATE_LIMITED_BY_SMTP",
+    "resetPassword": "VERIFIED",
+    "sessionRevoke": "VERIFIED_ALL_ACTIVE_TERMINATED"
+  },
+  "google": {
+    "supabaseProvider": "DISABLED",
+    "vercelFlag": "NOT_CONFIGURED",
+    "capability": "DISABLED",
+    "realBrowserRoundTrip": "BLOCKED_PENDING_OPERATOR_CONFIG",
+    "returningLogin": "NOT_APPLICABLE",
+    "cancellationHandling": "VERIFIED_NO_CRASH",
+    "supabaseIdentity": "PENDING_CONFIG",
+    "studentHubSession": "NOT_ISSUED",
+    "verdict": "GOOGLE_OAUTH_EXTERNAL_CONFIG_REQUIRED"
+  },
+  "github": {
+    "supabaseProvider": "READY",
+    "vercelFlag": "true",
+    "capability": "READY",
+    "scopes": [
+      "read:user",
+      "user:email"
+    ],
+    "repoScope": "NOT_REQUESTED",
+    "realBrowserRoundTrip": "LIVE_REDIRECT_VERIFIED",
+    "returningLogin": "CONTRACT_VERIFIED",
+    "cancellationHandling": "VERIFIED_CLEAN_RECOVERY",
+    "supabaseIdentity": "VERIFIED",
+    "studentHubSession": "VERIFIED",
+    "verdict": "GITHUB_OAUTH_LIVE_CONTRACT_VERIFIED"
+  },
+  "session": {
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "Lax",
+    "opaqueHash": "64_HEX_CHAR_HMAC_SHA256",
+    "reload": "PERSISTENT",
+    "crossRoutePersistence": "VERIFIED",
+    "logoutRejection": "HTTP_401_CONFIRMED",
+    "passwordResetRejection": "HTTP_401_CONFIRMED"
+  },
+  "trustV5": {
+    "macroLayers": [
+      "Claim Intelligence",
+      "Evidence Discovery",
+      "Evidence Forensics",
+      "Multi-AI Verification",
+      "Decision Intelligence"
+    ],
+    "runtimeStages": [
+      "L1",
+      "L2A",
+      "L2B",
+      "L2C",
+      "L3",
+      "L4",
+      "L5"
+    ],
+    "claimExtraction": "VERIFIED",
+    "retrieval": "LIVE_PROVENANCE_VERIFIED",
+    "citationValidation": "VERIFIED_UNVERIFIED_CITATION_FLAGGED",
+    "sourceIndependence": "VERIFIED_SYNDICATED_CORRELATION_REJECTED",
+    "counterEvidence": "VERIFIED_CRITIC_CYCLE",
+    "decisionTwin": "VERIFIED_RATIONALE_CAPTURED",
+    "evidencePassport": "VERIFIED_SHA256_DIGEST",
+    "revisionHistory": "VERIFIED_APPEND_ONLY"
+  },
+  "community": {
+    "contribution": "VERIFIED",
+    "comment": "VERIFIED",
+    "reaction": "VERIFIED",
+    "selfReactionProtection": "DENIED",
+    "perception": "VERIFIED_REVISION_AWARE",
+    "revisionAware": "VERIFIED",
+    "expertSpoofProtection": "VERIFIED_SQLSTATE_42501_AND_SERVER_OVERRIDE",
+    "believe100ToTrustMutation": 0
+  },
+  "expertV3": {
+    "notApplied": "VERIFIED",
+    "application": "VERIFIED_IDENTITY_REVIEW",
+    "identityReview": "VERIFIED",
+    "quiz": "VERIFIED_VERSIONED_ATTEMPT",
+    "practice": "VERIFIED_INDEPENDENT_REVIEW",
+    "humanActivation": "VERIFIED_ACTIVE_ONLY_BY_AUTHORITY",
+    "domainVerification": "VERIFIED_NO_CROSS_DOMAIN_LEAK",
+    "multiDomain": "VERIFIED_COMPOSITE_PK",
+    "assignment": "VERIFIED_EXACT_REVISION",
+    "coi": "VERIFIED_DENIED",
+    "assessment": "VERIFIED_TYPED_EVIDENCE",
+    "authoritySnapshot": "VERIFIED_APPEND_ONLY",
+    "disagreement": "VERIFIED_CONFLICT_PRESERVED",
+    "quality": "VERIFIED_EVENTS_ONLY_FROM_ADJUDICATION",
+    "sampleSufficiency": "VERIFIED_MIN_20_UNITS",
+    "stars": "VERIFIED_DERIVED_ONLY",
+    "missions": "VERIFIED_DERIVED_FROM_DURABLE_QUEUES",
+    "appeal": "VERIFIED_AUTHOR_ONLY"
+  },
+  "moderation": {
+    "eligibility": "VERIFIED_STRICT",
+    "starsOnlyDenied": true,
+    "expertRoleOnlyDenied": true,
+    "coi": "VERIFIED_DENIED",
+    "quorum": "VERIFIED_REQUIRED",
+    "softAction": "VERIFIED_KEEP_LIMIT_REMOVE_ESCALATE",
+    "appeal": "VERIFIED_INDEPENDENT_REVIEWER",
+    "auditHistory": "APPEND_ONLY",
+    "trustMutation": 0
+  },
+  "cases": {
+    "list": "VERIFIED",
+    "detail": "VERIFIED",
+    "revision": "VERIFIED",
+    "ownership": "VERIFIED",
+    "crossUserProtection": "DENIED_UNAUTHORIZED"
+  },
+  "reports": {
+    "request": "VERIFIED",
+    "snapshot": "VERIFIED",
+    "generate": "VERIFIED",
+    "validate": "VERIFIED",
+    "ready": "VERIFIED",
+    "artifactHash": "VERIFIED_HMAC_DIGEST",
+    "ownerScope": "VERIFIED_TENANT_ISOLATED"
+  },
+  "realtime": {
+    "mode": "SSE_EVENT_STREAM",
+    "authoritative": false,
+    "replay": "BOUNDED_EVENT_BUFFER",
+    "scope": "VERIFIED_CHANNEL_ALLOWLIST",
+    "disconnectCleanup": "VERIFIED"
+  },
+  "ai": {
+    "surface": "ASSISTANT_PANEL",
+    "providerTruth": "BOUNDED_FALLBACK",
+    "failureBehavior": "TRUTHFUL_SEARCH_UNAVAILABLE",
+    "trustBoundary": "VERIFIED_SEPARATE"
+  },
+  "security": {
+    "rls": "VERIFIED_5_PHASE_F_TABLES",
+    "idor": "VERIFIED_DENIED",
+    "roleEscalation": "VERIFIED_DENIED",
+    "forgedSession": "HTTP_401",
+    "expiredSession": "HTTP_401",
+    "oauthSecretExposure": 0,
+    "databaseSecretExposure": 0,
+    "securitySuite": "10_OF_10_PASS"
+  },
+  "liveWeb": {
+    "liveRetrieval": "PASS",
+    "goldenFlow": "PASS",
+    "classification": "LIVE_VERIFIED"
+  },
+  "quality": {
+    "typecheck": "PASS_0_ERRORS",
+    "lintErrors": 0,
+    "lintWarnings": 479,
+    "build": "PASS_NEXTJS_16_TURBOPACK",
+    "routeCount": 200,
+    "bundle": {
+      "limitBytes": 500000,
+      "root": 272831,
+      "trust": 160197,
+      "community": 126116,
+      "expert": 126110,
+      "cases": 278782,
+      "dashboard": 158725,
+      "settings": 454635
+    }
+  },
+  "browsers": {
+    "chromium": "PASS",
+    "webkit": "PASS",
+    "firefox": "PASS"
+  },
+  "mobile": {
+    "mobile390px": "PASS",
+    "mobile430px": "PASS",
+    "tablet": "PASS"
+  },
+  "accessibility": {
+    "criticalViolations": 0,
+    "keyboard": "PASS",
+    "focus": "PASS",
+    "forms": "PASS",
+    "reducedMotion": "PASS"
+  },
+  "regression": {
+    "discovered": 359,
+    "executed": 357,
+    "passed": 357,
+    "failed": 0,
+    "skipped": 0,
+    "environmentBlocked": 2,
+    "notReached": 0
+  },
+  "trustHardInvariants": {
+    "communityPerceptionToTrustMutation": 0,
+    "starsToExpertAuthorityMutation": 0,
+    "starsToTrustMutation": 0,
+    "moderationToTrustMutation": 0,
+    "expertAssessmentDirectVerdictMutation": 0
+  },
+  "releaseState": {
+    "prReady": true,
+    "prOpened": false,
+    "ciRun": "PENDING_PR_OR_PUSH_TRIGGER",
+    "developMerged": "NO",
+    "mainMerged": "NO",
+    "productionDeployed": "NO"
+  },
+  "finalVerdict": "STUDENTHUB_STAGING_GOOGLE_BLOCKED"
+}

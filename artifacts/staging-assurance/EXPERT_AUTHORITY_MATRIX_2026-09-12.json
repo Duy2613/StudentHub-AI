@@ -1,0 +1,46 @@
+{
+  "timestamp": "2026-09-12T02:00:00+07:00",
+  "candidateSha": "a7710c842839f92e24fbe04790a852d6448ff324",
+  "rules": [
+    {
+      "rule": "INITIAL_STATE_NOT_APPLIED",
+      "description": "Authenticated normal users begin strictly at NOT_APPLIED",
+      "verified": true
+    },
+    {
+      "rule": "LOGIN_NEQ_EXPERT",
+      "description": "Email, Google, or GitHub authentication never confers Expert role",
+      "verified": true
+    },
+    {
+      "rule": "STAR_NEQ_AUTHORITY",
+      "description": "5-star rating never confers Expert authority or moderator eligibility",
+      "verified": true
+    },
+    {
+      "rule": "SAMPLE_SUFFICIENCY",
+      "description": "Minimum 20 independent adjudicated units required before reliability projection",
+      "verified": true
+    },
+    {
+      "rule": "MULTI_DOMAIN_COMPOSITE_PK",
+      "description": "expert_progression_projections enforces PRIMARY KEY (user_id, domain_code)",
+      "verified": true
+    },
+    {
+      "rule": "ANTI_GAMING_SYBIL_RESISTANCE",
+      "description": "Idempotency key deduplication, correlated cluster event normalization, self-review denial",
+      "verified": true
+    },
+    {
+      "rule": "RLS_ENFORCEMENT",
+      "description": "Direct client inserts on community_perception_* and moderation_* blocked via RLS (SQLSTATE 42501)",
+      "verified": true
+    },
+    {
+      "rule": "SERVER_DERIVED_EXPERT_SEGMENT",
+      "description": "Client attempt to force voter_is_expert_at_vote = true is overridden/denied by server authority",
+      "verified": true
+    }
+  ]
+}
