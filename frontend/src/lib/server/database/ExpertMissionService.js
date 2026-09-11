@@ -23,7 +23,7 @@ export class ExpertMissionService {
 
     // 1. Check assigned expert cases
     const assignmentRes = await this.pool.query(
-      `SELECT a.id, a.case_id, a.case_revision, a.status, tc.title
+      `SELECT a.id, a.case_id, a.case_revision, a.status, NULL as title
        FROM private.expert_assignments a
        JOIN public.trust_cases tc ON tc.id = a.case_id
        WHERE a.expert_id = $1
@@ -48,7 +48,7 @@ export class ExpertMissionService {
 
     // 2. Check community contributions needing verification
     const contributionRes = await this.pool.query(
-      `SELECT c.id, c.case_id, c.contribution_type, tc.title
+      `SELECT c.id, c.case_id, c.contribution_type, NULL as title
        FROM public.community_contributions c
        JOIN public.trust_cases tc ON tc.id = c.case_id
        WHERE c.evidence_state IN ('UNKNOWN', 'INSUFFICIENT', 'NEEDS_VERIFICATION')
