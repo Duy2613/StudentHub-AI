@@ -61,9 +61,9 @@ export function KnowledgeAtlas({ domains = DEFAULT_DOMAINS }: { domains?: AtlasD
 
         {/* Semantic Topic Selector & Fallback List */}
         <div className="flex-1 w-full">
-          <h4 className="text-xs font-mono uppercase tracking-wider text-sky-400 mb-2">
+          <h2 className="text-xs font-mono uppercase tracking-wider text-sky-400 mb-2">
             Bản đồ Chòm sao Tri thức (2.5D SVG)
-          </h4>
+          </h2>
           <ul className="space-y-2" role="list" aria-label="Danh sách lĩnh vực chòm sao tri thức">
             {domains.map((dom) => {
               const isSel = dom.id === selected.id;
