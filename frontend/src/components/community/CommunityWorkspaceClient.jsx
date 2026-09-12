@@ -11,6 +11,18 @@ const CommunityWorkspace = dynamic(() => import("./CommunityIntelligenceView").t
   ),
 });
 
+const CommunityMaxWorkspace = dynamic(() => import("./CommunityMaxWorkspace"), {
+  ssr: false,
+  loading: () => (
+    <div className="workspace-loading" role="status" aria-live="polite">
+      Đang tải Community Max…
+    </div>
+  ),
+});
+
 export default function CommunityWorkspaceClient() {
-  return <CommunityWorkspace />;
+  return <>
+    <CommunityWorkspace />
+    <CommunityMaxWorkspace />
+  </>;
 }

@@ -5,7 +5,15 @@ import { AuthRouteGuard } from "@/lib/security/hardening/AuthRouteGuard.js";
 
 export const runtime = "nodejs";
 
-const repo = new CommunityPerceptionRepository();
+let sharedRepo;
+
+function repository() {
+  // Keep the durable dependency request-scoped so Next/Vercel can collect the
+  // route configuration without requiring DATABASE_URL during the build.
+  // The request still fails closed when durable storage is not configured.
+  if (!sharedRepo) sharedRepo = new CommunityPerceptionRepository();
+  return sharedRepo;
+}
 
 export async function GET(request) {
   try {
@@ -19,6 +27,7 @@ export async function GET(request) {
     const claimId = searchParams.get("claimId") || null;
     const contributionId = searchParams.get("contributionId") || null;
 
+    const repo = repository();
     const summary = await repo.getSummary({
       caseId,
       caseRevision,
@@ -59,6 +68,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
+    const repo = repository();
     AuthRouteGuard.assertRequest(request, { action: "PERCEPTION_VOTE", maxRequests: 60, maxBodyBytes: 8192 });
     const principal = await IdentityResolver.resolvePrincipal(request);
     if (!principal || principal.isAnonymous()) {
