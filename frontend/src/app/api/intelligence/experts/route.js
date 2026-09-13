@@ -14,7 +14,6 @@ export const GET = SecurityFabric.wrapHandler(
   {
     action: "DISCOVER_EXPERTS",
     requiredPermission: "EXPERT.READ",
-    requiredScopes: ["expert:read"],
     allowAnonymous: true
   },
   async (request, routeParams, principal, secContext) => {

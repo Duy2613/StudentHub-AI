@@ -12,7 +12,6 @@ import { ExpertPublicDTO } from "@/lib/intelligence/expert/ExpertPublicDTO.js";
 export const GET = SecurityFabric.wrapHandler({
   action: "READ_EXPERT_PROFILE",
   requiredPermission: "EXPERT.READ",
-  requiredScopes: ["expert:read"],
   allowAnonymous: true,
   maxRequests: 120
 }, async (_request, routeParams, _principal, secContext) => {

@@ -63,3 +63,17 @@ test("durable sessions expose the Expert read scope for roles that already grant
   assert.match(source, /STUDENT.*EXPERT.*ADMIN.*AI_AGENT/);
   assert.match(source, /expert:read/);
 });
+
+test("public Expert read projections keep RBAC without blocking browser sessions on an OAuth scope", () => {
+  for (const path of [
+    "frontend/src/app/api/intelligence/experts/route.js",
+    "frontend/src/app/api/intelligence/experts/[expertId]/route.js",
+    "frontend/src/app/api/expert/profile/[expertId]/route.js",
+    "frontend/src/app/api/v1/experts/route.js",
+  ]) {
+    const source = read(path);
+    assert.match(source, /requiredPermission:\s*["']EXPERT\.READ["']/);
+    assert.match(source, /allowAnonymous:\s*true/);
+    assert.doesNotMatch(source, /requiredScopes:\s*\[["']expert:read["']\]/);
+  }
+});

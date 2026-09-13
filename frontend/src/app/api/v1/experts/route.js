@@ -35,7 +35,6 @@ async function discoverExperts(request, routeParams, principal, securityContext)
 export const GET = SecurityFabric.wrapHandler({
   action: "DISCOVER_CANONICAL_EXPERTS",
   requiredPermission: "EXPERT.READ",
-  requiredScopes: ["expert:read"],
   allowAnonymous: true,
   maxRequests: 60,
   maxBodyBytes: 0,
