@@ -205,10 +205,11 @@ const PII_PATTERNS = Object.freeze([
   ["BANK_ACCOUNT", /\b(?:TK|STK|ACCOUNT|BANK|T[AÀ]I\s*KHO[AẢ]N(?:\s+NG[AÂ]N\s+H[AÀ]NG)?|SỐ\s*T[AÀ]I\s*KHO[AẢ]N|SO\s+TAI\s+KHOAN)[ :#-]*\d{8,20}\b/giu],
   ["IDENTITY_DOCUMENT", /\b(?:CCCD|CMND|PASSPORT|ID\s*CARD)[ :#-]*[A-Z0-9-]{6,20}\b/gi],
   ["QR_DATA", /\b(?:QR|QRCODE|QR\s*DATA)[:=][^\s]{6,}\b/gi],
-  // Require a separator after an address marker. Without this boundary,
-  // ordinary academic words such as "scope" and "source" were interpreted
-  // as the Vietnamese/English "so" address prefix and blocked practice text.
-  ["PRECISE_ADDRESS", /\b(?:số|so|street|st\.?|đường|duong|ngõ|ngo|phường|phuong|quận|quan|district)[ .:#-]+[A-Z0-9À-ỹ .,#/-]{5,80}\b/gi],
+  // Require a numeric street token after the address marker. A bare English
+  // "so ..." sentence is ordinary discussion text, not an address. Keeping
+  // the numeric boundary preserves concrete address blocking while avoiding
+  // false positives in legitimate Community/Expert discussion.
+  ["PRECISE_ADDRESS", /\b(?:số|so|street|st\.?|đường|duong|ngõ|ngo|phường|phuong|quận|quan|district)[ .:#-]+(?=[0-9][A-Z0-9À-ỹ .,#/-]{4,80}\b)[A-Z0-9À-ỹ .,#/-]{5,80}\b/giu],
 ]);
 
 function metadataFindings(metadata = {}) {

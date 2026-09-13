@@ -68,6 +68,12 @@ test("privacy scan catches text, image, QR, and location identifiers before publ
   assert.match(redactText("email student@example.edu.vn phone 0901234567"), /REDACTED_PHONE/);
 });
 
+test("privacy scan does not treat an ordinary English discussion sentence as an address", () => {
+  const scan = detectPII("The timing is not independently confirmed yet, so a fresh source check is still necessary.");
+  assert.equal(scan.findings.some((finding) => finding.type === "PRECISE_ADDRESS"), false);
+  assert.equal(scan.blocked, false);
+});
+
 test("source clustering does not mistake reposted accounts for independent evidence", () => {
   const first = clusterSource({ url: "https://example.edu/notice?id=7&utm_source=copy", publisher: "example.edu", independenceKey: "example.edu" });
   const second = clusterSource({ url: "https://example.edu/notice?id=7", publisher: "example.edu", independenceKey: "example.edu" });
