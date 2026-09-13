@@ -20,13 +20,25 @@ async function resolveRouteParams(routeParams) {
   return context || {};
 }
 
+function contributionIdFromRequest(request, params) {
+  if (params?.contributionId) return params.contributionId;
+  try {
+    const pathname = new URL(request.url).pathname;
+    const prefix = "/api/intelligence/community/contributions/";
+    if (!pathname.startsWith(prefix)) return null;
+    return decodeURIComponent(pathname.slice(prefix.length).split("/")[0] || "") || null;
+  } catch {
+    return null;
+  }
+}
+
 async function editContribution(request, routeParams, principal, securityContext) {
   const params = await resolveRouteParams(routeParams);
   const body = await request.json().catch(() => ({}));
   try {
     const data = await CommunityRepository.editContribution({
       authorId: principal.subjectId,
-      contributionId: params?.contributionId,
+      contributionId: contributionIdFromRequest(request, params),
       expectedRevision: body.expectedRevision,
       caseId: body.caseId || body.caseScope?.caseId,
       caseRevision: body.caseRevision ?? body.caseScope?.caseRevision,
@@ -52,7 +64,7 @@ async function editContribution(request, routeParams, principal, securityContext
 async function readContributionRevisions(request, routeParams, principal, securityContext) {
   const params = await resolveRouteParams(routeParams);
   try {
-    const revisions = await CommunityRepository.listContributionRevisions({ actorId: principal.subjectId, contributionId: params?.contributionId });
+    const revisions = await CommunityRepository.listContributionRevisions({ actorId: principal.subjectId, contributionId: contributionIdFromRequest(request, params) });
     return NextResponse.json({ success: true, revisions, historyPreserved: true, correlationId: securityContext.correlationId });
   } catch (error) {
     return errorResponse(error, securityContext.correlationId);

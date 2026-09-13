@@ -96,6 +96,8 @@ test("community revisions use expected-revision, privacy confirmation, and durab
   assert.match(repository, /requiresRereview: true/);
   assert.match(route, /EDIT_COMMUNITY_CONTRIBUTION/);
   assert.match(route, /READ_COMMUNITY_CONTRIBUTION_REVISIONS/);
+  assert.match(route, /resolveRouteParams/);
+  assert.match(route, /contributionIdFromRequest/);
 });
 
 test("expert qualification requires a supervised evidence-based practice review before activation", () => {
