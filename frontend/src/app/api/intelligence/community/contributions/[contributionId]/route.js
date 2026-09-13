@@ -12,8 +12,16 @@ function errorResponse(error, correlationId) {
   return NextResponse.json({ success: false, error: { code: "COMMUNITY_STORAGE_UNAVAILABLE", userMessage: "Community revision storage is temporarily unavailable.", correlationId } }, { status: 503 });
 }
 
+async function resolveRouteParams(routeParams) {
+  const context = await routeParams;
+  if (context?.params !== undefined) {
+    return (await context.params) || {};
+  }
+  return context || {};
+}
+
 async function editContribution(request, routeParams, principal, securityContext) {
-  const params = await routeParams.params;
+  const params = await resolveRouteParams(routeParams);
   const body = await request.json().catch(() => ({}));
   try {
     const data = await CommunityRepository.editContribution({
@@ -42,7 +50,7 @@ async function editContribution(request, routeParams, principal, securityContext
 }
 
 async function readContributionRevisions(request, routeParams, principal, securityContext) {
-  const params = await routeParams.params;
+  const params = await resolveRouteParams(routeParams);
   try {
     const revisions = await CommunityRepository.listContributionRevisions({ actorId: principal.subjectId, contributionId: params?.contributionId });
     return NextResponse.json({ success: true, revisions, historyPreserved: true, correlationId: securityContext.correlationId });
