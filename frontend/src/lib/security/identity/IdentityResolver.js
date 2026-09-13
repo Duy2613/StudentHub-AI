@@ -17,6 +17,14 @@ import { SecurityError } from "../core/SecurityErrorEnvelope.js";
 import { normalizeSubjectId } from "./normalizeSubjectId.js";
 
 const tokenValidator = new TokenValidator();
+const BASE_SCOPES = ["academic:read", "academic:plan", "community:read", "trust:read"];
+
+function defaultScopesForRoles(roles = []) {
+  const normalizedRoles = new Set((Array.isArray(roles) ? roles : [roles]).map((role) => String(role).trim().toUpperCase()));
+  const scopes = [...BASE_SCOPES];
+  if (["STUDENT", "EXPERT", "ADMIN", "AI_AGENT"].some((role) => normalizedRoles.has(role))) scopes.push("expert:read");
+  return scopes;
+}
 
 export class IdentityResolver {
   /**
@@ -139,7 +147,7 @@ export class IdentityResolver {
       email,
       roles,
       permissions: payload.permissions || this.#deriveDefaultPermissions(principalType),
-      scopes: payload.scopes || payload.scope?.split(" ") || ["academic:read", "community:read", "trust:read"],
+      scopes: payload.scopes || payload.scope?.split(" ") || defaultScopesForRoles(roles),
       tenantId: payload.tenantId || "hcmute",
       assuranceLevel: payload.aal || (payload.amr?.includes("mfa") ? AUTH_ASSURANCE_LEVEL.AAL2_STEP_UP : AUTH_ASSURANCE_LEVEL.AAL1_NORMAL),
       sessionId: payload.sid || null,
@@ -167,7 +175,7 @@ export class IdentityResolver {
       email: "",
       roles: [principalType.toLowerCase()],
       permissions: this.#deriveDefaultPermissions(principalType),
-      scopes: ["academic:read", "academic:plan", "community:read", "trust:read"],
+      scopes: defaultScopesForRoles([principalType]),
       tenantId: "hcmute",
       assuranceLevel: session.assuranceLevel,
       sessionId: session.sessionId
@@ -193,7 +201,7 @@ export class IdentityResolver {
       email: session.email || "",
       roles,
       permissions: this.#deriveDefaultPermissions(principalType),
-      scopes: ["academic:read", "academic:plan", "community:read", "trust:read"],
+      scopes: defaultScopesForRoles(roles),
       sessionId: "opaque-cookie",
       assuranceLevel: AUTH_ASSURANCE_LEVEL.AAL1_NORMAL,
       attributes: {

@@ -55,3 +55,11 @@ test("the public Expert scope evaluator is explicitly non-persistent", () => {
   assert.match(source, /EXPERT_STORAGE_UNAVAILABLE/);
   assert.doesNotMatch(source, /submitAssessment|createAssignment|recordQualityEvent|UPDATE|INSERT/i);
 });
+
+test("durable sessions expose the Expert read scope for roles that already grant Expert.READ", () => {
+  const source = read("frontend/src/lib/security/identity/IdentityResolver.js");
+  assert.match(source, /BASE_SCOPES/);
+  assert.match(source, /defaultScopesForRoles/);
+  assert.match(source, /STUDENT.*EXPERT.*ADMIN.*AI_AGENT/);
+  assert.match(source, /expert:read/);
+});
