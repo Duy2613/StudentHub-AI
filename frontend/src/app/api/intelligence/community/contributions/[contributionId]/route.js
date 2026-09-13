@@ -13,7 +13,7 @@ function errorResponse(error, correlationId) {
 }
 
 async function editContribution(request, routeParams, principal, securityContext) {
-  const params = await routeParams;
+  const params = await routeParams.params;
   const body = await request.json().catch(() => ({}));
   try {
     const data = await CommunityRepository.editContribution({
@@ -42,7 +42,7 @@ async function editContribution(request, routeParams, principal, securityContext
 }
 
 async function readContributionRevisions(request, routeParams, principal, securityContext) {
-  const params = await routeParams;
+  const params = await routeParams.params;
   try {
     const revisions = await CommunityRepository.listContributionRevisions({ actorId: principal.subjectId, contributionId: params?.contributionId });
     return NextResponse.json({ success: true, revisions, historyPreserved: true, correlationId: securityContext.correlationId });
