@@ -145,10 +145,10 @@ export default function ExpertTrustNetworkV3Workbench() {
               )}
             </div>
 
-            <h3 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
               {workbenchData?.fullName || "Chuyên gia Thẩm định"}
               <ShieldCheck className="w-6 h-6 text-teal-400 inline" />
-            </h3>
+            </h2>
             <p className="text-xs text-gray-400 mt-0.5">
               Hệ thống cấp bậc uy tín phái sinh độc lập từ lịch sử thẩm định đối soát bằng chứng.
             </p>
@@ -262,7 +262,7 @@ export default function ExpertTrustNetworkV3Workbench() {
           {/* Daily Progress */}
           <div className="p-4 rounded-2xl bg-space-900/60 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="w-full sm:w-auto">
-              <h4 className="text-sm font-semibold text-white">Tiến độ nhiệm vụ chuyên môn</h4>
+              <h3 className="text-sm font-semibold text-white">Tiến độ nhiệm vụ chuyên môn</h3>
               <p className="text-xs text-gray-400 mt-0.5">
                 Hoàn thành nhiệm vụ giúp cải thiện chất lượng đối soát và tích lũy điểm thẩm định.
               </p>
@@ -297,9 +297,9 @@ export default function ExpertTrustNetworkV3Workbench() {
                         +{m.points} pts
                       </span>
                     </div>
-                    <h5 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">
+                    <h4 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">
                       {m.title}
-                    </h5>
+                    </h4>
                     <p className="text-xs text-gray-400 mt-1 leading-relaxed">
                       {m.description}
                     </p>
@@ -337,7 +337,7 @@ export default function ExpertTrustNetworkV3Workbench() {
       {activeTab === "leaderboard" && (
         <div className="p-4 rounded-2xl bg-space-900/60 border border-white/10">
           <div className="mb-4">
-            <h4 className="text-sm font-semibold text-white">Bảng danh dự Chuyên gia Uy tín</h4>
+            <h3 className="text-sm font-semibold text-white">Bảng danh dự Chuyên gia Uy tín</h3>
             <p className="text-xs text-gray-400 mt-0.5">
               Chỉ xếp hạng các chuyên gia đạt chuẩn kiểm chứng tối thiểu (≥20 lượt đối soát độc lập).
             </p>
@@ -392,7 +392,7 @@ export default function ExpertTrustNetworkV3Workbench() {
           <div className="p-4 rounded-2xl bg-space-900/60 border border-white/10">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <h4 className="text-sm font-semibold text-white">Hàng đợi Kiểm duyệt Cộng đồng</h4>
+                <h3 className="text-sm font-semibold text-white">Hàng đợi Kiểm duyệt Cộng đồng</h3>
                 <p className="text-xs text-gray-400 mt-0.5">
                   Kiểm duyệt nội dung bài đăng và phản hồi từ sinh viên theo chuẩn mực học thuật.
                 </p>
