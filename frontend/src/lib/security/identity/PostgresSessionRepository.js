@@ -9,6 +9,30 @@ export class PostgresSessionRepository {
     const client = await this.pool.connect();
     try {
       await client.query("begin");
+      // Profile creation is part of the same trusted server transaction as
+      // application-session issuance. The auth trigger remains idempotent for
+      // Auth-side retries; this path repairs historical users whose trigger
+      // ran before the application profile existed.
+      const fallbackName = String(record.fullName || record.email || "StudentHub member")
+        .replace(/[\u0000-\u001F\u007F]/g, "")
+        .trim()
+        .slice(0, 120) || "StudentHub member";
+      try {
+        await client.query(`
+          insert into public.profiles(id, display_name, avatar_url)
+          values($1, $2, $3)
+          on conflict (id) do nothing
+        `, [record.userId, fallbackName, record.avatarUrl || null]);
+      } catch (error) {
+        // Keep the migration-window compatibility path for the legacy
+        // full_name column, while never accepting legacy role/trust fields.
+        if (error?.code !== "42703") throw error;
+        await client.query(`
+          insert into public.profiles(id, full_name, avatar_url)
+          values($1, $2, $3)
+          on conflict (id) do nothing
+        `, [record.userId, fallbackName, record.avatarUrl || null]);
+      }
       await client.query(`
         insert into private.server_sessions(
           token_hash, user_id, auth_provider, upstream_jti_hash, created_at,
@@ -39,8 +63,8 @@ export class PostgresSessionRepository {
         u.email,
         (u.email_confirmed_at is not null) as email_verified,
         nullif(u.raw_user_meta_data->>'full_name', '') as full_name,
-        case when u.raw_user_meta_data->>'onboarded' in ('true', 'false')
-          then (u.raw_user_meta_data->>'onboarded')::boolean else false end as onboarded,
+        case when (select to_jsonb(p)->>'onboarded' from public.profiles p where p.id = s.user_id) in ('true', 'false')
+          then ((select to_jsonb(p)->>'onboarded' from public.profiles p where p.id = s.user_id))::boolean else false end as onboarded,
         coalesce((select array_agg(r.code order by r.code)
           from private.user_roles ur join private.roles r on r.id=ur.role_id
           where ur.user_id=s.user_id and ur.revoked_at is null), array['STUDENT']::text[]) roles
