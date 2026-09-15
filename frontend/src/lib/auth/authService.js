@@ -5,9 +5,10 @@
 // - Interceptor bắt và dịch chính xác toàn bộ mã lỗi Supabase & ASP.NET Core sang tiếng Việt
 // - Provider bearer proof is kept in memory only and exchanged for an opaque
 //   server-issued HttpOnly cookie before the UI claims an authenticated session.
-// - "Remember Me" stores preferences/demo data only, never credentials.
+// - "Remember Me" stores only a UI preference; credentials stay transient or
+//   inside the server-owned HttpOnly application session.
 
-import { supabase } from "../supabase/client.js";
+import { clearPkceVerifierStorage, supabase } from "../supabase/client.js";
 
 const API_BASE = typeof window !== "undefined"
   ? "" // Sử dụng Next.js Route Proxy cùng origin để triệt tiêu lỗi CORS Preflight
@@ -24,17 +25,6 @@ function getBrowserStorage(storageName) {
     return window[storageName] || null;
   } catch (error) {
     logAuthError(`storage:${storageName}`, error);
-    return null;
-  }
-}
-
-function readBrowserStorage(storageName, key) {
-  const storage = getBrowserStorage(storageName);
-  if (!storage) return null;
-  try {
-    return storage.getItem(key);
-  } catch (error) {
-    logAuthError(`storage:${storageName}:read`, error);
     return null;
   }
 }
@@ -61,11 +51,8 @@ function removeBrowserStorage(storageName, key) {
   }
 }
 
-function isRememberedSession() {
-  return readBrowserStorage("localStorage", "studenthub_remember_me") === "true";
-}
-
 const SAFE_PROFILE_FIELDS = new Set([
+  "displayName",
   "fullName",
   "full_name",
   "avatarId",
@@ -113,6 +100,19 @@ export function logAuthInfo(functionName, message, data = null) {
   console.log(`[AUTH_INFO] - [${redactAuthLogText(functionName)}] - ${redactAuthLogText(message)}`, safeData);
 }
 
+function withAuthProvider(error, provider) {
+  const wrapped = new Error(error?.message || error?.error_description || error?.code || "OAuth provider error.");
+  wrapped.code = error?.code || "OAUTH_PROVIDER_ERROR";
+  wrapped.provider = provider;
+  return wrapped;
+}
+
+function providerCallbackUrl(origin, next, provider) {
+  const callback = new URL(buildAuthCallbackUrl(origin, next));
+  callback.searchParams.set("provider", provider);
+  return callback.toString();
+}
+
 import {
   AUTH_CAPABILITY_STATE,
   AUTH_CONFIGURATION_MESSAGE,
@@ -121,6 +121,7 @@ import {
   GOOGLE_AUTH_DISABLED_MESSAGE,
 } from "./authCapabilities.js";
 import { AUTH_LOGOUT_CHANNEL, AUTH_LOGOUT_SIGNAL_KEY } from "./authStateMachine.js";
+import { buildAuthCallbackUrl } from "./authRedirects.js";
 
 export { getAuthCapabilities } from "./authCapabilities.js";
 export { AUTH_LOGOUT_SIGNAL_KEY } from "./authStateMachine.js";
@@ -172,8 +173,9 @@ export function translateAuthError(error) {
   const structuredEnvelope = (candidateText.startsWith("{") && candidateText.endsWith("}"))
     || (candidateText.startsWith("[") && candidateText.endsWith("]"));
   const rawMsg = extractAuthErrorText(error);
-    
+
   const lower = rawMsg.toLowerCase();
+  const provider = String(error?.provider || "").toLowerCase();
 
   if (lower.includes("supabase_auth_env_missing") || lower.includes("legacy_auth_disabled")) {
     return AUTH_CONFIGURATION_MESSAGE;
@@ -189,6 +191,7 @@ export function translateAuthError(error) {
     lower.includes("validation_failed") ||
     lower.includes("provider_not_enabled")
   ) {
+    if (provider === "github") return "Đăng nhập bằng GitHub hiện chưa được kích hoạt trên hệ thống máy chủ.";
     return GOOGLE_AUTH_DISABLED_MESSAGE;
   }
 
@@ -401,6 +404,39 @@ export async function getApplicationSession() {
   }
 }
 
+/**
+ * Reads the presentation-safe projection of the durable public.profiles row.
+ * The server session remains the identity authority; this endpoint only
+ * supplies editable profile fields and never supplies role or authority.
+ */
+export async function getUserProfile() {
+  if (typeof window === "undefined") {
+    return { success: false, unavailable: false, profile: null, code: "BROWSER_CONTEXT_REQUIRED" };
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users/profile`, {
+      method: "GET",
+      credentials: "include",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+    const data = await res.json().catch(() => null);
+    if (res.ok && data?.success === true && data?.profile) {
+      return { success: true, unavailable: false, profile: data.profile, code: null };
+    }
+    return {
+      success: false,
+      unavailable: res.status >= 500,
+      profile: null,
+      code: data?.error?.code || `PROFILE_READ_HTTP_${res.status}`,
+    };
+  } catch (error) {
+    logAuthError("getUserProfile", error);
+    return { success: false, unavailable: true, profile: null, code: "PROFILE_READ_NETWORK_FAILURE" };
+  }
+}
+
 // =========================================================================
 // 3. APPLICATION SESSION ONLY
 // =========================================================================
@@ -489,20 +525,35 @@ export async function signUpWithEmail(email, password, fullName) {
       throw new Error(translateAuthError(error));
     }
 
-    if (data?.user) {
-      const identities = data.user.identities || [];
-      const isGoogleAccount = identities.length > 0 && identities.every((i) => i.provider === "google");
-
-      if (isGoogleAccount) {
-        const err = new Error(
-          "Email này đã được đăng ký thông qua tài khoản Google từ trước. Vui lòng sử dụng 'Continue with Google' để đăng nhập."
-        );
-        logAuthError("signUpWithEmail", err);
-        throw err;
-      }
+    // With email confirmation enabled Supabase intentionally returns a
+    // redacted user with no identities for an already-registered address.
+    // Treat that response as a duplicate instead of promising an OTP that
+    // will never arrive. This does not enumerate which provider owns it.
+    if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      const err = new Error("Email này đã được sử dụng. Vui lòng chuyển sang Đăng nhập.");
+      err.code = "USER_ALREADY_REGISTERED";
+      logAuthError("signUpWithEmail", err);
+      throw err;
     }
 
-    logAuthInfo("signUpWithEmail", "Đã gửi mã OTP 6 số thành công.");
+    if (data?.session?.access_token) {
+      setStoredToken(data.session.access_token, true);
+      const exchanged = await exchangeApplicationSession(data.session.access_token);
+      if (!exchanged.success) {
+        const exchangeError = new Error("Không thể tạo phiên đăng nhập an toàn. Vui lòng thử lại.");
+        exchangeError.code = exchanged.code;
+        throw exchangeError;
+      }
+      const applicationState = await getApplicationSession();
+      if (!applicationState.authenticated || !applicationState.user) {
+        const sessionError = new Error("Không thể xác nhận application session an toàn.");
+        sessionError.code = applicationState.code || "APPLICATION_SESSION_NOT_CONFIRMED";
+        throw sessionError;
+      }
+      data.applicationUser = applicationState.user;
+    }
+
+    logAuthInfo("signUpWithEmail", data?.applicationUser ? "Đăng ký email đã tạo phiên ứng dụng." : "Đã gửi mã OTP 6 số thành công.");
     return data;
   } catch (error) {
     logAuthError("signUpWithEmail", error);
@@ -664,7 +715,7 @@ export async function signInWithPassword(email, password, rememberMe = false) {
 /**
  * Đăng nhập OAuth Google
  */
-export async function signInWithGoogle() {
+export async function signInWithGoogle(next = "/dashboard") {
   logAuthInfo("signInWithGoogle", "Khởi tạo luồng Google OAuth.");
   const capabilities = getAuthCapabilities();
   if (capabilities.google !== AUTH_CAPABILITY_STATE.READY) {
@@ -678,7 +729,7 @@ export async function signInWithGoogle() {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${origin}/callback` },
+      options: { redirectTo: providerCallbackUrl(origin, next, "google") },
     });
 
     if (error) {
@@ -702,7 +753,7 @@ export async function signInWithGoogle() {
 /**
  * Đăng nhập OAuth GitHub
  */
-export async function signInWithGitHub() {
+export async function signInWithGitHub(next = "/dashboard") {
   logAuthInfo("signInWithGitHub", "Khởi tạo luồng GitHub OAuth.");
   const capabilities = getAuthCapabilities();
   if (capabilities.github !== AUTH_CAPABILITY_STATE.READY) {
@@ -715,20 +766,26 @@ export async function signInWithGitHub() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
-        redirectTo: `${origin}/callback`,
-        scopes: "read:user user:email repo",
+        redirectTo: providerCallbackUrl(origin, next, "github"),
+        scopes: "read:user user:email",
       },
     });
 
     if (error) {
       logAuthError("signInWithGitHub", error);
-      throw new Error(translateAuthError(error));
+      if (/unsupported provider|provider is not enabled|validation_failed/i.test(String(error.message || error.code || ""))) {
+        markAuthProviderDegraded("github", "GITHUB_AUTH_BLOCKED_BY_PROVIDER_CONFIGURATION");
+      }
+      throw withAuthProvider(error, "github");
     }
 
     return data;
   } catch (error) {
     logAuthError("signInWithGitHub", error);
-    throw error;
+    if (/unsupported provider|provider is not enabled|validation_failed/i.test(String(error?.message || error?.code || ""))) {
+      markAuthProviderDegraded("github", "GITHUB_AUTH_BLOCKED_BY_PROVIDER_CONFIGURATION");
+    }
+    throw withAuthProvider(error, "github");
   }
 }
 
@@ -753,13 +810,12 @@ export async function signOutSupabase() {
       }
 
       resetExchangeState();
+      clearPkceVerifierStorage();
       removeBrowserStorage("sessionStorage", "studenthub_user_profile");
-      removeBrowserStorage("sessionStorage", "studenthub_demo_user");
       // Remove credentials left by pre-migration releases. No new secret is
       // ever written to either Web Storage API.
       removeBrowserStorage("sessionStorage", "studenthub_jwt_token");
       removeBrowserStorage("localStorage", "studenthub_user_profile");
-      removeBrowserStorage("localStorage", "studenthub_demo_user");
       removeBrowserStorage("localStorage", "studenthub_jwt_token");
       removeBrowserStorage("localStorage", "studenthub_remember_me");
       notifyAuthLogout();
@@ -782,25 +838,26 @@ export async function updateUserProfile(profileData) {
   const safeProfileData = sanitizeProfileUpdates(profileData);
   logAuthInfo("updateUserProfile", "Cập nhật các trường hồ sơ không đặc quyền.");
   try {
-    if (typeof window !== "undefined") {
-      const storageName = isRememberedSession() ? "localStorage" : "sessionStorage";
-      const cached = readBrowserStorage(storageName, "studenthub_user_profile");
-      let current = {};
-      try {
-        current = cached ? JSON.parse(cached) : {};
-      } catch (error) {
-        logAuthError("updateUserProfile:parseCache", error);
-      }
-      writeBrowserStorage(storageName, "studenthub_user_profile", JSON.stringify({ ...current, ...safeProfileData }));
+    if (typeof window === "undefined") {
+      const error = new Error("Profile updates require a browser session.");
+      error.code = "BROWSER_CONTEXT_REQUIRED";
+      throw error;
     }
-
-    const { data } = await supabase.auth.updateUser({
-      data: safeProfileData,
-    }).catch(() => ({ data: { user: null } }));
-
-    return data?.user || safeProfileData;
+    const res = await fetch(`${API_BASE}/api/users/profile`, {
+      method: "PUT",
+      credentials: "include",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(safeProfileData),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok || data?.success !== true) {
+      const error = new Error(data?.error?.userMessage || "Không thể lưu hồ sơ lúc này.");
+      error.code = data?.error?.code || `PROFILE_UPDATE_HTTP_${res.status}`;
+      throw error;
+    }
+    return data?.profile || safeProfileData;
   } catch (error) {
     logAuthError("updateUserProfile", error);
-    return safeProfileData;
+    throw error;
   }
 }

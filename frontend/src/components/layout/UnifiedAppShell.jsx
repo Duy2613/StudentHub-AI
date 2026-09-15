@@ -4,8 +4,9 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
-import { Menu, Search, ShieldCheck, X } from "lucide-react";
+import { ChevronDown, LogOut, Menu, Search, Settings, ShieldCheck, UserRound, X } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { EXPERT_LIFECYCLE_STATE, normalizeExpertLifecycleState } from "@/lib/auth/presentationState";
 import MarginRail from "@/components/margin/MarginRail";
 import ContextBar from "@/components/ui/ContextBar";
 import RealtimeLiveConsole from "@/components/realtime/RealtimeLiveConsole";
@@ -19,10 +20,12 @@ const AcademicCommandPalette = dynamic(() => import("@/components/command/Academ
 
 export default function UnifiedAppShell({ children }) {
   const pathname = usePathname();
-  const { session, profile } = useAuth();
+  const { session, profile, isAuthenticated, ready, status, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchMounted, setSearchMounted] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [expertLifecycleState, setExpertLifecycleState] = useState(null);
   const searchButtonRef = useRef(null);
 
   const openSearch = () => {
@@ -52,7 +55,26 @@ export default function UnifiedAppShell({ children }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const displayName = profile?.fullName || session?.user?.email?.split("@")[0] || "Sinh viên";
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setExpertLifecycleState(null);
+      return undefined;
+    }
+    const controller = new AbortController();
+    fetch("/api/expert/qualification", { credentials: "include", cache: "no-store", signal: controller.signal })
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload) => setExpertLifecycleState(normalizeExpertLifecycleState(payload?.data?.state)))
+      .catch(() => {
+        if (!controller.signal.aborted) setExpertLifecycleState(null);
+      });
+    return () => controller.abort("expert-lifecycle-read-cancelled");
+  }, [isAuthenticated]);
+
+  const displayName = profile?.fullName || session?.user?.email?.split("@")[0] || "Khách";
+  const signedInForHeader = ready && status === "READY" && isAuthenticated;
+  const expertEntry = expertLifecycleState === EXPERT_LIFECYCLE_STATE.ACTIVE
+    ? { label: "Expert Dashboard", href: "/expert" }
+    : { label: "Trở thành chuyên gia.", href: "/expert/profile" };
   const handleNavigate = () => setMobileOpen(false);
   const routeProfile = getReferenceRouteProfile(pathname || "/");
   const contextItems = pathname && pathname !== "/dashboard"
@@ -64,9 +86,10 @@ export default function UnifiedAppShell({ children }) {
 
   return (
     <div
-      className="app-shell min-h-screen bg-app-canvas text-app-primary"
+      className="app-shell min-h-dvh bg-app-canvas text-app-primary"
       data-reference-route={routeProfile.id}
       data-reference-surface={routeProfile.surface}
+      data-auth-state={status}
     >
       <a href="#main-content" className="skip-link">Bỏ qua đến nội dung chính</a>
       <header className="app-header">
@@ -107,10 +130,48 @@ export default function UnifiedAppShell({ children }) {
           <span className="trust-status hidden sm:inline-flex">
             <span className="status-dot" /> Bảo vệ đang bật
           </span>
-          <Link href="/settings" prefetch={false} className="profile-chip" aria-label="Hồ sơ và Cài đặt">
-            <span className="profile-avatar">{displayName.slice(0, 1).toUpperCase()}</span>
-            <span className="hidden lg:block max-w-32 truncate">{displayName}</span>
-          </Link>
+          {!ready ? (
+            <span className="trust-status" role="status">Đang xác minh phiên…</span>
+          ) : status === "ERROR" ? (
+            <span className="trust-status" role="status">Phiên chưa khả dụng</span>
+          ) : signedInForHeader ? (
+            <div className="relative">
+              <button
+                type="button"
+                className="profile-chip"
+                aria-expanded={accountOpen}
+                aria-haspopup="menu"
+                aria-label="Mở menu tài khoản"
+                onClick={() => setAccountOpen((value) => !value)}
+              >
+                {profile?.avatarUrl ? (
+                  <img src={profile.avatarUrl} alt="" className="profile-avatar object-cover" />
+                ) : (
+                  <span className="profile-avatar">{displayName.slice(0, 1).toUpperCase()}</span>
+                )}
+                <span className="hidden lg:block max-w-32 truncate">{displayName}</span>
+                <ChevronDown size={14} aria-hidden="true" />
+              </button>
+              {accountOpen && (
+                <div className="account-menu" role="menu" aria-label="Menu tài khoản">
+                  <div className="account-menu-identity">
+                    <span className="data-label">Phiên StudentHub</span>
+                    <strong>{displayName}</strong>
+                    <small>{session?.user?.email || "Email chưa công bố"}</small>
+                  </div>
+                  <Link href="/profile" role="menuitem" onClick={() => setAccountOpen(false)}><UserRound size={15} /> Hồ sơ cá nhân</Link>
+                  <Link href={expertEntry.href} role="menuitem" onClick={() => setAccountOpen(false)}><ShieldCheck size={15} /> {expertEntry.label}</Link>
+                  <Link href="/settings" role="menuitem" onClick={() => setAccountOpen(false)}><Settings size={15} /> Cài đặt</Link>
+                  <button type="button" role="menuitem" onClick={() => { setAccountOpen(false); void signOut(); }}><LogOut size={15} /> Đăng xuất</button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="anonymous-actions">
+              <Link href="/login" prefetch={false} className="secondary-action">Đăng nhập</Link>
+              <Link href="/register" prefetch={false} className="primary-action">Đăng ký</Link>
+            </div>
+          )}
         </div>
       </header>
       <div className="app-body">

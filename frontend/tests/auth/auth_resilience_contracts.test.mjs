@@ -80,12 +80,13 @@ describe("HttpOnly application session boundary (Finding E)", () => {
     }
   });
 
-  it("contains no browser write path for provider or application bearer credentials", () => {
+  it("contains no browser storage path for provider or application bearer credentials", () => {
     const authSource = readFileSync(new URL("../../src/lib/auth/authService.js", import.meta.url), "utf8");
     const supabaseSource = readFileSync(new URL("../../src/lib/supabase/client.js", import.meta.url), "utf8");
 
     assert.doesNotMatch(authSource, /(?:localStorage|sessionStorage)\.setItem\(\s*["']studenthub_jwt_token["']/);
-    assert.doesNotMatch(supabaseSource, /(?:localStorage|sessionStorage)\./);
+    assert.doesNotMatch(supabaseSource, /(?:localStorage|sessionStorage)\.(?:setItem|getItem)\(\s*["'](?:sb-[^"']*auth-token|studenthub_session)/);
+    assert.match(supabaseSource, /isPkceVerifierKey/);
   });
 
   it("uses the same-origin cookie boundary for protected dashboard requests", () => {
@@ -95,13 +96,9 @@ describe("HttpOnly application session boundary (Finding E)", () => {
     assert.doesNotMatch(dashboardSource, /session\.access_token/);
   });
 
-  it("checks the authoritative application session before restoring demo cache", () => {
+  it("never restores a client-side demo identity", () => {
     const authContextSource = readFileSync(new URL("../../src/lib/auth/AuthContext.jsx", import.meta.url), "utf8");
-    assert.ok(
-      authContextSource.indexOf("const applicationState = await getApplicationSession();") <
-      authContextSource.indexOf("const savedDemo ="),
-      "stale local demo state must not shadow a server-owned session"
-    );
+    assert.doesNotMatch(authContextSource, /savedDemo|studenthub_demo_user|loginAsDemo|setIsDemoMode/);
   });
 
   it("serializes Supabase auth subscription after initial session reconciliation", () => {

@@ -12,6 +12,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { AUTH_LOGOUT_CHANNEL, AUTH_LOGOUT_SIGNAL_KEY, AUTH_STATE, canTransitionAuthState } from "./authStateMachine";
 import { normalizeSubjectId } from "@/lib/security/identity/normalizeSubjectId";
+import { hasCanonicalSession, isModeratorEligible } from "./presentationState";
 
 let authModulePromise;
 let supabaseModulePromise;
@@ -24,26 +25,6 @@ function loadAuthModule() {
 function loadSupabaseModule() {
   supabaseModulePromise ||= import("@/lib/supabase/client");
   return supabaseModulePromise;
-}
-
-function scheduleAuthBootstrap(callback) {
-  if (typeof window === "undefined") return () => {};
-
-  // Keep the provider graph out of the first render and give the route's
-  // text/CSS a chance to paint before Supabase and authService are fetched.
-  let idleId;
-  const delayId = window.setTimeout(() => {
-    if (typeof window.requestIdleCallback === "function") {
-      idleId = window.requestIdleCallback(callback, { timeout: 1800 });
-    } else {
-      callback();
-    }
-  }, 1200);
-
-  return () => {
-    window.clearTimeout(delayId);
-    if (idleId !== undefined) window.cancelIdleCallback?.(idleId);
-  };
 }
 
 function logAuthError(functionName, error, extraContext = null) {
@@ -59,102 +40,8 @@ function logAuthInfo(functionName, message) {
 
 const AuthContext = createContext(null);
 
-const DEMO_STUDENT = {
-  id: "demo-student-01",
-  email: "student.hust@sis.hust.edu.vn",
-  fullName: "Duy Nguyễn",
-  role: "student",
-  avatarId: "student-tech",
-  avatarUrl: null,
-  university: "Đại học Bách Khoa Hà Nội (HUST)",
-  major: "Kỹ thuật Phần mềm & Trí tuệ Nhân tạo",
-  academicYear: "K65 (2023 - 2027)",
-  expertTitle: "Kỹ sư Trưởng AI",
-  expertField: "Trí tuệ nhân tạo (AI & Machine Learning)",
-  experienceYears: "3+ năm",
-  bio: "Sinh viên đam mê nghiên cứu Machine Learning, Next.js và đồng hành cùng StudentHub AI.",
-  trustScore: 80,
-  verifiedStudent: true,
-  verifiedExpert: false,
-  onboarded: true,
-  badges: ["🎓 Sinh Viên Xác Thực", "🤖 AI Explorer", "Học Giả Tích Cực"],
-  rating: 4.95,
-  answersCount: 16,
-  questionsCount: 7,
-};
-
-const DEMO_EXPERT = {
-  id: "demo-expert-01",
-  email: "expert.ai@studenthub.ai",
-  fullName: "TS. Nguyễn Minh Đức",
-  role: "expert",
-  avatarId: "expert-ai",
-  avatarUrl: null,
-  university: "Đại học Quốc gia Hà Nội (VNU)",
-  major: "Khoa học Máy tính",
-  academicYear: "Giảng viên",
-  expertTitle: "Chuyên gia AI & Deep Learning",
-  expertField: "Trí tuệ nhân tạo (AI & Machine Learning)",
-  experienceYears: "6+ năm kinh nghiệm",
-  bio: "Tiến sĩ Khoa học Máy tính. Chuyên gia nghiên cứu về Large Language Models (LLMs) & Deep Learning. Cố vấn học thuật uy tín của StudentHub AI.",
-  trustScore: 99,
-  verifiedStudent: false,
-  verifiedExpert: true,
-  onboarded: true,
-  badges: ["⭐ Chuyên Gia Uy Tín", "Cố Vấn Xuất Sắc", "Top 1 Giải Đáp"],
-  rating: 4.98,
-  answersCount: 380,
-  questionsCount: 2,
-};
-
-function getClientStorage(storageName) {
-  if (typeof window === "undefined") return null;
-  try {
-    return window[storageName] || null;
-  } catch (error) {
-    logAuthError(`AuthContext:storage:${storageName}`, error);
-    return null;
-  }
-}
-
-function readClientStorage(storageName, key) {
-  const storage = getClientStorage(storageName);
-  if (!storage) return null;
-  try {
-    return storage.getItem(key);
-  } catch (error) {
-    logAuthError(`AuthContext:storage:${storageName}:read`, error);
-    return null;
-  }
-}
-
-function writeClientStorage(storageName, key, value) {
-  const storage = getClientStorage(storageName);
-  if (!storage) return false;
-  try {
-    storage.setItem(key, value);
-    return true;
-  } catch (error) {
-    logAuthError(`AuthContext:storage:${storageName}:write`, error);
-    return false;
-  }
-}
-
-function removeClientStorage(storageName, key) {
-  const storage = getClientStorage(storageName);
-  if (!storage) return;
-  try {
-    storage.removeItem(key);
-  } catch (error) {
-    logAuthError(`AuthContext:storage:${storageName}:remove`, error);
-  }
-}
-
-function isRememberedSession() {
-  return readClientStorage("localStorage", "studenthub_remember_me") === "true";
-}
-
 const SAFE_PROFILE_FIELDS = new Set([
+  "displayName",
   "fullName",
   "full_name",
   "avatarId",
@@ -178,79 +65,46 @@ function sanitizeProfileUpdates(value) {
 /**
  * Định dạng Profile chuẩn hóa an toàn từ User Object
  */
-function formatProfile(user, { authoritative = false, demo = false } = {}) {
+function formatProfile(user, { authoritative = false, durableProfile = null } = {}) {
   if (!user) return null;
 
-  let cached = {};
   const userId = normalizeSubjectId(user.id || user.Id || user.userId);
-  if (typeof window !== "undefined") {
-    try {
-      const s = isRememberedSession()
-        ? readClientStorage("localStorage", "studenthub_user_profile") || readClientStorage("sessionStorage", "studenthub_user_profile")
-        : readClientStorage("sessionStorage", "studenthub_user_profile");
-      if (s) {
-        const parsed = JSON.parse(s);
-        if (parsed?.id && normalizeSubjectId(parsed.id) === userId) cached = parsed;
-      }
-    } catch (err) {
-      logAuthError("formatProfile:parseCache", err);
-    }
-  }
-
-  // Provider metadata and cached profile fields are presentation inputs only.
-  // The application session is the only source allowed to grant role or
-  // verification labels for a real user.
-  const meta = demo ? user.user_metadata || {} : {};
+  // The application session and public.profiles projection are the only
+  // identity inputs. Provider metadata, browser storage, and presentation
+  // fixtures never create a principal or grant a role.
   const serverRoles = Array.isArray(user.roles) ? user.roles.map((role) => String(role).toUpperCase()) : [];
-  const rawRole = authoritative
-    ? (serverRoles.includes("EXPERT") ? "expert" : "student")
-    : demo
-      ? String(user.role || "student").toLowerCase()
-      : "student";
-  const email = user.email || user.Email || cached.email || "";
-  const fullName = user.fullName || user.FullName || meta.full_name || meta.name || cached.fullName || "Người dùng StudentHub";
-  const isExpert = rawRole === "expert";
-  // An email suffix is only a candidate for verification. It is not proof and
-  // must never grant a verified-student label or a reputation score.
-  const isEdu = authoritative
-    ? user.emailVerified === true
-    : demo && (user.universityEmailVerified === true || user.UniversityEmailVerified === true || meta.verified_student === true);
-  const explicitTrustScore = demo
-    ? [
-        user.reputation_score,
-        user.reputationScore,
-        user.trustScore,
-        user.TrustScore,
-        meta.reputation_score,
-        meta.trust_score,
-      ].find((value) => Number.isFinite(Number(value)))
-    : null;
-
+  const source = authoritative ? (durableProfile || {}) : {};
+  const email = user.email || user.Email || "";
+  const fullName = source.fullName || source.displayName || user.fullName || user.FullName || email.split("@")[0] || "Người dùng StudentHub";
   return {
-    id: userId || String(cached.id || ""),
-    email: email,
-    fullName: fullName,
-    role: isExpert ? "expert" : "student",
-    avatarId: cached.avatarId || meta.avatar_id || (isExpert ? "expert-ai" : "student-tech"),
-    avatarUrl: cached.avatarUrl || meta.avatar_url || null,
-    university: cached.university || meta.university || (isEdu ? "Đã xác minh theo nguồn tổ chức" : "Chưa cập nhật"),
-    major: cached.major || meta.major || "Khoa học & Kỹ thuật",
-    academicYear: cached.academicYear || meta.academic_year || "2024-2028",
-    expertTitle: cached.expertTitle || meta.expert_title || "Chuyên gia Tư vấn & Nghiên cứu",
-    expertField: cached.expertField || meta.expert_field || "Trí tuệ nhân tạo (AI & Machine Learning)",
-    experienceYears: cached.experienceYears || meta.experience_years || "3+ năm kinh nghiệm",
-    bio: cached.bio || meta.bio || (isExpert ? "Chuyên gia giải đáp học thuật và định hướng nghiên cứu cho sinh viên." : "Sinh viên đam mê học tập, khám phá công nghệ và AI."),
-    trustScore: explicitTrustScore ?? 50,
-    reputationScore: explicitTrustScore ?? 50,
-    githubUsername: cached.github_username || cached.githubUsername || meta.github_username || meta.user_name || null,
-    topRepos: cached.top_repos || cached.topRepos || meta.top_repos || [],
-    verifiedStudent: isEdu,
-    verifiedExpert: authoritative ? serverRoles.includes("EXPERT") || user.expertStatus === "ACTIVE" : demo && (isExpert || meta.verified_expert === true),
-    onboarded: authoritative ? user.onboarded === true : demo ? cached.onboarded === true || meta.onboarded === true : false,
-    badges: cached.badges || meta.badges || (isExpert ? ["⭐ Chuyên Gia Uy Tín", "Cố Vấn Xuất Sắc", "Top Người Giải Đáp"] : ["Sinh Viên Tiên Phong", "Học Giả Tích Cực"]),
-    rating: cached.rating || meta.rating || 4.95,
-    answersCount: cached.answersCount || meta.answers_count || (isExpert ? 24 : 3),
-    questionsCount: cached.questionsCount || meta.questions_count || (isExpert ? 2 : 8),
+    id: userId || "",
+    email,
+    fullName,
+    role: "student",
+    avatarId: source.avatarId || null,
+    avatarUrl: source.avatarUrl || null,
+    university: source.university || null,
+    major: source.major || null,
+    academicYear: source.academicYear || null,
+    expertTitle: null,
+    expertField: null,
+    experienceYears: null,
+    bio: source.bio || null,
+    trustScore: null,
+    reputationScore: null,
+    githubUsername: source.githubUsername || null,
+    topRepos: [],
+    verifiedStudent: false,
+    verifiedExpert: false,
+    onboarded: user.onboarded === true || source.onboarded === true,
+    badges: [],
+    rating: null,
+    answersCount: 0,
+    questionsCount: 0,
+    createdAt: source.createdAt || null,
+    updatedAt: source.updatedAt || null,
+    serverRoles,
+    emailVerified: user.emailVerified === true,
   };
 }
 
@@ -276,7 +130,7 @@ function applicationUserFromExchange(exchangeSession) {
     email: exchangeSession.email || "",
     emailVerified: exchangeSession.emailVerified === true,
     authProvider: exchangeSession.authProvider || "supabase",
-    roles: ["STUDENT"],
+    roles: Array.isArray(exchangeSession.roles) && exchangeSession.roles.length ? exchangeSession.roles : ["STUDENT"],
     onboarded: false,
   });
 }
@@ -285,7 +139,6 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDemoMode, setIsDemoMode] = useState(false);
   const [authState, setAuthState] = useState(AUTH_STATE.INITIALIZING);
   const [authError, setAuthError] = useState(null);
 
@@ -324,6 +177,18 @@ export function AuthProvider({ children }) {
     let authApi;
     let eventQueue = Promise.resolve();
 
+    const hydrateApplicationProfile = async (applicationUser, operationEpoch) => {
+      try {
+        const result = await authApi?.getUserProfile?.();
+        if (!mounted || authEpochRef.current !== operationEpoch || !result?.success || !result.profile) return;
+        setProfile(formatProfile(applicationUser, { authoritative: true, durableProfile: result.profile }));
+      } catch (error) {
+        // A session can remain useful while profile storage is unavailable;
+        // keep the safe identity shell and do not invent replacement fields.
+        logAuthError("AuthProvider:hydrateProfile", error);
+      }
+    };
+
     const applyApplicationUser = (userLike, operationEpoch = authEpochRef.current) => {
       if (!mounted || authEpochRef.current !== operationEpoch) return false;
       const applicationUser = normalizeApplicationUser(userLike);
@@ -331,9 +196,25 @@ export function AuthProvider({ children }) {
       applicationSessionReadyRef.current = true;
       setSession({ user: applicationUser, authority: "APPLICATION_SESSION" });
       setProfile(formatProfile(applicationUser, { authoritative: true }));
-      setIsDemoMode(false);
+      void hydrateApplicationProfile(applicationUser, operationEpoch);
       transitionAuthState(AUTH_STATE.SIGNED_IN);
       return true;
+    };
+
+    const resolveExchangedApplicationUser = async (exchangeResult) => {
+      const fallbackUser = applicationUserFromExchange(exchangeResult?.session);
+      try {
+        // The exchange response is intentionally minimal. Read the new opaque
+        // session once more so server-owned roles (including moderator) are
+        // available immediately without trusting provider metadata.
+        const authoritativeState = await authApi?.getApplicationSession?.();
+        if (authoritativeState?.authenticated && authoritativeState.user) {
+          return normalizeApplicationUser(authoritativeState.user);
+        }
+      } catch (error) {
+        logAuthError("AuthProvider:refreshExchangedSession", error);
+      }
+      return fallbackUser;
     };
 
     const initAuth = async () => {
@@ -342,8 +223,8 @@ export function AuthProvider({ children }) {
       try {
         if (typeof window === "undefined") return;
 
-        // Auth is a post-paint capability. The route can render its public
-        // shell while this optional provider graph is fetched on idle.
+        // Resolve the canonical session before any route can classify the
+        // principal as anonymous. Unknown and anonymous are different states.
         [authApi, { supabase: supabaseClient }] = await Promise.all([
           loadAuthModule(),
           loadSupabaseModule(),
@@ -351,8 +232,6 @@ export function AuthProvider({ children }) {
         if (!mounted || authEpochRef.current !== operationEpoch) return;
         logAuthInfo("AuthProvider", "Bắt đầu khởi tạo Auth State.");
         transitionAuthState(AUTH_STATE.AUTHENTICATING);
-
-        const isRemembered = isRememberedSession();
 
         // 1. Restore the server-authoritative opaque session first. Provider
         // credentials may be absent after reload by design.
@@ -380,7 +259,7 @@ export function AuthProvider({ children }) {
         if (currentSession?.user && mounted && authEpochRef.current === operationEpoch) {
           const exchanged = await authApi.exchangeApplicationSession(currentSession.access_token);
           if (exchanged.success && mounted && authEpochRef.current === operationEpoch) {
-            const exchangedUser = applicationUserFromExchange(exchanged.session);
+            const exchangedUser = await resolveExchangedApplicationUser(exchanged);
             if (applyApplicationUser(exchangedUser, operationEpoch)) {
               lastSessionTokenRef.current = currentSession.access_token;
               logAuthInfo("AuthProvider", "Đã trao đổi proof Supabase sang phiên HttpOnly.");
@@ -395,36 +274,12 @@ export function AuthProvider({ children }) {
             applicationSessionReadyRef.current = false;
             setSession(null);
             setProfile(null);
-            setIsDemoMode(false);
             transitionAuthState(AUTH_STATE.ERROR, { code: applicationState.code || "APPLICATION_SESSION_UNAVAILABLE" });
           }
           return;
         }
 
-        // 3. Demo mode is an explicit local presentation mode. It is checked
-        // only after authoritative application/provider identities so stale
-        // demo cache can never shadow a real server session.
-        const savedDemo = isRemembered
-          ? readClientStorage("localStorage", "studenthub_demo_user") || readClientStorage("sessionStorage", "studenthub_demo_user")
-          : readClientStorage("sessionStorage", "studenthub_demo_user");
-
-        if (savedDemo) {
-          try {
-            const parsed = JSON.parse(savedDemo);
-            if (mounted && authEpochRef.current === operationEpoch) {
-              setSession({ user: parsed });
-              setProfile(parsed);
-              setIsDemoMode(true);
-              transitionAuthState(AUTH_STATE.SIGNED_OUT);
-              logAuthInfo("AuthProvider", "Khôi phục phiên Demo Mode.");
-              return;
-            }
-          } catch (e) {
-            logAuthError("AuthProvider:parseDemo", e);
-          }
-        }
-
-        // 4. No authoritative session is available.
+        // 3. No authoritative session is available.
         if (mounted && authEpochRef.current === operationEpoch) {
           applicationSessionReadyRef.current = false;
           setSession(null);
@@ -450,7 +305,6 @@ export function AuthProvider({ children }) {
         applicationSessionReadyRef.current = false;
         setSession(null);
         setProfile(null);
-        setIsDemoMode(false);
         transitionAuthState(AUTH_STATE.SIGNED_OUT);
         return;
       }
@@ -475,7 +329,7 @@ export function AuthProvider({ children }) {
 
       const exchanged = await authApi.exchangeApplicationSession(newToken);
       if (!mounted || authEpochRef.current !== operationEpoch) return;
-      const exchangedUser = exchanged.success ? applicationUserFromExchange(exchanged.session) : null;
+      const exchangedUser = exchanged.success ? await resolveExchangedApplicationUser(exchanged) : null;
       if (exchanged.success && applyApplicationUser(exchangedUser, operationEpoch)) {
         lastSessionTokenRef.current = newToken;
         return;
@@ -484,7 +338,6 @@ export function AuthProvider({ children }) {
       applicationSessionReadyRef.current = false;
       setSession(null);
       setProfile(null);
-      setIsDemoMode(false);
       transitionAuthState(AUTH_STATE.ERROR, { code: exchanged.code || "SESSION_EXCHANGE_FAILED" });
       logAuthError("AuthProvider:onAuthStateChange:exchange", { code: exchanged.code });
     };
@@ -513,14 +366,13 @@ export function AuthProvider({ children }) {
       listener = data;
     };
 
-    const cancelBootstrap = scheduleAuthBootstrap(async () => {
+    void (async () => {
       await initAuth();
       if (mounted) subscribeToAuthChanges();
-    });
+    })();
 
     return () => {
       mounted = false;
-      cancelBootstrap();
       listener?.subscription?.unsubscribe();
     };
   }, [transitionAuthState]);
@@ -538,7 +390,6 @@ export function AuthProvider({ children }) {
       applicationSessionReadyRef.current = false;
       setSession(null);
       setProfile(null);
-      setIsDemoMode(false);
       if (authStateRef.current !== AUTH_STATE.SIGNED_OUT) {
         transitionAuthState(AUTH_STATE.SIGNED_OUT);
       }
@@ -592,34 +443,6 @@ export function AuthProvider({ children }) {
   }, [session]);
 
   /**
-   * Đăng nhập chế độ Demo
-   */
-  const loginAsDemo = useCallback((role = "student", rememberMe = false) => {
-    logAuthInfo("loginAsDemo", `Kích hoạt Demo Mode cho vai trò: ${role}`);
-    try {
-      const demoData = role === "expert" ? DEMO_EXPERT : DEMO_STUDENT;
-      setSession({ user: demoData });
-      setProfile(demoData);
-      setIsDemoMode(true);
-      // Demo is intentionally not an authenticated principal.
-      if (authStateRef.current !== AUTH_STATE.SIGNED_OUT) transitionAuthState(AUTH_STATE.SIGNED_OUT);
-      if (typeof window !== "undefined") {
-        if (rememberMe) {
-          writeClientStorage("localStorage", "studenthub_demo_user", JSON.stringify(demoData));
-          writeClientStorage("sessionStorage", "studenthub_demo_user", JSON.stringify(demoData));
-          writeClientStorage("localStorage", "studenthub_remember_me", "true");
-        } else {
-          writeClientStorage("sessionStorage", "studenthub_demo_user", JSON.stringify(demoData));
-          removeClientStorage("localStorage", "studenthub_demo_user");
-          removeClientStorage("localStorage", "studenthub_remember_me");
-        }
-      }
-    } catch (err) {
-      logAuthError("loginAsDemo", err);
-    }
-  }, [transitionAuthState]);
-
-  /**
    * Cập nhật thông tin hồ sơ
    */
   const updateProfile = useCallback(
@@ -627,22 +450,50 @@ export function AuthProvider({ children }) {
       logAuthInfo("updateProfile", "Bắt đầu cập nhật thông tin hồ sơ:", profileUpdates);
       try {
         const safeUpdates = sanitizeProfileUpdates(profileUpdates);
-        const merged = { ...(profile || {}), ...safeUpdates };
-        setProfile(merged);
-        if (typeof window !== "undefined") {
-          const storageName = isRememberedSession() ? "localStorage" : "sessionStorage";
-          writeClientStorage(storageName, "studenthub_user_profile", JSON.stringify(merged));
+        if (!hasCanonicalSession(session)) {
+          const error = new Error("Cần đăng nhập bằng phiên StudentHub để cập nhật hồ sơ.");
+          error.code = "AUTHENTICATION_REQUIRED";
+          throw error;
         }
         const authApi = await loadAuthModule();
-        await authApi.updateUserProfile(safeUpdates);
-        return merged;
+        const durableProfile = await authApi.updateUserProfile(safeUpdates);
+        const nextUser = durableProfile?.onboarded === true && session.user.onboarded !== true
+          ? { ...session.user, onboarded: true }
+          : session.user;
+        if (nextUser !== session.user) {
+          setSession((current) => current?.user?.id === nextUser.id
+            ? { ...current, user: nextUser }
+            : current);
+        }
+        const nextProfile = formatProfile(nextUser, { authoritative: true, durableProfile });
+        setProfile(nextProfile);
+        return nextProfile;
       } catch (err) {
         logAuthError("updateProfile", err);
-        return profile;
+        throw err;
       }
     },
-    [profile]
+    [session]
   );
+
+  const refreshProfile = useCallback(async () => {
+    if (!session?.user) return null;
+    if (!hasCanonicalSession(session)) {
+      return null;
+    }
+    try {
+      const authApi = await loadAuthModule();
+      const result = await authApi.getUserProfile();
+      if (result.success && result.profile) {
+        const nextProfile = formatProfile(session.user, { authoritative: true, durableProfile: result.profile });
+        setProfile(nextProfile);
+        return nextProfile;
+      }
+    } catch (error) {
+      logAuthError("refreshProfile", error);
+    }
+    return profile;
+  }, [profile, session]);
 
   /**
    * Đăng xuất toàn bộ phiên
@@ -654,7 +505,6 @@ export function AuthProvider({ children }) {
       transitionAuthState(AUTH_STATE.SIGNING_OUT);
       lastSessionTokenRef.current = null;
       applicationSessionReadyRef.current = false;
-      setIsDemoMode(false);
       const authApi = await loadAuthModule();
       await authApi.signOutSupabase();
       setSession(null);
@@ -669,6 +519,16 @@ export function AuthProvider({ children }) {
     }
   }, [transitionAuthState]);
 
+  const isAuthenticated = hasCanonicalSession(session);
+  const status = authState === AUTH_STATE.SIGNED_IN
+    ? "READY"
+    : authState === AUTH_STATE.SIGNED_OUT
+      ? "ANONYMOUS"
+      : authState === AUTH_STATE.ERROR
+        ? "ERROR"
+        : "UNKNOWN";
+  const ready = status !== "UNKNOWN";
+
   return (
     <AuthContext.Provider
       value={{
@@ -677,17 +537,16 @@ export function AuthProvider({ children }) {
         profile,
         isLoading,
         authState,
+        status,
+        ready,
+        authenticated: isAuthenticated,
         authError,
-        isDemoMode,
-        loginAsDemo,
+        isAuthenticated,
+        moderatorEligible: isModeratorEligible(session),
         ensureSynced,
         signOut,
         updateProfile,
-        refreshProfile: () => {
-          if (session?.user) {
-            setProfile(formatProfile(session.user, { authoritative: session.authority === "APPLICATION_SESSION", demo: isDemoMode }));
-          }
-        },
+        refreshProfile,
       }}
     >
       {children}

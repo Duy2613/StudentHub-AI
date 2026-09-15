@@ -65,7 +65,9 @@ export const canonicalEnv = {
   // Application
   NODE_ENV: process.env.NODE_ENV || "development",
   NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || "",
-  PROVIDER_MODE: process.env.NEXT_PUBLIC_STUDENTHUB_PROVIDER_MODE || "LIVE",
+  PROVIDER_MODE: process.env.NODE_ENV === "production"
+    ? "LIVE"
+    : process.env.NEXT_PUBLIC_STUDENTHUB_PROVIDER_MODE || "LIVE",
 
   // Supabase Client (Public)
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "",

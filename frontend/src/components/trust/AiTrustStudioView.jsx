@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { AlertTriangle, ArrowRight, Check, ClipboardPaste, Clock3, FileImage, FileText, Globe2, Image as ImageIcon, LoaderCircle, Printer, ScanSearch, ShieldAlert, ShieldCheck, Upload, Users, UserRoundCheck, X } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, ClipboardPaste, Clock3, FileImage, FileText, Globe2, Image as ImageIcon, LoaderCircle, ScanSearch, ShieldAlert, ShieldCheck, Upload, Users, UserRoundCheck, X } from "lucide-react";
 import { ApiError, apiErrorMessage } from "@/lib/api/errors";
 import { deriveSafetyActions } from "@/lib/trust/safetyActions";
 import { COMPETITION_DEMO_CASES } from "@/lib/trust/competitionDemoCases";
@@ -15,12 +15,20 @@ import SourceDisclosure from "@/components/ui/SourceDisclosure";
 import { getRuntimeProviderBundle } from "@/lib/backend/runtimeProvider";
 import TrustSectionBoundary from "./TrustSectionBoundary";
 import TrustPipelineTimeline from "./TrustPipelineTimeline";
+import TrustRunProgress from "./TrustRunProgress";
+import TrustResultSummary from "./TrustResultSummary";
+import {
+  createTrustPresentationModel,
+  isTrustPresentationEventCurrent,
+  mergeTrustBindings,
+} from "@/lib/ai-trust/v5/TrustPresentationModel.js";
 import { markAssurance, measureAssurance } from "@/lib/performance/assurance";
 import { useBackground } from "@/components/providers/BackgroundContext";
 import SourceInspectorDrawer from "./SourceInspectorDrawer";
 import EvidenceConstellationStage from "./EvidenceConstellationStage";
 import PostResultGateways from "./PostResultGateways";
 import ContractCheckIntakeTab from "./ContractCheckIntakeTab";
+import TrustMasterUltraJourney from "./TrustMasterUltraJourney";
 
 const TrustGraph2D = dynamic(() => import("./TrustGraph2D"), {
   ssr: false,
@@ -28,10 +36,11 @@ const TrustGraph2D = dynamic(() => import("./TrustGraph2D"), {
 });
 
 const EMPTY_PIPELINE = [
-  { id: "input", label: "Chuẩn hóa đầu vào", status: "waiting" },
-  { id: "local", label: "Phân tích rủi ro cục bộ", status: "waiting" },
-  { id: "external", label: "Đối soát bằng chứng", status: "waiting" },
-  { id: "reasoning", label: "Tổng hợp phán quyết", status: "waiting" },
+  { id: "claim-intelligence", label: "Claim Intelligence", status: "waiting" },
+  { id: "evidence-discovery", label: "Evidence Discovery", status: "waiting" },
+  { id: "evidence-forensics", label: "Evidence Forensics", status: "waiting" },
+  { id: "multi-ai-verification", label: "Multi-AI Verification", status: "waiting" },
+  { id: "decision-intelligence", label: "Decision Intelligence", status: "waiting" },
 ];
 
 function readable(value, fallback = "Chưa xác định") {
@@ -303,32 +312,27 @@ function buildGraph(input, layers, canonical, pipeline) {
   return { nodes, edges };
 }
 
-function legacyStatusFromV5(status) {
-  if (status === "RUNNING") return "running";
-  if (status === "PARTIAL") return "partial";
-  if (["FAILED", "BLOCKED", "SKIPPED"].includes(status)) return "error";
-  if (status === "COMPLETED") return "done";
-  return "waiting";
-}
-
 function legacyPipelineFromV5(currentPipeline, previousPipeline = EMPTY_PIPELINE) {
   const stages = currentPipeline?.stages || {};
-  const l1 = stages.l1;
-  const externalStages = [stages.l2a, stages.l2b, stages.l2c, stages.l3].filter(Boolean);
-  const reasoningStages = [stages.l4, stages.l5].filter(Boolean);
-  const external = externalStages.find((stage) => stage.operationStatus === "RUNNING") || externalStages.find((stage) => stage.operationStatus === "PARTIAL" || stage.operationStatus === "FAILED") || externalStages[externalStages.length - 1];
-  const reasoning = reasoningStages.find((stage) => stage.operationStatus === "RUNNING") || reasoningStages.find((stage) => stage.operationStatus === "PARTIAL" || stage.operationStatus === "FAILED") || reasoningStages[reasoningStages.length - 1];
-  const copy = previousPipeline.map((item) => ({ ...item }));
-  const update = (id, stage, fallbackDetail) => {
-    const item = copy.find((entry) => entry.id === id);
-    if (!item || !stage) return;
-    item.status = legacyStatusFromV5(stage.operationStatus);
-    item.detail = stage.finding || stage.summary || fallbackDetail;
-  };
-  update("local", l1, "Đang chờ Layer 1");
-  update("external", external, "Đang chờ các nguồn đối soát");
-  update("reasoning", reasoning, "Đang chờ policy và assurance");
-  return copy;
+  const groups = [
+    { id: "claim-intelligence", internal: [stages.l1, stages.l2b], detail: "Đọc luận điểm và nội dung" },
+    { id: "evidence-discovery", internal: [stages.l2a, stages.l2c], detail: "Tìm tín hiệu nguồn và ngữ cảnh" },
+    { id: "evidence-forensics", internal: [stages.l3], detail: "Đối chiếu chất lượng bằng chứng" },
+    { id: "multi-ai-verification", internal: [stages.l4], detail: "Tổng hợp tín hiệu kiểm tra" },
+    { id: "decision-intelligence", internal: [stages.l5], detail: "Kiểm tra kết luận và hành động" },
+  ];
+  return previousPipeline.map((item) => {
+    const group = groups.find((entry) => entry.id === item.id);
+    if (!group) return item;
+    const statuses = group.internal.filter(Boolean).map((stage) => stage.operationStatus);
+    const active = statuses.find((status) => ["RUNNING", "QUEUED"].includes(status));
+    const failed = statuses.find((status) => ["FAILED", "BLOCKED"].includes(status));
+    const partial = statuses.find((status) => status === "PARTIAL");
+    const complete = statuses.length > 0 && statuses.every((status) => status === "COMPLETED");
+    const status = active ? "running" : failed ? (statuses.some((value) => value === "COMPLETED") ? "partial" : "error") : partial ? "partial" : complete ? "done" : "waiting";
+    const detailStage = group.internal.find((stage) => stage && ["RUNNING", "PARTIAL", "FAILED", "BLOCKED", "COMPLETED"].includes(stage.operationStatus)) || group.internal.find(Boolean);
+    return { ...item, status, detail: detailStage?.summary || detailStage?.finding || group.detail };
+  });
 }
 
 function v5VerdictTitle(decision) {
@@ -355,7 +359,9 @@ function v5VerdictTitle(decision) {
 export function AiTrustStudioView({ initialMode = "image", initialContent = "", hideHero = false, onSourceProvenanceChange }) {
   const searchParams = useSearchParams();
   const tabParam = searchParams?.get("tab");
-  const demoEnabled = process.env.NEXT_PUBLIC_COMPETITION_DEMO === "true";
+  // Competition fixtures are a development/test aid only. A production
+  // client must never expose a synthetic Trust case as an application mode.
+  const demoEnabled = process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_COMPETITION_DEMO === "true";
   const { setRouteMediaAsset } = useBackground();
   const [mode, setMode] = useState(tabParam === "contract" ? "contract" : initialMode);
   const [content, setContent] = useState(initialContent);
@@ -388,14 +394,32 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
   const fileInput = useRef(null);
   const contentRef = useRef(initialContent);
   const activeScan = useRef(null);
+  const activeBinding = useRef(null);
   const scanSequence = useRef(0);
+  const [activeBindingState, setActiveBindingState] = useState(null);
+
+  const captureTrustBinding = (payload) => {
+    const merged = mergeTrustBindings(activeBinding.current, payload?.data, payload);
+    if (merged.conflict || !merged.binding) return;
+    activeBinding.current = merged.binding;
+    setActiveBindingState(merged.binding);
+  };
 
   const updateSourceProvenance = useCallback((nextProvenance) => {
     setSourceProvenance(nextProvenance);
     onSourceProvenanceChange?.(nextProvenance);
   }, [onSourceProvenanceChange]);
 
-  const updateStep = (id, status, detail = "") => setPipeline((items) => items.map((item) => item.id === id ? { ...item, status, detail } : item));
+  const updateStep = (id, status, detail = "") => {
+    const aliases = {
+      input: "claim-intelligence",
+      local: "claim-intelligence",
+      external: "evidence-forensics",
+      reasoning: "decision-intelligence",
+    };
+    const targetId = aliases[id] || id;
+    setPipeline((items) => items.map((item) => item.id === targetId ? { ...item, status, detail } : item));
+  };
   const record = (label, status) => setTimeline((items) => [...items, { id: `${Date.now()}-${items.length}`, label, status, at: new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) }]);
 
   const selectTrustMode = (nextMode) => {
@@ -440,12 +464,16 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
     setOcr(null);
     setConfirmedEntities([]);
     setDemoCaseId(null);
+    activeBinding.current = null;
+    setActiveBindingState(null);
   };
 
   const reset = () => {
     if (preview) URL.revokeObjectURL(preview);
     scanSequence.current += 1;
     activeScan.current?.abort("reset");
+    activeBinding.current = null;
+    setActiveBindingState(null);
     setComposerCollapsed(false);
     setAnalyzedSummary(null);
     setFile(null); setPreview(null); setContent(""); contentRef.current = ""; setError(null); setOcr(null); setConfirmedEntities([]); setDemoCaseId(null); setProviderResult(null); updateSourceProvenance(null); setReportState({ status: "IDLE", report: null, message: null });
@@ -459,6 +487,8 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
     activeScan.current = controller;
     const scanId = ++scanSequence.current;
     const submittedContent = content.trim();
+    activeBinding.current = null;
+    setActiveBindingState(null);
     setError(null); setProcessing(true); setComposerCollapsed(false); setPipeline(EMPTY_PIPELINE); setV5Pipeline(null); setProviderResult(null); updateSourceProvenance(null); setTimeline([]); setReportState({ status: "IDLE", report: null, message: null });
     setLayers({ layer1: null, layer2A: null, layer2: null, layer2C: null, layer3: null, layer4: null });
 
@@ -517,6 +547,8 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
       }
       if (controller.signal.aborted || scanId !== scanSequence.current) return;
       const identity = createWorkIdentity("trust");
+      activeBinding.current = { requestId: identity.requestId, runId: identity.runId };
+      setActiveBindingState(activeBinding.current);
       const input = {
         type: mode === "url" ? "URL" : mode === "image" ? "IMAGE" : mode === "qr" ? "QR_READY" : "TEXT",
         content: extracted,
@@ -527,7 +559,7 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
         runId: identity.runId,
         confirmedEntities,
       };
-      updateStep("input", "done", mode === "image" || mode === "qr" ? "CLIENT_OCR_HINT" : "Đã chuẩn hóa"); record("Đầu vào đã được xử lý", "DONE");
+      updateStep("input", "done", mode === "image" || mode === "qr" ? "Gợi ý cục bộ" : "Đã chuẩn hóa"); record("Đầu vào đã được xử lý", "DONE");
       updateStep("local", "running");
       updateStep("external", "running", "Đang kiểm tra nguồn và luận điểm");
       updateStep("reasoning", "running", "Chờ phán quyết xác định");
@@ -535,12 +567,14 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
       const provider = getRuntimeProviderBundle();
       const response = await provider.trust.investigate(input, controller.signal, (event) => {
         if (scanId !== scanSequence.current || !event?.data) return;
+        if (!isTrustPresentationEventCurrent(event, activeBinding.current)) return;
+        captureTrustBinding(event);
         markAccepted(mode === "url" ? extracted : extracted.slice(0, 80));
         streamedPipeline = event.data;
         setV5Pipeline(event.data);
         setPipeline((items) => legacyPipelineFromV5(event.data, items));
-        if (event.event === "STAGE_STARTED" || event.event === "STAGE_COMPLETED" || event.event === "STAGE_RETRY_SCHEDULED") {
-          record(`V5 ${String(event.stageId || "stage").toUpperCase()}`, readable(event.event));
+        if (["PIPELINE_STARTED", "PIPELINE_COMPLETED", "PIPELINE_PARTIAL"].includes(event.event)) {
+          record("Tiến độ kiểm tra được cập nhật", event.event === "PIPELINE_STARTED" ? "RUNNING" : event.event === "PIPELINE_PARTIAL" ? "PARTIAL" : "COMPLETE");
         }
         const eventLayers = event.data.layerResults;
         if (eventLayers) setLayers({
@@ -553,6 +587,8 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
         });
       });
       if (scanId !== scanSequence.current) return;
+      if (!isTrustPresentationEventCurrent(response, activeBinding.current)) return;
+      captureTrustBinding(response);
       markAccepted(mode === "url" ? extracted : extracted.slice(0, 80));
       setProviderResult(response);
       updateSourceProvenance(response.provenance);
@@ -577,7 +613,7 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
       const layer4 = resultLayers.layer4 || null;
       setLayers({ layer1, layer2A, layer2, layer2C, layer3, layer4 });
       setPipeline((items) => displayPipeline ? legacyPipelineFromV5(displayPipeline, items) : items.map((item) => item.status === "running" ? { ...item, status: "done", detail: "Canonical result" } : item));
-      record("Trust provider hoàn tất", readable(response.state));
+      record("Kết quả kiểm tra đã sẵn sàng", "COMPLETE");
     } catch (caught) {
       if (caught instanceof ApiError && caught.code === "ABORTED" && scanId !== scanSequence.current) return;
       setComposerCollapsed(false);
@@ -600,6 +636,13 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
   const hasNativeV5 = Boolean(v5Pipeline && v5Pipeline.pipelineVersion !== "trust-v5-compatibility");
   const canonicalResult = providerResult?.data || null;
   const hasResult = Boolean(layers.layer4 || v5Pipeline?.finalDecision || canonicalResult);
+  const trustPresentation = useMemo(() => createTrustPresentationModel({
+    pipeline: v5Pipeline,
+    canonicalResult,
+    layers,
+    processing,
+    activeBinding: activeBindingState,
+  }), [v5Pipeline, canonicalResult, layers, processing, activeBindingState]);
 
   useEffect(() => {
     setRouteMediaAsset(hasResult ? "VID-OPTIC-02" : "VID-OPTIC-01");
@@ -669,6 +712,63 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
     if (action.id === "START_OVER") reset();
     if (["REVIEW_UNKNOWN", "CHECK_OFFICIAL_SOURCE"].includes(action.id)) document.getElementById("trust-v5-timeline-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  if (process.env.NEXT_PUBLIC_TRUST_MASTER_ULTRA !== "false") {
+    return (
+      <TrustMasterUltraJourney
+        mode={mode}
+        content={content}
+        file={file}
+        preview={preview}
+        dragging={dragging}
+        processing={processing}
+        error={error}
+        ocr={ocr}
+        confirmedEntities={confirmedEntities}
+        hasResult={hasResult}
+        demoEnabled={demoEnabled}
+        sourceProvenance={sourceProvenance}
+        providers={providers}
+        analysisSummary={analyzedSummary}
+        pipeline={v5Pipeline}
+        canonicalResult={canonicalResult}
+        layers={layers}
+        presentation={trustPresentation}
+        input={{ type: mode, content: content || analyzedSummary?.label || "" }}
+        hideHero={hideHero}
+        fileInputRef={fileInput}
+        onModeChange={selectTrustMode}
+        onDragStateChange={setDragging}
+        onContentChange={(value) => {
+          setDemoCaseId(null);
+          contentRef.current = value;
+          setContent(value);
+        }}
+        onFileSelect={(nextFile) => {
+          setDemoCaseId(null);
+          acceptFile(nextFile);
+        }}
+        onClearFile={() => {
+          if (preview) URL.revokeObjectURL(preview);
+          setFile(null);
+          setPreview(null);
+          setOcr(null);
+          setConfirmedEntities([]);
+        }}
+        onAnalyze={analyze}
+        onReset={reset}
+        onContractAnalyze={(contractText) => {
+          setDemoCaseId(null);
+          setMode("text");
+          contentRef.current = contractText;
+          setContent(contractText);
+          window.setTimeout(() => analyze(), 0);
+        }}
+        onNewAnalysis={reset}
+        onPrint={() => window.print()}
+      />
+    );
+  }
 
   return (
     <div 
@@ -776,7 +876,7 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
             )}
             <div className="truth-note">
               <AlertTriangle size={15} />
-              <span><strong>Ranh giới OCR:</strong> ảnh được đọc cục bộ trong trình duyệt và chỉ là <code>CLIENT_OCR_HINT</code>, không phải OCR máy chủ có thẩm quyền.</span>
+              <span><strong>Ranh giới OCR:</strong> ảnh được đọc cục bộ trong trình duyệt và chỉ là <strong>gợi ý cục bộ</strong>, không phải OCR máy chủ có thẩm quyền.</span>
             </div>
             {error && (
               <div className="error-callout" role="alert">
@@ -797,51 +897,32 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
               </button>
             )}
           </div>
-          <aside className="intelligence-panel pipeline-panel"><div className="panel-heading"><div><p className="product-kicker">Live pipeline</p><h2 className="product-section-title">Dấu vết xử lý</h2></div><span className={`live-indicator ${processing ? "is-live" : ""}`}>{processing ? "RUNNING" : hasResult ? "COMPLETE" : "READY"}</span></div><ol className="pipeline-list">{pipeline.map((step, index) => <li key={step.id} data-status={step.status}><span className="pipeline-index">{step.status === "done" ? <Check size={14} /> : index + 1}</span><div><strong>{step.label}</strong><small>{step.detail || (step.status === "waiting" ? "Chờ bước trước" : readable(step.status))}</small></div></li>)}</ol>{ocr && <><div className="ocr-readout"><div><FileImage size={15} /><span>OCR trong trình duyệt</span><strong>{ocr.authority}</strong></div><p>{String(ocr.text || ocr.qrContent || "").slice(0, 180)}{String(ocr.text || ocr.qrContent || "").length > 180 ? "..." : ""}</p></div><div className="entity-inspector" aria-label="Các thực thể trích xuất"><div className="panel-heading"><span className="data-label">Entity inspector</span><span className="metadata-chip">HINT · không thẩm quyền</span></div><p className="entity-disclosure">Chọn thực thể để gửi kèm như một gợi ý có xác nhận. Việc chọn không biến OCR cục bộ thành bằng chứng.</p>{Object.entries(ocr.entities || {}).filter(([, values]) => Array.isArray(values) && values.length).map(([type, values]) => <div className="entity-row" key={type}><strong>{type.replaceAll(/([A-Z])/g, " $1")}</strong><div className="entity-values">{values.map((value) => <label key={value}><input type="checkbox" checked={confirmedEntities.includes(value)} onChange={() => setConfirmedEntities((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value].slice(0, 50))} /><span>{value}</span></label>)}</div></div>)}</div></>}</aside>
+          <aside className="intelligence-panel pipeline-panel"><div className="panel-heading"><div><p className="product-kicker">Trust progress</p><h2 className="product-section-title">Tiến độ kiểm tra</h2></div><span className={`live-indicator ${processing ? "is-live" : ""}`}>{processing ? "RUNNING" : hasResult ? "COMPLETE" : "WAITING"}</span></div><ol className="pipeline-list" aria-label="Năm giai đoạn kiểm tra chính">{pipeline.map((step, index) => <li key={step.id} data-status={step.status}><span className="pipeline-index">{step.status === "done" ? <Check size={14} /> : index + 1}</span><div><strong>{step.label}</strong><small>{step.detail || (step.status === "waiting" ? "Đang chờ" : readable(step.status))}</small></div></li>)}</ol>{ocr && <><div className="ocr-readout"><div><FileImage size={15} /><span>OCR trong trình duyệt</span><strong>Gợi ý cục bộ</strong></div><p>{String(ocr.text || ocr.qrContent || "").slice(0, 180)}{String(ocr.text || ocr.qrContent || "").length > 180 ? "..." : ""}</p></div><div className="entity-inspector" aria-label="Các thực thể trích xuất"><div className="panel-heading"><span className="data-label">Entity inspector</span><span className="metadata-chip">GỢI Ý · không thẩm quyền</span></div><p className="entity-disclosure">Chọn thực thể để gửi kèm như một gợi ý có xác nhận. Việc chọn không biến OCR cục bộ thành bằng chứng.</p>{Object.entries(ocr.entities || {}).filter(([, values]) => Array.isArray(values) && values.length).map(([type, values]) => <div className="entity-row" key={type}><strong>{type.replaceAll(/([A-Z])/g, " $1")}</strong><div className="entity-values">{values.map((value) => <label key={value}><input type="checkbox" checked={confirmedEntities.includes(value)} onChange={() => setConfirmedEntities((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value].slice(0, 50))} /><span>{value}</span></label>)}</div></div>)}</div></>}</aside>
         </section>
       )}
       {providerResult && providerResult.state !== "SUCCESS" && <StateBoundary envelope={providerResult} onAction={handleTrustStateAction} />}
-      <TrustPipelineTimeline pipeline={v5Pipeline} processing={processing} />
+      <TrustRunProgress model={trustPresentation} />
+      <details className="trust-technical-stage-details">
+        <summary>Chi tiết bảy tầng kỹ thuật (tùy chọn)</summary>
+        <TrustPipelineTimeline pipeline={v5Pipeline} processing={processing} />
+      </details>
       {hasResult && (
         <div className="result-stack vnext-trust-result-stack">
-          {/* Monumental Verdict Presentation Section */}
-          <section className="verdict-panel" aria-labelledby="verdict-title">
-            <div className="verdict-main">
-              <div className="flex items-center justify-between gap-3 flex-wrap">
-                <p className="product-kicker type-micro-label-v3 text-cyan-400">02 · FORENSIC VERDICT & SYNTHESIS</p>
-                <div className="flex items-center gap-3">
-                  <button type="button" className="text-link" onClick={startNewAnalysis}>
-                    <ScanSearch size={14} /> Kiểm tra nội dung khác
-                  </button>
-                  <button type="button" className="text-link print-trigger" onClick={() => window.print()}>
-                    <Printer size={14} /> In báo cáo
-                  </button>
-                </div>
-              </div>
-              <div className="verdict-icon">
-                <ShieldAlert size={28} className="text-cyan-400" />
-              </div>
-              <h2 id="verdict-title" className="type-monumental text-3xl sm:text-5xl text-white tracking-tight leading-[1.05] mt-2 mb-3">
-                {verdict}
-              </h2>
-              <div className="type-body-editorial text-slate-200 text-base sm:text-lg leading-relaxed">
-                <p>
-                  {layers.layer4?.userExplanation?.recommendedActionNote || canonicalResult?.recommendedAction || "Trust Engine chưa công bố khuyến nghị cho kết quả này."}
-                </p>
-              </div>
-            </div>
-          </section>
+          <TrustResultSummary model={trustPresentation} verdict={verdict} onNewAnalysis={startNewAnalysis} onPrint={() => window.print()} />
 
           {/* Relational Evidence Constellation Stage */}
           <EvidenceConstellationStage claims={constellationClaims} sources={constellationSources} onSelectSource={setInspectedSource} />
 
           <section className="intelligence-panel safety-actions" aria-labelledby="safety-actions-title"><div className="panel-heading"><div><p className="product-kicker">Hành động an toàn · Quy tắc xác định</p><h2 id="safety-actions-title" className="product-section-title">Bạn nên làm gì?</h2></div><ShieldCheck size={18} /></div><ol className="reason-list">{safetyActions.map((action, index) => <li key={action}><span>{index + 1}</span><p>{action}</p></li>)}</ol><p className="product-copy mt-3">Khuyến nghị này được chọn theo loại tín hiệu, không phải nội dung sinh ngẫu nhiên.</p></section>
+          <details className="trust-advanced-details">
+            <summary>Chi tiết diễn giải và kiểm toán (tùy chọn)</summary>
           <section className="result-grid"><div className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">03 · Level 1 · Top reasons</p><h2 className="product-section-title">Vì sao có phán quyết này?</h2></div><span className="signal-badge">{reasons.length} tín hiệu</span></div>{reasons.length ? <ol className="reason-list">{reasons.map((reason, index) => <li key={reason}><span>{String(index + 1).padStart(2, "0")}</span><p>{reason}</p></li>)}</ol> : <div className="empty-state">Pipeline chưa trả về diễn giải đủ để hiển thị. StudentHub không tự tạo lý do thay thế.</div>}</div><div className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">Level 1 · Unknowns</p><h2 className="product-section-title">Điều còn chưa biết</h2></div><span className="signal-badge">{unresolvedSignals.length}</span></div>{unresolvedSignals.length ? <ul className="report-unknown-list">{unresolvedSignals.map((signal) => <li key={signal}>{signal}</li>)}</ul> : <div className="empty-state">Phản hồi không công bố unresolved signal nào; điều này không chứng minh an toàn.</div>}</div></section>
           <section className="intelligence-panel report-metrics" aria-labelledby="report-metrics-title"><div className="panel-heading"><div><p className="product-kicker">Level 1 · Independent measures</p><h2 id="report-metrics-title" className="product-section-title">Đọc các chỉ số riêng biệt</h2></div><span className="metadata-chip">Không có điểm an toàn tổng hợp</span></div><dl className="verdict-metrics"><div><dt>Rủi ro</dt><dd data-risk={risk}>{risk}</dd><dd className="metric-note">Mức tác hại tiềm năng</dd></div><div><dt>Độ chắc quyết định</dt><dd>{confidenceLevel(layers.layer4, canonicalResult?.metrics?.confidence)}</dd><dd className="metric-note">Không phải bằng chứng an toàn</dd></div><div><dt>Bằng chứng</dt><dd>{evidenceLevel(layers.layer3, canonicalResult?.metrics?.evidenceCoverage)}</dd><dd className="metric-note">Mức đủ của nguồn</dd></div><div><dt>Source agreement</dt><dd>{readable(layers.layer3?.sourceAgreement || layers.layer3?.status || canonicalResult?.metrics?.sourceAgreement, "CHƯA CÓ")}</dd><dd className="metric-note">Mức đồng thuận nguồn</dd></div></dl></section>
           <section className="report-level-grid" aria-label="Trust Report Level 2"><div className="intelligence-panel report-level-panel"><div className="panel-heading"><div><p className="product-kicker">04 · Level 2 · Human-readable evidence</p><h2 className="product-section-title">Ngữ cảnh để đọc kết quả</h2></div><span className="signal-badge">{reportLevel2Sections.length} nhóm</span></div>{reportLevel2Sections.length ? <div className="report-fact-grid">{reportLevel2Sections.map((section) => <article className="report-fact-card" key={section.id}><h3>{section.title}</h3><dl>{section.facts.map((fact) => <div key={`${fact.label}-${fact.value}`}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl></article>)}</div> : <StateBoundary state="UNKNOWN" title="Chưa có bằng chứng diễn giải Level 2" description="Phản hồi hiện tại chưa công bố nhóm identity, technical, content, reputation, community hoặc expert đủ để hiển thị." />}</div></section>
           <section className="intelligence-panel report-technical-panel" aria-labelledby="report-technical-title"><div className="panel-heading"><div><p className="product-kicker">05 · Level 3 · Technical evidence</p><h2 id="report-technical-title" className="product-section-title">Chi tiết kỹ thuật có thể truy vết</h2></div><span className="signal-badge">{technicalFacts.length + evidenceRecords.length} bản ghi</span></div>{technicalFacts.length ? <dl className="technical-fact-list">{technicalFacts.map((fact) => <div key={`${fact.label}-${fact.value}`}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}</dl> : <StateBoundary state="UNKNOWN" title="Chưa có quan sát kỹ thuật được công bố" description="Không có URL, domain, redirect, DNS, TLS, certificate, headers, infrastructure hoặc raw observation đủ dữ liệu trong phản hồi này." />}{evidenceRecords.length ? <div className="technical-evidence-list"><p className="data-label">Evidence sources</p>{evidenceRecords.map((record, index) => <article key={`${record.source}-${index}`}><div><strong>{record.source}</strong><span>{record.sourceType}</span></div><p>{record.summary}</p><small>{record.observedAt || "Chưa có timestamp"}{record.provenance ? ` · ${record.provenance}` : ""}</small></article>)}</div> : <div className="empty-state">Không có evidence item hoặc reference chi tiết được công bố ở Level 3.</div>}</section>
           <section className="intelligence-panel"><div className="panel-heading"><div><p className="product-kicker">Case timeline</p><h2 className="product-section-title">Trình tự kiểm chứng</h2></div><Clock3 size={18} /></div><ol className="case-timeline">{timeline.map((event) => <li key={event.id || `${event.label}-${event.at}`}><time>{event.at}</time><span /><div><strong>{event.label}</strong><small>{event.status}</small></div></li>)}</ol></section>
-          {providers.length > 0 && <section className="intelligence-panel" aria-labelledby="provider-status-title"><div className="panel-heading"><div><p className="product-kicker">Provider status</p><h2 id="provider-status-title" className="product-section-title">Tình trạng nguồn đối soát</h2></div><span className="signal-badge">{providers.some((item) => ["error", "unavailable", "unknown", "not_configured", "timeout", "invalid_response", "circuit_open", "rate_limited"].includes(item.status)) ? "PARTIAL" : "COMPLETE"}</span></div><div className="provider-grid">{providers.map((provider) => <article key={provider.provider} className="provider-row"><div><strong>{provider.provider}</strong><small>{provider.latencyMs != null ? `${provider.latencyMs} ms` : "Không có latency"}</small></div><span data-provider-status={provider.status}>{readable(provider.status)}</span><p>{provider.signals?.length ? provider.signals.join(" · ") : provider.status === "clean" ? "Không phát hiện tín hiệu trong lần kiểm tra này." : "Không đủ dữ liệu để kết luận sạch."}</p></article>)}</div></section>}
+          {providers.length > 0 && <section className="intelligence-panel" aria-labelledby="provider-status-title"><div className="panel-heading"><div><p className="product-kicker">Chi tiết nguồn</p><h2 id="provider-status-title" className="product-section-title">Tình trạng nguồn đối soát</h2></div><span className="signal-badge">{providers.some((item) => ["error", "unavailable", "unknown", "not_configured", "timeout", "invalid_response", "circuit_open", "rate_limited"].includes(item.status)) ? "PARTIAL" : "COMPLETE"}</span></div><div className="provider-grid">{providers.map((provider) => <article key={provider.provider} className="provider-row"><div><strong>{provider.provider}</strong><small>{provider.latencyMs != null ? `${provider.latencyMs} ms` : "Không có latency"}</small></div><span data-provider-status={provider.status}>{readable(provider.status)}</span><p>{provider.signals?.length ? provider.signals.join(" · ") : provider.status === "clean" ? "Không phát hiện tín hiệu trong lần kiểm tra này." : "Không đủ dữ liệu để kết luận sạch."}</p></article>)}</div></section>}
+          </details>
 
           {/* Post-Result Expandable Next Action Gateways */}
           <PostResultGateways onPrint={() => window.print()} caseId={passportCaseId} caseRevision={passportCaseRevision} claimId={passportClaimId} />

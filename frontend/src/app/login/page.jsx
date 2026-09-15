@@ -4,13 +4,12 @@
 //
 // Đăng nhập StudentHub AI:
 // - Đăng nhập bằng Google OAuth & GitHub OAuth
-// - "Ghi nhớ đăng nhập" chỉ điều khiển preference/demo; phiên thật dùng HttpOnly cookie
-// - Trải nghiệm Demo Sinh viên & Chuyên gia uy tín tức thì
+// - "Ghi nhớ đăng nhập" chỉ điều khiển preference; phiên thật dùng HttpOnly cookie
 // - Tích hợp CreativeShaderCanvas & Double-Bezel Cyber Glassmorphism
 
 import React, { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Sparkles, GraduationCap, Star } from "lucide-react";
+import { Mail, Sparkles } from "lucide-react";
 import {
   AuthCard,
   InputField,
@@ -30,10 +29,11 @@ import {
 } from "@/lib/auth/authService";
 import { getAuthCapabilities } from "@/lib/auth/authCapabilities";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { normalizeAuthReturnPath, postAuthDestination } from "@/lib/auth/authRedirects";
 
 const LoginPage = () => {
   const router = useRouter();
-  const { loginAsDemo } = useAuth();
+  const { isAuthenticated, profile, ready, status } = useAuth();
   const capabilities = getAuthCapabilities();
 
   const [email, setEmail] = useState("");
@@ -42,6 +42,17 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isOAuthLoading, setIsOAuthLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // /login is a public entry point, not a second authenticated surface. Once
+  // the root provider has resolved the canonical session, an existing user is
+  // returned to the validated in-app destination instead of seeing login
+  // again while another page is still waiting for auth bootstrap.
+  useEffect(() => {
+    if (!ready || status !== "READY" || !isAuthenticated) return;
+    const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const next = normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath"));
+    router.replace(postAuthDestination({ next, onboarded: profile?.onboarded === true }));
+  }, [isAuthenticated, profile?.onboarded, ready, router, status]);
 
   // Kiểm tra lỗi truyền từ OAuth callback hoặc redirect
   useEffect(() => {
@@ -52,6 +63,8 @@ const LoginPage = () => {
         setError(capabilities.emailPasswordMessage);
       } else if (urlError === "google_unsupported_provider") {
         setError(capabilities.googleMessage);
+      } else if (urlError === "github_unsupported_provider") {
+        setError(capabilities.githubMessage);
       } else if (urlError === "google_login_failed" || urlError === "oauth_failed") {
         setError("Đăng nhập bằng OAuth không thành công hoặc đã bị hủy. Vui lòng thử lại.");
       } else if (urlError === "session_unavailable") {
@@ -73,9 +86,10 @@ const LoginPage = () => {
 
       const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
       const returnUrl = params?.get("next") || params?.get("returnPath");
-      const safeNext = (returnUrl && returnUrl.startsWith("/") && !returnUrl.startsWith("/login"))
-        ? returnUrl
-        : (applicationUser?.onboarded ? "/dashboard" : "/onboarding");
+      const safeNext = postAuthDestination({
+        next: normalizeAuthReturnPath(returnUrl),
+        onboarded: applicationUser?.onboarded === true,
+      });
 
       router.push(safeNext);
     } catch (err) {
@@ -95,7 +109,8 @@ const LoginPage = () => {
     setIsOAuthLoading(true);
     setRememberMePreference(rememberMe);
     try {
-      await signInWithGoogle();
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      await signInWithGoogle(normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath")));
     } catch (err) {
       setError(translateAuthError(err));
       setIsOAuthLoading(false);
@@ -108,12 +123,13 @@ const LoginPage = () => {
     setIsOAuthLoading(true);
     setRememberMePreference(rememberMe);
     try {
-      await signInWithGitHub();
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      await signInWithGitHub(normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath")));
     } catch (err) {
       setError(translateAuthError(err));
       setIsOAuthLoading(false);
     }
-  }, [isOAuthLoading, isLoading, rememberMe]);
+  }, [isOAuthLoading, isLoading, rememberMe, capabilities.github]);
 
   const isAnyLoading = isLoading || isOAuthLoading;
 
@@ -142,7 +158,7 @@ const LoginPage = () => {
           onClick={handleGoogleLogin}
           capability={capabilities}
         />
-        <GithubButton isLoading={isOAuthLoading} isDisabled={isLoading} onClick={handleGitHubLogin} />
+        <GithubButton isLoading={isOAuthLoading} isDisabled={isLoading} onClick={handleGitHubLogin} capability={capabilities} />
       </div>
 
       <div className="my-6 relative z-10">
@@ -201,35 +217,6 @@ const LoginPage = () => {
           </Button>
         </div>
       </form>
-
-      {/* Quick Demo Options */}
-      <div className="mt-6 pt-6 border-t border-white/10 relative z-10 space-y-3">
-        <p className="text-xs text-center text-gray-400 font-medium">
-          ⚡ Trải nghiệm nhanh giao diện (Demo Mode):
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              loginAsDemo("student", rememberMe);
-              router.push("/dashboard");
-            }}
-            className="py-2.5 px-3 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"
-          >
-            <GraduationCap className="w-4 h-4 text-indigo-400" /> Demo Sinh viên
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              loginAsDemo("expert", rememberMe);
-              router.push("/dashboard");
-            }}
-            className="py-2.5 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-102"
-          >
-            <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> Demo Chuyên gia
-          </button>
-        </div>
-      </div>
 
       <p className="mt-6 text-center text-sm text-gray-500 relative z-10">
         Chưa có tài khoản?{" "}

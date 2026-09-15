@@ -10,7 +10,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, ArrowRight, ArrowLeft, Sparkles, ShieldCheck, GraduationCap, Star, CheckCircle2, AlertCircle, Loader2, LogIn, UserPlus } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, ArrowLeft, Sparkles, ShieldCheck, CheckCircle2, AlertCircle, Loader2, LogIn, UserPlus } from "lucide-react";
 
 import {
   signInWithPassword,
@@ -23,7 +23,7 @@ import {
   setRememberMePreference,
 } from "@/lib/auth/authService";
 import { getAuthCapabilities } from "@/lib/auth/authCapabilities";
-import { useAuth } from "@/lib/auth/AuthContext";
+import { normalizeAuthReturnPath, postAuthDestination } from "@/lib/auth/authRedirects";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
 import MohsinCurtainTransition from "@/components/ui/MohsinCurtainTransition";
 import SaffronAcademicRadar from "@/components/auth/SaffronAcademicRadar";
@@ -32,7 +32,6 @@ import OtpVerificationOrbit from "@/components/ui/otp-verification-orbit";
 
 export default function SaffronAuthDeck({ initialMode = "register" }) {
   const router = useRouter();
-  const { loginAsDemo } = useAuth();
   const capabilities = getAuthCapabilities();
 
   // Mode: "login" | "register"
@@ -83,6 +82,8 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
         setError(capabilities.emailPasswordMessage);
       } else if (urlError === "google_unsupported_provider") {
         setError(capabilities.googleMessage);
+      } else if (urlError === "github_unsupported_provider") {
+        setError(capabilities.githubMessage);
       } else if (urlError === "google_login_failed" || urlError === "oauth_failed") {
         setError("Đăng nhập bằng OAuth không thành công hoặc đã bị hủy. Vui lòng thử lại.");
       } else if (urlError === "session_unavailable") {
@@ -120,12 +121,11 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
     try {
       const { applicationUser } = await signInWithPassword(email, password, rememberMe);
       saffronAudio.playSuccessChime();
-      const isOnboarded = applicationUser?.onboarded === true;
-      if (!isOnboarded) {
-        router.push("/onboarding");
-      } else {
-        router.push("/dashboard");
-      }
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      router.push(postAuthDestination({
+        next: normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath")),
+        onboarded: applicationUser?.onboarded === true,
+      }));
     } catch (err) {
       saffronAudio.playAlertBuzz();
       setError(translateAuthError(err));
@@ -143,8 +143,16 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
     setIsLoading(true);
 
     try {
-      await signUpWithEmail(email, password, fullName);
+      const result = await signUpWithEmail(email, password, fullName);
       saffronAudio.playSuccessChime();
+      if (result?.applicationUser) {
+        const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+        router.push(postAuthDestination({
+          next: normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath")),
+          onboarded: result.applicationUser.onboarded === true,
+        }));
+        return;
+      }
       setRegStep("OTP");
       setResendCountdown(60);
       setNotice(`Đã gửi mã xác nhận 6 chữ số tới ${email}. Vui lòng kiểm tra hộp thư.`);
@@ -166,11 +174,15 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
     setIsVerifying(true);
 
     try {
-      await verifySignupOtp(email, targetOtp);
+      const result = await verifySignupOtp(email, targetOtp);
       saffronAudio.playSuccessChime();
       setIsSuccessVerified(true);
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
       setTimeout(() => {
-        router.push("/onboarding");
+        router.push(postAuthDestination({
+          next: normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath")),
+          onboarded: result?.applicationUser?.onboarded === true,
+        }));
       }, 1000);
     } catch (err) {
       saffronAudio.playAlertBuzz();
@@ -212,7 +224,8 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
     setIsOAuthLoading(true);
     setRememberMePreference(rememberMe);
     try {
-      await signInWithGoogle();
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      await signInWithGoogle(normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath")));
     } catch (err) {
       saffronAudio.playAlertBuzz();
       setError(translateAuthError(err));
@@ -227,13 +240,14 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
     setIsOAuthLoading(true);
     setRememberMePreference(rememberMe);
     try {
-      await signInWithGitHub();
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      await signInWithGitHub(normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath")));
     } catch (err) {
       saffronAudio.playAlertBuzz();
       setError(translateAuthError(err));
       setIsOAuthLoading(false);
     }
-  }, [isLoading, isOAuthLoading, rememberMe]);
+  }, [isLoading, isOAuthLoading, rememberMe, capabilities.github]);
 
   const isAnyLoading = isLoading || isOAuthLoading || isVerifying;
 
@@ -348,13 +362,23 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
               <button
                 type="button"
                 onClick={handleGitHubOAuth}
-                disabled={isAnyLoading}
-                className="group relative py-3 px-3.5 rounded-xl bg-[#210a07]/90 hover:bg-[#2f0e09] border border-[#47140b] hover:border-[#ffbc09]/60 text-xs font-semibold text-[#ece7e0] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2.5 shadow-sm cursor-pointer disabled:opacity-50 font-human"
+                disabled={isAnyLoading || capabilities.github !== "READY"}
+                title={capabilities.github !== "READY" ? capabilities.githubMessage : "Đăng nhập bằng tài khoản GitHub"}
+                className={`group relative py-3 px-3.5 rounded-xl bg-[#210a07]/90 border border-[#47140b] text-xs font-semibold text-[#ece7e0] transition-all flex items-center justify-center gap-2.5 shadow-sm font-human ${
+                  capabilities.github !== "READY"
+                    ? "opacity-60 cursor-not-allowed hover:bg-[#210a07]/90"
+                    : "hover:bg-[#2f0e09] hover:border-[#ffbc09]/60 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                }`}
               >
                 <svg className="w-4 h-4 fill-current text-[#ece7e0] shrink-0" viewBox="0 0 24 24">
                   <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                 </svg>
                 <span className="truncate">GitHub Account</span>
+                {capabilities.github !== "READY" && (
+                  <span className="text-[9px] font-mono text-amber-400 bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/20">
+                    Chưa bật
+                  </span>
+                )}
               </button>
             </div>
 
@@ -392,14 +416,15 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
           /* =========================================================================
              LOGIN FORM
              ========================================================================= */
-          <form onSubmit={handleLoginSubmit} className="space-y-4">
+          <form onSubmit={handleLoginSubmit} className="space-y-4" aria-label="Đăng nhập bằng email và mật khẩu">
             {/* Field: Email */}
             <div className="space-y-1.5 text-left">
-              <label className="block text-xs font-semibold text-[#ece7e0] font-human">
+              <label htmlFor="saffron-login-email" className="block text-xs font-semibold text-[#ece7e0] font-human">
                 Địa chỉ Email <span className="text-[10px] font-mono text-[#ffbc09] font-normal ml-1">[ CHÍNH ]</span>
               </label>
               <input
                 type="email"
+                id="saffron-login-email"
                 required
                 disabled={isAnyLoading}
                 value={email}
@@ -414,12 +439,13 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
 
             {/* Field: Password */}
             <div className="space-y-1.5 text-left">
-              <label className="block text-xs font-semibold text-[#ece7e0] font-human">
+              <label htmlFor="saffron-login-password" className="block text-xs font-semibold text-[#ece7e0] font-human">
                 Mật khẩu bảo vệ <span className="text-[10px] font-mono text-[#ca56ed] font-normal ml-1">[ BẢO MẬT ]</span>
               </label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  id="saffron-login-password"
                   required
                   disabled={isAnyLoading}
                   value={password}
@@ -432,6 +458,7 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
                 />
                 <button
                   type="button"
+                  aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[#ece7e0]/50 hover:text-[#ffbc09] transition-colors"
                 >
@@ -476,17 +503,18 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
           /* =========================================================================
              REGISTER STEP 1 (FORM)
              ========================================================================= */
-          <form onSubmit={handleRegisterSubmit} className="space-y-4">
+          <form onSubmit={handleRegisterSubmit} className="space-y-4" aria-label="Đăng ký bằng email và mật khẩu">
             {/* Academic Transponder Radar */}
             <SaffronAcademicRadar email={email} />
 
             {/* Field: Full Name */}
             <div className="space-y-1.5 text-left">
-              <label className="block text-xs font-semibold text-[#ece7e0] font-human">
+              <label htmlFor="saffron-register-full-name" className="block text-xs font-semibold text-[#ece7e0] font-human">
                 Họ và tên của bạn <span className="text-[10px] font-mono text-[#ffbc09] font-normal ml-1">[ ĐẦY ĐỦ ]</span>
               </label>
               <input
                 type="text"
+                id="saffron-register-full-name"
                 required
                 disabled={isAnyLoading}
                 value={fullName}
@@ -501,11 +529,12 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
 
             {/* Field: Email */}
             <div className="space-y-1.5 text-left">
-              <label className="block text-xs font-semibold text-[#ece7e0] font-human">
+              <label htmlFor="saffron-register-email" className="block text-xs font-semibold text-[#ece7e0] font-human">
                 Email trường hoặc cá nhân <span className="text-[10px] font-mono text-[#38bdf8] font-normal ml-1">[ KHUYÊN DÙNG .EDU ]</span>
               </label>
               <input
                 type="email"
+                id="saffron-register-email"
                 required
                 disabled={isAnyLoading}
                 value={email}
@@ -520,12 +549,13 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
 
             {/* Field: Password & Entropy */}
             <div className="space-y-1.5 text-left">
-              <label className="block text-xs font-semibold text-[#ece7e0] font-human">
+              <label htmlFor="saffron-register-password" className="block text-xs font-semibold text-[#ece7e0] font-human">
                 Mật khẩu bảo vệ <span className="text-[10px] font-mono text-[#ca56ed] font-normal ml-1">[ TỐI THIỂU 6 KÝ TỰ ]</span>
               </label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  id="saffron-register-password"
                   required
                   minLength={6}
                   disabled={isAnyLoading}
@@ -539,6 +569,7 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
                 />
                 <button
                   type="button"
+                  aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[#ece7e0]/50 hover:text-[#ffbc09] transition-colors"
                 >
@@ -631,55 +662,6 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
           </div>
         )}
 
-        {/* 6. Demo Access Passes */}
-        {regStep === "FORM" && (
-          <div className="mt-6 pt-5 border-t border-[#47140b] space-y-3">
-            <div className="flex items-center justify-between text-[11px] text-[#ece7e0]/70 font-human font-medium">
-              <span>⚡ Trải nghiệm nhanh (Demo Mode):</span>
-              <span className="text-[10px] font-mono text-[#ffbc09] uppercase tracking-wider">[ MIỄN PHÍ ]</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2.5 font-human">
-              {/* Demo Sinh viên Pass */}
-              <button
-                type="button"
-                onClick={() => {
-                  saffronAudio.playHardwareKey();
-                  loginAsDemo("student", rememberMe);
-                  router.push("/dashboard");
-                }}
-                className="group p-2.5 rounded-xl bg-[#210a07] hover:bg-[#2f0e09] border border-[#ffbc09]/30 hover:border-[#ffbc09] text-left transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-              >
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#ffbc09]">
-                  <GraduationCap className="w-4 h-4" />
-                  <span>Demo Sinh Viên</span>
-                </div>
-                <div className="text-[10px] text-[#ece7e0]/60 mt-0.5">
-                  Điểm uy tín: 80 pts • Đầy đủ tính năng
-                </div>
-              </button>
-
-              {/* Demo Chuyên gia Pass */}
-              <button
-                type="button"
-                onClick={() => {
-                  saffronAudio.playHardwareKey();
-                  loginAsDemo("expert", rememberMe);
-                  router.push("/dashboard");
-                }}
-                className="group p-2.5 rounded-xl bg-[#210a07] hover:bg-[#2f0e09] border border-amber-500/30 hover:border-amber-400 text-left transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-              >
-                <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
-                  <Star className="w-4 h-4 fill-amber-400" />
-                  <span>Demo Cố Vấn</span>
-                </div>
-                <div className="text-[10px] text-[#ece7e0]/60 mt-0.5">
-                  Điểm uy tín: 100 pts • Quyền xác thực
-                </div>
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </MohsinCurtainTransition>
   );

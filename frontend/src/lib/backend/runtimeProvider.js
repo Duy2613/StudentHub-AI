@@ -1,6 +1,10 @@
 import { createApiProviderBundle, createProvider } from "./providerFactory";
 
 function configuredMode() {
+  // A production bundle always uses live adapters. Demo fixtures remain
+  // available to isolated development/contract tests, but an environment
+  // flag must never turn the deployed application into a fake data surface.
+  if (process.env.NODE_ENV === "production") return "LIVE";
   const configured = process.env.NEXT_PUBLIC_STUDENTHUB_PROVIDER_MODE;
   if (configured === "DEMO" || configured === "LIVE") return configured;
   if (process.env.NEXT_PUBLIC_COMPETITION_DEMO === "true") return "DEMO";

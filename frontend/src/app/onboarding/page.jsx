@@ -26,18 +26,21 @@ import RobinPayotRoadCanvas from "@/components/canvas/RobinPayotRoadCanvas";
 import { NoiseOverlay } from "@/components/auth/AuthUI";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
 import { ApiError, apiErrorMessage } from "@/lib/api/errors";
+import { normalizeAuthReturnPath, postAuthDestination } from "@/lib/auth/authRedirects";
 
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { session, profile, updateProfile, isLoading: isAuthLoading } = useAuth();
+  const { session, profile, updateProfile, isLoading: isAuthLoading, status } = useAuth();
 
   // Redirect if not logged in
   useEffect(() => {
-    if (!isAuthLoading && !session) {
-      router.replace("/login");
+    if (!isAuthLoading && status === "ANONYMOUS") {
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      const next = normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath"));
+      router.replace(`/login?next=${encodeURIComponent(next)}`);
     }
-  }, [session, isAuthLoading, router]);
+  }, [isAuthLoading, router, status]);
 
   const [step, setStep] = useState(1); // 1: Chọn Vai trò, 2: Chọn Avatar, 3: Thông tin chi tiết
   const [role, setRole] = useState("student"); // "student" | "expert"
@@ -166,7 +169,11 @@ export default function OnboardingPage() {
         onboarded: true,
       });
 
-      router.replace("/dashboard");
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      router.replace(postAuthDestination({
+        next: normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath")),
+        onboarded: true,
+      }));
     } catch (err) {
       setError(err instanceof ApiError ? apiErrorMessage(err) : "Không thể lưu thông tin hồ sơ.");
       setIsSubmitting(false);

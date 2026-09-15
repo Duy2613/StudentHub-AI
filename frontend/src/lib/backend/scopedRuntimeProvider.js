@@ -3,7 +3,9 @@ import { ApiError } from "@/lib/api/runtimeError";
 import { createStateEnvelope } from "@/lib/ui-state/clientModel";
 
 const configuredProviderMode = process.env.NEXT_PUBLIC_STUDENTHUB_PROVIDER_MODE;
-export const SCOPED_PROVIDER_MODE = configuredProviderMode === "DEMO" || configuredProviderMode === "LIVE"
+export const SCOPED_PROVIDER_MODE = process.env.NODE_ENV === "production"
+  ? "LIVE"
+  : configuredProviderMode === "DEMO" || configuredProviderMode === "LIVE"
   ? configuredProviderMode
   : process.env.NEXT_PUBLIC_COMPETITION_DEMO === "true"
     ? "DEMO"
@@ -56,6 +58,7 @@ function normalizeExpert(value) {
     expertId: String(raw.expertId || raw.id || "expert-unknown"),
     name: String(raw.name || "Chuyên gia chưa công bố tên"),
     title: nullableText(raw.title || raw.academicTitle),
+    bio: nullableText(raw.bio),
     institution: nullableText(raw.institution),
     department: nullableText(raw.department),
     isVerified: raw.isVerified === true,
@@ -63,9 +66,9 @@ function normalizeExpert(value) {
     scopes: Array.isArray(raw.scopes) ? raw.scopes.filter((scope) => asRecord(scope).domain && asRecord(scope).level).slice(0, 50) : [],
     credentials: Array.isArray(raw.credentials) ? raw.credentials.slice(0, 50) : [],
     publications: Array.isArray(raw.publications) ? raw.publications.slice(0, 100) : [],
-    hasRegistrarAuthority: raw.hasRegistrarAuthority === true,
+    reputationState: nullableText(raw.reputationState),
+    earnedStars: Array.isArray(raw.earnedStars) ? raw.earnedStars.slice(0, 12) : [],
     verificationSummary: raw.verificationSummary || undefined,
-    authorityBoundaries: raw.authorityBoundaries || undefined,
   };
 }
 
