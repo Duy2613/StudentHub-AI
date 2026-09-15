@@ -3,11 +3,9 @@
 // frontend/src/app/callback/page.jsx
 //
 // Trình xử lý Callback OAuth (Google / GitHub qua Supabase Auth):
-// - Loại bỏ hoàn toàn lệch pha đồng bộ (Async Mismatch) bằng chuỗi thực thi tuần tự:
-//   1. Trực tiếp giải mã Session từ URL qua supabase.auth.getSession()
-//   2. Dùng Bearer proof tạm thời để đồng bộ và trao đổi phiên một lần
-//   3. Nhận opaque HttpOnly application session từ máy chủ
-//   4. Phân luồng an toàn: Chưa Onboarded -> /onboarding | Đã Onboarded -> /dashboard
+// - PKCE code được đổi bằng Supabase trước khi tạo application session.
+// - Bearer proof chỉ tồn tại trong bộ nhớ của trang callback và được đổi một lần.
+// - Đích return-to luôn đi qua allowlist nội bộ.
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -20,6 +18,11 @@ import {
   logAuthError,
   logAuthInfo,
 } from "@/lib/auth/authService";
+import {
+  buildLoginErrorPath,
+  normalizeAuthReturnPath,
+  postAuthDestination,
+} from "@/lib/auth/authRedirects";
 import { Loader2, Sparkles } from "lucide-react";
 
 export default function AuthCallbackPage() {
@@ -33,10 +36,13 @@ export default function AuthCallbackPage() {
 
     const processOAuthCallback = async () => {
       logAuthInfo("OAuthCallback", "Bắt đầu phân giải OAuth callback.");
+      const searchParams = new URLSearchParams(window.location.search);
+      const providerHint = String(searchParams.get("provider") || "").toLowerCase();
+      const next = normalizeAuthReturnPath(searchParams.get("next") || searchParams.get("returnTo"));
+      const goToLogin = (errorCode) => router.replace(buildLoginErrorPath(errorCode, next));
 
       // 0. Bắt lỗi trả về qua URL Query hoặc Hash Fragment từ OAuth Provider (ví dụ: validation_failed: Unsupported provider)
       if (typeof window !== "undefined") {
-        const searchParams = new URLSearchParams(window.location.search);
         const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
         const rawError = searchParams.get("error") || hashParams.get("error") || "";
         const rawDesc = searchParams.get("error_description") || hashParams.get("error_description") || "";
@@ -44,28 +50,41 @@ export default function AuthCallbackPage() {
 
         if (combined.includes("unsupported provider") || combined.includes("validation_failed")) {
           logAuthError("OAuthCallback:unsupportedProvider", new Error(rawDesc || rawError));
-          router.replace("/login?error=google_unsupported_provider");
+          const provider = providerHint || (combined.includes("github") ? "github" : combined.includes("google") ? "google" : "");
+          goToLogin(provider === "google" ? "google_unsupported_provider" : provider === "github" ? "github_unsupported_provider" : "oauth_failed");
           return;
         }
 
         if (rawError || rawDesc) {
           logAuthError("OAuthCallback:urlError", new Error(rawDesc || rawError));
-          router.replace("/login?error=oauth_failed");
+          goToLogin("oauth_failed");
           return;
         }
       }
 
       try {
         if (!getAuthCapabilities().supabaseConfigured) {
-          router.replace("/login?error=auth_misconfigured");
+          goToLogin("auth_misconfigured");
           return;
         }
-        // 1. Lấy session từ Supabase (tự động phân giải hash fragment / code)
-        const { data: { session }, error } = await supabase.auth.getSession();
+        // 1. Complete the supported PKCE flow. Hash parsing remains a bounded
+        // compatibility path for older links already in circulation.
+        let session = null;
+        let error = null;
+        const code = searchParams.get("code");
+        if (code) {
+          const exchangedCode = await supabase.auth.exchangeCodeForSession(code);
+          session = exchangedCode.data?.session || null;
+          error = exchangedCode.error || null;
+        } else {
+          const current = await supabase.auth.getSession();
+          session = current.data?.session || null;
+          error = current.error || null;
+        }
 
         if (error) {
           logAuthError("OAuthCallback:getSession", error);
-          router.replace("/login?error=oauth_failed");
+          goToLogin("oauth_failed");
           return;
         }
 
@@ -91,7 +110,7 @@ export default function AuthCallbackPage() {
             if (settled) return;
             settled = true;
             subscription?.unsubscribe();
-            router.replace("/login?error=oauth_failed");
+            goToLogin("oauth_failed");
           }, 4000);
           return;
         }
@@ -99,35 +118,23 @@ export default function AuthCallbackPage() {
         await handleSuccessfulSession(session);
       } catch (err) {
         logAuthError("OAuthCallback:process", err);
-        router.replace("/login?error=oauth_failed");
+        goToLogin("oauth_failed");
       }
     };
 
     const handleSuccessfulSession = async (currentSession) => {
-      const user = currentSession.user;
       const accessToken = currentSession.access_token;
-      logAuthInfo("OAuthCallback", `Xác thực thành công cho user: ${user.email}`);
+      logAuthInfo("OAuthCallback", "Xác thực OAuth thành công.");
 
       setStatusMessage("Đang tạo phiên đăng nhập an toàn...");
-
-      // 3. Kiểm tra xem tài khoản có bị xung đột (ban đầu đăng ký email/mật khẩu)
-      const identities = user.identities || [];
-      const emailIdentity = identities.find((i) => i.provider === "email");
-      const oauthIdentity = identities.find((i) => i.provider === "google" || i.provider === "github");
-
-      const isOriginallyEmail =
-        emailIdentity && oauthIdentity && new Date(emailIdentity.created_at) < new Date(oauthIdentity.created_at);
-
-      if (isOriginallyEmail) {
-        logAuthInfo("OAuthCallback", "Tài khoản đăng ký ban đầu bằng mật khẩu. Yêu cầu đăng nhập mật khẩu.");
-        await signOutSupabase();
-        router.replace("/login?error=email_registered_use_password");
-        return;
-      }
 
       // 4. Exchange the transient provider proof for the server-owned opaque
       // session. Failure is terminal: the UI must not claim authentication
       // when durable session persistence is unavailable.
+      if (!accessToken) {
+        goToLogin("oauth_failed");
+        return;
+      }
       setStatusMessage("Đang tạo phiên đăng nhập an toàn...");
       const exchanged = await exchangeApplicationSession(accessToken);
       if (!exchanged.success) {
@@ -135,7 +142,7 @@ export default function AuthCallbackPage() {
         exchangeError.code = exchanged.code;
         logAuthError("OAuthCallback:sessionExchange", exchangeError);
         await signOutSupabase();
-        router.replace("/login?error=session_unavailable");
+        goToLogin("session_unavailable");
         return;
       }
 
@@ -145,20 +152,16 @@ export default function AuthCallbackPage() {
       if (!applicationState.authenticated || !applicationState.user) {
         logAuthError("OAuthCallback:applicationSession", new Error(applicationState.code || "APPLICATION_SESSION_NOT_CONFIRMED"));
         await signOutSupabase();
-        router.replace("/login?error=session_unavailable");
+        goToLogin("session_unavailable");
         return;
       }
       const isOnboarded = applicationState.user.onboarded === true;
 
       setStatusMessage("Hoàn tất! Đang chuyển hướng...");
 
-      if (!isOnboarded) {
-        logAuthInfo("OAuthCallback", "Chưa hoàn tất onboarding -> Chuyển về /onboarding");
-        router.replace("/onboarding");
-      } else {
-        logAuthInfo("OAuthCallback", "Đã hoàn tất hồ sơ -> Chuyển về /dashboard");
-        router.replace("/dashboard");
-      }
+      const destination = postAuthDestination({ next, onboarded: isOnboarded });
+      logAuthInfo("OAuthCallback", `Hoàn tất OAuth -> ${destination.startsWith("/onboarding") ? "onboarding" : "return-to"}.`);
+      router.replace(destination);
     };
 
     processOAuthCallback();
