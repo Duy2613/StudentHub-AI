@@ -18,7 +18,7 @@ Updated: 2026-08-30. Status is based on the current worktree, focused tests, and
 | L Evidence Triangle | Case lab keeps Official/Community/Expert separate | COMPLETE | Never flatten into a magic score. |
 | M Superflows | Exactly three deterministic, labeled end-to-end fixtures | COMPLETE | Demo fixture sources are not real evidence. |
 | N The Margin migration | Shared Margin primitives + 240px rail + responsive top strip in `UnifiedAppShell` | COMPLETE FOR SHELL / BODY FOLLOW-UP | Continue route-local body/footnote adoption only where it closes a real interaction gap. |
-| O Demo mode | `/cases`, `/api/v1/demo/superflows`, explicit fixture provenance | COMPLETE FOR CORE | Add categories only when backed by a real demo scenario. |
+| O Demo mode | `/cases`, explicit fixture provenance | COMPLETE FOR CORE | Add categories only when backed by a real demo scenario; keep fixtures out of live API contracts. |
 | P Providers | AI Gateway adapters and env contracts | COMPLETE AS ADAPTERS | Live calls blocked by missing fresh keys/terms. |
 | Q Freeze | Feature Freeze definition gates, final local audit, `250/250` discovered tests, canonical runtime smoke, `115/115` production routes, and Chromium/WebKit evidence | LOCAL RC READY WITH EXTERNAL LIMITATIONS | Stop feature work. Durable PostgreSQL/RLS/session proof, live-provider proof, staging E2E, rollback rehearsal, and Firefox host coverage remain external. |
 

@@ -47,7 +47,7 @@ No live provider result may be replaced by demo data. Demo records use `DEMO_FIX
 
 ## API contract
 
-- `GET /api/v1/demo/superflows`: public deterministic fixtures, always marked `demo: true` and `provenance: DEMO_FIXTURE`.
+- `/cases`: client-rendered deterministic fixtures, always marked `demo: true` and `provenance: DEMO_FIXTURE`; no public fixture API.
 - `POST /api/v1/decisions`: authenticated, server-authorized Decision Twin evaluation.
 - `GET|POST /api/v1/passports`: authenticated, owner-derived passport list/create.
 - `GET|PATCH /api/v1/passports/:passportId`: authenticated, owner-derived read/append.

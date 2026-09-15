@@ -19,7 +19,6 @@ Raw stacks, provider secrets, and internal SQL are server-only.
 | `GET /api/v1/dashboard` | `dashboard.v1` cross-pillar priorities | authenticated owner; no browser-supplied subject |
 | `GET /api/v1/search` | `search.v1` public product search | bounded public search over redacted records |
 | `GET|POST /api/v1/notifications` | `notifications.v1` list/action state machine | authenticated owner; server-owned notification state |
-| `GET /api/v1/demo/superflows` | deterministic labeled competition fixtures; optional `id` | public, never live evidence |
 | `POST /api/v1/decisions` | validate/evaluate/persist a non-demo Decision Twin | authenticated owner |
 | `GET|POST /api/v1/passports` | list/create owner Passport | authenticated owner |
 | `GET|PATCH /api/v1/passports/:passportId` | read/append a Passport event | authenticated owner |
@@ -28,7 +27,7 @@ Raw stacks, provider secrets, and internal SQL are server-only.
 
 ## Domain response principles
 
-Trust responses distinguish `SUPPORTED`, `SUSPICIOUS`, `HIGH_RISK`, `DANGEROUS`, `DISPUTED`, `UNKNOWN`, and `INSUFFICIENT_EVIDENCE`; provider `clean/findings/unknown/error/unavailable` states are not collapsed. Academic rules return source/version/provenance and deterministic eligibility. Decision responses expose every consequence basis. Demo responses include `demo: true`, `provenance: DEMO_FIXTURE`, and a warning.
+Trust responses distinguish `SUPPORTED`, `SUSPICIOUS`, `HIGH_RISK`, `DANGEROUS`, `DISPUTED`, `UNKNOWN`, and `INSUFFICIENT_EVIDENCE`; provider `clean/findings/unknown/error/unavailable` states are not collapsed. Academic rules return source/version/provenance and deterministic eligibility. Decision responses expose every consequence basis. Competition fixture data, where shown in the `/cases` UI, remains visibly labeled `demo: true` and `provenance: DEMO_FIXTURE`; it is not exposed as a live API contract.
 
 ## Long-running operations
 

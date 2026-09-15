@@ -46,14 +46,7 @@ test.describe("Evidence Case Lab", () => {
     expect(overflow).toBeLessThanOrEqual(1);
   });
 
-  test("serves labeled demo fixtures while live cross-system APIs remain authenticated", async ({ request }) => {
-    const demoResponse = await request.get("/api/v1/demo/superflows?id=fake-scholarship");
-    expect(demoResponse.status()).toBe(200);
-    const demoBody = await demoResponse.json();
-    expect(demoBody.demo).toBe(true);
-    expect(demoBody.provenance).toBe("DEMO_FIXTURE");
-    expect(demoBody.data.id).toBe("fake-scholarship");
-
+  test("keeps live cross-system APIs authenticated", async ({ request }) => {
     const passportResponse = await request.get("/api/v1/passports");
     expect(passportResponse.status()).toBe(401);
     const decisionResponse = await request.post("/api/v1/decisions", { data: { demo: true } });

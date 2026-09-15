@@ -10,7 +10,7 @@
 
 ## Demo contract
 
-Demo Mode is explicit on `/cases` and `/api/v1/demo/superflows`. Fixtures are deterministic and visibly labeled `DEMO_FIXTURE`; they cover low-risk/supportive, high-risk, conflict, unknown, Academic rule, and Reality Gap states across the three flows. Demo data never enters live persistence.
+Demo Mode is explicit on `/cases` only. Fixtures are deterministic and visibly labeled `DEMO_FIXTURE`; they cover low-risk/supportive, high-risk, conflict, unknown, Academic rule, and Reality Gap states across the three flows. No public API exposes these fixtures, and demo data never enters live persistence.
 
 ## Freeze gate
 

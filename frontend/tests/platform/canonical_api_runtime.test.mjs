@@ -24,7 +24,7 @@ async function waitForServer(baseUrl, output) {
   const deadline = Date.now() + 60_000;
   while (Date.now() < deadline) {
     try {
-      const response = await fetch(`${baseUrl}/api/v1/demo/superflows`);
+      const response = await fetch(`${baseUrl}/api/health/live`);
       if (response.status < 500) return;
     } catch {
       // Next is still compiling its first route.
