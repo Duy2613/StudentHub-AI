@@ -260,6 +260,20 @@ test("PublicSourceHub keeps partial provider state explicit and official seeds s
   assert.equal(discovery.provenance.isAuthoritative, false);
 });
 
+test("PublicSourceHub geocodes place weather when coordinates are absent", async () => {
+  const fixture = createFixtureFetch();
+  const hub = new PublicSourceHub({ client: new PublicApiClient({ fetchImpl: fixture.fetchImpl }) });
+  const result = await hub.weather({ place: "Hanoi", latitude: null, longitude: null, forecastDays: 2 });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.geocodedPlace.metadata.latitude, 21.0278);
+  assert.equal(result.geocodedPlace.metadata.longitude, 105.8342);
+  assert.equal(result.location.latitude, 21.0278);
+  assert.equal(result.location.longitude, 105.8342);
+  assert.equal(fixture.calls.some(({ parsed }) => parsed.hostname === "geocoding-api.open-meteo.com"), true);
+  assert.equal(fixture.calls.some(({ parsed }) => parsed.hostname === "api.open-meteo.com" && parsed.searchParams.get("latitude") === "21.0278"), true);
+});
+
 test("PublicSourceHub supports explicit official-page fetch without changing the soft authority boundary", async () => {
   const fixture = createFixtureFetch();
   const officialSource = {

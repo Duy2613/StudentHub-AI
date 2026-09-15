@@ -216,7 +216,8 @@ export class PublicSourceHub {
   }
 
   async weather({ place = "", countryCode = "", latitude, longitude, forecastDays = 3, timezone = "auto", signal } = {}) {
-    const hasCoordinates = latitude !== undefined && latitude !== "" && longitude !== undefined && longitude !== "";
+    const hasCoordinates = latitude !== null && latitude !== undefined && latitude !== ""
+      && longitude !== null && longitude !== undefined && longitude !== "";
     if (hasCoordinates) return callSafely("OPEN_METEO_FORECAST", () => this.openMeteo.forecast({ latitude, longitude, forecastDays, timezone, signal }));
     if (boundedText(place, 160).length < 2) return this._invalid("PLACE_QUERY_REQUIRED", "weather");
     return callSafely("OPEN_METEO_FORECAST", () => this.openMeteo.forecastForPlace({ place, countryCode, forecastDays, timezone, signal }));
