@@ -14,7 +14,12 @@ export const GET = SecurityFabric.wrapHandler(
       status: "LIVE",
       service: "studenthub-ai",
       checkedAt: new Date().toISOString(),
-      meta: { correlationId: securityContext.correlationId }
+      meta: {
+        correlationId: securityContext.correlationId,
+        releaseId: process.env.STUDENTHUB_RELEASE_ID || process.env.VERCEL_GIT_COMMIT_SHA || null,
+        gitCommitSha: process.env.VERCEL_GIT_COMMIT_SHA || null,
+        deploymentId: process.env.VERCEL_DEPLOYMENT_ID || null
+      }
     },
     { headers: { "cache-control": "no-store" } }
   )
