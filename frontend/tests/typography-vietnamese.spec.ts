@@ -29,4 +29,3 @@ test.describe('Vietnamese Diacritic Safe Headroom Regression', () => {
     await expect(communityHeading).toBeVisible();
   });
 });
-\n
