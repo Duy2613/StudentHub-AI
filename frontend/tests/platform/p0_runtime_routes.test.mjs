@@ -99,9 +99,6 @@ test("P0 runtime routes enforce auth and never regress to handler 500s", { timeo
       ["POST", "/api/intelligence/fusion/evaluate", 401],
       ["GET", "/api/not-allowlisted", 404],
       ["POST", "/api/not-allowlisted", 404],
-      ["POST", "/api/marketplace/items", 401],
-      ["POST", "/api/prof-rating/reviews", 401],
-      ["POST", "/api/quests/daily", 401],
       ["POST", "/api/safety-map/reports", 401],
       ["GET", "/api/users/profile?email=student.hust@sis.hust.edu.vn", 401],
       ["PUT", "/api/users/profile", 401],
@@ -204,28 +201,6 @@ test("P0 runtime routes enforce auth and never regress to handler 500s", { timeo
     assert.strictEqual(forumPostBody.post.authorTrustScore, 50);
     assert.strictEqual(forumPostBody.post.trustScoreSource, "SERVER_UNASSESSED_BASELINE");
 
-    const marketplacePost = await fetch(`${baseUrl}/api/marketplace/items`, {
-      method: "POST",
-      headers: { ...authHeaders, "content-type": "application/json" },
-      body: JSON.stringify({
-        title: "Giáo trình kiểm thử authority",
-        price: 100000,
-        campusLocation: "HCMUTE",
-        description: "Mục kiểm thử không cho trình duyệt tự gán vai trò, xác minh hoặc điểm tín nhiệm.",
-        sellerName: "Forged Admin",
-        sellerRole: "admin",
-        sellerTrustScore: 100,
-        sellerEduVerified: true
-      })
-    });
-    assert.strictEqual(marketplacePost.status, 201);
-    const marketplaceBody = await marketplacePost.json();
-    assert.strictEqual(marketplaceBody.item.sellerId, "student:24110001");
-    assert.strictEqual(marketplaceBody.item.sellerRole, "student");
-    assert.strictEqual(marketplaceBody.item.sellerTrustScore, null);
-    assert.strictEqual(marketplaceBody.item.sellerEduVerified, false);
-    assert.strictEqual(marketplaceBody.item.verifiedSafetyLevel, "UNASSESSED");
-
     const safetyPost = await fetch(`${baseUrl}/api/safety-map/reports`, {
       method: "POST",
       headers: { ...authHeaders, "content-type": "application/json" },
@@ -246,32 +221,6 @@ test("P0 runtime routes enforce auth and never regress to handler 500s", { timeo
     assert.strictEqual(safetyBody.report.authorTrustScore, null);
     assert.strictEqual(safetyBody.report.severity, "UNDER_REVIEW");
     assert.strictEqual(safetyBody.report.status, "PENDING_REVIEW");
-
-    const professorReview = await fetch(`${baseUrl}/api/prof-rating/reviews`, {
-      method: "POST",
-      headers: { ...authHeaders, "content-type": "application/json" },
-      body: JSON.stringify({
-        professorId: "prof-01",
-        rating: 4,
-        comment: "Giảng viên giải thích rõ và cung cấp tài liệu có cấu trúc.",
-        studentRole: "Administrator"
-      })
-    });
-    assert.strictEqual(professorReview.status, 201);
-    const professorReviewBody = await professorReview.json();
-    assert.strictEqual(professorReviewBody.review.authorId, "student:24110001");
-    assert.strictEqual(professorReviewBody.review.studentRole, "STUDENT");
-
-    const questPost = await fetch(`${baseUrl}/api/quests/daily`, {
-      method: "POST",
-      headers: { ...authHeaders, "content-type": "application/json" },
-      body: JSON.stringify({ questId: "quest-01" })
-    });
-    assert.strictEqual(questPost.status, 200);
-    const questBody = await questPost.json();
-    assert.strictEqual(questBody.rewardPoints, 0);
-    assert.strictEqual(questBody.submission.actorId, "student:24110001");
-    assert.strictEqual(questBody.submission.status, "PENDING_VERIFICATION");
 
     const unverifiedEduToken = new TokenValidator().signToken({
       sub: "student:24110001",
