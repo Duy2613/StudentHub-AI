@@ -14,7 +14,7 @@ export const TRUST_MACRO_STAGE_IDS = Object.freeze([
   "claim-intelligence",
   "evidence-discovery",
   "evidence-forensics",
-  "multi-ai-verification",
+  "ai-verification",
   "decision-intelligence",
 ]);
 
@@ -38,9 +38,9 @@ export const TRUST_MACRO_STAGES = Object.freeze([
     internalStageIds: Object.freeze(["l3"]),
   }),
   Object.freeze({
-    id: "multi-ai-verification",
-    name: "Multi-AI Verification",
-    description: "Tổng hợp các tín hiệu kiểm tra theo policy bảo vệ.",
+    id: "ai-verification",
+    name: "AI Verification",
+    description: "Gemini đối chiếu và giải thích evidence theo policy bảo vệ.",
     internalStageIds: Object.freeze(["l4"]),
   }),
   Object.freeze({

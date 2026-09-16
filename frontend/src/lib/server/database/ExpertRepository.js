@@ -8,7 +8,7 @@
 
 import { createHash, randomUUID } from "node:crypto";
 import { getPostgresPool } from "./PostgresPool.js";
-import { assertCaseScope, assertCoordinator, isCanonicalUuid, scopeError } from "./CommunityExpertScope.js";
+import { assertCaseScope, assertCoordinator, assertOwnedCaseScope, isCanonicalUuid, scopeError } from "./CommunityExpertScope.js";
 import {
   buildAssessmentContract,
   calculateQualityScore,
@@ -70,6 +70,30 @@ function sanitizeAssessment(value, depth = 0) {
   return value;
 }
 
+function reviewRequestDto(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    caseId: row.case_id,
+    caseRevision: Number(row.case_revision),
+    claimId: row.claim_id || null,
+    domainCode: row.domain_code,
+    question: row.question,
+    contextRefs: jsonArray(row.context_refs),
+    status: row.status,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    ...(row.idempotent !== undefined ? { idempotent: Boolean(row.idempotent) } : {}),
+    ...(row.deduplicated !== undefined ? { deduplicated: Boolean(row.deduplicated) } : {}),
+  };
+}
+
+function digestMatches(stored, expected) {
+  if (Buffer.isBuffer(stored)) return stored.equals(expected);
+  if (typeof stored === "string") return stored.replace(/^\\x/i, "").toLowerCase() === expected.toString("hex");
+  return false;
+}
+
 async function appendOutbox(client, { eventType, aggregateType = "EXPERT_ASSESSMENT", aggregateId, subject, payload, correlationId = "expert" }) {
   const eventId = randomUUID();
   await client.query(
@@ -97,7 +121,7 @@ export class ExpertRepository {
         `SELECT ep.user_id AS expert_id, ep.public_title, ep.public_bio,
                 coalesce(array_agg(distinct ev.domain_code) filter (where ev.status = 'VERIFIED'), '{}') AS verified_domains
            FROM public.expert_profiles ep
-           LEFT JOIN private.expert_verifications ev ON ev.user_id = ep.user_id AND ev.suspended_at IS NULL AND ev.status = 'VERIFIED' AND ev.qualification_state = 'DOMAIN_VERIFIED' AND (ev.expires_at IS NULL OR ev.expires_at > now())
+           JOIN private.expert_verifications ev ON ev.user_id = ep.user_id AND ev.suspended_at IS NULL AND ev.status = 'VERIFIED' AND ev.qualification_state = 'DOMAIN_VERIFIED' AND (ev.expires_at IS NULL OR ev.expires_at > now())
            ${domainPredicate}
           GROUP BY ep.user_id, ep.public_title, ep.public_bio
           ORDER BY ep.updated_at DESC, ep.user_id
@@ -117,7 +141,7 @@ export class ExpertRepository {
         `SELECT ep.user_id AS expert_id, ep.public_title, ep.public_bio,
                 coalesce(array_agg(distinct ev.domain_code) filter (where ev.status = 'VERIFIED'), '{}') AS verified_domains
            FROM public.expert_profiles ep
-           LEFT JOIN private.expert_verifications ev ON ev.user_id = ep.user_id AND ev.status = 'VERIFIED'
+           JOIN private.expert_verifications ev ON ev.user_id = ep.user_id AND ev.status = 'VERIFIED'
            ${legacyPredicate}
           GROUP BY ep.user_id, ep.public_title, ep.public_bio
           ORDER BY ep.updated_at DESC, ep.user_id
@@ -127,7 +151,7 @@ export class ExpertRepository {
     }
     return res.rows.map((row) => ({
       expertId: row.expert_id,
-      name: row.public_title || "Verified StudentHub expert",
+      name: row.public_title || "Chuyên gia StudentHub",
       title: row.public_title || null,
       bio: row.public_bio || null,
       scopes: (Array.isArray(row.verified_domains) ? row.verified_domains : []).map((domain) => ({ domain, level: "DOMAIN_VERIFIED", isEstablished: true })),
@@ -191,20 +215,170 @@ export class ExpertRepository {
     return res.rows.map((row) => row.domain_code);
   }
 
-  static async createAssignment({ assignedBy, expertId, caseId, caseRevision, claimId = null, domainCode, expiresAt = null, idempotencyKey }) {
+  /**
+   * Creates a user-owned request for server-side expert matching.  This is
+   * intentionally separate from createAssignment: a requester cannot name an
+   * expert, grant authority, or skip the coordinator eligibility checks.
+   */
+  static async createReviewRequest({
+    requesterId,
+    caseId,
+    caseRevision,
+    claimId = null,
+    domainCode,
+    question,
+    contextRefs = [],
+    idempotencyKey,
+    correlationId = "expert-review-request",
+  }) {
+    const normalizedRequester = String(requesterId || "").trim().toLowerCase();
+    const normalizedCaseId = String(caseId || "").trim().toLowerCase();
+    const normalizedClaimId = claimId ? String(claimId).trim().toLowerCase() : null;
+    const normalizedDomain = String(domainCode || "").trim().toUpperCase();
+    const normalizedQuestion = String(question || "").trim();
+    const normalizedRevision = Number(caseRevision);
+    const normalizedContextRefs = Array.isArray(contextRefs)
+      ? [...new Set(contextRefs.map((ref) => String(ref || "").trim().toLowerCase()).filter(Boolean))]
+      : [];
+
+    if (!isCanonicalUuid(normalizedRequester)) throw new ExpertRepositoryError("REQUESTER_ID_INVALID", "A durable authenticated user is required.", 400);
+    if (!isCanonicalUuid(normalizedCaseId)) throw new ExpertRepositoryError("CASE_ID_INVALID", "A canonical Trust case is required.", 400);
+    if (!Number.isInteger(normalizedRevision) || normalizedRevision < 1) throw new ExpertRepositoryError("CASE_REVISION_REQUIRED", "An immutable case revision is required.", 400);
+    if (normalizedClaimId && !isCanonicalUuid(normalizedClaimId)) throw new ExpertRepositoryError("CLAIM_ID_INVALID", "The selected claim is not valid for this case.", 400);
+    if (!/^[A-Z0-9][A-Z0-9_.:-]{0,79}$/.test(normalizedDomain)) throw new ExpertRepositoryError("DOMAIN_CODE_INVALID", "A bounded expert domain/category is required.", 400);
+    if (normalizedQuestion.length < 20 || normalizedQuestion.length > 4000) throw new ExpertRepositoryError("QUESTION_INVALID", "The expert question must be between 20 and 4000 characters.", 400);
+    if (normalizedContextRefs.length > 100 || normalizedContextRefs.some((ref) => !isCanonicalUuid(ref))) throw new ExpertRepositoryError("CONTEXT_REFS_INVALID", "Context references must be canonical UUIDs.", 400);
+    if (!idempotencyKey || String(idempotencyKey).trim().length < 1 || String(idempotencyKey).length > 180) throw new ExpertRepositoryError("IDEMPOTENCY_KEY_REQUIRED", "A stable Idempotency-Key is required.", 400);
+
+    const scan = detectPII(normalizedQuestion);
+    if (scan.blocked) throw new ExpertRepositoryError("PRIVACY_SCAN_BLOCKED", "The question contains identifying content and cannot be stored.", 422);
+    const safeQuestion = redactText(normalizedQuestion).slice(0, 4000);
+    const requestDigest = digest({
+      requesterId: normalizedRequester,
+      caseId: normalizedCaseId,
+      caseRevision: normalizedRevision,
+      claimId: normalizedClaimId,
+      domainCode: normalizedDomain,
+      question: safeQuestion,
+      contextRefs: normalizedContextRefs,
+    });
+
+    return transaction(async (client) => {
+      await assertOwnedCaseScope(client, {
+        actorId: normalizedRequester,
+        caseId: normalizedCaseId,
+        caseRevision: normalizedRevision,
+        claimId: normalizedClaimId,
+        evidenceRevisionIds: normalizedContextRefs,
+      });
+      await client.query(`SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, [`review-request:${normalizedRequester}:${idempotencyKey}`]);
+
+      const existing = await client.query(
+        `SELECT id, requester_id, case_id, case_revision, claim_id, domain_code,
+                question, context_refs, status, idempotency_key, request_digest,
+                created_at, updated_at
+           FROM private.expert_review_requests
+          WHERE requester_id = $1 AND idempotency_key = $2
+          LIMIT 1`,
+        [normalizedRequester, idempotencyKey]
+      );
+      if (existing.rows[0]) {
+        if (!digestMatches(existing.rows[0].request_digest, requestDigest)) throw scopeError("IDEMPOTENCY_CONFLICT");
+        return reviewRequestDto({ ...existing.rows[0], idempotent: true });
+      }
+
+      const active = await client.query(
+        `SELECT id, case_id, case_revision, claim_id, domain_code, question,
+                context_refs, status, created_at, updated_at
+           FROM private.expert_review_requests
+          WHERE requester_id = $1 AND case_id = $2 AND case_revision = $3
+            AND claim_id IS NOT DISTINCT FROM $4::uuid
+            AND domain_code = $5
+            AND status IN ('REQUESTED','MATCHING','ASSIGNED','IN_REVIEW')
+          ORDER BY created_at DESC
+          LIMIT 1`,
+        [normalizedRequester, normalizedCaseId, normalizedRevision, normalizedClaimId, normalizedDomain]
+      );
+      if (active.rows[0]) throw new ExpertRepositoryError("ACTIVE_REVIEW_REQUEST_EXISTS", "An active expert review request already exists for this Trust scope.", 409);
+
+      const inserted = await client.query(
+        `INSERT INTO private.expert_review_requests
+          (id, requester_id, case_id, case_revision, claim_id, domain_code,
+           question, context_refs, status, idempotency_key, request_digest,
+           created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, 'REQUESTED', $9, $10, now(), now())
+         RETURNING id, requester_id, case_id, case_revision, claim_id, domain_code,
+                   question, context_refs, status, idempotency_key, request_digest,
+                   created_at, updated_at`,
+        [randomUUID(), normalizedRequester, normalizedCaseId, normalizedRevision, normalizedClaimId, normalizedDomain, safeQuestion, JSON.stringify(normalizedContextRefs), idempotencyKey, requestDigest]
+      );
+      const request = inserted.rows[0];
+      await client.query(
+        `INSERT INTO private.expert_review_request_events
+          (request_id, status, actor_id, metadata)
+         VALUES ($1, 'REQUESTED', $2, $3::jsonb)`,
+        [request.id, normalizedRequester, JSON.stringify({ policyVersion: "expert-review-request.v1", contextRefCount: normalizedContextRefs.length })]
+      );
+      await appendOutbox(client, {
+        eventType: "EXPERT_REVIEW_REQUESTED",
+        aggregateType: "EXPERT_REVIEW_REQUEST",
+        aggregateId: request.id,
+        subject: normalizedRequester,
+        correlationId,
+        payload: {
+          requestId: request.id,
+          requesterId: normalizedRequester,
+          caseId: normalizedCaseId,
+          caseRevision: normalizedRevision,
+          claimId: normalizedClaimId,
+          domainCode: normalizedDomain,
+          question: safeQuestion,
+          contextRefs: normalizedContextRefs,
+          status: "REQUESTED",
+        },
+      });
+      return reviewRequestDto({ ...request, idempotent: false });
+    });
+  }
+
+  static async listReviewRequests({ requesterId, caseId = null, limit = 20 } = {}) {
+    const normalizedRequester = String(requesterId || "").trim().toLowerCase();
+    if (!isCanonicalUuid(normalizedRequester)) throw new ExpertRepositoryError("REQUESTER_ID_INVALID", "A durable authenticated user is required.", 400);
+    const normalizedCaseId = caseId ? String(caseId).trim().toLowerCase() : null;
+    if (normalizedCaseId && !isCanonicalUuid(normalizedCaseId)) throw new ExpertRepositoryError("CASE_ID_INVALID", "A canonical Trust case is required.", 400);
+    const boundedLimit = Math.min(Math.max(Number(limit) || 20, 1), 50);
+    const params = [normalizedRequester];
+    const caseFilter = normalizedCaseId ? ` AND case_id = $${params.push(normalizedCaseId)}` : "";
+    params.push(boundedLimit);
+    const pool = getPostgresPool();
+    const result = await pool.query(
+      `SELECT id, case_id, case_revision, claim_id, domain_code, question,
+              context_refs, status, created_at, updated_at
+         FROM private.expert_review_requests
+        WHERE requester_id = $1${caseFilter}
+        ORDER BY created_at DESC
+        LIMIT $${params.length}`,
+      params
+    );
+    return result.rows.map(reviewRequestDto);
+  }
+
+  static async createAssignment({ assignedBy, expertId, caseId, caseRevision, claimId = null, domainCode, expiresAt = null, idempotencyKey, reviewRequestId = null, correlationId = "expert-assignment" }) {
     if (!assignedBy || !expertId || !caseId || !domainCode || !Number.isInteger(Number(caseRevision)) || Number(caseRevision) < 1 || String(assignedBy) === String(expertId)) {
       throw new ExpertRepositoryError("ASSIGNMENT_INPUT_INVALID", "A coordinator must assign a case revision to another expert.", 400);
     }
     if (!idempotencyKey || String(idempotencyKey).length > 180) throw new ExpertRepositoryError("IDEMPOTENCY_KEY_REQUIRED", "A stable Idempotency-Key is required.", 400);
     if (expiresAt && (!Number.isFinite(Date.parse(expiresAt)) || Date.parse(expiresAt) <= Date.now())) throw new ExpertRepositoryError("ASSIGNMENT_EXPIRY_INVALID", "An assignment expiry must be in the future.", 400);
+    if (reviewRequestId && !isCanonicalUuid(reviewRequestId)) throw new ExpertRepositoryError("REVIEW_REQUEST_ID_INVALID", "The review request identifier is invalid.", 400);
     const normalizedDomain = String(domainCode).trim().toUpperCase();
-    const requestDigest = digest({ assignedBy, expertId, caseId, caseRevision: Number(caseRevision), claimId: claimId || null, domainCode: normalizedDomain, expiresAt: expiresAt || null });
+    const requestDigest = digest({ assignedBy, expertId, caseId, caseRevision: Number(caseRevision), claimId: claimId || null, domainCode: normalizedDomain, expiresAt: expiresAt || null, reviewRequestId: reviewRequestId || null });
     return transaction(async (client) => {
       await assertCoordinator(client, assignedBy, expertId);
       await client.query(`SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, [`assignment:${assignedBy}:${idempotencyKey}`]);
       const existing = await client.query(
         `SELECT id, expert_id, case_id, case_revision, claim_id, domain_code, status,
-                assigned_by, expires_at, revision, idempotency_key, request_digest, created_at
+                assigned_by, expires_at, revision, review_request_id,
+                idempotency_key, request_digest, created_at
            FROM private.expert_assignments
           WHERE assigned_by = $1 AND idempotency_key = $2
           LIMIT 1`,
@@ -215,6 +389,22 @@ export class ExpertRepository {
         return { ...existing.rows[0], idempotent: true };
       }
       await assertCaseScope(client, { actorId: assignedBy, caseId, caseRevision, claimId, publicOnly: true });
+      let reviewRequest = null;
+      if (reviewRequestId) {
+        const requestResult = await client.query(
+          `SELECT id, requester_id, case_id, case_revision, claim_id, domain_code, status
+             FROM private.expert_review_requests
+            WHERE id = $1
+            FOR UPDATE`,
+          [reviewRequestId]
+        );
+        reviewRequest = requestResult.rows[0] || null;
+        if (!reviewRequest) throw new ExpertRepositoryError("REVIEW_REQUEST_NOT_FOUND", "The expert review request is not available.", 404);
+        if (String(reviewRequest.case_id) !== String(caseId) || Number(reviewRequest.case_revision) !== Number(caseRevision) || String(reviewRequest.claim_id || "") !== String(claimId || "") || String(reviewRequest.domain_code) !== normalizedDomain) {
+          throw new ExpertRepositoryError("REVIEW_REQUEST_SCOPE_MISMATCH", "The assignment does not match the requested Trust scope.", 409);
+        }
+        if (!["REQUESTED", "MATCHING"].includes(String(reviewRequest.status))) throw new ExpertRepositoryError("REVIEW_REQUEST_NOT_ASSIGNABLE", "The review request is no longer awaiting assignment.", 409);
+      }
       const verified = await client.query(
         `SELECT status, qualification_state FROM private.expert_verifications WHERE user_id = $1 AND domain_code = $2 AND status = 'VERIFIED' AND qualification_state = 'DOMAIN_VERIFIED' AND suspended_at IS NULL AND (expires_at IS NULL OR expires_at > now()) FOR UPDATE`,
         [expertId, normalizedDomain]
@@ -222,11 +412,25 @@ export class ExpertRepository {
       if (verified.rows[0]?.status !== "VERIFIED") throw new ExpertRepositoryError("DOMAIN_NOT_VERIFIED", "The assigned expert is not verified for this domain.", 403);
       const inserted = await client.query(
         `INSERT INTO private.expert_assignments
-          (id, expert_id, case_id, case_revision, claim_id, domain_code, status, assigned_by, expires_at, idempotency_key, request_digest, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, 'ASSIGNED', $7, $8, $9, $10, now(), now())
-         RETURNING id, expert_id, case_id, case_revision, claim_id, domain_code, status, assigned_by, expires_at, revision, idempotency_key, created_at`,
-        [randomUUID(), expertId, caseId, caseRevision, claimId, normalizedDomain, assignedBy, expiresAt, idempotencyKey, requestDigest]
+          (id, expert_id, case_id, case_revision, claim_id, domain_code, status, assigned_by, expires_at, review_request_id, idempotency_key, request_digest, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, 'ASSIGNED', $7, $8, $9, $10, $11, now(), now())
+         RETURNING id, expert_id, case_id, case_revision, claim_id, domain_code, status, assigned_by, expires_at, review_request_id, revision, idempotency_key, created_at`,
+        [randomUUID(), expertId, caseId, caseRevision, claimId, normalizedDomain, assignedBy, expiresAt, reviewRequestId, idempotencyKey, requestDigest]
       );
+      if (reviewRequest) {
+        await client.query(
+          `UPDATE private.expert_review_requests
+              SET status = 'ASSIGNED', updated_at = now()
+            WHERE id = $1`,
+          [reviewRequest.id]
+        );
+        await client.query(
+          `INSERT INTO private.expert_review_request_events
+            (request_id, status, actor_id, metadata)
+           VALUES ($1, 'ASSIGNED', $2, $3::jsonb)`,
+          [reviewRequest.id, assignedBy, JSON.stringify({ assignmentId: inserted.rows[0].id, expertId, policyVersion: "expert-review-request.v1" })]
+        );
+      }
       await appendOutbox(client, {
         eventType: "EXPERT_CASE_ASSIGNED",
         aggregateType: "EXPERT_ASSIGNMENT",
@@ -240,7 +444,9 @@ export class ExpertRepository {
           claimId,
           domainCode: normalizedDomain,
           status: "ASSIGNED",
+          reviewRequestId: reviewRequestId || null,
         },
+        correlationId,
       });
       return { ...inserted.rows[0], idempotent: false };
     });

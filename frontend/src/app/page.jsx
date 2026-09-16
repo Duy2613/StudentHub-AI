@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import AcademicNavbar from "@/components/layout/AcademicNavbar";
-import VNextLanding from "@/components/landing/VNextLanding";
+import EvidenceWorldLanding from "@/components/landing/EvidenceWorldLanding";
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
@@ -15,7 +15,7 @@ export default function HomePage() {
     <div className="vnext-landing-page">
       <AcademicNavbar />
       <main id="main-content" className="vnext-landing-main">
-        <VNextLanding />
+        <EvidenceWorldLanding />
       </main>
       <footer className="vnext-landing-footer">
         <div className="vnext-landing-footer-inner">

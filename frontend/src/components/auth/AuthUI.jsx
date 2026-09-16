@@ -27,7 +27,20 @@ export const NoiseOverlay = () => (
 
 export const AmbientBackground = ({ mode = "cosmic-wave" }) => {
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 w-full h-full bg-[#07090e]">
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 w-full h-full bg-[#05070e]">
+      {/* 4K Auth Monolith Background Video Loop (Hobro/Overworld Cinematic Style) */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        poster="/media/v3/auth/login-poster.webp"
+        src="/media/v3/auth/login-loop.mp4"
+        className="absolute inset-0 w-full h-full object-cover opacity-40 filter contrast-125 saturate-120 scale-105 pointer-events-none"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#05070e] via-[#05070e]/80 to-[#05070e]/40" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#05070e_90%)]" />
+
       {/* 1. Subtle mineral-mint architectural lighting */}
       <div className="absolute -top-[20%] left-1/2 -translate-x-1/2 w-[70vw] h-[50vh] rounded-full bg-gradient-to-b from-[#79d8bd]/10 to-transparent blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[45vw] h-[45vw] rounded-full bg-gradient-to-tr from-[#6ea8fe]/08 via-transparent to-transparent blur-[140px] pointer-events-none" />
@@ -257,25 +270,36 @@ export const GithubIcon = ({ className = "w-5 h-5" }) => (
   </svg>
 );
 
-export const GithubButton = ({ isLoading, isDisabled, onClick }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={isLoading || isDisabled}
-    className={`relative w-full inline-flex justify-center items-center py-3.5 px-4 rounded-xl bg-space-950/70 border border-white/15 backdrop-blur-2xl text-sm font-medium text-gray-200 shadow-sm hover:bg-space-900/80 hover:text-white hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-teal-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
-      isLoading || isDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-space-950/70 hover:border-white/15 hover:text-gray-200" : ""
-    }`}
-  >
-    {isLoading ? (
-      <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
-    ) : (
-      <>
-        <GithubIcon className="h-5 w-5 mr-2 text-gray-200" />
-        Continue with GitHub
-      </>
-    )}
-  </button>
-);
+export const GithubButton = ({ isLoading, isDisabled, onClick, capability }) => {
+  const isGithubDisabled = Boolean(capability && capability.github !== "READY");
+  const effectivelyDisabled = isLoading || isDisabled || isGithubDisabled;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={effectivelyDisabled}
+      title={isGithubDisabled ? capability?.githubMessage || "GitHub OAuth chưa được kích hoạt trên hệ thống máy chủ" : "Đăng nhập bằng tài khoản GitHub"}
+      className={`relative w-full inline-flex flex-col sm:flex-row justify-center items-center py-3.5 px-4 rounded-xl bg-space-950/70 border border-white/15 backdrop-blur-2xl text-sm font-medium text-gray-200 shadow-sm hover:bg-space-900/80 hover:text-white hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-teal-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
+        effectivelyDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-space-950/70 hover:border-white/15 hover:text-gray-200" : ""
+      }`}
+    >
+      <span className="flex items-center">
+        {isLoading ? (
+          <Loader2 className="h-5 w-5 animate-spin text-gray-300" />
+        ) : (
+          <GithubIcon className="h-5 w-5 mr-2 text-gray-200" />
+        )}
+        <span>Continue with GitHub</span>
+      </span>
+      {isGithubDisabled && (
+        <span className="text-[10px] font-mono text-amber-400/80 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 sm:ml-2 mt-1 sm:mt-0">
+          Chưa kích hoạt
+        </span>
+      )}
+    </button>
+  );
+};
 
 export const ErrorMessage = ({ message }) => {
   if (!message) return null;

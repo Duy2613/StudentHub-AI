@@ -10,6 +10,10 @@ import { configureDisposableDatabase, disposableLiveGate } from "../helpers/disp
 const disposableDatabaseUrl = configureDisposableDatabase();
 const liveGate = disposableLiveGate();
 
+after(async () => {
+  if (disposableDatabaseUrl) await getPostgresPool().end();
+});
+
 test("PHASE 6 LIVE GATE: Auth session lifecycle, revocation, cross-user denial, and private boundaries", liveGate, async () => {
   const pool = getPostgresPool();
   const userRes = await pool.query(`SELECT id FROM auth.users LIMIT 2`);

@@ -64,6 +64,8 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
       orchestrator.run(input, {
         requestId,
         signal: abortController.signal,
+        useAIGateway: true,
+        aiMode: "GEMINI_ONLY",
         onTransition: (transition) => send({
           type: "stage",
           event: transition.event,
@@ -158,7 +160,12 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
     const idempotency = idempotencyKeyFor(request, principal, requestId);
     if (idempotency.error) return idempotency.error;
     if (wantsV5Stream(request, body)) return streamV5Pipeline(request, input, requestId, principal, idempotency.value);
-    const pipeline = await createTrustOrchestrator().run(input, { requestId, signal: request.signal });
+    const pipeline = await createTrustOrchestrator().run(input, {
+      requestId,
+      signal: request.signal,
+      useAIGateway: true,
+      aiMode: "GEMINI_ONLY",
+    });
     let persistence = { persisted: false, caseId: null };
     if (principal?.isAuthenticated) {
       try {

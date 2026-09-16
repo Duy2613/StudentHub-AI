@@ -1,65 +1,82 @@
-# Provider Registry — AI Gateway
+# StudentHub AI — Provider Registry
 
-Tracks every external AI provider adapter wired into
-`frontend/src/lib/ai-gateway/`. Update this file whenever a provider is
-added, its terms/pricing change, or it is retired. Cross-referenced by
-`docs/AI-MODEL-ROUTER.md`.
+Status: canonical production policy as of 2026-09-16
 
----
+This file records the provider boundary implemented in
+`frontend/src/lib/ai-gateway/`. It never contains secret values.
 
-## 1. GenSpark OpenAI-Compatible LLM Proxy
+## Active production provider
 
-| Field | Value |
-|---|---|
-| Adapter | `frontend/src/lib/ai-gateway/providers/OpenAICompatibleProvider.js` |
-| Official docs | Retrieved at implementation time via the platform's `get_external_api_docs("openai")` tool — base URL `https://www.genspark.ai/api/llm_proxy/v1`, OpenAI Chat Completions-compatible schema. |
-| Purpose | Primary text/JSON reasoning provider for `FAST_CLASSIFICATION`, `CLAIM_EXTRACTION`, `DEEP_REASONING`, `DOCUMENT`, `SUMMARIZATION`, `RERANKING`. |
-| Models used | `gpt-5-nano` (FAST_CHEAP), `gpt-5-mini` (BALANCED), `gpt-5.1` / `gpt-5.2` (DEEP). Only these platform-allowed model identifiers are used — no other model name is permitted per the platform's usage terms. |
-| Secrets required | `OPENAI_API_KEY`, `OPENAI_BASE_URL` (server-only, injected by the platform when the project owner configures an LLM API key in the GenSpark project's API Keys panel). |
-| Pricing / quota | Managed by the GenSpark platform's LLM proxy billing; not billed directly to a third-party vendor account. Cost class recorded per-model in `AI_GATEWAY_CONFIG.MODEL_CATALOG[...].costClass` (`LOW`/`MEDIUM`/`HIGH`). |
-| Data handling | Requests pass through the GenSpark LLM proxy. Only the minimal system/user prompt text built by the calling Layer is sent — no raw user PII beyond what the Layer already includes in its prompt (claim text, URL, OCR text). No conversation history is persisted by the gateway itself. |
-| Rate limits | Not independently documented by the proxy; the Gateway's own `AI_GATEWAY_CONFIG.RETRY` treats `429` as retryable once per candidate before falling through to the next model in the chain. |
-| Fallback | On failure, `ModelRouter` falls through to the next entry in the capability's chain (see `docs/AI-MODEL-ROUTER.md` §4); if the whole chain is exhausted, callers (`AIGatewayModelProvider`, `AIGatewayReasoningProvider`, `/api/chat`) fall back to the deterministic engine or an explicit `LIVE_PROVIDER_NOT_CONFIGURED` response. |
-| Verified working | Adapter contract and fallback tests pass locally. A live proxy response is **not** claimed in RC closure because `OPENAI_API_KEY` and `OPENAI_BASE_URL` are unset; simulated timeout/fallback behavior is covered by injected provider tests. |
-| Status | **ADAPTER_READY_NOT_CONFIGURED** |
+| Provider | Model | Role | Transport | Status |
+|---|---|---|---|---|
+| Gemini | `gemini-3.8-flash` | structured advisory reasoning, claims, multimodal/document analysis | Interactions API first | ACTIVE |
 
-## 2. Google Gemini (Generative Language API)
+Environment precedence is exact:
 
-| Field | Value |
-|---|---|
-| Adapter | `frontend/src/lib/ai-gateway/providers/GeminiProvider.js` |
-| Official docs | `https://ai.google.dev/gemini-api/docs` (direct REST `generateContent` endpoint). |
-| Purpose | Historical multimodal provider referenced in the `atudent.pdf` Trust Engine seed; kept as an optional multimodal candidate for `MULTIMODAL` capability and as a secondary candidate in `FAST_CLASSIFICATION`/`CLAIM_EXTRACTION` chains. |
-| Models used | `gemini-2.5-flash` |
-| Secrets required | `GEMINI_API_KEY` (or `GOOGLE_GENERATIVE_AI_API_KEY`) — server-only. |
-| Pricing / quota | Not provisioned in this environment; requires the project owner to supply their own Google AI Studio API key if this provider should participate in routing. |
-| Data handling | Prompt text sent directly to Google's API over HTTPS; no additional persistence by this adapter. |
-| Rate limits | Governed by the caller's Google AI Studio quota tier; not independently tracked by this repo. |
-| Fallback | Same `ModelRouter` fallback chain mechanism as above. |
-| Verified working | **Not currently configured in this environment** — `GEMINI_API_KEY` is unset, so `GeminiProvider.isConfigured()` returns `false` and the router transparently skips it in every chain (confirmed via `AIGatewayService.describeRoute(...)` — see `docs/AI-MODEL-ROUTER.md` §2). The adapter code itself reuses the same request logic validated for `OpenAICompatibleProvider` (timeout via `AbortController`, HTTP-status/empty-response classification) and was retained from the pre-existing `GeminiSemanticModelProvider`/`GeminiTrustReasoningProvider` implementations, which used an equivalent REST call shape. |
-| Status | **NOT_CONFIGURED** (participates automatically when an approved `GEMINI_API_KEY` is supplied — no code change required) |
+1. `GEMINI_API_KEY` — canonical secret;
+2. `GEMINI_KEY_1` — legacy fallback only when the canonical key is absent.
 
-## 3. Legacy single-vendor providers (retained, not part of the router)
+`GEMINI_MODEL` is diagnostic metadata only; the catalog model is authoritative.
+The adapter uses `store: false`, bounded timeouts/output, safe response-size
+limits, and never logs the key.
 
-`GeminiSemanticModelProvider` (Layer 2) and `GeminiTrustReasoningProvider`
-(Layer 4) are the original single-vendor adapters from the historical
-`atudent.pdf` Trust Engine seed. They are **retained unmodified** for
-backward compatibility (`options.useGemini`) but are **not** part of the
-`ModelRouter` fallback chains and are not the recommended integration path
-going forward — use `options.useAIGateway` instead, which routes through
-the multi-vendor `AIGatewayModelProvider` / `AIGatewayReasoningProvider`.
+## Compatibility metadata — not active
 
-- `GeminiTrustReasoningProvider.reason()` in particular never performed a
-  real network call even when `GEMINI_API_KEY` was set (it built a prompt
-  string and immediately delegated to the deterministic fallback). This is
-  documented here rather than silently fixed in place, because Master
-  Prompt Section A instructs preserving historical behavior unless the
-  current spec requires otherwise — the new `AIGatewayReasoningProvider` is
-  the corrected, functional replacement.
+| Provider | Model | Status | Rule |
+|---|---|---|---|
+| OpenAI-compatible adapter | historical catalog models | `DISABLED_INTENTIONALLY` | retained for imports only; active routing never selects it |
+| Gemini Lite | `gemini-3.5-flash-lite` | compatibility fallback metadata | not in the active production route for this release |
+| Local specialist | `FraudRiskEngine_v1` | advisory local engine | may provide signals, never the final truth/security decision |
 
-## 4. Providers considered but not integrated
+OpenAI availability, quota, 401/403 responses, and credit exhaustion are not
+release blockers because the OpenAI runtime is deliberately disabled. No
+production code in this release attempts an OpenAI request.
 
-| Provider | Reason not integrated |
-|---|---|
-| Dedicated embedding provider | No `EMBEDDING` capability route configured yet — no current Layer/Engine in this codebase performs vector search that would need it (retrieval in Layer 3 uses `KnowledgeBaseRetriever`/`WebSearchRetriever`, not embeddings). Add when a genuine RAG/embedding use case is implemented, per Master Prompt Section S ("use retrieval only where justified"). |
-| Anthropic Claude | Not currently provisioned with credentials in this environment; can be added as a new `IModelProvider` adapter following the pattern in §7 of `docs/AI-MODEL-ROUTER.md` if the project owner requests it and supplies an API key. |
+## Trust boundary
+
+The deterministic Trust Policy owns security classification, truth status,
+enforcement, confidence, and the L5 final decision. Gemini Layer 4 returns
+only the validated DTO below:
+
+```json
+{
+  "verdictSignal": "SUPPORTS|CONTRADICTS|MIXED|UNCERTAIN|NO_SIGNAL",
+  "supportReasons": [],
+  "contradictionReasons": [],
+  "missingEvidence": [],
+  "uncertainty": "string",
+  "citationsUsed": [{ "id": "evidence-id", "url": "https://…" }],
+  "provider": "gemini",
+  "model": "gemini-3.8-flash"
+}
+```
+
+The schema requires real HTTP(S) URLs for citations. Invalid output is retried
+once and then reported as `AI verification unavailable`; deterministic Trust
+still completes. The public UI shows `AI VERIFICATION — GEMINI`, actual
+provider/model/status, evidence references, and uncertainty. It does not show
+AI-agreement percentages.
+
+## Permitted advisory uses
+
+Gemini may assist with community classification, summaries, duplicate or
+evidence suggestions, expert evidence-packet summaries, assignment
+suggestions, and review summaries. It may not set reputation, ban a user,
+decide truth, perform irreversible moderation, qualify an Expert, assign
+authority, approve an assessment, or resolve an appeal alone.
+
+## Multimodal support
+
+The Gemini adapter accepts image, screenshot, QR, PDF, and document fixture
+parts through the provider-neutral gateway interface. The canonical
+Interactions request is attempted first; `generateContent` is used only for an
+explicit 404/405/501 compatibility response. Real multimodal evidence belongs
+in the smoke report, not in source control as a secret.
+
+## Historical note
+
+Older provider records, direct-provider names, and the legacy
+`MultiModelVerifier` class may remain in the repository for compatibility and
+audit traceability. They are not the canonical production route. The current
+entrypoint is `TrustPipelineOrchestrator` through `TrustOrchestrator`, with
+Gemini explicitly enabled for the production Trust API.

@@ -154,8 +154,8 @@ const ROUTE_POLICIES = Object.freeze([
     presentation: "cinematic",
     assetIds: ["VID-PRISM-01"],
     load: "INITIAL",
-    // W13 controlled enhancement: poster is first render; video waits for idle desktop time.
-    videoEligible: true,
+    // Performance optimization: HeroCinematicPorch owns the single active landing video; background provides the verified poster.
+    videoEligible: false,
     transitionAssetId: "VID-PRISM-03",
     transitionMaxPlays: 2,
     transitionVideoEligible: false,

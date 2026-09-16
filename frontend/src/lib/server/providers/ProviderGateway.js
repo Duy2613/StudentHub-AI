@@ -4,7 +4,7 @@
  * Centralized, authoritative gateway for all external provider executions:
  * - Reputation (Safe Browsing, URLhaus)
  * - Evidence Search (Tavily, Google Grounding)
- * - AI Synthesis / Semantic (Gemini, OpenAI, Groq)
+ * - AI Synthesis / Semantic (Gemini production adapter)
  * - Shadow / Verification
  * 
  * INVARIANT: Native deterministic authority remains PRIMARY.

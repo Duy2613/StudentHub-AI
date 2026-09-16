@@ -88,7 +88,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
       {/* Main Studio Body */}
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Knowledge Object Selector & Top Summary Bar */}
-        <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800/90 space-y-4">
+        <div className="p-6 rounded-2xl surface-instrument space-y-4">
           <div className="flex min-w-0 flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="min-w-0">
               <label htmlFor="knowledge-object-select" className="text-xs text-slate-400 font-mono block mb-1">Chọn Đối Tượng Tri Thức (Knowledge Object)</label>
@@ -142,7 +142,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
                   active
                     ? "bg-indigo-500/15 text-indigo-300 border border-indigo-500/40 shadow-lg shadow-indigo-500/5"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-transparent"
+                    : "text-slate-400 hover:text-slate-200 hover:surface-paper border-transparent"
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -163,7 +163,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
         {activeTab === "FOUR_LAYERS" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-200">
             {/* Layer A: Official Truth */}
-            <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 relative overflow-hidden">
+            <div className="p-6 rounded-2xl surface-instrument space-y-3 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase text-emerald-400 flex items-center gap-1.5 font-bold">
@@ -183,7 +183,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
             </div>
 
             {/* Layer B: AI Verified Reasoning */}
-            <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 relative overflow-hidden">
+            <div className="p-6 rounded-2xl surface-instrument space-y-3 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase text-indigo-400 flex items-center gap-1.5 font-bold">
@@ -203,7 +203,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
             </div>
 
             {/* Layer C: Expert Interpretation */}
-            <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 relative overflow-hidden">
+            <div className="p-6 rounded-2xl surface-instrument space-y-3 relative overflow-hidden">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase text-blue-400 flex items-center gap-1.5 font-bold">
                   <Award className="w-4 h-4" />
@@ -222,7 +222,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
             </div>
 
             {/* Layer D: Community Reality */}
-            <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 relative overflow-hidden">
+            <div className="p-6 rounded-2xl surface-instrument space-y-3 relative overflow-hidden">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase text-amber-400 flex items-center gap-1.5 font-bold">
                   <Users className="w-4 h-4" />
@@ -247,7 +247,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
 
         {/* TAB 2: WHY THIS CONCLUSION? */}
         {activeTab === "WHY_CONCLUSION" && (
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-6">
+          <div className="p-6 rounded-2xl surface-instrument space-y-6">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <Search className="w-4 h-4 text-indigo-400" />
               Sơ Đồ Dẫn Xuất Căn Cứ (Evidence Lineage DAG)
@@ -283,7 +283,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
 
         {/* TAB 3: WHAT DISAGREES? */}
         {activeTab === "WHAT_DISAGREES" && (
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4">
+          <div className="p-6 rounded-2xl surface-instrument space-y-4">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-400" />
               Bản Đồ Bất Đồng & Chênh Lệch Thực Tế (Conflict & Disagreement Map)
@@ -312,7 +312,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
 
         {/* TAB 4: WHAT CHANGED? */}
         {activeTab === "WHAT_CHANGED" && (
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4">
+          <div className="p-6 rounded-2xl surface-instrument space-y-4">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <GitCompare className="w-4 h-4 text-indigo-400" />
               Lịch Sử Biến Thiên Tri Thức (Knowledge Diff V1 ➔ V2)
@@ -340,7 +340,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
 
         {/* TAB 5: WHAT IS STILL UNKNOWN? */}
         {activeTab === "WHAT_UNKNOWN" && (
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4">
+          <div className="p-6 rounded-2xl surface-instrument space-y-4">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <HelpCircle className="w-4 h-4 text-blue-400" />
               Điểm Chưa Biết & Giới Hạn Nhận Thức (Epistemic Blindspots)
@@ -369,7 +369,7 @@ export function KnowledgeObjectStudio({ initialKnowledgeObjects = [] }) {
 
         {/* TAB 6: AUTHORITY MATRIX */}
         {activeTab === "AUTHORITY_MATRIX" && (
-          <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4">
+          <div className="p-6 rounded-2xl surface-instrument space-y-4">
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
               <Award className="w-4 h-4 text-indigo-400" />
               Ma Trận Phân Định Thẩm Quyền (Authority Matrix)

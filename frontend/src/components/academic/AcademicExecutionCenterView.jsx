@@ -92,7 +92,7 @@ export function AcademicExecutionCenterView({ initialData = null }) {
             <button
               onClick={handleReconcile}
               disabled={isReconciling || isLoading}
-              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-200 transition-all shadow-sm flex items-center gap-2"
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:surface-paper/80 text-xs font-bold text-slate-200 transition-all shadow-sm flex items-center gap-2"
             >
               <span>{isReconciling ? "🔄 Đang đối soát..." : "🔄 Đồng Bộ Đối Soát"}</span>
             </button>
@@ -106,7 +106,7 @@ export function AcademicExecutionCenterView({ initialData = null }) {
         </div>
 
         {/* Term Picker Header */}
-        <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="p-6 rounded-2xl surface-instrument backdrop-blur-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <div className="text-xs font-bold uppercase tracking-wider text-emerald-400">
               Học Kỳ Theo Dõi
@@ -143,14 +143,14 @@ export function AcademicExecutionCenterView({ initialData = null }) {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="p-12 text-center rounded-3xl bg-slate-900/40 border border-slate-800 animate-pulse text-slate-400 text-sm">
+          <div className="p-12 text-center rounded-3xl surface-instrument animate-pulse text-slate-400 text-sm">
             Đang đối soát dữ liệu thực tế từ hồ sơ học vụ, bản sao số và quy trình thực hiện...
           </div>
         )}
 
         {/* View when No Plan Adopted */}
         {!isLoading && !hasAdoptedPlan && (
-          <div className="p-12 rounded-3xl bg-slate-900/60 border border-slate-800/80 text-center space-y-5 max-w-2xl mx-auto">
+          <div className="p-12 rounded-3xl surface-instrument text-center space-y-5 max-w-2xl mx-auto">
             <div className="text-5xl">📋</div>
             <h2 className="text-xl font-bold text-white">Chưa Chọn Kế Hoạch Học Tập</h2>
             <p className="text-xs text-slate-400 leading-relaxed">
@@ -172,7 +172,7 @@ export function AcademicExecutionCenterView({ initialData = null }) {
           <div className="space-y-8">
             
             {/* Header: Active Plan Summary & Execution Status */}
-            <div className="p-8 rounded-3xl bg-slate-900/90 border border-slate-800/90 backdrop-blur-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="p-8 rounded-3xl surface-instrument backdrop-blur-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
@@ -259,7 +259,7 @@ export function AcademicExecutionCenterView({ initialData = null }) {
             {/* Execution Progress Bar & Counters */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               
-              <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800/80 space-y-3">
+              <div className="p-6 rounded-3xl surface-instrument space-y-3">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-400 font-semibold uppercase">Tiến Độ Tín Chỉ</span>
                   <span className="font-black text-white text-sm">
@@ -280,7 +280,7 @@ export function AcademicExecutionCenterView({ initialData = null }) {
                 </div>
               </div>
 
-              <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800/80 space-y-3">
+              <div className="p-6 rounded-3xl surface-instrument space-y-3">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-400 font-semibold uppercase">Mục Tiêu Đã Hoàn Thành</span>
                   <span className="font-black text-white text-sm">
@@ -299,7 +299,7 @@ export function AcademicExecutionCenterView({ initialData = null }) {
                 </div>
               </div>
 
-              <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800/80 space-y-2 flex flex-col justify-between">
+              <div className="p-6 rounded-3xl surface-instrument space-y-2 flex flex-col justify-between">
                 <div>
                   <div className="text-slate-400 font-semibold uppercase text-xs">Độ Khớp Kế Hoạch</div>
                   <div className="text-xl font-black text-white mt-1">
@@ -314,7 +314,7 @@ export function AcademicExecutionCenterView({ initialData = null }) {
             </div>
 
             {/* Plan vs Actual Comparative Matrix Table */}
-            <div className="p-6 md:p-8 rounded-3xl bg-slate-900/90 border border-slate-800/90 backdrop-blur-xl space-y-6">
+            <div className="p-6 md:p-8 rounded-3xl surface-instrument backdrop-blur-xl space-y-6">
               <div>
                 <h3 className="text-base font-bold text-white">Bảng Đối Soát Chi Tiết (Plan vs Actual Matrix)</h3>
                 <p className="text-xs text-slate-400 mt-0.5">
@@ -398,7 +398,7 @@ export function AcademicExecutionCenterView({ initialData = null }) {
             </div>
 
             {/* Next Recommended Actions Card */}
-            <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="p-6 rounded-3xl surface-instrument flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-1">
                 <div className="text-xs font-bold uppercase tracking-wider text-slate-400">
                   Hành Động Khuyến Nghị Tiếp Theo

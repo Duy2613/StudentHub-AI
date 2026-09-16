@@ -25,8 +25,8 @@ export class DatabaseUnavailableError extends Error {
 
 let sharedPool;
 
-export function getPostgresPool() {
-  ensureEnvLoaded();
+export function getPostgresPool({ loadEnv = true } = {}) {
+  if (loadEnv) ensureEnvLoaded();
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) throw new DatabaseUnavailableError("DATABASE_URL is required for durable production state.");
   if (!sharedPool) {

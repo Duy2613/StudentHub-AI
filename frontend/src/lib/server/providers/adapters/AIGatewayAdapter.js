@@ -1,7 +1,7 @@
 /**
  * StudentHub AI — AIGatewayAdapter
  * 
- * Binds AI synthesis & semantic analysis (Gemini / OpenAI / Groq) into ProviderGateway.
+ * Binds Gemini synthesis & semantic analysis into ProviderGateway.
  * CRITICAL RULE: AI is advisory only. It cannot manufacture citations, override
  * deterministic hard blocks, or upgrade L5 assurance.
  */

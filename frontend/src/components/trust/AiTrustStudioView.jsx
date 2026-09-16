@@ -39,7 +39,7 @@ const EMPTY_PIPELINE = [
   { id: "claim-intelligence", label: "Claim Intelligence", status: "waiting" },
   { id: "evidence-discovery", label: "Evidence Discovery", status: "waiting" },
   { id: "evidence-forensics", label: "Evidence Forensics", status: "waiting" },
-  { id: "multi-ai-verification", label: "Multi-AI Verification", status: "waiting" },
+  { id: "ai-verification", label: "AI Verification", status: "waiting" },
   { id: "decision-intelligence", label: "Decision Intelligence", status: "waiting" },
 ];
 
@@ -318,7 +318,7 @@ function legacyPipelineFromV5(currentPipeline, previousPipeline = EMPTY_PIPELINE
     { id: "claim-intelligence", internal: [stages.l1, stages.l2b], detail: "Đọc luận điểm và nội dung" },
     { id: "evidence-discovery", internal: [stages.l2a, stages.l2c], detail: "Tìm tín hiệu nguồn và ngữ cảnh" },
     { id: "evidence-forensics", internal: [stages.l3], detail: "Đối chiếu chất lượng bằng chứng" },
-    { id: "multi-ai-verification", internal: [stages.l4], detail: "Tổng hợp tín hiệu kiểm tra" },
+    { id: "ai-verification", internal: [stages.l4], detail: "Gemini đối chiếu tín hiệu kiểm tra" },
     { id: "decision-intelligence", internal: [stages.l5], detail: "Kiểm tra kết luận và hành động" },
   ];
   return previousPipeline.map((item) => {
@@ -925,7 +925,7 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
           </details>
 
           {/* Post-Result Expandable Next Action Gateways */}
-          <PostResultGateways onPrint={() => window.print()} caseId={passportCaseId} caseRevision={passportCaseRevision} claimId={passportClaimId} />
+          <PostResultGateways onPrint={() => window.print()} caseId={passportCaseId} caseRevision={passportCaseRevision} claimId={passportClaimId} domainCode={canonicalResult?.domainCode || canonicalResult?.claim?.domainCode || canonicalResult?.claim?.domain_code || ""} />
 
           {/* Secondary Sections Subject to Attentive Chamber Focus Teardown */}
           <div className="workbench-secondary-section" aria-hidden={processing ? "true" : "false"}>

@@ -15,18 +15,16 @@
 
 import { AI_GATEWAY_CONFIG } from "./config/AIGatewayConfig.js";
 import { PROVIDER_FAMILY, GATEWAY_ERROR_TYPE, createAttemptRecord, sanitizeGatewayError } from "./types.js";
-import { OpenAICompatibleProvider } from "./providers/OpenAICompatibleProvider.js";
 import { GeminiProvider } from "./providers/GeminiProvider.js";
 
 const PROVIDER_INSTANCES = {
-  [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: new OpenAICompatibleProvider(),
   [PROVIDER_FAMILY.GEMINI]: new GeminiProvider(),
 };
 
 export class ModelRouter {
   /**
-   * @param {object} [overrideProviders] - test-only injection point,
-   *   e.g. { openai_compatible: fakeProviderInstance }
+   * @param {object} [overrideProviders] - test-only injection point. Active
+   *   production routes still come exclusively from the Gemini route table.
    */
   constructor(overrideProviders = {}) {
     this.providers = { ...PROVIDER_INSTANCES, ...overrideProviders };
@@ -67,7 +65,10 @@ export class ModelRouter {
    * @param {string} params.capability - AI_CAPABILITY value
    * @param {string} params.systemPrompt
    * @param {string} params.userPrompt
+   * @param {Array<object>} [params.inputParts] - provider-neutral media parts;
+   *   Gemini maps these to Interactions content blocks
    * @param {boolean} [params.jsonMode]
+   * @param {object} [params.responseSchema] - optional provider JSON schema
    * @param {number} [params.timeoutMs]
    * @param {number} [params.maxOutputTokens]
    * @param {(text: string) => unknown} [params.parseResponse] - optional structured parser
@@ -78,7 +79,9 @@ export class ModelRouter {
     capability,
     systemPrompt,
     userPrompt,
+    inputParts = null,
     jsonMode = false,
+    responseSchema = null,
     timeoutMs = AI_GATEWAY_CONFIG.SLA.DEFAULT_TIMEOUT_MS,
     maxOutputTokens = AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS,
     signal,
@@ -160,15 +163,18 @@ export class ModelRouter {
         }
         const startedAt = Date.now();
         try {
-          const { text } = await provider.generate({
+          const generated = await provider.generate({
             catalogEntry,
             systemPrompt: boundedSystemPrompt,
             userPrompt: boundedUserPrompt,
+            inputParts,
             jsonMode,
+            responseSchema,
             timeoutMs: boundedTimeout,
             maxOutputTokens: boundedOutputTokens,
             signal,
           });
+          const text = generated?.text;
 
           let parsedResponse;
           if (typeof parseResponse === "function") {
@@ -188,9 +194,10 @@ export class ModelRouter {
                   latencyMs: Date.now() - startedAt,
                 })
               );
-              // Parsing is deterministic for this response. Do not retry the
-              // same candidate; continue with the next configured model.
-              break;
+              // A malformed response is a bounded candidate failure. Retry
+              // once under the same per-candidate budget before fallback.
+              if (attemptIndex === maxAttempts - 1) break;
+              continue;
             }
 
             let valid = true;
@@ -215,9 +222,9 @@ export class ModelRouter {
                   latencyMs: Date.now() - startedAt,
                 })
               );
-              // Schema validation is deterministic for this response. Do not
-              // retry the same candidate; continue with the next configured model.
-              break;
+              // Retry malformed structured output once, then fail closed.
+              if (attemptIndex === maxAttempts - 1) break;
+              continue;
             }
           }
 
@@ -235,6 +242,12 @@ export class ModelRouter {
             provider: catalogEntry.provider,
             model: catalogEntry.model,
             text: String(text ?? ""),
+            providerMetadata: {
+              transport: typeof generated?.transport === "string" ? generated.transport : null,
+              thinkingLevel: typeof generated?.thinkingLevel === "string"
+                ? generated.thinkingLevel
+                : typeof catalogEntry?.thinkingLevel === "string" ? catalogEntry.thinkingLevel : null,
+            },
             ...(typeof parseResponse === "function" ? { json: parsedResponse } : {}),
             attempts,
           };

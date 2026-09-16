@@ -160,6 +160,11 @@ test("P0 runtime routes enforce auth and never regress to handler 500s", { timeo
       assert.strictEqual(response.status, 403, `Cross-student request was not blocked: ${path}`);
     }
 
+    // The bearer token above deliberately uses the legacy student:<MSSV>
+    // compatibility subject so the route sweep can exercise stateless APIs.
+    // Durable profiles are keyed by auth.users.id UUIDs; accepting this
+    // compatibility subject here would recreate the retired email/demo
+    // profile authority. The route must fail closed rather than return 500.
     const profileUpdate = await fetch(`${baseUrl}/api/users/profile`, {
       method: "PUT",
       headers: { ...authHeaders, "content-type": "application/json" },
@@ -172,12 +177,9 @@ test("P0 runtime routes enforce auth and never regress to handler 500s", { timeo
         expertField: "Self appointed"
       })
     });
-    assert.strictEqual(profileUpdate.status, 200);
+    assert.strictEqual(profileUpdate.status, 403);
     const profileBody = await profileUpdate.json();
-    assert.strictEqual(profileBody.profile.role, "student");
-    assert.strictEqual(profileBody.profile.trustScore, 50);
-    assert.strictEqual(profileBody.profile.universityEmailVerified, false);
-    assert.strictEqual(profileBody.profile.expertField, undefined);
+    assert.strictEqual(profileBody.error?.code, "AUTHENTICATION_REQUIRED");
 
     const crossProfile = await fetch(`${baseUrl}/api/users/profile?email=other@studenthub.test`, {
       headers: authHeaders

@@ -3,11 +3,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useBackground } from "@/components/providers/BackgroundContext";
+import cinematicMediaCoordinator from "@/components/media/CinematicMediaCoordinator";
 
 /**
  * Route-aware enhancement layer.
  * Static poster is the first render. Video is a desktop-only enhancement for
- * the landing policy and pauses when hidden/offscreen. Static product routes
+ * eligible policies and pauses when hidden/offscreen. Static product routes
  * return null so the shell owns the reading surface.
  */
 export default function UniversalCinematicBackground() {
@@ -60,14 +61,8 @@ export default function UniversalCinematicBackground() {
     return () => observer.disconnect();
   }, []);
 
-  const [isSaveData, setIsSaveData] = useState(false);
+  const [isSaveData] = useState(() => Boolean(typeof navigator !== "undefined" && navigator.connection?.saveData));
   const [videoError, setVideoError] = useState(false);
-
-  useEffect(() => {
-    if (typeof navigator !== "undefined" && navigator.connection?.saveData) {
-      setIsSaveData(true);
-    }
-  }, []);
 
   const shouldRenderVideo = Boolean(
     activeMedia?.video &&
@@ -84,24 +79,26 @@ export default function UniversalCinematicBackground() {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return undefined;
-    if (shouldRenderVideo && !document.hidden) {
-      video.play().catch(() => {});
-    } else {
-      video.pause();
-    }
-    return undefined;
-  }, [shouldRenderVideo, activeMedia?.id]);
 
-  useEffect(() => {
-    const onVisibilityChange = () => {
-      const video = videoRef.current;
-      if (!video) return;
-      if (document.hidden || !shouldRenderVideo) video.pause();
-      else video.play().catch(() => {});
+    const bgVideoId = "universal-cinematic-bg";
+    cinematicMediaCoordinator.register(bgVideoId, {
+      videoEl: video,
+      onPause: () => {},
+      onResume: () => {},
+      isVisible: shouldRenderVideo,
+      isReducedMotion: reducedMotion,
+    });
+
+    if (shouldRenderVideo) {
+      cinematicMediaCoordinator.requestPlayback(bgVideoId);
+    } else {
+      cinematicMediaCoordinator.releasePlayback(bgVideoId);
+    }
+
+    return () => {
+      cinematicMediaCoordinator.unregister(bgVideoId);
     };
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
-  }, [shouldRenderVideo]);
+  }, [shouldRenderVideo, activeMedia?.id, reducedMotion]);
 
   if (!activeMedia || routeMediaPolicy.presentation === "static" || !activeMedia.desktopPoster) return null;
 

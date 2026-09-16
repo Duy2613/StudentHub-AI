@@ -119,6 +119,7 @@ export function createGatewayResult({
   errorMessage = null,
   requestId = null,
   totalLatencyMs = 0,
+  providerMetadata = null,
 }) {
   return {
     ok,
@@ -132,6 +133,12 @@ export function createGatewayResult({
     errorMessage: ok ? null : sanitizeGatewayError(errorType, errorMessage),
     requestId: requestId || createSecureId("req_gw"),
     totalLatencyMs: Number(totalLatencyMs.toFixed?.(2) ?? totalLatencyMs),
+    providerMetadata: providerMetadata && typeof providerMetadata === "object" && !Array.isArray(providerMetadata)
+      ? {
+        transport: typeof providerMetadata.transport === "string" ? providerMetadata.transport.slice(0, 120) : null,
+        thinkingLevel: typeof providerMetadata.thinkingLevel === "string" ? providerMetadata.thinkingLevel.slice(0, 40) : null,
+      }
+      : null,
     timestamp: Date.now(),
     schemaVersion: "ai-gateway-v1",
   };

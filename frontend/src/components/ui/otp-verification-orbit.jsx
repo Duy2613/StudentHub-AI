@@ -26,6 +26,7 @@ export default function OtpVerificationOrbit({
   className = "",
 }) {
   const inputRef = useRef(null);
+  const lastCompletedValueRef = useRef("");
   const [isFocused, setIsFocused] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
 
@@ -38,7 +39,15 @@ export default function OtpVerificationOrbit({
 
   // Trigger orbit animation when user completes the code
   useEffect(() => {
-    if (value.length === length) {
+    if (value.length < length) {
+      // Allow a user to retry the same code after clearing and re-entering it.
+      lastCompletedValueRef.current = "";
+    }
+    if (value.length === length && value !== lastCompletedValueRef.current) {
+      // The parent callback is recreated during loading/error state updates.
+      // Without this guard, the effect can submit the same OTP repeatedly and
+      // trip Supabase Auth's verification rate limit.
+      lastCompletedValueRef.current = value;
       setIsSpinning(true);
       if (onComplete) {
         onComplete(value);

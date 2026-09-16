@@ -215,5 +215,17 @@ export function getAuthCapabilities(env = runtimeEnvironment()) {
         ? "ENV_ATTESTATION_ONLY"
         : "NOT_VERIFIED",
     }),
+    githubAudit: Object.freeze({
+      providerEnabled: githubExplicitlyEnabled,
+      clientIdExpected: true,
+      clientSecretExpected: true,
+      clientCredentialsLocation: "SUPABASE_DASHBOARD_ONLY",
+      expectedProviderCallbackUri,
+      redirectUriConfigured: Boolean(redirectUri),
+      redirectUri: redirectUri || null,
+      configurationEvidence: githubResult.state === AUTH_CAPABILITY_STATE.READY
+        ? "ENV_ATTESTATION_ONLY"
+        : "NOT_VERIFIED",
+    }),
   };
 }

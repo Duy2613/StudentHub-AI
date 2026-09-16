@@ -314,15 +314,19 @@ export function stageFromL4(raw, requestId, timing = {}) {
   const hardNegative = finding === "MALICIOUS" || raw?.enforcement === "BLOCK";
   const truth = raw?.truthStatus || "INSUFFICIENT_EVIDENCE";
   const action = raw?.enforcement || raw?.recommendedAction || "REVIEW";
+  const aiVerification = raw?.aiVerification && typeof raw.aiVerification === "object" ? raw.aiVerification : null;
+  const aiStatus = String(raw?.aiVerificationStatus || "NOT_REQUESTED").toUpperCase();
   const legacyIntegration = raw?.legacyIntegration && typeof raw.legacyIntegration === "object" ? raw.legacyIntegration : null;
   const operationStatus = timing.operationStatus || OPERATION_STATUS.COMPLETED;
   return createStageEnvelope({
     ...stageBase("l4", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso(), operationStatus),
     finding,
     severity: finding === "MALICIOUS" ? "CRITICAL" : finding === "SUSPICIOUS" ? "HIGH" : "INFO",
-    providerStatus: "DETERMINISTIC_POLICY",
-    providerId: "deterministic_trust_policy_engine",
-    modelVersion: raw?.auditTrail?.ruleVersion || null,
+    providerStatus: aiStatus === "VERIFIED" ? "GEMINI_VERIFIED" : aiStatus === "UNAVAILABLE" ? "GEMINI_UNAVAILABLE" : "DETERMINISTIC_POLICY",
+    providerId: aiStatus === "VERIFIED" || aiStatus === "UNAVAILABLE"
+      ? (aiVerification?.provider || "gemini")
+      : "deterministic_trust_policy_engine",
+    modelVersion: aiVerification?.model || raw?.auditTrail?.ruleVersion || null,
     confidence: typeof raw?.decisionConfidence === "number" ? raw.decisionConfidence : null,
     confidenceKind: "DETERMINISTIC_POLICY_SCORE_NON_PROBABILISTIC",
     summary: `L4 quyết định SECURITY=${finding}, TRUTH=${truth}, ENFORCEMENT=${action}.`,
@@ -338,6 +342,12 @@ export function stageFromL4(raw, requestId, timing = {}) {
     meaning: hardNegative ? "L4 là authoritative policy boundary; hard negative giữ MALICIOUS/BLOCK." : "L4 tách riêng security, truth và action; UNKNOWN/thiếu evidence phải REVIEW.",
     userAction: action === "BLOCK" ? "Dừng hành động và không tương tác với target." : action === "REVIEW" ? "Tạm dừng và xác minh qua nguồn độc lập." : "Chỉ tiếp tục với caution, không coi là proven safe.",
     safeToContinue: true,
+    aiVerification,
+    aiVerificationStatus: aiStatus,
+    aiVerificationTransport: raw?.aiVerificationTransport || null,
+    aiVerificationThinkingLevel: raw?.aiVerificationThinkingLevel || null,
+    aiVerificationLatencyMs: raw?.aiVerificationLatencyMs ?? null,
+    aiVerificationErrorType: raw?.aiVerificationErrorType || null,
     rawMetadata: {
       securityClassification: finding,
       truthStatus: truth,
@@ -349,6 +359,12 @@ export function stageFromL4(raw, requestId, timing = {}) {
       legacyIntegrationStatus: legacyIntegration?.status || null,
       legacyIntegrationProviderStatus: legacyIntegration?.providerStatus || null,
       legacyIntegrationVerdict: legacyIntegration?.rawVerdict || null,
+      aiVerificationStatus: aiStatus,
+      aiVerificationTransport: raw?.aiVerificationTransport || null,
+      aiVerificationThinkingLevel: raw?.aiVerificationThinkingLevel || null,
+      aiVerificationLatencyMs: raw?.aiVerificationLatencyMs ?? null,
+      aiVerificationErrorType: raw?.aiVerificationErrorType || null,
+      aiVerification,
     },
   });
 }

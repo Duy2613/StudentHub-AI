@@ -33,7 +33,7 @@ test("Stage Presenter: Calibration Rule - Uncalibrated score displays 'Điểm r
   assert.equal(presented.riskDisplayLabel.includes("%"), false, "Must NOT show % when uncalibrated");
 });
 
-test("Stage Presenter: Calibration Rule - Calibrated score with provenance displays percentage", () => {
+test("Stage Presenter: Calibration Rule - Calibrated marker still displays bounded score", () => {
   const calibratedStage = {
     operationStatus: "COMPLETED",
     finding: "SEMANTIC_SUSPICIOUS",
@@ -46,7 +46,8 @@ test("Stage Presenter: Calibration Rule - Calibrated score with provenance displ
   const presented = presentStageForUser("l2b", calibratedStage);
   assert.equal(presented.calibrated, true);
   assert.equal(presented.calibratedProbability, 78);
-  assert.equal(presented.riskDisplayLabel, "78% xác suất");
+  assert.equal(presented.riskDisplayLabel, "Điểm rủi ro 78/100");
+  assert.equal(presented.calibrated, true);
 });
 
 test("Stage Presenter: Produces exact 9 user-facing attributes and isolates technical details", () => {

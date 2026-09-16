@@ -225,10 +225,20 @@ describe("Layer 4 deterministic policy boundary", () => {
           captured.push(args);
           return {
             ok: true,
-            provider: "fixture-ai",
-            model: "fixture-model",
+            provider: "gemini",
+            model: "gemini-3.8-flash",
             attempts: [],
-            json: { why: "AI narrative", classification: "MALICIOUS", enforcement: "BLOCK" },
+            providerMetadata: { transport: "interactions", thinkingLevel: "low" },
+            json: {
+              verdictSignal: "SUPPORTS",
+              supportReasons: ["AI narrative"],
+              contradictionReasons: [],
+              missingEvidence: [],
+              uncertainty: "Fixture uncertainty",
+              citationsUsed: [{ id: "fixture-evidence", url: TEST_EVIDENCE_URL }],
+              provider: "gemini",
+              model: "gemini-3.8-flash",
+            },
           };
         },
       },
@@ -240,7 +250,10 @@ describe("Layer 4 deterministic policy boundary", () => {
     assert.equal(result.securityClassification, "NO_KNOWN_THREAT");
     assert.equal(result.enforcement, "ALLOW_WITH_CAUTION");
     assert.equal(result.classification, "VERIFIED_TRUE");
-    assert.equal(result.userExplanation.why, "AI narrative");
+    assert.equal(result.aiVerificationStatus, "VERIFIED");
+    assert.equal(result.aiVerification.supportReasons[0], "AI narrative");
+    assert.notEqual(result.userExplanation.why, "AI narrative");
+    assert.match(result.userExplanation.why, /không phát hiện|bằng chứng/i);
     assert.equal(captured.length, 1);
     assert.match(captured[0].userPrompt, /<untrusted-data>/);
     assert.doesNotMatch(captured[0].systemPrompt, /Đại học Example/);

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Users, Clock, ShieldAlert, CheckCircle2, MessageSquare, Sparkles, Activity, AlertTriangle, Send, Building2, ThumbsUp } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function CommunityExperienceStudio({ initialPosts = [], initialConsensus = null }) {
   const [posts, setPosts] = useState(initialPosts);
@@ -64,7 +65,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-8 space-y-8 text-slate-200">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950/70 border border-slate-800 p-8 shadow-2xl">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950/70 border border-white/10 p-8 shadow-2xl">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3">
@@ -79,7 +80,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
               khai phá điểm nghẽn (edge-cases) và lá chắn chống thao túng thông tin (Astroturfing & Sockpuppets).
             </p>
           </div>
-          <div className="px-4 py-3 rounded-xl bg-slate-900/90 border border-slate-800 text-right">
+          <div className="px-4 py-3 rounded-xl surface-instrument text-right">
             <div className="text-xs text-slate-400 font-mono">BẤT BIẾN CỐT LÕI</div>
             <div className="text-sm font-bold text-amber-400">COMMUNITY ≠ OFFICIAL POLICY</div>
           </div>
@@ -87,7 +88,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
       </div>
 
       {/* Topic Switcher Bar */}
-      <div className="flex flex-wrap gap-2 p-1.5 rounded-xl bg-slate-950/80 border border-slate-800">
+      <div className="flex flex-wrap gap-2 p-1.5 rounded-xl surface-abyss/80 border border-white/10">
         {[
           { id: "TOEIC_SUBMISSION_TIME", label: "⏱️ Thời Gian Duyệt TOEIC" },
           { id: "PREREQUISITE_WAIVER_PRACTICE", label: "📋 Đơn Vượt Tiên Quyết" },
@@ -100,7 +101,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
             className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
               selectedTopic === t.id
                 ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
+                : "text-slate-400 hover:text-slate-200 hover:surface-instrument"
             }`}
           >
             {t.label}
@@ -111,7 +112,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
       {/* Consensus & Turnaround Metrics Widget */}
       {consensus && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
+          <div className="p-5 rounded-xl surface-abyss/80 border border-white/10 space-y-2">
             <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
               <Users className="w-4 h-4 text-amber-400" /> TÍN HIỆU ĐỒNG THUẬN CỘNG ĐỒNG
             </span>
@@ -131,7 +132,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
             <p className="text-xs text-slate-400">{consensus.summary}</p>
           </div>
 
-          <div className="p-5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
+          <div className="p-5 rounded-xl surface-abyss/80 border border-white/10 space-y-2">
             <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
               <Clock className="w-4 h-4 text-cyan-400" /> THỜI GIAN XỬ LÝ TRUNG VỊ
             </span>
@@ -141,7 +142,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
             <p className="text-xs text-slate-500">Dựa trên {consensus.independentAccountsCount} báo cáo sinh viên độc lập</p>
           </div>
 
-          <div className="p-5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2">
+          <div className="p-5 rounded-xl surface-abyss/80 border border-white/10 space-y-2">
             <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
               <AlertTriangle className="w-4 h-4 text-amber-400" /> ĐIỂM NGHẼN & LƯU Ý (EDGE-CASES)
             </span>
@@ -170,7 +171,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
 
           <div className="space-y-3">
             {posts.map((p) => (
-              <div key={p.postId} className="p-5 rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
+              <div key={p.postId} className="p-5 rounded-xl surface-abyss/60 border border-white/10 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-amber-500/10 border border-amber-500/30 text-amber-300">
@@ -200,7 +201,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
 
         {/* Right: Submit Experience Sandbox & Invariant Disclaimers */}
         <div className="lg:col-span-5 space-y-6">
-          <form onSubmit={handlePostSubmit} className="p-6 rounded-xl bg-slate-950/80 border border-slate-800 space-y-4">
+          <form onSubmit={handlePostSubmit} className="p-6 rounded-xl surface-abyss/80 border border-white/10 space-y-4">
             <h3 className="text-sm font-semibold text-white flex items-center gap-2">
               <Send className="w-4 h-4 text-amber-400" /> Đóng Góp Trải Nghiệm Thực Tế
             </h3>
@@ -212,7 +213,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
                 onChange={(e) => setNewContent(e.target.value)}
                 placeholder="Chia sẻ kinh nghiệm làm thủ tục, thời gian chờ, hoặc điểm cần lưu ý..."
                 rows={3}
-                className="w-full rounded-lg bg-slate-900 border border-slate-800 p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-mono"
+                className="w-full rounded-lg surface-instrument p-3 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-mono"
               />
             </div>
 
@@ -222,7 +223,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
                 <select
                   value={newCohort}
                   onChange={(e) => setNewCohort(e.target.value)}
-                  className="w-full rounded-lg bg-slate-900 border border-slate-800 p-2.5 text-xs text-slate-200 font-mono"
+                  className="w-full rounded-lg surface-instrument p-2.5 text-xs text-slate-200 font-mono"
                 >
                   <option value="K21">K21 (Năm 4 / Tốt Nghiệp)</option>
                   <option value="K22">K22 (Năm 3)</option>
@@ -237,7 +238,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
                   type="number"
                   value={newDuration}
                   onChange={(e) => setNewDuration(e.target.value)}
-                  className="w-full rounded-lg bg-slate-900 border border-slate-800 p-2.5 text-xs text-slate-200 font-mono"
+                  className="w-full rounded-lg surface-instrument p-2.5 text-xs text-slate-200 font-mono"
                 />
               </div>
             </div>
@@ -253,7 +254,7 @@ export function CommunityExperienceStudio({ initialPosts = [], initialConsensus 
           </form>
 
           {/* Official Policy Discrepancy Note */}
-          <div className="p-5 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2 text-xs">
+          <div className="p-5 rounded-xl surface-instrument space-y-2 text-xs">
             <div className="font-semibold text-amber-400 flex items-center gap-1.5">
               <Building2 className="w-4 h-4" /> Phân Định Quy Chế vs Thực Tế
             </div>

@@ -15,6 +15,7 @@ test("VNext media is registry-driven, verified-pack-only and poster-first", () =
   const registry = read("src/lib/media/vnextMediaRegistry.js");
   const background = read("src/components/providers/BackgroundContext.jsx");
   const runtime = read("src/components/providers/UniversalCinematicBackground.jsx");
+  const coordinator = read("src/components/media/CinematicMediaCoordinator.js");
   const css = read("src/app/globals.css");
 
   for (const id of ["VID-PRISM-01", "VID-HUMAN-01", "VID-OPTIC-01", "VID-OPTIC-02", "VID-HUMAN-02", "VID-PRISM-02", "HDRI-01"]) {
@@ -28,7 +29,8 @@ test("VNext media is registry-driven, verified-pack-only and poster-first", () =
   assert.match(runtime, /max-width: 768px/);
   assert.match(runtime, /prefers-reduced-motion: reduce/);
   assert.match(runtime, /preload="none"/);
-  assert.match(runtime, /document\.hidden/);
+  assert.match(coordinator, /document\.hidden/);
+  assert.match(coordinator, /visibilitychange/);
   assert.match(css, /\.vnext-media-atmosphere[\s\S]*pointer-events: none/);
   assert.match(registry, /id: "trust"[\s\S]*?videoEligible: true[\s\S]*?idleAssetId: "VID-OPTIC-01"[\s\S]*?resultAssetId: "VID-OPTIC-02"/);
   assert.match(registry, /id: "community"[\s\S]*?videoEligible: true[\s\S]*?maxConcurrentVideos: 1/);

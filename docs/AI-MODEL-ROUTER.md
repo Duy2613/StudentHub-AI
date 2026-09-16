@@ -1,198 +1,155 @@
-# AI Model Router — StudentHubAI AI Gateway
+# StudentHub AI — Gemini-only AI Gateway
 
-> Vault cross-reference: this document is the authoritative spec for
-> `frontend/src/lib/ai-gateway/*`. It supersedes the historical single-vendor
-> `GEMINI_API_KEY`-only pattern that previously existed (and never actually
-> ran, since no `GEMINI_API_KEY` was ever configured — see
-> `docs/PROVIDER-REGISTRY.md` §3 for the audit).
+Status: production policy `GEMINI_ONLY` · revision 2026-09-16
 
-## 1. Why this exists
+`frontend/src/lib/ai-gateway/config/AIGatewayConfig.js` is the single source
+of truth for active capability routing. Gemini is the only active external AI
+provider in this release, using `gemini-3.8-flash` and the Interactions API as
+the canonical transport.
 
-The Master Prompt (Section R) forbids hard-coding the application to one AI
-vendor/model:
+## Runtime policy
 
-> "Do not hard-code the application to one AI vendor/model... Create ONE
-> server-side AI Gateway. No random direct LLM calls from UI components."
+| Item | Contract |
+|---|---|
+| Active provider | Gemini |
+| Active model | `gemini-3.8-flash` |
+| Canonical secret | `GEMINI_API_KEY` |
+| Legacy fallback | `GEMINI_KEY_1`, used only when the canonical key is absent |
+| OpenAI runtime | `DISABLED_INTENTIONALLY` |
+| OpenAI compatibility code | Retained for old imports; never selected by active routes |
+| Production UX | `AI VERIFICATION — GEMINI` |
 
-Before this change, `Layer2SemanticService` and `Layer4TrustService` each
-called a single hard-coded vendor (`GeminiSemanticModelProvider`,
-`GeminiTrustReasoningProvider`) that required `GEMINI_API_KEY`. That variable
-was never set anywhere in the repo or CI, so in practice **100% of requests
-silently used the deterministic fallback** — the "AI" path was dead code.
-`GeminiTrustReasoningProvider.reason()` did not even perform a network call;
-it built a prompt string and immediately returned the deterministic result.
+The key value is read only server-side and never appears in telemetry, DTOs,
+browser bundles, or reports. The router does not call OpenAI, even if an old
+OpenAI environment variable is present.
 
-This AI Gateway replaces that with a capability-based **ModelRouter** that can
-rotate across configured providers with automatic fallback, timeout handling,
-and structured-output validation. Provider adapters are contract-tested, but
-live provider success is not claimed when the required secrets are absent;
-every deterministic engine remains the default and authoritative path (see §5).
+## Architecture
 
-## 2. Architecture
-
-```
-Layer2SemanticService / Layer4TrustService / /api/chat (AI Mentor)
-                │  (opt-in: options.useAIGateway)
-                ▼
-     AIGatewayService  (frontend/src/lib/ai-gateway/AIGatewayService.js)
-        - generateText({ capability, systemPrompt, userPrompt })
-        - generateStructured({ capability, ..., validate })
-        - describeRoute(capability)              [diagnostics only]
-                │
-                ▼
-        ModelRouter (frontend/src/lib/ai-gateway/ModelRouter.js)
-        - walks AI_GATEWAY_CONFIG.CAPABILITY_ROUTES[capability]
-        - skips any (provider, model) whose secrets are not configured
-        - retries transient errors once per candidate (429/5xx/timeout)
-        - for structured requests: parses and validates each candidate before
-          accepting it; deterministic parse/schema failures advance to the
-          next candidate without retrying the same model
-        - records every attempt for provenance/audit
-                │
-                ▼
-   IModelProvider adapters (frontend/src/lib/ai-gateway/providers/*)
-        - OpenAICompatibleProvider  (GenSpark LLM proxy, chat.completions)
-        - GeminiProvider            (Google Generative Language API)
-        - (future adapters implement the same interface)
+```text
+Trust / Community / Expert advisory caller
+                 │
+                 ▼
+        AIGatewayService
+                 │
+                 ▼
+          ModelRouter
+          │ active route table
+          ▼
+       GeminiProvider
+       Interactions API
 ```
 
-Nothing outside `frontend/src/lib/ai-gateway/` performs a `fetch()` call to
-an AI vendor. Every Layer/Engine that wants AI enrichment goes through
-`AIGatewayService`.
+All provider traffic is isolated in `frontend/src/lib/ai-gateway/providers/`.
+The UI and domain engines do not construct vendor requests directly. A
+compatibility OpenAI adapter remains available only to prevent import breakage;
+its runtime is fail-closed unless a future release explicitly re-enables it.
 
-## 3. Capability taxonomy
+## Active capability routes
 
-Domain code never requests a model by name — it requests a **capability**
-(`AI_CAPABILITY` in `types.js`):
+| Capability | Active entry | Model | Use |
+|---|---|---|---|
+| `FAST_CLASSIFICATION` | `GEMINI_FLASH` | `gemini-3.8-flash` | bounded triage |
+| `CLAIM_EXTRACTION` | `GEMINI_FLASH` | `gemini-3.8-flash` | claims/entities/context |
+| `DEEP_REASONING` | `GEMINI_FLASH` | `gemini-3.8-flash` | advisory explanation and Trust L4 |
+| `MULTIMODAL` | `GEMINI_FLASH` | `gemini-3.8-flash` | image, screenshot, QR |
+| `DOCUMENT` | `GEMINI_FLASH` | `gemini-3.8-flash` | PDF/document input |
+| `RERANKING` | `GEMINI_FLASH` | `gemini-3.8-flash` | advisory evidence ordering |
+| `SUMMARIZATION` | `GEMINI_FLASH` | `gemini-3.8-flash` | grounded summaries |
+| `EMBEDDING` | none | — | explicit `NOT_CONFIGURED` |
 
-| Capability            | Used by                                   | Purpose                                             |
-|------------------------|--------------------------------------------|------------------------------------------------------|
-| `FAST_CLASSIFICATION`  | quick triage (future use)                 | cheap/low-latency intent/claim heuristics            |
-| `CLAIM_EXTRACTION`     | `AIGatewayModelProvider` (Layer 2)         | structured claim/entity/context-signal extraction    |
-| `DEEP_REASONING`       | `AIGatewayReasoningProvider` (Layer 4), AI Mentor chat | narrative synthesis, multi-step explanation |
-| `MULTIMODAL`           | reserved for image/OCR-aware reasoning     | requires a configured multimodal provider (Gemini)   |
-| `DOCUMENT`             | reserved for long-document/PDF analysis    | high-context models                                  |
-| `EMBEDDING`            | reserved (no provider configured yet)      | vector embedding generation                          |
-| `RERANKING`            | reserved                                   | relevance re-ranking of retrieved evidence           |
-| `SUMMARIZATION`        | reserved                                   | grounded summarization with citation preservation    |
+The catalog may contain historical compatibility metadata, but
+`CAPABILITY_ROUTES` is intentionally Gemini-only. The route table does not
+represent provider agreement or a consensus percentage.
 
-## 4. Model catalog & fallback chains
+## Structured output contract
 
-See `frontend/src/lib/ai-gateway/config/AIGatewayConfig.js` for the
-authoritative table. Summary (as researched against `get_external_api_docs`
-at implementation time — 2026-08-29):
+Trust Layer 4 requests and validates this DTO:
 
-| Catalog entry | Provider | Model | Tier | Requires |
-|---|---|---|---|---|
-| `GPT_5_NANO`  | `openai_compatible` | `gpt-5-nano`  | FAST_CHEAP | `OPENAI_API_KEY` + `OPENAI_BASE_URL` |
-| `GPT_5_MINI`  | `openai_compatible` | `gpt-5-mini`  | BALANCED   | same |
-| `GPT_5_1`     | `openai_compatible` | `gpt-5.1`     | DEEP       | same |
-| `GPT_5_2`     | `openai_compatible` | `gpt-5.2`     | DEEP       | same |
-| `GEMINI_FLASH`| `gemini`             | `gemini-2.5-flash` | MULTIMODAL | `GEMINI_API_KEY` |
+```json
+{
+  "verdictSignal": "SUPPORTS|CONTRADICTS|MIXED|UNCERTAIN|NO_SIGNAL",
+  "supportReasons": [],
+  "contradictionReasons": [],
+  "missingEvidence": [],
+  "uncertainty": "string",
+  "citationsUsed": [{ "id": "evidence-id", "url": "https://…" }],
+  "provider": "gemini",
+  "model": "gemini-3.8-flash"
+}
+```
 
-Fallback chains (`CAPABILITY_ROUTES`):
+`GeminiTrustVerificationDTO.js` requires all fields, bounds all lists/text,
+and accepts only real HTTP(S) citation URLs. Invalid JSON or schema output is
+retried once for the same Gemini candidate, then the call becomes
+`AI verification unavailable`; the deterministic Trust Policy still completes.
 
-- `FAST_CLASSIFICATION` → `GPT_5_NANO` → `GEMINI_FLASH` → `GPT_5_MINI`
-- `CLAIM_EXTRACTION` → `GPT_5_MINI` → `GEMINI_FLASH` → `GPT_5_1`
-- `DEEP_REASONING` → `GPT_5_1` → `GPT_5_2` → `GPT_5_MINI`
-- `MULTIMODAL` → `GEMINI_FLASH` → `GPT_5_MINI`
-- `DOCUMENT` → `GPT_5_1` → `GPT_5_2`
-- `EMBEDDING` → *(none configured — returns `NOT_CONFIGURED`)*
-- `RERANKING` → `GPT_5_MINI`
-- `SUMMARIZATION` → `GPT_5_MINI` → `GPT_5_1`
+## Trust L1–L5 boundary
 
-Any entry whose `envKey` is unset at request time is **skipped** by the
-router (never attempted, never counted as a failure) — this is how Gemini
-silently drops out of every chain when `GEMINI_API_KEY` is not configured,
-without needing a code change.
+- L1 extracts claims and local safety signals.
+- L2 discovers candidate evidence and creates verification tasks.
+- L3 performs evidence forensics and requires real source URLs.
+- L4 runs deterministic policy first, then optionally asks Gemini for the
+  structured advisory DTO. Gemini cannot set truth, security, enforcement, or
+  confidence.
+- L5 makes the deterministic final decision and applies assurance gates.
 
-## 5. Deterministic engines remain authoritative
+The UI exposes actual provider/model/status, evidence references, and
+uncertainty. Fake AI-agreement percentages are not part of the contract.
 
-Per Master Prompt Section J1 / G3 ("AI may explain. AI must not determine
-deterministic rule satisfaction" / "absence of detection ≠ proof of safety"):
+## Community and Expert boundaries
 
-- **Layer 2** (`Layer2SemanticService.verify`): defaults to
-  `DeterministicSemanticProvider`. Passing `options.useAIGateway: true`
-  swaps in `AIGatewayModelProvider`, which itself falls back to the
-  deterministic engine on any Gateway failure or schema-invalid output.
-- **Layer 4** (`Layer4TrustService.evaluate`): defaults to
-  `DeterministicTrustPolicyProvider`. Passing `options.useAIGateway: true`
-  swaps in `AIGatewayReasoningProvider`, which **always** runs the
-  deterministic policy first to get the authoritative
-  classification/risk/action, and only asks the AI Gateway to rewrite the
-  Vietnamese `userExplanation.why` narrative. Hard-blocked
-  (`hardRuleTriggered`) and abstained (`INSUFFICIENT_EVIDENCE`) verdicts are
-  never narratively "softened" by AI.
-- **AI Mentor** (`/api/chat`): previously returned hard-coded canned replies
-  regardless of user input (a "no demo fiction" violation). It now always
-  calls the AI Gateway and returns an explicit
-  `providerStatus: "LIVE_PROVIDER_NOT_CONFIGURED"` degraded response instead
-  of fabricating a confident answer when no provider is available.
+Gemini is advisory for community classification, summaries, duplicate
+suggestions, evidence suggestions, expert evidence-packet summaries,
+assignment suggestions, and review summaries. Gemini never sets reputation,
+bans a user, decides truth, moderates irreversibly, qualifies an Expert,
+assigns authority, approves an assessment, or resolves an appeal alone.
 
-Because both integrations are strictly opt-in via `options.useAIGateway`, the
-deterministic path remains stable. The current closure run confirms
-`npm run test:all-discovered`: 250/250 discovered test files pass, with live
-provider proof kept separate and explicitly blocked when secrets are absent.
+## Multimodal boundary
 
-## 6. Resilience & observability
+`GeminiProvider` accepts provider-neutral `inputParts` and sends image,
+screenshot, QR, PDF, and document parts through the Gemini adapter. The
+canonical transport is Interactions; `generateContent` is an explicit
+compatibility fallback only for 404/405/501 responses. The multimodal smoke
+script records the fixture type, model, transport, latency, status, and parsed
+result without recording secrets.
 
-Every `AIGatewayService` call returns a normalized result (`types.js
-createGatewayResult`) including:
+## Failure and observability contract
 
-- `ok`, `provider`, `model` actually used (or `null` if none succeeded)
-- `attempts[]` — one record per (provider, model) tried, with
-  `errorType` (`NOT_CONFIGURED | TIMEOUT | HTTP_ERROR | NETWORK_ERROR |
-  INVALID_JSON | SCHEMA_VALIDATION_FAILED | EMPTY_RESPONSE`), latency, and a
-  safe error message. For structured generation, a provider response is only
-  successful after JSON parsing and the caller validator both pass. A parse
-  failure records `INVALID_JSON`; a parsed response rejected by the validator
-  records `SCHEMA_VALIDATION_FAILED` and moves to the next candidate without a
-  deterministic retry.
-- `totalLatencyMs`, `requestId`, `timestamp`, `schemaVersion`
+Every gateway result includes `ok`, provider/model when successful,
+`attempts[]`, safe error type, `requestId`, `totalLatencyMs`, and safe provider
+metadata (`transport`, `thinkingLevel`). Timeout, 429, 5xx, invalid JSON, and
+schema-invalid responses are bounded. No provider error body or secret is
+persisted.
 
-This provenance is attached by callers (`gatewayAttempts`,
-`aiNarrativeStatus`, etc.) so audit trails always show whether a result was
-AI-enriched or purely deterministic, and which vendor/model served it.
+When Gemini is unavailable, the public status is `AI verification unavailable`
+and the deterministic result remains visible. A failed Gemini call is never
+converted into fake Gemini success.
 
-Retry policy: only `429/500/502/503/504` and client-side `TIMEOUT` are
-retried, and only once per candidate, before moving to the next candidate in
-the fallback chain (`AI_GATEWAY_CONFIG.RETRY`).
+## Verification commands
 
-## 7. How to add a new provider
+Deterministic CI contracts use injected providers and never spend credits:
 
-1. Research the current official API docs (do not guess model names).
-2. Add an entry to `docs/PROVIDER-REGISTRY.md` (purpose, docs link, quota,
-   data-handling, secrets required, fallback).
-3. Implement `IModelProvider` in `frontend/src/lib/ai-gateway/providers/`.
-4. Register the model(s) in `AI_GATEWAY_CONFIG.MODEL_CATALOG` and add it to
-   the relevant `CAPABILITY_ROUTES` fallback chains.
-5. Add `.env.local.example` entries (server-only, no `NEXT_PUBLIC_` prefix).
-6. Add a mocked unit test in `frontend/tests/ai-gateway/` (no live network
-   calls in CI — see `docs/AI-MODEL-ROUTER.md` §8).
+```text
+cd frontend
+node --test tests/ai-gateway/ai_gateway_router.test.mjs
+node --test tests/gateway/provider_failure_cost_latency.test.mjs
+```
 
-No Layer/Engine file should ever need to change to add a new vendor.
+The real provider gate is separate:
 
-## 8. Testing policy
+```text
+node scripts/gemini-only-provider-smoke.mjs
+```
 
-`frontend/tests/ai-gateway/ai_gateway_router.test.mjs` exercises the
-`ModelRouter` and `AIGatewayService` with **injected fake providers**
-(`IModelProvider` test doubles) — it never makes a real network call, so it
-is safe and fast to run in CI regardless of whether real API keys are
-configured. Coverage includes:
+The provider smoke includes text, image, screenshot, QR, and PDF/document
+fixtures. It loads server-only environment variables, makes no OpenAI call,
+makes no secret-containing output, and must be run only when the owner has
+authorized spending the configured Gemini quota.
 
-- capability with zero configured providers → `NOT_CONFIGURED`
-- first candidate configured but fails → falls through to next candidate
-- transient error retried once then fallback → attempt count matches policy
-- malformed JSON → `INVALID_JSON`, then fallback to the next candidate
-- schema validation failure → `SCHEMA_VALIDATION_FAILED`, then fallback to the
-  next candidate
-- all structured candidates invalid → fail closed without repeating a
-  deterministic candidate
-- Gemini trusted system instruction and untrusted user/evidence content are
-  serialized into separate request fields
-- successful structured output → `json` populated, `ok: true`
+## Adding another provider later
 
-Live end-to-end verification against a real provider is **BLOCKED_BY_PROVIDER**
-in this closure environment because fresh approved secrets, terms, quotas, and
-data-handling approval are not configured. The automated suite uses injected
-provider doubles and does not spend live credits.
+An independent provider may be added only in a future release after its
+official API, data handling, quota, and secret boundary are documented. It
+must receive a new adapter, mocked contract tests, and an explicit routing
+change. Until then, product wording remains `AI VERIFICATION — GEMINI`, not
+`MULTI-AI`.

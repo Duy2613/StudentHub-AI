@@ -124,10 +124,10 @@ export const OFFICIAL_DISCOVERY_SOURCES = Object.freeze([
  * ownership only; it never exposes whether a provider secret is configured.
  */
 export const MODEL_CAPABILITY_POLICY = Object.freeze([
-  Object.freeze({ capability: "FAST_CLASSIFICATION", primaryModel: "gpt-5-nano", fallbackModels: ["gemini-3.8-flash", "DeterministicPolicyReasoner_v5"] }),
-  Object.freeze({ capability: "CLAIM_EXTRACTION", primaryModel: "gpt-5-mini", fallbackModels: ["gemini-3.8-flash", "DeterministicPolicyReasoner_v5"] }),
-  Object.freeze({ capability: "DEEP_REASONING", primaryModel: "gpt-5.6-luna", fallbackModels: ["gemini-3.8-flash", "DeterministicPolicyReasoner_v5"] }),
-  Object.freeze({ capability: "MULTIMODAL_INSPECTION", primaryModel: "gemini-3.8-flash", fallbackModels: ["gemini-3.6-flash", "Tesseract_local"] }),
+  Object.freeze({ capability: "FAST_CLASSIFICATION", primaryModel: "gpt-4o-mini", fallbackModels: ["gemini-3.5-flash-lite", "DeterministicPolicyReasoner_v5"] }),
+  Object.freeze({ capability: "CLAIM_EXTRACTION", primaryModel: "gpt-4o", fallbackModels: ["gemini-3.5-flash-lite", "DeterministicPolicyReasoner_v5"] }),
+  Object.freeze({ capability: "DEEP_REASONING", primaryModel: "gpt-4o", fallbackModels: ["gemini-3.8-flash", "DeterministicPolicyReasoner_v5"] }),
+  Object.freeze({ capability: "MULTIMODAL_INSPECTION", primaryModel: "gemini-3.8-flash", fallbackModels: ["gemini-3.5-flash-lite", "Tesseract_local"] }),
   Object.freeze({ capability: "EMBEDDING", primaryModel: null, fallbackModels: ["DeterministicLexicalRetrieval_v1"], status: "NOT_CONFIGURED" }),
 ]);
 

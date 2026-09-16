@@ -76,14 +76,14 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
       case "RETRACTED":
         return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-950/90 border border-rose-600 text-rose-300"><ShieldX className="w-3.5 h-3.5" /> ĐÃ THU HỒI / RÚT BÀI</span>;
       default:
-        return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-400">NGOÀI PHẠM VI XÁC LẬP</span>;
+        return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold surface-instrument border border-white/20 text-slate-400">NGOÀI PHẠM VI XÁC LẬP</span>;
     }
   };
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-8 space-y-8 text-slate-200">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-950/70 border border-slate-800 p-8 shadow-2xl">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-950/70 border border-white/10 p-8 shadow-2xl">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3">
@@ -98,7 +98,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
               và phân định tuyệt đối giữa năng lực chuyên môn học thuật với thẩm quyền quy chế đào tạo.
             </p>
           </div>
-          <div className="px-4 py-3 rounded-xl bg-slate-900/90 border border-slate-800 text-right">
+          <div className="px-4 py-3 rounded-xl surface-instrument text-right">
             <div className="text-xs text-slate-400 font-mono">BẤT BIẾN CỐT LÕI</div>
             <div className="text-sm font-bold text-emerald-400">EXPERTISE ≠ AUTHORITY</div>
           </div>
@@ -106,7 +106,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
       </div>
 
       {/* Multi-Signal Entity Search & Disambiguation Bar */}
-      <div className="p-5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
+      <div className="p-5 rounded-xl surface-abyss/80 border border-white/10 space-y-3">
         <div className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
           <Fingerprint className="w-4 h-4 text-emerald-400" /> TÌM KIẾM & PHÂN GIẢI THỰC THỂ CHUYÊN GIA (MULTI-SIGNAL RESOLUTION)
         </div>
@@ -117,7 +117,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
               placeholder="Tên chuyên gia (Ví dụ: Nguyễn Văn Minh)..."
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
-              className="w-full rounded-lg bg-slate-900 border border-slate-800 px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
+              className="w-full rounded-lg surface-instrument px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
             />
           </div>
           <div className="sm:col-span-4">
@@ -126,7 +126,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
               placeholder="ORCID (Ví dụ: 0000-0002-1825-0097)..."
               value={searchOrcid}
               onChange={(e) => setSearchOrcid(e.target.value)}
-              className="w-full rounded-lg bg-slate-900 border border-slate-800 px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
+              className="w-full rounded-lg surface-instrument px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
             />
           </div>
           <div className="sm:col-span-2">
@@ -145,7 +145,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
               ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-300"
               : resolveResult.status === "IDENTITY_AMBIGUOUS"
               ? "bg-amber-950/40 border-amber-500/40 text-amber-300"
-              : "bg-slate-900 border-slate-800 text-slate-400"
+              : "surface-instrument border-white/10 text-slate-400"
           }`}>
             <span className="font-bold font-mono">[{resolveResult.status}]:</span> {resolveResult.explanation}
           </div>
@@ -167,8 +167,8 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
                 onClick={() => setSelectedExpert(exp)}
                 className={`p-5 rounded-xl border transition-all cursor-pointer ${
                   selectedExpert?.expertId === exp.expertId
-                    ? "bg-slate-900 border-emerald-500 shadow-md shadow-emerald-500/10"
-                    : "bg-slate-950/60 border-slate-800/80 hover:border-slate-700"
+                    ? "surface-instrument border-emerald-500 shadow-md shadow-emerald-500/10"
+                    : "surface-abyss/60 border-white/10/80 hover:border-white/20"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -185,7 +185,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
                       {exp.orcid && <span className="text-emerald-400 ml-2">ID: {exp.orcid}</span>}
                     </p>
                   </div>
-                  <div className="px-2.5 py-1 rounded-md bg-slate-800 text-xs font-mono font-bold text-emerald-400">
+                  <div className="px-2.5 py-1 rounded-md surface-paper text-xs font-mono font-bold text-emerald-400">
                     {exp.reputationScore} PTS
                   </div>
                 </div>
@@ -200,7 +200,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
                           ? "bg-emerald-950/80 border border-emerald-500/40 text-emerald-300"
                           : sc.level === "MODERATE"
                           ? "bg-cyan-950/80 border border-cyan-500/40 text-cyan-300"
-                          : "bg-slate-900 border border-slate-800 text-slate-500"
+                          : "surface-instrument text-slate-500"
                       }`}
                     >
                       {sc.domain}: {sc.level}
@@ -215,7 +215,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
         {/* Right: Expert Detailed Scope, Credentials & Claim Sandbox */}
         <div className="lg:col-span-7 space-y-6">
           {selectedExpert ? (
-            <div className="rounded-xl bg-slate-950/80 border border-slate-800 p-6 space-y-5">
+            <div className="rounded-xl surface-abyss/80 border border-white/10 p-6 space-y-5">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-mono text-slate-400">HỒ SƠ NĂNG LỰC & ĐỒ THỊ CHUYÊN GIA</span>
@@ -226,7 +226,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
                     🏛️ THẨM QUYỀN PHÒNG ĐÀO TẠO
                   </span>
                 ) : (
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 flex items-center gap-1.5">
+                  <span className="px-3 py-1 rounded-full text-xs font-semibold surface-instrument text-slate-400 flex items-center gap-1.5">
                     🎓 CHUYÊN MÔN HỌC THUẬT
                   </span>
                 )}
@@ -234,7 +234,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
 
               {/* Credentials & Publications */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                <div className="p-3.5 rounded-lg bg-slate-900/60 border border-slate-800/80 space-y-1.5">
+                <div className="p-3.5 rounded-lg surface-instrument space-y-1.5">
                   <div className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
                     <Award className="w-3.5 h-3.5 text-amber-400" /> BẰNG CẤP & HỌC VỊ
                   </div>
@@ -248,7 +248,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
                   ))}
                 </div>
 
-                <div className="p-3.5 rounded-lg bg-slate-900/60 border border-slate-800/80 space-y-1.5">
+                <div className="p-3.5 rounded-lg surface-instrument space-y-1.5">
                   <div className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
                     <FileCheck2 className="w-3.5 h-3.5 text-cyan-400" /> CÔNG TRÌNH KHOA HỌC
                   </div>
@@ -261,7 +261,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
               </div>
 
               {/* Claim Evaluation Sandbox */}
-              <div className="pt-4 border-t border-slate-800 space-y-4">
+              <div className="pt-4 border-t border-white/10 space-y-4">
                 <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                   <Search className="w-4 h-4 text-emerald-400" /> Thẩm Định Ý Kiến & Thẩm Quyền Chuyên Gia
                 </h3>
@@ -272,7 +272,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
                     value={claimText}
                     onChange={(e) => setClaimText(e.target.value)}
                     rows={2}
-                    className="w-full rounded-lg bg-slate-900 border border-slate-800 p-3 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
+                    className="w-full rounded-lg surface-instrument p-3 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
                   />
                 </div>
 
@@ -282,7 +282,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
                     <select
                       value={claimDomain}
                       onChange={(e) => setClaimDomain(e.target.value)}
-                      className="w-full rounded-lg bg-slate-900 border border-slate-800 p-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
+                      className="w-full rounded-lg surface-instrument p-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
                     >
                       <option value="AI_ML">AI_ML (Trí Tuệ Nhân Tạo & Máy Học)</option>
                       <option value="COMPUTER_VISION">COMPUTER_VISION (Thị Giác Máy Tính)</option>
@@ -297,7 +297,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
                     <select
                       value={claimJurisdiction}
                       onChange={(e) => setClaimJurisdiction(e.target.value)}
-                      className="w-full rounded-lg bg-slate-900 border border-slate-800 p-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
+                      className="w-full rounded-lg surface-instrument p-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 font-mono"
                     >
                       <option value="TECHNICAL_DOMAIN">TECHNICAL_DOMAIN (Chuyên Môn Kỹ Thuật)</option>
                       <option value="PEDAGOGICAL">PEDAGOGICAL (Sư Phạm & Phương Pháp)</option>
@@ -318,7 +318,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
 
               {/* Evaluation Result */}
               {claimEvaluation && (
-                <div className="p-4 rounded-xl bg-slate-900 border border-emerald-500/40 space-y-2 animate-in fade-in">
+                <div className="p-4 rounded-xl surface-instrument border border-emerald-500/40 space-y-2 animate-in fade-in">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono text-slate-400">KẾT QUẢ THẨM ĐỊNH NĂNG LỰC</span>
                     {getStatusBadge(claimEvaluation.claimStatus)}
@@ -330,7 +330,7 @@ export function ExpertKnowledgeGraphView({ initialExperts = [] }) {
               )}
             </div>
           ) : (
-            <div className="rounded-xl bg-slate-950/40 border border-slate-800 p-12 text-center text-xs text-slate-500">
+            <div className="rounded-xl surface-abyss/40 border border-white/10 p-12 text-center text-xs text-slate-500">
               Chọn chuyên gia để khám phá đồ thị năng lực.
             </div>
           )}

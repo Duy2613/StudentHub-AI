@@ -118,7 +118,7 @@ export class Layer2SemanticService {
 
     let provider = options.provider;
     if (!provider || typeof provider.analyzeSemantics !== "function") {
-      if (options.useAIGateway === true || (options.useGemini === true && typeof process !== "undefined" && process.env?.GEMINI_API_KEY)) {
+      if (options.useAIGateway === true || (options.useGemini === true && typeof process !== "undefined" && (process.env?.GEMINI_API_KEY || process.env?.GEMINI_KEY_1))) {
         provider = new AIGatewayModelProvider();
       } else {
         provider = new DeterministicSemanticProvider();

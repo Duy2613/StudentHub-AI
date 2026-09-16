@@ -121,6 +121,38 @@ function safeArray(value, maxLength = 100) {
   return Array.isArray(value) ? value.slice(0, maxLength) : [];
 }
 
+function safeAiVerification(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const realUrl = (candidate) => {
+    if (typeof candidate !== "string" || !/^https?:\/\//i.test(candidate)) return null;
+    try {
+      const parsed = new URL(candidate);
+      return ["http:", "https:"].includes(parsed.protocol) ? parsed.toString().slice(0, 4096) : null;
+    } catch {
+      return null;
+    }
+  };
+  const safeList = (candidate, max = 12) => safeArray(candidate, max)
+    .map((item) => typeof item === "string" ? boundedText(item, 700) : "")
+    .filter(Boolean);
+  const citations = safeArray(value.citationsUsed, 20).map((item) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+    const url = realUrl(item.url);
+    if (!url) return null;
+    return { id: boundedText(item.id, 180) || url, url };
+  }).filter(Boolean);
+  return {
+    verdictSignal: boundedText(value.verdictSignal, 60) || "UNCERTAIN",
+    supportReasons: safeList(value.supportReasons),
+    contradictionReasons: safeList(value.contradictionReasons),
+    missingEvidence: safeList(value.missingEvidence),
+    uncertainty: boundedText(value.uncertainty, 700) || "Gemini không công bố thêm certainty ngoài evidence hiện có.",
+    citationsUsed: citations,
+    provider: boundedText(value.provider, 80).toLowerCase() || "gemini",
+    model: boundedText(value.model, 120) || "gemini-3.8-flash",
+  };
+}
+
 /**
  * Creates a Claim-Level Verdict DTO
  */
@@ -180,6 +212,12 @@ export function createLayer4Result(input = {}) {
   },
   auditTrail = {},
   metrics = {},
+  aiVerification = null,
+  aiVerificationStatus = null,
+  aiVerificationTransport = null,
+  aiVerificationThinkingLevel = null,
+  aiVerificationLatencyMs = null,
+  aiVerificationErrorType = null,
   } = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   const safeTruthAssessment = truthAssessment && typeof truthAssessment === "object" && !Array.isArray(truthAssessment)
     ? truthAssessment
@@ -237,6 +275,12 @@ export function createLayer4Result(input = {}) {
     limitations: safeLimitations,
     recommendedAction: canonicalAction,
     userExplanation: safeExplanation,
+    aiVerification: safeAiVerification(aiVerification),
+    aiVerificationStatus: boundedText(aiVerificationStatus, 80) || null,
+    aiVerificationTransport: boundedText(aiVerificationTransport, 120) || null,
+    aiVerificationThinkingLevel: boundedText(aiVerificationThinkingLevel, 40) || null,
+    aiVerificationLatencyMs: Number.isFinite(Number(aiVerificationLatencyMs)) ? Math.max(0, Number(aiVerificationLatencyMs)) : null,
+    aiVerificationErrorType: boundedText(aiVerificationErrorType, 120) || null,
     auditTrail: {
       requestId: boundedText(safeAuditTrail.requestId, 160) || createSecureId("req_l4"),
       timestamp: boundedText(safeAuditTrail.timestamp, 80) || new Date().toISOString(),

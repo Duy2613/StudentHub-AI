@@ -10,17 +10,21 @@ import "./globals.css";
 import "@/components/margin/margin.css";
 import { AuthProvider } from "@/lib/auth/AuthContext";
 import { BackgroundProvider } from "@/components/providers/BackgroundContext";
+import { AdaptiveQualityProvider } from "@/components/providers/AdaptiveQualityContext";
 import { RealtimeProvider } from "@/components/providers/RealtimeContext";
 import RealtimeNotificationToasts from "@/components/realtime/RealtimeNotificationToasts";
 import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import { ReducedMotionBoundary } from "@/components/visual/ReducedMotionBoundary";
 import PrimaryNavbar from "@/components/navigation/PrimaryNavbar";
 import MobileNavRail from "@/components/navigation/MobileNavRail";
+import HobroPrecisionCursor from "@/components/cinematic/HobroPrecisionCursor";
+import SoundAtmosphereController from "@/components/cinematic/SoundAtmosphereController";
+import ArstraumurAtmosphereCanvas from "@/components/cinematic/ArstraumurAtmosphereCanvas";
 
 const beVietnamPro = Be_Vietnam_Pro({
     variable: "--font-be-vietnam-pro",
     subsets: ["latin", "vietnamese"],
-    weight: ["400", "500", "600", "700"],
+    weight: ["400", "500", "600", "700", "800"],
     display: "swap",
     preload: true,
 });
@@ -48,7 +52,7 @@ const newsreader = Newsreader({
 const lora = Lora({
     variable: "--font-lora",
     subsets: ["latin", "vietnamese"],
-    weight: ["500", "600"],
+    weight: ["400", "500", "600", "700"],
     style: ["normal", "italic"],
     display: "swap",
     preload: false,
@@ -78,19 +82,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
             <body className="min-h-full flex flex-col bg-transparent text-gray-100 selection:bg-teal-400 selection:text-space-950">
                 <div className="analog-grain-overlay" aria-hidden="true" />
+                <HobroPrecisionCursor />
+                <SoundAtmosphereController />
+                <ArstraumurAtmosphereCanvas />
                 <AuthProvider>
                     <BackgroundProvider>
                         <RealtimeProvider>
-                            <ReducedMotionBoundary>
-                                <SmoothScrollProvider>
-                                    <RealtimeNotificationToasts />
-                                    <PrimaryNavbar />
-                                    <div className="flex-1 pb-16 md:pb-0">
-                                        {children}
-                                    </div>
-                                    <MobileNavRail />
-                                </SmoothScrollProvider>
-                            </ReducedMotionBoundary>
+                            <AdaptiveQualityProvider>
+                                <ReducedMotionBoundary>
+                                    <SmoothScrollProvider>
+                                        <RealtimeNotificationToasts />
+                                        <PrimaryNavbar />
+                                        <div className="flex-1 pb-16 md:pb-0">
+                                            {children}
+                                        </div>
+                                        <MobileNavRail />
+                                    </SmoothScrollProvider>
+                                </ReducedMotionBoundary>
+                            </AdaptiveQualityProvider>
                         </RealtimeProvider>
                     </BackgroundProvider>
                 </AuthProvider>

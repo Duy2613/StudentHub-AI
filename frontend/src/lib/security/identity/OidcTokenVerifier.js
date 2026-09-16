@@ -12,6 +12,14 @@ function isLoopbackHttpIssuer(value) {
   }
 }
 
+const AUTH_PROVIDERS = new Set(["email", "google", "github"]);
+
+function safePresentationClaim(value, max = 160) {
+  if (typeof value !== "string") return null;
+  const normalized = value.replace(/[\u0000-\u001F\u007F]/g, "").trim();
+  return normalized ? normalized.slice(0, max) : null;
+}
+
 export class OidcTokenVerifier {
   constructor({ issuer, audience = "authenticated", jwksUrl, jwks, secret, algorithms = ["ES256", "RS256"] } = {}) {
     if (!issuer) throw new Error("OIDC issuer is required.");
@@ -59,11 +67,25 @@ export class OidcTokenVerifier {
     });
     const userId = normalizeUuidSubjectId(payload.sub);
     if (!userId) throw new Error("OIDC subject must be a UUID.");
+    const userMetadata = payload.user_metadata && typeof payload.user_metadata === "object"
+      ? payload.user_metadata
+      : {};
+    const appMetadata = payload.app_metadata && typeof payload.app_metadata === "object"
+      ? payload.app_metadata
+      : {};
+    const claimedProvider = safePresentationClaim(payload.provider || appMetadata.provider, 32)?.toLowerCase();
     return {
       userId,
       email: typeof payload.email === "string" ? payload.email : "",
       emailVerified: payload.email_verified === true,
-      authProvider: "supabase",
+      // This is informational session metadata only. Roles and authorization
+      // remain sourced from private.user_roles, never from this claim.
+      authProvider: AUTH_PROVIDERS.has(claimedProvider) ? claimedProvider : "supabase",
+      fullName: safePresentationClaim(
+        userMetadata.full_name || userMetadata.name || payload.full_name || payload.name,
+        120
+      ),
+      avatarUrl: safePresentationClaim(userMetadata.avatar_url || payload.avatar_url, 1000),
       jti: typeof payload.jti === "string" ? payload.jti : null,
       amr: Array.isArray(payload.amr) ? payload.amr : [],
       algorithm: protectedHeader.alg,

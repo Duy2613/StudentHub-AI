@@ -30,10 +30,14 @@ test("PROVIDER REGISTRY: Exposes accurate capability metadata without leaking se
     assert.equal(model.secret, undefined, "Never expose secret in registry");
   }
 
-  const luna = ProviderRegistry.getModel("gpt-5.6-luna");
-  assert.ok(luna, "gpt-5.6-luna must be present");
-  assert.ok(luna.capabilities.includes("FAST_CLASSIFICATION"));
-  assert.ok(luna.capabilities.includes("REASONING"));
+  const disabledOpenAi = ProviderRegistry.getModel("gpt-4o-mini");
+  assert.ok(disabledOpenAi, "OpenAI compatibility metadata may remain present");
+  assert.equal(disabledOpenAi.active, false);
+  assert.equal(disabledOpenAi.runtimeStatus, "DISABLED_INTENTIONALLY");
+
+  const gemini = ProviderRegistry.getModel("gemini-3.8-flash");
+  assert.ok(gemini, "gemini-3.8-flash must be present");
+  assert.ok(gemini.capabilities.includes("MULTIMODAL"));
 });
 
 test("DOMAIN SPECIALIST BOUNDARY: FraudRiskEngine evaluates local signals as ADVISORY ONLY", () => {
@@ -57,5 +61,6 @@ test("MODEL ROUTER: Capability-based route returns configured candidates in prio
   const route = router.describeRoute(AI_CAPABILITY.FAST_CLASSIFICATION);
   assert.ok(Array.isArray(route), "Must describe route as candidate array");
   assert.ok(route.length > 0, "Route must have at least one candidate");
-  assert.equal(route[0].model, "gpt-5-nano", "Nano must be primary candidate for fast classification");
+  assert.equal(route[0].model, "gemini-3.8-flash", "Gemini 3.8 Flash must be the sole active candidate");
+  assert.deepEqual(route.map((entry) => entry.provider), ["gemini"]);
 });

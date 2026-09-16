@@ -1,0 +1,275 @@
+{
+  "version": "3.0.0",
+  "canonicalRoot": "/media/v3",
+  "updatedAt": "2026-09-14T09:45:20.539Z",
+  "integrityWarning": "shared/empty-expert.webp is 0 bytes in upstream delivery; flagged for fallback",
+  "categories": {
+    "landing": {
+      "hero": {
+        "type": "video",
+        "entry": "landing/hero-main.mp4",
+        "mime": "video/mp4",
+        "poster": "/media/v3/landing/hero-main-poster.webp",
+        "mobileFallback": "/media/v3/landing/hero-main-mobile.webp",
+        "reducedMotionFallback": "/media/v3/landing/hero-main-poster.webp"
+      },
+      "heroPoster": {
+        "type": "image",
+        "entry": "landing/hero-main-poster.webp",
+        "mime": "image/webp"
+      },
+      "heroMobile": {
+        "type": "image",
+        "entry": "landing/hero-main-mobile.webp",
+        "mime": "image/webp"
+      },
+      "prism": {
+        "type": "image",
+        "entry": "landing/prism.webp",
+        "mime": "image/webp"
+      },
+      "atlas": {
+        "type": "image",
+        "entry": "landing/atlas.webp",
+        "mime": "image/webp"
+      },
+      "humanAi": {
+        "type": "image",
+        "entry": "landing/human-ai.webp",
+        "mime": "image/webp"
+      },
+      "community": {
+        "type": "image",
+        "entry": "landing/community.webp",
+        "mime": "image/webp"
+      },
+      "expert": {
+        "type": "image",
+        "entry": "landing/expert.webp",
+        "mime": "image/webp"
+      },
+      "trustTransform": {
+        "type": "video",
+        "entry": "landing/trust-transform.mp4",
+        "mime": "video/mp4",
+        "poster": "/media/v3/landing/prism.webp",
+        "mobileFallback": "/media/v3/landing/prism.webp",
+        "reducedMotionFallback": "/media/v3/landing/prism.webp"
+      }
+    },
+    "auth": {
+      "loginLoop": {
+        "type": "video",
+        "entry": "auth/login-loop.mp4",
+        "mime": "video/mp4",
+        "poster": "/media/v3/auth/login-poster.webp",
+        "mobileFallback": "/media/v3/auth/login-mobile.webp",
+        "reducedMotionFallback": "/media/v3/auth/login-poster.webp"
+      },
+      "loginPoster": {
+        "type": "image",
+        "entry": "auth/login-poster.webp",
+        "mime": "image/webp"
+      },
+      "loginMobile": {
+        "type": "image",
+        "entry": "auth/login-mobile.webp",
+        "mime": "image/webp"
+      },
+      "register": {
+        "type": "image",
+        "entry": "auth/register.webp",
+        "mime": "image/webp"
+      },
+      "verify": {
+        "type": "image",
+        "entry": "auth/verify.webp",
+        "mime": "image/webp"
+      }
+    },
+    "trust": {
+      "input": {
+        "type": "image",
+        "entry": "trust/input.webp",
+        "mime": "image/webp"
+      },
+      "l1Claim": {
+        "type": "image",
+        "entry": "trust/l1-claim.webp",
+        "mime": "image/webp"
+      },
+      "l2Discovery": {
+        "type": "video",
+        "entry": "trust/l2-discovery.mp4",
+        "mime": "video/mp4",
+        "poster": "/media/v3/trust/l2-discovery-poster.webp",
+        "mobileFallback": "/media/v3/trust/l2-discovery-poster.webp",
+        "reducedMotionFallback": "/media/v3/trust/l2-discovery-poster.webp"
+      },
+      "l2DiscoveryPoster": {
+        "type": "image",
+        "entry": "trust/l2-discovery-poster.webp",
+        "mime": "image/webp"
+      },
+      "officialSource": {
+        "type": "image",
+        "entry": "trust/official-source.webp",
+        "mime": "image/webp"
+      },
+      "sourceIndependence": {
+        "type": "image",
+        "entry": "trust/source-independence.webp",
+        "mime": "image/webp"
+      },
+      "l3Forensics": {
+        "type": "image",
+        "entry": "trust/l3-forensics.webp",
+        "mime": "image/webp"
+      },
+      "l4MultiAi": {
+        "type": "video",
+        "entry": "trust/l4-multiai.mp4",
+        "mime": "video/mp4",
+        "poster": "/media/v3/trust/l4-multiai-poster.webp",
+        "mobileFallback": "/media/v3/trust/l4-multiai-poster.webp",
+        "reducedMotionFallback": "/media/v3/trust/l4-multiai-poster.webp"
+      },
+      "l4MultiAiPoster": {
+        "type": "image",
+        "entry": "trust/l4-multiai-poster.webp",
+        "mime": "image/webp"
+      },
+      "l5Decision": {
+        "type": "image",
+        "entry": "trust/l5-decision.webp",
+        "mime": "image/webp"
+      },
+      "humanReview": {
+        "type": "video",
+        "entry": "trust/human-review.mp4",
+        "mime": "video/mp4",
+        "poster": "/media/v3/trust/human-review-poster.webp",
+        "mobileFallback": "/media/v3/trust/human-review-poster.webp",
+        "reducedMotionFallback": "/media/v3/trust/human-review-poster.webp"
+      },
+      "humanReviewPoster": {
+        "type": "image",
+        "entry": "trust/human-review-poster.webp",
+        "mime": "image/webp"
+      }
+    },
+    "community": {
+      "hero": {
+        "type": "video",
+        "entry": "community/hero.mp4",
+        "mime": "video/mp4",
+        "poster": "/media/v3/community/hero-poster.webp",
+        "mobileFallback": "/media/v3/community/hero-poster.webp",
+        "reducedMotionFallback": "/media/v3/community/hero-poster.webp"
+      },
+      "heroPoster": {
+        "type": "image",
+        "entry": "community/hero-poster.webp",
+        "mime": "image/webp"
+      },
+      "feedBg": {
+        "type": "image",
+        "entry": "community/feed-bg.webp",
+        "mime": "image/webp"
+      },
+      "evidencePost": {
+        "type": "image",
+        "entry": "community/evidence-post.webp",
+        "mime": "image/webp"
+      },
+      "expertResponse": {
+        "type": "image",
+        "entry": "community/expert-response.webp",
+        "mime": "image/webp"
+      },
+      "discussion": {
+        "type": "image",
+        "entry": "community/discussion.webp",
+        "mime": "image/webp"
+      }
+    },
+    "expert": {
+      "network": {
+        "type": "image",
+        "entry": "expert/network.webp",
+        "mime": "image/webp"
+      },
+      "qualification": {
+        "type": "image",
+        "entry": "expert/qualification.webp",
+        "mime": "image/webp"
+      },
+      "liveReview": {
+        "type": "video",
+        "entry": "expert/live-review.mp4",
+        "mime": "video/mp4",
+        "poster": "/media/v3/expert/live-review-poster.webp",
+        "mobileFallback": "/media/v3/expert/live-review-poster.webp",
+        "reducedMotionFallback": "/media/v3/expert/live-review-poster.webp"
+      },
+      "liveReviewPoster": {
+        "type": "image",
+        "entry": "expert/live-review-poster.webp",
+        "mime": "image/webp"
+      },
+      "reputation": {
+        "type": "image",
+        "entry": "expert/reputation.webp",
+        "mime": "image/webp"
+      }
+    },
+    "profile": {
+      "user": {
+        "type": "image",
+        "entry": "profile/user.webp",
+        "mime": "image/webp"
+      },
+      "expert": {
+        "type": "image",
+        "entry": "profile/expert.webp",
+        "mime": "image/webp"
+      }
+    },
+    "dashboard": {
+      "dashboard": {
+        "type": "image",
+        "entry": "dashboard/dashboard.webp",
+        "mime": "image/webp"
+      }
+    },
+    "shared": {
+      "evidencePaper": {
+        "type": "image",
+        "entry": "shared/evidence-paper.webp",
+        "mime": "image/webp"
+      },
+      "prismTexture": {
+        "type": "image",
+        "entry": "shared/prism-texture.webp",
+        "mime": "image/webp"
+      },
+      "emptyCommunity": {
+        "type": "image",
+        "entry": "shared/empty-community.webp",
+        "mime": "image/webp"
+      },
+      "emptyExpert": {
+        "type": "image",
+        "entry": "shared/empty-expert.webp",
+        "mime": "image/webp",
+        "zeroByteUpstream": true,
+        "fallbackAsset": "/media/v3/shared/empty-community.webp"
+      },
+      "emptyTrust": {
+        "type": "image",
+        "entry": "shared/empty-trust.webp",
+        "mime": "image/webp"
+      }
+    }
+  }
+}

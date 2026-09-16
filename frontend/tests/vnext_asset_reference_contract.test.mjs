@@ -21,7 +21,7 @@ test("VNext product surfaces use verified registry media references", () => {
   assert.doesNotMatch(landing, /\/media\/studenthub-vnext\/landing-human/);
   assert.doesNotMatch(trust, /\/media\/studenthub-vnext\/(?:trust-inspection|trust-refraction-inspection)/);
   assert.match(landing, /VNextMediaFrame[\s\S]*assetId="VID-HUMAN-01"/);
-  assert.match(hero, /KhaiMinhImage[\s\S]*assetId="KH-LANDING-HERO-01"/);
+  assert.match(hero, /EvidencePrismHero[\s\S]*assetId="KH-LANDING-HERO-01"/);
   assert.match(trust, /VerifiedPoster[\s\S]*assetId="VID-OPTIC-01"/);
 
   for (const relativePath of [

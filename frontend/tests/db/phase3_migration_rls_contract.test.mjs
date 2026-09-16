@@ -7,6 +7,7 @@ import { DatabaseUnavailableError, getPostgresPool } from "../../src/lib/server/
 
 const repositoryRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const sql = readFileSync(join(repositoryRoot, "database", "migrations", "202608270001_v2_authority_foundation.sql"), "utf8");
+const rolesRlsSql = readFileSync(join(repositoryRoot, "database", "migrations", "202609160001_private_roles_service_rls.sql"), "utf8");
 const forumRoute = readFileSync(join(repositoryRoot, "frontend", "src", "app", "api", "forum", "posts", "route.js"), "utf8");
 
 describe("PHASE 3 — migration and RLS contract", () => {
@@ -37,11 +38,18 @@ describe("PHASE 3 — migration and RLS contract", () => {
     assert.match(sql, /trust_cases_own[\s\S]*auth\.uid\(\) = owner_id/i);
   });
 
+  it("closes the private role-authority advisory with a service-only policy", () => {
+    assert.match(rolesRlsSql, /alter table private\.roles enable row level security/i);
+    assert.match(rolesRlsSql, /create policy roles_service_only[\s\S]*to service_role/i);
+    assert.match(rolesRlsSql, /revoke all on private\.roles from public, anon, authenticated/i);
+    assert.match(rolesRlsSql, /grant select, insert, update, delete on private\.roles to service_role/i);
+  });
+
   it("fails closed when durable PostgreSQL is not configured", () => {
     const previous = process.env.DATABASE_URL;
     delete process.env.DATABASE_URL;
     try {
-      assert.throws(() => getPostgresPool(), DatabaseUnavailableError);
+      assert.throws(() => getPostgresPool({ loadEnv: false }), DatabaseUnavailableError);
     } finally {
       if (previous === undefined) delete process.env.DATABASE_URL;
       else process.env.DATABASE_URL = previous;

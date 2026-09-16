@@ -140,9 +140,9 @@ export function CommunityIntelligenceStudioV2({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 md:p-10 font-sans selection:bg-emerald-500/30">
+    <div className="min-h-screen surface-abyss text-slate-100 p-6 md:p-10 font-sans selection:bg-emerald-500/30">
       {/* Header */}
-      <header className="max-w-7xl mx-auto mb-8 border-b border-slate-800/80 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <header className="max-w-7xl mx-auto mb-8 border-b border-white/10/80 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
@@ -162,7 +162,7 @@ export function CommunityIntelligenceStudioV2({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-mono text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
+        <div className="flex items-center gap-2 text-xs font-mono text-slate-400 surface-instrument/80 px-3 py-1.5 rounded-lg border border-white/10">
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
           <span>INVARIANT: COMMUNITY SIGNAL ≠ OFFICIAL AUTHORITY</span>
         </div>
@@ -171,7 +171,7 @@ export function CommunityIntelligenceStudioV2({
       {/* Main Container */}
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 border-b border-slate-800/60 pb-2 overflow-x-auto">
+        <div className="flex items-center gap-2 border-b border-white/10/60 pb-2 overflow-x-auto">
           {[
             { id: "REALITY_GAPS", label: "Official vs Reality Gaps", icon: AlertTriangle, badge: `${realityGaps.length}` },
             { id: "FRICTION_HEATMAP", label: "Operational Friction Graph", icon: Flame, badge: `${frictionSignals.length}` },
@@ -187,13 +187,13 @@ export function CommunityIntelligenceStudioV2({
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
                   active
                     ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 shadow-lg shadow-emerald-500/5"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-transparent"
+                    : "text-slate-400 hover:text-slate-200 hover:surface-paper border-transparent"
                 }`}
               >
                 <Icon className="w-4 h-4" />
                 <span>{tab.label}</span>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${
-                  active ? "bg-emerald-500/20 text-emerald-200" : "bg-slate-800 text-slate-400"
+                  active ? "bg-emerald-500/20 text-emerald-200" : "surface-paper text-slate-400"
                 }`}>
                   {tab.badge}
                 </span>
@@ -218,9 +218,9 @@ export function CommunityIntelligenceStudioV2({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {realityGaps.map((gap, idx) => (
-                <div key={idx} className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800/80 hover:border-slate-700 transition-all space-y-4">
+                <div key={idx} className="p-6 rounded-2xl surface-instrument hover:border-white/20 transition-all space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+                    <span className="text-xs font-mono px-2.5 py-1 rounded-md surface-paper text-slate-300 border border-white/20">
                       {gap.topic}
                     </span>
                     <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
@@ -233,7 +233,7 @@ export function CommunityIntelligenceStudioV2({
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 pt-2">
-                    <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/90 space-y-1">
+                    <div className="p-3.5 rounded-xl surface-abyss/80 border border-white/10/90 space-y-1">
                       <div className="text-[11px] uppercase tracking-wider text-slate-400 font-mono flex items-center gap-1.5">
                         <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
                         Mục tiêu Quy chế
@@ -242,7 +242,7 @@ export function CommunityIntelligenceStudioV2({
                       <div className="text-[10px] text-slate-400 font-mono truncate">{gap.officialCitation}</div>
                     </div>
 
-                    <div className="p-3.5 rounded-xl bg-slate-950/80 border border-amber-500/20 space-y-1">
+                    <div className="p-3.5 rounded-xl surface-abyss/80 border border-amber-500/20 space-y-1">
                       <div className="text-[11px] uppercase tracking-wider text-amber-400 font-mono flex items-center gap-1.5">
                         <Users className="w-3.5 h-3.5" />
                         Thực tế Sinh viên
@@ -252,7 +252,7 @@ export function CommunityIntelligenceStudioV2({
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/50 p-3 rounded-xl border border-slate-800/60">
+                  <p className="text-xs text-slate-300 leading-relaxed surface-abyss/50 p-3 rounded-xl border border-white/10/60">
                     {gap.explanation}
                   </p>
                 </div>
@@ -276,8 +276,8 @@ export function CommunityIntelligenceStudioV2({
             </div>
 
             {/* Heatmap Table */}
-            <div className="rounded-2xl bg-slate-900/90 border border-slate-800 overflow-hidden shadow-xl">
-              <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div className="rounded-2xl surface-instrument overflow-hidden shadow-xl">
+              <div className="p-4 border-b border-white/10 flex items-center justify-between">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-emerald-400" />
                   Ma Trận Điểm Nghẽn Vận Hành Theo Khóa (Friction Heatmap)
@@ -288,7 +288,7 @@ export function CommunityIntelligenceStudioV2({
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-mono">
+                    <tr className="surface-abyss/80 border-b border-white/10 text-slate-400 font-mono">
                       <th className="p-3.5 pl-5">Quy trình & Bước thực hiện</th>
                       {heatmap.columns.map(c => (
                         <th key={c} className="p-3.5 text-center font-bold">{c}</th>
@@ -298,14 +298,14 @@ export function CommunityIntelligenceStudioV2({
                   </thead>
                   <tbody className="divide-y divide-slate-800/60">
                     {heatmap.rows.map((row, rIdx) => (
-                      <tr key={rIdx} className="hover:bg-slate-800/30 transition-colors">
+                      <tr key={rIdx} className="hover:surface-paper/30 transition-colors">
                         <td className="p-3.5 pl-5">
                           <div className="font-semibold text-white">{row.processName}</div>
                           <div className="text-slate-400 text-[11px] font-mono">{row.stepName}</div>
                         </td>
                         {heatmap.columns.map(c => {
                           const cell = row.cohorts[c] || { count: 0, severity: "NONE" };
-                          let bg = "bg-slate-950 text-slate-600";
+                          let bg = "surface-abyss text-slate-600";
                           if (cell.severity === "CRITICAL") bg = "bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold";
                           else if (cell.severity === "HIGH") bg = "bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold";
                           else if (cell.severity === "MEDIUM") bg = "bg-yellow-500/15 text-yellow-300 border border-yellow-500/30";
@@ -345,26 +345,26 @@ export function CommunityIntelligenceStudioV2({
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div className="p-6 rounded-2xl surface-instrument space-y-4">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <span className="text-sm font-bold text-white">Mô hình Thu gọn Sao chép (Syndication Collapse)</span>
                 <span className="text-xs font-mono text-emerald-400">100 Bài viết → 4 Cụm nguồn → 2 Đồng thuận độc lập</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
-                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                <div className="p-4 rounded-xl surface-abyss border border-white/10 space-y-2">
                   <div className="text-slate-400">TỔNG BÀI ĐĂNG FORUM</div>
                   <div className="text-2xl font-bold text-white">100 Posts</div>
                   <div className="text-slate-500 text-[11px]">Bao gồm các bài share lại, trích dẫn, ảnh chụp màn hình</div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-950 border border-blue-500/30 space-y-2">
+                <div className="p-4 rounded-xl surface-abyss border border-blue-500/30 space-y-2">
                   <div className="text-blue-400">CỤM NGUỒN GỐC (PROVENANCE)</div>
                   <div className="text-2xl font-bold text-blue-300">4 Clusters</div>
                   <div className="text-slate-400 text-[11px]">Gom nhóm tự động qua SHA-256 fingerprint & URL lineage</div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-slate-950 border border-emerald-500/30 space-y-2">
+                <div className="p-4 rounded-xl surface-abyss border border-emerald-500/30 space-y-2">
                   <div className="text-emerald-400">ĐỒNG THUẬN ĐỘC LẬP THỰC TẾ</div>
                   <div className="text-2xl font-bold text-emerald-300">2 Independent Units</div>
                   <div className="text-slate-400 text-[11px]">Chỉ tính các sinh viên thực hiện quy trình độc lập</div>
@@ -377,7 +377,7 @@ export function CommunityIntelligenceStudioV2({
         {/* TAB 4: REALITY QUERY SANDBOX */}
         {selectedTab === "QUERY_SANDBOX" && (
           <div className="space-y-6">
-            <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-4">
+            <div className="p-6 rounded-2xl surface-instrument space-y-4">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <Search className="w-4 h-4 text-emerald-400" />
                 Truy Vấn Trải Nghiệm Thực Tế Sinh Viên (7 Canonical Modes)
@@ -389,7 +389,7 @@ export function CommunityIntelligenceStudioV2({
                   <select
                     value={selectedTopic}
                     onChange={e => setSelectedTopic(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500/50"
+                    className="w-full surface-abyss border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500/50"
                   >
                     {initialTopics.map(t => (
                       <option key={t} value={t}>{t}</option>
@@ -402,7 +402,7 @@ export function CommunityIntelligenceStudioV2({
                   <select
                     value={queryType}
                     onChange={e => setQueryType(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500/50"
+                    className="w-full surface-abyss border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500/50"
                   >
                     <option value="WHAT_STUDENTS_EXPERIENCING">1. Thực tế sinh viên đang trải nghiệm gì?</option>
                     <option value="RECURRING_PROBLEMS">2. Có vấn đề nào lặp lại nhiều lần không?</option>
@@ -426,8 +426,8 @@ export function CommunityIntelligenceStudioV2({
 
             {/* Query Output */}
             {queryResult && (
-              <div className="p-6 rounded-2xl bg-slate-900 border border-emerald-500/30 space-y-4 animate-in fade-in duration-300">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="p-6 rounded-2xl surface-instrument border border-emerald-500/30 space-y-4 animate-in fade-in duration-300">
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                     <span className="text-sm font-bold text-white font-mono">BÁO CÁO THỰC TẾ SINH VIÊN (COMMUNITY REALITY)</span>
@@ -438,7 +438,7 @@ export function CommunityIntelligenceStudioV2({
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                  <div className="p-4 rounded-xl surface-abyss border border-white/10 space-y-2">
                     <div className="text-slate-400 font-mono uppercase text-[10px]">Tín hiệu Trải nghiệm</div>
                     <div className="text-slate-200 font-medium">{queryResult.communityReality?.signalSummary}</div>
                     <div className="text-slate-500 font-mono text-[11px]">
@@ -446,14 +446,14 @@ export function CommunityIntelligenceStudioV2({
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                  <div className="p-4 rounded-xl surface-abyss border border-white/10 space-y-2">
                     <div className="text-slate-400 font-mono uppercase text-[10px]">So Sánh Quy Chế Chính Thức</div>
                     <div className="text-slate-200 font-medium">Mục tiêu: {queryResult.officialComparison?.officialTarget}</div>
                     <div className="text-amber-300 font-medium">Thực tế: {queryResult.officialComparison?.communityObserved}</div>
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs text-slate-400 space-y-1">
+                <div className="p-3.5 rounded-xl surface-abyss/60 border border-white/10/80 text-xs text-slate-400 space-y-1">
                   <div className="font-semibold text-slate-300 font-mono uppercase text-[10px]">Giới hạn Nhận thức (Epistemic Limitations)</div>
                   {queryResult.limitations?.map((lim, lIdx) => (
                     <div key={lIdx} className="flex items-center gap-1.5">

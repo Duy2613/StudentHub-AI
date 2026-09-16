@@ -65,7 +65,19 @@ export class PersonalizationEngine {
    * @returns {object} Explainable Command Center Context
    */
   static compileCommandCenterContext(subjectId, principal) {
-    const digitalTwin = PersonalDigitalTwin.buildDigitalTwin(subjectId);
+    let digitalTwin;
+    try {
+      digitalTwin = PersonalDigitalTwin.buildDigitalTwin(subjectId);
+    } catch (error) {
+      // Supabase Auth UUIDs are valid application principals but are not
+      // institutional MSSV values. Do not turn an unbound academic identity
+      // into a 500 or fabricate a student record; return an explicit empty
+      // contract so the UI can ask for academic binding/data connection.
+      if (/Invalid studentId format|Expected 7-10 digit MSSV/.test(String(error?.message || error))) {
+        return this.buildUnavailableContext(subjectId);
+      }
+      throw error;
+    }
     const persona = this.inferPersona(digitalTwin, principal);
     const preferences = this.getPreferences(subjectId);
 
@@ -189,6 +201,47 @@ export class PersonalizationEngine {
         sourceCount: 0,
         provenanceType: "SYNTHETIC_FIXTURE",
         sourceState: "SYNTHETIC_FIXTURE",
+        isAuthoritative: false,
+        privacyFilterActive: true
+      }
+    };
+  }
+
+  static buildUnavailableContext(subjectId) {
+    const cleanSubjectId = String(subjectId || "").trim();
+    return {
+      commandCenterId: createSecureId("cmd"),
+      compiledAt: new Date().toISOString(),
+      subjectId: cleanSubjectId,
+      sourceState: "UNAVAILABLE",
+      dataNotice: "Danh tính học vụ chưa được liên kết. StudentHub không tự dựng lịch, điểm số hoặc cảnh báo học tập.",
+      isAuthoritative: false,
+      persona: PERSONA_TYPE.STUDENT,
+      preferences: this.getPreferences(cleanSubjectId),
+      digitalTwinSummary: {
+        fullName: "Sinh viên",
+        studentId: null,
+        cgpa: null,
+        earnedCredits: null,
+        totalRequiredCredits: null,
+        completionPercentage: null,
+        academicStanding: "UNVERIFIED"
+      },
+      urgentPriorities: [],
+      todaySchedule: [],
+      nextBestAction: null,
+      personalizedExperts: [],
+      communitySignals: [],
+      provenance: {
+        type: "UNAVAILABLE",
+        sourceCount: 0,
+        isAuthoritative: false,
+        notice: "Chưa có hồ sơ học vụ được xác minh cho danh tính này."
+      },
+      explainability: {
+        sourceCount: 0,
+        provenanceType: "UNAVAILABLE",
+        sourceState: "UNAVAILABLE",
         isAuthoritative: false,
         privacyFilterActive: true
       }

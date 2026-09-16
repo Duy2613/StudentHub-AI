@@ -6,6 +6,7 @@ import {
   ChevronDown,
   GraduationCap,
   LoaderCircle,
+  Send,
   Printer,
   Users,
 } from "lucide-react";
@@ -82,7 +83,153 @@ function ExpertAssessmentList({ assessments }) {
   </div>;
 }
 
-export default function PostResultGateways({ onPrint, caseId = null, caseRevision = null, claimId = null }) {
+const REQUEST_STATUS_COPY = Object.freeze({
+  REQUESTED: "Đã tạo yêu cầu. Hệ thống sẽ matching/assignment theo eligibility ở server; bạn chưa chọn và chưa được gán chuyên gia.",
+  MATCHING: "Server đang matching theo domain và eligibility. Chưa có chuyên gia được gán.",
+  ASSIGNED: "Yêu cầu đã được server gán vào một assignment đủ điều kiện.",
+  IN_REVIEW: "Một expert assignment đang xem xét yêu cầu này.",
+  COMPLETED: "Yêu cầu đã hoàn tất; assessment bền vững sẽ xuất hiện ở kênh Expert nếu được công bố.",
+  CANCELLED: "Yêu cầu đã bị huỷ.",
+  EXPIRED: "Yêu cầu đã hết hạn và không còn được xử lý.",
+});
+
+function AskExpertPanel({ caseId, caseRevision, claimId, defaultDomainCode = "" }) {
+  const [question, setQuestion] = useState("");
+  const [domainCode, setDomainCode] = useState(defaultDomainCode || "");
+  const [contextRefs, setContextRefs] = useState("");
+  const [requests, setRequests] = useState([]);
+  const [state, setState] = useState("IDLE");
+  const [error, setError] = useState("");
+  const controller = useRef(null);
+  const idempotencyKey = useRef("");
+  const scopeReady = validScope(caseId, caseRevision);
+  const scopeKey = `${caseId || ""}:${caseRevision || ""}:${claimId || ""}`;
+
+  useEffect(() => {
+    setDomainCode(defaultDomainCode || "");
+  }, [defaultDomainCode]);
+
+  useEffect(() => {
+    controller.current?.abort("review-request-scope-changed");
+    idempotencyKey.current = "";
+    setRequests([]);
+    setError("");
+    setState(scopeReady ? "LOADING" : "UNKNOWN");
+    if (!scopeReady) return undefined;
+    const nextController = new AbortController();
+    controller.current = nextController;
+    const requestId = createSecureId("trust-expert-requests-read");
+    apiRequest(`/api/expert/review-requests?caseId=${encodeURIComponent(caseId)}&limit=10`, { signal: nextController.signal, requestId })
+      .then((payload) => {
+        if (nextController.signal.aborted) return;
+        const data = Array.isArray(payload?.data) ? payload.data : [];
+        setRequests(data);
+        setState(data.length ? String(data[0].status || "REQUESTED") : "IDLE");
+      })
+      .catch((caught) => {
+        if (nextController.signal.aborted || (caught instanceof ApiError && caught.code === "ABORTED")) return;
+        setError(errorMessage(caught));
+        setState("ERROR");
+      });
+    return () => nextController.abort("review-request-panel-unmounted");
+  }, [caseId, caseRevision, scopeKey, scopeReady]);
+
+  const submit = async (event) => {
+    event.preventDefault();
+    const trimmedQuestion = question.trim();
+    const trimmedDomain = domainCode.trim();
+    if (!scopeReady) {
+      setState("UNKNOWN");
+      setError("Kết quả Trust chưa có case ID/revision bền vững để tạo yêu cầu.");
+      return;
+    }
+    if (trimmedQuestion.length < 20 || trimmedQuestion.length > 4000) {
+      setState("VALIDATION");
+      setError("Câu hỏi cần từ 20 đến 4000 ký tự.");
+      return;
+    }
+    if (!trimmedDomain) {
+      setState("VALIDATION");
+      setError("Hãy nhập domain/category cần expert xem xét.");
+      return;
+    }
+    const parsedContextRefs = contextRefs.split(",").map((value) => value.trim()).filter(Boolean);
+    setState("SUBMITTING");
+    setError("");
+    const stableKey = idempotencyKey.current || createSecureId("expert-review-request");
+    idempotencyKey.current = stableKey;
+    try {
+      const payload = await apiRequest("/api/expert/review-requests", {
+        method: "POST",
+        requestId: createSecureId("trust-expert-request-submit"),
+        headers: { "Idempotency-Key": stableKey },
+        body: JSON.stringify({
+          caseId,
+          caseRevision,
+          claimId: claimId || null,
+          domainCode: trimmedDomain,
+          question: trimmedQuestion,
+          contextRefs: parsedContextRefs,
+        }),
+      });
+      const created = payload?.data;
+      if (created) setRequests((current) => [created, ...current.filter((item) => item.id !== created.id)].slice(0, 10));
+      setState(String(created?.status || "REQUESTED"));
+      setQuestion("");
+    } catch (caught) {
+      setError(errorMessage(caught));
+      setState(caught instanceof ApiError && caught.code === "CONFLICT" ? "CONFLICT" : "ERROR");
+    }
+  };
+
+  return <section id="trust-ask-expert" className="p-6 rounded-2xl border border-purple-400/20 bg-purple-500/[0.04] backdrop-blur-md" aria-labelledby="trust-ask-expert-title">
+    <div className="flex items-start justify-between gap-4 flex-wrap mb-5">
+      <div className="flex items-start gap-3">
+        <span className="p-2 rounded-lg bg-purple-500/10 text-purple-300"><Send size={18} /></span>
+        <div>
+          <p className="product-kicker">Trust → Expert handoff</p>
+          <h3 id="trust-ask-expert-title" className="type-product-heading text-base text-slate-100">Yêu cầu chuyên gia xem xét</h3>
+          <p className="text-xs text-slate-400 mt-1 max-w-2xl">Bạn tạo một yêu cầu có scope. Server mới quyết định matching và assignment; bạn không chọn chuyên gia và không tạo được quyền DOMAIN_VERIFIED.</p>
+        </div>
+      </div>
+      {claimId && <span className="metadata-chip">Claim đã chọn: {String(claimId).slice(0, 8)}…</span>}
+    </div>
+    {!scopeReady && <ChannelState state="UNKNOWN" message="Kết quả Trust chưa có case ID và revision bền vững để nối yêu cầu chuyên gia." />}
+    {scopeReady && <form onSubmit={submit} className="space-y-4">
+      <div>
+        <label htmlFor="trust-expert-question" className="text-xs font-semibold text-slate-200">Câu hỏi / mối quan tâm</label>
+        <textarea id="trust-expert-question" value={question} onChange={(event) => setQuestion(event.target.value)} minLength={20} maxLength={4000} rows={4} className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-3 py-3 text-sm text-slate-100 outline-none focus:border-purple-400/60" placeholder="Tôi muốn expert kiểm tra điểm nào trong kết quả Trust này?" />
+        <p className="text-[11px] text-slate-500 mt-1">{question.length}/4000 · tối thiểu 20 ký tự</p>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <label htmlFor="trust-expert-domain" className="text-xs font-semibold text-slate-200">Domain / category</label>
+          <input id="trust-expert-domain" value={domainCode} onChange={(event) => setDomainCode(event.target.value)} maxLength={80} className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-purple-400/60" placeholder="Ví dụ: CYBERSECURITY" />
+        </div>
+        <div>
+          <label htmlFor="trust-expert-context" className="text-xs font-semibold text-slate-200">Evidence/context refs (tuỳ chọn)</label>
+          <input id="trust-expert-context" value={contextRefs} onChange={(event) => setContextRefs(event.target.value)} className="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-slate-100 outline-none focus:border-purple-400/60" placeholder="UUID, UUID" />
+        </div>
+      </div>
+      <div className="flex items-center gap-3 flex-wrap">
+        <button type="submit" disabled={state === "SUBMITTING"} className="inline-flex items-center gap-2 rounded-xl bg-purple-500/20 px-4 py-2.5 text-sm font-semibold text-purple-100 border border-purple-300/20 disabled:opacity-50">
+          {state === "SUBMITTING" ? <LoaderCircle size={16} className="animate-spin" /> : <Send size={16} />}
+          Tạo yêu cầu
+        </button>
+        {state === "LOADING" && <ChannelState state="LOADING" />}
+        {state === "ERROR" && <span className="text-xs text-rose-300" role="alert">{error}</span>}
+        {state === "VALIDATION" && <span className="text-xs text-amber-300" role="alert">{error}</span>}
+        {state === "CONFLICT" && <span className="text-xs text-amber-300" role="alert">{error || "Đã có một yêu cầu đang hoạt động cho scope này."}</span>}
+      </div>
+    </form>}
+    {state !== "IDLE" && REQUEST_STATUS_COPY[state] && <div className="mt-4 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-xs text-slate-300" role="status">{REQUEST_STATUS_COPY[state]}</div>}
+    {requests.length > 0 && <div className="mt-5 space-y-2" aria-label="Các yêu cầu chuyên gia của case này">
+      {requests.slice(0, 3).map((request) => <div key={request.id} className="flex items-start justify-between gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2.5 text-xs"><span className="text-slate-300">{request.question}</span><span className="shrink-0 text-purple-200">{request.status}</span></div>)}
+    </div>}
+  </section>;
+}
+
+export default function PostResultGateways({ onPrint, caseId = null, caseRevision = null, claimId = null, domainCode = "" }) {
   const [activeChannel, setActiveChannel] = useState(null);
   const [channelData, setChannelData] = useState({ community: null, expert: null });
   const [channelState, setChannelState] = useState({ community: "IDLE", expert: "IDLE" });
@@ -146,7 +293,7 @@ export default function PostResultGateways({ onPrint, caseId = null, caseRevisio
 
   const toggleChannel = (channel) => {
     setActiveChannel((current) => current === channel ? null : channel);
-    if (activeChannel !== channel) void loadChannel(channel);
+    if (activeChannel !== channel && channel !== "request") void loadChannel(channel);
   };
   const communitySignals = channelData.community?.scopeKey === scopeKey ? channelData.community.signals : [];
   const expertAssessments = channelData.expert?.scopeKey === scopeKey ? channelData.expert.assessments : [];
@@ -163,11 +310,18 @@ export default function PostResultGateways({ onPrint, caseId = null, caseRevisio
         <span>{channelState.expert === "SUCCESS" ? `Xem expert assessment liên quan (${expertAssessments.length})` : "Xem expert assessment liên quan"}</span>
         <ChevronDown size={14} className={`transition-transform duration-200 ${activeChannel === "expert" ? "rotate-180" : ""}`} />
       </button>
+      <button type="button" onClick={() => toggleChannel("request")} className={`post-result-pill ${activeChannel === "request" ? "is-active" : ""}`} aria-expanded={activeChannel === "request"} aria-controls="trust-ask-expert">
+        <Send size={16} className="text-purple-300" />
+        <span>Yêu cầu chuyên gia xem xét</span>
+        <ChevronDown size={14} className={`transition-transform duration-200 ${activeChannel === "request" ? "rotate-180" : ""}`} />
+      </button>
       <button type="button" onClick={onPrint || (() => window.print())} className="post-result-pill" aria-label="In báo cáo Trust dạng PDF">
         <Printer size={15} />
         <span>In báo cáo Trust PDF</span>
       </button>
     </div>
+
+    {activeChannel === "request" && <AskExpertPanel caseId={caseId} caseRevision={caseRevision} claimId={claimId} defaultDomainCode={domainCode} />}
 
     {activeChannel === "community" && <div id="trust-community-gateway" className="p-6 rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-300">
       <div className="flex items-center justify-between mb-4 gap-3 flex-wrap"><div className="flex items-center gap-2"><span className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400"><Users size={18} /></span><div><h3 className="type-product-heading text-sm text-slate-100">Cộng đồng · tín hiệu gắn với case</h3><p className="text-xs text-slate-400">Đọc từ contribution đã publish đúng case revision. Tín hiệu này không tự thay đổi Trust verdict.</p></div></div><Link href={communityLink} className="text-xs text-cyan-400 hover:text-cyan-300 font-medium inline-flex items-center gap-1">Mở Community <ArrowRight size={13} /></Link></div>

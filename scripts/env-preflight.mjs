@@ -65,6 +65,11 @@ function checkVar(name, { required = false, isUrl = false, formatRegex = null } 
   return "CONFIGURED";
 }
 
+function checkAnyVar(names, options = {}) {
+  const selected = names.find((name) => process.env[name] !== undefined && process.env[name] !== "");
+  return selected ? checkVar(selected, options) : (options.required ? "MISSING" : "OPTIONAL");
+}
+
 // Check custom model
 function checkCustomModel() {
   const modelRegistryPath = join(rootDir, "ai", "models", "model_registry.json");
@@ -89,6 +94,9 @@ const categories = {
     { name: "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", status: checkVar("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY") },
     { name: "NEXT_PUBLIC_SUPABASE_EMAIL_PASSWORD_AUTH", status: checkVar("NEXT_PUBLIC_SUPABASE_EMAIL_PASSWORD_AUTH") },
     { name: "NEXT_PUBLIC_SUPABASE_GOOGLE_AUTH", status: checkVar("NEXT_PUBLIC_SUPABASE_GOOGLE_AUTH") },
+    { name: "NEXT_PUBLIC_SUPABASE_GOOGLE_AUTH_VERIFIED", status: checkVar("NEXT_PUBLIC_SUPABASE_GOOGLE_AUTH_VERIFIED") },
+    { name: "NEXT_PUBLIC_SUPABASE_GITHUB_AUTH", status: checkVar("NEXT_PUBLIC_SUPABASE_GITHUB_AUTH") },
+    { name: "NEXT_PUBLIC_SUPABASE_AUTH_REDIRECT_URL", status: checkVar("NEXT_PUBLIC_SUPABASE_AUTH_REDIRECT_URL", { isUrl: true }) },
   ],
   "SUPABASE SERVER": [
     { name: "SUPABASE_URL", status: process.env.SUPABASE_URL ? checkVar("SUPABASE_URL", { isUrl: true }) : checkVar("NEXT_PUBLIC_SUPABASE_URL", { isUrl: true }) },
@@ -108,13 +116,13 @@ const categories = {
     { name: "STUDENTHUB_SCREENSHOT_STORAGE_BUCKET", status: checkVar("STUDENTHUB_SCREENSHOT_STORAGE_BUCKET") },
     { name: "STUDENTHUB_READINESS_REQUIRE_SCREENSHOT_STORAGE", status: checkVar("STUDENTHUB_READINESS_REQUIRE_SCREENSHOT_STORAGE") },
   ],
-  "OPENAI": [
-    { name: "OPENAI_API_KEY", status: checkVar("OPENAI_API_KEY", { required: false }) },
-    { name: "OPENAI_BASE_URL", status: checkVar("OPENAI_BASE_URL", { isUrl: true, required: false }) },
-    { name: "OPENAI_MODEL", status: checkVar("OPENAI_MODEL", { required: false }) },
+  "AI RUNTIME": [
+    { name: "ACTIVE_PROVIDER", status: "GEMINI" },
+    { name: "OPENAI_RUNTIME", status: "DISABLED_INTENTIONALLY" },
+    { name: "OPENAI_API_KEY (compatibility only)", status: "DISABLED" },
   ],
   "GEMINI": [
-    { name: "GEMINI_API_KEY", status: checkVar("GEMINI_API_KEY", { required: false }) },
+    { name: "GEMINI_API_KEY (canonical) / GEMINI_KEY_1 (legacy)", status: checkAnyVar(["GEMINI_API_KEY", "GEMINI_KEY_1"], { required: true }) },
     { name: "GEMINI_MODEL", status: checkVar("GEMINI_MODEL", { required: false }) },
   ],
   "OTHER AI PROVIDERS": [

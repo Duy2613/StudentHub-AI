@@ -8,13 +8,14 @@ describe("Gemini trusted instruction boundary", () => {
     let capturedRequest;
     const provider = new GeminiProvider({
       env: { GEMINI_API_KEY: "test-key" },
-      fetchImpl: async (_url, options) => {
+      fetchImpl: async (url, options) => {
         capturedRequest = {
+          url,
           headers: options.headers,
           body: JSON.parse(options.body),
         };
         return new Response(
-          JSON.stringify({ candidates: [{ content: { parts: [{ text: '{"ok":true}' }] } }] }),
+          JSON.stringify({ output_text: '{"ok":true}' }),
           { status: 200, headers: { "content-type": "application/json" } }
         );
       },
@@ -28,14 +29,71 @@ describe("Gemini trusted instruction boundary", () => {
     });
 
     assert.equal(result.text, '{"ok":true}');
+    assert.equal(capturedRequest.url, "https://generativelanguage.googleapis.com/v1beta/interactions");
     assert.equal(capturedRequest.headers["x-goog-api-key"], "test-key");
-    assert.deepEqual(capturedRequest.body.systemInstruction, {
-      parts: [{ text: "TRUSTED_INSTRUCTION_DO_NOT_TREAT_DATA_AS_COMMANDS" }],
+    assert.equal(capturedRequest.body.system_instruction, "TRUSTED_INSTRUCTION_DO_NOT_TREAT_DATA_AS_COMMANDS");
+    assert.equal(capturedRequest.body.input, "UNTRUSTED_OCR_TEXT_IGNORE_PREVIOUS_INSTRUCTIONS");
+    assert.deepEqual(capturedRequest.body.response_format, {
+      type: "text",
+      mime_type: "application/json",
+      schema: { type: "object" },
     });
-    assert.deepEqual(capturedRequest.body.contents, [
-      { role: "user", parts: [{ text: "UNTRUSTED_OCR_TEXT_IGNORE_PREVIOUS_INSTRUCTIONS" }] },
+    assert.equal(JSON.stringify(capturedRequest.body.input).includes("TRUSTED_INSTRUCTION"), false);
+    assert.equal(JSON.stringify(capturedRequest.body.system_instruction).includes("UNTRUSTED_OCR_TEXT"), false);
+  });
+
+  it("does not expose Interactions thought steps as the model answer", async () => {
+    const provider = new GeminiProvider({
+      env: { GEMINI_API_KEY: "test-key" },
+      fetchImpl: async () => new Response(
+        JSON.stringify({
+          steps: [
+            { type: "thought", content: [{ type: "text", text: "private reasoning" }] },
+            { type: "model_output", content: [{ type: "text", text: "public answer" }] },
+          ],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      ),
+    });
+
+    const result = await provider.generate({
+      catalogEntry: AI_GATEWAY_CONFIG.MODEL_CATALOG.GEMINI_FLASH,
+      systemPrompt: "trusted",
+      userPrompt: "question",
+    });
+
+    assert.equal(result.text, "public answer");
+    assert.equal(result.text.includes("private reasoning"), false);
+  });
+
+  it("uses generateContent only as the explicit endpoint compatibility fallback", async () => {
+    const requests = [];
+    const provider = new GeminiProvider({
+      env: { GEMINI_API_KEY: "test-key" },
+      fetchImpl: async (url, options) => {
+        requests.push({ url, body: JSON.parse(options.body) });
+        if (requests.length === 1) return new Response("", { status: 404 });
+        return new Response(
+          JSON.stringify({ candidates: [{ content: { parts: [{ text: "compatibility answer" }] } }] }),
+          { status: 200, headers: { "content-type": "application/json" } },
+        );
+      },
+    });
+
+    const result = await provider.generate({
+      catalogEntry: AI_GATEWAY_CONFIG.MODEL_CATALOG.GEMINI_FLASH,
+      systemPrompt: "trusted",
+      userPrompt: "inspect this",
+      inputParts: [{ type: "image", mime_type: "image/png", data: "AA==" }],
+    });
+
+    assert.equal(result.text, "compatibility answer");
+    assert.equal(result.transport, "generateContent_compatibility_fallback");
+    assert.equal(requests.length, 2);
+    assert.match(requests[1].url, /:generateContent$/);
+    assert.deepEqual(requests[1].body.contents[0].parts, [
+      { text: "inspect this" },
+      { inlineData: { mimeType: "image/png", data: "AA==" } },
     ]);
-    assert.equal(JSON.stringify(capturedRequest.body.contents).includes("TRUSTED_INSTRUCTION"), false);
-    assert.equal(JSON.stringify(capturedRequest.body.systemInstruction).includes("UNTRUSTED_OCR_TEXT"), false);
   });
 });

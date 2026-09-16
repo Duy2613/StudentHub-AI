@@ -69,10 +69,10 @@ export const MASTER_ULTRA_LAYERS = Object.freeze([
   Object.freeze({
     id: "l4",
     code: "04",
-    shortName: "Multi-AI",
-    name: "Multi-AI Verification",
-    question: "How do multiple analytical paths interpret the same evidence?",
-    questionVi: "Các đường phân tích độc lập đọc cùng bằng chứng ra sao?",
+    shortName: "AI",
+    name: "AI Verification",
+    question: "How does Gemini interpret the evidence without owning the decision?",
+    questionVi: "Gemini đọc bằng chứng ra sao mà không nắm quyền quyết định?",
     internalStageIds: Object.freeze(["l4"]),
     tone: "violet",
   }),
@@ -282,12 +282,14 @@ function providerRecords({ layers, canonicalResult, pipeline }) {
   const layer3 = record(layers?.layer3);
   const layer4 = record(layers?.layer4);
   const stage4 = record(stageMap(pipeline).l4);
+  const aiVerification = record(layer4.aiVerification || canonical.aiVerification || stage4.rawMetadata?.aiVerification);
   const candidates = [
     ...list(layer3.providerResults),
     ...list(canonical.providerObservations),
     ...list(layer4.providerResults),
     layer2A.provider || layer2A.providerId ? layer2A : null,
     stage4.providerId || stage4.modelId ? stage4 : null,
+    Object.keys(aiVerification).length ? aiVerification : null,
   ];
   return candidates
     .map((item) => {
@@ -462,15 +464,20 @@ export function normalizeMasterUltraRun({
       streams: analysisStreams,
       providers: resolvedProviders,
       sequentialSignals,
+      aiVerification: layers.layer4?.aiVerification || canonical.aiVerification || stages.l4?.rawMetadata?.aiVerification || null,
+      aiVerificationStatus: layers.layer4?.aiVerificationStatus || canonical.aiVerificationStatus || stages.l4?.rawMetadata?.aiVerificationStatus || "NOT_REQUESTED",
+      aiVerificationTransport: layers.layer4?.aiVerificationTransport || stages.l4?.rawMetadata?.aiVerificationTransport || null,
+      aiVerificationThinkingLevel: layers.layer4?.aiVerificationThinkingLevel || stages.l4?.rawMetadata?.aiVerificationThinkingLevel || null,
+      aiVerificationLatencyMs: layers.layer4?.aiVerificationLatencyMs ?? stages.l4?.rawMetadata?.aiVerificationLatencyMs ?? null,
       agreement: firstText(canonical.metrics?.evidenceAgreement, decision.evidenceAgreement, decision.agreement, sourceAgreement),
       operationStatus: stageStatus(stages.l4),
       operations: [
         { id: "research", label: "Additional research", available: Boolean(sources.length || canonical.additionalResearch || layers.layer4?.additionalResearch) },
         { id: "comparison", label: "Evidence comparison", available: Boolean(sources.length || buckets.relationships.length || canonical.evidenceComparison) },
         { id: "quality", label: "Source quality evaluation", available: Boolean(sources.some((source) => source.sourceType || source.contentHash) || canonical.sourceQuality) },
-        { id: "ai", label: "AI verification", available: Boolean(analysisStreams.length || stageStatus(stages.l4) === "COMPLETE") },
+        { id: "ai", label: "Gemini verification", available: Boolean(layers.layer4?.aiVerification || canonical.aiVerification || analysisStreams.length || stageStatus(stages.l4) === "COMPLETE") },
       ],
-      metricLabel: analysisStreams.length ? `${analysisStreams.length} analysis stream${analysisStreams.length === 1 ? "" : "s"}` : null,
+      metricLabel: layers.layer4?.aiVerificationStatus === "UNAVAILABLE" ? "AI verification unavailable" : analysisStreams.length ? `${analysisStreams.length} analysis stream${analysisStreams.length === 1 ? "" : "s"}` : null,
     },
     l5: {
       ...layerSummary("l5", { layers, pipeline, presentation }),

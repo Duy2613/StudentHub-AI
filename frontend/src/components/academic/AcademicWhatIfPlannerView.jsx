@@ -275,13 +275,13 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
           <div className="flex items-center gap-3">
             <Link
               href="/academic/execution"
-              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-200 transition-all shadow-sm"
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:surface-paper/80 text-xs font-bold text-slate-200 transition-all shadow-sm"
             >
               📊 Theo Dõi Thực Thi
             </Link>
             <Link
               href="/academic/roadmap"
-              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-slate-200 transition-all shadow-sm"
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:surface-paper/80 text-xs font-bold text-slate-200 transition-all shadow-sm"
             >
               🗺️ Xem Lộ Trình Học Vụ
             </Link>
@@ -289,7 +289,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
         </div>
 
         {/* Tab Selector: SEMESTER PLANNER vs DECISION STUDIO vs WHAT-IF SANDBOX */}
-        <div className="flex items-center gap-2 p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl max-w-xl">
+        <div className="flex items-center gap-2 p-1.5 surface-instrument rounded-2xl max-w-xl">
           <button
             onClick={() => setActiveTab("PLANNER")}
             className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
@@ -329,7 +329,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
           <div className="space-y-8">
             
             {/* Term Picker Header */}
-            <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="p-6 rounded-2xl surface-instrument backdrop-blur-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="space-y-1">
                 <div className="text-xs font-bold uppercase tracking-wider text-emerald-400">
                   Mục Tiêu Học Kỳ Dự Kiến
@@ -366,7 +366,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
 
             {/* Loading Skeleton */}
             {isPlannerLoading && (
-              <div className="p-12 text-center rounded-2xl bg-slate-900/40 border border-slate-800 animate-pulse text-slate-400 text-sm">
+              <div className="p-12 text-center rounded-2xl surface-instrument animate-pulse text-slate-400 text-sm">
                 Đang giải bài toán ràng buộc tiên quyết và xây dựng các phương án học kỳ tối ưu...
               </div>
             )}
@@ -449,7 +449,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
 
                 {/* Selected Plan In-Depth Analysis */}
                 {currentPlan && (
-                  <div className="p-8 rounded-3xl bg-slate-900/90 border border-slate-800/90 backdrop-blur-2xl space-y-8">
+                  <div className="p-8 rounded-3xl surface-instrument backdrop-blur-2xl space-y-8">
                     
                     {/* Header Details */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
@@ -521,7 +521,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
                                 <div>
                                   <div className="flex items-center gap-2">
                                     <span className="font-mono font-bold text-xs text-emerald-400">{c.code}</span>
-                                    <span className="text-xs px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400 font-mono text-[10px]">
+                                    <span className="text-xs px-2 py-0.5 rounded surface-instrument text-slate-400 font-mono text-[10px]">
                                       {c.credits} Tín chỉ
                                     </span>
                                   </div>
@@ -623,7 +623,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
                           <div className="pt-2 border-t border-slate-800/80 flex flex-col gap-2">
                             <Link
                               href="/academic"
-                              className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-bold text-center text-slate-200 transition-all"
+                              className="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:surface-paper/80 text-xs font-bold text-center text-slate-200 transition-all"
                             >
                               ⚡ Xem Quy Trình Tại Command Center
                             </Link>
@@ -646,7 +646,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
           <div className="space-y-8">
             
             {/* Preference Selector Bar */}
-            <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl space-y-4">
+            <div className="p-6 rounded-3xl surface-instrument backdrop-blur-xl space-y-4">
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-emerald-400">
                   Ưu Tiên Học Tập Cá Nhân
@@ -715,7 +715,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
 
             {/* Side-by-Side Comparison Matrix Table */}
             {decisionData?.plans && (
-              <div className="p-6 md:p-8 rounded-3xl bg-slate-900/90 border border-slate-800/90 backdrop-blur-xl space-y-6 overflow-hidden">
+              <div className="p-6 md:p-8 rounded-3xl surface-instrument backdrop-blur-xl space-y-6 overflow-hidden">
                 <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
                   <div>
                     <h3 className="text-base font-bold text-white">Bảng So Sánh Đối Ứng Các Phương Án (Decision Matrix)</h3>
@@ -817,7 +817,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
                   {decisionData.tradeOffs.map((to, i) => (
                     <div
                       key={i}
-                      className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl space-y-4"
+                      className="p-6 rounded-3xl surface-instrument backdrop-blur-xl space-y-4"
                     >
                       <h4 className="text-sm font-black text-white flex items-center gap-2">
                         <span>⚖️</span>
@@ -864,7 +864,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
                   <button
                     key={preset.id}
                     onClick={() => handleRunSimulation(preset.operations)}
-                    className="p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-emerald-500/40 text-left transition-all group"
+                    className="p-4 rounded-2xl bg-slate-900/60 hover:surface-instrument hover:border-emerald-500/40 text-left transition-all group"
                   >
                     <div className="font-bold text-sm text-slate-100 group-hover:text-emerald-400 transition-colors">
                       {preset.title}
@@ -882,7 +882,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
               
               {/* Left Column: Sandbox Controls (5 cols) */}
               <div className="lg:col-span-5 space-y-6">
-                <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl space-y-6">
+                <div className="p-6 rounded-3xl surface-instrument backdrop-blur-xl space-y-6">
                   
                   <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
                     <div>
@@ -998,7 +998,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
                 
                 {/* Result Card or Placeholder */}
                 {simulationResult ? (
-                  <div className="p-6 md:p-8 rounded-3xl bg-slate-900/90 border border-slate-800/90 backdrop-blur-xl space-y-6">
+                  <div className="p-6 md:p-8 rounded-3xl surface-instrument backdrop-blur-xl space-y-6">
                     
                     <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
                       <div>
@@ -1097,7 +1097,7 @@ export function AcademicWhatIfPlannerView({ initialData = null }) {
 
                   </div>
                 ) : (
-                  <div className="p-12 rounded-3xl bg-slate-900/40 border border-slate-800/60 text-center space-y-4">
+                  <div className="p-12 rounded-3xl surface-instrument text-center space-y-4">
                     <div className="text-4xl">🔮</div>
                     <h3 className="text-base font-bold text-white">Chưa Có Kịch Bản Mô Phỏng</h3>
                     <p className="text-xs text-slate-400 max-w-md mx-auto">

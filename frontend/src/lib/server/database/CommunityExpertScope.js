@@ -31,6 +31,27 @@ export async function assertCaseScope(client, { actorId, caseId, caseRevision, c
   return record;
 }
 
+/**
+ * A Trust result may be public for read-only Community/Expert projections,
+ * but creating an Expert review request is an owner action.  Keep that
+ * distinction explicit so a user cannot open a request against somebody
+ * else's public case by replaying a caseId from the browser.
+ */
+export async function assertOwnedCaseScope(client, { actorId, caseId, caseRevision, claimId, evidenceRevisionIds = [] }) {
+  const record = await assertCaseScope(client, {
+    actorId,
+    caseId,
+    caseRevision,
+    claimId,
+    evidenceRevisionIds,
+    publicOnly: false,
+  });
+  if (String(record.owner_id || "").toLowerCase() !== String(actorId || "").toLowerCase()) {
+    throw scopeError("CASE_OWNER_REQUIRED", 403);
+  }
+  return record;
+}
+
 export async function assertCoordinator(client, actorId, subjectId) {
   if (!actorId || String(actorId).toLowerCase() === String(subjectId || '').toLowerCase()) throw scopeError('INDEPENDENT_COORDINATOR_REQUIRED', 403);
   const role = await client.query(`SELECT 1 FROM private.user_roles ur JOIN private.roles r ON r.id=ur.role_id WHERE ur.user_id=$1 AND ur.revoked_at IS NULL AND r.code='ADMIN'`, [actorId]);

@@ -10,6 +10,7 @@ import {
   Globe2,
   ImageIcon,
   Lock,
+  RefreshCw,
   ScanSearch,
   ShieldCheck,
   Sparkles,
@@ -19,11 +20,26 @@ import VerifiedPoster from "@/components/media/VerifiedPoster";
 import ReferenceBirdStamp from "@/components/media/ReferenceBirdStamp";
 import { markAssurance } from "@/lib/performance/assurance";
 import ContractCheckIntakeTab from "./ContractCheckIntakeTab";
+import { motion } from "framer-motion";
 
 const MODES = ["image", "qr", "text", "url", "contract"];
 
 export function TrustCriticalHero({ provenance }) {
   const liveProvenance = provenance;
+  const [activeMediaKey, setActiveMediaKey] = useState("optic");
+
+  const mediaConfig =
+    activeMediaKey === "optic"
+      ? {
+          video: "/media/studenthub-vnext/video/trust-refraction-inspection-desktop.mp4",
+          poster: "/media/studenthub-vnext/posters/trust-refraction-inspection-desktop.webp",
+          label: "OPTIC INSPECTION",
+        }
+      : {
+          video: "/media/studenthub-vnext/video/trust-result-prism-desktop.mp4",
+          poster: "/media/studenthub-vnext/posters/trust-result-prism-desktop.webp",
+          label: "PRISM SPECIMEN",
+        };
 
   return (
     <header className="product-hero vnext-trust-hero swiss-crosshair-card relative overflow-hidden">
@@ -39,16 +55,16 @@ export function TrustCriticalHero({ provenance }) {
         <div className="vnext-trust-telemetry">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold tracking-wider">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_#34d399]" />
-            SERVER PIPELINE STATUS
+            TRUST ENGINE
           </span>
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-slate-300 font-mono text-xs">
-            <Activity size={12} className="text-cyan-400" /> {provenance?.latencyMs != null ? `${provenance.latencyMs}ms LATENCY` : "LATENCY: 240ms"}
+            <Activity size={12} className="text-cyan-400" /> {provenance?.sourceMode === "LIVE" ? "NGUỒN LIVE" : provenance?.sourceMode === "DEMO" ? "DEMO ĐƯỢC GẮN NHÃN" : "ĐANG CHỜ NGUỒN"}
           </span>
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-slate-300 font-mono text-xs">
-            <Lock size={12} className="text-purple-400" /> ZERO-TRUST AUDIT
+            <Lock size={12} className="text-purple-400" /> BẢO VỆ DỮ LIỆU
           </span>
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-xs">
-            <Sparkles size={12} /> MULTI-MODAL OCR & QR
+            <Sparkles size={12} /> ẢNH · QR · VĂN BẢN
           </span>
         </div>
 
@@ -80,7 +96,7 @@ export function TrustCriticalHero({ provenance }) {
             <span className="vnext-trust-pillar-mark font-mono text-cyan-400">03</span>
             <div>
               <strong className="text-slate-100">Chuyên gia</strong>
-              <small className="text-slate-400">Thẩm định giá trị pháp lý</small>
+              <small className="text-slate-400">Phản biện theo domain xác minh</small>
             </div>
           </div>
         </div>
@@ -88,13 +104,60 @@ export function TrustCriticalHero({ provenance }) {
         <SourceDisclosure provenance={liveProvenance} sourceMode={liveProvenance?.sourceMode || "UNAVAILABLE"} />
       </div>
 
-      <div className="hero-seal vnext-trust-seal relative z-10">
-        <div className="vnext-trust-seal-icon">
-          <ShieldCheck size={32} className="text-cyan-400" />
+      <div className="hero-seal vnext-trust-seal relative z-10 group overflow-hidden">
+        {/* Dynamic Animated Media Visual Layer */}
+        <div className="vnext-trust-seal-media" aria-hidden="true">
+          <video
+            key={mediaConfig.video}
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster={mediaConfig.poster}
+            src={mediaConfig.video}
+            className="vnext-trust-seal-video"
+          />
+          <div className="vnext-trust-seal-vignette" />
+          <div className="vnext-trust-seal-scanbeam" />
         </div>
-        <span className="vnext-trust-seal-label type-micro-label-v3 text-cyan-300">TRUST ENGINE</span>
-        <strong className="text-slate-100">Evidence first</strong>
-        <span className="vnext-trust-seal-note text-slate-400">Không có verdict nếu chưa đủ bằng chứng</span>
+
+        {/* Top HUD Telemetry */}
+        <div className="relative z-10 flex items-center justify-between w-full">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-950/80 border border-emerald-500/30 text-[10px] font-mono text-emerald-300 backdrop-blur-md shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            {mediaConfig.label}
+          </span>
+          <button
+            type="button"
+            onClick={() => setActiveMediaKey((k) => (k === "optic" ? "prism" : "optic"))}
+            title="Đổi hiệu ứng ảnh động quang học"
+            className="inline-flex items-center gap-1 text-[10px] font-mono text-cyan-300/90 hover:text-cyan-100 tracking-wider uppercase bg-slate-950/80 hover:bg-cyan-950/80 px-2.5 py-1 rounded-full border border-cyan-500/30 hover:border-cyan-400 backdrop-blur-md transition-all cursor-pointer shadow-sm"
+          >
+            <RefreshCw size={10} className="text-cyan-400 transition-transform duration-500" />
+            <span>{activeMediaKey === "optic" ? "Đổi ảnh động" : "Lăng kính"}</span>
+          </button>
+        </div>
+
+        {/* Center Forensic Reticle & Seal */}
+        <div className="relative z-10 my-auto flex flex-col items-center justify-center text-center py-6">
+          <div className="vnext-trust-seal-icon relative mb-3">
+            <div className="absolute -inset-1.5 rounded-2xl border border-dashed border-cyan-400/50 animate-[spin_20s_linear_infinite]" />
+            <ShieldCheck size={32} className="text-cyan-300 drop-shadow-[0_0_12px_rgba(34,211,238,0.8)]" />
+          </div>
+          <span className="vnext-trust-seal-label type-micro-label-v3 text-cyan-300 tracking-widest text-[11px]">TRUST ENGINE</span>
+          <strong className="text-slate-100 text-lg font-semibold mt-1">Evidence first</strong>
+        </div>
+
+        {/* Bottom Verdict Guarantee */}
+        <div className="relative z-10 pt-3 border-t border-white/10 flex flex-col items-center gap-1 w-full text-center">
+          <span className="vnext-trust-seal-note text-slate-300 text-xs leading-relaxed">
+            Không có verdict nếu chưa đủ bằng chứng
+          </span>
+          <span className="text-[10px] font-mono text-emerald-400/90 flex items-center gap-1.5 pt-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            ĐỐI CHIẾU 3 TẦNG BẢO MẬT
+          </span>
+        </div>
       </div>
     </header>
   );
@@ -115,7 +178,7 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
             <p className="product-kicker">Trust workspace</p>
             <h2 id="trust-input-title" className="product-section-title">Bắt đầu một phiên kiểm tra</h2>
           </div>
-          <span className="metadata-chip font-mono">READY · STATIC FIRST</span>
+          <span className="metadata-chip font-mono">WAITING · STATIC FIRST</span>
         </div>
         <div className="mode-switch" role="tablist" aria-label="Loại đầu vào">
           <button type="button" role="tab" aria-selected={mode === "image"} onClick={() => selectMode("image")}>
@@ -171,13 +234,13 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
         <div>
           <div className="panel-heading">
             <div>
-              <p className="product-kicker">Live pipeline</p>
-              <h2 className="product-section-title">Dấu vết xử lý</h2>
+              <p className="product-kicker">Trust progress</p>
+              <h2 className="product-section-title">Tiến độ kiểm tra</h2>
             </div>
-            <span className="live-indicator">READY</span>
+            <span className="live-indicator">WAITING</span>
           </div>
           <ol className="pipeline-list">
-            {["Chuẩn hóa đầu vào", "Phân tích rủi ro cục bộ", "Đối soát bằng chứng", "Tổng hợp phán quyết"].map((step, index) => (
+            {["Claim Intelligence", "Evidence Discovery", "Evidence Forensics", "AI Verification", "Decision Intelligence"].map((step, index) => (
               <li key={step} data-status="waiting">
                 <span className="pipeline-index">{index + 1}</span>
                 <div>
@@ -249,7 +312,12 @@ export default function TrustWorkspaceClient() {
   const handleSourceProvenanceChange = useCallback((nextProvenance) => setSourceProvenance(nextProvenance), []);
 
   return (
-    <div className="product-workspace">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="product-workspace"
+    >
       {/* Keep the SSR hero mounted while the optional Trust Studio chunk loads.
           Replacing it caused Lighthouse to select a late LCP candidate. */}
       <TrustCriticalHero provenance={sourceProvenance} />
@@ -269,6 +337,6 @@ export default function TrustWorkspaceClient() {
           onContentChange={setDraftContent}
         />
       )}
-    </div>
+    </motion.div>
   );
 }

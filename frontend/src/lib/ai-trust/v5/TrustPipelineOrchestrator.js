@@ -180,7 +180,7 @@ export class TrustPipelineOrchestrator {
     });
   }
 
-  async _stageWorker(stageId, input, rawResults, requestId, signal) {
+  async _stageWorker(stageId, input, rawResults, requestId, signal, runOptions = {}) {
     if (stageId === "l1") {
       return this.services.l1({ ...input, options: { requestId, signal } });
     }
@@ -203,7 +203,16 @@ export class TrustPipelineOrchestrator {
       });
     }
     if (stageId === "l2b") {
-      return this.services.l2b({ ...input, layer1Result: rawResults.l1, options: this.providers.l2b ? { provider: this.providers.l2b, requestId, signal } : { requestId, signal } });
+      return this.services.l2b({
+        ...input,
+        layer1Result: rawResults.l1,
+        options: {
+          ...(this.providers.l2b ? { provider: this.providers.l2b } : {}),
+          requestId,
+          signal,
+          ...(runOptions.useAIGateway === true ? { useAIGateway: true, aiMode: "GEMINI_ONLY" } : {}),
+        },
+      });
     }
     if (stageId === "l2c") {
       return this.services.l2c({ content: input.content || input.metadata.ocrText || input.metadata.qrContent || "", inputType: input.type, context: { inputType: input.type, institutionContext: input.metadata.institutionContext }, layer1Result: rawResults.l1, layer2BResult: rawResults.l2b, signal });
@@ -233,7 +242,11 @@ export class TrustPipelineOrchestrator {
         layer2CResult: rawResults.l2c || null,
         layer3Result: rawResults.l3 || null,
         input,
-        options: { requestId, signal },
+        options: {
+          requestId,
+          signal,
+          ...(runOptions.useAIGateway === true ? { useAIGateway: true, aiMode: "GEMINI_ONLY" } : {}),
+        },
       });
       if (!this.legacyVerificationEnabled || typeof this.legacyVerificationAdapter?.verifyLayer4 !== "function") return localResult;
 
@@ -361,7 +374,7 @@ export class TrustPipelineOrchestrator {
       this._assertActive(signal);
       const attemptTiming = attempt === startAttempt ? runningTiming : stageTiming();
       try {
-        const raw = await this._stageWorker(stageId, input, rawResults, pipeline.requestId, signal);
+        const raw = await this._stageWorker(stageId, input, rawResults, pipeline.requestId, signal, options);
         this._assertActive(signal);
         lastRaw = raw;
         const retryable = isRetryEligible(stageId, raw) && attempt < startAttempt + this.maxRetriesPerStage;
@@ -448,6 +461,8 @@ export class TrustPipelineOrchestrator {
         rawResults._pipeline = pipeline;
         const stageStatus = await this._executeStage(stageId, pipeline, input, rawResults, controller.signal, onTransition, {
           startAttempt: retryStageId === stageId && retrySource ? (Number(pipeline.stages[stageId]?.audit?.attemptCount) || 0) + 1 : 1,
+          useAIGateway: options.useAIGateway === true,
+          aiMode: options.aiMode || "GEMINI_ONLY",
         });
         if (stageStatus === PIPELINE_STATUS.PARTIAL) partial = true;
 

@@ -6,7 +6,7 @@
  * 
  * 1. Stage name (Vietnamese standard names)
  * 2. Result
- * 3. Risk score / calibrated probability (Strict calibration rule)
+ * 3. Risk score (a probability is never implied without external calibration)
  * 4. Confidence
  * 5. 2–4 important findings
  * 6. Main conclusion
@@ -135,9 +135,10 @@ function extractTopFindings(stage, stageId) {
 }
 
 /**
- * Maps raw risk & confidence values adhering strictly to calibration provenance rule:
- * If NOT calibrated: "Điểm rủi ro 84/100" (NOT "84% xác suất").
- * Only show probability percentages when calibration provenance exists.
+ * Maps raw risk & confidence values. The V5 UI treats the value as a bounded
+ * policy score, not a probability. The internal `calibrated` marker remains
+ * available for audit payloads, but user-facing copy never implies a measured
+ * probability without a calibration dataset and release-level provenance.
  */
 function deriveRiskAndCalibration(stage) {
   const isCalibrated = stage?.calibrated === true || stage?.calibrationStatus === "CALIBRATED";
@@ -169,14 +170,10 @@ function deriveRiskAndCalibration(stage) {
     }
   }
 
-  // Human readable label following calibration rule
+  // Human-readable label: always a bounded score, never a probability claim.
   let riskDisplayLabel = "Chưa xác định";
   if (riskScore !== null) {
-    if (isCalibrated && calibratedProbability !== null) {
-      riskDisplayLabel = `${calibratedProbability}% xác suất`;
-    } else {
-      riskDisplayLabel = `Điểm rủi ro ${riskScore}/100`;
-    }
+    riskDisplayLabel = `Điểm rủi ro ${riskScore}/100`;
   }
 
   return {

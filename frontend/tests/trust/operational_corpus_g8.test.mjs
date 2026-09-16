@@ -74,7 +74,7 @@ test("EVIDENCE PASSPORT COMMIT: Every corpus case successfully seals an immutabl
       sources: item.sources,
       relationships: item.relations,
       independenceGroups: [{ group: "primary", members: item.sources.map((s) => s.sourceId) }],
-      modelTraces: [{ role: "REASONER", model: "gpt-5.6-luna", latencyMs: 450 }],
+      modelTraces: [{ role: "REASONER", model: "gpt-4o", latencyMs: 450 }],
       verdictResult: { verdict: item.expectedVerdict, confidenceScore: 0.95 },
       decisionTwin: { reversalConditions: ["Có văn bản đính chính mới"] },
     });

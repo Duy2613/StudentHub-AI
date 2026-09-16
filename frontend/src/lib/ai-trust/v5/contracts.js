@@ -212,6 +212,27 @@ function publicRecord(value, fields) {
   return Object.keys(output).length ? output : null;
 }
 
+function publicAiVerification(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const safeList = (items, max = 12) => Array.isArray(items)
+    ? items.slice(0, max).map((item) => publicText(item, 700)).filter(Boolean)
+    : [];
+  const citationsUsed = Array.isArray(value.citationsUsed) ? value.citationsUsed.slice(0, 20).map((item) => {
+    if (!item || typeof item !== "object" || Array.isArray(item) || typeof item.url !== "string" || !/^https?:\/\//i.test(item.url)) return null;
+    return { id: publicText(item.id, 180) || item.url.slice(0, 4096), url: item.url.slice(0, 4096) };
+  }).filter(Boolean) : [];
+  return {
+    verdictSignal: publicText(value.verdictSignal, 60) || "UNCERTAIN",
+    supportReasons: safeList(value.supportReasons),
+    contradictionReasons: safeList(value.contradictionReasons),
+    missingEvidence: safeList(value.missingEvidence),
+    uncertainty: publicText(value.uncertainty, 700) || "Gemini uncertainty chưa được công bố.",
+    citationsUsed,
+    provider: publicText(value.provider, 80) || "gemini",
+    model: publicText(value.model, 120) || "gemini-3.8-flash",
+  };
+}
+
 function publicSignals(value) {
   return Array.isArray(value) ? value.slice(0, 40).map((item, index) => {
     if (typeof item === "string") return { signalId: `signal-${index + 1}`, code: publicText(item, 120), severity: "INFO", source: "stage_result", details: "" };
@@ -361,6 +382,7 @@ function publicLayerResult(value, layerId) {
     "semanticSummary", "sourceAgreement", "verificationCompleteness", "evidenceCompleteness", "externalEvidence", "retrievalMode",
     "retrievalStatus", "hardRuleTriggered", "classificationSource", "inputLength",
     "reputationLookupPolicy", "reputationLookupReason", "reputationLookupStatus", "reputationLookupTargetClass", "reputationLookupDisclosed",
+    "aiVerificationStatus", "aiVerificationTransport", "aiVerificationThinkingLevel", "aiVerificationLatencyMs", "aiVerificationErrorType",
   ]) || {};
 
   if (["l1", "l2b", "l2c"].includes(layerId)) base.signals = publicSignals(value.signals || value.riskSignals || value.contextSignals);
@@ -414,6 +436,7 @@ function publicLayerResult(value, layerId) {
     base.relatedCases = publicRelatedCases(value.relatedCases);
     base.legacyIntegration = publicLegacyIntegration(value.legacyIntegration);
     base.independentResearchSources = publicSources(value.independentResearchSources);
+    base.aiVerification = publicAiVerification(value.aiVerification);
   }
   return base;
 }
@@ -474,6 +497,12 @@ export function createStageEnvelope(input = {}) {
     nextStage: definition.nextStage,
     safeToContinue: value.safeToContinue === true,
     userAction: boundedString(value.userAction, 500) || "Đọc finding cùng limitations trước khi hành động.",
+    aiVerification: publicAiVerification(value.aiVerification),
+    aiVerificationStatus: publicText(value.aiVerificationStatus, 80) || null,
+    aiVerificationTransport: publicText(value.aiVerificationTransport, 120) || null,
+    aiVerificationThinkingLevel: publicText(value.aiVerificationThinkingLevel, 40) || null,
+    aiVerificationLatencyMs: typeof value.aiVerificationLatencyMs === "number" && Number.isFinite(value.aiVerificationLatencyMs) ? Math.max(0, value.aiVerificationLatencyMs) : null,
+    aiVerificationErrorType: publicText(value.aiVerificationErrorType, 120) || null,
     verificationPackage: publicVerificationPackage(value.verificationPackage),
     verificationTaskSummary: publicRecord(value.verificationTaskSummary, [
       "totalTasks", "l2bTaskCount", "l2cTaskCount", "deduplicatedCount", "highImpactTaskCount", "tasksWithQueries", "tasksWithoutQueries",

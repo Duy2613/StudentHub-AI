@@ -2,11 +2,13 @@
 
 import dynamic from "next/dynamic";
 
-const ExpertWorkspace = dynamic(() => import("./ExpertIntelligenceView").then((module) => ({ default: module.ExpertIntelligenceView })), {
+// Normal Expert is a single state-aware network. Legacy intelligence tooling
+// remains available only to internal callers and is not mounted here.
+const ExpertWorkspace = dynamic(() => import("./ExpertNetworkWorkspace"), {
   ssr: false,
   loading: () => (
     <div className="workspace-loading" role="status" aria-live="polite">
-      Đang tải Expert Intelligence…
+      Đang tải Expert Network…
     </div>
   ),
 });

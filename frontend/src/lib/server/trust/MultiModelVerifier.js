@@ -1,8 +1,8 @@
 /**
- * StudentHub AI — MultiModelVerifier (Layer 4 Multi-AI Verification)
+ * StudentHub AI — legacy verification compatibility adapter.
  *
  * Implements Sections 41, 42, 43, 44, 45, 46, 47:
- * - Role-specialized models: Domain Specialist, Deep Reasoner, Independent Critic.
+ * - Historical role-specialized trace shape retained for compatibility.
  * - Deep Reasoner: cites ONLY valid evidence IDs. No invented URLs.
  * - Independent Critic: challenges assumptions, looks for counter-evidence, checks independence.
  * - Citation Validator: strips any hallucinated citations before decision intelligence.
@@ -14,9 +14,18 @@ import { CitationValidator } from "./CitationValidator.js";
 import { ModelRouter } from "../../ai-gateway/ModelRouter.js";
 import { AI_CAPABILITY } from "../../ai-gateway/types.js";
 
+export function verificationCapabilityForInputType(inputType = "text") {
+  const normalized = String(inputType || "text").toLowerCase();
+  if (normalized === "image" || normalized === "qr") return AI_CAPABILITY.MULTIMODAL;
+  if (normalized === "file" || normalized === "document" || normalized === "pdf") return AI_CAPABILITY.DOCUMENT;
+  return AI_CAPABILITY.DEEP_REASONING;
+}
+
 export class MultiModelVerifier {
   /**
-   * Executes Layer 4 multi-model verification.
+   * Executes the legacy Layer 4 verification shape with the Gemini-only
+   * gateway when explicitly requested. The canonical production path uses
+   * TrustPipelineOrchestrator + AI Verification instead.
    * @param {object} params
    * @param {Array<object>} params.claims
    * @param {Array<object>} params.evidence
@@ -24,7 +33,10 @@ export class MultiModelVerifier {
    * @param {object} params.sufficiency
    * @param {string} params.runId
    * @param {number} params.revision
+   * @param {string} [params.inputType="text"] - selects the capability-specialized reasoner
    * @param {AbortSignal} [params.signal]
+   * @param {boolean} [params.useAIGateway=false] - opt in to live provider enrichment
+   * @param {object} [params.router] - test-only router injection
    * @returns {Promise<object>}
    */
   static async verify({
@@ -34,13 +46,17 @@ export class MultiModelVerifier {
     sufficiency = {},
     runId = "run-001",
     revision = 1,
+    inputType = "text",
     signal,
     disableCritic = false,
+    useAIGateway = false,
+    router = null,
   } = {}) {
     const modelTraces = [];
     const unknowns = [];
     const criticNotes = [];
-    const modelRouter = new ModelRouter();
+    const modelRouter = useAIGateway ? (router || new ModelRouter()) : null;
+    const verificationCapability = verificationCapabilityForInputType(inputType);
 
     // ──────────────────────────────────────────────────────────────────────────
     // 1. DEEP REASONER STEP
@@ -71,38 +87,41 @@ BẮT BUỘC:
 
     const userPrompt = `Tuyên bố cần kiểm tra:\n${claims.map((c) => `- [${c.claimId}] ${c.text}`).join("\n")}\n\nDanh mục bằng chứng được kiểm duyệt:\n${JSON.stringify(evidenceSummary, null, 2)}`;
 
-    try {
-      const response = await modelRouter.route({
-        capability: AI_CAPABILITY.DEEP_REASONING,
-        systemPrompt,
-        userPrompt,
-        jsonMode: true,
-        timeoutMs: 8000,
-        maxOutputTokens: 1024,
-        signal,
-        parseResponse: (text) => {
-          try {
-            return JSON.parse(text);
-          } catch {
-            // Attempt clean JSON markdown fences
-            const cleaned = text.replace(/```json/gi, "").replace(/```/g, "").trim();
-            return JSON.parse(cleaned);
-          }
-        },
-      });
-
-      if (response.ok && response.json) {
-        reasonerOutput = response.json;
-        modelTraces.push({
-          role: "DEEP_REASONER",
-          provider: response.provider || "openai_compatible",
-          model: response.model || "gpt-5.6-luna",
-          latencyMs: Date.now() - reasonerStart,
-          status: "SUCCESS",
+    if (useAIGateway) {
+      try {
+        const response = await modelRouter.route({
+          capability: verificationCapability,
+          systemPrompt,
+          userPrompt,
+          jsonMode: true,
+          timeoutMs: 8000,
+          maxOutputTokens: 1024,
+          signal,
+          parseResponse: (text) => {
+            try {
+              return JSON.parse(text);
+            } catch {
+              // Attempt clean JSON markdown fences
+              const cleaned = text.replace(/```json/gi, "").replace(/```/g, "").trim();
+              return JSON.parse(cleaned);
+            }
+          },
         });
+
+        if (response.ok && response.json) {
+          reasonerOutput = response.json;
+          modelTraces.push({
+            role: "DEEP_REASONER",
+            capability: verificationCapability,
+            provider: response.provider || "gemini",
+            model: response.model || "gemini-3.8-flash",
+            latencyMs: Date.now() - reasonerStart,
+            status: "SUCCESS",
+          });
+        }
+      } catch {
+        // Graceful fallback to deterministic synthesis if external model times out or errors
       }
-    } catch {
-      // Graceful fallback to deterministic synthesis if external model times out or errors
     }
 
     if (!reasonerOutput) {
@@ -132,6 +151,7 @@ BẮT BUỘC:
 
       modelTraces.push({
         role: "DEEP_REASONER",
+        capability: verificationCapability,
         provider: "deterministic_policy",
         model: "DeterministicPolicyReasoner_v5",
         latencyMs: Date.now() - reasonerStart,

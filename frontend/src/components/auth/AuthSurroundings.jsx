@@ -2,9 +2,10 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowLeft, Zap, Lock, CheckCircle2 } from "lucide-react";
 import LiveStudioClock from "@/components/ui/live-studio-clock";
+import V3_MEDIA from "@/lib/media/v3MediaRegistry";
+import SmartVideo from "@/components/media/SmartVideo";
 
 /**
  * Concentric Sparkling Astrolabe Orbital Rings behind the Central Card
@@ -90,20 +91,18 @@ export default function AuthSurroundings({ children }) {
 
       {/* 2. Main Content Area with Astrolabe Rings & Central Focused Card */}
       <div className="relative flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6">
-        {/* Approved Architectural Monolith Counterweight (Desktop atmospheric counterweight) */}
-        <div className="pointer-events-none absolute inset-0 z-0 hidden lg:flex items-center justify-center overflow-hidden opacity-[0.06]" aria-hidden="true">
-          <picture className="w-full h-full flex items-center justify-center">
-            <source media="(prefers-reduced-motion: reduce)" srcSet="/media/auth/auth-architectural-monolith.avif" />
-            <Image
-              src="/media/auth/auth-architectural-monolith.avif"
-              alt=""
-              width={1600}
-              height={2000}
-              unoptimized
-              priority
-              className="w-auto h-[85vh] max-w-none object-contain filter contrast-125 select-none"
-            />
-          </picture>
+        {/* V3 Cinematic Auth Ambient Loop (Academic Atmospheric Lighting) */}
+        <div className="pointer-events-none absolute inset-0 z-0 hidden lg:flex items-center justify-center overflow-hidden opacity-[0.14]" aria-hidden="true">
+          <SmartVideo
+            priority={true}
+            src={V3_MEDIA.auth.loginLoop.video}
+            poster={V3_MEDIA.auth.loginLoop.poster}
+            alt="Academic Atmospheric Lighting"
+            className="w-full h-full"
+            videoClassName="w-full h-full object-cover filter contrast-125 saturate-110 select-none"
+            posterClassName="w-full h-full object-cover filter contrast-125 saturate-110"
+          />
+          <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#05070e]/80 to-[#05070e]" />
         </div>
 
         {/* Astrolabe Orbital Rings */}

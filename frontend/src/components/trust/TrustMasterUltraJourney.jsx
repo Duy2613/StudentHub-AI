@@ -58,9 +58,9 @@ const STATE_LABELS = {
   L3_ENTER: "Evidence Forensics · bắt đầu",
   L3_RUNNING: "Evidence Forensics · đang đối chiếu",
   L3_COMPLETE: "Evidence Forensics · hoàn tất",
-  L4_ENTER: "Multi-AI Verification · bắt đầu",
-  L4_RUNNING: "Multi-AI Verification · đang so sánh",
-  L4_COMPLETE: "Multi-AI Verification · hoàn tất",
+  L4_ENTER: "AI Verification · bắt đầu",
+  L4_RUNNING: "AI Verification · Gemini đang đối chiếu",
+  L4_COMPLETE: "AI Verification · hoàn tất",
   L5_ENTER: "Decision Intelligence · bắt đầu",
   L5_RUNNING: "Decision Intelligence · đang kết luận",
   L5_COMPLETE: "Decision Intelligence · hoàn tất",
@@ -319,15 +319,23 @@ function ForensicsLayer({ layer, onSelectSource }) {
   );
 }
 
-function MultiAiLayer({ layer }) {
+function AiVerificationLayer({ layer }) {
+  const ai = layer.aiVerification || {};
+  const status = String(layer.aiVerificationStatus || "NOT_REQUESTED").toUpperCase();
+  const citationCount = Array.isArray(ai.citationsUsed) ? ai.citationsUsed.length : 0;
   return (
     <div className="master-ultra-layer-content">
       <div className="master-ultra-operation-grid">{layer.operations.map((operation) => <article key={operation.id} className={operation.available ? "is-observed" : "is-unknown"}><span className="master-ultra-operation-icon">{operation.available ? <Check size={15} /> : <span>—</span>}</span><strong>{operation.label}</strong><small>{operation.available ? "Observed in this run" : "Chưa công bố từ runtime"}</small></article>)}</div>
+      <div className="master-ultra-ai-verification-banner" data-ai-verification-status={status}>
+        <div><SectionLabel tone="violet">AI VERIFICATION — GEMINI</SectionLabel><strong>{status === "VERIFIED" ? "Gemini đã trả structured output" : "AI verification unavailable"}</strong><small>Deterministic Trust Policy vẫn là authority cuối.</small></div>
+        <dl><div><dt>Provider</dt><dd>{safeText(ai.provider, "gemini")}</dd></div><div><dt>Model</dt><dd>{safeText(ai.model, "gemini-3.8-flash")}</dd></div><div><dt>Thinking</dt><dd>{safeText(layer.aiVerificationThinkingLevel, "low")}</dd></div><div><dt>Transport</dt><dd>{safeText(layer.aiVerificationTransport, "Chưa công bố")}</dd></div><div><dt>Citations</dt><dd>{citationCount}</dd></div></dl>
+        <p className="master-ultra-ai-uncertainty"><strong>Uncertainty:</strong> {safeText(ai.uncertainty, "Chưa công bố")}</p>
+      </div>
       <div className="master-ultra-analysis-lanes">
         <SectionLabel tone="violet">Analysis streams</SectionLabel>
         {layer.streams.length ? layer.streams.map((stream) => <article key={stream.id}><div className="master-ultra-lane-line" /><div><strong>{safeText(stream.label)}</strong><span>{safeText(stream.provider, "Provider chưa công bố")}{stream.model ? ` · ${stream.model}` : ""}</span><small>{safeText(stream.summary, `Execution status: ${safeText(stream.status)}`)}</small></div></article>) : <EmptyData>Runtime không công bố analysis stream riêng.</EmptyData>}
       </div>
-      <div className="master-ultra-provider-strip"><div><SectionLabel>Evidence agreement</SectionLabel><strong>{safeText(layer.agreement)}</strong></div><div><SectionLabel>Provider provenance</SectionLabel><strong>{layer.providers.length ? `${layer.providers.length} provider record${layer.providers.length === 1 ? "" : "s"}` : "Chưa công bố"}</strong></div></div>
+      <div className="master-ultra-provider-strip"><div><SectionLabel>Gemini status</SectionLabel><strong>{status}</strong></div><div><SectionLabel>Evidence references</SectionLabel><strong>{citationCount ? `${citationCount} citation${citationCount === 1 ? "" : "s"}` : "Chưa công bố"}</strong></div></div>
       {layer.sequentialSignals.length ? <div className="master-ultra-sequential-signal"><SectionLabel tone="gold">Sequential verification signal</SectionLabel>{layer.sequentialSignals.map((signal, index) => <article key={`${signal.provider}-${index}`}><strong>{safeText(signal.provider, "Provider chưa công bố")}</strong><span>{safeText(signal.status)}</span><p>{safeText(signal.verdict, "Verdict chưa công bố")} · {safeText(signal.reasoning, "Reasoning chưa công bố")}</p></article>)}</div> : null}
     </div>
   );
@@ -352,7 +360,7 @@ function LayerDetail({ layer, onSelectSource }) {
   if (layer.id === "l1") return <ClaimLayer layer={layer.data} />;
   if (layer.id === "l2") return <DiscoveryLayer layer={layer.data} onSelectSource={onSelectSource} />;
   if (layer.id === "l3") return <ForensicsLayer layer={layer.data} onSelectSource={onSelectSource} />;
-  if (layer.id === "l4") return <MultiAiLayer layer={layer.data} />;
+  if (layer.id === "l4") return <AiVerificationLayer layer={layer.data} />;
   return <DecisionLayer layer={layer.data} />;
 }
 

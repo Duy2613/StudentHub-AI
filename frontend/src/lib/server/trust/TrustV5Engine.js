@@ -5,7 +5,7 @@
  * - LAYER 1: CLAIM INTELLIGENCE (normalization, entity extraction, claim decomposition)
  * - LAYER 2: EVIDENCE DISCOVERY (multi-strategy queries, SSRF safety, canonical URLs, SHA-256 snapshots)
  * - LAYER 3: EVIDENCE FORENSICS (source clustering, independence graph, claim-source relations, sufficiency)
- * - LAYER 4: MULTI-AI VERIFICATION (Luna classifier/critic/relation, Gemini extraction/synthesis, citation validation)
+ * - LAYER 4: AI VERIFICATION (Gemini advisory output + citation validation)
  * - LAYER 5: DECISION INTELLIGENCE (verdict policy, Decision Twin, next actions, immutable Evidence Passport)
  *
  * Produces Canonical Trust DTO matching Section 54 UX requirements.
@@ -29,7 +29,7 @@ export const TRUST_V5_PRODUCTION_PATH = Object.freeze([
   "CLAIM_INTELLIGENCE",
   "EVIDENCE_DISCOVERY",
   "EVIDENCE_FORENSICS",
-  "MULTI_MODEL_VERIFICATION",
+  "GEMINI_AI_VERIFICATION",
   "CITATION_VALIDATION",
   "VERDICT_POLICY_ENGINE",
   "DECISION_TWIN",
@@ -62,6 +62,7 @@ export class TrustV5Engine {
    * @param {boolean} [params.includeOfficialDiscovery=false]
    * @param {object|null} [params.publicApiDiscoveryAdapter]
    * @param {boolean} [params.includePublicApiDiscovery=false]
+   * @param {boolean} [params.useAIGateway=false] - opt in to live provider enrichment
    * @returns {Promise<object>} Canonical Trust DTO
    */
   static async verify({
@@ -79,6 +80,7 @@ export class TrustV5Engine {
     publicApiDiscoverySources = [],
     publicApiDiscoveryAdapter = null,
     includePublicApiDiscovery = false,
+    useAIGateway = false,
     expertAssessments = [],
     issuedAt = null,
   } = {}) {
@@ -195,7 +197,7 @@ export class TrustV5Engine {
     const sufficiency = EvidenceForensicsService.evaluateSufficiency(claims, relationships, sources);
 
     // ──────────────────────────────────────────────────────────────────────────
-    // LAYER 4: MULTI-AI VERIFICATION
+    // LAYER 4: AI VERIFICATION (legacy compatibility path; canonical route uses TrustPipelineOrchestrator)
     // ──────────────────────────────────────────────────────────────────────────
     const multiModelResult = await MultiModelVerifier.verify({
       claims,
@@ -204,8 +206,10 @@ export class TrustV5Engine {
       sufficiency,
       runId,
       revision,
+      inputType: type,
       signal,
       disableCritic,
+      useAIGateway,
     });
 
     // ──────────────────────────────────────────────────────────────────────────

@@ -1,260 +1,159 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { ModelRouter } from "../../src/lib/ai-gateway/ModelRouter.js";
+import { AIGatewayService } from "../../src/lib/ai-gateway/AIGatewayService.js";
 import { AI_CAPABILITY, PROVIDER_FAMILY, GATEWAY_ERROR_TYPE } from "../../src/lib/ai-gateway/types.js";
 import { IModelProvider } from "../../src/lib/ai-gateway/providers/IModelProvider.js";
-import { VerdictPolicyEngine, TRUST_FINAL_VERDICTS } from "../../src/lib/server/trust/VerdictPolicyEngine.js";
+import { AIGatewayReasoningProvider } from "../../src/lib/ai-trust/layer4/providers/AIGatewayReasoningProvider.js";
+import { Layer4TrustService } from "../../src/lib/ai-trust/layer4/Layer4TrustService.js";
 
-/**
- * StudentHub V5 — Provider Failure Matrix, Cost & Latency Benchmark
- *
- * Implements Sections 47, 48, 49, 50, 51:
- * - Provider Failure Matrix:
- *   1. OpenAI unavailable -> Gemini fallback
- *   2. OpenAI 429 Rate Limit -> retry once then fallback
- *   3. Gemini unavailable -> OpenAI fallback
- *   4. Gemini 429 Rate Limit -> retry once then fallback
- *   5. Both providers unavailable -> deterministic policy degradation (NO hallucinated verdicts)
- * - Cost Benchmark across execution modes:
- *   - FAST (Triage / Fast classification)
- *   - NORMAL (Standard verification)
- *   - DEEP (Deep reasoning + Counter-search + Independent critic)
- * - Modelled latency profile (p50, p90, p95 across stages); this is not live p95 telemetry.
- */
-
-class MockProvider extends IModelProvider {
-  constructor(family, behavior = {}) {
-    super(family);
-    this.behavior = behavior;
+const VALID_DTO = JSON.stringify({
+  verdictSignal: "UNCERTAIN",
+  supportReasons: [],
+  contradictionReasons: [],
+  missingEvidence: ["Nguồn chính thức cần được kiểm tra thêm."],
+  uncertainty: "Chưa đủ evidence để diễn giải mạnh hơn.",
+  citationsUsed: [],
+  provider: "gemini",
+  model: "gemini-3.8-flash",
+});
+class MockGeminiProvider extends IModelProvider {
+  constructor(mode = "success") {
+    super(PROVIDER_FAMILY.GEMINI);
+    this.mode = mode;
     this.calls = 0;
   }
 
   isConfigured() {
-    return this.behavior.configured !== false;
+    return true;
   }
 
-  async generate(candidate, promptParams) {
-    this.calls++;
-    if (this.behavior.failAlways) {
-      const err = new Error("Simulated Provider Outage (503 Service Unavailable)");
-      err.gatewayErrorType = GATEWAY_ERROR_TYPE.HTTP_ERROR;
-      err.httpStatus = 503;
-      throw err;
+  async generate() {
+    this.calls += 1;
+    if (this.mode === "timeout") {
+      const error = new Error("simulated timeout");
+      error.gatewayErrorType = GATEWAY_ERROR_TYPE.TIMEOUT;
+      throw error;
     }
-    if (this.behavior.rateLimitCount && this.calls <= this.behavior.rateLimitCount) {
-      const err = new Error("Simulated Rate Limit (429 Too Many Requests)");
-      err.gatewayErrorType = GATEWAY_ERROR_TYPE.RATE_LIMITED;
-      err.httpStatus = 429;
-      throw err;
+    if (this.mode === "429") {
+      const error = new Error("simulated rate limit");
+      error.gatewayErrorType = GATEWAY_ERROR_TYPE.HTTP_ERROR;
+      error.httpStatus = 429;
+      throw error;
     }
-    if (this.behavior.latencyMs) {
-      await new Promise(r => setTimeout(r, this.behavior.latencyMs));
+    if (this.mode === "5xx") {
+      const error = new Error("simulated upstream failure");
+      error.gatewayErrorType = GATEWAY_ERROR_TYPE.HTTP_ERROR;
+      error.httpStatus = 503;
+      throw error;
     }
-    return {
-      text: this.behavior.responseText || JSON.stringify({ summary: "Verified by mock", reasons: ["Valid signal"] }),
-      usage: { promptTokens: 400, completionTokens: 120 }
-    };
+    if (this.mode === "invalid-json") return { text: "not-json", transport: "interactions", thinkingLevel: "low" };
+    return { text: VALID_DTO, transport: "interactions", thinkingLevel: "low" };
   }
 }
 
-test("PROVIDER FAILURE MATRIX (SECTION 48)", async () => {
-  console.log("\n============================================================");
-  console.log("⚡ RUNNING PROVIDER FAILURE MATRIX (SECTION 48)");
-  console.log("============================================================\n");
-
-  // Case 1: OpenAI unavailable -> Fallback to Gemini
-  {
-    const fakeOpenAI = new MockProvider(PROVIDER_FAMILY.OPENAI_COMPATIBLE, { failAlways: true });
-    const fakeGemini = new MockProvider(PROVIDER_FAMILY.GEMINI, { responseText: "Gemini fallback response" });
-    const router = new ModelRouter({
-      [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: fakeOpenAI,
-      [PROVIDER_FAMILY.GEMINI]: fakeGemini
-    });
-
-    const res = await router.route({
-      capability: AI_CAPABILITY.FAST_CLASSIFICATION,
-      userPrompt: "Kiểm tra thông báo học bổng"
-    });
-
-    assert.equal(res.ok, true, "Fallback to Gemini must succeed");
-    assert.equal(res.provider, PROVIDER_FAMILY.GEMINI, "Provider must be Gemini");
-    console.log("  ✔ Case 1: OpenAI Unavailable -> Successfully routed to Gemini Fallback");
+class NeverCalledOpenAIProvider extends IModelProvider {
+  constructor() {
+    super(PROVIDER_FAMILY.OPENAI_COMPATIBLE);
+    this.calls = 0;
   }
 
-  // Case 2: OpenAI 429 Rate Limit -> Retry once then Fallback to Gemini
-  {
-    const fakeOpenAI = new MockProvider(PROVIDER_FAMILY.OPENAI_COMPATIBLE, { rateLimitCount: 10 }); // Keeps 429
-    const fakeGemini = new MockProvider(PROVIDER_FAMILY.GEMINI, { responseText: "Gemini response after 429" });
-    const router = new ModelRouter({
-      [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: fakeOpenAI,
-      [PROVIDER_FAMILY.GEMINI]: fakeGemini
-    });
-
-    const res = await router.route({
-      capability: AI_CAPABILITY.FAST_CLASSIFICATION,
-      userPrompt: "Kiểm tra lịch thi"
-    });
-
-    assert.equal(res.ok, true, "Fallback to Gemini must succeed after 429");
-    assert.equal(res.provider, PROVIDER_FAMILY.GEMINI);
-    console.log("  ✔ Case 2: OpenAI 429 Rate Limited -> Retried and routed to Gemini Fallback");
+  isConfigured() {
+    return true;
   }
 
-  // Case 3: Gemini unavailable -> fallback to OpenAI on a Gemini-first route
-  {
-    const fakeOpenAI = new MockProvider(PROVIDER_FAMILY.OPENAI_COMPATIBLE, { responseText: "OpenAI fallback response" });
-    const fakeGemini = new MockProvider(PROVIDER_FAMILY.GEMINI, { failAlways: true });
-    const router = new ModelRouter({
-      [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: fakeOpenAI,
-      [PROVIDER_FAMILY.GEMINI]: fakeGemini
-    });
-
-    const res = await router.route({
-      capability: AI_CAPABILITY.MULTIMODAL,
-      userPrompt: "Kiểm tra ảnh thông báo"
-    });
-
-    assert.equal(res.ok, true, "OpenAI fallback must succeed when Gemini is unavailable");
-    assert.equal(res.provider, PROVIDER_FAMILY.OPENAI_COMPATIBLE);
-    assert.ok(fakeGemini.calls >= 2, "Gemini-first candidates must be attempted before OpenAI fallback");
-    console.log("  ✔ Case 3: Gemini Unavailable -> Successfully routed to OpenAI Fallback");
+  async generate() {
+    this.calls += 1;
+    throw new Error("OpenAI must not be called in Gemini-only mode");
   }
+}
 
-  // Case 4: Gemini 429 -> retry once per Gemini candidate, then OpenAI fallback
-  {
-    const fakeOpenAI = new MockProvider(PROVIDER_FAMILY.OPENAI_COMPATIBLE, { responseText: "OpenAI response after Gemini 429" });
-    const fakeGemini = new MockProvider(PROVIDER_FAMILY.GEMINI, { rateLimitCount: 10 });
-    const router = new ModelRouter({
-      [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: fakeOpenAI,
-      [PROVIDER_FAMILY.GEMINI]: fakeGemini
-    });
-
-    const res = await router.route({
-      capability: AI_CAPABILITY.MULTIMODAL,
-      userPrompt: "Kiểm tra tài liệu hình ảnh"
-    });
-
-    assert.equal(res.ok, true, "OpenAI fallback must succeed after Gemini rate limits");
-    assert.equal(res.provider, PROVIDER_FAMILY.OPENAI_COMPATIBLE);
-    assert.ok(fakeGemini.calls >= 4, "Each Gemini candidate must receive its bounded retry");
-    console.log("  ✔ Case 4: Gemini 429 Rate Limited -> Retried per candidate and routed to OpenAI Fallback");
-  }
-
-  // Case 5: Both Providers Unavailable -> Graceful degradation to Deterministic Policy
-  {
-    const fakeOpenAI = new MockProvider(PROVIDER_FAMILY.OPENAI_COMPATIBLE, { failAlways: true });
-    const fakeGemini = new MockProvider(PROVIDER_FAMILY.GEMINI, { failAlways: true });
-    const router = new ModelRouter({
-      [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: fakeOpenAI,
-      [PROVIDER_FAMILY.GEMINI]: fakeGemini
-    });
-
-    const res = await router.route({
-      capability: AI_CAPABILITY.MULTIMODAL,
-      userPrompt: "Kiểm tra thông tin"
-    });
-
-    assert.equal(res.ok, false, "Router must report failure when both external APIs are down");
-    assert.ok(res.attempts.length >= 3, "All configured candidates were attempted");
-
-    // Adjudicate via deterministic policy engine
-    const deterministicVerdict = VerdictPolicyEngine.adjudicate({
-      claims: [{ text: "Thông tin học phí" }],
-      evidence: [],
-      sufficiency: { status: "INSUFFICIENT" }
-    });
-
-    assert.equal(deterministicVerdict.verdict, TRUST_FINAL_VERDICTS.INSUFFICIENT_EVIDENCE);
-    assert.equal(deterministicVerdict.policyApplied, "POLICY_EVIDENCE_ABSTENTION");
-    console.log("  ✔ Case 5: Both External LLMs Unavailable -> Truthful Abstention (No fabricated verdict)\n");
-  }
-});
-
-test("COST & TOKEN BUDGET BENCHMARK (SECTIONS 49, 50)", async () => {
-  console.log("============================================================");
-  console.log("💰 COST & TOKEN BUDGET BENCHMARK (FAST / NORMAL / DEEP)");
-  console.log("============================================================\n");
-
-  // Modelled price assumptions only. No provider billing API or live usage
-  // record is available in this local test.
-  const INPUT_PRICE_PER_M = 0.15;
-  const OUTPUT_PRICE_PER_M = 0.60;
-
-  const costProfiles = {
-    FAST: {
-      openAICalls: 1,
-      geminiCalls: 0,
-      inputTokens: 250,
-      outputTokens: 60,
-      searchCalls: 0,
-      criticCalls: 0
-    },
-    NORMAL: {
-      openAICalls: 2,
-      geminiCalls: 0,
-      inputTokens: 850,
-      outputTokens: 220,
-      searchCalls: 1,
-      criticCalls: 0
-    },
-    DEEP: {
-      openAICalls: 3,
-      geminiCalls: 0,
-      inputTokens: 2400,
-      outputTokens: 650,
-      searchCalls: 2,
-      criticCalls: 1
-    }
+function routeFor(mode) {
+  const gemini = new MockGeminiProvider(mode);
+  const openai = new NeverCalledOpenAIProvider();
+  return {
+    gemini,
+    openai,
+    router: new ModelRouter({
+      [PROVIDER_FAMILY.GEMINI]: gemini,
+      [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: openai,
+    }),
   };
+}
 
-  for (const [mode, p] of Object.entries(costProfiles)) {
-    const inputCost = (p.inputTokens / 1_000_000) * INPUT_PRICE_PER_M;
-    const outputCost = (p.outputTokens / 1_000_000) * OUTPUT_PRICE_PER_M;
-    const totalCostUSD = inputCost + outputCost;
-    const totalCostVND = totalCostUSD * 25400;
-
-    console.log(`📊 MODE: ${mode}`);
-    console.log(`  LLM Calls              : ${p.openAICalls + p.geminiCalls} (OpenAI: ${p.openAICalls}, Gemini: ${p.geminiCalls})`);
-    console.log(`  Input Tokens           : ${p.inputTokens}`);
-    console.log(`  Output Tokens          : ${p.outputTokens}`);
-    console.log(`  Live Search Calls      : ${p.searchCalls}`);
-    console.log(`  Critic Executions      : ${p.criticCalls}`);
-    console.log(`  Estimated Cost / Run   : $${totalCostUSD.toFixed(6)} USD (~${totalCostVND.toFixed(2)} VNĐ)\n`);
-
-    assert.ok(totalCostUSD < 0.01, "Cost per query must be under $0.01 USD");
+test("Gemini-only failure matrix retries bounded failures and never calls OpenAI", async () => {
+  for (const [mode, expectedError] of [
+    ["timeout", GATEWAY_ERROR_TYPE.TIMEOUT],
+    ["429", GATEWAY_ERROR_TYPE.HTTP_ERROR],
+    ["5xx", GATEWAY_ERROR_TYPE.HTTP_ERROR],
+    ["invalid-json", GATEWAY_ERROR_TYPE.INVALID_JSON],
+  ]) {
+    const { router, gemini, openai } = routeFor(mode);
+    const result = await AIGatewayService.generateStructured({
+      capability: AI_CAPABILITY.DEEP_REASONING,
+      systemPrompt: "test",
+      userPrompt: "test",
+      validate: () => true,
+      options: { router },
+    });
+    assert.equal(result.ok, false, `${mode} must fail closed`);
+    assert.equal(result.errorType, expectedError, `${mode} error should stay classified`);
+    assert.equal(result.provider, null);
+    assert.equal(openai.calls, 0, `OpenAI must not be called for ${mode}`);
+    assert.equal(gemini.calls, 2, `${mode} must receive one bounded retry`);
   }
 });
 
-test("LATENCY BENCHMARK: P50 / P90 / P95 (SECTION 51)", async () => {
-  console.log("============================================================");
-  console.log("⏱️ MODELLED LATENCY PROFILE (50 SYNTHETIC SAMPLES PER MODE)");
-  console.log("============================================================\n");
+test("successful structured Gemini output is parsed, validated, and consumed", async () => {
+  const { router, gemini, openai } = routeFor("success");
+  const result = await AIGatewayService.generateStructured({
+    capability: AI_CAPABILITY.DEEP_REASONING,
+    systemPrompt: "test",
+    userPrompt: "test",
+    validate: (value) => value?.provider === "gemini" && value?.model === "gemini-3.8-flash",
+    options: { router },
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.provider, PROVIDER_FAMILY.GEMINI);
+  assert.equal(result.model, "gemini-3.8-flash");
+  assert.equal(result.json.provider, "gemini");
+  assert.equal(result.providerMetadata.transport, "interactions");
+  assert.equal(result.providerMetadata.thinkingLevel, "low");
+  assert.equal(gemini.calls, 1);
+  assert.equal(openai.calls, 0);
+});
 
-  function simulateLatencyDistribution(baseMs, jitterMs, count = 50) {
-    const samples = [];
-    for (let i = 0; i < count; i++) {
-      // Deterministic synthetic spread keeps the report reproducible. These
-      // samples must never be described as observed provider p95 latency.
-      const val = baseMs + (((i * 37) % 100) / 100) * jitterMs;
-      samples.push(val);
-    }
-    samples.sort((a, b) => a - b);
-    return {
-      p50: Math.round(samples[Math.floor(count * 0.50)]),
-      p90: Math.round(samples[Math.floor(count * 0.90)]),
-      p95: Math.round(samples[Math.floor(count * 0.95)])
-    };
+test("Layer 4 remains deterministic when Gemini is unavailable", async () => {
+  const provider = new AIGatewayReasoningProvider({
+    gateway: {
+      async generateStructured() {
+        return { ok: false, errorType: GATEWAY_ERROR_TYPE.TIMEOUT, errorMessage: "safe timeout", attempts: [] };
+      },
+    },
+  });
+  const result = await Layer4TrustService.evaluate({
+    layer1Result: { status: "UNKNOWN", signals: [] },
+    layer2Result: { status: "UNKNOWN", claims: [], contextSignals: [] },
+    layer2AResult: { providerStatus: "NOT_APPLICABLE", finding: "NOT_APPLICABLE" },
+    layer3Result: { status: "INSUFFICIENT", evidence: [], verificationCompleteness: 0 },
+    options: { provider },
+  });
+  assert.equal(result.aiVerificationStatus, "UNAVAILABLE");
+  assert.equal(result.aiVerification.provider, "gemini");
+  assert.equal(result.enforcement, "REVIEW");
+  assert.equal(result.metrics.providerStatus, "UNAVAILABLE");
+});
+
+test("cost and latency budgets remain explicit synthetic assumptions", () => {
+  const profiles = [
+    { mode: "FAST", calls: 1, input: 250, output: 60, p95: 196, sla: 500 },
+    { mode: "NORMAL", calls: 1, input: 850, output: 220, p95: 532, sla: 1500 },
+    { mode: "DEEP", calls: 1, input: 2400, output: 650, p95: 1183, sla: 2500 },
+  ];
+  for (const profile of profiles) {
+    const cost = (profile.input * 0.15 + profile.output * 0.6) / 1_000_000;
+    assert.ok(cost < 0.01, `${profile.mode} synthetic cost budget`);
+    assert.ok(profile.calls >= 1);
+    assert.ok(profile.p95 <= profile.sla, `${profile.mode} synthetic latency budget`);
   }
-
-  const fastLat = simulateLatencyDistribution(120, 80);
-  const normalLat = simulateLatencyDistribution(380, 160);
-  const deepLat = simulateLatencyDistribution(850, 350);
-
-  console.log(`  FAST Mode   : p50 = ${fastLat.p50}ms | p90 = ${fastLat.p90}ms | p95 = ${fastLat.p95}ms (SLA <= 500ms)`);
-  console.log(`  NORMAL Mode : p50 = ${normalLat.p50}ms | p90 = ${normalLat.p90}ms | p95 = ${normalLat.p95}ms (SLA <= 1500ms)`);
-  console.log(`  DEEP Mode   : p50 = ${deepLat.p50}ms | p90 = ${deepLat.p90}ms | p95 = ${deepLat.p95}ms (SLA <= 2500ms)\n`);
-
-  assert.ok(fastLat.p95 <= 500, "FAST mode p95 within 500ms SLA");
-  assert.ok(normalLat.p95 <= 1500, "NORMAL mode p95 within 1500ms SLA");
-  assert.ok(deepLat.p95 <= 2500, "DEEP mode p95 within 2500ms SLA");
 });

@@ -14,7 +14,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
 
   if (!profile || !profile.identity) {
     return (
-      <div className="p-8 text-center bg-slate-900/60 border border-slate-800 rounded-2xl">
+      <div className="p-8 text-center surface-instrument rounded-2xl">
         <AlertTriangle className="w-10 h-10 text-amber-400 mx-auto mb-3" />
         <p className="text-slate-300 font-medium">Chưa có dữ liệu Hồ sơ Học vụ 360</p>
         <p className="text-slate-500 text-xs mt-1">Vui lòng kiểm tra kết nối với hệ thống Đào tạo nhà trường.</p>
@@ -99,7 +99,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
       {/* 2. Academic Summary Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Tín chỉ */}
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md">
+        <div className="p-4 rounded-2xl surface-instrument backdrop-blur-md">
           <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-2">
             <span>Tín chỉ tích lũy</span>
             <BookOpen className="w-4 h-4 text-blue-400" />
@@ -117,7 +117,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
         </div>
 
         {/* CGPA */}
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md">
+        <div className="p-4 rounded-2xl surface-instrument backdrop-blur-md">
           <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-2">
             <span>Điểm trung bình (CGPA)</span>
             <GraduationCap className="w-4 h-4 text-emerald-400" />
@@ -134,7 +134,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
         </div>
 
         {/* Chuẩn đầu ra */}
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md">
+        <div className="p-4 rounded-2xl surface-instrument backdrop-blur-md">
           <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-2">
             <span>Chuẩn tốt nghiệp</span>
             <Award className="w-4 h-4 text-purple-400" />
@@ -151,7 +151,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
         </div>
 
         {/* Học phí & Tài chính */}
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-md">
+        <div className="p-4 rounded-2xl surface-instrument backdrop-blur-md">
           <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-2">
             <span>Học phí học kỳ</span>
             <CreditCard className="w-4 h-4 text-amber-400" />
@@ -265,7 +265,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
                 className={`px-3 py-1 text-xs rounded-lg font-medium transition-all ${
                   courseFilter === f
                     ? "bg-slate-700 text-white"
-                    : "text-slate-400 hover:text-white bg-slate-900 border border-slate-800"
+                    : "text-slate-400 hover:text-white surface-instrument"
                 }`}
               >
                 {f === "ALL" && "Tất cả"}
@@ -340,7 +340,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
             certifications.map((cert) => (
               <div
                 key={cert.type}
-                className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-md flex items-start justify-between"
+                className="p-5 rounded-2xl surface-instrument backdrop-blur-md flex items-start justify-between"
               >
                 <div>
                   <div className="flex items-center gap-2">
@@ -375,7 +375,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.entries(provenance || {}).map(([key, prov]) => (
-              <div key={key} className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-2">
+              <div key={key} className="p-4 rounded-2xl surface-instrument space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-blue-400">{key}</span>
                   <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -393,7 +393,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
       {/* 5. Report Discrepancy Modal */}
       {showReportModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+          <div className="w-full max-w-md surface-instrument rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-amber-400" /> Báo cáo sai lệch dữ liệu học vụ
@@ -412,7 +412,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
                   <select
                     value={reportField}
                     onChange={(e) => setReportField(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    className="w-full surface-paper rounded-xl px-3 py-2 text-white"
                   >
                     <option value="cgpa">Điểm trung bình (CGPA)</option>
                     <option value="earnedCredits">Số tín chỉ tích lũy</option>
@@ -429,7 +429,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
                     value={reportValue}
                     onChange={(e) => setReportValue(e.target.value)}
                     placeholder="Ví dụ: TOEIC 650 điểm"
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    className="w-full surface-paper rounded-xl px-3 py-2 text-white"
                   />
                 </div>
 
@@ -440,7 +440,7 @@ export function Profile360View({ profile, onDiscrepancyReport, className = "" })
                     value={reportExplanation}
                     onChange={(e) => setReportExplanation(e.target.value)}
                     placeholder="Mô tả chi tiết hoặc mã biên nhận..."
-                    className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white"
+                    className="w-full surface-paper rounded-xl px-3 py-2 text-white"
                   />
                 </div>
 

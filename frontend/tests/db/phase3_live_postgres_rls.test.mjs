@@ -21,6 +21,11 @@ const migrations = [
   readFileSync(join(repositoryRoot, "database", "migrations", "202609070001_realtime_event_log.sql"), "utf8"),
   readFileSync(join(repositoryRoot, "database", "migrations", "202609090001_community_expert_promax.sql"), "utf8"),
   readFileSync(join(repositoryRoot, "database", "migrations", "202609100001_expert_authority_snapshot.sql"), "utf8"),
+  readFileSync(join(repositoryRoot, "database", "migrations", "202609150001_auth_profile_session_hardening.sql"), "utf8"),
+  readFileSync(join(repositoryRoot, "database", "migrations", "202609150002_auth_private_browser_boundary_hardening.sql"), "utf8"),
+  readFileSync(join(repositoryRoot, "database", "migrations", "202609150003_auth_public_trust_boundary_hardening.sql"), "utf8"),
+  readFileSync(join(repositoryRoot, "database", "migrations", "202609150004_expert_review_requests.sql"), "utf8"),
+  readFileSync(join(repositoryRoot, "database", "migrations", "202609160001_private_roles_service_rls.sql"), "utf8"),
 ];
 
 const userA = crypto.randomUUID();
@@ -239,6 +244,29 @@ describe("PHASE 3 — live PostgreSQL/RLS proof", liveGate, () => {
     await assert.rejects(asRole("authenticated", userA, "select report_id from private.report_artifacts where report_id=$1", [reportId]), /permission denied/i);
     assert.equal((await asRole("service_role", "", "select id from private.report_jobs where id=$1", [reportId])).rowCount, 1);
     assert.equal((await asRole("service_role", "", "select report_id from private.report_artifacts where report_id=$1", [reportId])).rowCount, 1);
+  });
+
+  it("keeps expert review requests private and exposes assignment linkage only to service role", async () => {
+    await assert.rejects(
+      asRole("anon", "", "select id from private.expert_review_requests"),
+      /permission denied/i
+    );
+    await assert.rejects(
+      asRole("authenticated", userA, "select id from private.expert_review_requests where requester_id=$1", [userA]),
+      /permission denied/i
+    );
+    await assert.rejects(
+      asRole(
+        "authenticated",
+        userA,
+        "insert into private.expert_review_requests(requester_id,case_id,case_revision,domain_code,question,idempotency_key) values($1,$2,1,'AI_ML','blocked review request with enough text','blocked-rls')",
+        [userA, trustCaseId]
+      ),
+      /permission denied/i
+    );
+    const serviceRead = await asRole("service_role", "", "select id, review_request_id from private.expert_assignments where review_request_id is null");
+    assert.equal(serviceRead.command, "SELECT");
+    assert.ok(serviceRead.fields.some((field) => field.name === "review_request_id"));
   });
 
   it("keeps the realtime event log private and service-readable", async () => {

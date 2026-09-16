@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { 
   CheckCircle2, 
   Clock, 
@@ -8,7 +8,8 @@ import {
   Fingerprint, 
   Lock, 
   ShieldAlert, 
-  ShieldCheck, 
+  ShieldCheck,
+  MessageCircle,
   X 
 } from "lucide-react";
 
@@ -17,6 +18,20 @@ export default function SourceInspectorDrawer({
   onClose,
   source = null,
 }) {
+  const closeButtonRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    previousFocusRef.current = document.activeElement;
+    const frameId = window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      const previous = previousFocusRef.current;
+      if (previous && typeof previous.focus === "function" && document.contains(previous)) previous.focus();
+    };
+  }, [isOpen]);
+
   // Handle ESC key to close drawer
   useEffect(() => {
     if (!isOpen) return;
@@ -44,6 +59,11 @@ export default function SourceInspectorDrawer({
   const snippet = source?.snippet || "Evidence record không có đoạn trích được công bố.";
   const relation = String(source?.relationship || "context").toLowerCase();
   const sourceType = source?.sourceType || "Chưa phân loại";
+  const sourceBadge = sourceType === "PRIMARY_OFFICIAL"
+    ? "NGUỒN CHÍNH THỨC CẤP I"
+    : sourceType === "COMMUNITY_SUBMITTED"
+      ? "NGUỒN DO CỘNG ĐỒNG CÔNG BỐ"
+      : "NGUỒN ĐÃ ĐỐI SOÁT";
 
   return (
     <>
@@ -74,6 +94,7 @@ export default function SourceInspectorDrawer({
           <button
             type="button"
             onClick={onClose}
+            ref={closeButtonRef}
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
             aria-label="Đóng bảng chi tiết nguồn"
           >
@@ -87,7 +108,7 @@ export default function SourceInspectorDrawer({
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mb-3">
               <ShieldCheck size={13} />
-              <span>{sourceType === "PRIMARY_OFFICIAL" ? "NGUỒN CHÍNH THỨC CẤP I" : "NGUỒN ĐÃ ĐỐI SOÁT"}</span>
+              <span>{sourceBadge}</span>
             </div>
             <h2 className="type-product-heading text-lg text-slate-100 mb-1">
               {title}
@@ -105,6 +126,11 @@ export default function SourceInspectorDrawer({
               <div className="flex items-center gap-2 text-rose-400 font-medium text-sm">
                 <ShieldAlert size={16} />
                 <span>MÂU THUẪN TRỰC TIẾP VỚI THÔNG BÁO LAN TRUYỀN</span>
+              </div>
+            ) : relation === "community_context" ? (
+              <div className="flex items-center gap-2 text-cyan-300 font-medium text-sm">
+                <MessageCircle size={16} />
+                <span>NGỮ CẢNH CỘNG ĐỒNG, CHƯA PHẢI VERDICT</span>
               </div>
             ) : (
               <div className="flex items-center gap-2 text-emerald-400 font-medium text-sm">

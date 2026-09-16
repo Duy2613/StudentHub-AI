@@ -28,10 +28,12 @@ export class AIGatewayService {
    * @param {string} params.capability
    * @param {string} params.systemPrompt
    * @param {string} params.userPrompt
+   * @param {Array<object>} [params.inputParts] - optional provider-neutral media
+   *   parts for a multimodal request
    * @param {object} [params.options]
    * @returns {Promise<object>} normalized Gateway result (see types.js)
    */
-  static async generateText({ capability, systemPrompt, userPrompt, options = {} }) {
+  static async generateText({ capability, systemPrompt, userPrompt, inputParts = null, options = {} }) {
     const router = options.router || defaultRouter;
     const startedAt = Date.now();
 
@@ -44,6 +46,7 @@ export class AIGatewayService {
       capability,
       systemPrompt,
       userPrompt: boundedPrompt,
+      inputParts,
       jsonMode: false,
       timeoutMs: options.timeoutMs,
       maxOutputTokens: options.maxOutputTokens,
@@ -61,6 +64,7 @@ export class AIGatewayService {
         errorMessage: routed.errorMessage,
         requestId: options.requestId,
         totalLatencyMs,
+        providerMetadata: routed.providerMetadata,
       });
     }
 
@@ -73,6 +77,7 @@ export class AIGatewayService {
       attempts: routed.attempts,
       requestId: options.requestId,
       totalLatencyMs,
+      providerMetadata: routed.providerMetadata,
     });
   }
 
@@ -86,11 +91,13 @@ export class AIGatewayService {
    * @param {string} params.capability
    * @param {string} params.systemPrompt
    * @param {string} params.userPrompt
+   * @param {Array<object>} [params.inputParts] - optional provider-neutral media
+   *   parts for a multimodal request
    * @param {(json: unknown) => boolean} [params.validate]
    * @param {object} [params.options]
    * @returns {Promise<object>} normalized Gateway result; `json` is populated only when ok
    */
-  static async generateStructured({ capability, systemPrompt, userPrompt, validate = () => true, options = {} }) {
+  static async generateStructured({ capability, systemPrompt, userPrompt, inputParts = null, validate = () => true, options = {} }) {
     const router = options.router || defaultRouter;
     const startedAt = Date.now();
 
@@ -103,7 +110,9 @@ export class AIGatewayService {
       capability,
       systemPrompt,
       userPrompt: boundedPrompt,
+      inputParts,
       jsonMode: true,
+      responseSchema: options.responseSchema || null,
       timeoutMs: options.timeoutMs,
       maxOutputTokens: options.maxOutputTokens,
       signal: options.signal,
@@ -122,6 +131,7 @@ export class AIGatewayService {
         errorMessage: routed.errorMessage,
         requestId: options.requestId,
         totalLatencyMs,
+        providerMetadata: routed.providerMetadata,
       });
     }
 
@@ -135,6 +145,7 @@ export class AIGatewayService {
       attempts: routed.attempts,
       requestId: options.requestId,
       totalLatencyMs,
+      providerMetadata: routed.providerMetadata,
     });
   }
 

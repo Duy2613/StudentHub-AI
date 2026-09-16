@@ -151,7 +151,10 @@ export class Layer4TrustService {
     let assessment = deterministicAssessment;
     try {
       if (narrativeProvider && typeof narrativeProvider.reason === "function") {
-        const candidate = await narrativeProvider.reason(fusedGraph);
+        const candidate = await narrativeProvider.reason(fusedGraph, {
+          requestId: options.requestId || layer1Result?.requestId || layer2Result?.requestId || layer3Result?.requestId || null,
+          signal: options.signal,
+        });
         // Preserve every security/truth/action/confidence field from the
         // deterministic result. Only a bounded narrative may cross this
         // optional boundary.
@@ -161,6 +164,12 @@ export class Layer4TrustService {
           aiNarrativeStatus: candidate?.aiNarrativeStatus || "provider_output_ignored_for_policy",
           aiNarrativeProvider: typeof candidate?.aiNarrativeProvider === "string" ? candidate.aiNarrativeProvider.slice(0, 120) : undefined,
           aiNarrativeModel: typeof candidate?.aiNarrativeModel === "string" ? candidate.aiNarrativeModel.slice(0, 120) : undefined,
+          aiVerification: candidate?.aiVerification || null,
+          aiVerificationStatus: candidate?.aiVerificationStatus || "UNAVAILABLE",
+          aiVerificationTransport: candidate?.aiVerificationTransport || null,
+          aiVerificationThinkingLevel: candidate?.aiVerificationThinkingLevel || null,
+          aiVerificationLatencyMs: candidate?.aiVerificationLatencyMs ?? null,
+          aiVerificationErrorType: candidate?.aiVerificationErrorType || null,
         };
       }
     } catch (err) {
@@ -169,6 +178,8 @@ export class Layer4TrustService {
         userExplanation: deterministicAssessment.userExplanation,
         aiNarrativeStatus: "fallback_deterministic_only",
         aiNarrativeError: err?.name || "provider_error",
+        aiVerificationStatus: "UNAVAILABLE",
+        aiVerificationErrorType: err?.name || "provider_error",
       };
     }
 
@@ -196,6 +207,12 @@ export class Layer4TrustService {
         matchedStandards: globalIntelligence.matchedStandards,
         matchedUniversity: globalIntelligence.matchedUniversity?.name || null,
       },
+      aiVerification: assessment.aiVerification || null,
+      aiVerificationStatus: assessment.aiVerificationStatus || (narrativeProvider ? "UNAVAILABLE" : "NOT_REQUESTED"),
+      aiVerificationTransport: assessment.aiVerificationTransport || null,
+      aiVerificationThinkingLevel: assessment.aiVerificationThinkingLevel || null,
+      aiVerificationLatencyMs: assessment.aiVerificationLatencyMs ?? null,
+      aiVerificationErrorType: assessment.aiVerificationErrorType || null,
       auditTrail: {
         requestId: layer1Result?.requestId || layer2Result?.requestId || layer2AResult?.requestId || layer3Result?.requestId || null,
         ruleVersion: LAYER_4_CONFIG.VERSION,
@@ -210,7 +227,7 @@ export class Layer4TrustService {
         executionTimeMs,
         modelUsed: deterministicProvider.providerId,
         providerStatus: narrativeProvider
-          ? (assessment.aiNarrativeStatus || "NARRATIVE_PROVIDER_ATTEMPTED")
+          ? (assessment.aiVerificationStatus || "UNAVAILABLE")
           : "LOCAL_DETERMINISTIC",
         confidenceBasis: assessment.confidenceBasis || "deterministic_policy",
       },

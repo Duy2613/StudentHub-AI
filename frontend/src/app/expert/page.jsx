@@ -3,8 +3,8 @@ import ExpertWorkspaceClient from "@/components/expert/ExpertWorkspaceClient";
 import UnifiedAppShell from "@/components/layout/UnifiedAppShell";
 
 export const metadata = {
-  title: "Expert Intelligence — StudentHub AI",
-  description: "Expert Knowledge Graph, Scope Graph & Credential Verification"
+  title: "Expert Network — StudentHub AI",
+  description: "Danh bạ chuyên gia công khai và qualification theo trạng thái server"
 };
 
 export default function ExpertPage() {

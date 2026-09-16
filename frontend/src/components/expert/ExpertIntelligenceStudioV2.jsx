@@ -168,14 +168,14 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
       case "RETRACTED":
         return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-950/90 border border-rose-600 text-rose-300"><ShieldX className="w-3.5 h-3.5" /> ĐÃ THU HỒI / RÚT BÀI</span>;
       default:
-        return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-900 border border-slate-700 text-slate-400">NGOÀI PHẠM VI XÁC LẬP</span>;
+        return <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold surface-instrument border border-white/20 text-slate-400">NGOÀI PHẠM VI XÁC LẬP</span>;
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 font-sans">
       {/* Header Banner */}
-      <div className="relative rounded-3xl overflow-hidden border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/40 p-6 md:p-8 shadow-2xl backdrop-blur-xl">
+      <div className="relative rounded-3xl overflow-hidden border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/40 p-6 md:p-8 shadow-2xl backdrop-blur-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 border border-indigo-500/30 text-indigo-300">
@@ -202,7 +202,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
             </button>
             <button
               onClick={handleOpenBoundariesModal}
-              className="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all flex items-center justify-center gap-2"
+              className="px-4 py-2.5 rounded-xl text-xs font-bold surface-paper hover:bg-slate-700 text-slate-200 border border-white/20 transition-all flex items-center justify-center gap-2"
             >
               <Compass className="w-4 h-4 text-amber-400" />
               Ranh giới phạm vi
@@ -212,7 +212,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
       </div>
 
       {/* Multi-Signal Search & Identity Resolution Bar */}
-      <div className="p-4 md:p-6 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-md space-y-4">
+      <div className="p-4 md:p-6 rounded-2xl border border-white/10/80 surface-instrument/60 backdrop-blur-md space-y-4">
         <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider">
           <Fingerprint className="w-4 h-4 text-cyan-400" />
           <span>Giải Định Danh Đa Tín Hiệu (Multi-Signal Entity Resolver)</span>
@@ -225,7 +225,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
               placeholder="Tên chuyên gia (vd: TS. Nguyễn Văn Minh)"
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
+              className="w-full surface-abyss border border-white/10 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
             />
           </div>
           <div className="relative">
@@ -234,12 +234,12 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
               placeholder="Mã ORCID (vd: 0000-0002-1825-0097)"
               value={searchOrcid}
               onChange={(e) => setSearchOrcid(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
+              className="w-full surface-abyss border border-white/10 rounded-xl px-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all"
             />
           </div>
           <button
             onClick={handleResolveEntity}
-            className="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 flex items-center justify-center gap-2 transition-all shadow-md"
+            className="px-4 py-2.5 rounded-xl text-xs font-bold surface-paper hover:bg-slate-700 border border-white/20 text-slate-100 flex items-center justify-center gap-2 transition-all shadow-md"
           >
             <Search className="w-4 h-4 text-cyan-400" />
             Đối Soát & Giải Định Danh
@@ -275,7 +275,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
               <Users className="w-4 h-4 text-indigo-400" />
               Danh Sách Chuyên Gia
             </h2>
-            <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 border border-slate-700">
+            <span className="text-xs font-medium px-2 py-0.5 rounded-md surface-paper text-slate-400 border border-white/20">
               {experts.length} hồ sơ
             </span>
           </div>
@@ -292,7 +292,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
                   className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                     isSelected
                       ? "bg-indigo-950/40 border-indigo-500/60 shadow-lg shadow-indigo-950/50"
-                      : "bg-slate-900/60 border-slate-800/80 hover:border-slate-700 hover:bg-slate-900"
+                      : "surface-instrument/60 border-white/10/80 hover:border-white/20 hover:surface-instrument"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -322,7 +322,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
                   </div>
 
                   {strongScope && (
-                    <div className="mt-3 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs">
+                    <div className="mt-3 pt-3 border-t border-white/10/60 flex items-center justify-between text-xs">
                       <span className="text-slate-400">Chuyên môn:</span>
                       <span className="font-semibold text-indigo-300">
                         {strongScope.domain} ({strongScope.level})
@@ -338,7 +338,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
         {/* Middle & Right Column: Details & Interactive Tabs */}
         <div className="lg:col-span-8 space-y-6">
           {/* Navigation Tabs */}
-          <div className="flex border-b border-slate-800 gap-6 text-xs font-bold tracking-wider uppercase">
+          <div className="flex border-b border-white/10 gap-6 text-xs font-bold tracking-wider uppercase">
             <button
               onClick={() => setActiveTab("sandbox")}
               className={`pb-3 flex items-center gap-2 border-b-2 transition-all ${
@@ -377,7 +377,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
           {/* TAB 1: CLAIM EVALUATION SANDBOX */}
           {activeTab === "sandbox" && (
             <div className="space-y-6">
-              <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur-md space-y-4">
+              <div className="p-6 rounded-2xl border border-white/10 surface-instrument/60 backdrop-blur-md space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-bold text-white flex items-center gap-2">
                     <Scale className="w-4 h-4 text-indigo-400" />
@@ -395,7 +395,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
                       rows={3}
                       value={claimText}
                       onChange={(e) => setClaimText(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all font-mono"
+                      className="w-full surface-abyss border border-white/10 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-all font-mono"
                     />
                   </div>
 
@@ -405,7 +405,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
                       <select
                         value={claimDomain}
                         onChange={(e) => setClaimDomain(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition-all"
+                        className="w-full surface-abyss border border-white/10 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition-all"
                       >
                         <option value="AI_ML">AI_ML (Trí Tuệ Nhân Tạo & NLP)</option>
                         <option value="COMPUTER_VISION">COMPUTER_VISION (Thị Giác Máy Tính)</option>
@@ -421,7 +421,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
                       <select
                         value={claimJurisdiction}
                         onChange={(e) => setClaimJurisdiction(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition-all"
+                        className="w-full surface-abyss border border-white/10 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 transition-all"
                       >
                         <option value="TECHNICAL_DOMAIN">TECHNICAL_DOMAIN (Chuyên môn kỹ thuật)</option>
                         <option value="RESEARCH_INTERPRETATION">RESEARCH_INTERPRETATION (Diễn giải nghiên cứu)</option>
@@ -443,32 +443,32 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
 
               {/* Evaluation Result */}
               {claimEvaluation && (
-                <div className="p-6 rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 to-slate-950 space-y-4 shadow-xl">
+                <div className="p-6 rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900 to-slate-950 space-y-4 shadow-xl">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Kết Quả Đánh Giá Thẩm Quyền</span>
                     {getStatusBadge(claimEvaluation.claimStatus)}
                   </div>
 
-                  <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800/80 text-xs leading-relaxed text-slate-300">
+                  <div className="p-4 rounded-xl surface-abyss/80 border border-white/10/80 text-xs leading-relaxed text-slate-300">
                     {claimEvaluation.explanation}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
-                    <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                    <div className="p-3 rounded-xl surface-instrument">
                       <span className="text-slate-400 block text-[11px]">Đúng chuyên môn:</span>
                       <strong className={claimEvaluation.isWithinExpertise ? "text-emerald-400" : "text-rose-400"}>
                         {claimEvaluation.isWithinExpertise ? "HỢP LỆ (Trong phạm vi)" : "NGOÀI PHẠM VI"}
                       </strong>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                    <div className="p-3 rounded-xl surface-instrument">
                       <span className="text-slate-400 block text-[11px]">Thẩm quyền quy chế:</span>
                       <strong className={claimEvaluation.isWithinJurisdiction ? "text-emerald-400" : "text-amber-400"}>
                         {claimEvaluation.isWithinJurisdiction ? "CÓ THẨM QUYỀN" : "KHÔNG CÓ THẨM QUYỀN"}
                       </strong>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+                    <div className="p-3 rounded-xl surface-instrument">
                       <span className="text-slate-400 block text-[11px]">Xung đột lợi ích:</span>
                       <strong className={claimEvaluation.hasConflictOfInterest ? "text-rose-400" : "text-emerald-400"}>
                         {claimEvaluation.hasConflictOfInterest ? "PHÁT HIỆN TÀI TRỢ" : "ĐỘC LẬP (Không phát hiện)"}
@@ -483,14 +483,14 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
           {/* TAB 2: DISAGREEMENT MAP */}
           {activeTab === "disagreements" && (
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300">
+              <div className="p-4 rounded-xl surface-instrument text-xs text-slate-300">
                 <strong className="text-white">Nguyên tắc bất biến:</strong> Khi hai chuyên gia có nhận định khác nhau, hệ thống
                 <span className="text-indigo-300 font-semibold"> KHÔNG chọn người thắng dựa trên danh tiếng</span> mà công khai dẫn chứng và giải thích nguồn gốc bất đồng (dữ liệu, mẫu khảo sát, phương pháp).
               </div>
 
               {disagreements.map((dis, idx) => (
-                <div key={idx} className="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div key={idx} className="p-6 rounded-2xl border border-white/10 surface-instrument/60 space-y-4">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
                     <h3 className="text-sm font-bold text-white flex items-center gap-2">
                       <Compass className="w-4 h-4 text-amber-400" />
                       {dis.topic}
@@ -502,28 +502,28 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Expert A */}
-                    <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                    <div className="p-4 rounded-xl surface-abyss border border-white/10 space-y-2">
                       <div className="flex items-center justify-between">
                         <strong className="text-xs text-indigo-300">{dis.expertA?.name}</strong>
                         <span className="text-[10px] text-slate-500">{dis.expertA?.institution}</span>
                       </div>
                       <p className="text-xs text-slate-300 italic">"{dis.claimA?.statement}"</p>
                       {dis.evidenceA?.[0] && (
-                        <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-800/80">
+                        <div className="text-[11px] text-slate-400 pt-2 border-t border-white/10/80">
                           Bằng chứng: {dis.evidenceA[0]}
                         </div>
                       )}
                     </div>
 
                     {/* Expert B */}
-                    <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                    <div className="p-4 rounded-xl surface-abyss border border-white/10 space-y-2">
                       <div className="flex items-center justify-between">
                         <strong className="text-xs text-emerald-300">{dis.expertB?.name}</strong>
                         <span className="text-[10px] text-slate-500">{dis.expertB?.institution}</span>
                       </div>
                       <p className="text-xs text-slate-300 italic">"{dis.claimB?.statement}"</p>
                       {dis.evidenceB?.[0] && (
-                        <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-800/80">
+                        <div className="text-[11px] text-slate-400 pt-2 border-t border-white/10/80">
                           Bằng chứng: {dis.evidenceB[0]}
                         </div>
                       )}
@@ -542,7 +542,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
           {activeTab === "profile" && selectedExpert && (
             <div className="space-y-6">
               {/* Credentials & Roles */}
-              <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div className="p-6 rounded-2xl border border-white/10 surface-instrument/60 space-y-4">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <Award className="w-4 h-4 text-indigo-400" />
                   Văn Bằng, Chứng Chỉ & Chức Danh Theo Thời Gian (Temporal Graph)
@@ -550,7 +550,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
 
                 <div className="space-y-3">
                   {(selectedExpert.credentials || []).map((cred) => (
-                    <div key={cred.credentialId} className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-xs">
+                    <div key={cred.credentialId} className="p-3 rounded-xl surface-abyss border border-white/10 flex items-center justify-between text-xs">
                       <div>
                         <strong className="text-slate-200 block">{cred.title}</strong>
                         <span className="text-slate-400">{cred.issuingInstitution} — Năm cấp: {cred.issuedYear}</span>
@@ -562,7 +562,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
                   ))}
 
                   {(selectedExpert.roles || []).map((role) => (
-                    <div key={role.roleId} className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-xs">
+                    <div key={role.roleId} className="p-3 rounded-xl surface-abyss border border-white/10 flex items-center justify-between text-xs">
                       <div>
                         <strong className="text-slate-200 block">{role.roleTitle}</strong>
                         <span className="text-slate-400">{role.organization} ({role.validFrom} ➔ {role.validUntil || "Hiện tại"})</span>
@@ -570,7 +570,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
                       <span className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
                         role.isCurrent
                           ? "bg-emerald-950 border border-emerald-500/30 text-emerald-300"
-                          : "bg-slate-900 border border-slate-700 text-slate-400"
+                          : "surface-instrument border border-white/20 text-slate-400"
                       }`}>
                         {role.isCurrent ? "ĐANG ĐẢM NHIỆM" : "ĐÃ HẾT NHIỆM KỲ"}
                       </span>
@@ -580,7 +580,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
               </div>
 
               {/* Publications & Provenance Clusters */}
-              <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div className="p-6 rounded-2xl border border-white/10 surface-instrument/60 space-y-4">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-cyan-400" />
                   Công Trình Nghiên Cứu & Cụm Bằng Chứng Độc Lập
@@ -588,7 +588,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
 
                 <div className="space-y-3">
                   {(selectedExpert.publications || []).map((pub) => (
-                    <div key={pub.pubId} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5 text-xs">
+                    <div key={pub.pubId} className="p-3.5 rounded-xl surface-abyss border border-white/10 space-y-1.5 text-xs">
                       <div className="flex items-center justify-between">
                         <strong className="text-slate-200">{pub.title}</strong>
                         <span className="text-slate-400">{pub.year}</span>
@@ -611,8 +611,8 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
       {/* MODAL 1: WHY THIS EXPERT? */}
       {showWhyModal && whyReport && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="surface-instrument rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-indigo-400" />
                 Tại Sao Là Chuyên Gia Này? (Why This Expert)
@@ -621,22 +621,22 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+              <div className="p-3 rounded-xl surface-abyss border border-white/10">
                 <span className="text-slate-400 block font-semibold mb-0.5">Xác thực danh tính:</span>
                 <p className="text-slate-200">{whyReport.identityEvidence}</p>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+              <div className="p-3 rounded-xl surface-abyss border border-white/10">
                 <span className="text-slate-400 block font-semibold mb-0.5">Chức danh công vụ hiện hành:</span>
                 <p className="text-slate-200">{whyReport.currentRole}</p>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+              <div className="p-3 rounded-xl surface-abyss border border-white/10">
                 <span className="text-slate-400 block font-semibold mb-0.5">Chuyên môn được kiểm chứng:</span>
                 <p className="text-indigo-300 font-semibold">{whyReport.relevantExpertise}</p>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+              <div className="p-3 rounded-xl surface-abyss border border-white/10">
                 <span className="text-slate-400 block font-semibold mb-0.5">Phạm vi thẩm quyền:</span>
                 <p className="text-slate-300">{whyReport.authorityScope}</p>
               </div>
@@ -655,8 +655,8 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
       {/* MODAL 2: WHERE NOT TO TRUST? */}
       {showBoundariesModal && boundariesReport && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div className="surface-instrument rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Compass className="w-5 h-5 text-amber-400" />
                 Ranh Giới Phạm Vi & Nơi Không Nên Tin Cậy
@@ -679,7 +679,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
                 </ul>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
+              <div className="p-3 rounded-xl surface-abyss border border-white/10">
                 <strong className="text-amber-300 block mb-1">Lưu ý bảo vệ nhận thức:</strong>
                 <ul className="list-disc pl-4 space-y-0.5 text-slate-400">
                   {boundariesReport.whereNotToTrust.map((w, idx) => <li key={idx}>{w}</li>)}
@@ -689,7 +689,7 @@ export function ExpertIntelligenceStudioV2({ initialExperts = [] }) {
 
             <button
               onClick={() => setShowBoundariesModal(false)}
-              className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold text-xs transition-all shadow-lg"
+              className="w-full py-2.5 rounded-xl surface-paper hover:bg-slate-700 border border-white/20 text-white font-bold text-xs transition-all shadow-lg"
             >
               Đóng Ranh Giới
             </button>

@@ -1,0 +1,116 @@
+{
+  "reportVersion": "gemini-only-provider-smoke-v1",
+  "generatedAt": "2026-09-16T09:46:01.319Z",
+  "activeProvider": "gemini",
+  "model": "gemini-3.8-flash",
+  "keySource": "GEMINI_API_KEY",
+  "requestsAttempted": 5,
+  "passed": 0,
+  "openaiCalls": 0,
+  "openaiRuntime": "DISABLED_INTENTIONALLY",
+  "records": [
+    {
+      "id": "text",
+      "capability": "DEEP_REASONING",
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "transport": null,
+      "thinkingLevel": "low",
+      "latencyMs": 8507,
+      "status": "FAILED",
+      "realOutbound": true,
+      "httpRequests": 1,
+      "parsed": false,
+      "schemaValid": false,
+      "consumed": false,
+      "fixture": null,
+      "errorType": "HTTP_ERROR",
+      "httpStatus": 429
+    },
+    {
+      "id": "image",
+      "capability": "MULTIMODAL",
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "transport": null,
+      "thinkingLevel": "low",
+      "latencyMs": 892,
+      "status": "FAILED",
+      "realOutbound": true,
+      "httpRequests": 1,
+      "parsed": false,
+      "schemaValid": false,
+      "consumed": false,
+      "fixture": {
+        "path": "frontend/public/wallpapers/01-ai-study-room.jpg",
+        "mimeType": "image/jpeg"
+      },
+      "errorType": "HTTP_ERROR",
+      "httpStatus": 429
+    },
+    {
+      "id": "screenshot",
+      "capability": "MULTIMODAL",
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "transport": null,
+      "thinkingLevel": "low",
+      "latencyMs": 1416,
+      "status": "FAILED",
+      "realOutbound": true,
+      "httpRequests": 1,
+      "parsed": false,
+      "schemaValid": false,
+      "consumed": false,
+      "fixture": {
+        "path": "artifacts/final-product-certification/screenshots/home-1440.png",
+        "mimeType": "image/png"
+      },
+      "errorType": "HTTP_ERROR",
+      "httpStatus": 429
+    },
+    {
+      "id": "qr",
+      "capability": "MULTIMODAL",
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "transport": null,
+      "thinkingLevel": "low",
+      "latencyMs": 742,
+      "status": "FAILED",
+      "realOutbound": true,
+      "httpRequests": 1,
+      "parsed": false,
+      "schemaValid": false,
+      "consumed": false,
+      "fixture": {
+        "path": "inline/qr-smoke-fixture.png",
+        "mimeType": "image/png"
+      },
+      "errorType": "HTTP_ERROR",
+      "httpStatus": 429
+    },
+    {
+      "id": "pdf-document",
+      "capability": "DOCUMENT",
+      "provider": "gemini",
+      "model": "gemini-3.8-flash",
+      "transport": null,
+      "thinkingLevel": "low",
+      "latencyMs": 658,
+      "status": "FAILED",
+      "realOutbound": true,
+      "httpRequests": 1,
+      "parsed": false,
+      "schemaValid": false,
+      "consumed": false,
+      "fixture": {
+        "path": "inline/minimal-pdf-smoke-fixture.pdf",
+        "mimeType": "application/pdf"
+      },
+      "errorType": "HTTP_ERROR",
+      "httpStatus": 429
+    }
+  ],
+  "noSecretsPrinted": true
+}

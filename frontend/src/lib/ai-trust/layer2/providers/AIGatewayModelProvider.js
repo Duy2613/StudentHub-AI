@@ -1,11 +1,10 @@
 /**
  * Layer 2 — AIGatewayModelProvider
  *
- * Multi-vendor replacement for the historical single-vendor
- * GeminiSemanticModelProvider. Routes through the shared AI Gateway
- * (docs/AI-MODEL-ROUTER.md) which capability-routes across every
- * configured provider (GenSpark OpenAI-compatible proxy, Gemini, ...)
- * with automatic fallback, instead of hard-coding one vendor.
+ * Gemini-backed replacement for the historical direct semantic provider.
+ * Routes through the shared AI Gateway (docs/AI-MODEL-ROUTER.md), whose
+ * production capability table contains Gemini only. Compatibility adapters
+ * for other vendors remain outside the active route.
  *
  * Falls back to DeterministicSemanticProvider whenever:
  *  - no provider is configured,
@@ -85,7 +84,7 @@ function appendInjectionSignal(analysis) {
 
 export class AIGatewayModelProvider extends ISemanticVerificationProvider {
   constructor({ gateway = AIGatewayService, fallbackEngine = new DeterministicSemanticProvider() } = {}) {
-    super("ai_gateway_multi_vendor_reasoning");
+    super("ai_gateway_gemini_reasoning");
     this.gateway = gateway;
     this.fallbackEngine = fallbackEngine;
   }

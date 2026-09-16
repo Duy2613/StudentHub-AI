@@ -83,11 +83,22 @@ export const canonicalEnv = {
   RLS_TEST_DATABASE_URL: process.env.STUDENTHUB_RLS_TEST_DATABASE_URL || "",
 
   // AI Providers (Private - Server Only)
-  OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
-  OPENAI_BASE_URL: process.env.OPENAI_BASE_URL || "",
-  OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-5.6-luna",
+  // OpenAI compatibility is retained for old imports, but it is intentionally
+  // disabled as an active production provider for the Gemini-only release.
+  OPENAI_RUNTIME: "DISABLED_INTENTIONALLY",
+  OPENAI_API_KEY: process.env.OPEN_AI_KEY_1 || process.env.OPENAI_API_KEY || "",
+  OPENAI_BASE_URL: process.env.OPENAI_BASE_URL || ((process.env.OPEN_AI_KEY_1 || process.env.OPENAI_API_KEY) ? "https://api.openai.com/v1" : ""),
+  // Retained for deployment diagnostics/backward-compatible env audits. The
+  // AI Gateway catalog is authoritative and does not let this value replace
+  // a route's verified model.
+  OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-4o-mini",
 
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY || "",
+  // Canonical Gemini secret first. GEMINI_KEY_1 is a legacy deployment alias
+  // and is used only when the canonical name is absent.
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || process.env.GEMINI_KEY_1 || "",
+  // Retained for deployment diagnostics/backward-compatible env audits. The
+  // AI Gateway catalog is authoritative and does not let this value replace
+  // a route's verified model.
   GEMINI_MODEL: process.env.GEMINI_MODEL || "gemini-3.8-flash",
 
   // Labbe Assurance

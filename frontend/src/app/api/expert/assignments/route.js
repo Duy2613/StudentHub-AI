@@ -13,7 +13,9 @@ async function assignCase(request, _routeParams, principal, securityContext) {
       claimId: body.claimId,
       domainCode: body.domainCode,
       expiresAt: body.expiresAt,
+      reviewRequestId: body.reviewRequestId,
       idempotencyKey: request.headers.get("idempotency-key") || body.idempotencyKey,
+      correlationId: securityContext.correlationId,
     });
     return NextResponse.json({ success: true, contractVersion: "expert-assignment.promax.v1", data: assignment, correlationId: securityContext.correlationId }, { status: assignment.idempotent ? 200 : 201 });
   } catch (error) {

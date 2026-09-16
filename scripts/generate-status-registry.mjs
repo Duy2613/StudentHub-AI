@@ -1,104 +1,114 @@
 import fs from "fs";
+import { resolve } from "node:path";
+
+const rootDir = process.cwd();
+
+function readEvidence(relativePath) {
+  try {
+    return JSON.parse(fs.readFileSync(resolve(rootDir, relativePath), "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+const auth = readEvidence("artifacts/final-product-certification/main-auth-snapshot-pre.json");
+const rls = readEvidence("artifacts/final-product-certification/main-rls-probe.json");
+const providerHealth = readEvidence("docs/reports/canonical_provider_health_snapshot.json");
+const generatedAt = new Date().toISOString();
+const evidenceInputs = [
+  "artifacts/final-product-certification/main-auth-snapshot-pre.json",
+  "artifacts/final-product-certification/main-rls-probe.json",
+  "docs/reports/canonical_provider_health_snapshot.json",
+].filter((relativePath) => fs.existsSync(resolve(rootDir, relativePath)));
+
+const databaseEvidenceReady = Boolean(auth && rls);
+const providerEvidenceReady = Boolean(providerHealth?.providers);
+const gemini = providerHealth?.providers?.gemini;
+const databaseBlockers = [];
+const aiBlockers = [];
+
+if (!databaseEvidenceReady) {
+  databaseBlockers.push("Current main auth/RLS evidence artifacts are not available.");
+}
+if (!providerEvidenceReady) {
+  aiBlockers.push("Current Gemini live provider evidence is not available.");
+} else if (gemini?.status !== "VERIFIED") {
+  aiBlockers.push("Gemini live provider evidence is not verified by the current smoke.");
+}
 
 const statusRegistry = {
-  candidateId: "studenthub-v5-pilot-rc1",
-  updatedAt: new Date().toISOString(),
+  candidateId: "studenthub-ai-current-source",
+  sourceState: "UNCOMMITTED_WORKTREE",
+  generatedAt,
   environmentClass: "HYBRID_LOCAL_AND_SUPABASE_PROD_READONLY",
+  evidenceInputs,
   subsystems: {
     database: {
-      status: "PARTIAL",
-      lastVerifiedAt: new Date().toISOString(),
-      candidateFingerprint: "sha256:pg17-aws-tokyo-supabase",
-      testArtifacts: [
-        "frontend/tests/db/beta_user_database_proof.test.mjs",
-        "frontend/tests/db/phase3_migration_rls_contract.test.mjs"
-      ],
-      metrics: {
-        liveTablesVerified: 40,
-        pendingMigrations: 2,
-        idempotencySuccessRate: "100%",
-        crossTenantIsolation: "VERIFIED"
-      },
+      status: databaseEvidenceReady ? "VERIFIED_WITH_WARNINGS" : "PENDING_EVIDENCE",
+      measuredAt: auth?.generatedAt || rls?.generatedAt || null,
+      metrics: databaseEvidenceReady
+        ? {
+          authUsers: auth.identity.authUsers,
+          profiles: auth.counts?.["public.profiles"]?.count ?? null,
+          missingProfiles: auth.identity.missingProfiles,
+          orphanProfiles: auth.identity.orphanProfiles,
+          duplicateProfileKeys: auth.identity.duplicateProfileKeys,
+          missingRoleAssignments: auth.identity.missingRoleAssignments,
+          rlsProbe: rls.summary,
+        }
+        : {},
       limitations: [
-        "Main Supabase DB protected from destructive DDL under Section 104",
-        "Migrations 8 & 9 pending application on live DB"
+        "Supabase advisor output still contains fail-closed no-policy INFO findings and performance findings; review each intended private/public boundary before certification.",
       ],
-      blockers: [
-        "STUDENTHUB_RLS_TEST_DATABASE_URL is absent; G1/G2-live/G4 require disposable DB"
-      ]
+      blockers: databaseBlockers,
     },
     retrieval: {
-      status: "VERIFIED",
-      lastVerifiedAt: new Date().toISOString(),
-      candidateFingerprint: "sha256:retrieval-authority-v2",
-      testArtifacts: [
-        "frontend/tests/evidence/live_web_retrieval.test.mjs",
-        "frontend/tests/evidence/real_world_live_search_golden_flow.test.mjs"
-      ],
-      metrics: {
-        ssrfBlocks: "100%",
-        realUrlProvenanceRate: "100%",
-        sha256SnapshotIntegrity: "100%",
-        criticCounterRetrievalSuccessRate: "100%"
-      },
-      limitations: [
-        "Direct portal scraping bounded to 1MB per document"
-      ],
-      blockers: []
+      status: "NOT_REASSESSED",
+      measuredAt: null,
+      metrics: {},
+      limitations: ["No current retrieval benchmark was run in this closure continuation."],
+      blockers: [],
     },
     privacy: {
-      status: "VERIFIED",
-      lastVerifiedAt: new Date().toISOString(),
-      candidateFingerprint: "sha256:privacy-pii-v2",
-      testArtifacts: [
-        "frontend/tests/storage/storage_g5_e2e.test.mjs"
-      ],
-      metrics: {
-        bucketPrivacyVerified: true,
-        signedUrlAccess200: true,
-        unauthenticatedPublicDenied400: true
-      },
-      limitations: [],
-      blockers: []
+      status: "NOT_REASSESSED",
+      measuredAt: null,
+      metrics: {},
+      limitations: ["No current storage privacy benchmark was run in this closure continuation."],
+      blockers: [],
     },
     aiOrchestration: {
-      status: "VERIFIED",
-      lastVerifiedAt: new Date().toISOString(),
-      candidateFingerprint: "sha256:ai-gateway-v1",
-      testArtifacts: [
-        "frontend/tests/ai-gateway/ai_gateway_router.test.mjs",
-        "frontend/tests/trust/trust_v5_golden_flow.test.mjs"
-      ],
-      metrics: {
-        openaiLunaP50Ms: 892,
-        geminiFlashP50Ms: 723,
-        customModelP50Ms: 1.94,
-        invalidCitationAcceptanceRate: "0%"
-      },
+      status: providerEvidenceReady
+        ? (gemini?.status === "VERIFIED" ? "VERIFIED" : "PARTIAL")
+        : "PENDING_EVIDENCE",
+      measuredAt: providerHealth?.timestamp || null,
+      metrics: providerEvidenceReady
+        ? {
+          gemini: {
+            status: gemini.status,
+            requestedModels: gemini.requestedModels,
+            actualReturnedModel: gemini.actualReturnedModel,
+            successCount: gemini.successCount,
+            nSamples: gemini.nSamples,
+            p50Ms: gemini.p50Ms,
+            p95Ms: gemini.p95Ms,
+          },
+        }
+        : {},
       limitations: [
-        "Gemini requested model gemini-3.8-flash hits 429 quota; gemini-flash-lite-latest active fallback"
+        "Live health is a point-in-time probe; it does not establish production quota, latency SLA, or end-to-end user-flow closure.",
       ],
-      blockers: []
+      blockers: aiBlockers,
     },
     aiEvaluation: {
-      status: "BLOCKED_BY_EVIDENCE",
-      lastVerifiedAt: new Date().toISOString(),
-      candidateFingerprint: "sha256:tevv-eval-dataset",
-      testArtifacts: [
-        "frontend/tests/evidence/operational_20_cases_pipeline.test.mjs"
-      ],
-      metrics: {
-        operationalCorpusPipelineReadiness: "20/20 PASS"
-      },
-      limitations: [
-        "Statistical AI accuracy benchmark requires locked holdout evaluation dataset"
-      ],
-      blockers: [
-        "Locked evaluation holdout dataset required for statistical benchmark"
-      ]
-    }
-  }
+      status: "NOT_REASSESSED",
+      measuredAt: null,
+      metrics: {},
+      limitations: ["No statistical holdout accuracy claim is made by this status registry."],
+      blockers: [],
+    },
+  },
 };
 
-fs.writeFileSync("docs/reports/STUDENTHUB_CANONICAL_VERIFICATION_STATUS.json", JSON.stringify(statusRegistry, null, 2));
-console.log("Wrote docs/reports/STUDENTHUB_CANONICAL_VERIFICATION_STATUS.json");
+const outputPath = resolve(rootDir, "docs/reports/STUDENTHUB_CANONICAL_VERIFICATION_STATUS.json");
+fs.writeFileSync(outputPath, `${JSON.stringify(statusRegistry, null, 2)}\n`);
+console.log(`Wrote ${outputPath}`);

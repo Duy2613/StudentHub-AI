@@ -3,7 +3,7 @@
  * 
  * Explicit Public Data Transfer Object projection for Expert entities.
  * STRICTLY strips all private contact information (personal phone, private email, CCCD, home address),
- * internal security scores, risk signals, and private notes before JSON serialization.
+ * internal security/reputation scores, risk signals, conflict data, and private notes before JSON serialization.
  */
 
 export class ExpertPublicDTO {
@@ -22,61 +22,68 @@ export class ExpertPublicDTO {
     const publications = Array.isArray(expert.publications) ? expert.publications : [];
     const conflicts = Array.isArray(expert.conflicts) ? expert.conflicts : [];
     const activeRoles = roles.filter((role) => role.isCurrent !== false && (!role.validUntil || new Date(role.validUntil) >= new Date()));
+    const verificationStatus = expert.status || expert.verificationStatus || "UNVERIFIED_EXPERT";
+    const isVerified = expert.isVerified === true || verificationStatus === "VERIFIED_EXPERT";
     const verifiedCredentials = credentials.filter((credential) => credential.status === "VERIFIED" && credential.isVerified !== false);
     const groundedPublications = publications.filter((publication) => !publication.isRetracted && (publication.doi || publication.provenanceClusterId));
     const latestResearchYear = publications.reduce((latest, publication) => Math.max(latest, Number(publication.year) || 0), 0);
     const activeConflicts = conflicts.filter((conflict) => conflict.isActive !== false);
-    const verificationStatus = expert.status || expert.verificationStatus || "UNVERIFIED_EXPERT";
+    const verifiedEmailDomain = typeof expert.verifiedEmail === "string" && expert.verifiedEmail.includes("@")
+      ? expert.verifiedEmail.slice(expert.verifiedEmail.lastIndexOf("@") + 1).trim().toLowerCase() || null
+      : null;
+    const safeCredentials = credentials.filter((credential) => credential.isPublic !== false).map((credential) => ({
+      type: credential.type || null,
+      field: credential.field || null,
+      issuer: credential.issuer || null,
+      issuedYear: credential.issuedYear || null,
+      status: credential.status || null,
+    }));
+    const safeRoles = roles.filter((role) => role.isPublic !== false).map((role) => ({
+      roleTitle: role.roleTitle || null,
+      organization: role.organization || null,
+      validFrom: role.validFrom || null,
+      validUntil: role.validUntil || null,
+    }));
+    const safePublications = publications.filter((publication) => publication.isPublic !== false).map((publication) => ({
+      title: publication.title || null,
+      venue: publication.venue || null,
+      year: publication.year || null,
+      domain: publication.domain || null,
+      doi: publication.doi || null,
+    }));
 
     return Object.freeze({
       expertId: expert.expertId,
-      canonicalIdentity: expert.canonicalIdentity || expert.name,
-      name: expert.name,
-      title: expert.title || "Giảng viên",
-      institution: expert.institution || "HCMUTE",
-      department: expert.department || "Khoa CNTT",
-      affiliationStatus: expert.affiliationStatus || "VERIFIED_ACTIVE",
-      status: expert.status || "VERIFIED_EXPERT",
-      orcid: expert.orcid || null,
-      verifiedEmailDomain: expert.verifiedEmail?.split("@")[1] || null,
+      canonicalIdentity: expert.canonicalIdentity || expert.name || null,
+      name: expert.name || null,
+      title: expert.title || null,
+      bio: expert.bio || null,
+      institution: expert.institution || null,
+      department: expert.department || null,
+      affiliationStatus: expert.affiliationStatus || null,
+      status: verificationStatus,
       directoryUrl: expert.directoryUrl || null,
+      verifiedEmailDomain,
       scopes: (expert.scopes || []).map(s => ({
         domain: s.domain,
         subdomain: s.subdomain,
         level: s.level,
         jurisdiction: s.jurisdiction,
-        citationCount: s.citationCount || 0,
-        recencyYear: s.recencyYear || 2024,
-        isEstablished: s.isEstablished ?? (s.level === "ESTABLISHED")
+        citationCount: Number.isFinite(Number(s.citationCount)) ? Number(s.citationCount) : null,
+        recencyYear: Number.isFinite(Number(s.recencyYear)) ? Number(s.recencyYear) : null,
+        isEstablished: s.isEstablished === true || s.level === "ESTABLISHED"
       })),
-      credentials: (expert.credentials || []).map(c => ({
-        credentialId: c.credentialId,
-        type: c.type,
-        field: c.field,
-        issuer: c.issuer,
-        issuedYear: c.issuedYear,
-        status: c.status
-      })),
-      roles: (expert.roles || []).map(r => ({
-        roleId: r.roleId,
-        roleTitle: r.roleTitle,
-        organization: r.organization,
-        validFrom: r.validFrom,
-        validUntil: r.validUntil
-      })),
-      publications: (expert.publications || []).map(p => ({
-        pubId: p.pubId,
-        title: p.title,
-        venue: p.venue,
-        year: p.year,
-        domain: p.domain,
-        doi: p.doi || null
-      })),
-      hasRegistrarAuthority: Boolean(expert.hasRegistrarAuthority),
-      reputationScore: expert.reputationScore || 0,
+      credentials: safeCredentials,
+      roles: safeRoles,
+      publications: safePublications,
+      reputationState: expert.reputationState || null,
+      earnedStars: Array.isArray(expert.earnedStars) ? expert.earnedStars.slice(0, 12).map((star) => ({
+        label: typeof star?.label === "string" ? star.label.slice(0, 120) : null,
+        earnedAt: star?.earnedAt || null,
+      })) : [],
       verificationSummary: Object.freeze({
         status: verificationStatus,
-        identity: expert.isVerified === true || verificationStatus === "VERIFIED_EXPERT" ? "VERIFIED" : "UNVERIFIED",
+        identity: isVerified ? "VERIFIED" : "UNVERIFIED",
         affiliation: activeRoles.length > 0 || expert.affiliationStatus === "VERIFIED_ACTIVE" ? "CURRENT" : "HISTORICAL_OR_UNVERIFIED",
         verifiedCredentials: verifiedCredentials.length,
         groundedPublications: groundedPublications.length,
@@ -85,21 +92,19 @@ export class ExpertPublicDTO {
         activeConflicts: activeConflicts.length,
         lastCheckedAt: expert.lastCheckedAt || null,
         evidenceGrade: this.#evidenceGrade({
-          isVerified: expert.isVerified === true || verificationStatus === "VERIFIED_EXPERT",
+          isVerified,
           activeRoles: activeRoles.length,
           verifiedCredentials: verifiedCredentials.length,
           groundedPublications: groundedPublications.length,
-          activeConflicts: activeConflicts.length
-        })
+          activeConflicts: activeConflicts.length,
+        }),
       }),
       authorityBoundaries: Object.freeze({
-        establishedDomains: scopes.filter((scope) => scope.isEstablished !== false && ["ESTABLISHED", "SUPPORTED"].includes(scope.level)).map((scope) => scope.domain),
+        establishedDomains: scopes.filter((scope) => scope.isEstablished !== false && ["ESTABLISHED", "SUPPORTED", "DOMAIN_VERIFIED"].includes(scope.level)).map((scope) => scope.domain),
         limitedDomains: scopes.filter((scope) => ["EMERGING", "LIMITED"].includes(scope.level)).map((scope) => scope.domain),
         outOfScopeDomains: scopes.filter((scope) => scope.level === "OUT_OF_SCOPE").map((scope) => scope.domain),
         institutionalAuthority: Boolean(expert.hasRegistrarAuthority),
-        warning: expert.hasRegistrarAuthority
-          ? "Có vai trò hành chính đang hiệu lực; vẫn cần đối chiếu văn bản gốc cho quyết định ràng buộc."
-          : "Chuyên môn không tự tạo ra thẩm quyền ban hành quy chế."
+        warning: "Ý kiến chuyên gia chỉ có giá trị trong phạm vi domain đã xác minh; không tự tạo ra thẩm quyền và không thay thế văn bản chính thức."
       })
     });
   }

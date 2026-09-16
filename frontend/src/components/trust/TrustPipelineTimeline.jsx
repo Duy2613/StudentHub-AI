@@ -260,7 +260,7 @@ export default function TrustPipelineTimeline({ pipeline, processing = false, re
         data-stage-id={presented.stageId}
         className={`relative overflow-hidden rounded-2xl bg-white/[0.03] border ${colors.border} p-6 sm:p-8 backdrop-blur-xl transition-all shadow-xl`}
       >
-        {/* Top Header: 1. Stage Name, 2. Result Label, 3. Risk Score / Calibrated Prob, 4. Confidence */}
+        {/* Top Header: 1. Stage Name, 2. Result Label, 3. Risk Score, 4. Confidence */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/10">
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 shrink-0">
@@ -291,12 +291,12 @@ export default function TrustPipelineTimeline({ pipeline, processing = false, re
             {/* Risk Number with Strict Calibration Compliance */}
             <div className="text-right">
               <span className="text-xs uppercase tracking-wider text-slate-400 font-medium block">
-                {presented.calibrated ? "Xác suất rủi ro" : "Mức độ rủi ro"}
+                Mức độ rủi ro
               </span>
               <div className={`text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight font-sans ${colors.riskText}`}>
                 {presented.riskScore !== null ? presented.riskScore : "—"}
                 <span className="text-lg font-normal text-slate-400 ml-1">
-                  {presented.calibrated ? "%" : "/100"}
+                  /100
                 </span>
               </div>
               <span className="text-xs text-slate-400 block mt-0.5">
@@ -311,7 +311,7 @@ export default function TrustPipelineTimeline({ pipeline, processing = false, re
                 {presented.confidenceLabel}
               </div>
               <span className="text-xs text-slate-400 block mt-0.5 font-mono">
-                {presented.confidence !== null ? `${Math.round(presented.confidence * 100)}% bằng chứng` : "Chưa công bố"}
+                {presented.confidence !== null ? `Mức định tính: ${presented.confidenceLabel}` : "Chưa công bố"}
               </span>
             </div>
           </div>

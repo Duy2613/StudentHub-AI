@@ -104,13 +104,13 @@ export class TrustPersistenceService {
       const labbeConfig = getLabbeConfig(labbeEnv);
       const labbeEvent = ["SHADOW", "STAGING"].includes(labbeConfig.mode)
         ? buildTrustDecisionEvent({
-            caseId: durableDto.caseRecord.id,
-            caseRevision: 1,
-            runId: durableDto.runRecord.id,
-            pipelineResult,
-            correlationId: requestId,
-            env: labbeEnv,
-          })
+          caseId: durableDto.caseRecord.id,
+          caseRevision: 1,
+          runId: durableDto.runRecord.id,
+          pipelineResult,
+          correlationId: requestId,
+          env: labbeEnv,
+        })
         : null;
 
       // 3. Persist atomically in short transaction
@@ -168,7 +168,7 @@ export class TrustPersistenceService {
           truth: String(decision.truth || "UNKNOWN").slice(0, 80),
           action: String(decision.action || "UNKNOWN").slice(0, 80),
         },
-      }).catch(() => {});
+      }).catch(() => { });
 
       // 4. Bind to Living Evidence Passport
       let passportId = null;
@@ -226,7 +226,7 @@ export class TrustPersistenceService {
 
       return { caseId, persisted: true };
     } catch (err) {
-      await client.query("ROLLBACK").catch(() => {});
+      await client.query("ROLLBACK").catch(() => { });
       console.error("[TrustPersistenceService] Failure logging error:", err.message);
       return { persisted: false };
     } finally {

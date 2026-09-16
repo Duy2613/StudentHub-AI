@@ -10,7 +10,7 @@
 import { AI_CAPABILITY, MODEL_TIER, PROVIDER_FAMILY } from "../types.js";
 
 export const AI_GATEWAY_CONFIG = {
-  VERSION: "ai-gateway-v1.0.0",
+  VERSION: "ai-gateway-v1.2.0-gemini-only",
 
   SLA: {
     // Hard per-attempt timeout. Layer 2/Layer 4 callers rely on this to stay
@@ -34,123 +34,76 @@ export const AI_GATEWAY_CONFIG = {
 
   /**
    * Model catalog: normalized entries describing every model this gateway
-   * knows how to call. `envKey` is the environment variable that must be
-   * non-empty for the entry to be considered CONFIGURED.
+   * knows how to call. `envKey` is a public-safe configuration label; provider
+   * adapters accept the canonical name and the current deployment alias.
    */
   MODEL_CATALOG: {
-    // ── GenSpark OpenAI-compatible LLM proxy ────────────────────────────
-    // Docs: get_external_api_docs("openai") — official base URL/model list.
-    // Requires OPENAI_API_KEY + OPENAI_BASE_URL (auto-injected by the
-    // platform when the user configures an LLM API key for this project).
-    GPT_5_6_LUNA: {
-      id: "GPT_5_6_LUNA",
+    // ── OpenAI provider ─────────────────────────────────────────────────
+    // The official endpoint uses the Responses API.  An explicitly configured
+    // approved proxy may still use the compatibility path in the adapter.
+    OPENAI_FAST: {
+      id: "OPENAI_FAST",
       provider: PROVIDER_FAMILY.OPENAI_COMPATIBLE,
-      model: "gpt-5.6-luna",
+      model: "gpt-4o-mini",
       tier: MODEL_TIER.FAST_CHEAP,
-      envKey: "OPENAI_API_KEY",
+      envKey: "OPEN_AI_KEY_1 | OPENAI_API_KEY",
       capabilities: [
         AI_CAPABILITY.FAST_CLASSIFICATION,
         AI_CAPABILITY.CLAIM_EXTRACTION,
-        AI_CAPABILITY.SUMMARIZATION,
         AI_CAPABILITY.RERANKING,
-        AI_CAPABILITY.DEEP_REASONING,
+        AI_CAPABILITY.SUMMARIZATION,
       ],
       supportsJsonMode: true,
       costClass: "LOW",
     },
-    GPT_5_NANO: {
-      id: "GPT_5_NANO",
+    OPENAI_STANDARD: {
+      id: "OPENAI_STANDARD",
       provider: PROVIDER_FAMILY.OPENAI_COMPATIBLE,
-      model: "gpt-5-nano",
-      tier: MODEL_TIER.FAST_CHEAP,
-      envKey: "OPENAI_API_KEY",
-      capabilities: [AI_CAPABILITY.FAST_CLASSIFICATION],
-      supportsJsonMode: true,
-      costClass: "LOW",
-    },
-    GPT_5_MINI: {
-      id: "GPT_5_MINI",
-      provider: PROVIDER_FAMILY.OPENAI_COMPATIBLE,
-      model: "gpt-5-mini",
+      model: "gpt-4o",
       tier: MODEL_TIER.BALANCED,
-      envKey: "OPENAI_API_KEY",
+      envKey: "OPEN_AI_KEY_1 | OPENAI_API_KEY",
       capabilities: [
-        AI_CAPABILITY.FAST_CLASSIFICATION,
         AI_CAPABILITY.CLAIM_EXTRACTION,
-        AI_CAPABILITY.SUMMARIZATION,
+        AI_CAPABILITY.DEEP_REASONING,
+        AI_CAPABILITY.DOCUMENT,
         AI_CAPABILITY.RERANKING,
+        AI_CAPABILITY.SUMMARIZATION,
       ],
       supportsJsonMode: true,
       costClass: "MEDIUM",
     },
-    GPT_5_1: {
-      id: "GPT_5_1",
-      provider: PROVIDER_FAMILY.OPENAI_COMPATIBLE,
-      model: "gpt-5.1",
-      tier: MODEL_TIER.DEEP,
-      envKey: "OPENAI_API_KEY",
-      capabilities: [
-        AI_CAPABILITY.DEEP_REASONING,
-        AI_CAPABILITY.CLAIM_EXTRACTION,
-        AI_CAPABILITY.DOCUMENT,
-        AI_CAPABILITY.SUMMARIZATION,
-      ],
-      supportsJsonMode: true,
-      costClass: "HIGH",
-    },
-    GPT_5_2: {
-      id: "GPT_5_2",
-      provider: PROVIDER_FAMILY.OPENAI_COMPATIBLE,
-      model: "gpt-5.2",
-      tier: MODEL_TIER.DEEP,
-      envKey: "OPENAI_API_KEY",
-      capabilities: [
-        AI_CAPABILITY.DEEP_REASONING,
-        AI_CAPABILITY.DOCUMENT,
-      ],
-      supportsJsonMode: true,
-      costClass: "HIGH",
-    },
-    GEMINI_3_8_FLASH: {
-      id: "GEMINI_3_8_FLASH",
-      provider: PROVIDER_FAMILY.GEMINI,
-      model: "gemini-3.8-flash",
-      tier: MODEL_TIER.MULTIMODAL,
-      envKey: "GEMINI_API_KEY",
-      capabilities: [
-        AI_CAPABILITY.MULTIMODAL,
-        AI_CAPABILITY.FAST_CLASSIFICATION,
-        AI_CAPABILITY.CLAIM_EXTRACTION,
-        AI_CAPABILITY.DEEP_REASONING,
-      ],
-      supportsJsonMode: true,
-      costClass: "LOW",
-    },
-    GEMINI_3_6_FLASH: {
-      id: "GEMINI_3_6_FLASH",
-      provider: PROVIDER_FAMILY.GEMINI,
-      model: "gemini-3.6-flash",
-      tier: MODEL_TIER.MULTIMODAL,
-      envKey: "GEMINI_API_KEY",
-      capabilities: [
-        AI_CAPABILITY.MULTIMODAL,
-        AI_CAPABILITY.FAST_CLASSIFICATION,
-        AI_CAPABILITY.CLAIM_EXTRACTION,
-      ],
-      supportsJsonMode: true,
-      costClass: "VERY_LOW",
-    },
+
+    // ── Google Gemini Interactions API ───────────────────────────────────
     GEMINI_FLASH: {
       id: "GEMINI_FLASH",
       provider: PROVIDER_FAMILY.GEMINI,
-      model: "gemini-flash-lite-latest",
+      model: "gemini-3.8-flash",
       tier: MODEL_TIER.MULTIMODAL,
-      envKey: "GEMINI_API_KEY",
+      envKey: "GEMINI_API_KEY | GEMINI_KEY_1",
       capabilities: [
         AI_CAPABILITY.MULTIMODAL,
         AI_CAPABILITY.FAST_CLASSIFICATION,
         AI_CAPABILITY.CLAIM_EXTRACTION,
+        AI_CAPABILITY.DEEP_REASONING,
+        AI_CAPABILITY.DOCUMENT,
       ],
+      thinkingLevel: "low",
+      supportsJsonMode: true,
+      costClass: "LOW",
+    },
+    GEMINI_FLASH_LITE: {
+      id: "GEMINI_FLASH_LITE",
+      provider: PROVIDER_FAMILY.GEMINI,
+      model: "gemini-3.5-flash-lite",
+      tier: MODEL_TIER.MULTIMODAL,
+      envKey: "GEMINI_API_KEY | GEMINI_KEY_1",
+      capabilities: [
+        AI_CAPABILITY.MULTIMODAL,
+        AI_CAPABILITY.FAST_CLASSIFICATION,
+        AI_CAPABILITY.CLAIM_EXTRACTION,
+        AI_CAPABILITY.DOCUMENT,
+      ],
+      thinkingLevel: "minimal",
       supportsJsonMode: true,
       costClass: "LOW",
     },
@@ -158,18 +111,18 @@ export const AI_GATEWAY_CONFIG = {
 
   /**
    * Capability -> ordered fallback chain of model catalog entry ids.
-   * Nano is prioritized for fast classification; Luna remains the deep-reasoning
-   * primary route and is available wherever the catalog declares it.
-   * Gemini is prioritized for multimodal and extraction.
+   * Gemini is the only active production provider in this release. The
+   * catalog retains compatibility metadata for OpenAI, but no active route
+   * may select it while OPENAI_RUNTIME is intentionally disabled.
    */
   CAPABILITY_ROUTES: {
-    [AI_CAPABILITY.FAST_CLASSIFICATION]: ["GPT_5_NANO", "GEMINI_3_8_FLASH", "GPT_5_MINI"],
-    [AI_CAPABILITY.CLAIM_EXTRACTION]: ["GPT_5_MINI", "GEMINI_3_8_FLASH", "GPT_5_1"],
-    [AI_CAPABILITY.DEEP_REASONING]: ["GPT_5_6_LUNA", "GEMINI_3_8_FLASH", "GPT_5_1", "GPT_5_2"],
-    [AI_CAPABILITY.MULTIMODAL]: ["GEMINI_3_8_FLASH", "GEMINI_FLASH", "GPT_5_MINI"],
-    [AI_CAPABILITY.DOCUMENT]: ["GEMINI_3_8_FLASH", "GPT_5_1", "GPT_5_2"],
+    [AI_CAPABILITY.FAST_CLASSIFICATION]: ["GEMINI_FLASH"],
+    [AI_CAPABILITY.CLAIM_EXTRACTION]: ["GEMINI_FLASH"],
+    [AI_CAPABILITY.DEEP_REASONING]: ["GEMINI_FLASH"],
+    [AI_CAPABILITY.MULTIMODAL]: ["GEMINI_FLASH"],
+    [AI_CAPABILITY.DOCUMENT]: ["GEMINI_FLASH"],
     [AI_CAPABILITY.EMBEDDING]: [],   // no embedding provider configured yet — router returns NOT_CONFIGURED
-    [AI_CAPABILITY.RERANKING]: ["GPT_5_6_LUNA", "GPT_5_MINI"],
-    [AI_CAPABILITY.SUMMARIZATION]: ["GPT_5_6_LUNA", "GEMINI_3_8_FLASH", "GPT_5_MINI"],
+    [AI_CAPABILITY.RERANKING]: ["GEMINI_FLASH"],
+    [AI_CAPABILITY.SUMMARIZATION]: ["GEMINI_FLASH"],
   },
 };

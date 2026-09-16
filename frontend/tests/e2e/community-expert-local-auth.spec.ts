@@ -194,17 +194,42 @@ test.describe("authenticated Community → Expert → Trust local reality", () =
 
     try {
       await login(candidatePage, candidateEmail, candidatePassword, `/community?caseId=${primaryCaseId}&caseRevision=1`);
-      await expect(candidatePage.getByRole("heading", { name: "Thêm trải nghiệm có thể đối soát" })).toBeVisible();
-      const contributionForm = candidatePage.locator("section.community-contribution");
-      const labeledInput = (labelText: string) => contributionForm.locator("label").filter({ hasText: labelText }).locator("input").first();
-      await expect(contributionForm.locator("select")).toBeVisible();
-      await contributionForm.locator("select").selectOption("CONTEXT");
-      await contributionForm.locator("textarea").fill("The local authenticated contributor observed a bounded case context that can be checked against the cited revision.");
-      await labeledInput("Case ID").fill(primaryCaseId);
-      await labeledInput("Case revision").fill("1");
-      await labeledInput("Evidence refs").fill(primaryEvidenceId);
-      await candidatePage.getByRole("button", { name: "Gửi observation", exact: true }).click();
-      await expect(candidatePage.getByText("Đã nhận · chưa phải phán quyết", { exact: true })).toBeVisible();
+      // The public route now mounts CommunitySocialWorkspace. Its composer is
+      // intentionally a lightweight social surface; case-bound authority
+      // records still enter through the authenticated Promax API below.
+      await expect(candidatePage.getByRole("heading", { name: "Collective intelligence.", exact: true })).toBeVisible();
+      const composer = candidatePage.getByRole("form", { name: "Bạn muốn chia sẻ điều gì?" });
+      await expect(composer).toBeVisible();
+      await expect(composer.getByLabel("Nội dung chia sẻ", { exact: true })).toBeVisible();
+
+      const contributionStatement = "The local authenticated contributor observed a bounded case context that can be checked against the cited revision.";
+      const contributionInput = {
+        caseId: primaryCaseId,
+        caseRevision: 1,
+        contributionType: "CONTEXT",
+        statement: contributionStatement,
+        evidenceRefs: [primaryEvidenceId],
+        evidenceRevisionIds: [primaryEvidenceId],
+      };
+      const preview = await api(candidatePage, "/api/intelligence/community/posts", {
+        method: "POST",
+        body: { ...contributionInput, phase: "PREVIEW" },
+      });
+      assertApi(preview);
+      const previewBody = asRecord(preview.body);
+      expect(previewBody.state).toBe("PREVIEW_READY");
+      const previewData = asRecord(previewBody.preview);
+      const publish = await api(candidatePage, "/api/intelligence/community/posts", {
+        method: "POST",
+        body: {
+          ...contributionInput,
+          phase: "PUBLISH",
+          privacyConfirmed: true,
+          previewDigest: previewData.previewDigest,
+        },
+        headers: { "Idempotency-Key": `local-browser-contribution-${primaryCaseId}` },
+      });
+      assertApi(publish, 201);
 
       const posts = await api(candidatePage, `/api/intelligence/community/posts?caseId=${encodeURIComponent(primaryCaseId)}&sort=recent`);
       assertApi(posts);
@@ -228,9 +253,9 @@ test.describe("authenticated Community → Expert → Trust local reality", () =
       assertApi(independentReaction);
       expect(asRecord(independentReaction.body).trustMutation).toBe(false);
 
-      await candidatePage.goto("/expert", { waitUntil: "domcontentloaded" });
-      await expect(candidatePage.getByText("100/100 điểm · 5/5 sao", { exact: true })).toBeVisible({ timeout: 60_000 });
-      await expect(candidatePage.getByText("HUMAN_QUALIFICATION_REQUIRED", { exact: true })).toBeVisible();
+      await candidatePage.goto("/expert/profile", { waitUntil: "domcontentloaded" });
+      await expect(candidatePage.getByRole("heading", { name: "Hồ sơ chuyên gia của bạn", exact: true })).toBeVisible({ timeout: 60_000 });
+      await expect(candidatePage.getByRole("heading", { name: "Hồ sơ → quiz → review domain", exact: true })).toBeVisible();
       const beforeApplication = await qualification(candidatePage);
       expect(beforeApplication.state).toBe("NOT_APPLIED");
 
@@ -282,7 +307,7 @@ test.describe("authenticated Community → Expert → Trust local reality", () =
       await candidatePage.getByLabel("Kết luận trong phạm vi", { exact: true }).fill("The practice conclusion stays within the AI/ML evidence scope and does not claim official authority.");
       await candidatePage.getByLabel("Điều chưa chắc chắn", { exact: true }).fill("The next official source revision is not yet available in this local fixture.");
       await candidatePage.getByLabel("Bước tiếp theo", { exact: true }).fill("Request an independent source snapshot before widening the conclusion.");
-      await candidatePage.getByLabel("Evidence revision IDs", { exact: true }).fill(primaryEvidenceId);
+      await candidatePage.getByLabel("Nguồn tham khảo cho reviewer", { exact: true }).fill(primaryEvidenceId);
       const practiceSubmitResponsePromise = candidatePage.waitForResponse(
         (response) => response.url().endsWith("/api/expert/qualification/practice"),
         { timeout: 20_000 },
@@ -311,8 +336,8 @@ test.describe("authenticated Community → Expert → Trust local reality", () =
       assertApi(activation);
 
       await candidatePage.reload({ waitUntil: "domcontentloaded" });
-      await expect(candidatePage.getByText("Hồ sơ đã hoạt động theo domain được duyệt.", { exact: true })).toBeVisible({ timeout: 60_000 });
-      await expect(candidatePage.getByText("ACTIVE", { exact: true })).toBeVisible();
+      await expect(candidatePage.getByText("ACTIVE EXPERT", { exact: true })).toBeVisible({ timeout: 60_000 });
+      await expect(candidatePage.getByRole("heading", { level: 1, name: "Local Evidence Reviewer Candidate", exact: true })).toBeVisible();
 
       const wrongDomainAssignment = await api(reviewerPage, "/api/expert/assignments", {
         method: "POST",

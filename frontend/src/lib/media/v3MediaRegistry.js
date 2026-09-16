@@ -51,7 +51,7 @@ export const V3_MEDIA = Object.freeze({
     officialSource: "/media/v3/trust/official-source.webp",
     sourceIndependence: "/media/v3/trust/source-independence.webp",
     l3Forensics: "/media/v3/trust/l3-forensics.webp",
-    l4MultiAi: Object.freeze({
+    l4AiVerification: Object.freeze({
       video: "/media/v3/trust/l4-multiai.mp4",
       poster: "/media/v3/trust/l4-multiai-poster.webp",
       mobile: "/media/v3/trust/l4-multiai-poster.webp",

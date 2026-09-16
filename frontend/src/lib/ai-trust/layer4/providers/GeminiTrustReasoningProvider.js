@@ -10,6 +10,6 @@ import { AIGatewayReasoningProvider } from "./AIGatewayReasoningProvider.js";
 export class GeminiTrustReasoningProvider extends AIGatewayReasoningProvider {
   constructor(options = {}) {
     super(options);
-    this.providerId = "ai_gateway_multi_vendor_trust_reasoning";
+    this.providerId = "ai_gateway_gemini_trust_reasoning";
   }
 }

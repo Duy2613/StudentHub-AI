@@ -3,14 +3,14 @@ import CommunityWorkspaceClient from "@/components/community/CommunityWorkspaceC
 import UnifiedAppShell from "@/components/layout/UnifiedAppShell";
 
 export const metadata = {
-  title: "Community Intelligence — StudentHub AI",
-  description: "Student Real-World Experience Layer, Consensus & Astroturfing Defense"
+  title: "Community — StudentHub AI",
+  description: "Bảng tin xã hội và tín hiệu trải nghiệm của cộng đồng StudentHub"
 };
 
 export default function CommunityPage() {
   return (
     <UnifiedAppShell>
-      <Suspense fallback={<div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center text-xs text-[var(--text-muted)] font-mono">LOADING COMMUNITY INTELLIGENCE...</div>}>
+      <Suspense fallback={<div className="workspace-loading">Đang tải Community…</div>}>
         <CommunityWorkspaceClient />
       </Suspense>
     </UnifiedAppShell>

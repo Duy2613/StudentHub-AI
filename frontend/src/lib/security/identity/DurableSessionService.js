@@ -34,6 +34,8 @@ export class DurableSessionService {
       tokenHash: this.hashSecret(secret),
       userId: identity.userId,
       authProvider: identity.authProvider || "supabase",
+      fullName: identity.fullName || null,
+      avatarUrl: identity.avatarUrl || null,
       upstreamJtiHash: identity.exchangeProofId
         ? this.hashSecret(`proof:${identity.exchangeProofId}`)
         : identity.jti ? this.hashSecret(`jti:${identity.jti}`) : null,

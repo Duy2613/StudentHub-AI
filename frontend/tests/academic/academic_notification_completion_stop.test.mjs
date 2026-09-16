@@ -9,6 +9,7 @@ describe("Academic Notification Completion Auto-Stop V1", () => {
   });
 
   it("should automatically cancel all pending future reminders when task is completed", () => {
+    const clock = { now: () => Date.parse("2026-09-01T00:00:00.000Z") };
     const task = {
       taskId: "task_thesis_submission_2026",
       studentId: "24110001",
@@ -18,7 +19,7 @@ describe("Academic Notification Completion Auto-Stop V1", () => {
     };
 
     // 1. Schedule reminders for the task
-    const scheduled = AcademicNotificationOrchestrator.scheduleTaskReminders({ task });
+    const scheduled = AcademicNotificationOrchestrator.scheduleTaskReminders({ task, clock });
     assert.ok(scheduled.length > 0);
 
     const pendingBeforeCompletion = AcademicNotificationStore.getNotificationsByTask(task.taskId)
@@ -26,7 +27,7 @@ describe("Academic Notification Completion Auto-Stop V1", () => {
     assert.ok(pendingBeforeCompletion.length > 0);
 
     // 2. Student completes task early
-    const cancelled = AcademicNotificationOrchestrator.onTaskCompleted(task.taskId, task.studentId);
+    const cancelled = AcademicNotificationOrchestrator.onTaskCompleted(task.taskId, task.studentId, clock);
     assert.strictEqual(cancelled.length, pendingBeforeCompletion.length);
 
     // 3. Verify zero active scheduled reminders remain

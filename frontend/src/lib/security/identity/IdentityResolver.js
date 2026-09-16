@@ -139,7 +139,7 @@ export class IdentityResolver {
       email,
       roles,
       permissions: payload.permissions || this.#deriveDefaultPermissions(principalType),
-      scopes: payload.scopes || payload.scope?.split(" ") || ["academic:read", "community:read", "trust:read"],
+      scopes: payload.scopes || payload.scope?.split(" ") || ["academic:read", "community:read", "trust:read", "expert:read"],
       tenantId: payload.tenantId || "hcmute",
       assuranceLevel: payload.aal || (payload.amr?.includes("mfa") ? AUTH_ASSURANCE_LEVEL.AAL2_STEP_UP : AUTH_ASSURANCE_LEVEL.AAL1_NORMAL),
       sessionId: payload.sid || null,
@@ -167,7 +167,7 @@ export class IdentityResolver {
       email: "",
       roles: [principalType.toLowerCase()],
       permissions: this.#deriveDefaultPermissions(principalType),
-      scopes: ["academic:read", "academic:plan", "community:read", "trust:read"],
+      scopes: ["academic:read", "academic:plan", "community:read", "trust:read", "expert:read"],
       tenantId: "hcmute",
       assuranceLevel: session.assuranceLevel,
       sessionId: session.sessionId
@@ -193,7 +193,7 @@ export class IdentityResolver {
       email: session.email || "",
       roles,
       permissions: this.#deriveDefaultPermissions(principalType),
-      scopes: ["academic:read", "academic:plan", "community:read", "trust:read"],
+      scopes: ["academic:read", "academic:plan", "community:read", "trust:read", "expert:read"],
       sessionId: "opaque-cookie",
       assuranceLevel: AUTH_ASSURANCE_LEVEL.AAL1_NORMAL,
       attributes: {
@@ -215,7 +215,7 @@ export class IdentityResolver {
       case PRINCIPAL_TYPE.ADMIN:
         return ["ACADEMIC.READ", "ACADEMIC.WRITE", "ADMIN.SECURITY", "TRUST.MANAGE", "AUDIT.READ", "*"];
       case PRINCIPAL_TYPE.EXPERT:
-        return ["ACADEMIC.READ", "EXPERT.PUBLISH", "EXPERT.EVALUATE", "COMMUNITY.READ", "TRUST.READ"];
+        return ["ACADEMIC.READ", "EXPERT.REQUEST", "EXPERT.PUBLISH", "EXPERT.EVALUATE", "COMMUNITY.READ", "TRUST.READ"];
       case PRINCIPAL_TYPE.MODERATOR:
         return ["COMMUNITY.READ", "COMMUNITY.MODERATE", "TRUST.READ"];
       case PRINCIPAL_TYPE.AI_AGENT:
@@ -227,6 +227,7 @@ export class IdentityResolver {
           "ACADEMIC.PLAN_OWN",
           "COMMUNITY.READ",
           "COMMUNITY.POST",
+          "EXPERT.REQUEST",
           "TRUST.READ"
         ];
     }

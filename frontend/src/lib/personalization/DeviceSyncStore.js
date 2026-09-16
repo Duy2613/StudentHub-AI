@@ -40,13 +40,24 @@ export class DeviceSyncStore {
 
   static #ensureStorageDir() {
     const dir = path.dirname(this.#storageFilePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    try {
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      return true;
+    } catch {
+      // Vercel/serverless filesystems can be read-only or unavailable. The
+      // in-process maps remain a safe degraded store; callers must not fail
+      // the authenticated Settings surface with an ENOENT/EROFS exception.
+      return false;
     }
   }
 
   static rehydrate() {
-    this.#ensureStorageDir();
+    if (!this.#ensureStorageDir()) {
+      this.#devices.clear();
+      this.#syncStores.clear();
+      this.#isHydrated = true;
+      return;
+    }
     if (!fs.existsSync(this.#storageFilePath)) {
       this.#devices.clear();
       this.#syncStores.clear();
@@ -90,7 +101,7 @@ export class DeviceSyncStore {
   }
 
   static persist() {
-    this.#ensureStorageDir();
+    if (!this.#ensureStorageDir()) return false;
     const devicesObj = {};
     for (const [id, dev] of this.#devices.entries()) {
       devicesObj[id] = dev;
@@ -132,6 +143,7 @@ export class DeviceSyncStore {
         fs.writeFileSync(this.#storageFilePath, JSON.stringify(payload, null, 2), "utf8");
       } catch {}
     }
+    return true;
   }
 
   static getDevice(deviceId) {
