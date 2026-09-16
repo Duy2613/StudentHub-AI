@@ -2,36 +2,25 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Filter, Search } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { EXPERT_LIFECYCLE_STATE, normalizeExpertLifecycleState } from "@/lib/auth/presentationState";
 import { apiRequest } from "@/lib/api/runtimeClient";
 import { apiErrorMessage } from "@/lib/api/runtimeError";
 import { createSecureId } from "@/lib/security/secureId";
-import CommunityComposer from "./CommunityComposer";
+import CommunityPrimaryActionCenter from "./CommunityPrimaryActionCenter";
+import CommunityFilterRail from "./CommunityFilterRail";
 import CommunityFeed from "./CommunityFeed";
-import CommunityCinematicHero from "./CommunityCinematicHero";
-import { CommunityEditorialStory, CommunityLiveQuestions } from "./CommunityEditorialStory";
-import CommunityEvidenceWorld from "./CommunityEvidenceWorld";
+import CommunityContextSignalRail from "./CommunityContextSignalRail";
+import CommunityQuickPostDialog from "./CommunityQuickPostDialog";
 
 export const NORMAL_COMMUNITY_WORKSPACE_COUNT = 1;
-
-const FILTERS = Object.freeze([
-  ["ALL", "Tất cả"],
-  ["TRENDING", "Đang được đọc"],
-  ["UNRESOLVED", "Chưa khép lại"],
-  ["TRUST_VERIFIED", "Trust linked"],
-  ["EXPERT_ANSWERED", "Expert answered"],
-  ["CAMPUS", "Campus"],
-  ["SCHOLARSHIP", "Học bổng"],
-  ["INTERNSHIP", "Thực tập"],
-  ["SECURITY", "An toàn số"],
-]);
 
 const API_TOPIC_BY_FILTER = Object.freeze({
   CAMPUS: "CAMPUS",
   SCHOLARSHIP: "SCHOLARSHIP",
-  SECURITY: "SAFETY",
+  SAFETY: "SAFETY",
+  ACADEMIC: "ACADEMIC",
+  GENERAL: "GENERAL",
 });
 
 function sourceList(post) {
@@ -97,12 +86,14 @@ export default function CommunitySocialWorkspace() {
   const [posts, setPosts] = useState([]);
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [sourceState, setSourceState] = useState("UNKNOWN");
   const [reloadKey, setReloadKey] = useState(0);
+  const [quickPostOpen, setQuickPostOpen] = useState(false);
   const [expertLifecycleState, setExpertLifecycleState] = useState(EXPERT_LIFECYCLE_STATE.NONE);
 
   const apiTopic = API_TOPIC_BY_FILTER[activeFilter] || "ALL";
@@ -112,12 +103,18 @@ export default function CommunitySocialWorkspace() {
     setError("");
     try {
       const params = new URLSearchParams({ limit: "60", topic: apiTopic });
-      const payload = await apiRequest(`/api/community/social?${params}`, { signal, requestId: createSecureId("community-feed") });
+      const payload = await apiRequest(`/api/community/social?${params}`, {
+        signal,
+        requestId: createSecureId("community-feed"),
+      });
       setPosts(Array.isArray(payload?.posts) ? payload.posts.map(normalizeForumPost) : []);
       setSourceState(payload?.sourceState || "UNKNOWN");
     } catch (caught) {
       try {
-        const fallback = await apiRequest("/api/forum/posts?sortBy=newest", { signal, requestId: createSecureId("community-feed-fallback") });
+        const fallback = await apiRequest("/api/forum/posts?sortBy=newest", {
+          signal,
+          requestId: createSecureId("community-feed-fallback"),
+        });
         setPosts(Array.isArray(fallback?.posts) ? fallback.posts.map(normalizeForumPost) : []);
         setSourceState(fallback?.sourceState || "COMMUNITY_SIGNAL");
         setNotice("Bảng tin đang dùng projection cộng đồng tương thích; các tín hiệu vẫn không phải kết luận xác minh.");
@@ -142,7 +139,7 @@ export default function CommunitySocialWorkspace() {
     }
     const controller = new AbortController();
     fetch("/api/expert/qualification", { credentials: "include", cache: "no-store", signal: controller.signal })
-      .then((response) => response.ok ? response.json() : null)
+      .then((response) => (response.ok ? response.json() : null))
       .then((payload) => setExpertLifecycleState(normalizeExpertLifecycleState(payload?.data?.state)))
       .catch(() => {
         if (!controller.signal.aborted) setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
@@ -151,61 +148,69 @@ export default function CommunitySocialWorkspace() {
   }, [isAuthenticated]);
 
   const activeExpert = expertLifecycleState === EXPERT_LIFECYCLE_STATE.ACTIVE;
+
+  // Filter posts client-side for fine-grained search & status facets
   const visiblePosts = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase("vi");
     const searched = normalized
-      ? posts.filter((post) => `${post.title} ${post.content} ${post.topic} ${post.sources.join(" ")}`.toLocaleLowerCase("vi").includes(normalized))
+      ? posts.filter((post) =>
+          `${post.title} ${post.content} ${post.topic} ${post.sources.join(" ")}`
+            .toLocaleLowerCase("vi")
+            .includes(normalized)
+        )
       : posts;
-    const filtered = searched.filter((post) => {
-      const status = String(post.status || "").toUpperCase();
-      switch (activeFilter) {
-        case "UNRESOLVED":
-          return ["OPEN", "UNRESOLVED", "PENDING", "UNKNOWN"].includes(status);
-        case "TRUST_VERIFIED":
-          return post.trustLinked || Boolean(post.trustCase?.verdict || post.trustCase?.status === "COMPLETE");
-        case "EXPERT_ANSWERED":
-          return Boolean(post.expertResponse);
-        case "INTERNSHIP":
-          return post.topic === "INTERNSHIP";
-        case "SECURITY":
-          return post.topic === "SECURITY" || post.topic === "SAFETY";
-        case "CAMPUS":
-        case "SCHOLARSHIP":
-          return post.topic === activeFilter;
-        default:
-          return true;
-      }
-    });
-    if (activeFilter !== "TRENDING") return filtered;
-    return [...filtered].sort((left, right) => {
-      const leftSignal = Number(left.likeCount || 0) + Number(left.commentCount || 0) * 2 + Number(left.sourceCount || 0);
-      const rightSignal = Number(right.likeCount || 0) + Number(right.commentCount || 0) * 2 + Number(right.sourceCount || 0);
-      return rightSignal - leftSignal;
-    });
-  }, [activeFilter, posts, query]);
 
-  const signals = useMemo(() => ({
-    questions: posts.length,
-    evidence: posts.filter((post) => mediaList(post).length + sourceList(post).length > 0).length,
-    expert: posts.filter((post) => Boolean(post.expertResponse)).length,
-  }), [posts]);
+    return searched.filter((post) => {
+      // 1. Topic filter
+      if (activeFilter === "EXPERT_ANSWERED") {
+        if (!post.expertResponse) return false;
+      } else if (activeFilter === "TRUST_VERIFIED") {
+        if (!post.trustLinked && !post.trustCase) return false;
+      } else if (activeFilter !== "ALL") {
+        if (post.topic !== activeFilter) return false;
+      }
+
+      // 2. Status facet filter
+      if (statusFilter === "WITH_EVIDENCE") {
+        return (post.sources?.length || 0) + (post.media?.length || 0) > 0;
+      }
+      if (statusFilter === "EXPERT_ANSWERED") {
+        return Boolean(post.expertResponse);
+      }
+      if (statusFilter === "TRUST_VERIFIED") {
+        return post.trustLinked || Boolean(post.trustCase);
+      }
+
+      return true;
+    });
+  }, [activeFilter, statusFilter, posts, query]);
 
   const createPost = async (draft) => {
     setBusy(true);
     setError("");
     try {
-      const payload = await apiRequest("/api/community/social", { method: "POST", body: JSON.stringify(draft), requestId: createSecureId("community-create") });
+      const payload = await apiRequest("/api/community/social", {
+        method: "POST",
+        body: JSON.stringify(draft),
+        requestId: createSecureId("community-create"),
+      });
       if (payload?.post) setPosts((current) => [normalizeForumPost(payload.post), ...current]);
-      setNotice("Đã đăng chia sẻ. Đây là tín hiệu cộng đồng, chưa phải kết luận xác minh.");
+      setNotice("Đã đăng quan sát. Đây là tín hiệu cộng đồng, chưa phải kết luận xác minh.");
     } catch (caught) {
       try {
         const payload = await apiRequest("/api/forum/posts", {
           method: "POST",
-          body: JSON.stringify({ category: draft.topic?.toLowerCase() === "safety" ? "nha_tro" : "truong_hoc", title: draft.content.slice(0, 90), content: draft.content, images: draft.imageUrl ? [draft.imageUrl] : [], links: draft.sourceUrl ? [draft.sourceUrl] : [] }),
+          body: JSON.stringify({
+            category: draft.topic?.toLowerCase() === "safety" ? "nha_tro" : "truong_hoc",
+            title: draft.content.slice(0, 90),
+            content: draft.content,
+            images: draft.imageUrl ? [draft.imageUrl] : [],
+            links: draft.sourceUrl ? [draft.sourceUrl] : [],
+          }),
           requestId: createSecureId("community-create-fallback"),
         });
         if (payload?.post) setPosts((current) => [normalizeForumPost(payload.post), ...current]);
-        setNotice("Đã nhận chia sẻ qua luồng cộng đồng tương thích; chưa phải kết luận xác minh.");
+        setNotice("Đã nhận quan sát qua luồng tương thích; chưa phải kết luận xác minh.");
       } catch (fallbackError) {
         setError(apiErrorMessage(fallbackError || caught));
       }
@@ -217,13 +222,29 @@ export default function CommunitySocialWorkspace() {
   const interact = async (post, action, details = {}) => {
     if (!isAuthenticated) return;
     try {
-      const payload = await apiRequest("/api/community/social", { method: "PATCH", body: JSON.stringify({ postId: post.postId, action, ...details }), requestId: createSecureId("community-interaction") });
-      if (payload?.post) setPosts((current) => current.map((item) => item.postId === post.postId ? normalizeForumPost(payload.post) : item));
+      const payload = await apiRequest("/api/community/social", {
+        method: "PATCH",
+        body: JSON.stringify({ postId: post.postId, action, ...details }),
+        requestId: createSecureId("community-interaction"),
+      });
+      if (payload?.post) {
+        setPosts((current) =>
+          current.map((item) => (item.postId === post.postId ? normalizeForumPost(payload.post) : item))
+        );
+      }
     } catch (caught) {
       if (action === "like" || action === "comment") {
         try {
-          const payload = await apiRequest("/api/forum/posts", { method: "PATCH", body: JSON.stringify({ postId: post.postId, action, text: details.text }), requestId: createSecureId("community-interaction-fallback") });
-          if (payload?.post) setPosts((current) => current.map((item) => item.postId === post.postId ? normalizeForumPost(payload.post) : item));
+          const payload = await apiRequest("/api/forum/posts", {
+            method: "PATCH",
+            body: JSON.stringify({ postId: post.postId, action, text: details.text }),
+            requestId: createSecureId("community-interaction-fallback"),
+          });
+          if (payload?.post) {
+            setPosts((current) =>
+              current.map((item) => (item.postId === post.postId ? normalizeForumPost(payload.post) : item))
+            );
+          }
           return;
         } catch (fallbackError) {
           setNotice(apiErrorMessage(fallbackError || caught));
@@ -234,31 +255,86 @@ export default function CommunitySocialWorkspace() {
     }
   };
 
+  const handleResetFilters = () => {
+    setActiveFilter("ALL");
+    setStatusFilter("ALL");
+    setQuery("");
+  };
+
   return (
-    <div className="unified-workspace unified-community-workspace" data-normal-workspace-count={NORMAL_COMMUNITY_WORKSPACE_COUNT}>
-      <CommunityCinematicHero posts={posts} />
+    <div
+      className="community-v2 unified-community-workspace"
+      data-community-theme="editorial"
+      data-normal-workspace-count={NORMAL_COMMUNITY_WORKSPACE_COUNT}
+    >
+      {/* 1. Primary Action Center */}
+      <CommunityPrimaryActionCenter
+        query={query}
+        onQueryChange={setQuery}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+        onOpenQuickPost={() => setQuickPostOpen(true)}
+      />
 
-      {!isAuthenticated && <div className="unified-auth-boundary"><div><strong>Đọc bảng tin mà không cần đăng nhập.</strong><p>Đăng nhập để đăng bài, bình luận, đánh dấu đáng tin hoặc không tin.</p></div><Link href="/login?next=%2Fcommunity" className="primary-action">Đăng nhập để tham gia</Link></div>}
-      {notice && <div className="unified-inline-notice" role="status">{notice}</div>}
+      {/* Global notifications & auth hint */}
+      {!isAuthenticated && (
+        <div className="community-auth-strip">
+          <div className="community-auth-strip-text">
+            <strong>Đọc quan sát công khai không cần đăng nhập.</strong>
+            <span>Đăng nhập để đăng quan sát thực địa, bình luận và phản hồi.</span>
+          </div>
+          <Link href="/login?next=%2Fcommunity" className="community-auth-strip-btn">
+            Đăng nhập để tham gia
+          </Link>
+        </div>
+      )}
 
-      <div className="community-data-strip" aria-label="Trạng thái dữ liệu Community">
-        <span className="community-data-state"><span className="community-live-indicator" aria-hidden="true" /> {sourceState === "DURABLE_POSTGRES" ? "LIVE PROVIDER" : sourceState === "COMMUNITY_SIGNAL" ? "COMMUNITY SIGNAL" : "NGUỒN DỮ LIỆU CHƯA XÁC ĐỊNH"}</span>
-        <span>Chỉ hiển thị dữ liệu đã trả về từ server.</span>
-        <span>Đọc công khai, tương tác cần identity.</span>
+      {notice && (
+        <div className="community-inline-notice" role="status">
+          {notice}
+        </div>
+      )}
+
+      {/* 2. Main 3-Column Layout Body */}
+      <div className="community-body-grid">
+        {/* Left Column: Filter Rail */}
+        <CommunityFilterRail
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+          onReset={handleResetFilters}
+        />
+
+        {/* Center Column: Live Evidence Stream */}
+        <main className="community-stream-column">
+          <CommunityFeed
+            posts={visiblePosts}
+            loading={loading}
+            error={error}
+            sourceState={sourceState}
+            canInteract={isAuthenticated}
+            activeExpert={activeExpert}
+            moderatorEligible={moderatorEligible}
+            onInteract={interact}
+            onModerate={() => setNotice("Công cụ kiểm duyệt chỉ mở cho moderator được máy chủ cấp quyền.")}
+            onRetry={() => setReloadKey((v) => v + 1)}
+            onResetFilters={handleResetFilters}
+          />
+        </main>
+
+        {/* Right Column: Context Signal Rail */}
+        <CommunityContextSignalRail posts={posts} />
       </div>
 
-      <CommunityEditorialStory posts={visiblePosts} signals={signals} />
-
-      {isAuthenticated && <CommunityComposer busy={busy} onCreate={createPost} />}
-
-      <div className="community-feed-toolbar" id="community-feed">
-        <label className="unified-search"><Search size={16} /><span className="sr-only">Tìm trong cộng đồng</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tìm vấn đề, quy trình hoặc bằng chứng..." /></label>
-        <div className="community-topic-filter" role="group" aria-label="Bộ lọc Community"><Filter size={15} aria-hidden="true" />{FILTERS.map(([value, label]) => <button type="button" key={value} className={`filter-chip ${activeFilter === value ? "is-active" : ""}`} aria-pressed={activeFilter === value} onClick={() => setActiveFilter(value)}>{label}</button>)}</div>
-      </div>
-
-      <CommunityFeed posts={visiblePosts.slice(1)} loading={loading} error={error} canInteract={isAuthenticated} activeExpert={activeExpert} moderatorEligible={moderatorEligible} onInteract={interact} onModerate={() => setNotice("Công cụ kiểm duyệt chỉ mở cho moderator được máy chủ cấp quyền.")} onRetry={() => setReloadKey((value) => value + 1)} />
-      <CommunityLiveQuestions posts={visiblePosts} />
-      <CommunityEvidenceWorld />
+      {/* 3. Quick Post Modal Dialog */}
+      <CommunityQuickPostDialog
+        isOpen={quickPostOpen}
+        onClose={() => setQuickPostOpen(false)}
+        onSubmit={createPost}
+        busy={busy}
+        isAuthenticated={isAuthenticated}
+      />
     </div>
   );
 }
