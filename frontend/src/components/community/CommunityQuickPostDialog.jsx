@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { X, Send, Image as ImageIcon, Link2, ShieldAlert, AlertTriangle, CheckCircle2 } from "lucide-react";
 
@@ -26,7 +27,6 @@ export default function CommunityQuickPostDialog({
   const [imageUrl, setImageUrl] = useState("");
   const [showSourceInput, setShowSourceInput] = useState(false);
   const [sourceUrl, setSourceUrl] = useState("");
-  const [redactionPreviewActive, setRedactionPreviewActive] = useState(true);
 
   const dialogRef = useRef(null);
   const textareaRef = useRef(null);
@@ -67,7 +67,8 @@ export default function CommunityQuickPostDialog({
     onClose?.();
   };
 
-  return (
+  const modalContent = (
+
     <div className="community-modal-backdrop" onClick={onClose} role="presentation">
       <div
         className="community-quickpost-modal"
@@ -80,7 +81,7 @@ export default function CommunityQuickPostDialog({
         <div className="community-modal-header">
           <div>
             <h2 id="quick-post-dialog-title" className="community-modal-title">
-              Đăng một quan sát
+              Đăng một quan sát thực địa
             </h2>
             <p className="community-modal-subtitle">
               Chia sẻ điều bạn trực tiếp thấy. Community sẽ tách quan sát khỏi kết luận.
@@ -98,7 +99,7 @@ export default function CommunityQuickPostDialog({
 
         {!isAuthenticated ? (
           <div className="community-modal-auth-warning">
-            <ShieldAlert size={24} className="text-amber-600" />
+            <ShieldAlert size={24} className="community-auth-warning-icon" />
             <div>
               <strong>Yêu cầu đăng nhập</strong>
               <p>Bạn cần có danh tính StudentHub xác thực để đăng bài và tương tác trong cộng đồng.</p>
@@ -111,7 +112,7 @@ export default function CommunityQuickPostDialog({
           <form onSubmit={handleSubmit} className="community-modal-form">
             <div className="community-form-group">
               <label htmlFor="qp-content" className="community-form-label">
-                Nội dung quan sát <span className="text-red-500">*</span>
+                Nội dung quan sát <span className="community-form-required">*</span>
               </label>
               <textarea
                 id="qp-content"
@@ -126,9 +127,9 @@ export default function CommunityQuickPostDialog({
               />
               <div className="community-form-char-count">
                 {charCount < 20 ? (
-                  <span className="text-amber-700">Cần thêm {20 - charCount} ký tự nữa</span>
+                  <span className="community-count-pending">Cần thêm {20 - charCount} ký tự nữa</span>
                 ) : (
-                  <span className="text-emerald-700 flex items-center gap-1">
+                  <span className="community-count-valid">
                     <CheckCircle2 size={12} /> Đã đủ độ dài ({charCount} ký tự)
                   </span>
                 )}
@@ -200,7 +201,7 @@ export default function CommunityQuickPostDialog({
 
               {showImageInput && (
                 <div className="community-input-drawer">
-                  <label htmlFor="qp-image-url" className="text-xs text-stone-600 block mb-1">
+                  <label htmlFor="qp-image-url" className="community-drawer-label">
                     Đường dẫn hình ảnh minh chứng:
                   </label>
                   <input
@@ -209,14 +210,14 @@ export default function CommunityQuickPostDialog({
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
                     placeholder="https://... hoặc /uploads/..."
-                    className="community-form-input text-sm"
+                    className="community-form-input"
                   />
                 </div>
               )}
 
               {showSourceInput && (
                 <div className="community-input-drawer">
-                  <label htmlFor="qp-source-url" className="text-xs text-stone-600 block mb-1">
+                  <label htmlFor="qp-source-url" className="community-drawer-label">
                     Đường dẫn tài liệu / bài báo / thông báo:
                   </label>
                   <input
@@ -225,7 +226,7 @@ export default function CommunityQuickPostDialog({
                     value={sourceUrl}
                     onChange={(e) => setSourceUrl(e.target.value)}
                     placeholder="https://..."
-                    className="community-form-input text-sm"
+                    className="community-form-input"
                   />
                 </div>
               )}
@@ -233,17 +234,17 @@ export default function CommunityQuickPostDialog({
 
             <div className="community-privacy-card">
               <div className="community-privacy-header">
-                <AlertTriangle size={15} className="text-amber-700" />
-                <span className="font-semibold text-stone-900 text-sm">
+                <AlertTriangle size={15} className="community-privacy-alert-icon" />
+                <span className="community-privacy-title">
                   Kiểm tra thông tin cá nhân trước khi đăng
                 </span>
               </div>
-              <p className="text-xs text-stone-600 mb-2">
+              <p className="community-privacy-desc">
                 Che số điện thoại, địa chỉ nhà và thông tin nhận dạng không cần thiết.
               </p>
               <div className="community-redaction-preview-box">
                 <span className="community-redaction-tag">REDACTION PREVIEW · BẢN MẪU</span>
-                <p className="text-xs text-stone-400 mt-1">
+                <p className="community-redaction-note">
                   Đảm bảo không lộ số tài khoản ngân hàng hoặc CCCD của bên thứ ba.
                 </p>
               </div>
@@ -284,5 +285,11 @@ export default function CommunityQuickPostDialog({
         )}
       </div>
     </div>
+  
   );
-}
+
+  if (typeof document !== "undefined") {
+    return createPortal(modalContent, document.body);
+  }
+  return modalContent;
+};
