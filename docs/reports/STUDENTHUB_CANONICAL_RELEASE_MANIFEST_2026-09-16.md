@@ -77,3 +77,19 @@ Canonical targets:
 This manifest is an audit record of the pre-release state. The final release
 report must update the actual release, preview, main, production, domain, test,
 secret-scan, and rollback evidence without exposing secrets.
+
+## Preview environment alignment
+
+The canonical Preview branch is `implementation/academic-cinematic-v1-f00`.
+Branch-scoped Preview variables were added without changing any Production
+variable. The Preview runtime is bound to the staging Supabase project
+`bniwtkjtramqaozrrtrk`, a staging database URL, staging service credentials,
+staging session pepper, staging screenshot bucket, Gemini canonical key, and
+the non-secret flags `GEMINI_MODEL=gemini-3.8-flash`,
+`OPENAI_RUNTIME=DISABLED_INTENTIONALLY`, and
+`NEXT_PUBLIC_STUDENTHUB_PROVIDER_MODE=GEMINI_ONLY`.
+
+The first Preview deployment was built before these variables existed and
+therefore reported database `NOT_CONFIGURED`. A CLI redeploy was refused by
+Vercel with a team-ownership mismatch, so the next implementation-branch
+commit is intentionally used to trigger a fresh Git-integrated Preview.
