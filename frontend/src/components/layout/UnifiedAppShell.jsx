@@ -57,7 +57,11 @@ export default function UnifiedAppShell({ children }) {
 
   const displayName = profile?.fullName || session?.user?.email?.split("@")[0] || "Khách";
   const signedInForHeader = ready && status === "READY" && isAuthenticated;
-  const expertEntry = expertLifecycleState === EXPERT_LIFECYCLE_STATE.ACTIVE
+  const isExpert = expertLifecycleState === EXPERT_LIFECYCLE_STATE.ACTIVE;
+  const profileLink = isExpert
+    ? { label: "Hồ sơ chuyên gia", href: "/expert/profile" }
+    : { label: "Hồ sơ cá nhân", href: "/profile" };
+  const expertEntry = isExpert
     ? { label: "Expert Dashboard", href: "/expert" }
     : { label: "Trở thành chuyên gia.", href: "/expert/profile" };
   const handleNavigate = () => setMobileOpen(false);
@@ -144,7 +148,9 @@ export default function UnifiedAppShell({ children }) {
                     <strong>{displayName}</strong>
                     <small>{session?.user?.email || "Email chưa công bố"}</small>
                   </div>
-                  <Link href="/profile" role="menuitem" onClick={() => setAccountOpen(false)}><UserRound size={15} /> Hồ sơ cá nhân</Link>
+                  <Link href={profileLink.href} role="menuitem" onClick={() => setAccountOpen(false)}>
+                    {isExpert ? <ShieldCheck size={15} /> : <UserRound size={15} />} {profileLink.label}
+                  </Link>
                   <Link href={expertEntry.href} role="menuitem" onClick={() => setAccountOpen(false)}><ShieldCheck size={15} /> {expertEntry.label}</Link>
                   <Link href="/settings" role="menuitem" onClick={() => setAccountOpen(false)}><Settings size={15} /> Cài đặt</Link>
                   <button type="button" role="menuitem" onClick={() => { setAccountOpen(false); void signOut(); }}><LogOut size={15} /> Đăng xuất</button>

@@ -1,8 +1,8 @@
 // frontend/src/lib/auth/authService.js
 //
-// Hệ thống dịch vụ xác thực trung tâm (Auth Core Service) kết nối Supabase Auth + ASP.NET Core Backend:
+// Hệ thống dịch vụ xác thực trung tâm kết nối Supabase Auth + StudentHub Owner BFF:
 // - Bọc 100% try/catch toàn diện với chuẩn Diagnostic Logging: [AUTH_ERROR] & [AUTH_INFO]
-// - Interceptor bắt và dịch chính xác toàn bộ mã lỗi Supabase & ASP.NET Core sang tiếng Việt
+// - Interceptor bắt và dịch chính xác các mã lỗi Supabase và Owner BFF sang tiếng Việt
 // - Provider bearer proof is kept in memory only and exchanged for an opaque
 //   server-issued HttpOnly cookie before the UI claims an authenticated session.
 // - "Remember Me" stores only a UI preference; credentials stay transient or
@@ -10,9 +10,9 @@
 
 import { clearPkceVerifierStorage, supabase } from "../supabase/client.js";
 
-const API_BASE = typeof window !== "undefined"
-  ? "" // Sử dụng Next.js Route Proxy cùng origin để triệt tiêu lỗi CORS Preflight
-  : (process.env.NEXT_PUBLIC_API_URL || "https://studenthub-api-8fqp.onrender.com");
+// Profile/Auth calls are same-origin Owner BFF calls. There is deliberately no
+// external backend fallback for browser or server execution.
+const API_BASE = "";
 
 let volatileToken = null;
 let exchangeInFlight = null;
@@ -415,7 +415,7 @@ export async function getUserProfile() {
   }
 
   try {
-    const res = await fetch(`${API_BASE}/api/users/profile`, {
+    const res = await fetch(`${API_BASE}/api/users/me`, {
       method: "GET",
       credentials: "include",
       headers: { Accept: "application/json" },
@@ -670,9 +670,8 @@ export async function signInWithPassword(email, password, rememberMe = false) {
       error.code = capabilities.emailPasswordReason || "EMAIL_PASSWORD_UNAVAILABLE";
       throw error;
     }
-    // Supabase/OIDC is the sole end-user identity authority. The external
-    // ASP.NET service remains a profile-sync compatibility dependency and may
-    // not independently establish an authenticated application session.
+    // Supabase/OIDC is the identity authority; the Owner BFF is the only
+    // application profile boundary.
     const { data, error } = await supabase.auth.signInWithPassword({
       email: cleanEmail,
       password,
@@ -843,7 +842,7 @@ export async function updateUserProfile(profileData) {
       error.code = "BROWSER_CONTEXT_REQUIRED";
       throw error;
     }
-    const res = await fetch(`${API_BASE}/api/users/profile`, {
+    const res = await fetch(`${API_BASE}/api/users/me`, {
       method: "PUT",
       credentials: "include",
       headers: { Accept: "application/json", "Content-Type": "application/json" },

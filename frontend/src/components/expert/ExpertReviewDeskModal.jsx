@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { AlertCircle, ArrowRight, CheckCircle2, FileText, Lock, ShieldCheck, X } from "lucide-react";
+import { AlertCircle, CheckCircle2, ShieldCheck, X } from "lucide-react";
 
 /**
  * ExpertReviewDeskModal — Active Review Workbench.
@@ -18,8 +18,12 @@ export default function ExpertReviewDeskModal({
   const [inScope, setInScope] = useState(true);
   const [verdict, setVerdict] = useState("AFFIRMED");
   const [confidence, setConfidence] = useState("HIGH");
+  const [assessment, setAssessment] = useState("");
   const [limitations, setLimitations] = useState("");
+  const [coiDeclared, setCoiDeclared] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -31,25 +35,55 @@ export default function ExpertReviewDeskModal({
 
   if (!isOpen) return null;
 
-  const claimText = caseDossier?.claim || caseDossier?.canonicalClaim || "Thời gian nộp đơn đăng ký dự thi tốt nghiệp THPT được gia hạn thêm 48 giờ.";
-  const caseId = caseDossier?.id || caseDossier?.caseId || "EXP-2026-8819";
-  const domain = caseDossier?.domain || "Quy chế Đào tạo & Khảo thí";
+  const claimText = caseDossier?.claim || caseDossier?.canonicalClaim || "";
+  const caseId = caseDossier?.id || caseDossier?.caseId || "";
+  const domain = caseDossier?.domain || caseDossier?.domainCode || "";
+  const hasBoundAssignment = Boolean(caseDossier && caseId && claimText && caseDossier.assignmentId);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError("");
+    const cleanAssessment = assessment.trim();
+    const cleanLimitations = limitations.trim();
+    if (!hasBoundAssignment) {
+      setSubmitError("Chưa có assignment Trust được server bind; không thể tạo đánh giá giả.");
+      return;
+    }
+    if (cleanAssessment.length < 20) {
+      setSubmitError("Nhận định chuyên môn phải có ít nhất 20 ký tự.");
+      return;
+    }
+    if (cleanAssessment.length > 20_000 || cleanLimitations.length > 20_000) {
+      setSubmitError("Nội dung đánh giá vượt quá giới hạn lưu trữ.");
+      return;
+    }
     setSubmitting(true);
-    onSubmitAssessment?.({
-      caseId,
-      verdict,
-      confidence,
-      limitations,
-      inScope,
-      timestamp: new Date().toISOString(),
-    });
-    setTimeout(() => {
+    try {
+      if (typeof onSubmitAssessment !== "function") {
+        throw new Error("Kênh lưu assessment chưa được cấu hình.");
+      }
+      await onSubmitAssessment({
+        caseId,
+        assignmentId: caseDossier.assignmentId,
+        caseRevision: caseDossier.caseRevision,
+        claimId: caseDossier.claimId || null,
+        domainCode: caseDossier.domainCode || domain,
+        evidenceRevisionIds: caseDossier.evidenceRevisionIds || [],
+        assessment: { analysis: cleanAssessment, claimReviewed: claimText, limitations: cleanLimitations },
+        reasoning: cleanAssessment,
+        confidence: { LOW: 0.3, MEDIUM: 0.6, HIGH: 0.9 }[confidence],
+        limitations: cleanLimitations,
+        conclusionWithinScope: inScope ? verdict : "OUT_OF_SCOPE",
+        coiDeclared,
+        inScope,
+        timestamp: new Date().toISOString(),
+      });
+      setSubmitted(true);
+    } catch (error) {
+      setSubmitError(error?.message || "Không thể lưu đánh giá. Vui lòng thử lại.");
+    } finally {
       setSubmitting(false);
-      onClose?.();
-    }, 600);
+    }
   };
 
   return (
@@ -71,52 +105,66 @@ export default function ExpertReviewDeskModal({
 
         {/* LEFT COLUMN: TRUST DOSSIER */}
         <div className="expert-review-desk-dossier">
-          <div className="relative rounded-md overflow-hidden aspect-video mb-4 border border-white/10 bg-black/40">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              poster="/media/v3/expert/live-review-poster.webp"
-              src="/media/v3/expert/live-review.mp4"
-              className="w-full h-full object-cover"
-            />
-            <img
-              src="/media/v3/expert/live-review-poster.webp"
-              alt="Live review workspace"
-              className="video-fallback-poster hidden w-full h-full object-cover"
-            />
-            <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 border border-emerald-500/30 text-[10px] font-mono text-emerald-300">
-              BÀN GIÁM ĐỊNH TRỰC THỜI GIAN THỰC
+          {/* Institutional Audit Environment — Zero-video policy: /media/v3/expert/live-review.mp4 disabled */}
+          <div className="video-fallback-poster rounded-md p-3 mb-4 border border-emerald-500/20 bg-emerald-950/20 text-emerald-300 flex items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <ShieldCheck size={18} className="text-emerald-400 shrink-0" />
+              <div>
+                <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-emerald-300">
+                  BÀN GIÁM ĐỊNH CHUYÊN MÔN CHÍNH THỨC
+                </div>
+                <div className="text-[11px] text-slate-400">
+                  Môi trường giám định độc lập · Server-owned authority
+                </div>
+              </div>
             </div>
+            <span
+              className="text-[10px] font-mono text-emerald-400 bg-black/60 px-2 py-0.5 rounded border border-emerald-500/30 shrink-0"
+              data-poster="/media/v3/expert/live-review-poster.webp"
+              data-media="/media/v3/expert/live-review.mp4"
+            >
+              LIVE AUDIT SESSION
+            </span>
           </div>
 
           <div className="space-y-3">
             <div>
               <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 block mb-0.5">
-                HỒ SƠ TRUST GỐC #{caseId}
+                {caseId ? `HỒ SƠ TRUST GỐC #${caseId}` : "CHƯA CÓ HỒ SƠ TRUST ĐƯỢC GÁN"}
               </span>
               <h4 className="text-sm font-semibold text-slate-100 font-serif">Mệnh đề cần thẩm định</h4>
-              <p className="text-xs text-slate-300 mt-1 italic p-2.5 rounded bg-[#0C0F14] border border-white/5">
-                "{claimText}"
-              </p>
+              {claimText ? (
+                <p className="text-xs text-slate-300 mt-1 italic p-2.5 rounded bg-[#0C0F14] border border-white/5">
+                  “{claimText}”
+                </p>
+              ) : (
+                <p className="text-xs text-amber-200 mt-1 p-2.5 rounded bg-amber-500/10 border border-amber-500/20" role="status">
+                  Chưa có assignment thực tế. Không hiển thị mệnh đề mẫu.
+                </p>
+              )}
             </div>
 
-            <div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1">
-                DỮ LIỆU ĐỐI SOÁT TỪ LAYER 03 TRUST
-              </span>
-              <ul className="text-[11px] text-slate-300 space-y-1.5 pl-4 list-disc">
-                <li>Văn bản đối chiếu: Quyết định điều chỉnh lịch thi số 104/QĐ-BGDĐT.</li>
-                <li>Nguồn cấp 1: Cổng thông tin Bộ Giáo dục & Đào tạo (.gov.vn).</li>
-                <li>Mâu thuẫn phát hiện: Bài đăng mạng xã hội đề cập ngày 18 thay vì ngày 15.</li>
-              </ul>
-            </div>
+            {Array.isArray(caseDossier?.evidence) && caseDossier.evidence.length > 0 && (
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1">
+                  DỮ LIỆU ĐỐI SOÁT TỪ LAYER 03 TRUST
+                </span>
+                <ul className="text-[11px] text-slate-300 space-y-1.5 pl-4 list-disc">
+                  {caseDossier.evidence.map((item, index) => (
+                    <li key={`${item?.id || "evidence"}-${index}`}>
+                      {item?.label || item?.title || item?.summary || String(item)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-            <div className="p-2.5 rounded bg-cyan-500/5 border border-cyan-500/20 text-[11px] text-cyan-200">
-              <strong className="block font-mono text-[10px] text-cyan-300">CỐ VẤN LAYER 04 (GEMINI):</strong>
-              Đề nghị đối chiếu cụ thể với điều khoản áp dụng cho thí sinh tự do.
-            </div>
+            {caseDossier?.layer4Summary && (
+              <div className="p-2.5 rounded bg-cyan-500/5 border border-cyan-500/20 text-[11px] text-cyan-200">
+                <strong className="block font-mono text-[10px] text-cyan-300">CỐ VẤN LAYER 04 (GEMINI):</strong>
+                {caseDossier.layer4Summary}
+              </div>
+            )}
           </div>
         </div>
 
@@ -130,10 +178,17 @@ export default function ExpertReviewDeskModal({
                   Biểu Mẫu Giám Định Chuyên Môn
                 </h3>
                 <span className="text-[10px] font-mono text-slate-400">
-                  PHẠM VI THẨM QUYỀN: {domain.toUpperCase()}
+                  PHẠM VI THẨM QUYỀN: {domain ? domain.toUpperCase() : "CHƯA XÁC ĐỊNH"}
                 </span>
               </div>
             </div>
+
+            {!hasBoundAssignment && (
+              <div className="mb-4 flex items-start gap-2 rounded border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-100" role="alert">
+                <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                <span>Review Desk chỉ mở biểu mẫu khi có assignment, case revision và mệnh đề do server bind.</span>
+              </div>
+            )}
 
             {/* JURISDICTION CONFIRMATION */}
             <div className="mb-4">
@@ -203,6 +258,29 @@ export default function ExpertReviewDeskModal({
               </div>
             </div>
 
+            {/* FORMAL ASSESSMENT */}
+            <div className="mb-4">
+              <label htmlFor="formal-expert-assessment" className="text-xs text-slate-300 font-medium block mb-1.5">
+                Nhận định chuyên môn chính thức <span aria-hidden="true">*</span>
+              </label>
+              <textarea
+                id="formal-expert-assessment"
+                value={assessment}
+                onChange={(e) => { setAssessment(e.target.value); setSubmitError(""); }}
+                rows={6}
+                required
+                minLength={20}
+                maxLength={20_000}
+                disabled={!hasBoundAssignment || submitting || submitted}
+                placeholder="Nêu kết luận độc lập, căn cứ trong phạm vi domain và mức độ bất định..."
+                aria-describedby="formal-expert-assessment-help"
+                className="w-full text-xs p-2.5 rounded bg-[#0C0F14] border border-white/10 text-slate-200 focus:border-emerald-400 outline-none resize-y leading-relaxed"
+              />
+              <p id="formal-expert-assessment-help" className="mt-1 text-[10px] text-slate-500">
+                {assessment.length}/20.000 ký tự · Nội dung được lưu như assessment độc lập, không sửa Trust L1–L5.
+              </p>
+            </div>
+
             {/* LIMITATIONS & CONDITIONS */}
             <div className="mb-4">
               <label className="text-xs text-slate-300 font-medium block mb-1">
@@ -213,13 +291,28 @@ export default function ExpertReviewDeskModal({
                 onChange={(e) => setLimitations(e.target.value)}
                 rows={3}
                 required
-                disabled={!inScope}
+                maxLength={20_000}
+                disabled={!hasBoundAssignment || !inScope || submitting || submitted}
                 placeholder="Nêu rõ điều kiện áp dụng, ví dụ: Áp dụng riêng cho sinh viên các khoa chất lượng cao..."
                 className="w-full text-xs p-2.5 rounded bg-[#0C0F14] border border-white/10 text-slate-200 focus:border-emerald-400 outline-none resize-none leading-relaxed"
               />
             </div>
+
+            <label className="mb-4 flex items-start gap-2 text-xs text-slate-300">
+              <input
+                type="checkbox"
+                checked={coiDeclared}
+                onChange={(e) => setCoiDeclared(e.target.checked)}
+                disabled={!hasBoundAssignment || submitting || submitted}
+                required
+                className="mt-0.5"
+              />
+              <span>Tôi xác nhận không có xung đột lợi ích với case này.</span>
+            </label>
           </div>
 
+          {submitError && <p className="mb-3 flex items-start gap-2 text-xs text-rose-200" role="alert"><AlertCircle size={15} className="mt-0.5 shrink-0" />{submitError}</p>}
+          {submitted && <p className="mb-3 flex items-start gap-2 text-xs text-emerald-200" role="status"><CheckCircle2 size={15} className="mt-0.5 shrink-0" />Đánh giá đã được gửi qua kênh server và không thay đổi phán quyết Trust.</p>}
           <div className="pt-3 border-t border-white/10 flex items-center justify-between">
             <button
               type="button"
@@ -230,7 +323,7 @@ export default function ExpertReviewDeskModal({
             </button>
             <button
               type="submit"
-              disabled={submitting || (!inScope && !limitations)}
+              disabled={!hasBoundAssignment || submitting || submitted || !assessment.trim() || !limitations.trim() || !coiDeclared}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-200 text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
             >
               <CheckCircle2 size={14} />

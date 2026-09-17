@@ -137,6 +137,7 @@ function normalizeProfile(profile) {
     displayName: boundedText(profile.displayName || profile.name, { field: "displayName", min: 1, max: 120 }),
     institution: boundedText(profile.institution, { field: "institution", max: 180 }),
     bio: boundedText(profile.bio, { field: "bio", max: 1000 }),
+    expertise: boundedText(profile.expertise, { field: "expertise", max: 500 }),
     credentials,
   };
 }
@@ -371,6 +372,46 @@ export class ExpertQualificationService {
         state: "IDENTITY_REVIEW",
         application: applicationDTO(inserted.rows[0]),
         latestAttempt: null,
+      };
+    }));
+  }
+
+  static async updateProfile({ userId, bio, expertise }) {
+    const normalizedUserId = normalizeUuid(userId, "user");
+    return withStorageErrors(() => transaction(async (client) => {
+      const result = await client.query(
+        `SELECT id, status, profile_snapshot, requested_domains, approved_domains,
+                created_at, updated_at, reviewed_at
+           FROM public.expert_applications
+          WHERE user_id = $1
+          FOR UPDATE`,
+        [normalizedUserId]
+      );
+      const application = result.rows[0];
+      if (!application) throw new ExpertQualificationError("QUALIFICATION_NOT_FOUND", "Submit an expert profile before editing it.", 404);
+
+      const current = jsonObject(application.profile_snapshot);
+      const nextBio = boundedText(bio === undefined ? current.bio : bio, { field: "bio", max: 1000 });
+      const nextExpertise = boundedText(expertise === undefined ? current.expertise : expertise, { field: "expertise", max: 500 });
+      const scan = detectPII(JSON.stringify({ bio: nextBio, expertise: nextExpertise }));
+      if (scan.blocked) throw new ExpertQualificationError("PRIVACY_SCAN_BLOCKED", "The expert profile contains identifying content and cannot be stored.", 422);
+
+      const profileSnapshot = {
+        ...current,
+        bio: redactText(nextBio),
+        expertise: redactText(nextExpertise),
+      };
+      const updated = await client.query(
+        `UPDATE public.expert_applications
+            SET profile_snapshot = $2::jsonb, updated_at = now()
+          WHERE id = $1
+          RETURNING id, status, profile_snapshot, requested_domains, approved_domains,
+                    created_at, updated_at, reviewed_at`,
+        [application.id, JSON.stringify(profileSnapshot)]
+      );
+      return {
+        state: String(updated.rows[0].status || application.status),
+        application: applicationDTO(updated.rows[0]),
       };
     }));
   }

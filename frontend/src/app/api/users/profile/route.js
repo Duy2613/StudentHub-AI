@@ -1,31 +1,39 @@
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
-import { UserProfileRepository } from "@/lib/server/database/UserProfileRepository.js";
+import { UserProfileService } from "@/lib/server/profile/UserProfileService.js";
 
 export const dynamic = "force-dynamic";
-
-function identityFrom(principal) {
-  return {
-    userId: principal.subjectId,
-    fallbackName: principal.attributes?.fullName || principal.email?.split("@")[0] || "Thành viên StudentHub",
-  };
-}
 
 function profileResponse(profile, principal) {
   return {
     ...profile,
     email: principal.email || null,
     emailVerified: principal.attributes?.emailVerified === true,
+    institutionalEmailVerified: principal.attributes?.institutionalEmailVerified === true,
+    verificationSource: principal.attributes?.verificationSource || "NONE",
+    qaEntitlements: Array.isArray(principal.attributes?.qaEntitlements) ? principal.attributes.qaEntitlements : [],
+    qaStudentFeatureAccess: principal.attributes?.qaStudentFeatureAccess === true,
+    demoFeatureAccess: principal.attributes?.demoFeatureAccess === true,
+    demoAccessSource: principal.attributes?.demoAccessSource || null,
   };
 }
 
 async function readProfile(_request, _routeParams, principal) {
   try {
-    const profile = await UserProfileRepository.getOrCreate(identityFrom(principal));
+    const profile = await UserProfileService.getUserProfileView({ principal });
     return Response.json({ success: true, profile: profileResponse(profile, principal) });
   } catch (error) {
+    const statusCode = error?.statusCode || 503;
+    const errorCode = error?.code === "PROFILE_ID_INVALID" ? "AUTHENTICATION_REQUIRED" : (error?.code || "PROFILE_STORAGE_UNAVAILABLE");
     return Response.json(
-      { success: false, error: { code: error?.code === "PROFILE_ID_INVALID" ? "AUTHENTICATION_REQUIRED" : "PROFILE_STORAGE_UNAVAILABLE", userMessage: "Hồ sơ cá nhân chưa khả dụng. Dữ liệu chưa được thay thế bằng bản demo." } },
-      { status: error?.statusCode || 503 }
+      {
+        success: false,
+        error: {
+          code: errorCode,
+          message: error?.message || "Hồ sơ cá nhân chưa khả dụng.",
+          userMessage: error?.message || "Hồ sơ cá nhân chưa khả dụng. Dữ liệu chưa được thay thế bằng bản demo.",
+        },
+      },
+      { status: statusCode }
     );
   }
 }
@@ -33,21 +41,27 @@ async function readProfile(_request, _routeParams, principal) {
 async function updateProfile(request, _routeParams, principal) {
   try {
     const body = await request.json().catch(() => ({}));
-    let profile = await UserProfileRepository.update({
-      ...identityFrom(principal),
+    if (body && typeof body === "object" && !Array.isArray(body) && body.onboardingCompleted === true) {
+      // Onboarding completion is handled in UserProfileService
+    }
+    const profile = await UserProfileService.updateUserProfile({
+      principal,
       updates: body,
     });
-    // Onboarding completion is an application-state transition, not a
-    // presentation field. Only the dedicated boolean accepted by this
-    // authenticated route can move it forward, and it is never downgraded.
-    if (body && typeof body === "object" && !Array.isArray(body) && body.onboardingCompleted === true) {
-      profile = await UserProfileRepository.markOnboarded(identityFrom(principal));
-    }
     return Response.json({ success: true, profile: profileResponse(profile, principal) });
   } catch (error) {
+    const statusCode = error?.statusCode || (error?.code === "FORBIDDEN_PROFILE_MUTATION" ? 403 : 400);
+    const errorCode = error?.code === "PROFILE_ID_INVALID" ? "AUTHENTICATION_REQUIRED" : (error?.code || "PROFILE_STORAGE_UNAVAILABLE");
     return Response.json(
-      { success: false, error: { code: error?.code === "PROFILE_ID_INVALID" ? "AUTHENTICATION_REQUIRED" : "PROFILE_STORAGE_UNAVAILABLE", userMessage: "Không thể lưu hồ sơ lúc này. Các trường quyền hạn vẫn do máy chủ giữ nguyên." } },
-      { status: error?.statusCode || 503 }
+      {
+        success: false,
+        error: {
+          code: errorCode,
+          message: error?.message || "Không thể lưu hồ sơ lúc này.",
+          userMessage: error?.message || "Không thể lưu hồ sơ lúc này. Các trường quyền hạn vẫn do máy chủ giữ nguyên.",
+        },
+      },
+      { status: statusCode }
     );
   }
 }
@@ -60,3 +74,4 @@ const ownProfilePolicy = {
 
 export const GET = SecurityFabric.wrapHandler({ ...ownProfilePolicy, action: "READ_OWN_PROFILE", maxBodyBytes: 0 }, readProfile);
 export const PUT = SecurityFabric.wrapHandler({ ...ownProfilePolicy, action: "UPDATE_OWN_PROFILE" }, updateProfile);
+export const PATCH = SecurityFabric.wrapHandler({ ...ownProfilePolicy, action: "UPDATE_OWN_PROFILE" }, updateProfile);

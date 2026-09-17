@@ -77,6 +77,8 @@ function formatProfile(user, { authoritative = false, durableProfile = null } = 
   const source = authoritative ? (durableProfile || {}) : {};
   const email = user.email || user.Email || "";
   const fullName = source.fullName || source.displayName || user.fullName || user.FullName || email.split("@")[0] || "Người dùng StudentHub";
+  const institutionalEmailVerified = source.institutionalEmailVerified === true || user.institutionalEmailVerified === true;
+  const qaEntitlements = Array.isArray(source.qaEntitlements) ? source.qaEntitlements : (Array.isArray(user.qaEntitlements) ? user.qaEntitlements : []);
   return {
     id: userId || "",
     email,
@@ -95,7 +97,9 @@ function formatProfile(user, { authoritative = false, durableProfile = null } = 
     reputationScore: null,
     githubUsername: source.githubUsername || null,
     topRepos: [],
-    verifiedStudent: false,
+    // A confirmed Gmail mailbox is not an institutional student identity.
+    // QA feature access is intentionally represented by separate fields.
+    verifiedStudent: institutionalEmailVerified,
     verifiedExpert: false,
     onboarded: user.onboarded === true || source.onboarded === true,
     badges: [],
@@ -106,6 +110,12 @@ function formatProfile(user, { authoritative = false, durableProfile = null } = 
     updatedAt: source.updatedAt || null,
     serverRoles,
     emailVerified: user.emailVerified === true,
+    institutionalEmailVerified,
+    verificationSource: source.verificationSource || user.verificationSource || "NONE",
+    qaEntitlements,
+    qaStudentFeatureAccess: source.qaStudentFeatureAccess === true || user.qaStudentFeatureAccess === true,
+    demoFeatureAccess: source.demoFeatureAccess === true || user.demoFeatureAccess === true,
+    demoAccessSource: source.demoAccessSource || user.demoAccessSource || null,
   };
 }
 
@@ -463,7 +473,7 @@ export function AuthProvider({ children }) {
   }, [transitionAuthState]);
 
   /**
-   * Đảm bảo đồng bộ với ASP.NET Core Backend
+   * Đảm bảo đồng bộ với StudentHub Owner BFF
    */
   const ensureSynced = useCallback(async () => {
     logAuthInfo("ensureSynced", "Kiểm tra application session authoritative.");
