@@ -90,8 +90,8 @@ export class TimetableVisionExtractor {
         validate: (value) => Boolean(normalizeCandidate(value)),
         options: {
           requestId,
-          perModelTimeoutMs: 10_000,
-          totalBudgetMs: 30_000,
+          perModelTimeoutMs: 6_000,
+          totalBudgetMs: 15_000,
           maxOutputTokens: 6_000,
           responseSchema: TIMETABLE_VISION_RESPONSE_SCHEMA,
         },
