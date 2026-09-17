@@ -976,9 +976,9 @@ html {
 .app-header {
   position: sticky;
   top: 0;
-  z-index: var(--z-shell, 10);
+  z-index: 50;
   display: flex;
-  height: 4.25rem;
+  height: var(--app-header-height, 4.25rem);
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
@@ -5948,8 +5948,7 @@ body {
   --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
-  --space-16: 64px;
-
+  --app-header-height: 4.25rem;
   --z-base: 0;
   --z-atmosphere: 1;
   --z-shell: 10;
@@ -8340,6 +8339,7 @@ body {
   border-bottom-color: color-mix(in srgb, var(--decoration-border) 78%, transparent);
   background: rgba(7, 9, 14, .82);
   box-shadow: 0 8px 28px rgba(0, 0, 0, .24);
+  z-index: 50;
 }
 
 .app-sidebar {
@@ -10522,6 +10522,7 @@ body {
   position: absolute;
   inset: 0;
   z-index: 1;
+  pointer-events: none !important;
   background:
     linear-gradient(90deg, rgba(4, 15, 18, .96) 0%, rgba(4, 15, 18, .75) 42%, rgba(4, 15, 18, .28) 76%, rgba(4, 15, 18, .6) 100%),
     linear-gradient(0deg, rgba(4, 15, 18, .88), transparent 52%);
@@ -11975,6 +11976,7 @@ body {
 }
 
 .expert-hero-vignette {
+  pointer-events: none !important;
   background:
     linear-gradient(90deg, rgba(18, 10, 9, .97), rgba(18, 10, 9, .78) 45%, rgba(18, 10, 9, .2) 79%, rgba(18, 10, 9, .58)),
     linear-gradient(0deg, rgba(18, 10, 9, .88), transparent 52%);
@@ -11992,6 +11994,7 @@ body {
   position: absolute;
   inset: 0;
   z-index: 1;
+  pointer-events: none !important;
 }
 
 .expert-hero-lines span {
@@ -16059,3 +16062,539 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ==========================================================================
+   TRUST FORENSIC LAB — OPTICAL EVIDENCE PRISM DESIGN SYSTEM
+   Academic Cinematic × Editorial Technology × Evidence Prism
+   Scoped exclusively under .trust-forensic-lab and [data-pillar="trust"]
+   ========================================================================== */
+
+.trust-forensic-lab,
+[data-pillar="trust"] {
+  --sh-surface-base: #0C0F14;
+  --sh-surface-card: #121720;
+  --sh-surface-elevated: #19202C;
+  --sh-surface-subtle: #1E2636;
+
+  --sh-border-subtle: rgba(255, 255, 255, 0.08);
+  --sh-border-medium: rgba(255, 255, 255, 0.14);
+  --sh-border-strong: rgba(255, 255, 255, 0.28);
+
+  --sh-trust-cyan: #22D3EE;
+  --sh-trust-blue: #38BDF8;
+  --sh-trust-cyan-glow: rgba(34, 211, 238, 0.22);
+  --sh-trust-border-glow: rgba(34, 211, 238, 0.35);
+  --sh-trust-reticle: rgba(56, 189, 248, 0.6);
+
+  --sh-text-primary: #F8FAFC;
+  --sh-text-secondary: #94A3B8;
+  --sh-text-muted: #64748B;
+
+  --sh-status-success: #10B981;
+  --sh-status-warning: #F59E0B;
+  --sh-status-danger: #EF4444;
+
+  --sh-radius-sm: 4px;
+  --sh-radius-md: 8px;
+  --sh-radius-lg: 12px;
+  --sh-radius-full: 9999px;
+
+  color: var(--sh-text-primary);
+  background-color: var(--sh-surface-base);
+  font-family: var(--font-ui, var(--font-be-vietnam-pro, sans-serif));
+}
+
+/* Trust Optical Grid & Crosshairs */
+.trust-forensic-lab .optical-reticle-box {
+  position: relative;
+  background-color: var(--sh-surface-card);
+  border: 1px solid var(--sh-border-subtle);
+  border-radius: var(--sh-radius-md);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.trust-forensic-lab .optical-reticle-box:hover {
+  border-color: var(--sh-border-medium);
+}
+
+.trust-forensic-lab .crosshair-corner {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  pointer-events: none;
+  border-color: var(--sh-trust-cyan);
+  opacity: 0.7;
+}
+
+.trust-forensic-lab .crosshair-tl { top: -1px; left: -1px; border-top: 1px solid currentColor; border-left: 1px solid currentColor; }
+.trust-forensic-lab .crosshair-tr { top: -1px; right: -1px; border-top: 1px solid currentColor; border-right: 1px solid currentColor; }
+.trust-forensic-lab .crosshair-bl { bottom: -1px; left: -1px; border-bottom: 1px solid currentColor; border-left: 1px solid currentColor; }
+.trust-forensic-lab .crosshair-br { bottom: -1px; right: -1px; border-bottom: 1px solid currentColor; border-right: 1px solid currentColor; }
+
+/* Trust Hero Specifics */
+.trust-forensic-lab .trust-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sh-trust-cyan);
+  font-family: var(--font-technical, monospace);
+}
+
+.trust-forensic-lab .trust-headline {
+  font-family: var(--font-display, var(--font-lora, serif));
+  font-weight: 400;
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #F8FAFC;
+}
+
+.trust-forensic-lab .trust-headline em {
+  font-style: italic;
+  color: var(--sh-trust-cyan);
+}
+
+.trust-forensic-lab .trust-lede {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--sh-text-secondary);
+  max-width: 640px;
+}
+
+/* Trust Viewport Frame */
+.trust-forensic-lab .trust-optic-viewport-card {
+  position: relative;
+  height: 320px;
+  border-radius: var(--sh-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--sh-border-medium);
+  background-color: var(--sh-surface-card);
+}
+
+.trust-forensic-lab .trust-optic-viewport-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Trust 5-Layer Progressive Execution Rail */
+.trust-forensic-lab .trust-5layer-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trust-forensic-lab .trust-layer-tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background-color: var(--sh-surface-card);
+  border: 1px solid var(--sh-border-subtle);
+  border-radius: var(--sh-radius-md);
+  color: var(--sh-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 180ms ease;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.trust-forensic-lab .trust-layer-tab:hover {
+  background-color: var(--sh-surface-elevated);
+  border-color: var(--sh-border-medium);
+  color: var(--sh-text-primary);
+}
+
+.trust-forensic-lab .trust-layer-tab.is-active {
+  background-color: var(--sh-surface-elevated);
+  border-color: var(--sh-trust-cyan);
+  color: var(--sh-text-primary);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.12);
+}
+
+.trust-forensic-lab .trust-layer-tab[data-status="running"] {
+  border-color: var(--sh-trust-cyan);
+  animation: trust-pulse 1500ms infinite ease-in-out;
+}
+
+.trust-forensic-lab .trust-layer-tab[data-status="complete"] {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.trust-forensic-lab .trust-layer-tab[data-status="degraded"],
+.trust-forensic-lab .trust-layer-tab[data-status="unavailable"] {
+  border-color: rgba(245, 158, 11, 0.3);
+  color: var(--sh-text-muted);
+}
+
+@keyframes trust-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.2); }
+  50% { box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.15); }
+}
+
+/* Layer 4 AI Advisory Transparent Telemetry */
+.trust-forensic-lab .trust-ai-advisory-panel {
+  background-color: var(--sh-surface-card);
+  border: 1px solid var(--sh-border-subtle);
+  border-radius: var(--sh-radius-md);
+  padding: 16px;
+}
+
+.trust-forensic-lab .trust-ai-degraded-card {
+  background-color: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--sh-radius-md);
+  padding: 14px;
+}
+
+/* Layer 5 Deterministic Decision Certificate */
+.trust-forensic-lab .trust-decision-certificate {
+  background: linear-gradient(180deg, #161D2A 0%, #101520 100%);
+  border: 1px solid var(--sh-border-strong);
+  border-radius: var(--sh-radius-lg);
+  padding: 20px;
+}
+
+.trust-forensic-lab .trust-vector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.trust-forensic-lab .trust-vector-cell {
+  background-color: var(--sh-surface-subtle);
+  border: 1px solid var(--sh-border-subtle);
+  border-radius: var(--sh-radius-sm);
+  padding: 10px 12px;
+}
+
+.trust-forensic-lab .trust-vector-cell span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sh-text-muted);
+  font-family: var(--font-technical, monospace);
+}
+
+.trust-forensic-lab .trust-vector-cell strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sh-text-primary);
+}
+
+/* Dialectic Comparison Matrix: Trust vs Expert */
+.trust-dialectic-matrix {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  background-color: #0C0F14;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.trust-dialectic-header {
+  grid-column: 1 / -1;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.trust-dialectic-notice {
+  font-size: 12px;
+  color: #94A3B8;
+  margin-top: 4px;
+}
+
+.trust-dialectic-col {
+  background-color: #121720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.trust-dialectic-col.is-trust {
+  border-top: 2px solid #22D3EE;
+}
+
+.trust-dialectic-col.is-expert {
+  border-top: 2px solid #34D399;
+}
+
+/* ==========================================================================
+   EXPERT COUNCIL SPACE — SCHOLARLY JURISDICTION REVIEW SYSTEM
+   Academic Cinematic × Scholarly Review Council × Evidence Verification
+   Scoped exclusively under .expert-council-space and [data-pillar="expert"]
+   ========================================================================== */
+
+.expert-council-space,
+[data-pillar="expert"] {
+  --sh-surface-base: #0C0F14;
+  --sh-surface-card: #121720;
+  --sh-surface-elevated: #19202C;
+  --sh-surface-subtle: #1E2636;
+
+  --sh-border-subtle: rgba(255, 255, 255, 0.08);
+  --sh-border-medium: rgba(255, 255, 255, 0.14);
+  --sh-border-strong: rgba(255, 255, 255, 0.28);
+
+  --sh-expert-sage: #34D399;
+  --sh-expert-navy: #60A5FA;
+  --sh-expert-border-academic: rgba(52, 211, 153, 0.35);
+
+  --sh-text-primary: #F8FAFC;
+  --sh-text-secondary: #94A3B8;
+  --sh-text-muted: #64748B;
+
+  --sh-radius-sm: 4px;
+  --sh-radius-md: 8px;
+  --sh-radius-lg: 12px;
+  --sh-radius-full: 9999px;
+
+  color: var(--sh-text-primary);
+  background-color: var(--sh-surface-base);
+  font-family: var(--font-ui, var(--font-be-vietnam-pro, sans-serif));
+}
+
+/* Expert Hero */
+.expert-council-space .expert-kicker {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sh-expert-sage);
+  font-family: var(--font-technical, monospace);
+}
+
+.expert-council-space .expert-headline {
+  font-family: var(--font-display, var(--font-lora, serif));
+  font-weight: 400;
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #F8FAFC;
+}
+
+.expert-council-space .expert-headline em {
+  font-style: italic;
+  color: var(--sh-expert-sage);
+}
+
+/* Formal Expert Assessment Card (Immutable Formal Entity) */
+.expert-formal-assessment-card {
+  background: #121720;
+  border: 1px solid var(--sh-expert-border-academic, rgba(52, 211, 153, 0.35));
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  position: relative;
+}
+
+.expert-formal-assessment-card .expert-seal-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.expert-formal-assessment-card .expert-verdict-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background-color: #1A2230;
+  margin-bottom: 16px;
+}
+
+.expert-formal-assessment-card .expert-verdict-banner strong {
+  font-size: 15px;
+  color: #F8FAFC;
+}
+
+/* Conversational Expert Response in Community */
+.community-expert-response-card {
+  background-color: #121720;
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 12px 0;
+}
+
+.community-expert-response-card .expert-response-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.community-expert-response-card .expert-response-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background-color: rgba(52, 211, 153, 0.12);
+  color: #34D399;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.community-expert-response-card .expert-response-disclaimer {
+  display: block;
+  font-size: 11px;
+  color: #64748B;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* Multi-Expert Disagreement Stack */
+.expert-disagreement-stack {
+  background-color: #121720;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 18px;
+  margin: 16px 0;
+}
+
+.expert-disagreement-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.expert-disagreement-item {
+  background-color: #19202C;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 14px;
+}
+
+/* Active Review Workbench / Modal */
+.expert-review-desk-modal {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 20px;
+  background-color: #0C0F14;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.expert-review-desk-dossier {
+  background-color: #121720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 18px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.expert-review-desk-form {
+  background-color: #121720;
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: 8px;
+  padding: 18px;
+}
+
+/* Expert Stacking Context & Clickability */
+.expert-council-space {
+  position: relative;
+}
+
+.expert-council-space .sticky-toolbar,
+.expert-council-space .expert-directory-filters.is-sticky,
+.expert-council-space .expert-directory-filters {
+  position: sticky;
+  top: var(--app-header-height, 4.25rem);
+  z-index: 40;
+}
+
+.expert-hero-vignette,
+.expert-hero-lines,
+.community-hero-vignette,
+.expert-decorative-layer,
+.expert-glow-backdrop {
+  pointer-events: none !important;
+}
+
+.expert-card,
+.expert-public-dossier,
+.expert-public-dossier a,
+.expert-card a,
+.expert-council-space .text-link {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 2;
+}
+
+.expert-public-dossier {
+  position: relative;
+  z-index: 5;
+}
+
+/* Responsive Rules for Trust & Expert */
+@media (max-width: 1024px) {
+  .trust-dialectic-matrix,
+  .expert-disagreement-grid,
+  .expert-review-desk-modal {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .trust-forensic-lab .trust-optic-viewport-card {
+    height: 220px;
+  }
+  .trust-forensic-lab .trust-vector-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 390px) {
+  .trust-forensic-lab .trust-vector-grid {
+    grid-template-columns: 1fr;
+  }
+  .trust-forensic-lab .trust-layer-tab {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .trust-dialectic-matrix {
+    padding: 14px;
+    gap: 12px;
+  }
+}
+
+/* Reduced Motion Safety */
+@media (prefers-reduced-motion: reduce) {
+  .trust-forensic-lab *,
+  .trust-forensic-lab *::before,
+  .trust-forensic-lab *::after,
+  .expert-council-space *,
+  .expert-council-space *::before,
+  .expert-council-space *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .trust-forensic-lab video,
+  .expert-council-space video {
+    display: none !important;
+  }
+  .trust-forensic-lab .video-fallback-poster,
+  .expert-council-space .video-fallback-poster {
+    display: block !important;
+  }
+}
+

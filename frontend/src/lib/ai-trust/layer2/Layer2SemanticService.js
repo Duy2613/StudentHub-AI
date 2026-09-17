@@ -118,7 +118,7 @@ export class Layer2SemanticService {
 
     let provider = options.provider;
     if (!provider || typeof provider.analyzeSemantics !== "function") {
-      if (options.useAIGateway === true || (options.useGemini === true && typeof process !== "undefined" && (process.env?.GEMINI_API_KEY || process.env?.GEMINI_KEY_1))) {
+      if (options.useAIGateway === true || (options.useGemini === true && typeof process !== "undefined" && process.env?.GEMINI_API_KEY)) {
         provider = new AIGatewayModelProvider();
       } else {
         provider = new DeterministicSemanticProvider();
@@ -203,6 +203,10 @@ export class Layer2SemanticService {
         modelProvider: semanticAnalysis.modelProvider,
         modelUsed: semanticAnalysis.modelUsed,
         fallbackReason: semanticAnalysis.fallbackReason,
+        providerStatus,
+        providerErrorType: semanticAnalysis.providerErrorType,
+        providerHttpStatus: semanticAnalysis.providerHttpStatus,
+        providerLatencyMs: semanticAnalysis.providerLatencyMs,
         gatewayAttempts: semanticAnalysis.gatewayAttempts,
         promptInjectionDetected: semanticAnalysis.promptInjectionDetected === true,
         candidateClassification: semanticAnalysis.candidateClassification || null,

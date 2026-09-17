@@ -1,0 +1,21 @@
+{
+  "benchmarkVersion": "1.0.0-historical-validation",
+  "evaluatedAt": "2026-09-17T07:46:44.097Z",
+  "totalUnits": 60,
+  "evidenceClass": "SOURCE_INDEPENDENCE_VALIDATION_V1",
+  "releaseGateEligible": false,
+  "supersededBy": "SOURCE_INDEPENDENCE_HOLDOUT_V2",
+  "pairwiseMetrics": {
+    "truePositivePairs": 94,
+    "falsePositivePairs": 0,
+    "falseNegativePairs": 2,
+    "trueNegativePairs": 31,
+    "sameOriginPrecision": 1,
+    "sameOriginRecall": 0.9791666666666666,
+    "clusterF1": 0.9894736842105264,
+    "falseMergeRate": 0,
+    "missedSyndicationRate": 0.020833333333333332
+  },
+  "exactOriginCountAccuracy": 0.9833333333333333,
+  "status": "SOURCE_INDEPENDENCE_VALIDATION_V1"
+}

@@ -238,12 +238,25 @@ export function normalizeSemanticAnalysis(value, { source = "provider" } = {}) {
     } : null,
     modelStatus: boundedString(value.modelStatus, 80) || "PROVIDER_SUCCESS_UNTRUSTED",
     fallbackReason: boundedString(value.fallbackReason, 160) || null,
+    providerErrorType: boundedString(value.providerErrorType, 100) || null,
+    providerHttpStatus: Number.isInteger(Number(value.providerHttpStatus)) && Number(value.providerHttpStatus) >= 100 && Number(value.providerHttpStatus) <= 599
+      ? Number(value.providerHttpStatus)
+      : null,
+    providerLatencyMs: Number.isFinite(Number(value.providerLatencyMs)) ? Math.max(0, Number(value.providerLatencyMs)) : null,
     gatewayAttempts: boundedArray(value.gatewayAttempts, SEMANTIC_BOUNDARY_LIMITS.GATEWAY_ATTEMPTS)
       .map((attempt) => isPlainObject(attempt) ? {
-        provider: boundedString(attempt.provider, 80),
-        model: boundedString(attempt.model, 120),
-        ok: attempt.ok === true,
-        errorType: boundedString(attempt.errorType, 80),
+         provider: boundedString(attempt.provider, 80),
+         model: boundedString(attempt.model, 120),
+         ok: attempt.ok === true,
+         attemptNumber: Number.isInteger(Number(attempt.attemptNumber)) && Number(attempt.attemptNumber) > 0 ? Number(attempt.attemptNumber) : 0,
+         startedAt: boundedString(attempt.startedAt, 80) || null,
+         durationMs: Number.isFinite(Number(attempt.durationMs ?? attempt.latencyMs)) ? Math.max(0, Number(attempt.durationMs ?? attempt.latencyMs)) : 0,
+         errorType: boundedString(attempt.errorType, 80),
+         providerErrorCode: boundedString(attempt.providerErrorCode, 80).toUpperCase() || null,
+         result: boundedString(attempt.result, 80).toUpperCase() || (attempt.ok === true ? "SUCCESS" : "FAILED"),
+        httpStatus: Number.isInteger(Number(attempt.httpStatus)) && Number(attempt.httpStatus) >= 100 && Number(attempt.httpStatus) <= 599
+          ? Number(attempt.httpStatus)
+          : null,
       } : null).filter(Boolean),
     providerId: boundedString(value.providerId, 120) || source,
     modelUsed: boundedString(value.modelUsed, 120) || null,

@@ -12,8 +12,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { GraduationCap, Award, CheckCircle2, ArrowLeft, User, Building, BookOpen, Briefcase, Star, Check } from "lucide-react";
-import { useAuth } from "@/lib/auth/AuthContext";
+import { GraduationCap, Award, CheckCircle2, ArrowLeft, User, Building, BookOpen, Briefcase, Star, Check, Loader2, ShieldAlert, RefreshCw } from "lucide-react";
+import { useAuth, PROFILE_STATUS } from "@/lib/auth/AuthContext";
 import {
   AVATAR_LIST,
   VIETNAM_UNIVERSITIES,
@@ -31,16 +31,22 @@ import { normalizeAuthReturnPath, postAuthDestination } from "@/lib/auth/authRed
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { session, profile, updateProfile, isLoading: isAuthLoading, status } = useAuth();
+  const { session, profile, profileStatus, refreshProfile, updateProfile, isLoading: isAuthLoading, status } = useAuth();
 
-  // Redirect if not logged in
+  // Redirect if not logged in, or if returning user has already completed onboarding
   useEffect(() => {
     if (!isAuthLoading && status === "ANONYMOUS") {
       const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
       const next = normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath"));
       router.replace(`/login?next=${encodeURIComponent(next)}`);
+      return;
     }
-  }, [isAuthLoading, router, status]);
+    if (profileStatus === PROFILE_STATUS.FOUND && profile?.onboarded === true) {
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      const next = normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath"));
+      router.replace(next || "/dashboard");
+    }
+  }, [isAuthLoading, profile?.onboarded, profileStatus, router, status]);
 
   const [step, setStep] = useState(1); // 1: Chọn Vai trò, 2: Chọn Avatar, 3: Thông tin chi tiết
   const [role, setRole] = useState("student"); // "student" | "expert"
@@ -181,6 +187,48 @@ export default function OnboardingPage() {
   };
 
   const selectedAvatarData = getAvatarById(avatarId);
+
+  if (profileStatus === PROFILE_STATUS.LOADING) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-gray-100 flex flex-col justify-center items-center py-12 px-4">
+        <Loader2 className="animate-spin text-teal-400 mb-4" size={36} />
+        <h2 className="text-lg font-medium text-white">Đang kiểm tra hồ sơ...</h2>
+        <p className="text-xs text-slate-400 mt-1">Hệ thống đang tải dữ liệu tài khoản của bạn.</p>
+      </div>
+    );
+  }
+
+  if (profileStatus === PROFILE_STATUS.ERROR) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-gray-100 flex flex-col justify-center items-center py-12 px-4">
+        <div className="max-w-md w-full p-8 rounded-2xl bg-slate-900/80 border border-red-500/30 text-center backdrop-blur-xl shadow-2xl">
+          <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 mx-auto mb-4">
+            <ShieldAlert size={24} />
+          </div>
+          <h2 className="text-lg font-semibold text-white">Lỗi kết nối máy chủ hồ sơ</h2>
+          <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+            Hệ thống không thể xác minh trạng thái hồ sơ của bạn. Để bảo toàn dữ liệu và tránh tạo tài khoản trùng lặp, vui lòng thử lại hoặc vào bảng điều khiển.
+          </p>
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <button
+              type="button"
+              onClick={() => refreshProfile()}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-500 text-slate-950 text-xs font-semibold hover:bg-teal-400 transition-colors cursor-pointer"
+            >
+              <RefreshCw size={14} /> Thử tải lại hồ sơ
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/dashboard")}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white text-xs hover:bg-white/20 transition-colors cursor-pointer"
+            >
+              Vào Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-transparent text-gray-100 flex flex-col justify-center items-center py-12 px-4 relative overflow-hidden">

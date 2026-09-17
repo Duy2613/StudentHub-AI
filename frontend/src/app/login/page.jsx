@@ -28,12 +28,12 @@ import {
   setRememberMePreference,
 } from "@/lib/auth/authService";
 import { getAuthCapabilities } from "@/lib/auth/authCapabilities";
-import { useAuth } from "@/lib/auth/AuthContext";
+import { useAuth, PROFILE_STATUS } from "@/lib/auth/AuthContext";
 import { normalizeAuthReturnPath, postAuthDestination } from "@/lib/auth/authRedirects";
 
 const LoginPage = () => {
   const router = useRouter();
-  const { isAuthenticated, profile, ready, status } = useAuth();
+  const { isAuthenticated, profile, profileStatus, ready, status, refreshProfile } = useAuth();
   const capabilities = getAuthCapabilities();
 
   const [email, setEmail] = useState("");
@@ -49,10 +49,19 @@ const LoginPage = () => {
   // again while another page is still waiting for auth bootstrap.
   useEffect(() => {
     if (!ready || status !== "READY" || !isAuthenticated) return;
+    if (profileStatus === PROFILE_STATUS.LOADING) return;
+
     const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
     const next = normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath"));
-    router.replace(postAuthDestination({ next, onboarded: profile?.onboarded === true }));
-  }, [isAuthenticated, profile?.onboarded, ready, router, status]);
+
+    if (profileStatus === PROFILE_STATUS.FOUND) {
+      router.replace(postAuthDestination({ next, onboarded: profile?.onboarded === true }));
+    } else if (profileStatus === PROFILE_STATUS.NOT_FOUND) {
+      router.replace("/onboarding");
+    } else if (profileStatus === PROFILE_STATUS.ERROR) {
+      setError("Không thể tải thông tin hồ sơ của bạn từ máy chủ. Vui lòng làm mới trang để thử lại.");
+    }
+  }, [isAuthenticated, profile?.onboarded, profileStatus, ready, router, status]);
 
   // Kiểm tra lỗi truyền từ OAuth callback hoặc redirect
   useEffect(() => {

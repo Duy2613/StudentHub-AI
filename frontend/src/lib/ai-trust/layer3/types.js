@@ -73,6 +73,8 @@ export const EVIDENCE_PROVIDER_STATUS = {
   SUCCESS: "SUCCESS",
   PARTIAL: "PARTIAL",
   TIMEOUT: "TIMEOUT",
+  RATE_LIMITED: "RATE_LIMITED",
+  AUTH_FAILED: "AUTH_FAILED",
   UNAVAILABLE: "UNAVAILABLE",
   NOT_CONFIGURED: "NOT_CONFIGURED",
   INVALID_RESPONSE: "INVALID_RESPONSE",
@@ -454,6 +456,44 @@ export function createLayer3Result(input = {}) {
       retrievalMode: boundedString(safeMetrics.retrievalMode, 80) || retrievalMode,
       externalEvidence: safeExternalEvidence,
       providerIndependent: safeMetrics.providerIndependent !== false,
+      providerCallCount: safeNonNegativeNumber(safeMetrics.providerCallCount),
+      providerDurationMs: safeNonNegativeNumber(safeMetrics.providerDurationMs),
+      providerTimeoutConfiguredMs: safeMetrics.providerTimeoutConfiguredMs === null || safeMetrics.providerTimeoutConfiguredMs === undefined
+        ? null
+        : safeNonNegativeNumber(safeMetrics.providerTimeoutConfiguredMs),
+      providerParentTimeoutMs: safeMetrics.providerParentTimeoutMs === null || safeMetrics.providerParentTimeoutMs === undefined
+        ? null
+        : safeNonNegativeNumber(safeMetrics.providerParentTimeoutMs),
+      providerRawResultCount: safeNonNegativeNumber(safeMetrics.providerRawResultCount),
+      providerAcceptedResultCount: safeNonNegativeNumber(safeMetrics.providerAcceptedResultCount),
+      providerAcceptedHostCount: safeNonNegativeNumber(safeMetrics.providerAcceptedHostCount),
+      providerRejectedResultCount: safeNonNegativeNumber(safeMetrics.providerRejectedResultCount),
+      providerRejectionReasons: Array.isArray(safeMetrics.providerRejectionReasons)
+        ? safeMetrics.providerRejectionReasons.slice(0, 20).map((item) => boundedString(item, 120)).filter(Boolean)
+        : [],
+      providerHttpStatuses: Array.isArray(safeMetrics.providerHttpStatuses)
+        ? safeMetrics.providerHttpStatuses.slice(-20).map((item) => Number(item)).filter((item) => Number.isInteger(item) && item >= 100 && item <= 599)
+        : [],
+      providerTimeoutClassification: boundedString(safeMetrics.providerTimeoutClassification, 80) || null,
+      providerAbortReason: boundedString(safeMetrics.providerAbortReason, 80) || null,
+      providerRetryCount: safeNonNegativeNumber(safeMetrics.providerRetryCount),
+      providerRetryExhausted: safeMetrics.providerRetryExhausted === true,
+      providerRetryable: typeof safeMetrics.providerRetryable === "boolean" ? safeMetrics.providerRetryable : null,
+      providerRequestTrace: Array.isArray(safeMetrics.providerRequestTrace)
+        ? safeMetrics.providerRequestTrace.slice(-12).filter((trace) => trace && typeof trace === "object" && !Array.isArray(trace)).map((trace) => ({
+          startedAt: boundedString(trace.startedAt, 80) || null,
+          endedAt: boundedString(trace.endedAt, 80) || null,
+          durationMs: safeNonNegativeNumber(trace.durationMs),
+          httpStatus: Number.isInteger(Number(trace.httpStatus)) && Number(trace.httpStatus) >= 100 && Number(trace.httpStatus) <= 599 ? Number(trace.httpStatus) : null,
+          abortReason: boundedString(trace.abortReason, 80) || null,
+          classification: boundedString(trace.classification, 80) || "OTHER",
+          outcome: boundedString(trace.outcome, 80) || "ERROR",
+          timeoutMs: trace.timeoutMs === null || trace.timeoutMs === undefined ? null : safeNonNegativeNumber(trace.timeoutMs),
+          attempt: Number.isInteger(Number(trace.attempt)) && Number(trace.attempt) > 0 ? Number(trace.attempt) : 1,
+        }))
+        : [],
+      independentHostCount: safeNonNegativeNumber(safeMetrics.independentHostCount),
+      independentClusterCount: safeNonNegativeNumber(safeMetrics.independentClusterCount),
       timestamp: Number.isFinite(safeMetrics.timestamp) ? safeMetrics.timestamp : Date.now(),
     },
     retrievalStatus: Object.values(EVIDENCE_PROVIDER_STATUS).includes(retrievalStatus) ? retrievalStatus : EVIDENCE_PROVIDER_STATUS.UNKNOWN,

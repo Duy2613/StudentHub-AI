@@ -56,6 +56,7 @@ export function RealtimeProvider({ children }) {
   const clientIdRef = useRef(null);
   const lastSequenceRef = useRef(0);
   const connectSSERef = useRef(null);
+  const reconnectAttemptRef = useRef(0);
   const previousPrincipalIdRef = useRef(null);
 
   const dispatchToSubscribers = useCallback((channel, eventType, data) => {
@@ -116,12 +117,18 @@ export function RealtimeProvider({ children }) {
     const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;
 
-    eventSource.onopen = () => setConnectionStatus("CONNECTED");
+    eventSource.onopen = () => {
+      reconnectAttemptRef.current = 0;
+      setConnectionStatus("CONNECTED");
+    };
     eventSource.onerror = () => {
       setConnectionStatus("RECONNECTING");
       eventSource.close();
       window.clearTimeout(reconnectTimeoutRef.current);
-      reconnectTimeoutRef.current = window.setTimeout(() => connectSSERef.current?.(), 3500);
+      const attempt = reconnectAttemptRef.current;
+      reconnectAttemptRef.current += 1;
+      const delay = Math.min(30000, Math.round(3500 * Math.pow(1.5, Math.min(attempt, 6))));
+      reconnectTimeoutRef.current = window.setTimeout(() => connectSSERef.current?.(), delay);
     };
 
     eventSource.addEventListener("system:connected", (event) => {

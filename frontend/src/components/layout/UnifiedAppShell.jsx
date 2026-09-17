@@ -20,12 +20,11 @@ const AcademicCommandPalette = dynamic(() => import("@/components/command/Academ
 
 export default function UnifiedAppShell({ children }) {
   const pathname = usePathname();
-  const { session, profile, isAuthenticated, ready, status, signOut } = useAuth();
+  const { session, profile, isAuthenticated, ready, status, signOut, expertLifecycleState } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchMounted, setSearchMounted] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [expertLifecycleState, setExpertLifecycleState] = useState(null);
   const searchButtonRef = useRef(null);
 
   const openSearch = () => {
@@ -55,20 +54,6 @@ export default function UnifiedAppShell({ children }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setExpertLifecycleState(null);
-      return undefined;
-    }
-    const controller = new AbortController();
-    fetch("/api/expert/qualification", { credentials: "include", cache: "no-store", signal: controller.signal })
-      .then((response) => response.ok ? response.json() : null)
-      .then((payload) => setExpertLifecycleState(normalizeExpertLifecycleState(payload?.data?.state)))
-      .catch(() => {
-        if (!controller.signal.aborted) setExpertLifecycleState(null);
-      });
-    return () => controller.abort("expert-lifecycle-read-cancelled");
-  }, [isAuthenticated]);
 
   const displayName = profile?.fullName || session?.user?.email?.split("@")[0] || "Khách";
   const signedInForHeader = ready && status === "READY" && isAuthenticated;

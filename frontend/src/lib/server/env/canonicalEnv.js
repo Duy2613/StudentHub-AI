@@ -93,14 +93,9 @@ export const canonicalEnv = {
   // a route's verified model.
   OPENAI_MODEL: process.env.OPENAI_MODEL || "gpt-4o-mini",
 
-  // Canonical Gemini secret first. GEMINI_KEY_1 is a legacy deployment alias
-  // and is used only when the canonical name is absent.
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY || process.env.GEMINI_KEY_1 || "",
-  // Retained for deployment diagnostics/backward-compatible env audits. The
-  // AI Gateway catalog is authoritative and does not let this value replace
-  // a route's verified model.
-  GEMINI_MODEL: process.env.GEMINI_MODEL || "gemini-3.8-flash",
-
+  // One canonical Gemini secret. Model failover is per model, never per key.
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || "",
+  TAVILY_API_KEY: process.env.TAVILY_API_KEY || "",
   // Labbe Assurance
   LABBE_MODE: process.env.STUDENTHUB_LABBE_MODE || "SHADOW",
   LABBE_BASE_URL: process.env.STUDENTHUB_LABBE_BASE_URL || "",

@@ -38,7 +38,7 @@ export const LAYER_2_CONFIG = {
   // Default Model Parameters
   MODEL: {
     DEFAULT_PROVIDER: "deterministic", // Default for deterministic test suites
-    GEMINI_MODEL: "gemini-3.8-flash",
+    ROUTING_SOURCE: "AI_GATEWAY_CONFIG",
     TEMPERATURE: 0.1,                 // Low temperature for strict factual reasoning
     MAX_OUTPUT_TOKENS: 2048,
   },

@@ -1,79 +1,218 @@
 /**
  * AI Gateway — ModelRouter
  *
- * Capability-based router: given a requested AI_CAPABILITY, walks the
- * configured fallback chain (AI_GATEWAY_CONFIG.CAPABILITY_ROUTES), skips
- * any model whose provider/secrets are not configured, retries transient
- * errors once per candidate, and stops at the first successful response.
- * Structured callers can provide a parser and validator; those checks are
- * performed inside the candidate lifecycle so deterministic output failures
- * advance to the next candidate without retrying the same model.
- *
- * This is the ONLY place capability -> model selection logic lives.
- * Domain code (Layer 2, Layer 4, AI Mentor) must never hard-code a model id.
+ * Capability-based, ordered Gemini failover. This module is the only place
+ * where a capability becomes a model sequence. It makes one bounded attempt
+ * per candidate, stops at the first valid structured result, and keeps health
+ * state per provider/model without rotating credentials.
  */
 
-import { AI_GATEWAY_CONFIG } from "./config/AIGatewayConfig.js";
-import { PROVIDER_FAMILY, GATEWAY_ERROR_TYPE, createAttemptRecord, sanitizeGatewayError } from "./types.js";
+import {
+  AI_GATEWAY_CONFIG,
+  validateActiveModelIdentifiers,
+  validateCatalogModelEntry,
+} from "./config/AIGatewayConfig.js";
+import {
+  PROVIDER_FAMILY,
+  GATEWAY_ERROR_TYPE,
+  classifyGatewayFailure,
+  createAttemptRecord,
+  isFailoverEligible,
+  sanitizeGatewayError,
+  traceResultForFailure,
+  normalizeProviderErrorCode,
+} from "./types.js";
+import { ModelHealthStore } from "./ModelHealthStore.js";
 import { GeminiProvider } from "./providers/GeminiProvider.js";
 
-const PROVIDER_INSTANCES = {
+const PROVIDER_INSTANCES = Object.freeze({
   [PROVIDER_FAMILY.GEMINI]: new GeminiProvider(),
-};
+});
+
+function finiteNumber(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+}
+
+function boundedTimeout(value, fallback) {
+  return Math.min(Math.max(finiteNumber(value, fallback), 250), 30_000);
+}
+
+function boundedBudget(value, fallback) {
+  return Math.min(Math.max(finiteNumber(value, fallback), 250), 120_000);
+}
+
+function boundedOutputTokens(value) {
+  return Math.min(Math.max(Math.floor(finiteNumber(value, AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS)), 1), AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS);
+}
+
+function nowIso(value) {
+  return new Date(value).toISOString();
+}
+
+function abortError(reason) {
+  const error = reason instanceof Error ? reason : new Error("AI gateway request cancelled");
+  error.name = "AbortError";
+  return error;
+}
+
+function timeoutError() {
+  const error = new Error("AI gateway model attempt timed out");
+  error.name = "TimeoutError";
+  error.code = "ATTEMPT_TIMEOUT";
+  error.gatewayErrorType = GATEWAY_ERROR_TYPE.TIMEOUT;
+  return error;
+}
+
+function linkAbortSignal(controller, signal) {
+  if (!signal || typeof signal.addEventListener !== "function") return () => {};
+  const onAbort = () => controller.abort(signal.reason);
+  if (signal.aborted) onAbort();
+  else signal.addEventListener("abort", onAbort, { once: true });
+  return () => signal.removeEventListener?.("abort", onAbort);
+}
+
+function fallbackReasonFor(attempt) {
+  const result = String(attempt?.result || "FAILED").toUpperCase();
+  return `PRIMARY_${result}`;
+}
+
+function providerStatusFor(errorType, httpStatus, providerErrorCode) {
+  return classifyGatewayFailure({ errorType, httpStatus, providerErrorCode });
+}
+
+function safeProviderValidation(provider, catalogEntry) {
+  if (!provider || typeof provider.validateModel !== "function") return { valid: true, compatible: true };
+  try {
+    const validation = provider.validateModel(catalogEntry);
+    if (validation === false) return { valid: false, compatible: false, code: "MODEL_INCOMPATIBLE" };
+    if (validation && typeof validation === "object") return validation;
+  } catch {
+    return { valid: false, compatible: false, code: "MODEL_VALIDATION_FAILED" };
+  }
+  return { valid: true, compatible: true };
+}
 
 export class ModelRouter {
   /**
-   * @param {object} [overrideProviders] - test-only injection point. Active
-   *   production routes still come exclusively from the Gemini route table.
+   * @param {object} [overrideProviders] test-only provider injection point
+   * @param {object} [options] health/clock injection for deterministic tests
    */
-  constructor(overrideProviders = {}) {
-    this.providers = { ...PROVIDER_INSTANCES, ...overrideProviders };
+  constructor(overrideProviders = {}, options = {}) {
+    this.providers = { ...PROVIDER_INSTANCES, ...(overrideProviders || {}) };
+    this.healthStore = options.healthStore || new ModelHealthStore({
+      maxEntries: AI_GATEWAY_CONFIG.CIRCUIT_BREAKER.MAX_ENTRIES,
+      baseCooldownMs: AI_GATEWAY_CONFIG.CIRCUIT_BREAKER.BASE_COOLDOWN_MS,
+      maxCooldownMs: AI_GATEWAY_CONFIG.CIRCUIT_BREAKER.MAX_COOLDOWN_MS,
+      dailyCooldownMs: AI_GATEWAY_CONFIG.CIRCUIT_BREAKER.DAILY_QUOTA_COOLDOWN_MS,
+      clock: options.clock,
+    });
+    this.modelIdentifierValidation = validateActiveModelIdentifiers();
+  }
+
+  /** Safe, no-network startup/provider initialization result. */
+  validateModelIdentifiers() {
+    return {
+      valid: this.modelIdentifierValidation.valid,
+      entries: this.modelIdentifierValidation.entries.map((entry) => ({ ...entry })),
+      expectedModels: [...this.modelIdentifierValidation.expectedModels],
+    };
+  }
+
+  getModelHealth() {
+    return this.healthStore.snapshot();
   }
 
   /**
-   * Lists model catalog entries eligible for a capability, in fallback
-   * order, annotated with whether they are currently configured.
-   * Useful for observability/diagnostics without making any network call.
+   * Lists the exact route without making a network call. Health is included so
+   * operators can explain why a primary was skipped on a later Trust case.
    */
   describeRoute(capability) {
     const chain = AI_GATEWAY_CONFIG.CAPABILITY_ROUTES[capability] || [];
     return chain.map((entryId) => {
       const entry = AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId];
       if (!entry) {
-        return {
-          entryId,
-          provider: null,
-          model: null,
-          tier: null,
-          configured: false,
-        };
+        return { entryId, provider: null, model: null, tier: null, configured: false, valid: false, validationCode: "CATALOG_ENTRY_MISSING" };
       }
       const provider = this.providers[entry.provider];
+      const validation = validateCatalogModelEntry(entryId);
+      const health = this.healthStore.get(entry.provider, entry.model);
+      let configured = false;
+      try {
+        configured = Boolean(provider?.isConfigured?.(entry));
+      } catch {
+        configured = false;
+      }
       return {
         entryId,
         provider: entry.provider,
         model: entry.model,
         tier: entry.tier,
-        configured: Boolean(provider?.isConfigured(entry)),
+        configured,
+        valid: validation.valid,
+        validationCode: validation.code,
+        structuredOutputContract: entry.structuredOutputContract || null,
+        cooldownUntil: health?.cooldownUntil || null,
+        cooldownRemainingMs: health?.cooldownRemainingMs || 0,
+        dailyQuotaExhausted: health?.dailyQuotaExhausted === true,
       };
     });
   }
 
+  async #invokeProvider(provider, payload, timeoutMs, signal) {
+    const controller = new AbortController();
+    const unbind = linkAbortSignal(controller, signal);
+    let timer = null;
+    const timeout = new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        controller.abort(timeoutError());
+        reject(timeoutError());
+      }, timeoutMs);
+    });
+    try {
+      const generation = Promise.resolve().then(() => provider.generate({
+        ...payload,
+        signal: controller.signal,
+        timeoutMs,
+      }));
+      return await Promise.race([generation, timeout]);
+    } finally {
+      if (timer) clearTimeout(timer);
+      unbind();
+    }
+  }
+
+  #pushFailure(attempts, {
+    entry,
+    attemptNumber,
+    startedAt,
+    durationMs,
+    errorType,
+    httpStatus = null,
+    providerErrorCode = null,
+    result = null,
+    errorMessage = null,
+  }) {
+    const attempt = createAttemptRecord({
+      provider: entry?.provider || "unknown",
+      model: entry?.model || entry?.id,
+      ok: false,
+      attemptNumber,
+      startedAt: nowIso(startedAt),
+      durationMs,
+      httpStatus,
+      providerErrorCode,
+      result,
+      errorType,
+      errorMessage,
+    });
+    attempts.push(attempt);
+    return attempt;
+  }
+
   /**
-   * Attempts generation for the given capability across the fallback chain.
-   * @param {object} params
-   * @param {string} params.capability - AI_CAPABILITY value
-   * @param {string} params.systemPrompt
-   * @param {string} params.userPrompt
-   * @param {Array<object>} [params.inputParts] - provider-neutral media parts;
-   *   Gemini maps these to Interactions content blocks
-   * @param {boolean} [params.jsonMode]
-   * @param {object} [params.responseSchema] - optional provider JSON schema
-   * @param {number} [params.timeoutMs]
-   * @param {number} [params.maxOutputTokens]
-   * @param {(text: string) => unknown} [params.parseResponse] - optional structured parser
-   * @param {(value: unknown) => boolean} [params.validateResponse] - optional structured validator
-   * @returns {Promise<{ ok: boolean, provider?: string, model?: string, text?: string, attempts: object[], errorType?: string, errorMessage?: string }>}
+   * Routes one request across the approved chain. The returned object is
+   * advisory transport metadata; Layer 4 remains responsible for policy.
    */
   async route({
     capability,
@@ -83,210 +222,373 @@ export class ModelRouter {
     jsonMode = false,
     responseSchema = null,
     timeoutMs = AI_GATEWAY_CONFIG.SLA.DEFAULT_TIMEOUT_MS,
+    perModelTimeoutMs = null,
+    totalBudgetMs = AI_GATEWAY_CONFIG.BUDGET.DEFAULT_TOTAL_MS,
     maxOutputTokens = AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS,
     signal,
     parseResponse = null,
     validateResponse = null,
-  }) {
-    const chain = (AI_GATEWAY_CONFIG.CAPABILITY_ROUTES[capability] || []).slice(
-      0,
-      AI_GATEWAY_CONFIG.LIMITS.MAX_ROUTER_ATTEMPTS
-    );
+  } = {}) {
+    const configuredChain = (AI_GATEWAY_CONFIG.CAPABILITY_ROUTES[capability] || []).slice(0, AI_GATEWAY_CONFIG.LIMITS.MAX_ROUTER_ATTEMPTS);
     const attempts = [];
+    const startedAt = Date.now();
+    const boundedTotalBudget = boundedBudget(totalBudgetMs, AI_GATEWAY_CONFIG.BUDGET.DEFAULT_TOTAL_MS);
+    const requestedTimeout = boundedTimeout(timeoutMs, AI_GATEWAY_CONFIG.SLA.DEFAULT_TIMEOUT_MS);
+    const perCandidateTimeout = boundedTimeout(perModelTimeoutMs || requestedTimeout, requestedTimeout);
     const boundedSystemPrompt = String(systemPrompt || "").slice(0, AI_GATEWAY_CONFIG.LIMITS.MAX_PROMPT_CHARACTERS);
     const boundedUserPrompt = String(userPrompt || "").slice(0, AI_GATEWAY_CONFIG.LIMITS.MAX_PROMPT_CHARACTERS);
-    const requestedTimeout = Number(timeoutMs);
-    const boundedTimeout = Number.isFinite(requestedTimeout)
-      ? Math.min(Math.max(requestedTimeout, 250), 30000)
-      : AI_GATEWAY_CONFIG.SLA.DEFAULT_TIMEOUT_MS;
-    const requestedOutputTokens = Number(maxOutputTokens);
-    const boundedOutputTokens = Number.isFinite(requestedOutputTokens)
-      ? Math.min(Math.max(Math.floor(requestedOutputTokens), 1), AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS)
-      : AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS;
+    const outputTokens = boundedOutputTokens(maxOutputTokens);
+    const requestedPrimaryModel = AI_GATEWAY_CONFIG.MODEL_CATALOG[configuredChain[0]]?.model || null;
+    const cooldownModels = [];
+    const activeCooldowns = [];
+    let primaryFailure = null;
+    let lastError = null;
 
-    if (chain.length === 0) {
+    if (configuredChain.length === 0) {
       return {
         ok: false,
         attempts,
+        requestedPrimaryModel,
+        executedModel: null,
+        fallbackUsed: false,
+        fallbackReason: null,
+        providerStatus: "NOT_CONFIGURED",
+        operationStatus: "PARTIAL",
+        totalBudgetMs: boundedTotalBudget,
         errorType: GATEWAY_ERROR_TYPE.NOT_CONFIGURED,
-        errorMessage: `No model route defined for capability "${capability}"`,
+        errorMessage: `No model route defined for capability ${capability}`,
       };
     }
 
-    let lastError = null;
-
-    for (const entryId of chain) {
-      if (signal?.aborted) {
-        const error = signal.reason instanceof Error ? signal.reason : new Error("AI gateway request cancelled");
-        error.name = "AbortError";
-        throw error;
-      }
-      const catalogEntry = AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId];
-      if (!catalogEntry) {
-        attempts.push(createAttemptRecord({
-          provider: "unknown",
-          model: entryId,
-          ok: false,
-          errorType: GATEWAY_ERROR_TYPE.NOT_CONFIGURED,
-          errorMessage: "Unknown model catalog entry"
-        }));
+    for (const entryId of configuredChain) {
+      if (signal?.aborted) throw abortError(signal.reason);
+      const entry = AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId];
+      const attemptNumber = attempts.length + 1;
+      if (!entry) {
+        const attempt = this.#pushFailure(attempts, {
+          entry: { provider: "unknown", model: entryId, id: entryId },
+          attemptNumber,
+          startedAt: Date.now(),
+          durationMs: 0,
+          errorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE,
+          providerErrorCode: "CATALOG_ENTRY_MISSING",
+          result: "MODEL_INCOMPATIBLE",
+          errorMessage: "Unknown model catalog entry",
+        });
+        primaryFailure ||= attempt;
+        lastError = { errorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE, providerStatus: "MODEL_INCOMPATIBLE" };
         continue;
       }
 
-      const provider = this.providers[catalogEntry.provider];
+      const validation = validateCatalogModelEntry(entryId);
+      if (!validation.valid) {
+        const attempt = this.#pushFailure(attempts, {
+          entry,
+          attemptNumber,
+          startedAt: Date.now(),
+          durationMs: 0,
+          errorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE,
+          providerErrorCode: validation.code,
+          result: "MODEL_INCOMPATIBLE",
+          errorMessage: "Model catalog validation failed",
+        });
+        primaryFailure ||= attempt;
+        lastError = { errorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE, providerErrorCode: validation.code, providerStatus: "MODEL_INCOMPATIBLE" };
+        continue;
+      }
 
+      const health = this.healthStore.get(entry.provider, entry.model);
+      if (health?.cooldownRemainingMs > 0) {
+        const skipStartedAt = Date.now();
+        const attempt = this.#pushFailure(attempts, {
+          entry,
+          attemptNumber,
+          startedAt: skipStartedAt,
+          durationMs: 0,
+          errorType: GATEWAY_ERROR_TYPE.CIRCUIT_OPEN,
+          providerErrorCode: "MODEL_COOLDOWN",
+          result: "COOLDOWN",
+          errorMessage: "Model is cooling down",
+        });
+        primaryFailure ||= attempt;
+        cooldownModels.push(entry.model);
+        activeCooldowns.push({ model: entry.model, cooldownUntil: health.cooldownUntil, cooldownRemainingMs: health.cooldownRemainingMs });
+        lastError = { errorType: GATEWAY_ERROR_TYPE.CIRCUIT_OPEN, providerErrorCode: "MODEL_COOLDOWN", providerStatus: "COOLDOWN" };
+        continue;
+      }
+
+      const provider = this.providers[entry.provider];
       let configured = false;
       try {
-        configured = Boolean(provider && provider.isConfigured(catalogEntry));
+        configured = Boolean(provider?.isConfigured?.(entry));
       } catch {
         configured = false;
       }
       if (!configured) {
-        attempts.push(
-          createAttemptRecord({
-            provider: catalogEntry.provider,
-            model: catalogEntry.model,
-            ok: false,
-            errorType: GATEWAY_ERROR_TYPE.NOT_CONFIGURED,
-            errorMessage: `Missing configuration for ${catalogEntry.envKey}`,
-          })
-        );
+        const attempt = this.#pushFailure(attempts, {
+          entry,
+          attemptNumber,
+          startedAt: Date.now(),
+          durationMs: 0,
+          errorType: GATEWAY_ERROR_TYPE.NOT_CONFIGURED,
+          providerErrorCode: "GEMINI_API_KEY_MISSING",
+          result: "NOT_CONFIGURED",
+          errorMessage: "Missing canonical provider configuration",
+        });
+        primaryFailure ||= attempt;
+        lastError = { errorType: GATEWAY_ERROR_TYPE.NOT_CONFIGURED, providerErrorCode: "GEMINI_API_KEY_MISSING", providerStatus: "NOT_CONFIGURED" };
         continue;
       }
 
-      const maxAttempts = 1 + AI_GATEWAY_CONFIG.RETRY.MAX_RETRIES_PER_CANDIDATE;
-      for (let attemptIndex = 0; attemptIndex < maxAttempts; attemptIndex += 1) {
-        if (signal?.aborted) {
-          const error = signal.reason instanceof Error ? signal.reason : new Error("AI gateway request cancelled");
-          error.name = "AbortError";
-          throw error;
-        }
-        const startedAt = Date.now();
-        try {
-          const generated = await provider.generate({
-            catalogEntry,
-            systemPrompt: boundedSystemPrompt,
-            userPrompt: boundedUserPrompt,
-            inputParts,
-            jsonMode,
-            responseSchema,
-            timeoutMs: boundedTimeout,
-            maxOutputTokens: boundedOutputTokens,
-            signal,
+      const providerValidation = safeProviderValidation(provider, entry);
+      if (providerValidation.valid === false || providerValidation.compatible === false) {
+        const attempt = this.#pushFailure(attempts, {
+          entry,
+          attemptNumber,
+          startedAt: Date.now(),
+          durationMs: 0,
+          errorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE,
+          providerErrorCode: providerValidation.code || "MODEL_INCOMPATIBLE",
+          result: "MODEL_INCOMPATIBLE",
+          errorMessage: "Provider model compatibility validation failed",
+        });
+        primaryFailure ||= attempt;
+        lastError = { errorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE, providerErrorCode: providerValidation.code, providerStatus: "MODEL_INCOMPATIBLE" };
+        continue;
+      }
+
+      // Budget reservation: Check if there is a known healthy candidate downstream.
+      // If entry is not terminal and a downstream candidate is healthy (e.g. 3.6),
+      // reserve L4_RESERVED_HEALTHY_BUDGET_MS (~6800ms) for it.
+      const downstreamCandidates = configuredChain.slice(configuredChain.indexOf(entryId) + 1);
+      const hasDownstreamHealthy = downstreamCandidates.some((id) => {
+        const downstreamEntry = AI_GATEWAY_CONFIG.MODEL_CATALOG[id];
+        return downstreamEntry && !this.healthStore.isCoolingDown(downstreamEntry.provider, downstreamEntry.model);
+      });
+
+      const reservedHealthyBudget = hasDownstreamHealthy
+        ? (AI_GATEWAY_CONFIG.BUDGET.L4_RESERVED_HEALTHY_BUDGET_MS || 6800)
+        : 0;
+
+      const remainingBeforeAttempt = boundedTotalBudget - (Date.now() - startedAt);
+      if (remainingBeforeAttempt < AI_GATEWAY_CONFIG.BUDGET.MIN_ATTEMPT_MS) {
+        lastError = { errorType: GATEWAY_ERROR_TYPE.BUDGET_EXHAUSTED, providerStatus: "BUDGET_EXHAUSTED" };
+        break;
+      }
+
+      // If attempting this candidate would violate the reservation for the downstream healthy candidate,
+      // bypass this candidate immediately to protect the healthy model's execution window
+      const availableForAttempt = remainingBeforeAttempt - reservedHealthyBudget;
+      if (hasDownstreamHealthy && availableForAttempt < AI_GATEWAY_CONFIG.BUDGET.MIN_ATTEMPT_MS) {
+        const attempt = this.#pushFailure(attempts, {
+          entry,
+          attemptNumber,
+          startedAt: Date.now(),
+          durationMs: 0,
+          errorType: GATEWAY_ERROR_TYPE.TIMEOUT,
+          providerErrorCode: "BUDGET_RESERVED_FOR_HEALTHY_CANDIDATE",
+          result: "BUDGET_EXHAUSTED",
+          errorMessage: "Bypassed candidate to preserve execution budget for healthy terminal candidate",
+        });
+        primaryFailure ||= attempt;
+        continue;
+      }
+
+      const attemptBudgetCap = hasDownstreamHealthy
+        ? Math.min(perCandidateTimeout, Math.max(AI_GATEWAY_CONFIG.BUDGET.MIN_ATTEMPT_MS, availableForAttempt))
+        : Math.min(perCandidateTimeout, remainingBeforeAttempt);
+
+      const attemptTimeout = Math.max(AI_GATEWAY_CONFIG.BUDGET.MIN_ATTEMPT_MS, attemptBudgetCap);
+
+      const candidateSystemPrompt = boundedSystemPrompt.includes("model must be one of:")
+        ? boundedSystemPrompt.replace(/model must be one of: [^.]+\./, `model must be "${entry.model}". Set "model": "${entry.model}".`)
+        : boundedSystemPrompt;
+
+      const attemptStartedAt = Date.now();
+      try {
+        const generated = await this.#invokeProvider(provider, {
+          catalogEntry: entry,
+          systemPrompt: candidateSystemPrompt,
+          userPrompt: boundedUserPrompt,
+          inputParts,
+          jsonMode,
+          responseSchema,
+          maxOutputTokens: outputTokens,
+        }, attemptTimeout, signal);
+        const text = String(generated?.text ?? "");
+        if (!text.trim()) {
+          throw Object.assign(new Error("Empty structured response"), {
+            gatewayErrorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE,
+            providerErrorCode: "EMPTY_RESPONSE",
           });
-          const text = generated?.text;
+        }
 
-          let parsedResponse;
-          if (typeof parseResponse === "function") {
-            try {
-              parsedResponse = parseResponse(String(text ?? ""));
-            } catch {
-              const errorType = GATEWAY_ERROR_TYPE.INVALID_JSON;
-              const errorMessage = "Model output was not valid JSON";
-              lastError = { errorType, errorMessage };
-              attempts.push(
-                createAttemptRecord({
-                  provider: catalogEntry.provider,
-                  model: catalogEntry.model,
-                  ok: false,
-                  errorType,
-                  errorMessage,
-                  latencyMs: Date.now() - startedAt,
-                })
-              );
-              // A malformed response is a bounded candidate failure. Retry
-              // once under the same per-candidate budget before fallback.
-              if (attemptIndex === maxAttempts - 1) break;
-              continue;
-            }
-
-            let valid = true;
-            if (typeof validateResponse === "function") {
-              try {
-                valid = Boolean(validateResponse(parsedResponse));
-              } catch {
-                valid = false;
-              }
-            }
-            if (!valid) {
-              const errorType = GATEWAY_ERROR_TYPE.SCHEMA_VALIDATION_FAILED;
-              const errorMessage = "Model output failed schema validation";
-              lastError = { errorType, errorMessage };
-              attempts.push(
-                createAttemptRecord({
-                  provider: catalogEntry.provider,
-                  model: catalogEntry.model,
-                  ok: false,
-                  errorType,
-                  errorMessage,
-                  latencyMs: Date.now() - startedAt,
-                })
-              );
-              // Retry malformed structured output once, then fail closed.
-              if (attemptIndex === maxAttempts - 1) break;
-              continue;
-            }
+        let parsedResponse;
+        if (typeof parseResponse === "function") {
+          try {
+            parsedResponse = parseResponse(text);
+          } catch {
+            const attempt = this.#pushFailure(attempts, {
+              entry,
+              attemptNumber,
+              startedAt: attemptStartedAt,
+              durationMs: Date.now() - attemptStartedAt,
+              errorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE,
+              providerErrorCode: "INVALID_JSON",
+              result: "MODEL_INCOMPATIBLE",
+              errorMessage: "Model output was not valid JSON",
+            });
+            primaryFailure ||= attempt;
+            lastError = { errorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE, providerErrorCode: "INVALID_JSON", providerStatus: "MODEL_INCOMPATIBLE" };
+            continue;
           }
 
-          attempts.push(
-            createAttemptRecord({
-              provider: catalogEntry.provider,
-              model: catalogEntry.model,
-              ok: true,
-              latencyMs: Date.now() - startedAt,
-            })
-          );
+          // Server-owned model provenance: authoritative model identity is stamped server-side
+          if (parsedResponse && typeof parsedResponse === "object" && !Array.isArray(parsedResponse)) {
+            parsedResponse.provider = "google";
+            parsedResponse.model = entry.model;
+          }
 
-          return {
-            ok: true,
-            provider: catalogEntry.provider,
-            model: catalogEntry.model,
-            text: String(text ?? ""),
-            providerMetadata: {
-              transport: typeof generated?.transport === "string" ? generated.transport : null,
-              thinkingLevel: typeof generated?.thinkingLevel === "string"
-                ? generated.thinkingLevel
-                : typeof catalogEntry?.thinkingLevel === "string" ? catalogEntry.thinkingLevel : null,
-            },
-            ...(typeof parseResponse === "function" ? { json: parsedResponse } : {}),
-            attempts,
-          };
-        } catch (err) {
-          if (signal?.aborted) throw err;
-          const latencyMs = Date.now() - startedAt;
-          const errorType = err.gatewayErrorType || GATEWAY_ERROR_TYPE.NETWORK_ERROR;
-          lastError = { errorType, errorMessage: sanitizeGatewayError(errorType, err.message) };
-
-          attempts.push(
-            createAttemptRecord({
-              provider: catalogEntry.provider,
-              model: catalogEntry.model,
-              ok: false,
-              errorType,
-              errorMessage: err.message,
-              latencyMs,
-            })
-          );
-
-          const isRetryable =
-            errorType === GATEWAY_ERROR_TYPE.TIMEOUT ||
-            AI_GATEWAY_CONFIG.RETRY.RETRYABLE_HTTP_STATUS.includes(err.httpStatus);
-
-          if (!isRetryable || attemptIndex === maxAttempts - 1) {
-            break; // move to next candidate in the fallback chain
+          let valid = true;
+          if (typeof validateResponse === "function") {
+            try {
+              valid = Boolean(validateResponse(parsedResponse, entry));
+            } catch {
+              valid = false;
+            }
+          }
+          if (!valid) {
+            const attempt = this.#pushFailure(attempts, {
+              entry,
+              attemptNumber,
+              startedAt: attemptStartedAt,
+              durationMs: Date.now() - attemptStartedAt,
+              errorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE,
+              providerErrorCode: "SCHEMA_VALIDATION_FAILED",
+              result: "MODEL_INCOMPATIBLE",
+              errorMessage: "Model output failed schema validation",
+            });
+            primaryFailure ||= attempt;
+            lastError = { errorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE, providerErrorCode: "SCHEMA_VALIDATION_FAILED", providerStatus: "MODEL_INCOMPATIBLE" };
+            continue;
           }
         }
+
+        const durationMs = Date.now() - attemptStartedAt;
+        const attempt = createAttemptRecord({
+          provider: entry.provider,
+          model: entry.model,
+          ok: true,
+          attemptNumber,
+          startedAt: nowIso(attemptStartedAt),
+          durationMs,
+          httpStatus: generated?.httpStatus ?? 200,
+          providerErrorCode: generated?.providerErrorCode || null,
+          result: "SUCCESS",
+        });
+        attempts.push(attempt);
+        this.healthStore.recordSuccess(entry.provider, entry.model);
+        const usedFallback = entry.model !== requestedPrimaryModel || Boolean(primaryFailure);
+        return {
+          ok: true,
+          provider: entry.provider,
+          model: entry.model,
+          text,
+          ...(typeof parseResponse === "function" ? { json: parsedResponse } : {}),
+          attempts,
+          modelTrace: attempts,
+          requestedPrimaryModel,
+          executedModel: entry.model,
+          fallbackUsed: usedFallback,
+          fallbackReason: usedFallback ? fallbackReasonFor(primaryFailure) : null,
+          providerStatus: "SUCCESS",
+          operationStatus: "COMPLETED",
+          totalBudgetMs: boundedTotalBudget,
+          totalLatencyMs: Date.now() - startedAt,
+          httpStatus: generated?.httpStatus ?? 200,
+          providerErrorCode: generated?.providerErrorCode || null,
+          providerMetadata: {
+            transport: generated?.transport || null,
+            thinkingLevel: generated?.thinkingLevel || entry.thinkingLevel || null,
+          },
+          cooldownResult: { skippedModels: cooldownModels, cooldownModels, activeCooldowns },
+        };
+      } catch (error) {
+        if (signal?.aborted) throw abortError(signal.reason);
+        const durationMs = Date.now() - attemptStartedAt;
+        const rawErrorType = error?.gatewayErrorType || (error?.name === "AbortError" || error?.name === "TimeoutError" ? GATEWAY_ERROR_TYPE.TIMEOUT : GATEWAY_ERROR_TYPE.NETWORK_ERROR);
+        const errorType = [GATEWAY_ERROR_TYPE.INVALID_JSON, GATEWAY_ERROR_TYPE.SCHEMA_VALIDATION_FAILED, GATEWAY_ERROR_TYPE.EMPTY_RESPONSE].includes(rawErrorType)
+          ? GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE
+          : rawErrorType;
+        const httpStatus = Number.isInteger(Number(error?.httpStatus)) ? Number(error.httpStatus) : null;
+        const providerErrorCode = normalizeProviderErrorCode(error?.providerErrorCode || error?.code);
+        const status = providerStatusFor(errorType, httpStatus, providerErrorCode);
+        const result = traceResultForFailure({ errorType, httpStatus, providerErrorCode });
+        const attempt = this.#pushFailure(attempts, {
+          entry,
+          attemptNumber,
+          startedAt: attemptStartedAt,
+          durationMs,
+          errorType,
+          httpStatus,
+          providerErrorCode,
+          result,
+          errorMessage: error?.message,
+        });
+        primaryFailure ||= attempt;
+        lastError = {
+          errorType,
+          httpStatus,
+          providerErrorCode,
+          providerStatus: status,
+          errorMessage: sanitizeGatewayError(errorType, error?.message),
+        };
+
+        const shouldFailover = isFailoverEligible({ errorType, httpStatus, providerErrorCode });
+        if (shouldFailover) {
+          if (errorType !== GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE) {
+            this.healthStore.recordFailure({
+              provider: entry.provider,
+              model: entry.model,
+              result,
+              httpStatus,
+              retryAfterMs: error?.retryAfterMs,
+              dailyQuotaExhausted: error?.dailyQuotaExhausted === true,
+              quotaResetAt: error?.quotaResetAt,
+            });
+          }
+          continue;
+        }
+        break;
       }
     }
 
+    const totalLatencyMs = Date.now() - startedAt;
+    const finalErrorType = lastError?.errorType || GATEWAY_ERROR_TYPE.NOT_CONFIGURED;
     return {
       ok: false,
+      provider: null,
+      model: null,
       attempts,
-      errorType: lastError?.errorType || GATEWAY_ERROR_TYPE.NOT_CONFIGURED,
-      errorMessage: sanitizeGatewayError(
-        lastError?.errorType || GATEWAY_ERROR_TYPE.NOT_CONFIGURED,
-        lastError?.errorMessage
-      ),
+      modelTrace: attempts,
+      requestedPrimaryModel,
+      executedModel: null,
+      fallbackUsed: false,
+      fallbackReason: null,
+      providerStatus: lastError?.providerStatus || classifyGatewayFailure({
+        errorType: finalErrorType,
+        httpStatus: lastError?.httpStatus,
+        providerErrorCode: lastError?.providerErrorCode,
+      }),
+      operationStatus: "PARTIAL",
+      totalBudgetMs: boundedTotalBudget,
+      totalLatencyMs,
+      errorType: finalErrorType,
+      errorMessage: sanitizeGatewayError(finalErrorType, lastError?.errorMessage),
+      httpStatus: lastError?.httpStatus || null,
+      providerErrorCode: lastError?.providerErrorCode || null,
+      providerMetadata: { transport: null, thinkingLevel: null },
+      cooldownResult: { skippedModels: cooldownModels, cooldownModels, activeCooldowns },
     };
   }
 }

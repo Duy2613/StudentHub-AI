@@ -1,82 +1,62 @@
 # StudentHub AI — Provider Registry
 
-Status: canonical production policy as of 2026-09-16
+Status: canonical Google multi-model routing policy · 2026-09-17
 
-This file records the provider boundary implemented in
-`frontend/src/lib/ai-gateway/`. It never contains secret values.
+This registry records public-safe provider/model metadata. Runtime route
+selection is owned by `frontend/src/lib/ai-gateway/config/AIGatewayConfig.js`;
+the registry never contains secret values.
 
-## Active production provider
+## Active production chain
 
-| Provider | Model | Role | Transport | Status |
-|---|---|---|---|---|
-| Gemini | `gemini-3.8-flash` | structured advisory reasoning, claims, multimodal/document analysis | Interactions API first | ACTIVE |
+| Order | Provider | Model | Role | Structured L4 DTO | Status |
+|---:|---|---|---|---|---|
+| 1 | Google Gemini | `gemini-3.8-flash` | primary advisory reasoning/multimodal | verified contract in code; project availability runtime-checked | ACTIVE |
+| 2 | Google Gemini | `gemini-3.7-flash` | model-specific fallback | same fixed contract | ACTIVE |
+| 3 | Google Gemini | `gemini-3.6-flash` | model-specific fallback | same fixed contract | ACTIVE |
+| 4 | Google Gemini | `gemini-2.5-flash` | final approved fallback | same fixed contract | ACTIVE |
 
-Environment precedence is exact:
+All four candidates use the existing canonical `GEMINI_API_KEY`. A 429 on one
+model does not imply a 429 on the others because quota is evaluated per model;
+the router may advance without rotating keys. A public model catalog does not
+prove current project access.
 
-1. `GEMINI_API_KEY` — canonical secret;
-2. `GEMINI_KEY_1` — legacy fallback only when the canonical key is absent.
+## Runtime controls
 
-`GEMINI_MODEL` is diagnostic metadata only; the catalog model is authoritative.
-The adapter uses `store: false`, bounded timeouts/output, safe response-size
-limits, and never logs the key.
+- Model identifiers are allow-listed and checked at provider initialization.
+- L4 has a 10,000 ms total provider budget and 2,200 ms per-model timeout.
+- One model call is made per routing sequence; the first valid DTO ends it.
+- 429, 503, timeout/network timeout, and 404 model-unavailable failures may
+  advance the chain. 400, 401, and 403 stop immediately.
+- `ModelHealthStore` maintains bounded, expiring provider/model cooldown state,
+  honors `Retry-After`, and does not permanently disable models.
+- Every attempt records model, sequence number, start time, duration, HTTP
+  status, provider error code, and bounded result status. API keys and raw
+  provider bodies are never recorded.
+
+## Gemma shadow candidates
+
+| Provider | Model | Status | Activation rule |
+|---|---|---|---|
+| Google Gemma | `gemma-4-31b-it` | SHADOW | exact Layer 4 compatibility gate must pass |
+| Google Gemma | `gemma-4-26b-a4b-it` | SHADOW | exact Layer 4 compatibility gate must pass |
+
+The gate must evidence endpoint compatibility, structured output, Vietnamese
+reasoning, evidence grounding, latency, project quota, safety behavior, and
+parser compatibility. Until all required checks pass, `GEMMA_COMPATIBLE=NO` and
+neither Gemma model is in the production route.
 
 ## Compatibility metadata — not active
 
-| Provider | Model | Status | Rule |
-|---|---|---|---|
-| OpenAI-compatible adapter | historical catalog models | `DISABLED_INTENTIONALLY` | retained for imports only; active routing never selects it |
-| Gemini Lite | `gemini-3.5-flash-lite` | compatibility fallback metadata | not in the active production route for this release |
-| Local specialist | `FraudRiskEngine_v1` | advisory local engine | may provide signals, never the final truth/security decision |
+| Provider | Status | Rule |
+|---|---|---|
+| OpenAI-compatible adapter | `DISABLED_INTENTIONALLY` | retained for old imports; never selected by active routes |
+| `FraudRiskEngine_v1` | local advisory | may provide signals, never final truth/security authority |
 
-OpenAI availability, quota, 401/403 responses, and credit exhaustion are not
-release blockers because the OpenAI runtime is deliberately disabled. No
-production code in this release attempts an OpenAI request.
-
-## Trust boundary
+## Layer boundary
 
 The deterministic Trust Policy owns security classification, truth status,
-enforcement, confidence, and the L5 final decision. Gemini Layer 4 returns
-only the validated DTO below:
+enforcement, confidence, and the L5 final decision. Gemini Layer 4 returns the
+validated existing advisory DTO only. It cannot create evidence, fabricate
+citations/confidence, or override policy. If every candidate fails, L4 exposes
+`UNAVAILABLE`/`PARTIAL` plus the exact trace and the V5 pipeline still runs L5.
 
-```json
-{
-  "verdictSignal": "SUPPORTS|CONTRADICTS|MIXED|UNCERTAIN|NO_SIGNAL",
-  "supportReasons": [],
-  "contradictionReasons": [],
-  "missingEvidence": [],
-  "uncertainty": "string",
-  "citationsUsed": [{ "id": "evidence-id", "url": "https://…" }],
-  "provider": "gemini",
-  "model": "gemini-3.8-flash"
-}
-```
-
-The schema requires real HTTP(S) URLs for citations. Invalid output is retried
-once and then reported as `AI verification unavailable`; deterministic Trust
-still completes. The public UI shows `AI VERIFICATION — GEMINI`, actual
-provider/model/status, evidence references, and uncertainty. It does not show
-AI-agreement percentages.
-
-## Permitted advisory uses
-
-Gemini may assist with community classification, summaries, duplicate or
-evidence suggestions, expert evidence-packet summaries, assignment
-suggestions, and review summaries. It may not set reputation, ban a user,
-decide truth, perform irreversible moderation, qualify an Expert, assign
-authority, approve an assessment, or resolve an appeal alone.
-
-## Multimodal support
-
-The Gemini adapter accepts image, screenshot, QR, PDF, and document fixture
-parts through the provider-neutral gateway interface. The canonical
-Interactions request is attempted first; `generateContent` is used only for an
-explicit 404/405/501 compatibility response. Real multimodal evidence belongs
-in the smoke report, not in source control as a secret.
-
-## Historical note
-
-Older provider records, direct-provider names, and the legacy
-`MultiModelVerifier` class may remain in the repository for compatibility and
-audit traceability. They are not the canonical production route. The current
-entrypoint is `TrustPipelineOrchestrator` through `TrustOrchestrator`, with
-Gemini explicitly enabled for the production Trust API.

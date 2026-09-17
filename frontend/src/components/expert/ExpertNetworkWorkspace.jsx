@@ -14,6 +14,9 @@ import ExpertOperationalWorkspace from "./ExpertOperationalWorkspace";
 import ExpertCinematicHero from "./ExpertCinematicHero";
 import ExpertAuthorityNetwork from "./ExpertAuthorityNetwork";
 import ExpertPublicStory from "./ExpertPublicStory";
+import FormalExpertAssessmentCard from "./FormalExpertAssessmentCard";
+import ReputationMatrixCard from "./ReputationMatrixCard";
+import ExpertReviewDeskModal from "./ExpertReviewDeskModal";
 
 export const SYNTHETIC_EXPERT_PUBLIC_COUNT = 0;
 
@@ -22,17 +25,24 @@ function isSynthetic(expert) {
 }
 
 export default function ExpertNetworkWorkspace() {
-  const { session, profile, isAuthenticated, moderatorEligible } = useAuth();
+  const {
+    session,
+    profile,
+    isAuthenticated,
+    moderatorEligible,
+    expertLifecycleState: lifecycle,
+    expertApplication: application,
+    verifiedDomains = [],
+  } = useAuth();
   const [experts, setExperts] = useState([]);
   const [selected, setSelected] = useState(null);
   const [query, setQuery] = useState("");
   const [domain, setDomain] = useState("ALL");
   const [directoryLoading, setDirectoryLoading] = useState(true);
   const [directoryError, setDirectoryError] = useState("");
-  const [lifecycle, setLifecycle] = useState(EXPERT_LIFECYCLE_STATE.NONE);
-  const [application, setApplication] = useState(null);
-  const [verifiedDomains, setVerifiedDomains] = useState([]);
   const [reloadKey, setReloadKey] = useState(0);
+  const [isReviewDeskOpen, setIsReviewDeskOpen] = useState(false);
+  const [activeReviewCase, setActiveReviewCase] = useState(null);
 
   const loadDirectory = useCallback(async (signal) => {
     setDirectoryLoading(true);
@@ -62,45 +72,169 @@ export default function ExpertNetworkWorkspace() {
     return () => controller.abort("expert-directory-unmounted");
   }, [loadDirectory, reloadKey]);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setLifecycle(EXPERT_LIFECYCLE_STATE.NONE);
-      setApplication(null);
-      setVerifiedDomains([]);
-      return undefined;
-    }
-    const controller = new AbortController();
-    fetch("/api/expert/qualification", { credentials: "include", cache: "no-store", signal: controller.signal })
-      .then((response) => response.ok ? response.json() : null)
-      .then((payload) => {
-        const data = payload?.data || {};
-        setLifecycle(normalizeExpertLifecycleState(data.state));
-        setApplication(data.application || null);
-        setVerifiedDomains(Array.isArray(data.application?.approvedDomains) ? data.application.approvedDomains : []);
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setLifecycle(EXPERT_LIFECYCLE_STATE.NONE);
-      });
-    return () => controller.abort("expert-state-unmounted");
-  }, [isAuthenticated]);
-
   const presentationState = resolvePresentationState({ session, expertState: lifecycle });
   const activeExpert = presentationState === PRESENTATION_STATE.ACTIVE_EXPERT;
+  const isApplicant = isAuthenticated && !activeExpert && lifecycle !== EXPERT_LIFECYCLE_STATE.NONE;
   const publicExperts = useMemo(() => experts.filter((expert) => !isSynthetic(expert)), [experts]);
 
   return (
-    <div className="unified-workspace unified-expert-workspace" data-public-synthetic-count={SYNTHETIC_EXPERT_PUBLIC_COUNT} data-presentation-state={presentationState}>
-      <ExpertCinematicHero experts={publicExperts} />
+    <div className="expert-council-space" data-pillar="expert">
+      <div className="unified-workspace unified-expert-workspace" data-public-synthetic-count={SYNTHETIC_EXPERT_PUBLIC_COUNT} data-presentation-state={presentationState}>
 
-      {!isAuthenticated && <div className="unified-auth-boundary"><div><strong>Xem danh bạ công khai trước khi đăng nhập.</strong><p>Bạn có thể tìm chuyên gia và đọc domain đã xác minh; đăng nhập để bắt đầu qualification.</p></div><Link href="/login?next=%2Fexpert" className="primary-action">Đăng nhập</Link></div>}
+        {/* ROLE 1: QUALIFIED ACTIVE EXPERT WORKSPACE */}
+        {activeExpert && (
+          <>
+            <header className="expert-role-header expert-header-active border border-emerald-500/30 bg-gradient-to-r from-emerald-950/40 to-slate-950/60 rounded-xl p-6 mb-6 shadow-xl">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <span className="text-emerald-400 font-mono text-xs uppercase tracking-widest flex items-center gap-2">
+                    <ShieldCheck size={14} /> EXPERT COUNCIL MEMBER · ACTIVE JURISDICTION
+                  </span>
+                  <h1 className="text-2xl sm:text-3xl font-serif text-white mt-1">Bàn làm việc Giám định Chuyên gia</h1>
+                  <p className="text-slate-300 text-sm mt-1">
+                    Thẩm quyền domain: {verifiedDomains.length ? verifiedDomains.map((d) => String(d).replaceAll("_", " ")).join(" · ") : "Đang cập nhật"}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500 text-slate-950 font-semibold text-sm hover:bg-emerald-400 transition-colors shadow-lg cursor-pointer"
+                  onClick={() => {
+                    setActiveReviewCase(null);
+                    setIsReviewDeskOpen(true);
+                  }}
+                >
+                  <ShieldCheck size={16} /> Mở bàn giám định (Review Desk)
+                </button>
+              </div>
+            </header>
 
-      <ExpertAuthorityNetwork experts={publicExperts} selected={selected} onSelect={setSelected} />
-      <ExpertPublicDirectory experts={publicExperts} selected={selected} query={query} domain={domain} onQueryChange={setQuery} onDomainChange={setDomain} onSelect={setSelected} onRetry={() => setReloadKey((value) => value + 1)} loading={directoryLoading} error={directoryError} />
-      {isAuthenticated && !activeExpert && <ExpertQualificationWorkspace lifecycle={lifecycle} application={application} />}
-      {!isAuthenticated && <ExpertQualificationWorkspace publicView />}
-      {activeExpert && <ExpertOperationalWorkspace profile={profile} verifiedDomains={verifiedDomains} moderatorEligible={moderatorEligible} />}
-      {selected && <section className="expert-public-dossier" aria-labelledby="expert-public-dossier-title"><div><span className="expert-kicker">Public profile / safe projection</span><h2 id="expert-public-dossier-title">{selected.name}</h2><p>{selected.bio || "Chưa có tiểu sử công khai."}</p></div><div className="expert-dossier-fields"><span><ShieldCheck size={14} /> {selected.verificationSummary?.identity === "VERIFIED" ? "Đã xác minh theo projection" : "Chưa có identity verification"}</span><span>Phạm vi: {selected.scopes?.length ? selected.scopes.map((scope) => scope.domain.replaceAll("_", " ")).join(" · ") : "Chưa công bố"}</span><span>Thông tin liên hệ riêng tư không hiển thị.</span></div><Link href={`/expert/profile/${encodeURIComponent(selected.expertId)}`} className="text-link">Mở hồ sơ công khai <ArrowRight size={14} /></Link></section>}
-      <ExpertPublicStory selected={selected} />
+            <ExpertOperationalWorkspace profile={profile} verifiedDomains={verifiedDomains} moderatorEligible={moderatorEligible} />
+          </>
+        )}
+
+        {/* ROLE 2: APPLICANT IN PROGRESS */}
+        {isApplicant && (
+          <>
+            <header className="expert-role-header expert-header-applicant border border-amber-500/30 bg-gradient-to-r from-amber-950/30 to-slate-950/60 rounded-xl p-6 mb-6 shadow-xl">
+              <span className="text-amber-400 font-mono text-xs uppercase tracking-widest flex items-center gap-2">
+                <ShieldCheck size={14} /> TIẾN TRÌNH KIỂM ĐỊNH CHUYÊN MÔN (QUALIFICATION)
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-serif text-white mt-1">Hồ sơ Ứng tuyển Chuyên gia</h1>
+              <p className="text-slate-300 text-sm mt-1">
+                Theo dõi và hoàn thành các giai đoạn kiểm định: Xác minh danh tính, Bài kiểm tra kiến thức, và Thẩm định domain.
+              </p>
+            </header>
+
+            <ExpertQualificationWorkspace lifecycle={lifecycle} application={application} />
+          </>
+        )}
+
+        {/* ROLE 3: NORMAL USER / PUBLIC DIRECTORY */}
+        {!activeExpert && !isApplicant && (
+          <header className="expert-role-header expert-header-directory border border-white/10 bg-slate-950/50 backdrop-blur-md rounded-xl p-6 mb-6 shadow-lg">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <span className="text-emerald-400 font-mono text-xs uppercase tracking-widest flex items-center gap-2">
+                  <ShieldCheck size={14} /> EXPERT COUNCIL / HỘI ĐỒNG CHUYÊN GIA
+                </span>
+                <h1 className="text-2xl sm:text-3xl font-serif text-white mt-1">
+                  Danh bạ Chuyên gia & Thẩm quyền Domain
+                </h1>
+                <p className="text-slate-300 text-sm mt-1 max-w-2xl">
+                  Tìm kiếm, đối chiếu và kết nối với các chuyên gia độc lập đã được xác minh theo từng domain chuyên môn.
+                </p>
+              </div>
+              <div>
+                {isAuthenticated ? (
+                  <Link
+                    href="/expert/profile"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 text-sm transition-colors"
+                  >
+                    Trở thành Chuyên gia <ArrowRight size={14} />
+                  </Link>
+                ) : (
+                  <Link
+                    href="/login?next=%2Fexpert"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 text-slate-950 font-semibold text-sm hover:bg-emerald-400 transition-colors"
+                  >
+                    Đăng nhập để ứng tuyển <ArrowRight size={14} />
+                  </Link>
+                )}
+              </div>
+            </div>
+          </header>
+        )}
+
+        {!isAuthenticated && (
+          <div className="unified-auth-boundary">
+            <div>
+              <strong>Xem danh bạ công khai trước khi đăng nhập.</strong>
+              <p>Bạn có thể tìm chuyên gia và đọc domain đã xác minh; đăng nhập để bắt đầu qualification.</p>
+            </div>
+            <Link href="/login?next=%2Fexpert" className="primary-action">Đăng nhập</Link>
+          </div>
+        )}
+
+        <ExpertAuthorityNetwork experts={publicExperts} selected={selected} onSelect={setSelected} />
+        <ExpertPublicDirectory
+          experts={publicExperts}
+          selected={selected}
+          query={query}
+          domain={domain}
+          onQueryChange={setQuery}
+          onDomainChange={setDomain}
+          onSelect={setSelected}
+          onRetry={() => setReloadKey((value) => value + 1)}
+          loading={directoryLoading}
+          error={directoryError}
+        />
+
+        {/* Informational Qualification footer for Normal Users */}
+        {!activeExpert && !isApplicant && (
+          <>
+            {isAuthenticated ? (
+              <ExpertQualificationWorkspace lifecycle={lifecycle} application={application} />
+            ) : (
+              <ExpertQualificationWorkspace publicView />
+            )}
+          </>
+        )}
+
+        {selected && (
+          <>
+            <section className="expert-public-dossier" aria-labelledby="expert-public-dossier-title">
+              <div>
+                <span className="expert-kicker">Public profile / safe projection</span>
+                <h2 id="expert-public-dossier-title">{selected.name}</h2>
+                <p>{selected.bio || "Chưa có tiểu sử công khai."}</p>
+              </div>
+              <div className="expert-dossier-fields">
+                <span><ShieldCheck size={14} /> {selected.verificationSummary?.identity === "VERIFIED" ? "Đã xác minh theo projection" : "Chưa có identity verification"}</span>
+                <span>Phạm vi: {selected.scopes?.length ? selected.scopes.map((scope) => scope.domain.replaceAll("_", " ")).join(" · ") : "Chưa công bố"}</span>
+                <span>Thông tin liên hệ riêng tư không hiển thị.</span>
+              </div>
+              <Link href={`/expert/profile/${encodeURIComponent(selected.expertId)}`} className="text-link">Mở hồ sơ công khai <ArrowRight size={14} /></Link>
+            </section>
+
+            {/* Structured Formal Assessment & Reputation Matrix surfaces */}
+            <section className="expert-evaluation-surfaces space-y-6 my-8" aria-label="Đánh giá và Chỉ số Chuyên gia">
+              <FormalExpertAssessmentCard assessment={selected.formalAssessment || null} />
+              <ReputationMatrixCard reputationData={selected.reputationData || selected.metrics || null} />
+            </section>
+          </>
+        )}
+        <ExpertPublicStory selected={selected} />
+
+        {isReviewDeskOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <ExpertReviewDeskModal
+              isOpen={isReviewDeskOpen}
+              onClose={() => setIsReviewDeskOpen(false)}
+              caseDossier={activeReviewCase}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

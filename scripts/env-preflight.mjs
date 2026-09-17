@@ -122,8 +122,7 @@ const categories = {
     { name: "OPENAI_API_KEY (compatibility only)", status: "DISABLED" },
   ],
   "GEMINI": [
-    { name: "GEMINI_API_KEY (canonical) / GEMINI_KEY_1 (legacy)", status: checkAnyVar(["GEMINI_API_KEY", "GEMINI_KEY_1"], { required: true }) },
-    { name: "GEMINI_MODEL", status: checkVar("GEMINI_MODEL", { required: false }) },
+    { name: "GEMINI_API_KEY (canonical)", status: checkVar("GEMINI_API_KEY", { required: true }) },
   ],
   "OTHER AI PROVIDERS": [
     { name: "ANTHROPIC_API_KEY", status: checkVar("ANTHROPIC_API_KEY", { required: false }) },

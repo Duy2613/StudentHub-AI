@@ -72,7 +72,7 @@ describe("Gemini trusted instruction boundary", () => {
       env: { GEMINI_API_KEY: "test-key" },
       fetchImpl: async (url, options) => {
         requests.push({ url, body: JSON.parse(options.body) });
-        if (requests.length === 1) return new Response("", { status: 404 });
+        if (requests.length === 1) return new Response("", { status: 405 });
         return new Response(
           JSON.stringify({ candidates: [{ content: { parts: [{ text: "compatibility answer" }] } }] }),
           { status: 200, headers: { "content-type": "application/json" } },
@@ -95,5 +95,45 @@ describe("Gemini trusted instruction boundary", () => {
       { text: "inspect this" },
       { inlineData: { mimeType: "image/png", data: "AA==" } },
     ]);
+  });
+
+  it("keeps Gemma shadow-only unless an explicit compatibility probe opts in", async () => {
+    let productionCalls = 0;
+    const provider = new GeminiProvider({
+      env: { GEMINI_API_KEY: "test-key" },
+      fetchImpl: async () => {
+        productionCalls += 1;
+        return new Response(JSON.stringify({ output_text: "must not run" }), { status: 200 });
+      },
+    });
+
+    await assert.rejects(
+      provider.generate({
+        catalogEntry: AI_GATEWAY_CONFIG.MODEL_CATALOG.GEMMA_4_31B_IT,
+        systemPrompt: "trusted",
+        userPrompt: "probe",
+        jsonMode: true,
+      }),
+      (error) => error.gatewayErrorType === "MODEL_INCOMPATIBLE" && error.providerErrorCode === "GEMMA_COMPATIBILITY_GATE_REQUIRED",
+    );
+    assert.equal(productionCalls, 0);
+
+    let shadowRequest;
+    const shadowProvider = new GeminiProvider({
+      env: { GEMINI_API_KEY: "test-key" },
+      fetchImpl: async (url, options) => {
+        shadowRequest = { url, body: JSON.parse(options.body) };
+        return new Response(JSON.stringify({ output_text: "probe response" }), { status: 200 });
+      },
+    });
+    const result = await shadowProvider.generate({
+      catalogEntry: AI_GATEWAY_CONFIG.MODEL_CATALOG.GEMMA_4_31B_IT,
+      systemPrompt: "trusted",
+      userPrompt: "probe",
+      jsonMode: true,
+      allowShadowCandidate: true,
+    });
+    assert.equal(result.text, "probe response");
+    assert.equal(shadowRequest.body.response_format.mime_type, "application/json");
   });
 });

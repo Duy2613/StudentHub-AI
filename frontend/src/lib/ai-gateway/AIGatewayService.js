@@ -22,6 +22,13 @@ import { createGatewayResult } from "./types.js";
 const defaultRouter = new ModelRouter();
 
 export class AIGatewayService {
+  static get defaultRouter() {
+    return defaultRouter;
+  }
+
+  static get router() {
+    return defaultRouter;
+  }
   /**
    * Generates plain text for a given capability with automatic fallback.
    * @param {object} params
@@ -49,6 +56,8 @@ export class AIGatewayService {
       inputParts,
       jsonMode: false,
       timeoutMs: options.timeoutMs,
+      perModelTimeoutMs: options.perModelTimeoutMs,
+      totalBudgetMs: options.totalBudgetMs,
       maxOutputTokens: options.maxOutputTokens,
       signal: options.signal,
     });
@@ -64,7 +73,17 @@ export class AIGatewayService {
         errorMessage: routed.errorMessage,
         requestId: options.requestId,
         totalLatencyMs,
+        totalBudgetMs: routed.totalBudgetMs,
         providerMetadata: routed.providerMetadata,
+        httpStatus: routed.httpStatus,
+        providerErrorCode: routed.providerErrorCode,
+        requestedPrimaryModel: routed.requestedPrimaryModel,
+        executedModel: routed.executedModel,
+        fallbackUsed: routed.fallbackUsed,
+        fallbackReason: routed.fallbackReason,
+        providerStatus: routed.providerStatus,
+        operationStatus: routed.operationStatus,
+        cooldownResult: routed.cooldownResult,
       });
     }
 
@@ -77,7 +96,17 @@ export class AIGatewayService {
       attempts: routed.attempts,
       requestId: options.requestId,
       totalLatencyMs,
+      totalBudgetMs: routed.totalBudgetMs,
       providerMetadata: routed.providerMetadata,
+      httpStatus: routed.httpStatus,
+      providerErrorCode: routed.providerErrorCode,
+      requestedPrimaryModel: routed.requestedPrimaryModel,
+      executedModel: routed.executedModel,
+      fallbackUsed: routed.fallbackUsed,
+      fallbackReason: routed.fallbackReason,
+      providerStatus: routed.providerStatus,
+      operationStatus: routed.operationStatus,
+      cooldownResult: routed.cooldownResult,
     });
   }
 
@@ -86,18 +115,8 @@ export class AIGatewayService {
    * `validate(json) => true|false` is a caller-supplied guard (cheap
    * structural check — this gateway does not depend on a JSON-schema
    * library to keep the dependency surface minimal).
-   *
-   * @param {object} params
-   * @param {string} params.capability
-   * @param {string} params.systemPrompt
-   * @param {string} params.userPrompt
-   * @param {Array<object>} [params.inputParts] - optional provider-neutral media
-   *   parts for a multimodal request
-   * @param {(json: unknown) => boolean} [params.validate]
-   * @param {object} [params.options]
-   * @returns {Promise<object>} normalized Gateway result; `json` is populated only when ok
    */
-  static async generateStructured({ capability, systemPrompt, userPrompt, inputParts = null, validate = () => true, options = {} }) {
+  static async generateStructured({ capability, systemPrompt, userPrompt, responseSchema, inputParts = null, validate = null, options = {} }) {
     const router = options.router || defaultRouter;
     const startedAt = Date.now();
 
@@ -112,8 +131,10 @@ export class AIGatewayService {
       userPrompt: boundedPrompt,
       inputParts,
       jsonMode: true,
-      responseSchema: options.responseSchema || null,
+      responseSchema: options.responseSchema || responseSchema || null,
       timeoutMs: options.timeoutMs,
+      perModelTimeoutMs: options.perModelTimeoutMs,
+      totalBudgetMs: options.totalBudgetMs,
       maxOutputTokens: options.maxOutputTokens,
       signal: options.signal,
       parseResponse: (text) => JSON.parse(text),
@@ -131,7 +152,17 @@ export class AIGatewayService {
         errorMessage: routed.errorMessage,
         requestId: options.requestId,
         totalLatencyMs,
+        totalBudgetMs: routed.totalBudgetMs,
         providerMetadata: routed.providerMetadata,
+        httpStatus: routed.httpStatus,
+        providerErrorCode: routed.providerErrorCode,
+        requestedPrimaryModel: routed.requestedPrimaryModel,
+        executedModel: routed.executedModel,
+        fallbackUsed: routed.fallbackUsed,
+        fallbackReason: routed.fallbackReason,
+        providerStatus: routed.providerStatus,
+        operationStatus: routed.operationStatus,
+        cooldownResult: routed.cooldownResult,
       });
     }
 
@@ -145,7 +176,17 @@ export class AIGatewayService {
       attempts: routed.attempts,
       requestId: options.requestId,
       totalLatencyMs,
+      totalBudgetMs: routed.totalBudgetMs,
       providerMetadata: routed.providerMetadata,
+      httpStatus: routed.httpStatus,
+      providerErrorCode: routed.providerErrorCode,
+      requestedPrimaryModel: routed.requestedPrimaryModel,
+      executedModel: routed.executedModel,
+      fallbackUsed: routed.fallbackUsed,
+      fallbackReason: routed.fallbackReason,
+      providerStatus: routed.providerStatus,
+      operationStatus: routed.operationStatus,
+      cooldownResult: routed.cooldownResult,
     });
   }
 

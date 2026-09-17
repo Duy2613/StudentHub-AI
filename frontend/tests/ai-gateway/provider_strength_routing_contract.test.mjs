@@ -14,7 +14,7 @@ class ConfiguredProvider {
   }
 }
 
-test("Gemini-only routing uses the canonical Gemini 3.8 Flash model for every active capability", () => {
+test("Gemini routing exposes the ordered production fallback chain for every active capability", () => {
   const router = new ModelRouter({
     [PROVIDER_FAMILY.OPENAI_COMPATIBLE]: new ConfiguredProvider(PROVIDER_FAMILY.OPENAI_COMPATIBLE),
     [PROVIDER_FAMILY.GEMINI]: new ConfiguredProvider(PROVIDER_FAMILY.GEMINI),
@@ -28,8 +28,16 @@ test("Gemini-only routing uses the canonical Gemini 3.8 Flash model for every ac
   assert.equal(deep[0].model, "gemini-3.8-flash");
   assert.equal(multimodal[0].provider, PROVIDER_FAMILY.GEMINI);
   assert.equal(multimodal[0].model, "gemini-3.8-flash");
-  assert.deepEqual(extraction.map((entry) => entry.provider), [PROVIDER_FAMILY.GEMINI]);
-  assert.deepEqual(router.describeRoute(AI_CAPABILITY.FAST_CLASSIFICATION).map((entry) => entry.provider), [PROVIDER_FAMILY.GEMINI]);
+  assert.deepEqual(extraction.map((entry) => entry.model), [
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
+    "gemini-3.6-flash",
+  ]);
+  assert.deepEqual(router.describeRoute(AI_CAPABILITY.FAST_CLASSIFICATION).map((entry) => entry.provider), [
+    PROVIDER_FAMILY.GEMINI,
+    PROVIDER_FAMILY.GEMINI,
+    PROVIDER_FAMILY.GEMINI,
+  ]);
 });
 
 test("Trust input modality selects the provider capability that matches the work", () => {

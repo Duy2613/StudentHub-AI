@@ -149,7 +149,45 @@ function safeAiVerification(value) {
     uncertainty: boundedText(value.uncertainty, 700) || "Gemini không công bố thêm certainty ngoài evidence hiện có.",
     citationsUsed: citations,
     provider: boundedText(value.provider, 80).toLowerCase() || "gemini",
-    model: boundedText(value.model, 120) || "gemini-3.8-flash",
+    model: boundedText(value.model, 120) || null,
+  };
+}
+
+function safeModelTrace(value) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, 12).map((attempt) => {
+    if (!attempt || typeof attempt !== "object" || Array.isArray(attempt)) return null;
+    const startedAt = typeof attempt.startedAt === "string" && !Number.isNaN(new Date(attempt.startedAt).getTime())
+      ? new Date(attempt.startedAt).toISOString()
+      : null;
+    const httpStatus = Number(attempt.httpStatus);
+    const durationMs = Number(attempt.durationMs ?? attempt.latencyMs);
+    return {
+      model: boundedText(attempt.model, 160) || null,
+      attemptNumber: Number.isInteger(Number(attempt.attemptNumber)) && Number(attempt.attemptNumber) > 0 ? Number(attempt.attemptNumber) : 0,
+      startedAt,
+      durationMs: Number.isFinite(durationMs) ? Math.max(0, Math.min(durationMs, 120_000)) : 0,
+      httpStatus: Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599 ? httpStatus : null,
+      providerErrorCode: boundedText(attempt.providerErrorCode, 80).toUpperCase() || null,
+      result: boundedText(attempt.result, 80).toUpperCase() || "FAILED",
+    };
+  }).filter(Boolean);
+}
+
+function safeCooldownResult(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return {
+    skippedModels: safeArray(value.skippedModels, 8).filter((item) => typeof item === "string").map((item) => boundedText(item, 160)),
+    cooldownModels: safeArray(value.cooldownModels, 8).filter((item) => typeof item === "string").map((item) => boundedText(item, 160)),
+    activeCooldowns: safeArray(value.activeCooldowns, 8).map((item) => {
+      if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+      const date = item.cooldownUntil ? new Date(item.cooldownUntil) : null;
+      return {
+        model: boundedText(item.model, 160) || null,
+        cooldownUntil: date && !Number.isNaN(date.getTime()) ? date.toISOString() : null,
+        cooldownRemainingMs: Number.isFinite(Number(item.cooldownRemainingMs)) ? Math.max(0, Math.min(Number(item.cooldownRemainingMs), 86_400_000)) : null,
+      };
+    }).filter((item) => item?.model),
   };
 }
 
@@ -218,6 +256,15 @@ export function createLayer4Result(input = {}) {
   aiVerificationThinkingLevel = null,
   aiVerificationLatencyMs = null,
   aiVerificationErrorType = null,
+  aiVerificationHttpStatus = null,
+  aiRequestedPrimaryModel = null,
+  aiExecutedModel = null,
+  aiFallbackUsed = false,
+  aiFallbackReason = null,
+  aiModelTrace = [],
+  aiProviderStatus = null,
+  aiOperationStatus = null,
+  aiCooldownResult = null,
   } = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   const safeTruthAssessment = truthAssessment && typeof truthAssessment === "object" && !Array.isArray(truthAssessment)
     ? truthAssessment
@@ -281,6 +328,15 @@ export function createLayer4Result(input = {}) {
     aiVerificationThinkingLevel: boundedText(aiVerificationThinkingLevel, 40) || null,
     aiVerificationLatencyMs: Number.isFinite(Number(aiVerificationLatencyMs)) ? Math.max(0, Number(aiVerificationLatencyMs)) : null,
     aiVerificationErrorType: boundedText(aiVerificationErrorType, 120) || null,
+    aiVerificationHttpStatus: Number.isInteger(Number(aiVerificationHttpStatus)) && Number(aiVerificationHttpStatus) >= 100 && Number(aiVerificationHttpStatus) <= 599 ? Number(aiVerificationHttpStatus) : null,
+    aiRequestedPrimaryModel: boundedText(aiRequestedPrimaryModel, 160) || null,
+    aiExecutedModel: boundedText(aiExecutedModel, 160) || null,
+    aiFallbackUsed: aiFallbackUsed === true,
+    aiFallbackReason: boundedText(aiFallbackReason, 120).toUpperCase() || null,
+    aiModelTrace: safeModelTrace(aiModelTrace),
+    aiProviderStatus: boundedText(aiProviderStatus, 120).toUpperCase() || null,
+    aiOperationStatus: boundedText(aiOperationStatus, 80).toUpperCase() || null,
+    aiCooldownResult: safeCooldownResult(aiCooldownResult),
     auditTrail: {
       requestId: boundedText(safeAuditTrail.requestId, 160) || createSecureId("req_l4"),
       timestamp: boundedText(safeAuditTrail.timestamp, 80) || new Date().toISOString(),

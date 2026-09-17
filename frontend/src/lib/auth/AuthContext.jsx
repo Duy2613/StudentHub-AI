@@ -12,7 +12,8 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { AUTH_LOGOUT_CHANNEL, AUTH_LOGOUT_SIGNAL_KEY, AUTH_STATE, canTransitionAuthState } from "./authStateMachine";
 import { normalizeSubjectId } from "@/lib/security/identity/normalizeSubjectId";
-import { hasCanonicalSession, isModeratorEligible } from "./presentationState";
+import { hasCanonicalSession, isModeratorEligible, normalizeExpertLifecycleState, EXPERT_LIFECYCLE_STATE, PROFILE_STATUS } from "./presentationState";
+export { PROFILE_STATUS };
 
 let authModulePromise;
 let supabaseModulePromise;
@@ -138,6 +139,12 @@ function applicationUserFromExchange(exchangeSession) {
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [profileStatus, setProfileStatus] = useState(PROFILE_STATUS.IDLE);
+  const [profileError, setProfileError] = useState(null);
+  const [expertLifecycleState, setExpertLifecycleState] = useState(EXPERT_LIFECYCLE_STATE.NONE);
+  const [expertApplication, setExpertApplication] = useState(null);
+  const [verifiedDomains, setVerifiedDomains] = useState([]);
+  const [expertLoading, setExpertLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [authState, setAuthState] = useState(AUTH_STATE.INITIALIZING);
   const [authError, setAuthError] = useState(null);
@@ -178,13 +185,25 @@ export function AuthProvider({ children }) {
     let eventQueue = Promise.resolve();
 
     const hydrateApplicationProfile = async (applicationUser, operationEpoch) => {
+      setProfileStatus(PROFILE_STATUS.LOADING);
+      setProfileError(null);
       try {
         const result = await authApi?.getUserProfile?.();
-        if (!mounted || authEpochRef.current !== operationEpoch || !result?.success || !result.profile) return;
-        setProfile(formatProfile(applicationUser, { authoritative: true, durableProfile: result.profile }));
+        if (!mounted || authEpochRef.current !== operationEpoch) return;
+        if (result?.success && result?.profile) {
+          setProfile(formatProfile(applicationUser, { authoritative: true, durableProfile: result.profile }));
+          setProfileStatus(PROFILE_STATUS.FOUND);
+        } else if (result?.code?.includes("404") || result?.code === "PROFILE_NOT_FOUND" || result?.code === "NOT_FOUND") {
+          setProfileStatus(PROFILE_STATUS.NOT_FOUND);
+        } else {
+          setProfileStatus(PROFILE_STATUS.ERROR);
+          setProfileError(result?.code || "PROFILE_LOAD_FAILED");
+        }
       } catch (error) {
-        // A session can remain useful while profile storage is unavailable;
-        // keep the safe identity shell and do not invent replacement fields.
+        if (mounted && authEpochRef.current === operationEpoch) {
+          setProfileStatus(PROFILE_STATUS.ERROR);
+          setProfileError(error?.message || "PROFILE_LOAD_FAILED");
+        }
         logAuthError("AuthProvider:hydrateProfile", error);
       }
     };
@@ -196,6 +215,7 @@ export function AuthProvider({ children }) {
       applicationSessionReadyRef.current = true;
       setSession({ user: applicationUser, authority: "APPLICATION_SESSION" });
       setProfile(formatProfile(applicationUser, { authoritative: true }));
+      setProfileStatus(PROFILE_STATUS.LOADING);
       void hydrateApplicationProfile(applicationUser, operationEpoch);
       transitionAuthState(AUTH_STATE.SIGNED_IN);
       return true;
@@ -274,6 +294,11 @@ export function AuthProvider({ children }) {
             applicationSessionReadyRef.current = false;
             setSession(null);
             setProfile(null);
+            setProfileStatus(PROFILE_STATUS.IDLE);
+            setProfileError(null);
+            setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
+            setExpertApplication(null);
+            setVerifiedDomains([]);
             transitionAuthState(AUTH_STATE.ERROR, { code: applicationState.code || "APPLICATION_SESSION_UNAVAILABLE" });
           }
           return;
@@ -284,6 +309,11 @@ export function AuthProvider({ children }) {
           applicationSessionReadyRef.current = false;
           setSession(null);
           setProfile(null);
+          setProfileStatus(PROFILE_STATUS.IDLE);
+          setProfileError(null);
+          setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
+          setExpertApplication(null);
+          setVerifiedDomains([]);
           transitionAuthState(AUTH_STATE.SIGNED_OUT);
           logAuthInfo("AuthProvider", "Khách vãng lai (Chưa đăng nhập).");
         }
@@ -305,6 +335,11 @@ export function AuthProvider({ children }) {
         applicationSessionReadyRef.current = false;
         setSession(null);
         setProfile(null);
+        setProfileStatus(PROFILE_STATUS.IDLE);
+        setProfileError(null);
+        setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
+        setExpertApplication(null);
+        setVerifiedDomains([]);
         transitionAuthState(AUTH_STATE.SIGNED_OUT);
         return;
       }
@@ -390,6 +425,11 @@ export function AuthProvider({ children }) {
       applicationSessionReadyRef.current = false;
       setSession(null);
       setProfile(null);
+      setProfileStatus(PROFILE_STATUS.IDLE);
+      setProfileError(null);
+      setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
+      setExpertApplication(null);
+      setVerifiedDomains([]);
       if (authStateRef.current !== AUTH_STATE.SIGNED_OUT) {
         transitionAuthState(AUTH_STATE.SIGNED_OUT);
       }
@@ -467,6 +507,7 @@ export function AuthProvider({ children }) {
         }
         const nextProfile = formatProfile(nextUser, { authoritative: true, durableProfile });
         setProfile(nextProfile);
+        setProfileStatus(PROFILE_STATUS.FOUND);
         return nextProfile;
       } catch (err) {
         logAuthError("updateProfile", err);
@@ -476,20 +517,78 @@ export function AuthProvider({ children }) {
     [session]
   );
 
+  const refreshExpertQualification = useCallback(async (signal) => {
+    if (!hasCanonicalSession(session)) {
+      setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
+      setExpertApplication(null);
+      setVerifiedDomains([]);
+      return null;
+    }
+    setExpertLoading(true);
+    try {
+      const res = await fetch("/api/expert/qualification", {
+        credentials: "include",
+        cache: "no-store",
+        signal,
+      });
+      if (res.ok) {
+        const payload = await res.json().catch(() => null);
+        const data = payload?.data || {};
+        const nextLifecycle = normalizeExpertLifecycleState(data.state);
+        setExpertLifecycleState(nextLifecycle);
+        setExpertApplication(data.application || null);
+        setVerifiedDomains(Array.isArray(data.application?.approvedDomains) ? data.application.approvedDomains : []);
+        return data;
+      }
+    } catch (error) {
+      if (!signal?.aborted) {
+        logAuthError("refreshExpertQualification", error);
+      }
+    } finally {
+      if (!signal?.aborted) setExpertLoading(false);
+    }
+    return null;
+  }, [session]);
+
+  // Unified single-point qualification ownership for all surfaces
+  useEffect(() => {
+    if (!hasCanonicalSession(session)) {
+      setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
+      setExpertApplication(null);
+      setVerifiedDomains([]);
+      return undefined;
+    }
+    const controller = new AbortController();
+    void refreshExpertQualification(controller.signal);
+    return () => controller.abort("expert-qualification-session-changed");
+  }, [session, refreshExpertQualification]);
+
   const refreshProfile = useCallback(async () => {
     if (!session?.user) return null;
     if (!hasCanonicalSession(session)) {
+      setProfileStatus(PROFILE_STATUS.IDLE);
       return null;
     }
+    setProfileStatus(PROFILE_STATUS.LOADING);
+    setProfileError(null);
     try {
       const authApi = await loadAuthModule();
       const result = await authApi.getUserProfile();
       if (result.success && result.profile) {
         const nextProfile = formatProfile(session.user, { authoritative: true, durableProfile: result.profile });
         setProfile(nextProfile);
+        setProfileStatus(PROFILE_STATUS.FOUND);
         return nextProfile;
       }
+      if (result?.code?.includes("404") || result?.code === "PROFILE_NOT_FOUND") {
+        setProfileStatus(PROFILE_STATUS.NOT_FOUND);
+      } else {
+        setProfileStatus(PROFILE_STATUS.ERROR);
+        setProfileError(result?.code || "PROFILE_LOAD_FAILED");
+      }
     } catch (error) {
+      setProfileStatus(PROFILE_STATUS.ERROR);
+      setProfileError(error?.message || "PROFILE_LOAD_FAILED");
       logAuthError("refreshProfile", error);
     }
     return profile;
@@ -509,12 +608,22 @@ export function AuthProvider({ children }) {
       await authApi.signOutSupabase();
       setSession(null);
       setProfile(null);
+      setProfileStatus(PROFILE_STATUS.IDLE);
+      setProfileError(null);
+      setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
+      setExpertApplication(null);
+      setVerifiedDomains([]);
       transitionAuthState(AUTH_STATE.SIGNED_OUT);
       logAuthInfo("signOut", "Đăng xuất thành công.");
     } catch (err) {
       logAuthError("signOut", err);
       setSession(null);
       setProfile(null);
+      setProfileStatus(PROFILE_STATUS.IDLE);
+      setProfileError(null);
+      setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
+      setExpertApplication(null);
+      setVerifiedDomains([]);
       transitionAuthState(AUTH_STATE.SIGNED_OUT);
     }
   }, [transitionAuthState]);
@@ -535,6 +644,14 @@ export function AuthProvider({ children }) {
         session,
         user: session?.user || null,
         profile,
+        profileStatus,
+        profileError,
+        PROFILE_STATUS,
+        expertLifecycleState,
+        expertApplication,
+        verifiedDomains,
+        expertLoading,
+        refreshExpertQualification,
         isLoading,
         authState,
         status,

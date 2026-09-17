@@ -229,7 +229,45 @@ function publicAiVerification(value) {
     uncertainty: publicText(value.uncertainty, 700) || "Gemini uncertainty chưa được công bố.",
     citationsUsed,
     provider: publicText(value.provider, 80) || "gemini",
-    model: publicText(value.model, 120) || "gemini-3.8-flash",
+    model: publicText(value.model, 120) || null,
+  };
+}
+
+function publicModelTrace(value) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, 12).map((item) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+    const startedAt = typeof item.startedAt === "string" && !Number.isNaN(new Date(item.startedAt).getTime())
+      ? new Date(item.startedAt).toISOString()
+      : null;
+    const durationMs = Number(item.durationMs ?? item.latencyMs);
+    const httpStatus = Number(item.httpStatus);
+    return {
+      model: publicText(item.model, 160),
+      attemptNumber: Number.isInteger(Number(item.attemptNumber)) && Number(item.attemptNumber) > 0 ? Number(item.attemptNumber) : 0,
+      startedAt,
+      durationMs: Number.isFinite(durationMs) ? Math.max(0, Math.min(durationMs, 120000)) : 0,
+      httpStatus: Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599 ? httpStatus : null,
+      providerErrorCode: publicText(item.providerErrorCode, 80)?.toUpperCase() || null,
+      result: publicText(item.result, 80)?.toUpperCase() || "FAILED",
+    };
+  }).filter(Boolean);
+}
+
+function publicCooldownResult(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return {
+    skippedModels: publicStringList(value.skippedModels, 8, 160),
+    cooldownModels: publicStringList(value.cooldownModels, 8, 160),
+    activeCooldowns: Array.isArray(value.activeCooldowns) ? value.activeCooldowns.slice(0, 8).map((item) => {
+      if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+      const date = item.cooldownUntil ? new Date(item.cooldownUntil) : null;
+      return {
+        model: publicText(item.model, 160),
+        cooldownUntil: date && !Number.isNaN(date.getTime()) ? date.toISOString() : null,
+        cooldownRemainingMs: Number.isFinite(Number(item.cooldownRemainingMs)) ? Math.max(0, Math.min(Number(item.cooldownRemainingMs), 86400000)) : null,
+      };
+    }).filter((item) => item?.model) : [],
   };
 }
 
@@ -376,13 +414,14 @@ function publicLayerResult(value, layerId) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const base = publicRecord(value, [
     "layer", "status", "finding", "classification", "securityClassification", "truthStatus", "enforcement", "recommendedAction",
-    "riskLevel", "decisionConfidence", "confidence", "confidenceScore", "provider", "providerStatus", "providerConfidence",
+    "riskLevel", "decisionConfidence", "confidence", "confidenceScore", "provider", "providerStatus", "providerConfidence", "providerErrorType", "providerHttpStatus",
     "rawVerdict", "notApplicable", "notMatchIsSafetyProof", "modelStatus", "modelType", "modelVersion", "taxonomyVersion",
     "datasetVersion", "modelScore", "calibratedRisk", "calibrationStatus", "confidenceKind", "severity", "explanation",
     "semanticSummary", "sourceAgreement", "verificationCompleteness", "evidenceCompleteness", "externalEvidence", "retrievalMode",
     "retrievalStatus", "hardRuleTriggered", "classificationSource", "inputLength",
     "reputationLookupPolicy", "reputationLookupReason", "reputationLookupStatus", "reputationLookupTargetClass", "reputationLookupDisclosed",
-    "aiVerificationStatus", "aiVerificationTransport", "aiVerificationThinkingLevel", "aiVerificationLatencyMs", "aiVerificationErrorType",
+    "aiVerificationStatus", "aiVerificationTransport", "aiVerificationThinkingLevel", "aiVerificationLatencyMs", "aiVerificationErrorType", "aiVerificationHttpStatus",
+    "aiRequestedPrimaryModel", "aiExecutedModel", "aiFallbackUsed", "aiFallbackReason", "aiProviderStatus", "aiOperationStatus",
   ]) || {};
 
   if (["l1", "l2b", "l2c"].includes(layerId)) base.signals = publicSignals(value.signals || value.riskSignals || value.contextSignals);
@@ -400,7 +439,7 @@ function publicLayerResult(value, layerId) {
     base.claims = publicClaims(value.claims);
     base.contextSignals = publicSignals(value.contextSignals);
     base.entities = publicClaims(value.entities);
-    base.details = publicRecord(value.details, ["confidenceKind", "modelUsed", "providerId", "providerStatus", "promptInjectionDetected", "decisionRationale"]);
+    base.details = publicRecord(value.details, ["confidenceKind", "modelUsed", "providerId", "providerStatus", "providerErrorType", "providerHttpStatus", "providerLatencyMs", "promptInjectionDetected", "decisionRationale"]);
     base.verificationPackage = publicRecord(value.verificationPackage, ["claimCount", "candidateSourceCount", "status"]);
   }
   if (layerId === "l2c") {
@@ -410,6 +449,25 @@ function publicLayerResult(value, layerId) {
     base.verificationPackage = publicVerificationPackage(value.verificationPackage);
   }
   if (layerId === "l3") {
+    base.metrics = publicRecord(value.metrics, [
+      "executionTimeMs", "queriesExecutedCount", "sourcesRetrievedCount", "evidenceItemsCount", "retrievalProvider",
+      "retrievalStatus", "retrievalMode", "externalEvidence", "providerIndependent", "providerCallCount", "providerDurationMs",
+      "providerTimeoutConfiguredMs", "providerParentTimeoutMs", "providerRawResultCount", "providerAcceptedResultCount",
+      "providerAcceptedHostCount", "providerRejectedResultCount", "providerTimeoutClassification", "providerAbortReason",
+      "providerRetryCount", "providerRetryExhausted", "providerRetryable", "independentHostCount", "independentClusterCount",
+      "verificationTasksCount", "l2cVerificationTasksCount",
+    ]);
+    if (base.metrics) {
+      base.metrics.providerRejectionReasons = publicStringList(value.metrics?.providerRejectionReasons, 20, 120);
+      base.metrics.providerHttpStatuses = Array.isArray(value.metrics?.providerHttpStatuses)
+        ? value.metrics.providerHttpStatuses.slice(-20).map((item) => Number(item)).filter((item) => Number.isInteger(item) && item >= 100 && item <= 599)
+        : [];
+      base.metrics.providerRequestTrace = Array.isArray(value.metrics?.providerRequestTrace)
+        ? value.metrics.providerRequestTrace.slice(-12).map((trace) => publicRecord(trace, [
+          "startedAt", "endedAt", "durationMs", "httpStatus", "abortReason", "classification", "outcome", "timeoutMs", "attempt",
+        ])).filter(Boolean)
+        : [];
+    }
     base.sources = publicSources(value.sources);
     base.verifiedSources = publicSources(value.verifiedSources);
     base.evidence = publicSources(value.evidence);
@@ -437,6 +495,8 @@ function publicLayerResult(value, layerId) {
     base.legacyIntegration = publicLegacyIntegration(value.legacyIntegration);
     base.independentResearchSources = publicSources(value.independentResearchSources);
     base.aiVerification = publicAiVerification(value.aiVerification);
+    base.aiModelTrace = publicModelTrace(value.aiModelTrace || value.gatewayAttempts || value.attempts);
+    base.aiCooldownResult = publicCooldownResult(value.aiCooldownResult || value.cooldownResult);
   }
   return base;
 }
@@ -482,6 +542,8 @@ export function createStageEnvelope(input = {}) {
     completedAt,
     latencyMs,
     providerStatus: boundedString(value.providerStatus, 80) || "NOT_STARTED",
+    providerErrorType: boundedString(value.providerErrorType, 120) || null,
+    providerHttpStatus: typeof value.providerHttpStatus === "number" && Number.isInteger(value.providerHttpStatus) && value.providerHttpStatus >= 100 && value.providerHttpStatus <= 599 ? value.providerHttpStatus : null,
     providerId: boundedString(value.providerId, 160) || null,
     modelId: boundedString(value.modelId, 160) || null,
     modelVersion: boundedString(value.modelVersion, 160) || null,
@@ -503,6 +565,15 @@ export function createStageEnvelope(input = {}) {
     aiVerificationThinkingLevel: publicText(value.aiVerificationThinkingLevel, 40) || null,
     aiVerificationLatencyMs: typeof value.aiVerificationLatencyMs === "number" && Number.isFinite(value.aiVerificationLatencyMs) ? Math.max(0, value.aiVerificationLatencyMs) : null,
     aiVerificationErrorType: publicText(value.aiVerificationErrorType, 120) || null,
+    aiVerificationHttpStatus: typeof value.aiVerificationHttpStatus === "number" && Number.isInteger(value.aiVerificationHttpStatus) && value.aiVerificationHttpStatus >= 100 && value.aiVerificationHttpStatus <= 599 ? value.aiVerificationHttpStatus : null,
+    aiRequestedPrimaryModel: publicText(value.aiRequestedPrimaryModel, 160) || null,
+    aiExecutedModel: publicText(value.aiExecutedModel, 160) || null,
+    aiFallbackUsed: value.aiFallbackUsed === true,
+    aiFallbackReason: publicText(value.aiFallbackReason, 120)?.toUpperCase() || null,
+    aiProviderStatus: publicText(value.aiProviderStatus, 120)?.toUpperCase() || null,
+    aiOperationStatus: publicText(value.aiOperationStatus, 80)?.toUpperCase() || null,
+    aiModelTrace: publicModelTrace(value.aiModelTrace || value.gatewayAttempts || value.attempts),
+    aiCooldownResult: publicCooldownResult(value.aiCooldownResult || value.cooldownResult),
     verificationPackage: publicVerificationPackage(value.verificationPackage),
     verificationTaskSummary: publicRecord(value.verificationTaskSummary, [
       "totalTasks", "l2bTaskCount", "l2cTaskCount", "deduplicatedCount", "highImpactTaskCount", "tasksWithQueries", "tasksWithoutQueries",

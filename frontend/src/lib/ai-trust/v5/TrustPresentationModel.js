@@ -23,13 +23,13 @@ export const TRUST_MACRO_STAGES = Object.freeze([
     id: "claim-intelligence",
     name: "Claim Intelligence",
     description: "Đọc nội dung và xác định các luận điểm cần kiểm tra.",
-    internalStageIds: Object.freeze(["l1", "l2b"]),
+    internalStageIds: Object.freeze(["l1"]),
   }),
   Object.freeze({
     id: "evidence-discovery",
     name: "Evidence Discovery",
     description: "Tìm các tín hiệu nguồn và ngữ cảnh liên quan.",
-    internalStageIds: Object.freeze(["l2a", "l2c"]),
+    internalStageIds: Object.freeze(["l2a", "l2b", "l2c"]),
   }),
   Object.freeze({
     id: "evidence-forensics",

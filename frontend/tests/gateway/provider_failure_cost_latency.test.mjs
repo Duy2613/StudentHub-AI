@@ -7,48 +7,40 @@ import { IModelProvider } from "../../src/lib/ai-gateway/providers/IModelProvide
 import { AIGatewayReasoningProvider } from "../../src/lib/ai-trust/layer4/providers/AIGatewayReasoningProvider.js";
 import { Layer4TrustService } from "../../src/lib/ai-trust/layer4/Layer4TrustService.js";
 
-const VALID_DTO = JSON.stringify({
+const MODELS = ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash"];
+const VALID_DTO = (model) => JSON.stringify({
   verdictSignal: "UNCERTAIN",
   supportReasons: [],
   contradictionReasons: [],
   missingEvidence: ["Nguồn chính thức cần được kiểm tra thêm."],
   uncertainty: "Chưa đủ evidence để diễn giải mạnh hơn.",
   citationsUsed: [],
-  provider: "gemini",
-  model: "gemini-3.8-flash",
+  provider: "google",
+  model,
 });
+
 class MockGeminiProvider extends IModelProvider {
-  constructor(mode = "success") {
+  constructor(failureByModel = {}) {
     super(PROVIDER_FAMILY.GEMINI);
-    this.mode = mode;
-    this.calls = 0;
+    this.failureByModel = { ...failureByModel };
+    this.calls = [];
   }
 
   isConfigured() {
     return true;
   }
 
-  async generate() {
-    this.calls += 1;
-    if (this.mode === "timeout") {
-      const error = new Error("simulated timeout");
-      error.gatewayErrorType = GATEWAY_ERROR_TYPE.TIMEOUT;
+  async generate({ catalogEntry }) {
+    this.calls.push(catalogEntry.model);
+    const failure = this.failureByModel[catalogEntry.model];
+    if (failure) {
+      const error = new Error(`simulated ${failure}`);
+      error.gatewayErrorType = failure === "timeout" ? GATEWAY_ERROR_TYPE.TIMEOUT : GATEWAY_ERROR_TYPE.HTTP_ERROR;
+      error.httpStatus = failure === "429" ? 429 : failure === "5xx" ? 503 : null;
+      error.providerErrorCode = failure === "429" ? "RESOURCE_EXHAUSTED" : failure === "5xx" ? "SERVICE_UNAVAILABLE" : null;
       throw error;
     }
-    if (this.mode === "429") {
-      const error = new Error("simulated rate limit");
-      error.gatewayErrorType = GATEWAY_ERROR_TYPE.HTTP_ERROR;
-      error.httpStatus = 429;
-      throw error;
-    }
-    if (this.mode === "5xx") {
-      const error = new Error("simulated upstream failure");
-      error.gatewayErrorType = GATEWAY_ERROR_TYPE.HTTP_ERROR;
-      error.httpStatus = 503;
-      throw error;
-    }
-    if (this.mode === "invalid-json") return { text: "not-json", transport: "interactions", thinkingLevel: "low" };
-    return { text: VALID_DTO, transport: "interactions", thinkingLevel: "low" };
+    return { text: VALID_DTO(catalogEntry.model), transport: "interactions", thinkingLevel: "low", httpStatus: 200 };
   }
 }
 
@@ -68,8 +60,8 @@ class NeverCalledOpenAIProvider extends IModelProvider {
   }
 }
 
-function routeFor(mode) {
-  const gemini = new MockGeminiProvider(mode);
+function routeFor(failureByModel) {
+  const gemini = new MockGeminiProvider(failureByModel);
   const openai = new NeverCalledOpenAIProvider();
   return {
     gemini,
@@ -81,53 +73,66 @@ function routeFor(mode) {
   };
 }
 
-test("Gemini-only failure matrix retries bounded failures and never calls OpenAI", async () => {
-  for (const [mode, expectedError] of [
-    ["timeout", GATEWAY_ERROR_TYPE.TIMEOUT],
-    ["429", GATEWAY_ERROR_TYPE.HTTP_ERROR],
-    ["5xx", GATEWAY_ERROR_TYPE.HTTP_ERROR],
-    ["invalid-json", GATEWAY_ERROR_TYPE.INVALID_JSON],
-  ]) {
-    const { router, gemini, openai } = routeFor(mode);
+test("bounded transient failover advances through models and never calls OpenAI", async () => {
+  for (const failure of ["timeout", "429", "5xx"]) {
+    const { router, gemini, openai } = routeFor({ [MODELS[0]]: failure });
     const result = await AIGatewayService.generateStructured({
       capability: AI_CAPABILITY.DEEP_REASONING,
       systemPrompt: "test",
       userPrompt: "test",
-      validate: () => true,
+      validate: (value) => ["gemini", "google"].includes(value?.provider) && value?.model === MODELS[1],
       options: { router },
     });
-    assert.equal(result.ok, false, `${mode} must fail closed`);
-    assert.equal(result.errorType, expectedError, `${mode} error should stay classified`);
-    assert.equal(result.provider, null);
-    assert.equal(openai.calls, 0, `OpenAI must not be called for ${mode}`);
-    assert.equal(gemini.calls, 2, `${mode} must receive one bounded retry`);
+    assert.equal(result.ok, true, failure);
+    assert.equal(result.model, MODELS[1], failure);
+    assert.equal(gemini.calls.length, 2, failure);
+    assert.equal(openai.calls, 0, failure);
   }
 });
 
 test("successful structured Gemini output is parsed, validated, and consumed", async () => {
-  const { router, gemini, openai } = routeFor("success");
+  const { router, gemini, openai } = routeFor({});
   const result = await AIGatewayService.generateStructured({
     capability: AI_CAPABILITY.DEEP_REASONING,
     systemPrompt: "test",
     userPrompt: "test",
-    validate: (value) => value?.provider === "gemini" && value?.model === "gemini-3.8-flash",
+    validate: (value) => ["gemini", "google"].includes(value?.provider) && value?.model === MODELS[0],
     options: { router },
   });
   assert.equal(result.ok, true);
-  assert.equal(result.provider, PROVIDER_FAMILY.GEMINI);
-  assert.equal(result.model, "gemini-3.8-flash");
-  assert.equal(result.json.provider, "gemini");
-  assert.equal(result.providerMetadata.transport, "interactions");
-  assert.equal(result.providerMetadata.thinkingLevel, "low");
-  assert.equal(gemini.calls, 1);
+  assert.equal(result.model, MODELS[0]);
+  assert.ok(["gemini", "google"].includes(result.json.provider));
+  assert.equal(result.attempts[0].result, "SUCCESS");
+  assert.equal(gemini.calls.length, 1);
   assert.equal(openai.calls, 0);
 });
 
-test("Layer 4 remains deterministic when Gemini is unavailable", async () => {
+test("Layer 4 remains deterministic and retains the model trace when all Gemini models fail", async () => {
+  const attempts = MODELS.map((model, index) => ({
+    provider: "gemini",
+    model,
+    attemptNumber: index + 1,
+    startedAt: new Date(1_700_000_000_000 + index).toISOString(),
+    durationMs: 12,
+    httpStatus: 503,
+    providerErrorCode: "SERVICE_UNAVAILABLE",
+    result: "SERVICE_UNAVAILABLE",
+    ok: false,
+    errorType: GATEWAY_ERROR_TYPE.HTTP_ERROR,
+  }));
   const provider = new AIGatewayReasoningProvider({
     gateway: {
       async generateStructured() {
-        return { ok: false, errorType: GATEWAY_ERROR_TYPE.TIMEOUT, errorMessage: "safe timeout", attempts: [] };
+        return {
+          ok: false,
+          errorType: GATEWAY_ERROR_TYPE.HTTP_ERROR,
+          httpStatus: 503,
+          providerStatus: "SERVICE_UNAVAILABLE",
+          attempts,
+          requestedPrimaryModel: MODELS[0],
+          operationStatus: "PARTIAL",
+          totalLatencyMs: 48,
+        };
       },
     },
   });
@@ -139,7 +144,9 @@ test("Layer 4 remains deterministic when Gemini is unavailable", async () => {
     options: { provider },
   });
   assert.equal(result.aiVerificationStatus, "UNAVAILABLE");
-  assert.equal(result.aiVerification.provider, "gemini");
+  assert.ok(["gemini", "google"].includes(result.aiVerification.provider));
+  assert.equal(result.aiRequestedPrimaryModel, MODELS[0]);
+  assert.equal(result.aiModelTrace.length, MODELS.length);
   assert.equal(result.enforcement, "REVIEW");
   assert.equal(result.metrics.providerStatus, "UNAVAILABLE");
 });
@@ -157,3 +164,4 @@ test("cost and latency budgets remain explicit synthetic assumptions", () => {
     assert.ok(profile.p95 <= profile.sla, `${profile.mode} synthetic latency budget`);
   }
 });
+

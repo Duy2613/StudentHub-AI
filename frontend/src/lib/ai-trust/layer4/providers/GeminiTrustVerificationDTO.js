@@ -1,3 +1,5 @@
+import { GEMINI_PRODUCTION_MODEL_IDS, isApprovedGeminiProductionModel, isGemmaShadowModel } from "../../../ai-gateway/config/GeminiModelCatalog.js";
+
 /**
  * Canonical structured contract for Gemini's Layer 4 advisory verification.
  *
@@ -99,7 +101,11 @@ function citations(value) {
   return output;
 }
 
-export function isValidGeminiTrustVerification(value, { allowedCitationUrls = null } = {}) {
+export function isValidGeminiTrustVerification(value, {
+  allowedCitationUrls = null,
+  allowedModels = GEMINI_PRODUCTION_MODEL_IDS,
+  allowGemmaShadow = false,
+} = {}) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   if (!VERDICT_SET.has(value.verdictSignal)) return false;
   if (!Array.isArray(value.supportReasons) || value.supportReasons.length > 12) return false;
@@ -107,8 +113,13 @@ export function isValidGeminiTrustVerification(value, { allowedCitationUrls = nu
   if (!Array.isArray(value.missingEvidence) || value.missingEvidence.length > 12) return false;
   if (typeof value.uncertainty !== "string" || value.uncertainty.length > 700) return false;
   if (!Array.isArray(value.citationsUsed) || value.citationsUsed.length > 20) return false;
-  if (typeof value.provider !== "string" || value.provider.trim().toLowerCase() !== "gemini") return false;
-  if (typeof value.model !== "string" || value.model.trim() !== "gemini-3.8-flash") return false;
+  const providerName = typeof value.provider === "string" ? value.provider.trim().toLowerCase() : "";
+  if (providerName !== "gemini" && providerName !== "google") return false;
+  if (typeof value.model !== "string") return false;
+  const model = value.model.trim();
+  const modelSet = new Set(Array.isArray(allowedModels) ? allowedModels : GEMINI_PRODUCTION_MODEL_IDS);
+  const modelApproved = isApprovedGeminiProductionModel(model) || (allowGemmaShadow === true && isGemmaShadowModel(model));
+  if (!modelSet.has(model) || !modelApproved) return false;
   return value.citationsUsed.every((citation) => {
     return citation && typeof citation === "object" && !Array.isArray(citation) &&
       typeof citation.id === "string" && citation.id.length <= 180 &&
@@ -118,13 +129,14 @@ export function isValidGeminiTrustVerification(value, { allowedCitationUrls = nu
 }
 
 export function normalizeGeminiTrustVerification(value, {
-  provider = "gemini",
-  model = "gemini-3.8-flash",
+  provider = "google",
+  model = GEMINI_PRODUCTION_MODEL_IDS[0],
   fallbackUncertainty = "Gemini không công bố thêm certainty ngoài evidence hiện có.",
 } = {}) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  const normalizedProvider = boundedText(provider, 80).toLowerCase() || "gemini";
-  const normalizedModel = boundedText(model, 120) || "gemini-3.8-flash";
+  const normalizedProvider = "google";
+  const normalizedModel = boundedText(model, 120) || GEMINI_PRODUCTION_MODEL_IDS[0];
+  if (!isApprovedGeminiProductionModel(normalizedModel)) return null;
   const verdictSignal = VERDICT_SET.has(value.verdictSignal) ? value.verdictSignal : "UNCERTAIN";
   return {
     verdictSignal,

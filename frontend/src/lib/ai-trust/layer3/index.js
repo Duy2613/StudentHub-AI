@@ -9,6 +9,7 @@ export * from "./query/QueryGenerator.js";
 export * from "./retrieval/IEvidenceRetriever.js";
 export * from "./retrieval/KnowledgeBaseRetriever.js";
 export * from "./retrieval/WebSearchRetriever.js";
+export * from "./retrieval/TavilyRetriever.js";
 export * from "./extractors/EvidenceExtractor.js";
 export * from "./extractors/TemporalEvaluator.js";
 export * from "./extractors/SourceIndependenceAnalyzer.js";

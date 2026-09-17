@@ -18,7 +18,7 @@
 
 import { ISemanticVerificationProvider } from "./ISemanticVerificationProvider.js";
 import { DeterministicSemanticProvider } from "./DeterministicSemanticProvider.js";
-import { AIGatewayService, AI_CAPABILITY } from "../../../ai-gateway/index.js";
+import { AIGatewayService, AI_CAPABILITY, classifyGatewayFailure, GATEWAY_ERROR_TYPE } from "../../../ai-gateway/index.js";
 import { AdversarialTrustGuard } from "../../../intelligence/trust/adversarialTrustGuard.js";
 import {
   SEMANTIC_BOUNDARY_LIMITS,
@@ -143,20 +143,35 @@ export class AIGatewayModelProvider extends ISemanticVerificationProvider {
         },
       });
     } catch (error) {
+      const errorType = error?.gatewayErrorType || (error?.name === "AbortError" ? GATEWAY_ERROR_TYPE.TIMEOUT : GATEWAY_ERROR_TYPE.NETWORK_ERROR);
+      const providerStatus = classifyGatewayFailure({ errorType, httpStatus: error?.httpStatus });
       return {
         ...baseline,
-        modelStatus: "UNAVAILABLE",
-        fallbackReason: error?.name === "AbortError" ? "TIMEOUT" : "AI_GATEWAY_ERROR",
+        modelStatus: providerStatus,
+        fallbackReason: errorType,
+        providerId: this.providerId,
+        modelProvider: "gemini",
+        providerErrorType: errorType,
+        providerHttpStatus: error?.httpStatus || null,
+        providerLatencyMs: null,
+        gatewayAttempts: [],
         providerIndependent: true,
         aiCannotOverrideSecurity: true,
       };
     }
 
     if (!result.ok) {
+      const providerStatus = classifyGatewayFailure({ errorType: result.errorType, httpStatus: result.httpStatus });
       return {
         ...baseline,
-        modelStatus: result.errorType === "TIMEOUT" ? "TIMEOUT" : "UNAVAILABLE",
-        fallbackReason: result.errorMessage,
+        modelStatus: providerStatus,
+        fallbackReason: result.errorType || result.errorMessage,
+        providerId: result.provider || this.providerId,
+        modelProvider: result.provider || "gemini",
+        modelUsed: result.model || null,
+        providerErrorType: result.errorType || null,
+        providerHttpStatus: result.httpStatus || null,
+        providerLatencyMs: Number.isFinite(Number(result.totalLatencyMs)) ? Number(result.totalLatencyMs) : null,
         gatewayAttempts: result.attempts,
         providerIndependent: true,
         aiCannotOverrideSecurity: true,
@@ -175,6 +190,9 @@ export class AIGatewayModelProvider extends ISemanticVerificationProvider {
         ...baseline,
         modelStatus: "INVALID_RESPONSE",
         fallbackReason: "AI_OUTPUT_BOUNDARY_REJECTED",
+        providerErrorType: GATEWAY_ERROR_TYPE.SCHEMA_VALIDATION_FAILED,
+        providerHttpStatus: null,
+        providerLatencyMs: Number.isFinite(Number(result.totalLatencyMs)) ? Number(result.totalLatencyMs) : null,
         gatewayAttempts: result.attempts,
         providerIndependent: true,
         aiCannotOverrideSecurity: true,
@@ -184,6 +202,9 @@ export class AIGatewayModelProvider extends ISemanticVerificationProvider {
     return {
       ...mergeSemanticCandidates(baseline, candidate),
       gatewayAttempts: result.attempts,
+      providerErrorType: null,
+      providerHttpStatus: null,
+      providerLatencyMs: Number.isFinite(Number(result.totalLatencyMs)) ? Number(result.totalLatencyMs) : null,
       modelStatus: "AI_ENRICHMENT_UNTRUSTED",
       providerIndependent: true,
       aiCannotOverrideSecurity: true,

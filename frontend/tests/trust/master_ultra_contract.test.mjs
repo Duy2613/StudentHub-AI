@@ -110,7 +110,7 @@ test("Master Ultra DTO preserves Main V5 authority, provenance, adapter signals,
   assert.equal(normalized.authority.finalDecision, "MAIN_TRUST_V5");
   assert.equal(normalized.authority.sequential, "ADAPTER_SIGNAL");
   assert.equal(normalized.noRerunOnInspect, true);
-  assert.deepEqual(normalized.macroStages.map((layer) => layer.status), ["COMPLETE", "COMPLETE", "COMPLETE", "COMPLETE", "COMPLETE"]);
+  assert.deepEqual(normalized.macroStages.map((layer) => layer.status), ["COMPLETE", "PARTIAL", "COMPLETE", "COMPLETE", "COMPLETE"]);
   assert.equal(normalized.layers.l2.sources[0].url, "https://university.example/scholarship");
   assert.equal(normalized.layers.l3.contradicting[0].id, "source-1");
   assert.equal(normalized.layers.l4.streams[0].provider, "Main Trust V5");

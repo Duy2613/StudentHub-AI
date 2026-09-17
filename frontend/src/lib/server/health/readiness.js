@@ -1,5 +1,6 @@
-import { getLegacyVerificationConfig } from "../../ai-trust/integrations/legacyVerification/config.js";
-import { getLayer2AConfig } from "../../ai-trust/layer2a/config.js";
+import { AI_GATEWAY_CONFIG, GEMINI_PRODUCTION_CHAIN_ENTRY_IDS, validateActiveModelIdentifiers } from "../../ai-gateway/config/AIGatewayConfig.js";
+import { GeminiProvider } from "../../ai-gateway/providers/GeminiProvider.js";
+import { TavilyRetriever } from "../../ai-trust/layer3/retrieval/TavilyRetriever.js";
 import { getPostgresPool } from "../database/PostgresPool.js";
 import { getLabbeReadiness } from "../integrations/LabbeBridge.js";
 
@@ -12,6 +13,27 @@ function safeStatus(configured, available) {
   if (available === true) return "AVAILABLE";
   if (available === false) return "UNAVAILABLE";
   return "UNKNOWN";
+}
+
+export function getTrustProviderReadiness(env = process.env) {
+  const tavily = new TavilyRetriever({ env });
+  const gemini = new GeminiProvider({ env });
+  const modelValidation = validateActiveModelIdentifiers();
+  const geminiModels = GEMINI_PRODUCTION_CHAIN_ENTRY_IDS.map((entryId) => AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId]?.model).filter(hasValue);
+  const geminiModelConfigured = modelValidation.valid && geminiModels.length > 0;
+  const tavilyConfigured = tavily.isConfigured();
+  const geminiConfigured = gemini.isConfigured();
+
+  return {
+    tavilyConfigured,
+    geminiConfigured,
+    geminiModelConfigured,
+    geminiModels,
+    geminiModelRouteValid: modelValidation.valid,
+    geminiModelValidation: modelValidation.entries,
+    liveEvidenceConfigured: tavilyConfigured,
+    aiSynthesisConfigured: geminiConfigured && geminiModelConfigured,
+  };
 }
 
 export async function checkReadiness() {
@@ -51,10 +73,9 @@ export async function checkReadiness() {
     && databaseConfigured
     && hasValue(process.env.STUDENTHUB_SESSION_PEPPER);
 
-  const layer2 = getLayer2AConfig();
-  const legacy = getLegacyVerificationConfig();
+  const trustProviders = getTrustProviderReadiness();
   const liveProvidersRequired = process.env.STUDENTHUB_READINESS_REQUIRE_LIVE_PROVIDERS === "true";
-  const providersConfigured = Boolean(layer2.baseUrl) && legacy.enabled;
+  const providersConfigured = trustProviders.liveEvidenceConfigured && trustProviders.aiSynthesisConfigured;
   const labbe = getLabbeReadiness();
 
   const screenshotStorageRequired = process.env.STUDENTHUB_READINESS_REQUIRE_SCREENSHOT_STORAGE === "true";
@@ -71,7 +92,8 @@ export async function checkReadiness() {
         ? (providersConfigured ? "AVAILABLE" : "NOT_CONFIGURED")
         : "NOT_REQUIRED",
       configured: providersConfigured,
-      required: liveProvidersRequired
+      required: liveProvidersRequired,
+      ...trustProviders
     },
     screenshotStorage: {
       status: screenshotStorageRequired
@@ -99,6 +121,7 @@ export async function checkReadiness() {
       status: providersConfigured ? "AVAILABLE" : liveProvidersRequired ? "NOT_READY" : "NOT_CONFIGURED",
       required: liveProvidersRequired,
       configured: providersConfigured,
+      ...trustProviders,
     },
     screenshotEvidence: {
       status: screenshotStorageConfigured ? "AVAILABLE" : screenshotStorageRequired ? "NOT_READY" : "NOT_CONFIGURED",
@@ -160,6 +183,7 @@ export async function checkReadiness() {
       requiredReady: requiredCapabilitiesReady,
       capabilities: capabilityStatuses
     },
+    providerReadiness: trustProviders,
     runStatus: "IDLE",
     checkedAt: new Date().toISOString(),
     checks

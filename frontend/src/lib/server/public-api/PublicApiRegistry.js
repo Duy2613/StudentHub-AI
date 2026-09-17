@@ -6,6 +6,8 @@
  * themselves. The registry deliberately contains no credentials.
  */
 
+import { GEMINI_PRODUCTION_CHAIN_ENTRY_IDS, AI_GATEWAY_CONFIG } from "../../ai-gateway/config/AIGatewayConfig.js";
+
 export const PUBLIC_API_ID = Object.freeze({
   OPENALEX: "OPENALEX",
   CROSSREF: "CROSSREF",
@@ -124,10 +126,10 @@ export const OFFICIAL_DISCOVERY_SOURCES = Object.freeze([
  * ownership only; it never exposes whether a provider secret is configured.
  */
 export const MODEL_CAPABILITY_POLICY = Object.freeze([
-  Object.freeze({ capability: "FAST_CLASSIFICATION", primaryModel: "gpt-4o-mini", fallbackModels: ["gemini-3.5-flash-lite", "DeterministicPolicyReasoner_v5"] }),
-  Object.freeze({ capability: "CLAIM_EXTRACTION", primaryModel: "gpt-4o", fallbackModels: ["gemini-3.5-flash-lite", "DeterministicPolicyReasoner_v5"] }),
-  Object.freeze({ capability: "DEEP_REASONING", primaryModel: "gpt-4o", fallbackModels: ["gemini-3.8-flash", "DeterministicPolicyReasoner_v5"] }),
-  Object.freeze({ capability: "MULTIMODAL_INSPECTION", primaryModel: "gemini-3.8-flash", fallbackModels: ["gemini-3.5-flash-lite", "Tesseract_local"] }),
+  Object.freeze({ capability: "FAST_CLASSIFICATION", primaryModel: AI_GATEWAY_CONFIG.MODEL_CATALOG[GEMINI_PRODUCTION_CHAIN_ENTRY_IDS[0]].model, fallbackModels: GEMINI_PRODUCTION_CHAIN_ENTRY_IDS.slice(1).map((entryId) => AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId].model) }),
+  Object.freeze({ capability: "CLAIM_EXTRACTION", primaryModel: AI_GATEWAY_CONFIG.MODEL_CATALOG[GEMINI_PRODUCTION_CHAIN_ENTRY_IDS[0]].model, fallbackModels: GEMINI_PRODUCTION_CHAIN_ENTRY_IDS.slice(1).map((entryId) => AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId].model) }),
+  Object.freeze({ capability: "DEEP_REASONING", primaryModel: AI_GATEWAY_CONFIG.MODEL_CATALOG[GEMINI_PRODUCTION_CHAIN_ENTRY_IDS[0]].model, fallbackModels: GEMINI_PRODUCTION_CHAIN_ENTRY_IDS.slice(1).map((entryId) => AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId].model) }),
+  Object.freeze({ capability: "MULTIMODAL_INSPECTION", primaryModel: AI_GATEWAY_CONFIG.MODEL_CATALOG[GEMINI_PRODUCTION_CHAIN_ENTRY_IDS[0]].model, fallbackModels: GEMINI_PRODUCTION_CHAIN_ENTRY_IDS.slice(1).map((entryId) => AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId].model) }),
   Object.freeze({ capability: "EMBEDDING", primaryModel: null, fallbackModels: ["DeterministicLexicalRetrieval_v1"], status: "NOT_CONFIGURED" }),
 ]);
 

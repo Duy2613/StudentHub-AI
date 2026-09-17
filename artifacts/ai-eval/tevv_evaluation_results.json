@@ -1,0 +1,78 @@
+{
+  "evaluationVersion": "1.0.0-tevv-gold",
+  "evaluatedAt": "2026-09-17T07:45:36.660Z",
+  "lockedHoldoutCases": 120,
+  "incidentGroupPolicy": "STRICT_INCIDENT_ISOLATION",
+  "primaryMetrics": {
+    "name": "Full StudentHub V5",
+    "overallAccuracy": 1,
+    "answeredAccuracy": 1,
+    "falseReassuranceRate": 0,
+    "falseAccusationRate": 0,
+    "abstentionRate": 0.2,
+    "coverage": 0.8,
+    "brierScore": 0.07540000000000004,
+    "citationValidity": 1
+  },
+  "ablations": {
+    "FULL": {
+      "name": "Full StudentHub V5",
+      "overallAccuracy": 1,
+      "answeredAccuracy": 1,
+      "falseReassuranceRate": 0,
+      "falseAccusationRate": 0,
+      "abstentionRate": 0.2,
+      "coverage": 0.8,
+      "brierScore": 0.07540000000000004,
+      "citationValidity": 1
+    },
+    "NO_CRITIC": {
+      "name": "Ablation: Without Critic",
+      "overallAccuracy": 0.6,
+      "answeredAccuracy": 0.5,
+      "falseReassuranceRate": 1,
+      "falseAccusationRate": 0,
+      "abstentionRate": 0.2,
+      "coverage": 0.8,
+      "brierScore": 0.3838799999999998,
+      "citationValidity": 1
+    },
+    "NO_COUNTER_SEARCH": {
+      "name": "Ablation: Without Counter-Search",
+      "overallAccuracy": 1,
+      "answeredAccuracy": 1,
+      "falseReassuranceRate": 0,
+      "falseAccusationRate": 0,
+      "abstentionRate": 0.2,
+      "coverage": 0.8,
+      "brierScore": 0.07540000000000004,
+      "citationValidity": 1
+    },
+    "NO_INDEPENDENCE": {
+      "name": "Ablation: Without Source Independence",
+      "overallAccuracy": 1,
+      "answeredAccuracy": 1,
+      "falseReassuranceRate": 0,
+      "falseAccusationRate": 0,
+      "abstentionRate": 0.2,
+      "coverage": 0.8,
+      "brierScore": 0.07540000000000004,
+      "citationValidity": 1
+    },
+    "NO_CUSTOM_MODEL": {
+      "name": "Ablation: Heuristic Rule Baseline",
+      "overallAccuracy": 1,
+      "answeredAccuracy": 1,
+      "falseReassuranceRate": 0,
+      "falseAccusationRate": 0,
+      "abstentionRate": 0.2,
+      "coverage": 0.8,
+      "brierScore": 0.07540000000000004,
+      "citationValidity": 1
+    }
+  },
+  "evidenceClass": "CONTROLLED_SYNTHETIC_TEVV",
+  "releaseGateEligible": false,
+  "supersededBy": "AI_CHALLENGE_HOLDOUT_V2",
+  "status": "CONTROLLED_SYNTHETIC_TEVV"
+}

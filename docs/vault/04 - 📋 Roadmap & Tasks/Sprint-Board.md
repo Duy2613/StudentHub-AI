@@ -180,3 +180,13 @@
 - [x] Live expert directory có compatibility read-only cho schema cũ; không suy diễn `DOMAIN_VERIFIED` khi Promax columns chưa có.
 - [x] Local proof cuối: Promax/domain/route/migration/Trust V5 `27/27`, ESLint error-only pass, production build `150/150` pages, HTTP smoke xác nhận page boundary và durable-empty Expert projection.
 - [ ] Apply migration `202609090001_community_expert_promax.sql` vào database disposable/staging được phê duyệt, sau đó chạy RLS/readback/concurrency gates. Chưa apply vào Supabase chính trong pass này.
+
+### Gemini multi-model router continuation — 2026-09-17
+
+- [x] Xây ordered Gemini-only router cho L4 với chain `3.8 → 3.7 → 3.6 → 2.5 Flash`, startup model-ID validation, canonical `GEMINI_API_KEY` và no key rotation.
+- [x] Thêm strict failover policy, per provider/model expiring cooldown, Retry-After/quota metadata, 10s L4 budget, abortable 2.2s candidate attempts và bounded per-attempt trace.
+- [x] Chuẩn hóa structured L4 DTO/prompt, `MODEL_INCOMPATIBLE` skip, truthful UI fallback/all-fail state và metadata passthrough không làm thay đổi deterministic Trust/L5 authority.
+- [x] Giữ Gemma 4 shadow-only với compatibility gate; hiện `GEMMA_COMPATIBLE=NO` vì chưa có đủ evidence.
+- [x] Hermetic A–G router/L4/V5 regression pass; one-shot real probe được ghi nhận secret-free và không lặp candidate.
+- [ ] Live project availability vẫn `PARTIAL`: 3.8 known HTTP 429 skip, 3.7/3.6 timeout, 2.5 HTTP 404; cần quota/access environment ổn định trước khi nâng verdict.
+- [ ] Full discovered regression còn Layer 3 Case C mismatch không thuộc router; không dùng kết quả đó để claim router failure.

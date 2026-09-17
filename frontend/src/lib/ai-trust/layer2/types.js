@@ -26,6 +26,11 @@ export const SEMANTIC_PROVIDER_STATUS = {
   // non-authoritative operational metric; the value is never a safety verdict.
   FALLBACK_USED: "fallback_used",
   TIMEOUT: "TIMEOUT",
+  RATE_LIMITED: "RATE_LIMITED",
+  AUTH_FAILED: "AUTH_FAILED",
+  MODEL_NOT_AVAILABLE: "MODEL_NOT_AVAILABLE",
+  NETWORK_ERROR: "NETWORK_ERROR",
+  NOT_CONFIGURED: "NOT_CONFIGURED",
   UNAVAILABLE: "UNAVAILABLE",
   INVALID_RESPONSE: "INVALID_RESPONSE",
   INJECTION_REJECTED: "INJECTION_REJECTED",
@@ -395,6 +400,11 @@ export function createLayer2Result(params = {}) {
   const safeModelProvider = boundedText(safeDetails.modelProvider, 120) || null;
   const safeModelUsed = boundedText(safeDetails.modelUsed, 120) || null;
   const safeFallbackReason = boundedText(safeDetails.fallbackReason, 160) || null;
+  const safeProviderErrorType = boundedText(safeDetails.providerErrorType, 100) || null;
+  const safeProviderHttpStatus = Number.isInteger(Number(safeDetails.providerHttpStatus)) && Number(safeDetails.providerHttpStatus) >= 100 && Number(safeDetails.providerHttpStatus) <= 599
+    ? Number(safeDetails.providerHttpStatus)
+    : null;
+  const safeProviderLatencyMs = Number.isFinite(Number(safeDetails.providerLatencyMs)) ? Math.max(0, Number(safeDetails.providerLatencyMs)) : null;
   const safeConfidenceKind = boundedText(safeDetails.confidenceKind, 120) || "semantic_candidate_only";
   const safeConfidenceSource = boundedText(safeDetails.confidenceSource, 120) || null;
   const safeCandidateClassification = Object.values(SEMANTIC_CLASSIFICATION).includes(safeDetails.candidateClassification)
@@ -471,6 +481,10 @@ export function createLayer2Result(params = {}) {
       modelProvider: safeModelProvider,
       modelUsed: safeModelUsed,
       fallbackReason: safeFallbackReason,
+      providerStatus: typeof safeDetails.providerStatus === "string" ? safeDetails.providerStatus.slice(0, 80) : null,
+      providerErrorType: safeProviderErrorType,
+      providerHttpStatus: safeProviderHttpStatus,
+      providerLatencyMs: safeProviderLatencyMs,
       gatewayAttempts: safeGatewayAttempts,
       promptInjectionDetected: safeDetails.promptInjectionDetected === true,
       candidateClassification: safeCandidateClassification,

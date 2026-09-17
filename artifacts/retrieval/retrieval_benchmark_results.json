@@ -1,0 +1,28 @@
+{
+  "benchmarkVersion": "1.0.0-dev-oracle",
+  "evaluatedAt": "2026-09-17T07:46:44.005Z",
+  "totalQueries": 84,
+  "evidenceClass": "RETRIEVAL_DEV",
+  "releaseGateEligible": false,
+  "supersededBy": "RETRIEVAL_HOLDOUT_V3",
+  "metrics": {
+    "entityResolutionRate": 0.8928571428571429,
+    "recallAt5": 0.9642857142857143,
+    "ndcgAt5": 0.9932871322517249,
+    "officialHitRate": 1,
+    "officialTop3Rate": 1,
+    "irrelevantTop1Rate": 0.023809523809523808,
+    "duplicateOriginInflation": 0
+  },
+  "ablation": {
+    "keywordOnlyRecall5": 0.5357142857142857,
+    "entityAwareRecall5": 0.9761904761904762,
+    "fullCandidateRecall5": 0.9642857142857143,
+    "rankingGain": 0.42857142857142855
+  },
+  "targetChecks": {
+    "recallAt5": true,
+    "ndcgAt5": true
+  },
+  "status": "RETRIEVAL_DEV"
+}

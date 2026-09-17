@@ -82,7 +82,8 @@ function normalizeForumPost(post) {
 }
 
 export default function CommunitySocialWorkspace() {
-  const { isAuthenticated, moderatorEligible } = useAuth();
+  const { isAuthenticated, moderatorEligible, expertLifecycleState: authExpertState } = useAuth();
+  const expertLifecycleState = isAuthenticated ? (authExpertState || EXPERT_LIFECYCLE_STATE.NONE) : EXPERT_LIFECYCLE_STATE.NONE;
   const [posts, setPosts] = useState([]);
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("ALL");
@@ -94,7 +95,6 @@ export default function CommunitySocialWorkspace() {
   const [sourceState, setSourceState] = useState("UNKNOWN");
   const [reloadKey, setReloadKey] = useState(0);
   const [quickPostOpen, setQuickPostOpen] = useState(false);
-  const [expertLifecycleState, setExpertLifecycleState] = useState(EXPERT_LIFECYCLE_STATE.NONE);
 
   const apiTopic = API_TOPIC_BY_FILTER[activeFilter] || "ALL";
 
@@ -131,21 +131,6 @@ export default function CommunitySocialWorkspace() {
     void loadFeed(controller.signal);
     return () => controller.abort("community-feed-unmounted");
   }, [loadFeed, reloadKey]);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
-      return undefined;
-    }
-    const controller = new AbortController();
-    fetch("/api/expert/qualification", { credentials: "include", cache: "no-store", signal: controller.signal })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((payload) => setExpertLifecycleState(normalizeExpertLifecycleState(payload?.data?.state)))
-      .catch(() => {
-        if (!controller.signal.aborted) setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
-      });
-    return () => controller.abort("community-expert-state-unmounted");
-  }, [isAuthenticated]);
 
   const activeExpert = expertLifecycleState === EXPERT_LIFECYCLE_STATE.ACTIVE;
 

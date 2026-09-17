@@ -43,7 +43,7 @@ export const MASTER_ULTRA_LAYERS = Object.freeze([
     name: "Claim Intelligence",
     question: "What exactly is being claimed?",
     questionVi: "Điều gì thực sự đang được khẳng định?",
-    internalStageIds: Object.freeze(["l1", "l2b"]),
+    internalStageIds: Object.freeze(["l1"]),
     tone: "ice",
   }),
   Object.freeze({
@@ -53,7 +53,7 @@ export const MASTER_ULTRA_LAYERS = Object.freeze([
     name: "Evidence Discovery",
     question: "What evidence exists around this claim?",
     questionVi: "Xung quanh mệnh đề này đang có bằng chứng nào?",
-    internalStageIds: Object.freeze(["l2a", "l2c"]),
+    internalStageIds: Object.freeze(["l2a", "l2b", "l2c"]),
     tone: "cyan",
   }),
   Object.freeze({
@@ -130,14 +130,13 @@ function macroStatus(id, presentation, pipeline, processing) {
   const definition = MASTER_ULTRA_LAYERS.find((layer) => layer.id === id);
   const stages = stageMap(pipeline);
   const statuses = definition?.internalStageIds.map((stageId) => stageStatus(stages[stageId])) || [];
-  const pipelineIsComplete = ["COMPLETED", "COMPLETE", "SUCCESS"].includes(String(pipeline?.pipelineStatus || "").toUpperCase());
-  if (pipelineIsComplete && (pipeline?.finalDecision || pipeline?.decision || pipeline?.layerResults)) return "COMPLETE";
   if (presented?.status && presented.status !== "WAITING") return presented.status;
   if (statuses.includes("FAILED")) return statuses.includes("COMPLETE") ? "PARTIAL" : "FAILED";
   if (statuses.includes("PARTIAL")) return "PARTIAL";
   if (statuses.includes("RUNNING")) return "RUNNING";
   if (statuses.length && statuses.every((value) => value === "COMPLETE")) return "COMPLETE";
-  return processing && id === "l1" ? "RUNNING" : "WAITING";
+  if (processing && id === "l1" && !["COMPLETE", "PARTIAL", "FAILED"].includes(stageStatus(stages.l1))) return "RUNNING";
+  return "WAITING";
 }
 
 function firstText(...values) {
@@ -366,13 +365,13 @@ function inputEnvelope({ input, pipeline, canonicalResult }) {
   };
 }
 
-function layerSummary(id, { layers, pipeline, presentation }) {
+function layerSummary(id, { layers, pipeline, presentation, processing = false }) {
   const stages = stageMap(pipeline);
   const internal = MASTER_ULTRA_LAYERS.find((layer) => layer.id === id)?.internalStageIds || [];
   const raw = internal.map((stageId) => stages[stageId]).find((stage) => text(stage?.summary) || text(stage?.finding));
   const layerData = id === "l1" ? layers?.layer1 : id === "l2" ? layers?.layer2 : id === "l3" ? layers?.layer3 : id === "l4" ? layers?.layer4 : pipeline?.finalDecision;
   return {
-    status: macroStatus(id, presentation, pipeline, false),
+    status: macroStatus(id, presentation, pipeline, processing),
     summary: firstText(layerData?.summary, layerData?.userExplanation?.why, raw?.summary, raw?.finding, "Chưa có dữ liệu công bố."),
   };
 }
@@ -435,7 +434,7 @@ export function normalizeMasterUltraRun({
   const decisionTwin = canonical.decisionTwin || pipeline?.decisionTwin || decision.decisionTwin || null;
   const layerData = {
     l1: {
-      ...layerSummary("l1", { layers, pipeline, presentation }),
+      ...layerSummary("l1", { layers, pipeline, presentation, processing }),
       claims,
       entities: list(layers.layer2?.entities || layers.layer1?.entities || pipeline?.entities).slice(0, 24),
       inputType: inputData.type,
@@ -444,7 +443,7 @@ export function normalizeMasterUltraRun({
       metricLabel: claims.length ? `${claims.length} claim${claims.length === 1 ? "" : "s"} extracted` : null,
     },
     l2: {
-      ...layerSummary("l2", { layers, pipeline, presentation }),
+      ...layerSummary("l2", { layers, pipeline, presentation, processing }),
       sources,
       groups,
       providerSignals: resolvedProviders.filter((item) => ["l2a", "security", "safe", "threat"].some((token) => `${item.provider}`.toLowerCase().includes(token))),
@@ -452,7 +451,7 @@ export function normalizeMasterUltraRun({
       metricLabel: sources.length ? `${sources.length} source${sources.length === 1 ? "" : "s"} discovered` : null,
     },
     l3: {
-      ...layerSummary("l3", { layers, pipeline, presentation }),
+      ...layerSummary("l3", { layers, pipeline, presentation, processing }),
       ...buckets,
       conflicts: list(record(canonical.evidence).conflicts).length ? record(canonical.evidence).conflicts : list(canonical.conflicts || layers.layer3?.conflicts),
       uncertainty,
@@ -460,7 +459,7 @@ export function normalizeMasterUltraRun({
       metricLabel: sources.length ? `${buckets.supporting.length} support · ${buckets.contradicting.length} contradict · ${buckets.context.length} context` : null,
     },
     l4: {
-      ...layerSummary("l4", { layers, pipeline, presentation }),
+      ...layerSummary("l4", { layers, pipeline, presentation, processing }),
       streams: analysisStreams,
       providers: resolvedProviders,
       sequentialSignals,
@@ -469,6 +468,14 @@ export function normalizeMasterUltraRun({
       aiVerificationTransport: layers.layer4?.aiVerificationTransport || stages.l4?.rawMetadata?.aiVerificationTransport || null,
       aiVerificationThinkingLevel: layers.layer4?.aiVerificationThinkingLevel || stages.l4?.rawMetadata?.aiVerificationThinkingLevel || null,
       aiVerificationLatencyMs: layers.layer4?.aiVerificationLatencyMs ?? stages.l4?.rawMetadata?.aiVerificationLatencyMs ?? null,
+      aiRequestedPrimaryModel: layers.layer4?.aiRequestedPrimaryModel || stages.l4?.aiRequestedPrimaryModel || null,
+      aiExecutedModel: layers.layer4?.aiExecutedModel || stages.l4?.aiExecutedModel || null,
+      aiFallbackUsed: layers.layer4?.aiFallbackUsed === true || stages.l4?.aiFallbackUsed === true,
+      aiFallbackReason: layers.layer4?.aiFallbackReason || stages.l4?.aiFallbackReason || null,
+      aiProviderStatus: layers.layer4?.aiProviderStatus || stages.l4?.aiProviderStatus || null,
+      aiOperationStatus: layers.layer4?.aiOperationStatus || stages.l4?.aiOperationStatus || null,
+      aiModelTrace: layers.layer4?.aiModelTrace || stages.l4?.aiModelTrace || [],
+      aiCooldownResult: layers.layer4?.aiCooldownResult || stages.l4?.aiCooldownResult || null,
       agreement: firstText(canonical.metrics?.evidenceAgreement, decision.evidenceAgreement, decision.agreement, sourceAgreement),
       operationStatus: stageStatus(stages.l4),
       operations: [
@@ -480,7 +487,7 @@ export function normalizeMasterUltraRun({
       metricLabel: layers.layer4?.aiVerificationStatus === "UNAVAILABLE" ? "AI verification unavailable" : analysisStreams.length ? `${analysisStreams.length} analysis stream${analysisStreams.length === 1 ? "" : "s"}` : null,
     },
     l5: {
-      ...layerSummary("l5", { layers, pipeline, presentation }),
+      ...layerSummary("l5", { layers, pipeline, presentation, processing }),
       decision,
       verdict: presentation?.finalDecisionLabel || firstText(decision.label, decision.truthStatus, decision.epistemicState, decision.security),
       confidence,

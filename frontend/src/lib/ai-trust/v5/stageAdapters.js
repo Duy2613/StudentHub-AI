@@ -16,6 +16,14 @@ function statusFor(raw, fallback = "UNKNOWN") {
   return typeof raw === "string" && raw.trim() ? raw.trim().toUpperCase() : fallback;
 }
 
+function httpStatusFor(...values) {
+  for (const value of values) {
+    const status = Number(value);
+    if (Number.isInteger(status) && status >= 100 && status <= 599) return status;
+  }
+  return null;
+}
+
 function severityForFinding(finding) {
   if (["THREAT_MATCH", "LOCAL_BLOCK", "CREDENTIAL_SOLICITATION"].includes(finding)) return "CRITICAL";
   if (["LOCAL_SUSPICIOUS", "PAYMENT_SOLICITATION", "MANIPULATION_DETECTED", "SEMANTIC_SUSPICIOUS", "UNKNOWN", "STALE", "REVIEW_REQUIRED", "RECHECK_REQUIRED"].includes(finding)) return "HIGH";
@@ -155,14 +163,24 @@ export function stageFromL2B(raw, requestId, timing = {}) {
   const promptInjection = raw?.details?.promptInjectionDetected === true;
   const claims = safeArray(raw?.claims);
   const entities = safeArray(raw?.entities);
+  const providerStatus = statusFor(raw?.metrics?.providerStatus || raw?.details?.providerStatus || raw?.modelStatus, "LOCAL_DETERMINISTIC");
+  const providerErrorType = statusFor(raw?.details?.providerErrorType || raw?.providerErrorType, "");
+  const providerHttpStatus = httpStatusFor(raw?.details?.providerHttpStatus, raw?.providerHttpStatus);
+  const transientStatuses = new Set([
+    "TIMEOUT", "RATE_LIMITED", "AUTH_FAILED", "MODEL_NOT_AVAILABLE", "NETWORK_ERROR",
+    "NOT_CONFIGURED", "UNAVAILABLE", "INVALID_RESPONSE", "ERROR", "PARTIAL", "DEGRADED",
+  ]);
+  const operationStatus = timing.operationStatus || (transientStatuses.has(providerStatus) ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED);
   return createStageEnvelope({
-    ...stageBase("l2b", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso()),
+    ...stageBase("l2b", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso(), operationStatus),
     finding,
     severity: severityForFinding(finding),
-    providerStatus: raw?.metrics?.providerStatus || raw?.details?.providerStatus || "LOCAL_DETERMINISTIC",
+    providerStatus,
     providerId: raw?.details?.providerId || raw?.metrics?.modelUsed || "layer2b_semantic",
     modelId: raw?.details?.modelUsed || null,
     modelVersion: raw?.details?.modelUsed || null,
+    providerErrorType,
+    providerHttpStatus,
     confidence: typeof raw?.confidence === "number" ? raw.confidence : null,
     confidenceKind: raw?.details?.confidenceKind || "SEMANTIC_CANDIDATE_SCORE_NON_PROBABILISTIC",
     summary: finding === "SEMANTIC_NORMAL" ? "Chưa thấy pattern semantic đáng kể trong phạm vi bộ phân tích." : finding === "UNKNOWN" ? "Semantic boundary/provider không đủ dữ liệu để kết luận." : `Semantic layer phát hiện ${finding.replaceAll("_", " ")} cần đối chiếu.`,
@@ -181,6 +199,9 @@ export function stageFromL2B(raw, requestId, timing = {}) {
       entities: entities.slice(0, 40),
       promptInjectionDetected: promptInjection,
       classification: raw?.classification || null,
+      providerStatus,
+      providerErrorType: providerErrorType || null,
+      providerHttpStatus,
     },
   });
 }
@@ -248,7 +269,7 @@ export function stageFromL3(raw, requestId, timing = {}) {
   const clusters = Array.from(new Set(sources.map((item) => item?.clusterId || item?.sourceFingerprint).filter(Boolean)));
   const local = String(raw?.retrievalMode || "").includes("LOCAL") || raw?.externalEvidence !== true;
   const stale = finding === "STALE" || Number(raw?.temporalAssessment?.outdatedEvidenceCount) > 0;
-  const partialOperation = ["PARTIAL", "UNAVAILABLE", "FAIL", "ERROR"].some((value) => statusFor(raw?.status).includes(value)) || ["UNAVAILABLE", "FAIL", "ERROR"].some((value) => statusFor(raw?.retrievalStatus).includes(value));
+  const partialOperation = ["PARTIAL", "UNAVAILABLE", "FAIL", "ERROR", "RATE_LIMITED", "AUTH_FAILED", "NOT_CONFIGURED", "TIMEOUT"].some((value) => statusFor(raw?.status).includes(value)) || ["UNAVAILABLE", "FAIL", "ERROR", "RATE_LIMITED", "AUTH_FAILED", "NOT_CONFIGURED", "TIMEOUT"].some((value) => statusFor(raw?.retrievalStatus).includes(value));
   const sourceTaskSummary = raw?.verificationTaskSummary && typeof raw.verificationTaskSummary === "object" ? raw.verificationTaskSummary : {};
   const verificationTasks = safeArray(raw?.verificationTasks).slice(0, 80);
   const taskCount = verificationTasks.length;
@@ -315,18 +336,58 @@ export function stageFromL4(raw, requestId, timing = {}) {
   const truth = raw?.truthStatus || "INSUFFICIENT_EVIDENCE";
   const action = raw?.enforcement || raw?.recommendedAction || "REVIEW";
   const aiVerification = raw?.aiVerification && typeof raw.aiVerification === "object" ? raw.aiVerification : null;
-  const aiStatus = String(raw?.aiVerificationStatus || "NOT_REQUESTED").toUpperCase();
+  const declaredStatus = String(raw?.aiVerificationStatus || raw?.metrics?.providerStatus || raw?.providerStatus || "").toUpperCase();
+  const errorType = String(raw?.aiVerificationErrorType || "").toUpperCase();
+  const aiProviderStatus = String(raw?.aiProviderStatus || "").toUpperCase();
+  const providerHttpStatus = httpStatusFor(raw?.aiVerificationHttpStatus, raw?.providerHttpStatus);
+  const aiModelTrace = safeArray(raw?.aiModelTrace || raw?.gatewayAttempts || raw?.attempts).slice(0, 12);
+  const rawStatus = (errorType && ["UNAVAILABLE", "GEMINI_UNAVAILABLE", "ERROR"].includes(declaredStatus))
+    ? errorType
+    : declaredStatus || errorType || "NOT_REQUESTED";
   const legacyIntegration = raw?.legacyIntegration && typeof raw.legacyIntegration === "object" ? raw.legacyIntegration : null;
-  const operationStatus = timing.operationStatus || OPERATION_STATUS.COMPLETED;
+
+  let providerStatus = "DETERMINISTIC_POLICY";
+  if (["RATE_LIMITED"].includes(aiProviderStatus) || (errorType === "HTTP_ERROR" && providerHttpStatus === 429) || (providerHttpStatus === 429 && rawStatus.includes("429"))) {
+    providerStatus = "RATE_LIMITED";
+  } else if (["AUTH_FAILED", "PERMISSION_DENIED"].includes(aiProviderStatus) || (errorType === "HTTP_ERROR" && [401, 403].includes(providerHttpStatus))) {
+    providerStatus = "AUTH_FAILED";
+  } else if (["MODEL_NOT_AVAILABLE", "MODEL_NOT_FOUND"].includes(aiProviderStatus) || (errorType === "HTTP_ERROR" && providerHttpStatus === 404)) {
+    providerStatus = "MODEL_NOT_AVAILABLE";
+  } else if (["TIMEOUT", "NETWORK_TIMEOUT"].includes(aiProviderStatus) || (errorType === "HTTP_ERROR" && providerHttpStatus === 504)) {
+    providerStatus = "TIMEOUT";
+  } else if (aiProviderStatus === "SERVICE_UNAVAILABLE" || aiProviderStatus === "UNAVAILABLE") {
+    providerStatus = "UNAVAILABLE";
+  } else if (["INVALID_REQUEST", "UPSTREAM_ERROR", "MODEL_INCOMPATIBLE", "COOLDOWN", "BUDGET_EXHAUSTED"].includes(aiProviderStatus)) {
+    providerStatus = aiProviderStatus;
+  } else if (rawStatus === "VERIFIED" || rawStatus === "GEMINI_VERIFIED" || rawStatus === "COMPLETED") {
+    providerStatus = "GEMINI_VERIFIED";
+  } else if (rawStatus.includes("RATE_LIMITED") || rawStatus.includes("429")) {
+    providerStatus = "RATE_LIMITED";
+  } else if (rawStatus.includes("TIMEOUT") || rawStatus.includes("504")) {
+    providerStatus = "TIMEOUT";
+  } else if (rawStatus.includes("INVALID_RESPONSE")) {
+    providerStatus = "INVALID_RESPONSE";
+  } else if (rawStatus.includes("UNAVAILABLE") || rawStatus.includes("503")) {
+    providerStatus = "UNAVAILABLE";
+  } else if (rawStatus.includes("ERROR") || rawStatus.includes("FAIL")) {
+    providerStatus = "ERROR";
+  } else if (rawStatus !== "NOT_REQUESTED") {
+    providerStatus = rawStatus;
+  }
+
+  const isTransientFailure = ["RATE_LIMITED", "TIMEOUT", "AUTH_FAILED", "PERMISSION_DENIED", "MODEL_NOT_AVAILABLE", "NETWORK_ERROR", "NOT_CONFIGURED", "INVALID_RESPONSE", "MODEL_INCOMPATIBLE", "INVALID_REQUEST", "COOLDOWN", "BUDGET_EXHAUSTED", "UNAVAILABLE", "ERROR"].includes(providerStatus);
+  const operationStatus = timing.operationStatus || (isTransientFailure ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED);
+
   return createStageEnvelope({
     ...stageBase("l4", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso(), operationStatus),
     finding,
     severity: finding === "MALICIOUS" ? "CRITICAL" : finding === "SUSPICIOUS" ? "HIGH" : "INFO",
-    providerStatus: aiStatus === "VERIFIED" ? "GEMINI_VERIFIED" : aiStatus === "UNAVAILABLE" ? "GEMINI_UNAVAILABLE" : "DETERMINISTIC_POLICY",
-    providerId: aiStatus === "VERIFIED" || aiStatus === "UNAVAILABLE"
+    providerStatus,
+    providerId: providerStatus === "GEMINI_VERIFIED" || isTransientFailure
       ? (aiVerification?.provider || "gemini")
       : "deterministic_trust_policy_engine",
-    modelVersion: aiVerification?.model || raw?.auditTrail?.ruleVersion || null,
+    modelId: raw?.aiExecutedModel || aiVerification?.model || null,
+    modelVersion: raw?.aiExecutedModel || aiVerification?.model || raw?.aiRequestedPrimaryModel || raw?.auditTrail?.ruleVersion || null,
     confidence: typeof raw?.decisionConfidence === "number" ? raw.decisionConfidence : null,
     confidenceKind: "DETERMINISTIC_POLICY_SCORE_NON_PROBABILISTIC",
     summary: `L4 quyết định SECURITY=${finding}, TRUTH=${truth}, ENFORCEMENT=${action}.`,
@@ -343,11 +404,22 @@ export function stageFromL4(raw, requestId, timing = {}) {
     userAction: action === "BLOCK" ? "Dừng hành động và không tương tác với target." : action === "REVIEW" ? "Tạm dừng và xác minh qua nguồn độc lập." : "Chỉ tiếp tục với caution, không coi là proven safe.",
     safeToContinue: true,
     aiVerification,
-    aiVerificationStatus: aiStatus,
+    aiVerificationStatus: raw?.aiVerificationStatus || rawStatus,
     aiVerificationTransport: raw?.aiVerificationTransport || null,
     aiVerificationThinkingLevel: raw?.aiVerificationThinkingLevel || null,
     aiVerificationLatencyMs: raw?.aiVerificationLatencyMs ?? null,
     aiVerificationErrorType: raw?.aiVerificationErrorType || null,
+    aiVerificationHttpStatus: providerHttpStatus,
+    aiRequestedPrimaryModel: raw?.aiRequestedPrimaryModel || null,
+    aiExecutedModel: raw?.aiExecutedModel || aiVerification?.model || null,
+    aiFallbackUsed: raw?.aiFallbackUsed === true,
+    aiFallbackReason: raw?.aiFallbackReason || null,
+    aiProviderStatus: raw?.aiProviderStatus || null,
+    aiOperationStatus: raw?.aiOperationStatus || null,
+    aiModelTrace,
+    aiCooldownResult: raw?.aiCooldownResult || null,
+    providerErrorType: errorType || null,
+    providerHttpStatus,
     rawMetadata: {
       securityClassification: finding,
       truthStatus: truth,
@@ -359,11 +431,20 @@ export function stageFromL4(raw, requestId, timing = {}) {
       legacyIntegrationStatus: legacyIntegration?.status || null,
       legacyIntegrationProviderStatus: legacyIntegration?.providerStatus || null,
       legacyIntegrationVerdict: legacyIntegration?.rawVerdict || null,
-      aiVerificationStatus: aiStatus,
+      aiVerificationStatus: raw?.aiVerificationStatus || rawStatus,
       aiVerificationTransport: raw?.aiVerificationTransport || null,
       aiVerificationThinkingLevel: raw?.aiVerificationThinkingLevel || null,
       aiVerificationLatencyMs: raw?.aiVerificationLatencyMs ?? null,
       aiVerificationErrorType: raw?.aiVerificationErrorType || null,
+      aiVerificationHttpStatus: providerHttpStatus,
+      aiRequestedPrimaryModel: raw?.aiRequestedPrimaryModel || null,
+      aiExecutedModel: raw?.aiExecutedModel || aiVerification?.model || null,
+      aiFallbackUsed: raw?.aiFallbackUsed === true,
+      aiFallbackReason: raw?.aiFallbackReason || null,
+      aiProviderStatus: raw?.aiProviderStatus || null,
+      aiOperationStatus: raw?.aiOperationStatus || null,
+      aiModelTrace,
+      aiCooldownResult: raw?.aiCooldownResult || null,
       aiVerification,
     },
   });

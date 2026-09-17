@@ -173,6 +173,23 @@ test("SEQUENTIAL_STAGE_CONTRACT_AND_ORDER", async () => {
   }
 });
 
+test("FAULT_INJECTION_REALTIME_LISTENER_CANNOT_INTERRUPT_L1_TO_L5", async () => {
+  const { orchestrator } = createHarness();
+  const transitionCount = { value: 0 };
+  const result = await orchestrator.run({ type: "text", content: "Listener fault injection fixture." }, {
+    requestId: "fault-injection-realtime",
+    onTransition: async () => {
+      transitionCount.value += 1;
+      throw new Error("simulated realtime listener failure");
+    },
+  });
+
+  assert.ok(transitionCount.value > 0);
+  assert.deepEqual(result.audit.stageSequence, STAGE_IDS);
+  assert.equal(result.stages.l5.operationStatus, "COMPLETED");
+  assert.ok(result.finalDecision);
+});
+
 test("PUBLIC_RESPONSE_OMITS_SERVER_RAW_METADATA", () => {
   const pipeline = createInitialPipeline({ requestId: REQUEST_ID, startedAt: new Date(0).toISOString() });
   pipeline.layerResults = { layer1: { metrics: { inputContent: "private-content" }, rawMetadata: { secret: "private" } } };

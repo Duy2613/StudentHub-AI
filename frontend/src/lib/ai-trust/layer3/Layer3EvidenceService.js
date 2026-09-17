@@ -8,6 +8,7 @@
 
 import { QueryGenerator } from "./query/QueryGenerator.js";
 import { KnowledgeBaseRetriever } from "./retrieval/KnowledgeBaseRetriever.js";
+import { TavilyRetriever } from "./retrieval/TavilyRetriever.js";
 import { validateRemoteUrlSync } from "../../security/hardening/SafeRemoteUrl.js";
 import { isNetworkGuardedRetriever } from "./retrieval/NetworkGuard.js";
 import { markTrustedLayer3Result } from "./TrustBoundary.js";
@@ -242,6 +243,51 @@ function safeFetchResult(value) {
   };
 }
 
+function safeRetrieverDiagnostics(retriever) {
+  if (!retriever || typeof retriever.getRuntimeDiagnostics !== "function") return {};
+  try {
+    const diagnostics = retriever.getRuntimeDiagnostics();
+    if (!diagnostics || typeof diagnostics !== "object" || Array.isArray(diagnostics)) return {};
+    return {
+      callCount: Number.isFinite(Number(diagnostics.callCount)) ? Math.max(0, Number(diagnostics.callCount)) : 0,
+      durationMs: Number.isFinite(Number(diagnostics.durationMs)) ? Math.max(0, Number(diagnostics.durationMs)) : 0,
+      timeoutConfiguredMs: Number.isFinite(Number(diagnostics.timeoutConfiguredMs)) ? Math.max(0, Number(diagnostics.timeoutConfiguredMs)) : null,
+      parentTimeoutMs: Number.isFinite(Number(diagnostics.parentTimeoutMs)) ? Math.max(0, Number(diagnostics.parentTimeoutMs)) : null,
+      rawResultCount: Number.isFinite(Number(diagnostics.rawResultCount)) ? Math.max(0, Number(diagnostics.rawResultCount)) : 0,
+      acceptedResults: Number.isFinite(Number(diagnostics.acceptedResults)) ? Math.max(0, Number(diagnostics.acceptedResults)) : 0,
+      acceptedHostCount: Number.isFinite(Number(diagnostics.acceptedHostCount)) ? Math.max(0, Number(diagnostics.acceptedHostCount)) : 0,
+      rejectedResults: Number.isFinite(Number(diagnostics.rejectedResults)) ? Math.max(0, Number(diagnostics.rejectedResults)) : 0,
+      rejectionReasons: asArray(diagnostics.rejectionReasons).map((item) => boundedString(item, 120)).filter(Boolean).slice(0, 20),
+      httpStatuses: asArray(diagnostics.httpStatuses).map((item) => Number(item)).filter((item) => Number.isInteger(item) && item >= 100 && item <= 599).slice(-20),
+      timeoutClassification: boundedString(diagnostics.lastTimeoutClassification, 80) || null,
+      abortReason: boundedString(diagnostics.lastAbortReason, 80) || null,
+      retryCount: Number.isFinite(Number(diagnostics.retryCount)) ? Math.max(0, Number(diagnostics.retryCount)) : 0,
+      retryExhausted: diagnostics.providerRetryExhausted === true,
+      retryable: typeof diagnostics.providerRetryable === "boolean" ? diagnostics.providerRetryable : null,
+      requestTrace: asArray(diagnostics.requestTrace).slice(-12).map((trace) => {
+        if (!trace || typeof trace !== "object" || Array.isArray(trace)) return null;
+        const httpStatus = Number(trace.httpStatus);
+        const timeoutMs = Number(trace.timeoutMs);
+        const durationMs = Number(trace.durationMs);
+        const attempt = Number(trace.attempt);
+        return {
+          startedAt: boundedString(trace.startedAt, 80) || null,
+          endedAt: boundedString(trace.endedAt, 80) || null,
+          durationMs: Number.isFinite(durationMs) ? Math.max(0, Math.min(durationMs, 120_000)) : 0,
+          httpStatus: Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599 ? httpStatus : null,
+          abortReason: boundedString(trace.abortReason, 80) || null,
+          classification: boundedString(trace.classification, 80) || "OTHER",
+          outcome: boundedString(trace.outcome, 80) || "ERROR",
+          timeoutMs: Number.isFinite(timeoutMs) ? Math.max(0, Math.min(timeoutMs, 8_000)) : null,
+          attempt: Number.isInteger(attempt) && attempt > 0 ? attempt : 1,
+        };
+      }).filter(Boolean),
+    };
+  } catch {
+    return {};
+  }
+}
+
 export class Layer3EvidenceService {
   static async verify(params = {}) {
     const input = params && typeof params === "object" && !Array.isArray(params) ? params : {};
@@ -255,7 +301,10 @@ export class Layer3EvidenceService {
     const safeOptions = options && typeof options === "object" ? options : {};
     const requestId = boundedString(safeOptions.requestId || layer2Result?.requestId, 160) ||
       createSecureId("req_l3");
-    const retriever = safeOptions.retriever || new KnowledgeBaseRetriever();
+    const defaultTavilyRetriever = new TavilyRetriever();
+    const retriever = safeOptions.retriever || (defaultTavilyRetriever.isConfigured()
+      ? defaultTavilyRetriever
+      : new KnowledgeBaseRetriever());
     const retrieverId = boundedString(retriever?.retrieverId, 160) || "unknown_retriever";
     const auditEvents = [];
 
@@ -291,20 +340,28 @@ export class Layer3EvidenceService {
       : "EXTERNAL_RETRIEVER";
     let externalEvidence = false;
     let fetchRetriever = retriever;
+    let providerDiagnostics = {};
 
     try {
       throwIfAborted(safeOptions.signal);
       if (typeof retriever.search !== "function") throw new Error("RETRIEVER_SEARCH_UNAVAILABLE");
       const searchResult = await retriever.search(boundedQueries, { requestId, signal: safeOptions.signal });
+      providerDiagnostics = safeRetrieverDiagnostics(retriever);
       throwIfAborted(safeOptions.signal);
       retrievedSources = asArray(searchResult).map(safeCandidate).filter(Boolean).slice(0, MAX_RETRIEVED_SOURCES);
+      if (Object.values(EVIDENCE_PROVIDER_STATUS).includes(retriever.lastSearchStatus) && retriever.lastSearchStatus !== EVIDENCE_PROVIDER_STATUS.SUCCESS) {
+        retrievalStatus = retriever.lastSearchStatus;
+      }
       if (retrieverId.includes("knowledge_base") || retrievedSources.some((src) => src.sourceType === SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE)) {
         retrievalMode = "LOCAL_KNOWLEDGE_BASE";
         retrievalStatus = EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY;
       }
     } catch (err) {
       if (safeOptions.signal?.aborted || err?.name === "AbortError") throw err;
-      retrievalStatus = EVIDENCE_PROVIDER_STATUS.UNAVAILABLE;
+      providerDiagnostics = safeRetrieverDiagnostics(retriever);
+      retrievalStatus = Object.values(EVIDENCE_PROVIDER_STATUS).includes(err?.providerStatus)
+        ? err.providerStatus
+        : EVIDENCE_PROVIDER_STATUS.UNAVAILABLE;
       retrievalMode = "LOCAL_FALLBACK";
       auditEvents.push({ type: "RETRIEVER_FAILURE", code: boundedString(err?.message, 120) || "RETRIEVER_FAILURE", at: new Date().toISOString() });
       try {
@@ -425,6 +482,8 @@ export class Layer3EvidenceService {
       independence,
     });
     const { verificationCompleteness, evidenceConfidence, crossSourceAgreement } = completenessResult;
+    providerDiagnostics = providerDiagnostics.callCount === undefined ? safeRetrieverDiagnostics(retriever) : providerDiagnostics;
+    const independentHostCount = new Set(processedSources.map((source) => boundedString(source.domain, 180)).filter(Boolean)).size;
     const decision = Layer3DecisionEngine.resolveStatus({
       claims: targetClaims,
       evidence: evidenceItems,
@@ -491,6 +550,24 @@ export class Layer3EvidenceService {
         retrievalMode,
         externalEvidence,
         providerIndependent: retrieverId.includes("knowledge_base"),
+        providerCallCount: providerDiagnostics.callCount || 0,
+        providerDurationMs: providerDiagnostics.durationMs || 0,
+        providerTimeoutConfiguredMs: providerDiagnostics.timeoutConfiguredMs,
+        providerParentTimeoutMs: providerDiagnostics.parentTimeoutMs,
+        providerRawResultCount: providerDiagnostics.rawResultCount || 0,
+        providerAcceptedResultCount: providerDiagnostics.acceptedResults || 0,
+        providerAcceptedHostCount: providerDiagnostics.acceptedHostCount || 0,
+        providerRejectedResultCount: providerDiagnostics.rejectedResults || 0,
+        providerRejectionReasons: providerDiagnostics.rejectionReasons || [],
+        providerHttpStatuses: providerDiagnostics.httpStatuses || [],
+        providerTimeoutClassification: providerDiagnostics.timeoutClassification,
+        providerAbortReason: providerDiagnostics.abortReason,
+        providerRetryCount: providerDiagnostics.retryCount || 0,
+        providerRetryExhausted: providerDiagnostics.retryExhausted === true,
+        providerRetryable: providerDiagnostics.retryable,
+        providerRequestTrace: providerDiagnostics.requestTrace || [],
+        independentHostCount,
+        independentClusterCount: independence.independentSourcesCount || 0,
         verificationTasksCount: taskMerge.tasks.length,
         l2cVerificationTasksCount: taskMerge.l2cTaskCount,
       },

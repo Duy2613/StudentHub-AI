@@ -18,6 +18,27 @@
  */
 
 import { canonicalEnv } from "../env/canonicalEnv.js";
+import { AI_GATEWAY_CONFIG, GEMINI_PRODUCTION_CHAIN_ENTRY_IDS } from "../../ai-gateway/config/AIGatewayConfig.js";
+
+const GEMINI_MODEL_PROFILES = GEMINI_PRODUCTION_CHAIN_ENTRY_IDS.map((entryId, index) => {
+  const entry = AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId];
+  const nextEntry = AI_GATEWAY_CONFIG.MODEL_CATALOG[GEMINI_PRODUCTION_CHAIN_ENTRY_IDS[index + 1]];
+  return {
+    providerId: "gemini",
+    modelId: entry.model,
+    assignedRole: index === 0 ? "MULTIMODAL_INSPECTION_SYNTHESIS" : "ORDERED_MODEL_FALLBACK",
+    capabilities: [...entry.capabilities],
+    configured: Boolean(canonicalEnv.GEMINI_API_KEY),
+    active: true,
+    runtimeStatus: "ACTIVE_ORDERED_FALLBACK",
+    structuredOutputSupport: entry.supportsStructuredOutput === true,
+    multimodal: entry.capabilities.includes("MULTIMODAL"),
+    toolSupport: false,
+    approxCostClass: "LOW_COST_MULTIMODAL",
+    fallbackModelId: nextEntry?.model || "DeterministicPolicyReasoner_v5",
+    knownLimitations: "The router validates project availability at runtime, applies per-model cooldown, and keeps the deterministic Trust policy authoritative.",
+  };
+});
 
 export const PROVIDER_REGISTRY = [
   {
@@ -37,50 +58,39 @@ export const PROVIDER_REGISTRY = [
     multimodal: false,
     toolSupport: false,
     approxCostClass: "LOW_COST",
-    fallbackModelId: "gemini-3.5-flash-lite",
+    fallbackModelId: "DeterministicPolicyReasoner_v5",
     knownLimitations: "OpenAI runtime is disabled intentionally for the Gemini-only production release; compatibility code is retained without active routing.",
   },
+  ...GEMINI_MODEL_PROFILES,
   {
     providerId: "gemini",
-    modelId: "gemini-3.8-flash",
-    assignedRole: "MULTIMODAL_INSPECTION_SYNTHESIS",
-    capabilities: [
-      "MULTIMODAL",
-      "MULTIMODAL_INSPECTION",
-      "DOCUMENT",
-      "CLAIM_EXTRACTION",
-      "DEEP_REASONING",
-    ],
+    modelId: "gemma-4-31b-it",
+    assignedRole: "SHADOW_COMPATIBILITY_CANDIDATE",
+    capabilities: ["DEEP_REASONING", "MULTIMODAL", "DOCUMENT"],
     configured: Boolean(canonicalEnv.GEMINI_API_KEY),
-    active: true,
-    runtimeStatus: "ACTIVE",
-    structuredOutputSupport: true,
+    active: false,
+    runtimeStatus: "SHADOW_GATE_REQUIRED",
+    structuredOutputSupport: false,
     multimodal: true,
     toolSupport: false,
-    approxCostClass: "LOW_COST_MULTIMODAL",
-    fallbackModelId: "gemini-3.5-flash-lite",
-    knownLimitations: "Subject to upstream availability; the adapter uses Interactions first and an explicit generateContent compatibility fallback.",
+    approxCostClass: "UNVERIFIED",
+    fallbackModelId: null,
+    knownLimitations: "Not in production fallback until the exact Layer 4 prompt/schema, Vietnamese grounding, safety, latency, quota, and parser gate passes.",
   },
   {
     providerId: "gemini",
-    modelId: "gemini-3.5-flash-lite",
-    assignedRole: "MULTIMODAL_FAST_FALLBACK",
-    capabilities: [
-      "MULTIMODAL",
-      "MULTIMODAL_INSPECTION",
-      "DOCUMENT",
-      "FAST_CLASSIFICATION",
-      "CLAIM_EXTRACTION",
-    ],
+    modelId: "gemma-4-26b-a4b-it",
+    assignedRole: "SHADOW_COMPATIBILITY_CANDIDATE",
+    capabilities: ["DEEP_REASONING", "MULTIMODAL", "DOCUMENT"],
     configured: Boolean(canonicalEnv.GEMINI_API_KEY),
     active: false,
-    runtimeStatus: "COMPATIBILITY_FALLBACK_NOT_ACTIVE",
-    structuredOutputSupport: true,
+    runtimeStatus: "SHADOW_GATE_REQUIRED",
+    structuredOutputSupport: false,
     multimodal: true,
     toolSupport: false,
-    approxCostClass: "LOW_COST_MULTIMODAL",
-    fallbackModelId: "DeterministicPolicyReasoner_v5",
-    knownLimitations: "Lower reasoning budget than Gemini 3.8 Flash; live smoke verified a minimal Interactions response, while quota remains deployment-controlled.",
+    approxCostClass: "UNVERIFIED",
+    fallbackModelId: null,
+    knownLimitations: "Not in production fallback until the exact Layer 4 compatibility gate passes.",
   },
   {
     providerId: "local_engine",

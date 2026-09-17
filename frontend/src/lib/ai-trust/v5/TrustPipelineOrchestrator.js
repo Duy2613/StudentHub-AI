@@ -20,7 +20,11 @@ import { failedStage, stageFromL1, stageFromL2A, stageFromL2B, stageFromL2C, sta
 import { buildCanonicalTrustProjection } from "../integrations/canonicalTrustProjection.js";
 
 const TRANSIENT_L2A_STATUSES = new Set(["TIMEOUT", "RATE_LIMITED", "UNAVAILABLE", "CIRCUIT_OPEN", "ERROR"]);
-const TRANSIENT_L3_STATUSES = new Set(["TIMEOUT", "UNAVAILABLE", "ERROR", "NOT_CONFIGURED"]);
+const TRANSIENT_L2B_STATUSES = new Set([
+  "TIMEOUT", "RATE_LIMITED", "AUTH_FAILED", "MODEL_NOT_AVAILABLE", "NETWORK_ERROR",
+  "NOT_CONFIGURED", "UNAVAILABLE", "INVALID_RESPONSE", "ERROR", "PARTIAL", "DEGRADED",
+]);
+const TRANSIENT_L3_STATUSES = new Set(["TIMEOUT", "RATE_LIMITED", "AUTH_FAILED", "UNAVAILABLE", "ERROR", "INVALID_RESPONSE", "NOT_CONFIGURED"]);
 
 export class TrustPipelineCancelledError extends Error {
   constructor() {
@@ -84,8 +88,17 @@ function completedTiming(timing) {
 function isTransient(stageId, result) {
   const providerStatus = String(result?.providerStatus || result?.retrievalStatus || result?.metrics?.providerStatus || "").toUpperCase();
   if (stageId === "l2a") return TRANSIENT_L2A_STATUSES.has(providerStatus);
+  if (stageId === "l2b") {
+    const semanticStatus = String(result?.modelStatus || result?.details?.providerStatus || providerStatus).toUpperCase();
+    return TRANSIENT_L2B_STATUSES.has(semanticStatus);
+  }
   if (stageId === "l3") return TRANSIENT_L3_STATUSES.has(providerStatus) || ["UNAVAILABLE", "INVALID_RESPONSE", "ERROR"].includes(String(result?.legacyIntegration?.status || "").toUpperCase());
-  if (stageId === "l4") return ["UNAVAILABLE", "INVALID_RESPONSE", "ERROR", "PARTIAL"].includes(String(result?.legacyIntegration?.status || result?.legacyIntegration?.providerStatus || "").toUpperCase());
+  if (stageId === "l4") {
+    const l4Status = String(result?.aiVerificationStatus || result?.aiVerificationErrorType || result?.metrics?.providerStatus || result?.providerStatus || "").toUpperCase();
+    const legacyStatus = String(result?.legacyIntegration?.status || result?.legacyIntegration?.providerStatus || "").toUpperCase();
+    const transientStatuses = ["UNAVAILABLE", "RATE_LIMITED", "TIMEOUT", "INVALID_RESPONSE", "ERROR", "PARTIAL", "DEGRADED"];
+    return transientStatuses.includes(l4Status) || transientStatuses.includes(legacyStatus);
+  }
   return false;
 }
 
@@ -100,7 +113,10 @@ function adapterIsEnabled(adapter) {
 }
 
 export function isRetryEligible(stageId, result = {}) {
-  return ["l2a", "l3"].includes(stageId) && isTransient(stageId, result);
+  if (!["l2a", "l3"].includes(stageId) || !isTransient(stageId, result)) return false;
+  if (stageId === "l3" && result?.metrics?.providerRetryExhausted === true) return false;
+  if (stageId === "l3" && result?.metrics?.providerRetryable === false) return false;
+  return true;
 }
 
 function terminalStatusForStage(stage) {

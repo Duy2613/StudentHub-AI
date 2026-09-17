@@ -1,69 +1,91 @@
-# StudentHub AI — Gemini-only AI Gateway
+# StudentHub AI — Gemini multi-model AI Gateway
 
-Status: production policy `GEMINI_ONLY` · revision 2026-09-16
+Status: production routing policy `GEMINI_ONLY` · revision 2026-09-17
 
 `frontend/src/lib/ai-gateway/config/AIGatewayConfig.js` is the single source
-of truth for active capability routing. Gemini is the only active external AI
-provider in this release, using `gemini-3.8-flash` and the Interactions API as
-the canonical transport.
+of truth for active capability routing. Google Gemini is the only active
+external provider; model failover is ordered, per-model, and uses the existing
+canonical `GEMINI_API_KEY`.
 
 ## Runtime policy
 
 | Item | Contract |
 |---|---|
-| Active provider | Gemini |
-| Active model | `gemini-3.8-flash` |
-| Canonical secret | `GEMINI_API_KEY` |
-| Legacy fallback | `GEMINI_KEY_1`, used only when the canonical key is absent |
+| Active provider | Google Gemini |
+| Active chain | `gemini-3.8-flash` → `gemini-3.7-flash` → `gemini-3.6-flash` → `gemini-2.5-flash` |
+| Canonical secret | `GEMINI_API_KEY` only |
+| Key rotation | Forbidden; quota failover is model-specific |
 | OpenAI runtime | `DISABLED_INTENTIONALLY` |
-| OpenAI compatibility code | Retained for old imports; never selected by active routes |
-| Production UX | `AI VERIFICATION — GEMINI` |
+| Gemma | Shadow-only until the exact compatibility gate passes |
+| L4 budget | 10,000 ms total; 2,200 ms per model attempt |
 
-The key value is read only server-side and never appears in telemetry, DTOs,
-browser bundles, or reports. The router does not call OpenAI, even if an old
-OpenAI environment variable is present.
+The key is read only server-side. It never appears in telemetry, DTOs,
+browser bundles, or reports. A public model catalog or Google-wide model list
+does not prove that the current project has quota or access to that model.
 
 ## Architecture
 
 ```text
-Trust / Community / Expert advisory caller
-                 │
-                 ▼
-        AIGatewayService
-                 │
-                 ▼
-          ModelRouter
-          │ active route table
+TrustPipelineOrchestrator
+          │ deterministic L1–L3 data
           ▼
-       GeminiProvider
-       Interactions API
+Layer4TrustService
+  deterministic policy first
+          │ advisory request only
+          ▼
+   AIGatewayService
+          ▼
+     ModelRouter ── ordered chain + health/cooldown + trace
+          ▼
+    GeminiProvider ── Interactions API, explicit 405/501 transport fallback
 ```
 
-All provider traffic is isolated in `frontend/src/lib/ai-gateway/providers/`.
-The UI and domain engines do not construct vendor requests directly. A
-compatibility OpenAI adapter remains available only to prevent import breakage;
-its runtime is fail-closed unless a future release explicitly re-enables it.
+The UI and domain engines do not construct vendor requests directly. L4 AI
+output is advisory and cannot set security, truth, enforcement, confidence, or
+the L5 decision.
 
 ## Active capability routes
 
-| Capability | Active entry | Model | Use |
-|---|---|---|---|
-| `FAST_CLASSIFICATION` | `GEMINI_FLASH` | `gemini-3.8-flash` | bounded triage |
-| `CLAIM_EXTRACTION` | `GEMINI_FLASH` | `gemini-3.8-flash` | claims/entities/context |
-| `DEEP_REASONING` | `GEMINI_FLASH` | `gemini-3.8-flash` | advisory explanation and Trust L4 |
-| `MULTIMODAL` | `GEMINI_FLASH` | `gemini-3.8-flash` | image, screenshot, QR |
-| `DOCUMENT` | `GEMINI_FLASH` | `gemini-3.8-flash` | PDF/document input |
-| `RERANKING` | `GEMINI_FLASH` | `gemini-3.8-flash` | advisory evidence ordering |
-| `SUMMARIZATION` | `GEMINI_FLASH` | `gemini-3.8-flash` | grounded summaries |
-| `EMBEDDING` | none | — | explicit `NOT_CONFIGURED` |
+Every externally routed capability uses the same ordered Gemini chain:
 
-The catalog may contain historical compatibility metadata, but
-`CAPABILITY_ROUTES` is intentionally Gemini-only. The route table does not
-represent provider agreement or a consensus percentage.
+| Capability | Ordered candidates |
+|---|---|
+| `FAST_CLASSIFICATION` | 3.8 → 3.7 → 3.6 → 2.5 Flash |
+| `CLAIM_EXTRACTION` | 3.8 → 3.7 → 3.6 → 2.5 Flash |
+| `DEEP_REASONING` | 3.8 → 3.7 → 3.6 → 2.5 Flash |
+| `MULTIMODAL` | 3.8 → 3.7 → 3.6 → 2.5 Flash |
+| `DOCUMENT` | 3.8 → 3.7 → 3.6 → 2.5 Flash |
+| `RERANKING` / `SUMMARIZATION` | 3.8 → 3.7 → 3.6 → 2.5 Flash |
+| `EMBEDDING` | none; explicit `NOT_CONFIGURED` |
+
+There is no ensemble, averaging, consensus score, or duplicate client request.
+The router stops on the first valid result.
+
+## Failover and cooldown policy
+
+The router advances to the next model only for:
+
+- HTTP 429 / `RATE_LIMITED` / `RESOURCE_EXHAUSTED` / quota exhaustion;
+- HTTP 503 / `SERVICE_UNAVAILABLE`;
+- provider timeout or network timeout;
+- HTTP 404 / `MODEL_NOT_FOUND` or temporary model unavailability;
+- an explicit `MODEL_INCOMPATIBLE` result from the fixed structured contract.
+
+HTTP 400 invalid request/schema errors, 401 authentication failures, and 403
+permission failures stop the sequence immediately. They are configuration or
+application problems, not reasons to cascade across models.
+
+`ModelHealthStore` keeps bounded process-local state keyed by provider/model.
+Transient failures create an expiring cooldown; successful use clears that
+model’s state. Google `Retry-After` and explicit quota-reset metadata are
+honored. A daily-quota signal receives a longer bounded cooldown without
+pretending to know a reset time that Google did not provide. No model is
+permanently disabled.
 
 ## Structured output contract
 
-Trust Layer 4 requests and validates this DTO:
+Layer 4 sends every active candidate the same current schema and prompt
+contract:
 
 ```json
 {
@@ -74,60 +96,66 @@ Trust Layer 4 requests and validates this DTO:
   "uncertainty": "string",
   "citationsUsed": [{ "id": "evidence-id", "url": "https://…" }],
   "provider": "gemini",
-  "model": "gemini-3.8-flash"
+  "model": "one of the active Gemini chain models"
 }
 ```
 
-`GeminiTrustVerificationDTO.js` requires all fields, bounds all lists/text,
-and accepts only real HTTP(S) citation URLs. Invalid JSON or schema output is
-retried once for the same Gemini candidate, then the call becomes
-`AI verification unavailable`; the deterministic Trust Policy still completes.
+`GeminiTrustVerificationDTO.js` keeps only real HTTP(S) citations already
+present in the supplied evidence, rejects unapproved model IDs, and does not
+invent confidence or citations. Malformed output is recorded as
+`MODEL_INCOMPATIBLE` and the next candidate may be tried without weakening the
+schema.
 
-## Trust L1–L5 boundary
+## Model trace
 
-- L1 extracts claims and local safety signals.
-- L2 discovers candidate evidence and creates verification tasks.
-- L3 performs evidence forensics and requires real source URLs.
-- L4 runs deterministic policy first, then optionally asks Gemini for the
-  structured advisory DTO. Gemini cannot set truth, security, enforcement, or
-  confidence.
-- L5 makes the deterministic final decision and applies assurance gates.
+Each candidate record contains only bounded public-safe fields:
 
-The UI exposes actual provider/model/status, evidence references, and
-uncertainty. Fake AI-agreement percentages are not part of the contract.
+```json
+{
+  "model": "gemini-3.7-flash",
+  "attemptNumber": 2,
+  "startedAt": "2026-09-17T00:00:00.000Z",
+  "durationMs": 412,
+  "httpStatus": 200,
+  "providerErrorCode": null,
+  "result": "SUCCESS"
+}
+```
 
-## Community and Expert boundaries
+The final gateway/L4 metadata also reports `requestedPrimaryModel`,
+`executedModel`, `fallbackUsed`, `fallbackReason`, `providerStatus`, and
+`operationStatus`. No raw response body, stack, prompt, or key enters the
+trace.
 
-Gemini is advisory for community classification, summaries, duplicate
-suggestions, evidence suggestions, expert evidence-packet summaries,
-assignment suggestions, and review summaries. Gemini never sets reputation,
-bans a user, decides truth, moderates irreversibly, qualifies an Expert,
-assigns authority, approves an assessment, or resolves an appeal alone.
+## Gemma safety gate
 
-## Multimodal boundary
+`gemma-4-31b-it` and `gemma-4-26b-a4b-it` remain shadow candidates. They are not
+in `CAPABILITY_ROUTES`. Before activation, the exact current L4 prompt/schema
+must pass endpoint, structured-output, Vietnamese reasoning, evidence
+grounding, latency, quota, safety, and parser checks. Until every required
+check is evidenced, the report is `GEMMA_COMPATIBLE=NO`.
 
-`GeminiProvider` accepts provider-neutral `inputParts` and sends image,
-screenshot, QR, PDF, and document parts through the Gemini adapter. The
-canonical transport is Interactions; `generateContent` is an explicit
-compatibility fallback only for 404/405/501 responses. The multimodal smoke
-script records the fixture type, model, transport, latency, status, and parsed
-result without recording secrets.
+## Trust and L5 boundary
 
-## Failure and observability contract
+- L1–L3 produce deterministic/local signals and evidence records.
+- L4 executes deterministic Trust Policy first, then optionally enriches the
+  explanation with one successful Gemini advisory result.
+- If every Gemini candidate fails, L4 is `UNAVAILABLE`/`PARTIAL` with the
+  exact model trace; the pipeline continues and L5 still runs.
+- L5 remains deterministic assurance/final authority and is not modified by
+  provider availability.
 
-Every gateway result includes `ok`, provider/model when successful,
-`attempts[]`, safe error type, `requestId`, `totalLatencyMs`, and safe provider
-metadata (`transport`, `thinkingLevel`). Timeout, 429, 5xx, invalid JSON, and
-schema-invalid responses are bounded. No provider error body or secret is
-persisted.
+## UI behavior
 
-When Gemini is unavailable, the public status is `AI verification unavailable`
-and the deterministic result remains visible. A failed Gemini call is never
-converted into fake Gemini success.
+When fallback succeeds, the L4 panel shows `AI Verification — Hoàn tất`,
+Google Gemini, the model used, the primary model, and a human-readable fallback
+reason. This is not rendered as an error. When all models fail, it shows
+`AI Verification — Không khả dụng`, the models attempted, and that Decision
+Intelligence continued using deterministic Trust policy without AI advisory.
 
 ## Verification commands
 
-Deterministic CI contracts use injected providers and never spend credits:
+Hermetic fault tests never spend provider quota:
 
 ```text
 cd frontend
@@ -135,21 +163,14 @@ node --test tests/ai-gateway/ai_gateway_router.test.mjs
 node --test tests/gateway/provider_failure_cost_latency.test.mjs
 ```
 
-The real provider gate is separate:
+The one-shot real probe is separate and secret-free:
 
 ```text
-node scripts/gemini-only-provider-smoke.mjs
+node scripts/gemini-model-router-probe.mjs
 ```
 
-The provider smoke includes text, image, screenshot, QR, and PDF/document
-fixtures. It loads server-only environment variables, makes no OpenAI call,
-makes no secret-containing output, and must be run only when the owner has
-authorized spending the configured Gemini quota.
+It skips a candidate already recorded as exhausted with HTTP 429, makes at most
+one bounded request per other candidate, and writes a JSON report under
+`docs/reports/`. Use `--probe-gemma` only for an explicitly authorized shadow
+compatibility gate; Gemma remains inactive unless all checks pass.
 
-## Adding another provider later
-
-An independent provider may be added only in a future release after its
-official API, data handling, quota, and secret boundary are documented. It
-must receive a new adapter, mocked contract tests, and an explicit routing
-change. Until then, product wording remains `AI VERIFICATION — GEMINI`, not
-`MULTI-AI`.

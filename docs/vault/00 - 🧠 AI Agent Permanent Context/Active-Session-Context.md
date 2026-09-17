@@ -574,3 +574,13 @@
 - Đã thêm compatibility read-only cho live expert schema cũ: directory chỉ chiếu rows có `status='VERIFIED'`, không suy diễn qualification/domain authority; Promax assignment/assessment vẫn fail closed cho đến khi migration live được apply.
 - Local proof sau pass: Promax/domain/route/migration/Trust V5 `27/27`, ESLint error-only `0 errors`, production build `150/150` pages pass; smoke HTTP `/`, `/community`, `/expert` `200`, Expert directory `200` với durable empty projection, Community Promax `503` khi migration chưa apply, unauthenticated track record/qualification `401`. `agent-browser` không có trong PATH nên chưa có browser harness evidence.
 - Live read-only discovery xác nhận Supabase hiện thiếu `community_expert_promax` và live `private.expert_verifications` chưa có `suspended_at`/`qualification_state`; không chạy migration, không ghi dữ liệu, không commit/push/deploy.
+
+## 23. Gemini multi-model router — 2026-09-17
+
+- Đã triển khai active Google Gemini chain duy nhất theo đúng thứ tự: `gemini-3.8-flash` → `gemini-3.7-flash` → `gemini-3.6-flash` → `gemini-2.5-flash`; model IDs được allowlist và validate khi gateway/provider khởi tạo.
+- Gateway chỉ đọc `GEMINI_API_KEY`; không xoay key, không thêm Groq, không thêm Sequential backend và không đổi Trust authority/L5 deterministic policy.
+- Router failover chỉ áp dụng cho transient quota/rate/resource exhaustion, 503, timeout/network timeout và 404 model unavailable; 400/401/403 dừng sequence. Mỗi provider/model có cooldown hết hạn, Retry-After/quota-reset handling và bounded trace.
+- L4 dùng cùng prompt/schema DTO cho mọi candidate, dừng ở structured result hợp lệ; mọi candidate lỗi schema trở thành `MODEL_INCOMPATIBLE`. Khi tất cả candidate lỗi, L4 `UNAVAILABLE/PARTIAL` nhưng V5 vẫn chạy L5.
+- Gemma 4 (`gemma-4-31b-it`, `gemma-4-26b-a4b-it`) chỉ shadow/probe; compatibility hiện `NO` vì chưa chạy gate đầy đủ.
+- Hermetic router/L4/V5/UI evidence đã pass; one-shot live probe không lặp request: primary đã biết HTTP 429 nên skip, 3.7/3.6 timeout, 2.5 trả HTTP 404. Vì vậy live verdict trung thực là `GEMINI_MULTI_MODEL_ROUTER_PARTIAL`.
+- Report: `docs/reports/GEMINI-MULTI-MODEL-ROUTER-2026-09-17.md` và `docs/reports/gemini_multi_model_router_probe_2026-09-17.json`. Full discovered suite vẫn có blocker không thuộc router tại Layer 3 Case C (`CONTESTED` expected, `INSUFFICIENT_EVIDENCE` received).

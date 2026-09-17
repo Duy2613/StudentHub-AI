@@ -151,10 +151,12 @@ export class Layer4TrustService {
     let assessment = deterministicAssessment;
     try {
       if (narrativeProvider && typeof narrativeProvider.reason === "function") {
-        const candidate = await narrativeProvider.reason(fusedGraph, {
-          requestId: options.requestId || layer1Result?.requestId || layer2Result?.requestId || layer3Result?.requestId || null,
-          signal: options.signal,
-        });
+          const candidate = await narrativeProvider.reason(fusedGraph, {
+            requestId: options.requestId || layer1Result?.requestId || layer2Result?.requestId || layer3Result?.requestId || null,
+            signal: options.signal,
+            perModelTimeoutMs: options.aiPerModelTimeoutMs,
+            totalBudgetMs: options.aiTotalBudgetMs,
+          });
         // Preserve every security/truth/action/confidence field from the
         // deterministic result. Only a bounded narrative may cross this
         // optional boundary.
@@ -170,6 +172,15 @@ export class Layer4TrustService {
           aiVerificationThinkingLevel: candidate?.aiVerificationThinkingLevel || null,
           aiVerificationLatencyMs: candidate?.aiVerificationLatencyMs ?? null,
           aiVerificationErrorType: candidate?.aiVerificationErrorType || null,
+          aiVerificationHttpStatus: candidate?.aiVerificationHttpStatus ?? null,
+          aiRequestedPrimaryModel: candidate?.aiRequestedPrimaryModel || null,
+          aiExecutedModel: candidate?.aiExecutedModel || null,
+          aiFallbackUsed: candidate?.aiFallbackUsed === true,
+          aiFallbackReason: candidate?.aiFallbackReason || null,
+          aiModelTrace: Array.isArray(candidate?.aiModelTrace) ? candidate.aiModelTrace : [],
+          aiProviderStatus: candidate?.aiProviderStatus || null,
+          aiOperationStatus: candidate?.aiOperationStatus || null,
+          aiCooldownResult: candidate?.aiCooldownResult || null,
         };
       }
     } catch (err) {
@@ -180,6 +191,15 @@ export class Layer4TrustService {
         aiNarrativeError: err?.name || "provider_error",
         aiVerificationStatus: "UNAVAILABLE",
         aiVerificationErrorType: err?.name || "provider_error",
+        aiVerificationHttpStatus: Number.isInteger(Number(err?.httpStatus)) ? Number(err.httpStatus) : null,
+        aiRequestedPrimaryModel: null,
+        aiExecutedModel: null,
+        aiFallbackUsed: false,
+        aiFallbackReason: null,
+        aiModelTrace: [],
+        aiProviderStatus: null,
+        aiOperationStatus: "PARTIAL",
+        aiCooldownResult: null,
       };
     }
 
@@ -213,6 +233,15 @@ export class Layer4TrustService {
       aiVerificationThinkingLevel: assessment.aiVerificationThinkingLevel || null,
       aiVerificationLatencyMs: assessment.aiVerificationLatencyMs ?? null,
       aiVerificationErrorType: assessment.aiVerificationErrorType || null,
+      aiVerificationHttpStatus: assessment.aiVerificationHttpStatus ?? null,
+      aiRequestedPrimaryModel: assessment.aiRequestedPrimaryModel || null,
+      aiExecutedModel: assessment.aiExecutedModel || null,
+      aiFallbackUsed: assessment.aiFallbackUsed === true,
+      aiFallbackReason: assessment.aiFallbackReason || null,
+      aiModelTrace: Array.isArray(assessment.aiModelTrace) ? assessment.aiModelTrace : [],
+      aiProviderStatus: assessment.aiProviderStatus || null,
+      aiOperationStatus: assessment.aiOperationStatus || null,
+      aiCooldownResult: assessment.aiCooldownResult || null,
       auditTrail: {
         requestId: layer1Result?.requestId || layer2Result?.requestId || layer2AResult?.requestId || layer3Result?.requestId || null,
         ruleVersion: LAYER_4_CONFIG.VERSION,
