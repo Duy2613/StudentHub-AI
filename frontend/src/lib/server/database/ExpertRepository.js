@@ -172,13 +172,18 @@ export class ExpertRepository {
   static async upsertProfile({ userId, publicTitle, publicBio }) {
     if (!userId) throw new Error("userId is required.");
     const pool = getPostgresPool();
+    const hasPublicTitle = publicTitle !== undefined;
+    const hasPublicBio = publicBio !== undefined;
     const res = await pool.query(
-      `INSERT INTO public.expert_profiles (user_id, public_title, public_bio, created_at, updated_at)
-       VALUES ($1, $2, $3, now(), now())
+      `INSERT INTO public.expert_profiles AS profile (user_id, public_title, public_bio, created_at, updated_at)
+       VALUES ($1, CASE WHEN $2 THEN $3::text ELSE NULL END,
+                  CASE WHEN $4 THEN $5::text ELSE NULL END, now(), now())
        ON CONFLICT (user_id) DO UPDATE
-       SET public_title = EXCLUDED.public_title, public_bio = EXCLUDED.public_bio, updated_at = now()
+       SET public_title = CASE WHEN $2 THEN EXCLUDED.public_title ELSE profile.public_title END,
+           public_bio = CASE WHEN $4 THEN EXCLUDED.public_bio ELSE profile.public_bio END,
+           updated_at = now()
        RETURNING user_id, public_title, public_bio, updated_at`,
-      [userId, publicTitle || null, publicBio || null]
+      [userId, hasPublicTitle, publicTitle ?? null, hasPublicBio, publicBio ?? null]
     );
     return res.rows[0];
   }
