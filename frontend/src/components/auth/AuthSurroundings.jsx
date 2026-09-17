@@ -109,9 +109,9 @@ export default function AuthSurroundings({ children }) {
         <CosmicAstrolabeRings />
 
         {/* Central Auth Form Card (Clean & Focused) */}
-        <div className="relative z-10 w-full flex justify-center">
+        <main id="main-content" className="relative z-10 w-full flex justify-center">
           {children}
-        </div>
+        </main>
       </div>
 
       {/* 3. Bottom Security Guarantee Bar */}

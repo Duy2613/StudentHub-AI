@@ -20,6 +20,7 @@ const CHANNEL_SCOPES = Object.freeze({
   telemetry: ["trust:read"],
   community: ["community:read"],
   expert: ["expert:read"],
+  academic: ["academic:read"],
 });
 
 const PUBLIC_CHANNELS = new Set(["system"]);

@@ -44,11 +44,6 @@ const DEFAULT_ITEMS = [
     href: "/expert",
   },
   {
-    title: "Academic 360",
-    icon: <Calendar className="w-full h-full text-cyan-400" />,
-    href: "/academic",
-  },
-  {
     title: "Bảng Điều Khiển",
     icon: <LayoutDashboard className="w-full h-full text-sky-400" />,
     href: "/dashboard",

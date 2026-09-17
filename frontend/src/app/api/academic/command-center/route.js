@@ -34,11 +34,30 @@ export const GET = SecurityFabric.wrapHandler(
       });
     }
 
-    const payload = getAuthoritativeCommandCenterData({
-      studentId,
-      cohort: principal.attributes?.cohort,
-      programCode: principal.attributes?.programCode
-    });
+    let payload;
+    try {
+      payload = getAuthoritativeCommandCenterData({
+        studentId,
+        cohort: principal.attributes?.cohort,
+        programCode: principal.attributes?.programCode
+      });
+    } catch (error) {
+      payload = {
+        studentProfile: {
+          studentId,
+          fullName: principal.attributes?.fullName || "Sinh viên StudentHub",
+          cohort: principal.attributes?.cohort || 2024,
+          programCode: principal.attributes?.programCode || "7480103",
+        },
+        digitalTwin: null,
+        status: "UNAVAILABLE",
+        notice: "Dữ liệu trung tâm điều hành học vụ tạm thời chưa khả dụng.",
+        error: {
+          code: error?.code || "DURABLE_ACADEMIC_UNAVAILABLE",
+          message: error?.message || "Cơ sở dữ liệu học vụ tạm thời không phản hồi.",
+        },
+      };
+    }
 
     return Response.json({
       ...payload,

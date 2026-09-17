@@ -26,6 +26,7 @@ const migrations = [
   readFileSync(join(repositoryRoot, "database", "migrations", "202609150003_auth_public_trust_boundary_hardening.sql"), "utf8"),
   readFileSync(join(repositoryRoot, "database", "migrations", "202609150004_expert_review_requests.sql"), "utf8"),
   readFileSync(join(repositoryRoot, "database", "migrations", "202609160001_private_roles_service_rls.sql"), "utf8"),
+  readFileSync(join(repositoryRoot, "database", "migrations", "202609170001_durable_academic_workflows.sql"), "utf8"),
 ];
 
 const userA = crypto.randomUUID();

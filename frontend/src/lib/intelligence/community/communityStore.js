@@ -22,10 +22,10 @@ const DEFAULT_STORE_FILE = path.join(DEFAULT_STORE_DIR, "community_intelligence_
 
 /** The file store is a fixture adapter, never a production authority. */
 export function isCommunityDemoMode() {
-  return process.env.NODE_ENV !== "production" && (
+  return process.env.NODE_ENV === "test" || (process.env.NODE_ENV !== "production" && (
     process.env.STUDENTHUB_PERSISTENCE_ADAPTER === "memory" ||
     process.env.STUDENTHUB_COMMUNITY_DEMO === "true"
-  );
+  ));
 }
 
 export class CommunityStore {
@@ -48,7 +48,7 @@ export class CommunityStore {
     this.#claimsById.clear();
     this.#experiencesById.clear();
     this.#feedbackList = [];
-    this.#seedDefaults();
+    if (isCommunityDemoMode()) this.#seedDefaults();
     this.#isHydrated = true;
     try {
       if (fs.existsSync(this.#storageFilePath)) {
@@ -67,6 +67,7 @@ export class CommunityStore {
   }
 
   static #seedDefaults() {
+    if (!isCommunityDemoMode()) return;
     // 1. Topic: TOEIC_SUBMISSION_TIME (7 days median)
     const p1 = CommunityIntelligenceModel.createCommunityPost({
       postId: "POST_TOEIC_01",

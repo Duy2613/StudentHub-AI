@@ -77,6 +77,7 @@ for (const key of [
   "STUDENTHUB_LABBE_BASE_URL",
   "STUDENTHUB_LABBE_TOKEN",
   "STUDENTHUB_LABBE_SCOPE",
+  "TAVILY_API_KEY",
 ]) {
   delete childEnv[key];
 }

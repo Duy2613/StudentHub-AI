@@ -24,7 +24,7 @@ test("The Margin is a shared production primitive, not a copied prototype", () =
   assert.match(source("../../src/app/layout.tsx"), /data-paper="night"/);
 });
 
-test("Dashboard and Academic surfaces expose source state instead of claiming fixture data is live", () => {
+test("Dashboard exposes source state instead of claiming fixture data is live", () => {
   const dashboard = source("../../src/components/home/CommandCenterDashboard.jsx");
   assert.match(dashboard, /DEMO_FIXTURE/);
   assert.match(dashboard, /SNAPSHOT \/ CẦN KẾT NỐI/);
@@ -32,8 +32,4 @@ test("Dashboard and Academic surfaces expose source state instead of claiming fi
   assert.doesNotMatch(dashboard, /48 \/ 150/);
   assert.doesNotMatch(dashboard, /13:40/);
 
-  const academicLoader = source("../../src/lib/intelligence/academic/academicCommandCenterDataLoader.js");
-  assert.match(academicLoader, /sourceState: "SYNTHETIC_FIXTURE"/);
-  assert.match(academicLoader, /isAuthoritative: false/);
-  assert.match(source("../../src/components/academic/AcademicHeader.jsx"), /sourceState !== "SYNTHETIC_FIXTURE"/);
 });

@@ -74,14 +74,14 @@ export default function CollectiveCommunitySection() {
                 Cảnh giác chiêu trò &ldquo;Tuyển thực tập sinh dịch thuật có cọc tiền&rdquo;
               </h4>
               <p className="text-xs text-slate-300 font-serif leading-relaxed mb-4">
-                3 sinh viên Bách Khoa và Ngoại Thương đã đối chiếu hợp đồng, phát hiện điều khoản phạt vi phạm trái luật lao động.
+                3 sinh viên Bách Khoa và Ngoại Thương đã đối chiếu thông báo tuyển dụng, phát hiện điều khoản phạt vi phạm trái luật lao động.
               </p>
               <div className="flex items-center gap-4 text-xs font-mono text-slate-400 pt-3 border-t border-white/10">
                 <span className="flex items-center gap-1">
                   <MessageSquare size={13} />
                   <span>48 Phản biện</span>
                 </span>
-                <span>3 Minh chứng hợp đồng</span>
+                <span>3 Minh chứng tuyển dụng</span>
               </div>
             </div>
 
@@ -96,7 +96,7 @@ export default function CollectiveCommunitySection() {
                 </span>
               </div>
               <p className="text-xs text-slate-200 font-serif leading-relaxed italic mb-3">
-                &ldquo;Các em lưu ý: Quy định nhà trường cấm tuyệt đối mọi hình thức thu tiền cọc khi giới thiệu việc làm. Hãy gửi hợp đồng qua cổng Trust để được hỗ trợ pháp lý miễn phí.&rdquo;
+                &ldquo;Các em lưu ý: Quy định nhà trường cấm tuyệt đối mọi hình thức thu tiền cọc khi giới thiệu việc làm. Hãy gửi thông báo qua cổng Trust để được đối chiếu nguồn miễn phí.&rdquo;
               </p>
               <span className="text-[10px] font-mono text-slate-400 block">
                 Phê duyệt vào hồ sơ án lệ #CASE-2026-089

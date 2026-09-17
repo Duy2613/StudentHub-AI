@@ -245,7 +245,7 @@ export default function RiskMeterSplitVerdict({ result, currentInput = {}, onSha
                 <div className="space-y-1.5">
                   <p className="font-bold text-white">👨‍🏫 Lời khuyên từ Cố vấn Đời sống:</p>
                   <p>
-                    Nội dung bước đầu an toàn. Nếu là thông tin thuê trọ hoặc việc làm, hãy luôn yêu cầu hợp đồng rõ ràng và biên lai thanh toán.
+                    Nội dung bước đầu an toàn. Nếu là thông tin thuê trọ hoặc việc làm, hãy luôn yêu cầu điều khoản rõ ràng và biên lai thanh toán.
                   </p>
                 </div>
               )}

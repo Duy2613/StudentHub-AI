@@ -3,6 +3,7 @@ import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { PostgresForumRepository } from "@/lib/forum/PostgresForumRepository.js";
 import { DatabaseUnavailableError } from "@/lib/server/database/PostgresPool.js";
 import { createSecureId } from "@/lib/security/secureId.js";
+import { deriveIdentityTruth } from "@/lib/server/auth/demoAccountPolicy.js";
 
 // In-memory store conforming to ForumPost model (Phần F)
 let FORUM_POSTS = [
@@ -283,6 +284,11 @@ async function createForumPost(request, routeParams, principal) {
       );
     }
 
+    const identityTruth = deriveIdentityTruth({
+      email: principal.email,
+      emailVerified: principal.attributes?.emailVerified === true,
+      qaEntitlements: principal.attributes?.qaEntitlements,
+    });
     const newPost = {
       id: createSecureId("post"),
       category: normalizedCategory,
@@ -296,7 +302,8 @@ async function createForumPost(request, routeParams, principal) {
       authorAvatar: normalizeText(authorAvatar || "student-tech", 80),
       authorTrustScore: 50,
       trustScoreSource: "SERVER_UNASSESSED_BASELINE",
-      authorVerificationState: principal.attributes?.emailVerified ? "VERIFIED_IDENTITY" : "KNOWN_ACCOUNT",
+      authorVerificationState: identityTruth.institutionalEmailVerified ? "VERIFIED_IDENTITY" : "KNOWN_ACCOUNT",
+      authorVerificationSource: identityTruth.verificationSource,
       trustVoteCount: 0,
       distrustVoteCount: 0,
       likeCount: 0,

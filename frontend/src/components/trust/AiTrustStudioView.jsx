@@ -4,8 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { AlertTriangle, ArrowRight, Check, ClipboardPaste, Clock3, FileImage, FileText, Globe2, Image as ImageIcon, LoaderCircle, ScanSearch, ShieldAlert, ShieldCheck, Upload, Users, UserRoundCheck, X } from "lucide-react";
+import { AlertTriangle, ArrowRight, Check, ClipboardPaste, Clock3, FileImage, Globe2, Image as ImageIcon, LoaderCircle, ScanSearch, ShieldAlert, ShieldCheck, Upload, Users, UserRoundCheck, X } from "lucide-react";
 import { ApiError, apiErrorMessage } from "@/lib/api/errors";
 import { deriveSafetyActions } from "@/lib/trust/safetyActions";
 import { COMPETITION_DEMO_CASES } from "@/lib/trust/competitionDemoCases";
@@ -27,7 +26,6 @@ import { useBackground } from "@/components/providers/BackgroundContext";
 import SourceInspectorDrawer from "./SourceInspectorDrawer";
 import EvidenceConstellationStage from "./EvidenceConstellationStage";
 import PostResultGateways from "./PostResultGateways";
-import ContractCheckIntakeTab from "./ContractCheckIntakeTab";
 import TrustMasterUltraJourney from "./TrustMasterUltraJourney";
 
 const TrustGraph2D = dynamic(() => import("./TrustGraph2D"), {
@@ -357,20 +355,12 @@ function v5VerdictTitle(decision) {
 }
 
 export function AiTrustStudioView({ initialMode = "image", initialContent = "", hideHero = false, onSourceProvenanceChange }) {
-  const searchParams = useSearchParams();
-  const tabParam = searchParams?.get("tab");
   // Competition fixtures are a development/test aid only. A production
   // client must never expose a synthetic Trust case as an application mode.
   const demoEnabled = process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_COMPETITION_DEMO === "true";
   const { setRouteMediaAsset } = useBackground();
-  const [mode, setMode] = useState(tabParam === "contract" ? "contract" : initialMode);
+  const [mode, setMode] = useState(initialMode);
   const [content, setContent] = useState(initialContent);
-
-  useEffect(() => {
-    if (tabParam === "contract") {
-      setMode("contract");
-    }
-  }, [tabParam]);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [dragging, setDragging] = useState(false);
@@ -757,13 +747,6 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
         }}
         onAnalyze={analyze}
         onReset={reset}
-        onContractAnalyze={(contractText) => {
-          setDemoCaseId(null);
-          setMode("text");
-          contentRef.current = contractText;
-          setContent(contractText);
-          window.setTimeout(() => analyze(), 0);
-        }}
         onNewAnalysis={reset}
         onPrint={() => window.print()}
       />
@@ -815,17 +798,8 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
               <button role="tab" aria-selected={mode === "qr"} onClick={() => selectTrustMode("qr")}><ScanSearch size={15} /> QR</button>
               <button role="tab" aria-selected={mode === "text"} onClick={() => selectTrustMode("text")}><ClipboardPaste size={15} /> Văn bản</button>
               <button role="tab" aria-selected={mode === "url"} onClick={() => selectTrustMode("url")}><Globe2 size={15} /> URL</button>
-              <button role="tab" aria-selected={mode === "contract"} onClick={() => selectTrustMode("contract")}><FileText size={15} /> Hợp đồng</button>
             </div>
-            {mode === "contract" ? (
-              <ContractCheckIntakeTab onAnalyzeContract={(contractText) => {
-                setDemoCaseId(null);
-                setMode("text");
-                contentRef.current = contractText;
-                setContent(contractText);
-                analyze();
-              }} />
-            ) : mode === "image" || mode === "qr" ? (
+            {mode === "image" || mode === "qr" ? (
               <div
                 className={`upload-zone ${dragging ? "is-dragging" : ""} ${preview ? "has-preview" : ""}`}
                 onDragEnter={(event) => { event.preventDefault(); setDragging(true); }}
@@ -884,18 +858,16 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
                 <span>{error.message}{error.traceId && <small>Reference: {error.traceId}</small>}</span>
               </div>
             )}
-            {mode !== "contract" && (
-              <button
-                type="button"
-                className="primary-action trust-submit"
-                disabled={((mode !== "image" && mode !== "qr") && !content.trim()) || ((mode === "image" || mode === "qr") && !file)}
-                onClick={analyze}
-              >
-                {processing ? <LoaderCircle className="animate-spin" size={17} /> : <ScanSearch size={17} />}
-                {processing || hasResult ? "Chạy lại với dữ liệu mới" : "Phân tích rủi ro"}
-                <ArrowRight size={16} />
-              </button>
-            )}
+            <button
+              type="button"
+              className="primary-action trust-submit"
+              disabled={((mode !== "image" && mode !== "qr") && !content.trim()) || ((mode === "image" || mode === "qr") && !file)}
+              onClick={analyze}
+            >
+              {processing ? <LoaderCircle className="animate-spin" size={17} /> : <ScanSearch size={17} />}
+              {processing || hasResult ? "Chạy lại với dữ liệu mới" : "Phân tích rủi ro"}
+              <ArrowRight size={16} />
+            </button>
           </div>
           <aside className="intelligence-panel pipeline-panel"><div className="panel-heading"><div><p className="product-kicker">Trust progress</p><h2 className="product-section-title">Tiến độ kiểm tra</h2></div><span className={`live-indicator ${processing ? "is-live" : ""}`}>{processing ? "RUNNING" : hasResult ? "COMPLETE" : "WAITING"}</span></div><ol className="pipeline-list" aria-label="Năm giai đoạn kiểm tra chính">{pipeline.map((step, index) => <li key={step.id} data-status={step.status}><span className="pipeline-index">{step.status === "done" ? <Check size={14} /> : index + 1}</span><div><strong>{step.label}</strong><small>{step.detail || (step.status === "waiting" ? "Đang chờ" : readable(step.status))}</small></div></li>)}</ol>{ocr && <><div className="ocr-readout"><div><FileImage size={15} /><span>OCR trong trình duyệt</span><strong>Gợi ý cục bộ</strong></div><p>{String(ocr.text || ocr.qrContent || "").slice(0, 180)}{String(ocr.text || ocr.qrContent || "").length > 180 ? "..." : ""}</p></div><div className="entity-inspector" aria-label="Các thực thể trích xuất"><div className="panel-heading"><span className="data-label">Entity inspector</span><span className="metadata-chip">GỢI Ý · không thẩm quyền</span></div><p className="entity-disclosure">Chọn thực thể để gửi kèm như một gợi ý có xác nhận. Việc chọn không biến OCR cục bộ thành bằng chứng.</p>{Object.entries(ocr.entities || {}).filter(([, values]) => Array.isArray(values) && values.length).map(([type, values]) => <div className="entity-row" key={type}><strong>{type.replaceAll(/([A-Z])/g, " $1")}</strong><div className="entity-values">{values.map((value) => <label key={value}><input type="checkbox" checked={confirmedEntities.includes(value)} onChange={() => setConfirmedEntities((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value].slice(0, 50))} /><span>{value}</span></label>)}</div></div>)}</div></>}</aside>
         </section>

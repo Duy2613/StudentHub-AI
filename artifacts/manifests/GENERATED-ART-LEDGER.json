@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-09-09",
+  "policy": {
+    "assetClass": "GENERATED_EDITORIAL_ATMOSPHERE",
+    "decorativeOnly": true,
+    "trustAuthority": false,
+    "communityAuthority": false,
+    "expertAuthority": false,
+    "mobilePolicy": "static-image",
+    "reducedMotionPolicy": "static-image"
+  },
+  "assets": [
+    {
+      "asset_id": "IMG-BIRD-01",
+      "semantic_name": "khai-minh-bird",
+      "source_type": "OPENAI_IMAGE_GENERATION",
+      "source_reference": "C:/Users/Duy/.codex/generated_images/01a07662-3854-7682-b24a-51237fabd267/exec-eb14098f-be02-44d9-a797-27f8c9db10ee.png",
+      "prompt_record": "Elegant Vietnamese white stork in a calm upward gliding side profile, transparent background, warm ivory/mineral charcoal/muted jade, no text or watermark.",
+      "original": {
+        "file": "artifacts/source-intake/generated/IMG-BIRD-01-generated.png",
+        "sha256": "B5C52CB81CD1E0F42B25EFE9C5DA95758485046592BDDBA3710411F71315DB62",
+        "width": 1536,
+        "height": 1024,
+        "format": "png",
+        "has_alpha": true
+      },
+      "production": {
+        "file": "frontend/public/media/studenthub-vnext/imagery/bird-khai-minh-v1.webp",
+        "publicPath": "/media/studenthub-vnext/imagery/bird-khai-minh-v1.webp",
+        "sha256": "9FF4766159CCB105C9E4E6AD4EB73B7D3AA9FAC71167451AC8E01CD6EF9D4DCA",
+        "width": 1536,
+        "height": 1024,
+        "format": "webp",
+        "sizeBytes": 184378,
+        "has_alpha": true,
+        "quality": 88
+      },
+      "routes": ["/", "/trust", "/community", "/expert", "/cases", "authenticated-workspace"],
+      "visual_review_status": "PASS",
+      "visual_review_notes": "Single white stork cutout; no text, logo, watermark or private content. Decorative layer only; never represents a person, source, verdict or authority."
+    }
+  ]
+}

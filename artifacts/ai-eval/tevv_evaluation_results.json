@@ -1,6 +1,6 @@
 {
   "evaluationVersion": "1.0.0-tevv-gold",
-  "evaluatedAt": "2026-09-17T07:45:36.660Z",
+  "evaluatedAt": "2026-09-17T16:23:47.984Z",
   "lockedHoldoutCases": 120,
   "incidentGroupPolicy": "STRICT_INCIDENT_ISOLATION",
   "primaryMetrics": {

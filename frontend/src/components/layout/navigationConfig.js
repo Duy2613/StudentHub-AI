@@ -49,7 +49,6 @@ export function chapterForPath(pathname = "") {
   if (pathname.startsWith("/trust")) return "I";
   if (pathname.startsWith("/community") || pathname.startsWith("/forum")) return "II";
   if (pathname.startsWith("/expert")) return "III";
-  if (pathname.startsWith("/academic")) return "IV";
-  if (pathname.startsWith("/cases")) return "V";
-  return "VI";
+  if (pathname.startsWith("/cases")) return "IV";
+  return "V";
 }

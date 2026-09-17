@@ -19,8 +19,6 @@ import { getCurriculumForStudent, HCMUTE_VERSIONED_CURRICULA } from "../../src/l
 import { AcademicRuleEngine } from "../../src/lib/intelligence/academic/academicRuleEngine.js";
 import { AcademicTruthEngine, RULE_VERIFICATION_STATUSES, HCMUTE_OFFICIAL_DOCUMENTS } from "../../src/lib/intelligence/academic/academicTruthEngine.js";
 import { WhatIfEngine } from "../../src/lib/intelligence/academic/whatIfEngine.js";
-import { AnnouncementEngine } from "../../src/lib/intelligence/academic/announcementEngine.js";
-import { AcademicRadarEngine } from "../../src/lib/intelligence/academic/academicRadarEngine.js";
 
 console.log("======================================================================");
 console.log("🏛️ STUDENTHUB AI — SOURCE-BACKED ACADEMIC TRUTH TEST SUITE (HCMUTE)");
@@ -169,13 +167,6 @@ describe("[UNIT_TEST] Protocol 5: Deterministic Graph & Scheduler Algorithms", (
     assert.ok(impact.totalDownstreamBlockedCount >= 4);
   });
 
-  it("should compute announcement diffs between two versions", () => {
-    const v1 = { deadline: "2026-08-30", location: "A1-302" };
-    const v2 = { deadline: "2026-09-02", location: "A1-405" };
-    const diff = AnnouncementEngine.computeAnnouncementDiff(v1, v2);
-    assert.strictEqual(diff.has_changed, true);
-    assert.strictEqual(diff.diff_status, "MODIFIED");
-  });
 });
 
 describe("[REGRESSION_TEST] Protocol 6: Non-destructive Upgrade Verification", () => {

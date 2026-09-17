@@ -1,119 +1,62 @@
 import { NextResponse } from "next/server";
-import { AcademicNotificationStore } from "@/lib/intelligence/academic/academicNotificationStore.js";
-import { AcademicNotificationOrchestrator } from "@/lib/intelligence/academic/academicNotificationOrchestrator.js";
+
+import { AcademicNotificationRepository } from "@/lib/server/database/AcademicNotificationRepository.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
-import { ObjectAuthorizer } from "@/lib/security/authorization/ObjectAuthorizer.js";
+import {
+  academicErrorResponse,
+  authenticatedOwnerId,
+  readJson,
+  requestId,
+} from "@/lib/server/academic/academicApi.js";
 
-async function getNotifications(request, routeParams, principal) {
+async function getNotifications(request, _routeContext, principal, securityContext) {
   try {
+    const owner = authenticatedOwnerId(principal);
     const { searchParams } = new URL(request.url);
-    const requestedStudentId = searchParams.get("studentId");
-    const studentId = principal.subjectId.replace("student:", "").trim();
-    if (requestedStudentId && requestedStudentId !== studentId) {
-      ObjectAuthorizer.assertAccess(principal, { studentId: requestedStudentId });
-    }
-    const status = searchParams.get("status") || null;
-    const unreadOnly = searchParams.get("unreadOnly") === "true";
-
-    const notifications = AcademicNotificationStore.getNotificationsByStudent(studentId, {
-      status,
-      unreadOnly,
-      excludeCancelled: true
+    const repository = new AcademicNotificationRepository();
+    const notifications = await repository.getNotificationsByStudent(owner, {
+      status: searchParams.get("status") || null,
+      unreadOnly: searchParams.get("unreadOnly") === "true",
+      excludeCancelled: true,
     });
-
-    const unreadCount = AcademicNotificationStore.countUnreadByStudent(studentId);
-
-    return NextResponse.json({
-      success: true,
-      studentId,
-      unreadCount,
-      notifications
-    });
-  } catch (err) {
-    if (err?.name === "SecurityError") throw err;
-    return NextResponse.json(
-      { success: false, message: "Không thể tải thông báo học vụ." },
-      { status: 400 }
-    );
+    const unreadCount = await repository.countUnreadByStudent(owner);
+    return NextResponse.json({ success: true, studentId: owner, unreadCount, notifications });
+  } catch (error) {
+    return academicErrorResponse(error, requestId(request, securityContext));
   }
 }
 
-async function updateNotification(request, routeParams, principal) {
+async function updateNotification(request, _routeContext, principal, securityContext) {
   try {
-    const body = await request.json();
-    const { action, notificationId, studentId: requestedStudentId, snoozeHours = 4 } = body || {};
-    const studentId = principal.subjectId.replace("student:", "").trim();
-
-    if (requestedStudentId && requestedStudentId !== studentId) {
-      ObjectAuthorizer.assertAccess(principal, { studentId: requestedStudentId });
-    }
-
-    if (!notificationId) {
-      return NextResponse.json(
-        { success: false, message: "Missing required notificationId." },
-        { status: 400 }
-      );
-    }
-
-    let updatedNotification = null;
-
-    switch (action) {
-      case "MARK_READ":
-        updatedNotification = AcademicNotificationOrchestrator.markAsRead(notificationId, studentId);
-        break;
-
-      case "ACKNOWLEDGE":
-        updatedNotification = AcademicNotificationOrchestrator.acknowledge(notificationId, studentId);
-        break;
-
-      case "SNOOZE":
-        updatedNotification = AcademicNotificationOrchestrator.snooze(notificationId, studentId, snoozeHours);
-        break;
-
-      case "DISMISS":
-        updatedNotification = AcademicNotificationOrchestrator.dismiss(notificationId, studentId);
-        break;
-
-      default:
-        return NextResponse.json(
-          { success: false, message: `Unsupported action: ${action}` },
-          { status: 400 }
-        );
-    }
-
-    const unreadCount = AcademicNotificationStore.countUnreadByStudent(studentId);
-
-    return NextResponse.json({
-      success: true,
-      notification: updatedNotification,
-      unreadCount
+    const body = await readJson(request);
+    const repository = new AcademicNotificationRepository();
+    const owner = authenticatedOwnerId(principal);
+    const notification = await repository.updateNotificationById(body.notificationId, owner, {
+      action: body.action,
+      snoozeHours: body.snoozeHours,
     });
-  } catch (err) {
-    if (err?.name === "SecurityError") throw err;
-    const status = err?.code === "FORBIDDEN" || err?.code === "OBJECT_NOT_OWNED" ? 403 : 400;
-    return NextResponse.json(
-      { success: false, message: "Không thể cập nhật thông báo học vụ." },
-      { status }
-    );
+    const unreadCount = await repository.countUnreadByStudent(owner);
+    return NextResponse.json({ success: true, notification, unreadCount });
+  } catch (error) {
+    return academicErrorResponse(error, requestId(request, securityContext));
   }
 }
 
-export const GET = SecurityFabric.wrapHandler(
-  {
-    action: "READ_ACADEMIC_NOTIFICATIONS",
-    requiredPermission: "ACADEMIC.READ_OWN",
-    requiredScopes: ["academic:read"],
-    allowAnonymous: false
-  },
-  getNotifications
-);
+export const GET = SecurityFabric.wrapHandler({
+  action: "READ_ACADEMIC_NOTIFICATIONS",
+  requiredPermission: "ACADEMIC.READ_OWN",
+  requiredScopes: ["academic:read"],
+  allowAnonymous: false,
+  maxRequests: 60,
+  maxBodyBytes: 0,
+}, getNotifications);
 
-export const POST = SecurityFabric.wrapHandler(
-  {
-    action: "UPDATE_ACADEMIC_NOTIFICATION",
-    requiredPermission: "ACADEMIC.PLAN_OWN",
-    requiredScopes: ["academic:plan"],
-    allowAnonymous: false
-  },
-  updateNotification
-);
+export const POST = SecurityFabric.wrapHandler({
+  action: "UPDATE_ACADEMIC_NOTIFICATION",
+  requiredPermission: "ACADEMIC.PLAN_OWN",
+  requiredScopes: ["academic:plan"],
+  allowAnonymous: false,
+  maxRequests: 60,
+  maxBodyBytes: 32 * 1024,
+}, updateNotification);
+

@@ -66,7 +66,7 @@ let SAFETY_REPORTS = [
     zoneName: "Thủ Đức - HCMUTE (TP.HCM)",
     address: "Hẻm 48 Hoàng Diệu 2, P. Linh Chiểu, TP. Thủ Đức",
     coordinates: { lat: 10.8524, lng: 106.7712 },
-    description: "Chủ nhà ký hợp đồng mẫu minh bạch, giá điện nước theo giá nhà nước, có camera an ninh 24/7 và cổng vân tay bảo mật.",
+    description: "Chủ nhà công khai điều khoản thuê minh bạch, giá điện nước theo giá nhà nước, có camera an ninh 24/7 và cổng vân tay bảo mật.",
     severity: "INFO",
     authorName: "Lê Quốc Bảo",
     authorRole: "student",

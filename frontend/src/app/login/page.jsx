@@ -151,9 +151,9 @@ const LoginPage = () => {
             <Sparkles className="h-7 w-7 text-teal-300" />
           </div>
         </div>
-        <h2 className="text-3xl font-extrabold font-human text-white tracking-tight">
+        <h1 className="text-3xl font-extrabold font-human text-white tracking-tight">
           Welcome Back
-        </h2>
+        </h1>
         <p className="mt-2 text-sm text-gray-400 font-medium font-human">
           Đăng nhập StudentHub AI để tiếp tục
         </p>

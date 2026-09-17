@@ -1,6 +1,6 @@
 {
   "benchmarkVersion": "2.0.0-fresh-holdout-historical-gold-derived",
-  "evaluatedAt": "2026-09-17T07:46:04.149Z",
+  "evaluatedAt": "2026-09-17T16:24:07.482Z",
   "totalQueries": 168,
   "evidenceClass": "RETRIEVAL_VALIDATION_V1",
   "releaseGateEligible": false,
@@ -12,13 +12,13 @@
       "sampleCount": 168,
       "recallAt1": {
         "mean": 0.0595,
-        "ci95Low": 0.0298,
+        "ci95Low": 0.0238,
         "ci95High": 0.0952
       },
       "recallAt3": {
         "mean": 0.125,
-        "ci95Low": 0.0774,
-        "ci95High": 0.1726
+        "ci95Low": 0.0714,
+        "ci95High": 0.1786
       },
       "recallAt5": {
         "mean": 0.1667,
@@ -27,18 +27,18 @@
       },
       "mrr": {
         "mean": 0.0965,
-        "ci95Low": 0.0586,
-        "ci95High": 0.1353
+        "ci95Low": 0.0606,
+        "ci95High": 0.1336
       },
       "ndcgAt5": {
         "mean": 0.8431,
-        "ci95Low": 0.8367,
-        "ci95High": 0.8498
+        "ci95Low": 0.8365,
+        "ci95High": 0.8504
       },
       "precisionAt5": {
         "mean": 0.0381,
         "ci95Low": 0.025,
-        "ci95High": 0.0512
+        "ci95High": 0.0524
       },
       "officialSourceHit": {
         "mean": 1,
@@ -92,7 +92,7 @@
       "precisionAt5": {
         "mean": 0.2286,
         "ci95Low": 0.219,
-        "ci95High": 0.2405
+        "ci95High": 0.2393
       },
       "officialSourceHit": {
         "mean": 1,
@@ -140,8 +140,8 @@
       },
       "ndcgAt5": {
         "mean": 0.9878,
-        "ci95Low": 0.981,
-        "ci95High": 0.9946
+        "ci95Low": 0.9816,
+        "ci95High": 0.9949
       },
       "precisionAt5": {
         "mean": 0.256,

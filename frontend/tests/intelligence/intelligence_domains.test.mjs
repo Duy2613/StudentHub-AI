@@ -5,7 +5,7 @@
  * 1. Source Registry & Provenance (Tier 1-4, 6-Question Provenance Model)
  * 2. HCMUTE Knowledge Graph & Academic Reasoning Engine (Prerequisite Cascade & GPA Trajectory)
  * 3. Document AI & Version Diff (v1 vs v2 diffing)
- * 4. Contract Intelligence (14 clauses, Labor & Civil Code risk flags)
+ * 4. Multimodal Fraud Intelligence (continued)
  * 5. Claim Verification & Conflict Engine (Abstaining on insufficient evidence)
  * 6. Threat Intelligence & Psychological Manipulation
  * 7. Cross-Modal Contradiction Engine (Brand vs Domain vs QR)
@@ -22,7 +22,6 @@ import { SOURCE_TIERS, evaluateDataProvenance, calculateFreshnessScore } from ".
 import { HCMUTE_UNIVERSITY_PROFILE } from "../../src/lib/intelligence/academic/hcmuteKnowledgeGraph.js";
 import { evaluatePrerequisiteCascade, calculateGpaTrajectory } from "../../src/lib/intelligence/academic/academicReasoningEngine.js";
 import { extractDocumentIntelligence, computeDocumentVersionDiff } from "../../src/lib/intelligence/document/documentVersionDiffEngine.js";
-import { analyzeContractIntelligence } from "../../src/lib/intelligence/contract/contractIntelligenceEngine.js";
 import { verifyFactualClaim, calculateEvidenceStrength } from "../../src/lib/intelligence/fusion/claimVerificationEngine.js";
 import { queryThreatIntelligence } from "../../src/lib/intelligence/fraud/threatIntelligenceFeed.js";
 import { analyzePsychologicalVectors } from "../../src/lib/intelligence/fraud/psychologicalManipulationEngine.js";
@@ -70,7 +69,7 @@ describe("Domain 1: Academic & University OS", () => {
   });
 });
 
-describe("Domain 2: Document & Contract Intelligence", () => {
+describe("Domain 2: Document Intelligence", () => {
   it("should compute Document Version Diff (v1 vs v2) with ADDED, REMOVED, MODIFIED", () => {
     const docV1 = extractDocumentIntelligence("Hạn chót đóng học phí là ngày 25/02/2026 cho sinh viên K22.", { title: "Công văn v1" });
     const docV2 = extractDocumentIntelligence("Hạn chót đóng học phí là ngày 15/03/2026 cho sinh viên K22 và K23.", { title: "Công văn v2" });
@@ -81,14 +80,6 @@ describe("Domain 2: Document & Contract Intelligence", () => {
     assert.ok(diff.diffItems.some((d) => d.changeType === "MODIFIED" || d.changeType === "ADDED"));
   });
 
-  it("should flag illegal ID retention and deposit traps under Labor Code 2019", () => {
-    const badContract = "Công ty tuyển dụng yêu cầu ứng viên nộp bản chính CCCD gốc và đặt cọc 500k tiền đồng phục.";
-    const analysis = analyzeContractIntelligence(badContract, "LABOR");
-
-    assert.strictEqual(analysis.overallRiskScore >= 80, true);
-    assert.ok(analysis.riskFlags.some((f) => f.id === "FLAG_ID_RETENTION"));
-    assert.ok(analysis.riskFlags.some((f) => f.id === "FLAG_LABOR_DEPOSIT"));
-  });
 });
 
 describe("Domain 3: Multimodal Fraud Intelligence & Evidence Fusion", () => {

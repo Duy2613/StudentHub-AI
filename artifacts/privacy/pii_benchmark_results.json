@@ -1,0 +1,69 @@
+{
+  "benchmarkVersion": "1.0.0",
+  "evaluatedAt": "2026-09-17T16:26:52.025Z",
+  "totalSamples": 1300,
+  "overallRecall": 1,
+  "overallPrecision": 1,
+  "criticalLeakageCount": 0,
+  "postRedactionPassRate": 1,
+  "categoryMetrics": {
+    "PHONE": {
+      "tp": 150,
+      "fp": 0,
+      "fn": 0,
+      "recall": 1,
+      "precision": 1
+    },
+    "EMAIL": {
+      "tp": 150,
+      "fp": 0,
+      "fn": 0,
+      "recall": 1,
+      "precision": 1
+    },
+    "STUDENT_ID": {
+      "tp": 150,
+      "fp": 0,
+      "fn": 0,
+      "recall": 1,
+      "precision": 1
+    },
+    "NATIONAL_ID": {
+      "tp": 150,
+      "fp": 0,
+      "fn": 0,
+      "recall": 1,
+      "precision": 1
+    },
+    "BANK_ACCOUNT": {
+      "tp": 150,
+      "fp": 0,
+      "fn": 0,
+      "recall": 1,
+      "precision": 1
+    },
+    "ADDRESS": {
+      "tp": 150,
+      "fp": 0,
+      "fn": 0,
+      "recall": 1,
+      "precision": 1
+    },
+    "QR": {
+      "tp": 100,
+      "fp": 0,
+      "fn": 0,
+      "recall": 1,
+      "precision": 1
+    },
+    "LOCATION_METADATA": {
+      "tp": 100,
+      "fp": 0,
+      "fn": 0,
+      "recall": 1,
+      "precision": 1
+    }
+  },
+  "storageAuthorizationMatrixPassed": true,
+  "status": "PRIVACY_PIPELINE_VERIFIED"
+}

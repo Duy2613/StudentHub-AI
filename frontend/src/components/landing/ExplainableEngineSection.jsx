@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Layers, ShieldCheck, Calendar, FileCheck2, ShieldAlert, Navigation, Radar, Sparkles } from "lucide-react";
+import { Layers, ShieldCheck, Calendar, ShieldAlert, Navigation, Radar, Sparkles } from "lucide-react";
 import TextScramble from "@/components/ui/TextScramble";
 
 export default function ExplainableEngineSection() {
@@ -17,16 +17,6 @@ export default function ExplainableEngineSection() {
       formula: "CSP(C, P, S, A) → Solved(0% Conflict) → Explain",
       metrics: "0ms Overlap • Backtracking Search • 100% Solved",
       color: "from-cyan-500 to-blue-500",
-    },
-    {
-      id: "contract",
-      title: "2. Bóc Tách Hợp Đồng",
-      icon: FileCheck2,
-      myth: "Upload PDF → GPT summary sơ sài",
-      reality: "PDF → OCR → layout → clause extraction → legal-source retrieval → version check → conflict check → risk analysis → cited explanation",
-      formula: "PDF → OCR(vie) → AST_Diff(v1, v2) → Law2019/2023",
-      metrics: "Điều 17 Luật LĐ • Điều 472 Luật Nhà ở • AST Diff",
-      color: "from-emerald-500 to-teal-500",
     },
     {
       id: "fraud",

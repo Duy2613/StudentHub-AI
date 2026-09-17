@@ -110,7 +110,7 @@ export function RealtimeProvider({ children }) {
     // for the server-owned application session prevents an EventSource page
     // error and reconnect loop during the auth bootstrap window.
     const requestedChannels = hasApplicationSession
-      ? ["system", "presence", "trust", "audit", "telemetry", "community", "expert"].join(",")
+      ? ["system", "presence", "trust", "audit", "telemetry", "community", "expert", "academic"].join(",")
       : "system";
     const cursor = lastSequenceRef.current > 0 ? `&cursor=${encodeURIComponent(lastSequenceRef.current)}` : "";
     const url = `/api/realtime/stream?clientId=${encodeURIComponent(clientIdRef.current)}&channels=${encodeURIComponent(requestedChannels)}${cursor}`;
@@ -168,6 +168,13 @@ export function RealtimeProvider({ children }) {
         handleAuditEvent(record);
         rememberEvent(record);
       } catch (error) { console.error("[Realtime] Error parsing audit event:", error); }
+    });
+
+    eventSource.addEventListener("academic:timetable.updated", (event) => {
+      try {
+        const record = JSON.parse(event.data);
+        rememberEvent(record);
+      } catch (error) { console.error("[Realtime] Error parsing academic timetable event:", error); }
     });
 
     eventSource.addEventListener("system:ping", (event) => {

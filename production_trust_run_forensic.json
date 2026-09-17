@@ -1,0 +1,2373 @@
+{
+  "productionUrl": "https://student-hub-ai-topaz.vercel.app",
+  "claim": "Đại học Bách Khoa Hà Nội có học bổng tài năng cho sinh viên xuất sắc.",
+  "startedAt": "2026-09-17T11:02:15.616Z",
+  "completedAt": "2026-09-17T11:02:54.093Z",
+  "durationMs": 38476,
+  "httpStatus": 200,
+  "response": {
+    "success": true,
+    "contractVersion": "trust.v5",
+    "requestId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+    "caseId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+    "caseRevision": null,
+    "runId": null,
+    "persistence": {
+      "persisted": false,
+      "idempotent": false
+    },
+    "version": "v5",
+    "demo": false,
+    "data": {
+      "schemaVersion": "trust.v5",
+      "pipelineVersion": "trust-pipeline-v5.0.0",
+      "requestId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+      "pipelineStatus": "COMPLETED",
+      "currentStage": "l5",
+      "stages": {
+        "l1": {
+          "schemaVersion": "trust.v5.stage.v1",
+          "requestId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+          "stageId": "l1",
+          "architecturalLayer": "L1",
+          "stageName": "LOCAL SECURITY",
+          "role": "Local Security Screening",
+          "checking": "Kiểm tra các thuộc tính kỹ thuật nhìn thấy trực tiếp trong input mà không tin provider bên ngoài.",
+          "operationStatus": "COMPLETED",
+          "finding": "LOCAL_CLEAR",
+          "severity": "INFO",
+          "startedAt": "2026-09-17T11:02:17.573Z",
+          "completedAt": "2026-09-17T11:02:17.583Z",
+          "latencyMs": 10,
+          "providerStatus": "LOCAL_DETERMINISTIC",
+          "providerErrorType": null,
+          "providerHttpStatus": null,
+          "providerId": "layer1_local_screen",
+          "modelId": null,
+          "modelVersion": "layer1-v1.0.0",
+          "confidence": 0.9,
+          "confidenceKind": "HEURISTIC_SCORE_NON_PROBABILISTIC",
+          "summary": "Layer 1 không thấy tín hiệu kỹ thuật bất thường đã biết trong input.",
+          "reasons": [],
+          "signals": [],
+          "evidenceRefs": [],
+          "meaning": "Đây chỉ là quan sát tất định trên input, dùng để định tuyến các bước tiếp theo.",
+          "notProve": "Kết quả sạch ở đây không chứng minh nội dung, URL hoặc người gửi an toàn.",
+          "limitations": [
+            "Chỉ quan sát input đã nhận; không xác minh danh tính, nguồn bên ngoài hoặc tính đúng của claim."
+          ],
+          "nextStage": "l2a",
+          "safeToContinue": true,
+          "userAction": "Không suy diễn SAFE từ kết quả cục bộ.",
+          "aiVerification": null,
+          "aiVerificationStatus": null,
+          "aiVerificationTransport": null,
+          "aiVerificationThinkingLevel": null,
+          "aiVerificationLatencyMs": null,
+          "aiVerificationErrorType": null,
+          "aiVerificationHttpStatus": null,
+          "aiRequestedPrimaryModel": null,
+          "aiExecutedModel": null,
+          "aiFallbackUsed": false,
+          "aiFallbackReason": null,
+          "aiProviderStatus": null,
+          "aiOperationStatus": null,
+          "aiModelTrace": [],
+          "aiCooldownResult": null,
+          "verificationPackage": null,
+          "verificationTaskSummary": null,
+          "audit": {
+            "attempt": 0,
+            "attemptCount": 0,
+            "errorCode": null,
+            "transition": "COMPLETED"
+          }
+        },
+        "l2a": {
+          "schemaVersion": "trust.v5.stage.v1",
+          "requestId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+          "stageId": "l2a",
+          "architecturalLayer": "L2A",
+          "stageName": "THREAT INTELLIGENCE",
+          "role": "Threat Intelligence",
+          "checking": "Phân loại disclosure URL bằng policy ALLOW/REDACT/SKIP rồi, nếu được phép, chỉ đối chiếu reputation; không fetch/render/execute target.",
+          "operationStatus": "COMPLETED",
+          "finding": "NOT_APPLICABLE",
+          "severity": "INFO",
+          "startedAt": "2026-09-17T11:02:17.588Z",
+          "completedAt": "2026-09-17T11:02:17.589Z",
+          "latencyMs": 1,
+          "providerStatus": "NOT_APPLICABLE",
+          "providerErrorType": null,
+          "providerHttpStatus": null,
+          "providerId": "studenthub_layer2_backend",
+          "modelId": null,
+          "modelVersion": null,
+          "confidence": null,
+          "confidenceKind": "NOT_DISCLOSED",
+          "summary": "Input không phải URL tương thích nên threat lookup không áp dụng.",
+          "reasons": [
+            "Reputation lookup reason: INVALID_URL"
+          ],
+          "signals": [
+            {
+              "signalId": "signal-1",
+              "code": "L2A_NOT_APPLICABLE",
+              "severity": "INFO",
+              "source": "studenthub_layer2_backend",
+              "details": "Finding của adapter: NOT_APPLICABLE."
+            }
+          ],
+          "evidenceRefs": [],
+          "meaning": "Không có kết quả provider đáng tin cậy để dùng làm clearance.",
+          "notProve": "NO_KNOWN_THREAT không phải là Verified Safe và không loại trừ mối đe dọa chưa biết.",
+          "limitations": [
+            "Phụ thuộc khả dụng, phạm vi và độ tươi của provider; lỗi/timeout luôn giữ UNKNOWN.",
+            "Private/local/link-local/metadata/SSRF-sensitive target bị SKIP và không tạo provider finding."
+          ],
+          "nextStage": "l2b",
+          "safeToContinue": true,
+          "userAction": "Chờ semantic/domain/evidence và policy; không gọi là Verified Safe.",
+          "aiVerification": null,
+          "aiVerificationStatus": null,
+          "aiVerificationTransport": null,
+          "aiVerificationThinkingLevel": null,
+          "aiVerificationLatencyMs": null,
+          "aiVerificationErrorType": null,
+          "aiVerificationHttpStatus": null,
+          "aiRequestedPrimaryModel": null,
+          "aiExecutedModel": null,
+          "aiFallbackUsed": false,
+          "aiFallbackReason": null,
+          "aiProviderStatus": null,
+          "aiOperationStatus": null,
+          "aiModelTrace": [],
+          "aiCooldownResult": null,
+          "verificationPackage": null,
+          "verificationTaskSummary": null,
+          "audit": {
+            "attempt": 0,
+            "attemptCount": 0,
+            "errorCode": null,
+            "transition": "COMPLETED"
+          }
+        },
+        "l2b": {
+          "schemaVersion": "trust.v5.stage.v1",
+          "requestId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+          "stageId": "l2b",
+          "architecturalLayer": "L2B",
+          "stageName": "SEMANTIC INTELLIGENCE",
+          "role": "Semantic Intelligence",
+          "checking": "Phân tích intent, claim, entity, urgency, payment/credential pressure và dấu hiệu thao túng.",
+          "operationStatus": "COMPLETED",
+          "finding": "SEMANTIC_SUSPICIOUS",
+          "severity": "HIGH",
+          "startedAt": "2026-09-17T11:02:17.590Z",
+          "completedAt": "2026-09-17T11:02:21.714Z",
+          "latencyMs": 4124,
+          "providerStatus": "MODEL_INCOMPATIBLE",
+          "providerErrorType": "MODEL_INCOMPATIBLE",
+          "providerHttpStatus": null,
+          "providerId": "ai_gateway_gemini_reasoning",
+          "modelId": null,
+          "modelVersion": null,
+          "confidence": 0.58,
+          "confidenceKind": "semantic_candidate_only",
+          "summary": "Semantic layer phát hiện SEMANTIC SUSPICIOUS cần đối chiếu.",
+          "reasons": [
+            "Phát hiện 1 phát ngôn / tuyên bố sự kiện cần kiểm chứng nguồn tin chính thức tại Layer 3.",
+            "Nội dung chứa 1 phát ngôn / thông cáo sự kiện quan trọng cần đối chiếu nguồn tin chính thống tại Layer 3."
+          ],
+          "signals": [
+            {
+              "signalId": "signal-1",
+              "code": "benign_brand_mention",
+              "severity": "INFO",
+              "source": "ai_candidate_semantic_signal",
+              "details": "Đề cập thương hiệu hợp lệ trong ngữ cảnh thông tin trung tính không có hành vi lừa đảo."
+            },
+            {
+              "signalId": "signal-2",
+              "code": "CLAIMS_EXTRACTED",
+              "severity": "INFO",
+              "source": "layer2b_semantic",
+              "details": "1 claim(s), 1 entity(ies) được bóc tách; đều là dữ liệu chưa xác minh."
+            }
+          ],
+          "evidenceRefs": [],
+          "meaning": "Layer 2B mô tả intent/claim/context để lập verification task; nó không phải threat-intelligence fact hay final policy.",
+          "notProve": "Phân tích ngữ nghĩa không tự tạo THREAT_MATCH, không chứng minh sự thật và không cấp SAFE.",
+          "limitations": [
+            "Tín hiệu semantic là advisory; nội dung ngoài phạm vi, provider lỗi hoặc prompt injection có thể yêu cầu review."
+          ],
+          "nextStage": "l2c",
+          "safeToContinue": true,
+          "userAction": "Đọc claim như dữ liệu chưa xác minh; chờ domain và evidence.",
+          "aiVerification": null,
+          "aiVerificationStatus": null,
+          "aiVerificationTransport": null,
+          "aiVerificationThinkingLevel": null,
+          "aiVerificationLatencyMs": null,
+          "aiVerificationErrorType": null,
+          "aiVerificationHttpStatus": null,
+          "aiRequestedPrimaryModel": null,
+          "aiExecutedModel": null,
+          "aiFallbackUsed": false,
+          "aiFallbackReason": null,
+          "aiProviderStatus": null,
+          "aiOperationStatus": null,
+          "aiModelTrace": [],
+          "aiCooldownResult": null,
+          "verificationPackage": null,
+          "verificationTaskSummary": null,
+          "audit": {
+            "attempt": 0,
+            "attemptCount": 0,
+            "errorCode": null,
+            "transition": "COMPLETED"
+          }
+        },
+        "l2c": {
+          "schemaVersion": "trust.v5.stage.v1",
+          "requestId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+          "stageId": "l2c",
+          "architecturalLayer": "L2C",
+          "stageName": "STUDENTHUB DOMAIN AI",
+          "role": "StudentHub Domain Risk Model",
+          "checking": "So khớp pattern lừa đảo/thao túng đặc thù đời sống sinh viên Việt Nam bằng baseline có version và tạo verification task candidate-only cho L3.",
+          "operationStatus": "COMPLETED",
+          "finding": "NO_MATERIAL_STUDENT_RISK",
+          "severity": "INFO",
+          "startedAt": "2026-09-17T11:02:21.714Z",
+          "completedAt": "2026-09-17T11:02:21.720Z",
+          "latencyMs": 6,
+          "providerStatus": "BASELINE_RULE_MODEL",
+          "providerErrorType": null,
+          "providerHttpStatus": null,
+          "providerId": "student_domain_intelligence",
+          "modelId": "BASELINE_RULE_MODEL",
+          "modelVersion": "studenthub-domain-rule-baseline-1.0.0",
+          "confidence": null,
+          "confidenceKind": "MODEL_SCORE_UNCALIBRATED",
+          "summary": "Baseline chưa thấy pattern rủi ro sinh viên đặc thù đủ mạnh.",
+          "reasons": [
+            "Baseline không thấy pattern rủi ro sinh viên đặc thù đủ mạnh trong input."
+          ],
+          "signals": [
+            {
+              "signalId": "signal-1",
+              "code": "MODEL_SCORE",
+              "severity": "INFO",
+              "source": "student_domain_intelligence",
+              "details": "MODEL_SCORE=0; calibration=NOT_CALIBRATED; đây không phải probability."
+            }
+          ],
+          "evidenceRefs": [],
+          "meaning": "Không thấy pattern domain không đồng nghĩa với nội dung an toàn.",
+          "notProve": "MODEL_SCORE chưa hiệu chuẩn không phải xác suất; L2C không thể clear L1/L2A hard negative hoặc thay L4.",
+          "limitations": [
+            "Runtime hiện là baseline rule model; chưa có artifact fine-tuned và không thay thế bằng chứng/Chính sách L4.",
+            "Verification package chỉ là yêu cầu kiểm tra, không phải evidence hoặc citation.",
+            "Đây là baseline rule model, không phải model đã fine-tune.",
+            "MODEL_SCORE chưa được hiệu chuẩn nên không phải xác suất.",
+            "Pattern domain chỉ là tín hiệu advisory; không thể xóa hard negative hoặc quyết định policy.",
+            "Instruction-like content được cách ly; model không coi nội dung đó là lệnh hệ thống."
+          ],
+          "nextStage": "l3",
+          "safeToContinue": true,
+          "userAction": "Vẫn chờ evidence và policy; không gọi là SAFE.",
+          "aiVerification": null,
+          "aiVerificationStatus": null,
+          "aiVerificationTransport": null,
+          "aiVerificationThinkingLevel": null,
+          "aiVerificationLatencyMs": null,
+          "aiVerificationErrorType": null,
+          "aiVerificationHttpStatus": null,
+          "aiRequestedPrimaryModel": null,
+          "aiExecutedModel": null,
+          "aiFallbackUsed": false,
+          "aiFallbackReason": null,
+          "aiProviderStatus": null,
+          "aiOperationStatus": null,
+          "aiModelTrace": [],
+          "aiCooldownResult": null,
+          "verificationPackage": {
+            "schemaVersion": "l2c.verification.v1",
+            "status": "NOT_REQUIRED",
+            "domainClaims": [],
+            "verificationTasks": [],
+            "candidateSourcePurposes": [],
+            "evidenceRequirements": [],
+            "candidateOnly": true,
+            "inputTrust": "UNTRUSTED_MODEL_OUTPUT"
+          },
+          "verificationTaskSummary": null,
+          "audit": {
+            "attempt": 0,
+            "attemptCount": 0,
+            "errorCode": null,
+            "transition": "COMPLETED"
+          }
+        },
+        "l3": {
+          "schemaVersion": "trust.v5.stage.v1",
+          "requestId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+          "stageId": "l3",
+          "architecturalLayer": "L3",
+          "stageName": "EVIDENCE & PROVENANCE",
+          "role": "Evidence & Provenance",
+          "checking": "Đánh giá nguồn, quan hệ hỗ trợ/mâu thuẫn, freshness, authority, independence và completeness; merge task L2B với yêu cầu xác minh L2C.",
+          "operationStatus": "COMPLETED",
+          "finding": "INSUFFICIENT",
+          "severity": "MEDIUM",
+          "startedAt": "2026-09-17T11:02:21.721Z",
+          "completedAt": "2026-09-17T11:02:47.538Z",
+          "latencyMs": 25817,
+          "providerStatus": "SUCCESS",
+          "providerErrorType": null,
+          "providerHttpStatus": null,
+          "providerId": "tavily_evidence_retriever",
+          "modelId": null,
+          "modelVersion": null,
+          "confidence": 0,
+          "confidenceKind": "EVIDENCE_COMPLETENESS_SCORE_NON_PROBABILISTIC",
+          "summary": "Chưa có đủ evidence độc lập và current để xác minh claim.",
+          "reasons": [
+            "EXTERNAL_RETRIEVER",
+            "SUCCESS"
+          ],
+          "signals": [
+            {
+              "signalId": "signal-1",
+              "code": "SOURCES_CHECKED",
+              "severity": "INFO",
+              "source": "layer3_provenance",
+              "details": "18 source(s), 0 evidence item(s)."
+            },
+            {
+              "signalId": "signal-2",
+              "code": "LOCAL_KNOWLEDGE_BASE_OR_FALLBACK",
+              "severity": "HIGH",
+              "source": "layer3_provenance",
+              "details": "Local/fallback không được label externally verified."
+            },
+            {
+              "signalId": "signal-3",
+              "code": "L2C_EVIDENCE_BRIDGE",
+              "severity": "HIGH",
+              "source": "l2c_l3_bridge",
+              "details": "2 verification task(s) được merge; L2C output vẫn là candidate-only."
+            }
+          ],
+          "evidenceRefs": [],
+          "meaning": "Layer 3 mô tả provenance, authority, freshness và independence của nguồn; model-generated explanation không phải evidence.",
+          "notProve": "Giải thích do model sinh ra không phải evidence; local KB không phải xác minh bên ngoài.",
+          "limitations": [
+            "Thiếu nguồn, nguồn stale, trùng lineage hoặc retrieval outage làm giảm completeness và không được nâng confidence.",
+            "Task từ L2C không tự tạo source, evidence hoặc citation."
+          ],
+          "nextStage": "l4",
+          "safeToContinue": true,
+          "userAction": "Xem nguồn/claim cụ thể trước khi hành động.",
+          "aiVerification": null,
+          "aiVerificationStatus": null,
+          "aiVerificationTransport": null,
+          "aiVerificationThinkingLevel": null,
+          "aiVerificationLatencyMs": null,
+          "aiVerificationErrorType": null,
+          "aiVerificationHttpStatus": null,
+          "aiRequestedPrimaryModel": null,
+          "aiExecutedModel": null,
+          "aiFallbackUsed": false,
+          "aiFallbackReason": null,
+          "aiProviderStatus": null,
+          "aiOperationStatus": null,
+          "aiModelTrace": [],
+          "aiCooldownResult": null,
+          "verificationPackage": null,
+          "verificationTaskSummary": {
+            "totalTasks": 2,
+            "l2bTaskCount": 2,
+            "l2cTaskCount": 0,
+            "deduplicatedCount": 0,
+            "highImpactTaskCount": 2,
+            "tasksWithQueries": 0,
+            "tasksWithoutQueries": 2
+          },
+          "audit": {
+            "attempt": 0,
+            "attemptCount": 0,
+            "errorCode": null,
+            "transition": "COMPLETED"
+          }
+        },
+        "l4": {
+          "schemaVersion": "trust.v5.stage.v1",
+          "requestId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+          "stageId": "l4",
+          "architecturalLayer": "L4",
+          "stageName": "FINAL POLICY",
+          "role": "Deterministic Trust Policy",
+          "checking": "Áp dụng precedence tất định lên toàn bộ signal/evidence để tách SECURITY, TRUTH và ENFORCEMENT.",
+          "operationStatus": "COMPLETED",
+          "finding": "UNKNOWN",
+          "severity": "INFO",
+          "startedAt": "2026-09-17T11:02:47.539Z",
+          "completedAt": "2026-09-17T11:02:53.693Z",
+          "latencyMs": 6154,
+          "providerStatus": "GEMINI_VERIFIED",
+          "providerErrorType": null,
+          "providerHttpStatus": 200,
+          "providerId": "google",
+          "modelId": "gemini-3.6-flash",
+          "modelVersion": "gemini-3.6-flash",
+          "confidence": 0.08,
+          "confidenceKind": "DETERMINISTIC_POLICY_SCORE_NON_PROBABILISTIC",
+          "summary": "L4 quyết định SECURITY=UNKNOWN, TRUTH=INSUFFICIENT_EVIDENCE, ENFORCEMENT=REVIEW.",
+          "reasons": [
+            "Chưa có đủ bằng chứng độc lập và có provenance để kết luận an toàn. Không nên coi trạng thái này là an toàn."
+          ],
+          "signals": [
+            {
+              "signalId": "signal-1",
+              "code": "SECURITY_AXIS",
+              "severity": "INFO",
+              "source": "layer4_deterministic_policy",
+              "details": "UNKNOWN"
+            },
+            {
+              "signalId": "signal-2",
+              "code": "TRUTH_AXIS",
+              "severity": "INFO",
+              "source": "layer4_deterministic_policy",
+              "details": "INSUFFICIENT_EVIDENCE"
+            },
+            {
+              "signalId": "signal-3",
+              "code": "ENFORCEMENT_AXIS",
+              "severity": "HIGH",
+              "source": "layer4_deterministic_policy",
+              "details": "REVIEW"
+            }
+          ],
+          "evidenceRefs": [],
+          "meaning": "L4 tách riêng security, truth và action; UNKNOWN/thiếu evidence phải REVIEW.",
+          "notProve": "Quyết định policy không biến NO_KNOWN_THREAT thành chứng nhận an toàn tuyệt đối.",
+          "limitations": [
+            "Đây là quyết định bảo vệ và hành động theo evidence hiện có; UNKNOWN/thiếu evidence vẫn cần REVIEW."
+          ],
+          "nextStage": "l5",
+          "safeToContinue": true,
+          "userAction": "Tạm dừng và xác minh qua nguồn độc lập.",
+          "aiVerification": {
+            "verdictSignal": "UNCERTAIN",
+            "supportReasons": [],
+            "contradictionReasons": [],
+            "missingEvidence": [
+              "Thiếu dữ liệu và bằng chứng độc lập có nguồn gốc xác thực (provenance) để đánh giá."
+            ],
+            "uncertainty": "Chưa có đủ bằng chứng độc lập và có provenance để kết luận an toàn. Không nên coi trạng thái này là an toàn.",
+            "citationsUsed": [],
+            "provider": "google",
+            "model": "gemini-3.6-flash"
+          },
+          "aiVerificationStatus": "VERIFIED",
+          "aiVerificationTransport": "interactions",
+          "aiVerificationThinkingLevel": "low",
+          "aiVerificationLatencyMs": 6148,
+          "aiVerificationErrorType": null,
+          "aiVerificationHttpStatus": 200,
+          "aiRequestedPrimaryModel": "gemini-3.8-flash",
+          "aiExecutedModel": "gemini-3.6-flash",
+          "aiFallbackUsed": true,
+          "aiFallbackReason": "PRIMARY_TIMEOUT",
+          "aiProviderStatus": "SUCCESS",
+          "aiOperationStatus": "COMPLETED",
+          "aiModelTrace": [
+            {
+              "model": "gemini-3.8-flash",
+              "attemptNumber": 1,
+              "startedAt": "2026-09-17T11:02:47.544Z",
+              "durationMs": 3201,
+              "httpStatus": null,
+              "providerErrorCode": "ATTEMPT_TIMEOUT",
+              "result": "TIMEOUT"
+            },
+            {
+              "model": "gemini-3.7-flash",
+              "attemptNumber": 2,
+              "startedAt": "2026-09-17T11:02:50.745Z",
+              "durationMs": 0,
+              "httpStatus": null,
+              "providerErrorCode": "BUDGET_RESERVED_FOR_HEALTHY_CANDIDATE",
+              "result": "BUDGET_EXHAUSTED"
+            },
+            {
+              "model": "gemini-3.6-flash",
+              "attemptNumber": 3,
+              "startedAt": "2026-09-17T11:02:50.745Z",
+              "durationMs": 2946,
+              "httpStatus": 200,
+              "providerErrorCode": null,
+              "result": "SUCCESS"
+            }
+          ],
+          "aiCooldownResult": {
+            "skippedModels": [],
+            "cooldownModels": [],
+            "activeCooldowns": []
+          },
+          "verificationPackage": null,
+          "verificationTaskSummary": null,
+          "audit": {
+            "attempt": 0,
+            "attemptCount": 0,
+            "errorCode": null,
+            "transition": "COMPLETED"
+          }
+        },
+        "l5": {
+          "schemaVersion": "trust.v5.stage.v1",
+          "requestId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+          "stageId": "l5",
+          "architecturalLayer": "L5",
+          "stageName": "ASSURANCE AUDIT",
+          "role": "Adversarial Assurance",
+          "checking": "Kiểm tra mất hard negative, failure-induced optimism, evidence concentration, stale/conflict, stage skip và overconfidence.",
+          "operationStatus": "COMPLETED",
+          "finding": "ASSURANCE_PASS",
+          "severity": "INFO",
+          "startedAt": "2026-09-17T11:02:53.694Z",
+          "completedAt": "2026-09-17T11:02:53.696Z",
+          "latencyMs": 2,
+          "providerStatus": "NOT_CONFIGURED",
+          "providerErrorType": null,
+          "providerHttpStatus": null,
+          "providerId": "adversarial_assurance_auditor",
+          "modelId": null,
+          "modelVersion": "trust-assurance-v5.0.0",
+          "confidence": null,
+          "confidenceKind": "NOT_CALIBRATED_ASSURANCE_RESULT",
+          "summary": "Assurance không phát hiện anomaly trong các kiểm tra đã khai báo.",
+          "reasons": [
+            "Deterministic assurance checks passed; L5 giữ nguyên quyết định L4 và không nâng safety."
+          ],
+          "signals": [
+            {
+              "signalId": "signal-1",
+              "code": "AI_ASSURANCE_STATUS",
+              "severity": "INFO",
+              "source": "layer5_assurance",
+              "details": "NOT_CONFIGURED"
+            }
+          ],
+          "evidenceRefs": [],
+          "meaning": "Chỉ giữ nguyên L4; không nâng safety.",
+          "notProve": "ASSURANCE_PASS chỉ nói audit không thấy lỗi đã kiểm tra; không nâng safety và không thay thế L4.",
+          "limitations": [
+            "Assurance chỉ bao phủ các kiểm tra deterministic đã khai báo; dữ liệu ngoài phạm vi vẫn có thể chưa được phát hiện."
+          ],
+          "nextStage": null,
+          "safeToContinue": true,
+          "userAction": "Vẫn tuân theo SECURITY/TRUTH/ENFORCEMENT của L4.",
+          "aiVerification": null,
+          "aiVerificationStatus": null,
+          "aiVerificationTransport": null,
+          "aiVerificationThinkingLevel": null,
+          "aiVerificationLatencyMs": null,
+          "aiVerificationErrorType": null,
+          "aiVerificationHttpStatus": null,
+          "aiRequestedPrimaryModel": null,
+          "aiExecutedModel": null,
+          "aiFallbackUsed": false,
+          "aiFallbackReason": null,
+          "aiProviderStatus": null,
+          "aiOperationStatus": null,
+          "aiModelTrace": [],
+          "aiCooldownResult": null,
+          "verificationPackage": null,
+          "verificationTaskSummary": null,
+          "audit": {
+            "attempt": 0,
+            "attemptCount": 0,
+            "errorCode": null,
+            "transition": "COMPLETED"
+          }
+        }
+      },
+      "finalDecision": {
+        "security": "UNKNOWN",
+        "truth": "INSUFFICIENT_EVIDENCE",
+        "action": "REVIEW",
+        "securityClassification": "UNKNOWN",
+        "truthStatus": "INSUFFICIENT_EVIDENCE",
+        "enforcement": "REVIEW",
+        "presentedTruthStatus": "INSUFFICIENT_EVIDENCE",
+        "presentedEnforcement": "REVIEW",
+        "l4Decision": {
+          "security": "UNKNOWN",
+          "truth": "INSUFFICIENT_EVIDENCE",
+          "action": "REVIEW"
+        },
+        "assuranceStatus": "ASSURANCE_PASS",
+        "assuranceApplied": false,
+        "decisionAuthority": "L4_DETERMINISTIC_POLICY",
+        "assuranceAuthority": "L5_DOWNGRADE_ONLY",
+        "isHardNegative": false
+      },
+      "startedAt": "2026-09-17T11:02:17.572Z",
+      "completedAt": "2026-09-17T11:02:53.696Z",
+      "verificationId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+      "mode": "LIVE",
+      "state": "COMPLETED",
+      "input": {
+        "type": "text",
+        "contentLength": 69
+      },
+      "layers": [
+        {
+          "stageId": "l1",
+          "operationStatus": "COMPLETED",
+          "finding": "LOCAL_CLEAR",
+          "summary": "Layer 1 không thấy tín hiệu kỹ thuật bất thường đã biết trong input.",
+          "providerStatus": "LOCAL_DETERMINISTIC",
+          "providerId": "layer1_local_screen",
+          "completedAt": "2026-09-17T11:02:17.583Z",
+          "evidenceRefs": []
+        },
+        {
+          "stageId": "l2a",
+          "operationStatus": "COMPLETED",
+          "finding": "NOT_APPLICABLE",
+          "summary": "Input không phải URL tương thích nên threat lookup không áp dụng.",
+          "providerStatus": "NOT_APPLICABLE",
+          "providerId": "studenthub_layer2_backend",
+          "completedAt": "2026-09-17T11:02:17.589Z",
+          "evidenceRefs": []
+        },
+        {
+          "stageId": "l2b",
+          "operationStatus": "COMPLETED",
+          "finding": "SEMANTIC_SUSPICIOUS",
+          "summary": "Semantic layer phát hiện SEMANTIC SUSPICIOUS cần đối chiếu.",
+          "providerStatus": "MODEL_INCOMPATIBLE",
+          "providerId": "ai_gateway_gemini_reasoning",
+          "completedAt": "2026-09-17T11:02:21.714Z",
+          "evidenceRefs": []
+        },
+        {
+          "stageId": "l2c",
+          "operationStatus": "COMPLETED",
+          "finding": "NO_MATERIAL_STUDENT_RISK",
+          "summary": "Baseline chưa thấy pattern rủi ro sinh viên đặc thù đủ mạnh.",
+          "providerStatus": "BASELINE_RULE_MODEL",
+          "providerId": "student_domain_intelligence",
+          "completedAt": "2026-09-17T11:02:21.720Z",
+          "evidenceRefs": []
+        },
+        {
+          "stageId": "l3",
+          "operationStatus": "COMPLETED",
+          "finding": "INSUFFICIENT",
+          "summary": "Chưa có đủ evidence độc lập và current để xác minh claim.",
+          "providerStatus": "SUCCESS",
+          "providerId": "tavily_evidence_retriever",
+          "completedAt": "2026-09-17T11:02:47.538Z",
+          "evidenceRefs": []
+        },
+        {
+          "stageId": "l4",
+          "operationStatus": "COMPLETED",
+          "finding": "UNKNOWN",
+          "summary": "L4 quyết định SECURITY=UNKNOWN, TRUTH=INSUFFICIENT_EVIDENCE, ENFORCEMENT=REVIEW.",
+          "providerStatus": "GEMINI_VERIFIED",
+          "providerId": "google",
+          "completedAt": "2026-09-17T11:02:53.693Z",
+          "evidenceRefs": []
+        }
+      ],
+      "decision": {
+        "verdict": "UNKNOWN",
+        "risk": "LOW",
+        "decisionConfidence": 0.08,
+        "evidenceCoverage": 0,
+        "sourceAgreement": null,
+        "unresolvedSignals": [
+          "Deterministic assurance checks passed; L5 giữ nguyên quyết định L4 và không nâng safety.",
+          "Bằng chứng hiện có chưa đủ để kết luận đáng tin cậy."
+        ],
+        "recommendedAction": "REVIEW"
+      },
+      "evidence": [
+        {
+          "id": "l3:tavily-1-1",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "Học bổng tài năng: Phần thưởng dành cho những sinh viên ...",
+          "source": {
+            "id": "tavily-1-1",
+            "url": "https://ts.hust.edu.vn/tin-tuc/hoc-bong-tai-nang-phan-thuong-danh-cho-nhung-sinh-vien-dac-biet-xuat-sac",
+            "title": "Học bổng tài năng: Phần thưởng dành cho những sinh viên ..."
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:32.030Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "TIMEOUT",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-1-1",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-1-2",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "Chương trình học bổng \"Sinh viên tài năng\"",
+          "source": {
+            "id": "tavily-1-2",
+            "url": "https://btec.bkacad.edu.vn/chuong-trinh-hoc-bong--sinh-vien-tai-nang--c328.html",
+            "title": "Chương trình học bổng \"Sinh viên tài năng\""
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:33.410Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-1-2",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-1-3",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "ĐH Bách Khoa Hà Nội dành nhiều ưu đãi cho kỹ sư tài năng",
+          "source": {
+            "id": "tavily-1-3",
+            "url": "https://nhandan.vn/dh-bach-khoa-ha-noi-danh-nhieu-uu-dai-cho-ky-su-tai-nang-post479938.html",
+            "title": "ĐH Bách Khoa Hà Nội dành nhiều ưu đãi cho kỹ sư tài năng"
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:34.629Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-1-3",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-1-4",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "Bách khoa Hà Nội công bố 55 chương trình cấp học bổng ...",
+          "source": {
+            "id": "tavily-1-4",
+            "url": "https://vnexpress.net/danh-sach-55-chuong-trinh-dao-tao-dai-hoc-bach-khoa-ha-noi-duoc-cap-hoc-bong-3-7-5-5-trieu-dong-theo-nghi-dinh-179-5092505.html",
+            "title": "Bách khoa Hà Nội công bố 55 chương trình cấp học bổng ..."
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:36.105Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-1-4",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-1-5",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "🌟 Sinh viên tốt nghiệp Bách khoa Hà Nội tiếp tục khẳng ...",
+          "source": {
+            "id": "tavily-1-5",
+            "url": "https://www.facebook.com/dhbkhanoi/posts/-sinh-vi%C3%AAn-t%E1%BB%91t-nghi%E1%BB%87p-b%C3%A1ch-khoa-h%C3%A0-n%E1%BB%99i-ti%E1%BA%BFp-t%E1%BB%A5c-kh%E1%BA%B3ng-%C4%91%E1%BB%8Bnh-n%C4%83ng-l%E1%BB%B1c-v%E1%BB%9Bi-h%E1%BB%8Dc-b%E1%BB%95ng/1364946622425851",
+            "title": "🌟 Sinh viên tốt nghiệp Bách khoa Hà Nội tiếp tục khẳng ..."
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:36.219Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-1-5",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-2-1",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "Học bổng sinh viên ĐHBK Hà Nội: Quy định và thông tin chi tiết - Studocu",
+          "source": {
+            "id": "tavily-2-1",
+            "url": "https://www.studocu.vn/vn/document/truong-dai-hoc-bach-khoa-ha-noi/triet-hoc-mac-lenin/hoc-bong-sinh-vien-dhbk-ha-noi-quy-dinh-va-thong-tin-chi-tiet/149766441",
+            "title": "Học bổng sinh viên ĐHBK Hà Nội: Quy định và thông tin chi tiết - Studocu"
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:36.273Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "UNAVAILABLE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-2-1",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-2-2",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "16K views · 106 reactions | 🔥𝐂𝐡𝐮𝐨̂̃𝐢 𝐛𝐚̀𝐢 𝐯𝐞̂̀ 𝐓𝐮𝐲𝐞̂̉𝐧 𝐬𝐢𝐧𝐡 Đ𝐇 𝐁𝐚́𝐜𝐡 𝐊𝐡𝐨𝐚 𝐇𝐍 (𝐇𝐔𝐒𝐓) ☘️𝐁𝐚̀𝐢 4: XÉT TUYỂN THEO HỒ SƠ NĂNG LỰC KẾT HỢP PHỎNG VẤN  (Diện 1.3 trong Phương thức xét tuyển Tài năng)  Đây là phư",
+          "source": {
+            "id": "tavily-2-2",
+            "url": "https://www.facebook.com/le.vinh.921/posts/%F0%9D%90%82%F0%9D%90%A1%F0%9D%90%AE%F0%9D%90%A8%CC%82%CC%83%F0%9D%90%A2-%F0%9D%90%9B%F0%9D%90%9A%CC%80%F0%9D%90%A2-%F0%9D%90%AF%F0%9D%90%9E%CC%82%CC%80-%F0%9D%90%93%F0%9D%90%AE%F0%9D%90%B2%F0%9D%90%9E%CC%82%CC%89%F0%9D%90%A7-%F0%9D%90%AC%F0%9D%90%A2%F0%9D%90%A7%F0%9D%90%A1-%C4%91%F0%9D%90%87-%F0%9D%90%81%F0%9D%90%9A%CC%81%F0%9D%90%9C%F0%9D%90%A1-%F0%9D%90%8A%F0%9D%90%A1%F0%9D%90%A8%F0%9D%90%9A-%F0%9D%90%87%F0%9D%90%8D-%F0%9D%90%87%F0%9D%90%94%F0%9D%90%92%F0%9D%90%93%EF%B8%8F%F0%9D%90%81%F0%9D%90%9A%CC%80%F0%9D%90%A2-4-x%C3%A9t-tuy%E1%BB%83n-theo-h%E1%BB%93-s%C6%A1/10163900538074696",
+            "title": "16K views · 106 reactions | 🔥𝐂𝐡𝐮𝐨̂̃𝐢 𝐛𝐚̀𝐢 𝐯𝐞̂̀ 𝐓𝐮𝐲𝐞̂̉𝐧 𝐬𝐢𝐧𝐡 Đ𝐇 𝐁𝐚́𝐜𝐡 𝐊𝐡𝐨𝐚 𝐇𝐍 (𝐇𝐔𝐒𝐓) ☘️𝐁𝐚̀𝐢 4: XÉT TUYỂN THEO HỒ SƠ NĂNG LỰC KẾT HỢP PHỎNG VẤN  (Diện 1.3 trong Phương thức xét tuyển Tài năng)  Đây là phư"
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:36.551Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-2-2",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-2-3",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "Học Bổng Dành Cho Tân Sinh Viên K70 Tại HUST",
+          "source": {
+            "id": "tavily-2-3",
+            "url": "https://www.tiktok.com/@bachkhoahanoi_hust/video/7552876191137533192",
+            "title": "Học Bổng Dành Cho Tân Sinh Viên K70 Tại HUST"
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:36.899Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-2-3",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-2-4",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "Trường đại học trao học bổng hàng chục tỉ đồng cho sinh ...",
+          "source": {
+            "id": "tavily-2-4",
+            "url": "https://laodong.vn/giao-duc/truong-dai-hoc-trao-hoc-bong-hang-chuc-ti-dong-cho-sinh-vien-1193285.ldo",
+            "title": "Trường đại học trao học bổng hàng chục tỉ đồng cho sinh ..."
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:37.915Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-2-4",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-2-5",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "Thông báo nhận hồ sơ học bổng Sau đại học của Đại học ...",
+          "source": {
+            "id": "tavily-2-5",
+            "url": "https://www.facebook.com/groups/464095635569608/posts/984812790164554",
+            "title": "Thông báo nhận hồ sơ học bổng Sau đại học của Đại học ..."
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:38.115Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-2-5",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-3-1",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "Chi tiết 55 Chương trình đào tạo tại Bách khoa Hà Nội nhận ...",
+          "source": {
+            "id": "tavily-3-1",
+            "url": "https://ts.hust.edu.vn/tin-tuc/chi-tiet-55-chuong-trinh-dao-tao-tai-bach-khoa-ha-noi-nhan-hoc-bong-chinh-phu-theo-nghi-dinh-179",
+            "title": "Chi tiết 55 Chương trình đào tạo tại Bách khoa Hà Nội nhận ..."
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:41.617Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "TIMEOUT",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-3-1",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-3-3",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "ĐHBK Hà Nội và trường ĐH Plymouth Marjon (Anh) rất vui ...",
+          "source": {
+            "id": "tavily-3-3",
+            "url": "https://www.facebook.com/sofl.at.hust/posts/-th%C3%B4ng-b%C3%A1o-ch%C6%B0%C6%A1ng-tr%C3%ACnh-h%E1%BB%8Dc-b%E1%BB%95ng-trao-%C4%91%E1%BB%95i-sinh-vi%C3%AAn-ipe-t%E1%BA%A1i-v%C6%B0%C6%A1ng-qu%E1%BB%91c-anh-n%C4%83m-h/1410101690924119",
+            "title": "ĐHBK Hà Nội và trường ĐH Plymouth Marjon (Anh) rất vui ..."
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:41.817Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-3-3",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-3-5",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "THÔNG BÁO VỀ KẾT QUẢ ĐÁNH GIÁ ĐIỀU KIỆN ĐƯỢC XÉT ...",
+          "source": {
+            "id": "tavily-3-5",
+            "url": "https://www.facebook.com/ictsv.hust/posts/th%C3%B4ng-b%C3%A1o-v%E1%BB%81-k%E1%BA%BFt-qu%E1%BA%A3-%C4%91%C3%A1nh-gi%C3%A1-%C4%91i%E1%BB%81u-ki%E1%BB%87n-%C4%91%C6%B0%E1%BB%A3c-x%C3%A9t-h%E1%BB%8Dc-b%E1%BB%95ng-k%E1%BB%B3-20252-hi%E1%BB%87n-t%E1%BA%A1i-%C4%91%C3%A3-c/1305876064980871",
+            "title": "THÔNG BÁO VỀ KẾT QUẢ ĐÁNH GIÁ ĐIỀU KIỆN ĐƯỢC XÉT ..."
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:41.992Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-3-5",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-4-1",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "CẢNH BÁO VỀ LỪA ĐẢO... - Khoa Toán-Tin, Đại học Bách khoa HN",
+          "source": {
+            "id": "tavily-4-1",
+            "url": "https://www.facebook.com/FaMIHUST/posts/c%E1%BA%A3nh-b%C3%A1o-v%E1%BB%81-l%E1%BB%ABa-%C4%91%E1%BA%A3o-li%C3%AAn-quan-%C4%91%E1%BA%BFn-trao-%C4%91%E1%BB%95i-sinh-vi%C3%AAn/1271841944968233",
+            "title": "CẢNH BÁO VỀ LỪA ĐẢO... - Khoa Toán-Tin, Đại học Bách khoa HN"
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:42.119Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-4-1",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-4-2",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "Cảnh báo về lừa đảo liên quan đến trao đổi sinh viên",
+          "source": {
+            "id": "tavily-4-2",
+            "url": "https://phapluat.tuoitrethudo.vn/canh-bao-ve-lua-dao-lien-quan-den-trao-doi-sinh-vien-111135.html",
+            "title": "Cảnh báo về lừa đảo liên quan đến trao đổi sinh viên"
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:42.439Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "UNAVAILABLE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-4-2",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-4-3",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "Cảnh báo lừa đảo về chương trình trao đổi sinh viên và học bổng hiệp định Nhật Bản năm 2026",
+          "source": {
+            "id": "tavily-4-3",
+            "url": "https://baogialai.com.vn/truong-dai-hoc-quy-nhon-canh-bao-lua-dao-ve-chuong-trinh-trao-doi-sinh-vien-va-hoc-bong-post576113.amp",
+            "title": "Cảnh báo lừa đảo về chương trình trao đổi sinh viên và học bổng hiệp định Nhật Bản năm 2026"
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:43.763Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-4-3",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-4-4",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "THÔNG BÁO HỌC BỔNG CHÍNH PHỦ HÀN QUỐC BẬC SAU ĐẠI HỌC NĂM 2025 (GKS-G)",
+          "source": {
+            "id": "tavily-4-4",
+            "url": "https://hust.edu.vn/vi/su-kien-noi-bat/hop-tac-doi-ngoai-truyen-thong/thong-bao-hoc-bong-chinh-phu-han-quoc-bac-sau-dai-hoc-nam-2025-gks-g-654748.html",
+            "title": "THÔNG BÁO HỌC BỔNG CHÍNH PHỦ HÀN QUỐC BẬC SAU ĐẠI HỌC NĂM 2025 (GKS-G)"
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:45.642Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-4-4",
+          "status": "SOURCE_ONLY"
+        },
+        {
+          "id": "l3:tavily-4-5",
+          "caseId": null,
+          "layer": "L3",
+          "origin": "LAYER_3_WEB_EVIDENCE",
+          "type": "WEB_SOURCE_OBSERVATION",
+          "claim": null,
+          "observation": "Bộ Giáo dục và Đào tạo bác bỏ thông tin sai lệch về nội dung dạy học lịch sử trong sách giáo khoa",
+          "source": {
+            "id": "tavily-4-5",
+            "url": "https://baovannghe.vn/bo-giao-duc-va-dao-tao-bac-bo-thong-tin-sai-lech-ve-noi-dung-day-hoc-lich-su-trong-sach-giao-khoa-26119.html",
+            "title": "Bộ Giáo dục và Đào tạo bác bỏ thông tin sai lệch về nội dung dạy học lịch sử trong sách giáo khoa"
+          },
+          "provider": "tavily_evidence_retriever",
+          "retrievedAt": "2026-09-17T11:02:47.535Z",
+          "provenance": {
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "sourceMode": "LIVE",
+            "providerStatus": "INVALID_RESPONSE",
+            "liveEvidence": false
+          },
+          "reliabilityMetadata": {
+            "confidence": null,
+            "evidenceCoverage": 0,
+            "sourceAgreement": null
+          },
+          "limitations": [
+            "A source record without an evidence excerpt does not prove a claim."
+          ],
+          "rawReference": "tavily-4-5",
+          "status": "SOURCE_ONLY"
+        }
+      ],
+      "graph": {
+        "schemaVersion": "trust.graph.v1",
+        "nodes": [
+          {
+            "id": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "kind": "INPUT",
+            "label": "Trust input",
+            "detail": "Actual input received by the canonical Trust API.",
+            "origin": "LAYER_1_INTERNAL"
+          },
+          {
+            "id": "claim:claim-inst-1",
+            "kind": "CLAIM",
+            "label": "Đại học Bách Khoa Hà Nội có học bổng tài năng cho sinh viên xuất sắc.",
+            "detail": "Candidate claim extracted by semantic analysis; not yet truth.",
+            "origin": "LAYER_1_INTERNAL",
+            "rawReference": "claim-inst-1"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-1-1",
+            "kind": "SOURCE",
+            "label": "Học bổng tài năng: Phần thưởng dành cho những sinh viên ...",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-1-1"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-1-2",
+            "kind": "SOURCE",
+            "label": "Chương trình học bổng \"Sinh viên tài năng\"",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-1-2"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-1-3",
+            "kind": "SOURCE",
+            "label": "ĐH Bách Khoa Hà Nội dành nhiều ưu đãi cho kỹ sư tài năng",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-1-3"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-1-4",
+            "kind": "SOURCE",
+            "label": "Bách khoa Hà Nội công bố 55 chương trình cấp học bổng ...",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-1-4"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-1-5",
+            "kind": "SOURCE",
+            "label": "🌟 Sinh viên tốt nghiệp Bách khoa Hà Nội tiếp tục khẳng ...",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-1-5"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-2-1",
+            "kind": "SOURCE",
+            "label": "Học bổng sinh viên ĐHBK Hà Nội: Quy định và thông tin chi tiết - Studocu",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-2-1"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-2-2",
+            "kind": "SOURCE",
+            "label": "16K views · 106 reactions | 🔥𝐂𝐡𝐮𝐨̂̃𝐢 𝐛𝐚̀𝐢 𝐯𝐞̂̀ 𝐓𝐮𝐲𝐞̂̉𝐧 𝐬𝐢𝐧𝐡 Đ𝐇 𝐁𝐚́𝐜𝐡 𝐊𝐡𝐨𝐚 𝐇𝐍 (𝐇𝐔𝐒𝐓) ☘️𝐁𝐚̀𝐢 4: XÉT TUYỂN THEO HỒ SƠ NĂNG LỰC KẾT HỢP PHỎNG VẤN  (Diện 1.3 trong Phương thức xét tuyển Tài năng)  Đây là phư",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-2-2"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-2-3",
+            "kind": "SOURCE",
+            "label": "Học Bổng Dành Cho Tân Sinh Viên K70 Tại HUST",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-2-3"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-2-4",
+            "kind": "SOURCE",
+            "label": "Trường đại học trao học bổng hàng chục tỉ đồng cho sinh ...",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-2-4"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-2-5",
+            "kind": "SOURCE",
+            "label": "Thông báo nhận hồ sơ học bổng Sau đại học của Đại học ...",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-2-5"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-3-1",
+            "kind": "SOURCE",
+            "label": "Chi tiết 55 Chương trình đào tạo tại Bách khoa Hà Nội nhận ...",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-3-1"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-3-3",
+            "kind": "SOURCE",
+            "label": "ĐHBK Hà Nội và trường ĐH Plymouth Marjon (Anh) rất vui ...",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-3-3"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-3-5",
+            "kind": "SOURCE",
+            "label": "THÔNG BÁO VỀ KẾT QUẢ ĐÁNH GIÁ ĐIỀU KIỆN ĐƯỢC XÉT ...",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-3-5"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-4-1",
+            "kind": "SOURCE",
+            "label": "CẢNH BÁO VỀ LỪA ĐẢO... - Khoa Toán-Tin, Đại học Bách khoa HN",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-4-1"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-4-2",
+            "kind": "SOURCE",
+            "label": "Cảnh báo về lừa đảo liên quan đến trao đổi sinh viên",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-4-2"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-4-3",
+            "kind": "SOURCE",
+            "label": "Cảnh báo lừa đảo về chương trình trao đổi sinh viên và học bổng hiệp định Nhật Bản năm 2026",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-4-3"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-4-4",
+            "kind": "SOURCE",
+            "label": "THÔNG BÁO HỌC BỔNG CHÍNH PHỦ HÀN QUỐC BẬC SAU ĐẠI HỌC NĂM 2025 (GKS-G)",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-4-4"
+          },
+          {
+            "id": "source:layer_3_web_evidence:tavily-4-5",
+            "kind": "SOURCE",
+            "label": "Bộ Giáo dục và Đào tạo bác bỏ thông tin sai lệch về nội dung dạy học lịch sử trong sách giáo khoa",
+            "detail": "LAYER_3_WEB_EVIDENCE · SOURCE_ONLY",
+            "origin": "LAYER_3_WEB_EVIDENCE",
+            "rawReference": "tavily-4-5"
+          }
+        ],
+        "edges": [
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "claim:claim-inst-1",
+            "label": "contains"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-1-1",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-1-2",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-1-3",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-1-4",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-1-5",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-2-1",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-2-2",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-2-3",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-2-4",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-2-5",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-3-1",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-3-3",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-3-5",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-4-1",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-4-2",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-4-3",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-4-4",
+            "label": "reported_by"
+          },
+          {
+            "from": "input:sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+            "to": "source:layer_3_web_evidence:tavily-4-5",
+            "label": "reported_by"
+          }
+        ],
+        "source": "CANONICAL_NORMALIZED_RECORDS"
+      },
+      "passport": {
+        "schemaVersion": "trust.passport-projection.v1",
+        "persistenceStatus": "NOT_PERSISTED",
+        "appendOnly": true,
+        "caseId": null,
+        "revision": null,
+        "reason": "The canonical Trust run has no authenticated case owner/revision scope; events are representable but not persisted here.",
+        "events": [
+          {
+            "id": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f:l1:COMPLETED",
+            "type": "LAYER_1_COMPLETED",
+            "status": "COMPLETED",
+            "references": [],
+            "metadata": {
+              "finding": "LOCAL_CLEAR",
+              "origin": "TRUST_ENGINE"
+            }
+          },
+          {
+            "id": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f:l2a:COMPLETED",
+            "type": "LAYER_2_COMPLETED",
+            "status": "COMPLETED",
+            "references": [],
+            "metadata": {
+              "finding": "NOT_APPLICABLE",
+              "origin": "TRUST_ENGINE"
+            }
+          },
+          {
+            "id": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f:l3:COMPLETED",
+            "type": "LAYER_3_COMPLETED",
+            "status": "COMPLETED",
+            "references": [],
+            "metadata": {
+              "finding": "INSUFFICIENT",
+              "origin": "LAYER_3_WEB_EVIDENCE"
+            }
+          },
+          {
+            "id": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f:l4:COMPLETED",
+            "type": "LAYER_4_COMPLETED",
+            "status": "COMPLETED",
+            "references": [],
+            "metadata": {
+              "finding": "UNKNOWN",
+              "origin": "TRUST_ENGINE"
+            }
+          },
+          {
+            "id": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f:evidence",
+            "type": "EVIDENCE_ADDED",
+            "status": "COMPLETED",
+            "references": [
+              "l3:tavily-1-1",
+              "l3:tavily-1-2",
+              "l3:tavily-1-3",
+              "l3:tavily-1-4",
+              "l3:tavily-1-5",
+              "l3:tavily-2-1",
+              "l3:tavily-2-2",
+              "l3:tavily-2-3",
+              "l3:tavily-2-4",
+              "l3:tavily-2-5",
+              "l3:tavily-3-1",
+              "l3:tavily-3-3",
+              "l3:tavily-3-5",
+              "l3:tavily-4-1",
+              "l3:tavily-4-2",
+              "l3:tavily-4-3",
+              "l3:tavily-4-4",
+              "l3:tavily-4-5"
+            ],
+            "metadata": {
+              "count": "18"
+            }
+          },
+          {
+            "id": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f:verdict",
+            "type": "VERDICT_COMPOSED",
+            "status": "COMPLETED",
+            "references": [],
+            "metadata": {
+              "security": "UNKNOWN",
+              "truth": "INSUFFICIENT_EVIDENCE",
+              "action": "REVIEW"
+            }
+          }
+        ]
+      },
+      "assurance": {
+        "status": "ASSURANCE_PASS",
+        "anomalies": [],
+        "assuranceReasons": [
+          "Deterministic assurance checks passed; L5 giữ nguyên quyết định L4 và không nâng safety."
+        ],
+        "crossLayerConflicts": [],
+        "evidenceWeaknesses": [],
+        "providerWeaknesses": [],
+        "modelWeaknesses": [],
+        "recommendedRechecks": [],
+        "assuranceConfidence": null,
+        "assuranceConfidenceKind": "NOT_CALIBRATED_ASSURANCE_RESULT",
+        "auditVersion": "trust-assurance-v5.0.0",
+        "deterministicChecks": [
+          "required_stage_presence:PASS",
+          "stage_order:PASS",
+          "terminal_stage_status:PASS",
+          "hard_negative_propagation:PASS"
+        ],
+        "aiAuditStatus": "NOT_CONFIGURED",
+        "aiAuditProvider": null,
+        "downgradeOnly": true
+      },
+      "layerResults": {
+        "layer1": {
+          "layer": 1,
+          "status": "PASS",
+          "confidence": 0.9,
+          "signals": [],
+          "reasons": [],
+          "metrics": {
+            "ruleVersion": "layer1-v1.0.0",
+            "modelUsed": null
+          },
+          "details": {
+            "decisionRationale": "Không phát hiện mối đe dọa trực diện ở Tầng 1. Chuyển tiếp Layer 2 để thẩm định nội dung chuyên sâu."
+          }
+        },
+        "layer2A": {
+          "layer": "2A",
+          "finding": "NOT_APPLICABLE",
+          "securityClassification": "NOT_APPLICABLE",
+          "provider": "studenthub_layer2_backend",
+          "providerStatus": "NOT_APPLICABLE",
+          "providerConfidence": null,
+          "rawVerdict": null,
+          "notApplicable": true,
+          "reputationLookupPolicy": "SKIP",
+          "reputationLookupReason": "INVALID_URL",
+          "reputationLookupStatus": "SKIPPED_PRIVACY_SAFETY",
+          "reputationLookupTargetClass": "INVALID_URL",
+          "reputationLookupDisclosed": false,
+          "threatTypes": [],
+          "providerResults": [],
+          "provenance": {
+            "noMatchIsSafetyProof": false
+          }
+        },
+        "layer2B": {
+          "layer": 2,
+          "status": "NEEDS_VERIFICATION",
+          "classification": "UNVERIFIED",
+          "confidence": 0.58,
+          "semanticSummary": "Phát hiện 1 phát ngôn / tuyên bố sự kiện cần kiểm chứng nguồn tin chính thức tại Layer 3.",
+          "signals": [
+            {
+              "signalId": "provider-context-1",
+              "code": "benign_brand_mention",
+              "severity": "info",
+              "source": "ai_candidate_semantic_signal",
+              "details": "Đề cập thương hiệu hợp lệ trong ngữ cảnh thông tin trung tính không có hành vi lừa đảo."
+            }
+          ],
+          "claims": [
+            {
+              "claimId": "claim-inst-1",
+              "subject": "HUST / Bách Khoa HN",
+              "predicate": "cấp / trao học bổng",
+              "rawText": "Đại học Bách Khoa Hà Nội có học bổng tài năng cho sinh viên xuất sắc."
+            }
+          ],
+          "contextSignals": [
+            {
+              "signalId": "provider-context-1",
+              "code": "benign_brand_mention",
+              "severity": "info",
+              "source": "ai_candidate_semantic_signal",
+              "details": "Đề cập thương hiệu hợp lệ trong ngữ cảnh thông tin trung tính không có hành vi lừa đảo."
+            }
+          ],
+          "entities": [],
+          "details": {
+            "confidenceKind": "semantic_candidate_only",
+            "modelUsed": null,
+            "providerId": "ai_gateway_gemini_reasoning",
+            "providerStatus": "MODEL_INCOMPATIBLE",
+            "providerErrorType": "MODEL_INCOMPATIBLE",
+            "providerHttpStatus": null,
+            "providerLatencyMs": 4059,
+            "promptInjectionDetected": false,
+            "decisionRationale": "Nội dung chứa 1 phát ngôn / thông cáo sự kiện quan trọng cần đối chiếu nguồn tin chính thống tại Layer 3."
+          },
+          "verificationPackage": null
+        },
+        "layer2C": {
+          "classification": "NO_MATERIAL_STUDENT_RISK",
+          "modelStatus": "BASELINE_RULE_MODEL",
+          "modelType": "BASELINE_RULE_MODEL",
+          "modelVersion": "studenthub-domain-rule-baseline-1.0.0",
+          "taxonomyVersion": "studenthub-student-risk-taxonomy-1.0.0",
+          "datasetVersion": "NO_VERIFIED_TRAINING_DATASET",
+          "modelScore": 0,
+          "calibratedRisk": null,
+          "calibrationStatus": "NOT_CALIBRATED",
+          "confidenceKind": "MODEL_SCORE_UNCALIBRATED",
+          "severity": "INFO",
+          "explanation": "Baseline không thấy pattern rủi ro sinh viên đặc thù đủ mạnh trong input.",
+          "inputLength": 69,
+          "signals": [],
+          "secondaryClassifications": [],
+          "riskSignals": [],
+          "studentContext": {
+            "inputType": "text"
+          },
+          "verificationPackage": {
+            "schemaVersion": "l2c.verification.v1",
+            "status": "NOT_REQUIRED",
+            "domainClaims": [],
+            "verificationTasks": [],
+            "candidateSourcePurposes": [],
+            "evidenceRequirements": [],
+            "candidateOnly": true,
+            "inputTrust": "UNTRUSTED_MODEL_OUTPUT"
+          }
+        },
+        "layer3": {
+          "layer": 3,
+          "status": "INSUFFICIENT_EVIDENCE",
+          "verificationCompleteness": 0,
+          "externalEvidence": false,
+          "retrievalMode": "EXTERNAL_RETRIEVER",
+          "retrievalStatus": "SUCCESS",
+          "metrics": {
+            "executionTimeMs": 25815.06,
+            "queriesExecutedCount": 5,
+            "sourcesRetrievedCount": 18,
+            "evidenceItemsCount": 0,
+            "retrievalProvider": "tavily_evidence_retriever",
+            "retrievalStatus": "SUCCESS",
+            "retrievalMode": "EXTERNAL_RETRIEVER",
+            "externalEvidence": false,
+            "providerIndependent": false,
+            "providerCallCount": 4,
+            "providerDurationMs": 6536,
+            "providerTimeoutConfiguredMs": 8000,
+            "providerParentTimeoutMs": 8000,
+            "providerRawResultCount": 20,
+            "providerAcceptedResultCount": 18,
+            "providerAcceptedHostCount": 12,
+            "providerRejectedResultCount": 2,
+            "providerTimeoutClassification": null,
+            "providerAbortReason": null,
+            "providerRetryCount": 0,
+            "providerRetryExhausted": false,
+            "providerRetryable": null,
+            "independentHostCount": 12,
+            "independentClusterCount": 18,
+            "providerRejectionReasons": [
+              "DUPLICATE_URL"
+            ],
+            "providerHttpStatuses": [
+              200,
+              200,
+              200,
+              200
+            ],
+            "providerRequestTrace": [
+              {
+                "startedAt": "2026-09-17T11:02:21.730Z",
+                "endedAt": "2026-09-17T11:02:23.102Z",
+                "durationMs": 1372,
+                "httpStatus": 200,
+                "abortReason": null,
+                "classification": "NONE",
+                "outcome": "SUCCESS",
+                "timeoutMs": 8000,
+                "attempt": 1
+              },
+              {
+                "startedAt": "2026-09-17T11:02:23.104Z",
+                "endedAt": "2026-09-17T11:02:24.551Z",
+                "durationMs": 1448,
+                "httpStatus": 200,
+                "abortReason": null,
+                "classification": "NONE",
+                "outcome": "SUCCESS",
+                "timeoutMs": 6625,
+                "attempt": 1
+              },
+              {
+                "startedAt": "2026-09-17T11:02:24.552Z",
+                "endedAt": "2026-09-17T11:02:25.374Z",
+                "durationMs": 822,
+                "httpStatus": 200,
+                "abortReason": null,
+                "classification": "NONE",
+                "outcome": "SUCCESS",
+                "timeoutMs": 5177,
+                "attempt": 1
+              },
+              {
+                "startedAt": "2026-09-17T11:02:25.375Z",
+                "endedAt": "2026-09-17T11:02:28.265Z",
+                "durationMs": 2890,
+                "httpStatus": 200,
+                "abortReason": null,
+                "classification": "NONE",
+                "outcome": "SUCCESS",
+                "timeoutMs": 4354,
+                "attempt": 1
+              }
+            ]
+          },
+          "sources": [
+            {
+              "sourceId": "tavily-1-1",
+              "url": "https://ts.hust.edu.vn/tin-tuc/hoc-bong-tai-nang-phan-thuong-danh-cho-nhung-sinh-vien-dac-biet-xuat-sac",
+              "title": "Học bổng tài năng: Phần thưởng dành cho những sinh viên ...",
+              "publisher": "ts.hust.edu.vn",
+              "domain": "ts.hust.edu.vn",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_5_PRIMARY_AUTHORITATIVE",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:32.030Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "a13a567e934bdd39972a6befde2036a9909238cccc0a8515075598bed37c3fb2",
+              "clusterId": "tavily-1-1",
+              "liveEvidence": false,
+              "providerStatus": "TIMEOUT"
+            },
+            {
+              "sourceId": "tavily-1-2",
+              "url": "https://btec.bkacad.edu.vn/chuong-trinh-hoc-bong--sinh-vien-tai-nang--c328.html",
+              "title": "Chương trình học bổng \"Sinh viên tài năng\"",
+              "publisher": "btec.bkacad.edu.vn",
+              "domain": "btec.bkacad.edu.vn",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:33.410Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "bbc36399afc52e66fdfae1702688d620b6db86c7ed1711194a8c1e1dea86ee40",
+              "clusterId": "tavily-1-2",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-1-3",
+              "url": "https://nhandan.vn/dh-bach-khoa-ha-noi-danh-nhieu-uu-dai-cho-ky-su-tai-nang-post479938.html",
+              "title": "ĐH Bách Khoa Hà Nội dành nhiều ưu đãi cho kỹ sư tài năng",
+              "publisher": "nhandan.vn",
+              "domain": "nhandan.vn",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:34.629Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "0aee0467d8ac71f53efdeb6ec91a1064b8f25e766c879162b6694466947d8ae5",
+              "clusterId": "tavily-1-3",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-1-4",
+              "url": "https://vnexpress.net/danh-sach-55-chuong-trinh-dao-tao-dai-hoc-bach-khoa-ha-noi-duoc-cap-hoc-bong-3-7-5-5-trieu-dong-theo-nghi-dinh-179-5092505.html",
+              "title": "Bách khoa Hà Nội công bố 55 chương trình cấp học bổng ...",
+              "publisher": "vnexpress.net",
+              "domain": "vnexpress.net",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_4_HIGH_REPUTABLE_SECONDARY",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:36.105Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "e253c3342314748a13105d73e82468a24aa18d70157c28bb6e9a1dffd8d3ec9f",
+              "clusterId": "tavily-1-4",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-1-5",
+              "url": "https://www.facebook.com/dhbkhanoi/posts/-sinh-vi%C3%AAn-t%E1%BB%91t-nghi%E1%BB%87p-b%C3%A1ch-khoa-h%C3%A0-n%E1%BB%99i-ti%E1%BA%BFp-t%E1%BB%A5c-kh%E1%BA%B3ng-%C4%91%E1%BB%8Bnh-n%C4%83ng-l%E1%BB%B1c-v%E1%BB%9Bi-h%E1%BB%8Dc-b%E1%BB%95ng/1364946622425851",
+              "title": "🌟 Sinh viên tốt nghiệp Bách khoa Hà Nội tiếp tục khẳng ...",
+              "publisher": "www.facebook.com",
+              "domain": "www.facebook.com",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:36.219Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "e9f31a619e39ac31941758d1fc35a172f8a9370653c5b4ccf9d10b79640c2a81",
+              "clusterId": "tavily-1-5",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-2-1",
+              "url": "https://www.studocu.vn/vn/document/truong-dai-hoc-bach-khoa-ha-noi/triet-hoc-mac-lenin/hoc-bong-sinh-vien-dhbk-ha-noi-quy-dinh-va-thong-tin-chi-tiet/149766441",
+              "title": "Học bổng sinh viên ĐHBK Hà Nội: Quy định và thông tin chi tiết - Studocu",
+              "publisher": "www.studocu.vn",
+              "domain": "www.studocu.vn",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:36.273Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "5f1a4168b22bbdd489cbd1c9fd55f5319463702944c3cf168e474f37a0b81f05",
+              "clusterId": "tavily-2-1",
+              "liveEvidence": false,
+              "providerStatus": "UNAVAILABLE"
+            },
+            {
+              "sourceId": "tavily-2-2",
+              "url": "https://www.facebook.com/le.vinh.921/posts/%F0%9D%90%82%F0%9D%90%A1%F0%9D%90%AE%F0%9D%90%A8%CC%82%CC%83%F0%9D%90%A2-%F0%9D%90%9B%F0%9D%90%9A%CC%80%F0%9D%90%A2-%F0%9D%90%AF%F0%9D%90%9E%CC%82%CC%80-%F0%9D%90%93%F0%9D%90%AE%F0%9D%90%B2%F0%9D%90%9E%CC%82%CC%89%F0%9D%90%A7-%F0%9D%90%AC%F0%9D%90%A2%F0%9D%90%A7%F0%9D%90%A1-%C4%91%F0%9D%90%87-%F0%9D%90%81%F0%9D%90%9A%CC%81%F0%9D%90%9C%F0%9D%90%A1-%F0%9D%90%8A%F0%9D%90%A1%F0%9D%90%A8%F0%9D%90%9A-%F0%9D%90%87%F0%9D%90%8D-%F0%9D%90%87%F0%9D%90%94%F0%9D%90%92%F0%9D%90%93%EF%B8%8F%F0%9D%90%81%F0%9D%90%9A%CC%80%F0%9D%90%A2-4-x%C3%A9t-tuy%E1%BB%83n-theo-h%E1%BB%93-s%C6%A1/10163900538074696",
+              "title": "16K views · 106 reactions | 🔥𝐂𝐡𝐮𝐨̂̃𝐢 𝐛𝐚̀𝐢 𝐯𝐞̂̀ 𝐓𝐮𝐲𝐞̂̉𝐧 𝐬𝐢𝐧𝐡 Đ𝐇 𝐁𝐚́𝐜𝐡 𝐊𝐡𝐨𝐚 𝐇𝐍 (𝐇𝐔𝐒𝐓) ☘️𝐁𝐚̀𝐢 4: XÉT TUYỂN THEO HỒ SƠ NĂNG LỰC KẾT HỢP PHỎNG VẤN  (Diện 1.3 trong Phương thức xét tuyển Tài năng)  Đây là phư",
+              "publisher": "www.facebook.com",
+              "domain": "www.facebook.com",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:36.551Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "84b6cd7032e01dc54260c5020036161d9ee97e1b878840dd45d9728d96a0077a",
+              "clusterId": "tavily-2-2",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-2-3",
+              "url": "https://www.tiktok.com/@bachkhoahanoi_hust/video/7552876191137533192",
+              "title": "Học Bổng Dành Cho Tân Sinh Viên K70 Tại HUST",
+              "publisher": "www.tiktok.com",
+              "domain": "www.tiktok.com",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:36.899Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "bb8d2c874a87cbd3eb82380eabe265601c01a4641ba015f25b840771c104cc23",
+              "clusterId": "tavily-2-3",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-2-4",
+              "url": "https://laodong.vn/giao-duc/truong-dai-hoc-trao-hoc-bong-hang-chuc-ti-dong-cho-sinh-vien-1193285.ldo",
+              "title": "Trường đại học trao học bổng hàng chục tỉ đồng cho sinh ...",
+              "publisher": "laodong.vn",
+              "domain": "laodong.vn",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:37.915Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "e4da575237193d92b055243835a27388486eca6e98d9a0baf75a5ddf23142a76",
+              "clusterId": "tavily-2-4",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-2-5",
+              "url": "https://www.facebook.com/groups/464095635569608/posts/984812790164554",
+              "title": "Thông báo nhận hồ sơ học bổng Sau đại học của Đại học ...",
+              "publisher": "www.facebook.com",
+              "domain": "www.facebook.com",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:38.115Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "ba813fbf741f4fd95e320ceadafb6f9297e73fadf484f4439fc8af6fc7b20bab",
+              "clusterId": "tavily-2-5",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-3-1",
+              "url": "https://ts.hust.edu.vn/tin-tuc/chi-tiet-55-chuong-trinh-dao-tao-tai-bach-khoa-ha-noi-nhan-hoc-bong-chinh-phu-theo-nghi-dinh-179",
+              "title": "Chi tiết 55 Chương trình đào tạo tại Bách khoa Hà Nội nhận ...",
+              "publisher": "ts.hust.edu.vn",
+              "domain": "ts.hust.edu.vn",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_5_PRIMARY_AUTHORITATIVE",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:41.617Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "dc20b6270ffca5eec7dd2a456d6294f19721581c7facbc07aef5c6a330bc2e4e",
+              "clusterId": "tavily-3-1",
+              "liveEvidence": false,
+              "providerStatus": "TIMEOUT"
+            },
+            {
+              "sourceId": "tavily-3-3",
+              "url": "https://www.facebook.com/sofl.at.hust/posts/-th%C3%B4ng-b%C3%A1o-ch%C6%B0%C6%A1ng-tr%C3%ACnh-h%E1%BB%8Dc-b%E1%BB%95ng-trao-%C4%91%E1%BB%95i-sinh-vi%C3%AAn-ipe-t%E1%BA%A1i-v%C6%B0%C6%A1ng-qu%E1%BB%91c-anh-n%C4%83m-h/1410101690924119",
+              "title": "ĐHBK Hà Nội và trường ĐH Plymouth Marjon (Anh) rất vui ...",
+              "publisher": "www.facebook.com",
+              "domain": "www.facebook.com",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:41.817Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "d8dab0633932193374a88fdc4696c2e00de76a96d9de111d3fe654fd94da6ec2",
+              "clusterId": "tavily-3-3",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-3-5",
+              "url": "https://www.facebook.com/ictsv.hust/posts/th%C3%B4ng-b%C3%A1o-v%E1%BB%81-k%E1%BA%BFt-qu%E1%BA%A3-%C4%91%C3%A1nh-gi%C3%A1-%C4%91i%E1%BB%81u-ki%E1%BB%87n-%C4%91%C6%B0%E1%BB%A3c-x%C3%A9t-h%E1%BB%8Dc-b%E1%BB%95ng-k%E1%BB%B3-20252-hi%E1%BB%87n-t%E1%BA%A1i-%C4%91%C3%A3-c/1305876064980871",
+              "title": "THÔNG BÁO VỀ KẾT QUẢ ĐÁNH GIÁ ĐIỀU KIỆN ĐƯỢC XÉT ...",
+              "publisher": "www.facebook.com",
+              "domain": "www.facebook.com",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:41.992Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "24e7d91c72a96b20c6d9cbe0b6473099257e8fac811022b7a96512c2d1e781d7",
+              "clusterId": "tavily-3-5",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-4-1",
+              "url": "https://www.facebook.com/FaMIHUST/posts/c%E1%BA%A3nh-b%C3%A1o-v%E1%BB%81-l%E1%BB%ABa-%C4%91%E1%BA%A3o-li%C3%AAn-quan-%C4%91%E1%BA%BFn-trao-%C4%91%E1%BB%95i-sinh-vi%C3%AAn/1271841944968233",
+              "title": "CẢNH BÁO VỀ LỪA ĐẢO... - Khoa Toán-Tin, Đại học Bách khoa HN",
+              "publisher": "www.facebook.com",
+              "domain": "www.facebook.com",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:42.119Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "4917a446e700f6b15fa150bde41331ada48209dd8a2faeb1df4ffbb62e6b4338",
+              "clusterId": "tavily-4-1",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-4-2",
+              "url": "https://phapluat.tuoitrethudo.vn/canh-bao-ve-lua-dao-lien-quan-den-trao-doi-sinh-vien-111135.html",
+              "title": "Cảnh báo về lừa đảo liên quan đến trao đổi sinh viên",
+              "publisher": "phapluat.tuoitrethudo.vn",
+              "domain": "phapluat.tuoitrethudo.vn",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:42.439Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "ebd45f0a98b388e4741b06e2e4c5be74bca9d2a7a5be3ad6f5ec51f0d7fdd753",
+              "clusterId": "tavily-4-2",
+              "liveEvidence": false,
+              "providerStatus": "UNAVAILABLE"
+            },
+            {
+              "sourceId": "tavily-4-3",
+              "url": "https://baogialai.com.vn/truong-dai-hoc-quy-nhon-canh-bao-lua-dao-ve-chuong-trinh-trao-doi-sinh-vien-va-hoc-bong-post576113.amp",
+              "title": "Cảnh báo lừa đảo về chương trình trao đổi sinh viên và học bổng hiệp định Nhật Bản năm 2026",
+              "publisher": "baogialai.com.vn",
+              "domain": "baogialai.com.vn",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:43.763Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "c70d3948d2ca6b378a548aae8801efd1860cef0924d9f33b87a18d09c8bb3179",
+              "clusterId": "tavily-4-3",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-4-4",
+              "url": "https://hust.edu.vn/vi/su-kien-noi-bat/hop-tac-doi-ngoai-truyen-thong/thong-bao-hoc-bong-chinh-phu-han-quoc-bac-sau-dai-hoc-nam-2025-gks-g-654748.html",
+              "title": "THÔNG BÁO HỌC BỔNG CHÍNH PHỦ HÀN QUỐC BẬC SAU ĐẠI HỌC NĂM 2025 (GKS-G)",
+              "publisher": "hust.edu.vn",
+              "domain": "hust.edu.vn",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_5_PRIMARY_AUTHORITATIVE",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:45.642Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "b6cbdbdf11f42ba36fb1e7f46afebdb208267c8e408511ac1204270d0384b40c",
+              "clusterId": "tavily-4-4",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            },
+            {
+              "sourceId": "tavily-4-5",
+              "url": "https://baovannghe.vn/bo-giao-duc-va-dao-tao-bac-bo-thong-tin-sai-lech-ve-noi-dung-day-hoc-lich-su-trong-sach-giao-khoa-26119.html",
+              "title": "Bộ Giáo dục và Đào tạo bác bỏ thông tin sai lệch về nội dung dạy học lịch sử trong sách giáo khoa",
+              "publisher": "baovannghe.vn",
+              "domain": "baovannghe.vn",
+              "sourceType": "SEARCH_RETRIEVAL",
+              "authorityTier": "TIER_1_UNKNOWN_LOW",
+              "publishedAt": null,
+              "retrievedAt": "2026-09-17T11:02:47.535Z",
+              "retrievalOutcome": "FAILURE",
+              "sourceFingerprint": "2011ab38dbaab095aff00518a83999b96571df6eec316f5ff392d4513fe76279",
+              "clusterId": "tavily-4-5",
+              "liveEvidence": false,
+              "providerStatus": "INVALID_RESPONSE"
+            }
+          ],
+          "verifiedSources": [],
+          "evidence": [],
+          "evidenceItems": [],
+          "conflicts": [],
+          "providerResults": [],
+          "relatedCases": [],
+          "claimStatuses": {
+            "claim-inst-1": "UNVERIFIED"
+          },
+          "verificationTasks": [
+            {
+              "taskId": "task-dom-hust-b-ch-khoa-hn",
+              "type": "DOMAIN_VERIFICATION",
+              "classification": null,
+              "priority": "HIGH",
+              "claimId": null,
+              "purpose": "verification DOMAIN_VERIFICATION",
+              "targetClaim": null,
+              "sourceScope": "GENERAL_SOURCE",
+              "origin": "L2B_SEMANTIC",
+              "candidateOnly": true,
+              "inputTrust": "UNTRUSTED_MODEL_OUTPUT",
+              "evidenceRequirements": []
+            },
+            {
+              "taskId": "task-claim-claim-inst-1",
+              "type": "CLAIM_VERIFICATION",
+              "classification": null,
+              "priority": "HIGH",
+              "claimId": "claim-inst-1",
+              "purpose": "verification CLAIM_VERIFICATION",
+              "targetClaim": "Đại học Bách Khoa Hà Nội có học bổng tài năng cho sinh viên xuất sắc.",
+              "sourceScope": "GENERAL_SOURCE",
+              "origin": "L2B_SEMANTIC",
+              "candidateOnly": true,
+              "inputTrust": "UNTRUSTED_MODEL_OUTPUT",
+              "evidenceRequirements": []
+            }
+          ],
+          "verificationTaskSummary": {
+            "totalTasks": 2,
+            "l2bTaskCount": 2,
+            "l2cTaskCount": 0,
+            "deduplicatedCount": 0,
+            "highImpactTaskCount": 2,
+            "tasksWithQueries": 0,
+            "tasksWithoutQueries": 2
+          },
+          "candidateClaimOrigins": [
+            "L2B_SEMANTIC"
+          ],
+          "evidenceRequirements": [],
+          "legacyIntegration": null
+        },
+        "layer4": {
+          "layer": 4,
+          "status": "REVIEW",
+          "classification": "INSUFFICIENT_EVIDENCE",
+          "securityClassification": "UNKNOWN",
+          "truthStatus": "INSUFFICIENT_EVIDENCE",
+          "enforcement": "REVIEW",
+          "recommendedAction": "REVIEW",
+          "decisionConfidence": 0.08,
+          "verificationCompleteness": 0,
+          "aiVerificationStatus": "VERIFIED",
+          "aiVerificationTransport": "interactions",
+          "aiVerificationThinkingLevel": "low",
+          "aiVerificationLatencyMs": 6148,
+          "aiVerificationErrorType": null,
+          "aiVerificationHttpStatus": 200,
+          "aiRequestedPrimaryModel": "gemini-3.8-flash",
+          "aiExecutedModel": "gemini-3.6-flash",
+          "aiFallbackUsed": true,
+          "aiFallbackReason": "PRIMARY_TIMEOUT",
+          "aiProviderStatus": "SUCCESS",
+          "aiOperationStatus": "COMPLETED",
+          "keyReasons": [
+            "Chưa có đủ bằng chứng độc lập và có provenance để kết luận an toàn. Không nên coi trạng thái này là an toàn."
+          ],
+          "policyPrecedence": [],
+          "evidenceRefs": [],
+          "userExplanation": {
+            "verdictTitle": "CHƯA THỂ XÁC MINH AN TOÀN",
+            "why": "Chưa có đủ bằng chứng độc lập và có provenance để kết luận an toàn. Không nên coi trạng thái này là an toàn.",
+            "riskSummary": "Mức độ rủi ro: CHƯA XÁC ĐỊNH (UNKNOWN).",
+            "recommendedActionNote": "Tạm dừng thao tác nhạy cảm và xác minh qua kênh độc lập, chính thức."
+          },
+          "riskAssessment": {
+            "level": "LOW",
+            "confidence": 0.2
+          },
+          "metrics": {
+            "modelUsed": "deterministic_trust_policy_engine",
+            "providerStatus": "VERIFIED"
+          },
+          "relatedCases": [],
+          "legacyIntegration": null,
+          "independentResearchSources": [],
+          "aiVerification": {
+            "verdictSignal": "UNCERTAIN",
+            "supportReasons": [],
+            "contradictionReasons": [],
+            "missingEvidence": [
+              "Thiếu dữ liệu và bằng chứng độc lập có nguồn gốc xác thực (provenance) để đánh giá."
+            ],
+            "uncertainty": "Chưa có đủ bằng chứng độc lập và có provenance để kết luận an toàn. Không nên coi trạng thái này là an toàn.",
+            "citationsUsed": [],
+            "provider": "google",
+            "model": "gemini-3.6-flash"
+          },
+          "aiModelTrace": [
+            {
+              "model": "gemini-3.8-flash",
+              "attemptNumber": 1,
+              "startedAt": "2026-09-17T11:02:47.544Z",
+              "durationMs": 3201,
+              "httpStatus": null,
+              "providerErrorCode": "ATTEMPT_TIMEOUT",
+              "result": "TIMEOUT"
+            },
+            {
+              "model": "gemini-3.7-flash",
+              "attemptNumber": 2,
+              "startedAt": "2026-09-17T11:02:50.745Z",
+              "durationMs": 0,
+              "httpStatus": null,
+              "providerErrorCode": "BUDGET_RESERVED_FOR_HEALTHY_CANDIDATE",
+              "result": "BUDGET_EXHAUSTED"
+            },
+            {
+              "model": "gemini-3.6-flash",
+              "attemptNumber": 3,
+              "startedAt": "2026-09-17T11:02:50.745Z",
+              "durationMs": 2946,
+              "httpStatus": 200,
+              "providerErrorCode": null,
+              "result": "SUCCESS"
+            }
+          ],
+          "aiCooldownResult": {
+            "skippedModels": [],
+            "cooldownModels": [],
+            "activeCooldowns": []
+          }
+        }
+      },
+      "audit": {
+        "requestId": "sec_edge_f4b10e96-e711-4c18-b15d-291eec8bd84f",
+        "stageSequence": [
+          "l1",
+          "l2a",
+          "l2b",
+          "l2c",
+          "l3",
+          "l4",
+          "l5"
+        ],
+        "stageAttempts": [
+          {
+            "stageId": "l1",
+            "attempt": 1,
+            "status": "COMPLETED",
+            "finding": "LOCAL_CLEAR",
+            "errorCode": null,
+            "startedAt": "2026-09-17T11:02:17.573Z",
+            "completedAt": "2026-09-17T11:02:17.583Z"
+          },
+          {
+            "stageId": "l2a",
+            "attempt": 1,
+            "status": "COMPLETED",
+            "finding": "NOT_APPLICABLE",
+            "errorCode": null,
+            "startedAt": "2026-09-17T11:02:17.588Z",
+            "completedAt": "2026-09-17T11:02:17.589Z"
+          },
+          {
+            "stageId": "l2b",
+            "attempt": 1,
+            "status": "COMPLETED",
+            "finding": "SEMANTIC_SUSPICIOUS",
+            "errorCode": null,
+            "startedAt": "2026-09-17T11:02:17.590Z",
+            "completedAt": "2026-09-17T11:02:21.714Z"
+          },
+          {
+            "stageId": "l2c",
+            "attempt": 1,
+            "status": "COMPLETED",
+            "finding": "NO_MATERIAL_STUDENT_RISK",
+            "errorCode": null,
+            "startedAt": "2026-09-17T11:02:21.714Z",
+            "completedAt": "2026-09-17T11:02:21.720Z"
+          },
+          {
+            "stageId": "l3",
+            "attempt": 1,
+            "status": "COMPLETED",
+            "finding": "INSUFFICIENT",
+            "errorCode": null,
+            "startedAt": "2026-09-17T11:02:21.721Z",
+            "completedAt": "2026-09-17T11:02:47.538Z"
+          },
+          {
+            "stageId": "l4",
+            "attempt": 1,
+            "status": "COMPLETED",
+            "finding": "UNKNOWN",
+            "errorCode": null,
+            "startedAt": "2026-09-17T11:02:47.539Z",
+            "completedAt": "2026-09-17T11:02:53.693Z"
+          },
+          {
+            "stageId": "l5",
+            "attempt": 1,
+            "status": "COMPLETED",
+            "finding": "ASSURANCE_PASS",
+            "errorCode": null,
+            "startedAt": "2026-09-17T11:02:53.694Z",
+            "completedAt": "2026-09-17T11:02:53.696Z"
+          }
+        ],
+        "hardNegativePropagation": [],
+        "policyVersion": "trust-policy-v5.0.0",
+        "assuranceVersion": "trust-assurance-v5.0.0"
+      }
+    }
+  }
+}

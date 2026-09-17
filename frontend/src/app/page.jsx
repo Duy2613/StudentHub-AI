@@ -27,7 +27,6 @@ export default function HomePage() {
           <nav aria-label="Điều hướng chân trang" className="vnext-landing-footer-nav">
             <Link href="/dashboard">Tổng quan</Link>
             <Link href="/trust">Kiểm chứng</Link>
-            <Link href="/academic">Học thuật</Link>
             <Link href="/community">Cộng đồng</Link>
             <Link href="/expert">Chuyên gia</Link>
           </nav>

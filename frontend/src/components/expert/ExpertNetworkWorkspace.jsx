@@ -66,6 +66,24 @@ export default function ExpertNetworkWorkspace() {
     }
   }, []);
 
+  const submitAssessment = useCallback(async (payload) => {
+    const response = await fetch("/api/expert/assessments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Idempotency-Key": payload.idempotencyKey || `expert-assessment:${payload.caseId}:${payload.assignmentId}`,
+      },
+      credentials: "same-origin",
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok || !result?.success) {
+      throw new Error(result?.error?.userMessage || "Không thể lưu đánh giá chuyên môn.");
+    }
+    setActiveReviewCase((current) => current ? { ...current, formalAssessment: result.data } : current);
+    return result.data;
+  }, []);
+
   useEffect(() => {
     const controller = new AbortController();
     void loadDirectory(controller.signal);
@@ -231,6 +249,7 @@ export default function ExpertNetworkWorkspace() {
               isOpen={isReviewDeskOpen}
               onClose={() => setIsReviewDeskOpen(false)}
               caseDossier={activeReviewCase}
+              onSubmitAssessment={submitAssessment}
             />
           </div>
         )}

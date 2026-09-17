@@ -1,5 +1,10 @@
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { SecurityError } from "@/lib/security/core/SecurityErrorEnvelope.js";
+import {
+  deriveIdentityTruth,
+  INSTITUTIONAL_VERIFICATION_SOURCE,
+  isInstitutionalEmailAddress,
+} from "@/lib/server/auth/demoAccountPolicy.js";
 
 // Comprehensive Vietnamese & Global Higher-Education Domain Mapping
 const KNOWN_EDU_DOMAINS = [
@@ -68,12 +73,22 @@ export const POST = SecurityFabric.wrapHandler(
 
     const domainMatch = principalEmail.split("@")[1] || "";
 
-    const isEduDomain = /(\.edu$|\.edu\.\w+$|\.ac\.\w+$|\.edu\.vn$|\.ac\.vn$)/i.test(domainMatch);
+    const isEduDomain = isInstitutionalEmailAddress(principalEmail);
+    const identityTruth = deriveIdentityTruth({
+      email: principalEmail,
+      emailVerified: principal.attributes?.emailVerified === true,
+      qaEntitlements: principal.attributes?.qaEntitlements,
+    });
 
     if (!isEduDomain) {
       return Response.json({
         success: false,
         isEdu: false,
+        institutionalEmailVerified: false,
+        verificationSource: identityTruth.verificationSource,
+        demoFeatureAccess: identityTruth.demoFeatureAccess,
+        qaStudentFeatureAccess: identityTruth.qaStudentFeatureAccess,
+        demoAccessSource: identityTruth.demoAccessSource,
         verificationStatus: "NOT_INSTITUTIONAL_DOMAIN",
         error: "Email không thuộc danh mục tên miền giáo dục được hỗ trợ."
       }, { status: 422 });
@@ -83,6 +98,11 @@ export const POST = SecurityFabric.wrapHandler(
       return Response.json({
         success: false,
         isEdu: false,
+        institutionalEmailVerified: false,
+        verificationSource: identityTruth.verificationSource,
+        demoFeatureAccess: identityTruth.demoFeatureAccess,
+        qaStudentFeatureAccess: identityTruth.qaStudentFeatureAccess,
+        demoAccessSource: identityTruth.demoAccessSource,
         verificationStatus: "MAILBOX_VERIFICATION_REQUIRED",
         error: "Hãy xác thực quyền sở hữu hộp thư với nhà cung cấp danh tính trước."
       }, { status: 409 });
@@ -94,6 +114,11 @@ export const POST = SecurityFabric.wrapHandler(
     return Response.json({
       success: true,
       isEdu: true,
+      institutionalEmailVerified: true,
+      verificationSource: INSTITUTIONAL_VERIFICATION_SOURCE,
+      demoFeatureAccess: identityTruth.demoFeatureAccess,
+      qaStudentFeatureAccess: identityTruth.qaStudentFeatureAccess,
+      demoAccessSource: identityTruth.demoAccessSource,
       university: universityName,
       verificationStatus: "VERIFIED_INSTITUTION_EMAIL",
       verifiedBy: "IDENTITY_PROVIDER_EMAIL_PROOF",

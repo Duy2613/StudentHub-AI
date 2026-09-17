@@ -227,7 +227,7 @@ export default function AcademicNavbar() {
                   className="flex items-center gap-3 p-3 rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-primary text-base font-medium"
                 >
                   <UserRoundCheck size={18} />
-                  <span>Hồ sơ học vụ 360</span>
+                  <span>Hồ sơ cá nhân</span>
                 </Link>
               </div>
             </div>

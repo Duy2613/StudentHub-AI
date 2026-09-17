@@ -77,7 +77,7 @@ test.describe("Trust flagship flow", () => {
     await page.route("**/api/v1/trust", (route) => route.fulfill({ status: 200, contentType: "text/plain", body: "not-json" }));
     await page.goto("/trust");
     await page.getByRole("tab", { name: "Văn bản" }).click();
-    await page.getByLabel("Nội dung tin nhắn hoặc thông báo").fill("Dữ liệu hợp đồng lỗi");
+    await page.getByLabel("Nội dung tin nhắn hoặc thông báo").fill("Dữ liệu văn bản lỗi");
     await page.getByRole("button", { name: /Phân tích rủi ro/ }).click();
     await expect(page.locator(".error-callout")).toContainText("dữ liệu không hợp lệ");
   });

@@ -21,7 +21,6 @@ test.describe("canonical product navigation", () => {
 
   for (const [legacyPath, canonicalPath] of [
     ["/ai", "/trust"],
-    ["/contract-check", "/trust?tab=contract"],
     ["/intelligence", "/trust"],
     ["/intelligence/ai-trust", "/trust"],
     ["/intelligence/community", "/community"],

@@ -11,7 +11,6 @@ import {
   ClipboardPaste,
   ExternalLink,
   FileImage,
-  FileText,
   Globe2,
   Image as ImageIcon,
   Info,
@@ -29,7 +28,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import SourceDisclosure from "@/components/ui/SourceDisclosure";
-import ContractCheckIntakeTab from "./ContractCheckIntakeTab";
 import SourceInspectorDrawer from "./SourceInspectorDrawer";
 import AskExpertGatewayCard from "./AskExpertGatewayCard";
 import TrustVsExpertComparisonMatrix from "./TrustVsExpertComparisonMatrix";
@@ -45,7 +43,6 @@ const INPUT_MODES = [
   { id: "qr", label: "QR", icon: ScanSearch },
   { id: "text", label: "Văn bản", icon: ClipboardPaste },
   { id: "url", label: "URL", icon: Globe2 },
-  { id: "contract", label: "Hợp đồng", icon: FileText },
 ];
 
 const STATE_LABELS = {
@@ -95,7 +92,6 @@ function inputTypeLabel(type) {
   if (value.includes("URL")) return "URL";
   if (value.includes("IMAGE")) return "Ảnh chụp";
   if (value.includes("QR")) return "QR";
-  if (value.includes("CONTRACT")) return "Hợp đồng";
   if (value.includes("TEXT")) return "Văn bản";
   return "Chưa công bố";
 }
@@ -199,7 +195,6 @@ function InputComposer({
   onClearFile,
   onAnalyze,
   onReset,
-  onContractAnalyze,
 }) {
   const canSubmit = mode === "image" || mode === "qr" ? Boolean(file) : Boolean(content?.trim());
   return (
@@ -213,7 +208,7 @@ function InputComposer({
           Kiểm tra thông tin
         </h1>
         <p className="text-slate-300 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-          Đưa ảnh chụp, mã QR, văn bản, URL hoặc hợp đồng vào luồng đối chiếu 5 tầng độc lập.
+          Đưa ảnh chụp, mã QR, văn bản hoặc URL vào luồng đối chiếu 5 tầng độc lập.
         </p>
       </div>
       <div className="master-ultra-composer-panel">
@@ -224,9 +219,7 @@ function InputComposer({
             </button>
           ))}
         </div>
-        {mode === "contract" ? (
-          <ContractCheckIntakeTab onAnalyzeContract={onContractAnalyze} />
-        ) : mode === "image" || mode === "qr" ? (
+        {mode === "image" || mode === "qr" ? (
           <div
             className={`master-ultra-upload ${dragging ? "is-dragging" : ""} ${preview ? "has-preview" : ""}`}
             onDragEnter={(event) => { event.preventDefault(); onDragStateChange?.(true); }}
@@ -257,13 +250,13 @@ function InputComposer({
             <textarea value={content} onChange={(event) => onContentChange?.(event.target.value)} rows={6} placeholder={mode === "url" ? "https://..." : "Dán nội dung cần đối soát tại đây..."} />
           </label>
         )}
-        {mode !== "contract" && <div className="master-ultra-composer-footer">
+        <div className="master-ultra-composer-footer">
           <span className="master-ultra-quiet-note"><Info size={14} /> OCR ảnh là gợi ý cục bộ, không phải bằng chứng máy chủ.</span>
           <button type="button" className="master-ultra-submit" disabled={!canSubmit || processing} onClick={onAnalyze}>
             {processing ? <LoaderCircle className="animate-spin" size={16} /> : <ScanSearch size={16} />}
             {hasResult ? "Chạy phiên mới" : "Phân tích rủi ro"} <ArrowRight size={15} />
           </button>
-        </div>}
+        </div>
         {error && <div className="master-ultra-error" role="alert"><ShieldAlert size={16} /><span>{error.message || "Trust Engine chưa thể hoàn tất."}{error.traceId ? <small>Reference: {error.traceId}</small> : null}</span></div>}
         {ocr && <div className="master-ultra-ocr-note"><FileImage size={14} /><span>CLIENT_OCR_HINT</span><p>{safeText(ocr.text || ocr.qrContent, "Không có văn bản OCR được đọc.")}</p>{confirmedEntities.length ? <small>{confirmedEntities.length} entity đã được người dùng xác nhận kèm theo</small> : null}</div>}
         <SourceDisclosure provenance={sourceProvenance} sourceMode={sourceProvenance?.sourceMode || (demoEnabled ? "DEMO" : "LIVE")} />
@@ -585,7 +578,6 @@ export default function TrustMasterUltraJourney({
   onClearFile,
   onAnalyze,
   onReset,
-  onContractAnalyze,
   onNewAnalysis,
   onPrint,
 }) {
@@ -764,7 +756,7 @@ export default function TrustMasterUltraJourney({
       <div className="master-ultra-atmosphere" aria-hidden="true"><span /><span /><span /></div>
       {showComposer ? (
         <div className="master-ultra-workspace-stack space-y-4">
-          <InputComposer mode={mode} content={content} file={file} preview={preview} dragging={dragging} error={error} ocr={ocr} confirmedEntities={confirmedEntities} processing={processing} hasResult={hasResult} demoEnabled={demoEnabled} sourceProvenance={sourceProvenance} fileInputRef={fileInputRef} onModeChange={onModeChange} onContentChange={onContentChange} onFileSelect={onFileSelect} onDragStateChange={onDragStateChange} onClearFile={onClearFile} onAnalyze={onAnalyze} onReset={onReset} onContractAnalyze={onContractAnalyze} />
+          <InputComposer mode={mode} content={content} file={file} preview={preview} dragging={dragging} error={error} ocr={ocr} confirmedEntities={confirmedEntities} processing={processing} hasResult={hasResult} demoEnabled={demoEnabled} sourceProvenance={sourceProvenance} fileInputRef={fileInputRef} onModeChange={onModeChange} onContentChange={onContentChange} onFileSelect={onFileSelect} onDragStateChange={onDragStateChange} onClearFile={onClearFile} onAnalyze={onAnalyze} onReset={onReset} />
           <ProgressRail normalized={normalized} activeIndex={0} processing={false} canInspect={false} />
         </div>
       ) : null}

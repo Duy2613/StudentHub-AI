@@ -7,12 +7,11 @@ import { usePathname } from 'next/navigation';
 const MOBILE_ITEMS = [
   { label: 'Tổng quan', href: '/dashboard' },
   { label: 'Xác minh', href: '/trust' },
-  { label: 'Học thuật', href: '/academic' },
   { label: 'Cộng đồng', href: '/community' },
   { label: 'AI', href: '/ai' },
 ];
 
-const CANONICAL_SHELL_PREFIXES = ["/trust", "/community", "/expert", "/cases", "/dashboard", "/settings", "/academic", "/profile"];
+const CANONICAL_SHELL_PREFIXES = ["/trust", "/community", "/expert", "/cases", "/dashboard", "/settings", "/profile", "/login", "/register", "/onboarding", "/callback"];
 
 export default function MobileNavRail() {
   const pathname = usePathname();

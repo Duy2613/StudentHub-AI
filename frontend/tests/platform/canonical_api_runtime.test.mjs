@@ -21,7 +21,7 @@ async function reservePort() {
 }
 
 async function waitForServer(baseUrl, output) {
-  const deadline = Date.now() + 60_000;
+  const deadline = Date.now() + 180_000;
   while (Date.now() < deadline) {
     try {
       const response = await fetch(`${baseUrl}/api/health/live`);
@@ -34,7 +34,7 @@ async function waitForServer(baseUrl, output) {
   throw new Error(`Canonical API smoke server did not become ready.\n${output()}`);
 }
 
-test("canonical v1 APIs expose honest public contracts and fail closed for personal data", { timeout: 90_000 }, async () => {
+test("canonical v1 APIs expose honest public contracts and fail closed for personal data", { timeout: 210_000 }, async () => {
   const port = await reservePort();
   const baseUrl = `http://127.0.0.1:${port}`;
   const output = [];

@@ -49,7 +49,9 @@ export class CommunityQueryEngine {
     const queryType = COMMUNITY_QUERY_TYPE[params.queryType] || COMMUNITY_QUERY_TYPE.WHAT_STUDENTS_EXPERIENCING;
     const filterCohort = params.cohort ? String(params.cohort).trim().toUpperCase() : null;
 
-    let posts = CommunityStore.getPostsByTopic(topic, { redactPrivate: true });
+    let posts = Array.isArray(params.posts)
+      ? params.posts.filter((post) => String(post?.topic || "").trim().toUpperCase() === topic)
+      : CommunityStore.getPostsByTopic(topic, { redactPrivate: true });
     if (filterCohort) {
       posts = posts.filter(p => p.context?.cohort === filterCohort);
     }
@@ -88,8 +90,8 @@ export class CommunityQueryEngine {
       },
       recency: {
         status: "CURRENT_PROCESS",
-        recentPostCount: posts.filter(p => (Date.now() - new Date(p.publishedAt).getTime()) <= 90 * 24 * 60 * 60 * 1000).length,
-        timeRange: "August 2026"
+        recentPostCount: posts.filter(p => Number.isFinite(new Date(p.publishedAt).getTime()) && (Date.now() - new Date(p.publishedAt).getTime()) <= 90 * 24 * 60 * 60 * 1000).length,
+        timeRange: posts.length > 0 ? "Dữ liệu gần đây được lưu trong projection cộng đồng" : null
       },
       independence: {
         provenanceClustersCount: consensus.provenanceClustersCount,
@@ -117,6 +119,15 @@ export class CommunityQueryEngine {
         "Độ trễ vận hành thực tế có thể dao động tùy từng đợt xét của Phòng Đào Tạo."
       ]
     };
+  }
+
+  /**
+   * Runs the same pure query projection over an explicitly supplied durable
+   * post list. Production route handlers use this entry point so the legacy
+   * fixture store can never become an implicit data source.
+   */
+  static queryFromPosts(params = {}, posts = []) {
+    return this.query({ ...params, posts: Array.isArray(posts) ? posts : [] });
   }
 
   /**

@@ -52,23 +52,38 @@ export class PostgresSessionRepository {
   }
 
   async findActive(tokenHash, now) {
-    const result = await this.pool.query(`
+    const sessionProjection = `
+      s.user_id, s.created_at, s.last_seen_at, s.expires_at, s.session_version,
+      s.auth_provider,
+      u.email,
+      (u.email_confirmed_at is not null) as email_verified,
+      nullif(u.raw_user_meta_data->>'full_name', '') as full_name,
+      case when (select to_jsonb(p)->>'onboarded' from public.profiles p where p.id = s.user_id) in ('true', 'false')
+        then ((select to_jsonb(p)->>'onboarded' from public.profiles p where p.id = s.user_id))::boolean else false end as onboarded,
+      coalesce((select array_agg(r.code order by r.code)
+        from private.user_roles ur join private.roles r on r.id=ur.role_id
+        where ur.user_id=s.user_id and ur.revoked_at is null), array['STUDENT']::text[]) roles`;
+    const activeSessionWhere = `
       update private.server_sessions s
       set last_seen_at=$2, idle_expires_at=least($2 + interval '30 minutes', s.expires_at)
       from auth.users u
       where s.token_hash=$1 and s.revoked_at is null and s.expires_at>$2 and s.idle_expires_at>$2
         and u.id=s.user_id
-      returning s.user_id, s.created_at, s.last_seen_at, s.expires_at, s.session_version,
-        s.auth_provider,
-        u.email,
-        (u.email_confirmed_at is not null) as email_verified,
-        nullif(u.raw_user_meta_data->>'full_name', '') as full_name,
-        case when (select to_jsonb(p)->>'onboarded' from public.profiles p where p.id = s.user_id) in ('true', 'false')
-          then ((select to_jsonb(p)->>'onboarded' from public.profiles p where p.id = s.user_id))::boolean else false end as onboarded,
-        coalesce((select array_agg(r.code order by r.code)
-          from private.user_roles ur join private.roles r on r.id=ur.role_id
-          where ur.user_id=s.user_id and ur.revoked_at is null), array['STUDENT']::text[]) roles
-    `, [tokenHash, now]);
+      returning `;
+    let result;
+    try {
+      result = await this.pool.query(`${activeSessionWhere}${sessionProjection},
+        coalesce((select array_agg(de.entitlement_code order by de.entitlement_code)
+          from private.demo_entitlements de
+          where de.user_id=s.user_id
+            and de.revoked_at is null
+            and (de.expires_at is null or de.expires_at>$2)), array[]::text[]) qa_entitlements`, [tokenHash, now]);
+    } catch (error) {
+      // Keep existing sessions valid during the short migration window. QA
+      // entitlements simply remain absent until the private table is applied.
+      if (error?.code !== "42P01") throw error;
+      result = await this.pool.query(`${activeSessionWhere}${sessionProjection}`, [tokenHash, now]);
+    }
     return result.rows[0] || null;
   }
 

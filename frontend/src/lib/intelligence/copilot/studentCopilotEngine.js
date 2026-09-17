@@ -6,7 +6,7 @@
  * 2. 🛡️ SAFETY (Geospatial safety scores, police stations, safe routes)
  * 3. 💼 CAREER (Internship demands, skill trees, research labs)
  * 4. 💰 FINANCE (Tuition bank verification, genuine scholarships)
- * 5. 📄 DOCUMENTS (Document extraction, contract clause risk checks)
+ * 5. 📄 DOCUMENTS (Document extraction and evidence review)
  * 6. 🚨 EMERGENCY (Instant 112/113/115 dispatch, GPS SOS beacon)
  */
 
@@ -21,7 +21,7 @@ export const STUDENT_SITUATION_MODES = [
   { id: "SAFETY", name: "An Toàn & Bản Đồ", icon: "Shield", color: "emerald" },
   { id: "CAREER", name: "Việc Làm & Lab NCKH", icon: "Briefcase", color: "purple" },
   { id: "FINANCE", name: "Học Phí & Học Bổng", icon: "Coins", color: "amber" },
-  { id: "DOCUMENTS", name: "Công Văn & Hợp Đồng", icon: "FileText", color: "blue" },
+  { id: "DOCUMENTS", name: "Công Văn & Bằng Chứng", icon: "FileText", color: "blue" },
   { id: "EMERGENCY", name: "Cấp Cứu Khẩn Cấp", icon: "AlertOctagon", color: "rose" },
 ];
 

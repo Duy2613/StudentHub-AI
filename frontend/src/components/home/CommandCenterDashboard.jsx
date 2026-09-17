@@ -21,6 +21,7 @@ import {
 import { useAuth } from "@/lib/auth/AuthContext";
 import V3_MEDIA from "@/lib/media/v3MediaRegistry";
 import HobroTiltCard from "@/components/cinematic/HobroTiltCard";
+import AcademicSummaryWidget from "@/components/academic/AcademicSummaryWidget";
 
 function Stat({ label, value, detail, icon: Icon, tone = "teal" }) {
   return (
@@ -200,6 +201,7 @@ export default function CommandCenterDashboard() {
       </div>
 
       <section className="surface-card grid gap-5 p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6"><div className="flex gap-3"><span className="stat-icon teal"><MessageCircle size={17} /></span><div><p className="eyebrow">Mạng lưới xác thực</p><h2 className="mt-2 text-lg font-bold text-white">Khi chưa chắc, hãy xem nguồn trước khi quyết định</h2><p className="mt-1 text-sm text-app-muted">Trust, Expert, Community và Evidence được nối trong cùng một luồng giải thích.</p></div></div><Link href="/trust" className="secondary-action justify-center"><UserRound size={14} /> Mở Trust Engine <ArrowRight size={14} /></Link></section>
+      <AcademicSummaryWidget />
     </div>
   );
 }

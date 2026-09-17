@@ -12,6 +12,8 @@ import {
 
 describe("CommunityV2GoldenScenariosE2E", () => {
   beforeEach(() => {
+    process.env.NODE_ENV = "test";
+    process.env.STUDENTHUB_COMMUNITY_DEMO = "true";
     CommunityStore.clear();
   });
 

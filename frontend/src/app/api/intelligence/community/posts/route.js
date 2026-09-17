@@ -13,6 +13,7 @@ import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { createSecureId } from "@/lib/security/secureId.js";
 import { redactText } from "@/lib/communityExpert/promaxDomain.js";
 import { publishRealtimeEvent } from "@/lib/server/realtime/RealtimePublisher.js";
+import { deriveIdentityTruth, DEMO_ENTITLEMENTS } from "@/lib/server/auth/demoAccountPolicy.js";
 
 function demoMode() {
   return isCommunityDemoMode();
@@ -84,14 +85,21 @@ async function createCommunityIntelligencePost(request, routeParams, principal, 
       return NextResponse.json({ success: false, error: { code: "PREVIEW_DIGEST_MISMATCH", userMessage: "The privacy preview changed; generate a new preview before publishing." } }, { status: 409 });
     }
     if (demoMode()) {
+      const identityTruth = deriveIdentityTruth({
+        email: principal.email,
+        emailVerified: principal.attributes?.emailVerified === true,
+        qaEntitlements: principal.attributes?.qaEntitlements,
+      });
       const saved = CommunityStore.savePost({
         ...body,
         postId: createSecureId("POST"),
         content: redactText(input.statement),
         authorId: principal.subjectId,
         authorCohort: principal.attributes?.cohort || "UNKNOWN",
-        verifiedIdentity: principal.attributes?.emailVerified ? "VERIFIED_STUDENT" : "UNVERIFIED_GUEST",
-        verificationState: principal.attributes?.emailVerified ? "VERIFIED_IDENTITY" : "KNOWN_ACCOUNT",
+        verifiedIdentity: identityTruth.institutionalEmailVerified ? "VERIFIED_STUDENT" : "UNVERIFIED_GUEST",
+        verificationState: identityTruth.institutionalEmailVerified ? "VERIFIED_IDENTITY" : "KNOWN_ACCOUNT",
+        verificationSource: identityTruth.verificationSource,
+        demoAccess: identityTruth.qaStudentFeatureAccess ? DEMO_ENTITLEMENTS.STUDENT_FEATURES : null,
         moderationState: "CLEAN",
         upvotes: 0,
         promaxMode: "DEMO_ONLY",

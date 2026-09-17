@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { CommunityQueryEngine } from "@/lib/intelligence/community/communityQueryEngine.js";
+import { CommunityRepository } from "@/lib/server/database/CommunityRepository.js";
+import { isCommunityDemoMode } from "@/lib/intelligence/community/communityStore.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
 function normalizeQuery(value) {
@@ -13,15 +15,20 @@ function normalizeQuery(value) {
 
 async function readCommunity(request) {
   const url = new URL(request.url);
-  const result = CommunityQueryEngine.query(normalizeQuery({
+  const query = normalizeQuery({
     topic: url.searchParams.get("topic"),
     queryType: url.searchParams.get("queryType"),
     cohort: url.searchParams.get("cohort"),
-  }));
+  });
+  const result = isCommunityDemoMode()
+    ? CommunityQueryEngine.query(query)
+    : CommunityQueryEngine.queryFromPosts(query, await CommunityRepository.listContributions({ limit: 100 }));
   return NextResponse.json({
     success: true,
     contractVersion: "community.v1",
-    provenance: "COMMUNITY",
+    provenance: isCommunityDemoMode() ? "DEMO_FIXTURE" : "DURABLE_POSTGRES",
+    sourceState: isCommunityDemoMode() ? "DEMO_FIXTURE" : "DURABLE_POSTGRES",
+    isAuthoritative: false,
     data: result,
   });
 }
@@ -29,8 +36,11 @@ async function readCommunity(request) {
 async function queryCommunity(request) {
   let body;
   try { body = await request.json(); } catch { return NextResponse.json({ success: false, error: { code: "INVALID_JSON", userMessage: "Payload phải là JSON hợp lệ." } }, { status: 400 }); }
-  const result = CommunityQueryEngine.query(normalizeQuery(body));
-  return NextResponse.json({ success: true, contractVersion: "community.v1", provenance: "COMMUNITY", data: result });
+  const query = normalizeQuery(body);
+  const result = isCommunityDemoMode()
+    ? CommunityQueryEngine.query(query)
+    : CommunityQueryEngine.queryFromPosts(query, await CommunityRepository.listContributions({ limit: 100 }));
+  return NextResponse.json({ success: true, contractVersion: "community.v1", provenance: isCommunityDemoMode() ? "DEMO_FIXTURE" : "DURABLE_POSTGRES", sourceState: isCommunityDemoMode() ? "DEMO_FIXTURE" : "DURABLE_POSTGRES", isAuthoritative: false, data: result });
 }
 
 export const GET = SecurityFabric.wrapHandler({ action: "READ_CANONICAL_COMMUNITY", allowAnonymous: true, maxRequests: 60, maxBodyBytes: 0 }, readCommunity);

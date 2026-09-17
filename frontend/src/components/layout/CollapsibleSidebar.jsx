@@ -10,7 +10,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, ShieldAlert, MessageSquare, User, Settings, LogOut, ChevronLeft, ChevronRight, ShieldCheck, Star, Compass, CreditCard, Scale, AlertOctagon, ShoppingBag, Trophy, Calendar, GraduationCap, Award } from "lucide-react";
+import { LayoutDashboard, ShieldAlert, MessageSquare, User, Settings, LogOut, ChevronLeft, ChevronRight, ShieldCheck, Star, Compass, CreditCard, Scale, AlertOctagon, ShoppingBag, Trophy, GraduationCap, Award } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
@@ -70,13 +70,6 @@ export default function CollapsibleSidebar({ className = "" }) {
       icon: GraduationCap,
       badge: "Dossier",
       badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/40",
-    },
-    {
-      label: "Academic 360",
-      href: "/academic",
-      icon: Calendar,
-      badge: "Digital Twin",
-      badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
     },
     {
       label: "Hồ Sơ & Bảo Mật",

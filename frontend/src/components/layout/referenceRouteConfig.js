@@ -32,14 +32,6 @@ const REFERENCE_ROUTE_PROFILES = Object.freeze([
     matches: (pathname) => pathname.startsWith("/expert"),
   }),
   Object.freeze({
-    id: "academic",
-    chapter: "IV",
-    label: "ACADEMIC ATLAS",
-    signal: "STATIC / READING",
-    surface: "archive",
-    matches: (pathname) => pathname.startsWith("/academic"),
-  }),
-  Object.freeze({
     id: "cases",
     chapter: "V",
     label: "EVIDENCE ARCHIVE",

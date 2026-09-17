@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import {
   Activity,
   ArrowRight,
   ClipboardPaste,
-  FileText,
   Globe2,
   ImageIcon,
   Lock,
@@ -19,13 +17,35 @@ import SourceDisclosure from "@/components/ui/SourceDisclosure";
 import VerifiedPoster from "@/components/media/VerifiedPoster";
 import ReferenceBirdStamp from "@/components/media/ReferenceBirdStamp";
 import { markAssurance } from "@/lib/performance/assurance";
-import ContractCheckIntakeTab from "./ContractCheckIntakeTab";
 import { motion } from "framer-motion";
 
-const MODES = ["image", "qr", "text", "url", "contract"];
+const MODES = ["image", "qr", "text", "url"];
 
-export function TrustCriticalHero() {
-  return null;
+export function TrustCriticalHero({ provenance }) {
+  return (
+    <header className="vnext-trust-hero relative mb-4">
+      <div className="trust-optic-viewport hidden" aria-hidden="true">
+        <VerifiedPoster assetId="VID-OPTIC-01" alt="" className="trust-optic-poster" />
+      </div>
+      <ReferenceBirdStamp className="vnext-trust-hero-bird hidden" />
+
+      <div className="vnext-trust-hero-copy relative z-10">
+        <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-950/40 px-3 py-0.5 font-mono text-[10px] text-cyan-300 backdrop-blur-md">
+          <ShieldCheck size={12} className="text-cyan-400" />
+          <span className="font-semibold uppercase tracking-wider">STATIC FIRST</span>
+          <span className="text-white/20">|</span>
+          <span className="text-slate-400">Dữ liệu nguồn cấp 1</span>
+        </div>
+
+        <h1 className="text-xl font-bold tracking-tight text-white font-serif">
+          Phòng Giám Định Độ Tin Cậy & Bằng Chứng
+        </h1>
+        <p className="mt-1 text-xs text-slate-400 leading-relaxed">
+          Thẩm tra đa tầng thông tin học vụ, học bổng và quy chế sinh viên. Không có verdict nếu chưa đủ bằng chứng.
+        </p>
+      </div>
+    </header>
+  );
 }
 
 export function TrustCriticalInput({ mode = "image", content = "", onActivate, onModeChange, onContentChange }) {
@@ -48,7 +68,7 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
               Kiểm tra thông tin
             </h1>
             <p className="text-slate-300 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-              Đưa ảnh chụp, mã QR, văn bản, URL hoặc hợp đồng vào luồng đối chiếu 5 tầng độc lập.
+              Đưa ảnh chụp, mã QR, văn bản hoặc URL vào luồng đối chiếu 5 tầng độc lập.
             </p>
           </div>
         </div>
@@ -66,20 +86,9 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
           <button type="button" role="tab" aria-selected={mode === "url"} onClick={() => selectMode("url")}>
             <Globe2 size={15} /> URL
           </button>
-          <button type="button" role="tab" aria-selected={mode === "contract"} onClick={() => selectMode("contract")}>
-            <FileText size={15} /> Hợp đồng
-          </button>
         </div>
 
-        {mode === "contract" ? (
-          <ContractCheckIntakeTab
-            onAnalyzeContract={(text) => {
-              onContentChange?.(text);
-              onModeChange?.("text");
-              activate();
-            }}
-          />
-        ) : mode === "image" || mode === "qr" ? (
+        {mode === "image" || mode === "qr" ? (
           <button
             type="button"
             className="upload-prompt relative overflow-hidden group border border-dashed border-cyan-500/30 hover:border-cyan-400/60 rounded-xl transition-all"
@@ -112,11 +121,9 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
           </label>
         )}
 
-        {mode !== "contract" && (
-          <button type="button" className="primary-action trust-submit mt-3" onClick={activate}>
-            <ScanSearch size={17} /> Phân tích rủi ro <ArrowRight size={16} />
-          </button>
-        )}
+        <button type="button" className="primary-action trust-submit mt-3" onClick={activate}>
+          <ScanSearch size={17} /> Phân tích rủi ro <ArrowRight size={16} />
+        </button>
       </div>
 
       <aside className="intelligence-panel pipeline-panel vnext-trust-pipeline-panel" aria-label="Trust pipeline">
@@ -168,18 +175,10 @@ export function TrustCriticalShell({ mode = "image", content = "", onActivate, o
 }
 
 export default function TrustWorkspaceClient() {
-  const searchParams = useSearchParams();
-  const tabParam = searchParams?.get("tab");
   const [TrustWorkspace, setTrustWorkspace] = useState(null);
-  const [requestedMode, setRequestedMode] = useState(tabParam === "contract" ? "contract" : "image");
+  const [requestedMode, setRequestedMode] = useState("image");
   const [draftContent, setDraftContent] = useState("");
   const [sourceProvenance, setSourceProvenance] = useState(null);
-
-  useEffect(() => {
-    if (tabParam === "contract") {
-      setRequestedMode("contract");
-    }
-  }, [tabParam]);
 
   const loadWorkspace = useCallback(() => {
     import("./AiTrustStudioView")

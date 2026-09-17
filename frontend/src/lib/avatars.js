@@ -109,7 +109,7 @@ export const AVATAR_LIST = [
     badgeColor: "bg-amber-500/25 text-amber-200 border-amber-400/60 shadow-[0_0_15px_rgba(245,158,11,0.3)]",
     iconType: "award",
     emoji: "⚖️",
-    description: "Tư vấn hợp đồng trọ, pháp lý việc làm và phòng chống chiếm đoạt tài sản",
+    description: "Tư vấn an toàn thuê trọ, pháp lý việc làm và phòng chống chiếm đoạt tài sản",
   },
   {
     id: "expert-ai",

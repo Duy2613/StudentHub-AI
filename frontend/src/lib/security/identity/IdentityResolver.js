@@ -15,6 +15,7 @@ import { getDurableSessionService } from "./DurableSessionService.js";
 import { StudentIdentityStore } from "../../intelligence/academic/studentIdentityStore.js";
 import { SecurityError } from "../core/SecurityErrorEnvelope.js";
 import { normalizeSubjectId } from "./normalizeSubjectId.js";
+import { deriveIdentityTruth } from "../../server/auth/demoAccountPolicy.js";
 
 const tokenValidator = new TokenValidator();
 
@@ -116,9 +117,13 @@ export class IdentityResolver {
     }
 
     // Look up authoritative identity in store if student
+    const emailVerified = payload.email_verified === true;
     let attributes = {
       ...payload.attributes,
-      emailVerified: payload.email_verified === true || payload.user_metadata?.email_verified === true
+      emailVerified,
+      // Token attributes are never allowed to mint QA entitlements.  The
+      // durable application-session path below is the only source for those.
+      ...deriveIdentityTruth({ email, emailVerified, qaEntitlements: [] }),
     };
     if (studentId) {
       const identity = StudentIdentityStore.getIdentityByStudentId(studentId);
@@ -201,6 +206,11 @@ export class IdentityResolver {
         emailVerified: session.email_verified === true,
         fullName: session.full_name || null,
         onboarded: session.onboarded === true,
+        ...deriveIdentityTruth({
+          email: session.email || "",
+          emailVerified: session.email_verified === true,
+          qaEntitlements: session.qa_entitlements,
+        }),
       }
     });
   }

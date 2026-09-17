@@ -46,6 +46,22 @@ export class ReBACPolicy {
         return { allowed: true };
       }
 
+      // An active expert may read a resource that the server explicitly
+      // assigned to that expert. The assignment is a separate server-owned
+      // relationship; a client-supplied role or assignee field cannot mint
+      // one because the resource must already have been returned by the
+      // scoped repository query.
+      const resourceAssignee = String(resource.assigneeId || resource.assignee_id || "").trim();
+      const cleanResourceAssignee = resourceAssignee.replace("expert:", "").trim();
+      if (
+        principal.hasRole("EXPERT") &&
+        cleanPrincipalStudentId &&
+        cleanResourceAssignee &&
+        cleanPrincipalStudentId === cleanResourceAssignee
+      ) {
+        return { allowed: true, relationship: "ASSIGNED_EXPERT" };
+      }
+
       // Check Agent Delegation: AI Agent ACTS_FOR student
       if (principal.isAgent && principal.agentIdentity) {
         const delegatorId = String(principal.agentIdentity.delegatorId || principal.attributes?.delegatorId || "").trim();

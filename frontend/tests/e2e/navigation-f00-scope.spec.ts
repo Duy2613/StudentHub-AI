@@ -8,7 +8,6 @@ const BANNED_NAV_HREFS = [
   '/scam-check',
   '/forum',
   '/prof-rating',
-  '/contract-check',
 ];
 
 test.describe('F00 Scope Enforcement — Navigation Non-Exposure', () => {
@@ -43,7 +42,5 @@ test.describe('F00 Scope Enforcement — Navigation Non-Exposure', () => {
     await page.goto('/prof-rating');
     await expect(page).toHaveURL(/\/academic/);
 
-    await page.goto('/contract-check');
-    await expect(page).toHaveURL(/\/trust\?tab=contract/);
   });
 });

@@ -133,7 +133,7 @@ export const STUDENT_RADAR_STREAMS = [
         sourceUrl: "/safety-map",
         authorityTier: "TIER_2_CORROBORATED",
         confidence: "HIGH",
-        actionRequired: "Chủ trọ có hợp đồng chuẩn, không phụ thu tiền điện sai quy định",
+        actionRequired: "Chủ trọ công khai điều khoản thuê, không phụ thu tiền điện sai quy định",
         publishedAt: "2026-02-24T16:00:00.000Z",
       },
     ],

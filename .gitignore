@@ -49,3 +49,6 @@ frontend/.lhci-temp/
 .github/skills/
 
 .vercel
+
+# Root level junction to frontend/public
+/public/
