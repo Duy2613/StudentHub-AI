@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
 /**
  * ArstraumurAtmosphereCanvas
@@ -8,9 +9,11 @@ import React, { useEffect, useRef } from "react";
  * Atmospheric particle and harmonic wave canvas that ripples dynamically with pointer coordinates.
  */
 export default function ArstraumurAtmosphereCanvas() {
+  const pathname = usePathname();
   const canvasRef = useRef(null);
 
   useEffect(() => {
+    if (pathname?.startsWith("/academic")) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -121,7 +124,11 @@ export default function ArstraumurAtmosphereCanvas() {
       window.removeEventListener("mousemove", handleMouseMove);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [pathname]);
+
+  if (pathname?.startsWith("/academic")) {
+    return null;
+  }
 
   return (
     <canvas
