@@ -61,6 +61,11 @@ test("MODEL ROUTER: Capability-based route returns configured candidates in prio
   const route = router.describeRoute(AI_CAPABILITY.FAST_CLASSIFICATION);
   assert.ok(Array.isArray(route), "Must describe route as candidate array");
   assert.ok(route.length > 0, "Route must have at least one candidate");
-  assert.equal(route[0].model, "gemini-3.8-flash", "Gemini 3.8 Flash must be the sole active candidate");
-  assert.deepEqual(route.map((entry) => entry.provider), ["gemini", "gemini", "gemini", "gemini"]);
+  assert.equal(route[0].model, "gemini-3.8-flash", "Gemini 3.8 Flash must be the primary candidate");
+  assert.deepEqual(route.map((entry) => entry.provider), ["gemini", "gemini", "gemini"]);
+  assert.deepEqual(route.map((entry) => entry.model), [
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
+    "gemini-3.6-flash",
+  ]);
 });
