@@ -30,7 +30,6 @@ import { apiRequest } from "@/lib/api/runtimeClient";
 import { apiErrorMessage } from "@/lib/api/runtimeError";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import UnifiedAppShell from "@/components/layout/UnifiedAppShell";
-import AcademicSummaryWidget from "@/components/academic/AcademicSummaryWidget";
 
 // Base presentation editable fields contract for backwards compatibility
 const EDITABLE_FIELDS = ["fullName", "avatarUrl"];
@@ -335,8 +334,6 @@ export default function ProfilePage() {
             </div>
           </div>
         </header>
-
-        <AcademicSummaryWidget />
 
         {saveSuccess && (
           <div className="rounded-lg p-3 bg-emerald-950/40 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2" role="status">
