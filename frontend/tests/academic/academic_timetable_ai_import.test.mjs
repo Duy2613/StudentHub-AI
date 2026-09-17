@@ -43,6 +43,10 @@ test("AI image import uses the multimodal gateway and returns an editable non-pe
   assert.equal(call.inputParts[0].mime_type, "image/png");
   assert.equal(result.importState, "DRAFT_READY");
   assert.equal(result.sourcePersisted, false);
+  assert.equal(result.provider, "google");
+  assert.equal(result.model, "gemini-test");
+  assert.equal(typeof result.durationMs, "number");
+  assert.equal(typeof result.attemptCount, "number");
   assert.equal(result.draft.entries[0].courseName, "Mạng máy tính");
   assert.equal(result.draft.entries[0].confidence.dayOfWeek, 0.55);
 });

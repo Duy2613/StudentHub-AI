@@ -39,7 +39,6 @@ const modelsToProbe = [
   { id: "gemini-3.8-flash", catalogKey: "GEMINI_3_8_FLASH" },
   { id: "gemini-3.7-flash", catalogKey: "GEMINI_3_7_FLASH" },
   { id: "gemini-3.6-flash", catalogKey: "GEMINI_3_6_FLASH" },
-  { id: "gemini-2.5-flash", catalogKey: "GEMINI_2_5_FLASH" },
 ];
 
 const results = [];

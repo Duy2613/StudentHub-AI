@@ -97,12 +97,13 @@ export class TimetableVisionExtractor {
         },
       });
     } catch (error) {
-      return this.#fallback("AI_IMPORT_UNAVAILABLE", error);
+      return this.#fallback("AI_EXTRACTION_UNAVAILABLE", error);
     }
 
     const draft = normalizeCandidate(result?.json);
     if (!result?.ok || !draft) {
-      return this.#fallback(result?.errorType || "AI_IMPORT_INVALID_RESPONSE", result);
+      const failureCode = !result?.ok ? "AI_EXTRACTION_UNAVAILABLE" : (result?.errorType || "AI_IMPORT_INVALID_RESPONSE");
+      return this.#fallback(failureCode, result);
     }
     if (!draft.entries.length) {
       draft.warnings = [...draft.warnings, "Chưa nhận diện được dòng học phần chắc chắn; bạn có thể nhập thủ công."];
@@ -114,6 +115,16 @@ export class TimetableVisionExtractor {
       providerStatus: result.providerStatus || "SUCCESS",
       provider: result.provider || "google",
       model: result.executedModel || result.model || null,
+      durationMs: Number.isFinite(result.totalLatencyMs) ? result.totalLatencyMs : 0,
+      attemptCount: Array.isArray(result.attempts) ? result.attempts.length : 1,
+      attempts: Array.isArray(result.attempts)
+        ? result.attempts.map((a) => ({
+            model: a.model,
+            result: a.result,
+            durationMs: a.durationMs,
+            httpStatus: a.httpStatus,
+          }))
+        : [],
       fallbackUsed: Boolean(result.fallbackUsed),
       sourcePersisted: false,
     };
@@ -127,7 +138,17 @@ export class TimetableVisionExtractor {
       providerStatus: result?.providerStatus || "UNAVAILABLE",
       provider: result?.provider || "google",
       model: result?.executedModel || result?.model || null,
-      failureCode: String(code || "AI_IMPORT_UNAVAILABLE").slice(0, 80),
+      durationMs: Number.isFinite(result?.totalLatencyMs) ? result.totalLatencyMs : 0,
+      attemptCount: Array.isArray(result?.attempts) ? result.attempts.length : 0,
+      attempts: Array.isArray(result?.attempts)
+        ? result?.attempts.map((a) => ({
+            model: a.model,
+            result: a.result,
+            durationMs: a.durationMs,
+            httpStatus: a.httpStatus,
+          }))
+        : [],
+      failureCode: String(code || "AI_EXTRACTION_UNAVAILABLE").slice(0, 80),
       fallbackUsed: true,
       sourcePersisted: false,
     };
