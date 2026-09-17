@@ -37,6 +37,10 @@ const USER_FORBIDDEN_MUTATION_FIELDS = new Set([
   "verifiedDomains",
   "active",
   "authority",
+  "qaAccess",
+  "qaEntitlements",
+  "demoAccess",
+  "demoEntitlements",
   "createdAt",
   "updatedAt",
 ]);

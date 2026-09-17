@@ -18,6 +18,13 @@ import { getPostgresPool } from "../frontend/src/lib/server/database/PostgresPoo
 
 const PROJECT_REF = "kytdomflmjytzyaabogi";
 const PROVISIONING_VERSION = "demo-accounts.v1";
+const EXPERT_CANONICAL_DOMAINS = Object.freeze([
+  "GENERAL_EPISTEMICS",
+  "AI_ML",
+  "ACADEMIC_INTEGRITY",
+  "CYBERSECURITY",
+  "SCHOLARSHIP",
+]);
 const EXPERT_DOMAIN = "GENERAL_EPISTEMICS";
 const EXPERT_EMAIL = "demo-expert@gmail.com";
 const USER_EMAIL = "demo-user@gmail.com";
@@ -133,7 +140,7 @@ async function ensureRole(client, userId, roleCode) {
   if (!result.rows[0]) fail("DEMO_ROLE_NOT_CONFIGURED");
 }
 
-async function ensureEntitlements(client, account, entitlements) {
+async function ensureEntitlements(client, account, entitlements, scopes = []) {
   for (const entitlementCode of entitlements) {
     await client.query(
       `insert into private.demo_entitlements
@@ -148,14 +155,14 @@ async function ensureEntitlements(client, account, entitlements) {
         account.userId,
         entitlementCode,
         QA_VERIFICATION_SOURCE,
-        JSON.stringify({ email: account.email, provisioningVersion: PROVISIONING_VERSION }),
+        JSON.stringify({ email: account.email, provisioningVersion: PROVISIONING_VERSION, scopes: scopes || [] }),
       ]
     );
   }
 }
 
 async function ensureExpertQualification(client, account) {
-  if (account.email !== EXPERT_EMAIL) return { domain: null, applicationId: null };
+  if (account.email !== EXPERT_EMAIL) return { domains: [], applicationId: null };
 
   const profileSnapshot = {
     displayName: "Demo Expert",
@@ -180,7 +187,7 @@ async function ensureExpertQualification(client, account) {
         (user_id, status, profile_snapshot, requested_domains, approved_domains, reviewed_at, reviewed_by)
        values ($1, 'ACTIVE', $2::jsonb, $3::jsonb, $3::jsonb, now(), null)
        returning id`,
-      [account.userId, JSON.stringify(profileSnapshot), JSON.stringify([EXPERT_DOMAIN])]
+      [account.userId, JSON.stringify(profileSnapshot), JSON.stringify(EXPERT_CANONICAL_DOMAINS)]
     );
     applicationId = inserted.rows[0]?.id;
   } else {
@@ -194,7 +201,7 @@ async function ensureExpertQualification(client, account) {
               reviewed_by = null,
               updated_at = now()
         where id = $1`,
-      [applicationId, JSON.stringify(profileSnapshot), JSON.stringify([EXPERT_DOMAIN])]
+      [applicationId, JSON.stringify(profileSnapshot), JSON.stringify(EXPERT_CANONICAL_DOMAINS)]
     );
   }
   if (!applicationId) fail("DEMO_EXPERT_APPLICATION_FAILED");
@@ -217,37 +224,61 @@ async function ensureExpertQualification(client, account) {
     );
   }
 
-  const practice = await client.query(
-    `select id, state
-       from private.expert_practice_submissions
-      where application_id = $1 and domain_code = $2
-      for update`,
-    [applicationId, EXPERT_DOMAIN]
-  );
   const practiceResponse = {
     scope: "evidence-bounded QA demonstration",
     conclusion: "The reviewer should separate source authority from expert interpretation and state uncertainty.",
     limitations: "This is a QA-provisioned practice record; it is not an external credential.",
   };
-  if (practice.rows.length && practice.rows[0].state !== "PASSED") fail("DEMO_EXPERT_PRACTICE_HAS_NON_QA_STATE");
-  if (!practice.rows.length) {
+
+  for (const domain of EXPERT_CANONICAL_DOMAINS) {
+    const practice = await client.query(
+      `select id, state
+         from private.expert_practice_submissions
+        where application_id = $1 and domain_code = $2
+        for update`,
+      [applicationId, domain]
+    );
+    if (practice.rows.length && practice.rows[0].state !== "PASSED") fail("DEMO_EXPERT_PRACTICE_HAS_NON_QA_STATE");
+    if (!practice.rows.length) {
+      await client.query(
+        `insert into private.expert_practice_submissions
+          (application_id, user_id, domain_code, prompt_version, prompt_snapshot,
+           response, evidence_revision_ids, state, idempotency_key, request_digest,
+           reviewed_by, reviewed_at)
+         values ($1, $2, $3, 'expert-practice.v1', $4::jsonb, $5::jsonb, $6::jsonb,
+                 'PASSED', $7, $8, null, now())`,
+        [
+          applicationId,
+          account.userId,
+          domain,
+          JSON.stringify({ promptVersion: "expert-practice.v1", domain, provisioningSource: QA_VERIFICATION_SOURCE }),
+          JSON.stringify(practiceResponse),
+          JSON.stringify([`QA_PROVISIONED:${PROVISIONING_VERSION}`]),
+          `qa:${PROVISIONING_VERSION}:${account.userId}:${domain}`,
+          digest(`${PROVISIONING_VERSION}:${account.userId}:${domain}`),
+        ]
+      );
+    }
+
     await client.query(
-      `insert into private.expert_practice_submissions
-        (application_id, user_id, domain_code, prompt_version, prompt_snapshot,
-         response, evidence_revision_ids, state, idempotency_key, request_digest,
-         reviewed_by, reviewed_at)
-       values ($1, $2, $3, 'expert-practice.v1', $4::jsonb, $5::jsonb, $6::jsonb,
-               'PASSED', $7, $8, null, now())`,
-      [
-        applicationId,
-        account.userId,
-        EXPERT_DOMAIN,
-        JSON.stringify({ promptVersion: "expert-practice.v1", domain: EXPERT_DOMAIN, provisioningSource: QA_VERIFICATION_SOURCE }),
-        JSON.stringify(practiceResponse),
-        JSON.stringify([`QA_PROVISIONED:${PROVISIONING_VERSION}`]),
-        `qa:${PROVISIONING_VERSION}:${account.userId}:${EXPERT_DOMAIN}`,
-        digest(`${PROVISIONING_VERSION}:${account.userId}:${EXPERT_DOMAIN}`),
-      ]
+      `insert into private.expert_domains (user_id, domain_code, evidence_count)
+       values ($1, $2, 0)
+       on conflict (user_id, domain_code) do nothing`,
+      [account.userId, domain]
+    );
+
+    await client.query(
+      `insert into private.expert_verifications
+        (user_id, domain_code, status, qualification_state, verified_by, verified_at, evidence_ref)
+       values ($1, $2, 'VERIFIED', 'DOMAIN_VERIFIED', null, now(), $3)
+       on conflict (user_id, domain_code) do update
+         set status = 'VERIFIED',
+             qualification_state = 'DOMAIN_VERIFIED',
+             suspended_at = null,
+             verified_by = null,
+             verified_at = now(),
+             evidence_ref = excluded.evidence_ref`,
+      [account.userId, domain, `${QA_VERIFICATION_SOURCE}:${PROVISIONING_VERSION}:${applicationId}:${domain}`]
     );
   }
 
@@ -260,27 +291,9 @@ async function ensureExpertQualification(client, account) {
            updated_at = now()`,
     [account.userId, profileSnapshot.bio]
   );
-  await client.query(
-    `insert into private.expert_domains (user_id, domain_code, evidence_count)
-     values ($1, $2, 0)
-     on conflict (user_id, domain_code) do nothing`,
-    [account.userId, EXPERT_DOMAIN]
-  );
-  await client.query(
-    `insert into private.expert_verifications
-      (user_id, domain_code, status, qualification_state, verified_by, verified_at, evidence_ref)
-     values ($1, $2, 'VERIFIED', 'DOMAIN_VERIFIED', null, now(), $3)
-     on conflict (user_id, domain_code) do update
-       set status = 'VERIFIED',
-           qualification_state = 'DOMAIN_VERIFIED',
-           suspended_at = null,
-           verified_by = null,
-           verified_at = now(),
-           evidence_ref = excluded.evidence_ref`,
-    [account.userId, EXPERT_DOMAIN, `${QA_VERIFICATION_SOURCE}:${PROVISIONING_VERSION}:${applicationId}`]
-  );
+
   await ensureRole(client, account.userId, "EXPERT");
-  return { domain: EXPERT_DOMAIN, applicationId };
+  return { domains: EXPERT_CANONICAL_DOMAINS, applicationId };
 }
 
 async function provision(accounts) {
@@ -303,7 +316,7 @@ async function provision(accounts) {
       if (roles.rows.some((row) => ["ADMIN", "SERVICE", "MODERATOR"].includes(row.code))) fail("DEMO_PRIVILEGED_ROLE_PRESENT");
       await ensureProfile(client, account);
       await ensureRole(client, account.userId, "STUDENT");
-      await ensureEntitlements(client, account, spec.entitlements);
+      await ensureEntitlements(client, account, spec.entitlements, spec.scopes);
       const expert = await ensureExpertQualification(client, account);
       await client.query(
         `insert into private.audit_events (event_type, actor_id, target_type, target_id, metadata)
@@ -320,10 +333,12 @@ async function provision(accounts) {
         authProvider: account.authProvider,
         roles: account.email === EXPERT_EMAIL ? ["STUDENT", "EXPERT"] : ["STUDENT"],
         entitlements: spec.entitlements,
+        qaScopes: spec.scopes || [],
         institutionalEmailVerified: false,
         verificationSource: "NONE",
         demoAccessSource: QA_VERIFICATION_SOURCE,
-        expertDomain: expert.domain,
+        expertDomain: expert.domains?.[0] || null,
+        expertDomains: expert.domains || [],
         expertApplicationId: expert.applicationId,
       });
     }
@@ -353,7 +368,7 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(`DEMO_PROVISIONING_FAILED:${error?.code || "UNKNOWN"}`);
+  console.error(`DEMO_PROVISIONING_FAILED:${error?.code || "UNKNOWN"}`, error);
   process.exitCode = 1;
 });
 
