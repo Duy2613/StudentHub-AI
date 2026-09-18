@@ -670,8 +670,22 @@ export class ExpertRepository {
           qualityMutation: "NONE_ON_SUBMISSION",
         },
       });
-      // Deliberately no private.reputation_events insert here. Quality changes
-      // only after an independent adjudication event is recorded below.
+
+      // Deliberately no private.reputation_events insert here for quality adjudication (quality changes only via recordQualityEvent).
+      // Canonical server-owned reputation reward for formal assessment completion (EXPERT_REPUTATION_POLICY_V1)
+      await client.query(
+        `INSERT INTO private.reputation_events
+          (user_id, domain_code, event_type, delta, reason, actor_id, idempotency_key, created_at)
+         VALUES ($1, $2, 'EXPERT_ASSESSMENT_COMPLETED', 5, $3, $1, $4, now())
+         ON CONFLICT (idempotency_key) DO NOTHING`,
+        [
+          expertId,
+          normalizedDomain,
+          `Formal assessment completed for case ${caseId} revision ${caseRevision}`,
+          `assessment_completion:${inserted.rows[0].id}`,
+        ]
+      );
+
       return inserted.rows[0];
     });
   }

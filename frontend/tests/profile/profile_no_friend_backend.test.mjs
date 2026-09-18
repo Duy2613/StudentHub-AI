@@ -68,7 +68,7 @@ test("No Friend Backend Contract: Canonical Identity Authority is strictly Owner
   const userProfileService = readFileSync(join(root, "lib", "server", "profile", "UserProfileService.js"), "utf8");
   const expertProfileService = readFileSync(join(root, "lib", "server", "profile", "ExpertProfileService.js"), "utf8");
 
-  assert.match(userMeRoute, /Owner BFF remains the\n\/\/ authority/);
+  assert.match(userMeRoute, /Owner BFF remains the\r?\n\/\/ authority/);
   assert.match(expertMeRoute, /OWNER_CANONICAL/);
   assert.match(userProfileService, /UserProfileRepository/);
   assert.match(expertProfileService, /Owner Supabase backend only/);

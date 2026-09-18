@@ -60,6 +60,7 @@ export class AIGatewayService {
       totalBudgetMs: options.totalBudgetMs,
       maxOutputTokens: options.maxOutputTokens,
       signal: options.signal,
+      allowQaExtended: options.allowQaExtended,
     });
 
     const totalLatencyMs = Date.now() - startedAt;
@@ -84,6 +85,7 @@ export class AIGatewayService {
         providerStatus: routed.providerStatus,
         operationStatus: routed.operationStatus,
         cooldownResult: routed.cooldownResult,
+        qaExtendedFallback: routed.qaExtendedFallback,
       });
     }
 
@@ -107,6 +109,7 @@ export class AIGatewayService {
       providerStatus: routed.providerStatus,
       operationStatus: routed.operationStatus,
       cooldownResult: routed.cooldownResult,
+      qaExtendedFallback: routed.qaExtendedFallback,
     });
   }
 
@@ -139,6 +142,7 @@ export class AIGatewayService {
       signal: options.signal,
       parseResponse: (text) => JSON.parse(text),
       validateResponse: validate,
+      allowQaExtended: options.allowQaExtended,
     });
 
     const totalLatencyMs = Date.now() - startedAt;
@@ -163,6 +167,7 @@ export class AIGatewayService {
         providerStatus: routed.providerStatus,
         operationStatus: routed.operationStatus,
         cooldownResult: routed.cooldownResult,
+        qaExtendedFallback: routed.qaExtendedFallback,
       });
     }
 
@@ -187,6 +192,7 @@ export class AIGatewayService {
       providerStatus: routed.providerStatus,
       operationStatus: routed.operationStatus,
       cooldownResult: routed.cooldownResult,
+      qaExtendedFallback: routed.qaExtendedFallback,
     });
   }
 
@@ -196,6 +202,6 @@ export class AIGatewayService {
    */
   static describeRoute(capability, options = {}) {
     const router = options.router || defaultRouter;
-    return router.describeRoute(capability);
+    return router.describeRoute(capability, { allowQaExtended: options.allowQaExtended });
   }
 }

@@ -1,6 +1,7 @@
 import pg from "pg";
 import { resolve, join } from "node:path";
 import { createRequire } from "node:module";
+import { canonicalEnv } from "../env/canonicalEnv.js";
 
 const { Pool } = pg;
 
@@ -27,8 +28,9 @@ let sharedPool;
 
 export function getPostgresPool({ loadEnv = true } = {}) {
   if (loadEnv) ensureEnvLoaded();
-  const connectionString = process.env.DATABASE_URL;
+  const connectionString = process.env.DATABASE_URL || (loadEnv ? canonicalEnv.DATABASE_URL : undefined);
   if (!connectionString) throw new DatabaseUnavailableError("DATABASE_URL is required for durable production state.");
+  if (!process.env.DATABASE_URL && connectionString) process.env.DATABASE_URL = connectionString;
   if (!sharedPool) {
     const configuredPoolMax = Number(process.env.DATABASE_POOL_MAX);
     const boundedPoolMax = Math.min(50, Math.max(1, Math.floor(Number.isFinite(configuredPoolMax) ? configuredPoolMax : 10)));

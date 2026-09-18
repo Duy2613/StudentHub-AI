@@ -189,6 +189,7 @@ export function stageFromL2B(raw, requestId, timing = {}) {
       ...safeArray(raw?.contextSignals).slice(0, 30).map((item) => signal(item?.type || "SEMANTIC_SIGNAL", item?.details || "Semantic context signal.", item?.source || "layer2b_semantic", String(item?.severity || "INFO").toUpperCase())),
       signal("CLAIMS_EXTRACTED", `${claims.length} claim(s), ${entities.length} entity(ies) được bóc tách; đều là dữ liệu chưa xác minh.`, "layer2b_semantic", "INFO"),
       ...(promptInjection ? [signal("PROMPT_INJECTION_ISOLATED", "Instruction-like content được coi là untrusted content, không phải system instruction.", "layer2b_boundary", "HIGH")] : []),
+      ...(Array.isArray(raw?.mediaForensics?.summary?.primarySignals) ? raw.mediaForensics.summary.primarySignals.map((s, idx) => signal(`MEDIA_FORENSIC_SIGNAL_${idx + 1}`, s, "image_forensics", "INFO")) : []),
     ],
     evidenceRefs: [],
     meaning: "Layer 2B mô tả intent/claim/context để lập verification task; nó không phải threat-intelligence fact hay final policy.",
@@ -202,6 +203,7 @@ export function stageFromL2B(raw, requestId, timing = {}) {
       providerStatus,
       providerErrorType: providerErrorType || null,
       providerHttpStatus,
+      mediaForensics: raw?.mediaForensics || null,
     },
   });
 }

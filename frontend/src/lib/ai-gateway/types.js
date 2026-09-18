@@ -214,6 +214,7 @@ export function createAttemptRecord({
   result = null,
   errorType = null,
   errorMessage = null,
+  qaExtendedFallback = false,
 } = {}) {
   const safeResult = traceResultForFailure({ errorType, httpStatus, providerErrorCode, result: ok ? "SUCCESS" : result });
   return {
@@ -225,6 +226,7 @@ export function createAttemptRecord({
     httpStatus: safeHttpStatus(httpStatus),
     providerErrorCode: normalizeProviderErrorCode(providerErrorCode),
     result: safeResult,
+    qaExtendedFallback: qaExtendedFallback === true,
 
     // Compatibility fields used by existing audit consumers. They are all
     // derived from the same bounded values above.
@@ -248,6 +250,7 @@ export function sanitizeAttemptRecord(attempt = {}) {
     result: attempt?.result,
     errorType: attempt?.errorType,
     errorMessage: attempt?.errorMessage,
+    qaExtendedFallback: attempt?.qaExtendedFallback === true,
   });
 }
 
@@ -302,6 +305,7 @@ export function createGatewayResult({
   providerStatus = null,
   operationStatus = null,
   cooldownResult = null,
+  qaExtendedFallback = false,
 } = {}) {
   const safeAttempts = Array.isArray(attempts) ? attempts.slice(0, 12).map(sanitizeAttemptRecord) : [];
   const safeOk = ok === true;
@@ -309,6 +313,7 @@ export function createGatewayResult({
   const safeOperationStatus = safeCode(operationStatus, safeOk ? "COMPLETED" : "PARTIAL");
   const safeRequestedPrimary = boundedText(requestedPrimaryModel, 160) || null;
   const safeExecuted = boundedText(executedModel || (safeOk ? model : ""), 160) || null;
+  const durationMs = Number(safeDuration(totalLatencyMs).toFixed(2));
   return {
     ok: safeOk,
     capability: boundedText(capability, 80) || null,
@@ -318,10 +323,13 @@ export function createGatewayResult({
     json: safeOk ? json : null,
     attempts: safeAttempts,
     modelTrace: safeAttempts,
+    attemptCount: safeAttempts.length,
+    durationMs,
+    qaExtendedFallback: qaExtendedFallback === true,
     errorType: boundedText(errorType, 80) || null,
     errorMessage: safeOk ? null : sanitizeGatewayError(errorType, errorMessage),
     requestId: requestId || createSecureId("req_gw"),
-    totalLatencyMs: Number(safeDuration(totalLatencyMs).toFixed(2)),
+    totalLatencyMs: durationMs,
     totalBudgetMs: Number.isFinite(Number(totalBudgetMs)) ? Math.max(0, Math.min(Number(totalBudgetMs), 120_000)) : null,
     httpStatus: safeHttpStatus(httpStatus),
     providerErrorCode: normalizeProviderErrorCode(providerErrorCode),

@@ -11,13 +11,23 @@ import { AI_CAPABILITY, MODEL_TIER, PROVIDER_FAMILY } from "../types.js";
 import {
   GEMMA_SHADOW_MODEL_IDS,
   GEMINI_PRODUCTION_MODEL_IDS,
+  GEMINI_EXTENDED_QA_MODEL_IDS,
+  isQaExtendedFallbackEnabled,
+  isQaExtendedGeminiModel,
   validateGeminiProductionRoute,
+  validateGeminiExtendedQaRoute,
 } from "./GeminiModelCatalog.js";
 
 export const GEMINI_PRODUCTION_CHAIN_ENTRY_IDS = Object.freeze([
   "GEMINI_3_8_FLASH",
   "GEMINI_3_7_FLASH",
   "GEMINI_3_6_FLASH",
+]);
+
+export const GEMINI_EXTENDED_QA_CHAIN_ENTRY_IDS = Object.freeze([
+  "GEMINI_3_5_FLASH",
+  "GEMINI_3_5_FLASH_LITE",
+  "GEMINI_3_1_FLASH_LITE",
 ]);
 
 const GEMINI_CAPABILITIES = Object.freeze([
@@ -29,7 +39,20 @@ const GEMINI_CAPABILITIES = Object.freeze([
   AI_CAPABILITY.SUMMARIZATION,
 ]);
 
-function geminiEntry(id, model, { thinkingLevel = "low", active = true, shadowOnly = false, compatibilityGate = null } = {}) {
+function geminiEntry(id, model, {
+  thinkingLevel = "low",
+  active = true,
+  shadowOnly = false,
+  compatibilityGate = null,
+  productionTier = "PRIMARY",
+  qaFallbackEligible = true,
+  priority = 1,
+  strengthClass = "HIGH",
+  costClass = "LOW",
+  latencyClass = "MEDIUM",
+  admittedAt = "2026-03-01T00:00:00Z",
+  probeStatus = "PROVEN",
+} = {}) {
   return {
     id,
     provider: PROVIDER_FAMILY.GEMINI,
@@ -40,16 +63,28 @@ function geminiEntry(id, model, { thinkingLevel = "low", active = true, shadowOn
     thinkingLevel,
     supportsJsonMode: active,
     supportsStructuredOutput: active,
+    supportsImageInput: true,
     structuredOutputContract: active ? "L4_TRUST_VERIFICATION_V1" : "PENDING_COMPATIBILITY_GATE",
     active,
     shadowOnly,
     compatibilityGate,
-    costClass: "LOW",
+    productionTier,
+    qaFallbackEligible,
+    priority,
+    strengthClass,
+    costClass,
+    latencyClass,
+    cooldownPolicy: {
+      baseCooldownMs: 5000,
+      dailyQuotaCooldownMs: 60 * 60 * 1000,
+    },
+    admittedAt,
+    probeStatus,
   };
 }
 
 export const AI_GATEWAY_CONFIG = {
-  VERSION: "ai-gateway-v1.3.0-gemini-multi-model",
+  VERSION: "ai-gateway-v1.4.0-gemini-extended-qa",
 
   SLA: {
     DEFAULT_TIMEOUT_MS: 2500,
@@ -59,7 +94,7 @@ export const AI_GATEWAY_CONFIG = {
   LIMITS: {
     MAX_PROMPT_CHARACTERS: 16_000,
     MAX_OUTPUT_TOKENS: 1024,
-    MAX_ROUTER_ATTEMPTS: GEMINI_PRODUCTION_CHAIN_ENTRY_IDS.length,
+    MAX_ROUTER_ATTEMPTS: 12,
     MAX_TRACE_ATTEMPTS: 12,
   },
 
@@ -127,14 +162,21 @@ export const AI_GATEWAY_CONFIG = {
     },
 
     // ── Active Google Gemini production chain ────────────────────────────
-    GEMINI_3_8_FLASH: geminiEntry("GEMINI_3_8_FLASH", GEMINI_PRODUCTION_MODEL_IDS[0]),
-    GEMINI_3_7_FLASH: geminiEntry("GEMINI_3_7_FLASH", GEMINI_PRODUCTION_MODEL_IDS[1]),
-    GEMINI_3_6_FLASH: geminiEntry("GEMINI_3_6_FLASH", GEMINI_PRODUCTION_MODEL_IDS[2]),
+    GEMINI_3_8_FLASH: geminiEntry("GEMINI_3_8_FLASH", GEMINI_PRODUCTION_MODEL_IDS[0], { priority: 1, strengthClass: "HIGH", latencyClass: "MEDIUM", productionTier: "PRIMARY" }),
+    GEMINI_3_7_FLASH: geminiEntry("GEMINI_3_7_FLASH", GEMINI_PRODUCTION_MODEL_IDS[1], { priority: 2, strengthClass: "HIGH", latencyClass: "FAST", productionTier: "PRIMARY" }),
+    GEMINI_3_6_FLASH: geminiEntry("GEMINI_3_6_FLASH", GEMINI_PRODUCTION_MODEL_IDS[2], { priority: 3, strengthClass: "MEDIUM", latencyClass: "FAST", productionTier: "PRIMARY" }),
+
+    // ── Extended QA fallback chain ─────────────────────────────────────────
+    GEMINI_3_5_FLASH: geminiEntry("GEMINI_3_5_FLASH", "gemini-3.5-flash", { priority: 4, strengthClass: "MEDIUM", latencyClass: "FAST", costClass: "LOW", productionTier: "EXTENDED_QA", admittedAt: "2026-09-18T00:00:00Z", probeStatus: "PROVEN" }),
+    GEMINI_3_5_FLASH_LITE: geminiEntry("GEMINI_3_5_FLASH_LITE", "gemini-3.5-flash-lite", { priority: 5, strengthClass: "LIGHT", latencyClass: "ULTRA_FAST", costClass: "VERY_LOW", productionTier: "EXTENDED_QA", admittedAt: "2026-09-18T00:00:00Z", probeStatus: "PROVEN" }),
+    GEMINI_3_1_FLASH_LITE: geminiEntry("GEMINI_3_1_FLASH_LITE", "gemini-3.1-flash-lite", { priority: 6, strengthClass: "LIGHT", latencyClass: "ULTRA_FAST", costClass: "VERY_LOW", productionTier: "EXTENDED_QA", admittedAt: "2026-09-18T00:00:00Z", probeStatus: "PROVEN" }),
+
     GEMINI_2_5_FLASH: {
-      ...geminiEntry("GEMINI_2_5_FLASH", "gemini-2.5-flash", { active: false, shadowOnly: true, compatibilityGate: "UNAVAILABLE_TO_NEW_USERS" }),
+      ...geminiEntry("GEMINI_2_5_FLASH", "gemini-2.5-flash", { active: false, shadowOnly: true, compatibilityGate: "UNAVAILABLE_TO_NEW_USERS", productionTier: "RETIRED", qaFallbackEligible: false, priority: 99, probeStatus: "RETIRED" }),
       legacyAlias: true,
       supportsJsonMode: false,
       supportsStructuredOutput: false,
+      supportsImageInput: false,
     },
 
     // Legacy catalog aliases are inactive so they cannot create an accidental
@@ -147,10 +189,10 @@ export const AI_GATEWAY_CONFIG = {
       structuredOutputContract: "L4_TRUST_VERIFICATION_V1",
     },
     GEMINI_FLASH_LITE: {
-      ...geminiEntry("GEMINI_FLASH_LITE", "gemini-3.5-flash-lite", { active: false, shadowOnly: true, compatibilityGate: "NOT_IN_PRODUCTION_CHAIN" }),
+      ...geminiEntry("GEMINI_FLASH_LITE", "gemini-3.5-flash-lite", { active: false, shadowOnly: true, compatibilityGate: "EXTENDED_QA_FALLBACK_ONLY", productionTier: "EXTENDED_QA" }),
       legacyAlias: true,
-      supportsJsonMode: false,
-      supportsStructuredOutput: false,
+      supportsJsonMode: true,
+      supportsStructuredOutput: true,
     },
 
     // Gemma remains outside production routing until the exact Layer 4 gate
@@ -179,31 +221,52 @@ export const AI_GATEWAY_CONFIG = {
   },
 };
 
+export function resolveCapabilityRoute(capability, { allowQaExtended = null } = {}) {
+  const qaExtendedActive = typeof allowQaExtended === "boolean" ? allowQaExtended : isQaExtendedFallbackEnabled();
+  const base = AI_GATEWAY_CONFIG.CAPABILITY_ROUTES[capability] || [];
+  if (!qaExtendedActive) {
+    return [...base];
+  }
+  if (capability === AI_CAPABILITY.MULTIMODAL || capability === AI_CAPABILITY.DEEP_REASONING || capability === AI_CAPABILITY.DOCUMENT || capability === AI_CAPABILITY.RERANKING) {
+    return [...GEMINI_PRODUCTION_CHAIN_ENTRY_IDS, ...GEMINI_EXTENDED_QA_CHAIN_ENTRY_IDS];
+  }
+  if (capability === AI_CAPABILITY.FAST_CLASSIFICATION || capability === AI_CAPABILITY.CLAIM_EXTRACTION || capability === AI_CAPABILITY.SUMMARIZATION) {
+    return ["GEMINI_3_5_FLASH_LITE", "GEMINI_3_1_FLASH_LITE", "GEMINI_3_5_FLASH", "GEMINI_3_8_FLASH", "GEMINI_3_7_FLASH", "GEMINI_3_6_FLASH"];
+  }
+  return [...base];
+}
+
 export const GEMINI_MODEL_ROUTE_VALIDATION = validateGeminiProductionRoute(
   GEMINI_PRODUCTION_CHAIN_ENTRY_IDS.map((entryId) => AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId].model)
 );
 
-export function validateCatalogModelEntry(entryId) {
+export const GEMINI_EXTENDED_MODEL_ROUTE_VALIDATION = validateGeminiExtendedQaRoute(
+  GEMINI_EXTENDED_QA_CHAIN_ENTRY_IDS.map((entryId) => AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId].model)
+);
+
+export function validateCatalogModelEntry(entryId, { allowQaExtended = null } = {}) {
+  const qaExtendedActive = typeof allowQaExtended === "boolean" ? allowQaExtended : isQaExtendedFallbackEnabled();
   const entry = AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId];
   if (!entry) return { valid: false, entryId, model: null, code: "CATALOG_ENTRY_MISSING" };
   if (entry.provider !== PROVIDER_FAMILY.GEMINI) {
     return { valid: false, entryId, model: entry.model || null, code: "PROVIDER_NOT_IN_GEMINI_ROUTE" };
   }
-  const model = GEMINI_PRODUCTION_MODEL_IDS.includes(entry.model)
-    ? entry.model
-    : null;
-  if (!model) return { valid: false, entryId, model: entry.model || null, code: "MODEL_NOT_IN_PRODUCTION_CHAIN" };
+  const isPrimary = GEMINI_PRODUCTION_MODEL_IDS.includes(entry.model);
+  const isExtended = GEMINI_EXTENDED_QA_MODEL_IDS.includes(entry.model);
+  if (!isPrimary && (!isExtended || !qaExtendedActive)) {
+    return { valid: false, entryId, model: entry.model || null, code: isExtended ? "QA_EXTENDED_GATE_REQUIRED" : "MODEL_NOT_IN_PRODUCTION_CHAIN" };
+  }
   if (entry.active !== true || entry.shadowOnly === true) {
-    return { valid: false, entryId, model, code: "MODEL_NOT_ACTIVE" };
+    return { valid: false, entryId, model: entry.model, code: "MODEL_NOT_ACTIVE" };
   }
   if (entry.supportsJsonMode !== true || entry.supportsStructuredOutput !== true || entry.structuredOutputContract !== "L4_TRUST_VERIFICATION_V1") {
-    return { valid: false, entryId, model, code: "MODEL_INCOMPATIBLE" };
+    return { valid: false, entryId, model: entry.model, code: "MODEL_INCOMPATIBLE" };
   }
-  return { valid: true, entryId, model, code: "MODEL_ENTRY_VALID" };
+  return { valid: true, entryId, model: entry.model, code: "MODEL_ENTRY_VALID" };
 }
 
 export function validateActiveModelIdentifiers() {
-  const entries = GEMINI_PRODUCTION_CHAIN_ENTRY_IDS.map(validateCatalogModelEntry);
+  const entries = GEMINI_PRODUCTION_CHAIN_ENTRY_IDS.map((id) => validateCatalogModelEntry(id, { allowQaExtended: false }));
   return Object.freeze({
     valid: GEMINI_MODEL_ROUTE_VALIDATION.valid && entries.every((entry) => entry.valid),
     entries,

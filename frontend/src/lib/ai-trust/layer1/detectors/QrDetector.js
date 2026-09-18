@@ -9,21 +9,26 @@ import { LAYER_1_REASONS, SIGNAL_SEVERITY, createSignal } from "../types.js";
 import { NormalizationService } from "../normalization/NormalizationService.js";
 import { UrlDetector } from "./UrlDetector.js";
 import { TextDetector } from "./TextDetector.js";
+import { QrIntakeService } from "../qr/QrIntakeService.js";
 
 export class QrDetector {
   /**
    * Screens a decoded QR code payload
    * @param {string} qrPayload
-   * @returns {object} { signals, qrPayload }
+   * @returns {object} { signals, qrPayload, intake }
    */
   static detect(qrPayload) {
     const signals = [];
     if (!qrPayload || typeof qrPayload !== "string" || !qrPayload.trim()) {
-      return { signals, qrPayload: "" };
+      return { signals, qrPayload: "", intake: null };
     }
 
     const trimmed = qrPayload.trim();
-    const isUrl = /^https?:\/\//i.test(trimmed) || /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/.test(trimmed);
+    // Authoritative Server-Owned QR Screening
+    const intake = QrIntakeService.intake(trimmed);
+    signals.push(...intake.signals);
+
+    const isUrl = intake.decodedType === "URL";
 
     if (isUrl) {
       const normUrl = NormalizationService.normalizeUrl(trimmed);

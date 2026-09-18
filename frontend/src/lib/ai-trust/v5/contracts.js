@@ -441,6 +441,9 @@ function publicLayerResult(value, layerId) {
     base.entities = publicClaims(value.entities);
     base.details = publicRecord(value.details, ["confidenceKind", "modelUsed", "providerId", "providerStatus", "providerErrorType", "providerHttpStatus", "providerLatencyMs", "promptInjectionDetected", "decisionRationale"]);
     base.verificationPackage = publicRecord(value.verificationPackage, ["claimCount", "candidateSourceCount", "status"]);
+    if (value.mediaForensics && typeof value.mediaForensics === "object") {
+      base.mediaForensics = value.mediaForensics;
+    }
   }
   if (layerId === "l2c") {
     base.secondaryClassifications = Array.isArray(value.secondaryClassifications) ? value.secondaryClassifications.slice(0, 8).map((item) => publicText(item, 120)).filter(Boolean) : [];

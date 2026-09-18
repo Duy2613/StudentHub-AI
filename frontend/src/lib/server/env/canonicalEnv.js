@@ -21,8 +21,8 @@ let loaded = false;
 function ensureEnvLoaded() {
   if (loaded) return;
 
-  // If already running inside Next.js runtime, process.env is populated by Next.js
-  if (process.env.NEXT_RUNTIME || process.env.__NEXT_PROCESSED_ENV) {
+  // If already running inside Next.js runtime with env populated
+  if ((process.env.NEXT_RUNTIME || process.env.__NEXT_PROCESSED_ENV) && process.env.DATABASE_URL) {
     loaded = true;
     return;
   }

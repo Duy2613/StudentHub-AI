@@ -13,7 +13,7 @@
   "releaseGateEligible": false,
   "supersededBy": "SECURITY_HOLDOUT_V2",
   "status": "SECURITY_VALIDATION_V1",
-  "executedAt": "2026-09-17T16:26:56.264Z",
+  "executedAt": "2026-09-18T04:24:01.037Z",
   "results": [
     {
       "vectorId": "SEC-SSRF-01",

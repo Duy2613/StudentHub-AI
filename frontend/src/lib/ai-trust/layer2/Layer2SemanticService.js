@@ -14,6 +14,7 @@ import { Layer2ConfidenceEngine } from "./engine/Layer2ConfidenceEngine.js";
 import { VerificationPlanner } from "./engine/VerificationPlanner.js";
 import { Layer2DecisionEngine } from "./engine/Layer2DecisionEngine.js";
 import { createSecureId } from "../../security/secureId.js";
+import { ImageForensicsOrchestrator } from "../forensics/ImageForensicsOrchestrator.js";
 import {
   SEMANTIC_BOUNDARY_LIMITS,
   createUnknownSemanticAnalysis,
@@ -32,7 +33,7 @@ function boundedString(value, maxLength) {
 
 function safeMetadata(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "exif", "senderDomain"];
+  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "exif", "senderDomain", "mediaArtifactId", "imageHash", "bytes"];
   return Object.fromEntries(allowed.filter((key) => Object.hasOwn(value, key)).map((key) => {
     const item = value[key];
     if (typeof item === "string") {
@@ -45,12 +46,15 @@ function safeMetadata(value) {
         boundedString(childKey, 80), boundedString(childValue, 200),
       ]))];
     }
+    if (key === "bytes" && (Buffer.isBuffer(item) || item instanceof Uint8Array || Array.isArray(item))) {
+      return [key, item];
+    }
     return [key, null];
   }).filter(([, item]) => item !== null));
 }
 
 function hasPayload({ content, metadata }) {
-  return Boolean(content || metadata.ocrText || metadata.qrContent || metadata.qrPayload || metadata.url);
+  return Boolean(content || metadata.ocrText || metadata.qrContent || metadata.qrPayload || metadata.url || metadata.mediaArtifactId || metadata.bytes);
 }
 
 function providerStatusFor(analysis, fallbackUsed = false) {
@@ -115,6 +119,36 @@ export class Layer2SemanticService {
       layer1Result,
       options: { requestId, signal: options.signal },
     };
+
+    // Layer 2 Media Forensics Orchestration for Image Inputs
+    let mediaForensics = null;
+    if (type === "image" || metadata.mediaArtifactId || metadata.bytes) {
+      try {
+        const forensicsOrchestrator = new ImageForensicsOrchestrator({
+          specialistAdapter: options.specialistAdapter,
+          advisoryService: options.advisoryService,
+        });
+        const forensicsRes = await forensicsOrchestrator.analyze({
+          mediaArtifactId: metadata.mediaArtifactId || null,
+          bytes: metadata.bytes || (typeof content === "string" && content.startsWith("data:image/") ? content : null),
+          metadata,
+          options: {
+            requestId,
+            signal: options.signal,
+            useAIGateway: options.useAIGateway !== false,
+            useCache: options.useCache !== false,
+            ownerUserId: options.ownerUserId || null,
+            caseId: options.caseId || null,
+          },
+        });
+        mediaForensics = forensicsRes.mediaForensics;
+        if (mediaForensics?.ocr?.text && !semanticParams.ocrText) {
+          semanticParams.ocrText = mediaForensics.ocr.text;
+        }
+      } catch (forensicsErr) {
+        console.warn("[Layer2SemanticService] Image forensics notice:", forensicsErr?.name || "forensics_warning");
+      }
+    }
 
     let provider = options.provider;
     if (!provider || typeof provider.analyzeSemantics !== "function") {
@@ -194,6 +228,7 @@ export class Layer2SemanticService {
       consistencyFindings: semanticAnalysis.consistencyFindings,
       crossModalFindings: semanticAnalysis.crossModalFindings,
       verificationPackage,
+      mediaForensics,
       nextLayer: decision.nextLayer,
       requestId,
       details: {

@@ -9,9 +9,14 @@
 
 import {
   AI_GATEWAY_CONFIG,
+  resolveCapabilityRoute,
   validateActiveModelIdentifiers,
   validateCatalogModelEntry,
 } from "./config/AIGatewayConfig.js";
+import {
+  isQaExtendedFallbackEnabled,
+  isQaExtendedGeminiModel,
+} from "./config/GeminiModelCatalog.js";
 import {
   PROVIDER_FAMILY,
   GATEWAY_ERROR_TYPE,
@@ -81,10 +86,10 @@ function providerStatusFor(errorType, httpStatus, providerErrorCode) {
   return classifyGatewayFailure({ errorType, httpStatus, providerErrorCode });
 }
 
-function safeProviderValidation(provider, catalogEntry) {
+function safeProviderValidation(provider, catalogEntry, { allowQaExtended = null } = {}) {
   if (!provider || typeof provider.validateModel !== "function") return { valid: true, compatible: true };
   try {
-    const validation = provider.validateModel(catalogEntry);
+    const validation = provider.validateModel(catalogEntry, { allowQaExtended });
     if (validation === false) return { valid: false, compatible: false, code: "MODEL_INCOMPATIBLE" };
     if (validation && typeof validation === "object") return validation;
   } catch {
@@ -127,15 +132,16 @@ export class ModelRouter {
    * Lists the exact route without making a network call. Health is included so
    * operators can explain why a primary was skipped on a later Trust case.
    */
-  describeRoute(capability) {
-    const chain = AI_GATEWAY_CONFIG.CAPABILITY_ROUTES[capability] || [];
+  describeRoute(capability, { allowQaExtended = null } = {}) {
+    const qaExtendedActive = typeof allowQaExtended === "boolean" ? allowQaExtended : isQaExtendedFallbackEnabled();
+    const chain = resolveCapabilityRoute(capability, { allowQaExtended: qaExtendedActive });
     return chain.map((entryId) => {
       const entry = AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId];
       if (!entry) {
         return { entryId, provider: null, model: null, tier: null, configured: false, valid: false, validationCode: "CATALOG_ENTRY_MISSING" };
       }
       const provider = this.providers[entry.provider];
-      const validation = validateCatalogModelEntry(entryId);
+      const validation = validateCatalogModelEntry(entryId, { allowQaExtended: qaExtendedActive });
       const health = this.healthStore.get(entry.provider, entry.model);
       let configured = false;
       try {
@@ -148,6 +154,8 @@ export class ModelRouter {
         provider: entry.provider,
         model: entry.model,
         tier: entry.tier,
+        productionTier: entry.productionTier || "PRIMARY",
+        qaFallbackEligible: entry.qaFallbackEligible === true,
         configured,
         valid: validation.valid,
         validationCode: validation.code,
@@ -205,6 +213,7 @@ export class ModelRouter {
       result,
       errorType,
       errorMessage,
+      qaExtendedFallback: isQaExtendedGeminiModel(entry?.model),
     });
     attempts.push(attempt);
     return attempt;
@@ -228,8 +237,10 @@ export class ModelRouter {
     signal,
     parseResponse = null,
     validateResponse = null,
+    allowQaExtended = null,
   } = {}) {
-    const configuredChain = (AI_GATEWAY_CONFIG.CAPABILITY_ROUTES[capability] || []).slice(0, AI_GATEWAY_CONFIG.LIMITS.MAX_ROUTER_ATTEMPTS);
+    const qaExtendedActive = typeof allowQaExtended === "boolean" ? allowQaExtended : isQaExtendedFallbackEnabled();
+    const configuredChain = resolveCapabilityRoute(capability, { allowQaExtended: qaExtendedActive }).slice(0, AI_GATEWAY_CONFIG.LIMITS.MAX_ROUTER_ATTEMPTS);
     const attempts = [];
     const startedAt = Date.now();
     const boundedTotalBudget = boundedBudget(totalBudgetMs, AI_GATEWAY_CONFIG.BUDGET.DEFAULT_TOTAL_MS);
@@ -280,7 +291,7 @@ export class ModelRouter {
         continue;
       }
 
-      const validation = validateCatalogModelEntry(entryId);
+      const validation = validateCatalogModelEntry(entryId, { allowQaExtended: qaExtendedActive });
       if (!validation.valid) {
         const attempt = this.#pushFailure(attempts, {
           entry,
@@ -340,7 +351,7 @@ export class ModelRouter {
         continue;
       }
 
-      const providerValidation = safeProviderValidation(provider, entry);
+      const providerValidation = safeProviderValidation(provider, entry, { allowQaExtended: qaExtendedActive });
       if (providerValidation.valid === false || providerValidation.compatible === false) {
         const attempt = this.#pushFailure(attempts, {
           entry,
@@ -414,6 +425,7 @@ export class ModelRouter {
           jsonMode,
           responseSchema,
           maxOutputTokens: outputTokens,
+          allowQaExtended: qaExtendedActive,
         }, attemptTimeout, signal);
         const text = String(generated?.text ?? "");
         if (!text.trim()) {
@@ -475,6 +487,7 @@ export class ModelRouter {
         }
 
         const durationMs = Date.now() - attemptStartedAt;
+        const isExecutedExtended = isQaExtendedGeminiModel(entry.model);
         const attempt = createAttemptRecord({
           provider: entry.provider,
           model: entry.model,
@@ -485,18 +498,24 @@ export class ModelRouter {
           httpStatus: generated?.httpStatus ?? 200,
           providerErrorCode: generated?.providerErrorCode || null,
           result: "SUCCESS",
+          qaExtendedFallback: isExecutedExtended,
         });
         attempts.push(attempt);
         this.healthStore.recordSuccess(entry.provider, entry.model);
         const usedFallback = entry.model !== requestedPrimaryModel || Boolean(primaryFailure);
+        const qaExtendedFallback = isExecutedExtended || attempts.some((a) => isQaExtendedGeminiModel(a.model));
         return {
           ok: true,
+          capability,
           provider: entry.provider,
           model: entry.model,
           text,
           ...(typeof parseResponse === "function" ? { json: parsedResponse } : {}),
           attempts,
           modelTrace: attempts,
+          attemptCount: attempts.length,
+          durationMs: Date.now() - startedAt,
+          qaExtendedFallback,
           requestedPrimaryModel,
           executedModel: entry.model,
           fallbackUsed: usedFallback,
@@ -565,12 +584,17 @@ export class ModelRouter {
 
     const totalLatencyMs = Date.now() - startedAt;
     const finalErrorType = lastError?.errorType || GATEWAY_ERROR_TYPE.NOT_CONFIGURED;
+    const qaExtendedFallback = attempts.some((a) => isQaExtendedGeminiModel(a.model));
     return {
       ok: false,
+      capability,
       provider: null,
       model: null,
       attempts,
       modelTrace: attempts,
+      attemptCount: attempts.length,
+      durationMs: totalLatencyMs,
+      qaExtendedFallback,
       requestedPrimaryModel,
       executedModel: null,
       fallbackUsed: false,

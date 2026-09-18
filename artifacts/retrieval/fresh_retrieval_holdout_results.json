@@ -1,6 +1,6 @@
 {
   "benchmarkVersion": "2.0.0-fresh-holdout-historical-gold-derived",
-  "evaluatedAt": "2026-09-17T16:24:07.482Z",
+  "evaluatedAt": "2026-09-18T04:20:53.645Z",
   "totalQueries": 168,
   "evidenceClass": "RETRIEVAL_VALIDATION_V1",
   "releaseGateEligible": false,
@@ -17,8 +17,8 @@
       },
       "recallAt3": {
         "mean": 0.125,
-        "ci95Low": 0.0714,
-        "ci95High": 0.1786
+        "ci95Low": 0.0774,
+        "ci95High": 0.1726
       },
       "recallAt5": {
         "mean": 0.1667,
@@ -27,13 +27,13 @@
       },
       "mrr": {
         "mean": 0.0965,
-        "ci95Low": 0.0606,
-        "ci95High": 0.1336
+        "ci95Low": 0.0598,
+        "ci95High": 0.1379
       },
       "ndcgAt5": {
         "mean": 0.8431,
-        "ci95Low": 0.8365,
-        "ci95High": 0.8504
+        "ci95Low": 0.8368,
+        "ci95High": 0.8499
       },
       "precisionAt5": {
         "mean": 0.0381,
@@ -91,7 +91,7 @@
       },
       "precisionAt5": {
         "mean": 0.2286,
-        "ci95Low": 0.219,
+        "ci95Low": 0.2179,
         "ci95High": 0.2393
       },
       "officialSourceHit": {
@@ -140,8 +140,8 @@
       },
       "ndcgAt5": {
         "mean": 0.9878,
-        "ci95Low": 0.9816,
-        "ci95High": 0.9949
+        "ci95Low": 0.9811,
+        "ci95High": 0.9952
       },
       "precisionAt5": {
         "mean": 0.256,

@@ -18,6 +18,10 @@ const AcademicCommandPalette = dynamic(() => import("@/components/command/Academ
   ssr: false,
 });
 
+const ExpertBlindReviewWidget = dynamic(() => import("@/components/expert/ExpertBlindReviewWidget"), {
+  ssr: false,
+});
+
 export default function UnifiedAppShell({ children }) {
   const pathname = usePathname();
   const { session, profile, isAuthenticated, ready, status, signOut, expertLifecycleState } = useAuth();
@@ -184,6 +188,7 @@ export default function UnifiedAppShell({ children }) {
         </main>
       </div>
       <RealtimeLiveConsole />
+      {isExpert && <ExpertBlindReviewWidget userRole="expert" />}
       {searchMounted && (
         <AcademicCommandPalette
           isOpen={searchOpen}

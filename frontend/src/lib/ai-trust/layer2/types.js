@@ -462,6 +462,7 @@ export function createLayer2Result(params = {}) {
     consistencyFindings: safeConsistencyFindings,
     crossModalFindings: safeCrossModalFindings,
     verificationPackage: safeVerificationPackage,
+    mediaForensics: input.mediaForensics && typeof input.mediaForensics === "object" ? input.mediaForensics : null,
     nextLayer: canonicalStatus === LAYER_2_STATUS.BLOCK ? null : safeNextLayer,
     requestId: safeRequestId,
     details: {

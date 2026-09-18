@@ -40,7 +40,16 @@ export class StudentProfile360Store {
     };
 
     fs.writeFileSync(this.#tempFilePath, JSON.stringify(payload, null, 2), "utf-8");
-    fs.renameSync(this.#tempFilePath, this.#storageFilePath);
+    try {
+      fs.renameSync(this.#tempFilePath, this.#storageFilePath);
+    } catch (err) {
+      if (err.code === "EPERM" || err.code === "EBUSY" || err.code === "EEXIST") {
+        fs.copyFileSync(this.#tempFilePath, this.#storageFilePath);
+        try { fs.unlinkSync(this.#tempFilePath); } catch {}
+      } else {
+        throw err;
+      }
+    }
   }
 
   /**

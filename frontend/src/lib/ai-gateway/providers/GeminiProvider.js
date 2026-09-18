@@ -10,7 +10,10 @@ import { IModelProvider } from "./IModelProvider.js";
 import { PROVIDER_FAMILY, GATEWAY_ERROR_TYPE, normalizeProviderErrorCode } from "../types.js";
 import {
   GEMINI_PRODUCTION_MODEL_IDS,
+  GEMINI_EXTENDED_QA_MODEL_IDS,
   isApprovedGeminiProductionModel,
+  isQaExtendedGeminiModel,
+  isQaExtendedFallbackEnabled,
   isGemmaShadowModel,
   validateGeminiProductionRoute,
   validateGeminiModelIdentifier,
@@ -228,8 +231,14 @@ export class GeminiProvider extends IModelProvider {
     return typeof this.env?.GEMINI_API_KEY === "string" && this.env.GEMINI_API_KEY.trim().length > 0;
   }
 
-  validateModel(catalogEntry, { allowShadowCandidate = false } = {}) {
-    const modelValidation = validateGeminiModelIdentifier(catalogEntry?.model, { allowGemmaShadow: true });
+  validateModel(catalogEntry, { allowShadowCandidate = false, allowQaExtended = null } = {}) {
+    const qaExtendedAllowed = typeof allowQaExtended === "boolean"
+      ? allowQaExtended
+      : isQaExtendedFallbackEnabled(this.env);
+    const modelValidation = validateGeminiModelIdentifier(catalogEntry?.model, {
+      allowGemmaShadow: true,
+      allowQaExtended: qaExtendedAllowed,
+    });
     if (!modelValidation.valid) return { ...modelValidation, compatible: false };
     if (isGemmaShadowModel(modelValidation.model) && !allowShadowCandidate) {
       return { ...modelValidation, valid: false, compatible: false, code: "GEMMA_COMPATIBILITY_GATE_REQUIRED" };
@@ -237,7 +246,16 @@ export class GeminiProvider extends IModelProvider {
     if (isGemmaShadowModel(modelValidation.model)) {
       return { ...modelValidation, compatible: true, shadowOnly: true, code: "GEMMA_SHADOW_PROBE_ONLY" };
     }
-    return { ...modelValidation, compatible: isApprovedGeminiProductionModel(modelValidation.model) };
+    const isPrimary = isApprovedGeminiProductionModel(modelValidation.model);
+    const isExtended = isQaExtendedGeminiModel(modelValidation.model);
+    const compatible = isPrimary || (isExtended && qaExtendedAllowed);
+    return {
+      ...modelValidation,
+      compatible,
+      code: compatible
+        ? (isPrimary ? "MODEL_IDENTIFIER_VALID" : "MODEL_IDENTIFIER_VALID_QA_EXTENDED")
+        : (isExtended ? "QA_EXTENDED_GATE_REQUIRED" : "MODEL_IDENTIFIER_UNAPPROVED"),
+    };
   }
 
   getInitializationStatus() {
@@ -255,9 +273,10 @@ export class GeminiProvider extends IModelProvider {
     maxOutputTokens = 1024,
     signal,
     allowShadowCandidate = false,
+    allowQaExtended = null,
   } = {}) {
     if (signal?.aborted) throw createAbortError(signal.reason);
-    const modelValidation = this.validateModel(catalogEntry, { allowShadowCandidate });
+    const modelValidation = this.validateModel(catalogEntry, { allowShadowCandidate, allowQaExtended });
     if (!modelValidation.compatible) {
       throw providerError("Gemini model is not compatible with the active gateway contract", {
         gatewayErrorType: GATEWAY_ERROR_TYPE.MODEL_INCOMPATIBLE,

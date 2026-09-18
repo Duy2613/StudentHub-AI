@@ -15,7 +15,16 @@ const root = resolve(import.meta.dirname, "../../..");
 const read = (path) => readFileSync(resolve(root, path), "utf8");
 
 test("demo allowlist is exact and Gmail mailbox proof does not become student-email proof", () => {
-  assert.deepEqual(DEMO_ACCOUNT_ALLOWLIST, ["demo-user@gmail.com", "demo-expert@gmail.com"]);
+  assert.deepEqual(DEMO_ACCOUNT_ALLOWLIST, [
+    "demo-user@gmail.com",
+    "demo-user1@gmail.com",
+    "demo-user2@gmail.com",
+    "demo-user3@gmail.com",
+    "demo-expert@gmail.com",
+    "demo-expert1@gmail.com",
+    "demo-expert2@gmail.com",
+    "demo-expert3@gmail.com",
+  ]);
   assert.equal(getDemoAccountSpec("attacker@gmail.com"), null);
   assert.equal(isInstitutionalEmailAddress("demo-user@gmail.com"), false);
 

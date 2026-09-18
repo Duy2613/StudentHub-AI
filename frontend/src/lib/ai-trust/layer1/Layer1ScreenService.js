@@ -23,6 +23,7 @@ import { FileUploadSecurityBoundary } from "./security/FileUploadSecurityBoundar
 import { ImageDetector } from "./detectors/ImageDetector.js";
 import { DecisionEngine } from "./engine/DecisionEngine.js";
 import { executeAuxiliaryModelSafe } from "./models/ITrustSignalModel.js";
+import { QrIntakeService } from "./qr/QrIntakeService.js";
 
 export class Layer1ScreenService {
   /**
@@ -76,6 +77,13 @@ export class Layer1ScreenService {
         const urlRes = UrlDetector.detect(normUrl);
         rawSignals.push(...urlRes.signals);
         isWhitelisted = urlRes.isWhitelisted;
+      } else if (normalizedType === "qr") {
+        detectorsExecuted.push("QrIntakeService");
+        const qrPayload = content || metadata.qrContent || metadata.qrPayload || "";
+        const qrRes = QrIntakeService.intake(qrPayload);
+        rawSignals.push(...qrRes.signals);
+        forceUnknown = qrRes.decodedType === "EMPTY";
+        unknownReason = forceUnknown ? "QR_PAYLOAD_EMPTY" : null;
       } else if (normalizedType === "image") {
         detectorsExecuted.push("ImageDetector", "FileDetector");
         if (metadata.ocrText) detectorsExecuted.push("OcrDetector");

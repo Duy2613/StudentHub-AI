@@ -73,7 +73,7 @@ export class TimetableVisionExtractor {
     this.gateway = gateway;
   }
 
-  async extract({ bytes, mimeType, requestId = "academic-timetable-import" } = {}) {
+  async extract({ bytes, mimeType, requestId = "academic-timetable-import", allowQaExtended = null } = {}) {
     const inputParts = [{
       type: "image",
       mime_type: mimeType,
@@ -94,6 +94,7 @@ export class TimetableVisionExtractor {
           totalBudgetMs: 15_000,
           maxOutputTokens: 6_000,
           responseSchema: TIMETABLE_VISION_RESPONSE_SCHEMA,
+          allowQaExtended,
         },
       });
     } catch (error) {
@@ -126,6 +127,7 @@ export class TimetableVisionExtractor {
           }))
         : [],
       fallbackUsed: Boolean(result.fallbackUsed),
+      qaExtendedFallback: Boolean(result.qaExtendedFallback),
       sourcePersisted: false,
     };
   }
@@ -150,6 +152,7 @@ export class TimetableVisionExtractor {
         : [],
       failureCode: String(code || "AI_EXTRACTION_UNAVAILABLE").slice(0, 80),
       fallbackUsed: true,
+      qaExtendedFallback: Boolean(result?.qaExtendedFallback),
       sourcePersisted: false,
     };
   }

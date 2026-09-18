@@ -8,19 +8,24 @@ import { TrustPipelineCancelledError } from "@/lib/ai-trust/v5/TrustPipelineOrch
 import { createTrustOrchestrator } from "@/lib/ai-trust/TrustOrchestrator.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { TrustPersistenceService } from "@/lib/server/database/TrustPersistenceService.js";
+import { MediaArtifactService } from "@/lib/server/media/MediaArtifactService.js";
+import { QrIntakeService } from "@/lib/ai-trust/layer1/qr/QrIntakeService.js";
+import { ExpertBlindReviewDispatcher } from "@/lib/server/expert/ExpertBlindReviewDispatcher.js";
 
 export const runtime = "nodejs";
 
 const INPUT_TYPES = new Set(["text", "url", "image", "file"]);
-const MAX_CONTENT_CHARS = 160_000;
+const ACCEPTED_INPUT_TYPES = new Set([...INPUT_TYPES, "qr"]);
+const MAX_CONTENT_CHARS = 500_000;
 
 function safeMetadata(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "extractionAuthority", "institutionContext"];
+  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "extractionAuthority", "institutionContext", "mediaArtifactId", "imageHash", "bytes", "width", "height"];
   return Object.fromEntries(allowed.filter((key) => Object.hasOwn(value, key)).map((key) => {
     const item = value[key];
     if (typeof item === "string") return [key, item.slice(0, 32_000)];
     if (typeof item === "number" && Number.isFinite(item)) return [key, item];
+    if (key === "bytes" && (Buffer.isBuffer(item) || item instanceof Uint8Array || Array.isArray(item))) return [key, item];
     return [key, null];
   }).filter(([, item]) => item !== null));
 }
@@ -66,6 +71,18 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
         signal: abortController.signal,
         useAIGateway: true,
         aiMode: "GEMINI_ONLY",
+        onL1ClaimReady: ({ l1Result, input: currentInput, pipeline: currentPipeline }) => {
+          const ownerId = principal?.subjectId ? String(principal.subjectId).replace(/^(student|expert|user):/, "") : null;
+          const caseId = currentPipeline?.verificationId || requestId;
+          void ExpertBlindReviewDispatcher.dispatchOnL1ClaimReady({
+            caseId,
+            caseRevision: 1,
+            ownerId,
+            input: currentInput,
+            l1Result,
+            requestId,
+          }).catch(() => {});
+        },
         onTransition: (transition) => send({
           type: "stage",
           event: transition.event,
@@ -144,14 +161,45 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
   const type = String(body?.type || "text").toLowerCase();
   const content = typeof body?.content === "string" ? body.content.trim() : "";
   const metadata = safeMetadata(body?.metadata);
-  if (!INPUT_TYPES.has(type)) {
+  if (!ACCEPTED_INPUT_TYPES.has(type)) {
     return NextResponse.json({ success: false, error: { code: "UNSUPPORTED_INPUT_TYPE", userMessage: "Loại dữ liệu này chưa được hỗ trợ." } }, { status: 422 });
   }
-  if (!content && !metadata.ocrText && !metadata.qrContent && !metadata.url) {
+  if (!content && !metadata.ocrText && !metadata.qrContent && !metadata.qrPayload && !metadata.url && !metadata.mediaArtifactId && !metadata.bytes) {
     return NextResponse.json({ success: false, error: { code: "CONTENT_REQUIRED", userMessage: "Nội dung đầu vào không được để trống." } }, { status: 422 });
   }
   if (content.length > MAX_CONTENT_CHARS) {
     return NextResponse.json({ success: false, error: { code: "CONTENT_TOO_LARGE", userMessage: "Nội dung vượt quá giới hạn cho phép." } }, { status: 413 });
+  }
+
+  // Authoritative Server-Side Image Intake & Media Artifact Management
+  if (type === "image" && (content || metadata.bytes) && !metadata.mediaArtifactId) {
+    const rawBytes = metadata.bytes || content;
+    const ingestRes = await MediaArtifactService.ingestImage({
+      bytes: rawBytes,
+      claimedMimeType: metadata.mimeType || "",
+      ownerUserId: principal?.subjectId ? String(principal.subjectId).replace(/^(student|expert|user):/, "") : null,
+    });
+    if (!ingestRes.ok) {
+      return NextResponse.json({
+        success: false,
+        error: { code: ingestRes.error?.code || "IMAGE_INTAKE_FAILED", userMessage: ingestRes.error?.message || "Tệp hình ảnh không hợp lệ." },
+      }, { status: 422 });
+    }
+    metadata.mediaArtifactId = ingestRes.artifact.mediaArtifactId;
+    metadata.imageHash = ingestRes.artifact.sha256;
+    metadata.mimeType = ingestRes.artifact.mimeType;
+    metadata.width = ingestRes.artifact.width;
+    metadata.height = ingestRes.artifact.height;
+    metadata.fileSize = ingestRes.artifact.byteSize;
+    // Strip large base64 so downstream stages reference mediaArtifactId + imageHash
+    delete metadata.bytes;
+  }
+
+  // Authoritative Server-Side QR Intake Screening
+  if (type === "qr" || metadata.qrContent || metadata.qrPayload) {
+    const qrRaw = content || metadata.qrContent || metadata.qrPayload || "";
+    const qrIntake = QrIntakeService.intake(qrRaw);
+    metadata.qrIntake = qrIntake;
   }
 
   const requestId = securityContext.correlationId;
@@ -165,6 +213,18 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
       signal: request.signal,
       useAIGateway: true,
       aiMode: "GEMINI_ONLY",
+      onL1ClaimReady: ({ l1Result, input: currentInput, pipeline: currentPipeline }) => {
+        const ownerId = principal?.subjectId ? String(principal.subjectId).replace(/^(student|expert|user):/, "") : null;
+        const caseId = currentPipeline?.verificationId || requestId;
+        void ExpertBlindReviewDispatcher.dispatchOnL1ClaimReady({
+          caseId,
+          caseRevision: 1,
+          ownerId,
+          input: currentInput,
+          l1Result,
+          requestId,
+        }).catch(() => {});
+      },
     });
     let persistence = { persisted: false, caseId: null };
     if (principal?.isAuthenticated) {

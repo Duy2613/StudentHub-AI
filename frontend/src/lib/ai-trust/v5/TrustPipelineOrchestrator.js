@@ -44,19 +44,20 @@ function boundedString(value, limit) {
 
 function safeMetadata(value) {
   const input = asObject(value);
-  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "extractionAuthority", "institutionContext"];
+  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "extractionAuthority", "institutionContext", "mediaArtifactId", "imageHash", "bytes"];
   const output = {};
   for (const key of allowed) {
     const item = input[key];
     if (typeof item === "string") output[key] = boundedString(item, key === "ocrText" || key === "qrContent" || key === "qrPayload" ? 16_000 : 2_048);
     else if (typeof item === "number" && Number.isFinite(item) && item >= 0) output[key] = item;
+    else if (key === "bytes" && (Buffer.isBuffer(item) || item instanceof Uint8Array || Array.isArray(item))) output[key] = item;
   }
   return output;
 }
 
 function normalizeInput(value) {
   const input = asObject(value);
-  const type = ["text", "url", "image", "file"].includes(String(input.type || "text").toLowerCase()) ? String(input.type || "text").toLowerCase() : "text";
+  const type = ["text", "url", "image", "file", "qr"].includes(String(input.type || "text").toLowerCase()) ? String(input.type || "text").toLowerCase() : "text";
   return {
     type,
     content: boundedString(input.content, 160_000),
@@ -433,6 +434,11 @@ export class TrustPipelineOrchestrator {
       pipeline.audit.hardNegativePropagation.push({ source: "l2a", finding: finalStage.finding, destination: "l4", expected: "MALICIOUS/BLOCK" });
     }
     await this._emit(pipeline, "STAGE_COMPLETED", onTransition);
+    if (stageId === "l1" && typeof options?.onL1ClaimReady === "function") {
+      try {
+        options.onL1ClaimReady({ l1Result: finalStage, input, pipeline, requestId: pipeline.requestId });
+      } catch {}
+    }
     return terminalStatusForStage(finalStage);
   }
 

@@ -1,4 +1,11 @@
-import { GEMINI_PRODUCTION_MODEL_IDS, isApprovedGeminiProductionModel, isGemmaShadowModel } from "../../../ai-gateway/config/GeminiModelCatalog.js";
+import {
+  GEMINI_PRODUCTION_MODEL_IDS,
+  GEMINI_EXTENDED_QA_MODEL_IDS,
+  isApprovedGeminiProductionModel,
+  isQaExtendedGeminiModel,
+  isQaExtendedFallbackEnabled,
+  isGemmaShadowModel,
+} from "../../../ai-gateway/config/GeminiModelCatalog.js";
 
 /**
  * Canonical structured contract for Gemini's Layer 4 advisory verification.
@@ -103,8 +110,9 @@ function citations(value) {
 
 export function isValidGeminiTrustVerification(value, {
   allowedCitationUrls = null,
-  allowedModels = GEMINI_PRODUCTION_MODEL_IDS,
+  allowedModels = null,
   allowGemmaShadow = false,
+  allowQaExtended = null,
 } = {}) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   if (!VERDICT_SET.has(value.verdictSignal)) return false;
@@ -117,8 +125,14 @@ export function isValidGeminiTrustVerification(value, {
   if (providerName !== "gemini" && providerName !== "google") return false;
   if (typeof value.model !== "string") return false;
   const model = value.model.trim();
-  const modelSet = new Set(Array.isArray(allowedModels) ? allowedModels : GEMINI_PRODUCTION_MODEL_IDS);
-  const modelApproved = isApprovedGeminiProductionModel(model) || (allowGemmaShadow === true && isGemmaShadowModel(model));
+  const qaExtendedActive = typeof allowQaExtended === "boolean" ? allowQaExtended : isQaExtendedFallbackEnabled();
+  const defaultAllowedModels = qaExtendedActive
+    ? [...GEMINI_PRODUCTION_MODEL_IDS, ...GEMINI_EXTENDED_QA_MODEL_IDS]
+    : GEMINI_PRODUCTION_MODEL_IDS;
+  const modelSet = new Set(Array.isArray(allowedModels) ? allowedModels : defaultAllowedModels);
+  const modelApproved = isApprovedGeminiProductionModel(model)
+    || (qaExtendedActive && isQaExtendedGeminiModel(model))
+    || (allowGemmaShadow === true && isGemmaShadowModel(model));
   if (!modelSet.has(model) || !modelApproved) return false;
   return value.citationsUsed.every((citation) => {
     return citation && typeof citation === "object" && !Array.isArray(citation) &&
@@ -132,11 +146,15 @@ export function normalizeGeminiTrustVerification(value, {
   provider = "google",
   model = GEMINI_PRODUCTION_MODEL_IDS[0],
   fallbackUncertainty = "Gemini không công bố thêm certainty ngoài evidence hiện có.",
+  allowQaExtended = null,
 } = {}) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const normalizedProvider = "google";
   const normalizedModel = boundedText(model, 120) || GEMINI_PRODUCTION_MODEL_IDS[0];
-  if (!isApprovedGeminiProductionModel(normalizedModel)) return null;
+  const qaExtendedActive = typeof allowQaExtended === "boolean" ? allowQaExtended : isQaExtendedFallbackEnabled();
+  const modelApproved = isApprovedGeminiProductionModel(normalizedModel)
+    || (qaExtendedActive && isQaExtendedGeminiModel(normalizedModel));
+  if (!modelApproved) return null;
   const verdictSignal = VERDICT_SET.has(value.verdictSignal) ? value.verdictSignal : "UNCERTAIN";
   return {
     verdictSignal,

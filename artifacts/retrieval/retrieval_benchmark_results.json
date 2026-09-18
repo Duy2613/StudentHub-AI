@@ -1,6 +1,6 @@
 {
   "benchmarkVersion": "1.0.0-dev-oracle",
-  "evaluatedAt": "2026-09-17T16:24:55.727Z",
+  "evaluatedAt": "2026-09-18T04:21:41.355Z",
   "totalQueries": 84,
   "evidenceClass": "RETRIEVAL_DEV",
   "releaseGateEligible": false,

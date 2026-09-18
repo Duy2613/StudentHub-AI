@@ -10,6 +10,7 @@
 import { getPostgresPool } from "../database/PostgresPool.js";
 import { ExpertQualificationService, authenticatedUserId } from "../expert/ExpertQualificationService.js";
 import { ExpertRepository } from "../database/ExpertRepository.js";
+import { ExpertReputationPolicy } from "../expert/ExpertReputationPolicy.js";
 
 const EXPERT_ALLOWED_UPDATE_FIELDS = new Set([
   "bio",
@@ -195,19 +196,16 @@ export class ExpertProfileService {
     const repRow = reputationResult.rows[0] || {};
     const reputationTotal = Number(repRow?.reputation || 0);
     const completedCount = workCounts.completed;
-
-    // Server-calibrated StarLevel: calculated from completed formal assessments and reputation
-    // If completedReviews > 0 or reputation > 0, project calibrated level, otherwise null.
-    let starLevel = null;
-    if (completedCount >= 20 || reputationTotal >= 100) {
-      starLevel = 3;
-    } else if (completedCount >= 5 || reputationTotal >= 25) {
-      starLevel = 2;
-    } else if (completedCount >= 1 || reputationTotal > 0) {
-      starLevel = 1;
-    }
-
     const isActive = qualification?.state === "ACTIVE" || (verifiedDomains.length > 0 && qualification?.state === "DOMAIN_VERIFIED");
+
+    // Canonical Server-calibrated StarLevel (EXPERT_REPUTATION_POLICY_V1)
+    const starLevel = ExpertReputationPolicy.calculateStarLevel({
+      completedReviews: completedCount,
+      reputation: reputationTotal,
+      qualificationState: qualification?.state,
+      activationState: isActive ? "ACTIVE" : "PENDING_ACTIVATION",
+      suspendedAt: qualification?.suspendedAt || null,
+    });
     const fullName = expertProfileRow?.public_title || snapshot.displayName || principal.attributes?.fullName || "Chuyên gia StudentHub";
     const bio = expertProfileRow?.public_bio || (typeof snapshot.bio === "string" ? snapshot.bio : null);
     const expertise = typeof snapshot.expertise === "string" ? snapshot.expertise : null;

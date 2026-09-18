@@ -76,10 +76,15 @@ export const LAYER_1_REASONS = {
 
   // Network & Security
   SSRF_ATTEMPT: "ssrf_attempt",
+  SSRF_TARGET_BLOCKED: "ssrf_target_blocked",
   REDIRECT_CHAIN_ABUSE: "redirect_chain_abuse",
+  OPEN_REDIRECT_SUSPECTED: "open_redirect_suspected",
   PAYLOAD_LIMIT_EXCEEDED: "payload_limit_exceeded",
   INVALID_INPUT: "invalid_input",
   UNSUPPORTED_SCHEME: "unsupported_scheme",
+  MALICIOUS_SCRIPT_PAYLOAD: "malicious_script_payload",
+  CREDENTIAL_LEAK_IN_URL: "credential_leak_in_url",
+  HOMOGRAPH_ATTACK: "homograph_attack",
 };
 
 const SENSITIVE_VALUE_PATTERN = /(password|passwd|pass|otp|token|secret|bearer|cookie|cvv|pin|private[_ -]?key|seed[_ -]?phrase)/i;
