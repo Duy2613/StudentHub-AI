@@ -1,9 +1,9 @@
-artifacts/
-qa/
-scripts/
-docs/
-fixtures/
-media/
+/artifacts/
+/qa/
+/scripts/
+/docs/
+/fixtures/
+/media/
 *.mp4
 *.webm
 *.traineddata
