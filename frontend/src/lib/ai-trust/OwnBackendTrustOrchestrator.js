@@ -3,8 +3,9 @@
  *
  * This is the only orchestrator used by the public /api/v1/trust V5 route.
  * Historical seven-slot V5 and legacy adapter code stays isolated in its own
- * module for compatibility, but this path has no Friend backend dependency,
- * no public L5 and no provider work after Final Predict.
+ * module for compatibility. An explicitly configured legacy adapter may add
+ * bounded Layer 2/3/4 observations; this path still has no public L5 and no
+ * provider work after Final Predict.
  */
 
 import { createHash } from "node:crypto";
@@ -108,6 +109,16 @@ function statusText(...values) {
 
 function providerFailure(status) {
   return TRANSIENT_L2_STATUS.has(statusText(status)) || ["UNKNOWN", "NOT_CONFIGURED", "INVALID_INPUT"].includes(statusText(status));
+}
+
+function adapterIsEnabled(adapter) {
+  if (!adapter || typeof adapter !== "object") return false;
+  if (adapter.enabled === true || adapter.isConfigured === true) return true;
+  try {
+    return typeof adapter.isConfigured === "function" && adapter.isConfigured() === true;
+  } catch {
+    return false;
+  }
 }
 
 function createUnknownLayer2A(requestId, errorCode = "LAYER2A_UNAVAILABLE") {
@@ -524,6 +535,8 @@ export class OwnBackendTrustOrchestrator {
     this.layer2AProvider = options.layer2AProvider || null;
     this.semanticProvider = options.semanticProvider || null;
     this.retriever = options.retriever || null;
+    this.legacyVerificationAdapter = options.legacyVerificationAdapter || null;
+    this.legacyVerificationEnabled = adapterIsEnabled(this.legacyVerificationAdapter);
     this._activeController = null;
     this._lastRun = null;
     this._lastInput = null;
@@ -647,8 +660,13 @@ export class OwnBackendTrustOrchestrator {
         "l2",
         async () => {
           const url = input.type === "url" ? input.content || input.metadata.url || "" : "";
+          const reputationProvider = this.layer2AProvider || (
+            this.legacyVerificationEnabled && typeof this.legacyVerificationAdapter?.layer2Provider === "function"
+              ? this.legacyVerificationAdapter.layer2Provider()
+              : null
+          );
           const [l2aSettled, l2bSettled] = await Promise.allSettled([
-            this.services.l2a({ url, requestId, options: { ...(this.layer2AProvider ? { provider: this.layer2AProvider } : {}), signal: controller.signal } }),
+            this.services.l2a({ url, requestId, options: { ...(reputationProvider ? { provider: reputationProvider } : {}), signal: controller.signal } }),
             this.services.l2b({
               ...input,
               layer1Result: l1.raw,
@@ -682,7 +700,7 @@ export class OwnBackendTrustOrchestrator {
         "l3",
         async () => {
           const internal = rawResults.l2Internal || {};
-          return this.services.l3({
+          const layer3Params = {
             claims: internal.layer2B?.claims || rawResults.l2?.claims || [],
             candidateSources: internal.layer2B?.verificationPackage?.candidateSources || [],
             layer2Result: internal.layer2B || null,
@@ -692,7 +710,11 @@ export class OwnBackendTrustOrchestrator {
             requestId,
             signal: controller.signal,
             options: { requestId, signal: controller.signal, allowLocalFallback: false, ...(this.retriever ? { retriever: this.retriever } : {}) },
-          });
+          };
+          if (this.legacyVerificationEnabled && typeof this.legacyVerificationAdapter?.verifyLayer3 === "function") {
+            return this.legacyVerificationAdapter.verifyLayer3(layer3Params);
+          }
+          return this.services.l3(layer3Params);
         },
         pipeline,
         rawResults,
@@ -706,7 +728,7 @@ export class OwnBackendTrustOrchestrator {
         "l4",
         async () => {
           const internal = rawResults.l2Internal || {};
-          return this.services.l4({
+          const localResult = await this.services.l4({
             layer1Result: rawResults.l1 || null,
             layer2AResult: internal.layer2A || null,
             layer2Result: internal.layer2B || null,
@@ -716,9 +738,9 @@ export class OwnBackendTrustOrchestrator {
             options: {
               requestId,
               signal: controller.signal,
-              // Canonical Layer 4 always uses the StudentHub Gemini gateway;
-              // callers may inject a test service but cannot route this path to
-              // an external legacy verification endpoint.
+              // Canonical Layer 4 always executes the StudentHub local policy
+              // and Gemini gateway first. A configured legacy adapter is
+              // attached later as bounded advisory metadata only.
               useAIGateway: true,
               aiMode: "GEMINI_ONLY",
               retrieveSupplementalEvidence: async ({ gaps = [], requestId: gapRequestId, signal } = {}) => {
@@ -763,6 +785,68 @@ export class OwnBackendTrustOrchestrator {
               },
             },
           });
+          if (!this.legacyVerificationEnabled || typeof this.legacyVerificationAdapter?.verifyLayer4 !== "function") return localResult;
+
+          const legacyLayer3 = rawResults.l3?.legacyIntegration;
+          const canRunIndependentSynthesis = !legacyLayer3 || (
+            legacyLayer3.status === "COMPLETED" &&
+            legacyLayer3.stop !== true &&
+            legacyLayer3.canContinueToLayer4 !== false
+          );
+          if (!canRunIndependentSynthesis) {
+            return {
+              ...localResult,
+              legacyIntegration: {
+                status: "SKIPPED",
+                providerStatus: "SKIPPED",
+                providerId: "legacy_verification_layer4",
+                requestId,
+                rawVerdict: null,
+                assessmentConfidence: null,
+                evidenceAgreement: null,
+                sourceQuality: null,
+                stop: true,
+                canContinueToLayer4: false,
+                reason: "Legacy Layer 3 continuation policy did not authorize independent Layer 4 synthesis.",
+                contradictoryEvidence: [],
+                sources: [],
+                sourceOrigin: "LAYER_4_INDEPENDENT_RESEARCH",
+                limitations: ["Layer 4 legacy synthesis was skipped by validated server-side continuation policy."],
+              },
+            };
+          }
+
+          const independent = await this.legacyVerificationAdapter.verifyLayer4({
+            input,
+            layer1Result: rawResults.l1 || null,
+            layer2AResult: internal.layer2A || null,
+            layer2Result: internal.layer2B || null,
+            layer2CResult: internal.layer2C || null,
+            layer3Result: rawResults.l3 || null,
+            unresolvedSignals: rawResults.l3?.legacyIntegration?.unresolvedSignals || [],
+            requestId,
+            signal: controller.signal,
+          });
+          return {
+            ...localResult,
+            legacyIntegration: independent || {
+              status: "UNAVAILABLE",
+              providerStatus: "UNAVAILABLE",
+              providerId: "legacy_verification_layer4",
+              requestId,
+              rawVerdict: null,
+              assessmentConfidence: null,
+              evidenceAgreement: null,
+              sourceQuality: null,
+              stop: true,
+              canContinueToLayer4: false,
+              reason: "Legacy Layer 4 returned no usable result.",
+              contradictoryEvidence: [],
+              sources: [],
+              sourceOrigin: "LAYER_4_INDEPENDENT_RESEARCH",
+              limitations: ["No independent legacy synthesis was used by the canonical policy."],
+            },
+          };
         },
         pipeline,
         rawResults,

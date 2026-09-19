@@ -56,9 +56,9 @@ may call the approved compatibility endpoints through
 | `POST /api/verify/layer4` | L4 independent synthesis | Advisory assessment only; local deterministic policy remains authoritative |
 
 The compatibility base URL is server-only and must be supplied by
-`STUDENTHUB_LEGACY_VERIFICATION_BASE_URL` (the legacy alias
-`LEGACY_VERIFICATION_BASE_URL` is accepted). The browser never calls these
-paths directly. Invalid/private/local targets, non-JSON responses, oversized
+`STUDENTHUB_LEGACY_VERIFICATION_BASE_URL` (the legacy aliases
+`LEGACY_VERIFICATION_BASE_URL` and `FRIEND_BACKEND_API_URL` are accepted).
+The browser never calls these paths directly. Invalid/private/local targets, non-JSON responses, oversized
 bodies, malformed payloads, timeouts, rate limits, and outages map to explicit
 unavailable/unknown states; no demo fallback is permitted.
 

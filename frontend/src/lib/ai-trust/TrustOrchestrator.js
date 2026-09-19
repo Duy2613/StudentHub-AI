@@ -1,14 +1,23 @@
 /**
  * Public Trust entrypoint for the StudentHub-owned four-layer pipeline.
  *
- * The historical internal V5 orchestrator is intentionally not imported here:
- * the public route must not construct a legacy/Friend adapter or expose L5.
+ * The optional Render compatibility adapter is constructed only at this
+ * server-side boundary. Its Layer 2/3/4 observations are normalized by the
+ * adapter; StudentHub's deterministic Final Predict remains authoritative.
  */
 
-import { OwnBackendTrustOrchestrator, createOwnBackendTrustOrchestrator } from "./OwnBackendTrustOrchestrator.js";
+import { createLegacyVerificationAdapter } from "./integrations/legacyVerification/LegacyVerificationAdapter.js";
+import { OwnBackendTrustOrchestrator } from "./OwnBackendTrustOrchestrator.js";
 
-export class TrustOrchestrator extends OwnBackendTrustOrchestrator {}
+export class TrustOrchestrator extends OwnBackendTrustOrchestrator {
+  constructor(options = {}) {
+    super({
+      ...options,
+      legacyVerificationAdapter: options.legacyVerificationAdapter || createLegacyVerificationAdapter(),
+    });
+  }
+}
 
 export function createTrustOrchestrator(options = {}) {
-  return createOwnBackendTrustOrchestrator(options);
+  return new TrustOrchestrator(options);
 }

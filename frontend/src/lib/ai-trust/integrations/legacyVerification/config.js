@@ -4,6 +4,7 @@ export const LEGACY_VERIFICATION_CONFIG = Object.freeze({
   VERSION: "legacy-verification-adapter-v1",
   BASE_URL_ENV: "STUDENTHUB_LEGACY_VERIFICATION_BASE_URL",
   FALLBACK_BASE_URL_ENV: "LEGACY_VERIFICATION_BASE_URL",
+  FRIEND_BACKEND_BASE_URL_ENV: "FRIEND_BACKEND_API_URL",
   TIMEOUT_ENV: "STUDENTHUB_LEGACY_VERIFICATION_TIMEOUT_MS",
   RESOLVE_DNS_ENV: "STUDENTHUB_LEGACY_VERIFICATION_RESOLVE_DNS",
   MAX_REQUEST_BYTES: 512 * 1024,
@@ -48,7 +49,10 @@ function normalizedBaseUrl(raw) {
 export function getLegacyVerificationConfig(env = process.env) {
   const preferred = envString(env, LEGACY_VERIFICATION_CONFIG.BASE_URL_ENV);
   const fallback = envString(env, LEGACY_VERIFICATION_CONFIG.FALLBACK_BASE_URL_ENV);
-  const rawBaseUrl = preferred || fallback;
+  // Keep the existing friend-backend deployment variable as a compatibility
+  // alias while the canonical Trust configuration remains server-only.
+  const friendBackend = envString(env, LEGACY_VERIFICATION_CONFIG.FRIEND_BACKEND_BASE_URL_ENV);
+  const rawBaseUrl = preferred || fallback || friendBackend;
   const base = normalizedBaseUrl(rawBaseUrl);
   const timeoutMs = boundedTimeout(envString(env, LEGACY_VERIFICATION_CONFIG.TIMEOUT_ENV));
   const resolveDnsValue = envString(env, LEGACY_VERIFICATION_CONFIG.RESOLVE_DNS_ENV).toLowerCase();

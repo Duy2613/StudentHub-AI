@@ -183,7 +183,8 @@ contracts. Browser code has no legacy endpoint dependency.
 
 The adapter is disabled when no server-only base URL is configured. The
 preferred variable is `STUDENTHUB_LEGACY_VERIFICATION_BASE_URL`; the
-`LEGACY_VERIFICATION_BASE_URL` alias is accepted for compatibility. A
+`LEGACY_VERIFICATION_BASE_URL` and existing `FRIEND_BACKEND_API_URL` aliases
+are accepted for compatibility. A
 configured but invalid, unreachable, timed-out, oversized, or malformed
 backend response is represented as `UNAVAILABLE`/`INVALID_RESPONSE`; it never
 selects `DemoProvider` or produces a positive finding.
