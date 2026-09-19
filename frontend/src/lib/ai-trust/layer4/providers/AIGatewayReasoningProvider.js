@@ -235,8 +235,8 @@ export class AIGatewayReasoningProvider extends ITrustReasoningModel {
         options: {
           requestId: options.requestId,
           signal: options.signal,
-          perModelTimeoutMs: options.perModelTimeoutMs || AI_GATEWAY_CONFIG.BUDGET.L4_PER_MODEL_TIMEOUT_MS,
-          totalBudgetMs: options.totalBudgetMs || AI_GATEWAY_CONFIG.BUDGET.L4_TOTAL_MS,
+          perModelTimeoutMs: options.perModelTimeoutMs || AI_GATEWAY_CONFIG.BUDGET.L4_GAP_PER_MODEL_TIMEOUT_MS,
+          totalBudgetMs: options.totalBudgetMs || AI_GATEWAY_CONFIG.BUDGET.L4_GAP_TOTAL_MS,
           responseSchema: GEMINI_EVIDENCE_GAP_SCHEMA,
           maxOutputTokens: 900,
           allowQaExtended: options.allowQaExtended,

@@ -399,13 +399,24 @@ export class ModelRouter {
         continue;
       }
 
-      // Budget reservation: Check if there is a known healthy candidate downstream.
-      // If entry is not terminal and a downstream candidate is healthy (e.g. 3.6),
-      // reserve L4_RESERVED_HEALTHY_BUDGET_MS (~6800ms) for it.
+      // Budget reservation: check if there is a genuinely routable candidate
+      // downstream. A catalog entry that is invalid or missing its provider
+      // configuration must not consume the reservation; doing so used to make
+      // the router waste the L4 budget before it reached the next model.
       const downstreamCandidates = configuredChain.slice(configuredChain.indexOf(entryId) + 1);
       const hasDownstreamHealthy = downstreamCandidates.some((id) => {
         const downstreamEntry = AI_GATEWAY_CONFIG.MODEL_CATALOG[id];
-        return downstreamEntry && !this.healthStore.isCoolingDown(downstreamEntry.provider, downstreamEntry.model);
+        if (!downstreamEntry) return false;
+        const downstreamValidation = validateCatalogModelEntry(id, { allowQaExtended: qaExtendedActive });
+        if (!downstreamValidation.valid) return false;
+        const downstreamProvider = this.providers[downstreamEntry.provider];
+        if (!downstreamProvider) return false;
+        try {
+          if (!downstreamProvider.isConfigured?.(downstreamEntry)) return false;
+        } catch {
+          return false;
+        }
+        return !this.healthStore.isCoolingDown(downstreamEntry.provider, downstreamEntry.model);
       });
 
       const reservedHealthyBudget = hasDownstreamHealthy

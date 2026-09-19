@@ -86,11 +86,11 @@ export function classifyGatewayFailure({ errorType = null, httpStatus = null, pr
     return code === "NETWORK_TIMEOUT" ? "NETWORK_TIMEOUT" : "NETWORK_ERROR";
   }
   if (errorType === GATEWAY_ERROR_TYPE.HTTP_ERROR) {
+    if (status === 429 || ["RESOURCE_EXHAUSTED", "QUOTA_EXHAUSTED", "RATE_LIMITED", "TOO_MANY_REQUESTS"].includes(code)) return "RATE_LIMITED";
     if (status === 401 || code === "UNAUTHENTICATED") return "AUTH_FAILED";
     if (status === 403 || code === "PERMISSION_DENIED") return "PERMISSION_DENIED";
     if (status === 404 || code === "NOT_FOUND" || code === "MODEL_NOT_FOUND") return "MODEL_NOT_AVAILABLE";
     if (status === 408 || status === 504 || code === "DEADLINE_EXCEEDED") return "TIMEOUT";
-    if (status === 429 || code === "RESOURCE_EXHAUSTED" || code === "QUOTA_EXHAUSTED" || code === "RATE_LIMITED") return "RATE_LIMITED";
     if (status === 503 || code === "UNAVAILABLE" || code === "SERVICE_UNAVAILABLE") return "SERVICE_UNAVAILABLE";
     if (status === 400 || code === "INVALID_ARGUMENT" || code === "INVALID_REQUEST") return "INVALID_REQUEST";
     if (status !== null && status >= 500) return "UPSTREAM_ERROR";
@@ -100,17 +100,19 @@ export function classifyGatewayFailure({ errorType = null, httpStatus = null, pr
 }
 
 /**
- * Strict failover policy for the Google model chain. 401, 403 and 400 are
- * deliberately excluded even if another field happens to contain a transient
- * looking word. Explicit MODEL_INCOMPATIBLE is the sole non-transport skip:
- * it means the candidate cannot satisfy the already-fixed caller schema.
+ * Strict failover policy for the Google model chain. Authentication and
+ * request-schema failures stop immediately, while model-specific quota/capacity
+ * failures (including Google's quota-shaped HTTP 403) hop to the next model.
+ * Explicit MODEL_INCOMPATIBLE is the sole non-transport skip: it means the
+ * candidate cannot satisfy the already-fixed caller schema.
  */
 export function isFailoverEligible({ errorType = null, httpStatus = null, providerErrorCode = null } = {}) {
   const status = safeHttpStatus(httpStatus);
   const code = normalizeProviderErrorCode(providerErrorCode);
 
   // Failover NO: Global client/auth/schema defects that cannot be resolved by model hopping
-  if ([401, 403, 400].includes(status)) return false;
+  if ([401, 400].includes(status)) return false;
+  if (status === 403 && !["RESOURCE_EXHAUSTED", "QUOTA_EXHAUSTED", "RATE_LIMITED", "TOO_MANY_REQUESTS"].includes(code)) return false;
   if ([
     "UNAUTHENTICATED",
     "AUTHENTICATION_FAILED",
@@ -138,6 +140,7 @@ export function isFailoverEligible({ errorType = null, httpStatus = null, provid
     "QUOTA_EXHAUSTED",
     "SERVICE_UNAVAILABLE",
     "UNAVAILABLE",
+    "TOO_MANY_REQUESTS",
     "PROVIDER_TIMEOUT",
     "MODEL_OUTPUT_INCOMPATIBLE",
     "MODEL_CAPABILITY_INCOMPATIBLE",

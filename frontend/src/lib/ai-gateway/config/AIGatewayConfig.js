@@ -124,15 +124,20 @@ export const AI_GATEWAY_CONFIG = {
     MAX_TRACE_ATTEMPTS: 12,
   },
 
-  // Health-aware budget reservation: ensure healthy terminal candidates (3.6)
-  // preserve ~6.8s of the total 10s budget to complete structured generation.
+  // Layer 4 may need to hop across several model-specific quota buckets. The
+  // final synthesis therefore gets a larger bounded budget than the generic
+  // gateway default; the gap-analysis pass remains deliberately shorter.
   BUDGET: {
-    L4_TOTAL_MS: 10_000,
-    L4_TOTAL_DEMO_BUDGET_MS: 22_000,
-    L4_HEALTHY_MODEL_TIMEOUT_MS: 6000,
-    L4_UNKNOWN_MODEL_TIMEOUT_MS: 4000,
-    L4_PER_MODEL_TIMEOUT_MS: 7000,
-    L4_RESERVED_HEALTHY_BUDGET_MS: 6800,
+    // Six-model failover window: enough time to try every candidate in order
+    // when a provider reports quota/capacity pressure on earlier models.
+    L4_TOTAL_MS: 45_000,
+    L4_GAP_TOTAL_MS: 15_000,
+    L4_TOTAL_DEMO_BUDGET_MS: 60_000,
+    L4_HEALTHY_MODEL_TIMEOUT_MS: 7500,
+    L4_UNKNOWN_MODEL_TIMEOUT_MS: 5000,
+    L4_PER_MODEL_TIMEOUT_MS: 7500,
+    L4_GAP_PER_MODEL_TIMEOUT_MS: 5000,
+    L4_RESERVED_HEALTHY_BUDGET_MS: 7500,
     DEFAULT_TOTAL_MS: 10_000,
     MIN_ATTEMPT_MS: 250,
   },

@@ -14,6 +14,7 @@ import { QrIntakeService } from "@/lib/ai-trust/layer1/qr/QrIntakeService.js";
 import { ExpertBlindReviewDispatcher } from "@/lib/server/expert/ExpertBlindReviewDispatcher.js";
 
 export const runtime = "nodejs";
+export const maxDuration = 120;
 
 const INPUT_TYPES = new Set(["text", "url", "image", "file"]);
 const ACCEPTED_INPUT_TYPES = new Set([...INPUT_TYPES, "qr"]);

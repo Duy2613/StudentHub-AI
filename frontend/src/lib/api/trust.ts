@@ -151,7 +151,11 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
   const abortFromCaller = () => controller.abort(callerSignal?.reason);
   if (callerSignal?.aborted) abortFromCaller();
   else callerSignal?.addEventListener("abort", abortFromCaller, { once: true });
-  const timeout = setTimeout(() => { timedOut = true; controller.abort("timeout"); }, 45_000);
+  // L3 retrieval plus one bounded L4 gap pass and one bounded L4 synthesis
+  // pass can legitimately exceed the old 45s client deadline. The server
+  // still owns the finite budgets; this timeout only prevents a permanently
+  // stuck connection from leaving the UI in a running state.
+  const timeout = setTimeout(() => { timedOut = true; controller.abort("timeout"); }, 120_000);
   try {
     let response: Response;
     try {

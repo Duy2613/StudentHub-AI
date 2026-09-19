@@ -61,6 +61,7 @@ function safeProviderCode(value, fallback = null) {
     "RESOURCE_EXHAUSTED",
     "QUOTA_EXHAUSTED",
     "RATE_LIMITED",
+    "TOO_MANY_REQUESTS",
     "UNAVAILABLE",
     "SERVICE_UNAVAILABLE",
     "DEADLINE_EXCEEDED",
@@ -99,6 +100,9 @@ function nestedStrings(value, depth = 0) {
 function metadataFromErrorPayload(payload, response, now = Date.now()) {
   const errorPayload = payload?.error && typeof payload.error === "object" ? payload.error : payload;
   const status = Number(response?.status);
+  const strings = nestedStrings(errorPayload);
+  const searchable = strings.join(" ").toLowerCase();
+  const quotaHint = /quota|rate[- ]?limit|too many requests|resource exhausted|requests\s*\/\s*(minute|day)|high demand|capacity/.test(searchable);
   const rawCode = errorPayload?.status || errorPayload?.reason || errorPayload?.code;
   let providerErrorCode = safeProviderCode(rawCode);
   if (!providerErrorCode && status === 401) providerErrorCode = "UNAUTHENTICATED";
@@ -107,9 +111,12 @@ function metadataFromErrorPayload(payload, response, now = Date.now()) {
   if (!providerErrorCode && status === 429) providerErrorCode = "RESOURCE_EXHAUSTED";
   if (!providerErrorCode && status === 503) providerErrorCode = "SERVICE_UNAVAILABLE";
   if (!providerErrorCode && status >= 400) providerErrorCode = `HTTP_${status}`;
-
-  const strings = nestedStrings(errorPayload);
-  const searchable = strings.join(" ").toLowerCase();
+  // Google can report exhausted quota as HTTP 403 with a generic
+  // PERMISSION_DENIED status. Preserve the quota meaning so the router can
+  // fail over to the next model instead of stopping on an auth-looking code.
+  if (quotaHint && (status === 403 || status === 429 || providerErrorCode === "PERMISSION_DENIED")) {
+    providerErrorCode = status === 403 ? "QUOTA_EXHAUSTED" : (providerErrorCode === "PERMISSION_DENIED" ? "QUOTA_EXHAUSTED" : providerErrorCode);
+  }
   const retryHeader = response?.headers?.get?.("retry-after") || response?.headers?.get?.("Retry-After");
   let retryAfterMs = parseRetryAfterValue(retryHeader, now);
   let quotaResetAt = null;
@@ -121,7 +128,7 @@ function metadataFromErrorPayload(payload, response, now = Date.now()) {
   }
   if (!retryAfterMs && quotaResetAt) retryAfterMs = Math.min(quotaResetAt - now, MAX_RETRY_AFTER_MS);
 
-  const quotaExhausted = status === 429 || ["RESOURCE_EXHAUSTED", "QUOTA_EXHAUSTED", "RATE_LIMITED"].includes(providerErrorCode);
+  const quotaExhausted = quotaHint || status === 429 || ["RESOURCE_EXHAUSTED", "QUOTA_EXHAUSTED", "RATE_LIMITED", "TOO_MANY_REQUESTS"].includes(providerErrorCode);
   const dailyQuotaExhausted = quotaExhausted && /daily|per day|rpd|requests\s*\/\s*day|day quota/.test(searchable);
   return {
     providerErrorCode,
