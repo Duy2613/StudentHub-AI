@@ -255,10 +255,13 @@ export const trustInvestigationInputSchema = z.object({
     extractionAuthority: z.string().trim().min(1).max(80).optional(),
     qrContent: z.string().trim().min(1).max(12_000).optional(),
     fileType: z.string().trim().min(1).max(80).optional(),
+    mimeType: z.string().trim().min(1).max(80).optional(),
+    bytes: z.string().optional(),
+    mediaArtifactId: z.string().trim().max(120).optional(),
   }).strict().default({}),
   scope: caseScopeSchema.optional(),
   requestId: identifierSchema,
-  runId: identifierSchema,
+  runId: identifierSchema.optional(),
   confirmedEntities: z.array(z.string().trim().min(1).max(240)).max(50).default([]),
 }).strict();
 export type TrustInvestigationInput = z.infer<typeof trustInvestigationInputSchema>;

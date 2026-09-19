@@ -1,0 +1,10 @@
+artifacts/
+qa/
+scripts/
+docs/
+fixtures/
+media/
+*.mp4
+*.webm
+*.traineddata
+*.py

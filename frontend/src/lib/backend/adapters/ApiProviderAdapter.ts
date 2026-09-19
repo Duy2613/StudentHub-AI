@@ -231,7 +231,7 @@ function trustResultFromResponse(input: TrustInvestigationInput, raw: unknown): 
   const pipeline = parsed.data.data;
   const durableCaseId = parsed.data.caseId || input.scope?.caseId || null;
   const durableCaseRevision = parsed.data.caseRevision ?? input.scope?.caseRevision ?? null;
-  const serverRunId = parsed.data.runId || input.runId;
+  const serverRunId = parsed.data.runId || input.runId || input.requestId || "run_default";
   const pipelineRecord = pipeline as unknown as Record<string, unknown>;
   const finalDecision = pipeline.finalDecision;
   const providerObservations = providerObservationsFromPipeline(pipelineRecord);

@@ -1,0 +1,278 @@
+[
+  {
+    "route": "/academic/[[...slug]]",
+    "filePath": "frontend/src/app/academic/[[...slug]]/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": true
+  },
+  {
+    "route": "/academic-showcase",
+    "filePath": "frontend/src/app/academic-showcase/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/ai",
+    "filePath": "frontend/src/app/ai/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/c9",
+    "filePath": "frontend/src/app/c9/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/callback",
+    "filePath": "frontend/src/app/callback/page.jsx",
+    "classification": "PUBLIC",
+    "isDynamic": false
+  },
+  {
+    "route": "/cases",
+    "filePath": "frontend/src/app/cases/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/cinema",
+    "filePath": "frontend/src/app/cinema/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/community",
+    "filePath": "frontend/src/app/community/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/community/[postId]",
+    "filePath": "frontend/src/app/community/[postId]/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": true
+  },
+  {
+    "route": "/credit-scheduler",
+    "filePath": "frontend/src/app/credit-scheduler/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/dashboard",
+    "filePath": "frontend/src/app/dashboard/page.jsx",
+    "classification": "PRIVILEGED_OR_AUTHENTICATED",
+    "isDynamic": false
+  },
+  {
+    "route": "/expert",
+    "filePath": "frontend/src/app/expert/page.jsx",
+    "classification": "PRIVILEGED_OR_AUTHENTICATED",
+    "isDynamic": false
+  },
+  {
+    "route": "/expert/profile",
+    "filePath": "frontend/src/app/expert/profile/page.jsx",
+    "classification": "PRIVILEGED_OR_AUTHENTICATED",
+    "isDynamic": false
+  },
+  {
+    "route": "/expert/profile/[expertId]",
+    "filePath": "frontend/src/app/expert/profile/[expertId]/page.jsx",
+    "classification": "PRIVILEGED_OR_AUTHENTICATED",
+    "isDynamic": true
+  },
+  {
+    "route": "/forum",
+    "filePath": "frontend/src/app/forum/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/intelligence/ai-trust",
+    "filePath": "frontend/src/app/intelligence/ai-trust/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/intelligence/community",
+    "filePath": "frontend/src/app/intelligence/community/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/intelligence/evidence",
+    "filePath": "frontend/src/app/intelligence/evidence/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/intelligence/experts",
+    "filePath": "frontend/src/app/intelligence/experts/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/intelligence/knowledge",
+    "filePath": "frontend/src/app/intelligence/knowledge/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/intelligence",
+    "filePath": "frontend/src/app/intelligence/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/intelligence/trust",
+    "filePath": "frontend/src/app/intelligence/trust/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/learn",
+    "filePath": "frontend/src/app/learn/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/learn/[courseId]/[lessonId]",
+    "filePath": "frontend/src/app/learn/[courseId]/[lessonId]/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": true
+  },
+  {
+    "route": "/login",
+    "filePath": "frontend/src/app/login/page.jsx",
+    "classification": "PUBLIC",
+    "isDynamic": false
+  },
+  {
+    "route": "/marketplace",
+    "filePath": "frontend/src/app/marketplace/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/onboarding",
+    "filePath": "frontend/src/app/onboarding/page.jsx",
+    "classification": "AUTHENTICATED",
+    "isDynamic": false
+  },
+  {
+    "route": "/page.jsx",
+    "filePath": "frontend/src/app/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/practice",
+    "filePath": "frontend/src/app/practice/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/prof-rating",
+    "filePath": "frontend/src/app/prof-rating/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/profile",
+    "filePath": "frontend/src/app/profile/page.jsx",
+    "classification": "AUTHENTICATED",
+    "isDynamic": false
+  },
+  {
+    "route": "/profile/[id]",
+    "filePath": "frontend/src/app/profile/[id]/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": true
+  },
+  {
+    "route": "/projects",
+    "filePath": "frontend/src/app/projects/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/quests",
+    "filePath": "frontend/src/app/quests/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/register",
+    "filePath": "frontend/src/app/register/page.jsx",
+    "classification": "PUBLIC",
+    "isDynamic": false
+  },
+  {
+    "route": "/roadmap",
+    "filePath": "frontend/src/app/roadmap/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/safety-map",
+    "filePath": "frontend/src/app/safety-map/page.jsx",
+    "classification": "AUTHENTICATED",
+    "isDynamic": false
+  },
+  {
+    "route": "/scam-check",
+    "filePath": "frontend/src/app/scam-check/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/scholarships",
+    "filePath": "frontend/src/app/scholarships/page.jsx",
+    "classification": "AUTHENTICATED",
+    "isDynamic": false
+  },
+  {
+    "route": "/settings",
+    "filePath": "frontend/src/app/settings/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/settings/privacy",
+    "filePath": "frontend/src/app/settings/privacy/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/sos",
+    "filePath": "frontend/src/app/sos/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/trust",
+    "filePath": "frontend/src/app/trust/page.jsx",
+    "classification": "PRIVILEGED_OR_AUTHENTICATED",
+    "isDynamic": false
+  },
+  {
+    "route": "/tuition-radar",
+    "filePath": "frontend/src/app/tuition-radar/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/ultra",
+    "filePath": "frontend/src/app/ultra/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  },
+  {
+    "route": "/verify",
+    "filePath": "frontend/src/app/verify/page.jsx",
+    "classification": "PUBLIC_OR_GENERAL",
+    "isDynamic": false
+  }
+]

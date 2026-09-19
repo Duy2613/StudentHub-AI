@@ -106,7 +106,7 @@ function trustFixture(input: TrustInvestigationInput): TrustInvestigationResult 
     contractVersion: "trust.demo.v1",
     caseId: input.scope?.caseId || null,
     caseRevision: input.scope?.caseRevision ?? null,
-    runId: input.runId,
+    runId: input.runId || input.requestId || "demo_run",
     generatedAt: FIXTURE_TIMESTAMP,
     decision: {
       security: "UNKNOWN",

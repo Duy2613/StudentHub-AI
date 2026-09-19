@@ -378,6 +378,12 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
   const [passportQuery, setPassportQuery] = useState(null);
   const [passportRetryKey, setPassportRetryKey] = useState(0);
   const [composerCollapsed, setComposerCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (initialMode && ["image", "qr", "text", "url"].includes(initialMode.toLowerCase())) {
+      setMode(initialMode.toLowerCase());
+    }
+  }, [initialMode]);
   const [inspectedSource, setInspectedSource] = useState(null);
   const [analyzedSummary, setAnalyzedSummary] = useState(null);
   const [, setReportState] = useState({ status: "IDLE", report: null, message: null });
@@ -422,16 +428,52 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
       measureAssurance("trust-workspace-open-duration", "trust-workspace-request", "trust-workspace-interactive");
     });
   };
-
   const acceptFile = useCallback((nextFile) => {
     setError(null);
-    if (!nextFile || !["image/png", "image/jpeg", "image/webp"].includes(nextFile.type)) return setError({ message: "Định dạng này chưa được hỗ trợ. Hãy chọn PNG, JPG hoặc WEBP.", code: "VALIDATION" });
-    if (nextFile.size > 8 * 1024 * 1024) return setError({ message: "Ảnh vượt quá giới hạn 8 MB.", code: "PAYLOAD_TOO_LARGE" });
-    if (preview) URL.revokeObjectURL(preview);
-    setFile(nextFile); setPreview(URL.createObjectURL(nextFile)); setOcr(null); setConfirmedEntities([]);
-  }, [preview]);
+    if (!nextFile) return;
+    const isSupportedMime = ["image/png", "image/jpeg", "image/webp"].includes(nextFile.type);
+    const isSupportedExt = /\.(png|jpe?g|webp)$/i.test(nextFile.name || "");
+    if (!isSupportedMime && !isSupportedExt && !nextFile.type?.startsWith("image/")) {
+      return setError({ message: "Định dạng này chưa được hỗ trợ. Hãy chọn PNG, JPG hoặc WEBP.", code: "VALIDATION" });
+    }
+    if (nextFile.size > 8 * 1024 * 1024) {
+      return setError({ message: "Ảnh vượt quá giới hạn 8 MB.", code: "PAYLOAD_TOO_LARGE" });
+    }
+    setFile(nextFile);
+    setOcr(null);
+    setConfirmedEntities([]);
 
-  useEffect(() => () => preview && URL.revokeObjectURL(preview), [preview]);
+    // Generate permanent Base64 Data URL for preview (immune to Strict Mode / re-render revocation)
+    try {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          setPreview(reader.result);
+        }
+      };
+      reader.readAsDataURL(nextFile);
+    } catch {
+      const objUrl = URL.createObjectURL(nextFile);
+      setPreview(objUrl);
+    }
+
+    // Immediate background OCR & QR extraction for instant client-side UX
+    import("@/lib/ai-trust/vision/OcrService").then(({ OcrService }) => {
+      OcrService.extract(nextFile).then((res) => {
+        setOcr({ ...res, authority: "CLIENT_OCR_HINT" });
+        if (res?.qrContent && !contentRef.current) {
+          setContent(res.qrContent);
+          contentRef.current = res.qrContent;
+        } else if (res?.text && !contentRef.current && (mode === "image" || mode === "text")) {
+          setContent(res.text);
+          contentRef.current = res.text;
+        }
+      }).catch((err) => {
+        console.warn("[AiTrustStudio] Immediate OCR extraction notice:", err);
+      });
+    }).catch(() => {});
+  }, [mode]);
+
   useEffect(() => () => activeScan.current?.abort("component-unmounted"), []);
   useEffect(() => {
     const onPaste = (event) => {
@@ -471,6 +513,7 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
   };
 
   const analyze = async () => {
+    console.log("[AI_TRUST_STUDIO] analyze() called. Mode:", mode, "content length:", content?.length, "file:", Boolean(file));
     markAssurance("trust-analysis-request", { mode });
     activeScan.current?.abort("superseded-by-new-scan");
     const controller = new AbortController();
@@ -495,13 +538,15 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
           label: summaryText || (mode === "url" ? content.trim() : mode === "image" || mode === "qr" ? (file?.name || "Tập tin") : content.trim().slice(0, 80))
         });
         if (!userChangedInput) {
-          if (preview) URL.revokeObjectURL(preview);
-          setFile(null);
-          setPreview(null);
-          setContent("");
-          contentRef.current = "";
-          setOcr(null);
-          setConfirmedEntities([]);
+          if (mode !== "image" && mode !== "qr") {
+            if (preview && typeof preview === "string" && preview.startsWith("blob:")) URL.revokeObjectURL(preview);
+            setFile(null);
+            setPreview(null);
+            setContent("");
+            contentRef.current = "";
+            setOcr(null);
+            setConfirmedEntities([]);
+          }
         }
       }
     };
@@ -527,7 +572,15 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
         if (controller.signal.aborted || scanId !== scanSequence.current) return;
         extracted = String(mode === "qr" ? result.qrContent || "" : result.text || result.qrContent || "").trim();
         setOcr({ ...result, authority: "CLIENT_OCR_HINT" });
-        if (!extracted) throw new ApiError(mode === "qr" ? "Không đọc được mã QR. Hãy dùng ảnh QR rõ hơn hoặc chuyển sang nhập URL/văn bản." : "OCR cục bộ không đọc được nội dung. Hãy dùng ảnh rõ hơn hoặc chuyển sang nhập văn bản.", "VALIDATION", { status: 422 });
+        if (!extracted) {
+          if (mode === "qr") {
+            throw new ApiError("Không đọc được mã QR. Hãy dùng ảnh QR rõ hơn hoặc chuyển sang nhập URL/văn bản.", "VALIDATION", { status: 422 });
+          } else {
+            extracted = file?.name
+              ? `[Tập tin ảnh: ${file.name}] Yêu cầu giám định độ tin cậy và phân tích rủi ro hình ảnh.`
+              : "Yêu cầu giám định độ tin cậy và phân tích rủi ro hình ảnh.";
+          }
+        }
       }
       if (mode === "url") {
         let parsedUrl;
@@ -537,21 +590,26 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
       }
       if (controller.signal.aborted || scanId !== scanSequence.current) return;
       const identity = createWorkIdentity("trust");
-      activeBinding.current = { requestId: identity.requestId, runId: identity.runId };
+      activeBinding.current = { requestId: identity.requestId, runId: identity.runId || null };
       setActiveBindingState(activeBinding.current);
       const input = {
         type: mode === "url" ? "URL" : mode === "image" ? "IMAGE" : mode === "qr" ? "QR_READY" : "TEXT",
         content: extracted,
         metadata: mode === "image" || mode === "qr"
-          ? { inputKind: mode === "qr" ? "QR" : "IMAGE", extractionAuthority: "CLIENT_OCR_HINT", fileType: file?.type, ...(mode === "qr" ? { qrContent: extracted } : {}) }
+          ? {
+              inputKind: mode === "qr" ? "QR" : "IMAGE",
+              extractionAuthority: "CLIENT_OCR_HINT",
+              fileType: file?.type,
+              mimeType: file?.type,
+              bytes: preview,
+              ...(mode === "qr" ? { qrContent: extracted } : {}),
+            }
           : { inputKind: mode === "url" ? "URL" : "TEXT" },
         requestId: identity.requestId,
         runId: identity.runId,
         confirmedEntities,
       };
       updateStep("input", "done", mode === "image" || mode === "qr" ? "Gợi ý cục bộ" : "Đã chuẩn hóa"); record("Đầu vào đã được xử lý", "DONE");
-      updateStep("local", "running");
-      updateStep("external", "running", "Đang kiểm tra nguồn và luận điểm");
       updateStep("reasoning", "running", "Chờ phán quyết xác định");
       let streamedPipeline = null;
       const provider = getRuntimeProviderBundle();
@@ -605,6 +663,7 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
       setPipeline((items) => displayPipeline ? legacyPipelineFromV5(displayPipeline, items) : items.map((item) => item.status === "running" ? { ...item, status: "done", detail: "Canonical result" } : item));
       record("Kết quả kiểm tra đã sẵn sàng", "COMPLETE");
     } catch (caught) {
+      console.error("[AI_TRUST_STUDIO] analyze error:", caught);
       if (caught instanceof ApiError && caught.code === "ABORTED" && scanId !== scanSequence.current) return;
       setComposerCollapsed(false);
       const message = caught instanceof ApiError ? apiErrorMessage(caught) : "Pipeline gặp lỗi ngoài dự kiến.";

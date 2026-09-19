@@ -68,6 +68,17 @@ export class ExpertBlindReviewDispatcher {
 
       await client.query("BEGIN");
 
+      // Ensure public.trust_cases exists to satisfy foreign key constraints
+      const caseOwnerUuid = ownerId && /^[0-9a-f-]{36}$/i.test(ownerId) ? ownerId : null;
+      if (caseOwnerUuid) {
+        await client.query(
+          `INSERT INTO public.trust_cases (id, owner_id, state, visibility, created_at, updated_at)
+           VALUES ($1, $2, 'RUNNING', 'PRIVATE', now(), now())
+           ON CONFLICT (id) DO NOTHING`,
+          [caseId, caseOwnerUuid]
+        );
+      }
+
       // 2. Insert or get expert_review_request
       const requestKey = `blind_req:${caseId}:${caseRevision}`;
       const existingReq = await client.query(

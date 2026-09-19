@@ -90,8 +90,9 @@ export class Layer1ScreenService {
         if (metadata.qrContent) detectorsExecuted.push("QrDetector");
 
         const normBytes = NormalizationService.normalizeBytes(metadata.bytes || content, metadata.fileSize || 0);
-        forceUnknown = !normBytes.isValid;
-        unknownReason = normBytes.isOverSize ? LAYER_1_REASONS.OVERSIZED_FILE : "BINARY_INPUT_UNAVAILABLE_OR_MALFORMED";
+        const hasVerifiedArtifact = Boolean(metadata.mediaArtifactId && metadata.imageHash);
+        forceUnknown = !normBytes.isValid && !hasVerifiedArtifact;
+        unknownReason = normBytes.isOverSize ? LAYER_1_REASONS.OVERSIZED_FILE : (forceUnknown ? "BINARY_INPUT_UNAVAILABLE_OR_MALFORMED" : null);
 
         const imgRes = ImageDetector.detect({
           bytes: normBytes.bytes,

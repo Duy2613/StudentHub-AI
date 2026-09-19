@@ -1,0 +1,1297 @@
+{
+  "corpusVersion": "V3.0",
+  "qaCorpusSeed": 20260919,
+  "generatedAt": "2026-09-18T18:15:00Z",
+  "categories": {
+    "text": [
+      {
+        "caseId": "TEXT-01-SCIENCE-FACT",
+        "claim": "Tốc độ của ánh sáng trong chân không là chính xác 299.792.458 mét trên giây theo chuẩn SI.",
+        "language": "vi",
+        "category": "SCIENTIFIC_FACT",
+        "expectedVerdict": "SUPPORTED",
+        "sourceOrigin": "NIST / BIPM Official Reference",
+        "sourceUrl": "https://www.nist.gov/pml/special-publication-330",
+        "retrievedAt": "2026-09-18T10:00:00Z"
+      },
+      {
+        "caseId": "TEXT-02-FALSE-CLAIM",
+        "claim": "Vạn Lý Trường Thành là công trình nhân tạo duy nhất có thể nhìn thấy bằng mắt thường từ bề mặt Mặt Trăng.",
+        "language": "vi",
+        "category": "FALSE_POPULAR_MYTH",
+        "expectedVerdict": "CONTRADICTED",
+        "sourceOrigin": "NASA Human Spaceflight FAQ",
+        "sourceUrl": "https://www.nasa.gov/audience/forstudents/k-4/home/F_Great_Wall_of_China.html",
+        "retrievedAt": "2026-09-18T10:05:00Z"
+      },
+      {
+        "caseId": "TEXT-03-MISLEADING-CLAIM",
+        "claim": "Uống nước chanh ấm vào buổi sáng có khả năng kiềm hóa cơ thể và tiêu diệt hoàn toàn tế bào ung thư.",
+        "language": "vi",
+        "category": "MISLEADING_HEALTH",
+        "expectedVerdict": "CONTRADICTED",
+        "sourceOrigin": "American Institute for Cancer Research",
+        "sourceUrl": "https://www.aicr.org/resources/blog/alkaline-diets-and-cancer/",
+        "retrievedAt": "2026-09-18T10:10:00Z"
+      },
+      {
+        "caseId": "TEXT-04-TEMPORAL-FACT",
+        "claim": "Tính đến năm 2026, Việt Nam có 63 đơn vị hành chính cấp tỉnh và thành phố trực thuộc trung ương.",
+        "language": "vi",
+        "category": "GOVERNMENT_DATA",
+        "expectedVerdict": "SUPPORTED",
+        "sourceOrigin": "Cổng Thông tin Điện tử Chính phủ",
+        "sourceUrl": "https://chinhphu.vn/dia-gioi-hanh-chinh",
+        "retrievedAt": "2026-09-18T10:15:00Z"
+      },
+      {
+        "caseId": "TEXT-05-AMBIGUOUS-TECH",
+        "claim": "Trí tuệ nhân tạo sẽ thay thế 100% lập trình viên phần mềm trên toàn cầu trước năm 2028.",
+        "language": "vi",
+        "category": "AMBIGUOUS_PREDICTION",
+        "expectedVerdict": "INSUFFICIENT_EVIDENCE",
+        "sourceOrigin": "ACM / IEEE Spectrum Report",
+        "sourceUrl": "https://spectrum.ieee.org/ai-software-engineering-future",
+        "retrievedAt": "2026-09-18T10:20:00Z"
+      },
+      {
+        "caseId": "TEXT-06-SCHOLARSHIP-OFFICIAL",
+        "claim": "Đại học Quốc gia Hà Nội công bố chương trình học bổng tài năng 2026 dành cho sinh viên xuất sắc ngành công nghệ bán dẫn.",
+        "language": "vi",
+        "category": "STUDENT_SCHOLARSHIP",
+        "expectedVerdict": "SUPPORTED",
+        "sourceOrigin": "ĐHQGHN Portal Đào tạo",
+        "sourceUrl": "https://vnu.edu.vn/hoc-bong-tai-nang-2026",
+        "retrievedAt": "2026-09-18T10:25:00Z"
+      },
+      {
+        "caseId": "TEXT-07-JOB-SCAM-TEXT",
+        "claim": "Tuyển sinh viên làm nhiệm vụ gõ capcha nhận 500k mỗi ngày, yêu cầu chuyển cọc trước 200k vào số tài khoản cá nhân.",
+        "language": "vi",
+        "category": "STUDENT_RECRUITMENT_SCAM",
+        "expectedVerdict": "CONTRADICTED",
+        "sourceOrigin": "Bộ Công an Cảnh báo Lừa đảo Trực tuyến",
+        "sourceUrl": "https://bocongan.gov.vn/canh-bao-lua-dao-tuyen-dung",
+        "retrievedAt": "2026-09-18T10:30:00Z"
+      },
+      {
+        "caseId": "TEXT-08-PHISHING-CREDENTIAL",
+        "claim": "Cảnh báo khẩn cấp từ phòng Công tác sinh viên: Tài khoản portal của bạn bị khóa, nhấp vào sinhvien-vnu-login.com để mở lại.",
+        "language": "vi",
+        "category": "CREDENTIAL_THEFT",
+        "expectedVerdict": "CONTRADICTED",
+        "sourceOrigin": "Trung tâm Ứng cứu Khẩn cấp Không gian mạng VNCERT",
+        "sourceUrl": "https://vncert.vn/canh-bao-tan-cong-lua-dao",
+        "retrievedAt": "2026-09-18T10:35:00Z"
+      },
+      {
+        "caseId": "TEXT-09-EN-SCIENTIFIC",
+        "claim": "The James Webb Space Telescope operates at the second Lagrange point (L2), approximately 1.5 million kilometers from Earth.",
+        "language": "en",
+        "category": "SCIENTIFIC_FACT",
+        "expectedVerdict": "SUPPORTED",
+        "sourceOrigin": "NASA JWST Orbit Mission Profile",
+        "sourceUrl": "https://webb.nasa.gov/content/about/orbit.html",
+        "retrievedAt": "2026-09-18T10:40:00Z"
+      },
+      {
+        "caseId": "TEXT-10-EN-FALSE-CLAIM",
+        "claim": "Human blood turns blue inside the veins before oxygen exposure turns it red upon exiting the body.",
+        "language": "en",
+        "category": "FALSE_BIOLOGY_MYTH",
+        "expectedVerdict": "CONTRADICTED",
+        "sourceOrigin": "Library of Congress Everyday Mysteries",
+        "sourceUrl": "https://www.loc.gov/everyday-mysteries/item/is-blood-ever-blue/",
+        "retrievedAt": "2026-09-18T10:45:00Z"
+      },
+      {
+        "caseId": "TEXT-11-MIXED-LANG",
+        "claim": "Sinh viên HUST nộp đơn tham gia Google Summer of Code 2026 (GSoC) sẽ nhận được tài trợ stipend lên tới $3000 USD từ Google LLC.",
+        "language": "mixed",
+        "category": "STUDENT_INTERNATIONAL_PROGRAM",
+        "expectedVerdict": "SUPPORTED",
+        "sourceOrigin": "Google Summer of Code Official Guide",
+        "sourceUrl": "https://summerofcode.withgoogle.com/get-started",
+        "retrievedAt": "2026-09-18T10:50:00Z"
+      },
+      {
+        "caseId": "TEXT-12-BENIGN-NOTICE",
+        "claim": "Thời khóa biểu các lớp học trực tiếp tại giảng đường D3 và D5 bắt đầu áp dụng từ thứ Hai tuần tới.",
+        "language": "vi",
+        "category": "ORDINARY_BENIGN",
+        "expectedVerdict": "SUPPORTED",
+        "sourceOrigin": "Thông báo nội bộ đào tạo",
+        "sourceUrl": "https://hust.edu.vn/lich-hoc-tuan",
+        "retrievedAt": "2026-09-18T10:55:00Z"
+      }
+    ],
+    "url": [
+      {
+        "caseId": "URL-01-GOV-SAFE",
+        "url": "https://moet.gov.vn",
+        "domain": "moet.gov.vn",
+        "type": "SAFE_HTTPS_GOV",
+        "publisher": "Bo Giao duc va Dao tao"
+      },
+      {
+        "caseId": "URL-02-EDU-SAFE",
+        "url": "https://vnu.edu.vn",
+        "domain": "vnu.edu.vn",
+        "type": "SAFE_HTTPS_EDU",
+        "publisher": "Dai hoc Quoc gia Ha Noi"
+      },
+      {
+        "caseId": "URL-03-TECH-SAFE",
+        "url": "https://hust.edu.vn",
+        "domain": "hust.edu.vn",
+        "type": "SAFE_HTTPS_TECH",
+        "publisher": "Dai hoc Bach Khoa Ha Noi"
+      },
+      {
+        "caseId": "URL-04-NEWS-SAFE",
+        "url": "https://vnexpress.net",
+        "domain": "vnexpress.net",
+        "type": "SAFE_HTTPS_NEWS",
+        "publisher": "VnExpress"
+      },
+      {
+        "caseId": "URL-05-DOCS-SAFE",
+        "url": "https://developer.mozilla.org",
+        "domain": "developer.mozilla.org",
+        "type": "SAFE_HTTPS_DOCS",
+        "publisher": "Mozilla MDN"
+      },
+      {
+        "caseId": "URL-06-SCIENCE-SAFE",
+        "url": "https://www.nature.com",
+        "domain": "nature.com",
+        "type": "SAFE_HTTPS_SCIENCE",
+        "publisher": "Nature Publishing"
+      },
+      {
+        "caseId": "URL-07-LOOPBACK-IPV4",
+        "url": "http://127.0.0.1:3000/api/keys",
+        "type": "SSRF_LOOPBACK",
+        "securityAction": "BLOCK_SSRF"
+      },
+      {
+        "caseId": "URL-08-LOCALHOST",
+        "url": "http://localhost:8080/admin",
+        "type": "SSRF_LOCALHOST",
+        "securityAction": "BLOCK_SSRF"
+      },
+      {
+        "caseId": "URL-09-AWS-METADATA",
+        "url": "http://169.254.169.254/latest/meta-data/",
+        "type": "SSRF_METADATA",
+        "securityAction": "BLOCK_SSRF"
+      },
+      {
+        "caseId": "URL-10-RFC1918-PRIVATE",
+        "url": "http://192.168.1.1/setup",
+        "type": "SSRF_PRIVATE_IP",
+        "securityAction": "BLOCK_SSRF"
+      },
+      {
+        "caseId": "URL-11-JAVASCRIPT-URI",
+        "url": "javascript:void(document.cookie)",
+        "type": "SCHEME_UNSAFE",
+        "securityAction": "BLOCK_SCHEME"
+      },
+      {
+        "caseId": "URL-12-DATA-URI",
+        "url": "data:text/html;base64,PHNjcmlwdD5ldmlsKCk8L3NjcmlwdD4=",
+        "type": "SCHEME_UNSAFE",
+        "securityAction": "BLOCK_SCHEME"
+      },
+      {
+        "caseId": "URL-13-FILE-URI",
+        "url": "file:///C:/Windows/System32/drivers/etc/hosts",
+        "type": "SCHEME_UNSAFE",
+        "securityAction": "BLOCK_SCHEME"
+      },
+      {
+        "caseId": "URL-14-CREDENTIALS-IN-URL",
+        "url": "https://admin:super_secret_token@phishing-target.com/auth",
+        "type": "CREDENTIAL_LEAK",
+        "securityAction": "STRIP_OR_BLOCK"
+      },
+      {
+        "caseId": "URL-15-PUNYCODE-CONFUSION",
+        "url": "https://xn--bchkhoa-hwa.com/portal-fake",
+        "type": "PUNYCODE_CONFUSION",
+        "securityAction": "FLAG_SUSPICIOUS"
+      }
+    ],
+    "images": {
+      "realWorld": [
+        {
+          "caseId": "REAL-01-CAMPUS",
+          "name": "Dai hoc Bach Khoa Ha Noi - Cong Parabol",
+          "filename": "REAL-01-CAMPUS.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://hust.edu.vn/uploads/sys/cong-parabol.jpg",
+          "publisher": "DH Bach Khoa Ha Noi",
+          "license": "CC-BY-4.0",
+          "dimensions": "640x480",
+          "sha256": "5506f09cb8c85006d9535b159250405674e9cb1a069840382111d1e4b1a57a4c"
+        },
+        {
+          "caseId": "REAL-02-STUDENT",
+          "name": "Sinh vien trong phong thi nghiem khoa hoc",
+          "filename": "REAL-02-STUDENT.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://vnu.edu.vn/media/lab-research.jpg",
+          "publisher": "Dai hoc Quoc gia Ha Noi",
+          "license": "CC-BY-4.0",
+          "dimensions": "640x480",
+          "sha256": "41fd0afa88cf742bc08154f449a4408b9bdcaf111d01cb07dcc5e29809fad6c3"
+        },
+        {
+          "caseId": "REAL-03-DOCUMENT",
+          "name": "Van ban Nghi dinh Chinh phu ban hanh",
+          "filename": "REAL-03-DOCUMENT.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://chinhphu.vn/van-ban/nghidinh.pdf",
+          "publisher": "Cong TT Chinh Phu",
+          "license": "Public Domain",
+          "dimensions": "640x480",
+          "sha256": "9005f144292bc623037e5279cc0cd642864670bcd8aeb56de87d1e326c21b3fa"
+        },
+        {
+          "caseId": "REAL-04-STREET",
+          "name": "Duong pho Ha Noi buoi sang",
+          "filename": "REAL-04-STREET.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://vietnamtourism.gov.vn/ha-noi-street.jpg",
+          "publisher": "Tong cuc Du lich",
+          "license": "CC-BY-SA-3.0",
+          "dimensions": "640x480",
+          "sha256": "8267dae1416f6cd98437b773fb31330a7e6a2097939feeea3a1d74b7a7b7819e"
+        },
+        {
+          "caseId": "REAL-05-ROOM",
+          "name": "Phong hoi thao khoa hoc sinh vien",
+          "filename": "REAL-05-ROOM.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://hust.edu.vn/conference-room.jpg",
+          "publisher": "DH Bach Khoa Ha Noi",
+          "license": "CC-BY-4.0",
+          "dimensions": "640x480",
+          "sha256": "cebe1a1198dd681a4ed9a21c847df5954096c1eeb7f908da47bd3786a0593bed"
+        },
+        {
+          "caseId": "REAL-06-GROUP",
+          "name": "Nhom sinh viên nghien cuu tai thu vien",
+          "filename": "REAL-06-GROUP.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://vnu.edu.vn/library-study.jpg",
+          "publisher": "Dai hoc Quoc gia Ha Noi",
+          "license": "CC-BY-4.0",
+          "dimensions": "640x480",
+          "sha256": "931535480594696537e37a4fa8da22f9e1ac9ff1029fd2b2a44875113975016d"
+        },
+        {
+          "caseId": "REAL-07-CERT",
+          "name": "Chung nhan giai thuong khoa hoc sinh vien",
+          "filename": "REAL-07-CERT.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://moet.gov.vn/giai-thuong-kh.jpg",
+          "publisher": "Bo Giao duc va Dao tao",
+          "license": "Public Domain",
+          "dimensions": "640x480",
+          "sha256": "b6c7dbf71d11d54d28bca7eeb87a62572d03555b8a2e068421b4ecd923c6ab5c"
+        },
+        {
+          "caseId": "REAL-08-NIGHT",
+          "name": "Khuon vien truong dai hoc ban dem",
+          "filename": "REAL-08-NIGHT.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://hust.edu.vn/campus-night.jpg",
+          "publisher": "DH Bach Khoa Ha Noi",
+          "license": "CC-BY-4.0",
+          "dimensions": "640x480",
+          "sha256": "f15550e2a3330eaf1de49ec2a0042c912e9d18488f609170d115f2d3df2a2b50"
+        },
+        {
+          "caseId": "REAL-09-BUILDING",
+          "name": "Toa nha thu vien Ta Quang Buu",
+          "filename": "REAL-09-BUILDING.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://library.hust.edu.vn/tqb-building.jpg",
+          "publisher": "Thu vien TQB",
+          "license": "CC-BY-4.0",
+          "dimensions": "640x480",
+          "sha256": "c1718e93148eea6cf5373db78ee228256ac7adaa8ba23aada9f05daabaeb15ff"
+        },
+        {
+          "caseId": "REAL-10-OBJECT",
+          "name": "Sach giao trinh va laptop hoc tap",
+          "filename": "REAL-10-OBJECT.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://vnu.edu.vn/media/academic-desk.jpg",
+          "publisher": "NXB Dai hoc Quoc gia",
+          "license": "CC-BY-4.0",
+          "dimensions": "640x480",
+          "sha256": "8be45974fa42cd78857be23f047ea53943b708023333f07f8c9244f7d7fd28db"
+        },
+        {
+          "caseId": "REAL-11-LOWLIGHT",
+          "name": "Hanh lang giang duong luc sang som",
+          "filename": "REAL-11-LOWLIGHT.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://hust.edu.vn/hallway-dawn.jpg",
+          "publisher": "DH Bach Khoa Ha Noi",
+          "license": "CC-BY-4.0",
+          "dimensions": "640x480",
+          "sha256": "c0a287122ef57abe5cac84434cf696657d0769b1770a8a259403027b8e09972d"
+        },
+        {
+          "caseId": "REAL-12-LANDSCAPE",
+          "name": "Ho Tay Ha Noi goc nhin tu tren cao",
+          "filename": "REAL-12-LANDSCAPE.png",
+          "sourceOrigin": "EXTERNAL_AUTHENTIC",
+          "sourceUrl": "https://vietnamtourism.gov.vn/west-lake.jpg",
+          "publisher": "Tong cuc Du lich",
+          "license": "CC-BY-SA-3.0",
+          "dimensions": "640x480",
+          "sha256": "5f1840c2fed58e40bf465884fefd9cb5868a9dd61faf56d08d1efa64acd206f8"
+        }
+      ],
+      "aiGenerated": [
+        {
+          "caseId": "AI-01-PORTRAIT",
+          "title": "Chan dung sinh vien nam tao boi AI",
+          "filename": "AI-01-PORTRAIT.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "Gemini-Imagen-3",
+          "prompt": "Photorealistic fictional Asian student wearing navy hoodie smiling in academic hall",
+          "seed": 401928,
+          "dimensions": "640x480",
+          "sha256": "b9cd14a0666f796f84517776fec606fea0131b63b85fd439fff6c877ffb88abf"
+        },
+        {
+          "caseId": "AI-02-GROUP",
+          "title": "Nhom sinh vien hu cau thao luan AI",
+          "filename": "AI-02-GROUP.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "Gemini-Imagen-3",
+          "prompt": "Group of 3 diverse university students reviewing laptop code in modern glass campus",
+          "seed": 401929,
+          "dimensions": "640x480",
+          "sha256": "1fc147d6ce0bd976e70d1276a9248b3328c66279828a29417ffdd474c5ab1cf0"
+        },
+        {
+          "caseId": "AI-03-CAMPUS",
+          "title": "Khuon vien dai hoc tuong lai tao bang AI",
+          "filename": "AI-03-CAMPUS.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "SynthModel-V3",
+          "prompt": "Futuristic clean university campus with solar canopies and green rooftop gardens",
+          "seed": 401930,
+          "dimensions": "640x480",
+          "sha256": "ed1645bbc9c4225f0ff0d758e367175d5d560ce1acd4652535e12c7429e1cb97"
+        },
+        {
+          "caseId": "AI-04-CERT",
+          "title": "Giay khen hu cau tao boi mo hinh AI",
+          "filename": "AI-04-CERT.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "Gemini-Imagen-3",
+          "prompt": "Formal academic certificate with ornate gold borders and synthetic signature stamps",
+          "seed": 401931,
+          "dimensions": "640x480",
+          "sha256": "9a1f19ef0f18adfea6ba36af4ece4fbb3e4aea07a496e6401fa1c4b769b5d58a"
+        },
+        {
+          "caseId": "AI-05-PROMO",
+          "title": "Poster quang cao hoc bong AI sinh ra",
+          "filename": "AI-05-PROMO.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "SynthModel-V3",
+          "prompt": "Vibrant graphic design banner announcing 100% full ride tech scholarship 2026",
+          "seed": 401932,
+          "dimensions": "640x480",
+          "sha256": "c3945b37c69e6716c486433246d3f67fcb67439613713357ba94bca4fa40b285"
+        },
+        {
+          "caseId": "AI-06-JOB",
+          "title": "Thong bao tuyen dung hu cau",
+          "filename": "AI-06-JOB.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "Gemini-Imagen-3",
+          "prompt": "Social recruitment visual for student part time AI assistant job with high salary badge",
+          "seed": 401933,
+          "dimensions": "640x480",
+          "sha256": "78b943b04a76ccc392a91702c76307702544e9defec5fd81dadc3ba7d850901c"
+        },
+        {
+          "caseId": "AI-07-QR-SYNTH",
+          "title": "Anh tong hop chua ma QR nhan tao",
+          "filename": "AI-07-QR-SYNTH.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "SynthModel-V3",
+          "prompt": "Digital artwork containing embedded synthetic QR code on glowing neon desk",
+          "seed": 401934,
+          "dimensions": "640x480",
+          "sha256": "49cec32048ede724c70843b26ddcaf22325b34840e3db05d7583f6331d637ce2"
+        },
+        {
+          "caseId": "AI-08-NIGHT",
+          "title": "Dem hoi sinh vien kien tao boi AI",
+          "filename": "AI-08-NIGHT.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "Gemini-Imagen-3",
+          "prompt": "Cinematic night concert with students holding glowing smartphones and lightsticks",
+          "seed": 401935,
+          "dimensions": "640x480",
+          "sha256": "94ff23cb1556b76bcad75992f822946c5b630d32317cab48e23132daf06559fe"
+        },
+        {
+          "caseId": "AI-09-LAB",
+          "title": "Phong thi nghiem robot AI tuong lai",
+          "filename": "AI-09-LAB.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "SynthModel-V3",
+          "prompt": "Robotics research lab with robotic arms and synthetic circuit blueprints",
+          "seed": 401936,
+          "dimensions": "640x480",
+          "sha256": "7093cff9e74ec80b14e2f227a2611906d77dbbf7aff07155ee18baa43417e48f"
+        },
+        {
+          "caseId": "AI-10-CLASSROOM",
+          "title": "Giang duong 500 sinh vien hu cau",
+          "filename": "AI-10-CLASSROOM.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "Gemini-Imagen-3",
+          "prompt": "Vast tiered university auditorium filled with synthetic students listening to lecture",
+          "seed": 401937,
+          "dimensions": "640x480",
+          "sha256": "cbcbec983a4f4c069600ee83002b8a981d8e8d5e20e5d79faf25e876692a1f0c"
+        },
+        {
+          "caseId": "AI-11-OBJECT",
+          "title": "Mo hinh 3D cup danh du sinh vien",
+          "filename": "AI-11-OBJECT.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "SynthModel-V3",
+          "prompt": "CGI rendered crystal award trophy with laser etched university emblem",
+          "seed": 401938,
+          "dimensions": "640x480",
+          "sha256": "ed11d9b30a019eae2cb281eec91a12895bbd7842de721072b531fa6e9ec166d3"
+        },
+        {
+          "caseId": "AI-12-ABSTRACT",
+          "title": "Hinh anh an du mang neural network",
+          "filename": "AI-12-ABSTRACT.png",
+          "sourceOrigin": "SYNTHETIC_GENERATIVE",
+          "generatorModel": "Gemini-Imagen-3",
+          "prompt": "Abstract digital neural network graph nodes connecting global knowledge repositories",
+          "seed": 401939,
+          "dimensions": "640x480",
+          "sha256": "db9fab48858bda6cd3bec308fe39d0498c30b43cf53b437ff9ebf2896ac4ec03"
+        }
+      ],
+      "transformed": [
+        {
+          "caseId": "TR-01-JPEG-Q10",
+          "transformationType": "JPEG_RECOMPRESSION_HEAVY",
+          "description": "Nén JPEG chất lượng cực thấp (Q=10)",
+          "filename": "TR-01-JPEG-Q10.png",
+          "sha256": "3df66d89932449d5adc94455761ab32bb0df5dd40a3b6e8390ef7880e9ba74a7"
+        },
+        {
+          "caseId": "TR-02-MULTI-RECOMPRESS",
+          "transformationType": "MULTI_RECOMPRESSION",
+          "description": "Nén JPEG lặp lại 5 chu kỳ",
+          "filename": "TR-02-MULTI-RECOMPRESS.png",
+          "sha256": "ad4565d91dc85fbdc3e7d61012832c536b699d35b7c594857ac300cb2f4dede3"
+        },
+        {
+          "caseId": "TR-03-DOWNSCALE-RESIZE",
+          "transformationType": "DOWNSCALE_RESIZE",
+          "description": "Thu nhỏ 50% rồi phóng to lại (resampling loss)",
+          "filename": "TR-03-DOWNSCALE-RESIZE.png",
+          "sha256": "a3b58fdc664eb9db68d18a21a916d7bde04ec36f5c77feedf277d2b79c8285b8"
+        },
+        {
+          "caseId": "TR-04-TIGHT-CROP",
+          "transformationType": "TIGHT_CROP",
+          "description": "Cắt xén chặt khung hình trung tâm 50%",
+          "filename": "TR-04-TIGHT-CROP.png",
+          "sha256": "51addd4902aba934ae0ea626f514508aa6af80ca92f78ad4658e995f9a93993f"
+        },
+        {
+          "caseId": "TR-05-ROTATION-90",
+          "transformationType": "ROTATION_90",
+          "description": "Xoay góc 90 độ",
+          "filename": "TR-05-ROTATION-90.png",
+          "sha256": "146e4c5e24948cfcdb4624219578e37f80b2e1107390ec31c33da51154e68235"
+        },
+        {
+          "caseId": "TR-06-BLUR-GAUSSIAN",
+          "transformationType": "GAUSSIAN_BLUR",
+          "description": "Làm mờ Gauss bán kính R=3",
+          "filename": "TR-06-BLUR-GAUSSIAN.png",
+          "sha256": "443a1afb7b2fa54b7779207062cc421561cdba18c21a84bb3ee147221381856e"
+        },
+        {
+          "caseId": "TR-07-NOISE-ADD",
+          "transformationType": "NOISE_ADDITION",
+          "description": "Thêm nhiễu ngẫu nhiên mô phỏng ISO cao",
+          "filename": "TR-07-NOISE-ADD.png",
+          "sha256": "79f15c75d7225a41c0b6494f1c0bbde377354373bbeb09ab0bb3a250ed83d67c"
+        },
+        {
+          "caseId": "TR-08-BRIGHTNESS-BOOST",
+          "transformationType": "BRIGHTNESS_BOOST",
+          "description": "Tăng độ sáng 150%",
+          "filename": "TR-08-BRIGHTNESS-BOOST.png",
+          "sha256": "f1b2f2a2ef35342f3056c267ea497fcf903fd21992a1f9c9f76f3050da4081df"
+        },
+        {
+          "caseId": "TR-09-CONTRAST-EXTREME",
+          "transformationType": "CONTRAST_EXTREME",
+          "description": "Tăng độ tương phản 180%",
+          "filename": "TR-09-CONTRAST-EXTREME.png",
+          "sha256": "d4eada6ac4a6e519e289df2856c1401f99905e08dc45ab3e4bd381f19f370088"
+        },
+        {
+          "caseId": "TR-10-OCCLUSION-BADGE",
+          "transformationType": "PARTIAL_OCCLUSION",
+          "description": "Che khuất một phần bằng tem kiểm duyệt",
+          "filename": "TR-10-OCCLUSION-BADGE.png",
+          "sha256": "05bdbf9cb40aa5b33af7811df1bd746a96fb85e55f8fc48b09ef9c78c94bdd39"
+        },
+        {
+          "caseId": "TR-11-WATERMARK-OVERLAY",
+          "transformationType": "WATERMARK_OVERLAY",
+          "description": "Chèn watermark bán trong suốt",
+          "filename": "TR-11-WATERMARK-OVERLAY.png",
+          "sha256": "c54b7b0ba0a5bf67ee9b0320672644db852375e7a8cedbdf38c2e64c7d0fb64d"
+        },
+        {
+          "caseId": "TR-12-SCREENSHOT-IN-SCREEN",
+          "transformationType": "NESTED_SCREENSHOT",
+          "description": "Ảnh chụp màn hình lồng trong khung điện thoại",
+          "filename": "TR-12-SCREENSHOT-IN-SCREEN.png",
+          "sha256": "5506f09cb8c85006d9535b159250405674e9cb1a069840382111d1e4b1a57a4c"
+        }
+      ],
+      "screenshots": [
+        {
+          "caseId": "SHOT-01-SCHOLARSHIP",
+          "type": "SCHOLARSHIP_LETTER",
+          "title": "QUYET DINH CAP HOC BONG TOAN PHAN 2026",
+          "filename": "SHOT-01-SCHOLARSHIP.png",
+          "sha256": "187b3fe96e4eb0a810c9e11e173ca8672f3ea9814adb4266038cc2dca21a17f0"
+        },
+        {
+          "caseId": "SHOT-02-TUITION-SCAM",
+          "type": "PAYMENT_REQUEST",
+          "title": "YEU CAU NOP HOC PHI KHOA 2026 QUA VI CA NHAN",
+          "filename": "SHOT-02-TUITION-SCAM.png",
+          "sha256": "79cbab447d4f432dd36818142a64326192a27a523db1761724589125521121ad"
+        },
+        {
+          "caseId": "SHOT-03-JOB-OFFER",
+          "type": "RECRUITMENT",
+          "title": "CONG VIEC DICH THUAT DU LIEU AI CHO SINH VIEN",
+          "filename": "SHOT-03-JOB-OFFER.png",
+          "sha256": "d7995cbc5ad96d8f611b5e5bb4534a5f5b4ff4711d359ce23b3df106167af52e"
+        },
+        {
+          "caseId": "SHOT-04-VERIFY-ALERT",
+          "type": "CREDENTIAL_PHISH",
+          "title": "TAI KHOAN PORTAL SAP BI KHOA",
+          "filename": "SHOT-04-VERIFY-ALERT.png",
+          "sha256": "a088150c3bec1cd074a48983ecf907118d2a163798c0080b99dfd5fe359650b3"
+        },
+        {
+          "caseId": "SHOT-05-STUDENT-CHAT",
+          "type": "CHAT_LOG",
+          "title": "Lich bao ve do an tot nghiep hoc ky 2",
+          "filename": "SHOT-05-STUDENT-CHAT.png",
+          "sha256": "6f1039b9486ceb0b32c3ee62e227049f4cb8ea9229cb913b1bc0f117c23a6a14"
+        },
+        {
+          "caseId": "SHOT-06-EXAM-NOTICE",
+          "type": "OFFICIAL_PORTAL",
+          "title": "THONG BAO LICH THI HOC KY VA QUY CHE PHONG THI",
+          "filename": "SHOT-06-EXAM-NOTICE.png",
+          "sha256": "177676bd3b7dae3e02d3198d558ce64f63d27d0eb9bc4c564eed702d1201a2aa"
+        },
+        {
+          "caseId": "SHOT-07-DISCOUNT-VOUCHER",
+          "type": "PROMOTION",
+          "title": "VOUCHER MUA MACBOOK GIAM 50% CHO TAN SINH VIEN",
+          "filename": "SHOT-07-DISCOUNT-VOUCHER.png",
+          "sha256": "0eedeb15459dad61a24eca3c3ce80d5928dddccc8294a6af7a66a4a9fbb4df6e"
+        },
+        {
+          "caseId": "SHOT-08-NEWS-SCREENSHOT",
+          "type": "NEWS_ARTICLE",
+          "title": "Cac truong dai hoc tang chi tieu xet tuyen hoc ba 2026",
+          "filename": "SHOT-08-NEWS-SCREENSHOT.png",
+          "sha256": "5f63a747cb450ca3f2e80047d44aaab9b9015f47292e3b8f2994d923b1b11837"
+        },
+        {
+          "caseId": "SHOT-09-PORTAL-DASHBOARD",
+          "type": "DASHBOARD",
+          "title": "BANG DIEM TICH LUY HE THONG TIN SINH VIEN",
+          "filename": "SHOT-09-PORTAL-DASHBOARD.png",
+          "sha256": "0011b75dd03a9f310c9d721ccf1890a2756bf8b1afa70ccc235f8a2498abe0d7"
+        },
+        {
+          "caseId": "SHOT-10-MSG-WITH-URL",
+          "type": "URL_CONTAINED",
+          "title": "Thong bao ket qua phong van thuc tap",
+          "filename": "SHOT-10-MSG-WITH-URL.png",
+          "sha256": "8e7bd0bdc08914386fe47fa64655c0e21a72edccfec147354a44d42a52c22554"
+        },
+        {
+          "caseId": "SHOT-11-MSG-WITH-QR",
+          "type": "QR_CONTAINED",
+          "title": "QR CHECK-IN HOI NGHIEU KHOA HOC SINH VIEN",
+          "filename": "SHOT-11-MSG-WITH-QR.png",
+          "sha256": "50e9650aa3d7890d10e30976a797f49f1c8e9276563e6aff7009a8b61d3cacfa"
+        },
+        {
+          "caseId": "SHOT-12-COMPOSITE-FULL",
+          "type": "COMPOSITE_FULL",
+          "title": "VAN BAN CHI DAO CO MA QR VA LINK",
+          "filename": "SHOT-12-COMPOSITE-FULL.png",
+          "sha256": "5e6aa996d1b6d90d9babc4c6f3ccc28f8d23e70145148a817e4cda6e30736e32"
+        }
+      ]
+    },
+    "qr": [
+      {
+        "caseId": "QR-01-HTTPS",
+        "type": "HTTPS_URL",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "https://hust.edu.vn/vi/tuyen-sinh",
+        "filename": "QR-01-HTTPS.png",
+        "sha256": "c586dbe9947c83a3548658dd818caf6b126f5ecf80798f00094fa8bb8c2b5672",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-02-HTTP",
+        "type": "HTTP_URL",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "http://info.cern.ch/hypertext/WWW/TheProject.html",
+        "filename": "QR-02-HTTP.png",
+        "sha256": "7950a18da90583b566c977e41bd393a33a27f8f4119f9b74db6d4fdbd5500edf",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-03-PLAIN-TEXT",
+        "type": "PLAIN_TEXT",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "StudentHub AI Blind Review Case Verification V3",
+        "filename": "QR-03-PLAIN-TEXT.png",
+        "sha256": "af0956286e419992de2418e181b5b9e8693ed5826c1b9d9e8c119cdf1a028df0",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-04-VN-UNICODE",
+        "type": "VN_UNICODE",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "Học bổng Tài năng Khoa học Công nghệ Đại học Bách Khoa Hà Nội 2026 - Miễn 100% học phí",
+        "filename": "QR-04-VN-UNICODE.png",
+        "sha256": "3efbaea2b1d84b1bace55ac45c669f91f6a773df123bdc06f74af2dd477d66b9",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-05-EN-TEXT",
+        "type": "EN_TEXT",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "Official Notice: Fall 2026 Academic Registration and Tuition Schedule",
+        "filename": "QR-05-EN-TEXT.png",
+        "sha256": "ad17b7b133283b87991184cd594451f8af9052ce8a2d34f89e2faca46fde646b",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-06-MIXED-UNICODE",
+        "type": "MIXED_UNICODE",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "Thông báo học bổng trao đổi SV / Global Exchange Scholarship Grant #VN-2026",
+        "filename": "QR-06-MIXED-UNICODE.png",
+        "sha256": "40e244a3c5aac4061ec157fa8d8c1ab4247b13772642007e1cbfb6d52e1d0059",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-07-LONG-TEXT",
+        "type": "LONG_TEXT",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "Nghị định số 84/2020/NĐ-CP của Chính phủ quy định chi tiết một số điều của Luật Giáo dục về chế độ học bổng khuyến khích học tập đối với học sinh, sinh viên các cơ sở giáo dục nghề nghiệp và cơ sở giáo dục đại học công lập tại Việt Nam.",
+        "filename": "QR-07-LONG-TEXT.png",
+        "sha256": "ef21cada511c57c98fbd0a3b634b521f6dfa117aa3f1114fd308e65532c0e76f",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-08-MAILTO",
+        "type": "MAILTO",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "mailto:scholarships@vnu.edu.vn?subject=Application_Inquiry",
+        "filename": "QR-08-MAILTO.png",
+        "sha256": "8575554c8b9128d27fcdd041592936d306bdb5fbb4925b82688b889a274fb30b",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-09-TEL",
+        "type": "TEL",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "tel:+842438692120",
+        "filename": "QR-09-TEL.png",
+        "sha256": "e81a3585913b6e0de47011e21ebf2d8c57d59ea48e3a0cac87d9e51374f6fa44",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-10-SMS",
+        "type": "SMS",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "sms:+84988123456?body=CONFIRM_ENROLLMENT_2026",
+        "filename": "QR-10-SMS.png",
+        "sha256": "3a704cf0a7bd62aa6dffa4c6820f01d8a7bde56b15dcbba1d45ab3cd380599d3",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-11-GEO",
+        "type": "GEO",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "geo:21.0049,105.8431;u=25",
+        "filename": "QR-11-GEO.png",
+        "sha256": "aaa5848aa6b161753d59473a9c62b1260ab5c9d37a2bb58dc16a8b698996e82b",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-12-VCARD",
+        "type": "VCARD",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "BEGIN:VCARD\nVERSION:3.0\nN:Tran;Van B;;GS.TS;\nFN:GS.TS Tran Van B\nORG:Dai hoc Quoc gia Ha Noi\nTITLE:Truong phong Dao tao\nTEL:+842437547670\nEMAIL:daotao@vnu.edu.vn\nEND:VCARD",
+        "filename": "QR-12-VCARD.png",
+        "sha256": "22cfd1e79852eba4f33db8be870677fb28fdc9e94632be3f023aa5376c871c28",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-13-MECARD",
+        "type": "MECARD",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "MECARD:N:Le,Thi C;TEL:0903123456;EMAIL:lethic@studenthub.vn;;",
+        "filename": "QR-13-MECARD.png",
+        "sha256": "76909cc4cb1d57043cdc5d9e67b601b37602e164a53aa5a3d2854dfb2a3b9aab",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-14-WIFI-DUMMY",
+        "type": "WIFI",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "WIFI:S:Campus-Guest-QA;T:WPA;P:DemoPass2026!;;",
+        "filename": "QR-14-WIFI-DUMMY.png",
+        "sha256": "68c1b667a22417671599ace07e8d1f2cf8c508dd4ed31b3945c90845c9a1d44f",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-15-CALENDAR",
+        "type": "EVENT",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "BEGIN:VEVENT\nSUMMARY:Le khai giang nam hoc 2026-2027\nLOCATION:Hoi truong C2, DH Bach Khoa Ha Noi\nDTSTART:20260905T080000Z\nEND:VEVENT",
+        "filename": "QR-15-CALENDAR.png",
+        "sha256": "fa70e813499e209d5f52433a26eb826654082924a59508b93520702c6c1989bf",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-16-DEEPLINK",
+        "type": "APP_LINK",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "studenthub://trust/verify?caseId=CASE_V3_BLIND_9901",
+        "filename": "QR-16-DEEPLINK.png",
+        "sha256": "1b446907e5b5b03a0a14f839c25bad1c51bbe4ba7322bddc3e6243a8c2b4ca80",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-17-QUERY-URL",
+        "type": "URL_QUERY",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "https://moet.gov.vn/tintuc?category=gddh&id=8842&utm_source=portal_v3",
+        "filename": "QR-17-QUERY-URL.png",
+        "sha256": "6d95e0e5fed181ca34f1d56d3909a5820854efe392c660dfc01a838dcf7adba5",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-18-FRAGMENT-URL",
+        "type": "URL_FRAGMENT",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "https://vnexpress.net/giao-duc#muc-hoc-bong-2026",
+        "filename": "QR-18-FRAGMENT-URL.png",
+        "sha256": "99f1f2981c78e69da85260a55536f1628e4f37ac348963a523d242fc5c45cf2b",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-19-PUNYCODE-URL",
+        "type": "PUNYCODE",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "https://xn--bchkhoa-hwa.vn/thong-bao",
+        "filename": "QR-19-PUNYCODE-URL.png",
+        "sha256": "d5a4e0a4faba9627325458f891c499f284e01dfdd31143739a25f3f478a9f4a6",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-20-SHORTENER",
+        "type": "SHORTENER",
+        "category": "CONTENT_TYPE",
+        "expectedPayload": "https://tinyurl.com/studenthub-qa-2026",
+        "filename": "QR-20-SHORTENER.png",
+        "sha256": "29d0f3f8f3fc42e8f6652f8582d643f4eb7cd098e05a19b1e13739cd93e8db68",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-21-ROT-0",
+        "type": "VISUAL_ROT_0",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://moet.gov.vn/chuong-trinh-hoc-bong-2026",
+        "filename": "QR-21-ROT-0.png",
+        "sha256": "513a4b1e7d079c97a8a76dcf45f584025615e0401ce9116c5f3683be140b3e6c",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-22-ROT-90",
+        "type": "VISUAL_ROT_90",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://moet.gov.vn/chuong-trinh-hoc-bong-2026",
+        "filename": "QR-22-ROT-90.png",
+        "sha256": "af917e4f487dc0ff756d6f497887db92e262d2c3fc50ce255e7156103bfcc0bb",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 90,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-23-ROT-180",
+        "type": "VISUAL_ROT_180",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://moet.gov.vn/chuong-trinh-hoc-bong-2026",
+        "filename": "QR-23-ROT-180.png",
+        "sha256": "f836b2557c7b663300232cbe6fb5a0852ae8503145f69b6f640f5f43cf7645aa",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 180,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-24-ROT-270",
+        "type": "VISUAL_ROT_270",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://moet.gov.vn/chuong-trinh-hoc-bong-2026",
+        "filename": "QR-24-ROT-270.png",
+        "sha256": "8a0047c6e042c46e446a4d7c63e851d3e01098de9b6f89bce5ac05df6169c0c8",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 270,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-25-SMALL",
+        "type": "VISUAL_SMALL",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://vnu.edu.vn/portal/scholarship",
+        "filename": "QR-25-SMALL.png",
+        "sha256": "cd5526ab9f0cba7d5a90986378da3f4b47224ab69f5c9cd8e8b72a5623ed3861",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-26-LARGE",
+        "type": "VISUAL_LARGE",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://vnu.edu.vn/portal/scholarship",
+        "filename": "QR-26-LARGE.png",
+        "sha256": "9a778c2d31e094de6fde2ceee6dbb7a57e83e8e761e6b51b840f10d4d77e1071",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-27-BLUR",
+        "type": "VISUAL_BLUR",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://hust.edu.vn/thong-tin-sinh-vien",
+        "filename": "QR-27-BLUR.png",
+        "sha256": "56101ece70e9e3fc0d790851f58330e864f1050fc8da3fc48501369decf6af0c",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": true,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-28-JPEG-COMPRESSED",
+        "type": "VISUAL_JPEG",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://hust.edu.vn/thong-tin-sinh-vien",
+        "filename": "QR-28-JPEG-COMPRESSED.png",
+        "sha256": "c815119b0315d343f1344f2271488fa1fa0c5384982d567bf5d3f1b80c177e9d",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-29-LOW-CONTRAST",
+        "type": "VISUAL_CONTRAST",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://chinhphu.vn/van-ban-chi-dao",
+        "filename": "QR-29-LOW-CONTRAST.png",
+        "sha256": "972269a3e4efd09fd8bb79b68fc9444e3139801796ca57c0783e43dc0c5aa1a7",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-30-INVERTED",
+        "type": "VISUAL_INVERTED",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://chinhphu.vn/van-ban-chi-dao",
+        "filename": "QR-30-INVERTED.png",
+        "sha256": "edd277eef4ffe43bd1e9f399cc1fddf62c41322d45c2119c2bcb717eca41c647",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": true
+        }
+      },
+      {
+        "caseId": "QR-31-COLORED",
+        "type": "VISUAL_COLORED",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://tuoitre.vn/giao-duc.htm",
+        "filename": "QR-31-COLORED.png",
+        "sha256": "417edc756bc8a593d298f01524cbaa2b745364e887a357cf92953cc9c5e6f359",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-32-GRADIENT-LIGHT",
+        "type": "VISUAL_GRADIENT",
+        "category": "VISUAL_VARIANT",
+        "expectedPayload": "https://tuoitre.vn/giao-duc.htm",
+        "filename": "QR-32-GRADIENT-LIGHT.png",
+        "sha256": "1d835cd40f0641c2dc4c3ecac93a6199dadf090be521753b488a7e80ad48a251",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-33-SEC-LOCALHOST",
+        "type": "SSRF_LOCALHOST",
+        "category": "SECURITY",
+        "expectedPayload": "http://localhost:3000/api/admin/keys",
+        "filename": "QR-33-SEC-LOCALHOST.png",
+        "sha256": "c1072502c66fb25d567dc5e94a0c6f983fa509c4bbf2f3e6483878676429c2f2",
+        "securityRule": "BLOCKED",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-34-SEC-127",
+        "type": "SSRF_127",
+        "category": "SECURITY",
+        "expectedPayload": "http://127.0.0.1:8080/internal/system",
+        "filename": "QR-34-SEC-127.png",
+        "sha256": "778267304de4edf6b051fdd5eb27376143da56dd597c91383ee6cae0101fa24f",
+        "securityRule": "BLOCKED",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-35-SEC-IPV6-LOOPBACK",
+        "type": "SSRF_IPV6",
+        "category": "SECURITY",
+        "expectedPayload": "http://[::1]:3000/metrics",
+        "filename": "QR-35-SEC-IPV6-LOOPBACK.png",
+        "sha256": "2e2b2b9cd0bd109a000bd08cf9d3f35a83d24b8048815707509dd28de5e69584",
+        "securityRule": "BLOCKED",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-36-SEC-RFC1918-10",
+        "type": "SSRF_PRIVATE_10",
+        "category": "SECURITY",
+        "expectedPayload": "http://10.0.0.1/router/config",
+        "filename": "QR-36-SEC-RFC1918-10.png",
+        "sha256": "f916dcb70e65400ab99cf90283129fce36b3217b85521a86c7823506bc2b932e",
+        "securityRule": "BLOCKED",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-37-SEC-RFC1918-192",
+        "type": "SSRF_PRIVATE_192",
+        "category": "SECURITY",
+        "expectedPayload": "http://192.168.1.1/setup",
+        "filename": "QR-37-SEC-RFC1918-192.png",
+        "sha256": "172d32793a198c963289ae413579afadcf3577e323847af31e1d17ac925deefd",
+        "securityRule": "BLOCKED",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-38-SEC-METADATA",
+        "type": "SSRF_METADATA",
+        "category": "SECURITY",
+        "expectedPayload": "http://169.254.169.254/latest/meta-data/",
+        "filename": "QR-38-SEC-METADATA.png",
+        "sha256": "045a6d6c92366927675eae844e5a1d8227baaae6ccdc4f3c0629436aff3a3b2c",
+        "securityRule": "BLOCKED",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-39-SEC-JAVASCRIPT",
+        "type": "XSS_SCHEME",
+        "category": "SECURITY",
+        "expectedPayload": "javascript:alert('XSS_ATTACK_VECTOR')",
+        "filename": "QR-39-SEC-JAVASCRIPT.png",
+        "sha256": "d4d4557204e53d3f7beac1ec29e8786156ce35a98ea582ec8afdce2c5f1df7b7",
+        "securityRule": "BLOCKED",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-40-SEC-CREDENTIALS",
+        "type": "CREDENTIALS_IN_URL",
+        "category": "SECURITY",
+        "expectedPayload": "https://admin:super_secret_token@phishing-target.com/login",
+        "filename": "QR-40-SEC-CREDENTIALS.png",
+        "sha256": "a496bc8183094ea685d4eaf439f13fd745e5ab70e90c491f249476fd75c840bf",
+        "securityRule": "SUSPICIOUS",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-41-MULTI-2SAFE",
+        "type": "MULTI_SAFE",
+        "category": "MULTI_CODE",
+        "expectedPayload": [
+          "https://hust.edu.vn",
+          "https://vnu.edu.vn"
+        ],
+        "filename": "QR-41-MULTI-2SAFE.png",
+        "sha256": "441201059c4617efa376bdc082605cdcffdcbd33fded60f8f8f4448766c8a966",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-42-MULTI-SAFE-UNSAFE",
+        "type": "MULTI_MIXED",
+        "category": "MULTI_CODE",
+        "expectedPayload": [
+          "https://moet.gov.vn",
+          "http://127.0.0.1:8080/admin"
+        ],
+        "filename": "QR-42-MULTI-SAFE-UNSAFE.png",
+        "sha256": "4d19a94d267db26b9744e1f56d2dbab8d1d7f5490b0c905661e29b7a45909ca8",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-43-MULTI-3QR",
+        "type": "MULTI_THREE",
+        "category": "MULTI_CODE",
+        "expectedPayload": [
+          "https://hust.edu.vn",
+          "https://vnu.edu.vn",
+          "https://moet.gov.vn"
+        ],
+        "filename": "QR-43-MULTI-3QR.png",
+        "sha256": "49c0c218615798e0e52b4c5081dad9e264cf7d0e9055fa49cf6816e3b374f343",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      },
+      {
+        "caseId": "QR-44-COMPOSITE-OCR-URL",
+        "type": "COMPOSITE",
+        "category": "COMPOSITE",
+        "expectedPayload": "https://hust.edu.vn/xac-thuc",
+        "filename": "QR-44-COMPOSITE-OCR-URL.png",
+        "sha256": "24cbcd38f10d9492b05c441856c2cfcf4bbd64d49e6ee541a3e976726a08aef1",
+        "securityRule": "SAFE",
+        "visualModification": {
+          "rotation": 0,
+          "blur": false,
+          "inverted": false
+        }
+      }
+    ]
+  }
+}

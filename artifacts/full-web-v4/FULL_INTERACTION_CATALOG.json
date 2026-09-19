@@ -1,0 +1,6225 @@
+[
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/app/academic-showcase/page.jsx",
+    "safeToExercise": true,
+    "route": "/academic-showcase"
+  },
+  {
+    "type": "link",
+    "label": "RETURN TO SHOWCASE",
+    "targetHref": "/academic-showcase",
+    "sourceFile": "frontend/src/app/cinema/page.jsx",
+    "safeToExercise": true,
+    "route": "/cinema"
+  },
+  {
+    "type": "button",
+    "label": "Đăng nhập",
+    "sourceFile": "frontend/src/app/login/page.jsx",
+    "safeToExercise": true,
+    "route": "/login"
+  },
+  {
+    "type": "link",
+    "label": "Đăng ký ngay",
+    "targetHref": "/register",
+    "sourceFile": "frontend/src/app/login/page.jsx",
+    "safeToExercise": true,
+    "route": "/login"
+  },
+  {
+    "type": "button",
+    "label": "refreshProfile()}\r\n              classNa",
+    "sourceFile": "frontend/src/app/onboarding/page.jsx",
+    "safeToExercise": true,
+    "route": "/onboarding"
+  },
+  {
+    "type": "button",
+    "label": "router.push(\"/dashboard\")}\r\n            ",
+    "sourceFile": "frontend/src/app/onboarding/page.jsx",
+    "safeToExercise": true,
+    "route": "/onboarding"
+  },
+  {
+    "type": "button",
+    "label": "setStep(1)}\r\n                  className",
+    "sourceFile": "frontend/src/app/onboarding/page.jsx",
+    "safeToExercise": true,
+    "route": "/onboarding"
+  },
+  {
+    "type": "button",
+    "label": "setStep(2)}\r\n                  className",
+    "sourceFile": "frontend/src/app/onboarding/page.jsx",
+    "safeToExercise": true,
+    "route": "/onboarding"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/app/onboarding/page.jsx",
+    "safeToExercise": true,
+    "route": "/onboarding"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/app/onboarding/page.jsx",
+    "safeToExercise": true,
+    "route": "/onboarding"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/app/onboarding/page.jsx",
+    "safeToExercise": true,
+    "route": "/onboarding"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/app/onboarding/page.jsx",
+    "safeToExercise": true,
+    "route": "/onboarding"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/app/onboarding/page.jsx",
+    "safeToExercise": true,
+    "route": "/onboarding"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/app/onboarding/page.jsx",
+    "safeToExercise": true,
+    "route": "/onboarding"
+  },
+  {
+    "type": "link",
+    "label": "Tổng quan",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/app/page.jsx",
+    "safeToExercise": true,
+    "route": "/page.jsx"
+  },
+  {
+    "type": "link",
+    "label": "Kiểm chứng",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/app/page.jsx",
+    "safeToExercise": true,
+    "route": "/page.jsx"
+  },
+  {
+    "type": "link",
+    "label": "Cộng đồng",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/app/page.jsx",
+    "safeToExercise": true,
+    "route": "/page.jsx"
+  },
+  {
+    "type": "link",
+    "label": "Chuyên gia",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/app/page.jsx",
+    "safeToExercise": true,
+    "route": "/page.jsx"
+  },
+  {
+    "type": "button",
+    "label": "window.location.reload()} className=\"pri",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "button",
+    "label": "window.location.reload()} className=\"pri",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                  setEditing(true);\r\n",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "button",
+    "label": "setEditing(false)}\r\n                  cl",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "button",
+    "label": "setEditing(false)}\r\n                    ",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "button",
+    "label": "{saving ? \"Đang lưu...\" : \"Lưu thay đổi\"",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập ngay",
+    "targetHref": "/login?next=%2Fprofile",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "link",
+    "label": "Cài đặt",
+    "targetHref": "/settings",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "link",
+    "label": "Kiểm chứng mới",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "link",
+    "label": "Bắt đầu kiểm chứng đầu tiên",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "link",
+    "label": "Diễn đàn",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "link",
+    "label": "Khám phá diễn đàn sinh viên",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "link",
+    "label": "Xem lộ trình Expert Qualification",
+    "targetHref": "/expert/profile",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "input:text",
+    "label": "edit-fullname",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "input:url",
+    "label": "edit-avatar",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "input:text",
+    "label": "edit-university",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "input:text",
+    "label": "edit-major",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "textarea",
+    "label": "edit-bio",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/app/profile/page.jsx",
+    "safeToExercise": true,
+    "route": "/profile"
+  },
+  {
+    "type": "button",
+    "label": "refreshProfile()}\r\n                class",
+    "sourceFile": "frontend/src/app/register/page.jsx",
+    "safeToExercise": true,
+    "route": "/register"
+  },
+  {
+    "type": "button",
+    "label": "router.push(\"/dashboard\")}\r\n            ",
+    "sourceFile": "frontend/src/app/register/page.jsx",
+    "safeToExercise": true,
+    "route": "/register"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                saffronAudio.playClic",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "button",
+    "label": "{ saffronAudio.playClick(400); setActive",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                  saffronAudio.playCl",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                          saffronAudi",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                      saffronAudio.pl",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "button",
+    "label": "Luồng xác minh chính thức chưa khả dụng",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "button",
+    "label": "setIsModalOpen(false)}\r\n                ",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "button",
+    "label": "setIsModalOpen(false)}\r\n                ",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "button",
+    "label": "{isSubmitting ? \"ĐANG GỬI...\" : \"GỬI BÁO",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "input:text",
+    "label": "Ví dụ: Cảnh báo ép cọc trọ tại đường...",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "input:text",
+    "label": "Số nhà, tên ngõ/hẻm, tên đường, phường...",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "textarea",
+    "label": "Mô tả thủ đoạn lừa đảo hoặc nguy cơ an ninh...",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/app/safety-map/page.jsx",
+    "safeToExercise": true,
+    "route": "/safety-map"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                saffronAudio.playClic",
+    "sourceFile": "frontend/src/app/scholarships/page.jsx",
+    "safeToExercise": true,
+    "route": "/scholarships"
+  },
+  {
+    "type": "button",
+    "label": "{isMatching ?  : }\r\n                KHỚP",
+    "sourceFile": "frontend/src/app/scholarships/page.jsx",
+    "safeToExercise": true,
+    "route": "/scholarships"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                saffronAudio.playClic",
+    "sourceFile": "frontend/src/app/scholarships/page.jsx",
+    "safeToExercise": true,
+    "route": "/scholarships"
+  },
+  {
+    "type": "button",
+    "label": "setIsCoverLetterOpen(false)}\r\n          ",
+    "sourceFile": "frontend/src/app/scholarships/page.jsx",
+    "safeToExercise": true,
+    "route": "/scholarships"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                    saffronAudio.play",
+    "sourceFile": "frontend/src/app/scholarships/page.jsx",
+    "safeToExercise": true,
+    "route": "/scholarships"
+  },
+  {
+    "type": "button",
+    "label": "{copiedLetter ?  : }\r\n                  ",
+    "sourceFile": "frontend/src/app/scholarships/page.jsx",
+    "safeToExercise": true,
+    "route": "/scholarships"
+  },
+  {
+    "type": "input:number",
+    "label": "number",
+    "sourceFile": "frontend/src/app/scholarships/page.jsx",
+    "safeToExercise": true,
+    "route": "/scholarships"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/app/scholarships/page.jsx",
+    "safeToExercise": true,
+    "route": "/scholarships"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/app/scholarships/page.jsx",
+    "safeToExercise": true,
+    "route": "/scholarships"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/app/scholarships/page.jsx",
+    "safeToExercise": true,
+    "route": "/scholarships"
+  },
+  {
+    "type": "button",
+    "label": "SOS\r\n            GIỮ 2 GIÂY",
+    "sourceFile": "frontend/src/app/sos/page.jsx",
+    "safeToExercise": true,
+    "route": "/sos"
+  },
+  {
+    "type": "link",
+    "label": "113\r\n            Cảnh sát Phản ứng nhanh",
+    "targetHref": "tel:113",
+    "sourceFile": "frontend/src/app/sos/page.jsx",
+    "safeToExercise": true,
+    "route": "/sos"
+  },
+  {
+    "type": "link",
+    "label": "115\r\n            Cấp cứu Y tế",
+    "targetHref": "tel:115",
+    "sourceFile": "frontend/src/app/sos/page.jsx",
+    "safeToExercise": true,
+    "route": "/sos"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/app/ultra/page.jsx",
+    "safeToExercise": true,
+    "route": "/ultra"
+  },
+  {
+    "type": "button",
+    "label": "{isReconciling ? \"🔄 Đang đối soát...\" :",
+    "sourceFile": "frontend/src/components/academic/AcademicExecutionCenterView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setTargetTerm(t.termId)}\r\n              ",
+    "sourceFile": "frontend/src/components/academic/AcademicExecutionCenterView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "← Academic Command Center",
+    "targetHref": "/academic",
+    "sourceFile": "frontend/src/components/academic/AcademicExecutionCenterView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "⚖️ Studio So Sánh & Quyết Định",
+    "targetHref": "/academic/planner",
+    "sourceFile": "frontend/src/components/academic/AcademicExecutionCenterView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "⚖️ Khám Phá & Chọn Kế Hoạch Ngay",
+    "targetHref": "/academic/planner",
+    "sourceFile": "frontend/src/components/academic/AcademicExecutionCenterView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "⚖️ Tái Đánh Giá Tại Studio",
+    "targetHref": "/academic/planner",
+    "sourceFile": "frontend/src/components/academic/AcademicExecutionCenterView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "⚡ Academic Command Center",
+    "targetHref": "/academic",
+    "sourceFile": "frontend/src/components/academic/AcademicExecutionCenterView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "🗺️ Lộ Trình Học Vụ",
+    "targetHref": "/academic/roadmap",
+    "sourceFile": "frontend/src/components/academic/AcademicExecutionCenterView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onClick(milestone)}\r\n      className={`w",
+    "sourceFile": "frontend/src/components/academic/AcademicRoadmapView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "← Quay lại Trung tâm Điều phối",
+    "targetHref": "/academic",
+    "sourceFile": "frontend/src/components/academic/AcademicRoadmapView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "← Trung tâm Điều phối",
+    "targetHref": "/academic",
+    "sourceFile": "frontend/src/components/academic/AcademicRoadmapView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "🔮\r\n            Giả Lập What-If",
+    "targetHref": "/academic/planner",
+    "sourceFile": "frontend/src/components/academic/AcademicRoadmapView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/academic/AcademicRoadmapView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Thử lại kết nối",
+    "sourceFile": "frontend/src/components/academic/AcademicStates.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở học vụ",
+    "targetHref": "/academic",
+    "sourceFile": "frontend/src/components/academic/AcademicSummaryWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Tạo lịch",
+    "targetHref": "/academic",
+    "sourceFile": "frontend/src/components/academic/AcademicSummaryWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"PLANNER\")}\r\n            cl",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"DECISION\")}\r\n            c",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"WHAT_IF\")}\r\n            cl",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setTargetTerm(t.termId)}\r\n              ",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleAdoptPlan(currentPlan.planId)}\r\n  ",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setStudentPreference(pref)}\r\n           ",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleAdoptPlan(decisionData.recommendat",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleAdoptPlan(p.planId)}\r\n            ",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleRunSimulation(preset.operations)}\r",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đặt lại",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleRunSimulation()}\r\n                ",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "← Academic Command Center",
+    "targetHref": "/academic",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "📊 Theo Dõi Thực Thi",
+    "targetHref": "/academic/execution",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "🗺️ Xem Lộ Trình Học Vụ",
+    "targetHref": "/academic/roadmap",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đi tới Command Center →",
+    "targetHref": "/academic",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "⚡ Xem Quy Trình Tại Command Center",
+    "targetHref": "/academic",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:range",
+    "label": "range",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:range",
+    "label": "range",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:range",
+    "label": "range",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:checkbox",
+    "label": "checkbox",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/academic/AcademicWhatIfPlannerView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onRemove(index)}>",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{reminder ? \"Đã nhắc 10 phút trước\" : \"N",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Nhập thủ công",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Nhập từ ảnh",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{ setState(\"loading\"); void loadWorkspac",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{timetable ? \"Sửa lịch\" : \"Nhập thủ công",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Nhập từ ảnh",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setView(\"today\")}>Hôm nay",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setView(\"week\")}>Tuần",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedDay(day.value)} className={`s",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Thêm dòng",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Hủy",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{busy ?  : source === \"IMAGE\" ?  : } {so",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập",
+    "targetHref": "/login?next=%2Facademic",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:time",
+    "label": "time",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:time",
+    "label": "time",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:number",
+    "label": "field-input",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:number",
+    "label": "field-input",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "field-input",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "field-input",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "field-input",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "field-input",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "field-input",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:file",
+    "label": "sr-only",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "field-input",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "field-input",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/academic/AcademicWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/academic/DigitalTwinDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/academic/DigitalTwinDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đóng [✕]",
+    "sourceFile": "frontend/src/components/academic/FacultyRubricModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Xong",
+    "sourceFile": "frontend/src/components/academic/FacultyRubricModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/academic/FacultyRubricModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "✕",
+    "sourceFile": "frontend/src/components/academic/MilestoneDetailDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/academic/MilestoneDetailDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/academic/NotificationCenterDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveFilter(tab.id)}\r\n              ",
+    "sourceFile": "frontend/src/components/academic/NotificationCenterDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                              onOpenW",
+    "sourceFile": "frontend/src/components/academic/NotificationCenterDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onMarkRead?.(notif.notificationId)}\r\n   ",
+    "sourceFile": "frontend/src/components/academic/NotificationCenterDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onSnooze?.(notif.notificationId, 4)}\r\n  ",
+    "sourceFile": "frontend/src/components/academic/NotificationCenterDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onAcknowledge?.(notif.notificationId)}\r\n",
+    "sourceFile": "frontend/src/components/academic/NotificationCenterDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đóng",
+    "sourceFile": "frontend/src/components/academic/NotificationCenterDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/academic/NotificationCenterDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/academic/NotificationCenterDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowReportModal(true)}\r\n             ",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"requirements\")}\r\n         ",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"courses\")}\r\n          clas",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"certificates\")}\r\n         ",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"provenance\")}\r\n          c",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setCourseFilter(f)}\r\n                cla",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowReportModal(false)} className=\"te",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowReportModal(false)}\r\n            ",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Gửi yêu cầu đối soát",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/academic/Profile360View.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicAdvisoryDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isSubmitting ? \"ĐANG TỔNG HỢP LỘ TRÌNH.",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicAdvisoryDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "HOÀN TẤT &amp; QUAY LẠI SHOWCASE",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicAdvisoryDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "Nguyễn Văn A",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicAdvisoryDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "23110...",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicAdvisoryDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicAdvisoryDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicAdvisoryDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicAdvisoryDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicAdvisoryDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isPlaying ? (\r\n          \r\n        ) : ",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicAudioEngine.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsPlaying(!isPlaying)}\r\n             ",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicCinemaTheater.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowSafeZones(!showSafeZones)}\r\n     ",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicCinemaTheater.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setUseWebpFallback(!useWebpFallback)}\r\n ",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicCinemaTheater.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                    setSelectedIdx(id",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicCinemaTheater.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveFilm(film)}\r\n                  ",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicFeatureBackgroundMatrix.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "AI Trust Engine V2",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicShowcaseFooter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Academic Command Center",
+    "targetHref": "/academic",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicShowcaseFooter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Evidence Case Lab",
+    "targetHref": "/cases",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicShowcaseFooter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Student Collective Intel",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/academic-showcase/AcademicShowcaseFooter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveMode(mode)}\r\n              clas",
+    "sourceFile": "frontend/src/components/academic-showcase/CinematicAtmosphereVideo.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/academic-showcase/CinematicAtmosphereVideo.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Thiết Lập Lộ Trình Học",
+    "sourceFile": "frontend/src/components/academic-showcase/CinematicHeroSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Trải Nghiệm AI Trust V2",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/academic-showcase/CinematicHeroSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onViewChange(\"desktop\")}\r\n            cl",
+    "sourceFile": "frontend/src/components/academic-showcase/DeviceSwitcherDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onViewChange(\"tablet\")}\r\n            cla",
+    "sourceFile": "frontend/src/components/academic-showcase/DeviceSwitcherDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onViewChange(\"mobile\")}\r\n            cla",
+    "sourceFile": "frontend/src/components/academic-showcase/DeviceSwitcherDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Tư Vấn Lộ Trình",
+    "sourceFile": "frontend/src/components/academic-showcase/DeviceSwitcherDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "8 Films Cinema",
+    "targetHref": "/cinema",
+    "sourceFile": "frontend/src/components/academic-showcase/DeviceSwitcherDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đặt Lịch Tư Vấn Cùng Mentor",
+    "sourceFile": "frontend/src/components/academic-showcase/ExpertCollective.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveStep(idx)}\r\n              data-",
+    "sourceFile": "frontend/src/components/academic-showcase/FourStepLearningFlow.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Tự Động Lập Kế Hoạch Học Kỳ",
+    "sourceFile": "frontend/src/components/academic-showcase/KnowledgeDomainsCatalog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveCategory(cat.id)}\r\n            ",
+    "sourceFile": "frontend/src/components/academic-showcase/KnowledgeDomainsCatalog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Mở Trợ Lý AI Học Phần Này",
+    "sourceFile": "frontend/src/components/academic-showcase/KnowledgeDomainsCatalog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/academic-showcase/KnowledgeDomainsCatalog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveFacility(idx)}\r\n              d",
+    "sourceFile": "frontend/src/components/academic-showcase/SmartCampusTour.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/academic-showcase/SmartCampusTour.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedMode(m.id)}\r\n              cl",
+    "sourceFile": "frontend/src/components/ai/GroundedAIStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isLoading ?  : }\r\n            Phân Tích",
+    "sourceFile": "frontend/src/components/ai/GroundedAIStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/ai/GroundedAIStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleTabChange(\"spatial\")}\r\n           ",
+    "sourceFile": "frontend/src/components/atlas/InteractiveKnowledgeAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleTabChange(\"semantic\")}\r\n          ",
+    "sourceFile": "frontend/src/components/atlas/InteractiveKnowledgeAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleFilterChange(cat)}\r\n            cl",
+    "sourceFile": "frontend/src/components/atlas/InteractiveKnowledgeAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedNodeId(preId)}\r\n             ",
+    "sourceFile": "frontend/src/components/atlas/InteractiveKnowledgeAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/atlas/InteractiveKnowledgeAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/atlas/InteractiveKnowledgeAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Về Trang Chủ",
+    "targetHref": "/",
+    "sourceFile": "frontend/src/components/auth/AuthSurroundings.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowPassword(!showPassword)}\r\n       ",
+    "sourceFile": "frontend/src/components/auth/AuthUI.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isLoading ? (\r\n        \r\n      ) : (\r\n ",
+    "sourceFile": "frontend/src/components/auth/AuthUI.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isLoading ? (\r\n          \r\n        ) : ",
+    "sourceFile": "frontend/src/components/auth/AuthUI.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isLoading ? (\r\n          \r\n        ) : ",
+    "sourceFile": "frontend/src/components/auth/AuthUI.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Trang chủ",
+    "targetHref": "/",
+    "sourceFile": "frontend/src/components/auth/AuthUI.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/auth/AuthUI.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/auth/AuthUI.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:checkbox",
+    "label": "w-4 h-4 rounded border-white/20 bg-white/5 text-teal-400 focus:ring-teal-400 focus:ring-offset-0 focus:ring-1 cursor-pointer accent-teal-400 transition-all",
+    "sourceFile": "frontend/src/components/auth/AuthUI.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "saffronAudio.playClick(600)}\r\n          ",
+    "targetHref": "/",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthContainer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleSwitchMode(\"login\")}\r\n            ",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleSwitchMode(\"register\")}\r\n         ",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Google\r\n                {capabilities.go",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "GitHub Account\r\n                {capabil",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowPassword(!showPassword)}\r\n       ",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isLoading ? (\r\n                \r\n      ",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowPassword(!showPassword)}\r\n       ",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isLoading ? (\r\n                \r\n      ",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleVerifyOtp(otp)}\r\n              dis",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                setRegStep(\"FORM\");\r\n",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Trang chủ",
+    "targetHref": "/",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:email",
+    "label": "saffron-login-email",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "saffron-login-password",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:checkbox",
+    "label": "checkbox",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "saffron-register-full-name",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:email",
+    "label": "saffron-register-email",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "saffron-register-password",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthDeck.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                  saffronAudio.playCl",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/auth/SaffronAuthModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isMuted ? (\r\n              <>\r\n        ",
+    "sourceFile": "frontend/src/components/auth/UAvionixTelemetryHUD.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n          markAssurance(\"profile-menu",
+    "sourceFile": "frontend/src/components/auth/UserDropdownMenu.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                  setIsOpen(false);\r\n",
+    "sourceFile": "frontend/src/components/auth/UserDropdownMenu.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng Nhập",
+    "targetHref": "/login",
+    "sourceFile": "frontend/src/components/auth/UserDropdownMenu.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Bắt Đầu Miễn Phí",
+    "targetHref": "/register",
+    "sourceFile": "frontend/src/components/auth/UserDropdownMenu.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setIsOpen(false)}\r\n                class",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/auth/UserDropdownMenu.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setIsOpen(false)}\r\n                class",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/auth/UserDropdownMenu.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setIsOpen(false)}\r\n                class",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/auth/UserDropdownMenu.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setIsOpen(false)}\r\n                class",
+    "targetHref": "/profile",
+    "sourceFile": "frontend/src/components/auth/UserDropdownMenu.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setIsOpen(false)}\r\n                class",
+    "targetHref": "/onboarding",
+    "sourceFile": "frontend/src/components/auth/UserDropdownMenu.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/AvatarDisplay.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/canvas/GeometricConstellationCanvas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/canvas/Hero3DCanvas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n            saffronAudio.playClick(40",
+    "sourceFile": "frontend/src/components/canvas/RobinPayotRoadCanvas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n          saffronAudio.playClick(600)",
+    "sourceFile": "frontend/src/components/canvas/RobinPayotRoadCanvas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n          saffronAudio.playClick(600)",
+    "sourceFile": "frontend/src/components/canvas/RobinPayotRoadCanvas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/canvas/RobinPayotRoadCanvas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/canvas/RobinPayotRoadCanvas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/cinematic/ArstraumurAtmosphereCanvas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isPlaying ?  : }",
+    "sourceFile": "frontend/src/components/cinematic/CinematicReelStage.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isMuted ?  : }",
+    "sourceFile": "frontend/src/components/cinematic/CinematicReelStage.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/cinematic/CinematicReelStage.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveChannelIndex(idx)}\r\n           ",
+    "sourceFile": "frontend/src/components/cinematic/CinematicReelStage.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Tham gia không gian thảo luận cộng đồng",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/cinematic/CollectiveCommunitySection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xem danh bạ chuyên gia & Đăng ký gia nhậ",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/cinematic/ExpertAuthoritySection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Bắt đầu kiểm chứng miễn phí",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/cinematic/FinalClaritySection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Vào tổng quan học vụ",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/cinematic/FinalClaritySection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Kiểm chứng tin đồn ngay",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/cinematic/HeroCinematicPorch.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Diễn đàn phản biện",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/cinematic/HeroCinematicPorch.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "OVERWORLD // AUDIO\r\n          \r\n        ",
+    "sourceFile": "frontend/src/components/cinematic/SoundAtmosphereController.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveIdx(idx)}\r\n                data",
+    "sourceFile": "frontend/src/components/cinematic/TrustCinematicJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Trải nghiệm luồng thẩm định thực tế",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/cinematic/TrustCinematicJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Khám phá không gian trí tuệ nhân tạo học",
+    "targetHref": "/ai",
+    "sourceFile": "frontend/src/components/cinematic/VerifiedHumanAiSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedCaseIndex(idx)}\r\n            ",
+    "sourceFile": "frontend/src/components/cinematic/WhyZeroManifestoSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "XEM CHI TIẾT HỒ SƠ BẰNG CHỨNG GỐC",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/cinematic/WhyZeroManifestoSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/command/AcademicCommandPalette.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/command/AcademicCommandPalette.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/command/AcademicCommandPalette.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setQuery(\"\")} className=\"text-neutral-40",
+    "sourceFile": "frontend/src/components/command/CommandPalette.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/command/CommandPalette.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đọc cuộc thảo luận",
+    "targetHref": "#community-story",
+    "sourceFile": "frontend/src/components/community/CommunityCinematicHero.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đưa claim sang Trust",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/community/CommunityCinematicHero.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowImage((value) => !value)}> Ảnh",
+    "sourceFile": "frontend/src/components/community/CommunityComposer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowSource((value) => !value)}> Thêm ",
+    "sourceFile": "frontend/src/components/community/CommunityComposer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIntent((value) => value === \"NEEDS_VE",
+    "sourceFile": "frontend/src/components/community/CommunityComposer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIntent(value)}>{label}",
+    "sourceFile": "frontend/src/components/community/CommunityComposer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{busy ? \"Đang đăng…\" : <> Đăng chia sẻ}",
+    "sourceFile": "frontend/src/components/community/CommunityComposer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/community/CommunityComposer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/community/CommunityComposer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/community/CommunityComposer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/community/CommunityComposer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/community/CommunityComposer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/community/CommunityContextSignalRail.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleOpenSource(src, idx)}\r\n           ",
+    "sourceFile": "frontend/src/components/community/CommunityDetailWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/community/CommunityDetailWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Quay lại Community",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/community/CommunityDetailWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Quay lại Community",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/community/CommunityDetailWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập để tham gia thảo luận cùng cộn",
+    "targetHref": "/login?next=%2Fcommunity",
+    "sourceFile": "frontend/src/components/community/CommunityDetailWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xem hồ sơ Trust →",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/community/CommunityDetailWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/community/CommunityDetailWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/community/CommunityDetailWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Tìm chuyên gia",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/community/CommunityEditorialStory.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xem toàn bộ Community",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/community/CommunityEditorialStory.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "/expert",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/community/CommunityEditorialStory.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/community/CommunityEvidenceWorld.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "fetchTopicData(t.id)}\r\n            class",
+    "sourceFile": "frontend/src/components/community/CommunityExperienceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{submitting ?  : }\r\n              Gửi Bá",
+    "sourceFile": "frontend/src/components/community/CommunityExperienceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:number",
+    "label": "number",
+    "sourceFile": "frontend/src/components/community/CommunityExperienceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/community/CommunityExperienceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/community/CommunityExperienceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Thử lại",
+    "sourceFile": "frontend/src/components/community/CommunityFeed.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đặt lại bộ lọc",
+    "sourceFile": "frontend/src/components/community/CommunityFeed.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đặt lại",
+    "sourceFile": "frontend/src/components/community/CommunityFilterRail.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setTopicOpen((prev) => !prev)}\r\n        ",
+    "sourceFile": "frontend/src/components/community/CommunityFilterRail.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setStatusOpen((prev) => !prev)}\r\n       ",
+    "sourceFile": "frontend/src/components/community/CommunityFilterRail.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:radio",
+    "label": "community-topic",
+    "sourceFile": "frontend/src/components/community/CommunityFilterRail.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:radio",
+    "label": "community-status",
+    "sourceFile": "frontend/src/components/community/CommunityFilterRail.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedTab(tab.id)}\r\n               ",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isQuerying ? \"Đang truy vấn đồ thị...\" ",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setTopic(\"ALL\")} className={`filter-chip",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setTopic(item)} className={`filter-chip ",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Gửi observation",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "toggleClusterExpand(post.canonicalId)}\r\n",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "openDiscourse(post)}\r\n                  ",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "openObservation(post)}>\r\n               ",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/community/CommunityIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onInteract?.(\"perception\", { value: 1 })",
+    "sourceFile": "frontend/src/components/community/CommunityPerceptionBar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onInteract?.(\"perception\", { value: -1 }",
+    "sourceFile": "frontend/src/components/community/CommunityPerceptionBar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleOpenSource(url || source, index)}\r",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onInteract?.(\"perception\", { value: 1 })",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onInteract?.(\"perception\", { value: -1 }",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onInteract?.(\"like\")}\r\n            >\r\n  ",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setCommentsOpen((prev) => !prev)}\r\n     ",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đáng tin ({perception.trust || 0}) · Chư",
+    "targetHref": "/login?next=%2Fcommunity",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Hữu ích ({post?.likeCount || 0})",
+    "targetHref": "/login?next=%2Fcommunity",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xác minh trong Trust",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập để tham gia thảo luận →",
+    "targetHref": "/login?next=%2Fcommunity",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/community/CommunityPostCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onFilterChange?.(chip.id)}\r\n            ",
+    "sourceFile": "frontend/src/components/community/CommunityPrimaryActionCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Bạn đã thấy điều gì, ở đâu và khi nào?\r\n",
+    "sourceFile": "frontend/src/components/community/CommunityPrimaryActionCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:search",
+    "label": "community-main-search",
+    "sourceFile": "frontend/src/components/community/CommunityPrimaryActionCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowImageInput((prev) => !prev)}\r\n   ",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowSourceInput((prev) => !prev)}\r\n  ",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Hủy",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Lưu nháp",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{busy ? \"Đang đăng...\" : (\r\n            ",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập ngay →",
+    "targetHref": "/login?next=%2Fcommunity",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "qp-location",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:url",
+    "label": "qp-image-url",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:url",
+    "label": "qp-source-url",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "qp-content",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "qp-topic",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/community/CommunityQuickPostDialog.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập để tham gia",
+    "targetHref": "/login?next=%2Fcommunity",
+    "sourceFile": "frontend/src/components/community/CommunitySocialWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/community/CommunitySocialWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đóng [Esc]",
+    "sourceFile": "frontend/src/components/community/ForumDiscourseDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Quay lại dòng tin",
+    "sourceFile": "frontend/src/components/community/ForumDiscourseDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/community/ForumDiscourseDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "selectFlow(flow.id)}\r\n          >\r\n     ",
+    "sourceFile": "frontend/src/components/competition/CompetitionCaseStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Trust",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/competition/CompetitionCaseStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Community",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/competition/CompetitionCaseStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Expert",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/competition/CompetitionCaseStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Dashboard",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/competition/CompetitionCaseStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/competition/CompetitionCaseStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onSelect?.(expert)} aria-pressed={isSele",
+    "sourceFile": "frontend/src/components/expert/ExpertAuthorityNetwork.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onSelect?.(expert)} className={selected?",
+    "sourceFile": "frontend/src/components/expert/ExpertAuthorityNetwork.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở danh bạ",
+    "targetHref": "/expert#expert-directory",
+    "sourceFile": "frontend/src/components/expert/ExpertAuthorityNetwork.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsExpanded(true)}\n          className",
+    "sourceFile": "frontend/src/components/expert/ExpertBlindReviewWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsExpanded(false)}\n                cl",
+    "sourceFile": "frontend/src/components/expert/ExpertBlindReviewWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setVote(opt.value)}\n                    ",
+    "sourceFile": "frontend/src/components/expert/ExpertBlindReviewWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Thêm nguồn",
+    "sourceFile": "frontend/src/components/expert/ExpertBlindReviewWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleRemoveEvidence(idx)}\n             ",
+    "sourceFile": "frontend/src/components/expert/ExpertBlindReviewWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{savingDraft ? \"Đang lưu...\" : \"Lưu nháp",
+    "sourceFile": "frontend/src/components/expert/ExpertBlindReviewWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{submitting ? \"Đang khóa...\" : \"Gửi đánh",
+    "sourceFile": "frontend/src/components/expert/ExpertBlindReviewWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:range",
+    "label": "range",
+    "sourceFile": "frontend/src/components/expert/ExpertBlindReviewWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:url",
+    "label": "https://...",
+    "sourceFile": "frontend/src/components/expert/ExpertBlindReviewWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/expert/ExpertBlindReviewWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/expert/ExpertBlindReviewWidget.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Khám phá network",
+    "targetHref": "#expert-network",
+    "sourceFile": "frontend/src/components/expert/ExpertCinematicHero.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đọc Community responses",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/expert/ExpertCinematicHero.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Tại sao là chuyên gia này?",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Ranh giới phạm vi",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đối Soát & Giải Định Danh",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"sandbox\")}\r\n              ",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"disagreements\")}\r\n        ",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"profile\")}\r\n              ",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{evaluating ?  : }\r\n                    ",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowWhyModal(false)} className=\"text-",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowWhyModal(false)}\r\n              c",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowBoundariesModal(false)} className",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowBoundariesModal(false)}\r\n        ",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "Tên chuyên gia (vd: TS. Nguyễn Văn Minh)",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "Mã ORCID (vd: 0000-0002-1825-0097)",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceStudioV2.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{ setSelected(expert); setDomain(expert.",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{loading ?  : } Kiểm tra phạm vi",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Quay lại Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/expert/ExpertIntelligenceView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Phân Giải",
+    "sourceFile": "frontend/src/components/expert/ExpertKnowledgeGraphView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{evaluating ?  : }\r\n                  Ki",
+    "sourceFile": "frontend/src/components/expert/ExpertKnowledgeGraphView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "Tên chuyên gia (Ví dụ: Nguyễn Văn Minh)...",
+    "sourceFile": "frontend/src/components/expert/ExpertKnowledgeGraphView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "ORCID (Ví dụ: 0000-0002-1825-0097)...",
+    "sourceFile": "frontend/src/components/expert/ExpertKnowledgeGraphView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/expert/ExpertKnowledgeGraphView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/expert/ExpertKnowledgeGraphView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/expert/ExpertKnowledgeGraphView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Mở bàn giám định (Review Desk)",
+    "sourceFile": "frontend/src/components/expert/ExpertNetworkWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Trở thành Chuyên gia",
+    "targetHref": "/expert/profile",
+    "sourceFile": "frontend/src/components/expert/ExpertNetworkWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập để ứng tuyển",
+    "targetHref": "/login?next=%2Fexpert",
+    "sourceFile": "frontend/src/components/expert/ExpertNetworkWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập",
+    "targetHref": "/login?next=%2Fexpert",
+    "sourceFile": "frontend/src/components/expert/ExpertNetworkWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/expert/ExpertNetworkWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setTab(id)}> {label}",
+    "sourceFile": "frontend/src/components/expert/ExpertOperationalWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setTab(\"moderation\")}> Kiểm duyệt",
+    "sourceFile": "frontend/src/components/expert/ExpertOperationalWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setNotice(\"Công cụ kiểm duyệt đang chờ m",
+    "sourceFile": "frontend/src/components/expert/ExpertOperationalWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Kiểm tra hồ sơ qualification",
+    "targetHref": "/expert/profile",
+    "sourceFile": "frontend/src/components/expert/ExpertOperationalWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở hồ sơ qualification",
+    "targetHref": "/expert/profile",
+    "sourceFile": "frontend/src/components/expert/ExpertOperationalWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/expert/ExpertOperationalWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "fetchExpertProfile()} className=\"primary",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleOpenReviewModal(tasks[0] || null)}",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setEditing((prev) => !prev)}\r\n          ",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{saving ? \"Đang lưu...\" : \"Lưu hồ sơ\"}",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleOpenReviewModal(task)}\r\n          ",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Về trang chủ",
+    "targetHref": "/",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập",
+    "targetHref": "/login?next=%2Fexpert%2Fprofile",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Lịch sử thẩm định",
+    "targetHref": "#assessments-history",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xem User Profile",
+    "targetHref": "/profile",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/expert/ExpertProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Thử lại",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicDirectory.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onSelect?.(featured)}>Chọn hồ sơ",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicDirectory.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onDomainChange?.(item)} className={domai",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicDirectory.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onSelect?.(expert)} aria-label={`Chọn hồ",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicDirectory.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicDirectory.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicDirectory.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "void load()}> Thử lại",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Quay lại Expert",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Quay lại Expert",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Quay lại Expert",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xem Community responses",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xem Trust reviews",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicProfileWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "View Community contributions",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicStory.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "View Trust reviews",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/expert/ExpertPublicStory.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{busy ?  : } Gửi hồ sơ để kiểm tra danh ",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Bắt đầu quiz",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "saveAnswer(choice.id)} disabled={savingA",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setQuestionIndex((index) => Math.max(0, ",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setQuestionIndex((index) => Math.min(que",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Nộp quiz",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "loadStatus()} disabled={loading}>Tải lại",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{practiceBusy ?  : } Gửi practice để rev",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập",
+    "targetHref": "/login",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:checkbox",
+    "label": "checkbox",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "{publicView ? \"Bắt đầu với hồ sơ\" : \"Mở ",
+    "targetHref": "/expert/profile",
+    "sourceFile": "frontend/src/components/expert/ExpertQualificationWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setConfidence(level)}\r\n                 ",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Hủy bỏ",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{submitting ? \"Đang lưu...\" : \"Ký & Ban ",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đóng bàn giám định",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:radio",
+    "label": "scope",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:radio",
+    "label": "scope",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:checkbox",
+    "label": "checkbox",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "formal-expert-assessment",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "Dropdown Select",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/expert/ExpertReviewDeskModal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(tab.id)}\r\n                c",
+    "sourceFile": "frontend/src/components/fusion/KnowledgeObjectStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "select",
+    "label": "knowledge-object-select",
+    "sourceFile": "frontend/src/components/fusion/KnowledgeObjectStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/fusion/KnowledgeObjectStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setOpenAction(openAction === action.id ?",
+    "sourceFile": "frontend/src/components/home/CommandCenterDashboard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập",
+    "targetHref": "/login?next=%2Fdashboard",
+    "sourceFile": "frontend/src/components/home/CommandCenterDashboard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/home/CommandCenterDashboard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Kiểm tra kết nối dữ liệu",
+    "targetHref": "/settings",
+    "sourceFile": "frontend/src/components/home/CommandCenterDashboard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/home/CommandCenterDashboard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Cài đặt quyền dữ liệu",
+    "targetHref": "/settings",
+    "sourceFile": "frontend/src/components/home/CommandCenterDashboard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Điều kiện tốt nghiệp",
+    "targetHref": "/trust?q=điều kiện tốt nghiệp",
+    "sourceFile": "frontend/src/components/home/CommandCenterDashboard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Kiểm tra bằng chứng",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/home/CommandCenterDashboard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/home/CommandCenterDashboard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/home/CommandCenterDashboard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Phân tích",
+    "sourceFile": "frontend/src/components/intelligence/CommunityIntelligenceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{ topicRef.current = id; setTopic(id); s",
+    "sourceFile": "frontend/src/components/intelligence/CommunityIntelligenceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "community-topic",
+    "sourceFile": "frontend/src/components/intelligence/CommunityIntelligenceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "community-cohort",
+    "sourceFile": "frontend/src/components/intelligence/CommunityIntelligenceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đối soát",
+    "sourceFile": "frontend/src/components/intelligence/EvidenceFusionStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActivePanel(panel)} className={`px-4 ",
+    "sourceFile": "frontend/src/components/intelligence/EvidenceFusionStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "knowledge-object-id",
+    "sourceFile": "frontend/src/components/intelligence/EvidenceFusionStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Tra Cứu",
+    "sourceFile": "frontend/src/components/intelligence/ExpertIntelligenceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                setTopicQuery(chip);\r",
+    "sourceFile": "frontend/src/components/intelligence/ExpertIntelligenceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "openExpertDetail(match.expertId)}\r\n     ",
+    "sourceFile": "frontend/src/components/intelligence/ExpertIntelligenceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/intelligence/ExpertIntelligenceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/intelligence/ExpertIntelligenceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/intelligence/ExpertIntelligenceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "toggleExpand(rec.recommendationId)}\r\n   ",
+    "sourceFile": "frontend/src/components/intelligence/GroundedRecommendationStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedTopic(topic)}\r\n              ",
+    "sourceFile": "frontend/src/components/intelligence/TrustIntelligenceStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"t4_fusion\")}\r\n          cl",
+    "sourceFile": "frontend/src/components/intelligence/UnifiedIntelligenceWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"t2_experts\")}\r\n          c",
+    "sourceFile": "frontend/src/components/intelligence/UnifiedIntelligenceWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"t1_trust\")}\r\n          cla",
+    "sourceFile": "frontend/src/components/intelligence/UnifiedIntelligenceWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/intelligence/UnifiedIntelligenceWorkspace.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveCase(item)}\r\n                cl",
+    "sourceFile": "frontend/src/components/landing/AcademicAiVerificationSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/landing/AcademicAiVerificationSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Kiểm tra trước khi tin",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/AcademicHeroSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Khám phá cách hoạt động",
+    "targetHref": "/learn",
+    "sourceFile": "frontend/src/components/landing/AcademicHeroSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Bắt đầu khảo chứng ngay",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/AcademicSafeActionSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Tạo tài khoản sinh viên",
+    "targetHref": "/register",
+    "sourceFile": "frontend/src/components/landing/AcademicSafeActionSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveActionId(action.id)}\r\n         ",
+    "sourceFile": "frontend/src/components/landing/AiTutorSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Khám phá Diễn đàn Sinh viên",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/landing/CommunityExpertCouncilSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xem Mạng lưới Chuyên gia",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/landing/CommunityExpertCouncilSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/CommunityExpertsSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Khám phá cộng đồng",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/landing/CommunityExpertsSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Kết nối chuyên gia",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/landing/CommunityExpertsSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xem thảo luận",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/landing/CommunityShowcaseSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "{isAuthenticated ? \"Vào bài học tiếp the",
+    "targetHref": "/learn",
+    "sourceFile": "frontend/src/components/landing/ContinueLearningBar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActivePipeline(idx)}\r\n               ",
+    "sourceFile": "frontend/src/components/landing/CoreFeaturesSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/landing/CoreFeaturesSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/landing/CoreFeaturesSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveCategory(cat.id)}\r\n            ",
+    "sourceFile": "frontend/src/components/landing/ExpertShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Kết nối",
+    "targetHref": "/login",
+    "sourceFile": "frontend/src/components/landing/ExpertShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng Ký Làm Cố Vấn",
+    "targetHref": "/register",
+    "sourceFile": "frontend/src/components/landing/ExpertShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedDomain(dom.id)}\r\n            ",
+    "sourceFile": "frontend/src/components/landing/ExplainableEngineSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/landing/ExplainableEngineSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xem tất cả khóa học",
+    "targetHref": "/learn",
+    "sourceFile": "frontend/src/components/landing/FeaturedCoursesSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Bắt đầu học chuyên đề này",
+    "targetHref": "/learn/full-stack/lesson-1",
+    "sourceFile": "frontend/src/components/landing/FeaturedCoursesSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "AI Systems Engineering & Grounded Truth",
+    "targetHref": "/learn",
+    "sourceFile": "frontend/src/components/landing/FeaturedCoursesSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Security Engineering, RLS & Zero-Trust A",
+    "targetHref": "/learn",
+    "sourceFile": "frontend/src/components/landing/FeaturedCoursesSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Evidence Case Lab & Digital Twin",
+    "targetHref": "/cases",
+    "sourceFile": "frontend/src/components/landing/FeaturedCoursesSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Bắt đầu học ngay",
+    "targetHref": "/learn",
+    "sourceFile": "frontend/src/components/landing/FinalCtaSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/FinalCtaSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedMacro(group.id)}\r\n           ",
+    "sourceFile": "frontend/src/components/landing/FullStackLayersSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/landing/FullStackLayersSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Kiểm tra ngay\r\n                    [AI M",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/IglooEcosystemShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xem bảng xếp hạng",
+    "targetHref": "/profile",
+    "sourceFile": "frontend/src/components/landing/IglooEcosystemShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Vào diễn đàn",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/landing/IglooEcosystemShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Khám phá Radar",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/IglooEcosystemShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/landing/IglooEcosystemShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedCase(c)}\r\n                  c",
+    "sourceFile": "frontend/src/components/landing/InteractiveScamDemo.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/LandingFooter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Quan sát cộng đồng",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/landing/LandingFooter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Bảng Điều Khiển &amp; Cảnh Báo",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/landing/LandingFooter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mạng lưới chuyên gia",
+    "targetHref": "/profile",
+    "sourceFile": "frontend/src/components/landing/LandingFooter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setMobileMenuOpen(!mobileMenuOpen)}\r\n   ",
+    "sourceFile": "frontend/src/components/landing/LandingHeader.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "StudentHub AI\r\n            \r\n           ",
+    "targetHref": "/",
+    "sourceFile": "frontend/src/components/landing/LandingHeader.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setMobileMenuOpen(false)}\r\n             ",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/landing/LandingHeader.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setMobileMenuOpen(false)}\r\n             ",
+    "targetHref": "/login",
+    "sourceFile": "frontend/src/components/landing/LandingHeader.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setMobileMenuOpen(false)}\r\n             ",
+    "targetHref": "/register",
+    "sourceFile": "frontend/src/components/landing/LandingHeader.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/landing/LandingHeader.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setMenuOpen((current) => !current)}\r\n   ",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveLayer(index)}\r\n                ",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở không gian của bạn",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Bỏ qua điều hướng",
+    "targetHref": "#main-content",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "/",
+    "targetHref": "/",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Kiểm chứng",
+    "targetHref": "#trust",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Lăng kính quang học",
+    "targetHref": "#knowledge-core",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Cộng đồng",
+    "targetHref": "#intelligence",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Chuyên gia",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Dashboard",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập",
+    "targetHref": "/login",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setMenuOpen(false)}>Kiểm chứng",
+    "targetHref": "#trust",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setMenuOpen(false)}>Lăng kính quang học",
+    "targetHref": "#knowledge-core",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setMenuOpen(false)}>Cộng đồng",
+    "targetHref": "#intelligence",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Chuyên gia",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Dashboard",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Kiểm tra trước khi tin",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Khám phá lăng kính quang học",
+    "targetHref": "#knowledge-core",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Kiểm tra một nội dung",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Bắt đầu với StudentHub",
+    "targetHref": "/register",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đã có tài khoản — Đăng nhập",
+    "targetHref": "/login",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Trust",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Community",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Experts",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Case Lab (Demo)",
+    "targetHref": "/cases",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Quyền riêng tư",
+    "targetHref": "/settings/privacy",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Điều khoản",
+    "targetHref": "/settings/privacy#terms",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/landing/LivingCampusAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Vào phòng thực hành",
+    "targetHref": "/practice",
+    "sourceFile": "frontend/src/components/landing/PracticeProjectLabSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Khám phá đồ án mẫu",
+    "targetHref": "/projects",
+    "sourceFile": "frontend/src/components/landing/PracticeProjectLabSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedCase(item)}\r\n                ",
+    "sourceFile": "frontend/src/components/landing/TrustEngineShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust Engine",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/TrustEngineShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/landing/TrustEngineShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/landing/TrustEngineShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Trust workspace",
+    "targetHref": "/trust",
+    "sourceFile": "frontend/src/components/landing/VNextLanding.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đến Cộng đồng",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/landing/VNextLanding.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đến Chuyên gia",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/landing/VNextLanding.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Xem cách hoạt động",
+    "targetHref": "#trust-chapter",
+    "sourceFile": "frontend/src/components/landing/VNextLandingHero.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{mobileOpen ?  : }",
+    "sourceFile": "frontend/src/components/layout/AcademicNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Tìm kiếm...\r\n              \r\n           ",
+    "sourceFile": "frontend/src/components/layout/AcademicNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                    setMobileOpen(fal",
+    "sourceFile": "frontend/src/components/layout/AcademicNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "StudentHub AI",
+    "targetHref": "/",
+    "sourceFile": "frontend/src/components/layout/AcademicNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Dashboard",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/layout/AcademicNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "{avatarLetter}",
+    "targetHref": "/profile",
+    "sourceFile": "frontend/src/components/layout/AcademicNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setMobileOpen(false)}\r\n                 ",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/layout/AcademicNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setMobileOpen(false)}\r\n                 ",
+    "targetHref": "/profile",
+    "sourceFile": "frontend/src/components/layout/AcademicNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/layout/AcademicNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isCollapsed ? (\r\n            \r\n        ",
+    "sourceFile": "frontend/src/components/layout/CollapsibleSidebar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n            saffronAudio.playClick(40",
+    "sourceFile": "frontend/src/components/layout/CollapsibleSidebar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "saffronAudio.playClick(600)}\r\n          ",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/layout/CollapsibleSidebar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setMobileMenuOpen(!mobileMenuOpen)}\r\n   ",
+    "sourceFile": "frontend/src/components/layout/ModernNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "StudentHub AI\r\n            \r\n           ",
+    "targetHref": "/",
+    "sourceFile": "frontend/src/components/layout/ModernNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng Nhập",
+    "targetHref": "/login",
+    "sourceFile": "frontend/src/components/layout/ModernNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Bắt Đầu Miễn Phí",
+    "targetHref": "/register",
+    "sourceFile": "frontend/src/components/layout/ModernNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setMobileMenuOpen(false)}\r\n             ",
+    "targetHref": "/login",
+    "sourceFile": "frontend/src/components/layout/ModernNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setMobileMenuOpen(false)}\r\n             ",
+    "targetHref": "/register",
+    "sourceFile": "frontend/src/components/layout/ModernNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/layout/ModernNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/layout/ModernNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setMobileOpen((value) => !value)}\r\n     ",
+    "sourceFile": "frontend/src/components/layout/UnifiedAppShell.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Tìm kiếm tình huống, Trust, chuyên gia..",
+    "sourceFile": "frontend/src/components/layout/UnifiedAppShell.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setAccountOpen((value) => !value)}\r\n    ",
+    "sourceFile": "frontend/src/components/layout/UnifiedAppShell.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{ setAccountOpen(false); void signOut();",
+    "sourceFile": "frontend/src/components/layout/UnifiedAppShell.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Bỏ qua đến nội dung chính",
+    "targetHref": "#main-content",
+    "sourceFile": "frontend/src/components/layout/UnifiedAppShell.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "StudentHub AI\r\n              Kiểm chứng ",
+    "targetHref": "/dashboard",
+    "sourceFile": "frontend/src/components/layout/UnifiedAppShell.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "setAccountOpen(false)}> Cài đặt",
+    "targetHref": "/settings",
+    "sourceFile": "frontend/src/components/layout/UnifiedAppShell.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng nhập",
+    "targetHref": "/login",
+    "sourceFile": "frontend/src/components/layout/UnifiedAppShell.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Đăng ký",
+    "targetHref": "/register",
+    "sourceFile": "frontend/src/components/layout/UnifiedAppShell.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/layout/UnifiedAppShell.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActivePanelTab(\"ai\")}\r\n          clas",
+    "sourceFile": "frontend/src/components/lesson/LessonCompanionPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActivePanelTab(\"notes\")}\r\n          c",
+    "sourceFile": "frontend/src/components/lesson/LessonCompanionPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleAskAi(\"Giải thích đơn giản hơn cho",
+    "sourceFile": "frontend/src/components/lesson/LessonCompanionPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleAskAi(\"Lỗi phổ biến nhất khi dùng ",
+    "sourceFile": "frontend/src/components/lesson/LessonCompanionPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Gửi",
+    "sourceFile": "frontend/src/components/lesson/LessonCompanionPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/lesson/LessonCompanionPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/lesson/LessonCompanionPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/lesson/LessonCompanionPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/margin/MarginRail.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "SOS",
+    "targetHref": "/sos",
+    "sourceFile": "frontend/src/components/navigation/MobileNavRail.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "StudentHubAI",
+    "targetHref": "/",
+    "sourceFile": "frontend/src/components/navigation/PrimaryNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "An toàn",
+    "targetHref": "/safety-map",
+    "sourceFile": "frontend/src/components/navigation/PrimaryNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "SOS",
+    "targetHref": "/sos",
+    "sourceFile": "frontend/src/components/navigation/PrimaryNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Hồ sơ",
+    "targetHref": "/profile",
+    "sourceFile": "frontend/src/components/navigation/PrimaryNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Cài đặt",
+    "targetHref": "/settings",
+    "sourceFile": "frontend/src/components/navigation/PrimaryNavbar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsMinimized(false)}\r\n          classN",
+    "sourceFile": "frontend/src/components/providers/CinematicAmbientDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsExpanded(false)}\r\n              cla",
+    "sourceFile": "frontend/src/components/providers/CinematicAmbientDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setBgOpacity(op)}\r\n                  cla",
+    "sourceFile": "frontend/src/components/providers/CinematicAmbientDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveFilm(film)}\r\n                  ",
+    "sourceFile": "frontend/src/components/providers/CinematicAmbientDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsExpanded(!isExpanded)}\r\n          c",
+    "sourceFile": "frontend/src/components/providers/CinematicAmbientDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsBgPaused(!isBgPaused)}\r\n          c",
+    "sourceFile": "frontend/src/components/providers/CinematicAmbientDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsMinimized(true)}\r\n          classNa",
+    "sourceFile": "frontend/src/components/providers/CinematicAmbientDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Rạp Chiếu 4K Cinema",
+    "targetHref": "/cinema",
+    "sourceFile": "frontend/src/components/providers/CinematicAmbientDock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsOpen(false)}\r\n                class",
+    "sourceFile": "frontend/src/components/realtime/RealtimeLiveConsole.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setFilterChannel(ch)}\r\n                c",
+    "sourceFile": "frontend/src/components/realtime/RealtimeLiveConsole.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsOpen(!isOpen)}\r\n        className=\"",
+    "sourceFile": "frontend/src/components/realtime/RealtimeLiveConsole.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/realtime/RealtimeLiveConsole.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "dismissNotification(notif.id)}\r\n        ",
+    "sourceFile": "frontend/src/components/realtime/RealtimeNotificationToasts.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Làm mới",
+    "sourceFile": "frontend/src/components/settings/AIDriveIntegrationPanel.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setMessage(null)} className=\"font-bold u",
+    "sourceFile": "frontend/src/components/settings/ConnectedSourcesManager.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleSync(s.connectorId)}\r\n            ",
+    "sourceFile": "frontend/src/components/settings/ConnectedSourcesManager.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setMessage(null)} className=\"font-bold u",
+    "sourceFile": "frontend/src/components/settings/PrivacyAccessCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đăng xuất thiết bị khác",
+    "sourceFile": "frontend/src/components/settings/PrivacyAccessCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleRevokeDevice(device.deviceId)} cla",
+    "sourceFile": "frontend/src/components/settings/PrivacyAccessCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Xuất dữ liệu cá nhân",
+    "sourceFile": "frontend/src/components/settings/PrivacyAccessCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đặt lại cá nhân hóa",
+    "sourceFile": "frontend/src/components/settings/PrivacyAccessCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"devices\")}\r\n          clas",
+    "sourceFile": "frontend/src/components/settings/PrivacyAndSecurityCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"memory\")}\r\n          class",
+    "sourceFile": "frontend/src/components/settings/PrivacyAndSecurityCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"sources\")}\r\n          clas",
+    "sourceFile": "frontend/src/components/settings/PrivacyAndSecurityCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"gdpr\")}\r\n          classNa",
+    "sourceFile": "frontend/src/components/settings/PrivacyAndSecurityCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleRevokeDevice(d.id)}\r\n             ",
+    "sourceFile": "frontend/src/components/settings/PrivacyAndSecurityCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleRevokeMemory(m.id)}\r\n             ",
+    "sourceFile": "frontend/src/components/settings/PrivacyAndSecurityCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Tải Tệp JSON Hồ Sơ Vault Cá Nhân",
+    "sourceFile": "frontend/src/components/settings/PrivacyAndSecurityCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/settings/PrivacyAndSecurityCenter.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Làm mới radar",
+    "sourceFile": "frontend/src/components/social/SocialSignalRadar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Gửi",
+    "sourceFile": "frontend/src/components/social/SocialSignalRadar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/social/SocialSignalRadar.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedNodeIdx(idx)}\r\n              ",
+    "sourceFile": "frontend/src/components/spatial/KnowledgeAtlas3D.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Kiểm tra nội dung khác",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Làm mới",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "selectTrustMode(\"image\")}> Ảnh chụp",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "selectTrustMode(\"qr\")}> QR",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "selectTrustMode(\"text\")}> Văn bản",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "selectTrustMode(\"url\")}> URL",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{ if (preview) URL.revokeObjectURL(previ",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "fileInput.current?.click()}>\n           ",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{processing ?  : }\n              {proces",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Collective Intelligence",
+    "targetHref": "/community",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Mở Expert Network",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:file",
+    "label": "sr-only",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:checkbox",
+    "label": "checkbox",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/trust/AiTrustStudioView.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Gửi yêu cầu thẩm định",
+    "sourceFile": "frontend/src/components/trust/AskExpertGatewayCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Tra cứu thẩm quyền Hội đồng",
+    "targetHref": "/expert",
+    "sourceFile": "frontend/src/components/trust/AskExpertGatewayCard.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setViewMode(\"constellation\")}\r\n         ",
+    "sourceFile": "frontend/src/components/trust/EvidenceConstellationStage.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setViewMode(\"list\")}\r\n            classN",
+    "sourceFile": "frontend/src/components/trust/EvidenceConstellationStage.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onSelectSource?.(source)}\r\n             ",
+    "sourceFile": "frontend/src/components/trust/EvidenceConstellationStage.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onSelectSource?.(source)}\r\n             ",
+    "sourceFile": "frontend/src/components/trust/EvidenceConstellationStage.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowTechnicalDetails(!showTechnicalDe",
+    "sourceFile": "frontend/src/components/trust/ImageForensicsHUD.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/trust/ImageForensicsHUD.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowTooltip(true)}\r\n        onMouseLe",
+    "sourceFile": "frontend/src/components/trust/InlineCitation.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/trust/InlineCitation.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"presets\")}\r\n            cl",
+    "sourceFile": "frontend/src/components/trust/Layer1BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveTab(\"url-matrix\")}\r\n           ",
+    "sourceFile": "frontend/src/components/trust/Layer1BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isRunningAll ? \"Đang Thẩm Định Toàn Bộ.",
+    "sourceFile": "frontend/src/components/trust/Layer1BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/trust/Layer1BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/trust/Layer1BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleModeChange(tab.id)}\r\n             ",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Hủy Camera",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Xóa ảnh",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Đặt lại",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:url",
+    "label": "url",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:file",
+    "label": "hidden",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/trust/Layer1LivePrechecker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isRunningAll ? \"Đang Thẩm Định...\" : \"\ud83d",
+    "sourceFile": "frontend/src/components/trust/Layer2BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/trust/Layer2BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                  saffronAudio.playCl",
+    "sourceFile": "frontend/src/components/trust/Layer2SemanticHUD.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/trust/Layer2SemanticHUD.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isRunningAll ? \"Đang Đối Soát...\" : \"🚀",
+    "sourceFile": "frontend/src/components/trust/Layer3BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/trust/Layer3BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isRunningAll ? \"Đang Chạy 8 Tests...\" :",
+    "sourceFile": "frontend/src/components/trust/Layer4BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                      e.stopPropagati",
+    "sourceFile": "frontend/src/components/trust/Layer4BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onSelectPreset(selectedCase)}\r\n         ",
+    "sourceFile": "frontend/src/components/trust/Layer4BenchmarkStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/trust/NeuralModelTelemetryHUD.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/trust/NeuralModelTelemetryHUD.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{state === \"SUBMITTING\" ?  : }\r\n        ",
+    "sourceFile": "frontend/src/components/trust/PostResultGateways.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "toggleChannel(\"community\")} className={`",
+    "sourceFile": "frontend/src/components/trust/PostResultGateways.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "toggleChannel(\"expert\")} className={`pos",
+    "sourceFile": "frontend/src/components/trust/PostResultGateways.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "toggleChannel(\"request\")} className={`po",
+    "sourceFile": "frontend/src/components/trust/PostResultGateways.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "window.print())} className=\"post-result-",
+    "sourceFile": "frontend/src/components/trust/PostResultGateways.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "trust-expert-domain",
+    "sourceFile": "frontend/src/components/trust/PostResultGateways.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "trust-expert-context",
+    "sourceFile": "frontend/src/components/trust/PostResultGateways.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "trust-expert-question",
+    "sourceFile": "frontend/src/components/trust/PostResultGateways.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                  saffronAudio.playSu",
+    "sourceFile": "frontend/src/components/trust/RiskMeterSplitVerdict.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/trust/SourceInspectorDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/trust/SourceInspectorDrawer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveFeedIdx(idx)}\r\n                ",
+    "sourceFile": "frontend/src/components/trust/TrustForensicPipelineVisualizer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/trust/TrustForensicPipelineVisualizer.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setMode(\"graph\")} aria-pressed={mode ===",
+    "sourceFile": "frontend/src/components/trust/TrustGraph2D.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setMode(\"list\")} aria-pressed={mode === ",
+    "sourceFile": "frontend/src/components/trust/TrustGraph2D.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setKind(item)} className={`filter-chip $",
+    "sourceFile": "frontend/src/components/trust/TrustGraph2D.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setZoom((value) => Math.min(1.4, value +",
+    "sourceFile": "frontend/src/components/trust/TrustGraph2D.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setZoom((value) => Math.max(.75, value -",
+    "sourceFile": "frontend/src/components/trust/TrustGraph2D.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedId(node.id)} className={`grap",
+    "sourceFile": "frontend/src/components/trust/TrustGraph2D.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSelectedId(node.id)} className=\"graph",
+    "sourceFile": "frontend/src/components/trust/TrustGraph2D.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/trust/TrustGraph2D.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setOpen(!open)}\r\n        className=\"w-fu",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onSelect?.(source)} className=\"master-ul",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onInspect?.(layer.id)}\r\n          >\r\n   ",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onModeChange?.(id)}>\r\n               {la",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "fileInputRef?.current?.click()}>\r\n      ",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{processing ?  : }\r\n            {hasResu",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Làm mới đầu vào",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Replay journey",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Phiên mới",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "In",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onInspect(layer.id)}>{layer.code}{layer.",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onSelectSource?.(source)}>{safeText(sour",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "All layers",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onNavigate(normalized.macroStages[index ",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onNavigate(normalized.macroStages[index ",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Về input",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:file",
+    "label": "sr-only",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/trust/TrustMasterUltraJourney.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Trước",
+    "sourceFile": "frontend/src/components/trust/TrustPipelineTimeline.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Kế tiếp",
+    "sourceFile": "frontend/src/components/trust/TrustPipelineTimeline.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{followingCurrent ? \"Đang theo dõi\" : \"T",
+    "sourceFile": "frontend/src/components/trust/TrustPipelineTimeline.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                if (node) stageButton",
+    "sourceFile": "frontend/src/components/trust/TrustPipelineTimeline.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "handleSelectStage(presented.nextStageId)",
+    "sourceFile": "frontend/src/components/trust/TrustPipelineTimeline.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setShowTechnicalDrawer(!showTechnicalDra",
+    "sourceFile": "frontend/src/components/trust/TrustPipelineTimeline.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/trust/TrustPipelineTimeline.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/trust/TrustPipelineTimeline.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Kiểm tra nội dung khác",
+    "sourceFile": "frontend/src/components/trust/TrustResultSummary.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "In báo cáo",
+    "sourceFile": "frontend/src/components/trust/TrustResultSummary.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Thử tải lại khu vực này",
+    "sourceFile": "frontend/src/components/trust/TrustSectionBoundary.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "selectMode(\"image\")}>\r\n             Ảnh",
+    "sourceFile": "frontend/src/components/trust/TrustWorkspaceClient.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "selectMode(\"qr\")}>\r\n             QR",
+    "sourceFile": "frontend/src/components/trust/TrustWorkspaceClient.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "selectMode(\"text\")}>\r\n             Văn b",
+    "sourceFile": "frontend/src/components/trust/TrustWorkspaceClient.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "selectMode(\"url\")}>\r\n             URL",
+    "sourceFile": "frontend/src/components/trust/TrustWorkspaceClient.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{/* Visual intake watermark using verifi",
+    "sourceFile": "frontend/src/components/trust/TrustWorkspaceClient.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Phân tích rủi ro",
+    "sourceFile": "frontend/src/components/trust/TrustWorkspaceClient.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "textarea",
+    "label": "Textarea",
+    "sourceFile": "frontend/src/components/trust/TrustWorkspaceClient.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "tabs",
+    "label": "Tabbed Navigation",
+    "sourceFile": "frontend/src/components/trust/TrustWorkspaceClient.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/trust/TrustWorkspaceClient.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/ui/AuroraParticleCanvas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsStudioOpen(!isStudioOpen)}\r\n       ",
+    "sourceFile": "frontend/src/components/ui/BackgroundsAndEffectsStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setIsStudioOpen(false)}\r\n               ",
+    "sourceFile": "frontend/src/components/ui/BackgroundsAndEffectsStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/ui/BackgroundsAndEffectsStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "scrollToSection(wp.sectionId, wp.id)}\r\n ",
+    "sourceFile": "frontend/src/components/ui/CinematicChapterNavigator.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/ui/creative-shader-canvas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setOpen(!open)}\r\n        className=\"h-12",
+    "sourceFile": "frontend/src/components/ui/floating-dock.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{isPlaying ? (\r\n          \r\n            ",
+    "sourceFile": "frontend/src/components/ui/IglooSoundAmbiencePill.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/ui/liquid-study-reveal.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/ui/MohsinCurtainTransition.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "0 || isResending}\r\n            onClick={",
+    "sourceFile": "frontend/src/components/ui/otp-verification-orbit.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/ui/otp-verification-orbit.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/ui/SaffronMarqueeTicker.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{/* spark container */}\r\n        \r\n     ",
+    "sourceFile": "frontend/src/components/ui/shimmer-button.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onAction(action)}>{action.label}",
+    "sourceFile": "frontend/src/components/ui/StateBoundary.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{buttonContent}",
+    "sourceFile": "frontend/src/components/ui/TactileButton.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/ui/TextScramble.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{content}",
+    "sourceFile": "frontend/src/components/ui/VNextButton.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "go(c.id)}\r\n                        onMou",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraChapterNav.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Hút theo con trỏ",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraEffectsGallery.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Bấm vào đây\r\n            \r\n            {",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraEffectsGallery.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraEffectsGallery.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSitemapOpen(true)}\r\n                 ",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraFeatureAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setFilter(f.id)}\r\n                      ",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraFeatureAtlas.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setPaletteOpen(true)}\r\n                 ",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraHeroSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "link",
+    "label": "Khám phá motion lab",
+    "targetHref": "#ultra-effects",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraHeroSection.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setMotionId(m.id)}\r\n                    ",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraPerformanceLab.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "t.set(!t.checked)}\r\n                    ",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraPerformanceLab.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraPerformanceLab.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                                     ",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraThemeShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "w-full rounded-xl border bg-transparent px-3.5 py-2.5 font-mono text-[12px] text-white/70 outline-none transition-colors focus:border-[var(--ux-accent)]",
+    "sourceFile": "frontend/src/components/ultra/sections/UltraThemeShowcase.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "Icon/Action Button",
+    "sourceFile": "frontend/src/components/ultra/UltraChrome.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setActiveIndex(idx)}\r\n                  ",
+    "sourceFile": "frontend/src/components/ultra/UltraCommandPalette.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/ultra/UltraCommandPalette.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/ultra/UltraCommandPalette.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "upload_control",
+    "label": "File/Image/QR Intake",
+    "sourceFile": "frontend/src/components/ultra/UltraMotionKit.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onPick(r)}\r\n                            ",
+    "sourceFile": "frontend/src/components/ultra/UltraSitemapOrbit.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setSitemapOpen(false)}\r\n                ",
+    "sourceFile": "frontend/src/components/ultra/UltraSitemapOrbit.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "onChange(!checked)}\r\n            classNa",
+    "sourceFile": "frontend/src/components/ultra/UltraThemeStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "setStudioOpen(false)}\r\n                 ",
+    "sourceFile": "frontend/src/components/ultra/UltraThemeStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                                     ",
+    "sourceFile": "frontend/src/components/ultra/UltraThemeStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                                     ",
+    "sourceFile": "frontend/src/components/ultra/UltraThemeStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "{\r\n                                     ",
+    "sourceFile": "frontend/src/components/ultra/UltraThemeStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "modal_dialog",
+    "label": "Modal/Dialog/Drawer Surface",
+    "sourceFile": "frontend/src/components/ultra/UltraThemeStudio.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "button",
+    "label": "dismissToast(t.id)}\r\n                   ",
+    "sourceFile": "frontend/src/components/ultra/UltraToastHub.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  },
+  {
+    "type": "input:text",
+    "label": "text",
+    "sourceFile": "frontend/src/components/visual/LivingKnowledgeCore.jsx",
+    "safeToExercise": true,
+    "route": "SHARED_COMPONENT"
+  }
+]

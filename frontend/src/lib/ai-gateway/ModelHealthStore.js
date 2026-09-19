@@ -88,6 +88,8 @@ export class ModelHealthStore {
       lastResult: entry.lastResult,
       lastHttpStatus: entry.lastHttpStatus,
       lastFailureAt: entry.lastFailureAt,
+      lastSuccessAt: entry.lastSuccessAt || null,
+      lastLatencyMs: entry.lastLatencyMs || null,
       cooldownUntil: entry.cooldownUntil,
       cooldownRemainingMs: remaining,
       dailyQuotaExhausted: entry.dailyQuotaExhausted === true,
@@ -98,8 +100,24 @@ export class ModelHealthStore {
     return (this.get(provider, model)?.cooldownRemainingMs || 0) > 0;
   }
 
-  recordSuccess(provider, model) {
-    this.entries.delete(this.key(provider, model));
+  recordSuccess(provider, model, { latencyMs = null } = {}) {
+    const key = this.key(provider, model);
+    const now = this.now();
+    const entry = {
+      provider: safeStatus(provider),
+      model: typeof model === "string" ? model.trim().slice(0, 120) : "",
+      healthStatus: MODEL_HEALTH_STATUS.HEALTHY,
+      consecutiveFailures: 0,
+      lastResult: "SUCCESS",
+      lastHttpStatus: 200,
+      lastLatencyMs: Number.isFinite(Number(latencyMs)) ? Number(latencyMs) : null,
+      lastSuccessAt: new Date(now).toISOString(),
+      lastFailureAt: null,
+      cooldownUntil: null,
+      dailyQuotaExhausted: false,
+    };
+    this.entries.delete(key);
+    this.entries.set(key, entry);
   }
 
   recordFailure({

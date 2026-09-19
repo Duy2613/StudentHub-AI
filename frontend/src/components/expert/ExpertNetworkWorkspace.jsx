@@ -44,6 +44,58 @@ export default function ExpertNetworkWorkspace() {
   const [isReviewDeskOpen, setIsReviewDeskOpen] = useState(false);
   const [activeReviewCase, setActiveReviewCase] = useState(null);
 
+  const openReviewDesk = useCallback(async () => {
+    try {
+      const res = await fetch("/api/expert/blind-reviews", { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.success && Array.isArray(data.reviews) && data.reviews.length > 0) {
+          setActiveReviewCase(data.reviews[0]);
+        } else {
+          setActiveReviewCase(null);
+        }
+      } else {
+        setActiveReviewCase(null);
+      }
+    } catch {
+      setActiveReviewCase(null);
+    }
+    setIsReviewDeskOpen(true);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("view", "review-desk");
+      window.history.pushState({}, "", url.toString());
+    }
+  }, []);
+
+  const closeReviewDesk = useCallback(() => {
+    setIsReviewDeskOpen(false);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("view");
+      window.history.pushState({}, "", url.toString());
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("view") === "review-desk") {
+        void openReviewDesk();
+      }
+      const handlePopState = () => {
+        const currentParams = new URLSearchParams(window.location.search);
+        if (currentParams.get("view") === "review-desk") {
+          setIsReviewDeskOpen(true);
+        } else {
+          setIsReviewDeskOpen(false);
+        }
+      };
+      window.addEventListener("popstate", handlePopState);
+      return () => window.removeEventListener("popstate", handlePopState);
+    }
+  }, [openReviewDesk]);
+
   const loadDirectory = useCallback(async (signal) => {
     setDirectoryLoading(true);
     setDirectoryError("");
@@ -115,11 +167,9 @@ export default function ExpertNetworkWorkspace() {
                 </div>
                 <button
                   type="button"
+                  id="open-review-desk-button"
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-500 text-slate-950 font-semibold text-sm hover:bg-emerald-400 transition-colors shadow-lg cursor-pointer"
-                  onClick={() => {
-                    setActiveReviewCase(null);
-                    setIsReviewDeskOpen(true);
-                  }}
+                  onClick={openReviewDesk}
                 >
                   <ShieldCheck size={16} /> Mở bàn giám định (Review Desk)
                 </button>
@@ -247,7 +297,7 @@ export default function ExpertNetworkWorkspace() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
             <ExpertReviewDeskModal
               isOpen={isReviewDeskOpen}
-              onClose={() => setIsReviewDeskOpen(false)}
+              onClose={closeReviewDesk}
               caseDossier={activeReviewCase}
               onSubmitAssessment={submitAssessment}
             />

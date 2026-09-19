@@ -1,0 +1,133 @@
+{
+  "reportVersion": "gemini-multi-model-router-probe-v1",
+  "generatedAt": "2026-09-18T14:25:25.845Z",
+  "GEMINI_API_KEY_PRESENT": true,
+  "MODEL_3_8": {
+    "MODEL": "gemini-3.8-flash",
+    "AVAILABLE": "SKIPPED_KNOWN_EXHAUSTED",
+    "HTTP_STATUS": 429,
+    "RPM/RPD failure": "KNOWN_PRIOR_429",
+    "PROVIDER_ERROR_CODE": null,
+    "DURATION": 0,
+    "SCHEMA_COMPATIBLE": "NOT_PROBED",
+    "HTTP_REQUESTS": 0,
+    "REAL_OUTBOUND": false,
+    "ERROR_TYPE": null
+  },
+  "MODEL_3_7": {
+    "MODEL": "gemini-3.7-flash",
+    "AVAILABLE": "NO",
+    "HTTP_STATUS": null,
+    "RPM/RPD failure": null,
+    "PROVIDER_ERROR_CODE": null,
+    "DURATION": 7009,
+    "SCHEMA_COMPATIBLE": "NOT_VERIFIED",
+    "HTTP_REQUESTS": 1,
+    "REAL_OUTBOUND": true,
+    "ERROR_TYPE": "TIMEOUT"
+  },
+  "MODEL_3_6": {
+    "MODEL": "gemini-3.6-flash",
+    "AVAILABLE": "NO",
+    "HTTP_STATUS": null,
+    "RPM/RPD failure": null,
+    "PROVIDER_ERROR_CODE": null,
+    "DURATION": 7002,
+    "SCHEMA_COMPATIBLE": "NOT_VERIFIED",
+    "HTTP_REQUESTS": 1,
+    "REAL_OUTBOUND": true,
+    "ERROR_TYPE": "TIMEOUT"
+  },
+  "MODEL_2_5": {
+    "MODEL": "gemini-2.5-flash",
+    "AVAILABLE": "RETIRED",
+    "HTTP_STATUS": 404,
+    "RPM/RPD failure": null,
+    "PROVIDER_ERROR_CODE": "PROJECT_MODEL_UNAVAILABLE",
+    "DURATION": 0,
+    "SCHEMA_COMPATIBLE": "NO",
+    "HTTP_REQUESTS": 0,
+    "REAL_OUTBOUND": false,
+    "ERROR_TYPE": "UNAVAILABLE_TO_NEW_USERS"
+  },
+  "MODEL_ROUTER_RESULT": {
+    "ACTIVE_FALLBACK_CHAIN": [
+      "gemini-3.8-flash",
+      "gemini-3.7-flash",
+      "gemini-3.6-flash"
+    ],
+    "ALL_PRODUCTION_PROBES_BOUNDED": true,
+    "ALL_PRODUCTION_AVAILABLE": false,
+    "ALL_PRODUCTION_SCHEMA_COMPATIBLE": false
+  },
+  "MODEL_COOLDOWN_RESULT": "PROCESS_LOCAL_PER_MODEL_COOLDOWN_ENABLED",
+  "MAX_L4_BUDGET": {
+    "totalMs": 10000,
+    "perModelTimeoutMs": 7000,
+    "maxAttempts": 12
+  },
+  "REAL_PROBE_RESULTS": [
+    {
+      "MODEL": "gemini-3.8-flash",
+      "AVAILABLE": "SKIPPED_KNOWN_EXHAUSTED",
+      "HTTP_STATUS": 429,
+      "RPM/RPD failure": "KNOWN_PRIOR_429",
+      "PROVIDER_ERROR_CODE": null,
+      "DURATION": 0,
+      "SCHEMA_COMPATIBLE": "NOT_PROBED",
+      "HTTP_REQUESTS": 0,
+      "REAL_OUTBOUND": false,
+      "ERROR_TYPE": null
+    },
+    {
+      "MODEL": "gemini-3.7-flash",
+      "AVAILABLE": "NO",
+      "HTTP_STATUS": null,
+      "RPM/RPD failure": null,
+      "PROVIDER_ERROR_CODE": null,
+      "DURATION": 7009,
+      "SCHEMA_COMPATIBLE": "NOT_VERIFIED",
+      "HTTP_REQUESTS": 1,
+      "REAL_OUTBOUND": true,
+      "ERROR_TYPE": "TIMEOUT"
+    },
+    {
+      "MODEL": "gemini-3.6-flash",
+      "AVAILABLE": "NO",
+      "HTTP_STATUS": null,
+      "RPM/RPD failure": null,
+      "PROVIDER_ERROR_CODE": null,
+      "DURATION": 7002,
+      "SCHEMA_COMPATIBLE": "NOT_VERIFIED",
+      "HTTP_REQUESTS": 1,
+      "REAL_OUTBOUND": true,
+      "ERROR_TYPE": "TIMEOUT"
+    }
+  ],
+  "GEMMA_31B_COMPATIBILITY": {
+    "MODEL": "gemma-4-31b-it",
+    "STATUS": "NOT_RUN_SHADOW_ONLY",
+    "COMPATIBLE": false,
+    "CHECKS": {}
+  },
+  "GEMMA_26B_COMPATIBILITY": {
+    "MODEL": "gemma-4-26b-a4b-it",
+    "STATUS": "NOT_RUN_SHADOW_ONLY",
+    "COMPATIBLE": false,
+    "CHECKS": {}
+  },
+  "GEMMA_COMPATIBLE": "NO",
+  "ACTIVE_FALLBACK_CHAIN": [
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
+    "gemini-3.6-flash"
+  ],
+  "L4_ALL_MODELS_FAIL_TEST": "SEE_HERMETIC_FAULT_MATRIX",
+  "L5_AFTER_ALL_MODELS_FAIL": "SEE_HERMETIC_V5_PIPELINE_TEST",
+  "ZERO_RERUN": "ONE_ROUTING_SEQUENCE_PER_TRUST_RUN",
+  "NO_GROQ": "YES",
+  "NO_SEQUENTIAL": "YES",
+  "TRUST_AUTHORITY_CHANGED": "NO",
+  "VERDICT": "GEMINI_MULTI_MODEL_ROUTER_PARTIAL",
+  "noSecretsPrinted": true
+}

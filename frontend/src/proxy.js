@@ -7,13 +7,23 @@ import { getContentSecurityPolicy } from "./lib/security/hardening/SecurityHeade
 
 export function proxy(request) {
   const { pathname } = request.nextUrl;
-  const incomingCorrelationId = request.headers.get("x-correlation-id") || "";
-  const correlationId = /^[A-Za-z0-9_.:-]{1,128}$/.test(incomingCorrelationId)
-    ? incomingCorrelationId
+  const rawIncoming = request.headers.get("x-correlation-id") || request.headers.get("x-request-id") || "";
+  const correlationId = /^[A-Za-z0-9_.:-]{1,128}$/.test(rawIncoming.trim())
+    ? rawIncoming.trim()
     : createCorrelationId("sec_edge");
-  const response = NextResponse.next();
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-correlation-id", correlationId);
+  requestHeaders.set("x-request-id", correlationId);
+
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 
   response.headers.set("x-correlation-id", correlationId);
+  response.headers.set("x-request-id", correlationId);
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");

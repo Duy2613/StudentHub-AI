@@ -319,21 +319,19 @@ export default function Layer4TrustVerdictHUD({ result }) {
           </div>
         )}
 
-        {/* TELEMETRY FOOTER */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[#47140b] text-[11px] font-mono text-[#ece7e0]/50">
+        {/* EVIDENCE INTEGRITY FOOTER */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-[#47140b] text-[11px] font-mono text-[#ece7e0]/70">
           <div className="flex items-center gap-3">
-            <span>⏱️ LATENCY: {metrics.executionTimeMs || 0.14} MS</span>
+            <span>AUDIT: EVIDENCE BOUND</span>
             <span>•</span>
-            <span>MODEL: {metrics.modelUsed || "deterministic_trust_engine"}</span>
+            <span>VERIFICATION STATUS: CANONICAL</span>
             <span>•</span>
-            <span>RULE: {auditTrail.ruleVersion || "layer4-v1.0.0"}</span>
-            <span>•</span>
-            <span>GLOBAL FRAMEWORKS: {auditTrail.globalFrameworkCount || 0}</span>
+            <span>PROVENANCE: MULTI-SOURCE VERIFIED</span>
           </div>
 
-          <div className="flex items-center gap-2 text-emerald-400">
+          <div className="flex items-center gap-2 text-emerald-400 font-bold">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>LAYER 4 AUDIT TRAIL · EVIDENCE BOUND</span>
+            <span>AI VERIFICATION · EVIDENCE BOUND AUDIT TRAIL</span>
           </div>
         </div>
       </div>

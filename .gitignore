@@ -52,3 +52,16 @@ frontend/.lhci-temp/
 
 # Root level junction to frontend/public
 /public/
+
+# OCR binary weights
+*.traineddata
+
+# Large media and video recording artifacts (prevent GitHub 100MB reject)
+*.mp4
+*.webm
+artifacts/**/videos/
+artifacts/final-demo-qa-*/
+artifacts/p24-reality-gate/
+artifacts/trust-assurance/
+artifacts/**/*.zip
+artifacts/visual/

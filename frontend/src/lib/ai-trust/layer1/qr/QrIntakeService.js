@@ -112,17 +112,74 @@ export class QrIntakeService {
         warnings.push(`Phát hiện mã độc/lệnh thực thi nguy hiểm (${scheme}) trong mã QR.`);
         return {
           inputType: "QR",
-          decodedType: "OTHER",
+          decodedType: "DANGEROUS",
           decodedValue: trimmed,
           normalizedValue: "",
           securityStatus: "BLOCKED",
+          ssrfStatus: "BLOCKED",
+          autoNavigation: "NO",
+          selectedRoute: "BLOCKED",
           warnings,
           signals,
         };
       }
     }
 
-    // 2. Classify: URL vs Plain Text vs Structured Scheme
+    // 2. Wi-Fi QR Code Payload: WIFI:T:WPA;S:MyNetwork;P:SuperSecretPassword;;
+    if (/^WIFI:/i.test(trimmed)) {
+      const redactedValue = trimmed.replace(/P:([^;]*);/gi, "P:********;");
+      const normalizedValue = redactedValue;
+      signals.push(
+        createSignal({
+          type: "QR_WIFI_CONFIG",
+          category: "security",
+          severity: SIGNAL_SEVERITY.INFO,
+          confidence: 1.0,
+          evidence: { redactedPayload: redactedValue, details: "Cấu hình Wi-Fi trong mã QR; mật khẩu đã được che bảo mật." },
+          source: "QrIntakeService",
+        })
+      );
+      return {
+        inputType: "QR",
+        decodedType: "WIFI",
+        decodedValue: redactedValue,
+        normalizedValue,
+        securityStatus: "PASS",
+        ssrfStatus: "NOT_APPLICABLE",
+        autoNavigation: "NO",
+        selectedRoute: "Text Claim Trust",
+        warnings: ["Mã QR chứa cấu hình mạng Wi-Fi. Mật khẩu đã được che để đảm bảo an toàn."],
+        signals,
+      };
+    }
+
+    // 3. vCard QR Code Payload: BEGIN:VCARD...END:VCARD
+    if (/^BEGIN:VCARD/i.test(trimmed)) {
+      signals.push(
+        createSignal({
+          type: "QR_VCARD_PAYLOAD",
+          category: "contact",
+          severity: SIGNAL_SEVERITY.INFO,
+          confidence: 1.0,
+          evidence: { preview: trimmed.slice(0, 160), details: "Danh thiếp điện tử (vCard) trong mã QR." },
+          source: "QrIntakeService",
+        })
+      );
+      return {
+        inputType: "QR",
+        decodedType: "VCARD",
+        decodedValue: trimmed,
+        normalizedValue: trimmed,
+        securityStatus: "PASS",
+        ssrfStatus: "NOT_APPLICABLE",
+        autoNavigation: "NO",
+        selectedRoute: "Text Claim Trust",
+        warnings: [],
+        signals,
+      };
+    }
+
+    // 4. Classify: URL vs Plain Text vs Structured Scheme
     const isExplicitUrl = /^https?:\/\//i.test(trimmed);
     const isDomainLike = /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(:\d+)?(\/.*)?$/i.test(trimmed);
 
@@ -149,6 +206,9 @@ export class QrIntakeService {
           decodedValue: trimmed,
           normalizedValue: "",
           securityStatus: "BLOCKED",
+          ssrfStatus: "BLOCKED",
+          autoNavigation: "NO",
+          selectedRoute: "BLOCKED",
           warnings,
           signals,
         };
@@ -169,10 +229,13 @@ export class QrIntakeService {
         warnings.push(`Giao thức ${parsedUrl.protocol} không được hỗ trợ để mở an toàn.`);
         return {
           inputType: "QR",
-          decodedType: "OTHER",
+          decodedType: "DANGEROUS",
           decodedValue: trimmed,
           normalizedValue: "",
           securityStatus: "BLOCKED",
+          ssrfStatus: "BLOCKED",
+          autoNavigation: "NO",
+          selectedRoute: "BLOCKED",
           warnings,
           signals,
         };
@@ -197,6 +260,9 @@ export class QrIntakeService {
           decodedValue: trimmed,
           normalizedValue: "",
           securityStatus: "BLOCKED",
+          ssrfStatus: "BLOCKED",
+          autoNavigation: "NO",
+          selectedRoute: "BLOCKED",
           warnings,
           signals,
         };
@@ -216,13 +282,16 @@ export class QrIntakeService {
             source: "QrIntakeService",
           })
         );
-        warnings.push("URL trỏ tới máy chủ nội bộ hoặc địa chỉ mạng cục bộ bị cấm.");
+        warnings.push("URL trỏ tới máy chủ nội bộ hoặc địa chỉ mạng cục bộ bị cấm (SSRF Protection).");
         return {
           inputType: "QR",
           decodedType: "URL",
           decodedValue: trimmed,
           normalizedValue: "",
           securityStatus: "BLOCKED",
+          ssrfStatus: "BLOCKED",
+          autoNavigation: "NO",
+          selectedRoute: "BLOCKED",
           warnings,
           signals,
         };
@@ -260,11 +329,9 @@ export class QrIntakeService {
       }
 
       const normalized = NormalizationService.normalizeUrl(candidateUrl);
-      const securityStatus = signals.some(s => s.severity === SIGNAL_SEVERITY.CRITICAL)
-        ? "BLOCKED"
-        : signals.some(s => s.severity === SIGNAL_SEVERITY.HIGH)
-        ? "SUSPICIOUS"
-        : "SAFE";
+      const isCritical = signals.some(s => s.severity === SIGNAL_SEVERITY.CRITICAL);
+      const isHigh = signals.some(s => s.severity === SIGNAL_SEVERITY.HIGH);
+      const securityStatus = isCritical ? "BLOCKED" : isHigh ? "SUSPICIOUS" : "PASS";
 
       return {
         inputType: "QR",
@@ -272,19 +339,25 @@ export class QrIntakeService {
         decodedValue: trimmed,
         normalizedValue: normalized.normalized || candidateUrl,
         securityStatus,
+        ssrfStatus: "PASS",
+        autoNavigation: "NO",
+        selectedRoute: securityStatus === "BLOCKED" ? "BLOCKED" : "URL Trust",
         warnings,
         signals,
       };
     }
 
-    // 3. Plain Text Payload
+    // 5. Plain Text Payload
     const normalizedText = NormalizationService.normalizeText(trimmed);
     return {
       inputType: "QR",
       decodedType: "TEXT",
       decodedValue: trimmed,
       normalizedValue: normalizedText.normalized || trimmed,
-      securityStatus: "SAFE",
+      securityStatus: "PASS",
+      ssrfStatus: "NOT_APPLICABLE",
+      autoNavigation: "NO",
+      selectedRoute: "Text Claim Trust",
       warnings,
       signals,
     };

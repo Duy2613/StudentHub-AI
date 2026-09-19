@@ -12,6 +12,7 @@ import {
   resolveCapabilityRoute,
   validateActiveModelIdentifiers,
   validateCatalogModelEntry,
+  isL4DemoPriorityEnabled,
 } from "./config/AIGatewayConfig.js";
 import {
   isQaExtendedFallbackEnabled,
@@ -238,12 +239,42 @@ export class ModelRouter {
     parseResponse = null,
     validateResponse = null,
     allowQaExtended = null,
+    resultPriority = null,
   } = {}) {
-    const qaExtendedActive = typeof allowQaExtended === "boolean" ? allowQaExtended : isQaExtendedFallbackEnabled();
-    const configuredChain = resolveCapabilityRoute(capability, { allowQaExtended: qaExtendedActive }).slice(0, AI_GATEWAY_CONFIG.LIMITS.MAX_ROUTER_ATTEMPTS);
+    const isDemoMode = resultPriority === "DEMO" || isL4DemoPriorityEnabled();
+    const qaExtendedActive = isDemoMode ? true : (typeof allowQaExtended === "boolean" ? allowQaExtended : isQaExtendedFallbackEnabled());
+    let configuredChain = resolveCapabilityRoute(capability, { allowQaExtended: qaExtendedActive }).slice(0, AI_GATEWAY_CONFIG.LIMITS.MAX_ROUTER_ATTEMPTS);
+
+    if (isDemoMode) {
+      // Dynamic candidate prioritization by current health for demo mode
+      configuredChain.sort((aId, bId) => {
+        const aEntry = AI_GATEWAY_CONFIG.MODEL_CATALOG[aId];
+        const bEntry = AI_GATEWAY_CONFIG.MODEL_CATALOG[bId];
+        const aHealth = aEntry ? this.healthStore.get(aEntry.provider, aEntry.model) : null;
+        const bHealth = bEntry ? this.healthStore.get(bEntry.provider, bEntry.model) : null;
+
+        const scoreModel = (health, entry) => {
+          if (!entry) return 999;
+          if (health?.dailyQuotaExhausted) return 500;
+          if (health?.cooldownRemainingMs > 0) return 400;
+          if (health?.healthStatus === "HEALTHY" && health?.lastSuccessAt) {
+            return 10 + (health?.lastLatencyMs ? Math.min(health.lastLatencyMs / 1000, 10) : 0);
+          }
+          if (health?.healthStatus === "HEALTHY") return 50;
+          if (health?.consecutiveFailures > 0) return 200;
+          return 100;
+        };
+
+        return scoreModel(aHealth, aEntry) - scoreModel(bHealth, bEntry);
+      });
+    }
+
     const attempts = [];
     const startedAt = Date.now();
-    const boundedTotalBudget = boundedBudget(totalBudgetMs, AI_GATEWAY_CONFIG.BUDGET.DEFAULT_TOTAL_MS);
+    const effectiveTotalBudget = isDemoMode
+      ? (totalBudgetMs || AI_GATEWAY_CONFIG.BUDGET.L4_TOTAL_DEMO_BUDGET_MS || 22_000)
+      : (totalBudgetMs || AI_GATEWAY_CONFIG.BUDGET.DEFAULT_TOTAL_MS);
+    const boundedTotalBudget = boundedBudget(effectiveTotalBudget, AI_GATEWAY_CONFIG.BUDGET.DEFAULT_TOTAL_MS);
     const requestedTimeout = boundedTimeout(timeoutMs, AI_GATEWAY_CONFIG.SLA.DEFAULT_TIMEOUT_MS);
     const perCandidateTimeout = boundedTimeout(perModelTimeoutMs || requestedTimeout, requestedTimeout);
     const boundedSystemPrompt = String(systemPrompt || "").slice(0, AI_GATEWAY_CONFIG.LIMITS.MAX_PROMPT_CHARACTERS);
@@ -501,7 +532,7 @@ export class ModelRouter {
           qaExtendedFallback: isExecutedExtended,
         });
         attempts.push(attempt);
-        this.healthStore.recordSuccess(entry.provider, entry.model);
+        this.healthStore.recordSuccess(entry.provider, entry.model, { latencyMs: durationMs });
         const usedFallback = entry.model !== requestedPrimaryModel || Boolean(primaryFailure);
         const qaExtendedFallback = isExecutedExtended || attempts.some((a) => isQaExtendedGeminiModel(a.model));
         return {
@@ -615,4 +646,85 @@ export class ModelRouter {
       cooldownResult: { skippedModels: cooldownModels, cooldownModels, activeCooldowns },
     };
   }
+
+  /**
+   * Preflight health probe for configured Gemini candidates.
+   * Runs lightweight checks to identify healthy models before recording or testing.
+   */
+  async preflightHealthCheck({ timeoutPerModelMs = 4500 } = {}) {
+    const candidateEntries = [
+      "GEMINI_3_8_FLASH",
+      "GEMINI_3_7_FLASH",
+      "GEMINI_3_6_FLASH",
+      "GEMINI_3_5_FLASH",
+      "GEMINI_3_5_FLASH_LITE",
+      "GEMINI_3_1_FLASH_LITE",
+    ];
+    const results = [];
+    const healthyModels = [];
+    const unhealthyModels = [];
+
+    for (const entryId of candidateEntries) {
+      const entry = AI_GATEWAY_CONFIG.MODEL_CATALOG[entryId];
+      if (!entry) continue;
+      const provider = this.providers[entry.provider];
+      if (!provider || !provider.isConfigured(entry)) {
+        unhealthyModels.push({ model: entry.model, reason: "NOT_CONFIGURED" });
+        results.push({ model: entry.model, health: "NOT_CONFIGURED", lastHttpStatus: null, latencyMs: 0, status: "NOT_CONFIGURED" });
+        continue;
+      }
+
+      const checkStart = Date.now();
+      try {
+        await this.#invokeProvider(provider, {
+          catalogEntry: entry,
+          systemPrompt: 'Respond strictly with {"status":"HEALTHY","model":"' + entry.model + '"}',
+          userPrompt: "Health probe",
+          jsonMode: true,
+          maxOutputTokens: 64,
+          allowQaExtended: true,
+        }, timeoutPerModelMs);
+
+        const latencyMs = Date.now() - checkStart;
+        this.healthStore.recordSuccess(entry.provider, entry.model, { latencyMs });
+        healthyModels.push(entry.model);
+        results.push({
+          model: entry.model,
+          health: "HEALTHY",
+          lastHttpStatus: 200,
+          latencyMs,
+          status: "SUCCESS",
+        });
+      } catch (err) {
+        const latencyMs = Date.now() - checkStart;
+        const httpStatus = err?.httpStatus || (err?.name === "TimeoutError" ? 408 : 500);
+        this.healthStore.recordFailure({
+          provider: entry.provider,
+          model: entry.model,
+          result: err?.name === "TimeoutError" ? "TIMEOUT" : "HTTP_" + httpStatus,
+          httpStatus,
+          dailyQuotaExhausted: err?.dailyQuotaExhausted === true || httpStatus === 429,
+        });
+        unhealthyModels.push({ model: entry.model, reason: err?.message || String(err), httpStatus, latencyMs });
+        results.push({
+          model: entry.model,
+          health: "UNHEALTHY",
+          lastHttpStatus: httpStatus,
+          latencyMs,
+          status: err?.name === "TimeoutError" ? "TIMEOUT" : "ERROR",
+        });
+      }
+    }
+
+    return {
+      preflightRun: true,
+      healthyModels,
+      unhealthyModels,
+      preferredModel: healthyModels[0] || null,
+      backupOrder: healthyModels.slice(1),
+      modelHealthSnapshot: results,
+      demoL4Ready: healthyModels.length >= 1,
+    };
+  }
 }
+

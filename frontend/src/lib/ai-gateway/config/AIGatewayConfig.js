@@ -102,6 +102,9 @@ export const AI_GATEWAY_CONFIG = {
   // preserve ~6.8s of the total 10s budget to complete structured generation.
   BUDGET: {
     L4_TOTAL_MS: 10_000,
+    L4_TOTAL_DEMO_BUDGET_MS: 22_000,
+    L4_HEALTHY_MODEL_TIMEOUT_MS: 6000,
+    L4_UNKNOWN_MODEL_TIMEOUT_MS: 4000,
     L4_PER_MODEL_TIMEOUT_MS: 7000,
     L4_RESERVED_HEALTHY_BUDGET_MS: 6800,
     DEFAULT_TOTAL_MS: 10_000,
@@ -273,3 +276,13 @@ export function validateActiveModelIdentifiers() {
     expectedModels: [...GEMINI_PRODUCTION_MODEL_IDS],
   });
 }
+
+export function getTrustL4ResultPriority() {
+  const env = (process.env.TRUST_L4_RESULT_PRIORITY || "").trim().toUpperCase();
+  return env === "DEMO" ? "DEMO" : "NORMAL";
+}
+
+export function isL4DemoPriorityEnabled() {
+  return getTrustL4ResultPriority() === "DEMO";
+}
+

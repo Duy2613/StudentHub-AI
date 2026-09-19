@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { Layer1ScreenService } from "@/lib/ai-trust/layer1/Layer1ScreenService.js";
 import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticService.js";
@@ -23,9 +24,13 @@ function safeMetadata(value) {
   const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "extractionAuthority", "institutionContext", "mediaArtifactId", "imageHash", "bytes", "width", "height"];
   return Object.fromEntries(allowed.filter((key) => Object.hasOwn(value, key)).map((key) => {
     const item = value[key];
+    if (key === "bytes") {
+      if (typeof item === "string") return [key, item.slice(0, 10_000_000)];
+      if (Buffer.isBuffer(item) || item instanceof Uint8Array || Array.isArray(item)) return [key, item];
+      return [key, null];
+    }
     if (typeof item === "string") return [key, item.slice(0, 32_000)];
     if (typeof item === "number" && Number.isFinite(item)) return [key, item];
-    if (key === "bytes" && (Buffer.isBuffer(item) || item instanceof Uint8Array || Array.isArray(item))) return [key, item];
     return [key, null];
   }).filter(([, item]) => item !== null));
 }
@@ -65,6 +70,13 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
         if (closed) return;
         try { controller.enqueue(encoder.encode(sseChunk({ ...event, requestId }))); } catch { closed = true; }
       };
+      const canonicalCaseId = (input.scope?.caseId && /^[0-9a-f-]{36}$/i.test(input.scope.caseId))
+        ? input.scope.caseId
+        : randomUUID();
+      if (!input.scope) input.scope = {};
+      input.scope.caseId = canonicalCaseId;
+      input.scope.caseRevision = 1;
+
       const orchestrator = createTrustOrchestrator();
       orchestrator.run(input, {
         requestId,
@@ -72,16 +84,18 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
         useAIGateway: true,
         aiMode: "GEMINI_ONLY",
         onL1ClaimReady: ({ l1Result, input: currentInput, pipeline: currentPipeline }) => {
+          if (currentPipeline) currentPipeline.caseId = canonicalCaseId;
           const ownerId = principal?.subjectId ? String(principal.subjectId).replace(/^(student|expert|user):/, "") : null;
-          const caseId = currentPipeline?.verificationId || requestId;
           void ExpertBlindReviewDispatcher.dispatchOnL1ClaimReady({
-            caseId,
+            caseId: canonicalCaseId,
             caseRevision: 1,
             ownerId,
             input: currentInput,
             l1Result,
             requestId,
-          }).catch(() => {});
+          }).catch((err) => {
+            console.error("[ExpertBlindReviewDispatcher] stream dispatch error:", err);
+          });
         },
         onTransition: (transition) => send({
           type: "stage",
@@ -90,6 +104,7 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
           data: transition.pipeline,
         }),
       }).then(async (result) => {
+        result.caseId = canonicalCaseId;
         let persistence = { persisted: false, caseId: null };
         if (principal?.isAuthenticated) {
           try {
@@ -172,7 +187,7 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
   }
 
   // Authoritative Server-Side Image Intake & Media Artifact Management
-  if (type === "image" && (content || metadata.bytes) && !metadata.mediaArtifactId) {
+  if (type === "image" && (metadata.bytes || (typeof content === "string" && content.startsWith("data:image/"))) && !metadata.mediaArtifactId) {
     const rawBytes = metadata.bytes || content;
     const ingestRes = await MediaArtifactService.ingestImage({
       bytes: rawBytes,
@@ -190,9 +205,12 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
     metadata.mimeType = ingestRes.artifact.mimeType;
     metadata.width = ingestRes.artifact.width;
     metadata.height = ingestRes.artifact.height;
-    metadata.fileSize = ingestRes.artifact.byteSize;
-    // Strip large base64 so downstream stages reference mediaArtifactId + imageHash
-    delete metadata.bytes;
+    // Retain magic byte prefix (32 bytes) so Layer 1 FileDetector / NormalizationService validates successfully
+    if (ingestRes.artifact.buffer) {
+      metadata.bytes = Array.from(ingestRes.artifact.buffer.subarray(0, 32));
+    } else {
+      delete metadata.bytes;
+    }
   }
 
   // Authoritative Server-Side QR Intake Screening
@@ -207,25 +225,34 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
   if (body?.version === "v5") {
     const idempotency = idempotencyKeyFor(request, principal, requestId);
     if (idempotency.error) return idempotency.error;
-    if (wantsV5Stream(request, body)) return streamV5Pipeline(request, input, requestId, principal, idempotency.value);
+    const canonicalCaseId = (input.scope?.caseId && /^[0-9a-f-]{36}$/i.test(input.scope.caseId))
+      ? input.scope.caseId
+      : randomUUID();
+    if (!input.scope) input.scope = {};
+    input.scope.caseId = canonicalCaseId;
+    input.scope.caseRevision = 1;
+
     const pipeline = await createTrustOrchestrator().run(input, {
       requestId,
       signal: request.signal,
       useAIGateway: true,
       aiMode: "GEMINI_ONLY",
       onL1ClaimReady: ({ l1Result, input: currentInput, pipeline: currentPipeline }) => {
+        if (currentPipeline) currentPipeline.caseId = canonicalCaseId;
         const ownerId = principal?.subjectId ? String(principal.subjectId).replace(/^(student|expert|user):/, "") : null;
-        const caseId = currentPipeline?.verificationId || requestId;
         void ExpertBlindReviewDispatcher.dispatchOnL1ClaimReady({
-          caseId,
+          caseId: canonicalCaseId,
           caseRevision: 1,
           ownerId,
           input: currentInput,
           l1Result,
           requestId,
-        }).catch(() => {});
+        }).catch((err) => {
+          console.error("[ExpertBlindReviewDispatcher] non-stream dispatch error:", err);
+        });
       },
     });
+    pipeline.caseId = canonicalCaseId;
     let persistence = { persisted: false, caseId: null };
     if (principal?.isAuthenticated) {
       try {

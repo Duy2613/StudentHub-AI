@@ -176,7 +176,14 @@ export function TrustCriticalShell({ mode = "image", content = "", onActivate, o
 
 export default function TrustWorkspaceClient() {
   const [TrustWorkspace, setTrustWorkspace] = useState(null);
-  const [requestedMode, setRequestedMode] = useState("image");
+  const [requestedMode, setRequestedMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      const m = p.get("mode") || p.get("tab");
+      if (m && MODES.includes(m.toLowerCase())) return m.toLowerCase();
+    }
+    return "image";
+  });
   const [draftContent, setDraftContent] = useState("");
   const [sourceProvenance, setSourceProvenance] = useState(null);
 

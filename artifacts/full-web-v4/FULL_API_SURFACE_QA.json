@@ -1,0 +1,1214 @@
+[
+  {
+    "endpoint": "/api/academic/command-center",
+    "filePath": "frontend/src/app/api/academic/command-center/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/me/decision-studio/adopt",
+    "filePath": "frontend/src/app/api/academic/me/decision-studio/adopt/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/me/decision-studio",
+    "filePath": "frontend/src/app/api/academic/me/decision-studio/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/me/discrepancy-report",
+    "filePath": "frontend/src/app/api/academic/me/discrepancy-report/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/me/execution/reconcile",
+    "filePath": "frontend/src/app/api/academic/me/execution/reconcile/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/me/execution",
+    "filePath": "frontend/src/app/api/academic/me/execution/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/me/planner",
+    "filePath": "frontend/src/app/api/academic/me/planner/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/me/profile-360",
+    "filePath": "frontend/src/app/api/academic/me/profile-360/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/me/roadmap",
+    "filePath": "frontend/src/app/api/academic/me/roadmap/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/me/simulate",
+    "filePath": "frontend/src/app/api/academic/me/simulate/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/notifications",
+    "filePath": "frontend/src/app/api/academic/notifications/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/tasks/[taskId]",
+    "filePath": "frontend/src/app/api/academic/tasks/[taskId]/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/timetable/confirm",
+    "filePath": "frontend/src/app/api/academic/timetable/confirm/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/timetable/entries/[entryId]",
+    "filePath": "frontend/src/app/api/academic/timetable/entries/[entryId]/route.js",
+    "methods": [
+      "PATCH",
+      "DELETE"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/timetable/import",
+    "filePath": "frontend/src/app/api/academic/timetable/import/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/timetable/reminders",
+    "filePath": "frontend/src/app/api/academic/timetable/reminders/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/timetable/reminders/[reminderId]",
+    "filePath": "frontend/src/app/api/academic/timetable/reminders/[reminderId]/route.js",
+    "methods": [
+      "DELETE"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/timetable",
+    "filePath": "frontend/src/app/api/academic/timetable/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/academic/timetable/[timetableId]",
+    "filePath": "frontend/src/app/api/academic/timetable/[timetableId]/route.js",
+    "methods": [
+      "PATCH",
+      "DELETE"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai/trust/audit/[answerId]",
+    "filePath": "frontend/src/app/api/ai/trust/audit/[answerId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai/trust/claims/[claimId]",
+    "filePath": "frontend/src/app/api/ai/trust/claims/[claimId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai/trust/evaluate",
+    "filePath": "frontend/src/app/api/ai/trust/evaluate/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai/trust/evaluations/[evaluationId]",
+    "filePath": "frontend/src/app/api/ai/trust/evaluations/[evaluationId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai/trust/evidence/[evidenceId]",
+    "filePath": "frontend/src/app/api/ai/trust/evidence/[evidenceId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai/trust/verify-claim",
+    "filePath": "frontend/src/app/api/ai/trust/verify-claim/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai-trust/evidence",
+    "filePath": "frontend/src/app/api/ai-trust/evidence/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai-trust/observatory",
+    "filePath": "frontend/src/app/api/ai-trust/observatory/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai-trust/ocr",
+    "filePath": "frontend/src/app/api/ai-trust/ocr/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai-trust/reasoning",
+    "filePath": "frontend/src/app/api/ai-trust/reasoning/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai-trust/reputation",
+    "filePath": "frontend/src/app/api/ai-trust/reputation/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai-trust/screen",
+    "filePath": "frontend/src/app/api/ai-trust/screen/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/ai-trust/semantic",
+    "filePath": "frontend/src/app/api/ai-trust/semantic/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/auth/session/exchange",
+    "filePath": "frontend/src/app/api/auth/session/exchange/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "AUTHENTICATED",
+    "action": "UPSTREAM_OIDC_EXCHANGE"
+  },
+  {
+    "endpoint": "/api/auth/session/logout",
+    "filePath": "frontend/src/app/api/auth/session/logout/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "AUTHENTICATED",
+    "action": "SESSION_LOGOUT"
+  },
+  {
+    "endpoint": "/api/auth/session",
+    "filePath": "frontend/src/app/api/auth/session/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "AUTHENTICATED",
+    "action": "SESSION_READ"
+  },
+  {
+    "endpoint": "/api/chat",
+    "filePath": "frontend/src/app/api/chat/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/community/experience/evaluate",
+    "filePath": "frontend/src/app/api/community/experience/evaluate/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/community/experiences",
+    "filePath": "frontend/src/app/api/community/experiences/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/community/social",
+    "filePath": "frontend/src/app/api/community/social/route.js",
+    "methods": [
+      "GET",
+      "POST",
+      "PATCH"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/appeals/review",
+    "filePath": "frontend/src/app/api/expert/appeals/review/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/appeals",
+    "filePath": "frontend/src/app/api/expert/appeals/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/assessments",
+    "filePath": "frontend/src/app/api/expert/assessments/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/assignments",
+    "filePath": "frontend/src/app/api/expert/assignments/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/blind-reviews",
+    "filePath": "frontend/src/app/api/expert/blind-reviews/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/blind-reviews/[assignmentId]",
+    "filePath": "frontend/src/app/api/expert/blind-reviews/[assignmentId]/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/evaluate",
+    "filePath": "frontend/src/app/api/expert/evaluate/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/graph",
+    "filePath": "frontend/src/app/api/expert/graph/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/profile/[expertId]",
+    "filePath": "frontend/src/app/api/expert/profile/[expertId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/qualification/practice/review",
+    "filePath": "frontend/src/app/api/expert/qualification/practice/review/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/qualification/practice",
+    "filePath": "frontend/src/app/api/expert/qualification/practice/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/qualification/quiz/answers",
+    "filePath": "frontend/src/app/api/expert/qualification/quiz/answers/route.js",
+    "methods": [
+      "PUT"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/qualification/quiz",
+    "filePath": "frontend/src/app/api/expert/qualification/quiz/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/qualification/quiz/submit",
+    "filePath": "frontend/src/app/api/expert/qualification/quiz/submit/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/qualification/review",
+    "filePath": "frontend/src/app/api/expert/qualification/review/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/qualification",
+    "filePath": "frontend/src/app/api/expert/qualification/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/quality",
+    "filePath": "frontend/src/app/api/expert/quality/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/review-requests",
+    "filePath": "frontend/src/app/api/expert/review-requests/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/expert/reviews",
+    "filePath": "frontend/src/app/api/expert/reviews/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/experts/me",
+    "filePath": "frontend/src/app/api/experts/me/route.js",
+    "methods": [
+      "GET",
+      "PUT",
+      "PATCH"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/forum/posts",
+    "filePath": "frontend/src/app/api/forum/posts/route.js",
+    "methods": [
+      "GET",
+      "PATCH",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/forum/vote",
+    "filePath": "frontend/src/app/api/forum/vote/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/health/live",
+    "filePath": "frontend/src/app/api/health/live/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/health/ready",
+    "filePath": "frontend/src/app/api/health/ready/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/claims/[claimId]",
+    "filePath": "frontend/src/app/api/intelligence/claims/[claimId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/consensus",
+    "filePath": "frontend/src/app/api/intelligence/community/consensus/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/contributions/preview",
+    "filePath": "frontend/src/app/api/intelligence/community/contributions/preview/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/contributions/[contributionId]",
+    "filePath": "frontend/src/app/api/intelligence/community/contributions/[contributionId]/route.js",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/corrections",
+    "filePath": "frontend/src/app/api/intelligence/community/corrections/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/evaluate",
+    "filePath": "frontend/src/app/api/intelligence/community/evaluate/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/experiences/[experienceId]",
+    "filePath": "frontend/src/app/api/intelligence/community/experiences/[experienceId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/feedback",
+    "filePath": "frontend/src/app/api/intelligence/community/feedback/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/friction",
+    "filePath": "frontend/src/app/api/intelligence/community/friction/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/posts",
+    "filePath": "frontend/src/app/api/intelligence/community/posts/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/query",
+    "filePath": "frontend/src/app/api/intelligence/community/query/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/reality-gaps",
+    "filePath": "frontend/src/app/api/intelligence/community/reality-gaps/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/search",
+    "filePath": "frontend/src/app/api/intelligence/community/search/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/topics/[topicId]",
+    "filePath": "frontend/src/app/api/intelligence/community/topics/[topicId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/community/track-record",
+    "filePath": "frontend/src/app/api/intelligence/community/track-record/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/contradictions/[claimId]",
+    "filePath": "frontend/src/app/api/intelligence/contradictions/[claimId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/experts/disagreements",
+    "filePath": "frontend/src/app/api/intelligence/experts/disagreements/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/experts/resolve",
+    "filePath": "frontend/src/app/api/intelligence/experts/resolve/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/experts",
+    "filePath": "frontend/src/app/api/intelligence/experts/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/experts/verify-claim",
+    "filePath": "frontend/src/app/api/intelligence/experts/verify-claim/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/experts/[expertId]/claims",
+    "filePath": "frontend/src/app/api/intelligence/experts/[expertId]/claims/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/experts/[expertId]/evidence",
+    "filePath": "frontend/src/app/api/intelligence/experts/[expertId]/evidence/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/experts/[expertId]",
+    "filePath": "frontend/src/app/api/intelligence/experts/[expertId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/fusion/evaluate",
+    "filePath": "frontend/src/app/api/intelligence/fusion/evaluate/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/fusion/objects/[knowledgeObjectId]/conflicts",
+    "filePath": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/conflicts/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/fusion/objects/[knowledgeObjectId]/evidence",
+    "filePath": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/evidence/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/fusion/objects/[knowledgeObjectId]/history",
+    "filePath": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/history/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/fusion/objects/[knowledgeObjectId]",
+    "filePath": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/fusion/objects/[knowledgeObjectId]/unknowns",
+    "filePath": "frontend/src/app/api/intelligence/fusion/objects/[knowledgeObjectId]/unknowns/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/health",
+    "filePath": "frontend/src/app/api/intelligence/health/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/recommendations",
+    "filePath": "frontend/src/app/api/intelligence/recommendations/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/reputation/[subjectId]",
+    "filePath": "frontend/src/app/api/intelligence/reputation/[subjectId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/social/early-warnings",
+    "filePath": "frontend/src/app/api/intelligence/social/early-warnings/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/social/signals",
+    "filePath": "frontend/src/app/api/intelligence/social/signals/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/social/sources",
+    "filePath": "frontend/src/app/api/intelligence/social/sources/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/social/sync",
+    "filePath": "frontend/src/app/api/intelligence/social/sync/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/intelligence/trust/[subjectId]",
+    "filePath": "frontend/src/app/api/intelligence/trust/[subjectId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/personalization/briefing",
+    "filePath": "frontend/src/app/api/personalization/briefing/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/personalization/command-center",
+    "filePath": "frontend/src/app/api/personalization/command-center/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/personalization/devices/revoke",
+    "filePath": "frontend/src/app/api/personalization/devices/revoke/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/personalization/devices",
+    "filePath": "frontend/src/app/api/personalization/devices/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/personalization/digital-twin",
+    "filePath": "frontend/src/app/api/personalization/digital-twin/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/personalization/goals",
+    "filePath": "frontend/src/app/api/personalization/goals/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/personalization/memory",
+    "filePath": "frontend/src/app/api/personalization/memory/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/personalization/preferences",
+    "filePath": "frontend/src/app/api/personalization/preferences/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/personalization/reset",
+    "filePath": "frontend/src/app/api/personalization/reset/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/personalization/search",
+    "filePath": "frontend/src/app/api/personalization/search/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/public/catalog",
+    "filePath": "frontend/src/app/api/public/catalog/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/public/discovery",
+    "filePath": "frontend/src/app/api/public/discovery/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/public/research",
+    "filePath": "frontend/src/app/api/public/research/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/public/weather",
+    "filePath": "frontend/src/app/api/public/weather/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/realtime/broadcast",
+    "filePath": "frontend/src/app/api/realtime/broadcast/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/realtime/stream",
+    "filePath": "frontend/src/app/api/realtime/stream/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/safety-map/reports",
+    "filePath": "frontend/src/app/api/safety-map/reports/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/scholarships/list",
+    "filePath": "frontend/src/app/api/scholarships/list/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/scholarships/match-profile",
+    "filePath": "frontend/src/app/api/scholarships/match-profile/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/sos/bank-hotlines",
+    "filePath": "frontend/src/app/api/sos/bank-hotlines/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/sos/generate-complaint",
+    "filePath": "frontend/src/app/api/sos/generate-complaint/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/student/identity",
+    "filePath": "frontend/src/app/api/student/identity/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/student/records",
+    "filePath": "frontend/src/app/api/student/records/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/users/me",
+    "filePath": "frontend/src/app/api/users/me/route.js",
+    "methods": [
+      "GET",
+      "PUT",
+      "PATCH"
+    ],
+    "securityPattern": "STANDARD_HANDLER"
+  },
+  {
+    "endpoint": "/api/users/profile",
+    "filePath": "frontend/src/app/api/users/profile/route.js",
+    "methods": [
+      "GET",
+      "PUT",
+      "PATCH"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/users/verify-edu",
+    "filePath": "frontend/src/app/api/users/verify-edu/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/academic",
+    "filePath": "frontend/src/app/api/v1/academic/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/community",
+    "filePath": "frontend/src/app/api/v1/community/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/dashboard",
+    "filePath": "frontend/src/app/api/v1/dashboard/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/decisions",
+    "filePath": "frontend/src/app/api/v1/decisions/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/experts",
+    "filePath": "frontend/src/app/api/v1/experts/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/integrations/aidrive",
+    "filePath": "frontend/src/app/api/v1/integrations/aidrive/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/integrations/labbe",
+    "filePath": "frontend/src/app/api/v1/integrations/labbe/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/notifications",
+    "filePath": "frontend/src/app/api/v1/notifications/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/passports",
+    "filePath": "frontend/src/app/api/v1/passports/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/passports/[passportId]",
+    "filePath": "frontend/src/app/api/v1/passports/[passportId]/route.js",
+    "methods": [
+      "GET",
+      "PATCH"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/reports",
+    "filePath": "frontend/src/app/api/v1/reports/route.js",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/reports/[reportId]",
+    "filePath": "frontend/src/app/api/v1/reports/[reportId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/search",
+    "filePath": "frontend/src/app/api/v1/search/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/trust/analyze",
+    "filePath": "frontend/src/app/api/v1/trust/analyze/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/trust/cases",
+    "filePath": "frontend/src/app/api/v1/trust/cases/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/trust/cases/[caseId]/community-signals",
+    "filePath": "frontend/src/app/api/v1/trust/cases/[caseId]/community-signals/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/trust/cases/[caseId]",
+    "filePath": "frontend/src/app/api/v1/trust/cases/[caseId]/route.js",
+    "methods": [
+      "GET"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/trust/continue",
+    "filePath": "frontend/src/app/api/v1/trust/continue/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/v1/trust",
+    "filePath": "frontend/src/app/api/v1/trust/route.js",
+    "methods": [
+      "POST"
+    ],
+    "securityPattern": "SECURITY_FABRIC"
+  },
+  {
+    "endpoint": "/api/[...path]",
+    "filePath": "frontend/src/app/api/[...path]/route.js",
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "PATCH",
+      "OPTIONS"
+    ],
+    "securityPattern": "STANDARD_HANDLER"
+  }
+]

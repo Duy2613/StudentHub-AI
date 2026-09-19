@@ -485,6 +485,7 @@ export class TrustPipelineOrchestrator {
           startAttempt: retryStageId === stageId && retrySource ? (Number(pipeline.stages[stageId]?.audit?.attemptCount) || 0) + 1 : 1,
           useAIGateway: options.useAIGateway === true,
           aiMode: options.aiMode || "GEMINI_ONLY",
+          onL1ClaimReady: options.onL1ClaimReady,
         });
         if (stageStatus === PIPELINE_STATUS.PARTIAL) partial = true;
 

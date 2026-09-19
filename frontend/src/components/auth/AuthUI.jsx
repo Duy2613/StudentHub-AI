@@ -85,12 +85,7 @@ export const InputField = ({ label, id, name, type = "text", icon: Icon, helperT
           id={id}
           name={name || id}
           type={type}
-          readOnly={!isInteractive}
-          onMouseDown={enableInteraction}
-          onTouchStart={enableInteraction}
-          onKeyDown={enableInteraction}
           onFocus={(e) => {
-            enableInteraction();
             setIsFocused(true);
             if (onFocus) onFocus(e);
           }}
@@ -142,12 +137,7 @@ export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) =>
           id={id}
           name={name || id}
           type={showPassword ? "text" : "password"}
-          readOnly={!isInteractive}
-          onMouseDown={enableInteraction}
-          onTouchStart={enableInteraction}
-          onKeyDown={enableInteraction}
           onFocus={(e) => {
-            enableInteraction();
             setIsFocused(true);
             if (onFocus) onFocus(e);
           }}

@@ -183,13 +183,21 @@ export default function ExpertReviewDeskModal({
               </div>
             </div>
 
-            {!hasBoundAssignment && (
-              <div className="mb-4 flex items-start gap-2 rounded border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-100" role="alert">
-                <AlertCircle size={16} className="mt-0.5 shrink-0" />
-                <span>Review Desk chỉ mở biểu mẫu khi có assignment, case revision và mệnh đề do server bind.</span>
+            {!hasBoundAssignment ? (
+              <div className="review-desk-empty-state text-center py-10 px-4 space-y-3" role="status" aria-label="Bàn giám định trống">
+                <CheckCircle2 size={36} className="mx-auto text-emerald-400/80" />
+                <h4 className="text-sm font-semibold text-slate-100">Bàn giám định hiện không có ca tồn đọng</h4>
+                <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
+                  Hiện tại bạn không có hồ sơ Trust nào được phân công chờ giám định độc lập. Khi có yêu cầu thẩm định mới từ hệ thống hoặc người dùng, nhiệm vụ sẽ tự động xuất hiện tại đây và trên widget nổi.
+                </p>
+                <div className="pt-2">
+                  <span className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+                    Trạng thái: Sẵn sàng nhận phân công
+                  </span>
+                </div>
               </div>
-            )}
-
+            ) : (
+              <>
             {/* JURISDICTION CONFIRMATION */}
             <div className="mb-4">
               <label className="text-xs text-slate-300 font-medium block mb-1.5">
@@ -309,27 +317,41 @@ export default function ExpertReviewDeskModal({
               />
               <span>Tôi xác nhận không có xung đột lợi ích với case này.</span>
             </label>
+            </>
+          )}
           </div>
 
           {submitError && <p className="mb-3 flex items-start gap-2 text-xs text-rose-200" role="alert"><AlertCircle size={15} className="mt-0.5 shrink-0" />{submitError}</p>}
           {submitted && <p className="mb-3 flex items-start gap-2 text-xs text-emerald-200" role="status"><CheckCircle2 size={15} className="mt-0.5 shrink-0" />Đánh giá đã được gửi qua kênh server và không thay đổi phán quyết Trust.</p>}
-          <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-xs text-slate-400 hover:text-slate-200 font-mono"
-            >
-              Hủy bỏ
-            </button>
-            <button
-              type="submit"
-              disabled={!hasBoundAssignment || submitting || submitted || !assessment.trim() || !limitations.trim() || !coiDeclared}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-200 text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
-            >
-              <CheckCircle2 size={14} />
-              {submitting ? "Đang lưu..." : "Ký & Ban hành Giám định"}
-            </button>
-          </div>
+          {hasBoundAssignment ? (
+            <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-xs text-slate-400 hover:text-slate-200 font-mono"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="submit"
+                disabled={!hasBoundAssignment || submitting || submitted || !assessment.trim() || !limitations.trim() || !coiDeclared}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-200 text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
+              >
+                <CheckCircle2 size={14} />
+                {submitting ? "Đang lưu..." : "Ký & Ban hành Giám định"}
+              </button>
+            </div>
+          ) : (
+            <div className="pt-3 border-t border-white/10 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition-all"
+              >
+                Đóng bàn giám định
+              </button>
+            </div>
+          )}
         </form>
       </div>
     </div>

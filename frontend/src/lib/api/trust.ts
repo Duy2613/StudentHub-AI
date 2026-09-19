@@ -191,7 +191,7 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
         headers: {
           Accept: "text/event-stream, application/json",
           "Content-Type": "application/json",
-          ...(requestId ? { "X-Request-ID": requestId.slice(0, 120) } : {}),
+          ...(requestId ? { "X-Request-ID": requestId.slice(0, 120), "x-correlation-id": requestId.slice(0, 120) } : {}),
           ...(idempotencyKey && /^[A-Za-z0-9._:-]{1,160}$/.test(idempotencyKey.trim()) ? { "Idempotency-Key": idempotencyKey.trim().slice(0, 160) } : {}),
         },
       });
