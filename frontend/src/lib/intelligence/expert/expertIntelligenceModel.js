@@ -25,6 +25,8 @@
  * ==================================================================================
  */
 
+import { clampReputationScore } from "../../expert/reputationScore.js";
+
 import crypto from "node:crypto";
 import { createSecureId } from "../../security/secureId.js";
 
@@ -197,7 +199,7 @@ export class ExpertIntelligenceModel {
       evidenceRefs: Object.freeze(evidenceRefs),
       hasRegistrarAuthority,
       isVerified,
-      reputationScore: Number(data.reputationScore ?? 85),
+      reputationScore: clampReputationScore(data.reputationScore ?? 85),
       verifiedAt: data.verifiedAt || data.lastVerifiedAt || new Date().toISOString(),
       lastVerifiedAt: data.lastVerifiedAt || data.verifiedAt || new Date().toISOString(),
       lastCheckedAt: data.lastCheckedAt || new Date().toISOString(),

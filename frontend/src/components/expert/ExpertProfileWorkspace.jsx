@@ -28,6 +28,7 @@ import { EXPERT_LIFECYCLE_STATE, normalizeExpertLifecycleState } from "@/lib/aut
 import { apiRequest } from "@/lib/api/runtimeClient";
 import { apiErrorMessage } from "@/lib/api/runtimeError";
 import { createSecureId } from "@/lib/security/secureId";
+import { clampReputationScore, MAX_REPUTATION_SCORE } from "@/lib/expert/reputationScore";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import ExpertQualificationPanel from "./ExpertQualificationPanel";
 import ExpertReviewDeskModal from "./ExpertReviewDeskModal";
@@ -210,7 +211,7 @@ export default function ExpertProfileWorkspace() {
   const publicBio = expert.bio || "Chưa có tiểu sử chuyên gia.";
   const publicExpertise = expert.expertise || "Chưa có tóm tắt chuyên môn.";
   const starLevel = reputation.starLevel ?? null;
-  const repPoints = reputation.reputation ?? 0;
+  const repPoints = clampReputationScore(reputation.reputation ?? 0);
   const completedReviews = reputation.completedReviews ?? work.completed ?? 0;
 
   return (
@@ -251,7 +252,7 @@ export default function ExpertProfileWorkspace() {
                   </span>
                 )}
                 <span className="inline-flex items-center gap-1 font-mono text-slate-300">
-                  <Scale size={13} /> Uy tín: {repPoints} pts
+                  <Scale size={13} /> Uy tín: {repPoints}/{MAX_REPUTATION_SCORE} pts
                 </span>
                 <span className="inline-flex items-center gap-1 font-mono text-slate-300">
                   <FileCheck size={13} /> Giám định hoàn thành: {completedReviews}
@@ -457,7 +458,7 @@ export default function ExpertProfileWorkspace() {
                   </h3>
                 </div>
                 <p className="text-slate-400 leading-relaxed text-[11px]">
-                  Điểm uy tín (Reputation: {repPoints}) phản ánh khối lượng và chất lượng đóng góp thực tế trên nền tảng theo chính sách máy chủ.
+                  Điểm uy tín (Reputation: {repPoints}/{MAX_REPUTATION_SCORE}) phản ánh khối lượng và chất lượng đóng góp thực tế trên nền tảng theo chính sách máy chủ.
                 </p>
                 <div className="p-2 rounded bg-white/[0.02] border border-white/5 text-[10px] text-slate-500 space-y-1">
                   <div><strong>Không phải</strong> xác suất chân lý của phát biểu.</div>

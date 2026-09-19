@@ -7,6 +7,8 @@ import {
   STAR_THRESHOLDS,
   REPUTATION_DELTAS,
   REWARD_EVENTS_PER_NORMAL_ASSESSMENT,
+  MAX_REPUTATION_SCORE,
+  clampReputationScore,
 } from "../../src/lib/server/expert/ExpertReputationPolicy.js";
 
 test("ExpertReputationPolicy exports canonical constants and thresholds", () => {
@@ -15,6 +17,10 @@ test("ExpertReputationPolicy exports canonical constants and thresholds", () => 
   assert.equal(REWARD_EVENTS_PER_NORMAL_ASSESSMENT, 1);
   assert.equal(REPUTATION_DELTAS.EXPERT_ASSESSMENT_COMPLETED, 5);
   assert.equal(REPUTATION_DELTAS.EXPERT_REVIEW_ACCEPTED, 0);
+  assert.equal(MAX_REPUTATION_SCORE, 100);
+  assert.equal(clampReputationScore(470), 100);
+  assert.equal(clampReputationScore(-10), 0);
+  assert.equal(clampReputationScore(72.5), 72.5);
 
   assert.deepEqual(STAR_THRESHOLDS.STAR_5, { starLevel: 5, minCompletedReviews: 50, minReputation: 250 });
   assert.deepEqual(STAR_THRESHOLDS.STAR_4, { starLevel: 4, minCompletedReviews: 30, minReputation: 150 });

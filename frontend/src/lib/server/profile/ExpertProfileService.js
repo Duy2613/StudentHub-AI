@@ -10,7 +10,7 @@
 import { getPostgresPool } from "../database/PostgresPool.js";
 import { ExpertQualificationService, authenticatedUserId } from "../expert/ExpertQualificationService.js";
 import { ExpertRepository } from "../database/ExpertRepository.js";
-import { ExpertReputationPolicy } from "../expert/ExpertReputationPolicy.js";
+import { ExpertReputationPolicy, clampReputationScore, MAX_REPUTATION_SCORE } from "../expert/ExpertReputationPolicy.js";
 
 const EXPERT_ALLOWED_UPDATE_FIELDS = new Set([
   "bio",
@@ -195,6 +195,7 @@ export class ExpertProfileService {
 
     const repRow = reputationResult.rows[0] || {};
     const reputationTotal = Number(repRow?.reputation || 0);
+    const reputationScore = clampReputationScore(reputationTotal);
     const completedCount = workCounts.completed;
     const isActive = qualification?.state === "ACTIVE" || (verifiedDomains.length > 0 && qualification?.state === "DOMAIN_VERIFIED");
 
@@ -239,9 +240,10 @@ export class ExpertProfileService {
       },
       reputation: {
         starLevel,
-        reputation: reputationTotal,
+        reputation: reputationScore,
+        maxScore: MAX_REPUTATION_SCORE,
         completedReviews: completedCount,
-        policyNotice: "Reputation reflects platform contribution under server-owned policy. It is not truth probability.",
+        policyNotice: `Reputation reflects platform contribution under server-owned policy on a 0-${MAX_REPUTATION_SCORE} scale. It is not truth probability.`,
       },
       work: workCounts,
       tasks: reviewDeskTasks,

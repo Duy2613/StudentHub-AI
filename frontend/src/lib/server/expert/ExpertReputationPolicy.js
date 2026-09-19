@@ -5,7 +5,10 @@
  * Client mutation of starLevel, reputation, and completedReviews is strictly prohibited.
  */
 
+import { clampReputationScore, MAX_REPUTATION_SCORE } from "../../expert/reputationScore.js";
+
 export const EXPERT_REPUTATION_POLICY_VERSION = "EXPERT_REPUTATION_POLICY_V1";
+export { clampReputationScore, MAX_REPUTATION_SCORE };
 
 export const STAR_THRESHOLDS = Object.freeze({
   STAR_5: Object.freeze({ starLevel: 5, minCompletedReviews: 50, minReputation: 250 }),
