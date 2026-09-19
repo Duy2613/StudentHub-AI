@@ -47,6 +47,9 @@ export const LAYER_1_REASONS = {
   // Social Engineering & Scam Patterns
   ADVANCE_FEE_SCAM: "advance_fee_scam",
   TASK_DEPOSIT_SCAM: "task_deposit_scam",
+  AUTHORITY_PAYMENT_DEMAND: "authority_payment_demand",
+  PERSONAL_TRANSFER_IMPERSONATION: "personal_transfer_impersonation",
+  GUARANTEED_RETURN_SCAM: "guaranteed_return_scam",
   REWARD_SCAM_PATTERN: "reward_scam_pattern",
   LOTTERY_PRIZE_SCAM: "lottery_prize_scam",
   URGENCY_PATTERN: "urgency_pattern",
@@ -71,8 +74,13 @@ export const LAYER_1_REASONS = {
   // OCR & QR
   OCR_PHISHING_PATTERN: "ocr_phishing_pattern",
   OCR_PHISHING_TEXT_DETECTED: "ocr_phishing_text_detected",
+  PAYMENT_PROOF_FRAUD: "payment_proof_fraud",
+  DOCUMENT_TAMPERING: "document_tampering",
   QR_MALICIOUS_URL: "qr_malicious_url",
   QR_CONTAINS_MALICIOUS_URL: "qr_contains_malicious_url",
+  QR_PAYMENT_REQUEST: "qr_payment_request",
+  QR_ACTION_URI: "qr_action_uri",
+  QR_UNTRUSTED_APP_SCHEME: "qr_untrusted_app_scheme",
 
   // Network & Security
   SSRF_ATTEMPT: "ssrf_attempt",

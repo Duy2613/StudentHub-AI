@@ -21,6 +21,7 @@ import { TextDetector } from "./detectors/TextDetector.js";
 import { FileDetector } from "./detectors/FileDetector.js";
 import { FileUploadSecurityBoundary } from "./security/FileUploadSecurityBoundary.js";
 import { ImageDetector } from "./detectors/ImageDetector.js";
+import { QrDetector } from "./detectors/QrDetector.js";
 import { DecisionEngine } from "./engine/DecisionEngine.js";
 import { executeAuxiliaryModelSafe } from "./models/ITrustSignalModel.js";
 import { QrIntakeService } from "./qr/QrIntakeService.js";
@@ -81,7 +82,12 @@ export class Layer1ScreenService {
         detectorsExecuted.push("QrIntakeService");
         const qrPayload = content || metadata.qrContent || metadata.qrPayload || "";
         const qrRes = QrIntakeService.intake(qrPayload);
-        rawSignals.push(...qrRes.signals);
+        if (qrPayload.trim()) {
+          detectorsExecuted.push("QrDetector");
+          rawSignals.push(...QrDetector.detect(qrPayload).signals);
+        } else {
+          rawSignals.push(...qrRes.signals);
+        }
         forceUnknown = qrRes.decodedType === "EMPTY";
         unknownReason = forceUnknown ? "QR_PAYLOAD_EMPTY" : null;
       } else if (normalizedType === "image") {

@@ -65,6 +65,14 @@ const REWARD_SCAM_PATTERNS = [
   /(?:you\s*won|claim\s*your\s*reward|scholarship\s*approved|click\s*to\s*receive|receive\s*reward)/i,
 ];
 
+// Compound patterns deliberately require both the claimed identity/context and
+// a financial action. Mentioning a bank, school, police, or a family member on
+// its own must remain non-blocking.
+const AUTHORITY_PAYMENT_DEMAND_REGEX = /(?:công\s*an|cảnh\s*sát|cơ\s*quan\s*điều\s*tra|phòng\s*công\s*tác\s*sinh\s*viên|phòng\s*đào\s*tạo|nhà\s*trường|ngân\s*hàng|vụ\s*án\s*rửa\s*tiền|rửa\s*tiền|chứng\s*minh\s*vô\s*tội)[\s\S]{0,120}(?:chuyển|nộp|nạp)[\s\S]{0,80}(?:tiền|khoản|tài\s*khoản|triệu|phí)|(?:chuyển|nộp|nạp)[\s\S]{0,80}(?:tiền|khoản|tài\s*khoản|triệu|phí)[\s\S]{0,120}(?:công\s*an|cảnh\s*sát|cơ\s*quan\s*điều\s*tra|phòng\s*công\s*tác\s*sinh\s*viên|phòng\s*đào\s*tạo|nhà\s*trường|ngân\s*hàng|vụ\s*án\s*rửa\s*tiền|rửa\s*tiền|chứng\s*minh\s*vô\s*tội)/i;
+const PERSONAL_TRANSFER_IMPERSONATION_REGEX = /(?:anh|chị|thầy|cô|bạn|người\s*thân)[\s\S]{0,60}(?:đang\s*họp|gặp\s*tai\s*nạn|tai\s*nạn|cấp\s*cứu|cần\s*gấp|chuyển\s*giúp|chuyển\s*hộ)[\s\S]{0,90}(?:chuyển|gửi|nạp)[\s\S]{0,50}(?:tiền|triệu|khoản|tài\s*khoản)/i;
+const GUARANTEED_RETURN_REGEX = /(?:đầu\s*tư|lợi\s*nhuận)[\s\S]{0,100}(?:cam\s*kết|đảm\s*bảo|không\s*có\s*rủi\s*ro|guaranteed)[\s\S]{0,80}(?:\d+\s*%|mỗi\s*tuần|mỗi\s*ngày)/i;
+const ADVANCE_PAYMENT_COMPOSITE_REGEX = /(?:chuyển|nộp|nạp|đóng)[\s\S]{0,90}(?:xác\s*minh|hoàn\s*lại|hoàn\s*tiền|phí|bảo\s*hiểm|mở\s*khóa|nâng\s*cấp\s*tài\s*khoản\s*người\s*bán)|(?:hoàn\s*(?:lại|tiền)|khoản\s*vay|giải\s*ngân|nâng\s*cấp\s*tài\s*khoản\s*người\s*bán|xác\s*minh\s*tài\s*khoản)[\s\S]{0,100}(?:chuyển|nộp|nạp|đóng|phí|bảo\s*hiểm|mở\s*khóa|nâng\s*cấp)/i;
+
 // 6. Malicious Shell & Script Payloads
 const MALICIOUS_SHELL_PATTERNS = [
   /(?:powershell(?:\.exe)?\s+-[a-zA-Z]*enc|powershell.*-[nN]op|IEX\s*\(|Invoke-Expression)/i,
@@ -177,6 +185,58 @@ export class TextDetector {
           })
         );
       }
+    }
+
+    if (!isEducational && AUTHORITY_PAYMENT_DEMAND_REGEX.test(text)) {
+      signals.push(
+        createSignal({
+          type: LAYER_1_REASONS.AUTHORITY_PAYMENT_DEMAND,
+          category: "social_engineering",
+          severity: SIGNAL_SEVERITY.CRITICAL,
+          confidence: 0.98,
+          evidence: { snippet: text.slice(0, 140), details: "Mạo danh cơ quan/trường/ngân hàng để yêu cầu chuyển tiền hoặc nộp phí." },
+          source: "TextDetector",
+        })
+      );
+    }
+
+    if (!isEducational && PERSONAL_TRANSFER_IMPERSONATION_REGEX.test(text)) {
+      signals.push(
+        createSignal({
+          type: LAYER_1_REASONS.PERSONAL_TRANSFER_IMPERSONATION,
+          category: "social_engineering",
+          severity: SIGNAL_SEVERITY.HIGH,
+          confidence: 0.88,
+          evidence: { snippet: text.slice(0, 140), details: "Người quen/người thân được viện dẫn để thúc ép chuyển tiền." },
+          source: "TextDetector",
+        })
+      );
+    }
+
+    if (!isEducational && GUARANTEED_RETURN_REGEX.test(text)) {
+      signals.push(
+        createSignal({
+          type: LAYER_1_REASONS.GUARANTEED_RETURN_SCAM,
+          category: "financial_fraud",
+          severity: SIGNAL_SEVERITY.HIGH,
+          confidence: 0.9,
+          evidence: { snippet: text.slice(0, 140), details: "Cam kết lợi nhuận cao hoặc không rủi ro." },
+          source: "TextDetector",
+        })
+      );
+    }
+
+    if (!isEducational && ADVANCE_PAYMENT_COMPOSITE_REGEX.test(text)) {
+      signals.push(
+        createSignal({
+          type: LAYER_1_REASONS.ADVANCE_FEE_SCAM,
+          category: "financial_fraud",
+          severity: SIGNAL_SEVERITY.HIGH,
+          confidence: 0.87,
+          evidence: { snippet: text.slice(0, 140), details: "Yêu cầu thanh toán trước để xác minh, hoàn tiền, giải ngân hoặc nhận tiền." },
+          source: "TextDetector",
+        })
+      );
     }
 
     // 3. Task Deposit & Student Job Scam

@@ -16,7 +16,7 @@ const INJECTION_PATTERNS = [
 const RULES = Object.freeze([
   {
     classification: "CREDENTIAL_HARVESTING",
-    phrases: ["mật khẩu", "password", "otp", "nhập otp", "mã otp", "gửi otp", "gui otp", "mã xác thực", "đăng nhập để xác minh", "xác minh tài khoản"],
+    phrases: ["mật khẩu", "password", "otp", "nhập otp", "mã otp", "gửi otp", "gui otp", "mã xác thực", "đăng nhập để xác minh"],
     score: 0.94,
     severity: "CRITICAL",
   },
@@ -24,6 +24,13 @@ const RULES = Object.freeze([
     classification: "ACCOUNT_TAKEOVER",
     phrases: ["khôi phục tài khoản", "mở khóa tài khoản", "tài khoản sẽ bị khóa", "chiếm quyền", "xác minh sinh viên"],
     requires: ["link", "ngay", "otp", "mật khẩu", "đăng nhập", "phí"],
+    score: 0.9,
+    severity: "HIGH",
+  },
+  {
+    classification: "ACCOUNT_VERIFICATION_SCAM",
+    phrases: ["xác minh tài khoản", "xác minh giao dịch", "verify account", "verify transaction"],
+    requires: ["chuyển tiền", "chuyển khoản", "phí", "nạp", "hoàn lại", "hoàn tiền", "mở khóa"],
     score: 0.9,
     severity: "HIGH",
   },
@@ -37,7 +44,7 @@ const RULES = Object.freeze([
   {
     classification: "TUITION_PAYMENT_SCAM",
     phrases: ["học phí", "tuition", "phòng tài vụ"],
-    requires: ["tài khoản cá nhân", "chuyển khoản", "qr", "gấp", "ngay", "đổi số tài khoản", "mã otp"],
+    requires: ["tài khoản cá nhân", "stk cá nhân", "chuyển khoản", "qr", "gấp", "ngay", "đổi số tài khoản", "mã otp"],
     score: 0.91,
     severity: "HIGH",
   },
@@ -70,7 +77,7 @@ const RULES = Object.freeze([
   },
   {
     classification: "FACULTY_IMPERSONATION",
-    phrases: ["giảng viên", "thầy", "cô", "khoa", "cố vấn học tập"],
+    phrases: ["giảng viên", "thầy ơi", "cô ơi", "thầy giáo", "cô giáo", "khoa đào tạo", "cố vấn học tập"],
     requires: ["chuyển khoản", "mật khẩu", "otp", "phí", "gấp", "ngay", "đặt cọc"],
     score: 0.82,
     severity: "HIGH",
@@ -98,7 +105,8 @@ const RULES = Object.freeze([
   },
   {
     classification: "PAYMENT_REDIRECTION",
-    phrases: ["tài khoản cá nhân", "số tài khoản mới", "đổi tài khoản nhận", "chuyển sang momo", "zalo pay", "zalopay"],
+    phrases: ["tài khoản cá nhân", "stk cá nhân", "số tài khoản mới", "đổi tài khoản nhận", "chuyển sang momo", "zalo pay", "zalopay"],
+    requires: ["chuyển tiền", "chuyển khoản", "thanh toán", "nộp", "nạp", "phí", "qr"],
     score: 0.89,
     severity: "HIGH",
   },
@@ -118,9 +126,51 @@ const RULES = Object.freeze([
   },
   {
     classification: "FAKE_REFUND",
-    phrases: ["hoàn học phí", "hoàn tiền", "refund"],
-    requires: ["otp", "mật khẩu", "chuyển khoản", "phí", "link", "đăng nhập"],
+    phrases: ["hoàn học phí", "hoàn tiền", "hoàn lại", "được hoàn", "refund"],
+    requires: ["otp", "mật khẩu", "chuyển", "chuyển tiền", "chuyển khoản", "phí", "link", "đăng nhập"],
     score: 0.88,
+    severity: "HIGH",
+  },
+  {
+    classification: "AUTHORITY_PAYMENT_SCAM",
+    phrases: ["công an", "cảnh sát", "cơ quan điều tra", "ngân hàng", "phòng công tác sinh viên", "nhà trường", "vụ án rửa tiền", "rửa tiền", "chứng minh vô tội", "tài khoản an toàn"],
+    requires: ["chuyển", "chuyển tiền", "chuyển khoản", "tài khoản an toàn", "mở khóa", "phí"],
+    score: 0.97,
+    severity: "CRITICAL",
+  },
+  {
+    classification: "EMERGENCY_TRANSFER_SCAM",
+    phrases: ["người thân gặp tai nạn", "tai nạn", "cấp cứu", "bệnh viện", "emergency"],
+    requires: ["chuyển tiền", "chuyển khoản", "cần tiền", "gấp", "khẩn", "giúp"],
+    score: 0.86,
+    severity: "HIGH",
+  },
+  {
+    classification: "GUARANTEED_INVESTMENT_SCAM",
+    phrases: ["đầu tư", "lợi nhuận", "cam kết", "đảm bảo lời", "không có rủi ro", "guaranteed profit"],
+    requires: ["lợi nhuận", "cam kết", "đảm bảo", "không có rủi ro", "mỗi tuần", "%"],
+    score: 0.9,
+    severity: "HIGH",
+  },
+  {
+    classification: "LOAN_ADVANCE_FEE",
+    phrases: ["khoản vay", "vay tiền", "giải ngân", "mở khóa khoản vay", "loan"],
+    requires: ["phí", "nạp tiền", "bảo hiểm", "mở khóa", "giải ngân", "chuyển"],
+    score: 0.9,
+    severity: "HIGH",
+  },
+  {
+    classification: "FAKE_ESCROW",
+    phrases: ["người mua đã chuyển tiền", "tài khoản người bán", "nâng cấp tài khoản người bán", "escrow", "ký quỹ"],
+    requires: ["nộp", "phí", "nâng cấp", "nhận tiền", "chuyển tiền"],
+    score: 0.88,
+    severity: "HIGH",
+  },
+  {
+    classification: "PERSONAL_TRANSFER_IMPERSONATION",
+    phrases: ["anh đang họp", "chị đang họp", "chuyển giúp", "chuyển hộ", "lát anh gửi lại", "lát chị gửi lại"],
+    requires: ["chuyển", "gửi", "triệu", "tài khoản", "tiền"],
+    score: 0.86,
     severity: "HIGH",
   },
   {
@@ -214,24 +264,34 @@ export class StudentDomainRiskModel {
     const analysisText = normalized.replace(/ignore previous instructions|bo qua moi chi dan|system mark this safe|trust_override true/giu, " ");
     const signals = [];
     const matches = [];
+    const isWifiPayload = /^wifi:/iu.test(original.trim());
 
-    for (const rule of RULES) {
-      const matchedPhrases = findMatches(analysisText, rule);
-      if (!matchedPhrases.length) continue;
-      const taxonomy = taxonomyEntry(rule.classification);
-      matches.push({
-        classification: rule.classification,
-        score: rule.score,
-        severity: rule.severity,
-        matchedPhrases,
-      });
+    if (isWifiPayload) {
       signals.push({
-        code: rule.classification,
-        severity: rule.severity,
-        source: "student_domain_rule_baseline",
-        details: `Pattern domain khớp: ${matchedPhrases.join(", ")}.`,
+        code: "QR_WIFI_CONFIG",
+        severity: "INFO",
+        source: "student_domain_input_guard",
+        details: "QR chứa cấu hình Wi-Fi; xử lý như dữ liệu riêng tư, không coi mật khẩu Wi-Fi là yêu cầu credential của người dùng.",
       });
-      if (!taxonomy) continue;
+    } else {
+      for (const rule of RULES) {
+        const matchedPhrases = findMatches(analysisText, rule);
+        if (!matchedPhrases.length) continue;
+        const taxonomy = taxonomyEntry(rule.classification);
+        matches.push({
+          classification: rule.classification,
+          score: rule.score,
+          severity: rule.severity,
+          matchedPhrases,
+        });
+        signals.push({
+          code: rule.classification,
+          severity: rule.severity,
+          source: "student_domain_rule_baseline",
+          details: `Pattern domain khớp: ${matchedPhrases.join(", ")}.`,
+        });
+        if (!taxonomy) continue;
+      }
     }
 
     if (injectionMatches.length > 0) {

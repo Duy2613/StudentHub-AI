@@ -112,7 +112,7 @@ export class QrIntakeService {
         warnings.push(`Phát hiện mã độc/lệnh thực thi nguy hiểm (${scheme}) trong mã QR.`);
         return {
           inputType: "QR",
-          decodedType: "DANGEROUS",
+          decodedType: "OTHER",
           decodedValue: trimmed,
           normalizedValue: "",
           securityStatus: "BLOCKED",
@@ -123,6 +123,63 @@ export class QrIntakeService {
           signals,
         };
       }
+    }
+
+    // Action URIs are data, not web pages. They must never auto-open or be
+    // silently treated as ordinary text. Keep them reviewable for the user.
+    const actionUriMatch = lower.match(/^(mailto|tel):/i);
+    if (actionUriMatch) {
+      signals.push(
+        createSignal({
+          type: LAYER_1_REASONS.QR_ACTION_URI,
+          category: "security",
+          severity: SIGNAL_SEVERITY.MEDIUM,
+          confidence: 0.9,
+          evidence: { scheme: actionUriMatch[1].toLowerCase(), details: "QR chứa URI hành động; không tự động gọi điện hoặc soạn email." },
+          source: "QrIntakeService",
+        })
+      );
+      return {
+        inputType: "QR",
+        decodedType: "ACTION_URI",
+        decodedValue: trimmed,
+        normalizedValue: trimmed,
+        securityStatus: "CAUTION",
+        ssrfStatus: "NOT_APPLICABLE",
+        autoNavigation: "NO",
+        selectedRoute: "CAUTION",
+        warnings: ["QR chứa hành động liên hệ; hãy tự xác minh người nhận trước khi thực hiện."],
+        signals,
+      };
+    }
+
+    // Unknown application/deep-link schemes are not navigated by the trust
+    // pipeline. They remain suspicious until the owning app and destination
+    // are independently verified.
+    const deepLinkMatch = lower.match(/^([a-z][a-z0-9+.-]*):\/\//i);
+    if (deepLinkMatch && !/^https?:$/i.test(`${deepLinkMatch[1]}:`)) {
+      signals.push(
+        createSignal({
+          type: LAYER_1_REASONS.QR_UNTRUSTED_APP_SCHEME,
+          category: "security",
+          severity: SIGNAL_SEVERITY.MEDIUM,
+          confidence: 0.82,
+          evidence: { scheme: deepLinkMatch[1], details: "QR chứa deep link ứng dụng không có nguồn xác minh." },
+          source: "QrIntakeService",
+        })
+      );
+      return {
+        inputType: "QR",
+        decodedType: "APP_DEEP_LINK",
+        decodedValue: trimmed,
+        normalizedValue: trimmed,
+        securityStatus: "SUSPICIOUS",
+        ssrfStatus: "NOT_APPLICABLE",
+        autoNavigation: "NO",
+        selectedRoute: "CAUTION",
+        warnings: ["Deep link ứng dụng chưa được xác minh; không tự động mở."],
+        signals,
+      };
     }
 
     // 2. Wi-Fi QR Code Payload: WIFI:T:WPA;S:MyNetwork;P:SuperSecretPassword;;
@@ -144,7 +201,7 @@ export class QrIntakeService {
         decodedType: "WIFI",
         decodedValue: redactedValue,
         normalizedValue,
-        securityStatus: "PASS",
+        securityStatus: "PRIVACY",
         ssrfStatus: "NOT_APPLICABLE",
         autoNavigation: "NO",
         selectedRoute: "Text Claim Trust",
@@ -229,7 +286,7 @@ export class QrIntakeService {
         warnings.push(`Giao thức ${parsedUrl.protocol} không được hỗ trợ để mở an toàn.`);
         return {
           inputType: "QR",
-          decodedType: "DANGEROUS",
+          decodedType: "OTHER",
           decodedValue: trimmed,
           normalizedValue: "",
           securityStatus: "BLOCKED",
@@ -328,10 +385,26 @@ export class QrIntakeService {
         warnings.push("URL chứa tham số chuyển hướng; cần đối chiếu đích đến thực tế.");
       }
 
+      const hasPaymentField = /(?:recipient|account|stk|amount|bank|transfer|payment|memo)=/i.test(parsedUrl.search);
+      const hasPersonalDestination = /(?:personal|ca-?nhan|cá-?nhân|private|individual)/i.test(parsedUrl.search);
+      if (hasPaymentField && hasPersonalDestination) {
+        signals.push(
+          createSignal({
+            type: LAYER_1_REASONS.QR_PAYMENT_REQUEST,
+            category: "financial_fraud",
+            severity: SIGNAL_SEVERITY.HIGH,
+            confidence: 0.88,
+            evidence: { query: parsedUrl.search, details: "QR URL chứa tham số thanh toán tới đích cá nhân chưa xác minh." },
+            source: "QrIntakeService",
+          })
+        );
+        warnings.push("QR có dấu hiệu yêu cầu thanh toán tới tài khoản cá nhân; không chuyển tiền trước khi xác minh.");
+      }
+
       const normalized = NormalizationService.normalizeUrl(candidateUrl);
       const isCritical = signals.some(s => s.severity === SIGNAL_SEVERITY.CRITICAL);
       const isHigh = signals.some(s => s.severity === SIGNAL_SEVERITY.HIGH);
-      const securityStatus = isCritical ? "BLOCKED" : isHigh ? "SUSPICIOUS" : "PASS";
+      const securityStatus = isCritical ? "BLOCKED" : isHigh ? "SUSPICIOUS" : "SAFE";
 
       return {
         inputType: "QR",
@@ -354,7 +427,7 @@ export class QrIntakeService {
       decodedType: "TEXT",
       decodedValue: trimmed,
       normalizedValue: normalizedText.normalized || trimmed,
-      securityStatus: "PASS",
+      securityStatus: "SAFE",
       ssrfStatus: "NOT_APPLICABLE",
       autoNavigation: "NO",
       selectedRoute: "Text Claim Trust",

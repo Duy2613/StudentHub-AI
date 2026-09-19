@@ -45,18 +45,39 @@ export class HardRuleEngine {
       maxConfidence = Math.max(maxConfidence, 0.99);
     }
 
-    // RULE 3: Direct Credential & OTP / PIN Theft Combination (P0)
+    // RULE 3: Direct Credential / OTP / PIN Theft (P0). An explicit request
+    // for an OTP or PIN is independently a credential-extraction attempt;
+    // it does not need a second password signal to fail closed.
     const hasCredential = signalTypes.has(LAYER_1_REASONS.CREDENTIAL_REQUEST);
     const hasOtpOrPin = signalTypes.has(LAYER_1_REASONS.OTP_REQUEST) || signalTypes.has(LAYER_1_REASONS.PIN_REQUEST);
-    if ((hasCredential && hasOtpOrPin) || signalTypes.has(LAYER_1_REASONS.PIN_REQUEST)) {
+    if (hasCredential && hasOtpOrPin) {
       matchedRules.push("RULE_CREDENTIAL_AND_OTP_THEFT");
       if (hasCredential) reasons.add(LAYER_1_REASONS.CREDENTIAL_REQUEST);
       if (signalTypes.has(LAYER_1_REASONS.OTP_REQUEST)) reasons.add(LAYER_1_REASONS.OTP_REQUEST);
       if (signalTypes.has(LAYER_1_REASONS.PIN_REQUEST)) reasons.add(LAYER_1_REASONS.PIN_REQUEST);
       maxConfidence = Math.max(maxConfidence, 0.98);
+    } else if (hasOtpOrPin) {
+      matchedRules.push("RULE_OTP_OR_PIN_THEFT");
+      if (signalTypes.has(LAYER_1_REASONS.OTP_REQUEST)) reasons.add(LAYER_1_REASONS.OTP_REQUEST);
+      if (signalTypes.has(LAYER_1_REASONS.PIN_REQUEST)) reasons.add(LAYER_1_REASONS.PIN_REQUEST);
+      maxConfidence = Math.max(maxConfidence, 0.98);
+    } else if (hasCredential) {
+      matchedRules.push("RULE_CREDENTIAL_REQUEST");
+      reasons.add(LAYER_1_REASONS.CREDENTIAL_REQUEST);
+      maxConfidence = Math.max(maxConfidence, 0.96);
     }
 
-    // RULE 4: Deceptive Phishing Domain / Homoglyph / Subdomain Impersonation / Typosquatting (P0)
+    // RULE 4: Authority impersonation combined with a transfer demand (P0).
+    // A message that merely mentions a bank, school, or police is not enough;
+    // the hard rule requires the explicit authority-to-payment signal emitted
+    // by TextDetector for the coercive combination.
+    if (signalTypes.has(LAYER_1_REASONS.AUTHORITY_PAYMENT_DEMAND)) {
+      matchedRules.push("RULE_AUTHORITY_PAYMENT_DEMAND");
+      reasons.add(LAYER_1_REASONS.AUTHORITY_PAYMENT_DEMAND);
+      maxConfidence = Math.max(maxConfidence, 0.98);
+    }
+
+    // RULE 5: Deceptive Phishing Domain / Homoglyph / Subdomain Impersonation / Typosquatting (P0)
     const hasDomainImpersonation =
       signalTypes.has(LAYER_1_REASONS.BRAND_IMPERSONATION_SUBDOMAIN) ||
       signalTypes.has(LAYER_1_REASONS.UNICODE_HOMOGLYPH) ||
@@ -86,7 +107,7 @@ export class HardRuleEngine {
       maxConfidence = Math.max(maxConfidence, 0.98);
     }
 
-    // RULE 5: Confirmed Task Deposit & Affiliate Scam Pattern (P1)
+    // RULE 6: Confirmed Task Deposit & Affiliate Scam Pattern (P1)
     if (signalTypes.has(LAYER_1_REASONS.TASK_DEPOSIT_SCAM)) {
       matchedRules.push("RULE_TASK_DEPOSIT_SCAM_CONFIRMED");
       reasons.add(LAYER_1_REASONS.TASK_DEPOSIT_SCAM);
@@ -94,28 +115,28 @@ export class HardRuleEngine {
       maxConfidence = Math.max(maxConfidence, 0.96);
     }
 
-    // RULE 6: OCR Phishing Text with Confirmed Demand (P0)
+    // RULE 7: OCR Phishing Text with Confirmed Demand (P0)
     if (signalTypes.has(LAYER_1_REASONS.OCR_PHISHING_PATTERN)) {
       matchedRules.push("RULE_OCR_PHISHING_TEXT");
       reasons.add(LAYER_1_REASONS.OCR_PHISHING_PATTERN);
       maxConfidence = Math.max(maxConfidence, 0.97);
     }
 
-    // RULE 7: QR Code Targeting Confirmed Malicious Destination (P0)
+    // RULE 8: QR Code Targeting Confirmed Malicious Destination (P0)
     if (signalTypes.has(LAYER_1_REASONS.QR_MALICIOUS_URL)) {
       matchedRules.push("RULE_QR_MALICIOUS_DESTINATION");
       reasons.add(LAYER_1_REASONS.QR_MALICIOUS_URL);
       maxConfidence = Math.max(maxConfidence, 0.98);
     }
 
-    // RULE 8: SSRF Private/Loopback Target Attempt (P0)
+    // RULE 9: SSRF Private/Loopback Target Attempt (P0)
     if (signalTypes.has(LAYER_1_REASONS.SSRF_ATTEMPT)) {
       matchedRules.push("RULE_SSRF_NETWORK_BLOCK");
       reasons.add(LAYER_1_REASONS.SSRF_ATTEMPT);
       maxConfidence = Math.max(maxConfidence, 0.99);
     }
 
-    // RULE 9: Unsupported active URL schemes are blocked at the boundary so
+    // RULE 10: Unsupported active URL schemes are blocked at the boundary so
     // no later layer can accidentally treat javascript:/data:/file: or a
     // similar non-web payload as an ordinary URL.
     if (signalTypes.has(LAYER_1_REASONS.UNSUPPORTED_SCHEME)) {

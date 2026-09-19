@@ -29,6 +29,7 @@ const HOMOGLYPH_SCRIPTS_REGEX = /[\u0400-\u04FF\u0370-\u03FF]/; // Cyrillic & Gr
 const HOT_PHISHING_PATH_REGEX = /(?:login|signin|verify|security|password|account|identity|otp|xac-nhan|nhan-thuong|nhan-hoc-bong|dat-coc|kich-hoat|cap-nhat-sinh-trac-hoc|sinh-trac-hoc|dinh-danh-vneid|dinh-danh|mo-khoa-tai-khoan|mo-khoa-the|nang-cap-smart-otp|dong-bo-du-lieu|tuyen-ctv|nhiem-vu-kiem-tien|nhan-qua)/i;
 
 const CREDENTIAL_PARAM_REGEX = /^(password|passwd|pass|otp|verification_code|verify_code|token|security_code|pin|card|cvv|smart_otp)$/i;
+const REDIRECT_QUERY_PARAM_REGEX = /(?:^|[?&])(?:url|redirect|next|target|dest|destination|r|u)=/i;
 
 const DANGEROUS_EXTENSIONS = [
   ".exe", ".scr", ".bat", ".cmd", ".ps1", ".apk", ".com", ".vbs",
@@ -478,7 +479,32 @@ export class UrlDetector {
       );
     }
 
-    // 13. Suspicious Query Parameters
+    // 13. Redirect-chain and suspicious query parameters
+    let decodedSearch = search;
+    try {
+      decodedSearch = decodeURIComponent(search);
+    } catch {
+      // Keep the raw query if a crafted percent-encoding sequence is invalid.
+    }
+    const redirectTargetCount = (decodedSearch.match(/https?:\/\//gi) || []).length;
+    if (REDIRECT_QUERY_PARAM_REGEX.test(search) || redirectTargetCount >= 2) {
+      signals.push(
+        createSignal({
+          type: redirectTargetCount >= 2 ? LAYER_1_REASONS.REDIRECT_CHAIN_ABUSE : LAYER_1_REASONS.OPEN_REDIRECT_SUSPECTED,
+          category: "url",
+          severity: SIGNAL_SEVERITY.MEDIUM,
+          confidence: 0.68,
+          evidence: {
+            matchedText: search.slice(0, 180),
+            redirectTargetCount,
+            details: redirectTargetCount >= 2
+              ? "URL chứa nhiều đích HTTP(S) lồng nhau, có dấu hiệu redirect chain abuse."
+              : "URL chứa tham số redirect; cần kiểm tra đích đến cuối cùng trước khi mở.",
+          },
+          source: "UrlDetector",
+        })
+      );
+    }
     try {
       parsed.searchParams.forEach((val, key) => {
         if (CREDENTIAL_PARAM_REGEX.test(key)) {
