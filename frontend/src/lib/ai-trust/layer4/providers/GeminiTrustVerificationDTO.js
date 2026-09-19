@@ -11,8 +11,10 @@ import {
  * Canonical structured contract for Gemini's Layer 4 advisory verification.
  *
  * Gemini may explain and organize evidence, but it never owns the final
- * security, truth, enforcement, or confidence decision. Citations are kept
- * only when the model echoes a real HTTP(S) URL already present in the input.
+ * security, truth, enforcement, or confidence decision. Tavily evidence is
+ * supplied as context; Gemini may also return independent HTTP(S) URLs. Those
+ * independent URLs are accepted only after the server performs its own safe
+ * reachability check.
  */
 
 export const GEMINI_TRUST_VERDICT_SIGNALS = Object.freeze([
@@ -55,6 +57,11 @@ export const GEMINI_TRUST_VERIFICATION_SCHEMA = Object.freeze({
         },
       },
     },
+    // Gemini may reference validated evidence/source IDs or return an
+    // independent URL. URL reachability and SSRF validation happen after the
+    // model response, before this DTO is exposed to the client.
+    supportingSourceIds: { type: "array", items: { type: "string", maxLength: 180 }, maxItems: 20 },
+    contradictingSourceIds: { type: "array", items: { type: "string", maxLength: 180 }, maxItems: 20 },
     provider: { type: "string", maxLength: 80 },
     model: { type: "string", maxLength: 120 },
   },
@@ -108,11 +115,22 @@ function citations(value) {
   return output;
 }
 
+function listIds(value) {
+  if (!Array.isArray(value)) return [];
+  return Array.from(new Set(value
+    .slice(0, 20)
+    .filter((item) => typeof item === "string")
+    .map((item) => boundedText(item, 180))
+    .filter(Boolean)));
+}
+
 export function isValidGeminiTrustVerification(value, {
   allowedCitationUrls = null,
+  allowedEvidenceIds = null,
   allowedModels = null,
   allowGemmaShadow = false,
   allowQaExtended = null,
+  allowExternalCitationUrls = false,
 } = {}) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   if (!VERDICT_SET.has(value.verdictSignal)) return false;
@@ -121,6 +139,11 @@ export function isValidGeminiTrustVerification(value, {
   if (!Array.isArray(value.missingEvidence) || value.missingEvidence.length > 12) return false;
   if (typeof value.uncertainty !== "string" || value.uncertainty.length > 700) return false;
   if (!Array.isArray(value.citationsUsed) || value.citationsUsed.length > 20) return false;
+  for (const field of ["supportingSourceIds", "contradictingSourceIds"]) {
+    if (value[field] !== undefined && (!Array.isArray(value[field]) || value[field].length > 20)) return false;
+    if (Array.isArray(value[field]) && value[field].some((item) => typeof item !== "string" || item.length > 180)) return false;
+    if (Array.isArray(value[field]) && allowedEvidenceIds && value[field].some((item) => !allowedEvidenceIds.has(item))) return false;
+  }
   const providerName = typeof value.provider === "string" ? value.provider.trim().toLowerCase() : "";
   if (providerName !== "gemini" && providerName !== "google") return false;
   if (typeof value.model !== "string") return false;
@@ -138,7 +161,7 @@ export function isValidGeminiTrustVerification(value, {
     return citation && typeof citation === "object" && !Array.isArray(citation) &&
       typeof citation.id === "string" && citation.id.length <= 180 &&
       realHttpUrl(citation.url) !== null &&
-      (!allowedCitationUrls || allowedCitationUrls.has(realHttpUrl(citation.url)));
+      (allowExternalCitationUrls === true || !allowedCitationUrls || allowedCitationUrls.has(realHttpUrl(citation.url)));
   });
 }
 
@@ -163,6 +186,8 @@ export function normalizeGeminiTrustVerification(value, {
     missingEvidence: list(value.missingEvidence),
     uncertainty: boundedText(value.uncertainty, 700) || fallbackUncertainty,
     citationsUsed: citations(value.citationsUsed),
+    supportingSourceIds: listIds(value.supportingSourceIds),
+    contradictingSourceIds: listIds(value.contradictingSourceIds),
     provider: normalizedProvider,
     model: normalizedModel,
   };

@@ -1,23 +1,14 @@
 /**
- * Canonical server-side Trust entrypoint.
+ * Public Trust entrypoint for the StudentHub-owned four-layer pipeline.
  *
- * The V5 pipeline remains the owned StudentHub policy engine. This facade
- * supplies the optional legacy verification adapter at the server boundary so
- * route handlers never need to know legacy endpoint names or response shapes.
+ * The historical internal V5 orchestrator is intentionally not imported here:
+ * the public route must not construct a legacy/Friend adapter or expose L5.
  */
 
-import { createLegacyVerificationAdapter } from "./integrations/legacyVerification/LegacyVerificationAdapter.js";
-import { TrustPipelineOrchestrator } from "./v5/TrustPipelineOrchestrator.js";
+import { OwnBackendTrustOrchestrator, createOwnBackendTrustOrchestrator } from "./OwnBackendTrustOrchestrator.js";
 
-export class TrustOrchestrator extends TrustPipelineOrchestrator {
-  constructor(options = {}) {
-    super({
-      ...options,
-      legacyVerificationAdapter: options.legacyVerificationAdapter || createLegacyVerificationAdapter(),
-    });
-  }
-}
+export class TrustOrchestrator extends OwnBackendTrustOrchestrator {}
 
 export function createTrustOrchestrator(options = {}) {
-  return new TrustOrchestrator(options);
+  return createOwnBackendTrustOrchestrator(options);
 }

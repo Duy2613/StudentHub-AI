@@ -858,13 +858,6 @@ function AiVerificationLayer({ layer, onSelectSource }) {
   const status = String(layer.aiVerificationStatus || "SUCCESS").toUpperCase();
   const sources = layer.evidenceSources || layer.sources || [];
 
-  const displayModel = (model) => {
-    const value = safeText(model, "Gemini");
-    return value.replace(/^gemini-/i, "Gemini ").replace(/-flash$/i, " Flash").replace(/-it$/i, "");
-  };
-
-  const executedModelName = displayModel(layer.aiExecutedModel || "gemini-3.8-flash");
-
   const supportingCount = layer.supportingCount ?? sources.filter(s => String(s.relationship).toLowerCase().includes("support")).length;
   const contradictingCount = layer.contradictingCount ?? sources.filter(s => String(s.relationship).toLowerCase().includes("contrad")).length;
   const contextCount = layer.contextCount ?? (sources.length - supportingCount - contradictingCount);
@@ -901,10 +894,6 @@ function AiVerificationLayer({ layer, onSelectSource }) {
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs font-bold text-violet-300 uppercase tracking-wider">
               AI VERIFICATION
-            </span>
-            <span className="text-slate-500">·</span>
-            <span className="text-xs font-mono text-slate-300">
-              AI engine: <strong className="text-violet-200">{executedModelName}</strong>
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -1069,11 +1058,6 @@ function AiVerificationLayer({ layer, onSelectSource }) {
         <span className="text-[11px] font-mono text-violet-400/80">L4 AI Verification ✓</span>
       </div>
 
-      {/* AI Engine Provenance (Subtle Single Line) */}
-      <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-slate-500 font-mono">
-        <span>AI engine: <span className="text-violet-400 font-semibold">{executedModelName}</span></span>
-        <span className="text-[11px] text-slate-500">Evidence-Centric Synthesis</span>
-      </div>
     </div>
   );
 }

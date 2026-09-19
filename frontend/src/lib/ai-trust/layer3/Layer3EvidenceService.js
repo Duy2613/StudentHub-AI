@@ -28,6 +28,7 @@ import {
   createLayer3Result,
   FRESHNESS_STATUS,
   SOURCE_TYPE,
+  RETRIEVAL_ORIGIN,
   EVIDENCE_PROVIDER_STATUS,
 } from "./types.js";
 import { LAYER_3_CONFIG } from "./config/Layer3Config.js";
@@ -171,6 +172,7 @@ function safeCandidate(candidate) {
   if (!candidate || typeof candidate !== "object") return null;
   const url = boundedString(candidate.url, 2048);
   if (!url) return null;
+  if (candidate.retrievalOrigin && !Object.values(RETRIEVAL_ORIGIN).includes(candidate.retrievalOrigin)) return null;
   return {
     sourceId: boundedString(candidate.sourceId, 160),
     url,
@@ -183,7 +185,29 @@ function safeCandidate(candidate) {
     isOfficial: candidate.isOfficial === true,
     officialDomains: asArray(candidate.officialDomains).slice(0, 12).map((item) => boundedString(item, 180).toLowerCase()).filter(Boolean),
     sourceFingerprint: boundedString(candidate.sourceFingerprint, 128) || null,
+    retrievalOrigin: candidate.retrievalOrigin || null,
   };
+}
+
+function dedupeCandidates(candidates, { defaultOrigin, supplemental = false } = {}) {
+  const seenUrls = new Set();
+  const seenIds = new Set();
+  return asArray(candidates).map((candidate, index) => {
+    const origin = candidate?.retrievalOrigin || defaultOrigin || RETRIEVAL_ORIGIN.TAVILY_INITIAL;
+    const sourceId = boundedString(candidate?.sourceId, 160) || `source-${index + 1}`;
+    return safeCandidate({
+      ...candidate,
+      sourceId: supplemental && !sourceId.startsWith("supplemental-")
+        ? `supplemental-${sourceId}`
+        : sourceId,
+      retrievalOrigin: origin,
+    });
+  }).filter((candidate) => {
+    if (!candidate || seenUrls.has(candidate.url.toLowerCase()) || seenIds.has(candidate.sourceId)) return false;
+    seenUrls.add(candidate.url.toLowerCase());
+    seenIds.add(candidate.sourceId);
+    return true;
+  });
 }
 
 function nowMs() {
@@ -299,10 +323,26 @@ export class Layer3EvidenceService {
     const options = input.options;
     const startTime = nowMs();
     const safeOptions = options && typeof options === "object" ? options : {};
+    const retrievalStage = safeOptions.retrievalStage === "SUPPLEMENTAL" ? "SUPPLEMENTAL" : "INITIAL";
+    const retrievalOrigin = retrievalStage === "SUPPLEMENTAL"
+      ? RETRIEVAL_ORIGIN.TAVILY_AI_REQUESTED_SUPPLEMENT
+      : RETRIEVAL_ORIGIN.TAVILY_INITIAL;
+    const previousEvidencePackage = retrievalStage === "SUPPLEMENTAL"
+      ? (safeOptions.previousEvidencePackage && typeof safeOptions.previousEvidencePackage === "object"
+        ? safeOptions.previousEvidencePackage
+        : null)
+      : null;
+    const previousSources = retrievalStage === "SUPPLEMENTAL"
+      ? dedupeCandidates(previousEvidencePackage?.sources, { defaultOrigin: RETRIEVAL_ORIGIN.TAVILY_INITIAL })
+      : [];
     const requestId = boundedString(safeOptions.requestId || layer2Result?.requestId, 160) ||
       createSecureId("req_l3");
+    // Supplemental retrieval is an external Tavily-only phase. A local
+    // corpus fallback would blur retrievalOrigin and could leak unvalidated
+    // supplemental material into the rebuilt Layer 4 evidence package.
+    const allowLocalFallback = retrievalStage !== "SUPPLEMENTAL" && safeOptions.allowLocalFallback !== false;
     const defaultTavilyRetriever = new TavilyRetriever();
-    const retriever = safeOptions.retriever || (defaultTavilyRetriever.isConfigured()
+    const retriever = safeOptions.retriever || (defaultTavilyRetriever.isConfigured() || !allowLocalFallback
       ? defaultTavilyRetriever
       : new KnowledgeBaseRetriever());
     const retrieverId = boundedString(retriever?.retrieverId, 160) || "unknown_retriever";
@@ -320,22 +360,31 @@ export class Layer3EvidenceService {
     const targetCandidates = rawCandidates.map(safeCandidate).filter(Boolean).slice(0, MAX_CANDIDATES);
 
     const allQueries = [];
-    for (const claim of targetClaims) {
-      const claimQueries = QueryGenerator.generateQueries(claim, targetCandidates);
-      allQueries.push(...claimQueries);
-    }
     const taskQueryCounts = new Map();
-    for (const task of taskMerge.tasks) {
-      const relatedClaim = targetClaims.find((claim) => claim.claimId === task.claimId) || null;
-      const taskQueries = QueryGenerator.generateTaskQueries(task, relatedClaim);
-      taskQueryCounts.set(task.taskId, taskQueries.length);
-      allQueries.push(...taskQueries);
+    if (retrievalStage === "SUPPLEMENTAL") {
+      for (const item of asArray(safeOptions.supplementalQueries).slice(0, 2)) {
+        const query = typeof item === "string" ? item : item?.suggestedQuery || item?.query;
+        if (typeof query === "string" && query.trim()) allQueries.push(query.trim().slice(0, 500));
+      }
+    } else {
+      for (const claim of targetClaims) {
+        const claimQueries = QueryGenerator.generateQueries(claim, targetCandidates);
+        allQueries.push(...claimQueries);
+      }
+      for (const task of taskMerge.tasks) {
+        const relatedClaim = targetClaims.find((claim) => claim.claimId === task.claimId) || null;
+        const taskQueries = QueryGenerator.generateTaskQueries(task, relatedClaim);
+        taskQueryCounts.set(task.taskId, taskQueries.length);
+        allQueries.push(...taskQueries);
+      }
     }
-    const boundedQueries = allQueries.slice(0, MAX_QUERY_COUNT);
+    const boundedQueries = allQueries.slice(0, retrievalStage === "SUPPLEMENTAL" ? 2 : MAX_QUERY_COUNT);
 
     let retrievedSources = [];
     let retrievalStatus = EVIDENCE_PROVIDER_STATUS.SUCCESS;
-    let retrievalMode = retrieverId.includes("knowledge_base") || retrieverId.includes("institutional")
+    let retrievalMode = retrievalStage === "SUPPLEMENTAL"
+      ? "TAVILY_SUPPLEMENTAL"
+      : retrieverId.includes("knowledge_base") || retrieverId.includes("institutional")
       ? "LOCAL_KNOWLEDGE_BASE"
       : "EXTERNAL_RETRIEVER";
     let externalEvidence = false;
@@ -348,11 +397,21 @@ export class Layer3EvidenceService {
       const searchResult = await retriever.search(boundedQueries, { requestId, signal: safeOptions.signal });
       providerDiagnostics = safeRetrieverDiagnostics(retriever);
       throwIfAborted(safeOptions.signal);
-      retrievedSources = asArray(searchResult).map(safeCandidate).filter(Boolean).slice(0, MAX_RETRIEVED_SOURCES);
+      const searchedSources = asArray(searchResult).map((source) => ({
+        ...source,
+        sourceId: retrievalStage === "SUPPLEMENTAL" && source?.sourceId
+          ? `supplemental-${source.sourceId}`
+          : source?.sourceId,
+        retrievalOrigin,
+      }));
+      retrievedSources = dedupeCandidates(
+        retrievalStage === "SUPPLEMENTAL" ? [...previousSources, ...searchedSources] : searchedSources,
+        { defaultOrigin: retrievalOrigin },
+      ).slice(0, MAX_RETRIEVED_SOURCES);
       if (Object.values(EVIDENCE_PROVIDER_STATUS).includes(retriever.lastSearchStatus) && retriever.lastSearchStatus !== EVIDENCE_PROVIDER_STATUS.SUCCESS) {
         retrievalStatus = retriever.lastSearchStatus;
       }
-      if (retrieverId.includes("knowledge_base") || retrievedSources.some((src) => src.sourceType === SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE)) {
+      if (retrievalStage !== "SUPPLEMENTAL" && (retrieverId.includes("knowledge_base") || retrievedSources.some((src) => src.sourceType === SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE))) {
         retrievalMode = "LOCAL_KNOWLEDGE_BASE";
         retrievalStatus = EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY;
       }
@@ -362,17 +421,26 @@ export class Layer3EvidenceService {
       retrievalStatus = Object.values(EVIDENCE_PROVIDER_STATUS).includes(err?.providerStatus)
         ? err.providerStatus
         : EVIDENCE_PROVIDER_STATUS.UNAVAILABLE;
-      retrievalMode = "LOCAL_FALLBACK";
       auditEvents.push({ type: "RETRIEVER_FAILURE", code: boundedString(err?.message, 120) || "RETRIEVER_FAILURE", at: new Date().toISOString() });
-      try {
-        const fallback = new KnowledgeBaseRetriever();
-        fetchRetriever = fallback;
-        retrievedSources = asArray(await fallback.search(boundedQueries, { requestId, signal: safeOptions.signal }))
-          .map(safeCandidate).filter(Boolean).slice(0, MAX_RETRIEVED_SOURCES);
-      } catch (fallbackError) {
-        if (safeOptions.signal?.aborted || fallbackError?.name === "AbortError") throw fallbackError;
-        retrievedSources = [];
-        auditEvents.push({ type: "LOCAL_FALLBACK_FAILURE", code: boundedString(fallbackError?.message, 120) || "LOCAL_FALLBACK_FAILURE", at: new Date().toISOString() });
+      if (allowLocalFallback) {
+        retrievalMode = "LOCAL_FALLBACK";
+        try {
+          const fallback = new KnowledgeBaseRetriever();
+          fetchRetriever = fallback;
+          retrievedSources = dedupeCandidates(asArray(await fallback.search(boundedQueries, { requestId, signal: safeOptions.signal })), {
+            defaultOrigin: RETRIEVAL_ORIGIN.LOCAL_KNOWLEDGE,
+          }).slice(0, MAX_RETRIEVED_SOURCES);
+        } catch (fallbackError) {
+          if (safeOptions.signal?.aborted || fallbackError?.name === "AbortError") throw fallbackError;
+          retrievedSources = retrievalStage === "SUPPLEMENTAL" ? previousSources : [];
+          auditEvents.push({ type: "LOCAL_FALLBACK_FAILURE", code: boundedString(fallbackError?.message, 120) || "LOCAL_FALLBACK_FAILURE", at: new Date().toISOString() });
+        }
+      } else {
+        // Canonical own-backend mode never relabels local corpus content as
+        // external evidence after Tavily fails or is not configured.
+        retrievalMode = "TAVILY_UNAVAILABLE";
+        fetchRetriever = retriever;
+        retrievedSources = retrievalStage === "SUPPLEMENTAL" ? previousSources : [];
       }
     }
 
@@ -427,6 +495,7 @@ export class Layer3EvidenceService {
         sourceFingerprint,
         contentFingerprint,
         retrievalOutcome: fetchedSuccessfully ? "SUCCESS" : "FAILURE",
+        retrievalOrigin: src.retrievalOrigin || retrievalOrigin,
       });
       processedSources.push(sourceDto);
       externalEvidence = externalEvidence || sourceDto.liveEvidence;
@@ -469,6 +538,7 @@ export class Layer3EvidenceService {
           sourceFingerprint: sourceDto.sourceFingerprint,
           contentFingerprint: sourceDto.contentFingerprint,
           retrievalOutcome: sourceDto.retrievalOutcome,
+          retrievalOrigin: sourceDto.retrievalOrigin,
         }));
       }
     }
@@ -501,6 +571,56 @@ export class Layer3EvidenceService {
         ? ["Không có bằng chứng live độc lập; trạng thái được hạ cấp để tránh false-safe."]
         : []),
     ];
+
+    const sourceCountByOrigin = (origin) => processedSources.filter((source) => source.retrievalOrigin === origin).length;
+    const evidenceCountByOrigin = (origin) => evidenceItems.filter((item) => item.retrievalOrigin === origin).length;
+    const validatedSourceCount = processedSources.filter((source) => source.liveEvidence === true).length;
+    const previousInitialPhase = previousEvidencePackage?.retrievalPhases?.initialSearch;
+    const retrievalPhases = {
+      initialSearch: retrievalStage === "SUPPLEMENTAL" && previousInitialPhase
+        ? previousInitialPhase
+        : {
+          status: retrievalStatus,
+          queryCount: retrievalStage === "INITIAL" ? boundedQueries.length : 0,
+          sourceCount: sourceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_INITIAL),
+          evidenceCount: evidenceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_INITIAL),
+          validatedSourceCount: processedSources.filter((source) => source.retrievalOrigin === RETRIEVAL_ORIGIN.TAVILY_INITIAL && source.liveEvidence === true).length,
+          provider: retrieverId,
+          providerStatus: retrievalStage === "INITIAL" ? retrievalStatus : null,
+          retrievalOrigin: RETRIEVAL_ORIGIN.TAVILY_INITIAL,
+        },
+      supplementalSearch: retrievalStage === "SUPPLEMENTAL"
+        ? {
+          status: retrievalStatus === EVIDENCE_PROVIDER_STATUS.SUCCESS ? "COMPLETED" : retrievalStatus,
+          queryCount: boundedQueries.length,
+          sourceCount: sourceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_AI_REQUESTED_SUPPLEMENT),
+          evidenceCount: evidenceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_AI_REQUESTED_SUPPLEMENT),
+          validatedSourceCount: processedSources.filter((source) => source.retrievalOrigin === RETRIEVAL_ORIGIN.TAVILY_AI_REQUESTED_SUPPLEMENT && source.liveEvidence === true).length,
+          provider: retrieverId,
+          providerStatus: retrievalStatus,
+          retrievalOrigin: RETRIEVAL_ORIGIN.TAVILY_AI_REQUESTED_SUPPLEMENT,
+        }
+        : {
+          status: "NOT_REQUESTED",
+          queryCount: 0,
+          sourceCount: 0,
+          evidenceCount: 0,
+          validatedSourceCount: 0,
+          provider: null,
+          providerStatus: null,
+          retrievalOrigin: RETRIEVAL_ORIGIN.TAVILY_AI_REQUESTED_SUPPLEMENT,
+        },
+      finalValidatedEvidenceSet: {
+        status: validatedSourceCount > 0 ? "COMPLETED" : "INSUFFICIENT",
+        queryCount: boundedQueries.length,
+        sourceCount: processedSources.length,
+        evidenceCount: evidenceItems.length,
+        validatedSourceCount,
+        provider: retrieverId,
+        providerStatus: retrievalStatus,
+        retrievalOrigin,
+      },
+    };
 
     return markTrustedLayer3Result(createLayer3Result({
       status: decision.status,
@@ -535,6 +655,7 @@ export class Layer3EvidenceService {
       },
       candidateClaimOrigins: Array.from(new Set(targetClaims.map((claim) => claim.origin).filter(Boolean))).slice(0, 4),
       evidenceRequirements: asArray(taskMerge.l2cPackage?.evidenceRequirements).slice(0, 16),
+      retrievalPhases,
       limitations,
       nextLayer: 4,
       requestId,
@@ -548,6 +669,16 @@ export class Layer3EvidenceService {
         retrievalProvider: retrieverId,
         retrievalStatus,
         retrievalMode,
+        retrievalStage,
+        retrievalOrigin,
+        initialQueryCount: retrievalPhases.initialSearch.queryCount,
+        initialSourceCount: retrievalPhases.initialSearch.sourceCount,
+        initialEvidenceCount: retrievalPhases.initialSearch.evidenceCount,
+        supplementalQueryCount: retrievalPhases.supplementalSearch.queryCount,
+        supplementalSourceCount: retrievalPhases.supplementalSearch.sourceCount,
+        supplementalEvidenceCount: retrievalPhases.supplementalSearch.evidenceCount,
+        finalValidatedSourceCount: retrievalPhases.finalValidatedEvidenceSet.validatedSourceCount,
+        geminiGeneratedUrlCount: 0,
         externalEvidence,
         providerIndependent: retrieverId.includes("knowledge_base"),
         providerCallCount: providerDiagnostics.callCount || 0,

@@ -123,6 +123,57 @@ export const trustV5PipelineSchema = z.object({
   layerResults: z.object({ layer1: z.unknown().nullable(), layer2A: z.unknown().nullable(), layer2B: z.unknown().nullable(), layer2C: z.unknown().nullable(), layer3: z.unknown().nullable(), layer4: z.unknown().nullable() }).passthrough().optional(),
 }).passthrough();
 
+const fourLayerStageSchema = v5StageSchema.extend({
+  pipelineModel: z.literal("FOUR_LAYER").optional(),
+  stageId: z.enum(["l1", "l2", "l3", "l4"]),
+});
+
+const finalPredictSchema = z.object({
+  status: z.string().optional(),
+  verdict: z.string().optional(),
+  truthVerdict: z.string().optional(),
+  truthStatus: z.string().optional(),
+  truthAssessment: z.string().optional(),
+  security: z.string().optional(),
+  securityClassification: z.string().optional(),
+  securityRisk: z.string().optional(),
+  recommendedAction: z.string().optional(),
+  action: z.string().optional(),
+  assessmentConfidence: z.number().min(0).max(1).optional(),
+  decisionConfidence: z.number().min(0).max(1).optional(),
+  evidenceAgreement: z.union([z.string(), z.number()]).nullable().optional(),
+  sourceQuality: z.number().min(0).max(1).nullable().optional(),
+  evidenceSufficiency: z.string().optional(),
+  independentSourceCount: z.number().int().nonnegative().optional(),
+  evidenceCount: z.number().int().nonnegative().optional(),
+  sourceCount: z.number().int().nonnegative().optional(),
+  keyReasons: z.array(z.string()).default([]),
+  remainingUncertainty: z.array(z.string()).default([]),
+  keySources: z.array(z.unknown()).default([]),
+  evidenceRefs: z.array(z.string()).default([]),
+  derivedFrom: z.array(z.string()).default([]),
+  traceability: z.array(z.unknown()).default([]),
+  calls: z.object({ tavily: z.number().int().nonnegative().optional(), ai: z.number().int().nonnegative().optional(), gemini: z.number().int().nonnegative().optional(), finalPredict: z.number().int().nonnegative().optional() }).passthrough().optional(),
+}).passthrough();
+
+export const fourLayerTrustPipelineSchema = z.object({
+  schemaVersion: z.literal("trust.v5"),
+  pipelineVersion: z.string().min(1),
+  pipelineModel: z.literal("FOUR_LAYER"),
+  publicLayerCount: z.literal(4),
+  requestId: z.string().min(1),
+  pipelineStatus: z.enum(["IDLE", "RUNNING", "COMPLETED", "PARTIAL", "FAILED", "CANCELLED"]),
+  currentStage: z.enum(["l1", "l2", "l3", "l4"]).nullable(),
+  stages: z.object({ l1: fourLayerStageSchema, l2: fourLayerStageSchema, l3: fourLayerStageSchema, l4: fourLayerStageSchema }),
+  finalDecision: z.object({ security: z.string(), truth: z.string(), action: z.string(), securityClassification: z.string(), truthStatus: z.string(), enforcement: z.string(), decisionAuthority: z.literal("FINAL_PREDICT_DETERMINISTIC"), aiOverride: z.literal(false) }).passthrough().nullable(),
+  finalPredict: finalPredictSchema.nullable(),
+  assurance: z.null(),
+  startedAt: z.string().nullable(),
+  completedAt: z.string().nullable(),
+  audit: z.object({ requestId: z.string(), stageSequence: z.array(z.string()), stageAttempts: z.array(z.unknown()), hardNegativePropagation: z.array(z.unknown()), policyVersion: z.string(), assuranceVersion: z.null() }).passthrough(),
+  layerResults: z.object({ layer1: z.unknown().nullable(), layer2: z.unknown().nullable(), layer3: z.unknown().nullable(), layer4: z.unknown().nullable() }).passthrough().optional(),
+}).passthrough();
+
 export const trustV5ResponseSchema = z.object({
   success: z.literal(true),
   contractVersion: z.literal("trust.v5"),
@@ -133,7 +184,7 @@ export const trustV5ResponseSchema = z.object({
   persistence: z.object({ persisted: z.boolean(), idempotent: z.boolean() }).optional(),
   version: z.literal("v5"),
   demo: z.literal(false),
-  data: trustV5PipelineSchema,
+  data: z.union([fourLayerTrustPipelineSchema, trustV5PipelineSchema]),
 }).passthrough();
 
 export type RelatedCase = z.infer<typeof relatedCaseSchema>;
@@ -141,5 +192,5 @@ export type ThreatProviderResult = z.infer<typeof threatProviderResultSchema>;
 export type ExpertConsensus = z.infer<typeof expertConsensusSchema>;
 export type TrustLayerResult = z.infer<typeof trustLayerResultSchema>;
 export type CanonicalTrustResponse = z.infer<typeof canonicalTrustResponseSchema>;
-export type TrustV5Pipeline = z.infer<typeof trustV5PipelineSchema>;
+export type TrustV5Pipeline = z.infer<typeof trustV5PipelineSchema> | z.infer<typeof fourLayerTrustPipelineSchema>;
 export type TrustV5Response = z.infer<typeof trustV5ResponseSchema>;

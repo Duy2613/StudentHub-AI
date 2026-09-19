@@ -130,7 +130,7 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
          send({
            type: "complete",
            event: "PIPELINE_COMPLETED",
-           stageId: "l5",
+           stageId: "final_predict",
            caseId: persistence.caseId || result.verificationId || null,
            caseRevision: persistence.caseRevision || null,
            runId: persistence.runId || null,
@@ -225,6 +225,9 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
   if (body?.version === "v5") {
     const idempotency = idempotencyKeyFor(request, principal, requestId);
     if (idempotency.error) return idempotency.error;
+    if (wantsV5Stream(request, body)) {
+      return streamV5Pipeline(request, input, requestId, principal, idempotency.value);
+    }
     const canonicalCaseId = (input.scope?.caseId && /^[0-9a-f-]{36}$/i.test(input.scope.caseId))
       ? input.scope.caseId
       : randomUUID();

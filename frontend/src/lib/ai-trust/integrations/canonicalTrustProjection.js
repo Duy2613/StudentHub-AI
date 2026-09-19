@@ -110,7 +110,10 @@ function layer1Evidence(layer, requestId) {
 }
 
 function layer2Evidence(layer, requestId) {
-  return safeArray(layer?.providerResults, 20).map((provider, index) => {
+  const providers = safeArray(layer?.providerResults, 20).length
+    ? safeArray(layer?.providerResults, 20)
+    : safeArray(layer?.providerObservations || layer?.providers, 20);
+  return providers.map((provider, index) => {
     const item = asRecord(provider);
     const providerId = safeText(item.provider, 160) || `provider-${index + 1}`;
     return canonicalEvidenceItem({
@@ -228,6 +231,7 @@ export function buildCanonicalEvidence({ requestId, layers = {}, input = {} } = 
   const result = [];
   for (const item of layer1Evidence(layers.layer1, requestId)) pushEvidence(result, item);
   for (const item of layer2Evidence(layers.layer2A, requestId)) pushEvidence(result, item);
+  for (const item of layer2Evidence(layers.layer2, requestId)) pushEvidence(result, item);
   for (const item of layer3Evidence(layers.layer3)) pushEvidence(result, item);
   for (const item of layer4Evidence(layers.layer4)) pushEvidence(result, item);
   return result.slice(0, MAX_EVIDENCE).map((item) => ({
@@ -303,13 +307,14 @@ function passportEvent(id, type, status, references = [], metadata = {}) {
 
 export function buildPassportProjection({ requestId, pipelineStatus, stages = {}, finalDecision = null, evidence = [], caseId = null } = {}) {
   const events = [];
-  for (const stageId of ["l1", "l2a", "l3", "l4"]) {
+  const stageIds = stages?.l2 ? ["l1", "l2", "l3", "l4"] : ["l1", "l2a", "l3", "l4"];
+  for (const stageId of stageIds) {
     const stage = asRecord(stages[stageId]);
     if (!stage.operationStatus || stage.operationStatus === "NOT_STARTED") continue;
     const references = safeArray(stage.evidenceRefs, 8);
     const type = stage.operationStatus === "PARTIAL" || stage.operationStatus === "FAILED"
       ? "PROVIDER_UNAVAILABLE"
-      : `LAYER_${stageId === "l2a" ? "2" : stageId.slice(1)}_COMPLETED`;
+      : `LAYER_${stageId === "l2a" || stageId === "l2" ? "2" : stageId.slice(1)}_COMPLETED`;
     events.push(passportEvent(`${requestId}:${stageId}:${stage.operationStatus}`, type, stage.operationStatus, references, { finding: stage.finding || "UNKNOWN", origin: stageId === "l3" ? "LAYER_3_WEB_EVIDENCE" : "TRUST_ENGINE" }));
   }
   if (evidence.length) events.push(passportEvent(`${requestId}:evidence`, "EVIDENCE_ADDED", "COMPLETED", evidence.slice(0, 20).map((item) => item.id), { count: String(evidence.length) }));
@@ -342,7 +347,22 @@ export function buildCanonicalTrustProjection({ requestId, input, pipeline, laye
     mode: "LIVE",
     state: pipeline?.pipelineStatus || "UNKNOWN",
     input: { type: safeText(input?.type, 40), contentLength: typeof input?.content === "string" ? input.content.length : 0 },
-    layers: ["l1", "l2a", "l2b", "l2c", "l3", "l4"].map((id) => {
+    layers: pipeline?.pipelineModel === "FOUR_LAYER"
+      ? ["l1", "l2", "l3", "l4"].map((id) => {
+        const stage = asRecord(pipeline?.stages?.[id]);
+        if (!stage.stageId) return null;
+        return {
+          stageId: safeText(stage.stageId, 40),
+          operationStatus: safeText(stage.operationStatus, 40),
+          finding: safeText(stage.finding, 120) || null,
+          summary: safeText(stage.summary, 900),
+          providerStatus: safeText(stage.providerStatus, 100),
+          providerId: safeText(stage.providerId, 160) || null,
+          completedAt: typeof stage.completedAt === "string" ? stage.completedAt : null,
+          evidenceRefs: safeArray(stage.evidenceRefs, 20).map((item) => safeText(item, 180)).filter(Boolean),
+        };
+      }).filter(Boolean)
+      : ["l1", "l2a", "l2b", "l2c", "l3", "l4"].map((id) => {
       const stage = asRecord(pipeline?.stages?.[id]);
       if (!stage.stageId) return null;
       return {
@@ -355,7 +375,7 @@ export function buildCanonicalTrustProjection({ requestId, input, pipeline, laye
         completedAt: typeof stage.completedAt === "string" ? stage.completedAt : null,
         evidenceRefs: safeArray(stage.evidenceRefs, 20).map((item) => safeText(item, 180)).filter(Boolean),
       };
-    }).filter(Boolean),
+      }).filter(Boolean),
     decision: {
       verdict: safeText(finalDecision?.security || finalDecision?.truth, 120) || "UNKNOWN",
       risk: safeText(layer4.riskAssessment?.level || finalDecision?.security, 80) || "UNKNOWN",

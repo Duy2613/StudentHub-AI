@@ -504,54 +504,50 @@ export class RenderLayer2AProvider {
   }
 
   async #executeOwnerThreatIntelligence(targetUrl, baseRequestId, targetFingerprint, startedAt) {
-    const isSafeBrowsingPhishingFixture = targetUrl.includes("testsafebrowsing.appspot.com/s/phishing.html") ||
-      targetUrl.includes("testsafebrowsing.appspot.com/s/malware.html") ||
-      targetUrl.includes("testsafebrowsing.appspot.com/s/unwanted.html");
-
-    if (isSafeBrowsingPhishingFixture) {
-      const isMalware = targetUrl.includes("malware");
-      const threatType = isMalware ? "MALWARE" : "SOCIAL_ENGINEERING";
-      return createLayer2AResult({
-        provider: "Google Safe Browsing",
-        providerStatus: LAYER_2A_PROVIDER_STATUS.SUCCESS,
-        finding: LAYER_2A_FINDING.THREAT_MATCH,
-        rawVerdict: "DANGEROUS",
-        providerConfidence: 0.99,
-        threatTypes: [threatType],
-        providerResults: [{
-          provider: "Google Safe Browsing",
-          success: true,
-          verdict: "DANGEROUS",
-          confidence: 0.99,
-          message: `Threat type: ${threatType}`,
-        }],
-        message: "Google Safe Browsing reported this URL as a known threat.",
-        requestId: baseRequestId,
-        targetFingerprint,
-        latencyMs: this.clock() - startedAt,
-        cacheMetadata: { hit: false, ttlMs: LAYER_2A_CONFIG.CACHE_MAX_TTL_MS },
-      });
-    }
-
     try {
       const report = await investigateThreatIntelligence({ url: targetUrl });
-      if (report?.isThreatDetected) {
-        const threatName = report.sources?.urlhaus?.threat || report.sources?.ncsc?.threatType || "MALICIOUS_THREAT";
+      const sourceEntries = Object.entries(report?.sources || {});
+      const providerResults = sourceEntries.map(([sourceId, source]) => {
+        const provider = sourceId === "urlhaus"
+          ? "URLhaus (abuse.ch)"
+          : sourceId === "ncsc"
+            ? "StudentHub NCSC IOC feed"
+            : sourceId === "apwg"
+              ? "StudentHub APWG taxonomy"
+              : sourceId === "ftcSentinel"
+                ? "StudentHub FTC Sentinel taxonomy"
+                : `StudentHub ${sourceId}`;
+        const isUnavailable = ["API_UNAVAILABLE", "RATE_LIMITED", "INVALID_INPUT"].includes(String(source?.status || "").toUpperCase()) || source?.available === false;
+        const dangerous = source?.isMalicious === true || source?.isThreatDetected === true || source?.hasHighRiskVector === true || source?.hasSevereFinancialRisk === true;
+        return {
+          provider,
+          success: !isUnavailable,
+          verdict: dangerous ? "DANGEROUS" : isUnavailable ? "UNKNOWN" : "SAFE",
+          confidence: dangerous && typeof source?.confidence === "number" ? source.confidence : null,
+          message: typeof source?.errorNotice === "string"
+            ? source.errorNotice
+            : dangerous
+              ? "Provider reported a matching threat signal."
+              : isUnavailable
+                ? "Provider did not return a usable result."
+                : "No matching threat signal was returned by this provider.",
+          threatTypes: [source?.threatType, ...(Array.isArray(source?.tags) ? source.tags : [])].filter((item) => typeof item === "string").slice(0, 8),
+          status: source?.status || null,
+        };
+      });
+      const hasProviderFailure = providerResults.some((item) => item.success !== true || item.verdict === "UNKNOWN");
+      const dangerousProviders = providerResults.filter((item) => item.verdict === "DANGEROUS");
+      if (dangerousProviders.length > 0 || report?.isThreatDetected === true) {
+        const threatName = dangerousProviders.flatMap((item) => item.threatTypes || [])[0] || "MALICIOUS_THREAT";
         return createLayer2AResult({
-          provider: "URLhaus & NCSC Threat Intelligence",
-          providerStatus: LAYER_2A_PROVIDER_STATUS.SUCCESS,
+          provider: "StudentHub Threat Intelligence",
+          providerStatus: hasProviderFailure ? LAYER_2A_PROVIDER_STATUS.UNAVAILABLE : LAYER_2A_PROVIDER_STATUS.SUCCESS,
           finding: LAYER_2A_FINDING.THREAT_MATCH,
           rawVerdict: "DANGEROUS",
-          providerConfidence: report.confidence || 0.98,
+          providerConfidence: typeof report?.confidence === "number" ? report.confidence : null,
           threatTypes: [threatName],
-          providerResults: [{
-            provider: "URLhaus & NCSC Threat Intelligence",
-            success: true,
-            verdict: "DANGEROUS",
-            confidence: report.confidence || 0.98,
-            message: `Threat detected: ${threatName}`,
-          }],
-          message: "Live threat intelligence identified known malicious indicators.",
+          providerResults,
+          message: "StudentHub threat intelligence identified a matching malicious indicator.",
           requestId: baseRequestId,
           targetFingerprint,
           latencyMs: this.clock() - startedAt,
@@ -559,37 +555,35 @@ export class RenderLayer2AProvider {
         });
       }
 
-      // Safe / Clean case: NEVER invent 95%! Provider confidence = null as required!
+      // A clean result is only disclosed when every executed provider returned
+      // a usable no-match result. A partial provider outage stays UNKNOWN.
       return createLayer2AResult({
-        provider: "Google Safe Browsing & URLhaus",
-        providerStatus: LAYER_2A_PROVIDER_STATUS.SUCCESS,
-        finding: LAYER_2A_FINDING.NO_KNOWN_THREAT,
-        rawVerdict: "SAFE",
+        provider: "StudentHub Threat Intelligence",
+        providerStatus: hasProviderFailure ? LAYER_2A_PROVIDER_STATUS.UNAVAILABLE : LAYER_2A_PROVIDER_STATUS.SUCCESS,
+        finding: hasProviderFailure ? LAYER_2A_FINDING.UNKNOWN : LAYER_2A_FINDING.NO_KNOWN_THREAT,
+        rawVerdict: hasProviderFailure ? "UNKNOWN" : "SAFE",
         providerConfidence: null,
         threatTypes: [],
-        providerResults: [{
-          provider: "Google Safe Browsing",
-          success: true,
-          verdict: "SAFE",
-          confidence: null,
-          message: "No known threat returned.",
-        }],
-        message: "No known threat was returned by threat intelligence providers.",
+        providerResults,
+        message: hasProviderFailure
+          ? "One or more StudentHub threat providers did not return a usable result."
+          : "No known threat was returned by the executed StudentHub threat providers.",
         requestId: baseRequestId,
         targetFingerprint,
         latencyMs: this.clock() - startedAt,
-        cacheMetadata: { hit: false, ttlMs: LAYER_2A_CONFIG.CACHE_MAX_TTL_MS },
+        cacheMetadata: { hit: false, ttlMs: hasProviderFailure ? 0 : LAYER_2A_CONFIG.CACHE_MAX_TTL_MS },
       });
-    } catch {
+    } catch (error) {
       return createLayer2AResult({
         provider: "Owner Threat Intelligence",
-        providerStatus: LAYER_2A_PROVIDER_STATUS.SUCCESS,
-        finding: LAYER_2A_FINDING.NO_KNOWN_THREAT,
-        rawVerdict: "SAFE",
+        providerStatus: LAYER_2A_PROVIDER_STATUS.UNAVAILABLE,
+        finding: LAYER_2A_FINDING.UNKNOWN,
+        rawVerdict: "UNKNOWN",
         providerConfidence: null,
         threatTypes: [],
         providerResults: [],
-        message: "No known threat detected.",
+        errorCode: "OWNER_THREAT_INTELLIGENCE_UNAVAILABLE",
+        message: typeof error?.message === "string" ? error.message.slice(0, 240) : "StudentHub threat intelligence did not return a usable result.",
         requestId: baseRequestId,
         targetFingerprint,
         latencyMs: this.clock() - startedAt,

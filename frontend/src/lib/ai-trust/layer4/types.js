@@ -139,8 +139,22 @@ function safeAiVerification(value) {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
     const url = realUrl(item.url);
     if (!url) return null;
-    return { id: boundedText(item.id, 180) || url, url };
+    const httpStatus = Number(item.httpStatus);
+    const redirectCount = Number(item.redirectCount);
+    return {
+      id: boundedText(item.id, 180) || url,
+      url,
+      retrievalOrigin: boundedText(item.retrievalOrigin, 120) || null,
+      validationStatus: boundedText(item.validationStatus, 80) || null,
+      requestedUrl: realUrl(item.requestedUrl) || null,
+      httpStatus: Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599 ? httpStatus : null,
+      redirectCount: Number.isInteger(redirectCount) && redirectCount >= 0 ? redirectCount : 0,
+    };
   }).filter(Boolean);
+  const sourceIds = (candidate) => Array.from(new Set(safeArray(candidate, 20)
+    .filter((item) => typeof item === "string")
+    .map((item) => boundedText(item, 180))
+    .filter(Boolean)));
   return {
     verdictSignal: boundedText(value.verdictSignal, 60) || "UNCERTAIN",
     supportReasons: safeList(value.supportReasons),
@@ -148,8 +162,50 @@ function safeAiVerification(value) {
     missingEvidence: safeList(value.missingEvidence),
     uncertainty: boundedText(value.uncertainty, 700) || "Gemini không công bố thêm certainty ngoài evidence hiện có.",
     citationsUsed: citations,
+    supportingSourceIds: sourceIds(value.supportingSourceIds),
+    contradictingSourceIds: sourceIds(value.contradictingSourceIds),
+    citationValidation: value.citationValidation && typeof value.citationValidation === "object" && !Array.isArray(value.citationValidation)
+      ? {
+        checkedCount: Number.isFinite(Number(value.citationValidation.checkedCount)) ? Math.max(0, Number(value.citationValidation.checkedCount)) : 0,
+        acceptedCount: Number.isFinite(Number(value.citationValidation.acceptedCount)) ? Math.max(0, Number(value.citationValidation.acceptedCount)) : 0,
+        rejectedCount: Number.isFinite(Number(value.citationValidation.rejectedCount)) ? Math.max(0, Number(value.citationValidation.rejectedCount)) : 0,
+        allLinksValidated: value.citationValidation.allLinksValidated === true,
+      }
+      : null,
     provider: boundedText(value.provider, 80).toLowerCase() || "gemini",
     model: boundedText(value.model, 120) || null,
+  };
+}
+
+function safeEvidenceGapAnalysis(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return {
+    status: boundedText(value.status, 80).toUpperCase() || "UNKNOWN",
+    needsMoreEvidence: value.needsMoreEvidence === true,
+    evidenceGaps: safeArray(value.evidenceGaps, 2).map((gap) => ({
+      reason: boundedText(gap?.reason, 500),
+      suggestedQuery: boundedText(gap?.suggestedQuery, 320),
+      preferredAuthority: boundedText(gap?.preferredAuthority, 180),
+      targetClaimId: boundedText(gap?.targetClaimId, 180),
+    })).filter((gap) => gap.reason && gap.suggestedQuery),
+    requestedQueryCount: Number.isFinite(Number(value.requestedQueryCount)) ? Math.max(0, Math.min(2, Number(value.requestedQueryCount))) : 0,
+    executedQueryCount: Number.isFinite(Number(value.executedQueryCount)) ? Math.max(0, Math.min(2, Number(value.executedQueryCount))) : 0,
+    executedModel: boundedText(value.executedModel, 160) || null,
+    providerStatus: boundedText(value.providerStatus, 100).toUpperCase() || null,
+    errorCode: boundedText(value.errorCode, 120) || null,
+    aiModelTrace: safeModelTrace(value.aiModelTrace),
+  };
+}
+
+function safeSupplementalRetrieval(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return {
+    status: boundedText(value.status, 80).toUpperCase() || "UNKNOWN",
+    queryCount: Number.isFinite(Number(value.queryCount)) ? Math.max(0, Math.min(2, Number(value.queryCount))) : 0,
+    sourceCount: Number.isFinite(Number(value.sourceCount)) ? Math.max(0, Number(value.sourceCount)) : 0,
+    validatedSourceCount: Number.isFinite(Number(value.validatedSourceCount)) ? Math.max(0, Number(value.validatedSourceCount)) : 0,
+    retrievalOrigin: boundedText(value.retrievalOrigin, 100) || "TAVILY_AI_REQUESTED_SUPPLEMENT",
+    providerStatus: boundedText(value.providerStatus, 100).toUpperCase() || null,
   };
 }
 
@@ -265,6 +321,8 @@ export function createLayer4Result(input = {}) {
   aiProviderStatus = null,
   aiOperationStatus = null,
   aiCooldownResult = null,
+  evidenceGapAnalysis = null,
+  supplementalRetrieval = null,
   } = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   const safeTruthAssessment = truthAssessment && typeof truthAssessment === "object" && !Array.isArray(truthAssessment)
     ? truthAssessment
@@ -337,6 +395,8 @@ export function createLayer4Result(input = {}) {
     aiProviderStatus: boundedText(aiProviderStatus, 120).toUpperCase() || null,
     aiOperationStatus: boundedText(aiOperationStatus, 80).toUpperCase() || null,
     aiCooldownResult: safeCooldownResult(aiCooldownResult),
+    evidenceGapAnalysis: safeEvidenceGapAnalysis(evidenceGapAnalysis),
+    supplementalRetrieval: safeSupplementalRetrieval(supplementalRetrieval),
     auditTrail: {
       requestId: boundedText(safeAuditTrail.requestId, 160) || createSecureId("req_l4"),
       timestamp: boundedText(safeAuditTrail.timestamp, 80) || new Date().toISOString(),

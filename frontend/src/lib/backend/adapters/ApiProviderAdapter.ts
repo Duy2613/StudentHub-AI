@@ -242,7 +242,14 @@ function trustResultFromResponse(input: TrustInvestigationInput, raw: unknown): 
   const layer4 = asRecord(layerResults.layer4);
   const layer4Explanation = asRecord(layer4.userExplanation);
 
-  const stageValues = Object.values(pipeline.stages);
+  const stageValues = Object.values(pipeline.stages) as Array<{
+    stageId: string;
+    operationStatus: string;
+    finding: string | null;
+    summary: string;
+    evidenceRefs: string[];
+    completedAt: string | null;
+  }>;
   const stages = stageValues.map((stage) => ({
     stageId: stage.stageId,
     status: statusForStage(stage.operationStatus),

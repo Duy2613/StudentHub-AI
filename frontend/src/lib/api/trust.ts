@@ -5,7 +5,7 @@ import { canonicalTrustResponseSchema, trustEvidenceResultSchema, trustReasoning
 export type { ExpertConsensus, RelatedCase, ThreatProviderResult, TrustLayerResult } from "./schemas/trust.ts";
 
 export type TrustInput = {
-  type: "text" | "url" | "image" | "file";
+  type: "text" | "url" | "image" | "file" | "qr";
   content: string;
   metadata?: Record<string, unknown>;
 };
@@ -23,17 +23,18 @@ type TrustV5Event = {
   error?: { code?: string; message?: string };
 };
 
-function legacyStage(stageId: string, raw: Record<string, unknown> | null | undefined, finding: string, summary: string, nextStage: string | null) {
+function legacyStage(stageId: "l1" | "l2" | "l3" | "l4", raw: Record<string, unknown> | null | undefined, finding: string, summary: string, nextStage: string | null) {
   const source = raw || {};
-  const operationStatus = raw ? (stageId === "l5" ? "PARTIAL" : "COMPLETED") : stageId === "l5" ? "PARTIAL" : "FAILED";
+  const operationStatus = raw ? "COMPLETED" : "FAILED";
   return {
     schemaVersion: "trust.v5.stage.compatibility",
     requestId: "legacy-compatibility",
     stageId,
+    pipelineModel: "FOUR_LAYER",
     architecturalLayer: stageId.toUpperCase(),
-    stageName: stageId === "l1" ? "LOCAL SECURITY" : stageId === "l2a" ? "THREAT INTELLIGENCE" : stageId === "l2b" ? "SEMANTIC INTELLIGENCE" : stageId === "l2c" ? "STUDENTHUB DOMAIN AI" : stageId === "l3" ? "EVIDENCE & PROVENANCE" : stageId === "l4" ? "FINAL POLICY" : "ASSURANCE AUDIT",
-    role: "Compatibility view for a pre-V5 response",
-    checking: "Phản hồi cũ không có đầy đủ V5 stage contract; dữ liệu được giữ nguyên để hiển thị chuyển tiếp.",
+    stageName: stageId === "l1" ? "DETERMINISTIC SCREEN" : stageId === "l2" ? "THREAT & SEMANTIC INTELLIGENCE" : stageId === "l3" ? "EVIDENCE RETRIEVAL" : "SYNTHESIS & REASONING",
+    role: "Compatibility view for an older StudentHub response",
+    checking: "Phản hồi cũ không có đầy đủ four-layer contract; dữ liệu được giữ nguyên để hiển thị chuyển tiếp.",
     operationStatus,
     finding,
     severity: finding === "UNKNOWN" || finding === "BLOCKED_BY_MISSING_EVIDENCE" ? "HIGH" : "INFO",
@@ -52,7 +53,7 @@ function legacyStage(stageId: string, raw: Record<string, unknown> | null | unde
     evidenceRefs: Array.isArray(source.evidenceRefs) ? source.evidenceRefs.filter((value): value is string => typeof value === "string").slice(0, 20) : [],
     meaning: "Đây là compatibility data từ contract cũ, không phải bằng chứng V5 đầy đủ.",
     notProve: "Không chứng minh an toàn; V5 stage contract chưa được upstream cung cấp.",
-    limitations: ["Upstream response không chứa đầy đủ bảy stage V5; không dùng compatibility view làm maturity evidence."],
+    limitations: ["Upstream response không chứa đầy đủ four-layer contract; không dùng compatibility view làm evidence mới."],
     nextStage,
     safeToContinue: operationStatus !== "FAILED",
     userAction: "Giữ thận trọng và chờ contract V5 đầy đủ.",
@@ -63,66 +64,37 @@ function legacyStage(stageId: string, raw: Record<string, unknown> | null | unde
 function legacyToV5(payload: Record<string, unknown>): TrustV5Response {
   const data = (payload.data && typeof payload.data === "object" ? payload.data : {}) as Record<string, unknown>;
   const layer1 = (data.layer1 && typeof data.layer1 === "object" ? data.layer1 : null) as Record<string, unknown> | null;
-  const layer2A = (data.layer2A && typeof data.layer2A === "object" ? data.layer2A : null) as Record<string, unknown> | null;
   const layer2 = (data.layer2 && typeof data.layer2 === "object" ? data.layer2 : null) as Record<string, unknown> | null;
   const layer3 = (data.layer3 && typeof data.layer3 === "object" ? data.layer3 : null) as Record<string, unknown> | null;
   const layer4 = (data.layer4 && typeof data.layer4 === "object" ? data.layer4 : null) as Record<string, unknown> | null;
   const layer1Finding = layer1?.status === "BLOCK" ? "LOCAL_BLOCK" : layer1?.status === "SUSPICIOUS" ? "LOCAL_SUSPICIOUS" : layer1?.status === "PASS" ? "LOCAL_CLEAR" : "LOCAL_UNKNOWN";
-  const l2aFinding = typeof layer2A?.finding === "string" && ["THREAT_MATCH", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE", "SKIPPED_PRIVACY_SAFETY"].includes(layer2A.finding) ? layer2A.finding : "UNKNOWN";
-  const l2bFinding = layer2?.status === "UNKNOWN" ? "UNKNOWN" : layer2?.status === "PASS" ? "SEMANTIC_NORMAL" : "SEMANTIC_SUSPICIOUS";
   const l3Status = String(layer3?.status || "").toUpperCase();
   const l3Finding = l3Status.includes("CONTEST") ? "MIXED" : l3Status.includes("VERIFIED") ? "SUPPORTED" : l3Status.includes("PARTIAL") ? "MIXED" : l3Status.includes("UNAVAILABLE") ? "UNAVAILABLE" : "INSUFFICIENT";
   const security = typeof layer4?.securityClassification === "string" ? layer4.securityClassification : layer1?.status === "BLOCK" ? "MALICIOUS" : layer1?.status === "SUSPICIOUS" ? "SUSPICIOUS" : "UNKNOWN";
-  const truth = typeof layer4?.truthStatus === "string" ? layer4.truthStatus : "INSUFFICIENT_EVIDENCE";
-  const action = typeof layer4?.enforcement === "string" ? layer4.enforcement : security === "MALICIOUS" ? "BLOCK" : security === "SUSPICIOUS" ? "WARN" : "REVIEW";
   const requestId = typeof payload.requestId === "string" ? payload.requestId : "legacy-compatibility";
   const stages = {
-    l1: legacyStage("l1", layer1, layer1Finding, "Layer 1 compatibility result.", "l2a"),
-    l2a: legacyStage("l2a", layer2A, l2aFinding, "Layer 2A compatibility result.", "l2b"),
-    l2b: legacyStage("l2b", layer2, l2bFinding, "Layer 2B compatibility result.", "l2c"),
-    l2c: legacyStage("l2c", null, "UNKNOWN_STUDENT_RISK", "V5 L2C chưa có trong upstream response.", "l3"),
+    l1: legacyStage("l1", layer1, layer1Finding, "Layer 1 compatibility result.", "l2"),
+    l2: legacyStage("l2", layer2, typeof layer2?.finding === "string" ? layer2.finding : "UNKNOWN", "Layer 2 compatibility result.", "l3"),
     l3: legacyStage("l3", layer3, l3Finding, "Layer 3 compatibility result.", "l4"),
-    l4: legacyStage("l4", layer4, ["MALICIOUS", "SUSPICIOUS", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE"].includes(security) ? security : "UNKNOWN", "Layer 4 compatibility result.", "l5"),
-    l5: legacyStage("l5", null, "BLOCKED_BY_MISSING_EVIDENCE", "L5 chưa chạy vì upstream trả contract trước V5.", null),
+    l4: legacyStage("l4", layer4, ["MALICIOUS", "SUSPICIOUS", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE"].includes(security) ? security : "UNKNOWN", "Layer 4 compatibility result.", null),
   };
   for (const stage of Object.values(stages)) stage.requestId = requestId;
   const pipeline = {
     schemaVersion: "trust.v5",
-    pipelineVersion: "trust-v5-compatibility",
+    pipelineVersion: "trust-pipeline-four-layer-final-predict-compatibility",
+    pipelineModel: "FOUR_LAYER",
+    publicLayerCount: 4,
     requestId,
     pipelineStatus: "PARTIAL",
-    currentStage: "l5",
+    currentStage: null,
     stages,
-    finalDecision: {
-      security,
-      truth,
-      action,
-      securityClassification: security,
-      truthStatus: truth,
-      enforcement: action,
-      presentedTruthStatus: truth,
-      presentedEnforcement: action,
-      l4Decision: { security, truth, action },
-      assuranceStatus: "BLOCKED_BY_MISSING_EVIDENCE",
-      assuranceApplied: false,
-      decisionAuthority: "L4_DETERMINISTIC_POLICY",
-      assuranceAuthority: "L5_DOWNGRADE_ONLY",
-      isHardNegative: security === "MALICIOUS" || action === "BLOCK",
-    },
-    assurance: {
-      status: "BLOCKED_BY_MISSING_EVIDENCE",
-      anomalies: [{ code: "V5_CONTRACT_MISSING", severity: "HIGH", details: "Upstream response chưa có V5 orchestration." }],
-      assuranceReasons: ["Compatibility response không được coi là V5 evidence."],
-      recommendedRechecks: ["retry_with_v5_contract"],
-      assuranceConfidence: null,
-      assuranceConfidenceKind: "NOT_CALIBRATED_ASSURANCE_RESULT",
-      auditVersion: "trust-v5-compatibility",
-      downgradeOnly: true,
-    },
+    finalDecision: null,
+    finalPredict: null,
+    assurance: null,
     startedAt: null,
     completedAt: null,
-    audit: { requestId, stageSequence: ["l1", "l2a", "l2b", "l2c", "l3", "l4", "l5"], stageAttempts: [], hardNegativePropagation: [], policyVersion: "trust-v5-compatibility", assuranceVersion: "trust-v5-compatibility", compatibilityFallback: true },
-    layerResults: { layer1, layer2A, layer2B: layer2, layer2C: null, layer3, layer4 },
+    audit: { requestId, stageSequence: ["l1", "l2", "l3", "l4"], stageAttempts: [], hardNegativePropagation: [], policyVersion: "trust-v5-compatibility", assuranceVersion: null, compatibilityFallback: true },
+    layerResults: { layer1, layer2, layer3, layer4 },
   };
   return { success: true, contractVersion: "trust.v5", requestId, version: "v5", demo: false, data: pipeline } as unknown as TrustV5Response;
 }
@@ -210,7 +182,7 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
     if (!contentType.toLowerCase().includes("text/event-stream")) {
       const payload = await readJsonOrNull(response);
       const result = parseV5Response(payload);
-      onEvent?.({ type: "complete", event: "PIPELINE_COMPLETED", stageId: "l5", requestId: result.requestId, data: result.data });
+      onEvent?.({ type: "complete", event: "PIPELINE_COMPLETED", stageId: "final_predict", requestId: result.requestId, data: result.data });
       return result;
     }
     if (!response.body) throw new ApiError("Streaming response did not include a readable body.", "INVALID_RESPONSE", { requestId });

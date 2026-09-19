@@ -57,7 +57,7 @@ export class Layer4TrustService {
     const layer2Result = safeObject(input.layer2Result);
     const layer2AResult = safeObject(input.layer2AResult);
     const layer2CResult = safeObject(input.layer2CResult);
-    const layer3Result = safeObject(input.layer3Result);
+    let currentLayer3Result = safeObject(input.layer3Result);
     const options = safeObject(input.options) || {};
     const startTime = nowMs();
     const deterministicProvider = new DeterministicTrustPolicyProvider();
@@ -73,7 +73,7 @@ export class Layer4TrustService {
         layer2Result,
         layer2AResult,
         layer2CResult,
-        layer3Result,
+        layer3Result: currentLayer3Result,
         documentContext: options.documentContext || null,
         conversationContext: options.conversationContext || null,
       });
@@ -96,7 +96,7 @@ export class Layer4TrustService {
           layer2ASecurityClassification: layer2AResult?.securityClassification || "UNKNOWN",
           layer3Sources: [],
           layer3Evidence: [],
-          layer3Result,
+          layer3Result: currentLayer3Result,
           layer3ResultTrusted: false,
           layer3ClaimStatuses: {},
           layer3Conflicts: [],
@@ -115,7 +115,7 @@ export class Layer4TrustService {
         fusionError: error?.name || "FUSION_FAILURE",
       };
     }
-    const {
+    let {
       fusedGraph: _fusedGraph,
       totalEvidenceItems,
       shouldAbstain,
@@ -126,7 +126,7 @@ export class Layer4TrustService {
     } = fusion;
 
     // Attach fusion metadata to fusedGraph so the reasoning provider can access it
-    const fusedGraph = {
+    let fusedGraph = {
       ..._fusedGraph,
       shouldAbstain,
       abstentionReason,
@@ -147,15 +147,141 @@ export class Layer4TrustService {
     }
 
     // 3. Execute deterministic policy first and keep it authoritative.
-    const deterministicAssessment = await deterministicProvider.reason(fusedGraph);
+    let deterministicAssessment = await deterministicProvider.reason(fusedGraph);
+
+    let evidenceGapAnalysis = {
+      status: "NOT_REQUESTED",
+      needsMoreEvidence: false,
+      evidenceGaps: [],
+      requestedQueryCount: 0,
+      executedQueryCount: 0,
+      executedModel: null,
+      providerStatus: null,
+      errorCode: null,
+      aiModelTrace: [],
+    };
+    let supplementalRetrieval = {
+      status: "NOT_REQUESTED",
+      queryCount: 0,
+      sourceCount: 0,
+      validatedSourceCount: 0,
+      retrievalOrigin: "TAVILY_AI_REQUESTED_SUPPLEMENT",
+      providerStatus: null,
+    };
+
+    // One bounded gap-analysis pass may request at most two Tavily queries.
+    // The final synthesis below remains a separate, single pass over the
+    // rebuilt canonical evidence package.
+    if (
+      narrativeProvider &&
+      typeof narrativeProvider.analyzeEvidenceGaps === "function"
+    ) {
+      try {
+        evidenceGapAnalysis = await narrativeProvider.analyzeEvidenceGaps(fusedGraph, {
+          requestId: options.requestId || layer1Result?.requestId || layer2Result?.requestId || currentLayer3Result?.requestId || null,
+          signal: options.signal,
+          perModelTimeoutMs: options.aiPerModelTimeoutMs,
+          totalBudgetMs: options.aiTotalBudgetMs,
+        });
+      } catch (error) {
+        evidenceGapAnalysis = {
+          ...evidenceGapAnalysis,
+          status: "UNAVAILABLE",
+          errorCode: error?.name || "GAP_ANALYSIS_FAILURE",
+        };
+      }
+
+      const gaps = Array.isArray(evidenceGapAnalysis?.evidenceGaps)
+        ? evidenceGapAnalysis.evidenceGaps.slice(0, 2)
+        : [];
+      evidenceGapAnalysis.requestedQueryCount = gaps.length;
+      if (evidenceGapAnalysis?.needsMoreEvidence === true && gaps.length > 0 && typeof options.retrieveSupplementalEvidence === "function") {
+        try {
+          const retrieval = await options.retrieveSupplementalEvidence({
+            initialLayer3Result: currentLayer3Result,
+            evidenceGapAnalysis,
+            gaps,
+            requestId: options.requestId || layer1Result?.requestId || layer2Result?.requestId || currentLayer3Result?.requestId || null,
+            signal: options.signal,
+          });
+          const replacement = safeObject(retrieval?.layer3Result || retrieval);
+          if (replacement) {
+            currentLayer3Result = replacement;
+            supplementalRetrieval = retrieval?.phaseSummary || replacement.retrievalPhases?.supplementalSearch || {
+              status: "COMPLETED",
+              queryCount: gaps.length,
+              sourceCount: replacement.metrics?.sourcesRetrievedCount || replacement.sources?.length || 0,
+              validatedSourceCount: replacement.sources?.filter?.((source) => source?.liveEvidence === true).length || 0,
+              retrievalOrigin: "TAVILY_AI_REQUESTED_SUPPLEMENT",
+              providerStatus: replacement.retrievalStatus || null,
+            };
+            evidenceGapAnalysis.executedQueryCount = Math.min(2, Number(supplementalRetrieval.queryCount) || gaps.length);
+
+            // Rebuild fusion and the deterministic baseline after supplemental
+            // retrieval. No source from the first pass is discarded.
+            try {
+              fusion = EvidenceFusionEngine.fuse({
+                layer1Result,
+                layer2Result,
+                layer2AResult,
+                layer2CResult,
+                layer3Result: currentLayer3Result,
+                documentContext: options.documentContext || null,
+                conversationContext: options.conversationContext || null,
+              });
+              ({
+                fusedGraph: _fusedGraph,
+                totalEvidenceItems,
+                shouldAbstain,
+                abstentionReason,
+                isHardNegative,
+                hardNegativeContext,
+                interactionMultiplier,
+              } = fusion);
+              fusedGraph = {
+                ..._fusedGraph,
+                shouldAbstain,
+                abstentionReason,
+                isHardNegative,
+                hardNegativeContext,
+                interactionMultiplier,
+              };
+              globalIntelligence = emptyGlobalIntelligence();
+              try {
+                globalIntelligence = GlobalIntelligenceEngine.correlate({
+                  fusedGraph,
+                  url: typeof layer1Result?.metrics?.inputContent === "string" ? layer1Result.metrics.inputContent : "",
+                });
+              } catch {
+                globalIntelligence = emptyGlobalIntelligence();
+              }
+              deterministicAssessment = await deterministicProvider.reason(fusedGraph);
+            } catch {
+              // Keep the initial fused graph if rebuilding fails; the final
+              // provider still receives an evidence-bound deterministic state.
+            }
+          } else {
+            supplementalRetrieval = { ...supplementalRetrieval, status: "UNAVAILABLE" };
+          }
+        } catch (error) {
+          supplementalRetrieval = {
+            ...supplementalRetrieval,
+            status: "UNAVAILABLE",
+            providerStatus: "UNAVAILABLE",
+            errorCode: error?.name || "SUPPLEMENTAL_RETRIEVAL_FAILURE",
+          };
+        }
+      }
+    }
     let assessment = deterministicAssessment;
     try {
       if (narrativeProvider && typeof narrativeProvider.reason === "function") {
           const candidate = await narrativeProvider.reason(fusedGraph, {
-            requestId: options.requestId || layer1Result?.requestId || layer2Result?.requestId || layer3Result?.requestId || null,
+            requestId: options.requestId || layer1Result?.requestId || layer2Result?.requestId || currentLayer3Result?.requestId || null,
             signal: options.signal,
             perModelTimeoutMs: options.aiPerModelTimeoutMs,
             totalBudgetMs: options.aiTotalBudgetMs,
+            validateCitationUrl: options.validateCitationUrl,
           });
         // Preserve every security/truth/action/confidence field from the
         // deterministic result. Only a bounded narrative may cross this
@@ -242,8 +368,10 @@ export class Layer4TrustService {
       aiProviderStatus: assessment.aiProviderStatus || null,
       aiOperationStatus: assessment.aiOperationStatus || null,
       aiCooldownResult: assessment.aiCooldownResult || null,
+      evidenceGapAnalysis,
+      supplementalRetrieval,
       auditTrail: {
-        requestId: layer1Result?.requestId || layer2Result?.requestId || layer2AResult?.requestId || layer3Result?.requestId || null,
+        requestId: layer1Result?.requestId || layer2Result?.requestId || layer2AResult?.requestId || currentLayer3Result?.requestId || null,
         ruleVersion: LAYER_4_CONFIG.VERSION,
         fusedEvidenceCount: totalEvidenceItems,
         hardRuleTriggered: assessment.hardRuleTriggered,

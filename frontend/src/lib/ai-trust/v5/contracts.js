@@ -27,9 +27,22 @@ export const PIPELINE_STATUS = Object.freeze({
 });
 
 export const STAGE_IDS = Object.freeze(["l1", "l2a", "l2b", "l2c", "l3", "l4", "l5"]);
+export const FOUR_LAYER_STAGE_IDS = Object.freeze(["l1", "l2", "l3", "l4"]);
+export const FOUR_LAYER_PIPELINE_VERSION = "trust-pipeline-four-layer-final-predict-1.0.0";
+export const FOUR_LAYER_MODEL = "FOUR_LAYER";
 
 export const STAGE_FINDINGS = Object.freeze({
   l1: Object.freeze(["LOCAL_BLOCK", "LOCAL_SUSPICIOUS", "LOCAL_CLEAR", "LOCAL_UNKNOWN"]),
+  l2: Object.freeze([
+    "THREAT_MATCH",
+    "NO_KNOWN_THREAT",
+    "SEMANTIC_NORMAL",
+    "SEMANTIC_SUSPICIOUS",
+    "MANIPULATION_DETECTED",
+    "PARTIAL",
+    "UNKNOWN",
+    "NOT_APPLICABLE",
+  ]),
   l2a: Object.freeze(["THREAT_MATCH", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE", "SKIPPED_PRIVACY_SAFETY"]),
   l2b: Object.freeze([
     "SEMANTIC_NORMAL",
@@ -151,6 +164,52 @@ export const STAGE_DEFINITIONS = Object.freeze({
   }),
 });
 
+// Public four-layer presentation. The older L2A/L2B/L2C and L5 definitions
+// remain available for historical/internal compatibility, but are never
+// emitted by the canonical own-backend route.
+export const FOUR_LAYER_STAGE_DEFINITIONS = Object.freeze({
+  l1: Object.freeze({
+    id: "l1",
+    architecturalLayer: "L1",
+    stageName: "DETERMINISTIC SCREEN",
+    role: "Deterministic Screen",
+    checking: "Kiểm tra tất định trên input đã nhận và công bố đúng các detector thực sự đã chạy.",
+    notProve: "PASS ở Layer 1 không chứng minh nội dung, URL hoặc người gửi là đúng hay an toàn.",
+    limitations: ["Chỉ quan sát input đã nhận; chưa xác minh nguồn bên ngoài, danh tính hoặc tính đúng của claim."],
+    nextStage: "l2",
+  }),
+  l2: Object.freeze({
+    id: "l2",
+    architecturalLayer: "L2",
+    stageName: "THREAT & SEMANTIC INTELLIGENCE",
+    role: "Threat & Semantic Intelligence",
+    checking: "Gộp threat/reputation, semantic/entity/manipulation và student scam/context từ các provider StudentHub đã thực sự chạy.",
+    notProve: "Không có provider result hoặc provider lỗi không phải SAFE; Layer 2 chỉ tạo tín hiệu cần đối chiếu.",
+    limitations: ["Provider failure giữ UNKNOWN/PARTIAL; semantic và domain signal không tự chứng minh sự thật."],
+    nextStage: "l3",
+  }),
+  l3: Object.freeze({
+    id: "l3",
+    architecturalLayer: "L3",
+    stageName: "EVIDENCE RETRIEVAL",
+    role: "Tavily Evidence Retrieval",
+    checking: "Truy vấn Tavily theo bounded query strategy, xác thực URL/nội dung và giữ provenance của nguồn thực.",
+    notProve: "Task hoặc claim candidate không phải evidence; zero usable sources là INSUFFICIENT_EVIDENCE/UNKNOWN.",
+    limitations: ["Tavily outage, nguồn lỗi, nguồn stale hoặc thiếu độc lập đều làm giảm completeness và không được nâng confidence."],
+    nextStage: "l4",
+  }),
+  l4: Object.freeze({
+    id: "l4",
+    architecturalLayer: "L4",
+    stageName: "AI SYNTHESIS & REASONING",
+    role: "Gemini Synthesis & Reasoning",
+    checking: "Dùng evidence Tavily làm context, nêu support/contradiction/uncertainty và có thể bổ sung URL độc lập nếu URL đó vượt qua kiểm tra an toàn/truy cập.",
+    notProve: "AI không được đổi policy hoặc biến thiếu evidence thành kết luận chắc chắn; URL AI bổ sung không được đưa ra ngoài nếu chưa validate.",
+    limitations: ["Gemini failure giữ partial/unknown; Final Predict vẫn là projection tất định sau Layer 4."],
+    nextStage: null,
+  }),
+});
+
 const ALLOWED_OPERATION_STATUSES = new Set(Object.values(OPERATION_STATUS));
 
 function boundedString(value, maxLength) {
@@ -219,7 +278,17 @@ function publicAiVerification(value) {
     : [];
   const citationsUsed = Array.isArray(value.citationsUsed) ? value.citationsUsed.slice(0, 20).map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item) || typeof item.url !== "string" || !/^https?:\/\//i.test(item.url)) return null;
-    return { id: publicText(item.id, 180) || item.url.slice(0, 4096), url: item.url.slice(0, 4096) };
+    const httpStatus = Number(item.httpStatus);
+    const redirectCount = Number(item.redirectCount);
+    return {
+      id: publicText(item.id, 180) || item.url.slice(0, 4096),
+      url: item.url.slice(0, 4096),
+      retrievalOrigin: publicText(item.retrievalOrigin, 120) || null,
+      validationStatus: publicText(item.validationStatus, 80) || null,
+      requestedUrl: typeof item.requestedUrl === "string" && /^https?:\/\//i.test(item.requestedUrl) ? item.requestedUrl.slice(0, 4096) : null,
+      httpStatus: Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599 ? httpStatus : null,
+      redirectCount: Number.isInteger(redirectCount) && redirectCount >= 0 ? redirectCount : 0,
+    };
   }).filter(Boolean) : [];
   return {
     verdictSignal: publicText(value.verdictSignal, 60) || "UNCERTAIN",
@@ -228,6 +297,16 @@ function publicAiVerification(value) {
     missingEvidence: safeList(value.missingEvidence),
     uncertainty: publicText(value.uncertainty, 700) || "Gemini uncertainty chưa được công bố.",
     citationsUsed,
+    supportingSourceIds: publicStringList(value.supportingSourceIds, 20, 180),
+    contradictingSourceIds: publicStringList(value.contradictingSourceIds, 20, 180),
+    citationValidation: value.citationValidation && typeof value.citationValidation === "object" && !Array.isArray(value.citationValidation)
+      ? {
+        checkedCount: Number.isFinite(Number(value.citationValidation.checkedCount)) ? Math.max(0, Number(value.citationValidation.checkedCount)) : 0,
+        acceptedCount: Number.isFinite(Number(value.citationValidation.acceptedCount)) ? Math.max(0, Number(value.citationValidation.acceptedCount)) : 0,
+        rejectedCount: Number.isFinite(Number(value.citationValidation.rejectedCount)) ? Math.max(0, Number(value.citationValidation.rejectedCount)) : 0,
+        allLinksValidated: value.citationValidation.allLinksValidated === true,
+      }
+      : null,
     provider: publicText(value.provider, 80) || "gemini",
     model: publicText(value.model, 120) || null,
   };
@@ -285,6 +364,50 @@ function publicSignals(value) {
   }).filter(Boolean) : [];
 }
 
+function publicRetrievalPhase(value) {
+  return publicRecord(value, [
+    "status", "queryCount", "sourceCount", "evidenceCount", "validatedSourceCount",
+    "provider", "providerStatus", "retrievalOrigin",
+  ]) || {
+    status: "NOT_REQUESTED",
+    queryCount: 0,
+    sourceCount: 0,
+    evidenceCount: 0,
+    validatedSourceCount: 0,
+    provider: null,
+    providerStatus: null,
+    retrievalOrigin: null,
+  };
+}
+
+function publicRetrievalPhases(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return {
+    initialSearch: publicRetrievalPhase(value.initialSearch),
+    supplementalSearch: publicRetrievalPhase(value.supplementalSearch),
+    finalValidatedEvidenceSet: publicRetrievalPhase(value.finalValidatedEvidenceSet),
+  };
+}
+
+function publicEvidenceGapAnalysis(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return {
+    status: publicText(value.status, 80) || "UNKNOWN",
+    needsMoreEvidence: value.needsMoreEvidence === true,
+    requestedQueryCount: Number.isFinite(Number(value.requestedQueryCount)) ? Math.max(0, Math.min(2, Number(value.requestedQueryCount))) : 0,
+    executedQueryCount: Number.isFinite(Number(value.executedQueryCount)) ? Math.max(0, Math.min(2, Number(value.executedQueryCount))) : 0,
+    evidenceGaps: Array.isArray(value.evidenceGaps) ? value.evidenceGaps.slice(0, 2).map((gap) => publicRecord(gap, ["reason", "suggestedQuery", "preferredAuthority", "targetClaimId"])).filter(Boolean) : [],
+    providerStatus: publicText(value.providerStatus, 100),
+    errorCode: publicText(value.errorCode, 120),
+    executedModel: publicText(value.executedModel, 160),
+  };
+}
+
+function publicSupplementalRetrieval(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return publicRecord(value, ["status", "queryCount", "sourceCount", "validatedSourceCount", "retrievalOrigin", "providerStatus"]);
+}
+
 function publicClaims(value) {
   return Array.isArray(value) ? value.slice(0, 40).map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
@@ -339,8 +462,8 @@ function publicSources(value) {
     return publicRecord(item, [
       "evidenceId", "claimId", "sourceId", "sourceUrl", "url", "title", "publisher", "domain", "sourceType",
       "authorityTier", "freshness", "publishedAt", "retrievedAt", "relation", "status", "retrievalOutcome",
-      "sourceFingerprint", "clusterId", "excerpt", "relevance", "strength", "liveEvidence", "providerStatus",
-      "origin", "provider",
+      "sourceFingerprint", "clusterId", "excerpt", "relevance", "strength", "liveEvidence", "providerStatus", "retrievalOrigin",
+      "origin", "provider", "validationStatus", "httpStatus", "requestedUrl",
     ]);
   }).filter(Boolean) : [];
 }
@@ -348,7 +471,21 @@ function publicSources(value) {
 function publicProviders(value) {
   return Array.isArray(value) ? value.slice(0, 20).map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
-    return publicRecord(item, ["provider", "success", "verdict", "confidence", "message", "threatTypes", "status", "latencyMs", "reference"]);
+    return publicRecord(item, ["provider", "providerId", "success", "verdict", "confidence", "message", "threatTypes", "status", "latencyMs", "reference", "finding", "observedAt"]);
+  }).filter(Boolean) : [];
+}
+
+function publicProviderObservations(value) {
+  return Array.isArray(value) ? value.slice(0, 20).map((item) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+    const output = publicRecord(item, [
+      "provider", "providerId", "status", "finding", "verdict", "success", "confidence", "message",
+      "latencyMs", "errorCode", "source", "executed", "scope", "observedAt",
+    ]);
+    if (!output) return null;
+    output.signals = publicStringList(item.signals, 12, 500);
+    output.threatTypes = publicStringList(item.threatTypes, 12, 120);
+    return output;
   }).filter(Boolean) : [];
 }
 
@@ -422,13 +559,33 @@ function publicLayerResult(value, layerId) {
     "reputationLookupPolicy", "reputationLookupReason", "reputationLookupStatus", "reputationLookupTargetClass", "reputationLookupDisclosed",
     "aiVerificationStatus", "aiVerificationTransport", "aiVerificationThinkingLevel", "aiVerificationLatencyMs", "aiVerificationErrorType", "aiVerificationHttpStatus",
     "aiRequestedPrimaryModel", "aiExecutedModel", "aiFallbackUsed", "aiFallbackReason", "aiProviderStatus", "aiOperationStatus",
+    "conclusion", "continuation", "safeToContinue", "sourceCount", "usableSourceCount", "independentSourceCount", "evidenceSufficiency",
+    "sourceQuality", "evidenceAgreement", "assessmentConfidence", "model", "modelId", "providerMessage", "result", "truthAssessment", "securityRisk",
   ]) || {};
 
-  if (["l1", "l2b", "l2c"].includes(layerId)) base.signals = publicSignals(value.signals || value.riskSignals || value.contextSignals);
+  if (["l1", "l2", "l2b", "l2c"].includes(layerId)) base.signals = publicSignals(value.signals || value.riskSignals || value.contextSignals);
   if (layerId === "l1") {
     base.reasons = Array.isArray(value.reasons) ? value.reasons.slice(0, 12).map((item) => publicText(item, 700)).filter(Boolean) : [];
+    base.checksPerformed = Array.isArray(value.checksPerformed || value.actualChecks)
+      ? (value.checksPerformed || value.actualChecks).slice(0, 24).map((item) => {
+        if (typeof item === "string") return { check: publicText(item, 160), status: "EXECUTED" };
+        return publicRecord(item, ["check", "id", "name", "status", "result", "details", "executedAt"]);
+      }).filter(Boolean)
+      : [];
     base.metrics = publicRecord(value.metrics, ["ruleVersion", "modelUsed", "signalCount", "latencyMs", "riskLevel", "inputLength"]);
     base.details = publicRecord(value.details, ["decisionRationale", "promptInjectionDetected", "hardBlock", "source"]);
+  }
+  if (layerId === "l2") {
+    base.providerObservations = publicProviderObservations(value.providerObservations || value.providers || value.providerResults);
+    base.providers = base.providerObservations;
+    base.semanticSignals = publicSignals(value.semanticSignals || value.contextSignals);
+    base.entities = publicClaims(value.entities);
+    base.claims = publicClaims(value.claims);
+    base.contextSignals = publicSignals(value.contextSignals || value.riskSignals);
+    base.threatTypes = publicStringList(value.threatTypes, 20, 120);
+    base.reasons = publicStringList(value.reasons, 16, 700);
+    base.details = publicRecord(value.details, ["decisionRationale", "promptInjectionDetected", "providerStatus", "providerErrorType", "providerHttpStatus", "providerLatencyMs"]);
+    base.verificationPackage = publicVerificationPackage(value.verificationPackage);
   }
   if (layerId === "l2a") {
     base.threatTypes = Array.isArray(value.threatTypes) ? value.threatTypes.slice(0, 20).map((item) => publicText(item, 120)).filter(Boolean) : [];
@@ -458,7 +615,9 @@ function publicLayerResult(value, layerId) {
       "providerTimeoutConfiguredMs", "providerParentTimeoutMs", "providerRawResultCount", "providerAcceptedResultCount",
       "providerAcceptedHostCount", "providerRejectedResultCount", "providerTimeoutClassification", "providerAbortReason",
       "providerRetryCount", "providerRetryExhausted", "providerRetryable", "independentHostCount", "independentClusterCount",
-      "verificationTasksCount", "l2cVerificationTasksCount",
+      "verificationTasksCount", "l2cVerificationTasksCount", "retrievalStage", "retrievalOrigin",
+      "initialQueryCount", "initialSourceCount", "initialEvidenceCount", "supplementalQueryCount",
+      "supplementalSourceCount", "supplementalEvidenceCount", "finalValidatedSourceCount", "geminiGeneratedUrlCount",
     ]);
     if (base.metrics) {
       base.metrics.providerRejectionReasons = publicStringList(value.metrics?.providerRejectionReasons, 20, 120);
@@ -475,6 +634,7 @@ function publicLayerResult(value, layerId) {
     base.verifiedSources = publicSources(value.verifiedSources);
     base.evidence = publicSources(value.evidence);
     base.evidenceItems = publicSources(value.evidenceItems);
+    base.crossSourceAgreement = publicRecord(value.crossSourceAgreement, ["agreementScore", "status", "unresolved"]);
     base.conflicts = Array.isArray(value.conflicts) ? value.conflicts.slice(0, 30).map((item) => publicText(typeof item === "string" ? item : item?.details || item?.type, 700)).filter(Boolean) : [];
     base.providerResults = publicProviders(value.providerResults);
     base.relatedCases = publicRelatedCases(value.relatedCases);
@@ -485,6 +645,7 @@ function publicLayerResult(value, layerId) {
     ]);
     base.candidateClaimOrigins = publicStringList(value.candidateClaimOrigins, 20, 120);
     base.evidenceRequirements = publicStringList(value.evidenceRequirements, 16, 240);
+    base.retrievalPhases = publicRetrievalPhases(value.retrievalPhases);
     base.legacyIntegration = publicLegacyIntegration(value.legacyIntegration);
   }
   if (layerId === "l4") {
@@ -500,6 +661,8 @@ function publicLayerResult(value, layerId) {
     base.aiVerification = publicAiVerification(value.aiVerification);
     base.aiModelTrace = publicModelTrace(value.aiModelTrace || value.gatewayAttempts || value.attempts);
     base.aiCooldownResult = publicCooldownResult(value.aiCooldownResult || value.cooldownResult);
+    base.evidenceGapAnalysis = publicEvidenceGapAnalysis(value.evidenceGapAnalysis);
+    base.supplementalRetrieval = publicSupplementalRetrieval(value.supplementalRetrieval);
   }
   return base;
 }
@@ -512,12 +675,14 @@ function normalizedConfidence(value) {
 
 export function createStageEnvelope(input = {}) {
   const value = input && typeof input === "object" && !Array.isArray(input) ? input : {};
-  const stageId = STAGE_IDS.includes(value.stageId) ? value.stageId : "l1";
-  const definition = STAGE_DEFINITIONS[stageId];
+  const stageId = [...STAGE_IDS, ...FOUR_LAYER_STAGE_IDS].includes(value.stageId) ? value.stageId : "l1";
+  const useFourLayerDefinition = value.pipelineModel === FOUR_LAYER_MODEL || stageId === "l2";
+  const definition = useFourLayerDefinition ? FOUR_LAYER_STAGE_DEFINITIONS[stageId] : STAGE_DEFINITIONS[stageId];
+  const findingOptions = STAGE_FINDINGS[stageId] || [];
   const operationStatus = ALLOWED_OPERATION_STATUSES.has(value.operationStatus)
     ? value.operationStatus
     : OPERATION_STATUS.NOT_STARTED;
-  const validFinding = typeof value.finding === "string" && STAGE_FINDINGS[stageId].includes(value.finding)
+  const validFinding = typeof value.finding === "string" && findingOptions.includes(value.finding)
     ? value.finding
     : null;
   const startedAt = typeof value.startedAt === "string" ? value.startedAt : null;
@@ -532,6 +697,7 @@ export function createStageEnvelope(input = {}) {
 
   return {
     schemaVersion: V5_STAGE_SCHEMA_VERSION,
+    pipelineModel: useFourLayerDefinition ? FOUR_LAYER_MODEL : "INTERNAL_V5",
     requestId: boundedString(value.requestId, 160) || createSecureId("req_v5"),
     stageId,
     architecturalLayer: definition.architecturalLayer,
@@ -591,20 +757,26 @@ export function createStageEnvelope(input = {}) {
   };
 }
 
-export function createInitialPipeline({ requestId, startedAt } = {}) {
+export function createInitialPipeline({ requestId, startedAt, pipelineModel = null } = {}) {
   const safeRequestId = boundedString(requestId, 160) || createSecureId("req_v5");
+  const isFourLayer = pipelineModel === FOUR_LAYER_MODEL;
+  const stageIds = isFourLayer ? FOUR_LAYER_STAGE_IDS : STAGE_IDS;
   return {
     schemaVersion: V5_SCHEMA_VERSION,
-    pipelineVersion: V5_PIPELINE_VERSION,
+    pipelineVersion: isFourLayer ? FOUR_LAYER_PIPELINE_VERSION : V5_PIPELINE_VERSION,
+    pipelineModel: isFourLayer ? FOUR_LAYER_MODEL : "INTERNAL_V5",
+    publicLayerCount: isFourLayer ? FOUR_LAYER_STAGE_IDS.length : null,
     requestId: safeRequestId,
     pipelineStatus: PIPELINE_STATUS.IDLE,
     currentStage: null,
-    stages: Object.fromEntries(STAGE_IDS.map((stageId) => [stageId, createStageEnvelope({
+    stages: Object.fromEntries(stageIds.map((stageId) => [stageId, createStageEnvelope({
       stageId,
       requestId: safeRequestId,
       operationStatus: OPERATION_STATUS.NOT_STARTED,
+      pipelineModel: isFourLayer ? FOUR_LAYER_MODEL : null,
     })])),
     finalDecision: null,
+    finalPredict: null,
     assurance: null,
     startedAt: typeof startedAt === "string" ? startedAt : null,
     completedAt: null,
@@ -629,6 +801,9 @@ export function toPublicStageEnvelope(stage) {
 
 export function toPublicPipelineResult(result) {
   if (!result || typeof result !== "object") return null;
+  if (result.pipelineModel === FOUR_LAYER_MODEL || result.pipelineVersion === FOUR_LAYER_PIPELINE_VERSION) {
+    return toPublicFourLayerPipelineResult(result);
+  }
   const publicResult = { ...result };
   const layerResults = publicResult.layerResults;
   delete publicResult.layerResults;
@@ -660,8 +835,72 @@ export function toPublicPipelineResult(result) {
   };
 }
 
+function publicFinalPredict(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const output = publicRecord(value, [
+    "verdict", "truthVerdict", "truthStatus", "truthAssessment", "security", "securityRisk", "securityClassification",
+    "recommendedAction", "action", "assessmentConfidence", "decisionConfidence", "evidenceAgreement", "sourceQuality",
+    "evidenceSufficiency", "independentSourceCount", "evidenceCount", "sourceCount", "status", "derivedFrom",
+  ]) || {};
+  if (value.truthAssessment && typeof value.truthAssessment === "object" && !Array.isArray(value.truthAssessment)) {
+    output.truthAssessment = publicText(value.truthAssessment.status || value.truthAssessment.verdict, 120) || null;
+  }
+  output.keyReasons = publicStringList(value.keyReasons, 20, 700);
+  output.remainingUncertainty = publicStringList(value.remainingUncertainty, 20, 700);
+  output.keySources = publicSources(value.keySources || value.sources);
+  output.evidenceRefs = publicStringList(value.evidenceRefs, 40, 240);
+  output.traceability = Array.isArray(value.traceability)
+    ? value.traceability.slice(0, 24).map((item) => publicRecord(item, ["source", "stage", "field", "reason", "value"])).filter(Boolean)
+    : [];
+  output.calls = publicRecord(value.calls, ["tavily", "ai", "gemini", "finalPredict"]);
+  return output;
+}
+
+function toPublicFourLayerPipelineResult(result) {
+  const publicResult = { ...result };
+  const layerResults = publicResult.layerResults;
+  delete publicResult.layerResults;
+  delete publicResult.assurance;
+  delete publicResult.audit;
+  delete publicResult.rawMetadata;
+  const publicStages = Object.fromEntries(FOUR_LAYER_STAGE_IDS.map((stageId) => [
+    stageId,
+    toPublicStageEnvelope(result.stages?.[stageId] || { stageId, requestId: result.requestId }),
+  ]));
+  return {
+    ...publicResult,
+    pipelineModel: FOUR_LAYER_MODEL,
+    publicLayerCount: FOUR_LAYER_STAGE_IDS.length,
+    assurance: null,
+    stages: publicStages,
+    finalPredict: publicFinalPredict(result.finalPredict),
+    // Final Predict is intentionally separate from `stages`; it is not a
+    // fifth layer and contains no provider-generated work.
+    audit: {
+      requestId: publicText(result.audit?.requestId, 160) || publicText(result.requestId, 160) || "",
+      stageSequence: publicStringList(result.audit?.stageSequence, 8, 40).filter((stageId) => FOUR_LAYER_STAGE_IDS.includes(stageId)),
+      stageAttempts: Array.isArray(result.audit?.stageAttempts)
+        ? result.audit.stageAttempts.slice(0, 48).map((attempt) => publicRecord(attempt, ["stageId", "attempt", "status", "finding", "errorCode", "startedAt", "completedAt"])).filter(Boolean)
+        : [],
+      hardNegativePropagation: Array.isArray(result.audit?.hardNegativePropagation)
+        ? result.audit.hardNegativePropagation.slice(0, 24).map((item) => publicRecord(item, ["source", "finding", "destination", "expected"])).filter(Boolean)
+        : [],
+      policyVersion: publicText(result.audit?.policyVersion, 160) || V5_POLICY_VERSION,
+      assuranceVersion: null,
+    },
+    ...(layerResults && typeof layerResults === "object" ? {
+      layerResults: {
+        layer1: publicLayerResult(layerResults.layer1, "l1"),
+        layer2: publicLayerResult(layerResults.layer2, "l2"),
+        layer3: publicLayerResult(layerResults.layer3, "l3"),
+        layer4: publicLayerResult(layerResults.layer4, "l4"),
+      },
+    } : {}),
+  };
+}
+
 export function stageDefinition(stageId) {
-  return STAGE_DEFINITIONS[stageId] || null;
+  return FOUR_LAYER_STAGE_DEFINITIONS[stageId] || STAGE_DEFINITIONS[stageId] || null;
 }
 
 export function isStageComplete(stage) {

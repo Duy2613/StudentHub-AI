@@ -12,8 +12,8 @@ import {
   GEMMA_SHADOW_MODEL_IDS,
   GEMINI_PRODUCTION_MODEL_IDS,
   GEMINI_EXTENDED_QA_MODEL_IDS,
+  getConfiguredGeminiModelChain,
   isQaExtendedFallbackEnabled,
-  isQaExtendedGeminiModel,
   validateGeminiProductionRoute,
   validateGeminiExtendedQaRoute,
 } from "./GeminiModelCatalog.js";
@@ -82,6 +82,32 @@ function geminiEntry(id, model, {
     probeStatus,
   };
 }
+
+const CONFIGURED_GEMINI_ROUTE = getConfiguredGeminiModelChain();
+const CONFIGURED_GEMINI_ENTRY_IDS = Object.freeze(
+  CONFIGURED_GEMINI_ROUTE.configured && CONFIGURED_GEMINI_ROUTE.valid
+    ? CONFIGURED_GEMINI_ROUTE.models.map((_, index) => `GEMINI_CONFIGURED_${index + 1}`)
+    : [],
+);
+const CONFIGURED_GEMINI_ENTRIES = Object.fromEntries(
+  CONFIGURED_GEMINI_ENTRY_IDS.map((entryId, index) => [
+    entryId,
+    geminiEntry(entryId, CONFIGURED_GEMINI_ROUTE.models[index], {
+      priority: index + 1,
+      strengthClass: index === 0 ? "HIGH" : "MEDIUM",
+      latencyClass: index === 0 ? "MEDIUM" : "FAST",
+      productionTier: "CONFIGURED",
+      qaFallbackEligible: true,
+    }),
+  ]),
+);
+// If an explicit route exists but is invalid, the active route is empty and
+// the gateway reports NOT_CONFIGURED/MODEL_INCOMPATIBLE instead of guessing.
+const ACTIVE_GEMINI_CHAIN_ENTRY_IDS = Object.freeze(
+  CONFIGURED_GEMINI_ROUTE.configured ? [...CONFIGURED_GEMINI_ENTRY_IDS] : [...GEMINI_PRODUCTION_CHAIN_ENTRY_IDS],
+);
+
+export const GEMINI_CONFIGURED_CHAIN_ENTRY_IDS = CONFIGURED_GEMINI_ENTRY_IDS;
 
 export const AI_GATEWAY_CONFIG = {
   VERSION: "ai-gateway-v1.4.0-gemini-extended-qa",
@@ -169,6 +195,10 @@ export const AI_GATEWAY_CONFIG = {
     GEMINI_3_7_FLASH: geminiEntry("GEMINI_3_7_FLASH", GEMINI_PRODUCTION_MODEL_IDS[1], { priority: 2, strengthClass: "HIGH", latencyClass: "FAST", productionTier: "PRIMARY" }),
     GEMINI_3_6_FLASH: geminiEntry("GEMINI_3_6_FLASH", GEMINI_PRODUCTION_MODEL_IDS[2], { priority: 3, strengthClass: "MEDIUM", latencyClass: "FAST", productionTier: "PRIMARY" }),
 
+    // Operator-supplied server-only route. These entries exist only when the
+    // configured model chain passed the catalog validation above.
+    ...CONFIGURED_GEMINI_ENTRIES,
+
     // ── Extended QA fallback chain ─────────────────────────────────────────
     GEMINI_3_5_FLASH: geminiEntry("GEMINI_3_5_FLASH", "gemini-3.5-flash", { priority: 4, strengthClass: "MEDIUM", latencyClass: "FAST", costClass: "LOW", productionTier: "EXTENDED_QA", admittedAt: "2026-09-18T00:00:00Z", probeStatus: "PROVEN" }),
     GEMINI_3_5_FLASH_LITE: geminiEntry("GEMINI_3_5_FLASH_LITE", "gemini-3.5-flash-lite", { priority: 5, strengthClass: "LIGHT", latencyClass: "ULTRA_FAST", costClass: "VERY_LOW", productionTier: "EXTENDED_QA", admittedAt: "2026-09-18T00:00:00Z", probeStatus: "PROVEN" }),
@@ -213,20 +243,21 @@ export const AI_GATEWAY_CONFIG = {
   },
 
   CAPABILITY_ROUTES: {
-    [AI_CAPABILITY.FAST_CLASSIFICATION]: [...GEMINI_PRODUCTION_CHAIN_ENTRY_IDS],
-    [AI_CAPABILITY.CLAIM_EXTRACTION]: [...GEMINI_PRODUCTION_CHAIN_ENTRY_IDS],
-    [AI_CAPABILITY.DEEP_REASONING]: [...GEMINI_PRODUCTION_CHAIN_ENTRY_IDS],
-    [AI_CAPABILITY.MULTIMODAL]: [...GEMINI_PRODUCTION_CHAIN_ENTRY_IDS],
-    [AI_CAPABILITY.DOCUMENT]: [...GEMINI_PRODUCTION_CHAIN_ENTRY_IDS],
+    [AI_CAPABILITY.FAST_CLASSIFICATION]: [...ACTIVE_GEMINI_CHAIN_ENTRY_IDS],
+    [AI_CAPABILITY.CLAIM_EXTRACTION]: [...ACTIVE_GEMINI_CHAIN_ENTRY_IDS],
+    [AI_CAPABILITY.DEEP_REASONING]: [...ACTIVE_GEMINI_CHAIN_ENTRY_IDS],
+    [AI_CAPABILITY.MULTIMODAL]: [...ACTIVE_GEMINI_CHAIN_ENTRY_IDS],
+    [AI_CAPABILITY.DOCUMENT]: [...ACTIVE_GEMINI_CHAIN_ENTRY_IDS],
     [AI_CAPABILITY.EMBEDDING]: [],
-    [AI_CAPABILITY.RERANKING]: [...GEMINI_PRODUCTION_CHAIN_ENTRY_IDS],
-    [AI_CAPABILITY.SUMMARIZATION]: [...GEMINI_PRODUCTION_CHAIN_ENTRY_IDS],
+    [AI_CAPABILITY.RERANKING]: [...ACTIVE_GEMINI_CHAIN_ENTRY_IDS],
+    [AI_CAPABILITY.SUMMARIZATION]: [...ACTIVE_GEMINI_CHAIN_ENTRY_IDS],
   },
 };
 
 export function resolveCapabilityRoute(capability, { allowQaExtended = null } = {}) {
   const qaExtendedActive = typeof allowQaExtended === "boolean" ? allowQaExtended : isQaExtendedFallbackEnabled();
   const base = AI_GATEWAY_CONFIG.CAPABILITY_ROUTES[capability] || [];
+  if (CONFIGURED_GEMINI_ROUTE.configured) return [...base];
   if (!qaExtendedActive) {
     return [...base];
   }
@@ -269,11 +300,28 @@ export function validateCatalogModelEntry(entryId, { allowQaExtended = null } = 
 }
 
 export function validateActiveModelIdentifiers() {
+  if (CONFIGURED_GEMINI_ROUTE.configured) {
+    const entries = CONFIGURED_GEMINI_ROUTE.models.map((model, index) => {
+      const entryId = CONFIGURED_GEMINI_ENTRY_IDS[index];
+      return entryId
+        ? validateCatalogModelEntry(entryId, { allowQaExtended: isQaExtendedFallbackEnabled() })
+        : { valid: false, entryId: `GEMINI_CONFIGURED_${index + 1}`, model, code: "MODEL_ROUTE_INVALID" };
+    });
+    return Object.freeze({
+      valid: CONFIGURED_GEMINI_ROUTE.valid && entries.length > 0 && entries.every((entry) => entry.valid),
+      entries,
+      expectedModels: [...CONFIGURED_GEMINI_ROUTE.models],
+      source: "SERVER_ENVIRONMENT",
+      code: CONFIGURED_GEMINI_ROUTE.code,
+    });
+  }
   const entries = GEMINI_PRODUCTION_CHAIN_ENTRY_IDS.map((id) => validateCatalogModelEntry(id, { allowQaExtended: false }));
   return Object.freeze({
     valid: GEMINI_MODEL_ROUTE_VALIDATION.valid && entries.every((entry) => entry.valid),
     entries,
     expectedModels: [...GEMINI_PRODUCTION_MODEL_IDS],
+    source: "STATIC_COMPATIBILITY_CATALOG",
+    code: "MODEL_ROUTE_COMPATIBILITY_DEFAULT",
   });
 }
 

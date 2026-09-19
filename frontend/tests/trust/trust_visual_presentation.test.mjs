@@ -3,10 +3,8 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  MASTER_ULTRA_LAYERS,
-  normalizeMasterUltraRun,
-} from "../../src/lib/ai-trust/v5/MasterUltraTrustModel.js";
+import { normalizeMasterUltraRun } from "../../src/lib/ai-trust/v5/MasterUltraTrustModel.js";
+import { FOUR_LAYER_STAGE_IDS } from "../../src/lib/ai-trust/v5/contracts.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const frontendRoot = path.resolve(here, "../..");
@@ -15,27 +13,18 @@ function read(relativePath) {
   return fs.readFileSync(path.join(frontendRoot, relativePath), "utf8");
 }
 
-test("1. Trust 5-layer visual rendering is complete and canonical", () => {
-  const journeySource = read("src/components/trust/TrustMasterUltraJourney.jsx");
-  const layerIds = MASTER_ULTRA_LAYERS.map((l) => l.id);
-  assert.deepEqual(layerIds, ["l1", "l2", "l3", "l4", "l5"]);
+test("1. Own-backend visual rendering is complete and canonical", () => {
+  const journeySource = read("src/components/trust/OwnTrustJourney.jsx");
+  assert.deepEqual(FOUR_LAYER_STAGE_IDS, ["l1", "l2", "l3", "l4"]);
 
-  // Verify all 5 layers are implemented as subcomponents
-  assert.match(journeySource, /function ClaimLayer/);
-  assert.match(journeySource, /function DiscoveryLayer/);
-  assert.match(journeySource, /function ForensicsLayer/);
-  assert.match(journeySource, /function AiVerificationLayer/);
-  assert.match(journeySource, /function DecisionLayer/);
-
-  // Verify verified media assets are referenced
-  assert.match(journeySource, /\/media\/v3\/trust\/l1-claim\.webp/);
-  assert.match(journeySource, /\/media\/v3\/trust\/l2-discovery\.mp4/);
-  assert.match(journeySource, /\/media\/v3\/trust\/l3-forensics\.webp/);
-  assert.match(journeySource, /\/media\/v3\/trust\/l4-multiai\.mp4/);
-  assert.match(journeySource, /\/media\/v3\/trust\/l5-decision\.webp/);
+  assert.match(journeySource, /Initial Search/);
+  assert.match(journeySource, /Supplemental Search/);
+  assert.match(journeySource, /Final Validated Evidence Set/);
+  assert.match(journeySource, /Validated evidence & Gemini links/);
+  assert.match(journeySource, /Final Predict/);
 });
 
-test("2. L4 Gemini AVAILABLE state renders real observations without synthetic consensus", () => {
+test("2. L4 renders validated Gemini citations without exposing engine UI", () => {
   const normalized = normalizeMasterUltraRun({
     pipeline: { pipelineStatus: "COMPLETED", stages: { l4: { operationStatus: "COMPLETED" } } },
     canonicalResult: {
@@ -51,27 +40,19 @@ test("2. L4 Gemini AVAILABLE state renders real observations without synthetic c
   assert.equal(normalized.layers.l4.streams[0].provider, "Gemini");
   assert.equal(normalized.layers.l4.streams[0].status, "COMPLETED");
 
-  const journeySource = read("src/components/trust/TrustMasterUltraJourney.jsx");
-  assert.doesNotMatch(journeySource, /Internal Academic Model/i);
-  assert.doesNotMatch(journeySource, /Multi-model consensus/i);
-  assert.doesNotMatch(journeySource, /synthetic AI agreement/i);
+  const journeySource = read("src/components/trust/OwnTrustJourney.jsx");
+  assert.match(journeySource, /citationRecords/);
+  assert.match(journeySource, /Gemini links validated/);
+  assert.doesNotMatch(journeySource, /AI engine/i);
+  assert.doesNotMatch(journeySource, /AI model/i);
+  assert.doesNotMatch(journeySource, /model\/gateway/i);
 });
 
-test("3. L4 Gemini 429 state renders truthful degraded notice", () => {
-  const journeySource = read("src/components/trust/TrustMasterUltraJourney.jsx");
-  assert.match(journeySource, /Rate limit \/ timeout \/ unavailable/i);
-  assert.match(journeySource, /Decision Intelligence continued using deterministic Trust policy/i);
-  assert.match(journeySource, /429/);
-});
-
-test("4. L4 Gemini TIMEOUT state renders truthful degraded notice", () => {
-  const journeySource = read("src/components/trust/TrustMasterUltraJourney.jsx");
-  assert.match(journeySource, /504/);
-});
-
-test("5. L4 Gemini UNAVAILABLE state renders truthful degraded notice", () => {
-  const journeySource = read("src/components/trust/TrustMasterUltraJourney.jsx");
-  assert.match(journeySource, /503/);
+test("3. L4 degraded state remains evidence-bound and truthful", () => {
+  const journeySource = read("src/components/trust/OwnTrustJourney.jsx");
+  assert.match(journeySource, /Synthesis status/);
+  assert.match(journeySource, /Đang tổng hợp evidence đã kiểm chứng/);
+  assert.match(journeySource, /Chưa có URL evidence đã validate để mở/);
 });
 
 test("6. L5 still renders after degraded L4", () => {

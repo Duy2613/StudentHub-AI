@@ -223,6 +223,15 @@ describe("Layer 4 deterministic policy boundary", () => {
       gateway: {
         async generateStructured(args) {
           captured.push(args);
+          if (args.options?.responseSchema?.properties?.evidenceGaps) {
+            return {
+              ok: true,
+              provider: "gemini",
+              model: "gemini-3.8-flash",
+              attempts: [],
+              json: { needsMoreEvidence: false, evidenceGaps: [] },
+            };
+          }
           return {
             ok: true,
             provider: "gemini",
@@ -235,7 +244,8 @@ describe("Layer 4 deterministic policy boundary", () => {
               contradictionReasons: [],
               missingEvidence: [],
               uncertainty: "Fixture uncertainty",
-              citationsUsed: [{ id: "fixture-evidence", url: TEST_EVIDENCE_URL }],
+              citationsUsed: [],
+              supportingSourceIds: ["fixture-evidence"],
               provider: "gemini",
               model: "gemini-3.8-flash",
             },
@@ -254,9 +264,9 @@ describe("Layer 4 deterministic policy boundary", () => {
     assert.equal(result.aiVerification.supportReasons[0], "AI narrative");
     assert.notEqual(result.userExplanation.why, "AI narrative");
     assert.match(result.userExplanation.why, /không phát hiện|bằng chứng/i);
-    assert.equal(captured.length, 1);
-    assert.match(captured[0].userPrompt, /<untrusted-data>/);
-    assert.doesNotMatch(captured[0].systemPrompt, /Đại học Example/);
+    assert.equal(captured.length, 2);
+    assert.ok(captured.some((request) => /<untrusted-data>/.test(request.userPrompt)));
+    assert.doesNotMatch(captured[1].systemPrompt, /Đại học Example/);
   });
 
   it("keeps supported truth separate from unknown security when reputation is unavailable", async () => {

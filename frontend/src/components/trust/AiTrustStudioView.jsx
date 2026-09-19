@@ -26,7 +26,7 @@ import { useBackground } from "@/components/providers/BackgroundContext";
 import SourceInspectorDrawer from "./SourceInspectorDrawer";
 import EvidenceConstellationStage from "./EvidenceConstellationStage";
 import PostResultGateways from "./PostResultGateways";
-import TrustMasterUltraJourney from "./TrustMasterUltraJourney";
+import OwnTrustJourney from "./OwnTrustJourney";
 
 const TrustGraph2D = dynamic(() => import("./TrustGraph2D"), {
   ssr: false,
@@ -34,11 +34,10 @@ const TrustGraph2D = dynamic(() => import("./TrustGraph2D"), {
 });
 
 const EMPTY_PIPELINE = [
-  { id: "claim-intelligence", label: "Claim Intelligence", status: "waiting" },
-  { id: "evidence-discovery", label: "Evidence Discovery", status: "waiting" },
-  { id: "evidence-forensics", label: "Evidence Forensics", status: "waiting" },
-  { id: "ai-verification", label: "AI Verification", status: "waiting" },
-  { id: "decision-intelligence", label: "Decision Intelligence", status: "waiting" },
+  { id: "claim-intelligence", label: "Layer 1 · Deterministic Screen", status: "waiting" },
+  { id: "evidence-discovery", label: "Layer 2 · Threat & Semantic Intelligence", status: "waiting" },
+  { id: "evidence-forensics", label: "Layer 3 · Evidence Retrieval", status: "waiting" },
+  { id: "ai-verification", label: "Layer 4 · Synthesis & Reasoning", status: "waiting" },
 ];
 
 function readable(value, fallback = "Chưa xác định") {
@@ -312,12 +311,25 @@ function buildGraph(input, layers, canonical, pipeline) {
 
 function legacyPipelineFromV5(currentPipeline, previousPipeline = EMPTY_PIPELINE) {
   const stages = currentPipeline?.stages || {};
+  if (currentPipeline?.pipelineModel === "FOUR_LAYER") {
+    return previousPipeline.slice(0, 4).map((item, index) => {
+      const stage = stages[["l1", "l2", "l3", "l4"][index]];
+      if (!stage) return { ...item, status: "waiting" };
+      const status = ["RUNNING", "QUEUED"].includes(stage.operationStatus)
+        ? "running"
+        : ["PARTIAL", "FAILED", "BLOCKED"].includes(stage.operationStatus)
+          ? "partial"
+          : ["COMPLETED", "SKIPPED"].includes(stage.operationStatus)
+            ? "done"
+            : "waiting";
+      return { ...item, status, detail: stage.summary || stage.finding || item.label };
+    });
+  }
   const groups = [
     { id: "claim-intelligence", internal: [stages.l1, stages.l2b], detail: "Đọc luận điểm và nội dung" },
     { id: "evidence-discovery", internal: [stages.l2a, stages.l2c], detail: "Tìm tín hiệu nguồn và ngữ cảnh" },
     { id: "evidence-forensics", internal: [stages.l3], detail: "Đối chiếu chất lượng bằng chứng" },
     { id: "ai-verification", internal: [stages.l4], detail: "Gemini đối chiếu tín hiệu kiểm tra" },
-    { id: "decision-intelligence", internal: [stages.l5], detail: "Kiểm tra kết luận và hành động" },
   ];
   return previousPipeline.map((item) => {
     const group = groups.find((entry) => entry.id === item.id);
@@ -628,7 +640,7 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
         if (eventLayers) setLayers({
           layer1: eventLayers.layer1 || null,
           layer2A: eventLayers.layer2A || null,
-          layer2: eventLayers.layer2B || null,
+          layer2: eventLayers.layer2 || eventLayers.layer2B || null,
           layer2C: eventLayers.layer2C || null,
           layer3: eventLayers.layer3 || null,
           layer4: eventLayers.layer4 || null,
@@ -684,7 +696,7 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
 
   const hasNativeV5 = Boolean(v5Pipeline && v5Pipeline.pipelineVersion !== "trust-v5-compatibility");
   const canonicalResult = providerResult?.data || null;
-  const hasResult = Boolean(layers.layer4 || v5Pipeline?.finalDecision || canonicalResult);
+  const hasResult = Boolean(layers.layer4 || v5Pipeline?.finalDecision || v5Pipeline?.finalPredict || canonicalResult);
   const trustPresentation = useMemo(() => createTrustPresentationModel({
     pipeline: v5Pipeline,
     canonicalResult,
@@ -764,7 +776,7 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
 
   if (process.env.NEXT_PUBLIC_TRUST_MASTER_ULTRA !== "false") {
     return (
-      <TrustMasterUltraJourney
+      <OwnTrustJourney
         mode={mode}
         content={content}
         file={file}
@@ -808,6 +820,10 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
         onReset={reset}
         onNewAnalysis={reset}
         onPrint={() => window.print()}
+        caseId={passportCaseId}
+        caseRevision={passportCaseRevision}
+        claimId={passportClaimId}
+        domainCode={canonicalResult?.domainCode || canonicalResult?.claim?.domainCode || canonicalResult?.claim?.domain_code || ""}
       />
     );
   }
@@ -934,7 +950,7 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
       {providerResult && providerResult.state !== "SUCCESS" && <StateBoundary envelope={providerResult} onAction={handleTrustStateAction} />}
       <TrustRunProgress model={trustPresentation} />
       <details className="trust-technical-stage-details">
-        <summary>Chi tiết bảy tầng kỹ thuật (tùy chọn)</summary>
+        <summary>Chi tiết pipeline kỹ thuật (tùy chọn)</summary>
         <TrustPipelineTimeline pipeline={v5Pipeline} processing={processing} />
       </details>
       {hasResult && (

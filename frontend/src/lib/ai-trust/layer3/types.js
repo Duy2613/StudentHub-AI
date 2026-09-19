@@ -69,6 +69,15 @@ export const SOURCE_TYPE = {
   UNKNOWN: "UNKNOWN",
 };
 
+export const RETRIEVAL_ORIGIN = Object.freeze({
+  TAVILY_INITIAL: "TAVILY_INITIAL",
+  TAVILY_AI_REQUESTED_SUPPLEMENT: "TAVILY_AI_REQUESTED_SUPPLEMENT",
+  DIRECT_OFFICIAL: "DIRECT_OFFICIAL",
+  LOCAL_KNOWLEDGE: "LOCAL_KNOWLEDGE",
+});
+
+const RETRIEVAL_ORIGIN_VALUES = new Set(Object.values(RETRIEVAL_ORIGIN));
+
 export const EVIDENCE_PROVIDER_STATUS = {
   SUCCESS: "SUCCESS",
   PARTIAL: "PARTIAL",
@@ -119,6 +128,24 @@ function safeObject(value) {
 
 function safeNonNegativeNumber(value, fallback = 0) {
   return Number.isFinite(Number(value)) ? Math.max(0, Number(value)) : fallback;
+}
+
+function safeRetrievalOrigin(value, fallback = RETRIEVAL_ORIGIN.LOCAL_KNOWLEDGE) {
+  return RETRIEVAL_ORIGIN_VALUES.has(value) ? value : fallback;
+}
+
+function normalizeRetrievalPhase(value, fallbackStatus = "NOT_REQUESTED") {
+  const source = safeObject(value);
+  return {
+    status: boundedString(source.status, 80).toUpperCase() || fallbackStatus,
+    queryCount: safeNonNegativeNumber(source.queryCount),
+    sourceCount: safeNonNegativeNumber(source.sourceCount),
+    evidenceCount: safeNonNegativeNumber(source.evidenceCount),
+    validatedSourceCount: safeNonNegativeNumber(source.validatedSourceCount),
+    provider: boundedString(source.provider, 120) || null,
+    providerStatus: boundedString(source.providerStatus, 80).toUpperCase() || null,
+    retrievalOrigin: RETRIEVAL_ORIGIN_VALUES.has(source.retrievalOrigin) ? source.retrievalOrigin : null,
+  };
 }
 
 function normalizeVerificationTask(value, index) {
@@ -197,6 +224,7 @@ export function createEvidence(input = {}) {
   contentFingerprint = null,
   evidenceScope = "claim_specific",
   retrievalOutcome = "SUCCESS",
+  retrievalOrigin = RETRIEVAL_ORIGIN.LOCAL_KNOWLEDGE,
   } = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   const safeSourceUrl = safeHttpUrl(sourceUrl);
   const safeRelation = Object.values(CLAIM_EVIDENCE_RELATION).includes(relation)
@@ -237,6 +265,7 @@ export function createEvidence(input = {}) {
     contentFingerprint: boundedString(contentFingerprint, 128) || null,
     evidenceScope: boundedString(evidenceScope, 120) || "claim_specific",
     retrievalOutcome: boundedString(retrievalOutcome, 80) || "UNKNOWN",
+    retrievalOrigin: safeRetrievalOrigin(retrievalOrigin),
     contentTrust: "UNTRUSTED_RETRIEVED_CONTENT",
   };
 }
@@ -264,6 +293,7 @@ export function createSource(input = {}) {
   sourceFingerprint = null,
   contentFingerprint = null,
   retrievalOutcome = "UNKNOWN",
+  retrievalOrigin = RETRIEVAL_ORIGIN.LOCAL_KNOWLEDGE,
   sourceScope = "claim_specific",
   } = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   const safeUrl = safeHttpUrl(url);
@@ -308,6 +338,7 @@ export function createSource(input = {}) {
     sourceFingerprint: safeSourceFingerprint,
     contentFingerprint: boundedString(contentFingerprint, 128) || null,
     retrievalOutcome: boundedString(retrievalOutcome, 80) || "UNKNOWN",
+    retrievalOrigin: safeRetrievalOrigin(retrievalOrigin),
     sourceScope: boundedString(sourceScope, 120) || "claim_specific",
     contentTrust: "UNTRUSTED_RETRIEVED_CONTENT",
   };
@@ -342,6 +373,7 @@ export function createLayer3Result(input = {}) {
   verificationTaskSummary = {},
   candidateClaimOrigins = [],
   evidenceRequirements = [],
+  retrievalPhases = {},
   } = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   const safeClaims = Array.isArray(claims) ? claims.slice(0, 40).filter((claim) => claim && typeof claim === "object" && !Array.isArray(claim)).map((claim) => ({
     claimId: boundedString(claim.claimId, 160),
@@ -433,6 +465,11 @@ export function createLayer3Result(input = {}) {
     },
     candidateClaimOrigins: Array.from(new Set(Array.isArray(candidateClaimOrigins) ? candidateClaimOrigins.map((item) => boundedString(item, 120)).filter(Boolean) : [])).slice(0, 8),
     evidenceRequirements: Array.from(new Set(Array.isArray(evidenceRequirements) ? evidenceRequirements.map((item) => boundedString(item, 240)).filter(Boolean) : [])).slice(0, 16),
+    retrievalPhases: {
+      initialSearch: normalizeRetrievalPhase(retrievalPhases.initialSearch, "NOT_REQUESTED"),
+      supplementalSearch: normalizeRetrievalPhase(retrievalPhases.supplementalSearch, "NOT_REQUESTED"),
+      finalValidatedEvidenceSet: normalizeRetrievalPhase(retrievalPhases.finalValidatedEvidenceSet, "NOT_REQUESTED"),
+    },
     temporalAssessment: (() => {
       const source = safeObject(temporalAssessment);
       return {
@@ -454,6 +491,16 @@ export function createLayer3Result(input = {}) {
       retrievalProvider: boundedString(safeMetrics.retrievalProvider, 120) || "knowledge_base_retriever",
       retrievalStatus: boundedString(safeMetrics.retrievalStatus, 80) || retrievalStatus,
       retrievalMode: boundedString(safeMetrics.retrievalMode, 80) || retrievalMode,
+      retrievalStage: boundedString(safeMetrics.retrievalStage, 40).toUpperCase() || "INITIAL",
+      retrievalOrigin: safeRetrievalOrigin(safeMetrics.retrievalOrigin),
+      initialQueryCount: safeNonNegativeNumber(safeMetrics.initialQueryCount),
+      initialSourceCount: safeNonNegativeNumber(safeMetrics.initialSourceCount),
+      initialEvidenceCount: safeNonNegativeNumber(safeMetrics.initialEvidenceCount),
+      supplementalQueryCount: safeNonNegativeNumber(safeMetrics.supplementalQueryCount),
+      supplementalSourceCount: safeNonNegativeNumber(safeMetrics.supplementalSourceCount),
+      supplementalEvidenceCount: safeNonNegativeNumber(safeMetrics.supplementalEvidenceCount),
+      finalValidatedSourceCount: safeNonNegativeNumber(safeMetrics.finalValidatedSourceCount),
+      geminiGeneratedUrlCount: 0,
       externalEvidence: safeExternalEvidence,
       providerIndependent: safeMetrics.providerIndependent !== false,
       providerCallCount: safeNonNegativeNumber(safeMetrics.providerCallCount),

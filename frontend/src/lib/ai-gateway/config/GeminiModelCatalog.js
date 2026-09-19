@@ -97,6 +97,42 @@ export function validateGeminiModelIdentifier(value, { allowGemmaShadow = true, 
   return { valid: false, model, code: "MODEL_IDENTIFIER_UNAPPROVED" };
 }
 
+/**
+ * Reads the operator-owned Gemini route without ever exposing credentials.
+ * An explicit route is fail-closed: an invalid model is not silently replaced
+ * by a guessed/default model. The static catalog remains the compatibility
+ * route only when neither new server-side setting is present.
+ */
+export function getConfiguredGeminiModelChain(env = (typeof process !== "undefined" ? process.env : {}), { allowQaExtended = null } = {}) {
+  const source = env && typeof env === "object" ? env : {};
+  const primary = normalizedModelId(source.GEMINI_MODEL_PRIMARY);
+  const fallbackText = typeof source.GEMINI_MODEL_FALLBACKS === "string" ? source.GEMINI_MODEL_FALLBACKS : "";
+  const fallbackModels = fallbackText.split(",").map((value) => normalizedModelId(value)).filter(Boolean);
+  const configured = Boolean(primary || fallbackModels.length);
+  if (!configured) {
+    return Object.freeze({ configured: false, valid: true, models: [], validation: [], code: "MODEL_ROUTE_NOT_CONFIGURED" });
+  }
+
+  const models = [primary, ...fallbackModels];
+  const uniqueModels = [...new Set(models)];
+  const qaExtendedAllowed = typeof allowQaExtended === "boolean" ? allowQaExtended : isQaExtendedFallbackEnabled(source);
+  const validation = uniqueModels.map((model) => validateGeminiModelIdentifier(model, {
+    allowGemmaShadow: false,
+    allowQaExtended: qaExtendedAllowed,
+  }));
+  const valid = Boolean(primary)
+    && uniqueModels.length === models.length
+    && validation.length > 0
+    && validation.every((item) => item.valid);
+  return Object.freeze({
+    configured: true,
+    valid,
+    models: uniqueModels,
+    validation,
+    code: valid ? "MODEL_ROUTE_CONFIGURED" : "MODEL_ROUTE_INVALID",
+  });
+}
+
 export function validateGeminiProductionRoute(modelIds = GEMINI_PRODUCTION_MODEL_IDS) {
   const ids = Array.isArray(modelIds) ? modelIds : [];
   const expected = GEMINI_PRODUCTION_MODEL_IDS;

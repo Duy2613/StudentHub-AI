@@ -130,8 +130,8 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
         <div>
           <div className="panel-heading mb-3">
             <div>
-              <p className="product-kicker text-xs font-mono text-cyan-400 uppercase tracking-wider">5 LỚP KIỂM ĐỊNH</p>
-              <h2 className="text-sm font-semibold text-white">Tiến độ 5 tầng độc lập</h2>
+              <p className="product-kicker text-xs font-mono text-cyan-400 uppercase tracking-wider">4 LỚP KIỂM ĐỊNH</p>
+              <h2 className="text-sm font-semibold text-white">Tiến độ 4 tầng độc lập</h2>
             </div>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px] font-mono">WAITING</span>
           </div>
@@ -140,8 +140,7 @@ export function TrustCriticalInput({ mode = "image", content = "", onActivate, o
               { id: "l1", name: "Claim Intelligence", note: "Bóc tách mệnh đề sơ cấp" },
               { id: "l2", name: "Evidence Discovery", note: "Tìm kiếm nguồn chính thống" },
               { id: "l3", name: "Evidence Forensics", note: "Đối soát và trích xuất bằng chứng" },
-              { id: "l4", name: "AI Verification", note: "Gemini đối chiếu đa chiều" },
-              { id: "l5", name: "Decision Intelligence", note: "Đưa ra kết luận có căn cứ" },
+              { id: "l4", name: "Synthesis & Reasoning", note: "Tổng hợp evidence đã kiểm chứng" },
             ].map((step, index) => (
               <li key={step.id} data-status="waiting" className="flex items-center gap-3 p-2 rounded-lg bg-white/[0.02] border border-white/5">
                 <span className="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-mono font-bold">
