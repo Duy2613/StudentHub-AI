@@ -72,6 +72,7 @@ export const SOURCE_TYPE = {
 export const RETRIEVAL_ORIGIN = Object.freeze({
   TAVILY_INITIAL: "TAVILY_INITIAL",
   TAVILY_AI_REQUESTED_SUPPLEMENT: "TAVILY_AI_REQUESTED_SUPPLEMENT",
+  DIRECT_INPUT: "DIRECT_INPUT",
   DIRECT_OFFICIAL: "DIRECT_OFFICIAL",
   LOCAL_KNOWLEDGE: "LOCAL_KNOWLEDGE",
 });
@@ -142,6 +143,9 @@ function normalizeRetrievalPhase(value, fallbackStatus = "NOT_REQUESTED") {
     sourceCount: safeNonNegativeNumber(source.sourceCount),
     evidenceCount: safeNonNegativeNumber(source.evidenceCount),
     validatedSourceCount: safeNonNegativeNumber(source.validatedSourceCount),
+    directInputSourceCount: safeNonNegativeNumber(source.directInputSourceCount),
+    directInputEvidenceCount: safeNonNegativeNumber(source.directInputEvidenceCount),
+    directInputValidatedSourceCount: safeNonNegativeNumber(source.directInputValidatedSourceCount),
     provider: boundedString(source.provider, 120) || null,
     providerStatus: boundedString(source.providerStatus, 80).toUpperCase() || null,
     retrievalOrigin: RETRIEVAL_ORIGIN_VALUES.has(source.retrievalOrigin) ? source.retrievalOrigin : null,
@@ -295,6 +299,9 @@ export function createSource(input = {}) {
   retrievalOutcome = "UNKNOWN",
   retrievalOrigin = RETRIEVAL_ORIGIN.LOCAL_KNOWLEDGE,
   sourceScope = "claim_specific",
+  httpStatus = null,
+  requestedUrl = null,
+  finalUrl = null,
   } = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   const safeUrl = safeHttpUrl(url);
   const resolvedDomain = boundedString(domain, 180).toLowerCase() || safeHostname(safeUrl);
@@ -340,6 +347,9 @@ export function createSource(input = {}) {
     retrievalOutcome: boundedString(retrievalOutcome, 80) || "UNKNOWN",
     retrievalOrigin: safeRetrievalOrigin(retrievalOrigin),
     sourceScope: boundedString(sourceScope, 120) || "claim_specific",
+    httpStatus: Number.isInteger(Number(httpStatus)) && Number(httpStatus) >= 100 && Number(httpStatus) <= 599 ? Number(httpStatus) : null,
+    requestedUrl: safeHttpUrl(requestedUrl),
+    finalUrl: safeHttpUrl(finalUrl),
     contentTrust: "UNTRUSTED_RETRIEVED_CONTENT",
   };
 }
@@ -374,6 +384,8 @@ export function createLayer3Result(input = {}) {
   candidateClaimOrigins = [],
   evidenceRequirements = [],
   retrievalPhases = {},
+  executionStatus = "COMPLETED",
+  retrievalExecuted = true,
   } = input && typeof input === "object" && !Array.isArray(input) ? input : {};
   const safeClaims = Array.isArray(claims) ? claims.slice(0, 40).filter((claim) => claim && typeof claim === "object" && !Array.isArray(claim)).map((claim) => ({
     claimId: boundedString(claim.claimId, 160),
@@ -418,6 +430,8 @@ export function createLayer3Result(input = {}) {
   return {
     layer: 3,
     status: safeStatus,
+    executionStatus: boundedString(executionStatus, 80).toUpperCase() || "COMPLETED",
+    retrievalExecuted: retrievalExecuted !== false,
     claims: safeClaims,
     claimStatuses: normalizeClaimStatusMap(claimStatuses, new Set(safeClaims.map((claim) => claim.claimId).filter(Boolean))),
     sources: safeSources,
@@ -496,6 +510,9 @@ export function createLayer3Result(input = {}) {
       initialQueryCount: safeNonNegativeNumber(safeMetrics.initialQueryCount),
       initialSourceCount: safeNonNegativeNumber(safeMetrics.initialSourceCount),
       initialEvidenceCount: safeNonNegativeNumber(safeMetrics.initialEvidenceCount),
+      directInputSourceCount: safeNonNegativeNumber(safeMetrics.directInputSourceCount),
+      directInputEvidenceCount: safeNonNegativeNumber(safeMetrics.directInputEvidenceCount),
+      directInputValidatedSourceCount: safeNonNegativeNumber(safeMetrics.directInputValidatedSourceCount),
       supplementalQueryCount: safeNonNegativeNumber(safeMetrics.supplementalQueryCount),
       supplementalSourceCount: safeNonNegativeNumber(safeMetrics.supplementalSourceCount),
       supplementalEvidenceCount: safeNonNegativeNumber(safeMetrics.supplementalEvidenceCount),

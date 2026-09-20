@@ -102,6 +102,11 @@ export class WebSearchRetriever extends IEvidenceRetriever {
             headers: {
               "User-Agent": "StudentHubAI-Trust-EvidenceEngine/1.0",
               Accept: "text/html,application/xhtml+xml,text/plain",
+              // Ask upstreams for an identity-coded response. Some runtimes
+              // expose auto-decompression inconsistently; rejecting a
+              // response merely because a proxy added content-encoding would
+              // hide otherwise usable URL evidence.
+              "Accept-Encoding": "identity",
             },
             signal: controller.signal,
           });

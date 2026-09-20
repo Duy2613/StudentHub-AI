@@ -768,6 +768,10 @@
   line-height: 1.4;
 }
 
+.provider .tagRow {
+  grid-column: 1 / -1;
+}
+
 .providerStatus {
   color: var(--green);
   font: 600 0.62rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
@@ -823,6 +827,87 @@
 
 .sourceCard span {
   color: var(--cyan);
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  margin-top: 0.45rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0.22rem 0.38rem;
+  border: 1px solid rgba(100, 216, 255, 0.2);
+  border-radius: 999px;
+  color: var(--cyan);
+  background: rgba(5, 25, 34, 0.38);
+  font: 600 0.56rem/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.recordList,
+.evidenceList {
+  display: grid;
+  gap: 0.48rem;
+}
+
+.recordCard,
+.evidenceCard {
+  min-width: 0;
+  padding: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.62rem;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.recordHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.55rem;
+}
+
+.recordHeader strong {
+  min-width: 0;
+  color: var(--text);
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+
+.recordCard p,
+.evidenceCard p {
+  margin: 0.42rem 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.recordCard small,
+.evidenceCard small {
+  display: block;
+  margin-top: 0.42rem;
+  color: var(--muted);
+  font-size: 0.6rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.evidenceExcerpt {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.evidenceCard .reasonLink {
+  margin-top: 0.45rem;
+  font-size: 0.68rem;
 }
 
 .empty {

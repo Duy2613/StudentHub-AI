@@ -60,13 +60,13 @@ test("L4 preserves auth failure while deterministic policy remains authoritative
     options: { provider },
   });
 
-  assert.equal(result.aiVerificationStatus, "UNAVAILABLE");
+  assert.equal(result.aiVerificationStatus, "FALLBACK_DETERMINISTIC");
   assert.equal(result.aiVerificationErrorType, "HTTP_ERROR");
   assert.equal(result.aiVerificationHttpStatus, 401);
   assert.equal(result.enforcement, "REVIEW");
   const stage = stageFromL4(result, "l4-provider-fixture");
   assert.equal(stage.providerStatus, "AUTH_FAILED");
-  assert.equal(stage.operationStatus, "PARTIAL");
+  assert.equal(stage.operationStatus, "COMPLETED");
   assert.equal(stage.providerHttpStatus, 401);
 });
 

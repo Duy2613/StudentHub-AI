@@ -37,6 +37,7 @@ import {
 } from "./v5/stageAdapters.js";
 import { TrustPipelineCancelledError } from "./v5/TrustPipelineOrchestrator.js";
 import { buildCanonicalTrustProjection } from "./integrations/canonicalTrustProjection.js";
+import { MediaArtifactService } from "../server/media/MediaArtifactService.js";
 
 const TRANSIENT_L2_STATUS = new Set([
   "TIMEOUT", "RATE_LIMITED", "AUTH_FAILED", "MODEL_NOT_AVAILABLE", "NETWORK_ERROR",
@@ -81,13 +82,22 @@ function normalizeInput(value) {
   const metadata = asObject(input.metadata);
   const allowedMetadata = [
     "url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "extractionAuthority",
-    "institutionContext", "mediaArtifactId", "imageHash", "width", "height", "bytes",
+    "institutionContext", "mediaArtifactId", "imageHash", "width", "height", "bytes", "inputKind", "fileType", "qrIntake",
   ];
   const safeMetadata = Object.fromEntries(allowedMetadata
     .filter((key) => Object.hasOwn(metadata, key))
     .map((key) => {
       const item = metadata[key];
       if (key === "bytes" && (Buffer.isBuffer(item) || item instanceof Uint8Array || Array.isArray(item))) return [key, item];
+      if (key === "qrIntake" && item && typeof item === "object" && !Array.isArray(item)) {
+        return [key, {
+          status: boundedText(item.status, 40).toUpperCase() || null,
+          securityStatus: boundedText(item.securityStatus, 40).toUpperCase() || null,
+          kind: boundedText(item.kind, 80) || null,
+          normalizedValue: boundedText(item.normalizedValue, 32_000) || null,
+          reason: boundedText(item.reason, 500) || null,
+        }];
+      }
       if (typeof item === "string") return [key, boundedText(item, key === "ocrText" || key === "qrContent" || key === "qrPayload" ? 32_000 : 2_048)];
       if (typeof item === "number" && Number.isFinite(item) && item >= 0) return [key, item];
       return [key, null];
@@ -98,6 +108,21 @@ function normalizeInput(value) {
     content: boundedText(input.content, 500_000),
     metadata: safeMetadata,
   };
+}
+
+const MAX_MULTIMODAL_BYTES = 2 * 1024 * 1024;
+
+function multimodalInputParts(input) {
+  const source = asObject(input);
+  if (!(["image", "qr"].includes(source.type))) return null;
+  const artifactId = boundedText(source.metadata?.mediaArtifactId, 180);
+  if (!artifactId) return null;
+  const artifact = MediaArtifactService.getArtifact(artifactId);
+  const bytes = artifact?.buffer;
+  const mimeType = boundedText(artifact?.mimeType || source.metadata?.mimeType, 80).toLowerCase();
+  if (!bytes || !Buffer.isBuffer(bytes) || bytes.length === 0 || bytes.length > MAX_MULTIMODAL_BYTES) return null;
+  if (!/^image\/(jpeg|png|webp)$/.test(mimeType)) return null;
+  return [{ type: "image", mime_type: mimeType, data: bytes.toString("base64") }];
 }
 
 function statusText(...values) {
@@ -169,7 +194,9 @@ function createUnknownLayer2C(requestId, errorCode = "LAYER2C_UNAVAILABLE") {
 
 function createUnknownLayer3(requestId, errorCode = "TAVILY_UNAVAILABLE") {
   return {
-    status: "UNAVAILABLE",
+    status: "INSUFFICIENT_EVIDENCE",
+    executionStatus: "COMPLETED_WITH_PROVIDER_FAILURE",
+    retrievalExecuted: true,
     claims: [],
     claimStatuses: {},
     sources: [],
@@ -181,7 +208,7 @@ function createUnknownLayer3(requestId, errorCode = "TAVILY_UNAVAILABLE") {
     retrievalStatus: "UNAVAILABLE",
     retrievalMode: "TAVILY_UNAVAILABLE",
     externalEvidence: false,
-    limitations: ["Tavily did not return usable external evidence; no local corpus was substituted."],
+    limitations: ["Tavily did not return usable external evidence; no local corpus was substituted. L3 vẫn hoàn tất gói kết quả với provider failure được công bố."],
     auditEvents: [{ type: "RETRIEVER_FAILURE", code: errorCode, at: nowIso() }],
     metrics: {
       queriesExecutedCount: 0,
@@ -218,9 +245,25 @@ function createUnknownLayer4(requestId, errorCode = "LAYER4_UNAVAILABLE") {
       recommendedActionNote: "Review trước khi hành động.",
       uncertainties: [errorCode],
     },
-    aiVerificationStatus: "UNAVAILABLE",
+    executionStatus: "COMPLETED_WITH_FALLBACK",
+    aiVerification: {
+      verdictSignal: "UNCERTAIN",
+      supportReasons: [],
+      contradictionReasons: [],
+      missingEvidence: ["Gemini không trả về synthesis usable trong ngân sách lần chạy."],
+      uncertainty: "Kết quả policy deterministic vẫn có hiệu lực; AI synthesis đã fallback sau khi thử route model.",
+      citationsUsed: [],
+      provider: null,
+      model: null,
+    },
+    aiVerificationStatus: "FALLBACK_DETERMINISTIC",
     aiVerificationErrorType: errorCode,
-    aiOperationStatus: "PARTIAL",
+    aiRequestedPrimaryModel: null,
+    aiExecutedModel: null,
+    aiFallbackUsed: true,
+    aiFallbackReason: errorCode,
+    aiProviderStatus: "FALLBACK_DETERMINISTIC",
+    aiOperationStatus: "COMPLETED",
     auditTrail: { requestId, fusedEvidenceCount: 0, evidenceBound: true },
     metrics: { providerStatus: "UNAVAILABLE", modelUsed: "deterministic_policy" },
   });
@@ -305,6 +348,12 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
   const semanticSuspicious = ["DECEPTIVE", "SUSPICIOUS", "NEEDS_VERIFICATION", "REVIEW_REQUIRED"].includes(statusText(layer2B?.classification, layer2B?.status)) ||
     boundedArray(layer2B?.contextSignals).length > 0 || boundedArray(layer2C?.riskSignals).length > 0;
   const providerPartial = observations.some((item) => item.success !== true && item.executed !== false);
+  const semanticPackage = asObject(layer2B?.verificationPackage);
+  const domainPackage = asObject(layer2C?.verificationPackage);
+  const verificationTasks = [
+    ...boundedArray(semanticPackage.verificationTasks, 40),
+    ...boundedArray(domainPackage.verificationTasks, 40),
+  ].slice(0, 80);
   const finding = threatMatch
     ? "THREAT_MATCH"
     : semanticSuspicious
@@ -333,9 +382,28 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     semanticSignals: boundedArray(layer2B?.contextSignals, 30),
     contextSignals: boundedArray(layer2B?.contextSignals, 30),
     riskSignals: boundedArray(layer2C?.riskSignals, 30),
+    mediaForensics: layer2B?.mediaForensics || null,
+    secondaryClassifications: boundedArray(layer2C?.secondaryClassifications, 12),
+    limitations: [
+      ...boundedArray(layer2B?.limitations, 8),
+      ...boundedArray(layer2C?.limitations, 8),
+    ].map((item) => boundedText(item, 700)).filter(Boolean).slice(0, 16),
     claims: boundedArray(layer2B?.claims, 40),
     entities: boundedArray(layer2B?.entities, 40),
-    verificationPackage: layer2C?.verificationPackage || layer2B?.verificationPackage || null,
+    verificationPackage: Object.keys(domainPackage).length ? domainPackage : (Object.keys(semanticPackage).length ? semanticPackage : null),
+    verificationTasks,
+    verificationTaskSummary: {
+      totalTasks: verificationTasks.length,
+      l2bTaskCount: boundedArray(semanticPackage.verificationTasks, 40).length,
+      l2cTaskCount: boundedArray(domainPackage.verificationTasks, 40).length,
+    },
+    modelStatus: layer2B?.modelStatus || layer2B?.details?.providerStatus || layer2B?.metrics?.providerStatus || "UNKNOWN",
+    modelType: layer2B?.modelType || layer2B?.details?.modelProvider || "SEMANTIC_PROVIDER",
+    modelVersion: layer2B?.modelVersion || layer2B?.details?.modelUsed || layer2B?.metrics?.modelUsed || null,
+    confidenceKind: layer2B?.details?.confidenceKind || layer2B?.metrics?.confidenceKind || "NOT_DISCLOSED",
+    classificationSource: layer2B?.details?.confidenceSource || layer2B?.details?.providerId || null,
+    inputLength: layer2B?.inputLength || null,
+    promptInjectionDetected: layer2B?.details?.promptInjectionDetected === true,
     confidence: typeof layer2B?.confidence === "number" ? layer2B.confidence : null,
     reasons,
     conclusion: threatMatch
@@ -358,11 +426,41 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
   };
 }
 
-function makeCanonicalStage(stageId, raw, requestId, operationStatus, startedAt, completedAt) {
+function makeCanonicalStage(stageId, raw, requestId, operationStatus, startedAt, completedAt, context = {}) {
   let adapted = {};
   if (stageId === "l1") adapted = stageFromL1(raw, requestId, { startedAt, completedAt, operationStatus });
   if (stageId === "l3") adapted = stageFromL3(raw, requestId, { startedAt, completedAt, operationStatus });
-  if (stageId === "l4") adapted = stageFromL4(raw, requestId, { startedAt, completedAt, operationStatus });
+  if (stageId === "l4") {
+    adapted = stageFromL4(raw, requestId, { startedAt, completedAt, operationStatus });
+    const layer3 = asObject(context.layer3);
+    const layer3Sources = boundedArray(layer3.sources, 40);
+    const layer3Evidence = boundedArray(layer3.evidence, 80);
+    const validatedLayer3Sources = layer3Sources.filter((source) => source?.liveEvidence === true && source?.retrievalOutcome === "SUCCESS" && source?.providerStatus === "SUCCESS" && typeof (source?.sourceUrl || source?.url) === "string");
+    const layer3SourceQuality = validatedLayer3Sources.length
+      ? Number((validatedLayer3Sources.reduce((total, source) => total + (Number(source.authorityScore) || 0), 0) / validatedLayer3Sources.length).toFixed(4))
+      : null;
+    const supplementalSources = boundedArray(raw?.independentResearchSources, 16).map((source) => ({
+      ...source,
+      retrievalOrigin: source?.retrievalOrigin || "LAYER_4_SUPPLEMENTAL",
+    }));
+    const sourceSet = [...layer3Sources, ...supplementalSources];
+    const supportingEvidence = layer3Evidence.filter((item) => /SUPPORT/i.test(String(item?.relation || "")));
+    const contradictoryEvidence = layer3Evidence.filter((item) => /CONTRADICT/i.test(String(item?.relation || "")));
+    adapted = {
+      ...adapted,
+      sources: sourceSet,
+      evidence: layer3Evidence,
+      supportingEvidence,
+      contradictoryEvidence,
+      sourceQuality: layer3SourceQuality ?? adapted.sourceQuality ?? null,
+      evidenceAgreement: layer3.crossSourceAgreement?.agreementScore ?? adapted.evidenceAgreement ?? null,
+      verificationCompleteness: layer3.verificationCompleteness ?? adapted.verificationCompleteness ?? null,
+      evidenceSummary: layer3.evidenceSummary || `${layer3Evidence.length} evidence item(s) from ${layer3Sources.length} source(s); source quality is calculated only from validated live sources.`,
+      crossSourceAgreement: layer3.crossSourceAgreement || null,
+      sourceIndependence: layer3.sourceIndependence || null,
+      temporalAssessment: layer3.temporalAssessment || null,
+    };
+  }
   if (stageId === "l2") {
     const l2a = stageFromL2A(raw?.layer2A || {}, requestId, { startedAt, completedAt, operationStatus }, false);
     const l2b = stageFromL2B(raw?.layer2B || {}, requestId, { startedAt, completedAt, operationStatus });
@@ -384,9 +482,28 @@ function makeCanonicalStage(stageId, raw, requestId, operationStatus, startedAt,
       rawMetadata: { providerObservations: raw.providerObservations, status: raw.status },
     };
   }
-  return createStageEnvelope({
+  const stageInput = {
     ...adapted,
     ...raw,
+    ...(stageId === "l4" ? {
+      sources: adapted.sources,
+      evidence: adapted.evidence,
+      supportingEvidence: adapted.supportingEvidence,
+      contradictoryEvidence: adapted.contradictoryEvidence,
+      sourceQuality: adapted.sourceQuality,
+      evidenceAgreement: adapted.evidenceAgreement,
+      verificationCompleteness: adapted.verificationCompleteness,
+      evidenceSummary: adapted.evidenceSummary,
+      crossSourceAgreement: adapted.crossSourceAgreement,
+      sourceIndependence: adapted.sourceIndependence,
+      temporalAssessment: adapted.temporalAssessment,
+    } : {}),
+    ...(stageId === "l2" && /semantic|candidate/i.test(String(raw?.confidenceKind || "")) ? {
+      confidenceKind: "SEMANTIC_CANDIDATE_SCORE_NON_PROBABILISTIC",
+    } : {}),
+  };
+  return createStageEnvelope({
+    ...stageInput,
     stageId,
     pipelineModel: FOUR_LAYER_MODEL,
     requestId,
@@ -400,9 +517,12 @@ function makeCanonicalStage(stageId, raw, requestId, operationStatus, startedAt,
 function stageOperationStatus(stageId, raw) {
   if (stageId === "l1") return OPERATION_STATUS.COMPLETED;
   if (stageId === "l2") return raw.status === "PARTIAL" ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED;
-  if (stageId === "l3") return ["UNAVAILABLE", "PARTIAL", "TIMEOUT", "RATE_LIMITED", "NOT_CONFIGURED", "ERROR", "INVALID_RESPONSE"].includes(statusText(raw.status, raw.retrievalStatus))
+  if (stageId === "l3") return String(raw?.executionStatus || "").toUpperCase().startsWith("COMPLETED") || raw?.fallbackApplied === true
+    ? OPERATION_STATUS.COMPLETED
+    : ["UNAVAILABLE", "PARTIAL", "TIMEOUT", "RATE_LIMITED", "NOT_CONFIGURED", "ERROR", "INVALID_RESPONSE"].includes(statusText(raw.status, raw.retrievalStatus))
     ? OPERATION_STATUS.PARTIAL
     : OPERATION_STATUS.COMPLETED;
+  if (String(raw?.executionStatus || "").toUpperCase().startsWith("COMPLETED") || raw?.fallbackApplied === true) return OPERATION_STATUS.COMPLETED;
   const aiStatus = statusText(raw.aiVerificationStatus, raw.aiOperationStatus);
   return ["UNAVAILABLE", "PARTIAL", "DEGRADED", "ERROR", "INVALID_RESPONSE"].includes(aiStatus) ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED;
 }
@@ -467,6 +587,7 @@ function finalPredict({ layer1, layer2, layer3, layer4 }) {
     ...usableSources.slice(0, 8),
     ...geminiCitationSources,
   ].map((source) => [source?.url || source?.sourceId, source])).values()).slice(0, 16);
+  const confidenceKind = "DETERMINISTIC_POLICY_SCORE_NON_PROBABILISTIC";
   return {
     status: "READY",
     verdict: truthStatus,
@@ -480,15 +601,24 @@ function finalPredict({ layer1, layer2, layer3, layer4 }) {
     action: recommendedAction,
     assessmentConfidence: Number(decisionConfidence.toFixed(4)),
     decisionConfidence: Number(decisionConfidence.toFixed(4)),
+    confidence: Number(decisionConfidence.toFixed(4)),
+    confidenceKind,
+    confidenceExplanation: "Điểm này là score của policy tất định trên signal/evidence hiện có, không phải xác suất claim đúng.",
     evidenceAgreement,
     sourceQuality,
+    verificationCompleteness: layer3?.verificationCompleteness ?? null,
     evidenceSufficiency: insufficientEvidence ? "INSUFFICIENT" : "SUFFICIENT",
     independentSourceCount: usableSources.length,
     evidenceCount,
     sourceCount: sources.length,
     keyReasons: reasons,
+    reason: reasons[0] || "Final Predict giữ REVIEW vì chưa có đủ dữ liệu để kết luận an toàn.",
     remainingUncertainty: uncertainty,
+    uncertainties: uncertainty,
     keySources,
+    sources: keySources,
+    topEvidence: keySources.slice(0, 8),
+    authoritativeComponent: "STUDENTHUB_DETERMINISTIC_FINAL_PREDICT",
     evidenceRefs: boundedArray(layer4?.evidenceRefs, 40),
     derivedFrom: [...FOUR_LAYER_STAGE_IDS],
     traceability: [
@@ -515,8 +645,10 @@ function finalDecisionFromPredict(predict) {
     truthStatus: predict.truthStatus,
     enforcement: predict.recommendedAction,
     decisionConfidence: predict.decisionConfidence,
+    confidenceKind: predict.confidenceKind,
     evidenceSufficiency: predict.evidenceSufficiency,
     decisionAuthority: "FINAL_PREDICT_DETERMINISTIC",
+    authoritativeComponent: "FINAL_PREDICT_DETERMINISTIC",
     aiOverride: false,
   };
 }
@@ -549,10 +681,13 @@ export class OwnBackendTrustOrchestrator {
   async _emit(pipeline, event, onTransition) {
     if (typeof onTransition !== "function") return;
     try {
+      const publicPipeline = toPublicPipelineResult(cloneSafe(pipeline));
+      const stageId = pipeline.currentStage;
       await onTransition({
         event,
-        stageId: pipeline.currentStage,
-        pipeline: toPublicPipelineResult(cloneSafe(pipeline)),
+        stageId,
+        stage: stageId ? publicPipeline?.stages?.[stageId] || null : (event === "FINAL_PREDICT_READY" ? publicPipeline?.finalPredict || null : null),
+        pipeline: publicPipeline,
       });
     } catch {
       // A stream observer cannot change the canonical result.
@@ -577,9 +712,11 @@ export class OwnBackendTrustOrchestrator {
       requestId: pipeline.requestId,
     });
     await this._emit(pipeline, "STAGE_STARTED", onTransition);
+    await this._emit(pipeline, "STAGE_PROGRESS", onTransition);
 
     let raw;
     let errorCode = null;
+    let fallbackApplied = false;
     try {
       raw = await worker();
       this._assertActive(signal);
@@ -587,13 +724,16 @@ export class OwnBackendTrustOrchestrator {
       if (signal?.aborted || error?.name === "AbortError" || error?.code === "PIPELINE_CANCELLED") throw new TrustPipelineCancelledError();
       errorCode = boundedText(error?.code || error?.name || "STAGE_FAILURE", 120) || "STAGE_FAILURE";
       raw = options.fallback?.(error) || {};
+      fallbackApplied = raw?.fallbackApplied === true || String(raw?.executionStatus || "").toUpperCase().startsWith("COMPLETED");
     }
     const completedAt = nowIso();
-    const operationStatus = errorCode ? OPERATION_STATUS.PARTIAL : stageOperationStatus(stageId, raw || {});
-    const stage = makeCanonicalStage(stageId, raw || {}, pipeline.requestId, operationStatus, startedAt, completedAt);
+    const operationStatus = errorCode && !fallbackApplied ? OPERATION_STATUS.PARTIAL : stageOperationStatus(stageId, raw || {});
+    const stage = makeCanonicalStage(stageId, raw || {}, pipeline.requestId, operationStatus, startedAt, completedAt, {
+      layer3: rawResults.l3 || null,
+    });
     if (errorCode) {
       stage.providerErrorType = errorCode;
-      stage.audit = { ...stage.audit, errorCode, transition: OPERATION_STATUS.PARTIAL };
+      stage.audit = { ...stage.audit, errorCode, transition: operationStatus, fallbackApplied };
     }
     pipeline.stages[stageId] = stage;
     rawResults[stageId] = raw || {};
@@ -711,10 +851,41 @@ export class OwnBackendTrustOrchestrator {
             signal: controller.signal,
             options: { requestId, signal: controller.signal, allowLocalFallback: false, ...(this.retriever ? { retriever: this.retriever } : {}) },
           };
-          if (this.legacyVerificationEnabled && typeof this.legacyVerificationAdapter?.verifyLayer3 === "function") {
-            return this.legacyVerificationAdapter.verifyLayer3(layer3Params);
+          // Canonical StudentHub evidence is authoritative for Layer 3. The
+          // optional legacy adapter may still contribute an explicitly
+          // labelled advisory report, but it must never replace the
+          // canonical source/evidence/provenance set.
+          const canonicalLayer3 = await this.services.l3(layer3Params);
+          if (!this.legacyVerificationEnabled || typeof this.legacyVerificationAdapter?.verifyLayer3 !== "function") {
+            return canonicalLayer3;
           }
-          return this.services.l3(layer3Params);
+          let legacyIntegration;
+          try {
+            legacyIntegration = await this.legacyVerificationAdapter.verifyLayer3(layer3Params);
+          } catch (error) {
+            legacyIntegration = {
+              status: "UNAVAILABLE",
+              providerStatus: "UNAVAILABLE",
+              providerId: "legacy_verification_layer3",
+              requestId,
+              rawVerdict: null,
+              assessmentConfidence: null,
+              evidenceAgreement: null,
+              sourceQuality: null,
+              stop: true,
+              canContinueToLayer4: false,
+              reason: boundedText(error?.code || error?.name || "LEGACY_LAYER3_FAILURE", 240),
+              contradictoryEvidence: [],
+              sources: [],
+              sourceOrigin: "LAYER_3_LEGACY_ADVISORY",
+              limitations: ["Legacy Layer 3 advisory failed; canonical StudentHub evidence was preserved."],
+            };
+          }
+          const nestedLegacyAdvisory = asObject(legacyIntegration?.legacyIntegration);
+          const boundedLegacyAdvisory = Object.keys(nestedLegacyAdvisory).length
+            ? { ...asObject(legacyIntegration), ...nestedLegacyAdvisory }
+            : legacyIntegration;
+          return { ...canonicalLayer3, legacyIntegration: boundedLegacyAdvisory || null };
         },
         pipeline,
         rawResults,
@@ -743,6 +914,8 @@ export class OwnBackendTrustOrchestrator {
               // attached later as bounded advisory metadata only.
               useAIGateway: true,
               aiMode: "GEMINI_ONLY",
+              allowQaExtended: true,
+              inputParts: multimodalInputParts(input),
               retrieveSupplementalEvidence: async ({ gaps = [], requestId: gapRequestId, signal } = {}) => {
                 const currentLayer3 = rawResults.l3 || null;
                 const supplementalRequestId = gapRequestId || requestId;

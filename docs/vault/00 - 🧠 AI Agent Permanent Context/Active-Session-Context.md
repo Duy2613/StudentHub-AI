@@ -1,6 +1,25 @@
 # ⚡ Active Session Context & Working State
 > **Vault Node**: `Active-Session-Context` | **Tags**: `#active-session` `#state` `#v9-reality-first` `#mlops`
 
+## 2026-09-20 — Trust evidence visibility and direct URL provenance
+
+- Canonical own-backend Layer 3 now always runs before the optional legacy
+  verification adapter. Legacy Layer 3/4 output remains visible as explicitly
+  labelled advisory metadata and cannot replace canonical source/evidence
+  provenance.
+- URL input is retained as a `USER_SUPPLIED` / `DIRECT_INPUT` source after
+  guarded fetch. Reachability is shown as provenance only; URL-only input with
+  no factual claim remains `NOT_APPLICABLE` and does not manufacture
+  claim-specific evidence.
+- Trust UI now exposes bounded Layer 2 provider/model/claim/task output, Layer 3
+  source/evidence/diagnostic/conflict/task detail, and Layer 4 deterministic
+  policy plus AI verification/model trace/citation/gap metadata.
+- Direct smoke evidence: YouTube and Vercel sample URLs both returned guarded
+  live direct sources with `providerStatus=SUCCESS`, `retrievalOutcome=SUCCESS`,
+  `sourceScope=direct_input`, and zero claim-specific evidence when no claim was
+  available. Boundary/retrieval/own-backend tests: 19/19; sequential Trust
+  tests: 63/63; production build and targeted ESLint pass.
+
 ## 2026-09-07 — Durable realtime event-log slice
 
 - Auth/identity closure remains the authoritative prior checkpoint; Labbe stays
@@ -584,3 +603,12 @@
 - Gemma 4 (`gemma-4-31b-it`, `gemma-4-26b-a4b-it`) chỉ shadow/probe; compatibility hiện `NO` vì chưa chạy gate đầy đủ.
 - Hermetic router/L4/V5/UI evidence đã pass; one-shot live probe không lặp request: primary đã biết HTTP 429 nên skip, 3.7/3.6 timeout, 2.5 trả HTTP 404. Vì vậy live verdict trung thực là `GEMINI_MULTI_MODEL_ROUTER_PARTIAL`.
 - Report: `docs/reports/GEMINI-MULTI-MODEL-ROUTER-2026-09-17.md` và `docs/reports/gemini_multi_model_router_probe_2026-09-17.json`. Full discovered suite vẫn có blocker không thuộc router tại Layer 3 Case C (`CONTESTED` expected, `INSUFFICIENT_EVIDENCE` received).
+
+## 24. Trust V5 full L3/L4 completion & multimodal QA — 2026-09-20
+
+- Đã khóa canonical L3/L4 completion contract: L3 luôn trả envelope có provenance/retrieval status; L4 chạy Gemini chain `3.5-flash-lite → 3.1-flash-lite → extended QA models` và khi tất cả provider fail vẫn trả `COMPLETED_WITH_FALLBACK` từ `deterministic_trust_policy`, không giả `VERIFIED`.
+- Đã đưa image/QR artifact vào server-owned `MediaArtifactService`; QR giữ `type: "qr"`, chuyển input parts dạng multimodal vào Gemini, và Layer 2 semantic đã coi QR là input hạng nhất thay vì `UNKNOWN/PARTIAL`.
+- Live multimodal matrix `18/18` (9 input URLs × IMAGE/QR): HTTP `200`, pipeline `COMPLETED`, L2 `COMPLETED`, L3 `COMPLETED/SUCCESS` với direct URL provenance cho 16 web cases, L4 `COMPLETED` hoặc `COMPLETED_WITH_FALLBACK`, `aiOperationStatus=COMPLETED`.
+- URL browser matrix: 8 HTTP cases có L3/L4 screenshots sau `FINAL PREDICT Hoàn tất`; `chrome://` bị UI validation chặn đúng contract. Multimodal browser matrix thêm đủ 16 cases (8 URL × IMAGE/QR), mỗi case có screenshot L3 và L4 sau final rail.
+- Evidence artifacts: `artifacts/trust-full-multimodal-qa-2026-09-20/multimodal-matrix.json`, `multimodal-summary.json`, `url-screenshot-matrix.json`, `multimodal-screenshot-matrix.json` và screenshots cùng thư mục.
+- Local gates sau thay đổi: targeted tests pass; lint/build/regression trước đó pass. Live model outcome phụ thuộc quota/runtime, deterministic policy vẫn là authority; chưa claim production deployment hay live provider SLO.

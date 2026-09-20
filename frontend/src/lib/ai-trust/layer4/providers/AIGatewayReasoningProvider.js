@@ -174,6 +174,9 @@ export function buildGeminiLayer4Prompts({ deterministic = {}, evidence = [], al
 }
 
 function emptyVerification(status = "UNAVAILABLE", errorCode = null, httpStatus = null, latencyMs = null, routing = {}) {
+  const deterministicFallback = status === "FALLBACK_DETERMINISTIC" || routing.deterministicFallback === true;
+  const publicStatus = deterministicFallback ? "FALLBACK_DETERMINISTIC" : status;
+  const executedModel = routing.executedModel || (deterministicFallback ? "deterministic_trust_policy" : null);
   const requestedPrimaryModel = routing.requestedPrimaryModel || PRIMARY_GEMINI_MODEL;
   return {
     aiVerification: {
@@ -181,24 +184,26 @@ function emptyVerification(status = "UNAVAILABLE", errorCode = null, httpStatus 
       supportReasons: [],
       contradictionReasons: [],
       missingEvidence: [],
-      uncertainty: "AI verification unavailable; deterministic Trust Policy remains authoritative.",
+      uncertainty: deterministicFallback
+        ? "Gemini không trả về synthesis usable trong ngân sách lần chạy; deterministic Trust Policy vẫn là boundary authoritative."
+        : "AI verification unavailable; deterministic Trust Policy remains authoritative.",
       citationsUsed: [],
       provider: "google",
-      model: routing.executedModel || null,
+      model: executedModel,
     },
-    aiVerificationStatus: status,
+    aiVerificationStatus: publicStatus,
     aiVerificationTransport: null,
     aiVerificationThinkingLevel: "low",
     aiVerificationLatencyMs: Number.isFinite(Number(latencyMs)) ? Math.max(0, Number(latencyMs)) : null,
     aiVerificationErrorType: errorCode,
     aiVerificationHttpStatus: Number.isInteger(Number(httpStatus)) && Number(httpStatus) >= 100 && Number(httpStatus) <= 599 ? Number(httpStatus) : null,
     aiRequestedPrimaryModel: requestedPrimaryModel,
-    aiExecutedModel: routing.executedModel || null,
-    aiFallbackUsed: routing.fallbackUsed === true,
-    aiFallbackReason: routing.fallbackReason || null,
+    aiExecutedModel: executedModel,
+    aiFallbackUsed: routing.fallbackUsed === true || deterministicFallback,
+    aiFallbackReason: routing.fallbackReason || (deterministicFallback ? errorCode : null),
     aiModelTrace: Array.isArray(routing.attempts) ? routing.attempts : [],
-    aiProviderStatus: routing.providerStatus || null,
-    aiOperationStatus: routing.operationStatus || (status === "UNAVAILABLE" ? "PARTIAL" : null),
+    aiProviderStatus: routing.providerStatus || (deterministicFallback ? "FALLBACK_DETERMINISTIC" : null),
+    aiOperationStatus: deterministicFallback ? "COMPLETED" : routing.operationStatus || (status === "UNAVAILABLE" ? "PARTIAL" : null),
     aiCooldownResult: routing.cooldownResult || null,
     qaExtendedFallback: routing.qaExtendedFallback === true || isQaExtendedGeminiModel(routing.executedModel),
   };
@@ -231,10 +236,12 @@ export class AIGatewayReasoningProvider extends ITrustReasoningModel {
         capability: AI_CAPABILITY.DEEP_REASONING,
         systemPrompt,
         userPrompt,
+        inputParts: options.inputParts || null,
         validate: isValidGeminiEvidenceGap,
         options: {
           requestId: options.requestId,
           signal: options.signal,
+          inputParts: options.inputParts || null,
           perModelTimeoutMs: options.perModelTimeoutMs || AI_GATEWAY_CONFIG.BUDGET.L4_GAP_PER_MODEL_TIMEOUT_MS,
           totalBudgetMs: options.totalBudgetMs || AI_GATEWAY_CONFIG.BUDGET.L4_GAP_TOTAL_MS,
           responseSchema: GEMINI_EVIDENCE_GAP_SCHEMA,
@@ -288,6 +295,7 @@ export class AIGatewayReasoningProvider extends ITrustReasoningModel {
         capability: AI_CAPABILITY.DEEP_REASONING,
         systemPrompt,
         userPrompt,
+        inputParts: options.inputParts || null,
         validate: (value, catalogEntry) => isValidGeminiTrustVerification(value, {
           allowedCitationUrls,
           allowedEvidenceIds: new Set(evidence.flatMap((item) => [item.evidenceId, item.sourceId]).filter(Boolean)),
@@ -308,8 +316,10 @@ export class AIGatewayReasoningProvider extends ITrustReasoningModel {
       const errorType = error?.gatewayErrorType || (error?.name === "AbortError" ? GATEWAY_ERROR_TYPE.TIMEOUT : GATEWAY_ERROR_TYPE.NETWORK_ERROR);
       return {
         ...deterministic,
-        ...emptyVerification("UNAVAILABLE", errorType, error?.httpStatus, null, {
+        ...emptyVerification("FALLBACK_DETERMINISTIC", errorType, error?.httpStatus, null, {
           requestedPrimaryModel: PRIMARY_GEMINI_MODEL,
+          deterministicFallback: true,
+          fallbackReason: errorType,
         }),
         aiNarrativeStatus: "fallback_deterministic_only",
         aiNarrativeFailureStatus: classifyGatewayFailure({ errorType, httpStatus: error?.httpStatus }),
@@ -325,7 +335,11 @@ export class AIGatewayReasoningProvider extends ITrustReasoningModel {
     })) {
       return {
         ...deterministic,
-        ...emptyVerification("UNAVAILABLE", result?.errorType || "INVALID_RESPONSE", result?.httpStatus, result?.totalLatencyMs, result),
+        ...emptyVerification("FALLBACK_DETERMINISTIC", result?.errorType || "INVALID_RESPONSE", result?.httpStatus, result?.totalLatencyMs, {
+          ...result,
+          deterministicFallback: true,
+          fallbackReason: result?.fallbackReason || result?.errorType || "INVALID_RESPONSE",
+        }),
         aiNarrativeStatus: "fallback_deterministic_only",
         aiNarrativeError: result?.errorMessage || "AI verification unavailable",
       };
@@ -339,7 +353,11 @@ export class AIGatewayReasoningProvider extends ITrustReasoningModel {
     if (!dto) {
       return {
         ...deterministic,
-        ...emptyVerification("UNAVAILABLE", "INVALID_RESPONSE", result.httpStatus, result.totalLatencyMs, result),
+        ...emptyVerification("FALLBACK_DETERMINISTIC", "INVALID_RESPONSE", result.httpStatus, result.totalLatencyMs, {
+          ...result,
+          deterministicFallback: true,
+          fallbackReason: "INVALID_RESPONSE",
+        }),
         aiNarrativeStatus: "fallback_deterministic_only",
       };
     }

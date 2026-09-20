@@ -186,7 +186,50 @@ function safeCandidate(candidate) {
     officialDomains: asArray(candidate.officialDomains).slice(0, 12).map((item) => boundedString(item, 180).toLowerCase()).filter(Boolean),
     sourceFingerprint: boundedString(candidate.sourceFingerprint, 128) || null,
     retrievalOrigin: candidate.retrievalOrigin || null,
+    sourceScope: boundedString(candidate.sourceScope, 120) || "claim_specific",
   };
+}
+
+function directInputCandidates(requestInput) {
+  const source = requestInput && typeof requestInput === "object" && !Array.isArray(requestInput)
+    ? requestInput
+    : {};
+  const inputType = String(source.type || "").toLowerCase();
+  const metadata = source.metadata && typeof source.metadata === "object" ? source.metadata : {};
+  const values = [
+    ...(inputType === "url" ? [source.content] : []),
+    metadata.url,
+    source.url,
+    ...(inputType === "image" || inputType === "qr" ? [source.content, metadata.ocrText, metadata.qrContent, metadata.qrPayload, metadata.qrIntake?.normalizedValue] : []),
+  ].filter((value) => typeof value === "string" && value.trim());
+  const candidates = [];
+  for (const value of values.slice(0, 12)) {
+    const matches = inputType === "url" && /^https?:\/\//i.test(value.trim())
+      ? [value.trim()]
+      : (value.match(/https?:\/\/[^\s<>"'`]+/gi) || []);
+    for (const match of matches.slice(0, 8)) {
+      const candidateUrl = match.replace(/[),.;!?\]}]+$/g, "");
+      const guard = validateRemoteUrlSync(candidateUrl);
+      if (!guard.ok) continue;
+      let parsed;
+      try { parsed = new URL(guard.url); } catch { continue; }
+      const hostname = parsed.hostname.toLowerCase();
+      const multimodal = inputType === "image" || inputType === "qr";
+      candidates.push({
+        sourceId: createSecureId("src_direct_input"),
+        url: guard.url,
+        domain: hostname,
+        title: `${multimodal ? inputType.toUpperCase() : "Direct input"} · ${hostname}`,
+        publisher: hostname,
+        sourceType: SOURCE_TYPE.USER_SUPPLIED,
+        sourceScope: multimodal ? "multimodal_extracted_url" : "direct_input",
+        isOfficial: false,
+        retrievalOrigin: RETRIEVAL_ORIGIN.DIRECT_INPUT,
+        retrievalOutcome: "CANDIDATE",
+      });
+    }
+  }
+  return dedupeCandidates(candidates, { defaultOrigin: RETRIEVAL_ORIGIN.DIRECT_INPUT }).slice(0, 12);
 }
 
 function dedupeCandidates(candidates, { defaultOrigin, supplemental = false } = {}) {
@@ -353,6 +396,9 @@ export class Layer3EvidenceService {
       : asArray(layer2Result?.verificationPackage?.claims || layer2Result?.claims);
     const taskMerge = mergeVerificationTasks(layer2Result, layer2CVerificationPackage);
     const targetClaims = dedupeClaims([...rawClaims, ...l2cCandidateClaims(taskMerge.l2cPackage)]);
+    const directInputSources = retrievalStage === "INITIAL"
+      ? directInputCandidates(input.input || input)
+      : [];
 
     const rawCandidates = asArray(candidateSources).length > 0
       ? candidateSources
@@ -405,7 +451,7 @@ export class Layer3EvidenceService {
         retrievalOrigin,
       }));
       retrievedSources = dedupeCandidates(
-        retrievalStage === "SUPPLEMENTAL" ? [...previousSources, ...searchedSources] : searchedSources,
+        retrievalStage === "SUPPLEMENTAL" ? [...previousSources, ...searchedSources] : [...directInputSources, ...searchedSources],
         { defaultOrigin: retrievalOrigin },
       ).slice(0, MAX_RETRIEVED_SOURCES);
       if (Object.values(EVIDENCE_PROVIDER_STATUS).includes(retriever.lastSearchStatus) && retriever.lastSearchStatus !== EVIDENCE_PROVIDER_STATUS.SUCCESS) {
@@ -427,12 +473,12 @@ export class Layer3EvidenceService {
         try {
           const fallback = new KnowledgeBaseRetriever();
           fetchRetriever = fallback;
-          retrievedSources = dedupeCandidates(asArray(await fallback.search(boundedQueries, { requestId, signal: safeOptions.signal })), {
+          retrievedSources = dedupeCandidates([...directInputSources, ...asArray(await fallback.search(boundedQueries, { requestId, signal: safeOptions.signal }))], {
             defaultOrigin: RETRIEVAL_ORIGIN.LOCAL_KNOWLEDGE,
           }).slice(0, MAX_RETRIEVED_SOURCES);
         } catch (fallbackError) {
           if (safeOptions.signal?.aborted || fallbackError?.name === "AbortError") throw fallbackError;
-          retrievedSources = retrievalStage === "SUPPLEMENTAL" ? previousSources : [];
+          retrievedSources = retrievalStage === "SUPPLEMENTAL" ? previousSources : directInputSources;
           auditEvents.push({ type: "LOCAL_FALLBACK_FAILURE", code: boundedString(fallbackError?.message, 120) || "LOCAL_FALLBACK_FAILURE", at: new Date().toISOString() });
         }
       } else {
@@ -440,7 +486,7 @@ export class Layer3EvidenceService {
         // external evidence after Tavily fails or is not configured.
         retrievalMode = "TAVILY_UNAVAILABLE";
         fetchRetriever = retriever;
-        retrievedSources = retrievalStage === "SUPPLEMENTAL" ? previousSources : [];
+        retrievedSources = retrievalStage === "SUPPLEMENTAL" ? previousSources : directInputSources;
       }
     }
 
@@ -455,10 +501,13 @@ export class Layer3EvidenceService {
         continue;
       }
 
+      const sourceFetcher = src.retrievalOrigin === RETRIEVAL_ORIGIN.DIRECT_INPUT
+        ? retriever
+        : fetchRetriever;
       let fetchResult;
       try {
-        if (typeof fetchRetriever.fetch !== "function") throw new Error("RETRIEVER_FETCH_UNAVAILABLE");
-        fetchResult = safeFetchResult(await fetchRetriever.fetch(urlGuard.url, { requestId, signal: safeOptions.signal }));
+        if (typeof sourceFetcher.fetch !== "function") throw new Error("RETRIEVER_FETCH_UNAVAILABLE");
+        fetchResult = safeFetchResult(await sourceFetcher.fetch(urlGuard.url, { requestId, signal: safeOptions.signal }));
       } catch (err) {
         if (safeOptions.signal?.aborted || err?.name === "AbortError") throw err;
         fetchResult = { html: "", textContent: "", status: 502, error: boundedString(err?.message, 120) || "FETCH_FAILURE" };
@@ -466,7 +515,7 @@ export class Layer3EvidenceService {
       throwIfAborted(safeOptions.signal);
 
       const fetchedSuccessfully = isSuccessfulFetch(fetchResult);
-      const sourceType = inferSourceType(src, fetchResult, retrieverId);
+      const sourceType = inferSourceType(src, fetchResult, sourceFetcher?.retrieverId || retrieverId);
       const providerStatus = providerStatusFor(fetchResult, retrievalStatus, fetchedSuccessfully);
       const authority = SourceAuthorityRegistry.evaluateAuthority(src.domain || urlGuard.url, "general");
       const sourceFingerprint = src.sourceType === SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE
@@ -474,7 +523,7 @@ export class Layer3EvidenceService {
         : await sha256Hex(urlGuard.url);
       const contentFingerprint = fetchedSuccessfully ? await sha256Hex(fetchResult.textContent) : null;
       const liveEvidenceAllowed = sourceType !== SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE &&
-        isNetworkGuardedRetriever(fetchRetriever) &&
+        isNetworkGuardedRetriever(sourceFetcher) &&
         fetchedSuccessfully &&
         fetchResult.liveEvidence === true;
       const sourceDto = createSource({
@@ -496,6 +545,10 @@ export class Layer3EvidenceService {
         contentFingerprint,
         retrievalOutcome: fetchedSuccessfully ? "SUCCESS" : "FAILURE",
         retrievalOrigin: src.retrievalOrigin || retrievalOrigin,
+        sourceScope: src.sourceScope || "claim_specific",
+        httpStatus: fetchResult.status,
+        requestedUrl: urlGuard.url,
+        finalUrl: fetchResult.finalUrl || urlGuard.url,
       });
       processedSources.push(sourceDto);
       externalEvidence = externalEvidence || sourceDto.liveEvidence;
@@ -561,9 +614,17 @@ export class Layer3EvidenceService {
       completeness: verificationCompleteness,
       externalEvidence,
     });
+    const sourceCountByOrigin = (origin) => processedSources.filter((source) => source.retrievalOrigin === origin).length;
+    const evidenceCountByOrigin = (origin) => evidenceItems.filter((item) => item.retrievalOrigin === origin).length;
+    const directInputSourceCount = sourceCountByOrigin(RETRIEVAL_ORIGIN.DIRECT_INPUT);
+    const directInputEvidenceCount = evidenceCountByOrigin(RETRIEVAL_ORIGIN.DIRECT_INPUT);
+    const directInputValidatedSourceCount = processedSources.filter((source) => source.retrievalOrigin === RETRIEVAL_ORIGIN.DIRECT_INPUT && source.liveEvidence === true).length;
 
     const limitations = [
       ...asArray(decision.limitations),
+      ...(directInputSourceCount > 0 && targetClaims.length === 0
+        ? ["URL đầu vào đã được fetch và lưu provenance; chưa có factual claim từ Layer 2 nên chưa tạo evidence claim-specific."]
+        : []),
       ...(retrievalStatus === EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY || retrievalMode === "LOCAL_FALLBACK"
         ? ["Bằng chứng cục bộ/fallback không được coi là xác minh trực tiếp từ nguồn bên ngoài."]
         : []),
@@ -572,8 +633,6 @@ export class Layer3EvidenceService {
         : []),
     ];
 
-    const sourceCountByOrigin = (origin) => processedSources.filter((source) => source.retrievalOrigin === origin).length;
-    const evidenceCountByOrigin = (origin) => evidenceItems.filter((item) => item.retrievalOrigin === origin).length;
     const validatedSourceCount = processedSources.filter((source) => source.liveEvidence === true).length;
     const previousInitialPhase = previousEvidencePackage?.retrievalPhases?.initialSearch;
     const retrievalPhases = {
@@ -585,6 +644,9 @@ export class Layer3EvidenceService {
           sourceCount: sourceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_INITIAL),
           evidenceCount: evidenceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_INITIAL),
           validatedSourceCount: processedSources.filter((source) => source.retrievalOrigin === RETRIEVAL_ORIGIN.TAVILY_INITIAL && source.liveEvidence === true).length,
+          directInputSourceCount,
+          directInputEvidenceCount,
+          directInputValidatedSourceCount,
           provider: retrieverId,
           providerStatus: retrievalStage === "INITIAL" ? retrievalStatus : null,
           retrievalOrigin: RETRIEVAL_ORIGIN.TAVILY_INITIAL,
@@ -616,6 +678,9 @@ export class Layer3EvidenceService {
         sourceCount: processedSources.length,
         evidenceCount: evidenceItems.length,
         validatedSourceCount,
+        directInputSourceCount,
+        directInputEvidenceCount,
+        directInputValidatedSourceCount,
         provider: retrieverId,
         providerStatus: retrievalStatus,
         retrievalOrigin,
@@ -624,6 +689,8 @@ export class Layer3EvidenceService {
 
     return markTrustedLayer3Result(createLayer3Result({
       status: decision.status,
+      executionStatus: "COMPLETED",
+      retrievalExecuted: true,
       claims: targetClaims,
       claimStatuses: decision.claimStatuses,
       sources: processedSources,
@@ -666,6 +733,8 @@ export class Layer3EvidenceService {
       metrics: {
         executionTimeMs: Number((nowMs() - startTime).toFixed(2)),
         queriesExecutedCount: boundedQueries.length,
+        executionStatus: "COMPLETED",
+        retrievalExecuted: true,
         retrievalProvider: retrieverId,
         retrievalStatus,
         retrievalMode,
@@ -674,6 +743,9 @@ export class Layer3EvidenceService {
         initialQueryCount: retrievalPhases.initialSearch.queryCount,
         initialSourceCount: retrievalPhases.initialSearch.sourceCount,
         initialEvidenceCount: retrievalPhases.initialSearch.evidenceCount,
+        directInputSourceCount,
+        directInputEvidenceCount,
+        directInputValidatedSourceCount,
         supplementalQueryCount: retrievalPhases.supplementalSearch.queryCount,
         supplementalSourceCount: retrievalPhases.supplementalSearch.sourceCount,
         supplementalEvidenceCount: retrievalPhases.supplementalSearch.evidenceCount,

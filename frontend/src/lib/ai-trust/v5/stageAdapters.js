@@ -63,7 +63,9 @@ export function stageFromL1(raw, requestId, timing = {}) {
     modelId: raw?.metrics?.modelUsed || null,
     modelVersion: raw?.metrics?.ruleVersion || null,
     confidence: typeof raw?.confidence === "number" ? raw.confidence : null,
-    confidenceKind: "HEURISTIC_SCORE_NON_PROBABILISTIC",
+    confidenceKind: typeof raw?.confidence === "number" ? (raw?.metrics?.confidenceKind || "HEURISTIC_SCORE_NON_PROBABILISTIC") : "NOT_DISCLOSED",
+    metrics: raw?.metrics || {},
+    checks: raw?.checksPerformed || raw?.checks || [],
     summary: hardBlock
       ? "Layer 1 phát hiện chỉ dấu kỹ thuật hard block; hành động không an toàn bị chặn ngay."
       : finding === "LOCAL_SUSPICIOUS"
@@ -288,14 +290,45 @@ export function stageFromL3(raw, requestId, timing = {}) {
     tasksWithoutQueries: boundedTaskSummaryCount(sourceTaskSummary.tasksWithoutQueries),
   };
   const l2cEvidenceCount = evidence.filter((item) => String(item?.claimId || "").startsWith("l2c-domain-")).length;
+  const usableSources = sources.filter((source) => source?.liveEvidence === true && source?.retrievalOutcome === "SUCCESS" && source?.providerStatus === "SUCCESS" && typeof (source?.sourceUrl || source?.url) === "string");
+  const sourceQuality = usableSources.length
+    ? Number((usableSources.reduce((total, source) => total + (Number(source.authorityScore) || 0), 0) / usableSources.length).toFixed(4))
+    : null;
+  const evidenceSummary = typeof raw?.evidenceSummary === "string" && raw.evidenceSummary.trim()
+    ? raw.evidenceSummary
+    : `${finding}: ${evidence.length} evidence item(s) from ${sources.length} source(s); source quality is calculated only from validated live sources.`;
+  const provider = {
+    providerId: raw?.metrics?.retrievalProvider || raw?.retrievalMode || "evidence_retriever",
+    status: raw?.retrievalStatus || "UNKNOWN",
+    queryCount: raw?.metrics?.queriesExecutedCount ?? 0,
+    sourceCount: raw?.metrics?.sourcesRetrievedCount ?? sources.length,
+    acceptedHostCount: raw?.metrics?.providerAcceptedHostCount ?? 0,
+    latencyMs: raw?.metrics?.providerDurationMs ?? null,
+    retrievalOrigin: raw?.metrics?.retrievalOrigin || null,
+    retrievalMode: raw?.retrievalMode || null,
+  };
   return createStageEnvelope({
     ...stageBase("l3", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso(), partialOperation ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED),
     finding,
     severity: severityForFinding(finding),
     providerStatus: raw?.retrievalStatus || "UNKNOWN",
     providerId: raw?.metrics?.retrievalProvider || raw?.retrievalMode || "evidence_retriever",
-    confidence: typeof raw?.verificationCompleteness === "number" ? raw.verificationCompleteness : null,
-    confidenceKind: "EVIDENCE_COMPLETENESS_SCORE_NON_PROBABILISTIC",
+    provider,
+    providers: [provider],
+    confidence: typeof raw?.evidenceConfidence === "number"
+      ? raw.evidenceConfidence
+      : (typeof raw?.verificationCompleteness === "number" ? raw.verificationCompleteness : null),
+    confidenceKind: typeof raw?.evidenceConfidence === "number"
+      ? "EVIDENCE_CONFIDENCE_NON_PROBABILISTIC"
+      : "EVIDENCE_COMPLETENESS_SCORE_NON_PROBABILISTIC",
+    sourceQuality,
+    evidenceAgreement: raw?.crossSourceAgreement?.agreementScore ?? null,
+    verificationCompleteness: raw?.verificationCompleteness,
+    evidenceSummary,
+    crossSourceAgreement: raw?.crossSourceAgreement,
+    sourceIndependence: raw?.sourceIndependence,
+    temporalAssessment: raw?.temporalAssessment,
+    retrievalPhases: raw?.retrievalPhases,
     summary: `${finding === "SUPPORTED" ? "Bằng chứng hiện có hỗ trợ claim trong phạm vi nguồn đã kiểm tra." : finding === "CONTRADICTED" ? "Bằng chứng hiện có mâu thuẫn với claim." : finding === "MIXED" ? "Nguồn/evidence có mâu thuẫn hoặc không đồng nhất." : finding === "STALE" ? "Evidence có dấu hiệu stale, không đủ để dùng như current proof." : "Chưa có đủ evidence độc lập và current để xác minh claim."}${l2cTaskCount > 0 ? ` L3 đã nhận ${l2cTaskCount} task(s) từ L2C để kiểm tra độc lập.` : ""}`,
     reasons: [raw?.retrievalMode, raw?.retrievalStatus, raw?.crossSourceAgreement].filter(Boolean).map((item) => safeText(item)).slice(0, 12),
     signals: [
@@ -306,6 +339,8 @@ export function stageFromL3(raw, requestId, timing = {}) {
       ...(verificationTasks.length > 0 ? [signal("L2C_EVIDENCE_BRIDGE", `${verificationTasks.length} verification task(s) được merge; L2C output vẫn là candidate-only.`, "l2c_l3_bridge", "HIGH")] : []),
     ],
     evidenceRefs: evidence.map((item) => item?.evidenceId).filter((item) => typeof item === "string").slice(0, 40),
+    supportingEvidence: evidence.filter((item) => /SUPPORT/i.test(String(item?.relation || ""))),
+    contradictoryEvidence: evidence.filter((item) => /CONTRADICT/i.test(String(item?.relation || ""))),
     meaning: "Layer 3 mô tả provenance, authority, freshness và independence của nguồn; model-generated explanation không phải evidence.",
     userAction: finding === "CONTRADICTED" || finding === "MIXED" ? "Không dựa vào claim; đối chiếu nguồn chính thức và giữ review." : "Xem nguồn/claim cụ thể trước khi hành động.",
     safeToContinue: true,
@@ -378,16 +413,19 @@ export function stageFromL4(raw, requestId, timing = {}) {
   }
 
   const isTransientFailure = ["RATE_LIMITED", "TIMEOUT", "AUTH_FAILED", "PERMISSION_DENIED", "MODEL_NOT_AVAILABLE", "NETWORK_ERROR", "NOT_CONFIGURED", "INVALID_RESPONSE", "MODEL_INCOMPATIBLE", "INVALID_REQUEST", "COOLDOWN", "BUDGET_EXHAUSTED", "UNAVAILABLE", "ERROR"].includes(providerStatus);
-  const operationStatus = timing.operationStatus || (isTransientFailure ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED);
+  const fallbackCompleted = String(raw?.executionStatus || "").toUpperCase().startsWith("COMPLETED") || (raw?.aiFallbackUsed === true && String(raw?.aiOperationStatus || "").toUpperCase() === "COMPLETED");
+  const operationStatus = timing.operationStatus || (fallbackCompleted ? OPERATION_STATUS.COMPLETED : isTransientFailure ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED);
 
   return createStageEnvelope({
     ...stageBase("l4", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso(), operationStatus),
     finding,
     severity: finding === "MALICIOUS" ? "CRITICAL" : finding === "SUSPICIOUS" ? "HIGH" : "INFO",
     providerStatus,
-    providerId: providerStatus === "GEMINI_VERIFIED" || isTransientFailure
-      ? (aiVerification?.provider || "gemini")
-      : "deterministic_trust_policy_engine",
+    providerId: providerStatus === "GEMINI_VERIFIED"
+      ? (aiVerification?.provider || null)
+      : isTransientFailure
+        ? (aiVerification?.provider || null)
+        : "deterministic_trust_policy_engine",
     modelId: raw?.aiExecutedModel || aiVerification?.model || null,
     modelVersion: raw?.aiExecutedModel || aiVerification?.model || raw?.aiRequestedPrimaryModel || raw?.auditTrail?.ruleVersion || null,
     confidence: typeof raw?.decisionConfidence === "number" ? raw.decisionConfidence : null,
@@ -406,6 +444,15 @@ export function stageFromL4(raw, requestId, timing = {}) {
     userAction: action === "BLOCK" ? "Dừng hành động và không tương tác với target." : action === "REVIEW" ? "Tạm dừng và xác minh qua nguồn độc lập." : "Chỉ tiếp tục với caution, không coi là proven safe.",
     safeToContinue: true,
     aiVerification,
+    providers: aiVerification?.provider ? [{
+      provider: aiVerification.provider,
+      providerId: aiVerification.provider,
+      status: aiProviderStatus || rawStatus || "UNKNOWN",
+      success: aiProviderStatus === "SUCCESS" || rawStatus === "GEMINI_VERIFIED",
+      executed: Boolean(aiVerification.model || raw?.aiExecutedModel),
+      latencyMs: raw?.aiVerificationLatencyMs ?? null,
+      observedAt: nowIso(),
+    }] : [],
     aiVerificationStatus: raw?.aiVerificationStatus || rawStatus,
     aiVerificationTransport: raw?.aiVerificationTransport || null,
     aiVerificationThinkingLevel: raw?.aiVerificationThinkingLevel || null,

@@ -180,8 +180,10 @@ export class Layer4TrustService {
         evidenceGapAnalysis = await narrativeProvider.analyzeEvidenceGaps(fusedGraph, {
           requestId: options.requestId || layer1Result?.requestId || layer2Result?.requestId || currentLayer3Result?.requestId || null,
           signal: options.signal,
+          inputParts: options.inputParts || null,
           perModelTimeoutMs: options.aiPerModelTimeoutMs,
           totalBudgetMs: options.aiTotalBudgetMs,
+          allowQaExtended: options.allowQaExtended === true,
         });
       } catch (error) {
         evidenceGapAnalysis = {
@@ -279,9 +281,11 @@ export class Layer4TrustService {
           const candidate = await narrativeProvider.reason(fusedGraph, {
             requestId: options.requestId || layer1Result?.requestId || layer2Result?.requestId || currentLayer3Result?.requestId || null,
             signal: options.signal,
+            inputParts: options.inputParts || null,
             perModelTimeoutMs: options.aiPerModelTimeoutMs,
             totalBudgetMs: options.aiTotalBudgetMs,
             validateCitationUrl: options.validateCitationUrl,
+            allowQaExtended: options.allowQaExtended === true,
           });
         // Preserve every security/truth/action/confidence field from the
         // deterministic result. Only a bounded narrative may cross this
@@ -307,6 +311,7 @@ export class Layer4TrustService {
           aiProviderStatus: candidate?.aiProviderStatus || null,
           aiOperationStatus: candidate?.aiOperationStatus || null,
           aiCooldownResult: candidate?.aiCooldownResult || null,
+          executionStatus: candidate?.executionStatus || (candidate?.aiFallbackUsed === true ? "COMPLETED_WITH_FALLBACK" : "COMPLETED"),
         };
       }
     } catch (err) {
@@ -315,16 +320,27 @@ export class Layer4TrustService {
         userExplanation: deterministicAssessment.userExplanation,
         aiNarrativeStatus: "fallback_deterministic_only",
         aiNarrativeError: err?.name || "provider_error",
-        aiVerificationStatus: "UNAVAILABLE",
+        executionStatus: "COMPLETED_WITH_FALLBACK",
+        aiVerification: {
+          verdictSignal: "UNCERTAIN",
+          supportReasons: [],
+          contradictionReasons: [],
+          missingEvidence: ["Gemini provider exception"],
+          uncertainty: "Kết quả policy deterministic vẫn được trả về sau khi AI provider exception.",
+          citationsUsed: [],
+          provider: "google",
+          model: "deterministic_trust_policy",
+        },
+        aiVerificationStatus: "FALLBACK_DETERMINISTIC",
         aiVerificationErrorType: err?.name || "provider_error",
         aiVerificationHttpStatus: Number.isInteger(Number(err?.httpStatus)) ? Number(err.httpStatus) : null,
-        aiRequestedPrimaryModel: null,
-        aiExecutedModel: null,
-        aiFallbackUsed: false,
-        aiFallbackReason: null,
+        aiRequestedPrimaryModel: "gemini-3.8-flash",
+        aiExecutedModel: "deterministic_trust_policy",
+        aiFallbackUsed: true,
+        aiFallbackReason: err?.name || "provider_error",
         aiModelTrace: [],
-        aiProviderStatus: null,
-        aiOperationStatus: "PARTIAL",
+        aiProviderStatus: "FALLBACK_DETERMINISTIC",
+        aiOperationStatus: "COMPLETED",
         aiCooldownResult: null,
       };
     }
@@ -368,6 +384,7 @@ export class Layer4TrustService {
       aiProviderStatus: assessment.aiProviderStatus || null,
       aiOperationStatus: assessment.aiOperationStatus || null,
       aiCooldownResult: assessment.aiCooldownResult || null,
+      executionStatus: assessment.executionStatus || (assessment.aiFallbackUsed === true ? "COMPLETED_WITH_FALLBACK" : "COMPLETED"),
       evidenceGapAnalysis,
       supplementalRetrieval,
       auditTrail: {

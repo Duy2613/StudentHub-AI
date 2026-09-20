@@ -49,7 +49,7 @@ const STAGE_INFO = {
     index: "02",
     eyebrow: "INTELLIGENCE",
     title: "Threat & Semantic Intelligence",
-    description: "Đối soát threat, semantic và ngữ cảnh theo provider thực tế.",
+    description: "Đối soát threat, semantic và ngữ cảnh theo nguồn kiểm tra thực tế.",
     icon: Brain,
   },
   l3: {
@@ -70,7 +70,7 @@ const STAGE_INFO = {
     index: "FINAL",
     eyebrow: "PREDICT",
     title: "Final Predict",
-    description: "Kết luận deterministic từ L1–L4, không gọi thêm provider.",
+    description: "Kết luận deterministic từ L1–L4, không gọi thêm nguồn ngoài.",
     icon: ShieldCheck,
   },
 };
@@ -108,6 +108,56 @@ function percentOrValue(value) {
   if (number === null) return safeText(value);
   const normalized = number >= 0 && number <= 1 ? number * 100 : number;
   return `${Math.round(normalized)}%`;
+}
+
+function publicRetrievalMode(value) {
+  const normalized = String(value || "").toUpperCase();
+  if (!normalized) return null;
+  if (normalized.includes("SUPPLEMENT")) return "SUPPLEMENTAL_RETRIEVAL";
+  if (normalized.includes("INITIAL")) return "INITIAL_RETRIEVAL";
+  return "EXTERNAL_RETRIEVAL";
+}
+
+function publicRetrievalOrigin(value) {
+  const normalized = String(value || "").toUpperCase();
+  if (!normalized) return null;
+  if (normalized.includes("TAVILY") || normalized.includes("SEARCH") || normalized.includes("RETRIEVAL")) {
+    return "EXTERNAL_RETRIEVAL";
+  }
+  return value;
+}
+
+function publicOperationStatus(value) {
+  const text = String(value || "").trim();
+  if (!text) return null;
+  if (/^(?:GEMINI|TAVILY|GOOGLE)(?:_|$)/i.test(text)) {
+    if (/(?:FAILED|ERROR|TIMEOUT|UNAVAILABLE|REJECT)/i.test(text)) return "EXTERNAL_ERROR";
+    if (/(?:RUNNING|PENDING|QUEUED)/i.test(text)) return "EXTERNAL_PENDING";
+    if (/(?:COMPLETED|SUCCESS|VERIFIED|REACHABLE)/i.test(text)) return "EXTERNAL_OK";
+    return "EXTERNAL";
+  }
+  return text;
+}
+
+function publicMetadataValue(value, fallback = "Chưa công bố") {
+  const text = safeText(value, fallback);
+  if (!/(?:gemini|tavily|^google(?:[-_: ]+(?:search|gemini)))/i.test(text)) return text;
+  if (/(?:failed|error|timeout|unavailable|reject)/i.test(text)) return "EXTERNAL_ERROR";
+  if (/(?:running|pending|queued)/i.test(text)) return "EXTERNAL_PENDING";
+  if (/(?:completed|success|verified|reachable)/i.test(text)) return "EXTERNAL_OK";
+  return "EXTERNAL";
+}
+
+function publicSourceTitle(source, index) {
+  const title = safeText(source?.title || source?.publisher || source?.domain || source?.url);
+  return /^(?:supplemental[-_:])?tavily(?:[-_: ]|$)|^gemini(?:[-_: ]|$)|^google(?:[-_: ]+(?:search|gemini))(?:[-_: ]|$)/i.test(title)
+    ? `Evidence source ${index + 1}`
+    : title;
+}
+
+function publicSourcePublisher(source) {
+  const publisher = safeText(source?.publisher || source?.domain);
+  return /gemini|tavily/i.test(publisher) ? "Validated external source" : publisher;
 }
 
 function statusLabel(status) {
@@ -189,9 +239,9 @@ function citationRecords(aiVerification) {
     if (!url) return null;
     return {
       ...record,
-      id: record.id || `gemini-citation-${index + 1}`,
-      title: record.title || record.id || "Gemini validated citation",
-      publisher: record.publisher || (record.retrievalOrigin === "GEMINI_GENERATED" ? "Gemini independent citation" : "Layer 3 validated source"),
+      id: record.id || `validated-citation-${index + 1}`,
+      title: record.title || record.id || "Validated evidence source",
+      publisher: record.publisher || "Layer 3 validated source",
       url,
       retrievalOrigin: record.retrievalOrigin || "GEMINI_GENERATED",
       validationStatus: record.validationStatus || "REACHABLE",
@@ -256,6 +306,217 @@ function Metric({ label, value }) {
 
 function Stat({ label, value }) {
   return <div className={styles.stat}><span className={styles.metricLabel}>{label}</span><strong>{safeText(value)}</strong></div>;
+}
+
+function StageContractMeta({ stage }) {
+  const value = asRecord(stage);
+  const providers = Array.isArray(value.providers) ? value.providers.length : 0;
+  const sources = Array.isArray(value.sources) ? value.sources.length : 0;
+  const evidence = Array.isArray(value.evidence) ? value.evidence.length : 0;
+  return (
+    <div className={styles.subPanel} data-testid={`trust-stage-contract-${value.stageId || "unknown"}`}>
+      <h3>Rich response contract</h3>
+      <div className={styles.phaseStats}>
+        <Metric label="Stage" value={value.stageName || value.stageId} />
+        <Metric label="Operation" value={value.operationStatus} />
+        <Metric label="Verdict / finding" value={value.verdict || value.finding} />
+        <Metric label="Confidence" value={percentOrValue(value.confidence)} />
+        <Metric label="Confidence kind" value={value.confidenceKind} />
+        <Metric label="Execution checks" value={providers} />
+        <Metric label="Sources" value={sources} />
+        <Metric label="Evidence" value={evidence} />
+        <Metric label="Latency" value={value.latencyMs != null ? `${value.latencyMs} ms` : null} />
+        <Metric label="Request" value={value.requestId} />
+      </div>
+      <p className={styles.evidenceExcerpt}>{safeText(value.reason || value.explanation || value.summary)}</p>
+      <small className={styles.phaseOrigin}>{safeText(value.confidenceExplanation, "Confidence semantics chưa được công bố.")}</small>
+    </div>
+  );
+}
+
+function claimText(claim) {
+  const record = asRecord(claim);
+  return record.rawText || record.text || record.claim || record.statement || record.targetClaim || "Claim chưa công bố";
+}
+
+function identity(value, fallback = "Chưa công bố") {
+  if (value === null || value === undefined || value === "") return fallback;
+  return safeText(value, fallback);
+}
+
+function TagRow({ items, empty = "Chưa có dữ liệu" }) {
+  const values = (Array.isArray(items) ? items : []).map((item) => {
+    if (typeof item === "string") return item;
+    const record = asRecord(item);
+    return record.code || record.type || record.status || record.label || record.name || "";
+  }).filter(Boolean).slice(0, 24);
+  return values.length ? (
+    <div className={styles.tagRow}>{values.map((item, index) => <span className={styles.tag} key={`${item}-${index}`}>{item}</span>)}</div>
+  ) : <div className={styles.empty}>{empty}</div>;
+}
+
+function SignalList({ title, items, empty = "Chưa có signal được công bố." }) {
+  const values = Array.isArray(items) ? items.slice(0, 40) : [];
+  return (
+    <div className={styles.subPanel}>
+      <h3>{title}</h3>
+      {values.length ? (
+        <div className={styles.recordList}>
+          {values.map((item, index) => {
+            const record = typeof item === "string" ? { code: item } : asRecord(item);
+            return <article className={styles.recordCard} key={`${record.signalId || record.code || "signal"}-${index}`}>
+              <div className={styles.recordHeader}><strong>{identity(record.code || record.type || record.signal, "Signal")}</strong><span className={styles.tag}>{identity(record.severity, "INFO")}</span></div>
+              <p>{identity(record.details || record.description, "Không có mô tả signal.")}</p>
+              <small>{[record.source, record.signalId].filter(Boolean).join(" · ") || "Nguồn signal chưa công bố"}</small>
+            </article>;
+          })}
+        </div>
+      ) : <div className={styles.empty}>{empty}</div>}
+    </div>
+  );
+}
+
+function ClaimList({ title, items, claimStatuses = {}, empty = "Chưa có claim được công bố." }) {
+  const values = Array.isArray(items) ? items.slice(0, 40) : [];
+  return (
+    <div className={styles.subPanel}>
+      <h3>{title}</h3>
+      {values.length ? (
+        <div className={styles.recordList}>
+          {values.map((item, index) => {
+            const record = asRecord(item);
+            const claimId = record.claimId || `claim-${index + 1}`;
+            return <article className={styles.recordCard} key={`${claimId}-${index}`}>
+              <div className={styles.recordHeader}><strong>{claimId}</strong><span className={styles.tag}>{identity(claimStatuses[claimId], record.candidateOnly === true ? "CANDIDATE" : "UNSPECIFIED")}</span></div>
+              <p>{claimText(record)}</p>
+              <small>{[
+                record.origin,
+                record.sourceScope,
+                record.verificationTaskId,
+                record.candidateOnly === true ? "candidate-only" : null,
+              ].filter(Boolean).join(" · ") || "Claim metadata chưa công bố"}</small>
+            </article>;
+          })}
+        </div>
+      ) : <div className={styles.empty}>{empty}</div>}
+    </div>
+  );
+}
+
+function TaskList({ title, tasks, empty = "Không có verification task được công bố." }) {
+  const values = Array.isArray(tasks) ? tasks.slice(0, 40) : [];
+  return (
+    <div className={styles.subPanel}>
+      <h3>{title}</h3>
+      {values.length ? (
+        <div className={styles.recordList}>
+          {values.map((item, index) => {
+            const record = asRecord(item);
+            return <article className={styles.recordCard} key={`${record.taskId || "task"}-${index}`}>
+              <div className={styles.recordHeader}><strong>{identity(record.taskId, `task-${index + 1}`)}</strong><span className={styles.tag}>{identity(record.priority, "MEDIUM")}</span></div>
+              <p>{identity(record.purpose || record.targetClaim, "Task purpose chưa công bố")}</p>
+              <small>{[
+                record.type,
+                record.classification,
+                record.claimId,
+                record.origin,
+                record.sourceScope,
+              ].filter(Boolean).join(" · ") || "Task metadata chưa công bố"}</small>
+              {Array.isArray(record.evidenceRequirements) && record.evidenceRequirements.length ? <TagRow items={record.evidenceRequirements} /> : null}
+            </article>;
+          })}
+        </div>
+      ) : <div className={styles.empty}>{empty}</div>}
+    </div>
+  );
+}
+
+function evidenceRecords(layer3) {
+  const layer = asRecord(layer3);
+  const sources = sourceRecords(layer);
+  const sourceById = new Map(sources.map((source) => [source.sourceId || source.id, source]));
+  return (Array.isArray(layer.evidence) ? layer.evidence : []).slice(0, 80).map((item, index) => {
+    const record = asRecord(item);
+    const source = sourceById.get(record.sourceId) || {};
+    return {
+      ...record,
+      id: record.evidenceId || `evidence-${index + 1}`,
+      title: record.sourceTitle || source.title || source.domain || "Evidence chưa có tiêu đề",
+      url: safeSourceUrl(record) || source.url,
+      sourceType: record.sourceType || source.sourceType,
+      liveEvidence: record.liveEvidence === true || source.liveEvidence === true,
+    };
+  });
+}
+
+function EvidenceList({ layer3 }) {
+  const values = evidenceRecords(layer3);
+  return (
+    <div className={styles.subPanel}>
+      <h3>Claim-specific evidence</h3>
+      {values.length ? (
+        <div className={styles.evidenceList}>
+          {values.map((item) => <article className={styles.evidenceCard} key={item.id}>
+            <div className={styles.recordHeader}><strong>{identity(item.relation, "RELATION UNKNOWN")}</strong><span className={styles.tag}>{item.liveEvidence ? "LIVE" : "NOT LIVE"}</span></div>
+            <p>{identity(item.excerpt, "Excerpt chưa công bố")}</p>
+            <small>{[
+              item.claimId,
+              item.sourceId,
+              item.freshness,
+              item.authorityTier,
+              item.sourceType,
+              item.relevance != null ? `relevance ${percentOrValue(item.relevance)}` : null,
+              item.strength != null ? `strength ${percentOrValue(item.strength)}` : null,
+            ].filter(Boolean).join(" · ")}</small>
+            {item.url ? <a className={styles.reasonLink} href={item.url} target="_blank" rel="noreferrer">{item.title} <ExternalLink size={12} aria-hidden="true" /></a> : null}
+          </article>)}
+        </div>
+      ) : <div className={styles.empty}>Chưa có claim-specific evidence; source có thể đã được fetch nhưng chưa có claim để đối soát.</div>}
+    </div>
+  );
+}
+
+function ConflictList({ conflicts, empty = "Không có conflict được công bố." }) {
+  const values = Array.isArray(conflicts) ? conflicts.slice(0, 30) : [];
+  return (
+    <div className={styles.subPanel}>
+      <h3>Conflicts</h3>
+      {values.length ? (
+        <div className={styles.recordList}>
+          {values.map((item, index) => {
+            const record = typeof item === "string" ? { details: item } : asRecord(item);
+            return <article className={styles.recordCard} key={`${record.conflictId || record.claimId || "conflict"}-${index}`}>
+              <div className={styles.recordHeader}><strong>{identity(record.conflictType || record.type, "CONFLICT")}</strong><span className={styles.tag}>{identity(record.claimId, "claim scope unknown")}</span></div>
+              <p>{identity(record.details || record.resolutionRecommendation, "Conflict details chưa công bố")}</p>
+              <small>{[record.conflictId, ...(Array.isArray(record.evidenceIds) ? record.evidenceIds : [])].filter(Boolean).join(" · ") || "Conflict provenance chưa công bố"}</small>
+            </article>;
+          })}
+        </div>
+      ) : <div className={styles.empty}>{empty}</div>}
+    </div>
+  );
+}
+
+function AdvisoryPanel({ value, title = "Legacy advisory (separate provenance)" }) {
+  const record = asRecord(value);
+  if (!Object.keys(record).length) return null;
+  const sources = sourceRecords(record);
+  return (
+    <div className={styles.subPanel}>
+      <h3>{title}</h3>
+      <div className={styles.phaseStats}>
+        <Metric label="Status" value={record.status} />
+        <Metric label="Stop" value={record.stop} />
+        <Metric label="Continue L4" value={record.canContinueToLayer4} />
+        <Metric label="Confidence" value={percentOrValue(record.assessmentConfidence)} />
+        <Metric label="Sources" value={sources.length} />
+      </div>
+      <p className={styles.evidenceExcerpt}>{identity(record.reason, "Advisory reason chưa công bố.")}</p>
+      <TagRow items={[...(record.contradictoryEvidence || []), ...(record.unresolvedSignals || [])]} empty="Không có advisory contradiction/unresolved signal." />
+      {sources.length ? <div className={styles.sourceList}>{sources.slice(0, 20).map((source, index) => source.url ? <a className={styles.sourceCard} href={source.url} target="_blank" rel="noreferrer" key={source.id}><strong>{publicSourceTitle(source, index)}</strong><span>{source.url}</span><small>{[source.sourceScope, source.sourceType, publicRetrievalOrigin(source.sourceOrigin)].filter(Boolean).join(" · ") || "Legacy provenance metadata"}</small><ExternalLink size={13} aria-hidden="true" /></a> : <div className={styles.sourceCard} key={source.id}><strong>{publicSourceTitle(source, index)}</strong><small>URL chưa công bố</small></div>)}</div> : null}
+      <DetailList title="Advisory limitations" items={record.limitations} />
+    </div>
+  );
 }
 
 function OwnTrustJourney({
@@ -377,7 +638,7 @@ function OwnTrustJourney({
         <>
           <div className={styles.statGrid}>
             <Stat label="Finding" value={stage?.finding || raw.finding || raw.status} />
-            <Stat label="Provider" value={stage?.providerId || stage?.providerStatus || raw.providerStatus} />
+            <Stat label="Execution status" value={publicMetadataValue(stage?.providerStatus || raw.providerStatus)} />
             <Stat label="Detectors" value={checks.length || metrics.signalCount || null} />
             <Stat label="Confidence" value={percentOrValue(stage?.confidence ?? raw.confidence)} />
           </div>
@@ -386,7 +647,7 @@ function OwnTrustJourney({
               <h3>Checks thực thi</h3>
               {checks.length ? (
                 <ul className={styles.checkList}>
-                  {checks.map((check, index) => <li key={`${check.check || check.name || "check"}-${index}`}><Check size={13} /> <span>{safeText(check.name || check.check || check.id)} · {safeText(check.status, "EXECUTED")}</span></li>)}
+                  {checks.map((check, index) => <li key={`${check.check || check.name || "check"}-${index}`}><Check size={13} /> <span>{safeText(check.name || check.check || check.id)} · {publicMetadataValue(check.status, "EXECUTED")}</span></li>)}
                 </ul>
               ) : <div className={styles.empty}>Backend chưa công bố danh sách checks cho lần chạy này.</div>}
             </div>
@@ -399,34 +660,86 @@ function OwnTrustJourney({
 
     if (stageId === "l2") {
       const observations = providerRecords(raw, providers);
+      const claims = Array.isArray(raw.claims) ? raw.claims : [];
+      const entities = Array.isArray(raw.entities) ? raw.entities : [];
+      const contextSignals = Array.isArray(raw.contextSignals) ? raw.contextSignals : [];
+      const semanticSignals = Array.isArray(raw.semanticSignals) ? raw.semanticSignals : [];
+      const riskSignals = Array.isArray(raw.riskSignals) ? raw.riskSignals : [];
+      const verificationPackage = asRecord(raw.verificationPackage);
+      const verificationTasks = Array.isArray(verificationPackage.verificationTasks)
+        ? verificationPackage.verificationTasks
+        : (Array.isArray(raw.verificationTasks) ? raw.verificationTasks : []);
       return (
         <>
           <div className={styles.statGrid}>
             <Stat label="Finding" value={stage?.finding || raw.finding || raw.classification} />
-            <Stat label="Provider status" value={raw.providerStatus || stage?.providerStatus} />
-            <Stat label="Providers" value={observations.length || null} />
+            <Stat label="Execution status" value={publicMetadataValue(raw.providerStatus || stage?.providerStatus)} />
+            <Stat label="Execution checks" value={observations.length || null} />
             <Stat label="Confidence" value={percentOrValue(raw.confidence ?? stage?.confidence)} />
+            <Stat label="Claims" value={claims.length} />
+            <Stat label="Entities" value={entities.length} />
+            <Stat label="Threat types" value={Array.isArray(raw.threatTypes) ? raw.threatTypes.length : 0} />
+            <Stat label="Verification tasks" value={verificationTasks.length} />
           </div>
           <div className={styles.subPanel}>
-            <h3>Provider observations</h3>
+            <h3>Execution observations</h3>
             {observations.length ? (
               <div className={styles.providerList}>
                 {observations.map((provider, index) => {
-                  const status = String(provider.status || "UNKNOWN").toUpperCase();
+                  const status = publicMetadataValue(provider.status, "UNKNOWN");
                   return <article className={styles.provider} key={`${provider.providerId || provider.provider || "provider"}-${index}`}>
-                    <strong>{safeText(provider.provider || provider.providerId)}</strong>
+                    <strong>Semantic check {index + 1}</strong>
                     <span className={styles.providerStatus} data-status={status}>{status}</span>
                     <small>{provider.latencyMs != null ? `${provider.latencyMs} ms` : "Latency chưa công bố"}</small>
-                    <p>{safeText(provider.message || provider.verdict || provider.finding)}</p>
+                    <p>{publicMetadataValue(provider.message || provider.verdict || provider.finding)}</p>
+                    <small>{[
+                      provider.finding,
+                      provider.verdict,
+                      provider.confidence != null ? `confidence ${percentOrValue(provider.confidence)}` : null,
+                      publicMetadataValue(provider.errorCode),
+                      provider.executed === false ? "not executed" : "executed",
+                    ].filter(Boolean).join(" · ")}</small>
+                    {Array.isArray(provider.signals) && provider.signals.length ? <TagRow items={provider.signals} /> : null}
                   </article>;
                 })}
               </div>
-            ) : <div className={styles.empty}>Không có provider observation được backend công bố.</div>}
+            ) : <div className={styles.empty}>Không có execution observation được backend công bố.</div>}
           </div>
           <div className={styles.listGrid}>
-            <DetailList title="Semantic / context signals" items={raw.semanticSignals || raw.contextSignals || stage?.signals} />
-            <DetailList title="Reasons" items={raw.reasons || stage?.reasons} />
+            <SignalList title="Semantic signals" items={semanticSignals.length ? semanticSignals : (raw.contextSignals || stage?.signals)} />
+            <SignalList title="Student context / risk signals" items={riskSignals.length ? riskSignals : contextSignals} />
           </div>
+          <div className={styles.listGrid}>
+            <ClaimList title="AI candidate claims" items={claims} />
+            <ClaimList title="Entities / extracted objects" items={entities} empty="Không có entity được công bố." />
+          </div>
+          <div className={styles.listGrid}>
+            <div className={styles.subPanel}>
+              <h3>Analysis boundary</h3>
+              <div className={styles.phaseStats}>
+                <Metric label="Analysis status" value={publicMetadataValue(raw.modelStatus || raw.details?.semanticProviderStatus)} />
+                <Metric label="Confidence kind" value={raw.confidenceKind} />
+                <Metric label="Input type" value={raw.details?.inputType} />
+                <Metric label="External check partial" value={raw.details?.providerPartial} />
+                <Metric label="Prompt injection" value={raw.details?.promptInjectionDetected} />
+              </div>
+              <TagRow items={raw.threatTypes} empty="Không có threat type được công bố." />
+            </div>
+            <div className={styles.subPanel}>
+              <h3>Verification package</h3>
+              <div className={styles.phaseStats}>
+                <Metric label="Status" value={verificationPackage.status} />
+                <Metric label="Schema" value={verificationPackage.schemaVersion} />
+                <Metric label="Candidate-only" value={verificationPackage.candidateOnly} />
+                <Metric label="Input trust" value={verificationPackage.inputTrust} />
+                <Metric label="Domain claims" value={verificationPackage.domainClaims?.length} />
+                <Metric label="Tasks" value={verificationTasks.length} />
+              </div>
+              <TagRow items={verificationPackage.evidenceRequirements} empty="Không có evidence requirement được công bố." />
+            </div>
+          </div>
+          <TaskList title="Layer 2 → Layer 3 verification tasks" tasks={verificationTasks} />
+          <DetailList title="Reasons / conclusion" items={[...(raw.reasons || []), raw.conclusion, raw.details?.decisionRationale]} />
           <p className={styles.stageSummary}>{safeText(raw.conclusion || raw.semanticSummary || stage?.summary)}</p>
         </>
       );
@@ -445,12 +758,16 @@ function OwnTrustJourney({
       return (
         <>
           <div className={styles.statGrid}>
-            <Stat label="Retrieval status" value={raw.retrievalStatus || stage?.providerStatus} />
-            <Stat label="Retrieval mode" value={raw.retrievalMode || metrics.retrievalMode} />
-            <Stat label="Provider" value={metrics.retrievalProvider || stage?.providerId} />
+            <Stat label="Execution" value={raw.executionStatus || (stage?.operationStatus === "COMPLETED" ? "COMPLETED" : stage?.operationStatus)} />
+            <Stat label="Retrieval status" value={publicMetadataValue(raw.retrievalStatus || stage?.providerStatus)} />
+            <Stat label="Retrieval mode" value={publicRetrievalMode(raw.retrievalMode || metrics.retrievalMode)} />
             <Stat label="Sources" value={metrics.sourcesRetrievedCount ?? raw.sourceCount ?? (sources.length || null)} />
+            <Stat label="Live sources" value={metrics.finalValidatedSourceCount ?? sources.filter((source) => source.liveEvidence === true).length} />
+            <Stat label="Direct input" value={metrics.directInputSourceCount ?? sources.filter((source) => source.retrievalOrigin === "DIRECT_INPUT").length} />
+            <Stat label="Claims" value={Array.isArray(raw.claims) ? raw.claims.length : 0} />
             <Stat label="Independent domains" value={metrics.independentHostCount ?? metrics.independentClusterCount ?? raw.independentSourceCount} />
             <Stat label="Evidence" value={metrics.evidenceItemsCount ?? (Array.isArray(raw.evidence) ? raw.evidence.length : null)} />
+            <Stat label="Evidence confidence" value={percentOrValue(raw.evidenceConfidence)} />
             <Stat label="Agreement" value={percentOrValue(raw.crossSourceAgreement?.agreementScore ?? raw.evidenceAgreement)} />
             <Stat label="Sufficiency" value={raw.evidenceSufficiency || stage?.finding} />
           </div>
@@ -463,19 +780,20 @@ function OwnTrustJourney({
                   <Metric label="Queries" value={phase.queryCount} />
                   <Metric label="Sources" value={phase.sourceCount} />
                   <Metric label="Validated" value={phase.validatedSourceCount} />
+                  <Metric label="Direct input" value={phase.directInputSourceCount} />
                 </div>
-                <small className={styles.phaseOrigin}>{safeText(phase.retrievalOrigin, "Origin chưa công bố")}</small>
+                <small className={styles.phaseOrigin}>{safeText(publicRetrievalOrigin(phase.retrievalOrigin), "Origin chưa công bố")}</small>
               </div>
             ))}
           </div>
-          {running && <div className={styles.notice}><LoaderCircle size={14} className="animate-spin" /> <span>Đang truy vấn provider retrieval của Layer 3…</span></div>}
+          {running && <div className={styles.notice}><LoaderCircle size={14} className="animate-spin" /> <span>Đang truy vấn external retrieval của Layer 3…</span></div>}
           <div className={styles.subPanel}>
             <h3>Evidence collected</h3>
             {sources.length ? (
               <div className={styles.sourceList}>
-                {sources.map((source) => {
-                  const sourceMeta = [source.retrievalOrigin, source.relation, source.authorityTier, source.publishedAt].filter(Boolean).join(" · ");
-                  const content = <><strong>{safeText(source.title)}</strong><span>{safeText(source.publisher || source.domain)}</span><span>{source.url || "URL chưa công bố"}</span><small>{safeText(source.excerpt, "Excerpt chưa công bố")}{sourceMeta ? ` · ${sourceMeta}` : ""}</small></>;
+                {sources.map((source, index) => {
+                  const sourceMeta = [source.sourceType, source.sourceScope, source.authorityTier, source.publishedAt].filter(Boolean).join(" · ");
+                  const content = <><strong>{publicSourceTitle(source, index)}</strong><span>{publicSourcePublisher(source)}</span><span>{source.url || "URL chưa công bố"}</span><div className={styles.tagRow}><span className={styles.tag}>{source.liveEvidence ? "LIVE FETCH" : "NOT LIVE"}</span><span className={styles.tag}>{publicMetadataValue(source.providerStatus, "external status unknown")}</span><span className={styles.tag}>{publicMetadataValue(source.retrievalOutcome, "outcome unknown")}</span></div><small>{safeText(source.excerpt, "Excerpt chưa công bố")}{sourceMeta ? ` · ${sourceMeta}` : ""}</small><small>{[source.authorityScore != null ? `authority ${percentOrValue(source.authorityScore)}` : null, source.httpStatus ? `HTTP ${source.httpStatus}` : null, source.sourceFingerprint ? `fingerprint ${source.sourceFingerprint.slice(0, 16)}…` : null].filter(Boolean).join(" · ") || "Provenance metadata chưa công bố"}</small></>;
                   return source.url
                     ? <a className={styles.sourceCard} href={source.url} target="_blank" rel="noreferrer" key={source.id}>{content}<ExternalLink size={13} aria-hidden="true" /></a>
                     : <div className={styles.sourceCard} key={source.id}>{content}</div>;
@@ -483,9 +801,44 @@ function OwnTrustJourney({
               </div>
             ) : <div className={styles.empty}>{running ? "Chưa có source nào được trả về." : "Không có source live usable được backend công bố; trạng thái là chưa đủ/không xác định."}</div>}
           </div>
+          <AdvisoryPanel value={raw.legacyIntegration} />
+          <EvidenceList layer3={raw} />
+          <div className={styles.listGrid}>
+            <ClaimList title="Claims & claim statuses" items={raw.claims} claimStatuses={raw.claimStatuses} />
+            <div className={styles.subPanel}>
+              <h3>Source independence / freshness</h3>
+              <div className={styles.phaseStats}>
+                <Metric label="Evaluated" value={raw.sourceAuthority?.totalEvaluated} />
+                <Metric label="Primary" value={raw.sourceAuthority?.primaryCount} />
+                <Metric label="Clusters" value={raw.sourceIndependence?.totalClusters} />
+                <Metric label="Independent" value={raw.sourceIndependence?.independentSourcesCount} />
+                <Metric label="All current" value={raw.temporalAssessment?.allCurrent} />
+                <Metric label="Outdated" value={raw.temporalAssessment?.outdatedEvidenceCount} />
+                <Metric label="Unknown date" value={raw.temporalAssessment?.unknownDateCount} />
+                <Metric label="External calls" value={metrics.providerCallCount} />
+              </div>
+              <TagRow items={raw.candidateClaimOrigins} empty="Không có claim origin được công bố." />
+            </div>
+          </div>
+          <TaskList title="Verification tasks / evidence requirements" tasks={raw.verificationTasks} empty="Không có task; URL-only có thể không tạo factual claim." />
+          <div className={styles.listGrid}>
+            <div className={styles.subPanel}>
+              <h3>Retrieval diagnostics</h3>
+              <div className={styles.phaseStats}>
+                <Metric label="Raw results" value={metrics.providerRawResultCount} />
+                <Metric label="Accepted results" value={metrics.providerAcceptedResultCount} />
+                <Metric label="Accepted hosts" value={metrics.providerAcceptedHostCount} />
+                <Metric label="Rejected results" value={metrics.providerRejectedResultCount} />
+                <Metric label="External status" value={publicMetadataValue(metrics.retrievalStatus)} />
+                <Metric label="Timeout class" value={metrics.providerTimeoutClassification} />
+              </div>
+              <TagRow items={metrics.providerRejectionReasons} empty="Không có rejection reason được công bố." />
+            </div>
+            <ConflictList conflicts={raw.conflicts} />
+          </div>
           <div className={styles.listGrid}>
             <DetailList title="Evidence requirements" items={raw.evidenceRequirements} />
-            <DetailList title="Conflicts / limitations" items={[...(raw.conflicts || []), ...(raw.limitations || []), ...(stage?.limitations || [])]} />
+            <DetailList title="Limitations" items={[...(raw.limitations || []), ...(stage?.limitations || [])]} />
           </div>
         </>
       );
@@ -500,12 +853,22 @@ function OwnTrustJourney({
     const initialSearch = asRecord(retrievalPhases.initialSearch);
     const supplementalSearch = asRecord(retrievalPhases.supplementalSearch);
     const finalEvidence = asRecord(retrievalPhases.finalValidatedEvidenceSet);
+    const explanation = asRecord(raw.userExplanation);
+    const gapAnalysis = asRecord(raw.evidenceGapAnalysis);
+    const supplementalRetrieval = asRecord(raw.supplementalRetrieval);
+    const executionTrace = Array.isArray(raw.aiModelTrace) ? raw.aiModelTrace : [];
     return (
       <>
         <div className={styles.statGrid}>
-          <Stat label="Synthesis status" value={raw.aiVerificationStatus || stage?.aiVerificationStatus || raw.aiProviderStatus} />
+          <Stat label="Execution" value={raw.executionStatus || (stage?.operationStatus === "COMPLETED" ? "COMPLETED" : stage?.operationStatus)} />
+          <Stat label="Synthesis status" value={publicOperationStatus(raw.aiVerificationStatus || stage?.aiVerificationStatus || raw.aiProviderStatus)} />
           <Stat label="Truth" value={raw.truthStatus || stage?.finding} />
+          <Stat label="Security" value={raw.securityClassification || raw.enforcement} />
+          <Stat label="Action" value={raw.recommendedAction || raw.enforcement} />
           <Stat label="Confidence" value={percentOrValue(raw.decisionConfidence ?? stage?.confidence)} />
+          <Stat label="Reasoning operation" value={publicMetadataValue(raw.aiOperationStatus)} />
+          <Stat label="Fallback" value={raw.aiFallbackUsed} />
+          <Stat label="Fallback reason" value={raw.aiFallbackReason} />
           <Stat label="Evidence agreement" value={percentOrValue(evidenceLayer.crossSourceAgreement?.agreementScore ?? finalPredict?.evidenceAgreement)} />
           <Stat label="Source quality" value={percentOrValue(finalPredict?.sourceQuality)} />
           <Stat label="Evidence sufficiency" value={finalPredict?.evidenceSufficiency || evidenceLayer.evidenceSufficiency || evidenceLayer.finding || stage?.finding} />
@@ -513,16 +876,18 @@ function OwnTrustJourney({
           <Stat label="Initial sources" value={initialSearch.sourceCount ?? evidenceMetrics.initialSourceCount} />
           <Stat label="Supplemental sources" value={supplementalSearch.sourceCount ?? evidenceMetrics.supplementalSourceCount} />
           <Stat label="Total validated sources" value={finalEvidence.validatedSourceCount ?? evidenceMetrics.finalValidatedSourceCount} />
-          <Stat label="Gemini links validated" value={ai.citationValidation?.acceptedCount ?? citationRecords(ai).length} />
+          <Stat label="Validated links" value={ai.citationValidation?.acceptedCount ?? citationRecords(ai).length} />
+          <Stat label="Evidence refs" value={Array.isArray(raw.evidenceRefs) ? raw.evidenceRefs.length : 0} />
+          <Stat label="Gap analysis" value={gapAnalysis.status} />
         </div>
         {state === "running" && <div className={styles.notice}><LoaderCircle size={14} className="animate-spin" /> <span>Đang tổng hợp evidence đã kiểm chứng; chưa hiển thị kết luận thay thế.</span></div>}
         <div className={styles.subPanel}>
-          <h3>Validated evidence & Gemini links</h3>
+          <h3>Validated evidence links</h3>
           {validatedLinkSources.length ? (
             <div className={styles.sourceList}>
-              {validatedLinkSources.slice(0, 20).map((source) => {
-                const sourceMeta = [source.retrievalOrigin, source.validationStatus, source.authorityTier, source.publishedAt, source.httpStatus ? `HTTP ${source.httpStatus}` : null].filter(Boolean).join(" · ");
-                const content = <><strong>{safeText(source.title)}</strong><span>{safeText(source.publisher || source.domain)}</span><span>{source.url || "URL chưa công bố"}</span><small>{safeText(source.excerpt, "Excerpt chưa công bố")}{sourceMeta ? ` · ${sourceMeta}` : ""}</small></>;
+              {validatedLinkSources.slice(0, 20).map((source, index) => {
+                const sourceMeta = [publicMetadataValue(source.validationStatus), source.authorityTier, source.publishedAt, source.httpStatus ? `HTTP ${source.httpStatus}` : null].filter(Boolean).join(" · ");
+                const content = <><strong>{publicSourceTitle(source, index)}</strong><span>{publicSourcePublisher(source)}</span><span>{source.url || "URL chưa công bố"}</span><small>{safeText(source.excerpt, "Excerpt chưa công bố")}{sourceMeta ? ` · ${sourceMeta}` : ""}</small></>;
                 return source.url
                   ? <a className={styles.sourceCard} href={source.url} target="_blank" rel="noreferrer" key={source.id}>{content}<ExternalLink size={13} aria-hidden="true" /></a>
                   : <div className={styles.sourceCard} key={source.id}>{content}</div>;
@@ -530,11 +895,71 @@ function OwnTrustJourney({
             </div>
           ) : <div className={styles.empty}>Chưa có URL evidence đã validate để mở.</div>}
         </div>
+        <AdvisoryPanel value={raw.legacyIntegration} title="Layer 4 legacy advisory (separate provenance)" />
+        <div className={styles.listGrid}>
+          <div className={styles.subPanel}>
+            <h3>AI verification boundary</h3>
+            <div className={styles.phaseStats}>
+              <Metric label="Verdict signal" value={ai.verdictSignal} />
+              <Metric label="Transport" value={raw.aiVerificationTransport} />
+              <Metric label="Thinking level" value={raw.aiVerificationThinkingLevel} />
+              <Metric label="Latency" value={raw.aiVerificationLatencyMs != null ? `${raw.aiVerificationLatencyMs} ms` : null} />
+              <Metric label="HTTP" value={raw.aiVerificationHttpStatus} />
+              <Metric label="Validation" value={ai.citationValidation?.allLinksValidated} />
+            </div>
+            <p className={styles.evidenceExcerpt}>{identity(ai.uncertainty, "AI uncertainty chưa công bố.")}</p>
+            <TagRow items={ai.supportingSourceIds} empty="AI chưa công bố supporting source ID." />
+            <TagRow items={ai.contradictingSourceIds} empty="AI chưa công bố contradicting source ID." />
+          </div>
+          <div className={styles.subPanel}>
+            <h3>Execution trace</h3>
+            {executionTrace.length ? <div className={styles.recordList}>{executionTrace.map((trace, index) => <article className={styles.recordCard} key={`${trace.attemptNumber || "attempt"}-${index}`}>
+              <div className={styles.recordHeader}><strong>Attempt {trace.attemptNumber || index + 1}</strong><span className={styles.tag}>{identity(trace.result, "FAILED")}</span></div>
+              <p>{[trace.attemptNumber ? `attempt ${trace.attemptNumber}` : null, trace.durationMs != null ? `${trace.durationMs} ms` : null, trace.httpStatus ? `HTTP ${trace.httpStatus}` : null].filter(Boolean).join(" · ") || "Trace metadata chưa công bố"}</p>
+              <small>{[publicMetadataValue(trace.providerErrorCode), trace.startedAt].filter(Boolean).join(" · ") || "Không có external error"}</small>
+            </article>)}</div> : <div className={styles.empty}>Không có execution trace được công bố.</div>}
+          </div>
+        </div>
+        <div className={styles.listGrid}>
+          <div className={styles.subPanel}>
+            <h3>User explanation / policy boundary</h3>
+            <p className={styles.evidenceExcerpt}>{identity(explanation.why, "Why chưa công bố.")}</p>
+            <div className={styles.phaseStats}>
+              <Metric label="Verdict title" value={explanation.verdictTitle} />
+              <Metric label="Risk summary" value={explanation.riskSummary} />
+              <Metric label="Recommended note" value={explanation.recommendedActionNote} />
+              <Metric label="Rule version" value={raw.auditTrail?.ruleVersion} />
+              <Metric label="Fused evidence" value={raw.auditTrail?.fusedEvidenceCount} />
+              <Metric label="Evidence bound" value={raw.auditTrail?.evidenceBound} />
+            </div>
+            <TagRow items={raw.policyPrecedence} empty="Không có policy precedence được công bố." />
+            <TagRow items={raw.evidenceRefs} empty="Không có evidence reference được công bố." />
+          </div>
+          <div className={styles.subPanel}>
+            <h3>AI evidence gap / supplemental retrieval</h3>
+            <div className={styles.phaseStats}>
+              <Metric label="Gap status" value={gapAnalysis.status} />
+              <Metric label="Needs more" value={gapAnalysis.needsMoreEvidence} />
+              <Metric label="Requested queries" value={gapAnalysis.requestedQueryCount} />
+              <Metric label="Executed queries" value={gapAnalysis.executedQueryCount} />
+              <Metric label="Supplement status" value={supplementalRetrieval.status} />
+              <Metric label="Supplement sources" value={supplementalRetrieval.sourceCount} />
+              <Metric label="Supplement validated" value={supplementalRetrieval.validatedSourceCount} />
+              <Metric label="External status" value={publicMetadataValue(gapAnalysis.providerStatus || supplementalRetrieval.providerStatus)} />
+            </div>
+            <DetailList title="Evidence gaps" items={(gapAnalysis.evidenceGaps || []).map((gap) => gap.reason || gap.suggestedQuery || gap.targetClaimId)} />
+          </div>
+        </div>
         <div className={styles.listGrid}>
           <DetailList title="Support reasons" items={ai.supportReasons} />
           <DetailList title="Contradictions / missing evidence" items={[...(ai.contradictionReasons || []), ...(ai.missingEvidence || [])]} />
         </div>
+        <div className={styles.listGrid}>
+          <ClaimList title="L4 claims carried into synthesis" items={raw.claims} />
+          <ConflictList conflicts={raw.conflicts} />
+        </div>
         <DetailList title="Key findings" items={raw.keyReasons || stage?.reasons} />
+        <DetailList title="L4 limitations" items={[...(raw.limitations || []), raw.aiVerificationErrorType, raw.aiFallbackReason]} />
         {ai.uncertainty && <div className={styles.notice}><AlertTriangle size={14} /> <span>{ai.uncertainty}</span></div>}
       </>
     );
@@ -578,7 +1003,7 @@ function OwnTrustJourney({
             </span>
           </span>
         </button>
-        {selectedStage && <div className={styles.stageBody}><p className={styles.stageSummary}>{info.description}</p>{renderLayerBody(stageId, raw, stage, state)}</div>}
+        {selectedStage && <div className={styles.stageBody}><p className={styles.stageSummary}>{info.description}</p><StageContractMeta stage={stage} />{renderLayerBody(stageId, raw, stage, state)}</div>}
       </article>
     );
   };
@@ -608,6 +1033,8 @@ function OwnTrustJourney({
             <Metric label="Security risk" value={finalSecurity} />
             <Metric label="Recommended action" value={finalAction} />
             <Metric label="Confidence" value={percentOrValue(finalPredict.assessmentConfidence ?? finalPredict.decisionConfidence)} />
+            <Metric label="Confidence kind" value={finalPredict.confidenceKind} />
+            <Metric label="Authoritative component" value={finalPredict.authoritativeComponent} />
             <Metric label="Evidence health" value={finalPredict.evidenceSufficiency} />
             <Metric label="Evidence agreement" value={percentOrValue(finalPredict.evidenceAgreement)} />
             <Metric label="Source quality" value={percentOrValue(finalPredict.sourceQuality)} />
@@ -622,7 +1049,7 @@ function OwnTrustJourney({
                 <ul className={styles.reasonList}>
                   {finalKeySources.slice(0, 8).map((source, index) => {
                     const url = safeSourceUrl(source);
-                    const label = safeText(source?.title || source?.publisher || source?.domain || source?.url);
+                    const label = publicSourceTitle(source, index);
                     return <li key={source?.sourceId || source?.evidenceId || source?.url || index}>{url ? <a className={styles.reasonLink} href={url} target="_blank" rel="noreferrer">{label} <ExternalLink size={12} aria-hidden="true" /></a> : label}</li>;
                   })}
                 </ul>
@@ -631,7 +1058,7 @@ function OwnTrustJourney({
           </div>
           <div className={styles.derived}>
             {STAGE_IDS.map((stageId) => <span key={stageId}><Check size={11} /> {stageId.toUpperCase()}</span>)}
-            <span><ShieldCheck size={11} /> No provider call after Final Predict</span>
+            <span><ShieldCheck size={11} /> No external call after Final Predict</span>
           </div>
           <button type="button" className={styles.chainButton} onClick={() => setChainOpen((value) => !value)} aria-expanded={chainOpen}>
             {chainOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />} Evidence chain {chainOpen ? "ẩn" : "hiện"}

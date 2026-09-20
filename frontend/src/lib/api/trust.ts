@@ -13,7 +13,10 @@ export type TrustInput = {
 type TrustV5Event = {
   type?: string;
   event?: string;
+  eventType?: string;
+  contractVersion?: string;
   stageId?: string | null;
+  stage?: Record<string, unknown> | null;
   caseId?: string | null;
   caseRevision?: number | null;
   runId?: string | null;

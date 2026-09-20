@@ -2,6 +2,7 @@ import { createSecureId } from "../../security/secureId.js";
 
 export const V5_SCHEMA_VERSION = "trust.v5";
 export const V5_STAGE_SCHEMA_VERSION = "trust.v5.stage.v1";
+export const TRUST_RICH_RESPONSE_CONTRACT_VERSION = "trust.rich.v1";
 export const V5_PIPELINE_VERSION = "trust-pipeline-v5.0.0";
 export const V5_POLICY_VERSION = "trust-policy-v5.0.0";
 export const V5_AUDIT_VERSION = "trust-assurance-v5.0.0";
@@ -265,6 +266,158 @@ function publicText(value, maxLength = 900) {
   return typeof value === "string" ? value.replace(/[\u0000-\u001F\u007F]/g, " ").slice(0, maxLength) : null;
 }
 
+function isPrivateOrLocalHostname(hostname) {
+  const host = String(hostname || "").toLowerCase().replace(/^\[|\]$/g, "");
+  if (!host || host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host === "::1" || host === "0.0.0.0") return true;
+  const octets = host.split(".").map((item) => Number(item));
+  if (octets.length !== 4 || octets.some((item) => !Number.isInteger(item) || item < 0 || item > 255)) return host.includes(":");
+  const [a, b] = octets;
+  return a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168);
+}
+
+function safeHttpUrl(value) {
+  if (typeof value !== "string" || !/^https?:\/\//i.test(value)) return null;
+  try {
+    const parsed = new URL(value);
+    if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password || isPrivateOrLocalHostname(parsed.hostname)) return null;
+    return parsed.toString().slice(0, 4096);
+  } catch {
+    return null;
+  }
+}
+
+function publicMetrics(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const allowed = [
+    "signalCount", "detectorCount", "detectorsExecuted", "latencyMs", "executionTimeMs", "inputLength", "ruleVersion", "modelUsed", "providerStatus",
+    "providerCallCount", "providerDurationMs", "queriesExecutedCount", "sourcesRetrievedCount", "evidenceItemsCount", "validatedSourceCount",
+    "providerRawResultCount", "providerAcceptedResultCount", "providerAcceptedHostCount", "providerRejectedResultCount", "independentHostCount",
+    "independentClusterCount", "verificationTasksCount", "l2cVerificationTasksCount", "initialQueryCount", "initialSourceCount",
+    "initialEvidenceCount", "supplementalQueryCount", "supplementalSourceCount", "supplementalEvidenceCount", "finalValidatedSourceCount",
+    "directInputSourceCount", "directInputEvidenceCount", "directInputValidatedSourceCount", "confidenceBasis",
+  ];
+  const output = {};
+  for (const key of allowed) {
+    const item = value[key];
+    if (typeof item === "string") output[key] = publicText(item, 180);
+    else if (typeof item === "number" && Number.isFinite(item)) output[key] = item;
+    else if (typeof item === "boolean") output[key] = item;
+    else if (key === "detectorsExecuted" && Array.isArray(item)) {
+      output[key] = item.slice(0, 24).map((detector) => publicText(detector, 160)).filter(Boolean);
+    }
+  }
+  return output;
+}
+
+function publicConfidenceExplanation(value, confidenceKind) {
+  const explicit = publicText(value, 500);
+  if (explicit) return explicit;
+  const kind = String(confidenceKind || "NOT_DISCLOSED").toUpperCase();
+  const explanations = {
+    RULE_COVERAGE_CONFIDENCE: "Phản ánh độ phủ của các rule/detector đã thực thi; không phải xác suất claim đúng.",
+    HEURISTIC_SCORE_NON_PROBABILISTIC: "Đây là điểm heuristic tất định, không phải xác suất đã hiệu chuẩn.",
+    PROVIDER_ASSERTED_SCORE_NON_PROBABILISTIC: "Đây là điểm do provider công bố trong phạm vi provider; không phải xác suất độc lập.",
+    SEMANTIC_CANDIDATE_SCORE_NON_PROBABILISTIC: "Đây là điểm semantic candidate để định tuyến xác minh; không phải xác suất claim đúng.",
+    EVIDENCE_CONFIDENCE: "Phản ánh chất lượng, độ phủ và mức đồng thuận của evidence đã xác thực; không phải xác suất sự thật.",
+    EVIDENCE_CONFIDENCE_NON_PROBABILISTIC: "Phản ánh chất lượng, độ phủ và mức đồng thuận của evidence đã xác thực; không phải xác suất sự thật.",
+    EVIDENCE_COMPLETENESS_SCORE_NON_PROBABILISTIC: "Phản ánh mức độ đầy đủ của việc kiểm tra evidence; không phải xác suất claim đúng.",
+    MODEL_SCORE_UNCALIBRATED: "Model score chưa được hiệu chuẩn; không được diễn giải như probability.",
+    DETERMINISTIC_POLICY_SCORE_NON_PROBABILISTIC: "Phản ánh điểm policy tất định trên signal/evidence hiện có; không phải xác suất.",
+    NOT_DISCLOSED: "Runtime không công bố confidence đã hiệu chuẩn cho stage này.",
+  };
+  return explanations[kind] || `Confidence kind ${kind} chỉ mô tả loại điểm được quan sát, không phải xác suất nếu chưa hiệu chuẩn.`;
+}
+
+function publicChecks(value) {
+  const checks = Array.isArray(value) ? value : [];
+  return checks.slice(0, 24).map((item) => {
+    if (typeof item === "string") return { name: publicText(item, 160), status: "EXECUTED", result: null };
+    if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+    return {
+      name: publicText(item.name || item.check || item.id, 160) || "UNNAMED_CHECK",
+      status: publicText(item.status, 60) || "UNKNOWN",
+      result: publicText(item.result, 120) || null,
+      details: publicText(item.details, 500) || null,
+      executedAt: publicText(item.executedAt, 80) || null,
+    };
+  }).filter(Boolean);
+}
+
+function publicProviderSummary(value) {
+  if (typeof value === "string") {
+    const providerId = publicText(value, 160);
+    return providerId ? { providerId, status: null } : null;
+  }
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return publicRecord(value, [
+    "provider", "providerId", "status", "providerStatus", "queryCount", "sourceCount", "acceptedHostCount",
+    "latencyMs", "errorCode", "retrievalOrigin", "retrievalMode", "externalEvidence",
+  ]);
+}
+
+function publicCrossSourceAgreement(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return publicRecord(value, ["agreementScore", "supportingSourcesCount", "contradictingSourcesCount", "unresolved", "status"]);
+}
+
+function publicSourceIndependence(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const output = publicRecord(value, ["totalClusters", "independentSourcesCount"]);
+  if (output) output.clusters = publicStringList(value.clusters, 40, 180);
+  return output;
+}
+
+function publicTemporalAssessment(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  return publicRecord(value, ["allCurrent", "outdatedEvidenceCount", "unknownDateCount"]);
+}
+
+function publicEvidenceCollection(value, maxItems = 40) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, maxItems).map((item) => {
+    if (typeof item === "string") return { details: publicText(item, 700) };
+    if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+    return publicSources([item])[0] || publicRecord(item, ["evidenceId", "sourceId", "claimId", "relation", "status", "excerpt", "details"]);
+  }).filter(Boolean);
+}
+
+function publicAiProvenance(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const aiVerification = value.aiVerification && typeof value.aiVerification === "object" ? value.aiVerification : {};
+  const executedModel = publicText(value.aiExecutedModel, 160) || publicText(aiVerification.model, 160) || null;
+  const isDeterministicFallback = executedModel === "deterministic_trust_policy" || executedModel === "deterministic_policy";
+  return {
+    provider: publicText(aiVerification.provider, 80) || null,
+    requestedModel: publicText(value.aiRequestedPrimaryModel, 160) || null,
+    executedModel: isDeterministicFallback ? null : executedModel,
+    status: publicText(value.aiProviderStatus || value.aiVerificationStatus || value.aiOperationStatus, 120)?.toUpperCase() || "NOT_REQUESTED",
+    executed: Boolean(!isDeterministicFallback && (aiVerification.model || value.aiExecutedModel)),
+    fallback: value.aiFallbackUsed === true,
+    fallbackReason: publicText(value.aiFallbackReason, 180) || null,
+    latencyMs: typeof value.aiVerificationLatencyMs === "number" && Number.isFinite(value.aiVerificationLatencyMs) ? Math.max(0, value.aiVerificationLatencyMs) : null,
+    errorType: publicText(value.aiVerificationErrorType, 120) || null,
+    transport: publicText(value.aiVerificationTransport, 120) || null,
+    modelTrace: publicModelTrace(value.aiModelTrace || value.gatewayAttempts || value.attempts),
+  };
+}
+
+function publicPolicyProvenance(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const auditTrail = value.auditTrail && typeof value.auditTrail === "object" && !Array.isArray(value.auditTrail)
+    ? value.auditTrail
+    : {};
+  const rawMetadata = value.rawMetadata && typeof value.rawMetadata === "object" && !Array.isArray(value.rawMetadata)
+    ? value.rawMetadata
+    : {};
+  return {
+    authoritative: true,
+    ruleVersion: publicText(value.policyVersion || auditTrail.ruleVersion || rawMetadata.policyVersion, 160) || null,
+    hardRuleTriggered: publicText(value.hardRuleTriggered || auditTrail.hardRuleTriggered || rawMetadata.hardRuleTriggered, 180) || null,
+    precedence: publicStringList(value.policyPrecedence || auditTrail.policyPrecedence || rawMetadata.policyPrecedence, 24, 180),
+    decisionAuthority: "DETERMINISTIC_POLICY",
+  };
+}
+
 function publicRecord(value, fields) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const output = {};
@@ -284,15 +437,16 @@ function publicAiVerification(value) {
     ? items.slice(0, max).map((item) => publicText(item, 700)).filter(Boolean)
     : [];
   const citationsUsed = Array.isArray(value.citationsUsed) ? value.citationsUsed.slice(0, 20).map((item) => {
-    if (!item || typeof item !== "object" || Array.isArray(item) || typeof item.url !== "string" || !/^https?:\/\//i.test(item.url)) return null;
+    const url = safeHttpUrl(item?.url);
+    if (!item || typeof item !== "object" || Array.isArray(item) || !url) return null;
     const httpStatus = Number(item.httpStatus);
     const redirectCount = Number(item.redirectCount);
     return {
-      id: publicText(item.id, 180) || item.url.slice(0, 4096),
-      url: item.url.slice(0, 4096),
+      id: publicText(item.id, 180) || url,
+      url,
       retrievalOrigin: publicText(item.retrievalOrigin, 120) || null,
       validationStatus: publicText(item.validationStatus, 80) || null,
-      requestedUrl: typeof item.requestedUrl === "string" && /^https?:\/\//i.test(item.requestedUrl) ? item.requestedUrl.slice(0, 4096) : null,
+      requestedUrl: safeHttpUrl(item.requestedUrl),
       httpStatus: Number.isInteger(httpStatus) && httpStatus >= 100 && httpStatus <= 599 ? httpStatus : null,
       redirectCount: Number.isInteger(redirectCount) && redirectCount >= 0 ? redirectCount : 0,
     };
@@ -314,8 +468,8 @@ function publicAiVerification(value) {
         allLinksValidated: value.citationValidation.allLinksValidated === true,
       }
       : null,
-    provider: publicText(value.provider, 80) || "gemini",
-    model: publicText(value.model, 120) || null,
+    provider: publicText(value.provider, 80) || null,
+    model: /^deterministic_/i.test(publicText(value.model, 120) || "") ? null : (publicText(value.model, 120) || null),
   };
 }
 
@@ -374,6 +528,7 @@ function publicSignals(value) {
 function publicRetrievalPhase(value) {
   return publicRecord(value, [
     "status", "queryCount", "sourceCount", "evidenceCount", "validatedSourceCount",
+    "directInputSourceCount", "directInputEvidenceCount", "directInputValidatedSourceCount",
     "provider", "providerStatus", "retrievalOrigin",
   ]) || {
     status: "NOT_REQUESTED",
@@ -381,9 +536,65 @@ function publicRetrievalPhase(value) {
     sourceCount: 0,
     evidenceCount: 0,
     validatedSourceCount: 0,
+    directInputSourceCount: 0,
+    directInputEvidenceCount: 0,
+    directInputValidatedSourceCount: 0,
     provider: null,
     providerStatus: null,
     retrievalOrigin: null,
+  };
+}
+
+function publicMediaForensics(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const detector = (item) => {
+    const output = publicRecord(item, ["status", "verdict", "score", "scoreKind", "provider", "providerScore", "calibratedConfidence", "confidenceType", "reason"]);
+    if (output) {
+      if (output.score === undefined) output.score = normalizedConfidence(item?.score ?? item?.providerScore ?? item?.calibratedConfidence);
+      if (output.scoreKind === undefined) output.scoreKind = publicText(item?.scoreKind || item?.confidenceType, 120) || null;
+      if (output.provider === undefined) output.provider = publicText(item?.provider, 120) || null;
+      output.providers = publicProviders(item?.providers);
+    }
+    return output;
+  };
+  const summary = publicRecord(value.summary, ["riskLevel", "requiresHumanReview", "disclaimer"]);
+  if (summary) summary.primarySignals = publicStringList(value.summary?.primarySignals, 16, 500);
+  const metadata = publicRecord(value.metadata, ["status", "exifPresent", "hasGps"]);
+  if (metadata) {
+    metadata.camera = publicRecord(value.metadata?.camera, ["make", "model"]);
+    metadata.software = publicRecord(value.metadata?.software, ["editorDetected", "editorName"]);
+    metadata.timestamps = publicRecord(value.metadata?.timestamps, ["creationTime"]);
+    metadata.warnings = publicStringList(value.metadata?.warnings, 12, 400);
+  }
+  const provenance = publicRecord(value.provenance, ["c2paStatus", "claimGenerator", "isVerified"]);
+  if (provenance) provenance.warnings = publicStringList(value.provenance?.warnings, 12, 400);
+  const ocr = publicRecord(value.ocr, ["status", "text", "available"]);
+  if (ocr) {
+    ocr.text = publicText(value.ocr?.text, 12_000) || "";
+    if (ocr.available === undefined) ocr.available = Boolean(ocr.text);
+    ocr.regions = Array.isArray(value.ocr?.regions) ? value.ocr.regions.slice(0, 40).map((region) => publicRecord(region, ["text", "confidence", "x", "y", "width", "height"])).filter(Boolean) : [];
+    ocr.warnings = publicStringList(value.ocr?.warnings, 12, 400);
+  }
+  const advisory = value.advisory && typeof value.advisory === "object" ? publicRecord(value.advisory, ["role", "visualContext", "ocrInterpretation", "semanticExplanation"]) : null;
+  if (advisory) advisory.sceneElements = publicStringList(value.advisory?.sceneElements, 16, 300);
+  return {
+    version: publicText(value.version, 120) || null,
+    status: publicText(value.status, 80) || "UNKNOWN",
+    summary,
+    aiGeneration: detector(value.aiGeneration),
+    deepfake: detector(value.deepfake),
+    manipulation: detector(value.manipulation),
+    metadata,
+    provenance,
+    compression: publicRecord(value.compression, ["signal", "qualityEstimate"]),
+    resampling: publicRecord(value.resampling, ["signal", "hasResamplingSignal"]),
+    ocr,
+    metadataSignals: publicSignals(value.metadataSignals),
+    forensicSignals: publicSignals(value.forensicSignals),
+    visibleUrls: Array.isArray(value.visibleUrls) ? value.visibleUrls.slice(0, 20).map((url) => safeHttpUrl(url)).filter(Boolean) : [],
+    quality: publicRecord(value.quality, ["width", "height", "byteSize", "isDegraded"]),
+    advisory,
+    providerAgreement: publicRecord(value.providerAgreement, ["status"]),
   };
 }
 
@@ -466,19 +677,40 @@ function publicVerificationTasks(value) {
 function publicSources(value) {
   return Array.isArray(value) ? value.slice(0, 40).map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
-    return publicRecord(item, [
-      "evidenceId", "claimId", "sourceId", "sourceUrl", "url", "title", "publisher", "domain", "sourceType",
-      "authorityTier", "freshness", "publishedAt", "retrievedAt", "relation", "status", "retrievalOutcome",
-      "sourceFingerprint", "clusterId", "excerpt", "relevance", "strength", "liveEvidence", "providerStatus", "retrievalOrigin",
-      "origin", "provider", "validationStatus", "httpStatus", "requestedUrl",
+    const output = publicRecord(item, [
+      "evidenceId", "claimId", "sourceId", "sourceUrl", "url", "title", "sourceTitle", "publisher", "domain", "sourceType",
+      "authorityTier", "authorityScore", "freshness", "publishedAt", "retrievedAt", "relation", "status", "retrievalOutcome",
+      "sourceFingerprint", "contentFingerprint", "clusterId", "excerpt", "relevance", "strength", "liveEvidence", "providerStatus", "retrievalOrigin",
+      "origin", "provider", "validationStatus", "httpStatus", "requestedUrl", "finalUrl", "isOfficial", "isDirectQuote", "evidenceScope", "sourceScope", "contentTrust",
     ]);
+    if (!output) return null;
+    for (const field of ["sourceUrl", "url", "requestedUrl", "finalUrl"]) {
+      const safeUrl = safeHttpUrl(item[field]);
+      if (safeUrl) output[field] = safeUrl;
+      else delete output[field];
+    }
+    if (!output.title && output.sourceTitle) output.title = output.sourceTitle;
+    if (!output.sourceTitle && output.title) output.sourceTitle = output.title;
+    output.authorityBasis = publicStringList(item.authorityBasis, 8, 180);
+    return output;
+  }).filter(Boolean) : [];
+}
+
+function publicConflicts(value) {
+  return Array.isArray(value) ? value.slice(0, 30).map((item) => {
+    if (typeof item === "string") return { details: publicText(item, 700) };
+    if (!item || typeof item !== "object" || Array.isArray(item)) return null;
+    const output = publicRecord(item, ["conflictId", "claimId", "conflictType", "type", "details", "resolutionRecommendation"]);
+    if (!output) return null;
+    output.evidenceIds = publicStringList(item.evidenceIds || item.sourceIds, 12, 180);
+    return output;
   }).filter(Boolean) : [];
 }
 
 function publicProviders(value) {
   return Array.isArray(value) ? value.slice(0, 20).map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
-    return publicRecord(item, ["provider", "providerId", "success", "verdict", "confidence", "message", "threatTypes", "status", "latencyMs", "reference", "finding", "observedAt"]);
+    return publicRecord(item, ["provider", "providerId", "success", "verdict", "confidence", "message", "threatTypes", "status", "latencyMs", "reference", "finding", "errorCode", "executed", "observedAt"]);
   }).filter(Boolean) : [];
 }
 
@@ -507,6 +739,7 @@ function publicLegacyIntegration(value) {
   output.contradictoryEvidence = publicStringList(value.contradictoryEvidence, 20, 700);
   output.sources = publicSources(value.sources);
   output.limitations = publicStringList(value.limitations, 8, 600);
+  output.unresolvedSignals = publicStringList(value.unresolvedSignals, 20, 500);
   return output;
 }
 
@@ -568,7 +801,39 @@ function publicLayerResult(value, layerId) {
     "aiRequestedPrimaryModel", "aiExecutedModel", "aiFallbackUsed", "aiFallbackReason", "aiProviderStatus", "aiOperationStatus",
     "conclusion", "continuation", "safeToContinue", "sourceCount", "usableSourceCount", "independentSourceCount", "evidenceSufficiency",
     "sourceQuality", "evidenceAgreement", "assessmentConfidence", "model", "modelId", "providerMessage", "result", "truthAssessment", "securityRisk",
+    "executionStatus", "retrievalExecuted",
   ]) || {};
+
+  base.verdict = publicText(value.verdict || value.truthStatus || value.securityClassification || value.finding, 120) || null;
+  base.confidenceExplanation = publicConfidenceExplanation(value.confidenceExplanation, base.confidenceKind || value.confidenceKind);
+  base.explanation = publicText(value.explanation || value.meaning || value.semanticSummary, 1000) || null;
+  base.reason = publicText(value.reason || value.reasons?.[0] || value.keyReasons?.[0], 700) || null;
+  base.provider = publicProviderSummary(value.provider);
+  base.providers = publicProviderObservations(value.providers || value.providerObservations || value.providerResults);
+  base.sources = publicSources(value.sources || value.verifiedSources);
+  base.evidence = publicSources(value.evidence || value.evidenceItems);
+  base.supportingEvidence = publicEvidenceCollection(value.supportingEvidence || value.supportingSources);
+  base.contradictoryEvidence = publicEvidenceCollection(value.contradictoryEvidence || value.contradictingEvidence || value.conflicts);
+  base.metrics = publicMetrics(value.metrics);
+  base.checks = publicChecks(value.checks || value.checksPerformed || value.actualChecks);
+  base.checksPerformed = base.checks;
+  base.evidenceSummary = publicText(value.evidenceSummary, 1200) || null;
+  base.crossSourceAgreement = publicCrossSourceAgreement(value.crossSourceAgreement);
+  base.sourceIndependence = publicSourceIndependence(value.sourceIndependence);
+  base.temporalAssessment = publicTemporalAssessment(value.temporalAssessment);
+  base.provider = base.provider || (value.providerId ? publicProviderSummary({ providerId: value.providerId, status: value.providerStatus }) : null);
+  base.truthStatus = publicText(value.truthStatus, 120) || null;
+  base.securityClassification = publicText(value.securityClassification, 120) || null;
+  base.enforcement = publicText(value.enforcement, 120) || null;
+  base.recommendedAction = publicText(value.recommendedAction, 120) || null;
+  base.decisionConfidence = normalizedConfidence(value.decisionConfidence);
+  base.keyReasons = publicStringList(value.keyReasons, 20, 700);
+  base.claims = publicClaims(value.claims);
+  base.entities = publicClaims(value.entities);
+  base.semanticSignals = publicSignals(value.semanticSignals);
+  base.riskSignals = publicSignals(value.riskSignals);
+  base.verificationTasks = publicVerificationTasks(value.verificationTasks);
+  base.mediaForensics = publicMediaForensics(value.mediaForensics);
 
   if (["l1", "l2", "l2b", "l2c"].includes(layerId)) base.signals = publicSignals(value.signals || value.riskSignals || value.contextSignals);
   if (layerId === "l1") {
@@ -579,7 +844,7 @@ function publicLayerResult(value, layerId) {
         return publicRecord(item, ["check", "id", "name", "status", "result", "details", "executedAt"]);
       }).filter(Boolean)
       : [];
-    base.metrics = publicRecord(value.metrics, ["ruleVersion", "modelUsed", "signalCount", "latencyMs", "riskLevel", "inputLength"]);
+    base.metrics = publicMetrics(value.metrics);
     base.details = publicRecord(value.details, ["decisionRationale", "promptInjectionDetected", "hardBlock", "source"]);
   }
   if (layerId === "l2") {
@@ -590,8 +855,15 @@ function publicLayerResult(value, layerId) {
     base.claims = publicClaims(value.claims);
     base.contextSignals = publicSignals(value.contextSignals || value.riskSignals);
     base.threatTypes = publicStringList(value.threatTypes, 20, 120);
+    base.secondaryClassifications = publicStringList(value.secondaryClassifications, 12, 160);
+    base.verificationTasks = publicVerificationTasks(value.verificationTasks);
+    base.verificationTaskSummary = publicRecord(value.verificationTaskSummary, ["totalTasks", "l2bTaskCount", "l2cTaskCount"]);
+    base.limitations = publicStringList(value.limitations, 16, 700);
     base.reasons = publicStringList(value.reasons, 16, 700);
-    base.details = publicRecord(value.details, ["decisionRationale", "promptInjectionDetected", "providerStatus", "providerErrorType", "providerHttpStatus", "providerLatencyMs"]);
+    base.details = publicRecord(value.details, [
+      "decisionRationale", "promptInjectionDetected", "providerStatus", "providerErrorType", "providerHttpStatus", "providerLatencyMs",
+      "inputType", "threatFinding", "semanticProviderStatus", "studentContextModelStatus", "providerPartial",
+    ]);
     base.verificationPackage = publicVerificationPackage(value.verificationPackage);
   }
   if (layerId === "l2a") {
@@ -606,7 +878,7 @@ function publicLayerResult(value, layerId) {
     base.details = publicRecord(value.details, ["confidenceKind", "modelUsed", "providerId", "providerStatus", "providerErrorType", "providerHttpStatus", "providerLatencyMs", "promptInjectionDetected", "decisionRationale"]);
     base.verificationPackage = publicRecord(value.verificationPackage, ["claimCount", "candidateSourceCount", "status"]);
     if (value.mediaForensics && typeof value.mediaForensics === "object") {
-      base.mediaForensics = value.mediaForensics;
+      base.mediaForensics = publicMediaForensics(value.mediaForensics);
     }
   }
   if (layerId === "l2c") {
@@ -625,6 +897,7 @@ function publicLayerResult(value, layerId) {
       "verificationTasksCount", "l2cVerificationTasksCount", "retrievalStage", "retrievalOrigin",
       "initialQueryCount", "initialSourceCount", "initialEvidenceCount", "supplementalQueryCount",
       "supplementalSourceCount", "supplementalEvidenceCount", "finalValidatedSourceCount", "geminiGeneratedUrlCount",
+      "directInputSourceCount", "directInputEvidenceCount", "directInputValidatedSourceCount",
     ]);
     if (base.metrics) {
       base.metrics.providerRejectionReasons = publicStringList(value.metrics?.providerRejectionReasons, 20, 120);
@@ -637,12 +910,35 @@ function publicLayerResult(value, layerId) {
         ])).filter(Boolean)
         : [];
     }
+    base.claims = publicClaims(value.claims);
+    base.limitations = publicStringList(value.limitations, 20, 700);
     base.sources = publicSources(value.sources);
     base.verifiedSources = publicSources(value.verifiedSources);
     base.evidence = publicSources(value.evidence);
     base.evidenceItems = publicSources(value.evidenceItems);
-    base.crossSourceAgreement = publicRecord(value.crossSourceAgreement, ["agreementScore", "status", "unresolved"]);
-    base.conflicts = Array.isArray(value.conflicts) ? value.conflicts.slice(0, 30).map((item) => publicText(typeof item === "string" ? item : item?.details || item?.type, 700)).filter(Boolean) : [];
+    base.crossSourceAgreement = publicCrossSourceAgreement(value.crossSourceAgreement);
+    base.conflicts = publicConflicts(value.conflicts);
+    base.sourceAuthority = publicRecord(value.sourceAuthority, ["totalEvaluated", "primaryCount"]);
+    if (base.sourceAuthority) {
+      base.sourceAuthority.bySource = Array.isArray(value.sourceAuthority?.bySource)
+        ? value.sourceAuthority.bySource.slice(0, 40).map((item) => publicRecord(item, ["sourceId", "tier", "scope", "sourceType"])).filter(Boolean)
+        : [];
+    }
+    base.sourceIndependence = publicRecord(value.sourceIndependence, ["totalClusters", "independentSourcesCount"]);
+    if (base.sourceIndependence) base.sourceIndependence.clusters = publicStringList(value.sourceIndependence?.clusters, 40, 180);
+    base.temporalAssessment = publicRecord(value.temporalAssessment, ["allCurrent", "outdatedEvidenceCount", "unknownDateCount"]);
+    base.evidenceConfidence = normalizedConfidence(value.evidenceConfidence);
+    base.evidenceSummary = publicText(value.evidenceSummary, 1200) || null;
+    base.provider = base.provider || publicProviderSummary({
+      providerId: value.metrics?.retrievalProvider || value.retrievalMode || null,
+      status: value.retrievalStatus || value.metrics?.retrievalStatus || null,
+      queryCount: value.metrics?.queriesExecutedCount,
+      sourceCount: value.metrics?.sourcesRetrievedCount,
+      acceptedHostCount: value.metrics?.providerAcceptedHostCount,
+      latencyMs: value.metrics?.providerDurationMs,
+      retrievalOrigin: value.metrics?.retrievalOrigin,
+      retrievalMode: value.retrievalMode,
+    });
     base.providerResults = publicProviders(value.providerResults);
     base.relatedCases = publicRelatedCases(value.relatedCases);
     base.claimStatuses = publicRecord(value.claimStatuses, Object.keys(value.claimStatuses || {}).slice(0, 40));
@@ -656,20 +952,31 @@ function publicLayerResult(value, layerId) {
     base.legacyIntegration = publicLegacyIntegration(value.legacyIntegration);
   }
   if (layerId === "l4") {
+    base.claims = publicClaims(value.claims);
     base.keyReasons = Array.isArray(value.keyReasons) ? value.keyReasons.slice(0, 20).map((item) => publicText(item, 700)).filter(Boolean) : [];
     base.policyPrecedence = Array.isArray(value.policyPrecedence) ? value.policyPrecedence.slice(0, 20).map((item) => publicText(item, 160)).filter(Boolean) : [];
     base.evidenceRefs = Array.isArray(value.evidenceRefs) ? value.evidenceRefs.slice(0, 40).map((item) => publicText(item, 240)).filter(Boolean) : [];
-    base.userExplanation = publicRecord(value.userExplanation, ["verdictTitle", "why", "riskSummary", "recommendedActionNote", "evidenceRefs"]);
+    base.limitations = publicStringList(value.limitations, 20, 700);
+    base.conflicts = publicConflicts(value.conflicts);
+    base.userExplanation = publicRecord(value.userExplanation, ["verdictTitle", "why", "riskSummary", "recommendedActionNote", "globalComplianceSummary", "matchedUniversity"]);
+    if (base.userExplanation) {
+      base.userExplanation.evidenceRefs = publicStringList(value.userExplanation?.evidenceRefs, 40, 240);
+      base.userExplanation.matchedStandards = publicStringList(value.userExplanation?.matchedStandards, 20, 240);
+    }
     base.riskAssessment = publicRecord(value.riskAssessment, ["level", "score", "confidence", "primaryRisk", "uncertainty"]);
     base.metrics = publicRecord(value.metrics, ["modelUsed", "ruleVersion", "providerStatus", "latencyMs"]);
     base.relatedCases = publicRelatedCases(value.relatedCases);
     base.legacyIntegration = publicLegacyIntegration(value.legacyIntegration);
     base.independentResearchSources = publicSources(value.independentResearchSources);
     base.aiVerification = publicAiVerification(value.aiVerification);
+    base.ai = publicAiProvenance(value);
+    base.policy = publicPolicyProvenance(value);
     base.aiModelTrace = publicModelTrace(value.aiModelTrace || value.gatewayAttempts || value.attempts);
     base.aiCooldownResult = publicCooldownResult(value.aiCooldownResult || value.cooldownResult);
+    base.executionStatus = publicText(value.executionStatus, 80)?.toUpperCase() || null;
     base.evidenceGapAnalysis = publicEvidenceGapAnalysis(value.evidenceGapAnalysis);
     base.supplementalRetrieval = publicSupplementalRetrieval(value.supplementalRetrieval);
+    base.auditTrail = publicRecord(value.auditTrail, ["requestId", "ruleVersion", "fusedEvidenceCount", "hardRuleTriggered", "evidenceBound", "globalFrameworkCount", "isAccreditedEcosystem"]);
   }
   return base;
 }
@@ -712,6 +1019,7 @@ export function createStageEnvelope(input = {}) {
     role: definition.role,
     checking: definition.checking,
     operationStatus,
+    verdict: boundedString(value.verdict, 120) || validFinding || null,
     finding: validFinding,
     severity: boundedString(value.severity, 40) || "UNKNOWN",
     startedAt,
@@ -725,10 +1033,48 @@ export function createStageEnvelope(input = {}) {
     modelVersion: boundedString(value.modelVersion, 160) || null,
     confidence: normalizedConfidence(value.confidence),
     confidenceKind: boundedString(value.confidenceKind, 120) || "NOT_DISCLOSED",
+    confidenceExplanation: publicConfidenceExplanation(value.confidenceExplanation, value.confidenceKind),
+    explanation: boundedString(value.explanation || value.meaning, 1000) || null,
+    reason: boundedString(value.reason || value.reasons?.[0], 700) || null,
     summary: boundedString(value.summary, 1000) || (operationStatus === OPERATION_STATUS.NOT_STARTED ? "Chưa bắt đầu stage này." : "Chưa có kết luận đủ tin cậy."),
     reasons: boundedList(value.reasons, 12, (item) => boundedString(item, 500)),
     signals: boundedList(value.signals, 40, normalizeSignal),
     evidenceRefs: Array.from(new Set(boundedList(value.evidenceRefs, 40, (item) => boundedString(item, 240)))),
+    providers: publicProviderObservations(value.providers || value.providerObservations || value.providerResults),
+    sources: publicSources(value.sources || value.verifiedSources),
+    evidence: publicSources(value.evidence || value.evidenceItems),
+    supportingEvidence: publicEvidenceCollection(value.supportingEvidence || value.supportingSources),
+    contradictoryEvidence: publicEvidenceCollection(value.contradictoryEvidence || value.contradictingEvidence || value.conflicts),
+    metrics: publicMetrics(value.metrics),
+    provider: publicProviderSummary(value.provider),
+    checks: publicChecks(value.checks || value.checksPerformed || value.actualChecks),
+    checksPerformed: publicChecks(value.checksPerformed || value.checks || value.actualChecks),
+    sourceCount: Number.isFinite(Number(value.sourceCount)) ? Math.max(0, Math.round(Number(value.sourceCount))) : null,
+    evidenceCount: Number.isFinite(Number(value.evidenceCount)) ? Math.max(0, Math.round(Number(value.evidenceCount))) : null,
+    sourceQuality: normalizedConfidence(value.sourceQuality),
+    evidenceAgreement: typeof value.evidenceAgreement === "number" && Number.isFinite(value.evidenceAgreement)
+      ? normalizedConfidence(value.evidenceAgreement)
+      : (boundedString(value.evidenceAgreement, 120) || null),
+    verificationCompleteness: normalizedConfidence(value.verificationCompleteness),
+    evidenceCompleteness: normalizedConfidence(value.evidenceCompleteness),
+    evidenceSummary: boundedString(value.evidenceSummary, 1200) || null,
+    crossSourceAgreement: publicCrossSourceAgreement(value.crossSourceAgreement),
+    sourceIndependence: publicSourceIndependence(value.sourceIndependence),
+    temporalAssessment: publicTemporalAssessment(value.temporalAssessment),
+    retrievalPhases: publicRetrievalPhases(value.retrievalPhases),
+    externalEvidence: value.externalEvidence === true,
+    truthStatus: publicText(value.truthStatus, 120) || null,
+    securityClassification: publicText(value.securityClassification, 120) || null,
+    enforcement: publicText(value.enforcement, 120) || null,
+    recommendedAction: publicText(value.recommendedAction, 120) || null,
+    decisionConfidence: normalizedConfidence(value.decisionConfidence),
+    keyReasons: publicStringList(value.keyReasons, 20, 700),
+    claims: publicClaims(value.claims),
+    entities: publicClaims(value.entities),
+    semanticSignals: publicSignals(value.semanticSignals),
+    riskSignals: publicSignals(value.riskSignals),
+    verificationTasks: publicVerificationTasks(value.verificationTasks),
+    mediaForensics: publicMediaForensics(value.mediaForensics),
     meaning: boundedString(value.meaning, 1000) || "Đây là kết quả trong phạm vi riêng của stage.",
     notProve: boundedString(value.notProve, 1000) || definition.notProve,
     limitations,
@@ -736,6 +1082,8 @@ export function createStageEnvelope(input = {}) {
     safeToContinue: value.safeToContinue === true,
     userAction: boundedString(value.userAction, 500) || "Đọc finding cùng limitations trước khi hành động.",
     aiVerification: publicAiVerification(value.aiVerification),
+    ai: publicAiProvenance(value),
+    policy: publicPolicyProvenance(value),
     aiVerificationStatus: publicText(value.aiVerificationStatus, 80) || null,
     aiVerificationTransport: publicText(value.aiVerificationTransport, 120) || null,
     aiVerificationThinkingLevel: publicText(value.aiVerificationThinkingLevel, 40) || null,
@@ -770,6 +1118,7 @@ export function createInitialPipeline({ requestId, startedAt, pipelineModel = nu
   const stageIds = isFourLayer ? FOUR_LAYER_STAGE_IDS : STAGE_IDS;
   return {
     schemaVersion: V5_SCHEMA_VERSION,
+    responseContractVersion: TRUST_RICH_RESPONSE_CONTRACT_VERSION,
     pipelineVersion: isFourLayer ? FOUR_LAYER_PIPELINE_VERSION : V5_PIPELINE_VERSION,
     pipelineModel: isFourLayer ? FOUR_LAYER_MODEL : "INTERNAL_V5",
     publicLayerCount: isFourLayer ? FOUR_LAYER_STAGE_IDS.length : null,
@@ -819,6 +1168,7 @@ export function toPublicPipelineResult(result) {
   delete publicResult.rawMetadata;
   return {
     ...publicResult,
+    responseContractVersion: TRUST_RICH_RESPONSE_CONTRACT_VERSION,
     assurance: publicAssurance(result.assurance),
     stages: Object.fromEntries(STAGE_IDS.map((stageId) => [stageId, toPublicStageEnvelope(result.stages?.[stageId] || { stageId, requestId: result.requestId })])),
     ...(layerResults && typeof layerResults === "object" ? {
@@ -846,15 +1196,20 @@ function publicFinalPredict(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const output = publicRecord(value, [
     "verdict", "truthVerdict", "truthStatus", "truthAssessment", "security", "securityRisk", "securityClassification",
-    "recommendedAction", "action", "assessmentConfidence", "decisionConfidence", "evidenceAgreement", "sourceQuality",
-    "evidenceSufficiency", "independentSourceCount", "evidenceCount", "sourceCount", "status", "derivedFrom",
+    "recommendedAction", "action", "assessmentConfidence", "decisionConfidence", "confidence", "evidenceAgreement", "sourceQuality", "verificationCompleteness",
+    "evidenceSufficiency", "independentSourceCount", "evidenceCount", "sourceCount", "status", "derivedFrom", "confidenceKind", "confidenceExplanation",
+    "authoritativeComponent",
   ]) || {};
   if (value.truthAssessment && typeof value.truthAssessment === "object" && !Array.isArray(value.truthAssessment)) {
     output.truthAssessment = publicText(value.truthAssessment.status || value.truthAssessment.verdict, 120) || null;
   }
   output.keyReasons = publicStringList(value.keyReasons, 20, 700);
+  output.reason = publicText(value.reason || value.keyReasons?.[0], 700) || null;
   output.remainingUncertainty = publicStringList(value.remainingUncertainty, 20, 700);
+  output.uncertainties = publicStringList(value.uncertainties || value.remainingUncertainty, 20, 700);
   output.keySources = publicSources(value.keySources || value.sources);
+  output.sources = publicSources(value.sources || value.keySources);
+  output.topEvidence = publicEvidenceCollection(value.topEvidence || value.keySources, 8);
   output.evidenceRefs = publicStringList(value.evidenceRefs, 40, 240);
   output.traceability = Array.isArray(value.traceability)
     ? value.traceability.slice(0, 24).map((item) => publicRecord(item, ["source", "stage", "field", "reason", "value"])).filter(Boolean)
@@ -878,6 +1233,7 @@ function toPublicFourLayerPipelineResult(result) {
     ...publicResult,
     pipelineModel: FOUR_LAYER_MODEL,
     publicLayerCount: FOUR_LAYER_STAGE_IDS.length,
+    responseContractVersion: TRUST_RICH_RESPONSE_CONTRACT_VERSION,
     assurance: null,
     stages: publicStages,
     finalPredict: publicFinalPredict(result.finalPredict),

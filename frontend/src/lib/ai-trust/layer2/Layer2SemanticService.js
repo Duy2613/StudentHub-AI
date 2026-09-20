@@ -22,7 +22,10 @@ import {
   sanitizeLayer1ForSemantic,
 } from "./guards/SemanticBoundary.js";
 
-const INPUT_TYPES = new Set(["text", "url", "image", "file", "link"]);
+// QR is a first-class multimodal input.  It shares the bounded semantic
+// boundary with image OCR while keeping the decoded payload explicit for
+// cross-modal analysis and downstream evidence retrieval.
+const INPUT_TYPES = new Set(["text", "url", "image", "file", "qr", "link"]);
 
 function nowMs() {
   return typeof performance !== "undefined" ? performance.now() : Date.now();

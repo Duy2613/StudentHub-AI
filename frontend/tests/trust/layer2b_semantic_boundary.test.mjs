@@ -101,6 +101,27 @@ describe("Layer 2B semantic trust boundary", () => {
     assert.equal(calls[0].systemPrompt.includes("untrusted"), true);
   });
 
+  it("accepts QR as a first-class semantic input and forwards its payload", async () => {
+    const calls = [];
+    const provider = new AIGatewayModelProvider({ gateway: gatewayReturning(benignAiResponse(), calls) });
+    const result = await Layer2SemanticService.verify({
+      type: "qr",
+      content: "https://example.invalid/qr-semantic-input",
+      metadata: {
+        inputKind: "QR",
+        qrContent: "https://example.invalid/qr-semantic-input",
+        qrPayload: "https://example.invalid/qr-semantic-input",
+      },
+      layer1Result: { status: "PASS", signals: [] },
+      options: { provider },
+    });
+
+    assert.notEqual(result.status, "UNKNOWN");
+    assert.equal(calls.length, 1);
+    assert.match(calls[0].userPrompt, /QR Code Payload/);
+    assert.match(calls[0].userPrompt, /qr-semantic-input/);
+  });
+
   it("does not invent confidence when an AI entity omits confidence", () => {
     const normalized = normalizeSemanticAnalysis({
       entities: [{ name: "Untrusted institution" }],

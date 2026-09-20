@@ -135,7 +135,7 @@ function invalidInput<T>(requestId?: string, runId?: string, issues: string[] = 
 function transportInput(input: TrustInvestigationInput): TrustInput | null {
   if (input.type === "QR_READY") {
     return {
-      type: "text",
+      type: "qr",
       content: input.content,
       metadata: { ...input.metadata, inputKind: "QR", extractionAuthority: input.metadata.extractionAuthority || "CLIENT_QR_HINT", qrContent: input.content },
     };

@@ -12,6 +12,7 @@ import { TrustPersistenceService } from "@/lib/server/database/TrustPersistenceS
 import { MediaArtifactService } from "@/lib/server/media/MediaArtifactService.js";
 import { QrIntakeService } from "@/lib/ai-trust/layer1/qr/QrIntakeService.js";
 import { ExpertBlindReviewDispatcher } from "@/lib/server/expert/ExpertBlindReviewDispatcher.js";
+import { TRUST_RICH_RESPONSE_CONTRACT_VERSION } from "@/lib/ai-trust/v5/contracts.js";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -22,7 +23,7 @@ const MAX_CONTENT_CHARS = 500_000;
 
 function safeMetadata(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "extractionAuthority", "institutionContext", "mediaArtifactId", "imageHash", "bytes", "width", "height"];
+  const allowed = ["url", "ocrText", "qrContent", "qrPayload", "mimeType", "fileName", "fileSize", "inputKind", "fileType", "extractionAuthority", "institutionContext", "mediaArtifactId", "imageHash", "bytes", "width", "height"];
   return Object.fromEntries(allowed.filter((key) => Object.hasOwn(value, key)).map((key) => {
     const item = value[key];
     if (key === "bytes") {
@@ -87,6 +88,7 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
         onL1ClaimReady: ({ l1Result, input: currentInput, pipeline: currentPipeline }) => {
           if (currentPipeline) currentPipeline.caseId = canonicalCaseId;
           const ownerId = principal?.subjectId ? String(principal.subjectId).replace(/^(student|expert|user):/, "") : null;
+          if (!principal?.isAuthenticated || !/^[0-9a-f-]{36}$/i.test(ownerId || "")) return;
           void ExpertBlindReviewDispatcher.dispatchOnL1ClaimReady({
             caseId: canonicalCaseId,
             caseRevision: 1,
@@ -98,12 +100,26 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
             console.error("[ExpertBlindReviewDispatcher] stream dispatch error:", err);
           });
         },
-        onTransition: (transition) => send({
-          type: "stage",
-          event: transition.event,
-          stageId: transition.stageId,
-          data: transition.pipeline,
-        }),
+        onTransition: (transition) => {
+          const eventName = transition.event === "STAGE_STARTED"
+            ? "stage_started"
+            : transition.event === "STAGE_PROGRESS"
+              ? "stage_progress"
+              : transition.event === "STAGE_COMPLETED"
+                ? "stage_completed"
+                : transition.event === "FINAL_PREDICT_READY"
+                  ? "final_predict"
+                  : "pipeline";
+          return send({
+            type: eventName,
+            event: transition.event,
+            eventType: eventName,
+            stageId: transition.stageId,
+            stage: transition.stage || null,
+            contractVersion: TRUST_RICH_RESPONSE_CONTRACT_VERSION,
+            data: transition.pipeline,
+          });
+        },
       }).then(async (result) => {
         result.caseId = canonicalCaseId;
         let persistence = { persisted: false, caseId: null };
@@ -131,6 +147,8 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
          send({
            type: "complete",
            event: "PIPELINE_COMPLETED",
+           eventType: "pipeline_completed",
+           contractVersion: TRUST_RICH_RESPONSE_CONTRACT_VERSION,
            stageId: "final_predict",
            caseId: persistence.caseId || result.verificationId || null,
            caseRevision: persistence.caseRevision || null,
@@ -161,6 +179,7 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
       "X-Accel-Buffering": "no",
       "X-Content-Type-Options": "nosniff",
       "X-AI-Trust-Contract": "trust.v5",
+      "X-AI-Trust-Response-Contract": TRUST_RICH_RESPONSE_CONTRACT_VERSION,
       "X-AI-Trust-Request-Id": requestId,
     },
   });
@@ -188,7 +207,7 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
   }
 
   // Authoritative Server-Side Image Intake & Media Artifact Management
-  if (type === "image" && (metadata.bytes || (typeof content === "string" && content.startsWith("data:image/"))) && !metadata.mediaArtifactId) {
+  if ((type === "image" || type === "qr") && (metadata.bytes || (typeof content === "string" && content.startsWith("data:image/"))) && !metadata.mediaArtifactId) {
     const rawBytes = metadata.bytes || content;
     const ingestRes = await MediaArtifactService.ingestImage({
       bytes: rawBytes,
@@ -244,6 +263,7 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
       onL1ClaimReady: ({ l1Result, input: currentInput, pipeline: currentPipeline }) => {
         if (currentPipeline) currentPipeline.caseId = canonicalCaseId;
         const ownerId = principal?.subjectId ? String(principal.subjectId).replace(/^(student|expert|user):/, "") : null;
+        if (!principal?.isAuthenticated || !/^[0-9a-f-]{36}$/i.test(ownerId || "")) return;
         void ExpertBlindReviewDispatcher.dispatchOnL1ClaimReady({
           caseId: canonicalCaseId,
           caseRevision: 1,
@@ -297,6 +317,7 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
         "Cache-Control": "no-store, max-age=0",
         "X-Content-Type-Options": "nosniff",
         "X-AI-Trust-Contract": "trust.v5",
+        "X-AI-Trust-Response-Contract": TRUST_RICH_RESPONSE_CONTRACT_VERSION,
         "X-AI-Trust-Request-Id": requestId,
       },
     });

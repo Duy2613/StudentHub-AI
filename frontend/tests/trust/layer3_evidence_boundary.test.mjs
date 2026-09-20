@@ -96,6 +96,28 @@ describe("Layer 3 evidence and provenance boundary", () => {
     assert.equal(result.externalEvidence, false);
   });
 
+  it("keeps a direct URL fetch visible without turning reachability into a factual claim", async () => {
+    const result = await Layer3EvidenceService.verify({
+      input: { type: "url", content: TEST_URL },
+      claims: [],
+      candidateSources: [],
+      options: { retriever: sourceFixture(), requestId: "l3-direct-url-fixture" },
+    });
+
+    assert.equal(result.status, "NOT_APPLICABLE");
+    assert.equal(result.claims.length, 0);
+    assert.equal(result.evidence.length, 0);
+    assert.equal(result.sources.length, 1);
+    assert.equal(result.sources[0].sourceType, "USER_SUPPLIED");
+    assert.equal(result.sources[0].retrievalOrigin, "DIRECT_INPUT");
+    assert.equal(result.sources[0].sourceScope, "direct_input");
+    assert.equal(result.sources[0].liveEvidence, true);
+    assert.equal(result.sources[0].httpStatus, 200);
+    assert.equal(result.sources[0].requestedUrl, TEST_URL);
+    assert.equal(result.sources[0].finalUrl, TEST_URL);
+    assert.match(result.limitations.join(" "), /provenance|factual claim/i);
+  });
+
   it("falls back honestly when the configured retriever fails", async () => {
     const result = await Layer3EvidenceService.verify({
       claims: [claim("HCMUTE công bố học phí năm 2026.")],

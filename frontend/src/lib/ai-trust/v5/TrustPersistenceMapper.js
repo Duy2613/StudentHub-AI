@@ -9,7 +9,7 @@
  */
 
 import crypto from "node:crypto";
-import { STAGE_IDS } from "./contracts.js";
+import { FOUR_LAYER_STAGE_IDS, STAGE_IDS } from "./contracts.js";
 import { computeTrustInputHash } from "../../server/database/TrustInputHash.js";
 
 function isValidUuid(str) {
@@ -32,10 +32,37 @@ function boundedText(value, max = 240) {
   return typeof value === "string" ? value.replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, max) : null;
 }
 
+function boundedNumber(value) {
+  return typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.min(1, Number(value))) : null;
+}
+
+function boundedCount(value) {
+  return Number.isFinite(Number(value)) ? Math.max(0, Math.min(10000, Math.round(Number(value)))) : 0;
+}
+
 function safeStageSummary(stage) {
+  const sources = Array.isArray(stage?.sources) ? stage.sources : [];
+  const evidence = Array.isArray(stage?.evidence) ? stage.evidence : [];
+  const metrics = stage?.metrics && typeof stage.metrics === "object" ? stage.metrics : {};
   return {
+    stageId: boundedText(stage?.stageId, 40),
+    stageName: boundedText(stage?.stageName, 180),
+    operationStatus: boundedText(stage?.operationStatus, 40),
+    verdict: boundedText(stage?.verdict || stage?.finding, 120),
     finding: boundedText(stage?.finding, 120),
     summary: boundedText(stage?.summary, 600),
+    reason: boundedText(stage?.reason || stage?.reasons?.[0], 600),
+    confidence: boundedNumber(stage?.confidence),
+    confidenceKind: boundedText(stage?.confidenceKind, 120),
+    providerId: boundedText(stage?.providerId, 160),
+    providerStatus: boundedText(stage?.providerStatus, 100),
+    modelId: boundedText(stage?.modelId, 160),
+    sourceCount: boundedCount(metrics.sourcesRetrievedCount ?? stage?.sourceCount ?? sources.length),
+    evidenceCount: boundedCount(metrics.evidenceItemsCount ?? stage?.evidenceCount ?? evidence.length),
+    sourceQuality: boundedNumber(stage?.sourceQuality),
+    evidenceAgreement: boundedNumber(stage?.evidenceAgreement),
+    verificationCompleteness: boundedNumber(stage?.verificationCompleteness ?? stage?.evidenceCompleteness),
+    topSourceRefs: sources.slice(0, 8).map((source) => boundedText(source?.sourceId || source?.evidenceId || source?.url, 240)).filter(Boolean),
     evidenceRefs: Array.isArray(stage?.evidenceRefs) ? stage.evidenceRefs.filter((value) => typeof value === "string").slice(0, 40) : [],
     limitations: Array.isArray(stage?.limitations) ? stage.limitations.filter((value) => typeof value === "string").map((value) => value.slice(0, 240)).slice(0, 20) : [],
   };
@@ -86,7 +113,8 @@ export class TrustPersistenceMapper {
     const pipelineStatus = ["COMPLETED", "PARTIAL", "FAILED", "CANCELLED"].includes(String(pipelineResult.pipelineStatus || "").toUpperCase())
       ? String(pipelineResult.pipelineStatus).toUpperCase()
       : "COMPLETED";
-    const stageEntries = STAGE_IDS
+    const stageIds = pipelineResult.pipelineModel === "FOUR_LAYER" ? FOUR_LAYER_STAGE_IDS : STAGE_IDS;
+    const stageEntries = stageIds
       .map((stageId) => [stageId, pipelineResult.stages?.[stageId]])
       .filter(([, stage]) => stage && typeof stage === "object" && !Array.isArray(stage));
     const stageRuns = stageEntries.map(([stageId, stage], stageIndex) => ({

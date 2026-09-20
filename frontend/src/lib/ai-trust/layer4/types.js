@@ -172,8 +172,8 @@ function safeAiVerification(value) {
         allLinksValidated: value.citationValidation.allLinksValidated === true,
       }
       : null,
-    provider: boundedText(value.provider, 80).toLowerCase() || "gemini",
-    model: boundedText(value.model, 120) || null,
+    provider: boundedText(value.provider, 80).toLowerCase() || null,
+    model: /^deterministic_/i.test(boundedText(value.model, 120)) ? null : (boundedText(value.model, 120) || null),
   };
 }
 
@@ -321,6 +321,7 @@ export function createLayer4Result(input = {}) {
   aiProviderStatus = null,
   aiOperationStatus = null,
   aiCooldownResult = null,
+  executionStatus = "COMPLETED",
   evidenceGapAnalysis = null,
   supplementalRetrieval = null,
   } = input && typeof input === "object" && !Array.isArray(input) ? input : {};
@@ -395,6 +396,7 @@ export function createLayer4Result(input = {}) {
     aiProviderStatus: boundedText(aiProviderStatus, 120).toUpperCase() || null,
     aiOperationStatus: boundedText(aiOperationStatus, 80).toUpperCase() || null,
     aiCooldownResult: safeCooldownResult(aiCooldownResult),
+    executionStatus: boundedText(executionStatus, 80).toUpperCase() || "COMPLETED",
     evidenceGapAnalysis: safeEvidenceGapAnalysis(evidenceGapAnalysis),
     supplementalRetrieval: safeSupplementalRetrieval(supplementalRetrieval),
     auditTrail: {

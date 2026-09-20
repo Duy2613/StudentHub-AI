@@ -20,6 +20,26 @@ function safeText(value, max = 700) {
   return typeof value === "string" ? value.replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, max) : "";
 }
 
+function isPrivateOrLocalHostname(hostname) {
+  const host = String(hostname || "").toLowerCase().replace(/^\[|\]$/g, "");
+  if (!host || host === "localhost" || host.endsWith(".localhost") || host.endsWith(".local") || host === "::1" || host === "0.0.0.0") return true;
+  const octets = host.split(".").map((item) => Number(item));
+  if (octets.length !== 4 || octets.some((item) => !Number.isInteger(item) || item < 0 || item > 255)) return host.includes(":");
+  const [a, b] = octets;
+  return a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168);
+}
+
+function safeHttpUrl(value) {
+  if (typeof value !== "string" || !/^https?:\/\//i.test(value)) return null;
+  try {
+    const parsed = new URL(value);
+    if (!["http:", "https:"].includes(parsed.protocol) || parsed.username || parsed.password || isPrivateOrLocalHostname(parsed.hostname)) return null;
+    return parsed.toString().slice(0, 4096);
+  } catch {
+    return null;
+  }
+}
+
 function safeArray(value, max = 40) {
   return Array.isArray(value) ? value.slice(0, max) : [];
 }
@@ -60,7 +80,7 @@ function canonicalEvidenceItem(input = {}) {
     observation: safeText(input.observation, 1200) || null,
     source: {
       id: safeText(source.id, 180) || null,
-      url: safeText(source.url, 4096) || null,
+      url: safeHttpUrl(source.url),
       title: safeText(source.title, 240) || null,
     },
     provider: safeText(input.provider, 160) || null,
@@ -185,8 +205,9 @@ function layer3Evidence(layer) {
 }
 
 function layer4Evidence(layer) {
-  const integration = asRecord(layer?.legacyIntegration);
-  const sourceRecords = safeArray(integration.sources || layer?.independentResearchSources, 80);
+  // Legacy/friend-backend output is advisory metadata only. It must not be
+  // promoted into the canonical evidence graph or source-quality counts.
+  const sourceRecords = safeArray(layer?.independentResearchSources, 80);
   const records = sourceRecords.map((value, index) => {
     const source = asRecord(value);
     const rawReference = safeText(source.sourceId || source.id, 180);
@@ -198,7 +219,7 @@ function layer4Evidence(layer) {
       type: "INDEPENDENT_RESEARCH_SOURCE",
       observation: source.title || source.publisher || source.domain || "Independent research source returned without a summary.",
       source: { id: rawReference || id, url: source.url, title: source.title || source.publisher || source.domain },
-      provider: source.provider || integration.providerId || "legacy_verification_layer4",
+      provider: source.provider || null,
       retrievedAt: source.retrievedAt || null,
       provenance: { sourceMode: "LIVE", providerStatus: source.providerStatus || integration.providerStatus || "UNKNOWN", liveEvidence: source.liveEvidence === true },
       reliabilityMetadata: { confidence: boundedUnit(integration.assessmentConfidence), sourceAgreement: boundedScalar(integration.evidenceAgreement) },
@@ -207,23 +228,6 @@ function layer4Evidence(layer) {
       status: "CANDIDATE_RESEARCH",
     });
   });
-  if (integration.status === "COMPLETED" && (integration.reason || integration.rawVerdict)) {
-    records.push(canonicalEvidenceItem({
-      id: `l4:synthesis:${safeText(layer?.requestId || "run", 80)}`,
-      layer: "L4",
-      origin: "LAYER_4_INDEPENDENT_RESEARCH",
-      type: "MODEL_ASSESSMENT",
-      observation: integration.reason || integration.rawVerdict,
-      source: { id: integration.providerId || "legacy_verification_layer4", title: "Legacy Layer 4 independent synthesis" },
-      provider: integration.providerId || "legacy_verification_layer4",
-      retrievedAt: null,
-      provenance: { sourceMode: "LIVE", providerStatus: integration.providerStatus || "SUCCESS", liveEvidence: false },
-      reliabilityMetadata: { confidence: boundedUnit(integration.assessmentConfidence), sourceAgreement: boundedScalar(integration.evidenceAgreement) },
-      limitations: ["Model assessment is not evidence, safety probability, or final decision confidence."],
-      rawReference: integration.rawVerdict || "legacy-layer4-synthesis",
-      status: "CANDIDATE_ASSESSMENT",
-    }));
-  }
   return records;
 }
 
@@ -353,12 +357,28 @@ export function buildCanonicalTrustProjection({ requestId, input, pipeline, laye
         if (!stage.stageId) return null;
         return {
           stageId: safeText(stage.stageId, 40),
+          stageName: safeText(stage.stageName, 180) || null,
           operationStatus: safeText(stage.operationStatus, 40),
+          verdict: safeText(stage.verdict || stage.finding, 120) || null,
           finding: safeText(stage.finding, 120) || null,
+          confidence: boundedUnit(stage.confidence),
+          confidenceKind: safeText(stage.confidenceKind, 120) || "NOT_DISCLOSED",
+          reason: safeText(stage.reason || stage.reasons?.[0], 700) || null,
+          explanation: safeText(stage.explanation || stage.meaning, 1000) || null,
           summary: safeText(stage.summary, 900),
+          providers: safeArray(stage.providers, 20),
+          sources: safeArray(stage.sources, 40),
+          evidence: safeArray(stage.evidence, 40),
+          supportingEvidence: safeArray(stage.supportingEvidence, 20),
+          contradictoryEvidence: safeArray(stage.contradictoryEvidence, 20),
+          metrics: stage.metrics && typeof stage.metrics === "object" ? stage.metrics : {},
+          limitations: safeArray(stage.limitations, 16).map((item) => safeText(item, 500)).filter(Boolean),
           providerStatus: safeText(stage.providerStatus, 100),
           providerId: safeText(stage.providerId, 160) || null,
+          startedAt: typeof stage.startedAt === "string" ? stage.startedAt : null,
           completedAt: typeof stage.completedAt === "string" ? stage.completedAt : null,
+          latencyMs: Number.isFinite(Number(stage.latencyMs)) ? Math.max(0, Number(stage.latencyMs)) : null,
+          requestId: safeText(stage.requestId || requestId, 160),
           evidenceRefs: safeArray(stage.evidenceRefs, 20).map((item) => safeText(item, 180)).filter(Boolean),
         };
       }).filter(Boolean)
@@ -367,12 +387,28 @@ export function buildCanonicalTrustProjection({ requestId, input, pipeline, laye
       if (!stage.stageId) return null;
       return {
         stageId: safeText(stage.stageId, 40),
+        stageName: safeText(stage.stageName, 180) || null,
         operationStatus: safeText(stage.operationStatus, 40),
+        verdict: safeText(stage.verdict || stage.finding, 120) || null,
         finding: safeText(stage.finding, 120) || null,
+        confidence: boundedUnit(stage.confidence),
+        confidenceKind: safeText(stage.confidenceKind, 120) || "NOT_DISCLOSED",
+        reason: safeText(stage.reason || stage.reasons?.[0], 700) || null,
+        explanation: safeText(stage.explanation || stage.meaning, 1000) || null,
         summary: safeText(stage.summary, 900),
+        providers: safeArray(stage.providers, 20),
+        sources: safeArray(stage.sources, 40),
+        evidence: safeArray(stage.evidence, 40),
+        supportingEvidence: safeArray(stage.supportingEvidence, 20),
+        contradictoryEvidence: safeArray(stage.contradictoryEvidence, 20),
+        metrics: stage.metrics && typeof stage.metrics === "object" ? stage.metrics : {},
+        limitations: safeArray(stage.limitations, 16).map((item) => safeText(item, 500)).filter(Boolean),
         providerStatus: safeText(stage.providerStatus, 100),
         providerId: safeText(stage.providerId, 160) || null,
+        startedAt: typeof stage.startedAt === "string" ? stage.startedAt : null,
         completedAt: typeof stage.completedAt === "string" ? stage.completedAt : null,
+        latencyMs: Number.isFinite(Number(stage.latencyMs)) ? Math.max(0, Number(stage.latencyMs)) : null,
+        requestId: safeText(stage.requestId || requestId, 160),
         evidenceRefs: safeArray(stage.evidenceRefs, 20).map((item) => safeText(item, 180)).filter(Boolean),
       };
       }).filter(Boolean),
@@ -380,10 +416,12 @@ export function buildCanonicalTrustProjection({ requestId, input, pipeline, laye
       verdict: safeText(finalDecision?.security || finalDecision?.truth, 120) || "UNKNOWN",
       risk: safeText(layer4.riskAssessment?.level || finalDecision?.security, 80) || "UNKNOWN",
       decisionConfidence: boundedUnit(layer4.decisionConfidence),
+      confidenceKind: "DETERMINISTIC_POLICY_SCORE_NON_PROBABILISTIC",
       evidenceCoverage: boundedUnit(layer3.verificationCompleteness),
       sourceAgreement: (boundedUnit(layer3.crossSourceAgreement?.agreementScore) ?? safeText(layer3.status, 80)) || null,
       unresolvedSignals,
       recommendedAction: safeText(finalDecision?.action, 120) || "REVIEW",
+      authoritativeComponent: "STUDENTHUB_DETERMINISTIC_FINAL_PREDICT",
     },
     evidence,
     graph,

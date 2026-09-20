@@ -7,6 +7,11 @@
 
 ### Core system master prompt implementation (2026-09-06)
 
+- [x] Trust evidence visibility pass (2026-09-20): canonical direct URL
+  provenance, full bounded Layer 2/3/4 evidence panels, legacy advisory
+  isolation, guarded YouTube/Vercel URL smoke, 19/19 boundary/retrieval/own-
+  backend tests, 63/63 sequential tests, ESLint and production build pass.
+
 - [x] M0 runtime truth: bỏ fake realtime metrics/events, thêm readiness model tách liveness/platform/capability/run status.
 - [x] M1 Trust UX: một stage panel tại một thời điểm, tabs/keyboard/follow current, không rerun/scroll/focus steal khi đổi lớp.
 - [x] M2 durable Trust core: persist case/run/stage/revision trong PostgreSQL cùng terminal commit; khóa idempotency và ownership conflict. Queue worker/restart/cluster gate còn mở.
@@ -190,3 +195,12 @@
 - [x] Hermetic A–G router/L4/V5 regression pass; one-shot real probe được ghi nhận secret-free và không lặp candidate.
 - [ ] Live project availability vẫn `PARTIAL`: 3.8 known HTTP 429 skip, 3.7/3.6 timeout, 2.5 HTTP 404; cần quota/access environment ổn định trước khi nâng verdict.
 - [ ] Full discovered regression còn Layer 3 Case C mismatch không thuộc router; không dùng kết quả đó để claim router failure.
+
+### Trust V5 full L3/L4 completion & multimodal QA — 2026-09-20
+
+- [x] L3 always-emits execution/retrieval envelope; preserve direct URL provenance, live HTTP status, retrieval phases and provider diagnostics.
+- [x] L4 bounded Gemini model chain + deterministic fallback; fallback result is explicit (`FALLBACK_DETERMINISTIC`, `deterministic_trust_policy`, `aiOperationStatus=COMPLETED`).
+- [x] Server-owned IMAGE/QR artifact ingestion, QR transport branch, multimodal Gemini input parts and first-class QR semantic Layer 2 boundary.
+- [x] Live matrix `18/18` across the requested URL set × IMAGE/QR; all terminal pipelines completed, including model fallback cases.
+- [x] Browser screenshot evidence: URL L3/L4 matrix, full 16-case IMAGE/QR L3/L4 matrix, and intentional `chrome://` validation block.
+- [ ] Production availability/SLO remains environment/provider-quota gated; no deployment or remote migration claimed.
