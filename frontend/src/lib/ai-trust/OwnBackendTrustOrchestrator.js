@@ -676,11 +676,13 @@ function finalPredict({ layer1, layer2, layer2A, layer3, layer4 }) {
     ["UNKNOWN", "INSUFFICIENT_EVIDENCE"].includes(deterministicTruthStatus) && Boolean(geminiTruthSignal);
   const securityClassification = l1Blocked || l2Threat
     ? "MALICIOUS"
-    : reputationAndLiveSafeTarget
-      ? "SAFE"
-      : geminiBackedSafeTarget
-      ? "NO_KNOWN_THREAT"
-      : layer4Security;
+    : layer4PolicyAllows
+      ? layer4Security
+      : reputationAndLiveSafeTarget
+        ? "SAFE"
+        : geminiBackedSafeTarget
+          ? "NO_KNOWN_THREAT"
+          : layer4Security;
   const securityRisk = l1Blocked || l2Threat
     ? "CRITICAL"
     : reputationAndLiveSafeTarget
