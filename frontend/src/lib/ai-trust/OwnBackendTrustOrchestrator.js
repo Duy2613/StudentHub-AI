@@ -482,15 +482,17 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     reasons,
     conclusion: threatMatch
       ? "Threat intelligence reported a matching threat; semantic and context signals cannot downgrade it."
-      : semanticFallbackAvailable
-        ? "Gemini semantic enrichment was unavailable, but the deterministic semantic baseline completed and remains auditable."
+      : threatProviderPartial
+        ? semanticFallbackAvailable
+          ? "One or more Layer 2 threat providers are partial or unavailable; the deterministic semantic baseline completed and remains auditable."
+          : "One or more Layer 2 threat providers are partial or unavailable; the result remains unresolved."
         : domainProviderPartial
           ? "Student context advisory was unavailable; threat and semantic checks completed without treating the outage as content risk."
-          : providerPartial
-            ? "One or more Layer 2 threat providers are partial or unavailable; the result remains unresolved."
-        : semanticSuspicious
-            ? "Semantic or student-context signals require external evidence before a final trust decision."
-            : "Layer 2 did not find a known threat or material semantic/context signal in the executed checks.",
+          : semanticFallbackAvailable
+            ? "Gemini semantic enrichment was unavailable, but the deterministic semantic baseline completed and remains auditable."
+            : semanticSuspicious
+              ? "Semantic or student-context signals require external evidence before a final trust decision."
+              : "Layer 2 did not find a known threat or material semantic/context signal in the executed checks.",
     continuation: "L3_EVIDENCE_RETRIEVAL",
     safeToContinue: true,
     requestId,
