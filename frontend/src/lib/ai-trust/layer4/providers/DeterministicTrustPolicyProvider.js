@@ -109,6 +109,32 @@ function hasValidatedLiveExternalTarget(fusedGraph) {
   });
 }
 
+function hasValidatedDirectInputTarget(fusedGraph) {
+  const layer3Result = fusedGraph?.layer3Result;
+  if (!isTrustedLayer3Result(layer3Result) || layer3Result.externalEvidence !== true) return false;
+
+  const candidates = [
+    ...asArray(fusedGraph?.layer3Sources),
+    ...asArray(fusedGraph?.layer3Evidence),
+  ];
+  return candidates.some((item) => {
+    if (!item || typeof item !== "object") return false;
+    const url = item.url || item.sourceUrl || item.canonicalUrl;
+    const fingerprint = item.sourceFingerprint;
+    const httpStatus = item.httpStatus;
+    const scope = String(item.sourceScope || item.evidenceScope || "").trim().toLowerCase();
+    const sourceId = String(item.sourceId || "").trim().toLowerCase();
+    const isDirectInput = scope === "direct_input" || sourceId.startsWith("src_direct_input");
+    return isDirectInput &&
+      item.liveEvidence === true &&
+      SUCCESS_PROVIDER_STATUS.has(item.providerStatus) &&
+      item.retrievalOutcome === "SUCCESS" &&
+      typeof fingerprint === "string" && fingerprint.trim().length > 0 &&
+      typeof url === "string" && /^https?:\/\//i.test(url) &&
+      (httpStatus == null || Number(httpStatus) === 200);
+  });
+}
+
 function hasStrongSecurityNegative(fusedGraph, riskAssessment) {
   const hasMaterialRiskVector = asArray(riskAssessment?.primaryVectors)
     .some((vector) => !SOFT_REVIEW_VECTORS.has(String(vector)));
@@ -305,10 +331,21 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
     const threatLookupFailed = threatLookupPresent && !threatLookupSucceeded;
     const reputationClearance = hasValidatedReputationClearance(safeGraph);
     const liveExternalTarget = hasValidatedLiveExternalTarget(safeGraph);
+    const directInputTarget = hasValidatedDirectInputTarget(safeGraph);
     const validatedReputationSafeTarget = reputationClearance &&
       liveExternalTarget &&
       !hasUnresolvedConflict(safeGraph, reconciliation) &&
       ![TRUTH_STATUS.CONTRADICTED, TRUTH_STATUS.MIXED].includes(truthStatus) &&
+      !hasStrongSecurityNegative(safeGraph, baseRiskAssessment);
+    const claimlessOperationalSafeTarget =
+      truthStatus === TRUTH_STATUS.NOT_APPLICABLE &&
+      safeGraph.layer1Status === "PASS" &&
+      safeGraph.layer2Status !== "BLOCK" &&
+      threatLookupFailed &&
+      isOperationallyPartial(safeGraph.layer2AProviderStatus) &&
+      directInputTarget &&
+      !hasUnresolvedConflict(safeGraph, reconciliation) &&
+      !["MALICIOUS", "DECEPTIVE", "MISLEADING"].includes(String(safeGraph.layer2Classification || "").toUpperCase()) &&
       !hasStrongSecurityNegative(safeGraph, baseRiskAssessment);
     const riskAssessment = validatedReputationSafeTarget && baseRiskAssessment.level === SECURITY_RISK_LEVEL.MEDIUM
       ? {
@@ -352,6 +389,15 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
       securityClassification = SECURITY_CLASSIFICATION.SAFE;
       enforcement = RECOMMENDED_ACTION.ALLOW_VERIFIED;
       policyPrecedence.push("L2A_ALL_PROVIDERS_SAFE_PLUS_L3_LIVE_TARGET", "SAFE", "ALLOW");
+    } else if (claimlessOperationalSafeTarget) {
+      // A direct URL that was fetched successfully by the trusted Layer 3
+      // adapter is safe to continue cautiously when the only missing signal
+      // is an operational Layer 2A provider. This is intentionally narrower
+      // than a reputation clearance: it applies only to claimless input and
+      // never bypasses the hard-negative rules above.
+      securityClassification = SECURITY_CLASSIFICATION.SAFE;
+      enforcement = RECOMMENDED_ACTION.ALLOW_WITH_CAUTION;
+      policyPrecedence.push("L2A_OPERATIONAL_PARTIAL_PLUS_L3_DIRECT_INPUT", "SAFE", "ALLOW_WITH_CAUTION");
     } else if (localSuspicion) {
       securityClassification = SECURITY_CLASSIFICATION.SUSPICIOUS;
       enforcement = threatLookupFailed ? RECOMMENDED_ACTION.REVIEW : RECOMMENDED_ACTION.WARN;

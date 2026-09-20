@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { OwnBackendTrustOrchestrator } from "../../src/lib/ai-trust/OwnBackendTrustOrchestrator.js";
+import { Layer4TrustService } from "../../src/lib/ai-trust/layer4/Layer4TrustService.js";
 import { Layer3EvidenceService } from "../../src/lib/ai-trust/layer3/Layer3EvidenceService.js";
 import { markTrustedLayer2AResult } from "../../src/lib/ai-trust/layer2a/TrustBoundary.js";
 import { markTrustedLayer3Result } from "../../src/lib/ai-trust/layer3/TrustBoundary.js";
@@ -382,6 +383,58 @@ test("own backend labels Layer 2 provider outage as partial, not suspicious", as
   assert.equal(result.finalPredict.securityClassification, "UNKNOWN");
   assert.equal(result.finalPredict.recommendedAction, "REVIEW");
   assert.equal(result.finalPredict.securityEvidenceStatus, "INSUFFICIENT");
+});
+
+test("own backend allows a claimless direct URL after L3 live validation despite an operational L2A partial", async () => {
+  const services = servicesWithPartialLayer2();
+  services.l2a = async () => ({
+    provider: "fixture-threat-provider",
+    providerStatus: "UNAVAILABLE",
+    finding: "UNKNOWN",
+    message: "One threat provider is temporarily unavailable.",
+    providerResults: [],
+  });
+  services.l3 = async () => markTrustedLayer3Result({
+    status: "NOT_APPLICABLE",
+    retrievalStatus: "SUCCESS",
+    retrievalMode: "EXTERNAL_RETRIEVER",
+    externalEvidence: true,
+    sources: [{
+      sourceId: "src_direct_input_chatgpt",
+      url: "https://chatgpt.com/",
+      sourceScope: "direct_input",
+      sourceType: "USER_SUPPLIED",
+      providerStatus: "SUCCESS",
+      liveEvidence: true,
+      sourceFingerprint: "sha256-chatgpt-fixture",
+      retrievalOutcome: "SUCCESS",
+      httpStatus: 200,
+    }],
+    evidence: [],
+    conflicts: [],
+    claims: [],
+    verificationCompleteness: 0,
+    metrics: { retrievalStatus: "SUCCESS", providerCallCount: 1 },
+  });
+  services.l4 = async (params) => Layer4TrustService.evaluate({
+    ...params,
+    options: { ...params.options, useAIGateway: false },
+  });
+
+  const result = await new OwnBackendTrustOrchestrator({ services }).run({
+    type: "url",
+    content: "https://chatgpt.com/",
+  }, { requestId: "req_claimless_direct_url_partial_l2a" });
+
+  assert.equal(result.stages.l2.finding, "PARTIAL");
+  assert.equal(result.stages.l3.operationStatus, "COMPLETED");
+  assert.equal(result.stages.l4.operationStatus, "COMPLETED");
+  assert.equal(result.layerResults.layer4.securityClassification, "SAFE");
+  assert.equal(result.layerResults.layer4.enforcement, "ALLOW_WITH_CAUTION");
+  assert.equal(result.finalPredict.securityClassification, "SAFE");
+  assert.equal(result.finalPredict.recommendedAction, "ALLOW_WITH_CAUTION");
+  assert.equal(result.finalPredict.truthStatus, "NOT_APPLICABLE");
+  assert.equal(result.finalPredict.securityEvidenceStatus, "LAYER4_POLICY");
 });
 
 test("own backend completes L2 when semantic gateway fails but deterministic fallback is valid", async () => {
