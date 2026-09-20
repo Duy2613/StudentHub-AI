@@ -27,6 +27,7 @@ import { NoiseOverlay } from "@/components/auth/AuthUI";
 import BackgroundsAndEffectsStudio from "@/components/ui/BackgroundsAndEffectsStudio";
 import { ApiError, apiErrorMessage } from "@/lib/api/errors";
 import { normalizeAuthReturnPath, postAuthDestination } from "@/lib/auth/authRedirects";
+import { buildOnboardingProfilePayload } from "@/lib/auth/onboardingProfile";
 
 
 export default function OnboardingPage() {
@@ -107,7 +108,6 @@ export default function OnboardingPage() {
     setVerificationNotice("");
 
     const email = session?.user?.email || "";
-    let isEdu = false;
     let verifiedUniversity = university;
 
     try {
@@ -119,7 +119,6 @@ export default function OnboardingPage() {
       });
       const eduCheckData = await eduCheckRes.json().catch(() => null);
       if (eduCheckRes.ok && eduCheckData?.success === true && eduCheckData?.isEdu === true) {
-        isEdu = true;
         if (eduCheckData.university) verifiedUniversity = eduCheckData.university;
       } else {
         setVerificationNotice("Chưa thể xác minh email tổ chức từ provider hiện tại; hệ thống không cấp trạng thái sinh viên xác thực thay thế.");
@@ -129,51 +128,19 @@ export default function OnboardingPage() {
     }
 
     const isExpert = role === "expert";
-    const finalTrustScore = isExpert ? 98 : isEdu ? 80 : 50;
 
     try {
-      // 2. Sync to API backend (Phần F Data Model)
-      const profileResponse = await fetch("/api/users/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          fullName: fullName || "Thành viên StudentHub",
-          role: isExpert ? "expert" : "student",
-          avatarId: avatarId,
-          expertField: isExpert ? expertField : null,
-          university: !isExpert ? verifiedUniversity : null,
-          major: !isExpert ? major : null,
-          onboardingCompleted: true,
-        }),
-      });
-      const profileData = await profileResponse.json().catch(() => null);
-      if (!profileResponse.ok || profileData?.success !== true) {
-        throw new ApiError("Không thể xác nhận lưu hồ sơ với profile API.", profileResponse.status === 401 ? "UNAUTHORIZED" : profileResponse.status === 403 ? "FORBIDDEN" : "INVALID_RESPONSE", { status: profileResponse.status });
-      }
-
-      // 3. Update Auth context & local cache
-      await updateProfile({
-        full_name: fullName || "Thành viên StudentHub",
-        role: isExpert ? "expert" : "student",
-        avatar_id: avatarId,
-        reputation_score: finalTrustScore,
-        trust_score: finalTrustScore,
-        university: !isExpert ? verifiedUniversity : null,
-        major: !isExpert ? major : null,
-        academic_year: !isExpert ? academicYear : null,
-        expert_title: isExpert ? expertTitle : null,
-        expert_field: isExpert ? expertField : null,
-        experience_years: isExpert ? experienceYears : null,
-        bio:
-          bio ||
-          (isExpert
-            ? "Chuyên gia cố vấn phòng chống lừa đảo và bảo vệ sinh viên."
-            : "Sinh viên tích cực tham gia xác thực và xây dựng cộng đồng an toàn."),
-        verified_student: !isExpert && isEdu,
-        verified_expert: isExpert,
-        onboarded: true,
-      });
+      // 2. Persist through the same-origin Owner BFF. The payload is a strict
+      // presentation allowlist; authority fields remain server-owned.
+      await updateProfile(buildOnboardingProfilePayload({
+        fullName,
+        avatarId,
+        university: verifiedUniversity,
+        major,
+        academicYear,
+        isExpert,
+        bio,
+      }));
 
       const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
       router.replace(postAuthDestination({
@@ -181,7 +148,7 @@ export default function OnboardingPage() {
         onboarded: true,
       }));
     } catch (err) {
-      setError(err instanceof ApiError ? apiErrorMessage(err) : "Không thể lưu thông tin hồ sơ.");
+      setError(err instanceof ApiError ? apiErrorMessage(err) : (err?.message || "Không thể lưu thông tin hồ sơ."));
       setIsSubmitting(false);
     }
   };

@@ -56,6 +56,7 @@ const SAFE_PROFILE_FIELDS = new Set([
   "bio",
   "githubUsername",
   "github_username",
+  "onboardingCompleted",
 ]);
 
 function sanitizeProfileUpdates(value) {
