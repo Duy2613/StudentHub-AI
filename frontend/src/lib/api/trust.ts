@@ -197,6 +197,7 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
     const decoder = new TextDecoder();
     let buffer = "";
     let completed: TrustV5Response | null = null;
+    let finalPredictReady: TrustV5Response | null = null;
     const dispatch = (block: string) => {
       const dataLines = block.split(/\r?\n/).filter((line) => line.startsWith("data:")).map((line) => line.slice(5).trim());
       if (!dataLines.length) return;
@@ -204,6 +205,24 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
       try { event = JSON.parse(dataLines.join("\n")) as TrustV5Event; } catch { throw new ApiError("Streaming response contained malformed event data.", "INVALID_RESPONSE", { requestId }); }
       onEvent?.(event);
       if (event.type === "error") throw new ApiError("Trust pipeline failed.", "SERVER_ERROR", { requestId: event.requestId || requestId });
+      // FINAL_PREDICT_READY is the authoritative four-layer result. Do not
+      // keep the UI waiting for persistence/stream teardown after L4 has
+      // already produced the final decision. This prevents a slow tail from
+      // turning a completed analysis into a client timeout.
+      if ((event.event === "FINAL_PREDICT_READY" || event.type === "final_predict") && event.data?.finalPredict) {
+        finalPredictReady = parseV5Response({
+          success: true,
+          contractVersion: "trust.v5",
+          requestId: event.requestId || event.data.requestId,
+          caseId: event.caseId || null,
+          caseRevision: event.caseRevision ?? null,
+          runId: event.runId || null,
+          persistence: event.persistence,
+          version: "v5",
+          demo: false,
+          data: event.data,
+        });
+      }
       if (event.type === "complete" && event.data) completed = parseV5Response({
         success: true,
         contractVersion: "trust.v5",
@@ -226,9 +245,15 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
         buffer = buffer.slice(separator + 2);
         separator = buffer.indexOf("\n\n");
       }
+      if (finalPredictReady) {
+        try { await reader.cancel(); } catch { /* stream tail is no longer needed */ }
+        controller.abort("final-predict-ready");
+        return finalPredictReady;
+      }
       if (done) break;
     }
     if (buffer.trim()) dispatch(buffer);
+    if (finalPredictReady) return finalPredictReady;
     if (!completed) throw new ApiError("Streaming response ended without a completed V5 result.", "INVALID_RESPONSE", { requestId });
     return completed;
   } catch (error) {
