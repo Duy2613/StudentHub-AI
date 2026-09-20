@@ -166,13 +166,16 @@ export function stageFromL2B(raw, requestId, timing = {}) {
   const claims = safeArray(raw?.claims);
   const entities = safeArray(raw?.entities);
   const providerStatus = statusFor(raw?.metrics?.providerStatus || raw?.details?.providerStatus || raw?.modelStatus, "LOCAL_DETERMINISTIC");
+  const deterministicFallbackAvailable = raw?.details?.deterministicFallbackAvailable === true || raw?.metrics?.deterministicFallbackAvailable === true;
   const providerErrorType = statusFor(raw?.details?.providerErrorType || raw?.providerErrorType, "");
   const providerHttpStatus = httpStatusFor(raw?.details?.providerHttpStatus, raw?.providerHttpStatus);
   const transientStatuses = new Set([
     "TIMEOUT", "RATE_LIMITED", "AUTH_FAILED", "MODEL_NOT_AVAILABLE", "NETWORK_ERROR",
     "NOT_CONFIGURED", "UNAVAILABLE", "INVALID_RESPONSE", "ERROR", "PARTIAL", "DEGRADED",
+    "COOLDOWN", "BUDGET_EXHAUSTED", "MODEL_INCOMPATIBLE", "PERMISSION_DENIED", "INVALID_REQUEST",
+    "SERVICE_UNAVAILABLE", "UPSTREAM_ERROR", "NETWORK_TIMEOUT",
   ]);
-  const operationStatus = timing.operationStatus || (transientStatuses.has(providerStatus) ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED);
+  const operationStatus = timing.operationStatus || (deterministicFallbackAvailable || !transientStatuses.has(providerStatus) ? OPERATION_STATUS.COMPLETED : OPERATION_STATUS.PARTIAL);
   return createStageEnvelope({
     ...stageBase("l2b", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso(), operationStatus),
     finding,
@@ -185,7 +188,9 @@ export function stageFromL2B(raw, requestId, timing = {}) {
     providerHttpStatus,
     confidence: typeof raw?.confidence === "number" ? raw.confidence : null,
     confidenceKind: raw?.details?.confidenceKind || "SEMANTIC_CANDIDATE_SCORE_NON_PROBABILISTIC",
-    summary: finding === "SEMANTIC_NORMAL" ? "Chưa thấy pattern semantic đáng kể trong phạm vi bộ phân tích." : finding === "UNKNOWN" ? "Semantic boundary/provider không đủ dữ liệu để kết luận." : `Semantic layer phát hiện ${finding.replaceAll("_", " ")} cần đối chiếu.`,
+    summary: deterministicFallbackAvailable && transientStatuses.has(providerStatus)
+      ? "Gemini semantic enrichment không khả dụng; deterministic baseline đã hoàn tất và được giữ làm kết quả semantic."
+      : finding === "SEMANTIC_NORMAL" ? "Chưa thấy pattern semantic đáng kể trong phạm vi bộ phân tích." : finding === "UNKNOWN" ? "Semantic boundary/provider không đủ dữ liệu để kết luận." : `Semantic layer phát hiện ${finding.replaceAll("_", " ")} cần đối chiếu.`,
     reasons: [raw?.semanticSummary, raw?.details?.decisionRationale].filter(Boolean).map((item) => safeText(item)).slice(0, 12),
     signals: [
       ...safeArray(raw?.contextSignals).slice(0, 30).map((item) => signal(item?.type || "SEMANTIC_SIGNAL", item?.details || "Semantic context signal.", item?.source || "layer2b_semantic", String(item?.severity || "INFO").toUpperCase())),
@@ -203,6 +208,7 @@ export function stageFromL2B(raw, requestId, timing = {}) {
       promptInjectionDetected: promptInjection,
       classification: raw?.classification || null,
       providerStatus,
+      deterministicFallbackAvailable,
       providerErrorType: providerErrorType || null,
       providerHttpStatus,
       mediaForensics: raw?.mediaForensics || null,

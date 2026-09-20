@@ -384,6 +384,69 @@ test("own backend labels Layer 2 provider outage as partial, not suspicious", as
   assert.equal(result.finalPredict.securityEvidenceStatus, "INSUFFICIENT");
 });
 
+test("own backend completes L2 when semantic gateway fails but deterministic fallback is valid", async () => {
+  const orchestrator = new OwnBackendTrustOrchestrator({
+    services: {
+      l1: async () => ({ status: "PASS", reasons: [], signals: [], metrics: {} }),
+      l2a: async () => ({ providerStatus: "NOT_APPLICABLE", finding: "NOT_APPLICABLE", providerResults: [] }),
+      l2b: async () => ({
+        status: "PASS",
+        classification: "BENIGN",
+        confidence: 0.5,
+        semanticSummary: "Deterministic baseline completed.",
+        contextSignals: [],
+        claims: [],
+        entities: [],
+        details: {
+          providerStatus: "NETWORK_ERROR",
+          upstreamProviderStatus: "NETWORK_ERROR",
+          deterministicFallbackAvailable: true,
+        },
+        metrics: {
+          providerStatus: "NETWORK_ERROR",
+          deterministicFallbackAvailable: true,
+        },
+      }),
+      l2c: async () => ({ classification: "NO_MATERIAL_STUDENT_RISK", modelStatus: "BASELINE_RULE_MODEL", riskSignals: [] }),
+      l3: async () => ({ status: "INSUFFICIENT_EVIDENCE", retrievalStatus: "UNAVAILABLE", externalEvidence: false, sources: [], evidence: [], claims: [], conflicts: [] }),
+      l4: async () => ({
+        securityClassification: "UNKNOWN",
+        truthStatus: "NOT_APPLICABLE",
+        enforcement: "REVIEW",
+        recommendedAction: "REVIEW",
+        decisionConfidence: 0,
+        riskAssessment: { level: "LOW", primaryVectors: ["threat_intelligence_unavailable"] },
+        aiVerification: { verdictSignal: "UNCERTAIN", citationsUsed: [] },
+      }),
+    },
+  });
+
+  const result = await orchestrator.run({ type: "text", content: "ordinary input" }, { requestId: "req_l2_gateway_fallback" });
+
+  assert.equal(result.stages.l2.operationStatus, "COMPLETED");
+  assert.equal(result.stages.l2.finding, "NO_KNOWN_THREAT");
+  assert.equal(result.stages.l2.providers.some((item) => item.status === "NETWORK_ERROR"), true);
+});
+
+test("L2C advisory outage does not make the completed semantic/threat composite partial", async () => {
+  const orchestrator = new OwnBackendTrustOrchestrator({
+    services: {
+      l1: async () => ({ status: "PASS", reasons: [], signals: [], metrics: {} }),
+      l2a: async () => ({ providerStatus: "NOT_APPLICABLE", finding: "NOT_APPLICABLE", providerResults: [] }),
+      l2b: async () => ({ status: "PASS", classification: "BENIGN", semanticSummary: "Baseline completed.", contextSignals: [], claims: [], entities: [], details: { providerStatus: "LOCAL_DETERMINISTIC" }, metrics: { providerStatus: "LOCAL_DETERMINISTIC" } }),
+      l2c: async () => ({ classification: "UNKNOWN_STUDENT_RISK", modelStatus: "UNAVAILABLE", riskSignals: [] }),
+      l3: async () => ({ status: "INSUFFICIENT_EVIDENCE", retrievalStatus: "UNAVAILABLE", externalEvidence: false, sources: [], evidence: [], claims: [], conflicts: [] }),
+      l4: async () => ({ securityClassification: "UNKNOWN", truthStatus: "NOT_APPLICABLE", enforcement: "REVIEW", recommendedAction: "REVIEW", decisionConfidence: 0, riskAssessment: { level: "LOW", primaryVectors: ["threat_intelligence_unavailable"] }, aiVerification: { verdictSignal: "UNCERTAIN", citationsUsed: [] } }),
+    },
+  });
+
+  const result = await orchestrator.run({ type: "text", content: "ordinary input" }, { requestId: "req_l2c_advisory_outage" });
+
+  assert.equal(result.stages.l2.operationStatus, "COMPLETED");
+  assert.equal(result.stages.l2.finding, "NO_KNOWN_THREAT");
+  assert.equal(result.stages.l2.providers.some((item) => item.status === "UNAVAILABLE"), true);
+});
+
 test("Final Predict consumes verified Gemini URL evidence for a cautious safe-target decision", async () => {
   const orchestrator = new OwnBackendTrustOrchestrator({ services: servicesWithGeminiValidatedSafeUrl() });
 

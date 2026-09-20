@@ -399,6 +399,7 @@ export function createLayer2Result(params = {}) {
   const safeProviderId = boundedText(safeDetails.providerId, 120) || null;
   const safeModelProvider = boundedText(safeDetails.modelProvider, 120) || null;
   const safeModelUsed = boundedText(safeDetails.modelUsed, 120) || null;
+  const safeUpstreamProviderStatus = boundedText(safeDetails.upstreamProviderStatus, 80).toUpperCase() || null;
   const safeFallbackReason = boundedText(safeDetails.fallbackReason, 160) || null;
   const safeProviderErrorType = boundedText(safeDetails.providerErrorType, 100) || null;
   const safeProviderHttpStatus = Number.isInteger(Number(safeDetails.providerHttpStatus)) && Number(safeDetails.providerHttpStatus) >= 100 && Number(safeDetails.providerHttpStatus) <= 599
@@ -483,6 +484,8 @@ export function createLayer2Result(params = {}) {
       modelUsed: safeModelUsed,
       fallbackReason: safeFallbackReason,
       providerStatus: typeof safeDetails.providerStatus === "string" ? safeDetails.providerStatus.slice(0, 80) : null,
+      upstreamProviderStatus: safeUpstreamProviderStatus,
+      deterministicFallbackAvailable: safeDetails.deterministicFallbackAvailable === true,
       providerErrorType: safeProviderErrorType,
       providerHttpStatus: safeProviderHttpStatus,
       providerLatencyMs: safeProviderLatencyMs,
@@ -497,6 +500,8 @@ export function createLayer2Result(params = {}) {
       executionTimeMs: Number.isFinite(safeMetrics.executionTimeMs) ? Math.max(0, safeMetrics.executionTimeMs) : 0,
       modelUsed: typeof safeMetrics.modelUsed === "string" ? safeMetrics.modelUsed.slice(0, 120) : "deterministic_fallback",
       providerStatus: typeof safeMetrics.providerStatus === "string" ? safeMetrics.providerStatus.slice(0, 80) : SEMANTIC_PROVIDER_STATUS.LOCAL_DETERMINISTIC,
+      upstreamProviderStatus: typeof safeMetrics.upstreamProviderStatus === "string" ? safeMetrics.upstreamProviderStatus.slice(0, 80) : null,
+      deterministicFallbackAvailable: safeMetrics.deterministicFallbackAvailable === true,
       timestamp: Number.isFinite(safeMetrics.timestamp) ? safeMetrics.timestamp : Date.now(),
       providerIndependent: true,
       confidenceKind: typeof safeMetrics.confidenceKind === "string" ? safeMetrics.confidenceKind.slice(0, 120) : "semantic_candidate_only",

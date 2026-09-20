@@ -366,6 +366,8 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     }, "StudentHub Threat Intelligence"));
   }
   const semanticStatus = statusText(layer2B?.details?.providerStatus, layer2B?.metrics?.providerStatus, "LOCAL_DETERMINISTIC");
+  const semanticFallbackAvailable = layer2B?.details?.deterministicFallbackAvailable === true ||
+    layer2B?.metrics?.deterministicFallbackAvailable === true;
   const domainStatus = statusText(layer2C?.modelStatus, "BASELINE_RULE_MODEL");
   const observations = [
     ...l2aProviders,
@@ -375,7 +377,7 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
       status: semanticStatus,
       verdict: layer2B?.classification || layer2B?.status || "UNKNOWN",
       finding: layer2B?.classification || layer2B?.status,
-      success: !providerFailure(semanticStatus),
+      success: semanticFallbackAvailable || !providerFailure(semanticStatus),
       message: layer2B?.semanticSummary || layer2B?.details?.decisionRationale || "Semantic analysis completed.",
       latencyMs: layer2B?.details?.providerLatencyMs,
       signals: layer2B?.contextSignals,
@@ -394,9 +396,10 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     }, "StudentHub Student Context Model"),
   ];
   const threatMatch = layer2A?.finding === "THREAT_MATCH";
-  const semanticProviderPartial = providerFailure(semanticStatus) || semanticStatus === "FALLBACK_USED" ||
-    ["UNKNOWN", "PARTIAL"].includes(statusText(layer2B?.status));
+  const semanticProviderPartial = !semanticFallbackAvailable && (providerFailure(semanticStatus) || semanticStatus === "FALLBACK_USED" ||
+    ["UNKNOWN", "PARTIAL"].includes(statusText(layer2B?.status)));
   const domainProviderPartial = providerFailure(domainStatus);
+  const threatProviderPartial = l2aProviders.some((item) => item.success !== true && item.executed !== false);
   const semanticContextRisk = boundedArray(layer2B?.contextSignals).some((item) =>
     item?.authoritative !== false && /credential|financial|account_takeover|malware|social_engineering|impersonation|urgency|authority|scarcity|prompt_injection/i.test(
       String(item?.type || item?.code || ""),
@@ -412,8 +415,10 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     "NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN",
   ].includes(statusText(layer2C.classification)) && !domainProviderPartial;
   const semanticSuspicious = semanticClassificationRisk || semanticDecisionRisk || semanticContextRisk || domainRisk;
-  const providerPartial = observations.some((item) => item.success !== true && item.executed !== false) ||
-    semanticProviderPartial || domainProviderPartial;
+  // L2C is advisory domain intelligence. Its outage is disclosed in the
+  // provider observations but must not make an otherwise completed L2 run
+  // partial. L2A remains a separate threat-intelligence gate for SAFE.
+  const providerPartial = threatProviderPartial || semanticProviderPartial;
   const semanticPackage = asObject(layer2B?.verificationPackage);
   const domainPackage = asObject(layer2C?.verificationPackage);
   const verificationTasks = [
@@ -430,7 +435,7 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
         : layer2A?.finding === "NOT_APPLICABLE" && layer2B?.status === "UNKNOWN"
           ? "UNKNOWN"
           : "NO_KNOWN_THREAT";
-  const status = providerPartial || layer2B?.status === "UNKNOWN" || layer2C?.modelStatus === "UNAVAILABLE" ? "PARTIAL" : "COMPLETED";
+  const status = providerPartial || layer2B?.status === "UNKNOWN" ? "PARTIAL" : "COMPLETED";
   const reasons = [
     layer2A?.message,
     layer2B?.semanticSummary,
@@ -477,11 +482,15 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     reasons,
     conclusion: threatMatch
       ? "Threat intelligence reported a matching threat; semantic and context signals cannot downgrade it."
-      : providerPartial
-        ? "One or more Layer 2 providers are partial or unavailable; the result remains unresolved."
+      : semanticFallbackAvailable
+        ? "Gemini semantic enrichment was unavailable, but the deterministic semantic baseline completed and remains auditable."
+        : domainProviderPartial
+          ? "Student context advisory was unavailable; threat and semantic checks completed without treating the outage as content risk."
+          : providerPartial
+            ? "One or more Layer 2 threat providers are partial or unavailable; the result remains unresolved."
         : semanticSuspicious
-          ? "Semantic or student-context signals require external evidence before a final trust decision."
-          : "Layer 2 did not find a known threat or material semantic/context signal in the executed checks.",
+            ? "Semantic or student-context signals require external evidence before a final trust decision."
+            : "Layer 2 did not find a known threat or material semantic/context signal in the executed checks.",
     continuation: "L3_EVIDENCE_RETRIEVAL",
     safeToContinue: true,
     requestId,
@@ -489,7 +498,9 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
       inputType: input.type,
       threatFinding: layer2A?.finding || "UNKNOWN",
       semanticProviderStatus: semanticStatus,
+      semanticFallbackAvailable,
       studentContextModelStatus: domainStatus,
+      studentContextAdvisoryPartial: domainProviderPartial,
       providerPartial,
     },
   };

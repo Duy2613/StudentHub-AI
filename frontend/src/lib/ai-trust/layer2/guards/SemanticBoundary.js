@@ -250,6 +250,8 @@ export function normalizeSemanticAnalysis(value, { source = "provider" } = {}) {
       hardNegativeSignal: authoritative && value.manipulation.hardNegativeSignal === true,
     } : null,
     modelStatus: boundedString(value.modelStatus, 80) || "PROVIDER_SUCCESS_UNTRUSTED",
+    upstreamProviderStatus: boundedString(value.upstreamProviderStatus, 80).toUpperCase() || null,
+    deterministicFallbackAvailable: value.deterministicFallbackAvailable === true,
     fallbackReason: boundedString(value.fallbackReason, 160) || null,
     providerErrorType: boundedString(value.providerErrorType, 100) || null,
     providerHttpStatus: Number.isInteger(Number(value.providerHttpStatus)) && Number(value.providerHttpStatus) >= 100 && Number(value.providerHttpStatus) <= 599

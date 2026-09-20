@@ -90,6 +90,7 @@ function isTransient(stageId, result) {
   const providerStatus = String(result?.providerStatus || result?.retrievalStatus || result?.metrics?.providerStatus || "").toUpperCase();
   if (stageId === "l2a") return TRANSIENT_L2A_STATUSES.has(providerStatus);
   if (stageId === "l2b") {
+    if (result?.details?.deterministicFallbackAvailable === true || result?.metrics?.deterministicFallbackAvailable === true) return false;
     const semanticStatus = String(result?.modelStatus || result?.details?.providerStatus || providerStatus).toUpperCase();
     return TRANSIENT_L2B_STATUSES.has(semanticStatus);
   }

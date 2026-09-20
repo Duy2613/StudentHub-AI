@@ -62,7 +62,7 @@ function hasPayload({ content, metadata }) {
 
 function providerStatusFor(analysis, fallbackUsed = false) {
   if (fallbackUsed) return SEMANTIC_PROVIDER_STATUS.FALLBACK_USED;
-  return analysis?.modelStatus || SEMANTIC_PROVIDER_STATUS.LOCAL_DETERMINISTIC;
+  return analysis?.upstreamProviderStatus || analysis?.modelStatus || SEMANTIC_PROVIDER_STATUS.LOCAL_DETERMINISTIC;
 }
 
 function emptyVerificationPackage() {
@@ -188,6 +188,7 @@ export class Layer2SemanticService {
         : "PROVIDER_UNAVAILABLE";
       semanticAnalysis.providerIndependent = true;
       semanticAnalysis.aiCannotOverrideSecurity = true;
+      semanticAnalysis.deterministicFallbackAvailable = semanticAnalysis.classification !== SEMANTIC_CLASSIFICATION.UNKNOWN;
     }
 
     if (!semanticAnalysis) semanticAnalysis = createUnknownSemanticAnalysis("SEMANTIC_BOUNDARY_FAILURE");
@@ -242,6 +243,8 @@ export class Layer2SemanticService {
         modelUsed: semanticAnalysis.modelUsed,
         fallbackReason: semanticAnalysis.fallbackReason,
         providerStatus,
+        upstreamProviderStatus: semanticAnalysis.upstreamProviderStatus,
+        deterministicFallbackAvailable: semanticAnalysis.deterministicFallbackAvailable === true,
         providerErrorType: semanticAnalysis.providerErrorType,
         providerHttpStatus: semanticAnalysis.providerHttpStatus,
         providerLatencyMs: semanticAnalysis.providerLatencyMs,
@@ -258,6 +261,8 @@ export class Layer2SemanticService {
         executionTimeMs,
         modelUsed: semanticAnalysis.modelUsed || semanticAnalysis.providerId || provider.providerId || "semantic_boundary",
         providerStatus,
+        upstreamProviderStatus: semanticAnalysis.upstreamProviderStatus || null,
+        deterministicFallbackAvailable: semanticAnalysis.deterministicFallbackAvailable === true,
         providerIndependent: semanticAnalysis.providerIndependent !== false,
         confidenceKind: semanticAnalysis.confidenceKind || "semantic_candidate_only",
         timestamp: Date.now(),

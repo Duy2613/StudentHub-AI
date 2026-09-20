@@ -196,4 +196,27 @@ describe("Layer 2B semantic trust boundary", () => {
     assert.equal(result.classification, "UNKNOWN");
     assert.equal(result.details.providerStatus, "COOLDOWN");
   });
+
+  it("completes with the deterministic baseline when Gemini transport fails", async () => {
+    const provider = new AIGatewayModelProvider({
+      gateway: {
+        async generateStructured() {
+          return { ok: false, errorType: "NETWORK_ERROR", attempts: [] };
+        },
+      },
+    });
+    const result = await Layer2SemanticService.verify({
+      type: "text",
+      content: "ordinary input",
+      layer1Result: { status: "PASS", signals: [] },
+      options: { provider },
+    });
+
+    assert.equal(result.status, "PASS");
+    assert.equal(result.classification, "BENIGN");
+    assert.equal(result.details.providerStatus, "NETWORK_ERROR");
+    assert.equal(result.details.upstreamProviderStatus, "NETWORK_ERROR");
+    assert.equal(result.details.deterministicFallbackAvailable, true);
+    assert.equal(result.metrics.deterministicFallbackAvailable, true);
+  });
 });
