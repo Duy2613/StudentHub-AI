@@ -101,6 +101,22 @@ describe("Layer 2B semantic trust boundary", () => {
     assert.equal(calls[0].systemPrompt.includes("untrusted"), true);
   });
 
+  it("still runs the complete semantic provider path after Layer 1 BLOCK", async () => {
+    const calls = [];
+    const provider = new AIGatewayModelProvider({ gateway: gatewayReturning(benignAiResponse(), calls) });
+    const result = await Layer2SemanticService.verify({
+      type: "text",
+      content: "Nội dung cần được phân tích đầy đủ dù Layer 1 đã chặn.",
+      layer1Result: { status: "BLOCK", signals: [{ code: "LOCAL_BLOCK" }] },
+      options: { provider },
+    });
+
+    assert.equal(calls.length, 1);
+    assert.equal(result.status, "BLOCK");
+    assert.equal(result.details.aiCannotOverrideSecurity, true);
+    assert.equal(result.metrics.providerStatus, "AI_ENRICHMENT_UNTRUSTED");
+  });
+
   it("accepts QR as a first-class semantic input and forwards its payload", async () => {
     const calls = [];
     const provider = new AIGatewayModelProvider({ gateway: gatewayReturning(benignAiResponse(), calls) });

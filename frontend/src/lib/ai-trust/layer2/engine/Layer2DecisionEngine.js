@@ -78,10 +78,11 @@ export class Layer2DecisionEngine {
       safeContextSignals.some((signal) => signal?.type === "prompt_injection_detected");
 
     const providerFailure = semanticAnalysis.classification === SEMANTIC_CLASSIFICATION.UNKNOWN ||
-      semanticAnalysis.modelStatus === "INVALID_RESPONSE" ||
-      semanticAnalysis.modelStatus === "PROVIDER_UNAVAILABLE" ||
-      semanticAnalysis.modelStatus === "UNAVAILABLE" ||
-      semanticAnalysis.modelStatus === "TIMEOUT";
+      [
+        "INVALID_RESPONSE", "PROVIDER_UNAVAILABLE", "UNAVAILABLE", "TIMEOUT", "RATE_LIMITED",
+        "AUTH_FAILED", "MODEL_NOT_AVAILABLE", "NETWORK_ERROR", "NOT_CONFIGURED", "PARTIAL", "DEGRADED",
+        "INJECTION_REJECTED",
+      ].includes(String(semanticAnalysis.modelStatus || "").toUpperCase());
     const providerReturnedMalicious = semanticAnalysis.classification === SEMANTIC_CLASSIFICATION.MALICIOUS;
 
     // Keep the exact educational predicate as a mutation-test anchor. The

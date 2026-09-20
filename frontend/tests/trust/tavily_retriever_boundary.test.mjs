@@ -65,6 +65,30 @@ test("Tavily accepts bounded public candidates, rejects SSRF candidates, and kee
   assert.equal(JSON.stringify(retriever.getRuntimeDiagnostics()).includes("fixture-tavily-secret"), false);
 });
 
+test("Tavily preserves candidates beyond one provider batch while keeping each request at 20", async () => {
+  const payloads = [];
+  const retriever = new TavilyRetriever({
+    env: { TAVILY_API_KEY: "fixture-tavily-secret" },
+    fetchImpl: async (_url, options) => {
+      const body = JSON.parse(options.body);
+      payloads.push(body);
+      const offset = payloads.length === 1 ? 0 : 20;
+      return jsonResponse({
+        results: Array.from({ length: 20 }, (_, index) => ({
+          title: `Source ${offset + index + 1}`,
+          url: `https://example.com/source-${offset + index + 1}`,
+        })),
+      });
+    },
+  });
+
+  const sources = await retriever.search([{ query: "first" }, { query: "second" }]);
+  assert.equal(sources.length, 40);
+  assert.deepEqual(payloads.map((payload) => payload.max_results), [20, 20]);
+  assert.equal(new Set(sources.map((source) => source.url)).size, 40);
+  assert.equal(retriever.getRuntimeDiagnostics().acceptedResults, 40);
+});
+
 test("Tavily preserves typed rate-limit status and bounded call diagnostics", async () => {
   const retriever = new TavilyRetriever({
     env: { TAVILY_API_KEY: "fixture-tavily-secret" },

@@ -378,7 +378,10 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
       requestId,
     })
     : await Layer2AReputationService.verify({ url: "", requestId });
-  const layer2 = layer1.status === "BLOCK" ? null : await Layer2SemanticService.verify({
+  // Layer 2 is mandatory even after a Layer 1 hard block. It must complete
+  // semantic/multimodal/provider analysis; Layer 1 remains authoritative for
+  // the final security decision and downstream evidence gating.
+  const layer2 = await Layer2SemanticService.verify({
     ...input,
     layer1Result: layer1,
     options: { requestId, useAIGateway },

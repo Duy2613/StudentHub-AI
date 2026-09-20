@@ -28,6 +28,8 @@ test("canonical Trust accepts only server-composed evidence inputs", () => {
   assert.match(source, /safeMetadata/);
   assert.match(source, /Layer1ScreenService\.screen/);
   assert.match(source, /Layer2SemanticService\.verify/);
+  assert.match(source, /const layer2 = await Layer2SemanticService\.verify/);
+  assert.doesNotMatch(source, /const layer2 = layer1\.status === "BLOCK" \? null/);
   assert.match(source, /Layer3EvidenceService\.verify/);
   assert.match(source, /Layer4TrustService\.evaluate/);
   assert.doesNotMatch(source, /body\?\.(evidence|candidates|sources)\b/, "browser must not provide candidate evidence authority");

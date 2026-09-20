@@ -219,3 +219,12 @@
 - [x] Preserved every safe source/evidence/citation in API/UI compatibility output and added the full JSON inspection panel.
 - [x] Kept SSRF, timeout, body/artifact byte, image decompression and no-base64-echo protections; no fabricated URL is emitted.
 - [x] Targeted trust/multimodal/legacy tests `39/39`, full regression group `89/89`, production build `142/142`, and text/multipart-image smoke passed; undisclosed L5 confidence/evidence sufficiency remains `null` instead of a fabricated default.
+
+### Final Predict evidence aggregation & full source output — 2026-09-20
+
+- [x] Removed the application-level 30-source cap; preserve every validated Tavily/Layer 3/Gemini URL in canonical and public response projections.
+- [x] Made Layer 2 execution mandatory after Layer 1 BLOCK while retaining Layer 1 hard-negative precedence.
+- [x] Classified Layer 2 provider outage/fallback as `PARTIAL/REVIEW`, not semantic suspicious, unless independent content-risk signals exist.
+- [x] Routed direct HTTP(S) URL fetches through the guarded web retriever when the configured search retriever is local/fallback; preserve contextual evidence without promoting it to claim proof.
+- [x] Added Gemini Layer 4 validated citation/support signals to Final Predict: cautious safe-target clearance and evidence-gated truth refinement only; hard negatives cannot be downgraded.
+- [x] Local verification: trust group `112/112`, build `142/142`, lint `0` errors; live Gemini availability remains quota/environment gated.

@@ -14,9 +14,8 @@ import { SOURCE_TYPE, EVIDENCE_PROVIDER_STATUS } from "../types.js";
 import { validateRemoteUrlSync } from "../../../security/hardening/SafeRemoteUrl.js";
 
 const TAVILY_SEARCH_ENDPOINT = "https://api.tavily.com/search";
-// Tavily's public API accepts up to 20 results per request. We request that
-// provider maximum and deliberately do not impose another application-level
-// source/result cap after the response arrives.
+// Tavily's public API accepts up to 20 results per request. Keep that provider
+// maximum per request while preserving the complete deduplicated result set.
 const MAX_RESULTS_PER_QUERY = 20;
 const MAX_RESPONSE_BYTES = 512 * 1024;
 const DEFAULT_SEARCH_BUDGET_MS = 30_000;

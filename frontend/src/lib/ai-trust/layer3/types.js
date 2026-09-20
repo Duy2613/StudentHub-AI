@@ -403,9 +403,8 @@ export function createLayer3Result(input = {}) {
     sourceScope: boundedString(claim.sourceScope, 120) || "GENERAL_SOURCE",
     verificationTaskId: boundedString(claim.verificationTaskId, 160) || null,
   })) : [];
-  // Source and evidence collections are intentionally lossless at this
-  // boundary. The caller may return every Tavily/Gemini URL; only individual
-  // field sizes and URL safety are normalized by createSource/createEvidence.
+  // Preserve every validated source and evidence record. Individual fields
+  // remain bounded by createSource/createEvidence and URL safety guards.
   const safeSources = Array.isArray(sources) ? sources.filter((source) => source && typeof source === "object" && !Array.isArray(source)).map((source) => createSource(source)) : [];
   const safeEvidence = Array.isArray(evidence) ? evidence.filter((item) => item && typeof item === "object" && !Array.isArray(item)).map((item) => createEvidence(item)) : [];
   const safeConflicts = Array.isArray(conflicts) ? conflicts.slice(0, 80).filter((conflict) => conflict && typeof conflict === "object" && !Array.isArray(conflict)).map(normalizeConflict) : [];

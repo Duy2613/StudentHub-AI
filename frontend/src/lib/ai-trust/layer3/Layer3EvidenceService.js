@@ -9,6 +9,7 @@
 import { QueryGenerator } from "./query/QueryGenerator.js";
 import { KnowledgeBaseRetriever } from "./retrieval/KnowledgeBaseRetriever.js";
 import { TavilyRetriever } from "./retrieval/TavilyRetriever.js";
+import { WebSearchRetriever } from "./retrieval/WebSearchRetriever.js";
 import { validateRemoteUrlSync } from "../../security/hardening/SafeRemoteUrl.js";
 import { isNetworkGuardedRetriever } from "./retrieval/NetworkGuard.js";
 import { markTrustedLayer3Result } from "./TrustBoundary.js";
@@ -518,7 +519,7 @@ export class Layer3EvidenceService {
       }
 
       const sourceFetcher = src.retrievalOrigin === RETRIEVAL_ORIGIN.DIRECT_INPUT
-        ? retriever
+        ? (isNetworkGuardedRetriever(retriever) ? retriever : new WebSearchRetriever())
         : fetchRetriever;
       let fetchResult;
       try {

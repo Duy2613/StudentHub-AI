@@ -14,6 +14,7 @@ import { Layer1ScreenService } from "./layer1/Layer1ScreenService.js";
 import { Layer2AReputationService } from "./layer2a/Layer2AReputationService.js";
 import { Layer2SemanticService } from "./layer2/Layer2SemanticService.js";
 import { Layer3EvidenceService } from "./layer3/Layer3EvidenceService.js";
+import { WebSearchRetriever } from "./layer3/retrieval/WebSearchRetriever.js";
 import { Layer4TrustService } from "./layer4/Layer4TrustService.js";
 import { createLayer4Result } from "./layer4/types.js";
 import { StudentDomainRiskModel } from "./v5/l2c/StudentDomainRiskModel.js";
@@ -346,22 +347,38 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     }, "StudentHub Student Context Model"),
   ];
   const threatMatch = layer2A?.finding === "THREAT_MATCH";
-  const semanticSuspicious = ["DECEPTIVE", "SUSPICIOUS", "NEEDS_VERIFICATION", "REVIEW_REQUIRED"].includes(statusText(layer2B?.classification, layer2B?.status)) ||
-    boundedArray(layer2B?.contextSignals).length > 0 || boundedArray(layer2C?.riskSignals).length > 0;
-  const providerPartial = observations.some((item) => item.success !== true && item.executed !== false);
+  const semanticProviderPartial = providerFailure(semanticStatus) || semanticStatus === "FALLBACK_USED" ||
+    ["UNKNOWN", "PARTIAL"].includes(statusText(layer2B?.status));
+  const domainProviderPartial = providerFailure(domainStatus);
+  const semanticContextRisk = boundedArray(layer2B?.contextSignals).some((item) =>
+    /credential|financial|account_takeover|malware|social_engineering|impersonation|urgency|authority|scarcity|prompt_injection/i.test(
+      String(item?.type || item?.code || ""),
+    ),
+  );
+  const semanticClassificationRisk = ["DECEPTIVE", "MISLEADING", "MALICIOUS"].includes(statusText(layer2B?.classification));
+  const semanticDecisionRisk = ["BLOCK", "SUSPICIOUS"].includes(statusText(layer2B?.status));
+  const domainRisk = Boolean(layer2C?.classification) && ![
+    "NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN",
+  ].includes(statusText(layer2C.classification)) && !domainProviderPartial;
+  const semanticSuspicious = semanticClassificationRisk || semanticDecisionRisk || semanticContextRisk || domainRisk;
+  const providerPartial = observations.some((item) => item.success !== true && item.executed !== false) ||
+    semanticProviderPartial || domainProviderPartial;
   const semanticPackage = asObject(layer2B?.verificationPackage);
   const domainPackage = asObject(layer2C?.verificationPackage);
   const verificationTasks = [
     ...boundedArray(semanticPackage.verificationTasks, 40),
     ...boundedArray(domainPackage.verificationTasks, 40),
   ].slice(0, 80);
+  const operationallyPartialWithoutContentSignal = providerPartial && !semanticSuspicious;
   const finding = threatMatch
     ? "THREAT_MATCH"
-    : semanticSuspicious
-      ? (boundedArray(layer2B?.contextSignals).some((item) => /credential|payment|urgency|impersonation/i.test(String(item?.type || item?.code || ""))) ? "MANIPULATION_DETECTED" : "SEMANTIC_SUSPICIOUS")
-      : layer2A?.finding === "NOT_APPLICABLE" && layer2B?.status === "UNKNOWN"
-        ? "UNKNOWN"
-        : "NO_KNOWN_THREAT";
+    : operationallyPartialWithoutContentSignal
+      ? "PARTIAL"
+      : semanticSuspicious
+        ? (boundedArray(layer2B?.contextSignals).some((item) => /credential|payment|urgency|impersonation/i.test(String(item?.type || item?.code || ""))) ? "MANIPULATION_DETECTED" : "SEMANTIC_SUSPICIOUS")
+        : layer2A?.finding === "NOT_APPLICABLE" && layer2B?.status === "UNKNOWN"
+          ? "UNKNOWN"
+          : "NO_KNOWN_THREAT";
   const status = providerPartial || layer2B?.status === "UNKNOWN" || layer2C?.modelStatus === "UNAVAILABLE" ? "PARTIAL" : "COMPLETED";
   const reasons = [
     layer2A?.message,
@@ -531,28 +548,71 @@ function stageOperationStatus(stageId, raw) {
 function finalPredict({ layer1, layer2, layer3, layer4 }) {
   const l1Blocked = layer1?.status === "BLOCK" || layer1?.finding === "LOCAL_BLOCK";
   const l2Threat = layer2?.finding === "THREAT_MATCH" || layer2?.securityClassification === "MALICIOUS";
+  const layer4Security = statusText(layer4?.securityClassification, "UNKNOWN");
+  const layer4Action = statusText(layer4?.enforcement, layer4?.recommendedAction, "REVIEW");
+  const geminiVerification = layer4?.aiVerification && typeof layer4.aiVerification === "object" && !Array.isArray(layer4.aiVerification)
+    ? layer4.aiVerification
+    : null;
+  const geminiSignal = statusText(geminiVerification?.verdictSignal, "UNCERTAIN");
+  const geminiCitationValidation = geminiVerification?.citationValidation && typeof geminiVerification.citationValidation === "object"
+    ? geminiVerification.citationValidation
+    : {};
+  const geminiCitationCount = Array.isArray(geminiVerification?.citationsUsed)
+    ? geminiVerification.citationsUsed.filter((citation) => typeof citation?.url === "string" && /^https?:\/\//i.test(citation.url)).length
+    : 0;
+  const geminiCitationsValidated = geminiCitationCount > 0 &&
+    geminiCitationValidation.allLinksValidated === true &&
+    Number(geminiCitationValidation.acceptedCount) >= geminiCitationCount &&
+    Number(geminiCitationValidation.rejectedCount || 0) === 0;
+  const geminiSupportsWithValidatedEvidence = layer4?.aiVerificationStatus === "VERIFIED" &&
+    geminiSignal === "SUPPORTS" && geminiCitationsValidated;
+  const geminiTruthSignal = layer4?.aiVerificationStatus === "VERIFIED" && geminiCitationsValidated &&
+    ["SUPPORTS", "CONTRADICTS", "MIXED"].includes(geminiSignal)
+    ? geminiSignal
+    : null;
+  const layer4HardNegative = layer4Security === "MALICIOUS" || layer4Action === "BLOCK";
+  const layer4PolicyAllows = !layer4HardNegative &&
+    layer4Security === "NO_KNOWN_THREAT" &&
+    ["ALLOW", "ALLOW_WITH_CAUTION"].includes(layer4Action);
+  // Final Predict consumes the complete L4 package. A validated Gemini
+  // citation can resolve an otherwise unresolved safe-target check, but it
+  // can never downgrade an L1/L2/L4 hard negative or turn reachability alone
+  // into proof that a factual claim is true.
+  const geminiBackedSafeTarget = !l1Blocked && !l2Threat && !layer4HardNegative && geminiSupportsWithValidatedEvidence;
+  const securityDecisionBacked = layer4PolicyAllows || geminiBackedSafeTarget;
   const sources = Array.isArray(layer3?.sources) ? layer3.sources : [];
   const evidence = Array.isArray(layer3?.evidence) ? layer3.evidence : [];
   const claimSpecificEvidence = evidence.filter((item) => item?.evidenceScope !== "input_context" && Boolean(item?.claimId));
   const usableSources = sources.filter((source) => source?.liveEvidence === true && source?.retrievalOutcome === "SUCCESS");
   const evidenceCount = evidence.length;
   const insufficientEvidence = usableSources.length === 0 || claimSpecificEvidence.length === 0 || layer3?.externalEvidence !== true;
+  const deterministicTruthStatus = statusText(layer4?.truthStatus, layer4?.truthAssessment?.status, "INSUFFICIENT_EVIDENCE");
+  const geminiTruthRefinement = !insufficientEvidence && !l1Blocked && !l2Threat && !layer4HardNegative &&
+    ["UNKNOWN", "INSUFFICIENT_EVIDENCE"].includes(deterministicTruthStatus) && Boolean(geminiTruthSignal);
   const securityClassification = l1Blocked || l2Threat
     ? "MALICIOUS"
-    : layer4?.securityClassification || "UNKNOWN";
+    : geminiBackedSafeTarget
+      ? "NO_KNOWN_THREAT"
+      : layer4Security;
   const securityRisk = l1Blocked || l2Threat
     ? "CRITICAL"
     : layer4?.riskAssessment?.level || "UNKNOWN";
   const truthStatus = insufficientEvidence
     ? "INSUFFICIENT_EVIDENCE"
-    : layer4?.truthStatus || layer4?.truthAssessment?.status || "INSUFFICIENT_EVIDENCE";
+    : geminiTruthRefinement
+      ? ({ SUPPORTS: "SUPPORTED", CONTRADICTS: "CONTRADICTED", MIXED: "MIXED" }[geminiTruthSignal] || deterministicTruthStatus)
+      : deterministicTruthStatus;
   const recommendedAction = l1Blocked || l2Threat
     ? "BLOCK"
+    : securityDecisionBacked
+      ? (layer4PolicyAllows ? layer4Action : "ALLOW_WITH_CAUTION")
     : insufficientEvidence
       ? "REVIEW"
-      : layer4?.enforcement || layer4?.recommendedAction || "REVIEW";
+      : layer4Action;
   const decisionConfidence = insufficientEvidence
-    ? Math.min(Number(layer4?.decisionConfidence) || 0, 0.35)
+    ? securityDecisionBacked
+      ? Math.min(Number(layer4?.decisionConfidence) || 0, 0.65)
+      : Math.min(Number(layer4?.decisionConfidence) || 0, 0.35)
     : Number(layer4?.decisionConfidence) || 0;
   const evidenceAgreement = layer3?.crossSourceAgreement?.agreementScore ?? layer3?.crossSourceAgreement?.status ?? null;
   const sourceQuality = usableSources.length
@@ -561,6 +621,8 @@ function finalPredict({ layer1, layer2, layer3, layer4 }) {
   const reasons = [
     ...(l1Blocked ? ["Layer 1 phát hiện hard block kỹ thuật."] : []),
     ...(l2Threat ? ["Layer 2 threat intelligence có threat match; không bị hạ cấp bởi các lớp sau."] : []),
+    ...(geminiBackedSafeTarget ? ["Gemini Layer 4 đã đối chiếu bằng chứng URL và các liên kết đã được server xác thực; Final Predict cho phép tiếp tục có điều kiện."] : []),
+    ...(geminiTruthRefinement ? [`Gemini Layer 4 đã tổng hợp claim-specific evidence của Layer 3 và bổ sung kết luận sự thật: ${truthStatus}.`] : []),
     ...boundedArray(layer4?.keyReasons, 8),
     ...(insufficientEvidence
       ? [claimSpecificEvidence.length > 0
@@ -603,7 +665,7 @@ function finalPredict({ layer1, layer2, layer3, layer4 }) {
     verdict: truthStatus,
     truthVerdict: truthStatus,
     truthStatus,
-    truthAssessment: layer4?.truthAssessment?.status || truthStatus,
+    truthAssessment: geminiTruthRefinement ? truthStatus : (layer4?.truthAssessment?.status || truthStatus),
     security: securityClassification,
     securityClassification,
     securityRisk,
@@ -618,6 +680,12 @@ function finalPredict({ layer1, layer2, layer3, layer4 }) {
     sourceQuality,
     verificationCompleteness: layer3?.verificationCompleteness ?? null,
     evidenceSufficiency: insufficientEvidence ? "INSUFFICIENT" : "SUFFICIENT",
+    securityEvidenceStatus: securityDecisionBacked
+      ? (geminiBackedSafeTarget ? "GEMINI_VALIDATED" : "LAYER4_POLICY")
+      : "INSUFFICIENT",
+    geminiVerdictSignal: geminiSignal,
+    geminiCitationCount,
+    geminiCitationsValidated,
     independentSourceCount: usableSources.length,
     evidenceCount,
     claimSpecificEvidenceCount: claimSpecificEvidence.length,

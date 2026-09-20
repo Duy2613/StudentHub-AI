@@ -110,6 +110,167 @@ function servicesWithLiveEvidence(calls) {
   };
 }
 
+function servicesWithPartialLayer2() {
+  return {
+    l1: async () => ({
+      status: "PASS",
+      reasons: [],
+      signals: [],
+      metrics: { detectorsExecuted: ["InputNormalizer", "DecisionEngine"] },
+    }),
+    l2a: async () => ({
+      provider: "fixture-threat-provider",
+      providerStatus: "NOT_APPLICABLE",
+      finding: "NOT_APPLICABLE",
+      message: "Threat lookup is not applicable to this text fixture.",
+      providerResults: [],
+    }),
+    l2b: async () => ({
+      status: "UNKNOWN",
+      classification: "UNKNOWN",
+      confidence: 0,
+      semanticSummary: "Semantic provider was unavailable; no semantic finding was established.",
+      contextSignals: [],
+      claims: [],
+      entities: [],
+      details: { providerStatus: "UNAVAILABLE", providerIndependent: true },
+      metrics: { providerStatus: "UNAVAILABLE", modelUsed: "fixture-semantic-unavailable" },
+    }),
+    l2c: async () => ({
+      classification: "UNKNOWN_STUDENT_RISK",
+      modelStatus: "UNAVAILABLE",
+      riskSignals: [],
+      explanation: "Student context model was unavailable; no domain risk finding was established.",
+    }),
+    l3: async () => ({
+      status: "UNAVAILABLE",
+      retrievalStatus: "UNAVAILABLE",
+      retrievalMode: "TAVILY_UNAVAILABLE",
+      externalEvidence: false,
+      sources: [],
+      evidence: [],
+      conflicts: [],
+      limitations: ["Fixture retrieval outage."],
+      metrics: { providerCallCount: 0 },
+    }),
+    l4: async () => ({
+      securityClassification: "UNKNOWN",
+      truthStatus: "INSUFFICIENT_EVIDENCE",
+      enforcement: "REVIEW",
+      recommendedAction: "REVIEW",
+      decisionConfidence: 0,
+      keyReasons: ["No provider returned enough information to clear the input."],
+      aiVerificationStatus: "FALLBACK_DETERMINISTIC",
+      aiVerification: { verdictSignal: "UNCERTAIN", citationsUsed: [] },
+    }),
+  };
+}
+
+function servicesWithGeminiValidatedSafeUrl() {
+  return {
+    l1: async () => ({ status: "PASS", reasons: [], signals: [], metrics: {} }),
+    l2a: async () => ({
+      provider: "fixture-threat-provider",
+      providerStatus: "NOT_APPLICABLE",
+      finding: "NOT_APPLICABLE",
+      message: "Threat lookup is not applicable to this URL fixture.",
+      providerResults: [],
+    }),
+    l2b: async () => ({
+      status: "PASS",
+      classification: "BENIGN",
+      confidence: 0.8,
+      semanticSummary: "No material semantic risk in the fixture URL.",
+      contextSignals: [],
+      claims: [],
+      entities: [],
+      details: { providerStatus: "SUCCESS", providerIndependent: true },
+      metrics: { providerStatus: "SUCCESS", modelUsed: "fixture-semantic" },
+    }),
+    l2c: async () => ({
+      classification: "NO_MATERIAL_STUDENT_RISK",
+      modelStatus: "BASELINE_RULE_MODEL",
+      riskSignals: [],
+      explanation: "No material domain risk in the fixture URL.",
+    }),
+    l3: async () => ({
+      status: "INSUFFICIENT",
+      retrievalStatus: "SUCCESS",
+      retrievalMode: "EXTERNAL_RETRIEVER",
+      externalEvidence: false,
+      sources: [],
+      evidence: [],
+      conflicts: [],
+      limitations: ["No claim-specific Layer 3 evidence was available in this fixture."],
+      metrics: { providerCallCount: 1 },
+    }),
+    l4: async () => ({
+      securityClassification: "UNKNOWN",
+      truthStatus: "INSUFFICIENT_EVIDENCE",
+      enforcement: "REVIEW",
+      recommendedAction: "REVIEW",
+      decisionConfidence: 0.9,
+      keyReasons: ["Gemini reviewed the public URL and returned a validated citation."],
+      aiVerificationStatus: "VERIFIED",
+      aiExecutedModel: "gemini-fixture-model",
+      aiVerification: {
+        verdictSignal: "SUPPORTS",
+        supportReasons: ["The validated public URL is consistent with the safe-target decision."],
+        contradictionReasons: [],
+        missingEvidence: [],
+        uncertainty: "The URL is reachable, but reachability does not prove every factual claim.",
+        citationsUsed: [{ id: "fixture-zalo", url: "https://zalo.me/fixture", validationStatus: "REACHABLE" }],
+        citationValidation: {
+          checkedCount: 1,
+          acceptedCount: 1,
+          rejectedCount: 0,
+          allLinksValidated: true,
+        },
+        provider: "google",
+        model: "gemini-fixture-model",
+      },
+    }),
+  };
+}
+
+function servicesWithGeminiValidatedClaimEvidence() {
+  const services = servicesWithGeminiValidatedSafeUrl();
+  services.l3 = async () => ({
+    status: "SUPPORTED",
+    retrievalStatus: "SUCCESS",
+    retrievalMode: "EXTERNAL_RETRIEVER",
+    externalEvidence: true,
+    sources: [{
+      sourceId: "fixture-zalo",
+      url: "https://zalo.me/fixture",
+      title: "Fixture public source",
+      publisher: "Fixture publisher",
+      domain: "zalo.me",
+      liveEvidence: true,
+      retrievalOutcome: "SUCCESS",
+      providerStatus: "SUCCESS",
+      authorityScore: 0.8,
+    }],
+    evidence: [{
+      evidenceId: "fixture-zalo-evidence",
+      sourceId: "fixture-zalo",
+      claimId: "fixture-claim-1",
+      sourceUrl: "https://zalo.me/fixture",
+      evidenceScope: "claim_specific",
+      liveEvidence: true,
+      retrievalOutcome: "SUCCESS",
+      excerpt: "The fixture source contains claim-specific supporting context.",
+    }],
+    conflicts: [],
+    limitations: [],
+    crossSourceAgreement: { agreementScore: 0.8, unresolved: false },
+    verificationCompleteness: 0.8,
+    evidenceConfidence: 0.8,
+    metrics: { providerCallCount: 1, retrievalStatus: "SUCCESS" },
+  });
+  return services;
+}
+
 test("own backend publishes exactly four stages and deterministic Final Predict", async () => {
   const calls = { l4: 0 };
   const events = [];
@@ -138,6 +299,78 @@ test("own backend publishes exactly four stages and deterministic Final Predict"
   assert.ok(events.some((item) => item.event === "PIPELINE_COMPLETED"));
   assert.equal(events.some((item) => item.stageId === "l5"), false);
   assert.equal(JSON.stringify(result).includes('"l5"'), false);
+});
+
+test("own backend labels Layer 2 provider outage as partial, not suspicious", async () => {
+  const orchestrator = new OwnBackendTrustOrchestrator({ services: servicesWithPartialLayer2() });
+
+  const result = await orchestrator.run({ type: "text", content: "A neutral fixture input." }, {
+    requestId: "req_layer2_partial_fixture",
+  });
+
+  assert.equal(result.stages.l2.finding, "PARTIAL");
+  assert.equal(result.stages.l2.operationStatus, "PARTIAL");
+  assert.equal(result.stages.l2.severity, "MEDIUM");
+  assert.notEqual(result.stages.l2.finding, "SEMANTIC_SUSPICIOUS");
+  assert.equal(result.finalPredict.securityClassification, "UNKNOWN");
+  assert.equal(result.finalPredict.recommendedAction, "REVIEW");
+  assert.equal(result.finalPredict.securityEvidenceStatus, "INSUFFICIENT");
+});
+
+test("Final Predict consumes verified Gemini URL evidence for a cautious safe-target decision", async () => {
+  const orchestrator = new OwnBackendTrustOrchestrator({ services: servicesWithGeminiValidatedSafeUrl() });
+
+  const result = await orchestrator.run({
+    type: "url",
+    content: "https://zalo.me/fixture",
+    metadata: { url: "https://zalo.me/fixture" },
+  }, { requestId: "req_gemini_validated_safe_target" });
+
+  assert.equal(result.finalPredict.securityClassification, "NO_KNOWN_THREAT");
+  assert.equal(result.finalPredict.recommendedAction, "ALLOW_WITH_CAUTION");
+  assert.equal(result.finalPredict.securityEvidenceStatus, "GEMINI_VALIDATED");
+  assert.equal(result.finalPredict.geminiVerdictSignal, "SUPPORTS");
+  assert.equal(result.finalPredict.geminiCitationCount, 1);
+  assert.equal(result.finalPredict.geminiCitationsValidated, true);
+  assert.equal(result.finalPredict.truthStatus, "INSUFFICIENT_EVIDENCE");
+  assert.equal(result.finalPredict.evidenceSufficiency, "INSUFFICIENT");
+  assert.ok(result.finalPredict.sources.some((source) => source.url === "https://zalo.me/fixture"));
+});
+
+test("Final Predict lets validated Gemini evidence refine an unresolved truth status only when Layer 3 is sufficient", async () => {
+  const orchestrator = new OwnBackendTrustOrchestrator({ services: servicesWithGeminiValidatedClaimEvidence() });
+
+  const result = await orchestrator.run({
+    type: "text",
+    content: "A fixture claim with independently retrieved evidence.",
+  }, { requestId: "req_gemini_truth_refinement" });
+
+  assert.equal(result.finalPredict.truthStatus, "SUPPORTED");
+  assert.equal(result.finalPredict.truthVerdict, "SUPPORTED");
+  assert.equal(result.finalPredict.truthAssessment, "SUPPORTED");
+  assert.equal(result.finalPredict.evidenceSufficiency, "SUFFICIENT");
+  assert.equal(result.finalPredict.geminiVerdictSignal, "SUPPORTS");
+});
+
+test("Final Predict never downgrades a Layer 1 hard block because Gemini cites a URL", async () => {
+  const services = servicesWithGeminiValidatedSafeUrl();
+  services.l1 = async () => ({
+    status: "BLOCK",
+    reasons: ["Fixture hard block."],
+    signals: [{ type: "LOCAL_BLOCK", severity: "critical" }],
+    metrics: {},
+  });
+  const orchestrator = new OwnBackendTrustOrchestrator({ services });
+
+  const result = await orchestrator.run({
+    type: "url",
+    content: "https://zalo.me/fixture",
+    metadata: { url: "https://zalo.me/fixture" },
+  }, { requestId: "req_gemini_cannot_downgrade_l1" });
+
+  assert.equal(result.finalPredict.securityClassification, "MALICIOUS");
+  assert.equal(result.finalPredict.recommendedAction, "BLOCK");
+  assert.notEqual(result.finalPredict.securityEvidenceStatus, "GEMINI_VALIDATED");
 });
 
 test("own backend does not substitute local corpus when canonical retrieval is unavailable", async () => {

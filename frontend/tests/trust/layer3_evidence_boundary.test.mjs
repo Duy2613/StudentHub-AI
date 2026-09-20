@@ -106,7 +106,8 @@ describe("Layer 3 evidence and provenance boundary", () => {
 
     assert.equal(result.status, "NOT_APPLICABLE");
     assert.equal(result.claims.length, 0);
-    assert.equal(result.evidence.length, 0);
+    assert.ok(result.evidence.length >= 1);
+    assert.ok(result.evidence.every((item) => !item.claimId && item.evidenceScope === "input_context"));
     assert.equal(result.sources.length, 1);
     assert.equal(result.sources[0].sourceType, "USER_SUPPLIED");
     assert.equal(result.sources[0].retrievalOrigin, "DIRECT_INPUT");

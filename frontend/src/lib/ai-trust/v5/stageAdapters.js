@@ -26,8 +26,8 @@ function httpStatusFor(...values) {
 
 function severityForFinding(finding) {
   if (["THREAT_MATCH", "LOCAL_BLOCK", "CREDENTIAL_SOLICITATION"].includes(finding)) return "CRITICAL";
-  if (["LOCAL_SUSPICIOUS", "PAYMENT_SOLICITATION", "MANIPULATION_DETECTED", "SEMANTIC_SUSPICIOUS", "UNKNOWN", "STALE", "REVIEW_REQUIRED", "RECHECK_REQUIRED"].includes(finding)) return "HIGH";
-  if (["MIXED", "INSUFFICIENT", "UNKNOWN_STUDENT_RISK"].includes(finding)) return "MEDIUM";
+  if (["LOCAL_SUSPICIOUS", "PAYMENT_SOLICITATION", "MANIPULATION_DETECTED", "SEMANTIC_SUSPICIOUS", "STALE", "REVIEW_REQUIRED", "RECHECK_REQUIRED"].includes(finding)) return "HIGH";
+  if (["MIXED", "INSUFFICIENT", "UNKNOWN", "PARTIAL", "UNKNOWN_STUDENT_RISK"].includes(finding)) return "MEDIUM";
   return "INFO";
 }
 

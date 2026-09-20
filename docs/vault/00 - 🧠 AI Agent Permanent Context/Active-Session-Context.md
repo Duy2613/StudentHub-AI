@@ -628,3 +628,12 @@
 - UI có panel `Backend-compatible response · full JSON` để xem nguyên response; source/evidence/citation collections không bị cắt trong API. Graph/UI presentation vẫn có guard tài nguyên riêng.
 - Giữ safety boundary: SSRF/private-host validation, timeout/rate limit, artifact image tối đa 8 MB và transport body tối đa 12 MB; không echo base64 ảnh trong response.
 - Verification: targeted trust/multimodal/legacy tests `39/39`, full regression group `89/89`, production build `142/142` pages, text legacy smoke `200`, multipart image smoke `200`; lint `0 errors`.
+
+## 27. Final Predict evidence aggregation & unrestricted source projection — 2026-09-20
+
+- Bỏ application-level cap 30 trên Tavily/Layer 3/Final Predict/public projection; mọi source/evidence/citation URL hợp lệ được dedupe rồi trả đầy đủ. Tavily vẫn gửi tối đa 20 kết quả cho mỗi provider request theo giới hạn API, nhưng không cắt tổng hợp sau các batch.
+- Canonical `/api/v1/trust` luôn chạy Layer 2 semantic path kể cả khi Layer 1 đã BLOCK; Layer 1 vẫn là hard-negative authority và không bị hạ cấp.
+- Provider outage/fallback/partial của Layer 2 được tách khỏi content risk: composite finding là `PARTIAL`, severity vận hành là `MEDIUM`, không tự sinh `SEMANTIC_SUSPICIOUS` hay `MALICIOUS` nếu không có risk signal độc lập.
+- Direct public URL (Zalo/YouTube/ChatGPT và domain HTTP(S) khác) dùng guarded fetcher với SSRF/DNS/redirect/content checks ngay cả khi Tavily search fallback local; contextual excerpt có `input_context` và không được dùng làm claim proof.
+- Final Predict đã tổng hợp Gemini Layer 4: chỉ dùng `VERIFIED + SUPPORTS/CONTRADICTS/MIXED + citationValidation.allLinksValidated` và Layer 3 claim-specific evidence để refine truth; URL an toàn không có claim evidence chỉ cho `NO_KNOWN_THREAT/ALLOW_WITH_CAUTION`, không giả `SUPPORTED`. Hard block L1/L2/L4 luôn thắng.
+- Verification mới: trust regression group `112/112`, production build `142/142`, lint `0 errors` (`588` existing warnings). Chưa claim live Gemini quota/SLO hay production deploy trong vault entry này.
