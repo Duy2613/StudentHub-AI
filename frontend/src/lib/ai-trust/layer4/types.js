@@ -30,6 +30,9 @@ export const FINAL_CLASSIFICATION = {
 export const SECURITY_CLASSIFICATION = {
   MALICIOUS: "MALICIOUS",
   SUSPICIOUS: "SUSPICIOUS",
+  // SAFE is evidence-gated: it is reserved for a validated security target,
+  // not for a bare reputation no-match or a missing provider result.
+  SAFE: "SAFE",
   NO_KNOWN_THREAT: "NO_KNOWN_THREAT",
   UNKNOWN: "UNKNOWN",
   NOT_APPLICABLE: "NOT_APPLICABLE",
@@ -55,12 +58,14 @@ export const SECURITY_RISK_LEVEL = {
 export const RECOMMENDED_ACTION = {
   BLOCK: "BLOCK",                                 // Intercept and prevent user access immediately
   WARN: "WARN",                                   // Show a safety warning before continued interaction
+  ALLOW_VERIFIED: "ALLOW",                        // Evidence-gated safe target only
   ALLOW_WITH_CAUTION: "ALLOW_WITH_CAUTION",       // No known threat, but no safety proof
   REVIEW: "REVIEW",                               // Abstain and require verification or human review
 
-  // Deprecated compatibility aliases. They intentionally resolve to the
-  // narrower canonical enforcement vocabulary; no caller can obtain a plain
-  // ALLOW outcome from the Trust Engine.
+  // Deprecated compatibility aliases. ALLOW remains mapped to the historical
+  // cautious behavior for callers that still use this enum member; new
+  // evidence-gated safe decisions use ALLOW_VERIFIED and emit the literal
+  // canonical action "ALLOW".
   ALLOW: "ALLOW_WITH_CAUTION",
   ALLOW_WITH_WARNING: "WARN",
   REQUIRE_VERIFICATION: "REVIEW",
@@ -74,6 +79,7 @@ const TRUTH_STATUS_VALUES = new Set(Object.values(TRUTH_STATUS));
 const ENFORCEMENT_VALUES = new Set([
   RECOMMENDED_ACTION.BLOCK,
   RECOMMENDED_ACTION.WARN,
+  RECOMMENDED_ACTION.ALLOW_VERIFIED,
   RECOMMENDED_ACTION.ALLOW_WITH_CAUTION,
   RECOMMENDED_ACTION.REVIEW,
 ]);

@@ -354,12 +354,14 @@ function v5VerdictTitle(decision) {
     case "CONFLICTING_EVIDENCE": return "CÁC NGUỒN XUNG ĐỘT · CHƯA AN TOÀN";
     case "INSUFFICIENT_EVIDENCE": return "CHƯA ĐỦ BẰNG CHỨNG";
     case "UNKNOWN": return "CHƯA THỂ KẾT LUẬN";
+    case "SAFE": return "AN TOÀN · ĐÃ XÁC MINH TARGET";
     default: break;
   }
   switch (decision?.security) {
     case "MALICIOUS": return "NGUY HIỂM · ĐÃ CHẶN";
     case "SUSPICIOUS": return "ĐÁNG NGỜ · CẦN THẬN TRỌNG";
     case "NO_KNOWN_THREAT": return "CHƯA THẤY MỐI ĐE DỌA ĐÃ BIẾT";
+    case "SAFE": return "AN TOÀN · ĐÃ XÁC MINH TARGET";
     case "NOT_APPLICABLE": return "KHÔNG ÁP DỤNG";
     default: return "CHƯA ĐỦ BẰNG CHỨNG";
   }

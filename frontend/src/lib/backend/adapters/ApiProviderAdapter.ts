@@ -163,6 +163,7 @@ function decisionState(value: { security: string; truth: string; action: string 
   if (text.includes("DANGEROUS") || text.includes("MALICIOUS")) return "DANGEROUS";
   if (text.includes("HIGH_RISK")) return "HIGH_RISK";
   if (text.includes("SUSPICIOUS")) return "SUSPICIOUS";
+  if (text.includes("SAFE")) return "SAFE";
   return "SUPPORTED";
 }
 

@@ -269,6 +269,7 @@ export const trustInvestigationInputSchema = z.object({
 export type TrustInvestigationInput = z.infer<typeof trustInvestigationInputSchema>;
 
 export const TRUST_DECISION_STATE_VALUES = [
+  "SAFE",
   "SUPPORTED",
   "SUSPICIOUS",
   "HIGH_RISK",

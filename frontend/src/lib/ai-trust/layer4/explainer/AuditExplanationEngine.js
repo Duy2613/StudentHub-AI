@@ -54,6 +54,12 @@ export class AuditExplanationEngine {
         ? "Không thực hiện thao tác nhạy cảm cho đến khi có kết quả xác minh độc lập."
         : "Không cung cấp dữ liệu nhạy cảm; hãy đối chiếu với kênh chính thức trước khi tiếp tục.";
       uncertainties.push("Tín hiệu đáng ngờ không tự nó chứng minh toàn bộ nội dung là độc hại; cần giữ trạng thái cảnh báo.");
+    } else if (securityClassification === SECURITY_CLASSIFICATION.SAFE) {
+      verdictTitle = "AN TOÀN (ĐÃ XÁC MINH)";
+      why = "Layer 2A đã nhận kết quả SAFE từ toàn bộ provider reputation đã thực thi và Layer 3 đã xác minh URL live với provenance hợp lệ; security target này đủ điều kiện SAFE trong phạm vi kiểm tra hiện tại.";
+      riskSummary = `Mức độ rủi ro: ${riskLevel || "THẤP"}. SAFE chỉ áp dụng cho security target đã được xác minh, không tự chứng minh factual claim là đúng.`;
+      recommendedActionNote = "Có thể tiếp tục với target này; không dùng kết quả SAFE để bỏ qua cảnh báo mới hoặc cung cấp thông tin nhạy cảm ngoài phạm vi target đã kiểm tra.";
+      uncertainties.push("SAFE là kết luận có phạm vi theo các provider và lần fetch đã xác minh; không phải bảo đảm tuyệt đối cho mọi nội dung phát sinh sau đó.");
     } else if (securityClassification === SECURITY_CLASSIFICATION.NO_KNOWN_THREAT) {
       verdictTitle = "KHÔNG PHÁT HIỆN MỐI ĐE DỌA ĐÃ BIẾT";
       why = fusedGraph.validatedReputationAndLiveTarget === true

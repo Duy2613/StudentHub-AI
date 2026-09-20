@@ -146,10 +146,11 @@ describe("Layer 4 deterministic policy boundary", () => {
       layer3Result: validatedLiveUrl(),
     });
 
-    assert.equal(result.securityClassification, "NO_KNOWN_THREAT");
-    assert.equal(result.enforcement, "ALLOW_WITH_CAUTION");
+    assert.equal(result.securityClassification, "SAFE");
+    assert.equal(result.enforcement, "ALLOW");
     assert.equal(result.riskAssessment.level, "LOW");
     assert.ok(result.auditTrail.policyPrecedence.includes("L2A_ALL_PROVIDERS_SAFE_PLUS_L3_LIVE_TARGET"));
+    assert.match(result.userExplanation.verdictTitle, /AN TOÀN.*XÁC MINH/i);
     assert.match(result.userExplanation.why, /Layer 2A.*Layer 3/i);
   });
 

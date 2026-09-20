@@ -413,12 +413,13 @@ test("Final Predict uses multi-provider Layer 2A clearance plus a live Layer 3 U
     metadata: { url: "https://chatgpt.com/" },
   }, { requestId: "req_l2a_l3_safe_target" });
 
-  assert.equal(result.finalPredict.securityClassification, "NO_KNOWN_THREAT");
-  assert.equal(result.finalPredict.recommendedAction, "ALLOW_WITH_CAUTION");
+  assert.equal(result.finalPredict.securityClassification, "SAFE");
+  assert.equal(result.finalPredict.recommendedAction, "ALLOW");
   assert.equal(result.finalPredict.securityEvidenceStatus, "L2_REPUTATION_L3_LIVE");
   assert.equal(result.finalPredict.securityRisk, "LOW");
   assert.equal(result.finalPredict.validatedSecuritySourceCount, 1);
-  assert.equal(result.finalDecision.security, "NO_KNOWN_THREAT");
+  assert.equal(result.finalDecision.security, "SAFE");
+  assert.equal(result.finalDecision.action, "ALLOW");
 });
 
 test("Final Predict lets validated Gemini evidence refine an unresolved truth status only when Layer 3 is sufficient", async () => {

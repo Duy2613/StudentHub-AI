@@ -216,6 +216,7 @@ function decisionLabel(decision) {
     SUPPORTED: "Có cơ sở hỗ trợ · Không đồng nghĩa an toàn",
     INSUFFICIENT_EVIDENCE: "Chưa đủ bằng chứng",
     UNKNOWN: "Chưa thể kết luận",
+    SAFE: "An toàn · Đã xác minh target",
     NO_KNOWN_THREAT: "Chưa thấy mối đe dọa đã biết",
     NOT_APPLICABLE: "Không áp dụng",
   };

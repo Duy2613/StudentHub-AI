@@ -283,6 +283,7 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
     const validatedReputationSafeTarget = reputationClearance &&
       liveExternalTarget &&
       !hasUnresolvedConflict(safeGraph, reconciliation) &&
+      ![TRUTH_STATUS.CONTRADICTED, TRUTH_STATUS.MIXED].includes(truthStatus) &&
       !hasStrongSecurityNegative(safeGraph, baseRiskAssessment);
     const riskAssessment = validatedReputationSafeTarget && baseRiskAssessment.level === SECURITY_RISK_LEVEL.MEDIUM
       ? {
@@ -320,11 +321,12 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
     } else if (validatedReputationSafeTarget) {
       // A no-match alone is intentionally not a safety proof. This branch is
       // narrower: every trusted reputation provider cleared the target and L3
-      // independently fetched the URL with live provenance. It clears only
-      // soft local suspicion; hard negatives remain above this branch.
-      securityClassification = SECURITY_CLASSIFICATION.NO_KNOWN_THREAT;
-      enforcement = RECOMMENDED_ACTION.ALLOW_WITH_CAUTION;
-      policyPrecedence.push("L2A_ALL_PROVIDERS_SAFE_PLUS_L3_LIVE_TARGET", "ALLOW_WITH_CAUTION");
+      // independently fetched the URL with live provenance. Only that
+      // evidence-gated target may receive the explicit SAFE/ALLOW result;
+      // hard negatives remain above this branch.
+      securityClassification = SECURITY_CLASSIFICATION.SAFE;
+      enforcement = RECOMMENDED_ACTION.ALLOW_VERIFIED;
+      policyPrecedence.push("L2A_ALL_PROVIDERS_SAFE_PLUS_L3_LIVE_TARGET", "SAFE", "ALLOW");
     } else if (localSuspicion) {
       securityClassification = SECURITY_CLASSIFICATION.SUSPICIOUS;
       enforcement = threatLookupFailed ? RECOMMENDED_ACTION.REVIEW : RECOMMENDED_ACTION.WARN;

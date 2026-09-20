@@ -338,6 +338,7 @@ function legacyLayer4(layer4, layer3, layer2, finalPredict) {
     : truthStatus === "SUPPORTED" ? "TRUE"
       : truthStatus === "CONTRADICTED" ? "FAKE"
         : security === "MALICIOUS" ? "DANGEROUS"
+          : security === "SAFE" ? "SAFE"
           : security === "SUSPICIOUS" || security === "HIGH" ? "SUSPICIOUS" : "UNKNOWN";
   const policyConfidence = numberOrNull(value.decisionConfidence, predict.decisionConfidence, predict.confidence);
   const forensicConfidence = numberOrNull(media?.aiGeneration?.providerScore, media?.aiGeneration?.calibratedConfidence);

@@ -89,7 +89,7 @@ export const STAGE_FINDINGS = Object.freeze({
     "UNKNOWN_STUDENT_RISK",
   ]),
   l3: Object.freeze(["SUPPORTED", "CONTRADICTED", "MIXED", "INSUFFICIENT", "STALE", "UNAVAILABLE"]),
-  l4: Object.freeze(["MALICIOUS", "SUSPICIOUS", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE"]),
+  l4: Object.freeze(["MALICIOUS", "SUSPICIOUS", "SAFE", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE"]),
   l5: Object.freeze([
     "ASSURANCE_PASS",
     "REVIEW_REQUIRED",

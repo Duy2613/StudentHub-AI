@@ -283,11 +283,11 @@ export class AdversarialAssuranceAuditor {
 
 function normalizeL4Decision(l4 = {}) {
   const value = asObject(l4);
-  const securityClassification = ["MALICIOUS", "SUSPICIOUS", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE"].includes(value.securityClassification)
+  const securityClassification = ["MALICIOUS", "SUSPICIOUS", "SAFE", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE"].includes(value.securityClassification)
     ? value.securityClassification
     : "UNKNOWN";
   const truthStatus = bounded(value.truthStatus, 80).toUpperCase() || "INSUFFICIENT_EVIDENCE";
-  const enforcement = ["BLOCK", "WARN", "ALLOW_WITH_CAUTION", "REVIEW"].includes(value.enforcement || value.recommendedAction)
+  const enforcement = ["BLOCK", "WARN", "ALLOW", "ALLOW_WITH_CAUTION", "REVIEW"].includes(value.enforcement || value.recommendedAction)
     ? (value.enforcement || value.recommendedAction)
     : "REVIEW";
   return { ...value, securityClassification, truthStatus, enforcement };
@@ -299,7 +299,7 @@ export function applyAssuranceDowngrade(l4Input, assurance) {
   // evidence gap. It may only make the presentation more cautious; it must
   // never leave an ALLOW_WITH_CAUTION path looking fully cleared.
   const nonPass = assurance?.status !== "ASSURANCE_PASS" || NON_PASS_ASSURANCE.has(assurance?.status);
-  const enforcement = nonPass && l4.enforcement === "ALLOW_WITH_CAUTION" ? "REVIEW" : l4.enforcement;
+  const enforcement = nonPass && ["ALLOW", "ALLOW_WITH_CAUTION"].includes(l4.enforcement) ? "REVIEW" : l4.enforcement;
   const truthPresentation = nonPass && l4.truthStatus === "SUPPORTED" ? "NEEDS_RECHECK" : l4.truthStatus;
   return {
     security: l4.securityClassification,
@@ -330,5 +330,6 @@ export function isAssuranceDowngradeOnly(l4Input, finalDecision) {
   if (l4.enforcement === "BLOCK" && finalValue.presentedEnforcement !== "BLOCK") return false;
   if (l4.enforcement === "REVIEW" && finalValue.presentedEnforcement !== "REVIEW") return false;
   if (l4.enforcement === "ALLOW_WITH_CAUTION" && !["ALLOW_WITH_CAUTION", "REVIEW"].includes(finalValue.presentedEnforcement)) return false;
+  if (l4.enforcement === "ALLOW" && !["ALLOW", "REVIEW"].includes(finalValue.presentedEnforcement)) return false;
   return true;
 }

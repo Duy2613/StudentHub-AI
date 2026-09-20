@@ -79,7 +79,7 @@ function legacyToV5(payload: Record<string, unknown>): TrustV5Response {
     l1: legacyStage("l1", layer1, layer1Finding, "Layer 1 compatibility result.", "l2"),
     l2: legacyStage("l2", layer2, typeof layer2?.finding === "string" ? layer2.finding : "UNKNOWN", "Layer 2 compatibility result.", "l3"),
     l3: legacyStage("l3", layer3, l3Finding, "Layer 3 compatibility result.", "l4"),
-    l4: legacyStage("l4", layer4, ["MALICIOUS", "SUSPICIOUS", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE"].includes(security) ? security : "UNKNOWN", "Layer 4 compatibility result.", null),
+    l4: legacyStage("l4", layer4, ["MALICIOUS", "SUSPICIOUS", "SAFE", "NO_KNOWN_THREAT", "UNKNOWN", "NOT_APPLICABLE"].includes(security) ? security : "UNKNOWN", "Layer 4 compatibility result.", null),
   };
   for (const stage of Object.values(stages)) stage.requestId = requestId;
   const pipeline = {

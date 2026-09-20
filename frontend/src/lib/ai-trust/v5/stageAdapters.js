@@ -440,8 +440,8 @@ export function stageFromL4(raw, requestId, timing = {}) {
       ...(legacyIntegration ? [signal("LEGACY_SYNTHESIS_STATUS", legacyIntegration.status || "UNKNOWN", "legacy_verification_layer4", legacyIntegration.status === "UNAVAILABLE" ? "HIGH" : "INFO")] : []),
     ],
     evidenceRefs: safeArray(raw?.evidenceRefs).filter((item) => typeof item === "string").slice(0, 40),
-    meaning: hardNegative ? "L4 là authoritative policy boundary; hard negative giữ MALICIOUS/BLOCK." : "L4 tách riêng security, truth và action; UNKNOWN/thiếu evidence phải REVIEW.",
-    userAction: action === "BLOCK" ? "Dừng hành động và không tương tác với target." : action === "REVIEW" ? "Tạm dừng và xác minh qua nguồn độc lập." : "Chỉ tiếp tục với caution, không coi là proven safe.",
+    meaning: hardNegative ? "L4 là authoritative policy boundary; hard negative giữ MALICIOUS/BLOCK." : finding === "SAFE" ? "L4 cấp SAFE chỉ khi target có clearance reputation đa provider và live provenance từ Layer 3." : "L4 tách riêng security, truth và action; UNKNOWN/thiếu evidence phải REVIEW.",
+    userAction: action === "BLOCK" ? "Dừng hành động và không tương tác với target." : action === "REVIEW" ? "Tạm dừng và xác minh qua nguồn độc lập." : finding === "SAFE" ? "Có thể tiếp tục với target đã được xác minh; vẫn giữ phạm vi an toàn của evidence." : "Chỉ tiếp tục với caution, không coi là proven safe.",
     safeToContinue: true,
     aiVerification,
     providers: aiVerification?.provider ? [{

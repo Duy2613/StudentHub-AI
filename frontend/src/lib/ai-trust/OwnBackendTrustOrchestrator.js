@@ -617,15 +617,17 @@ function finalPredict({ layer1, layer2, layer2A, layer3, layer4 }) {
     : null;
   const layer4HardNegative = layer4Security === "MALICIOUS" || layer4Action === "BLOCK";
   const layer4PolicyAllows = !layer4HardNegative &&
-    layer4Security === "NO_KNOWN_THREAT" &&
+    ["SAFE", "NO_KNOWN_THREAT"].includes(layer4Security) &&
     ["ALLOW", "ALLOW_WITH_CAUTION"].includes(layer4Action);
   const l2ReputationClearance = hasFinalReputationClearance(layer2A);
   const l3LiveExternalTarget = hasFinalLiveExternalTarget(layer3);
+  const truthConflict = ["CONTRADICTED", "MIXED"].includes(statusText(layer4?.truthStatus, layer4?.truthAssessment?.status));
   const reputationAndLiveSafeTarget = !l1Blocked &&
     !l2Threat &&
     !layer4HardNegative &&
     l2ReputationClearance &&
     l3LiveExternalTarget &&
+    !truthConflict &&
     !hasFinalStrongSecurityNegative(layer1, layer2, layer4);
   // Final Predict consumes the complete L4 package. A validated Gemini
   // citation can resolve an otherwise unresolved safe-target check, but it
@@ -649,7 +651,9 @@ function finalPredict({ layer1, layer2, layer2A, layer3, layer4 }) {
     ["UNKNOWN", "INSUFFICIENT_EVIDENCE"].includes(deterministicTruthStatus) && Boolean(geminiTruthSignal);
   const securityClassification = l1Blocked || l2Threat
     ? "MALICIOUS"
-    : geminiBackedSafeTarget || reputationAndLiveSafeTarget
+    : reputationAndLiveSafeTarget
+      ? "SAFE"
+      : geminiBackedSafeTarget
       ? "NO_KNOWN_THREAT"
       : layer4Security;
   const securityRisk = l1Blocked || l2Threat
@@ -665,7 +669,7 @@ function finalPredict({ layer1, layer2, layer2A, layer3, layer4 }) {
   const recommendedAction = l1Blocked || l2Threat
     ? "BLOCK"
     : securityDecisionBacked
-      ? (layer4PolicyAllows && !reputationAndLiveSafeTarget ? layer4Action : "ALLOW_WITH_CAUTION")
+      ? (reputationAndLiveSafeTarget ? "ALLOW" : layer4PolicyAllows ? layer4Action : "ALLOW_WITH_CAUTION")
       : insufficientEvidence
       ? "REVIEW"
       : layer4Action;
