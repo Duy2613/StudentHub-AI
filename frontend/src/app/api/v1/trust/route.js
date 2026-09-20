@@ -20,6 +20,32 @@ export const maxDuration = 120;
 const INPUT_TYPES = new Set(["text", "url", "image", "file"]);
 const ACCEPTED_INPUT_TYPES = new Set([...INPUT_TYPES, "qr"]);
 const MAX_CONTENT_CHARS = 500_000;
+// An 8 MB validated image becomes roughly 11 MB as base64 JSON. The media
+// artifact service still enforces the real binary/decompression boundaries.
+const MAX_BODY_BYTES = 12 * 1024 * 1024;
+
+function persistenceEnvelope(principal, persistence = {}, errorCode = null) {
+  const persisted = persistence?.persisted === true;
+  const status = persisted
+    ? "PERSISTED"
+    : principal?.isAuthenticated
+      ? "UNAVAILABLE"
+      : "EPHEMERAL";
+
+  return {
+    persisted,
+    idempotent: persistence?.idempotent === true,
+    status,
+    ...(errorCode ? { errorCode: String(errorCode).slice(0, 120) } : {}),
+  };
+}
+
+function deliveredPipelineResult(result, persistence) {
+  // A generated verificationId is useful for internal diagnostics, but an
+  // authenticated run without a durable commit must never be presented as a
+  // durable case that can be reopened or joined to other pillars.
+  return persistence.persisted ? result : { ...result, caseId: null };
+}
 
 function safeMetadata(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
@@ -27,11 +53,20 @@ function safeMetadata(value) {
   return Object.fromEntries(allowed.filter((key) => Object.hasOwn(value, key)).map((key) => {
     const item = value[key];
     if (key === "bytes") {
-      if (typeof item === "string") return [key, item.slice(0, 10_000_000)];
-      if (Buffer.isBuffer(item) || item instanceof Uint8Array || Array.isArray(item)) return [key, item];
+      // Keep the complete data URL/base64 payload for server-side image
+      // validation. MediaArtifactService remains the authoritative 8 MB
+      // binary/decompression safety boundary.
+      if (typeof item === "string") return [key, item];
+      if (Buffer.isBuffer(item) || item instanceof Uint8Array) return [key, item];
+      if (Array.isArray(item) && item.length <= 8 * 1024 * 1024 && item.every((byte) => Number.isInteger(byte) && byte >= 0 && byte <= 255)) {
+        return [key, Uint8Array.from(item)];
+      }
       return [key, null];
     }
-    if (typeof item === "string") return [key, item.slice(0, 32_000)];
+    if (typeof item === "string") {
+      const textLimit = ["ocrText", "qrContent", "qrPayload"].includes(key) ? MAX_CONTENT_CHARS : 2_048;
+      return [key, item.slice(0, textLimit)];
+    }
     if (typeof item === "number" && Number.isFinite(item)) return [key, item];
     return [key, null];
   }).filter(([, item]) => item !== null));
@@ -123,6 +158,7 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
       }).then(async (result) => {
         result.caseId = canonicalCaseId;
         let persistence = { persisted: false, caseId: null };
+        let persistenceErrorCode = null;
         if (principal?.isAuthenticated) {
           try {
             persistence = await TrustPersistenceService.recordTrustExecution({
@@ -133,29 +169,30 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
               idempotencyKey,
             });
           } catch (error) {
+            if (error.code === "TRUST_IDEMPOTENCY_CONFLICT") {
+              console.error("[TrustPersistence] Stream idempotency conflict:", error.message);
+              send({ type: "error", event: "TRUST_PERSISTENCE_FAILED", error: { code: error.code, message: "Idempotency-Key đã được dùng cho input khác." } });
+              close();
+              return;
+            }
+            persistenceErrorCode = "TRUST_PERSISTENCE_UNAVAILABLE";
             console.error("[TrustPersistence] Stream terminal commit failed:", error.message);
-            send({ type: "error", event: "TRUST_PERSISTENCE_FAILED", error: { code: error.code === "TRUST_IDEMPOTENCY_CONFLICT" ? error.code : "TRUST_PERSISTENCE_UNAVAILABLE", message: error.code === "TRUST_IDEMPOTENCY_CONFLICT" ? "Idempotency-Key đã được dùng cho input khác." : "Trust result could not be committed." } });
-            close();
-            return;
           }
-          if (!persistence.persisted) {
-            send({ type: "error", event: "TRUST_PERSISTENCE_FAILED", error: { code: "TRUST_PERSISTENCE_UNAVAILABLE", message: "Trust result could not be committed." } });
-            close();
-            return;
-          }
+          if (!persistence.persisted) persistenceErrorCode ||= "TRUST_PERSISTENCE_UNAVAILABLE";
         }
-         send({
-           type: "complete",
-           event: "PIPELINE_COMPLETED",
+        const persistenceState = persistenceEnvelope(principal, persistence, persistenceErrorCode);
+        send({
+          type: "complete",
+          event: "PIPELINE_COMPLETED",
            eventType: "pipeline_completed",
-           contractVersion: TRUST_RICH_RESPONSE_CONTRACT_VERSION,
-           stageId: "final_predict",
-           caseId: persistence.caseId || result.verificationId || null,
-           caseRevision: persistence.caseRevision || null,
-           runId: persistence.runId || null,
-           persistence: { persisted: Boolean(persistence.persisted), idempotent: Boolean(persistence.idempotent) },
-           data: result,
-         });
+          contractVersion: TRUST_RICH_RESPONSE_CONTRACT_VERSION,
+          stageId: "final_predict",
+          caseId: persistenceState.persisted ? persistence.caseId || result.verificationId || null : null,
+          caseRevision: persistenceState.persisted ? persistence.caseRevision || null : null,
+          runId: persistenceState.persisted ? persistence.runId || null : null,
+          persistence: persistenceState,
+          data: deliveredPipelineResult(result, persistenceState),
+        });
         close();
       }).catch((error) => {
         if (!(error instanceof TrustPipelineCancelledError)) {
@@ -278,6 +315,7 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
     });
     pipeline.caseId = canonicalCaseId;
     let persistence = { persisted: false, caseId: null };
+    let persistenceErrorCode = null;
     if (principal?.isAuthenticated) {
       try {
         persistence = await TrustPersistenceService.recordTrustExecution({
@@ -288,17 +326,17 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
           idempotencyKey: idempotency.value,
         });
       } catch (error) {
+        if (error.code === "TRUST_IDEMPOTENCY_CONFLICT") {
+          console.error("[TrustPersistence] Idempotency conflict:", error.message);
+          return NextResponse.json({ success: false, error: { code: error.code, userMessage: "Idempotency-Key đã được dùng cho input khác." } }, { status: 409 });
+        }
+        persistenceErrorCode = "TRUST_PERSISTENCE_UNAVAILABLE";
         console.error("[TrustPersistence] Terminal commit failed:", error.message);
-        const status = error.code === "TRUST_IDEMPOTENCY_CONFLICT" ? 409 : 503;
-        const code = error.code === "TRUST_IDEMPOTENCY_CONFLICT" ? error.code : "TRUST_PERSISTENCE_UNAVAILABLE";
-        const userMessage = error.code === "TRUST_IDEMPOTENCY_CONFLICT" ? "Idempotency-Key đã được dùng cho input khác." : "Kết quả Trust chưa thể ghi nhận bền vững. Vui lòng thử lại.";
-        return NextResponse.json({ success: false, error: { code, userMessage } }, { status });
       }
-      if (!persistence.persisted) {
-        return NextResponse.json({ success: false, error: { code: "TRUST_PERSISTENCE_UNAVAILABLE", userMessage: "Kết quả Trust chưa thể ghi nhận bền vững. Vui lòng thử lại." } }, { status: 503 });
-      }
+      if (!persistence.persisted) persistenceErrorCode ||= "TRUST_PERSISTENCE_UNAVAILABLE";
     }
-    const caseId = persistence.caseId || pipeline.verificationId || null;
+    const persistenceState = persistenceEnvelope(principal, persistence, persistenceErrorCode);
+    const caseId = persistenceState.persisted ? persistence.caseId || pipeline.verificationId || null : null;
 
     return NextResponse.json({
       success: true,
@@ -307,10 +345,10 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
       caseId,
       caseRevision: persistence.caseRevision || null,
       runId: persistence.runId || null,
-      persistence: { persisted: Boolean(persistence.persisted), idempotent: Boolean(persistence.idempotent) },
+      persistence: persistenceState,
       version: "v5",
       demo: false,
-      data: pipeline,
+      data: deliveredPipelineResult(pipeline, persistenceState),
     }, {
       status: 200,
       headers: {
@@ -372,5 +410,5 @@ export const POST = SecurityFabric.wrapHandler({
   action: "RUN_CANONICAL_TRUST_PIPELINE",
   allowAnonymous: true,
   maxRequests: 20,
-  maxBodyBytes: 512 * 1024,
+  maxBodyBytes: MAX_BODY_BYTES,
 }, runCanonicalTrust);

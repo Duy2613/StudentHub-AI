@@ -138,7 +138,7 @@ export async function validateGeminiCitationList(citations, {
   const rejected = [];
   const seen = new Set();
 
-  for (const item of Array.isArray(citations) ? citations.slice(0, 20) : []) {
+  for (const item of Array.isArray(citations) ? citations : []) {
     const inputUrl = realHttpUrl(item?.url);
     if (!inputUrl || seen.has(inputUrl)) continue;
     seen.add(inputUrl);
@@ -186,4 +186,3 @@ export async function validateGeminiCitationList(citations, {
     allLinksValidated: rejected.length === 0,
   };
 }
-

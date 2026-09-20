@@ -195,12 +195,11 @@ function buildEvidenceRecords(layers, canonical) {
       observedAt: safeFactValue(item.observedAt),
       provenance: safeFactValue(asRecord(item.provenance).label || item.publisher),
     };
-  }).filter(Boolean).slice(0, 50);
+  }).filter(Boolean);
   if (records.length) return records;
   return (Array.isArray(layer3.evidenceRefs) ? layer3.evidenceRefs : [])
     .map((reference) => safeFactValue(reference))
     .filter(Boolean)
-    .slice(0, 50)
     .map((reference) => ({ source: reference, summary: "Evidence reference được stage công bố; nội dung chi tiết chưa có.", sourceType: "LIVE_PROVIDER", observedAt: null, provenance: null }));
 }
 
@@ -256,7 +255,7 @@ function buildConstellationSources(layers, canonical) {
       snippet: safeFactValue(item.snippet || item.summary || item.description),
       contentHash: safeFactValue(item.contentHash || item.sha256),
     };
-  }).filter(Boolean).filter((source, index, list) => list.findIndex((item) => item.id === source.id) === index).slice(0, 12);
+  }).filter(Boolean).filter((source, index, list) => list.findIndex((item) => item.id === source.id) === index);
 }
 
 function buildUnresolvedSignals(layers, canonical, envelope) {
@@ -564,6 +563,8 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
     };
 
     let extracted = content.trim();
+    let extractedOcrText = "";
+    let extractedQrPayload = "";
     try {
       const demoCase = demoEnabled ? COMPETITION_DEMO_CASES.find((item) => item.id === demoCaseId) : null;
       if (demoCase) {
@@ -582,7 +583,9 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
         const { OcrService } = await import("@/lib/ai-trust/vision/OcrService");
         const result = await OcrService.extract(file);
         if (controller.signal.aborted || scanId !== scanSequence.current) return;
-        extracted = String(mode === "qr" ? result.qrContent || "" : result.text || result.qrContent || "").trim();
+        extractedOcrText = String(result.text || "").trim();
+        extractedQrPayload = String(result.qrContent || "").trim();
+        extracted = String(mode === "qr" ? extractedQrPayload : extractedOcrText || extractedQrPayload).trim();
         setOcr({ ...result, authority: "CLIENT_OCR_HINT" });
         if (!extracted) {
           if (mode === "qr") {
@@ -614,7 +617,8 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
               fileType: file?.type,
               mimeType: file?.type,
               bytes: preview,
-              ...(mode === "qr" ? { qrContent: extracted } : {}),
+              ...(extractedOcrText ? { ocrText: extractedOcrText } : {}),
+              ...(extractedQrPayload ? { qrContent: extractedQrPayload, qrPayload: extractedQrPayload } : {}),
             }
           : { inputKind: mode === "url" ? "URL" : "TEXT" },
         requestId: identity.requestId,
@@ -667,7 +671,7 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
       const resultLayers = displayPipeline?.layerResults || {};
       const layer1 = resultLayers.layer1 || null;
       const layer2A = resultLayers.layer2A || null;
-      const layer2 = resultLayers.layer2B || null;
+      const layer2 = resultLayers.layer2 || resultLayers.layer2B || null;
       const layer2C = resultLayers.layer2C || null;
       const layer3 = resultLayers.layer3 || null;
       const layer4 = resultLayers.layer4 || null;

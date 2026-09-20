@@ -372,9 +372,10 @@ function publicTemporalAssessment(value) {
   return publicRecord(value, ["allCurrent", "outdatedEvidenceCount", "unknownDateCount"]);
 }
 
-function publicEvidenceCollection(value, maxItems = 40) {
+function publicEvidenceCollection(value, maxItems = null) {
   if (!Array.isArray(value)) return [];
-  return value.slice(0, maxItems).map((item) => {
+  const entries = maxItems === null ? value : value.slice(0, maxItems);
+  return entries.map((item) => {
     if (typeof item === "string") return { details: publicText(item, 700) };
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
     return publicSources([item])[0] || publicRecord(item, ["evidenceId", "sourceId", "claimId", "relation", "status", "excerpt", "details"]);
@@ -436,7 +437,7 @@ function publicAiVerification(value) {
   const safeList = (items, max = 12) => Array.isArray(items)
     ? items.slice(0, max).map((item) => publicText(item, 700)).filter(Boolean)
     : [];
-  const citationsUsed = Array.isArray(value.citationsUsed) ? value.citationsUsed.slice(0, 20).map((item) => {
+  const citationsUsed = Array.isArray(value.citationsUsed) ? value.citationsUsed.map((item) => {
     const url = safeHttpUrl(item?.url);
     if (!item || typeof item !== "object" || Array.isArray(item) || !url) return null;
     const httpStatus = Number(item.httpStatus);
@@ -458,8 +459,8 @@ function publicAiVerification(value) {
     missingEvidence: safeList(value.missingEvidence),
     uncertainty: publicText(value.uncertainty, 700) || "Gemini uncertainty chưa được công bố.",
     citationsUsed,
-    supportingSourceIds: publicStringList(value.supportingSourceIds, 20, 180),
-    contradictingSourceIds: publicStringList(value.contradictingSourceIds, 20, 180),
+    supportingSourceIds: publicStringList(value.supportingSourceIds, null, 180),
+    contradictingSourceIds: publicStringList(value.contradictingSourceIds, null, 180),
     citationValidation: value.citationValidation && typeof value.citationValidation === "object" && !Array.isArray(value.citationValidation)
       ? {
         checkedCount: Number.isFinite(Number(value.citationValidation.checkedCount)) ? Math.max(0, Number(value.citationValidation.checkedCount)) : 0,
@@ -570,7 +571,9 @@ function publicMediaForensics(value) {
   if (provenance) provenance.warnings = publicStringList(value.provenance?.warnings, 12, 400);
   const ocr = publicRecord(value.ocr, ["status", "text", "available"]);
   if (ocr) {
-    ocr.text = publicText(value.ocr?.text, 12_000) || "";
+    // OCR is user-provided evidence. Keep the complete normalized text in the
+    // public contract; UI components may render a compact preview separately.
+    ocr.text = publicText(value.ocr?.text, 500_000) || "";
     if (ocr.available === undefined) ocr.available = Boolean(ocr.text);
     ocr.regions = Array.isArray(value.ocr?.regions) ? value.ocr.regions.slice(0, 40).map((region) => publicRecord(region, ["text", "confidence", "x", "y", "width", "height"])).filter(Boolean) : [];
     ocr.warnings = publicStringList(value.ocr?.warnings, 12, 400);
@@ -591,7 +594,7 @@ function publicMediaForensics(value) {
     ocr,
     metadataSignals: publicSignals(value.metadataSignals),
     forensicSignals: publicSignals(value.forensicSignals),
-    visibleUrls: Array.isArray(value.visibleUrls) ? value.visibleUrls.slice(0, 20).map((url) => safeHttpUrl(url)).filter(Boolean) : [],
+    visibleUrls: Array.isArray(value.visibleUrls) ? value.visibleUrls.map((url) => safeHttpUrl(url)).filter(Boolean) : [],
     quality: publicRecord(value.quality, ["width", "height", "byteSize", "isDegraded"]),
     advisory,
     providerAgreement: publicRecord(value.providerAgreement, ["status"]),
@@ -675,7 +678,7 @@ function publicVerificationTasks(value) {
 }
 
 function publicSources(value) {
-  return Array.isArray(value) ? value.slice(0, 40).map((item) => {
+  return Array.isArray(value) ? value.map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
     const output = publicRecord(item, [
       "evidenceId", "claimId", "sourceId", "sourceUrl", "url", "title", "sourceTitle", "publisher", "domain", "sourceType",
@@ -708,14 +711,14 @@ function publicConflicts(value) {
 }
 
 function publicProviders(value) {
-  return Array.isArray(value) ? value.slice(0, 20).map((item) => {
+  return Array.isArray(value) ? value.map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
     return publicRecord(item, ["provider", "providerId", "success", "verdict", "confidence", "message", "threatTypes", "status", "latencyMs", "reference", "finding", "errorCode", "executed", "observedAt"]);
   }).filter(Boolean) : [];
 }
 
 function publicProviderObservations(value) {
-  return Array.isArray(value) ? value.slice(0, 20).map((item) => {
+  return Array.isArray(value) ? value.map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
     const output = publicRecord(item, [
       "provider", "providerId", "status", "finding", "verdict", "success", "confidence", "message",
@@ -753,9 +756,9 @@ function publicRelatedCases(value) {
 }
 
 function publicStringList(value, maxItems = 40, maxLength = 240) {
-  return Array.isArray(value)
-    ? value.slice(0, maxItems).map((item) => publicText(item, maxLength)).filter(Boolean)
-    : [];
+  if (!Array.isArray(value)) return [];
+  const entries = maxItems === null ? value : value.slice(0, maxItems);
+  return entries.map((item) => publicText(item, maxLength)).filter(Boolean);
 }
 
 function publicAssurance(value) {
@@ -1209,7 +1212,7 @@ function publicFinalPredict(value) {
   output.uncertainties = publicStringList(value.uncertainties || value.remainingUncertainty, 20, 700);
   output.keySources = publicSources(value.keySources || value.sources);
   output.sources = publicSources(value.sources || value.keySources);
-  output.topEvidence = publicEvidenceCollection(value.topEvidence || value.keySources, 8);
+  output.topEvidence = publicEvidenceCollection(value.topEvidence || value.keySources);
   output.evidenceRefs = publicStringList(value.evidenceRefs, 40, 240);
   output.traceability = Array.isArray(value.traceability)
     ? value.traceability.slice(0, 24).map((item) => publicRecord(item, ["source", "stage", "field", "reason", "value"])).filter(Boolean)

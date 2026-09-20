@@ -53,7 +53,7 @@ export class WebSearchRetriever extends IEvidenceRetriever {
     // told through source provenance that it is not live external evidence.
     throwIfAborted(options?.signal);
     this.lastSearchStatus = EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY;
-    return this.kbRetriever.search(Array.isArray(queries) ? queries.slice(0, 240) : [], options);
+    return this.kbRetriever.search(Array.isArray(queries) ? queries : [], options);
   }
 
   /**

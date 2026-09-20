@@ -403,8 +403,11 @@ export function createLayer3Result(input = {}) {
     sourceScope: boundedString(claim.sourceScope, 120) || "GENERAL_SOURCE",
     verificationTaskId: boundedString(claim.verificationTaskId, 160) || null,
   })) : [];
-  const safeSources = Array.isArray(sources) ? sources.slice(0, 80).filter((source) => source && typeof source === "object" && !Array.isArray(source)).map((source) => createSource(source)) : [];
-  const safeEvidence = Array.isArray(evidence) ? evidence.slice(0, 160).filter((item) => item && typeof item === "object" && !Array.isArray(item)).map((item) => createEvidence(item)) : [];
+  // Source and evidence collections are intentionally lossless at this
+  // boundary. The caller may return every Tavily/Gemini URL; only individual
+  // field sizes and URL safety are normalized by createSource/createEvidence.
+  const safeSources = Array.isArray(sources) ? sources.filter((source) => source && typeof source === "object" && !Array.isArray(source)).map((source) => createSource(source)) : [];
+  const safeEvidence = Array.isArray(evidence) ? evidence.filter((item) => item && typeof item === "object" && !Array.isArray(item)).map((item) => createEvidence(item)) : [];
   const safeConflicts = Array.isArray(conflicts) ? conflicts.slice(0, 80).filter((conflict) => conflict && typeof conflict === "object" && !Array.isArray(conflict)).map(normalizeConflict) : [];
   const safeVerificationTasks = Array.isArray(verificationTasks)
     ? verificationTasks.slice(0, 80).map(normalizeVerificationTask).filter(Boolean)

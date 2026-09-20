@@ -209,8 +209,7 @@ function rawEvidence({ layers, canonicalResult, pipeline }) {
       };
     })
     .filter(Boolean)
-    .filter((source, index, all) => all.findIndex((item) => item.id === source.id || (item.url && item.url === source.url)) === index)
-    .slice(0, 30);
+    .filter((source, index, all) => all.findIndex((item) => item.id === source.id || (item.url && item.url === source.url)) === index);
 }
 
 function sourceRelationship(source) {
@@ -428,7 +427,7 @@ export function normalizeMasterUltraRun({
     provider: firstText(value.provider, value.providerId, value.sourceOrigin),
     verdict: firstText(value.rawVerdict, value.verdict, value.status),
     reasoning: firstText(value.reason, value.rationale, value.summary),
-    sources: list(value.sources).slice(0, 8),
+    sources: list(value.sources),
     status: text(value.status || value.providerStatus, "OBSERVED").toUpperCase(),
   }));
   const decisionTwin = canonical.decisionTwin || pipeline?.decisionTwin || decision.decisionTwin || null;
@@ -535,8 +534,8 @@ export function normalizeMasterUltraRun({
       sourceQuality: firstText(canonical.metrics?.sourceQuality, layers.layer4?.sourceQuality) || "0.92",
       evidenceSufficiency: layers.layer4?.evidenceSufficiency || "HIGH",
       reasoningSummary: layers.layer4?.summary || stages.l4?.summary || "AI đối chiếu bằng chứng cho thấy nguồn độc lập xác nhận thông tin.",
-      citationsUsed: sources.filter((s) => s.url).slice(0, 6),
-      evidenceSources: sources.slice(0, 8),
+      citationsUsed: sources.filter((s) => s.url),
+      evidenceSources: sources,
       supportingCount: buckets.supporting.length,
       contradictingCount: buckets.contradicting.length,
       contextCount: buckets.context.length,
@@ -564,14 +563,17 @@ export function normalizeMasterUltraRun({
       ...layerSummary("l5", { layers, pipeline, presentation, processing }),
       decision,
       verdict: presentation?.finalDecisionLabel || firstText(decision.label, decision.truthStatus, decision.epistemicState, decision.security) || "SUPPORTED",
-      confidence: confidence || "85%",
-      evidenceSufficiency: evidenceSufficiency || "HIGH",
+      // Do not manufacture a confidence or evidence-sufficiency label when
+      // the canonical result did not disclose one. The Master Ultra surface
+      // must preserve that gap instead of presenting a demo-looking default.
+      confidence: confidence || null,
+      evidenceSufficiency: evidenceSufficiency || null,
       sourceAgreement: sourceAgreement || "HIGH",
       securityRisk: decision.security || "SAFE",
       claimReliability: decision.claimReliability || "HIGH",
       aiAdvisory: layers.layer4?.truthStatus || stages.l4?.rawMetadata?.truthStatus || "TRUE",
       reasons: presentation?.reasons || unique([decision.reasons, decision.rationale, layers.layer4?.userExplanation?.why], 3),
-      keyEvidence: sources.slice(0, 4),
+      keyEvidence: sources,
       decisionPolicy: "L5 Deterministic Authority",
       aiOverride: "NO",
       expertOverride: "NO",

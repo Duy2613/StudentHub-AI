@@ -14,11 +14,13 @@ import { SOURCE_TYPE, EVIDENCE_PROVIDER_STATUS } from "../types.js";
 import { validateRemoteUrlSync } from "../../../security/hardening/SafeRemoteUrl.js";
 
 const TAVILY_SEARCH_ENDPOINT = "https://api.tavily.com/search";
-const MAX_QUERY_CALLS = 4;
-const MAX_RESULTS_PER_QUERY = 5;
+// Tavily's public API accepts up to 20 results per request. We request that
+// provider maximum and deliberately do not impose another application-level
+// source/result cap after the response arrives.
+const MAX_RESULTS_PER_QUERY = 20;
 const MAX_RESPONSE_BYTES = 512 * 1024;
-const DEFAULT_SEARCH_BUDGET_MS = 8000;
-const MAX_SEARCH_BUDGET_MS = 8000;
+const DEFAULT_SEARCH_BUDGET_MS = 30_000;
+const MAX_SEARCH_BUDGET_MS = 120_000;
 const MAX_REQUEST_TIMEOUT_MS = 8000;
 const MIN_REQUEST_TIMEOUT_MS = 250;
 const MAX_TRANSIENT_RETRIES = 1;
@@ -26,6 +28,9 @@ const RETRY_BACKOFF_MIN_MS = 100;
 const RETRY_BACKOFF_MAX_MS = 250;
 const RETRYABLE_HTTP_STATUSES = new Set([502, 503, 504]);
 const MAX_REQUEST_TRACES = 12;
+// Run every generated query, but keep a bounded number of in-flight requests
+// so a long OCR/QR input cannot exhaust sockets or the Tavily rate budget.
+const SEARCH_CONCURRENCY = 8;
 
 function defaultEnv() {
   return typeof process !== "undefined" ? process.env : {};
@@ -351,7 +356,7 @@ export class TavilyRetriever extends IEvidenceRetriever {
         });
       }
       return {
-        results: payload.results.slice(0, MAX_RESULTS_PER_QUERY),
+        results: payload.results,
         httpStatus: responseStatus || 200,
         requestTrace: trace({
           httpStatus: responseStatus || 200,
@@ -413,8 +418,10 @@ export class TavilyRetriever extends IEvidenceRetriever {
     const boundedQueries = (Array.isArray(queries) ? queries : [])
       .map((item) => typeof item === "string" ? item : item?.query)
       .filter((item) => typeof item === "string" && item.trim())
-      .map((item) => item.normalize("NFKC").replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, 500))
-      .slice(0, MAX_QUERY_CALLS);
+      // Tavily recommends compact queries. This is a provider transport
+      // constraint, not a source-count limit: every generated query is kept
+      // and sent within the provider's accepted query size.
+      .map((item) => item.normalize("NFKC").replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, 380));
     const diagnostics = {
       provider: "tavily",
       envPresent: this.isConfigured(),
@@ -454,6 +461,7 @@ export class TavilyRetriever extends IEvidenceRetriever {
     const deadline = Date.now() + parentTimeoutMs;
     const sources = [];
     const seenUrls = new Set();
+    let searchBudgetExhausted = false;
     const recordTrace = (trace) => {
       if (!trace || typeof trace !== "object") return;
       diagnostics.requestTrace = [...diagnostics.requestTrace, { ...trace }].slice(-MAX_REQUEST_TRACES);
@@ -463,70 +471,100 @@ export class TavilyRetriever extends IEvidenceRetriever {
       diagnostics.lastTimeoutClassification = trace.classification && trace.classification !== "NONE" ? trace.classification : null;
     };
     try {
-      for (const [queryIndex, query] of boundedQueries.entries()) {
+      const runQuery = async ([queryIndex, query]) => {
         throwIfAborted(options.signal);
         diagnostics.queriesExecuted += 1;
         let response = null;
-        for (let attempt = 1; attempt <= MAX_TRANSIENT_RETRIES + 1; attempt += 1) {
-          const remainingMs = deadline - Date.now();
-          if (remainingMs < MIN_REQUEST_TIMEOUT_MS) {
-            // A completed Tavily response is still useful even when the
-            // bounded search budget cannot afford another query. Do not throw
-            // away accepted external candidates and silently fall back to the
-            // local corpus in that case.
-            if (sources.length > 0) break;
-            const error = createProviderErrorWithMetadata("TAVILY_LOCAL_TIMEOUT", EVIDENCE_PROVIDER_STATUS.TIMEOUT, null, {
-              timeoutClassification: "LOCAL_ADAPTER_TIMEOUT",
-              abortReason: "search-budget-exhausted",
-              retryable: false,
-              requestTrace: requestTrace({
-                startedAt: new Date().toISOString(),
-                startedClock: Date.now(),
+        try {
+          for (let attempt = 1; attempt <= MAX_TRANSIENT_RETRIES + 1; attempt += 1) {
+            const remainingMs = deadline - Date.now();
+            if (remainingMs < MIN_REQUEST_TIMEOUT_MS) {
+              const error = createProviderErrorWithMetadata("TAVILY_LOCAL_TIMEOUT", EVIDENCE_PROVIDER_STATUS.TIMEOUT, null, {
+                timeoutClassification: "LOCAL_ADAPTER_TIMEOUT",
                 abortReason: "search-budget-exhausted",
-                classification: "LOCAL_ADAPTER_TIMEOUT",
-                outcome: "NOT_ATTEMPTED",
+                retryable: false,
+                requestTrace: requestTrace({
+                  startedAt: new Date().toISOString(),
+                  startedClock: Date.now(),
+                  abortReason: "search-budget-exhausted",
+                  classification: "LOCAL_ADAPTER_TIMEOUT",
+                  outcome: "NOT_ATTEMPTED",
+                  timeoutMs: remainingMs,
+                  attempt,
+                }),
+              });
+              recordTrace(error.requestTrace);
+              return { queryIndex, budgetExhausted: true, error };
+            }
+            diagnostics.callCount += 1;
+            try {
+              response = await this.#searchOne(query, {
+                signal: options.signal,
                 timeoutMs: remainingMs,
                 attempt,
-              }),
-            });
-            recordTrace(error.requestTrace);
-            throw error;
-          }
-          diagnostics.callCount += 1;
-          try {
-            response = await this.#searchOne(query, {
-              signal: options.signal,
-              timeoutMs: remainingMs,
-              attempt,
-            });
-            recordTrace(response.requestTrace);
-            break;
-          } catch (error) {
-            recordTrace(error?.requestTrace);
-            diagnostics.lastErrorCode = boundedString(error?.code || error?.message, 120) || "TAVILY_SEARCH_FAILURE";
-            diagnostics.lastTimeoutClassification = error?.timeoutClassification || null;
-            diagnostics.lastAbortReason = error?.abortReason || null;
-            diagnostics.providerRetryable = isRetryableProviderError(error);
-            if (!isRetryableProviderError(error) || attempt > MAX_TRANSIENT_RETRIES) {
-              diagnostics.providerRetryExhausted = isRetryableProviderError(error);
-              throw error;
+              });
+              recordTrace(response.requestTrace);
+              break;
+            } catch (error) {
+              recordTrace(error?.requestTrace);
+              diagnostics.lastErrorCode = boundedString(error?.code || error?.message, 120) || "TAVILY_SEARCH_FAILURE";
+              diagnostics.lastTimeoutClassification = error?.timeoutClassification || null;
+              diagnostics.lastAbortReason = error?.abortReason || null;
+              diagnostics.providerRetryable = isRetryableProviderError(error);
+              if (!isRetryableProviderError(error) || attempt > MAX_TRANSIENT_RETRIES) {
+                diagnostics.providerRetryExhausted = isRetryableProviderError(error);
+                throw error;
+              }
+              const retryRemainingMs = deadline - Date.now();
+              const retryDelayMs = boundedRetryDelay(this.randomImpl);
+              if (retryRemainingMs < MIN_REQUEST_TIMEOUT_MS + retryDelayMs) {
+                diagnostics.providerRetryExhausted = true;
+                throw error;
+              }
+              diagnostics.retryCount += 1;
+              diagnostics.retryBackoffMs += retryDelayMs;
+              await this.sleepImpl(retryDelayMs);
+              throwIfAborted(options.signal);
             }
-            const retryRemainingMs = deadline - Date.now();
-            const retryDelayMs = boundedRetryDelay(this.randomImpl);
-            if (retryRemainingMs < MIN_REQUEST_TIMEOUT_MS + retryDelayMs) {
-              diagnostics.providerRetryExhausted = true;
-              throw error;
-            }
-            diagnostics.retryCount += 1;
-            diagnostics.retryBackoffMs += retryDelayMs;
-            await this.sleepImpl(retryDelayMs);
-            throwIfAborted(options.signal);
           }
+          if (!response) throw createProviderError("TAVILY_NO_RESPONSE", EVIDENCE_PROVIDER_STATUS.UNAVAILABLE);
+          return { queryIndex, response };
+        } catch (error) {
+          if (options.signal?.aborted || error?.name === "AbortError") throw error;
+          return { queryIndex, error };
         }
-        if (!response) throw createProviderError("TAVILY_NO_RESPONSE", EVIDENCE_PROVIDER_STATUS.UNAVAILABLE);
+      };
+
+      const queryEntries = Array.from(boundedQueries.entries());
+      const queryResults = [];
+      for (let offset = 0; offset < queryEntries.length; offset += SEARCH_CONCURRENCY) {
+        throwIfAborted(options.signal);
+        const batch = queryEntries.slice(offset, offset + SEARCH_CONCURRENCY);
+        queryResults.push(...await Promise.all(batch.map(runQuery)));
+      }
+
+      queryResults.sort((left, right) => left.queryIndex - right.queryIndex);
+      let firstQueryError = null;
+      let successfulResponseCount = 0;
+      let hadQueryFailure = false;
+      for (const queryResult of queryResults) {
+        if (queryResult.budgetExhausted) {
+          searchBudgetExhausted = true;
+          hadQueryFailure = true;
+          firstQueryError ||= queryResult.error;
+          continue;
+        }
+        if (queryResult.error) {
+          hadQueryFailure = true;
+          firstQueryError ||= queryResult.error;
+          continue;
+        }
+        const response = queryResult.response;
+        if (!response) continue;
+        successfulResponseCount += 1;
         diagnostics.rawResultCount += response.results.length;
         for (const [resultIndex, result] of response.results.entries()) {
-          const candidate = sourceFromResult(result, queryIndex, resultIndex);
+          const candidate = sourceFromResult(result, queryResult.queryIndex, resultIndex);
           if (candidate.rejected) {
             recordRejection(diagnostics, candidate.rejected);
             continue;
@@ -542,14 +580,19 @@ export class TavilyRetriever extends IEvidenceRetriever {
         }
         diagnostics.acceptedHostCount = new Set(sources.map((source) => source.domain).filter(Boolean)).size;
       }
-      this.lastSearchStatus = EVIDENCE_PROVIDER_STATUS.SUCCESS;
+      if (successfulResponseCount === 0 && firstQueryError) throw firstQueryError;
+      this.lastSearchStatus = searchBudgetExhausted
+        ? EVIDENCE_PROVIDER_STATUS.TIMEOUT
+        : hadQueryFailure ? EVIDENCE_PROVIDER_STATUS.PARTIAL : EVIDENCE_PROVIDER_STATUS.SUCCESS;
       diagnostics.providerRetryable = null;
-      diagnostics.providerRetryExhausted = false;
-      diagnostics.lastErrorCode = null;
-      diagnostics.lastTimeoutClassification = null;
-      diagnostics.lastAbortReason = null;
+      diagnostics.providerRetryExhausted = hadQueryFailure ? diagnostics.providerRetryExhausted : false;
+      diagnostics.lastErrorCode = searchBudgetExhausted
+        ? "TAVILY_SEARCH_BUDGET_EXHAUSTED"
+        : hadQueryFailure ? boundedString(firstQueryError?.code || firstQueryError?.message, 120) || "TAVILY_PARTIAL_SEARCH" : null;
+      diagnostics.lastTimeoutClassification = searchBudgetExhausted ? "LOCAL_ADAPTER_TIMEOUT" : diagnostics.lastTimeoutClassification;
+      diagnostics.lastAbortReason = searchBudgetExhausted ? "search-budget-exhausted" : diagnostics.lastAbortReason;
       diagnostics.durationMs = Date.now() - startedAt;
-      return sources.slice(0, MAX_QUERY_CALLS * MAX_RESULTS_PER_QUERY);
+      return sources;
     } catch (error) {
       if (options.signal?.aborted || error?.name === "AbortError") throw error;
       this.lastSearchStatus = error?.providerStatus || EVIDENCE_PROVIDER_STATUS.UNAVAILABLE;

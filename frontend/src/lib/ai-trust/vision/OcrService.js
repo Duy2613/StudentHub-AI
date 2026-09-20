@@ -13,7 +13,7 @@ import { createWorker } from "tesseract.js";
 import jsQR from "jsqr";
 
 function uniqueMatches(text, pattern) {
-  return [...new Set(String(text || "").match(pattern) || [])].slice(0, 50);
+  return [...new Set(String(text || "").match(pattern) || [])];
 }
 
 function extractEntities(text, qrContent) {
@@ -23,7 +23,7 @@ function extractEntities(text, qrContent) {
     emails: uniqueMatches(normalizedText, /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi),
     bankAccounts: uniqueMatches(normalizedText, /\b\d{9,16}\b/g),
     phoneNumbers: uniqueMatches(normalizedText, /\b(?:0\d{9,10}|\+84\d{9,10})\b/g),
-    qrPayloads: qrContent ? [String(qrContent).slice(0, 4000)] : [],
+    qrPayloads: qrContent ? [String(qrContent)] : [],
   };
 }
 

@@ -651,6 +651,35 @@
   background: rgba(255, 255, 255, 0.025);
 }
 
+.compatibilityPanel {
+  min-width: 0;
+  margin-top: 1rem;
+  border: 1px solid rgba(100, 216, 255, 0.28);
+  border-radius: 0.9rem;
+  background: rgba(4, 12, 18, 0.9);
+  overflow: hidden;
+}
+
+.compatibilitySummary {
+  padding: 0.85rem 1rem;
+  color: var(--cyan);
+  cursor: pointer;
+  font: 600 0.68rem/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rawResponse {
+  max-height: 60rem;
+  margin: 0;
+  padding: 0 1rem 1rem;
+  overflow: auto;
+  color: #d8e9e7;
+  font: 0.68rem/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .subPanel h3 {
   margin: 0 0 0.6rem;
   color: var(--gold);

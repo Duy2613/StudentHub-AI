@@ -21,10 +21,13 @@ import {
 } from "../types.js";
 
 export const SEMANTIC_BOUNDARY_LIMITS = Object.freeze({
-  TEXT: 12_000,
-  OCR: 8_000,
-  QR: 4_096,
-  URL: 2_048,
+  // Preserve the complete normalized user payload through Layer 2.  The
+  // route/media artifact boundary already owns the request and binary safety
+  // budget; these limits prevent accidental provider-specific truncation.
+  TEXT: 500_000,
+  OCR: 500_000,
+  QR: 500_000,
+  URL: 4_096,
   SUMMARY: 800,
   DETAILS: 1_200,
   CLAIMS: 40,

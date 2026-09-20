@@ -249,11 +249,13 @@ export const trustInputTypeSchema = z.enum(TRUST_INPUT_TYPE_VALUES);
 
 export const trustInvestigationInputSchema = z.object({
   type: trustInputTypeSchema,
-  content: z.string().trim().min(1).max(200_000),
+  content: z.string().trim().min(1).max(500_000),
   metadata: z.object({
     inputKind: z.enum(["URL", "TEXT", "MESSAGE", "IMAGE", "SCREENSHOT", "QR"]).optional(),
     extractionAuthority: z.string().trim().min(1).max(80).optional(),
-    qrContent: z.string().trim().min(1).max(12_000).optional(),
+    ocrText: z.string().trim().min(1).max(500_000).optional(),
+    qrContent: z.string().trim().min(1).max(500_000).optional(),
+    qrPayload: z.string().trim().min(1).max(500_000).optional(),
     fileType: z.string().trim().min(1).max(80).optional(),
     mimeType: z.string().trim().min(1).max(80).optional(),
     bytes: z.string().optional(),

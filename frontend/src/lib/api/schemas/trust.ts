@@ -219,6 +219,14 @@ export const fourLayerTrustPipelineSchema = z.object({
   layerResults: z.object({ layer1: z.unknown().nullable(), layer2: z.unknown().nullable(), layer3: z.unknown().nullable(), layer4: z.unknown().nullable() }).passthrough().optional(),
 }).passthrough();
 
+const trustPersistenceStatusSchema = z.enum(["PERSISTED", "EPHEMERAL", "UNAVAILABLE"]);
+const trustPersistenceSchema = z.object({
+  persisted: z.boolean(),
+  idempotent: z.boolean(),
+  status: trustPersistenceStatusSchema.optional(),
+  errorCode: z.string().trim().min(1).max(120).optional(),
+}).passthrough();
+
 export const trustV5ResponseSchema = z.object({
   success: z.literal(true),
   contractVersion: z.literal("trust.v5"),
@@ -226,7 +234,7 @@ export const trustV5ResponseSchema = z.object({
   caseId: z.string().min(1).nullable().optional(),
   caseRevision: z.number().int().positive().nullable().optional(),
   runId: z.string().min(1).nullable().optional(),
-  persistence: z.object({ persisted: z.boolean(), idempotent: z.boolean() }).optional(),
+  persistence: trustPersistenceSchema.optional(),
   version: z.literal("v5"),
   demo: z.literal(false),
   data: z.union([fourLayerTrustPipelineSchema, trustV5PipelineSchema]),

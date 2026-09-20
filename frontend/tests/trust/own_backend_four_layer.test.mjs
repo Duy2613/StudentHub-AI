@@ -27,15 +27,18 @@ function servicesWithLiveEvidence(calls) {
         message: "No match in this fixture observation.",
       }],
     }),
-    l2b: async () => ({
-      status: "PASS",
-      classification: "BENIGN",
-      confidence: 0.8,
-      semanticSummary: "No material semantic signal in the fixture input.",
-      contextSignals: [],
-      claims: [],
-      entities: [],
-    }),
+    l2b: async (params) => {
+      calls.l2bOptions = params?.options || {};
+      return {
+        status: "PASS",
+        classification: "BENIGN",
+        confidence: 0.8,
+        semanticSummary: "No material semantic signal in the fixture input.",
+        contextSignals: [],
+        claims: [],
+        entities: [],
+      };
+    },
     l2c: async () => ({
       classification: "NO_MATERIAL_STUDENT_RISK",
       modelStatus: "BASELINE_RULE_MODEL",
@@ -127,6 +130,8 @@ test("own backend publishes exactly four stages and deterministic Final Predict"
   assert.equal(result.finalPredict.status, "READY");
   assert.equal(result.finalPredict.calls.finalPredict, 0);
   assert.equal(calls.l4, 1);
+  assert.equal(calls.l2bOptions.useAIGateway, true);
+  assert.equal(calls.l2bOptions.aiMode, "GEMINI_ONLY");
   assert.equal(result.finalPredict.independentSourceCount, 1);
   assert.equal(result.finalPredict.evidenceSufficiency, "SUFFICIENT");
   assert.ok(events.some((item) => item.event === "FINAL_PREDICT_READY"));

@@ -26,6 +26,7 @@ import {
   createEvidence,
   createSource,
   createLayer3Result,
+  CLAIM_EVIDENCE_RELATION,
   FRESHNESS_STATUS,
   SOURCE_TYPE,
   RETRIEVAL_ORIGIN,
@@ -40,9 +41,6 @@ import {
 } from "../v5/l2c/verificationPackage.js";
 
 const MAX_CLAIMS = 40;
-const MAX_CANDIDATES = 80;
-const MAX_QUERY_COUNT = 240;
-const MAX_RETRIEVED_SOURCES = 80;
 const MAX_TEXT_LENGTH = 1_000_000;
 const MAX_VERIFICATION_TASKS = 80;
 
@@ -197,17 +195,20 @@ function directInputCandidates(requestInput) {
   const inputType = String(source.type || "").toLowerCase();
   const metadata = source.metadata && typeof source.metadata === "object" ? source.metadata : {};
   const values = [
-    ...(inputType === "url" ? [source.content] : []),
+    source.content,
     metadata.url,
     source.url,
-    ...(inputType === "image" || inputType === "qr" ? [source.content, metadata.ocrText, metadata.qrContent, metadata.qrPayload, metadata.qrIntake?.normalizedValue] : []),
+    metadata.ocrText,
+    metadata.qrContent,
+    metadata.qrPayload,
+    metadata.qrIntake?.normalizedValue,
   ].filter((value) => typeof value === "string" && value.trim());
   const candidates = [];
-  for (const value of values.slice(0, 12)) {
+  for (const value of values) {
     const matches = inputType === "url" && /^https?:\/\//i.test(value.trim())
       ? [value.trim()]
       : (value.match(/https?:\/\/[^\s<>"'`]+/gi) || []);
-    for (const match of matches.slice(0, 8)) {
+    for (const match of matches) {
       const candidateUrl = match.replace(/[),.;!?\]}]+$/g, "");
       const guard = validateRemoteUrlSync(candidateUrl);
       if (!guard.ok) continue;
@@ -229,7 +230,7 @@ function directInputCandidates(requestInput) {
       });
     }
   }
-  return dedupeCandidates(candidates, { defaultOrigin: RETRIEVAL_ORIGIN.DIRECT_INPUT }).slice(0, 12);
+  return dedupeCandidates(candidates, { defaultOrigin: RETRIEVAL_ORIGIN.DIRECT_INPUT });
 }
 
 function dedupeCandidates(candidates, { defaultOrigin, supplemental = false } = {}) {
@@ -399,11 +400,13 @@ export class Layer3EvidenceService {
     const directInputSources = retrievalStage === "INITIAL"
       ? directInputCandidates(input.input || input)
       : [];
+    const submittedInput = input.input || input;
+    const inputContextText = QueryGenerator.getInputContextText(submittedInput);
 
     const rawCandidates = asArray(candidateSources).length > 0
       ? candidateSources
       : asArray(layer2Result?.verificationPackage?.candidateSources);
-    const targetCandidates = rawCandidates.map(safeCandidate).filter(Boolean).slice(0, MAX_CANDIDATES);
+    const targetCandidates = rawCandidates.map(safeCandidate).filter(Boolean);
 
     const allQueries = [];
     const taskQueryCounts = new Map();
@@ -413,6 +416,18 @@ export class Layer3EvidenceService {
         if (typeof query === "string" && query.trim()) allQueries.push(query.trim().slice(0, 500));
       }
     } else {
+      // Input-context discovery is intentionally first. It is independent of
+      // extracted claims and is not discarded when claims/tasks also exist.
+      // Tavily receives the complete generated query set; it may still stop
+      // on transport timeout or provider policy, but this layer does not
+      // silently drop queries before handing them to the retriever.
+      const inputQueries = QueryGenerator.generateInputQueries(submittedInput);
+      // Keep the two broad input queries first when extracted claims exist so
+      // the provider always sees claim-independent context before claim
+      // verification. The remaining input viewpoints/counter-context queries
+      // are appended below; none are discarded.
+      if (targetClaims.length > 0) allQueries.push(...inputQueries.slice(0, 2));
+      else allQueries.push(...inputQueries);
       for (const claim of targetClaims) {
         const claimQueries = QueryGenerator.generateQueries(claim, targetCandidates);
         allQueries.push(...claimQueries);
@@ -423,8 +438,9 @@ export class Layer3EvidenceService {
         taskQueryCounts.set(task.taskId, taskQueries.length);
         allQueries.push(...taskQueries);
       }
+      if (targetClaims.length > 0) allQueries.push(...inputQueries.slice(2));
     }
-    const boundedQueries = allQueries.slice(0, retrievalStage === "SUPPLEMENTAL" ? 2 : MAX_QUERY_COUNT);
+    const retrievalQueries = retrievalStage === "SUPPLEMENTAL" ? allQueries.slice(0, 2) : allQueries;
 
     let retrievedSources = [];
     let retrievalStatus = EVIDENCE_PROVIDER_STATUS.SUCCESS;
@@ -440,7 +456,7 @@ export class Layer3EvidenceService {
     try {
       throwIfAborted(safeOptions.signal);
       if (typeof retriever.search !== "function") throw new Error("RETRIEVER_SEARCH_UNAVAILABLE");
-      const searchResult = await retriever.search(boundedQueries, { requestId, signal: safeOptions.signal });
+      const searchResult = await retriever.search(retrievalQueries, { requestId, signal: safeOptions.signal });
       providerDiagnostics = safeRetrieverDiagnostics(retriever);
       throwIfAborted(safeOptions.signal);
       const searchedSources = asArray(searchResult).map((source) => ({
@@ -453,7 +469,7 @@ export class Layer3EvidenceService {
       retrievedSources = dedupeCandidates(
         retrievalStage === "SUPPLEMENTAL" ? [...previousSources, ...searchedSources] : [...directInputSources, ...searchedSources],
         { defaultOrigin: retrievalOrigin },
-      ).slice(0, MAX_RETRIEVED_SOURCES);
+      );
       if (Object.values(EVIDENCE_PROVIDER_STATUS).includes(retriever.lastSearchStatus) && retriever.lastSearchStatus !== EVIDENCE_PROVIDER_STATUS.SUCCESS) {
         retrievalStatus = retriever.lastSearchStatus;
       }
@@ -473,9 +489,9 @@ export class Layer3EvidenceService {
         try {
           const fallback = new KnowledgeBaseRetriever();
           fetchRetriever = fallback;
-          retrievedSources = dedupeCandidates([...directInputSources, ...asArray(await fallback.search(boundedQueries, { requestId, signal: safeOptions.signal }))], {
+          retrievedSources = dedupeCandidates([...directInputSources, ...asArray(await fallback.search(retrievalQueries, { requestId, signal: safeOptions.signal }))], {
             defaultOrigin: RETRIEVAL_ORIGIN.LOCAL_KNOWLEDGE,
-          }).slice(0, MAX_RETRIEVED_SOURCES);
+          });
         } catch (fallbackError) {
           if (safeOptions.signal?.aborted || fallbackError?.name === "AbortError") throw fallbackError;
           retrievedSources = retrievalStage === "SUPPLEMENTAL" ? previousSources : directInputSources;
@@ -545,7 +561,15 @@ export class Layer3EvidenceService {
         contentFingerprint,
         retrievalOutcome: fetchedSuccessfully ? "SUCCESS" : "FAILURE",
         retrievalOrigin: src.retrievalOrigin || retrievalOrigin,
-        sourceScope: src.sourceScope || "claim_specific",
+        sourceScope: targetClaims.length === 0 &&
+          src.retrievalOrigin !== RETRIEVAL_ORIGIN.DIRECT_INPUT &&
+          (!src.sourceScope || src.sourceScope === "claim_specific")
+          ? "input_context"
+          : src.sourceScope || (
+            src.retrievalOrigin === RETRIEVAL_ORIGIN.DIRECT_INPUT
+              ? "direct_input"
+              : "claim_specific"
+          ),
         httpStatus: fetchResult.status,
         requestedUrl: urlGuard.url,
         finalUrl: fetchResult.finalUrl || urlGuard.url,
@@ -594,6 +618,50 @@ export class Layer3EvidenceService {
           retrievalOrigin: sourceDto.retrievalOrigin,
         }));
       }
+
+      // A free-form input may be worth researching even when Layer 2 did not
+      // produce a factual claim. Store a clearly labelled contextual excerpt
+      // so Gemini can reason over it and the UI can show the source. It is not
+      // claim evidence and cannot make Layer 3/Final Predict verify anything.
+      if (inputContextText) {
+        const contextExcerpt = boundedString(
+          EvidenceExtractor.extractRelevantPassage(textContent, {
+            subject: inputContextText,
+            predicate: "",
+            rawText: inputContextText,
+            time: null,
+          }),
+          LAYER_3_CONFIG.LIMITS.MAX_EXCERPT_LENGTH,
+        );
+        if (contextExcerpt && contextExcerpt.length >= LAYER_3_CONFIG.LIMITS.MIN_EXCERPT_LENGTH) {
+          const temporal = TemporalEvaluator.evaluate({
+            publishedAt: fetchResult.publishedAt || src.publishedAt,
+            claim: { time: null },
+          });
+          evidenceItems.push(createEvidence({
+            claimId: null,
+            sourceId: sourceDto.sourceId,
+            sourceUrl: sourceDto.url,
+            sourceTitle: sourceDto.title,
+            excerpt: contextExcerpt,
+            relation: CLAIM_EVIDENCE_RELATION.CONTEXTUALIZES,
+            relevance: 0.35,
+            strength: 0.25,
+            publishedAt: fetchResult.publishedAt || src.publishedAt,
+            freshness: temporal.freshness,
+            authorityTier: authority.tier,
+            clusterId: sourceDto.clusterId,
+            sourceType: sourceDto.sourceType,
+            providerStatus: sourceDto.providerStatus,
+            liveEvidence: sourceDto.liveEvidence,
+            sourceFingerprint: sourceDto.sourceFingerprint,
+            contentFingerprint: sourceDto.contentFingerprint,
+            evidenceScope: "input_context",
+            retrievalOutcome: sourceDto.retrievalOutcome,
+            retrievalOrigin: sourceDto.retrievalOrigin,
+          }));
+        }
+      }
     }
 
     const independence = SourceIndependenceAnalyzer.analyzeIndependence(processedSources, evidenceItems);
@@ -622,8 +690,8 @@ export class Layer3EvidenceService {
 
     const limitations = [
       ...asArray(decision.limitations),
-      ...(directInputSourceCount > 0 && targetClaims.length === 0
-        ? ["URL đầu vào đã được fetch và lưu provenance; chưa có factual claim từ Layer 2 nên chưa tạo evidence claim-specific."]
+      ...(inputContextText && targetClaims.length === 0
+        ? ["Input đã được Tavily tìm kiếm tự do và có thể có contextual evidence; vì chưa có factual claim nên chưa tạo verdict claim-specific."]
         : []),
       ...(retrievalStatus === EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY || retrievalMode === "LOCAL_FALLBACK"
         ? ["Bằng chứng cục bộ/fallback không được coi là xác minh trực tiếp từ nguồn bên ngoài."]
@@ -640,7 +708,7 @@ export class Layer3EvidenceService {
         ? previousInitialPhase
         : {
           status: retrievalStatus,
-          queryCount: retrievalStage === "INITIAL" ? boundedQueries.length : 0,
+          queryCount: retrievalStage === "INITIAL" ? retrievalQueries.length : 0,
           sourceCount: sourceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_INITIAL),
           evidenceCount: evidenceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_INITIAL),
           validatedSourceCount: processedSources.filter((source) => source.retrievalOrigin === RETRIEVAL_ORIGIN.TAVILY_INITIAL && source.liveEvidence === true).length,
@@ -654,7 +722,7 @@ export class Layer3EvidenceService {
       supplementalSearch: retrievalStage === "SUPPLEMENTAL"
         ? {
           status: retrievalStatus === EVIDENCE_PROVIDER_STATUS.SUCCESS ? "COMPLETED" : retrievalStatus,
-          queryCount: boundedQueries.length,
+          queryCount: retrievalQueries.length,
           sourceCount: sourceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_AI_REQUESTED_SUPPLEMENT),
           evidenceCount: evidenceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_AI_REQUESTED_SUPPLEMENT),
           validatedSourceCount: processedSources.filter((source) => source.retrievalOrigin === RETRIEVAL_ORIGIN.TAVILY_AI_REQUESTED_SUPPLEMENT && source.liveEvidence === true).length,
@@ -674,7 +742,7 @@ export class Layer3EvidenceService {
         },
       finalValidatedEvidenceSet: {
         status: validatedSourceCount > 0 ? "COMPLETED" : "INSUFFICIENT",
-        queryCount: boundedQueries.length,
+        queryCount: retrievalQueries.length,
         sourceCount: processedSources.length,
         evidenceCount: evidenceItems.length,
         validatedSourceCount,
@@ -732,7 +800,7 @@ export class Layer3EvidenceService {
       auditEvents,
       metrics: {
         executionTimeMs: Number((nowMs() - startTime).toFixed(2)),
-        queriesExecutedCount: boundedQueries.length,
+        queriesExecutedCount: retrievalQueries.length,
         executionStatus: "COMPLETED",
         retrievalExecuted: true,
         retrievalProvider: retrieverId,

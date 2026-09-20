@@ -217,7 +217,7 @@ function sourceRecords(layer3) {
   const evidenceBySource = new Map(
     (Array.isArray(layer.evidence) ? layer.evidence : []).map((item) => [item?.sourceId || item?.sourceUrl || item?.url, item]),
   );
-  return sources.slice(0, 40).map((source, index) => {
+  return sources.map((source, index) => {
     const record = asRecord(source);
     const evidence = evidenceBySource.get(record.sourceId || record.sourceUrl || record.url) || {};
     return {
@@ -233,7 +233,7 @@ function sourceRecords(layer3) {
 
 function citationRecords(aiVerification) {
   const ai = asRecord(aiVerification);
-  return (Array.isArray(ai.citationsUsed) ? ai.citationsUsed : []).slice(0, 20).map((citation, index) => {
+  return (Array.isArray(ai.citationsUsed) ? ai.citationsUsed : []).map((citation, index) => {
     const record = asRecord(citation);
     const url = safeSourceUrl(record);
     if (!url) return null;
@@ -266,8 +266,8 @@ function mergeSourceRecords(...groups) {
 function providerRecords(layer2, fallbackProviders) {
   const layer = asRecord(layer2);
   const records = layer.providerObservations || layer.providers || layer.providerResults;
-  if (Array.isArray(records)) return records.slice(0, 20).map(asRecord);
-  return Array.isArray(fallbackProviders) ? fallbackProviders.slice(0, 20).map(asRecord) : [];
+  if (Array.isArray(records)) return records.map(asRecord);
+  return Array.isArray(fallbackProviders) ? fallbackProviders.map(asRecord) : [];
 }
 
 function inputModeLabel(mode) {
@@ -297,6 +297,22 @@ function DetailList({ title, items, empty = "Chưa có dữ liệu được côn
         </ul>
       ) : <div className={styles.empty}>{empty}</div>}
     </div>
+  );
+}
+
+function CompatibilityResponsePanel({ value }) {
+  if (!value || typeof value !== "object") return null;
+  let serialized = "";
+  try {
+    serialized = JSON.stringify(value, null, 2);
+  } catch {
+    serialized = "Không thể serialize compatibility response.";
+  }
+  return (
+    <details className={styles.compatibilityPanel} open data-testid="legacy-response-panel">
+      <summary className={styles.compatibilitySummary}>Backend-compatible response · full JSON</summary>
+      <pre className={styles.rawResponse}>{serialized}</pre>
+    </details>
   );
 }
 
@@ -435,7 +451,7 @@ function evidenceRecords(layer3) {
   const layer = asRecord(layer3);
   const sources = sourceRecords(layer);
   const sourceById = new Map(sources.map((source) => [source.sourceId || source.id, source]));
-  return (Array.isArray(layer.evidence) ? layer.evidence : []).slice(0, 80).map((item, index) => {
+  return (Array.isArray(layer.evidence) ? layer.evidence : []).map((item, index) => {
     const record = asRecord(item);
     const source = sourceById.get(record.sourceId) || {};
     return {
@@ -451,16 +467,17 @@ function evidenceRecords(layer3) {
 
 function EvidenceList({ layer3 }) {
   const values = evidenceRecords(layer3);
+  const hasContextualEvidence = values.some((item) => item.evidenceScope === "input_context");
   return (
     <div className={styles.subPanel}>
-      <h3>Claim-specific evidence</h3>
+      <h3>{hasContextualEvidence ? "Evidence & contextual references" : "Claim-specific evidence"}</h3>
       {values.length ? (
         <div className={styles.evidenceList}>
           {values.map((item) => <article className={styles.evidenceCard} key={item.id}>
             <div className={styles.recordHeader}><strong>{identity(item.relation, "RELATION UNKNOWN")}</strong><span className={styles.tag}>{item.liveEvidence ? "LIVE" : "NOT LIVE"}</span></div>
             <p>{identity(item.excerpt, "Excerpt chưa công bố")}</p>
             <small>{[
-              item.claimId,
+              item.evidenceScope === "input_context" ? "input context" : item.claimId,
               item.sourceId,
               item.freshness,
               item.authorityTier,
@@ -513,7 +530,7 @@ function AdvisoryPanel({ value, title = "Legacy advisory (separate provenance)" 
       </div>
       <p className={styles.evidenceExcerpt}>{identity(record.reason, "Advisory reason chưa công bố.")}</p>
       <TagRow items={[...(record.contradictoryEvidence || []), ...(record.unresolvedSignals || [])]} empty="Không có advisory contradiction/unresolved signal." />
-      {sources.length ? <div className={styles.sourceList}>{sources.slice(0, 20).map((source, index) => source.url ? <a className={styles.sourceCard} href={source.url} target="_blank" rel="noreferrer" key={source.id}><strong>{publicSourceTitle(source, index)}</strong><span>{source.url}</span><small>{[source.sourceScope, source.sourceType, publicRetrievalOrigin(source.sourceOrigin)].filter(Boolean).join(" · ") || "Legacy provenance metadata"}</small><ExternalLink size={13} aria-hidden="true" /></a> : <div className={styles.sourceCard} key={source.id}><strong>{publicSourceTitle(source, index)}</strong><small>URL chưa công bố</small></div>)}</div> : null}
+      {sources.length ? <div className={styles.sourceList}>{sources.map((source, index) => source.url ? <a className={styles.sourceCard} href={source.url} target="_blank" rel="noreferrer" key={source.id}><strong>{publicSourceTitle(source, index)}</strong><span>{source.url}</span><small>{[source.sourceScope, source.sourceType, publicRetrievalOrigin(source.sourceOrigin)].filter(Boolean).join(" · ") || "Legacy provenance metadata"}</small><ExternalLink size={13} aria-hidden="true" /></a> : <div className={styles.sourceCard} key={source.id}><strong>{publicSourceTitle(source, index)}</strong><small>URL chưa công bố</small></div>)}</div> : null}
       <DetailList title="Advisory limitations" items={record.limitations} />
     </div>
   );
@@ -617,6 +634,7 @@ function OwnTrustJourney({
   const l3 = publicLayer(layers, pipeline, "l3");
   const l4 = publicLayer(layers, pipeline, "l4");
   const layerMap = { l1, l2, l3, l4 };
+  const legacyResponse = pipeline?.legacyResponse || canonicalResult?.legacyResponse || null;
   const finalSources = sourceRecords(l3);
   const geminiCitationSources = citationRecords(l4?.aiVerification);
   const finalKeySources = mergeSourceRecords(
@@ -882,10 +900,11 @@ function OwnTrustJourney({
         </div>
         {state === "running" && <div className={styles.notice}><LoaderCircle size={14} className="animate-spin" /> <span>Đang tổng hợp evidence đã kiểm chứng; chưa hiển thị kết luận thay thế.</span></div>}
         <div className={styles.subPanel}>
-          <h3>Validated evidence links</h3>
+          <h3>Validated evidence & Gemini links</h3>
+          <small className={styles.phaseOrigin}>Gemini links validated</small>
           {validatedLinkSources.length ? (
             <div className={styles.sourceList}>
-              {validatedLinkSources.slice(0, 20).map((source, index) => {
+              {validatedLinkSources.map((source, index) => {
                 const sourceMeta = [publicMetadataValue(source.validationStatus), source.authorityTier, source.publishedAt, source.httpStatus ? `HTTP ${source.httpStatus}` : null].filter(Boolean).join(" · ");
                 const content = <><strong>{publicSourceTitle(source, index)}</strong><span>{publicSourcePublisher(source)}</span><span>{source.url || "URL chưa công bố"}</span><small>{safeText(source.excerpt, "Excerpt chưa công bố")}{sourceMeta ? ` · ${sourceMeta}` : ""}</small></>;
                 return source.url
@@ -1047,7 +1066,7 @@ function OwnTrustJourney({
               <h3>Key sources</h3>
               {finalKeySources.length ? (
                 <ul className={styles.reasonList}>
-                  {finalKeySources.slice(0, 8).map((source, index) => {
+                  {finalKeySources.map((source, index) => {
                     const url = safeSourceUrl(source);
                     const label = publicSourceTitle(source, index);
                     return <li key={source?.sourceId || source?.evidenceId || source?.url || index}>{url ? <a className={styles.reasonLink} href={url} target="_blank" rel="noreferrer">{label} <ExternalLink size={12} aria-hidden="true" /></a> : label}</li>;
@@ -1131,6 +1150,8 @@ function OwnTrustJourney({
       </section>
 
       {renderFinalCard()}
+
+      {legacyResponse && <CompatibilityResponsePanel value={legacyResponse} />}
 
       {finalReady && <PostResultGateways onPrint={onPrint} caseId={caseId} caseRevision={caseRevision} claimId={claimId} domainCode={domainCode || ""} />}
 

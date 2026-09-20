@@ -46,7 +46,6 @@ export const GEMINI_TRUST_VERIFICATION_SCHEMA = Object.freeze({
     uncertainty: { type: "string", maxLength: 700 },
     citationsUsed: {
       type: "array",
-      maxItems: 20,
       items: {
         type: "object",
         additionalProperties: false,
@@ -60,8 +59,8 @@ export const GEMINI_TRUST_VERIFICATION_SCHEMA = Object.freeze({
     // Gemini may reference validated evidence/source IDs or return an
     // independent URL. URL reachability and SSRF validation happen after the
     // model response, before this DTO is exposed to the client.
-    supportingSourceIds: { type: "array", items: { type: "string", maxLength: 180 }, maxItems: 20 },
-    contradictingSourceIds: { type: "array", items: { type: "string", maxLength: 180 }, maxItems: 20 },
+    supportingSourceIds: { type: "array", items: { type: "string", maxLength: 180 } },
+    contradictingSourceIds: { type: "array", items: { type: "string", maxLength: 180 } },
     provider: { type: "string", maxLength: 80 },
     model: { type: "string", maxLength: 120 },
   },
@@ -103,7 +102,7 @@ function citations(value) {
   if (!Array.isArray(value)) return [];
   const seen = new Set();
   const output = [];
-  for (const item of value.slice(0, 20)) {
+  for (const item of value) {
     const url = realHttpUrl(typeof item === "string" ? item : item?.url || item?.sourceUrl || item?.canonicalUrl);
     if (!url || seen.has(url)) continue;
     seen.add(url);
@@ -118,7 +117,6 @@ function citations(value) {
 function listIds(value) {
   if (!Array.isArray(value)) return [];
   return Array.from(new Set(value
-    .slice(0, 20)
     .filter((item) => typeof item === "string")
     .map((item) => boundedText(item, 180))
     .filter(Boolean)));
@@ -138,9 +136,9 @@ export function isValidGeminiTrustVerification(value, {
   if (!Array.isArray(value.contradictionReasons) || value.contradictionReasons.length > 12) return false;
   if (!Array.isArray(value.missingEvidence) || value.missingEvidence.length > 12) return false;
   if (typeof value.uncertainty !== "string" || value.uncertainty.length > 700) return false;
-  if (!Array.isArray(value.citationsUsed) || value.citationsUsed.length > 20) return false;
+  if (!Array.isArray(value.citationsUsed)) return false;
   for (const field of ["supportingSourceIds", "contradictingSourceIds"]) {
-    if (value[field] !== undefined && (!Array.isArray(value[field]) || value[field].length > 20)) return false;
+    if (value[field] !== undefined && !Array.isArray(value[field])) return false;
     if (Array.isArray(value[field]) && value[field].some((item) => typeof item !== "string" || item.length > 180)) return false;
     if (Array.isArray(value[field]) && allowedEvidenceIds && value[field].some((item) => !allowedEvidenceIds.has(item))) return false;
   }

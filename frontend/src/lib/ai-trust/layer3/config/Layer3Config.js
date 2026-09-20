@@ -10,12 +10,10 @@ export const LAYER_3_CONFIG = {
     FALLBACK_LATENCY_TARGET_MS: 35,      // Offline knowledge base retrieval latency
   },
 
-  // Retrieval & Evidence Bounds
+  // Retrieval query/source collections are lossless. These limits only shape
+  // an individual evidence passage so a page cannot flood the LLM prompt.
   LIMITS: {
-    MAX_QUERIES_PER_CLAIM: 6,
-    MAX_CANDIDATE_SOURCES_PER_CLAIM: 8,
-    MAX_EVIDENCE_ITEMS_PER_CLAIM: 5,
-    MAX_EXCERPT_LENGTH: 400,             // Concise, high-relevance evidence passages
+    MAX_EXCERPT_LENGTH: 400,
     MIN_EXCERPT_LENGTH: 20,
   },
 

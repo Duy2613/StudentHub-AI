@@ -5,10 +5,11 @@ import { runCanonicalTrust } from "../route.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
 export const runtime = "nodejs";
+const MAX_BODY_BYTES = 12 * 1024 * 1024;
 
 export const POST = SecurityFabric.wrapHandler({
   action: "RUN_CANONICAL_TRUST_PIPELINE",
   allowAnonymous: true,
   maxRequests: 20,
-  maxBodyBytes: 512 * 1024,
+  maxBodyBytes: MAX_BODY_BYTES,
 }, runCanonicalTrust);

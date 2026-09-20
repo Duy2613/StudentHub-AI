@@ -10,10 +10,12 @@ export const LAYER_2_CONFIG = {
     FALLBACK_LATENCY_TARGET_MS: 25,      // Latency target for zero-LLM fallback engine
   },
 
-  // Input bounding limits to prevent token exhaustion or DOS
+  // Request-level safety is enforced by the API/media artifact boundary.
+  // Keep the semantic layer lossless for user text, OCR, and QR payloads;
+  // provider context windows still decide how much can be processed at once.
   LIMITS: {
-    MAX_TEXT_CHARACTERS: 12000,
-    MAX_OCR_CHARACTERS: 8000,
+    MAX_TEXT_CHARACTERS: 500000,
+    MAX_OCR_CHARACTERS: 500000,
     MAX_CLAIMS_TO_EXTRACT: 15,
     MAX_ENTITIES_TO_EXTRACT: 20,
     MAX_VERIFICATION_TASKS: 10,

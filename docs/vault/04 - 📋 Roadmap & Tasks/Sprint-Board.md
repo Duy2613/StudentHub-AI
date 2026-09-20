@@ -204,3 +204,18 @@
 - [x] Live matrix `18/18` across the requested URL set × IMAGE/QR; all terminal pipelines completed, including model fallback cases.
 - [x] Browser screenshot evidence: URL L3/L4 matrix, full 16-case IMAGE/QR L3/L4 matrix, and intentional `chrome://` validation block.
 - [ ] Production availability/SLO remains environment/provider-quota gated; no deployment or remote migration claimed.
+
+### Claim-independent Trust input research — 2026-09-20
+
+- [x] Tavily input-context discovery runs before claim/task query generation for free-form text, subjective statements, OCR/QR payloads, and direct URLs.
+- [x] Layer 3 publishes contextual source/evidence provenance without manufacturing a claim-specific verdict.
+- [x] Canonical Layer 2B enables Gemini and Layer 4 receives bounded raw input context for independent reasoning/citation.
+- [x] Added regression coverage for claim-less text and URL input; existing L3/L4, multimodal, dual-stage and four-layer tests remain green.
+
+### Legacy full-source response compatibility — 2026-09-20
+
+- [x] Added exact-shape-compatible `/api/verify` layer2/layer3/layer4 text, URL, image and QR routes with full legacy fields plus extended provenance.
+- [x] Removed claim-gating from external research: Tavily input/context/debate/counter-context queries run in bounded parallel batches; Gemini may independently identify topics and return validated public URLs.
+- [x] Preserved every safe source/evidence/citation in API/UI compatibility output and added the full JSON inspection panel.
+- [x] Kept SSRF, timeout, body/artifact byte, image decompression and no-base64-echo protections; no fabricated URL is emitted.
+- [x] Targeted trust/multimodal/legacy tests `39/39`, full regression group `89/89`, production build `142/142`, and text/multipart-image smoke passed; undisclosed L5 confidence/evidence sufficiency remains `null` instead of a fabricated default.

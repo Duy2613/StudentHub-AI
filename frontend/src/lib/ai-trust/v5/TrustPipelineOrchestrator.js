@@ -48,7 +48,7 @@ function safeMetadata(value) {
   const output = {};
   for (const key of allowed) {
     const item = input[key];
-    if (typeof item === "string") output[key] = boundedString(item, key === "ocrText" || key === "qrContent" || key === "qrPayload" ? 16_000 : 2_048);
+    if (typeof item === "string") output[key] = boundedString(item, key === "ocrText" || key === "qrContent" || key === "qrPayload" ? 500_000 : 2_048);
     else if (typeof item === "number" && Number.isFinite(item) && item >= 0) output[key] = item;
     else if (key === "bytes" && (Buffer.isBuffer(item) || item instanceof Uint8Array || Array.isArray(item))) output[key] = item;
   }
@@ -60,7 +60,7 @@ function normalizeInput(value) {
   const type = ["text", "url", "image", "file", "qr"].includes(String(input.type || "text").toLowerCase()) ? String(input.type || "text").toLowerCase() : "text";
   return {
     type,
-    content: boundedString(input.content, 160_000),
+    content: boundedString(input.content, 500_000),
     metadata: safeMetadata(input.metadata),
   };
 }

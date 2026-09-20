@@ -612,3 +612,19 @@
 - URL browser matrix: 8 HTTP cases có L3/L4 screenshots sau `FINAL PREDICT Hoàn tất`; `chrome://` bị UI validation chặn đúng contract. Multimodal browser matrix thêm đủ 16 cases (8 URL × IMAGE/QR), mỗi case có screenshot L3 và L4 sau final rail.
 - Evidence artifacts: `artifacts/trust-full-multimodal-qa-2026-09-20/multimodal-matrix.json`, `multimodal-summary.json`, `url-screenshot-matrix.json`, `multimodal-screenshot-matrix.json` và screenshots cùng thư mục.
 - Local gates sau thay đổi: targeted tests pass; lint/build/regression trước đó pass. Live model outcome phụ thuộc quota/runtime, deterministic policy vẫn là authority; chưa claim production deployment hay live provider SLO.
+
+## 25. Claim-independent input research — 2026-09-20
+
+- Canonical Layer 3 no longer waits for extracted claims before searching: every bounded text, free-form opinion, OCR/QR payload, or URL input creates input-context Tavily queries first.
+- Retrieved pages are exposed as `input_context` / `CONTEXTUALIZES` evidence with live provenance so the UI can show sources and excerpts even when Layer 2 returns zero claims.
+- Canonical Layer 2B now explicitly routes through the Gemini gateway; Layer 4 receives bounded raw input context and may independently identify topics, entities, viewpoints, and debates before citing validated evidence.
+- Contextual evidence never upgrades a claim-less input to a factual verification verdict; Final Predict still requires claim-specific evidence for truth sufficiency.
+- Regression coverage: claim-independent text/URL retrieval `2/2`, existing dual-stage L3/L4 `3/3`, multimodal completion `4/4`, own-backend contract `2/2`.
+
+## 26. Legacy full-source response compatibility — 2026-09-20
+
+- Đã thêm `LegacyResponseProjector` và route tương thích `/api/verify/layer2|layer3|layer4` cùng nhánh `/image` và `/qr`; output giữ đúng các key legacy (`verdict`, `confidence`, `reason`, `providers`, `evidence`, `sources`, `contradictoryEvidence`) và mở rộng full provenance/forensics/OCR/QR.
+- Text, URL, OCR, QR và ảnh đều đi qua cùng canonical orchestrator; Tavily chạy input-context, viewpoint/counter-context và claim/task retrieval song song có thứ tự ổn định, còn Gemini có thể tự suy luận/cite URL độc lập nhưng chỉ expose URL HTTP(S) đã validate.
+- UI có panel `Backend-compatible response · full JSON` để xem nguyên response; source/evidence/citation collections không bị cắt trong API. Graph/UI presentation vẫn có guard tài nguyên riêng.
+- Giữ safety boundary: SSRF/private-host validation, timeout/rate limit, artifact image tối đa 8 MB và transport body tối đa 12 MB; không echo base64 ảnh trong response.
+- Verification: targeted trust/multimodal/legacy tests `39/39`, full regression group `89/89`, production build `142/142` pages, text legacy smoke `200`, multipart image smoke `200`; lint `0 errors`.

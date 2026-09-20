@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 
-const MAX_EVIDENCE = 240;
+// The response/evidence collections are lossless. The graph renderer still
+// has a bounded node/edge budget so a pathological input cannot freeze a
+// visualization, but that presentation budget must not hide source URLs from
+// the API response.
+const MAX_GRAPH_EVIDENCE = 240;
 const MAX_NODES = 120;
 const MAX_EDGES = 240;
 const SOURCE_ORIGINS = new Set([
@@ -156,8 +160,8 @@ function layer2Evidence(layer, requestId) {
 }
 
 function layer3Evidence(layer) {
-  const evidence = safeArray(layer?.evidence, 160);
-  const sources = safeArray(layer?.sources, 80);
+  const evidence = Array.isArray(layer?.evidence) ? layer.evidence : [];
+  const sources = Array.isArray(layer?.sources) ? layer.sources : [];
   const sourceById = new Map(sources.map((source) => [safeText(source?.sourceId, 180), source]));
   const records = evidence.map((value, index) => {
     const item = asRecord(value);
@@ -207,7 +211,7 @@ function layer3Evidence(layer) {
 function layer4Evidence(layer) {
   // Legacy/friend-backend output is advisory metadata only. It must not be
   // promoted into the canonical evidence graph or source-quality counts.
-  const sourceRecords = safeArray(layer?.independentResearchSources, 80);
+  const sourceRecords = Array.isArray(layer?.independentResearchSources) ? layer.independentResearchSources : [];
   const records = sourceRecords.map((value, index) => {
     const source = asRecord(value);
     const rawReference = safeText(source.sourceId || source.id, 180);
@@ -238,7 +242,7 @@ export function buildCanonicalEvidence({ requestId, layers = {}, input = {} } = 
   for (const item of layer2Evidence(layers.layer2, requestId)) pushEvidence(result, item);
   for (const item of layer3Evidence(layers.layer3)) pushEvidence(result, item);
   for (const item of layer4Evidence(layers.layer4)) pushEvidence(result, item);
-  return result.slice(0, MAX_EVIDENCE).map((item) => ({
+  return result.map((item) => ({
     ...item,
     caseId: safeText(input.caseId, 160) || null,
   }));
@@ -281,7 +285,7 @@ export function buildTrustGraph({ requestId, input = {}, layers = {}, evidence =
     addNode({ id, kind: "CLAIM", label: safeText(claim.rawText || claim.text || claim.claim || claim.statement, 240) || claimId, detail: "Candidate claim extracted by semantic analysis; not yet truth.", origin: "LAYER_1_INTERNAL", rawReference: claimId });
     addEdge(inputId, id, "contains");
   }
-  for (const item of safeArray(evidence, MAX_EVIDENCE)) {
+  for (const item of safeArray(evidence, MAX_GRAPH_EVIDENCE)) {
     const sourceId = safeText(item.source?.id, 180) || safeText(item.provider, 180) || safeText(item.id, 180);
     if (!sourceId) continue;
     const origin = canonicalOrigin(item.origin, "LAYER_1_INTERNAL").toLowerCase();
@@ -367,10 +371,10 @@ export function buildCanonicalTrustProjection({ requestId, input, pipeline, laye
           explanation: safeText(stage.explanation || stage.meaning, 1000) || null,
           summary: safeText(stage.summary, 900),
           providers: safeArray(stage.providers, 20),
-          sources: safeArray(stage.sources, 40),
-          evidence: safeArray(stage.evidence, 40),
-          supportingEvidence: safeArray(stage.supportingEvidence, 20),
-          contradictoryEvidence: safeArray(stage.contradictoryEvidence, 20),
+          sources: Array.isArray(stage.sources) ? stage.sources : [],
+          evidence: Array.isArray(stage.evidence) ? stage.evidence : [],
+          supportingEvidence: Array.isArray(stage.supportingEvidence) ? stage.supportingEvidence : [],
+          contradictoryEvidence: Array.isArray(stage.contradictoryEvidence) ? stage.contradictoryEvidence : [],
           metrics: stage.metrics && typeof stage.metrics === "object" ? stage.metrics : {},
           limitations: safeArray(stage.limitations, 16).map((item) => safeText(item, 500)).filter(Boolean),
           providerStatus: safeText(stage.providerStatus, 100),

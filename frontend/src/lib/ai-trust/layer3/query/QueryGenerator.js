@@ -1,12 +1,15 @@
 /**
  * Layer 3 — QueryGenerator
  * 
- * Generates multi-strategy search queries for each claim.
+ * Generates multi-strategy search queries for raw input and extracted claims.
  * Enforces the Anti-Confirmation-Bias rule by producing both supporting and contradiction-oriented queries.
  */
 
-import { LAYER_3_CONFIG } from "../config/Layer3Config.js";
 import { L2C_VERIFICATION_TASK_TYPES, verificationTaskCatalog } from "../../v5/l2c/verificationPackage.js";
+
+const MAX_INPUT_CONTEXT_CHARS = 500_000;
+const INPUT_QUERY_CHUNK_CHARS = 320;
+const MAX_TAVILY_QUERY_CHARS = 380;
 
 function sanitizeQueryPart(value, maxLength = 180) {
   return typeof value === "string"
@@ -19,7 +22,105 @@ function safeDomain(value) {
   return /^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/.test(domain) && domain.includes(".") ? domain : null;
 }
 
+function sanitizeInputContextPart(value) {
+  return typeof value === "string"
+    ? value.normalize("NFKC").replace(/[\u0000-\u001F\u007F\u200B-\u200D\u2060\uFEFF]/g, " ").replace(/\s+/g, " ").trim()
+    : "";
+}
+
+function inputContextText(input = {}) {
+  const source = input && typeof input === "object" && !Array.isArray(input) ? input : {};
+  const metadata = source.metadata && typeof source.metadata === "object" && !Array.isArray(source.metadata)
+    ? source.metadata
+    : {};
+  const inputType = sanitizeQueryPart(source.type, 40).toLowerCase();
+  const values = [
+    inputType === "url" || inputType === "link" ? source.content : "",
+    metadata.url,
+    source.url,
+    source.content && !/^data:/i.test(String(source.content)) ? source.content : "",
+    metadata.ocrText,
+    metadata.qrContent,
+    metadata.qrPayload,
+    metadata.qrIntake?.normalizedValue,
+  ]
+    .filter((value) => typeof value === "string" && value.trim())
+    .map(sanitizeInputContextPart)
+    .filter(Boolean);
+  return Array.from(new Set(values)).join(" ").slice(0, MAX_INPUT_CONTEXT_CHARS);
+}
+
+function splitInputContext(text, maxLength = INPUT_QUERY_CHUNK_CHARS) {
+  const chunks = [];
+  let cursor = 0;
+  while (cursor < text.length) {
+    let end = Math.min(cursor + maxLength, text.length);
+    if (end < text.length) {
+      const boundary = text.lastIndexOf(" ", end);
+      if (boundary > cursor + 80) end = boundary;
+    }
+    const chunk = text.slice(cursor, end).trim();
+    if (chunk) chunks.push(chunk);
+    cursor = end;
+    while (cursor < text.length && /\s/.test(text[cursor])) cursor += 1;
+  }
+  return chunks;
+}
+
+function inputUrl(text) {
+  const match = typeof text === "string" ? text.match(/https?:\/\/[^\s<>"'`]+/i) : null;
+  if (!match) return null;
+  const candidate = match[0].replace(/[),.;!?\]}]+$/g, "");
+  try {
+    const parsed = new URL(candidate);
+    if (!["http:", "https:"].includes(parsed.protocol)) return null;
+    return {
+      url: parsed.toString(),
+      hostname: parsed.hostname.toLowerCase(),
+      path: parsed.pathname.replace(/\/+/, " ").trim(),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export class QueryGenerator {
+  /**
+   * Generates bounded discovery queries directly from the submitted input.
+   * Claims are useful verification structure, but they must not be a gate for
+   * free-form research and source discovery.
+   */
+  static generateInputQueries(input = {}) {
+    const text = inputContextText(input);
+    if (!text) return [];
+
+    const normalized = text.replace(/["']/g, " ").replace(/\s+/g, " ").trim();
+    const url = inputUrl(normalized);
+    if (url) {
+      const hostContext = sanitizeQueryPart(`${url.hostname} ${sanitizeQueryPart(url.path, 100)}`.trim(), 260);
+      return [
+        { strategy: "INPUT_URL_EXACT", query: sanitizeQueryPart(url.url, MAX_TAVILY_QUERY_CHARS), purpose: "Tìm nguồn trực tiếp cho URL người dùng gửi", sourceScope: "input_context", origin: "INPUT_CONTEXT" },
+        { strategy: "INPUT_URL_CONTEXT", query: sanitizeQueryPart(`${hostContext} news analysis review`, MAX_TAVILY_QUERY_CHARS), purpose: "Tìm ngữ cảnh công khai quanh URL", sourceScope: "input_context", origin: "INPUT_CONTEXT" },
+        { strategy: "INPUT_URL_OFFICIAL", query: sanitizeQueryPart(`site:${url.hostname} ${sanitizeQueryPart(url.path, 100)}`, MAX_TAVILY_QUERY_CHARS), purpose: "Tìm thông tin chính thức quanh URL", sourceScope: "input_context", origin: "INPUT_CONTEXT" },
+        { strategy: "INPUT_URL_COUNTER_CONTEXT", query: sanitizeQueryPart(`${hostContext} criticism warning discussion`, MAX_TAVILY_QUERY_CHARS), purpose: "Tìm góc nhìn đối chiếu quanh URL", sourceScope: "input_context", origin: "INPUT_CONTEXT", isContradictionSeeking: true },
+      ];
+    }
+
+    return splitInputContext(normalized).flatMap((queryText, index) => {
+      const suffix = index === 0 ? "" : `_${index + 1}`;
+      return [
+        { strategy: `INPUT_EXACT${suffix}`, query: sanitizeQueryPart(`"${queryText}"`, MAX_TAVILY_QUERY_CHARS), purpose: "Tìm nguồn trực tiếp cho toàn bộ input", sourceScope: "input_context", origin: "INPUT_CONTEXT" },
+        { strategy: `INPUT_NEUTRAL_CONTEXT${suffix}`, query: sanitizeQueryPart(`${queryText} news analysis`, MAX_TAVILY_QUERY_CHARS), purpose: "Tìm ngữ cảnh và nguồn báo chí liên quan", sourceScope: "input_context", origin: "INPUT_CONTEXT" },
+        { strategy: `INPUT_VIEWPOINTS${suffix}`, query: sanitizeQueryPart(`${queryText} opinions debate comparison`, MAX_TAVILY_QUERY_CHARS), purpose: "Tìm các quan điểm và tranh luận liên quan", sourceScope: "input_context", origin: "INPUT_CONTEXT" },
+        { strategy: `INPUT_COUNTER_CONTEXT${suffix}`, query: sanitizeQueryPart(`${queryText} criticism evidence fact check`, MAX_TAVILY_QUERY_CHARS), purpose: "Tìm thông tin phản biện và kiểm chứng", sourceScope: "input_context", origin: "INPUT_CONTEXT", isContradictionSeeking: true },
+      ];
+    });
+  }
+
+  static getInputContextText(input = {}) {
+    return inputContextText(input);
+  }
+
   /**
    * Generates search queries for a claim and candidate sources
    * @param {object} claim - Claim DTO from Layer 2
@@ -92,7 +193,7 @@ export class QueryGenerator {
       targetClaimId: claim.claimId,
     });
 
-    return queries.slice(0, LAYER_3_CONFIG.LIMITS.MAX_QUERIES_PER_CLAIM);
+    return queries;
   }
 
   /**

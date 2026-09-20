@@ -135,7 +135,7 @@ function safeAiVerification(value) {
   const safeList = (candidate, max = 12) => safeArray(candidate, max)
     .map((item) => typeof item === "string" ? boundedText(item, 700) : "")
     .filter(Boolean);
-  const citations = safeArray(value.citationsUsed, 20).map((item) => {
+  const citations = (Array.isArray(value.citationsUsed) ? value.citationsUsed : []).map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
     const url = realUrl(item.url);
     if (!url) return null;
@@ -151,7 +151,7 @@ function safeAiVerification(value) {
       redirectCount: Number.isInteger(redirectCount) && redirectCount >= 0 ? redirectCount : 0,
     };
   }).filter(Boolean);
-  const sourceIds = (candidate) => Array.from(new Set(safeArray(candidate, 20)
+  const sourceIds = (candidate) => Array.from(new Set((Array.isArray(candidate) ? candidate : [])
     .filter((item) => typeof item === "string")
     .map((item) => boundedText(item, 180))
     .filter(Boolean)));

@@ -118,8 +118,11 @@ export const AI_GATEWAY_CONFIG = {
   },
 
   LIMITS: {
-    MAX_PROMPT_CHARACTERS: 16_000,
-    MAX_OUTPUT_TOKENS: 1024,
+    // Source/evidence URLs are lossless at the trust boundary. Keep a large
+    // transport envelope for complete OCR/QR context and full URL sets; the
+    // provider still owns its own context-window enforcement.
+    MAX_PROMPT_CHARACTERS: 4_000_000,
+    MAX_OUTPUT_TOKENS: 8192,
     MAX_ROUTER_ATTEMPTS: 12,
     MAX_TRACE_ATTEMPTS: 12,
   },
