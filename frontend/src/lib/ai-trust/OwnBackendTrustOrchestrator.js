@@ -415,9 +415,12 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     "NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN",
   ].includes(statusText(layer2C.classification)) && !domainProviderPartial;
   const semanticSuspicious = semanticClassificationRisk || semanticDecisionRisk || semanticContextRisk || domainRisk;
-  // L2C is advisory domain intelligence. Its outage is disclosed in the
-  // provider observations but must not make an otherwise completed L2 run
-  // partial. L2A remains a separate threat-intelligence gate for SAFE.
+  // L2C and external threat-provider outages are provider-health metadata,
+  // not a failed L2 operation. Every L2 branch above has settled and the
+  // deterministic semantic baseline can still be audited and passed to L3.
+  // Keep providerPartial in details/providerObservations, but do not turn the
+  // whole four-layer pipeline PARTIAL solely because an optional provider did
+  // not respond.
   const providerPartial = threatProviderPartial || semanticProviderPartial;
   const semanticPackage = asObject(layer2B?.verificationPackage);
   const domainPackage = asObject(layer2C?.verificationPackage);
@@ -425,17 +428,19 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     ...boundedArray(semanticPackage.verificationTasks, 40),
     ...boundedArray(domainPackage.verificationTasks, 40),
   ].slice(0, 80);
-  const operationallyPartialWithoutContentSignal = providerPartial && !semanticSuspicious;
+  const semanticBaselineCompleted = semanticFallbackAvailable ||
+    layer2B?.status === "PASS" ||
+    ["BENIGN", "INFORMATIVE"].includes(statusText(layer2B?.classification));
   const finding = threatMatch
     ? "THREAT_MATCH"
-    : operationallyPartialWithoutContentSignal
-      ? "PARTIAL"
-      : semanticSuspicious
-        ? (boundedArray(layer2B?.contextSignals).some((item) => /credential|payment|urgency|impersonation/i.test(String(item?.type || item?.code || ""))) ? "MANIPULATION_DETECTED" : "SEMANTIC_SUSPICIOUS")
-        : layer2A?.finding === "NOT_APPLICABLE" && layer2B?.status === "UNKNOWN"
+    : semanticSuspicious
+      ? (boundedArray(layer2B?.contextSignals).some((item) => /credential|payment|urgency|impersonation/i.test(String(item?.type || item?.code || ""))) ? "MANIPULATION_DETECTED" : "SEMANTIC_SUSPICIOUS")
+      : layer2A?.finding === "NOT_APPLICABLE" && layer2B?.status === "UNKNOWN"
           ? "UNKNOWN"
-          : "NO_KNOWN_THREAT";
-  const status = providerPartial || layer2B?.status === "UNKNOWN" ? "PARTIAL" : "COMPLETED";
+          : semanticBaselineCompleted
+            ? "SEMANTIC_NORMAL"
+            : "NO_KNOWN_THREAT";
+  const status = "COMPLETED";
   const reasons = [
     layer2A?.message,
     layer2B?.semanticSummary,
@@ -448,7 +453,7 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     finding,
     classification: layer2B?.classification || "UNKNOWN",
     provider: "StudentHub L2 composite",
-    providerStatus: status,
+    providerStatus: "COMPLETED",
     providerObservations: observations,
     providers: observations,
     threatTypes: boundedArray(layer2A?.threatTypes, 20),
@@ -484,12 +489,12 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
       ? "Threat intelligence reported a matching threat; semantic and context signals cannot downgrade it."
       : threatProviderPartial
         ? semanticFallbackAvailable
-          ? "One or more Layer 2 threat providers are partial or unavailable; the deterministic semantic baseline completed and remains auditable."
-          : "One or more Layer 2 threat providers are partial or unavailable; the result remains unresolved."
+          ? "Layer 2 đã hoàn tất baseline deterministic; provider threat bên ngoài chưa phản hồi được ghi riêng trong provider observations."
+          : "Layer 2 đã hoàn tất các nhánh kiểm tra; một provider threat bên ngoài chưa phản hồi được giữ trong audit details."
         : domainProviderPartial
-          ? "Student context advisory was unavailable; threat and semantic checks completed without treating the outage as content risk."
+          ? "Layer 2 đã hoàn tất threat và semantic checks; student-context advisory chưa phản hồi và không bị coi là content risk."
           : semanticFallbackAvailable
-            ? "Gemini semantic enrichment was unavailable, but the deterministic semantic baseline completed and remains auditable."
+            ? "Layer 2 đã hoàn tất deterministic semantic baseline; Gemini enrichment chưa phản hồi được ghi trong provider observations."
             : semanticSuspicious
               ? "Semantic or student-context signals require external evidence before a final trust decision."
               : "Layer 2 did not find a known threat or material semantic/context signal in the executed checks.",

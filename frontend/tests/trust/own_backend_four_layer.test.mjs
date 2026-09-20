@@ -369,17 +369,18 @@ test("own backend publishes exactly four stages and deterministic Final Predict"
   assert.equal(JSON.stringify(result).includes('"l5"'), false);
 });
 
-test("own backend labels Layer 2 provider outage as partial, not suspicious", async () => {
+test("own backend completes Layer 2 while retaining provider outage details", async () => {
   const orchestrator = new OwnBackendTrustOrchestrator({ services: servicesWithPartialLayer2() });
 
   const result = await orchestrator.run({ type: "text", content: "A neutral fixture input." }, {
     requestId: "req_layer2_partial_fixture",
   });
 
-  assert.equal(result.stages.l2.finding, "PARTIAL");
-  assert.equal(result.stages.l2.operationStatus, "PARTIAL");
+  assert.equal(result.stages.l2.finding, "UNKNOWN");
+  assert.equal(result.stages.l2.operationStatus, "COMPLETED");
   assert.equal(result.stages.l2.severity, "MEDIUM");
-  assert.notEqual(result.stages.l2.finding, "SEMANTIC_SUSPICIOUS");
+  assert.equal(result.layerResults.layer2.details.providerPartial, true);
+  assert.notEqual(result.stages.l2.operationStatus, "PARTIAL");
   assert.equal(result.finalPredict.securityClassification, "UNKNOWN");
   assert.equal(result.finalPredict.recommendedAction, "REVIEW");
   assert.equal(result.finalPredict.securityEvidenceStatus, "INSUFFICIENT");
@@ -393,6 +394,25 @@ test("own backend allows a claimless direct URL after L3 live validation despite
     finding: "UNKNOWN",
     message: "One threat provider is temporarily unavailable.",
     providerResults: [],
+  });
+  services.l2b = async () => ({
+    status: "PASS",
+    classification: "BENIGN",
+    confidence: 0.55,
+    semanticSummary: "Deterministic semantic baseline found no material signal.",
+    contextSignals: [],
+    claims: [],
+    entities: [],
+    details: {
+      providerStatus: "UNAVAILABLE",
+      deterministicFallbackAvailable: true,
+      providerIndependent: true,
+    },
+    metrics: {
+      providerStatus: "UNAVAILABLE",
+      deterministicFallbackAvailable: true,
+      modelUsed: "deterministic-semantic-fixture",
+    },
   });
   services.l3 = async () => markTrustedLayer3Result({
     status: "NOT_APPLICABLE",
@@ -426,9 +446,11 @@ test("own backend allows a claimless direct URL after L3 live validation despite
     content: "https://chatgpt.com/",
   }, { requestId: "req_claimless_direct_url_partial_l2a" });
 
-  assert.equal(result.stages.l2.finding, "PARTIAL");
+  assert.equal(result.stages.l2.finding, "SEMANTIC_NORMAL");
+  assert.equal(result.stages.l2.operationStatus, "COMPLETED");
   assert.equal(result.stages.l3.operationStatus, "COMPLETED");
   assert.equal(result.stages.l4.operationStatus, "COMPLETED");
+  assert.equal(result.pipelineStatus, "COMPLETED");
   assert.equal(result.layerResults.layer4.securityClassification, "SAFE");
   assert.equal(result.layerResults.layer4.enforcement, "ALLOW_WITH_CAUTION");
   assert.equal(result.finalPredict.securityClassification, "SAFE");
@@ -477,7 +499,7 @@ test("own backend completes L2 when semantic gateway fails but deterministic fal
   const result = await orchestrator.run({ type: "text", content: "ordinary input" }, { requestId: "req_l2_gateway_fallback" });
 
   assert.equal(result.stages.l2.operationStatus, "COMPLETED");
-  assert.equal(result.stages.l2.finding, "NO_KNOWN_THREAT");
+  assert.equal(result.stages.l2.finding, "SEMANTIC_NORMAL");
   assert.equal(result.stages.l2.providers.some((item) => item.status === "NETWORK_ERROR"), true);
 });
 
@@ -496,7 +518,7 @@ test("L2C advisory outage does not make the completed semantic/threat composite 
   const result = await orchestrator.run({ type: "text", content: "ordinary input" }, { requestId: "req_l2c_advisory_outage" });
 
   assert.equal(result.stages.l2.operationStatus, "COMPLETED");
-  assert.equal(result.stages.l2.finding, "NO_KNOWN_THREAT");
+  assert.equal(result.stages.l2.finding, "SEMANTIC_NORMAL");
   assert.equal(result.stages.l2.providers.some((item) => item.status === "UNAVAILABLE"), true);
 });
 
