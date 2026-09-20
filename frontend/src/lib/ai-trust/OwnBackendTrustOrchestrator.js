@@ -46,6 +46,8 @@ import { isTrustedLayer3Result } from "./layer3/TrustBoundary.js";
 const TRANSIENT_L2_STATUS = new Set([
   "TIMEOUT", "RATE_LIMITED", "AUTH_FAILED", "MODEL_NOT_AVAILABLE", "NETWORK_ERROR",
   "NOT_CONFIGURED", "UNAVAILABLE", "INVALID_RESPONSE", "ERROR", "PARTIAL", "DEGRADED",
+  "COOLDOWN", "BUDGET_EXHAUSTED", "MODEL_INCOMPATIBLE", "PERMISSION_DENIED", "INVALID_REQUEST",
+  "SERVICE_UNAVAILABLE", "UPSTREAM_ERROR", "NETWORK_TIMEOUT",
 ]);
 
 function asObject(value) {
@@ -396,12 +398,16 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     ["UNKNOWN", "PARTIAL"].includes(statusText(layer2B?.status));
   const domainProviderPartial = providerFailure(domainStatus);
   const semanticContextRisk = boundedArray(layer2B?.contextSignals).some((item) =>
-    /credential|financial|account_takeover|malware|social_engineering|impersonation|urgency|authority|scarcity|prompt_injection/i.test(
+    item?.authoritative !== false && /credential|financial|account_takeover|malware|social_engineering|impersonation|urgency|authority|scarcity|prompt_injection/i.test(
       String(item?.type || item?.code || ""),
     ),
   );
   const semanticClassificationRisk = ["DECEPTIVE", "MISLEADING", "MALICIOUS"].includes(statusText(layer2B?.classification));
-  const semanticDecisionRisk = ["BLOCK", "SUSPICIOUS"].includes(statusText(layer2B?.status));
+  // SUSPICIOUS is not itself an independent security finding.  It can be a
+  // provider-side operational fallback or a candidate-model label.  Content
+  // risk must come from a hard BLOCK, an authoritative classification, or an
+  // authoritative signal with a concrete security vector.
+  const semanticDecisionRisk = statusText(layer2B?.status) === "BLOCK";
   const domainRisk = Boolean(layer2C?.classification) && ![
     "NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN",
   ].includes(statusText(layer2C.classification)) && !domainProviderPartial;
@@ -647,6 +653,7 @@ function finalPredict({ layer1, layer2, layer2A, layer3, layer4 }) {
     ? sources.filter((source) => source?.liveEvidence === true && statusText(source?.providerStatus) === "SUCCESS" && source?.retrievalOutcome === "SUCCESS").length
     : 0;
   const deterministicTruthStatus = statusText(layer4?.truthStatus, layer4?.truthAssessment?.status, "INSUFFICIENT_EVIDENCE");
+  const claimlessInput = deterministicTruthStatus === "NOT_APPLICABLE";
   const geminiTruthRefinement = !insufficientEvidence && !l1Blocked && !l2Threat && !layer4HardNegative &&
     ["UNKNOWN", "INSUFFICIENT_EVIDENCE"].includes(deterministicTruthStatus) && Boolean(geminiTruthSignal);
   const securityClassification = l1Blocked || l2Threat
@@ -661,11 +668,14 @@ function finalPredict({ layer1, layer2, layer2A, layer3, layer4 }) {
     : reputationAndLiveSafeTarget
       ? "LOW"
       : layer4?.riskAssessment?.level || "UNKNOWN";
-  const truthStatus = insufficientEvidence
+  const truthStatus = claimlessInput
+    ? "NOT_APPLICABLE"
+    : insufficientEvidence
     ? "INSUFFICIENT_EVIDENCE"
     : geminiTruthRefinement
       ? ({ SUPPORTS: "SUPPORTED", CONTRADICTS: "CONTRADICTED", MIXED: "MIXED" }[geminiTruthSignal] || deterministicTruthStatus)
       : deterministicTruthStatus;
+  const truthEvidenceGap = insufficientEvidence && !claimlessInput;
   const recommendedAction = l1Blocked || l2Threat
     ? "BLOCK"
     : securityDecisionBacked
@@ -689,14 +699,14 @@ function finalPredict({ layer1, layer2, layer2A, layer3, layer4 }) {
     ...(geminiBackedSafeTarget ? ["Gemini Layer 4 đã đối chiếu bằng chứng URL và các liên kết đã được server xác thực; Final Predict cho phép tiếp tục có điều kiện."] : []),
     ...(geminiTruthRefinement ? [`Gemini Layer 4 đã tổng hợp claim-specific evidence của Layer 3 và bổ sung kết luận sự thật: ${truthStatus}.`] : []),
     ...boundedArray(layer4?.keyReasons, 8),
-    ...(insufficientEvidence
+    ...(truthEvidenceGap
       ? [claimSpecificEvidence.length > 0
         ? "Có nguồn live nhưng chưa đủ claim-specific evidence để nâng kết luận sự thật."
         : "Có thể có nguồn ngữ cảnh, nhưng chưa có claim-specific evidence để nâng kết luận sự thật."]
       : []),
   ].map((item) => boundedText(item, 700)).filter(Boolean).slice(0, 20);
   const uncertainty = [
-    ...(insufficientEvidence
+    ...(truthEvidenceGap
       ? [claimSpecificEvidence.length > 0
         ? "Evidence sufficiency chưa đạt vì claim-specific evidence chưa đủ."
         : "Evidence hiện có chỉ là contextual reference hoặc chưa đủ để xác minh factual claim."]
@@ -744,7 +754,7 @@ function finalPredict({ layer1, layer2, layer2A, layer3, layer4 }) {
     evidenceAgreement,
     sourceQuality,
     verificationCompleteness: layer3?.verificationCompleteness ?? null,
-    evidenceSufficiency: insufficientEvidence ? "INSUFFICIENT" : "SUFFICIENT",
+    evidenceSufficiency: claimlessInput ? "NOT_APPLICABLE" : insufficientEvidence ? "INSUFFICIENT" : "SUFFICIENT",
     securityEvidenceStatus: securityDecisionBacked
       ? (reputationAndLiveSafeTarget
         ? "L2_REPUTATION_L3_LIVE"

@@ -12,6 +12,17 @@ function asArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+const OPERATIONAL_L2_FAILURES = new Set([
+  "UNKNOWN", "PARTIAL", "DEGRADED", "TIMEOUT", "RATE_LIMITED", "AUTH_FAILED",
+  "MODEL_NOT_AVAILABLE", "MODEL_INCOMPATIBLE", "NETWORK_ERROR", "NETWORK_TIMEOUT",
+  "NOT_CONFIGURED", "UNAVAILABLE", "INVALID_RESPONSE", "COOLDOWN", "BUDGET_EXHAUSTED",
+  "PERMISSION_DENIED", "INVALID_REQUEST", "SERVICE_UNAVAILABLE", "UPSTREAM_ERROR", "FALLBACK_USED",
+]);
+
+function isOperationallyPartial(status) {
+  return OPERATIONAL_L2_FAILURES.has(String(status || "").trim().toUpperCase());
+}
+
 export class RiskAssessmentEngine {
   /**
    * Assesses risk level across fused evidence
@@ -65,9 +76,16 @@ export class RiskAssessmentEngine {
 
     const hasSuspiciousSignal =
       fusedGraph?.layer1Status === "SUSPICIOUS" ||
-      fusedGraph?.layer2Status === "SUSPICIOUS" ||
-      fusedGraph?.layer2Classification === "DECEPTIVE" ||
-      (typeof fusedGraph?.layer2CClassification === "string" && !["NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN"].includes(fusedGraph.layer2CClassification));
+      (
+        !isOperationallyPartial(fusedGraph?.layer2ProviderStatus) &&
+        (fusedGraph?.layer2Status === "SUSPICIOUS" ||
+          ["DECEPTIVE", "MISLEADING", "MALICIOUS"].includes(String(fusedGraph?.layer2Classification || "").toUpperCase()))
+      ) ||
+      (
+        !isOperationallyPartial(fusedGraph?.layer2CModelStatus) &&
+        typeof fusedGraph?.layer2CClassification === "string" &&
+        !["NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN"].includes(fusedGraph.layer2CClassification)
+      );
     const threatProviderFailed = fusedGraph?.layer2AResult &&
       !["SUCCESS", "success", "healthy"].includes(fusedGraph.layer2AProviderStatus) &&
       fusedGraph.layer2AFinding !== "NO_KNOWN_THREAT";
@@ -110,7 +128,7 @@ export class RiskAssessmentEngine {
     const hasPartial =
       layer3Evidence.some((e) => e && e.relation === "PARTIALLY_SUPPORTS") ||
       Object.values(layer3ClaimStatuses).includes("PARTIALLY_SUPPORTED") ||
-      fusedGraph.layer2Classification === "DECEPTIVE";
+      (!isOperationallyPartial(fusedGraph?.layer2ProviderStatus) && fusedGraph.layer2Classification === "DECEPTIVE");
 
     if (hasPartial) {
       primaryVectors.push(LAYER_4_CONFIG.HARM_CATEGORIES.ACADEMIC_MISINFORMATION);
@@ -119,7 +137,9 @@ export class RiskAssessmentEngine {
 
     // L2C is advisory domain intelligence. It can raise suspicion/risk but it
     // never becomes a hard block and never clears stronger negative evidence.
-    if (fusedGraph?.layer2CClassification && !["NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN"].includes(fusedGraph.layer2CClassification)) {
+    if (!isOperationallyPartial(fusedGraph?.layer2CModelStatus) &&
+      fusedGraph?.layer2CClassification &&
+      !["NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN"].includes(fusedGraph.layer2CClassification)) {
       primaryVectors.push("student_domain_risk_pattern");
       riskScore = Math.max(riskScore, layer2CDomainSignals.some((signal) => ["CRITICAL", "HIGH", "critical", "high"].includes(signal.severity)) ? 0.75 : 0.55);
     }

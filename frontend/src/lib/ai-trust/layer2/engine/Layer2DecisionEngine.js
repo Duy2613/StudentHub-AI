@@ -81,7 +81,8 @@ export class Layer2DecisionEngine {
       [
         "INVALID_RESPONSE", "PROVIDER_UNAVAILABLE", "UNAVAILABLE", "TIMEOUT", "RATE_LIMITED",
         "AUTH_FAILED", "MODEL_NOT_AVAILABLE", "NETWORK_ERROR", "NOT_CONFIGURED", "PARTIAL", "DEGRADED",
-        "INJECTION_REJECTED",
+        "INJECTION_REJECTED", "COOLDOWN", "BUDGET_EXHAUSTED", "MODEL_INCOMPATIBLE",
+        "PERMISSION_DENIED", "INVALID_REQUEST", "SERVICE_UNAVAILABLE", "UPSTREAM_ERROR", "NETWORK_TIMEOUT",
       ].includes(String(semanticAnalysis.modelStatus || "").toUpperCase());
     const providerReturnedMalicious = semanticAnalysis.classification === SEMANTIC_CLASSIFICATION.MALICIOUS;
 

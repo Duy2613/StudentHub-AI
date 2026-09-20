@@ -146,4 +146,54 @@ describe("Layer 2B semantic trust boundary", () => {
 
     assert.equal(normalized.entities[0].confidence, 0);
   });
+
+  it("keeps short opinions and official URLs out of neural security verdicts", async () => {
+    for (const input of [
+      { type: "url", content: "https://chatgpt.com/" },
+      { type: "url", content: "https://www.google.com/" },
+      { type: "url", content: "https://www.youtube.com/" },
+      { type: "text", content: "goat is ronaldo" },
+      { type: "text", content: "ngọc trinh đẹp lắm" },
+    ]) {
+      const result = await Layer2SemanticService.verify({
+        ...input,
+        layer1Result: { status: "PASS", signals: [] },
+        options: { useAIGateway: false },
+      });
+
+      assert.equal(result.status, "PASS", input.content);
+      assert.equal(result.classification, "BENIGN", input.content);
+      assert.ok(result.contextSignals.every((signal) => signal.authoritative === false || !signal.type.startsWith("neural_")), input.content);
+    }
+  });
+
+  it("turns a cooldown response into UNKNOWN instead of trusting its malicious label", async () => {
+    const result = await Layer2SemanticService.verify({
+      type: "text",
+      content: "ordinary input",
+      layer1Result: { status: "PASS", signals: [] },
+      options: {
+        provider: {
+          providerId: "cooldown-fixture",
+          async analyzeSemantics() {
+            return {
+              semanticSummary: "Provider output is operationally unavailable.",
+              intent: { primary: "inform", secondary: null },
+              entities: [],
+              claims: [],
+              contextSignals: [],
+              consistencyFindings: [],
+              crossModalFindings: [],
+              classification: "MALICIOUS",
+              modelStatus: "COOLDOWN",
+            };
+          },
+        },
+      },
+    });
+
+    assert.equal(result.status, "UNKNOWN");
+    assert.equal(result.classification, "UNKNOWN");
+    assert.equal(result.details.providerStatus, "COOLDOWN");
+  });
 });

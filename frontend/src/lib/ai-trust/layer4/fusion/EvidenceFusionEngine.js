@@ -195,6 +195,11 @@ export class EvidenceFusionEngine {
       layer2CrossModalFindings,
       layer2Status: typeof layer2Result?.status === "string" ? layer2Result.status : "UNKNOWN",
       layer2Classification: typeof layer2Result?.classification === "string" ? layer2Result.classification : "UNKNOWN",
+      layer2ProviderStatus: typeof layer2Result?.details?.providerStatus === "string"
+        ? layer2Result.details.providerStatus
+        : typeof layer2Result?.metrics?.providerStatus === "string"
+          ? layer2Result.metrics.providerStatus
+          : typeof layer2Result?.modelStatus === "string" ? layer2Result.modelStatus : "UNKNOWN",
 
       // L2C is a bounded domain-risk signal. It is retained separately from
       // generic semantic context so L4 can use it as advisory suspicion only.

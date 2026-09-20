@@ -1031,7 +1031,9 @@ function OwnTrustJourney({
   const finalVerdict = finalPredict?.truthVerdict || finalPredict?.truthStatus || finalPredict?.verdict || finalPredict?.truthAssessment;
   const finalReasons = finalPredict?.keyReasons;
   const finalUncertainty = finalPredict?.remainingUncertainty;
-  const finalSecurity = finalPredict?.securityRisk || finalPredict?.securityClassification || finalPredict?.security;
+  const finalSecurityClassification = finalPredict?.securityClassification || finalPredict?.security || "UNKNOWN";
+  const finalSecurityRisk = finalPredict?.securityRisk || "UNKNOWN";
+  const finalHeadline = finalSecurityClassification || finalVerdict;
   const finalAction = finalPredict?.recommendedAction || finalPredict?.action;
 
   const renderFinalCard = () => (
@@ -1040,7 +1042,7 @@ function OwnTrustJourney({
         <div className={styles.finalSeal}>{finalReady ? <Sparkles size={22} /> : <LockKeyhole size={21} />}</div>
         <div>
           <p className={styles.eyebrow}>FINAL PREDICT · DETERMINISTIC</p>
-          <h2>{finalReady ? safeText(finalVerdict) : "Final Predict đang khóa"}</h2>
+          <h2>{finalReady ? safeText(finalHeadline) : "Final Predict đang khóa"}</h2>
           <p className={styles.finalCaption}>{finalReady ? "Kết quả được suy ra từ dữ liệu đã lưu của bốn lớp." : "Chỉ mở khi backend công bố kết quả cuối cùng."}</p>
         </div>
         <span className={styles.statusPill}>{finalReady ? <Check size={12} /> : <LockKeyhole size={12} />} {finalStatusText}</span>
@@ -1049,7 +1051,8 @@ function OwnTrustJourney({
         <>
           <div className={styles.finalMetrics}>
             <Metric label="Truth assessment" value={finalVerdict} />
-            <Metric label="Security risk" value={finalSecurity} />
+            <Metric label="Security classification" value={finalSecurityClassification} />
+            <Metric label="Security risk" value={finalSecurityRisk} />
             <Metric label="Recommended action" value={finalAction} />
             <Metric label="Confidence" value={percentOrValue(finalPredict.assessmentConfidence ?? finalPredict.decisionConfidence)} />
             <Metric label="Confidence kind" value={finalPredict.confidenceKind} />

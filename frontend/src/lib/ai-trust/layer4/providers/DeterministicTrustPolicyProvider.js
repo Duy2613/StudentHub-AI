@@ -27,6 +27,19 @@ const SUCCESS_PROVIDER_STATUS = new Set(["SUCCESS", "success", "healthy"]);
 const SAFE_REPUTATION_VERDICTS = new Set(["SAFE", "NO_KNOWN_THREAT"]);
 const STRONG_SECURITY_SIGNAL_PATTERN = /credential|password|otp|account[\s_-]*takeover|phish|malware|ransom|payment|financial|bank|remote[\s_-]*access|executable|apk|install|impersonat|social[\s_-]*engineer|prompt[\s_-]*injection|ssrf|dangerous|download[\s_-]*file|secret|cvv|credit[\s_-]*card|gift[\s_-]*card|open[\s_-]*redirect|homograph|punycode|obfuscat|shortener|suspicious[\s_-]*query/i;
 const STRONG_DOMAIN_RISK_PATTERN = /credential|account|phish|payment|financial|scam|fake|impersonat|money|loan|refund|reward|transfer|escrow|certificate|housing|internship/i;
+const OPERATIONAL_L2_FAILURES = new Set([
+  "UNKNOWN", "PARTIAL", "DEGRADED", "TIMEOUT", "RATE_LIMITED", "AUTH_FAILED",
+  "MODEL_NOT_AVAILABLE", "MODEL_INCOMPATIBLE", "NETWORK_ERROR", "NETWORK_TIMEOUT",
+  "NOT_CONFIGURED", "UNAVAILABLE", "INVALID_RESPONSE", "COOLDOWN", "BUDGET_EXHAUSTED",
+  "PERMISSION_DENIED", "INVALID_REQUEST", "SERVICE_UNAVAILABLE", "UPSTREAM_ERROR", "FALLBACK_USED",
+]);
+const SOFT_REVIEW_VECTORS = new Set([
+  "insufficient_evidence",
+  "threat_intelligence_unavailable",
+  "unverified_factual_claim",
+  "student_domain_verification_gap",
+  "local_or_semantic_suspicion",
+]);
 
 function asArray(value) {
   return Array.isArray(value) ? value : [];
@@ -34,6 +47,10 @@ function asArray(value) {
 
 function isFiniteUnit(value) {
   return Number.isFinite(value) && value >= 0 && value <= 1;
+}
+
+function isOperationallyPartial(status) {
+  return OPERATIONAL_L2_FAILURES.has(String(status || "").trim().toUpperCase());
 }
 
 function hasThreatLookup(fusedGraph) {
@@ -93,15 +110,18 @@ function hasValidatedLiveExternalTarget(fusedGraph) {
 }
 
 function hasStrongSecurityNegative(fusedGraph, riskAssessment) {
-  if ([SECURITY_RISK_LEVEL.HIGH, SECURITY_RISK_LEVEL.CRITICAL].includes(riskAssessment?.level)) return true;
+  const hasMaterialRiskVector = asArray(riskAssessment?.primaryVectors)
+    .some((vector) => !SOFT_REVIEW_VECTORS.has(String(vector)));
+  if ([SECURITY_RISK_LEVEL.HIGH, SECURITY_RISK_LEVEL.CRITICAL].includes(riskAssessment?.level) && hasMaterialRiskVector) return true;
   if (["BLOCK", "MALICIOUS"].includes(String(fusedGraph?.layer1Status || "").toUpperCase())) return true;
   if (["BLOCK", "MALICIOUS"].includes(String(fusedGraph?.layer2Status || "").toUpperCase())) return true;
 
   const semanticClassification = String(fusedGraph?.layer2Classification || "").toUpperCase();
-  if (["MALICIOUS", "DECEPTIVE", "MISLEADING"].includes(semanticClassification)) return true;
+  if (!isOperationallyPartial(fusedGraph?.layer2ProviderStatus) &&
+    ["MALICIOUS", "DECEPTIVE", "MISLEADING"].includes(semanticClassification)) return true;
 
   const domainClassification = String(fusedGraph?.layer2CClassification || "").toUpperCase();
-  if (STRONG_DOMAIN_RISK_PATTERN.test(domainClassification)) return true;
+  if (!isOperationallyPartial(fusedGraph?.layer2CModelStatus) && STRONG_DOMAIN_RISK_PATTERN.test(domainClassification)) return true;
 
   const signals = [
     ...asArray(fusedGraph?.layer1Signals),
@@ -112,6 +132,7 @@ function hasStrongSecurityNegative(fusedGraph, riskAssessment) {
   ];
   return signals.some((signal) => {
     if (!signal || typeof signal !== "object") return false;
+    if (signal.authoritative === false) return false;
     const label = [signal.type, signal.code, signal.classification, signal.tactic, signal.asset]
       .filter((value) => typeof value === "string")
       .join(" ");
@@ -178,13 +199,17 @@ function mapTruthStatus(truthAssessment, fusedGraph, reconciliation) {
 }
 
 function getLocalSuspicion(fusedGraph, riskAssessment) {
-  return fusedGraph?.layer1Status === "SUSPICIOUS" ||
+  const semanticSuspicion = !isOperationallyPartial(fusedGraph?.layer2ProviderStatus) && (
     fusedGraph?.layer2Status === "SUSPICIOUS" ||
-    fusedGraph?.layer2Classification === "DECEPTIVE" ||
-    (typeof fusedGraph?.layer2CClassification === "string" &&
-      !["NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN"].includes(fusedGraph.layer2CClassification)) ||
-    riskAssessment?.level === SECURITY_RISK_LEVEL.HIGH ||
-    riskAssessment?.level === SECURITY_RISK_LEVEL.MEDIUM;
+    ["DECEPTIVE", "MISLEADING", "MALICIOUS"].includes(String(fusedGraph?.layer2Classification || "").toUpperCase())
+  );
+  const domainSuspicion = !isOperationallyPartial(fusedGraph?.layer2CModelStatus) &&
+    typeof fusedGraph?.layer2CClassification === "string" &&
+    !["NO_MATERIAL_STUDENT_RISK", "UNKNOWN_STUDENT_RISK", "UNKNOWN"].includes(fusedGraph.layer2CClassification);
+  const materialRisk = asArray(riskAssessment?.primaryVectors).some((vector) => !SOFT_REVIEW_VECTORS.has(String(vector)));
+  return fusedGraph?.layer1Status === "SUSPICIOUS" || semanticSuspicion || domainSuspicion || (
+    [SECURITY_RISK_LEVEL.HIGH, SECURITY_RISK_LEVEL.MEDIUM].includes(riskAssessment?.level) && materialRisk
+  );
 }
 
 function resolveLegacyClassification(truthAssessment, securityClassification, evidenceSufficient) {

@@ -142,6 +142,13 @@ function normalizeSignal(value, index, kind, authoritative) {
   if (!isPlainObject(value)) return null;
   const type = boundedString(value.type, 120).trim();
   if (!type || !/^[a-zA-Z0-9_.:-]+$/u.test(type)) return null;
+  // Neural/advisory detectors may be useful for diagnostics and Layer 3
+  // planning, but they are not an authoritative semantic finding.  Preserve
+  // an explicit false from the provider instead of re-promoting it merely
+  // because the provider itself is the deterministic baseline.
+  const normalizedAuthoritative = authoritative &&
+    value.authoritative !== false &&
+    !type.toLowerCase().startsWith("neural_");
   const details = boundedString(value.details || value.description, SEMANTIC_BOUNDARY_LIMITS.DETAILS).trim();
   const safeEvidence = isPlainObject(value.evidence)
     ? Object.fromEntries(Object.entries(value.evidence).slice(0, 8).map(([key, item]) => [
@@ -156,10 +163,10 @@ function normalizeSignal(value, index, kind, authoritative) {
     details,
     evidence: safeEvidence,
     confidence: clampUnit(value.confidence, 0),
-    source: "ai_candidate_semantic_signal",
-    detector: "ai_candidate_semantic_signal",
+    source: boundedString(value.source, 100).trim() || (normalizedAuthoritative ? "deterministic_semantic_signal" : "ai_candidate_semantic_signal"),
+    detector: boundedString(value.detector, 100).trim() || (normalizedAuthoritative ? "deterministic_semantic_signal" : "ai_candidate_semantic_signal"),
     ruleVersion: "layer2b-provider-boundary-v1",
-    authoritative,
+    authoritative: normalizedAuthoritative,
     inputTrust: "UNTRUSTED_CONTENT",
   };
 }
@@ -168,6 +175,9 @@ function normalizeFinding(value, index, kind, authoritative) {
   if (!isPlainObject(value)) return null;
   const type = boundedString(value.type, 120).trim();
   if (!type || !/^[a-zA-Z0-9_.:-]+$/u.test(type)) return null;
+  const normalizedAuthoritative = authoritative &&
+    value.authoritative !== false &&
+    !type.toLowerCase().startsWith("neural_");
   const evidence = boundedArray(value.evidence, 8).map((item) => boundedString(item, 400)).filter(Boolean);
   return {
     findingId: boundedString(value.findingId, 160).trim() || `provider-${kind}-${index + 1}`,
@@ -176,8 +186,8 @@ function normalizeFinding(value, index, kind, authoritative) {
     confidence: clampUnit(value.confidence, 0),
     evidence,
     details: boundedString(value.details || value.description, SEMANTIC_BOUNDARY_LIMITS.DETAILS),
-    source: "ai_candidate_semantic_finding",
-    authoritative,
+    source: boundedString(value.source, 100).trim() || (normalizedAuthoritative ? "deterministic_semantic_finding" : "ai_candidate_semantic_finding"),
+    authoritative: normalizedAuthoritative,
     inputTrust: "UNTRUSTED_CONTENT",
   };
 }

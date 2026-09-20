@@ -114,6 +114,27 @@ describe("Layer 4 deterministic policy boundary", () => {
     assert.notEqual(result.securityClassification, "NO_KNOWN_THREAT");
   });
 
+  it("does not turn an L2 cooldown/partial label into security suspicion", async () => {
+    const result = await Layer4TrustService.evaluate({
+      layer1Result: cleanLayer1(),
+      layer2Result: {
+        layer: 2,
+        status: "SUSPICIOUS",
+        classification: "UNKNOWN",
+        claims: [],
+        contextSignals: [],
+        details: { providerStatus: "COOLDOWN" },
+        metrics: { providerStatus: "COOLDOWN" },
+      },
+      layer2AResult: { layer: "2A", providerStatus: "NOT_APPLICABLE", finding: "NOT_APPLICABLE" },
+      layer3Result: { layer: 3, status: "NOT_APPLICABLE", evidence: [], claims: [] },
+    });
+
+    assert.equal(result.securityClassification, "UNKNOWN");
+    assert.equal(result.enforcement, "REVIEW");
+    assert.notEqual(result.riskAssessment.level, "MEDIUM");
+  });
+
   it("keeps local suspicion at WARN even when threat intelligence returns no-match", async () => {
     const result = await Layer4TrustService.evaluate({
       layer1Result: { ...cleanLayer1(), status: "SUSPICIOUS" },
