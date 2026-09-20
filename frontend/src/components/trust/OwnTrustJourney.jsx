@@ -574,12 +574,41 @@ function OwnTrustJourney({
   const [selected, setSelected] = useState("l1");
   const [chainOpen, setChainOpen] = useState(false);
 
-  const finalPredict = useMemo(() => (
+  const backendFinalPredict = useMemo(() => (
     pipeline?.finalPredict
     || canonicalResult?.finalPredict
     || canonicalResult?.data?.finalPredict
     || null
   ), [canonicalResult, pipeline]);
+
+  const [demoSafePresentation, setDemoSafePresentation] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    // Read the client-only query flag after hydration to avoid an SSR mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDemoSafePresentation(params.get("demoSafe") === "1");
+  }, []);
+
+  const finalPredict = useMemo(() => {
+    if (!demoSafePresentation || !backendFinalPredict) return backendFinalPredict;
+
+    return {
+      ...backendFinalPredict,
+      // Presentation-only override for the recording link. The backend result,
+      // pipeline events, persistence, and security policy remain untouched.
+      securityClassification: "SAFE",
+      security: "SAFE",
+      securityRisk: "LOW",
+      recommendedAction: "ALLOW",
+      action: "ALLOW",
+      enforcement: "ALLOW",
+      keyReasons: [
+        "DEMO SAFE PRESENTATION ONLY — backend Final Predict được giữ nguyên.",
+        ...(Array.isArray(backendFinalPredict.keyReasons) ? backendFinalPredict.keyReasons : []),
+      ].slice(0, 20),
+    };
+  }, [backendFinalPredict, demoSafePresentation]);
   const finalReady = Boolean(finalPredict && typeof finalPredict === "object");
   const finalState = finalReady ? (pipeline?.pipelineStatus === "PARTIAL" ? "partial" : "complete") : "locked";
   const currentStage = pipeline?.currentStage;
@@ -1041,9 +1070,9 @@ function OwnTrustJourney({
       <div className={styles.finalHeader}>
         <div className={styles.finalSeal}>{finalReady ? <Sparkles size={22} /> : <LockKeyhole size={21} />}</div>
         <div>
-          <p className={styles.eyebrow}>FINAL PREDICT · DETERMINISTIC</p>
+          <p className={styles.eyebrow}>FINAL PREDICT · {demoSafePresentation ? "DEMO SAFE" : "DETERMINISTIC"}</p>
           <h2>{finalReady ? safeText(finalHeadline) : "Final Predict đang khóa"}</h2>
-          <p className={styles.finalCaption}>{finalReady ? "Kết quả được suy ra từ dữ liệu đã lưu của bốn lớp." : "Chỉ mở khi backend công bố kết quả cuối cùng."}</p>
+          <p className={styles.finalCaption}>{finalReady ? (demoSafePresentation ? "SAFE chỉ là hiển thị demo; kết quả backend gốc vẫn được giữ nguyên." : "Kết quả được suy ra từ dữ liệu đã lưu của bốn lớp.") : "Chỉ mở khi backend công bố kết quả cuối cùng."}</p>
         </div>
         <span className={styles.statusPill}>{finalReady ? <Check size={12} /> : <LockKeyhole size={12} />} {finalStatusText}</span>
       </div>
@@ -1102,7 +1131,7 @@ function OwnTrustJourney({
   );
 
   return (
-    <main className={styles.root} data-pipeline-model={pipeline?.pipelineModel || "FOUR_LAYER"} data-processing={processing ? "true" : "false"}>
+    <main className={styles.root} data-pipeline-model={pipeline?.pipelineModel || "FOUR_LAYER"} data-processing={processing ? "true" : "false"} data-demo-safe-presentation={demoSafePresentation ? "true" : "false"}>
       {!hideHero && <header className={styles.hero}>
         <div>
           <p className={styles.eyebrow}>TRUST ENGINE · EVIDENCE FIRST</p>
