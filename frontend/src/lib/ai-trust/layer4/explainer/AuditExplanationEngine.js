@@ -56,7 +56,9 @@ export class AuditExplanationEngine {
       uncertainties.push("Tín hiệu đáng ngờ không tự nó chứng minh toàn bộ nội dung là độc hại; cần giữ trạng thái cảnh báo.");
     } else if (securityClassification === SECURITY_CLASSIFICATION.NO_KNOWN_THREAT) {
       verdictTitle = "KHÔNG PHÁT HIỆN MỐI ĐE DỌA ĐÃ BIẾT";
-      why = "Các kiểm tra hiện có không phát hiện mối đe dọa đã biết hoặc bằng chứng đang hỗ trợ nội dung trong phạm vi được kiểm tra.";
+      why = fusedGraph.validatedReputationAndLiveTarget === true
+        ? "Layer 2A đã nhận kết quả SAFE từ các provider reputation đã thực thi và Layer 3 đã fetch URL thành công với live provenance; vì vậy security target được cho phép tiếp tục có điều kiện."
+        : "Các kiểm tra hiện có không phát hiện mối đe dọa đã biết hoặc bằng chứng đang hỗ trợ nội dung trong phạm vi được kiểm tra.";
       riskSummary = `Mức độ rủi ro: ${riskLevel || "THẤP"}. Đây không phải chứng nhận an toàn hoặc chứng minh sự thật tuyệt đối.`;
       recommendedActionNote = "Vẫn thận trọng với yêu cầu thanh toán, mã OTP, đăng nhập và tệp tải xuống; không coi kết quả này là bảo đảm an toàn.";
       uncertainties.push("Không phát hiện mối đe dọa đã biết không đồng nghĩa với đã chứng minh an toàn.");

@@ -49,6 +49,43 @@ function evidenceBackedInputs() {
   };
 }
 
+function validatedSafeReputation() {
+  return markTrustedLayer2AResult({
+    layer: "2A",
+    providerStatus: "SUCCESS",
+    finding: "NO_KNOWN_THREAT",
+    securityClassification: "NO_KNOWN_THREAT",
+    providerResults: [
+      { provider: "Google Safe Browsing", success: true, verdict: "SAFE" },
+      { provider: "Firefox Safe Browsing", success: true, verdict: "SAFE" },
+    ],
+    provenance: { noMatchIsSafetyProof: false },
+  });
+}
+
+function validatedLiveUrl() {
+  return markTrustedLayer3Result({
+    layer: 3,
+    status: "NOT_APPLICABLE",
+    externalEvidence: true,
+    sources: [{
+      sourceId: "direct-chatgpt",
+      url: "https://chatgpt.com/",
+      sourceType: "USER_SUPPLIED",
+      providerStatus: "SUCCESS",
+      liveEvidence: true,
+      sourceFingerprint: "sha256-direct-chatgpt",
+      retrievalOutcome: "SUCCESS",
+      httpStatus: 200,
+      sourceScope: "direct_input",
+    }],
+    evidence: [],
+    claims: [],
+    conflicts: [],
+    verificationCompleteness: 0,
+  });
+}
+
 describe("Layer 4 deterministic policy boundary", () => {
   it("fails closed for missing and malformed upstream graphs", async () => {
     const result = await Layer4TrustService.evaluate({
@@ -93,6 +130,40 @@ describe("Layer 4 deterministic policy boundary", () => {
 
     assert.equal(result.securityClassification, "SUSPICIOUS");
     assert.equal(result.enforcement, "WARN");
+  });
+
+  it("clears soft local suspicion after all reputation providers and Layer 3 validate the URL target", async () => {
+    const result = await Layer4TrustService.evaluate({
+      layer1Result: { ...cleanLayer1(), status: "SUSPICIOUS", signals: [{ type: "url_heuristic" }] },
+      layer2Result: {
+        layer: 2,
+        status: "SUSPICIOUS",
+        classification: "UNVERIFIED",
+        claims: [],
+        contextSignals: [],
+      },
+      layer2AResult: validatedSafeReputation(),
+      layer3Result: validatedLiveUrl(),
+    });
+
+    assert.equal(result.securityClassification, "NO_KNOWN_THREAT");
+    assert.equal(result.enforcement, "ALLOW_WITH_CAUTION");
+    assert.equal(result.riskAssessment.level, "LOW");
+    assert.ok(result.auditTrail.policyPrecedence.includes("L2A_ALL_PROVIDERS_SAFE_PLUS_L3_LIVE_TARGET"));
+    assert.match(result.userExplanation.why, /Layer 2A.*Layer 3/i);
+  });
+
+  it("never lets reputation clearance downgrade a credential hard negative", async () => {
+    const result = await Layer4TrustService.evaluate({
+      layer1Result: { ...cleanLayer1(), signals: [{ type: "credential_request" }] },
+      layer2Result: { layer: 2, status: "PASS", classification: "BENIGN", claims: [], contextSignals: [] },
+      layer2AResult: validatedSafeReputation(),
+      layer3Result: validatedLiveUrl(),
+    });
+
+    assert.equal(result.securityClassification, "MALICIOUS");
+    assert.equal(result.enforcement, "BLOCK");
+    assert.equal(result.auditTrail.hardRuleTriggered, "HARD_RULE_2_CREDENTIAL_PHISHING");
   });
 
   it("keeps an explicit provider no-match bounded and non-safe", async () => {

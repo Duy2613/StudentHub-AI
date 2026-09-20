@@ -24,6 +24,9 @@ import { isTrustedLayer2AResult } from "../../layer2a/TrustBoundary.js";
 import { isTrustedLayer3Result } from "../../layer3/TrustBoundary.js";
 
 const SUCCESS_PROVIDER_STATUS = new Set(["SUCCESS", "success", "healthy"]);
+const SAFE_REPUTATION_VERDICTS = new Set(["SAFE", "NO_KNOWN_THREAT"]);
+const STRONG_SECURITY_SIGNAL_PATTERN = /credential|password|otp|account[\s_-]*takeover|phish|malware|ransom|payment|financial|bank|remote[\s_-]*access|executable|apk|install|impersonat|social[\s_-]*engineer|prompt[\s_-]*injection|ssrf|dangerous|download[\s_-]*file|secret|cvv|credit[\s_-]*card|gift[\s_-]*card|open[\s_-]*redirect|homograph|punycode|obfuscat|shortener|suspicious[\s_-]*query/i;
+const STRONG_DOMAIN_RISK_PATTERN = /credential|account|phish|payment|financial|scam|fake|impersonat|money|loan|refund|reward|transfer|escrow|certificate|housing|internship/i;
 
 function asArray(value) {
   return Array.isArray(value) ? value : [];
@@ -47,6 +50,73 @@ function hasValidNoKnownThreat(fusedGraph) {
   return SUCCESS_PROVIDER_STATUS.has(result.providerStatus) &&
     result.finding === "NO_KNOWN_THREAT" &&
     result.provenance?.noMatchIsSafetyProof === false;
+}
+
+function hasValidatedReputationClearance(fusedGraph) {
+  const result = fusedGraph?.layer2AResult;
+  if (!hasValidNoKnownThreat(fusedGraph)) return false;
+
+  // The deployed Layer 2A adapter exposes one normalized observation per
+  // reputation provider (Google/Firefox/Safe Browsing/etc.). A no-match with
+  // a failed or unknown nested provider is not a clearance. Older trusted
+  // single-provider adapters may omit providerResults, so that shape remains
+  // valid only because the service capability already marked it trusted.
+  const providerResults = asArray(result.providerResults);
+  if (providerResults.length === 0) return true;
+  return providerResults.every((provider) => {
+    if (!provider || typeof provider !== "object") return false;
+    const verdict = String(provider.verdict || provider.finding || "").trim().toUpperCase();
+    return provider.success === true && SAFE_REPUTATION_VERDICTS.has(verdict);
+  });
+}
+
+function hasValidatedLiveExternalTarget(fusedGraph) {
+  const layer3Result = fusedGraph?.layer3Result;
+  if (!isTrustedLayer3Result(layer3Result) || layer3Result.externalEvidence !== true) return false;
+
+  const candidates = [
+    ...asArray(fusedGraph?.layer3Sources),
+    ...asArray(fusedGraph?.layer3Evidence),
+  ];
+  return candidates.some((item) => {
+    if (!item || typeof item !== "object") return false;
+    const url = item.url || item.sourceUrl || item.canonicalUrl;
+    const fingerprint = item.sourceFingerprint;
+    const httpStatus = item.httpStatus;
+    return item.liveEvidence === true &&
+      SUCCESS_PROVIDER_STATUS.has(item.providerStatus) &&
+      item.retrievalOutcome === "SUCCESS" &&
+      typeof fingerprint === "string" && fingerprint.trim().length > 0 &&
+      typeof url === "string" && /^https?:\/\//i.test(url) &&
+      (httpStatus == null || Number(httpStatus) === 200);
+  });
+}
+
+function hasStrongSecurityNegative(fusedGraph, riskAssessment) {
+  if ([SECURITY_RISK_LEVEL.HIGH, SECURITY_RISK_LEVEL.CRITICAL].includes(riskAssessment?.level)) return true;
+  if (["BLOCK", "MALICIOUS"].includes(String(fusedGraph?.layer1Status || "").toUpperCase())) return true;
+  if (["BLOCK", "MALICIOUS"].includes(String(fusedGraph?.layer2Status || "").toUpperCase())) return true;
+
+  const semanticClassification = String(fusedGraph?.layer2Classification || "").toUpperCase();
+  if (["MALICIOUS", "DECEPTIVE", "MISLEADING"].includes(semanticClassification)) return true;
+
+  const domainClassification = String(fusedGraph?.layer2CClassification || "").toUpperCase();
+  if (STRONG_DOMAIN_RISK_PATTERN.test(domainClassification)) return true;
+
+  const signals = [
+    ...asArray(fusedGraph?.layer1Signals),
+    ...asArray(fusedGraph?.layer2ContextSignals),
+    ...asArray(fusedGraph?.layer2CDomainSignals),
+    ...asArray(fusedGraph?.layer2CrossModalFindings),
+    ...asArray(fusedGraph?.layer2ManipulationResult?.detectedTactics),
+  ];
+  return signals.some((signal) => {
+    if (!signal || typeof signal !== "object") return false;
+    const label = [signal.type, signal.code, signal.classification, signal.tactic, signal.asset]
+      .filter((value) => typeof value === "string")
+      .join(" ");
+    return STRONG_SECURITY_SIGNAL_PATTERN.test(label);
+  });
 }
 
 function hasUsableEvidence(fusedGraph) {
@@ -200,7 +270,7 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
       safeGraph.layer3Evidence,
       safeGraph.layer3Sources
     );
-    const riskAssessment = RiskAssessmentEngine.assessRisk(safeGraph, reconciliation);
+    const baseRiskAssessment = RiskAssessmentEngine.assessRisk(safeGraph, reconciliation);
     const truthAssessment = TruthAssessmentEngine.assessTruth(safeGraph, reconciliation);
     const truthStatus = mapTruthStatus(truthAssessment, safeGraph, reconciliation);
     const evidenceSufficient = hasUsableEvidence(safeGraph);
@@ -208,9 +278,30 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
     const threatLookupSucceeded = hasValidNoKnownThreat(safeGraph) ||
       (threatLookupPresent && SUCCESS_PROVIDER_STATUS.has(safeGraph.layer2AProviderStatus) && safeGraph.layer2AFinding === "THREAT_MATCH");
     const threatLookupFailed = threatLookupPresent && !threatLookupSucceeded;
-    const localSuspicion = getLocalSuspicion(safeGraph, riskAssessment);
+    const reputationClearance = hasValidatedReputationClearance(safeGraph);
+    const liveExternalTarget = hasValidatedLiveExternalTarget(safeGraph);
+    const validatedReputationSafeTarget = reputationClearance &&
+      liveExternalTarget &&
+      !hasUnresolvedConflict(safeGraph, reconciliation) &&
+      !hasStrongSecurityNegative(safeGraph, baseRiskAssessment);
+    const riskAssessment = validatedReputationSafeTarget && baseRiskAssessment.level === SECURITY_RISK_LEVEL.MEDIUM
+      ? {
+        ...baseRiskAssessment,
+        level: SECURITY_RISK_LEVEL.LOW,
+        primaryVectors: [
+          ...baseRiskAssessment.primaryVectors.filter((vector) => ![
+            "local_or_semantic_suspicion",
+            "student_domain_risk_pattern",
+            "student_domain_verification_gap",
+          ].includes(vector)),
+          "validated_l2_reputation_and_l3_live_target",
+        ],
+      }
+      : baseRiskAssessment;
+    const localSuspicion = getLocalSuspicion(safeGraph, baseRiskAssessment);
     const hasUnknownLayer = safeGraph.layer1Status === "UNKNOWN" || safeGraph.layer2Status === "UNKNOWN";
     const noKnownThreat = hasValidNoKnownThreat(safeGraph);
+    safeGraph.validatedReputationAndLiveTarget = validatedReputationSafeTarget;
 
     let securityClassification = SECURITY_CLASSIFICATION.UNKNOWN;
     let enforcement = RECOMMENDED_ACTION.REVIEW;
@@ -226,6 +317,14 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
       securityClassification = SECURITY_CLASSIFICATION.SUSPICIOUS;
       enforcement = RECOMMENDED_ACTION.REVIEW;
       policyPrecedence.push("UNRESOLVED_SOURCE_CONFLICT", "REVIEW");
+    } else if (validatedReputationSafeTarget) {
+      // A no-match alone is intentionally not a safety proof. This branch is
+      // narrower: every trusted reputation provider cleared the target and L3
+      // independently fetched the URL with live provenance. It clears only
+      // soft local suspicion; hard negatives remain above this branch.
+      securityClassification = SECURITY_CLASSIFICATION.NO_KNOWN_THREAT;
+      enforcement = RECOMMENDED_ACTION.ALLOW_WITH_CAUTION;
+      policyPrecedence.push("L2A_ALL_PROVIDERS_SAFE_PLUS_L3_LIVE_TARGET", "ALLOW_WITH_CAUTION");
     } else if (localSuspicion) {
       securityClassification = SECURITY_CLASSIFICATION.SUSPICIOUS;
       enforcement = threatLookupFailed ? RECOMMENDED_ACTION.REVIEW : RECOMMENDED_ACTION.WARN;
@@ -281,7 +380,8 @@ export class DeterministicTrustPolicyProvider extends ITrustReasoningModel {
       conflicts: reconciliation.unresolvedConflicts,
       limitations: [
         ...(threatLookupFailed ? ["Threat-intelligence provider did not return a usable result."] : []),
-        ...(!evidenceSufficient ? ["Không đủ bằng chứng có provenance để xác minh an toàn."] : []),
+        ...(!evidenceSufficient && !validatedReputationSafeTarget ? ["Không đủ bằng chứng có provenance để xác minh an toàn."] : []),
+        ...(validatedReputationSafeTarget ? ["Security target đã được reputation đa provider và L3 live fetch clearance; điều này không chứng minh factual claim là đúng."] : []),
         ...reconciliation.temporalUpdates.map((t) => t.notes),
       ],
       recommendedAction: enforcement,

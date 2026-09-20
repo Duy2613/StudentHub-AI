@@ -3,6 +3,8 @@ import test from "node:test";
 
 import { OwnBackendTrustOrchestrator } from "../../src/lib/ai-trust/OwnBackendTrustOrchestrator.js";
 import { Layer3EvidenceService } from "../../src/lib/ai-trust/layer3/Layer3EvidenceService.js";
+import { markTrustedLayer2AResult } from "../../src/lib/ai-trust/layer2a/TrustBoundary.js";
+import { markTrustedLayer3Result } from "../../src/lib/ai-trust/layer3/TrustBoundary.js";
 
 function servicesWithLiveEvidence(calls) {
   return {
@@ -271,6 +273,71 @@ function servicesWithGeminiValidatedClaimEvidence() {
   return services;
 }
 
+function servicesWithReputationValidatedSafeUrl() {
+  return {
+    l1: async () => ({ status: "SUSPICIOUS", reasons: ["Fixture URL heuristic."], signals: [], metrics: {} }),
+    l2a: async () => markTrustedLayer2AResult({
+      provider: "fixture-reputation-aggregator",
+      providerStatus: "SUCCESS",
+      finding: "NO_KNOWN_THREAT",
+      securityClassification: "NO_KNOWN_THREAT",
+      providerResults: [
+        { provider: "Google Safe Browsing", success: true, verdict: "SAFE" },
+        { provider: "Firefox Safe Browsing", success: true, verdict: "SAFE" },
+      ],
+      provenance: { noMatchIsSafetyProof: false },
+    }),
+    l2b: async () => ({
+      status: "PASS",
+      classification: "BENIGN",
+      confidence: 0.8,
+      semanticSummary: "No material semantic risk in the fixture URL.",
+      contextSignals: [],
+      claims: [],
+      entities: [],
+      details: { providerStatus: "SUCCESS", providerIndependent: true },
+    }),
+    l2c: async () => ({
+      classification: "NO_MATERIAL_STUDENT_RISK",
+      modelStatus: "BASELINE_RULE_MODEL",
+      riskSignals: [],
+      explanation: "No material domain risk in the fixture URL.",
+    }),
+    l3: async () => markTrustedLayer3Result({
+      status: "NOT_APPLICABLE",
+      retrievalStatus: "SUCCESS",
+      retrievalMode: "EXTERNAL_RETRIEVER",
+      externalEvidence: true,
+      sources: [{
+        sourceId: "fixture-chatgpt",
+        url: "https://chatgpt.com/",
+        sourceType: "USER_SUPPLIED",
+        providerStatus: "SUCCESS",
+        liveEvidence: true,
+        sourceFingerprint: "sha256-fixture-chatgpt",
+        retrievalOutcome: "SUCCESS",
+        httpStatus: 200,
+        sourceScope: "direct_input",
+      }],
+      evidence: [],
+      conflicts: [],
+      verificationCompleteness: 0,
+      metrics: { retrievalStatus: "SUCCESS", providerCallCount: 1 },
+    }),
+    l4: async () => ({
+      securityClassification: "SUSPICIOUS",
+      truthStatus: "NOT_APPLICABLE",
+      enforcement: "WARN",
+      recommendedAction: "WARN",
+      riskAssessment: { level: "MEDIUM", confidence: 0.45, primaryVectors: ["local_or_semantic_suspicion"] },
+      decisionConfidence: 0.45,
+      keyReasons: ["Soft URL heuristic only."],
+      aiVerificationStatus: "FALLBACK_DETERMINISTIC",
+      aiVerification: { verdictSignal: "UNCERTAIN", citationsUsed: [] },
+    }),
+  };
+}
+
 test("own backend publishes exactly four stages and deterministic Final Predict", async () => {
   const calls = { l4: 0 };
   const events = [];
@@ -335,6 +402,23 @@ test("Final Predict consumes verified Gemini URL evidence for a cautious safe-ta
   assert.equal(result.finalPredict.truthStatus, "INSUFFICIENT_EVIDENCE");
   assert.equal(result.finalPredict.evidenceSufficiency, "INSUFFICIENT");
   assert.ok(result.finalPredict.sources.some((source) => source.url === "https://zalo.me/fixture"));
+});
+
+test("Final Predict uses multi-provider Layer 2A clearance plus a live Layer 3 URL to clear a soft warning", async () => {
+  const orchestrator = new OwnBackendTrustOrchestrator({ services: servicesWithReputationValidatedSafeUrl() });
+
+  const result = await orchestrator.run({
+    type: "url",
+    content: "https://chatgpt.com/",
+    metadata: { url: "https://chatgpt.com/" },
+  }, { requestId: "req_l2a_l3_safe_target" });
+
+  assert.equal(result.finalPredict.securityClassification, "NO_KNOWN_THREAT");
+  assert.equal(result.finalPredict.recommendedAction, "ALLOW_WITH_CAUTION");
+  assert.equal(result.finalPredict.securityEvidenceStatus, "L2_REPUTATION_L3_LIVE");
+  assert.equal(result.finalPredict.securityRisk, "LOW");
+  assert.equal(result.finalPredict.validatedSecuritySourceCount, 1);
+  assert.equal(result.finalDecision.security, "NO_KNOWN_THREAT");
 });
 
 test("Final Predict lets validated Gemini evidence refine an unresolved truth status only when Layer 3 is sufficient", async () => {

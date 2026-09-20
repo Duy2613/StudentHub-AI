@@ -40,6 +40,8 @@ import { TrustPipelineCancelledError } from "./v5/TrustPipelineOrchestrator.js";
 import { buildCanonicalTrustProjection } from "./integrations/canonicalTrustProjection.js";
 import { MediaArtifactService } from "../server/media/MediaArtifactService.js";
 import { buildLegacyPipelineResponse } from "./legacy/LegacyResponseProjector.js";
+import { isTrustedLayer2AResult } from "./layer2a/TrustBoundary.js";
+import { isTrustedLayer3Result } from "./layer3/TrustBoundary.js";
 
 const TRANSIENT_L2_STATUS = new Set([
   "TIMEOUT", "RATE_LIMITED", "AUTH_FAILED", "MODEL_NOT_AVAILABLE", "NETWORK_ERROR",
@@ -136,6 +138,49 @@ function statusText(...values) {
 
 function providerFailure(status) {
   return TRANSIENT_L2_STATUS.has(statusText(status)) || ["UNKNOWN", "NOT_CONFIGURED", "INVALID_INPUT"].includes(statusText(status));
+}
+
+const FINAL_SAFE_REPUTATION_VERDICTS = new Set(["SAFE", "NO_KNOWN_THREAT"]);
+
+function hasFinalReputationClearance(layer2A) {
+  if (!layer2A || typeof layer2A !== "object" || !isTrustedLayer2AResult(layer2A)) return false;
+  if (statusText(layer2A.providerStatus) !== "SUCCESS" || layer2A.finding !== "NO_KNOWN_THREAT") return false;
+  if (layer2A.provenance?.noMatchIsSafetyProof !== false) return false;
+  const providerResults = Array.isArray(layer2A.providerResults) ? layer2A.providerResults : [];
+  if (providerResults.length === 0) return true;
+  return providerResults.every((provider) => provider?.success === true && FINAL_SAFE_REPUTATION_VERDICTS.has(statusText(provider.verdict, provider.finding)));
+}
+
+function hasFinalLiveExternalTarget(layer3) {
+  if (!layer3 || typeof layer3 !== "object" || !isTrustedLayer3Result(layer3) || layer3.externalEvidence !== true) return false;
+  const candidates = [
+    ...(Array.isArray(layer3.sources) ? layer3.sources : []),
+    ...(Array.isArray(layer3.evidence) ? layer3.evidence : []),
+  ];
+  return candidates.some((item) => {
+    const url = item?.url || item?.sourceUrl || item?.canonicalUrl;
+    const httpStatus = item?.httpStatus;
+    return item?.liveEvidence === true &&
+      statusText(item?.providerStatus) === "SUCCESS" &&
+      item?.retrievalOutcome === "SUCCESS" &&
+      typeof item?.sourceFingerprint === "string" && item.sourceFingerprint.trim().length > 0 &&
+      typeof url === "string" && /^https?:\/\//i.test(url) &&
+      (httpStatus == null || Number(httpStatus) === 200);
+  });
+}
+
+function hasFinalStrongSecurityNegative(layer1, layer2, layer4) {
+  if (["HIGH", "CRITICAL"].includes(statusText(layer4?.riskAssessment?.level))) return true;
+  if (["MALICIOUS", "DECEPTIVE", "MISLEADING"].includes(statusText(layer2?.classification))) return true;
+  const signals = [
+    ...(Array.isArray(layer1?.signals) ? layer1.signals : []),
+    ...(Array.isArray(layer2?.contextSignals) ? layer2.contextSignals : []),
+    ...(Array.isArray(layer2?.semanticSignals) ? layer2.semanticSignals : []),
+    ...(Array.isArray(layer2?.riskSignals) ? layer2.riskSignals : []),
+  ];
+  return signals.some((signal) => /credential|password|otp|account[\s_-]*takeover|phish|malware|ransom|payment|financial|bank|remote[\s_-]*access|executable|apk|install|impersonat|social[\s_-]*engineer|prompt[\s_-]*injection|ssrf|dangerous|download[\s_-]*file|secret|cvv|credit[\s_-]*card|gift[\s_-]*card|open[\s_-]*redirect|homograph|punycode|obfuscat|shortener|suspicious[\s_-]*query/i.test(
+    [signal?.type, signal?.code, signal?.classification, signal?.asset].filter((value) => typeof value === "string").join(" "),
+  ));
 }
 
 function adapterIsEnabled(adapter) {
@@ -545,9 +590,9 @@ function stageOperationStatus(stageId, raw) {
   return ["UNAVAILABLE", "PARTIAL", "DEGRADED", "ERROR", "INVALID_RESPONSE"].includes(aiStatus) ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED;
 }
 
-function finalPredict({ layer1, layer2, layer3, layer4 }) {
+function finalPredict({ layer1, layer2, layer2A, layer3, layer4 }) {
   const l1Blocked = layer1?.status === "BLOCK" || layer1?.finding === "LOCAL_BLOCK";
-  const l2Threat = layer2?.finding === "THREAT_MATCH" || layer2?.securityClassification === "MALICIOUS";
+  const l2Threat = layer2?.finding === "THREAT_MATCH" || layer2?.securityClassification === "MALICIOUS" || layer2A?.finding === "THREAT_MATCH" || layer2A?.securityClassification === "MALICIOUS";
   const layer4Security = statusText(layer4?.securityClassification, "UNKNOWN");
   const layer4Action = statusText(layer4?.enforcement, layer4?.recommendedAction, "REVIEW");
   const geminiVerification = layer4?.aiVerification && typeof layer4.aiVerification === "object" && !Array.isArray(layer4.aiVerification)
@@ -574,29 +619,44 @@ function finalPredict({ layer1, layer2, layer3, layer4 }) {
   const layer4PolicyAllows = !layer4HardNegative &&
     layer4Security === "NO_KNOWN_THREAT" &&
     ["ALLOW", "ALLOW_WITH_CAUTION"].includes(layer4Action);
+  const l2ReputationClearance = hasFinalReputationClearance(layer2A);
+  const l3LiveExternalTarget = hasFinalLiveExternalTarget(layer3);
+  const reputationAndLiveSafeTarget = !l1Blocked &&
+    !l2Threat &&
+    !layer4HardNegative &&
+    l2ReputationClearance &&
+    l3LiveExternalTarget &&
+    !hasFinalStrongSecurityNegative(layer1, layer2, layer4);
   // Final Predict consumes the complete L4 package. A validated Gemini
   // citation can resolve an otherwise unresolved safe-target check, but it
   // can never downgrade an L1/L2/L4 hard negative or turn reachability alone
-  // into proof that a factual claim is true.
+  // into proof that a factual claim is true. A multi-provider Layer 2A
+  // clearance plus a trusted live Layer 3 fetch is a separate security-target
+  // path, so a soft semantic warning cannot hide that verified URL result.
   const geminiBackedSafeTarget = !l1Blocked && !l2Threat && !layer4HardNegative && geminiSupportsWithValidatedEvidence;
-  const securityDecisionBacked = layer4PolicyAllows || geminiBackedSafeTarget;
+  const securityDecisionBacked = layer4PolicyAllows || geminiBackedSafeTarget || reputationAndLiveSafeTarget;
   const sources = Array.isArray(layer3?.sources) ? layer3.sources : [];
   const evidence = Array.isArray(layer3?.evidence) ? layer3.evidence : [];
   const claimSpecificEvidence = evidence.filter((item) => item?.evidenceScope !== "input_context" && Boolean(item?.claimId));
   const usableSources = sources.filter((source) => source?.liveEvidence === true && source?.retrievalOutcome === "SUCCESS");
   const evidenceCount = evidence.length;
   const insufficientEvidence = usableSources.length === 0 || claimSpecificEvidence.length === 0 || layer3?.externalEvidence !== true;
+  const validatedSecuritySourceCount = l3LiveExternalTarget
+    ? sources.filter((source) => source?.liveEvidence === true && statusText(source?.providerStatus) === "SUCCESS" && source?.retrievalOutcome === "SUCCESS").length
+    : 0;
   const deterministicTruthStatus = statusText(layer4?.truthStatus, layer4?.truthAssessment?.status, "INSUFFICIENT_EVIDENCE");
   const geminiTruthRefinement = !insufficientEvidence && !l1Blocked && !l2Threat && !layer4HardNegative &&
     ["UNKNOWN", "INSUFFICIENT_EVIDENCE"].includes(deterministicTruthStatus) && Boolean(geminiTruthSignal);
   const securityClassification = l1Blocked || l2Threat
     ? "MALICIOUS"
-    : geminiBackedSafeTarget
+    : geminiBackedSafeTarget || reputationAndLiveSafeTarget
       ? "NO_KNOWN_THREAT"
       : layer4Security;
   const securityRisk = l1Blocked || l2Threat
     ? "CRITICAL"
-    : layer4?.riskAssessment?.level || "UNKNOWN";
+    : reputationAndLiveSafeTarget
+      ? "LOW"
+      : layer4?.riskAssessment?.level || "UNKNOWN";
   const truthStatus = insufficientEvidence
     ? "INSUFFICIENT_EVIDENCE"
     : geminiTruthRefinement
@@ -605,8 +665,8 @@ function finalPredict({ layer1, layer2, layer3, layer4 }) {
   const recommendedAction = l1Blocked || l2Threat
     ? "BLOCK"
     : securityDecisionBacked
-      ? (layer4PolicyAllows ? layer4Action : "ALLOW_WITH_CAUTION")
-    : insufficientEvidence
+      ? (layer4PolicyAllows && !reputationAndLiveSafeTarget ? layer4Action : "ALLOW_WITH_CAUTION")
+      : insufficientEvidence
       ? "REVIEW"
       : layer4Action;
   const decisionConfidence = insufficientEvidence
@@ -621,6 +681,7 @@ function finalPredict({ layer1, layer2, layer3, layer4 }) {
   const reasons = [
     ...(l1Blocked ? ["Layer 1 phát hiện hard block kỹ thuật."] : []),
     ...(l2Threat ? ["Layer 2 threat intelligence có threat match; không bị hạ cấp bởi các lớp sau."] : []),
+    ...(reputationAndLiveSafeTarget ? ["Layer 2A đã được các provider reputation trả về SAFE/NO_KNOWN_THREAT và Layer 3 đã xác minh URL live; Final Predict gỡ cảnh báo mềm cho security target."] : []),
     ...(geminiBackedSafeTarget ? ["Gemini Layer 4 đã đối chiếu bằng chứng URL và các liên kết đã được server xác thực; Final Predict cho phép tiếp tục có điều kiện."] : []),
     ...(geminiTruthRefinement ? [`Gemini Layer 4 đã tổng hợp claim-specific evidence của Layer 3 và bổ sung kết luận sự thật: ${truthStatus}.`] : []),
     ...boundedArray(layer4?.keyReasons, 8),
@@ -681,12 +742,15 @@ function finalPredict({ layer1, layer2, layer3, layer4 }) {
     verificationCompleteness: layer3?.verificationCompleteness ?? null,
     evidenceSufficiency: insufficientEvidence ? "INSUFFICIENT" : "SUFFICIENT",
     securityEvidenceStatus: securityDecisionBacked
-      ? (geminiBackedSafeTarget ? "GEMINI_VALIDATED" : "LAYER4_POLICY")
+      ? (reputationAndLiveSafeTarget
+        ? "L2_REPUTATION_L3_LIVE"
+        : geminiBackedSafeTarget ? "GEMINI_VALIDATED" : "LAYER4_POLICY")
       : "INSUFFICIENT",
     geminiVerdictSignal: geminiSignal,
     geminiCitationCount,
     geminiCitationsValidated,
     independentSourceCount: usableSources.length,
+    validatedSecuritySourceCount,
     evidenceCount,
     claimSpecificEvidenceCount: claimSpecificEvidence.length,
     sourceCount: sources.length,
@@ -702,6 +766,7 @@ function finalPredict({ layer1, layer2, layer3, layer4 }) {
     derivedFrom: [...FOUR_LAYER_STAGE_IDS],
     traceability: [
       { source: "l1", stage: "l1", field: "status", reason: layer1?.status || "UNKNOWN", value: layer1?.status || "UNKNOWN" },
+      { source: "l2a", stage: "l2", field: "finding", reason: layer2A?.finding || "UNKNOWN", value: layer2A?.finding || "UNKNOWN" },
       { source: "l2", stage: "l2", field: "finding", reason: layer2?.finding || "UNKNOWN", value: layer2?.finding || "UNKNOWN" },
       { source: "l3", stage: "l3", field: "externalEvidence", reason: layer3?.externalEvidence === true ? "LIVE_EVIDENCE" : "NO_LIVE_EVIDENCE", value: layer3?.externalEvidence === true ? "true" : "false" },
       { source: "l4", stage: "l4", field: "aiExecutedModel", reason: layer4?.aiExecutedModel || "AI_UNAVAILABLE", value: layer4?.aiExecutedModel || "UNKNOWN" },
@@ -1128,7 +1193,13 @@ export class OwnBackendTrustOrchestrator {
 
       this._assertActive(controller.signal);
       pipeline.currentStage = null;
-      const predict = finalPredict({ layer1: rawResults.l1, layer2: rawResults.l2, layer3: rawResults.l3, layer4: rawResults.l4 });
+      const predict = finalPredict({
+        layer1: rawResults.l1,
+        layer2: rawResults.l2,
+        layer2A: rawResults.l2Internal?.layer2A || null,
+        layer3: rawResults.l3,
+        layer4: rawResults.l4,
+      });
       pipeline.finalPredict = predict;
       pipeline.legacyResponse = buildLegacyPipelineResponse({
         input,

@@ -1201,7 +1201,7 @@ function publicFinalPredict(value) {
     "verdict", "truthVerdict", "truthStatus", "truthAssessment", "security", "securityRisk", "securityClassification",
     "recommendedAction", "action", "assessmentConfidence", "decisionConfidence", "confidence", "evidenceAgreement", "sourceQuality", "verificationCompleteness",
     "evidenceSufficiency", "independentSourceCount", "evidenceCount", "sourceCount", "status", "derivedFrom", "confidenceKind", "confidenceExplanation",
-    "authoritativeComponent", "securityEvidenceStatus", "geminiVerdictSignal", "geminiCitationCount", "geminiCitationsValidated",
+    "authoritativeComponent", "securityEvidenceStatus", "geminiVerdictSignal", "geminiCitationCount", "geminiCitationsValidated", "validatedSecuritySourceCount",
   ]) || {};
   if (value.truthAssessment && typeof value.truthAssessment === "object" && !Array.isArray(value.truthAssessment)) {
     output.truthAssessment = publicText(value.truthAssessment.status || value.truthAssessment.verdict, 120) || null;
