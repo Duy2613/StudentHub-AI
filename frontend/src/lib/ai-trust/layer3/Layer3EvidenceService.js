@@ -44,6 +44,10 @@ import {
 const MAX_CLAIMS = 40;
 const MAX_TEXT_LENGTH = 1_000_000;
 const MAX_VERIFICATION_TASKS = 80;
+// Multimodal inputs can produce many candidate URLs. Keep network work
+// bounded while avoiding a serial fetch of every source, which can push the
+// complete four-layer request past the route SLA.
+const SOURCE_FETCH_CONCURRENCY = 8;
 
 const L2B_TASK_TYPES = new Set(Object.values(VERIFICATION_TASK_TYPES));
 const L2C_TASK_TYPES = new Set(Object.values(L2C_VERIFICATION_TASK_TYPES));
@@ -441,9 +445,14 @@ export class Layer3EvidenceService {
       }
       if (targetClaims.length > 0) allQueries.push(...inputQueries.slice(2));
     }
-    const retrievalQueries = retrievalStage === "SUPPLEMENTAL" ? allQueries.slice(0, 2) : allQueries;
+    const generatedRetrievalQueries = retrievalStage === "SUPPLEMENTAL" ? allQueries.slice(0, 2) : allQueries;
+    const configuredQueryLimit = Number(safeOptions.maxRetrievalQueries);
+    const retrievalQueries = Number.isFinite(configuredQueryLimit) && configuredQueryLimit > 0
+      ? generatedRetrievalQueries.slice(0, Math.min(32, Math.max(1, Math.floor(configuredQueryLimit))))
+      : generatedRetrievalQueries;
 
     let retrievedSources = [];
+    let retrievalSourceLimit = null;
     let retrievalStatus = EVIDENCE_PROVIDER_STATUS.SUCCESS;
     let retrievalMode = retrievalStage === "SUPPLEMENTAL"
       ? "TAVILY_SUPPLEMENTAL"
@@ -457,7 +466,14 @@ export class Layer3EvidenceService {
     try {
       throwIfAborted(safeOptions.signal);
       if (typeof retriever.search !== "function") throw new Error("RETRIEVER_SEARCH_UNAVAILABLE");
-      const searchResult = await retriever.search(retrievalQueries, { requestId, signal: safeOptions.signal });
+      const searchOptions = { requestId, signal: safeOptions.signal };
+      if (Number.isFinite(Number(safeOptions.retrievalTimeoutMs))) {
+        searchOptions.timeoutMs = Math.max(500, Math.min(120_000, Number(safeOptions.retrievalTimeoutMs)));
+      }
+      if (Number.isFinite(Number(safeOptions.tavilyMaxResults))) {
+        searchOptions.maxResults = Math.max(1, Math.min(20, Math.floor(Number(safeOptions.tavilyMaxResults))));
+      }
+      const searchResult = await retriever.search(retrievalQueries, searchOptions);
       providerDiagnostics = safeRetrieverDiagnostics(retriever);
       throwIfAborted(safeOptions.signal);
       const searchedSources = asArray(searchResult).map((source) => ({
@@ -507,28 +523,51 @@ export class Layer3EvidenceService {
       }
     }
 
+    const configuredSourceLimit = Number(safeOptions.maxRetrievedSources);
+    if (Number.isFinite(configuredSourceLimit) && configuredSourceLimit > 0 && retrievedSources.length > configuredSourceLimit) {
+      retrievalSourceLimit = Math.max(1, Math.floor(configuredSourceLimit));
+      retrievedSources = retrievedSources.slice(0, retrievalSourceLimit);
+      auditEvents.push({ type: "RETRIEVAL_SOURCE_BOUND_APPLIED", limit: retrievalSourceLimit, at: new Date().toISOString() });
+    }
+
     const evidenceItems = [];
     const processedSources = [];
+    const fetchedSourceRecords = [];
 
-    for (const src of retrievedSources) {
+    // Preserve retrievedSources order in the records below so evidence and
+    // audit output remain deterministic even though the network fetches are
+    // performed concurrently in bounded batches.
+    for (let offset = 0; offset < retrievedSources.length; offset += SOURCE_FETCH_CONCURRENCY) {
       throwIfAborted(safeOptions.signal);
-      const urlGuard = validateRemoteUrlSync(src.url);
-      if (!urlGuard.ok) {
-        auditEvents.push({ type: "RETRIEVAL_REJECTED", code: urlGuard.code, sourceId: src.sourceId || null, at: new Date().toISOString() });
+      const batch = retrievedSources.slice(offset, offset + SOURCE_FETCH_CONCURRENCY);
+      const batchRecords = await Promise.all(batch.map(async (src) => {
+        throwIfAborted(safeOptions.signal);
+        const urlGuard = validateRemoteUrlSync(src.url);
+        if (!urlGuard.ok) return { src, urlGuard: null, sourceFetcher: null, fetchResult: null, rejectionCode: urlGuard.code };
+
+        const sourceFetcher = src.retrievalOrigin === RETRIEVAL_ORIGIN.DIRECT_INPUT
+          ? (isNetworkGuardedRetriever(retriever) ? retriever : new WebSearchRetriever())
+          : fetchRetriever;
+        let fetchResult;
+        try {
+          if (typeof sourceFetcher.fetch !== "function") throw new Error("RETRIEVER_FETCH_UNAVAILABLE");
+          fetchResult = safeFetchResult(await sourceFetcher.fetch(urlGuard.url, { requestId, signal: safeOptions.signal }));
+        } catch (err) {
+          if (safeOptions.signal?.aborted || err?.name === "AbortError") throw err;
+          fetchResult = { html: "", textContent: "", status: 502, error: boundedString(err?.message, 120) || "FETCH_FAILURE" };
+        }
+        throwIfAborted(safeOptions.signal);
+        return { src, urlGuard, sourceFetcher, fetchResult, rejectionCode: null };
+      }));
+      fetchedSourceRecords.push(...batchRecords);
+    }
+
+    for (const { src, urlGuard, sourceFetcher, fetchResult, rejectionCode } of fetchedSourceRecords) {
+      if (!urlGuard) {
+        auditEvents.push({ type: "RETRIEVAL_REJECTED", code: rejectionCode || "INVALID_URL", sourceId: src.sourceId || null, at: new Date().toISOString() });
         continue;
       }
 
-      const sourceFetcher = src.retrievalOrigin === RETRIEVAL_ORIGIN.DIRECT_INPUT
-        ? (isNetworkGuardedRetriever(retriever) ? retriever : new WebSearchRetriever())
-        : fetchRetriever;
-      let fetchResult;
-      try {
-        if (typeof sourceFetcher.fetch !== "function") throw new Error("RETRIEVER_FETCH_UNAVAILABLE");
-        fetchResult = safeFetchResult(await sourceFetcher.fetch(urlGuard.url, { requestId, signal: safeOptions.signal }));
-      } catch (err) {
-        if (safeOptions.signal?.aborted || err?.name === "AbortError") throw err;
-        fetchResult = { html: "", textContent: "", status: 502, error: boundedString(err?.message, 120) || "FETCH_FAILURE" };
-      }
       throwIfAborted(safeOptions.signal);
 
       const fetchedSuccessfully = isSuccessfulFetch(fetchResult);
@@ -696,6 +735,9 @@ export class Layer3EvidenceService {
         : []),
       ...(retrievalStatus === EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY || retrievalMode === "LOCAL_FALLBACK"
         ? ["Bằng chứng cục bộ/fallback không được coi là xác minh trực tiếp từ nguồn bên ngoài."]
+        : []),
+      ...(retrievalSourceLimit
+        ? [`Đã giới hạn số source fetch ở ${retrievalSourceLimit} để giữ SLA; friend backend L4 vẫn là authority.`]
         : []),
       ...(!externalEvidence && evidenceItems.length > 0
         ? ["Không có bằng chứng live độc lập; trạng thái được hạ cấp để tránh false-safe."]

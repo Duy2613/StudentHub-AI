@@ -637,3 +637,36 @@
 - Direct public URL (Zalo/YouTube/ChatGPT và domain HTTP(S) khác) dùng guarded fetcher với SSRF/DNS/redirect/content checks ngay cả khi Tavily search fallback local; contextual excerpt có `input_context` và không được dùng làm claim proof.
 - Final Predict đã tổng hợp Gemini Layer 4: chỉ dùng `VERIFIED + SUPPORTS/CONTRADICTS/MIXED + citationValidation.allLinksValidated` và Layer 3 claim-specific evidence để refine truth; URL an toàn không có claim evidence chỉ cho `NO_KNOWN_THREAT/ALLOW_WITH_CAUTION`, không giả `SUPPORTED`. Hard block L1/L2/L4 luôn thắng.
 - Verification mới: trust regression group `112/112`, production build `142/142`, lint `0 errors` (`588` existing warnings). Chưa claim live Gemini quota/SLO hay production deploy trong vault entry này.
+
+## 28. AI / Omni V4 implementation — 2026-09-29
+
+- [x] Implemented one lazy Omni surface across shell shortcut/search and `/ai` compatibility entry, with bounded public Community/Expert/source discovery and exact owner-authorized Trust lookup.
+- [x] Added explicit user-invoked JSON AI, bounded text/topic context, safe Markdown, keyboard/focus handling, responsive visualViewport layout, stale-result revalidation, and deterministic allowlisted navigation.
+- [x] Isolated local production verification passed: Omni model `12/12`, combined three-core/product regressions `24/24`, browser `12/12`, build `142/142`, TypeScript pass, lint `0 errors` / `2 inherited warnings`.
+- [x] Report and evidence: `docs/reports/AI_OMNI_V4_IMPLEMENTATION_REPORT.md`; browser screenshots/performance under `artifacts/visual/AI_OMNI_V4/2026-09-28/`.
+- [ ] Implementation verdict remains `PARTIAL`: no revision-bound product-context AI or structured citation contract; unsupported capabilities stay hidden. Live DB/provider assurance is `DEFERRED` and was not run.
+- [x] The 360px Midnight shell overflow was closed in the V4 Cross-Core pass for authenticated and anonymous headers; Omni's text-only backend contract remains unchanged.
+
+## 29. V4 Cross-Core closure — 2026-09-29
+
+- [x] `V4_CROSS_CORE_CLOSURE_IMPLEMENTATION_VERDICT = PASS` with A explicitly recorded as `PARTIAL_CONTRACT_BOUND` for Omni's text-only `/api/chat` contract.
+- [x] Trust V5 L4 structured citations remain linked to safe source/evidence rows and persisted `caseRevision`/`runId`; the result UI separates AI citation references from Trust evidence.
+- [x] Trust → Expert request verified with exact case, revision, and selected claim scope. Eight enabled demo identities remain inventoried (4 USER + 4 EXPERT); the existing matrix records 8/8 PASS and was not rerun against live accounts in this pass.
+- [x] Chromium `9/9` and Firefox `9/9`; each covered 21 responsive width/theme combinations with zero horizontal overflow, plus anonymous Midnight 360px.
+- [x] Focused ESLint `0 errors / 0 warnings`; contract/model tests `11/11`; isolated production build generated `142/142` pages.
+- [x] `agent-browser` 360×844 smoke measured document width `360` with no horizontal overflow. Evidence and screenshots: `artifacts/visual/V4_CROSS_CORE_CLOSURE/2026-09-29/`.
+- [ ] `LIVE_ASSURANCE = DEFERRED`; no staging sign-in, migration, provider request, or deployment. No commit was created.
+
+## 30. V4 Full Web Functional Closure — 2026-09-29
+
+- [x] Executed the isolated Full Web three-core matrix from run `2026-09-29T12-12-43-262Z-19340`: Chromium `33/33`, Firefox `32 passed + 1 intentional screenshot-only skip`, WebKit `32 passed + 1 intentional screenshot-only skip`; total `97 passed / 2 skipped / 0 failed`, no flaky retries, 30m 18s Playwright duration.
+- [x] The clean copied production build completed with `run-manifest.status=PASS`, exit code `0`; the runner manifest confirms no environment files were copied, the parent environment was scrubbed, and no live database/provider assurance ran. Standalone `npx tsc --noEmit` passed.
+- [x] Refreshed safe cross-core/data-honesty/identity/demo-guard contracts: `54/54` passed, `0` skipped. Full ESLint exited `0`, `0` errors and `533` repository warnings.
+- [x] Browser evidence contains `244` PNGs across Community (35), Expert (85), frontend shell (8), Omni (82), release smoke (1), and Trust (33). Screenshot-only Community browser captures intentionally run in Chromium; functional flows still ran in all three engines.
+- [x] Final local LAB measurements and run outputs are stored under `artifacts/lab/full-web-v4/2026-09-29T12-12-43-262Z-19340/`. These use deterministic fixtures and are not field CWV, provider latency, production data, or live assurance.
+- [x] Browser-harness stability fixes wait for the settled theme surface before accessibility analysis and use isolated route contexts so WebKit does not exhaust connections across route smoke cases.
+- [ ] Overall implementation remains `PARTIAL / DO_NOT_RELEASE`: Omni `/api/chat` is text-contract bound and does not provide structured citations or revision-pinned product context; Expert conflict adjudication lacks the required backend conflict contract; Trust claim edit/exclude/split/merge and immutable rerun operations are not represented by the current API contract.
+- [ ] The historic Main-directed write/cleanup incident still has unknown readback/reconciliation status. Main was not accessed in this verification. Keep the release hold until an operator reconciles that incident.
+- [ ] Live database/RLS/persistence/realtime, real eight-account authentication, provider/web/YouTube ingestion, deployment, and field performance remain `DEFERRED` or `IMPLEMENTED_UNVERIFIED_RUNTIME`; synthetic fixtures are not evidence of those runtime properties.
+- [ ] Route aliases previously classified `UNKNOWN` still need product-owner dispositions. Do not treat them as removed solely because first-class removed pages return 404.
+- [x] Preserved the existing branch and dirty worktree; no stage, commit, reset, stash, cleanup, Main access, remote migration, provider call, or deployment occurred. Stopped at the runbook's section 47 and did not execute its subsequent instruction.

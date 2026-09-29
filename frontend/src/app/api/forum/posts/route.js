@@ -4,6 +4,7 @@ import { PostgresForumRepository } from "@/lib/forum/PostgresForumRepository.js"
 import { DatabaseUnavailableError } from "@/lib/server/database/PostgresPool.js";
 import { createSecureId } from "@/lib/security/secureId.js";
 import { deriveIdentityTruth } from "@/lib/server/auth/demoAccountPolicy.js";
+import { isCommunityDemoMode } from "@/lib/intelligence/community/communityStore.js";
 
 // In-memory store conforming to ForumPost model (Phần F)
 let FORUM_POSTS = [
@@ -128,10 +129,6 @@ function rankingScore(post) {
   return confidenceAdjustedApproval * 100 + Math.min(10, total) + (Number(post.likeCount) || 0) * 0.02;
 }
 
-function usesExplicitMemoryAdapter() {
-  return process.env.NODE_ENV !== "production" && process.env.STUDENTHUB_PERSISTENCE_ADAPTER === "memory";
-}
-
 function isUuid(value) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
 }
@@ -156,7 +153,7 @@ async function readForumPosts(request) {
     const locationTag = (searchParams.get("locationTag") || "").toLowerCase().trim();
     const sortBy = searchParams.get("sortBy") || "ranking"; // 'ranking' | 'newest' | 'likes'
 
-    if (!usesExplicitMemoryAdapter()) {
+    if (!isCommunityDemoMode()) {
       const posts = await new PostgresForumRepository().list({ category, q, locationTag, sortBy });
       return NextResponse.json({ success: true, count: posts.length, posts: posts.map((post) => toPublicForumPost({ ...post, comments: [], integrity: enrichIntegrity(post) })), sourceState: "COMMUNITY_SIGNAL", isAuthoritative: false });
     }
@@ -220,7 +217,7 @@ async function readForumPosts(request) {
  */
 async function updateForumPost(request, routeParams, principal) {
   try {
-    if (!usesExplicitMemoryAdapter()) {
+    if (!isCommunityDemoMode()) {
       return NextResponse.json({
         success: false,
         error: { code: "PERSISTENCE_WORKFLOW_NOT_MIGRATED", message: "Forum reactions and comments are unavailable until their PostgreSQL workflow is enabled." }
@@ -310,7 +307,7 @@ async function createForumPost(request, routeParams, principal) {
       createdAt: new Date().toISOString(),
     };
 
-    const memoryAdapter = usesExplicitMemoryAdapter();
+    const memoryAdapter = isCommunityDemoMode();
     if (!memoryAdapter && !isUuid(principal.subjectId)) {
       return NextResponse.json({
         success: false,

@@ -819,7 +819,7 @@ function ForensicsLayer({ layer, onSelectSource }) {
           <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
             {sortedSources.map((src, index) => (
               <TrustEvidenceCard
-                key={src.id || index}
+                key={`${src.id || src.url || "source"}-${index}`}
                 evidence={src}
                 onSelect={onSelectSource}
               />
@@ -992,7 +992,7 @@ function AiVerificationLayer({ layer, onSelectSource }) {
           <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
             {sources.map((src, idx) => (
               <TrustEvidenceCard
-                key={src.id || idx}
+                key={`${src.id || src.url || "source"}-${idx}`}
                 evidence={src}
                 onSelect={onSelectSource}
               />
@@ -1150,7 +1150,7 @@ function DecisionLayer({ layer, onSelectSource }) {
           <div className="space-y-2">
             {keyEvidence.map((src, index) => (
               <TrustEvidenceCard
-                key={src.id || index}
+                key={`${src.id || src.url || "source"}-${index}`}
                 evidence={src}
                 compact
                 onSelect={onSelectSource}

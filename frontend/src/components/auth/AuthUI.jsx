@@ -15,6 +15,7 @@ import GeometricConstellationCanvas from "@/components/canvas/GeometricConstella
 import SparklingStardustCanvas from "@/components/ui/SparklingStardustCanvas";
 import PageTransitionWrapper from "@/components/ui/page-transition-wrapper";
 import { BorderBeam } from "@/components/ui/border-beam";
+import { Input } from "@/components/ui/input";
 
 export const NoiseOverlay = () => (
   <div
@@ -56,32 +57,21 @@ export const AmbientBackground = ({ mode = "cosmic-wave" }) => {
   );
 };
 
-export const InputField = ({ label, id, name, type = "text", icon: Icon, helperText, onFocus, onBlur, ...props }) => {
+export const InputField = ({ label, id, name, type = "text", icon: Icon, helperText, onFocus, onBlur, className = "", ...props }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [isInteractive, setIsInteractive] = useState(false);
-
-  const enableInteraction = () => {
-    if (!isInteractive) setIsInteractive(true);
-  };
 
   return (
     <div className="space-y-2 relative group/input">
-      <label htmlFor={id} className="block text-sm font-medium text-gray-300 pl-1 transition-colors group-hover/input:text-gray-100">
+      <label htmlFor={id} className="ui-label block pl-1">
         {label}
       </label>
-      {/* Focus Halo Glow */}
-      <div
-        className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-teal-400/40 via-cyan-500/40 to-indigo-500/30 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
-          isFocused ? "opacity-100 blur-[2px]" : "opacity-0 blur-0"
-        }`}
-      />
       <div className="relative">
         {Icon && (
-          <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-teal-400" : "text-gray-400"}`}>
+          <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-mint-400" : "text-text-tertiary"}`}>
             <Icon className="h-5 w-5" />
           </div>
         )}
-        <input
+        <Input
           id={id}
           name={name || id}
           type={type}
@@ -93,47 +83,29 @@ export const InputField = ({ label, id, name, type = "text", icon: Icon, helperT
             setIsFocused(false);
             if (onBlur) onBlur(e);
           }}
-          className={`
-            block w-full ${Icon ? "pl-12" : "pl-4"} pr-4 py-3.5 text-sm
-            bg-space-950/85 backdrop-blur-2xl border border-white/15
-            rounded-xl shadow-sm placeholder-gray-400 text-gray-100
-            transition-all duration-300 ease-premium
-            focus:outline-none focus:bg-space-950 focus:border-teal-400/60
-            hover:bg-space-900/80 hover:border-white/25
-          `}
+          className={`${Icon ? "ui-input-icon-leading" : ""} ${className}`.trim()}
           {...props}
         />
       </div>
-      {helperText && <p className="text-xs text-gray-400 pl-1">{helperText}</p>}
+      {helperText && <p className="ui-helper pl-1">{helperText}</p>}
     </div>
   );
 };
 
-export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) => {
+export const PasswordInput = ({ id, name, label, onFocus, onBlur, className = "", ...props }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [isInteractive, setIsInteractive] = useState(false);
-
-  const enableInteraction = () => {
-    if (!isInteractive) setIsInteractive(true);
-  };
 
   return (
     <div className="space-y-2 relative group/input">
-      <label htmlFor={id} className="block text-sm font-medium text-gray-300 pl-1 transition-colors group-hover/input:text-gray-100">
+      <label htmlFor={id} className="ui-label block pl-1">
         {label}
       </label>
-      {/* Focus Halo Glow */}
-      <div
-        className={`absolute inset-0 top-7 rounded-xl bg-gradient-to-r from-teal-400/40 via-cyan-500/40 to-indigo-500/30 -m-[1.5px] transition-all duration-500 ease-premium pointer-events-none ${
-          isFocused ? "opacity-100 blur-[2px]" : "opacity-0 blur-0"
-        }`}
-      />
       <div className="relative z-10">
-        <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-teal-400" : "text-gray-400"}`}>
+        <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors duration-300 ${isFocused ? "text-mint-400" : "text-text-tertiary"}`}>
           <Lock className="h-5 w-5" />
         </div>
-        <input
+        <Input
           id={id}
           name={name || id}
           type={showPassword ? "text" : "password"}
@@ -145,14 +117,7 @@ export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) =>
             setIsFocused(false);
             if (onBlur) onBlur(e);
           }}
-          className={`
-            block w-full pl-12 pr-12 py-3.5 text-sm
-            bg-space-950/85 backdrop-blur-2xl border border-white/15
-            rounded-xl shadow-sm placeholder-gray-400 text-gray-100
-            transition-all duration-300 ease-premium
-            focus:outline-none focus:bg-space-950 focus:border-teal-400/60
-            hover:bg-space-900/80 hover:border-white/25
-          `}
+          className={`ui-input-icon-leading ui-input-icon-trailing ${className}`.trim()}
           {...props}
         />
         <button
@@ -160,7 +125,7 @@ export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) =>
           onClick={() => setShowPassword(!showPassword)}
           aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
           aria-pressed={showPassword}
-          className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-200 transition-colors focus:outline-none focus-visible:text-teal-300 focus-visible:ring-2 focus-visible:ring-teal-400/60 rounded-lg"
+          className="ui-button ui-button-quiet ui-button-icon absolute right-0 top-1/2 -translate-y-1/2"
         >
           {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
         </button>
@@ -170,39 +135,30 @@ export const PasswordInput = ({ id, name, label, onFocus, onBlur, ...props }) =>
 };
 
 export const CheckboxField = ({ id, checked, onChange, label, helperText, ...props }) => (
-  <div className="flex items-center justify-between text-xs py-1 select-none">
-    <label htmlFor={id} className="flex items-center gap-2.5 cursor-pointer text-gray-300 hover:text-white transition-colors">
+  <div className="flex items-center justify-between type-caption py-1 select-none">
+    <label htmlFor={id} className="flex min-h-11 items-center gap-2.5 cursor-pointer text-text-secondary hover:text-text-primary transition-colors">
       <input
         type="checkbox"
         id={id}
         checked={checked}
         onChange={onChange}
-        className="w-4 h-4 rounded border-white/20 bg-white/5 text-teal-400 focus:ring-teal-400 focus:ring-offset-0 focus:ring-1 cursor-pointer accent-teal-400 transition-all"
+        className="ui-checkbox"
         {...props}
       />
-      <span className="font-medium text-gray-300 hover:text-gray-100">{label}</span>
+      <span className="type-ui text-text-secondary">{label}</span>
     </label>
     {helperText && (
-      <span className="text-gray-400 text-[11px]">{helperText}</span>
+      <span className="ui-helper">{helperText}</span>
     )}
   </div>
 );
 
-export const Button = ({ children, isLoading, disabled, ...props }) => (
-  <div className="relative group z-20">
-    <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/30 via-indigo-600/30 to-cyan-500/30 rounded-2xl blur-lg opacity-60 group-hover:opacity-100 group-hover:blur-xl transition-all duration-500 ease-premium" />
+export const Button = ({ children, isLoading, disabled, className = "", ...props }) => (
+  <div className="relative z-20">
     <button
       disabled={isLoading || disabled}
-      className={`
-        relative w-full flex justify-center items-center py-3.5 px-4
-        bg-gradient-to-r from-teal-400 via-emerald-400 to-cyan-400
-        rounded-xl text-sm font-bold text-space-950
-        shadow-[0_4px_20px_rgba(52,231,196,0.25)]
-        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#06060a] focus:ring-teal-400
-        disabled:opacity-70 disabled:cursor-not-allowed
-        transition-all duration-300 ease-premium
-        active:scale-[0.98] group-hover:-translate-y-0.5 hover:brightness-105 cursor-pointer
-      `}
+      aria-busy={isLoading || undefined}
+      className={`ui-button ui-button-primary ui-button-lg w-full ${className}`.trim()}
       {...props}
     >
       {isLoading ? (
@@ -226,11 +182,8 @@ export const GoogleButton = ({ isLoading, isDisabled, onClick, capability }) => 
       onClick={onClick}
       disabled={effectivelyDisabled}
       title={isGoogleDisabled ? capability?.googleMessage || "Google OAuth chưa được kích hoạt trên hệ thống máy chủ" : "Đăng nhập bằng tài khoản Google"}
-      className={`relative w-full inline-flex flex-col sm:flex-row justify-center items-center py-3 px-3 rounded-xl bg-space-950/70 border border-white/15 backdrop-blur-2xl text-xs font-medium text-gray-200 shadow-sm transition-all duration-300 ease-premium group ${
-        effectivelyDisabled
-          ? "opacity-60 cursor-not-allowed hover:bg-space-950/70 hover:border-white/15 text-gray-400"
-          : "hover:bg-space-900/80 hover:text-white hover:border-white/30 hover:-translate-y-0.5 cursor-pointer"
-      }`}
+      aria-busy={isLoading || undefined}
+      className="ui-button ui-button-secondary ui-button-md relative w-full flex-col sm:flex-row text-xs font-medium"
     >
       <div className="flex items-center gap-2">
         {isLoading ? (
@@ -270,9 +223,8 @@ export const GithubButton = ({ isLoading, isDisabled, onClick, capability }) => 
       onClick={onClick}
       disabled={effectivelyDisabled}
       title={isGithubDisabled ? capability?.githubMessage || "GitHub OAuth chưa được kích hoạt trên hệ thống máy chủ" : "Đăng nhập bằng tài khoản GitHub"}
-      className={`relative w-full inline-flex flex-col sm:flex-row justify-center items-center py-3.5 px-4 rounded-xl bg-space-950/70 border border-white/15 backdrop-blur-2xl text-sm font-medium text-gray-200 shadow-sm hover:bg-space-900/80 hover:text-white hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-[#06060a] focus:ring-teal-400 transition-all duration-300 ease-premium hover:-translate-y-0.5 group ${
-        effectivelyDisabled ? "opacity-60 cursor-not-allowed hover:translate-y-0 hover:bg-space-950/70 hover:border-white/15 hover:text-gray-200" : ""
-      }`}
+      aria-busy={isLoading || undefined}
+      className="ui-button ui-button-secondary ui-button-md relative w-full flex-col sm:flex-row text-sm font-medium"
     >
       <span className="flex items-center">
         {isLoading ? (
@@ -294,7 +246,7 @@ export const GithubButton = ({ isLoading, isDisabled, onClick, capability }) => 
 export const ErrorMessage = ({ message }) => {
   if (!message) return null;
   return (
-    <div className="rounded-xl bg-red-500/15 border border-red-500/30 p-3 flex items-start animate-in fade-in slide-in-from-top-1 duration-300">
+    <div role="alert" aria-live="assertive" className="rounded-xl bg-red-500/15 border border-red-500/30 p-3 flex items-start animate-in fade-in slide-in-from-top-1 duration-300">
       <AlertCircle className="h-5 w-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" />
       <div className="min-w-0">
         <p className="text-sm text-red-200">{message}</p>
@@ -318,31 +270,24 @@ export const NoticeMessage = ({ message }) => {
 
 // Regex nhận diện email học thuật (.edu, .edu.vn, .ac.uk, v.v.)
 export const ACADEMIC_EMAIL_REGEX = /(\.edu$|\.edu\.\w+$|@[\w.-]+\.ac\.\w+$)/i;
-export const STUDENT_BONUS_POINTS = 30;
-
 export const StudentBenefitBanner = ({ email }) => {
-  const isStudent = ACADEMIC_EMAIL_REGEX.test((email || "").trim().toLowerCase());
+  const hasInstitutionalEmailShape = ACADEMIC_EMAIL_REGEX.test((email || "").trim().toLowerCase());
   return (
     <div
-      className={`mb-8 relative overflow-hidden rounded-2xl border transition-all duration-500 ease-premium ${
-        isStudent ? "bg-teal-950/30 border-teal-500/40 shadow-[0_0_20px_rgba(52,231,196,0.15)]" : "bg-space-950/60 border-white/10"
-      }`}
+      className="mb-8 relative overflow-hidden rounded-2xl border bg-space-950/60 border-white/10"
     >
-      <div className={`absolute -inset-1 bg-gradient-to-r from-teal-500/15 to-cyan-500/15 blur-md transition-opacity duration-500 ${isStudent ? "opacity-100 animate-pulse-slow" : "opacity-0"}`} />
+      <div className="absolute -inset-1 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 blur-md opacity-50" />
       <div className="relative z-10 flex items-start p-4">
-        <div className={`flex-shrink-0 p-2 rounded-lg transition-colors duration-500 ${isStudent ? "bg-teal-400 text-space-950 shadow-md font-bold" : "bg-white/15 text-gray-300"}`}>
+        <div className="flex-shrink-0 p-2 rounded-lg bg-white/15 text-gray-300">
           <GraduationCap className="h-5 w-5" />
         </div>
         <div className="ml-4 transition-all duration-500">
-          <h3 className={`text-sm font-semibold ${isStudent ? "text-teal-100" : "text-gray-200"}`}>Student Benefit Program</h3>
-          <div className="mt-1 relative h-5">
-            <p className={`text-xs absolute top-0 left-0 transition-all duration-500 ${isStudent ? "opacity-0 translate-y-2" : "opacity-100 text-gray-300"} `}>
-              Đăng ký bằng email trường để nhận <span className="text-teal-300 font-semibold">+{STUDENT_BONUS_POINTS} điểm uy tín</span>.
-            </p>
-            <p className={`text-xs flex items-center font-medium text-emerald-300 absolute top-0 left-0 transition-all duration-500 ${isStudent ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"} `}>
-              <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Đã nhận diện email trường! (+{STUDENT_BONUS_POINTS} pts)
-            </p>
-          </div>
+          <h3 className="text-sm font-semibold text-gray-200">Xác minh email tổ chức</h3>
+          <p className="mt-1 text-xs text-gray-300">
+            {hasInstitutionalEmailShape
+              ? "Định dạng email gợi ý một tổ chức; hộp thư và tư cách chưa được xác nhận."
+              : "Nếu có email do trường cấp, hãy dùng địa chỉ đó để xác minh hộp thư."}
+          </p>
         </div>
       </div>
     </div>

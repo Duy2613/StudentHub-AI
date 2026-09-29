@@ -1,0 +1,53 @@
+/**
+ * StudentHub AI — Accessibility Foundation (WCAG 2.2 AA)
+ *
+ * Governing Authority: MASTER FRONTEND CONSTITUTION v3.0 (M-51, C-28)
+ */
+
+/* Visible Focus Management (C-28) */
+:focus-visible {
+  outline: 2px solid var(--border-focus) !important;
+  outline-offset: 2px !important;
+}
+
+/* Skip link for keyboard users */
+.skip-to-main {
+  position: absolute;
+  top: -9999px;
+  left: 16px;
+  z-index: 1000;
+  padding: 12px 20px;
+  background-color: var(--surface-1);
+  color: var(--text-primary);
+  border: 2px solid var(--border-focus);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+.skip-to-main:focus {
+  top: 16px;
+}
+
+/* Touch targets (C-28: ~44x44px for interactive controls) */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Screen reader only utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

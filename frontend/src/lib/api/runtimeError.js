@@ -15,6 +15,7 @@ const SAFE_MESSAGES = Object.freeze({
   ABORTED: "Yêu cầu đã được dừng.",
   INVALID_RESPONSE: "Máy chủ trả về dữ liệu không hợp lệ.",
   PROMAX_MIGRATION_REQUIRED: "Dữ liệu Promax chưa được khởi tạo trong môi trường này; chưa có dữ liệu thay thế.",
+  EXPERT_CASE_NOT_PUBLIC: "Hồ sơ này không có trạng thái công khai cần thiết cho Expert review. Nội dung case bị ẩn.",
 });
 
 export const SAFE_SERVER_ERROR_CODES = new Set(["PROMAX_MIGRATION_REQUIRED"]);

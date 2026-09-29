@@ -48,10 +48,10 @@ export default function FinalClaritySection() {
           </Link>
 
           <Link
-            href="/dashboard"
+            href="/community"
             className="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/15 backdrop-blur-md font-semibold text-sm transition-all"
           >
-            <span>Vào tổng quan học vụ</span>
+            <span>Tham gia Cộng đồng</span>
           </Link>
         </div>
 

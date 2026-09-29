@@ -56,6 +56,99 @@ describe("legacy four-layer anti-corruption adapter", () => {
     assert.equal(unknown.finding, "UNKNOWN");
   });
 
+  it("uses the friend's exact image contract across Layers 2, 3, and 4", async () => {
+    const imageBytes = Buffer.from("studenthub-image-fixture");
+    const input = {
+      type: "image",
+      metadata: { bytes: imageBytes, mimeType: "image/webp", fileName: "fixture.webp" },
+    };
+    const requests = [];
+    const adapter = adapterWith(async (endpoint, init) => {
+      requests.push({ endpoint, init });
+      if (endpoint.endsWith("/layer2/image")) {
+        assert.equal(init.body instanceof FormData, true);
+        const uploaded = init.body.get("image");
+        assert.equal(uploaded.type, "image/webp");
+        assert.equal(uploaded.size, imageBytes.length);
+        return responseFor({
+          verdict: "LIKELY_AI_GENERATED",
+          confidence: 0.99,
+          reason: "Synthetic image signal.",
+          providers: [
+            { provider: "Sightengine GenAI", success: true, verdict: "LIKELY_AI_GENERATED", confidence: 0.99 },
+            { provider: "Sightengine Deepfake", success: true, verdict: "LIKELY_REAL", confidence: 0.999 },
+          ],
+        });
+      }
+      if (endpoint.endsWith("/layer3/image")) {
+        const body = JSON.parse(init.body);
+        assert.equal(body.contentType, "image/webp");
+        assert.equal(Buffer.from(body.imageBase64, "base64").equals(imageBytes), true);
+        assert.equal(body.layer2.verdict, "LIKELY_AI_GENERATED");
+        return responseFor({ verdict: "UNKNOWN", confidence: 0.5, stop: false, canContinueToLayer4: true, reason: "Contextual research completed." });
+      }
+      if (endpoint.endsWith("/layer4/image")) {
+        const body = JSON.parse(init.body);
+        assert.equal(body.contentType, "image/webp");
+        assert.equal(Buffer.from(body.imageBase64, "base64").equals(imageBytes), true);
+        assert.equal(body.mode, "user");
+        assert.equal(body.layer2.verdict, "LIKELY_AI_GENERATED");
+        assert.equal(body.layer3.verdict, "UNKNOWN");
+        return responseFor({ verdict: "FAKE", confidence: 0.98, stop: true, canContinueToLayer4: false, reason: "AI-generated image." });
+      }
+      throw new Error(`Unexpected endpoint: ${endpoint}`);
+    });
+
+    const layer2 = await adapter.verifyLayer2({ input, requestId: "image-contract-l2" });
+    const layer3 = await adapter.verifyLayer3({ input, legacyLayer2Result: layer2, requestId: "image-contract-l3" });
+    const layer4 = await adapter.verifyLayer4({ input, legacyLayer2Result: layer2, layer3Result: layer3, requestId: "image-contract-l4" });
+
+    assert.equal(layer2.rawVerdict, "LIKELY_AI_GENERATED");
+    assert.equal(layer2.mediaForensics.aiGeneration.verdict, "LIKELY_AI_GENERATED");
+    assert.equal(layer3.legacyIntegration.rawVerdict, "UNKNOWN");
+    assert.equal(layer4.rawVerdict, "FAKE");
+    assert.equal(layer4.assessmentConfidence, 0.98);
+    assert.deepEqual(requests.map(({ endpoint }) => endpoint), [
+      "https://legacy.example.test/api/verify/layer2/image",
+      "https://legacy.example.test/api/verify/layer3/image",
+      "https://legacy.example.test/api/verify/layer4/image",
+    ]);
+  });
+
+  it("forwards the normalized text Layer 2 result to the friend's Layer 3/4 contract", async () => {
+    const input = { type: "text", content: "A bounded claim." };
+    const requests = [];
+    const adapter = adapterWith(async (endpoint, init) => {
+      requests.push({ endpoint, init });
+      if (endpoint.endsWith("/layer2")) return responseFor({ verdict: "UNKNOWN", confidence: 0, providers: [{ provider: "Google Fact Check", success: true, verdict: "UNKNOWN", confidence: 0 }] });
+      if (endpoint.endsWith("/layer3")) {
+        const body = JSON.parse(init.body);
+        assert.equal(body.type, "text");
+        assert.equal(body.content, input.content);
+        assert.equal(body.layer2.verdict, "UNKNOWN");
+        return responseFor({ verdict: "UNKNOWN", confidence: 0.5, stop: false, canContinueToLayer4: true });
+      }
+      const body = JSON.parse(init.body);
+      assert.equal(body.type, "text");
+      assert.equal(body.layer2.verdict, "UNKNOWN");
+      assert.equal(body.layer3.verdict, "UNKNOWN");
+      return responseFor({ verdict: "FAKE", confidence: 0.92, stop: false, canContinueToLayer4: true });
+    });
+
+    const layer2 = await adapter.verifyLayer2({ input, requestId: "text-contract-l2" });
+    const layer3 = await adapter.verifyLayer3({ input, legacyLayer2Result: layer2, requestId: "text-contract-l3" });
+    const layer4 = await adapter.verifyLayer4({ input, legacyLayer2Result: layer2, layer3Result: layer3, requestId: "text-contract-l4" });
+
+    assert.equal(layer2.rawVerdict, "UNKNOWN");
+    assert.equal(layer3.legacyIntegration.rawVerdict, "UNKNOWN");
+    assert.equal(layer4.rawVerdict, "FAKE");
+    assert.deepEqual(requests.map(({ endpoint }) => endpoint), [
+      "https://legacy.example.test/api/verify/layer2",
+      "https://legacy.example.test/api/verify/layer3",
+      "https://legacy.example.test/api/verify/layer4",
+    ]);
+  });
+
   it("maps Layer 2 outage to UNAVAILABLE and never DEMO", async () => {
     const adapter = adapterWith(async () => { throw new Error("network down"); });
     const result = await adapter.verifyLayer2({ url: "https://example.com", requestId: "legacy-l2-outage" });

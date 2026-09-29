@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ExpertRepository, ExpertRepositoryError } from "@/lib/server/database/ExpertRepository.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { publishRealtimeEvent } from "@/lib/server/realtime/RealtimePublisher.js";
 
 function errorResponse(error, correlationId) {
   if (error instanceof ExpertRepositoryError || (error?.code && Number(error.statusCode) >= 400 && Number(error.statusCode) < 500)) return NextResponse.json({ success: false, error: { code: error.code, userMessage: error.message, correlationId } }, { status: error.statusCode || 409 });
@@ -42,6 +43,33 @@ async function submitAssessment(request, _routeParams, principal, securityContex
       policyVersion: body.policyVersion,
       requireAssignment: true,
     });
+    const ownerId = await ExpertRepository.getTrustCaseOwnerId(assessment.case_id);
+    if (assessment.reviewRequestId && ownerId) {
+      void publishRealtimeEvent({
+        channel: "trust",
+        eventType: "trust:expert_review",
+        subjectId: ownerId,
+        classification: "RESTRICTED",
+        producer: "StudentHub-AI",
+        environment: process.env.NODE_ENV || "development",
+        correlationId: securityContext.correlationId,
+        causationId: assessment.id,
+        idempotencyKey: `trust:expert-review:${assessment.reviewRequestId}:completed:${assessment.id}`,
+        data: { caseId: assessment.case_id, caseRevision: Number(assessment.case_revision), requestId: assessment.reviewRequestId, status: assessment.reviewRequestStatus || "IN_REVIEW" },
+      }).catch(() => {});
+    }
+    void publishRealtimeEvent({
+      channel: "expert",
+      eventType: "expert:revision",
+      subjectId: principal.subjectId,
+      classification: "RESTRICTED",
+      producer: "StudentHub-AI",
+      environment: process.env.NODE_ENV || "development",
+      correlationId: securityContext.correlationId,
+      causationId: assessment.id,
+      idempotencyKey: `expert:revision:${assessment.id}`,
+      data: { assessmentId: assessment.id, caseId: assessment.case_id, caseRevision: Number(assessment.case_revision), status: "SUBMITTED" },
+    }).catch(() => {});
     return NextResponse.json({ success: true, contractVersion: "expert-assessment.promax.v1", data: assessment, qualityMutation: "NONE_ON_SUBMISSION", correlationId: securityContext.correlationId }, { status: 201 });
   } catch (error) {
     return errorResponse(error, securityContext.correlationId);

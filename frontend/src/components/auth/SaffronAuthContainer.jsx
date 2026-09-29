@@ -79,9 +79,9 @@ export default function SaffronAuthContainer({ children }) {
       </header>
 
       {/* 5. Main Central Auth Card Experience */}
-      <main className="relative z-20 flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
+      <div className="relative z-20 flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8">
         <div className="w-full max-w-[500px]">{children}</div>
-      </main>
+      </div>
 
       {/* 6. Footer Security & Compliance Strip */}
       <footer className="relative z-30 w-full py-4 px-4 text-center font-mono text-[11px] text-[#ece7e0]/60 border-t border-[#47140b]/60 bg-[#150604]/80 backdrop-blur-md">

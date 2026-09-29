@@ -23,7 +23,7 @@ const CHANNEL_SCOPES = Object.freeze({
   academic: ["academic:read"],
 });
 
-const PUBLIC_CHANNELS = new Set(["system"]);
+const PUBLIC_CHANNELS = new Set(["system", "community"]);
 const ALL_CHANNELS = Object.freeze(Object.keys(CHANNEL_SCOPES));
 const CHANNEL_PATTERN = /^[a-z][a-z0-9._:-]{0,63}$/;
 const SUBJECT_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;

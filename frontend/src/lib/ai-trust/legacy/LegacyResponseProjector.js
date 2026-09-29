@@ -198,6 +198,30 @@ function genericProviderRecords(layer2) {
     .map((item) => providerRecord(item, "StudentHub Layer 2"));
 }
 
+function legacyAdvisoryProjection(value) {
+  const integration = asRecord(value);
+  if (!Object.keys(integration).length) return null;
+  const sources = collectSourceRecords(integration.sources);
+  return {
+    status: text(integration.status, 80) || null,
+    providerStatus: text(integration.providerStatus, 80) || null,
+    providerId: text(integration.providerId, 180) || null,
+    verdict: text(integration.rawVerdict, 120).toUpperCase() || null,
+    confidence: numberOrNull(integration.legacyAssessmentConfidence, integration.assessmentConfidence, integration.providerConfidence),
+    reason: text(integration.reason, 1_200) || null,
+    stop: integration.stop === true,
+    canContinueToLayer4: integration.canContinueToLayer4 !== false,
+    mode: text(integration.mode, 80) || null,
+    geminiModel: text(integration.geminiModel, 180) || null,
+    groqModel: text(integration.groqModel, 180) || null,
+    sourceOrigin: text(integration.sourceOrigin, 120) || null,
+    sources,
+    evidence: collectEvidenceRecords(integration.evidence, sources),
+    contradictoryEvidence: asArray(integration.contradictoryEvidence).map((item) => text(typeof item === "string" ? item : item?.details || item?.reason || item?.message, 1_200)).filter(Boolean),
+    limitations: asArray(integration.limitations).map((item) => text(item, 700)).filter(Boolean),
+  };
+}
+
 function publicQrIntake(value) {
   const intake = asRecord(value);
   if (!Object.keys(intake).length) return null;
@@ -280,6 +304,7 @@ function legacyLayer2(layer2, layer2A, input) {
     confidence,
     reason: reasons[0] || "Layer 2 completed without a provider explanation.",
     providers,
+    legacyIntegration: legacyAdvisoryProjection(value.legacyIntegration),
     ...(media ? {
       mediaForensics: media,
       aiGeneration: media.aiGeneration || null,
@@ -323,6 +348,7 @@ function legacyLayer3(layer3, layer2) {
     sources,
     evidenceAgreement: value.crossSourceAgreement?.agreementScore ?? value.evidenceAgreement ?? null,
     sourceQuality: numberOrNull(value.sourceQuality),
+    legacyIntegration: legacyAdvisoryProjection(value.legacyIntegration),
     ...(media ? { mediaForensics: media } : {}),
   };
 }
@@ -373,6 +399,7 @@ function legacyLayer4(layer4, layer3, layer2, finalPredict) {
     reason,
     contradictoryEvidence,
     sources,
+    legacyIntegration: legacyAdvisoryProjection(value.legacyIntegration),
     confidenceKind: aiGenerated ? "PROVIDER_SCORE_FOR_MEDIA_SIGNAL" : (value.confidenceKind || predict.confidenceKind || "DETERMINISTIC_POLICY_SCORE"),
     decisionConfidence: policyConfidence,
     aiGenerated,

@@ -1,0 +1,36 @@
+# AI / Omni V4 — O0 contract audit
+
+Date: 2026-09-28. Authority: attached AI / Omni runbook and external Three-Core Constitution v4. Inspection is static; live database/provider assurance is DEFERRED. Existing Community LOCKED, Expert V4.1 PASS and Trust PARTIAL_CONTRACT_BOUND statuses are preserved.
+
+| Capability | Status | Existing file:line | Shape and decision |
+|---|---|---|---|
+| Global search | PARTIAL | `frontend/src/app/api/v1/search/route.js:12` | `search.v1`, `data.results[{id,kind,title,summary}]`; public Community contributions and Experts only. Query 2–120 chars, lexical match, max 8/category over latest 100 records. |
+| Route index / account | EXISTS | `frontend/src/config/navigation.ts:22` | Canonical core/utility/account destinations and availability. Derive navigation from this single source; omit Omni self-link and unauthenticated account commands. |
+| Legacy Omni | PARTIAL | `frontend/src/components/command/AcademicCommandPalette.jsx:19`, `frontend/src/lib/search/searchProviders.js:25` | Current shell palette only calls static index. Duplicates core destinations and includes unresolved `/cases`; replace with unified surface. |
+| Normal Community search | EXISTS | `frontend/src/app/api/community/social/route.js:69`, `:120` | `community-social.v1`, public `posts` with public author, content, topic, sources. `q` uses ILIKE over title/content; newest first, bounded results. |
+| Community contribution lookup | EXISTS | `frontend/src/app/api/intelligence/community/experiences/[experienceId]/route.js:7` | `{success,experience,sourceState}`; public redacted `public_statement`, PUBLISHED only. Canonical destination `/community/:id`. |
+| Community social lookup | EXISTS | `frontend/src/app/api/community/social/route.js:120` | `?postId=UUID` returns only published row. Destination `/community/discussion/:id`. Do not conflate social IDs with contribution IDs. |
+| Expert search | EXISTS | `frontend/src/app/api/v1/experts/route.js:12` | `experts.v1`, `data.experts` public DTO; topic matches name/title/scopes, latest bounded directory. No inferred relevance or reputation. |
+| Expert profile | EXISTS | `frontend/src/app/api/expert/profile/[expertId]/route.js:12` | `{success,expert,meta.sourceState}`. `ExpertPublicDTO.js:22` projects public identity, scopes, credentials. Omit scores/earned stars entirely. |
+| Trust keyword / claim search | MISSING | `frontend/src/app/api/v1/search/route.js:12` | No Trust/claim lane. Do not fetch entire private cases to manufacture a full-text index. |
+| Owned Trust exact lookup | EXISTS | `frontend/src/app/api/v1/trust/cases/[caseId]/route.js:12`, `frontend/src/lib/server/database/TrustPersistenceService.js:271` | Authenticated owner check; `{success,case}` with `owner_id`, claims and evidence. Support exact UUID only; revalidate identity/owner before display and selection. |
+| Trust revision metadata | PARTIAL | `frontend/src/lib/server/database/DurableTrustRepository.js:412` | Owner list `{cases}` includes `case_revision`; individual detail lacks immutable verdict/revision snapshot. No conclusion inferred. |
+| Source search | PARTIAL | `frontend/src/app/api/community/social/route.js:42` | Public post sources are attached references, not a global source index. Show source rows only as references from matching public discussions; revalidate parent and URL. |
+| External research | EXISTS, outside automatic Omni | `frontend/src/app/api/public/research/route.js:1` | Provider-backed discovery; not a product source index. Do not invoke in search-as-you-type. |
+| AI gateway | EXISTS | `frontend/src/app/api/chat/route.js:34`, `frontend/src/lib/ai-gateway/AIGatewayService.js:43` | Authenticated POST `{messages:[{role,content}],subject,reasoningMode}`; response `{role,content,providerStatus,requestId,timestamp}`. Use explicit user invocation, one bounded user message. |
+| Routing / fallback | EXISTS | `frontend/src/lib/ai-gateway/ModelRouter.js:403`, `frontend/src/app/api/chat/route.js:58` | Backend owns model cascade. HTTP 200 may carry `LIVE_PROVIDER_NOT_CONFIGURED`; treat as unavailable, never a completed answer. |
+| Streaming / partial | MISSING | `frontend/src/app/api/chat/route.js:74` | Single JSON response; no token stream or partial-result contract. Normal loading only, no simulated streaming. |
+| Cancellation | PARTIAL | `frontend/src/lib/api/runtimeClient.js:28` | Fetch abort/timeout available; `/api/chat` does not pass abort to gateway. No server-cancel control. Closing ends client observation, not necessarily provider work. |
+| Citations | MISSING | `frontend/src/app/api/chat/route.js:74` | Text only. Safe text links may be shown as AI suggestions, never labelled verified citations/evidence. |
+| Product context packaging | MISSING | `frontend/src/app/api/chat/route.js:27` | No case/thread/assessment identity, revision or authorized context compiler. Only user-entered query and optional allowlisted core label are sent. No selected record content. |
+| Legacy context compiler | EXISTS, ineligible | `frontend/src/lib/intelligence/recommendation/AiContextCompiler.js:22`, `frontend/src/app/api/intelligence/recommendations/route.js:11` | Academic-planning scope, not an authorized Trust/Community/Expert contextual AI contract. Do not repurpose. |
+| Session / conversation identity | PARTIAL | `frontend/src/app/api/chat/route.js:17` | Up to 24 input messages, last eight used; no persistent conversation ID. Omni sends one message and keeps response only while open for same principal. |
+| History / recent | MISSING | Search and chat routes above | No durable Omni history. Omit recent section; opening suggestions are real navigation. |
+| Permissions / privacy | EXISTS | `frontend/src/lib/security/SecurityFabric.js:1` and route wrappers above | Cookies via canonical apiRequest; public projections vs authenticated owner detail. No browser authorization bypass or credential reads. |
+| Commands / AI tools | PARTIAL | `frontend/src/config/navigation.ts:22` | Deterministic navigation only. No supported mutating/tool-action DTO; model text cannot execute commands. |
+| Realtime | EXISTS | `frontend/src/components/providers/RealtimeContext.jsx:17`, `:246` | Reuse provider subscriptions to invalidate search. Never merge event payload as domain data or open another connection. |
+| Errors / limits | EXISTS | `frontend/src/lib/api/runtimeError.js:1`, `frontend/src/lib/api/runtimeClient.js:28` | Typed errors, timeout, Retry-After. Search 90/min; Expert 60/min; AI 30/min. Independent lane errors preserve available results. |
+| Analytics | PARTIAL | `frontend/src/lib/performance/assurance.js:1` | Existing timing seam; only timings/operation names. No raw query/profile/context analytics. |
+| Fixture safety | PARTIAL | `frontend/src/app/api/v1/search/route.js:21`, Expert/Community routes above | Existing source markers differ. Production projection rejects demo/fixture markers and unknown contract shapes; test injection remains in isolated browser harness. |
+
+O0 decision: implement against the existing public read contracts, exact owner-authorized Trust lookup, and explicit user-text AI. No new domain API, provider routing, database migration or private context transport is needed.

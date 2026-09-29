@@ -175,7 +175,7 @@ export function stageFromL2B(raw, requestId, timing = {}) {
     "COOLDOWN", "BUDGET_EXHAUSTED", "MODEL_INCOMPATIBLE", "PERMISSION_DENIED", "INVALID_REQUEST",
     "SERVICE_UNAVAILABLE", "UPSTREAM_ERROR", "NETWORK_TIMEOUT",
   ]);
-  const operationStatus = timing.operationStatus || (deterministicFallbackAvailable || !transientStatuses.has(providerStatus) ? OPERATION_STATUS.COMPLETED : OPERATION_STATUS.PARTIAL);
+  const operationStatus = timing.operationStatus || (transientStatuses.has(providerStatus) ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED);
   return createStageEnvelope({
     ...stageBase("l2b", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso(), operationStatus),
     finding,

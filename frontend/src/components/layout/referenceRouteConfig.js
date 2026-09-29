@@ -45,7 +45,7 @@ const REFERENCE_ROUTE_PROFILES = Object.freeze([
     label: "PERSONAL DESK",
     signal: "SIGNAL / NEXT STEP",
     surface: "paper",
-    matches: (pathname) => pathname.startsWith("/dashboard") || pathname.startsWith("/profile") || pathname.startsWith("/settings"),
+    matches: (pathname) => pathname.startsWith("/profile") || pathname.startsWith("/settings"),
   }),
   Object.freeze({
     id: "static",

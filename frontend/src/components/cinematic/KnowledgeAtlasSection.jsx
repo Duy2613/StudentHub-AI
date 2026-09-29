@@ -3,7 +3,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import V3_MEDIA from "@/lib/media/v3MediaRegistry";
-import { Compass, Network, Sparkles, BookOpen } from "lucide-react";
+import { Compass } from "lucide-react";
 import CinematicPillarTrackers from "./CinematicPillarTrackers";
 
 const KnowledgeAtlas3D = dynamic(
@@ -21,7 +21,7 @@ const KnowledgeAtlas3D = dynamic(
         <div className="absolute top-6 left-6 z-10 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400" />
           <span className="text-[11px] font-mono tracking-widest text-emerald-400 uppercase font-semibold">
-            LIVING KNOWLEDGE ATLAS // REALTIME TOPOLOGY
+            SƠ ĐỒ KHÁI NIỆM · KHÔNG PHẢI DỮ LIỆU TRỰC TIẾP
           </span>
         </div>
       </div>
@@ -43,15 +43,15 @@ export default function KnowledgeAtlasSection() {
               </span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight font-sans">
-              Mạng lưới tri thức sống động,{" "}
+              Ba không gian,{" "}
               <span className="font-serif italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-indigo-300 to-purple-300">
-                kết nối từng quyết định.
+                ranh giới riêng biệt.
               </span>
             </h2>
           </div>
           <div className="lg:col-span-4">
             <p className="text-slate-300 font-serif text-base sm:text-lg leading-relaxed">
-              Không phải bảng dữ liệu khô cứng. Tri thức học vụ tại StudentHub là một trường không gian liên kết: quy chế viện trường, học bổng, và kinh nghiệm đối soát của hàng ngàn sinh viên.
+              Đây là sơ đồ khái niệm về ba không gian Trust, Community và Expert. Nó không biểu diễn dữ liệu trực tiếp, số lượng hồ sơ hay trạng thái xác minh.
             </p>
           </div>
         </div>

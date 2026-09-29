@@ -20,7 +20,7 @@ export default function EvidenceWorldLanding() {
       {/* 01. HIÊN TRI THỨC (Hero Cinematic Porch with 3D Evidence Prism) */}
       <HeroCinematicPorch />
 
-      {/* Forensic Telemetry Marquee Ticker (Hobro Digital Ticker) */}
+      {/* Product principles ticker */}
       <div className="w-full border-b border-white/10 bg-space-950/70 py-3 overflow-hidden backdrop-blur-md relative z-10">
         <HobroTelemetryMarquee />
       </div>
@@ -30,37 +30,37 @@ export default function EvidenceWorldLanding() {
         <NoiseToSignalSection />
       </div>
 
-      {/* 03. 4K CINEMATIC REEL STAGE (Showcasing all pre-rendered v3 video assets) */}
+      {/* 03. Product introduction reel; it does not show live case data */}
       <div className="relative z-10">
         <CinematicReelStage />
       </div>
 
-      {/* 04. TRUST ENGINE (8-Stage Forensic Verification Journey) */}
+      {/* 04. Trust response, sources, and limits */}
       <div className="relative z-10">
         <TrustCinematicJourney />
       </div>
 
-      {/* 05. WHY ZERO MANIFESTO & INTERACTIVE VERDICT LAB (Zero University Manifesto) */}
+      {/* 05. Data-honesty principles */}
       <div className="relative z-10">
         <WhyZeroManifestoSection />
       </div>
 
-      {/* 06. LIVING KNOWLEDGE ATLAS (3D Spatial Scene & Expanding Pillars) */}
+      {/* 06. Conceptual map of the three product spaces */}
       <div className="relative z-10">
         <KnowledgeAtlasSection />
       </div>
 
-      {/* 07. VERIFIED HUMAN + AI FORENSICS */}
+      {/* 07. AI output and provenance boundaries */}
       <div className="relative z-10">
         <VerifiedHumanAiSection />
       </div>
 
-      {/* 08. COLLECTIVE INTELLIGENCE (Community Fellowship) */}
+      {/* 08. Community discussion boundaries */}
       <div className="relative z-10" style={{ contentVisibility: "auto", containIntrinsicSize: "900px" }}>
         <CollectiveCommunitySection />
       </div>
 
-      {/* 09. EXPERT TRUST NETWORK (Academic Authority) */}
+      {/* 09. Expert authority boundaries */}
       <div className="relative z-10" style={{ contentVisibility: "auto", containIntrinsicSize: "900px" }}>
         <ExpertAuthoritySection />
       </div>

@@ -1,14 +1,14 @@
 /**
- * Public Trust entrypoint for the StudentHub-owned four-layer pipeline.
+ * Public Trust entrypoint.
  *
- * The optional Render compatibility adapter is constructed only when an
- * explicit opt-in is supplied. The canonical public route must be able to
- * run without the friend deployment and must never use its observations as
- * authoritative Trust evidence.
+ * The web route explicitly selects the friend-backend-authoritative runner.
+ * The StudentHub-owned runner remains exported for its isolated internal
+ * tests and legacy callers, but it is not used by the web Trust route.
  */
 
 import { createLegacyVerificationAdapter } from "./integrations/legacyVerification/LegacyVerificationAdapter.js";
 import { OwnBackendTrustOrchestrator } from "./OwnBackendTrustOrchestrator.js";
+import { FriendBackendTrustOrchestrator } from "./FriendBackendTrustOrchestrator.js";
 
 export class TrustOrchestrator extends OwnBackendTrustOrchestrator {
   constructor(options = {}) {
@@ -22,5 +22,6 @@ export class TrustOrchestrator extends OwnBackendTrustOrchestrator {
 }
 
 export function createTrustOrchestrator(options = {}) {
+  if (options.authority === "FRIEND_BACKEND") return new FriendBackendTrustOrchestrator(options);
   return new TrustOrchestrator(options);
 }

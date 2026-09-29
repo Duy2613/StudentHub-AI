@@ -14,7 +14,9 @@ function read(relativePath) {
 test("VNext product surfaces use verified registry media references", () => {
   const landing = read("src/components/landing/VNextLanding.jsx");
   const hero = read("src/components/landing/VNextLandingHero.jsx");
-  const trust = read("src/components/trust/TrustWorkspaceClient.jsx");
+  const trust = read("src/components/trust/AiTrustStudioView.jsx");
+  const mediaContext = read("src/components/providers/BackgroundContext.jsx");
+  const mediaStage = read("src/components/providers/UniversalCinematicBackground.jsx");
   const registry = read("src/lib/media/vnextMediaRegistry.js");
   const khaiMinhRegistry = read("src/lib/media/khaiMinhVisualRegistry.js");
 
@@ -22,7 +24,9 @@ test("VNext product surfaces use verified registry media references", () => {
   assert.doesNotMatch(trust, /\/media\/studenthub-vnext\/(?:trust-inspection|trust-refraction-inspection)/);
   assert.match(landing, /VNextMediaFrame[\s\S]*assetId="VID-HUMAN-01"/);
   assert.match(hero, /EvidencePrismHero[\s\S]*assetId="KH-LANDING-HERO-01"/);
-  assert.match(trust, /VerifiedPoster[\s\S]*assetId="VID-OPTIC-01"/);
+  assert.match(trust, /setRouteMediaAsset\(hasResult \? "VID-OPTIC-02" : "VID-OPTIC-01"\)/);
+  assert.match(mediaContext, /getRouteMediaAsset\(pathname, assetId\)/);
+  assert.match(mediaStage, /src=\{activeMedia\.desktopPoster\}/);
 
   for (const relativePath of [
     "public/media/home/home-campus-atlas.webm",

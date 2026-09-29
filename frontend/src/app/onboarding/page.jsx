@@ -8,7 +8,7 @@
 // - Ma trận Bento 3D Holographic Foil phản quang (.igloo-hologram-card)
 // - Chọn vai trò: "Người dùng thường" (Sinh viên) hoặc "Chuyên gia uy tín"
 // - Chọn 1 Avatar trong bộ có sẵn + Nhập thông tin & Lĩnh vực chuyên môn
-// - Tự động đồng bộ Supabase & ASP.NET Core Backend -> Điều hướng về /dashboard
+// - Tự động đồng bộ Supabase & ASP.NET Core Backend -> Điều hướng về hồ sơ cá nhân
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -45,7 +45,7 @@ export default function OnboardingPage() {
     if (profileStatus === PROFILE_STATUS.FOUND && profile?.onboarded === true) {
       const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
       const next = normalizeAuthReturnPath(params?.get("next") || params?.get("returnPath"));
-      router.replace(next || "/dashboard");
+      router.replace(next || "/profile");
     }
   }, [isAuthLoading, profile?.onboarded, profileStatus, router, status]);
 
@@ -174,7 +174,7 @@ export default function OnboardingPage() {
           </div>
           <h2 className="text-lg font-semibold text-white">Lỗi kết nối máy chủ hồ sơ</h2>
           <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-            Hệ thống không thể xác minh trạng thái hồ sơ của bạn. Để bảo toàn dữ liệu và tránh tạo tài khoản trùng lặp, vui lòng thử lại hoặc vào bảng điều khiển.
+            Hệ thống không thể xác minh trạng thái hồ sơ của bạn. Để bảo toàn dữ liệu và tránh tạo tài khoản trùng lặp, vui lòng thử tải lại hoặc quay về trang chủ.
           </p>
           <div className="flex items-center justify-center gap-3 mt-6">
             <button
@@ -186,10 +186,10 @@ export default function OnboardingPage() {
             </button>
             <button
               type="button"
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/")}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white text-xs hover:bg-white/20 transition-colors cursor-pointer"
             >
-              Vào Dashboard
+              Về trang chủ
             </button>
           </div>
         </div>
@@ -319,7 +319,7 @@ export default function OnboardingPage() {
                   </ul>
                 </div>
 
-                {/* Option 2: Chuyên gia uy tín */}
+                  {/* Option 2: Chọn vai trò chuyên gia; server cấp quyền riêng biệt */}
                 <div
                   onClick={() => handleRoleSelect("expert")}
                   onMouseMove={handleCardMouseMove}
@@ -341,21 +341,18 @@ export default function OnboardingPage() {
                   </div>
 
                   <h3 className="text-lg sm:text-xl font-human font-black text-amber-200 mb-2 flex items-center gap-1.5">
-                    ⭐ Chuyên Gia Uy Tín
+                    Đăng ký làm chuyên gia
                   </h3>
                   <p className="text-xs text-gray-300 mb-4 leading-relaxed font-human">
-                    Dành cho chuyên gia các lĩnh vực (An ninh mạng, Luật pháp, Kinh tế, Bất động sản): thẩm định độc lập và cố vấn cho cộng đồng sinh viên.
+                    Dành cho người có chuyên môn muốn đóng góp trong lĩnh vực phù hợp. Chọn vai trò này chưa xác minh danh tính/chuyên môn hoặc cấp quyền thẩm định.
                   </p>
 
                   <ul className="space-y-2 text-xs text-gray-300 font-human">
                     <li className="flex items-center gap-2 text-amber-300 font-bold">
-                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" /> Cấp Huy hiệu Vàng "⭐ Chuyên Gia Uy Tín"
+                      <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" /> Danh tính, lĩnh vực và quyền thẩm định được xác nhận riêng bởi máy chủ
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" /> Bình luận thẩm định có gắn nhãn nổi bật
-                    </li>
-                    <li className="flex items-center gap-2 text-amber-300 font-mono font-bold">
-                      <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" /> KHỞI ĐẦU VỚI 98 PTS ĐIỂM UY TÍN
+                      <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" /> Chỉ hồ sơ đủ điều kiện và có phân công mới gửi được assessment
                     </li>
                   </ul>
                 </div>
@@ -393,7 +390,7 @@ export default function OnboardingPage() {
                         : "bg-teal-500/20 text-teal-300 border-teal-500/40"
                     }`}
                   >
-                    {role === "expert" ? "⭐ EXPERT MENTOR" : "🎓 VERIFIED STUDENT"}
+                    {role === "expert" ? "CHUYÊN GIA" : "SINH VIÊN"}
                   </span>
                   <h4 className="text-base font-human font-bold text-white">{selectedAvatarData?.name}</h4>
                   <p className="text-[11px] text-gray-400 font-human">{selectedAvatarData?.description}</p>
@@ -560,7 +557,7 @@ export default function OnboardingPage() {
                 <TactileButton
                   variant="primary"
                   size="md"
-                  techSuffix="[DASHBOARD]"
+                  techSuffix="[ACCOUNT]"
                   onClick={handleFinish}
                   isLoading={isSubmitting}
                 >

@@ -7,49 +7,58 @@
 // - Saffron Gold (#ffbc09) active pill indicators with Web Audio tactile haptics
 // - Smooth collapsible desktop width (76px <-> 260px) & corner crosshair ticks (+)
 
-import React, { useState, useEffect } from "react";
+import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, ShieldAlert, MessageSquare, User, Settings, LogOut, ChevronLeft, ChevronRight, ShieldCheck, Star, Compass, CreditCard, Scale, AlertOctagon, ShoppingBag, Trophy, GraduationCap, Award } from "lucide-react";
+import { ShieldAlert, MessageSquare, User, LogOut, ChevronLeft, ChevronRight, ShieldCheck, Star, GraduationCap } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import AvatarDisplay from "@/components/AvatarDisplay";
 import { saffronAudio } from "@/lib/audio/saffronAudio";
+
+const SIDEBAR_STORAGE_KEY = "studenthub_sidebar_collapsed";
+const SIDEBAR_STATE_EVENT = "studenthub:sidebar-state";
+
+function readSidebarCollapsed() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function subscribeToSidebarState(onChange) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("storage", onChange);
+  window.addEventListener(SIDEBAR_STATE_EVENT, onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener(SIDEBAR_STATE_EVENT, onChange);
+  };
+}
 
 export default function CollapsibleSidebar({ className = "" }) {
   const pathname = usePathname();
   const router = useRouter();
   const { session, profile, signOut } = useAuth();
   
-  // Default expanded on desktop, can be collapsed
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  // Restore sidebar state from localStorage
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("studenthub_sidebar_collapsed");
-      if (saved !== null) {
-        setIsCollapsed(saved === "true");
-      }
-    }
-  }, []);
+  // Preserve the server-rendered expanded shell and subscribe to browser storage after hydration.
+  const isCollapsed = useSyncExternalStore(subscribeToSidebarState, readSidebarCollapsed, () => false);
 
   const toggleSidebar = () => {
     saffronAudio.playClick(500);
     const nextState = !isCollapsed;
-    setIsCollapsed(nextState);
     if (typeof window !== "undefined") {
-      localStorage.setItem("studenthub_sidebar_collapsed", String(nextState));
+      try {
+        window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(nextState));
+        window.dispatchEvent(new Event(SIDEBAR_STATE_EVENT));
+      } catch {
+        // The sidebar remains usable when browser storage is unavailable.
+      }
     }
   };
 
   const navItems = [
-    {
-      label: "Bảng Điều Khiển",
-      href: "/dashboard",
-      icon: LayoutDashboard,
-      badge: "Command",
-      badgeColor: "bg-sky-500/20 text-sky-300 border-sky-500/40",
-    },
     {
       label: "Trust Engine (AI Thẩm Định)",
       href: "/trust",
@@ -94,7 +103,7 @@ export default function CollapsibleSidebar({ className = "" }) {
         <span className="absolute top-2 left-2 text-[#ffbc09]/40 font-mono text-[10px] select-none">+</span>
 
         <Link
-          href="/dashboard"
+          href="/"
           onClick={() => saffronAudio.playClick(600)}
           className="flex items-center gap-3 min-w-0 group"
         >
@@ -109,7 +118,7 @@ export default function CollapsibleSidebar({ className = "" }) {
                 StudentHub <span className="text-[#ffbc09] text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#ffbc09]/15 border border-[#ffbc09]/30">AI</span>
               </span>
               <span className="text-[10px] text-[#ece7e0]/60 font-medium truncate">
-                Scam Prevention Hub
+                Trust · Community · Expert
               </span>
             </div>
           )}

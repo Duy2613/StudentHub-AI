@@ -4,7 +4,7 @@ const INTERNAL_ORIGIN = "https://studenthub.internal";
 // allowlist is deliberately route-based so a provider callback can never turn
 // an arbitrary `next` value into an external redirect.
 const AUTH_RETURN_PREFIXES = Object.freeze([
-  "/dashboard",
+  "/",
   "/community",
   "/trust",
   "/expert",
@@ -45,11 +45,11 @@ function parseInternalPath(value) {
   return `${parsed.pathname}${parsed.search}`;
 }
 
-export function normalizeAuthReturnPath(value, fallback = "/dashboard") {
-  return parseInternalPath(value) || parseInternalPath(fallback) || "/dashboard";
+export function normalizeAuthReturnPath(value, fallback = "/profile") {
+  return parseInternalPath(value) || parseInternalPath(fallback) || "/profile";
 }
 
-export function buildAuthCallbackUrl(origin, next = "/dashboard") {
+export function buildAuthCallbackUrl(origin, next = "/profile") {
   const callbackOrigin = typeof origin === "string" && origin ? origin : INTERNAL_ORIGIN;
   let callback;
   try {
@@ -58,14 +58,14 @@ export function buildAuthCallbackUrl(origin, next = "/dashboard") {
     callback = new URL("/callback", INTERNAL_ORIGIN);
   }
   const safeNext = normalizeAuthReturnPath(next);
-  if (safeNext !== "/dashboard") callback.searchParams.set("next", safeNext);
+  if (safeNext !== "/profile") callback.searchParams.set("next", safeNext);
   return callback.toString();
 }
 
-export function buildLoginErrorPath(errorCode, next = "/dashboard") {
+export function buildLoginErrorPath(errorCode, next = "/profile") {
   const params = new URLSearchParams({ error: String(errorCode || "oauth_failed") });
   const safeNext = normalizeAuthReturnPath(next);
-  if (safeNext !== "/dashboard") params.set("next", safeNext);
+  if (safeNext !== "/profile") params.set("next", safeNext);
   return `/login?${params.toString()}`;
 }
 
@@ -73,8 +73,8 @@ export function postAuthDestination({ next, onboarded = false } = {}) {
   const safeNext = normalizeAuthReturnPath(next);
   // An explicit in-app return path is an intent from the user (for example a
   // profile edit or a community reply). Onboarding must not swallow that
-  // intent and send the user into a redirect loop. Only the default dashboard
+  // intent and send the user into a redirect loop. Only the default profile
   // destination may enter first-time onboarding.
-  if (onboarded || safeNext !== "/dashboard") return safeNext;
+  if (onboarded || safeNext !== "/profile") return safeNext;
   return "/onboarding";
 }

@@ -1,0 +1,116 @@
+/**
+ * StudentHub AI — Typography Foundation
+ *
+ * Governing Authority: MASTER FRONTEND CONSTITUTION v3.0 (M-20, M-21)
+ * Exactly three canonical font roles:
+ * - Editorial / Display: Lora Variable
+ * - Product / UI / Reading: Be Vietnam Pro
+ * - Technical: JetBrains Mono
+ */
+
+body {
+  font-family: var(--font-product);
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Editorial / Display Headings --- */
+.type-display-xl {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-display-xl);
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.type-display {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-display);
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.type-h1 {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-h1);
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.type-h2 {
+  font-family: var(--font-editorial);
+  font-size: var(--font-size-h2);
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.type-h3 {
+  font-family: var(--font-product);
+  font-size: var(--font-size-h3);
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+/* --- UI Titles & Text --- */
+.type-title-lg {
+  font-family: var(--font-product);
+  font-size: var(--font-size-title-lg);
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.type-title {
+  font-family: var(--font-product);
+  font-size: var(--font-size-title);
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.type-body-lg {
+  font-family: var(--font-product);
+  font-size: var(--font-size-body-lg);
+  line-height: 1.65;
+  font-weight: 400;
+}
+
+.type-body {
+  font-family: var(--font-product);
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.type-ui {
+  font-family: var(--font-product);
+  font-size: var(--font-size-ui);
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+.type-caption {
+  font-family: var(--font-product);
+  font-size: var(--font-size-caption);
+  line-height: 1.4;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* --- Technical Text (JetBrains Mono) --- */
+.type-tech {
+  font-family: var(--font-technical);
+  font-size: var(--font-size-tech);
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+}
+
+/* --- Long-form Reading Target (M-21) --- */
+.reading-measure {
+  max-width: 70ch;
+  line-height: 1.7;
+}

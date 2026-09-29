@@ -3,7 +3,7 @@
 // components/AvatarDisplay.jsx
 //
 // Component hiển thị Avatar cao cấp: hỗ trợ cả Preset Avatar SVG, Custom Upload,
-// cùng viền sáng phát quang (glow) và Huy hiệu vai trò (Verified Badge).
+// cùng viền sáng phát quang (glow) và dấu vai trò không hàm ý xác minh.
 
 import React from "react";
 import {
@@ -20,7 +20,6 @@ import {
   TrendingUp,
   ShieldAlert,
   User,
-  CheckCircle,
 } from "lucide-react";
 import { getAvatarById } from "@/lib/avatars";
 
@@ -93,10 +92,14 @@ export const AvatarDisplay = ({
         } ${avatarUrl ? "bg-space-900" : `bg-gradient-to-br ${avatarData?.bgGradient || "from-indigo-600 to-purple-600"}`}`}
       >
         {avatarUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- uploaded avatar hosts are user supplied; do not route them through Next's remote image optimizer.
           <img
             src={avatarUrl}
             alt={avatarData?.name || "Avatar"}
             className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
           />
         ) : (
           <div className="flex flex-col items-center justify-center text-white relative">
@@ -106,7 +109,7 @@ export const AvatarDisplay = ({
         )}
       </div>
 
-      {/* Verified Role Badge on Corner */}
+      {/* Role marker; it does not certify identity or expertise. */}
       {showBadge && (
         <div
           className={`absolute -bottom-1.5 -right-1.5 p-1 rounded-full border shadow-md flex items-center justify-center ${
@@ -114,12 +117,12 @@ export const AvatarDisplay = ({
               ? "bg-amber-500 border-amber-300 text-black shadow-amber-500/50"
               : "bg-indigo-600 border-indigo-300 text-white shadow-indigo-500/50"
           }`}
-          title={isExpert ? "Chuyên gia uy tín" : "Sinh viên xác thực"}
+          title={isExpert ? "Vai trò: Chuyên gia" : "Vai trò: Sinh viên"}
         >
           {isExpert ? (
-            <Star className="w-3.5 h-3.5 fill-current text-black" />
+            <User className="w-3.5 h-3.5 text-black" />
           ) : (
-            <CheckCircle className="w-3.5 h-3.5 fill-current text-white" />
+            <GraduationCap className="w-3.5 h-3.5 text-white" />
           )}
         </div>
       )}

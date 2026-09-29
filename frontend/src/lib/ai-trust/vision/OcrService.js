@@ -12,6 +12,12 @@
 import { createWorker } from "tesseract.js";
 import jsQR from "jsqr";
 
+// Tesseract's default browser worker is fetched from jsDelivr. The Trust
+// backend and jsQR path must remain usable when that optional CDN asset is
+// blocked by a CSP, offline browser, or restricted corporate network. Enable
+// the worker explicitly when the deployment serves its worker assets.
+const BROWSER_OCR_ENABLED = typeof process !== "undefined" && process.env?.NEXT_PUBLIC_TRUST_BROWSER_OCR === "true";
+
 function uniqueMatches(text, pattern) {
   return [...new Set(String(text || "").match(pattern) || [])];
 }
@@ -114,6 +120,7 @@ export class OcrService {
    * Initializes and caches Tesseract Worker with timeout protection
    */
   static async getWorker() {
+    if (typeof window !== "undefined" && !BROWSER_OCR_ENABLED) return null;
     if (this.workerInstance) return this.workerInstance;
     if (this.isInitializing) {
       const startWait = Date.now();

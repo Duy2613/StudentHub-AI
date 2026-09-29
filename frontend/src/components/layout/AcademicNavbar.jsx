@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
-  LayoutDashboard,
   Menu,
   Search,
   ShieldCheck,
@@ -15,22 +14,26 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { markAssurance, measureAssurance } from "@/lib/performance/assurance";
+import { getAccountNavItems, getCoreNavItems, getUtilityNavItems } from "@/config/navigation";
 
 const AcademicCommandPalette = dynamic(() => import("../command/AcademicCommandPalette"), {
   ssr: false,
 });
 
-export const PRIMARY_NAV_ITEMS = [
-  { id: "home", label: "Trang chủ", href: "/", icon: null },
-  { id: "trust", label: "Kiểm chứng", href: "/trust", icon: ShieldCheck },
-  { id: "community", label: "Cộng đồng", href: "/community", icon: Users },
-  { id: "expert", label: "Chuyên gia", href: "/expert", icon: UserRoundCheck },
-];
+const NAV_ICONS = Object.freeze({ trust: ShieldCheck, community: Users, expert: UserRoundCheck });
+export const PRIMARY_NAV_ITEMS = getCoreNavItems().map((item) => ({
+  id: item.id,
+  label: item.label,
+  href: item.route,
+  icon: NAV_ICONS[item.id],
+}));
 
 export const ALL_NAV_ITEMS = [...PRIMARY_NAV_ITEMS];
 
 export default function AcademicNavbar() {
   const pathname = usePathname();
+  const omniItem = getUtilityNavItems().find((item) => item.id === "omni");
+  const profileItem = getAccountNavItems().find((item) => item.id === "profile");
   const { session, profile } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -143,7 +146,7 @@ export default function AcademicNavbar() {
               ref={commandPaletteTriggerRef}
               onClick={openCommandPalette}
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-primary border border-border-subtle hover:border-border-strong text-text-muted text-xs font-mono transition-all focus:outline-none focus:ring-2 focus:ring-accent-primary"
-              aria-label="Tìm kiếm toàn hệ thống (Ctrl K)"
+              aria-label={`Mở ${omniItem?.label || "AI / Omni"} (Ctrl K)`}
             >
               <Search size={14} className="text-text-secondary" />
               <span>Tìm kiếm...</span>
@@ -152,18 +155,9 @@ export default function AcademicNavbar() {
               </kbd>
             </button>
 
-            {/* Dashboard button */}
-            <Link
-              href="/dashboard"
-              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-surface-primary border border-border-subtle transition-all focus:outline-none focus:ring-2 focus:ring-accent-primary"
-            >
-              <LayoutDashboard size={14} />
-              <span>Dashboard</span>
-            </Link>
-
             {/* Profile Avatar */}
             <Link
-              href="/profile"
+              href={profileItem?.route || "/profile"}
               className="flex items-center gap-2 p-1 rounded-full text-text-primary hover:ring-2 hover:ring-accent-primary transition-all focus:outline-none focus:ring-2 focus:ring-accent-primary"
               aria-label={`Hồ sơ của ${displayName}`}
             >
@@ -194,7 +188,7 @@ export default function AcademicNavbar() {
                 >
                   <div className="flex items-center gap-2">
                     <Search size={16} />
-                    <span>Tìm kiếm...</span>
+                    <span>{omniItem?.label || "AI / Omni"}</span>
                   </div>
                   <kbd className="px-2 py-0.5 rounded bg-surface-elevated text-xs">Ctrl K</kbd>
                 </button>
@@ -213,14 +207,6 @@ export default function AcademicNavbar() {
                 <div className="text-xs font-mono uppercase tracking-wider text-text-muted px-3 mb-2">
                   Cá nhân & Thiết lập
                 </div>
-                <Link
-                  href="/dashboard"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-primary text-base font-medium"
-                >
-                  <LayoutDashboard size={18} />
-                  <span>Dashboard điều hành</span>
-                </Link>
                 <Link
                   href="/profile"
                   onClick={() => setMobileOpen(false)}

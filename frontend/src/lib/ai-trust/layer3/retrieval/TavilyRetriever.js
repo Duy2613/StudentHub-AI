@@ -255,7 +255,7 @@ export class TavilyRetriever extends IEvidenceRetriever {
     };
   }
 
-  async #searchOne(query, { signal, timeoutMs, attempt = 1 }) {
+  async #searchOne(query, { signal, timeoutMs, attempt = 1, maxResults = MAX_RESULTS_PER_QUERY }) {
     throwIfAborted(signal);
     if (typeof this.fetchImpl !== "function") {
       throw createProviderErrorWithMetadata("TAVILY_FETCH_UNAVAILABLE", EVIDENCE_PROVIDER_STATUS.UNAVAILABLE, null, {
@@ -293,7 +293,7 @@ export class TavilyRetriever extends IEvidenceRetriever {
           api_key: this.apiKey,
           query,
           search_depth: "basic",
-          max_results: MAX_RESULTS_PER_QUERY,
+          max_results: maxResults,
           include_answer: false,
           include_raw_content: false,
         }),
@@ -421,6 +421,10 @@ export class TavilyRetriever extends IEvidenceRetriever {
       // constraint, not a source-count limit: every generated query is kept
       // and sent within the provider's accepted query size.
       .map((item) => item.normalize("NFKC").replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, 380));
+    const requestedMaxResults = Number(options.maxResults);
+    const maxResults = Number.isFinite(requestedMaxResults)
+      ? Math.max(1, Math.min(MAX_RESULTS_PER_QUERY, Math.floor(requestedMaxResults)))
+      : MAX_RESULTS_PER_QUERY;
     const diagnostics = {
       provider: "tavily",
       envPresent: this.isConfigured(),
@@ -501,6 +505,7 @@ export class TavilyRetriever extends IEvidenceRetriever {
                 signal: options.signal,
                 timeoutMs: remainingMs,
                 attempt,
+                maxResults,
               });
               recordTrace(response.requestTrace);
               break;

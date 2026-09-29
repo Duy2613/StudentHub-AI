@@ -17,7 +17,7 @@ const DEFAULT_ANNOTATIONS = Object.freeze([
 ]);
 
 function isCurrent(pathname, href) {
-  return pathname === href || (href !== "/dashboard" && pathname.startsWith(`${href}/`));
+  return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 }
 
 function safeChapter(chapter) {
@@ -28,12 +28,13 @@ function safeChapter(chapter) {
 
 export default function MarginRail({
   groups = [],
-  pathname = "/dashboard",
+  pathname = "/",
   chapter = "I",
   chapterLabel = "StudentHub / Margin",
   annotations = DEFAULT_ANNOTATIONS,
   displayName = "Sinh viên",
   mobileOpen = false,
+  communityMode = false,
   onMobileToggle,
   onNavigate,
 }) {
@@ -74,22 +75,22 @@ export default function MarginRail({
 
   return (
     <>
-      <aside className="app-sidebar margin-rail hidden md:flex" aria-label="The Margin — điều hướng và chú giải">
+      <aside className={`app-sidebar margin-rail hidden md:flex${communityMode ? " community-margin-rail" : ""}`} aria-label="Điều hướng StudentHub">
         <div className="margin-rail-top">
-          <div className="margin-chapter" role="group" aria-label={`Chương ${chapterNumber}`}>
+          {!communityMode && <div className="margin-chapter" role="group" aria-label={`Chương ${chapterNumber}`}>
             <span className="margin-meta">Chapter</span>
             <strong>{chapterNumber}</strong>
             <span className="margin-chapter-label">{chapterLabel}</span>
-          </div>
+          </div>}
           {renderNavigation()}
         </div>
 
-        <div className="margin-annotations" role="region" aria-label="Chú giải The Margin">
+        {!communityMode && <div className="margin-annotations" role="region" aria-label="Chú giải The Margin">
           <p className="margin-nav-label">Annotation lexicon</p>
           {visibleAnnotations.map((annotation, index) => (
             <Annotation key={`${annotation.mark}-${annotation.title || index}`} {...annotation} ordinal={annotation.ordinal || String(index + 1).padStart(2, "0")} />
           ))}
-        </div>
+        </div>}
 
         <div className="margin-rail-footer">
           <span className="margin-meta">Signed in as</span>
@@ -98,20 +99,22 @@ export default function MarginRail({
         </div>
       </aside>
 
-      <details id="mobile-navigation" className="margin-mobile-strip" open={mobileOpen} onToggle={(event) => onMobileToggle?.(event.currentTarget.open)}>
+      <details id="mobile-navigation" className={`margin-mobile-strip${communityMode ? " community-mobile-strip" : ""}`} open={mobileOpen} onToggle={(event) => onMobileToggle?.(event.currentTarget.open)}>
         <summary>
           <span className="margin-mobile-summary-mark"><Menu size={15} aria-hidden="true" /></span>
-          <span><span className="margin-meta">Chapter {chapterNumber}</span><strong>{chapterLabel}</strong></span>
-          <span className="margin-mobile-summary-action">Mở Margin</span>
+          {communityMode
+            ? <span><strong>Điều hướng StudentHub</strong></span>
+            : <span><span className="margin-meta">Chapter {chapterNumber}</span><strong>{chapterLabel}</strong></span>}
+          <span className="margin-mobile-summary-action">{communityMode ? "Mở điều hướng" : "Mở Margin"}</span>
         </summary>
         <div className="margin-mobile-sheet">
           {renderNavigation(true)}
-          <div className="margin-mobile-annotations">
+          {!communityMode && <div className="margin-mobile-annotations">
             <p className="margin-nav-label">Chú giải</p>
             {visibleAnnotations.map((annotation, index) => (
               <Annotation key={`mobile-${annotation.mark}-${annotation.title || index}`} {...annotation} ordinal={annotation.ordinal || String(index + 1).padStart(2, "0")} />
             ))}
-          </div>
+          </div>}
         </div>
       </details>
     </>

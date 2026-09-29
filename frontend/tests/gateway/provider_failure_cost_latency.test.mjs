@@ -143,12 +143,19 @@ test("Layer 4 remains deterministic and retains the model trace when all Gemini 
     layer3Result: { status: "INSUFFICIENT", evidence: [], verificationCompleteness: 0 },
     options: { provider },
   });
-  assert.equal(result.aiVerificationStatus, "UNAVAILABLE");
+  // Layer 4's deterministic policy remains authoritative when Gemini fails;
+  // the provider outage and model trace stay visible in their own fields.
+  assert.equal(result.aiVerificationStatus, "FALLBACK_DETERMINISTIC");
   assert.ok(["gemini", "google"].includes(result.aiVerification.provider));
   assert.equal(result.aiRequestedPrimaryModel, MODELS[0]);
   assert.equal(result.aiModelTrace.length, MODELS.length);
+  assert.equal(result.aiProviderStatus, "SERVICE_UNAVAILABLE");
+  assert.equal(result.aiVerificationErrorType, GATEWAY_ERROR_TYPE.HTTP_ERROR);
+  assert.equal(result.aiVerificationHttpStatus, 503);
+  assert.equal(result.aiOperationStatus, "COMPLETED");
+  assert.equal(result.aiExecutedModel, "deterministic_trust_policy");
   assert.equal(result.enforcement, "REVIEW");
-  assert.equal(result.metrics.providerStatus, "UNAVAILABLE");
+  assert.equal(result.metrics.providerStatus, "FALLBACK_DETERMINISTIC");
 });
 
 test("cost and latency budgets remain explicit synthetic assumptions", () => {

@@ -3,39 +3,46 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { getMobilePrimaryNavItems, isRouteActive } from '@/config/navigation';
 
-const MOBILE_ITEMS = [
-  { label: 'Tổng quan', href: '/dashboard' },
-  { label: 'Xác minh', href: '/trust' },
-  { label: 'Cộng đồng', href: '/community' },
-  { label: 'AI', href: '/ai' },
+const CANONICAL_SHELL_PREFIXES = [
+  "/trust",
+  "/community",
+  "/expert",
+  "/cases",
+  "/settings",
+  "/profile",
+  "/login",
+  "/register",
+  "/onboarding",
+  "/callback",
 ];
-
-const CANONICAL_SHELL_PREFIXES = ["/trust", "/community", "/expert", "/cases", "/dashboard", "/settings", "/profile", "/login", "/register", "/onboarding", "/callback"];
 
 export default function MobileNavRail() {
   const pathname = usePathname();
 
-  if (pathname === "/" || CANONICAL_SHELL_PREFIXES.some((prefix) => pathname?.startsWith(prefix))) return null;
+  if (pathname === "/" || CANONICAL_SHELL_PREFIXES.some((prefix) => pathname?.startsWith(prefix))) {
+    return null;
+  }
+
+  const mobileItems = getMobilePrimaryNavItems();
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-[var(--border-subtle)] bg-[var(--bg-primary)]/95 backdrop-blur-lg px-2 py-1.5 flex items-center justify-around"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-[var(--border-subtle)] bg-[var(--surface-1)]/95 backdrop-blur-lg px-2 py-1.5 flex items-center justify-around"
       aria-label="Điều hướng di động"
     >
-      {MOBILE_ITEMS.map((item) => {
-        const isActive =
-          pathname === item.href ||
-          (item.href !== '/dashboard' && pathname.startsWith(item.href));
+      {mobileItems.map((item) => {
+        const isActive = isRouteActive(pathname, item.route);
 
         return (
           <Link
-            key={item.href}
-            href={item.href}
-            className={`flex flex-col items-center py-1 px-2 text-[11px] font-[family-name:var(--font-ui)] ${
+            key={item.id}
+            href={item.route}
+            className={`flex flex-col items-center py-1 px-2 text-[11px] font-[family-name:var(--font-product)] transition-colors ${
               isActive
-                ? 'text-[var(--accent-trust)] font-semibold'
-                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                ? 'text-[var(--action-primary)] font-semibold'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
             }`}
             aria-current={isActive ? 'page' : undefined}
           >
@@ -43,12 +50,6 @@ export default function MobileNavRail() {
           </Link>
         );
       })}
-      <Link
-        href="/sos"
-        className="flex flex-col items-center py-1 px-2 text-[11px] font-bold text-[var(--status-danger)]"
-      >
-        <span>SOS</span>
-      </Link>
     </nav>
   );
 }

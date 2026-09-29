@@ -1,26 +1,28 @@
 import type { Metadata } from "next";
 import {
     Be_Vietnam_Pro,
-    Cormorant_Garamond,
     JetBrains_Mono,
     Lora,
-    Newsreader,
 } from "next/font/google";
 import "./globals.css";
+import "@/styles/index.css";
 import "@/components/margin/margin.css";
 import { AuthProvider } from "@/lib/auth/AuthContext";
 import { BackgroundProvider } from "@/components/providers/BackgroundContext";
 import { AdaptiveQualityProvider } from "@/components/providers/AdaptiveQualityContext";
 import { RealtimeProvider } from "@/components/providers/RealtimeContext";
 import RealtimeNotificationToasts from "@/components/realtime/RealtimeNotificationToasts";
-import SmoothScrollProvider from "@/components/providers/SmoothScrollProvider";
 import { ReducedMotionBoundary } from "@/components/visual/ReducedMotionBoundary";
 import PrimaryNavbar from "@/components/navigation/PrimaryNavbar";
 import MobileNavRail from "@/components/navigation/MobileNavRail";
-import HobroPrecisionCursor from "@/components/cinematic/HobroPrecisionCursor";
-import SoundAtmosphereController from "@/components/cinematic/SoundAtmosphereController";
-import ArstraumurAtmosphereCanvas from "@/components/cinematic/ArstraumurAtmosphereCanvas";
 
+/**
+ * MASTER FRONTEND CONSTITUTION v4.0 (three canonical font roles)
+ * Exactly three canonical font roles:
+ * - Editorial / Display: Lora Variable
+ * - Product / UI / Reading: Be Vietnam Pro
+ * - Technical: JetBrains Mono
+ */
 const beVietnamPro = Be_Vietnam_Pro({
     variable: "--font-be-vietnam-pro",
     subsets: ["latin", "vietnamese"],
@@ -29,36 +31,15 @@ const beVietnamPro = Be_Vietnam_Pro({
     preload: true,
 });
 
-// Monumental & Editorial Display: Cormorant Garamond (Classical tension, academic authority)
-const cormorantGaramond = Cormorant_Garamond({
-    variable: "--font-cormorant-garamond",
-    subsets: ["latin", "vietnamese"],
-    weight: ["400", "500", "600", "700"],
-    style: ["normal", "italic"],
-    display: "swap",
-    preload: true,
-});
-
-// Editorial Reading & Quotes: Newsreader
-const newsreader = Newsreader({
-    variable: "--font-newsreader",
-    subsets: ["latin", "vietnamese"],
-    weight: ["400", "500", "600"],
-    style: ["normal", "italic"],
-    display: "swap",
-    preload: false,
-});
-
 const lora = Lora({
     variable: "--font-lora",
     subsets: ["latin", "vietnamese"],
-    weight: ["400", "500", "600", "700"],
+    weight: "variable",
     style: ["normal", "italic"],
     display: "swap",
     preload: false,
 });
 
-// Machine Interface: JetBrains Mono (Data, code, hash, timestamps, alerts, OCR)
 const jetbrainsMono = JetBrains_Mono({
     variable: "--font-jetbrains-mono",
     subsets: ["latin"],
@@ -67,37 +48,37 @@ const jetbrainsMono = JetBrains_Mono({
     preload: false,
 });
 
-
 export const metadata: Metadata = {
     title: "StudentHub AI | Hiểu đúng. Đi xa.",
-    description: "Kiểm tra nguồn tin, đối chiếu bối cảnh và xem điều còn thiếu trước khi bạn quyết định.",
+    description: "Kiểm chứng thông tin, thảo luận có dẫn chứng và hiểu đánh giá từ chuyên gia.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html
             lang="vi"
+            data-theme="midnight"
             data-paper="night"
-            className={`${beVietnamPro.variable} ${cormorantGaramond.variable} ${newsreader.variable} ${lora.variable} ${jetbrainsMono.variable} h-full antialiased`}
+            className={`${beVietnamPro.variable} ${lora.variable} ${jetbrainsMono.variable} h-full antialiased`}
         >
-            <body className="min-h-full flex flex-col bg-transparent text-gray-100 selection:bg-teal-400 selection:text-space-950">
+            <body className="min-h-full flex flex-col">
+                {/* Accessible Skip Link (M-51, C-28) */}
+                <a href="#main-content" className="skip-to-main">
+                    Bỏ qua đến nội dung chính
+                </a>
+
                 <div className="analog-grain-overlay" aria-hidden="true" />
-                <HobroPrecisionCursor />
-                <SoundAtmosphereController />
-                <ArstraumurAtmosphereCanvas />
                 <AuthProvider>
                     <BackgroundProvider>
                         <RealtimeProvider>
                             <AdaptiveQualityProvider>
                                 <ReducedMotionBoundary>
-                                    <SmoothScrollProvider>
-                                        <RealtimeNotificationToasts />
-                                        <PrimaryNavbar />
-                                        <div className="flex-1 pb-16 md:pb-0">
-                                            {children}
-                                        </div>
-                                        <MobileNavRail />
-                                    </SmoothScrollProvider>
+                                    <RealtimeNotificationToasts />
+                                    <PrimaryNavbar />
+                                    <main id="main-content" className="flex-1 pb-16 md:pb-0 focus:outline-none">
+                                        {children}
+                                    </main>
+                                    <MobileNavRail />
                                 </ReducedMotionBoundary>
                             </AdaptiveQualityProvider>
                         </RealtimeProvider>

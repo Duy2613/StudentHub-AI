@@ -21,6 +21,13 @@ let loaded = false;
 function ensureEnvLoaded() {
   if (loaded) return;
 
+  // The repository-wide test runner isolates each test process from local
+  // credentials. Do not silently re-import .env.local inside those children.
+  if (process.env.STUDENTHUB_HERMETIC_TEST_MODE === "1") {
+    loaded = true;
+    return;
+  }
+
   // If already running inside Next.js runtime with env populated
   if ((process.env.NEXT_RUNTIME || process.env.__NEXT_PROCESSED_ENV) && process.env.DATABASE_URL) {
     loaded = true;

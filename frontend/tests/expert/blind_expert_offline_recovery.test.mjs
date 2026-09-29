@@ -1,13 +1,13 @@
-import test, { after } from "node:test";
+import { after } from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
 import { ExpertBlindReviewService } from "../../src/lib/server/expert/ExpertBlindReviewService.js";
 import { ExpertBlindReviewDispatcher } from "../../src/lib/server/expert/ExpertBlindReviewDispatcher.js";
-import { getDemoAccounts, createTestTrustCase, cleanupTestCase } from "./test_helpers.mjs";
+import { getDemoAccounts, createTestTrustCase, cleanupTestCase, closeExpertTestPool, liveExpertTest as test } from "./test_helpers.mjs";
 
 after(async () => {
-  await getPostgresPool().end().catch(() => {});
+  await closeExpertTestPool();
 });
 
 test("Blind Expert Offline Recovery — Full reconstruction of pending reviews from database without realtime dependency", async () => {

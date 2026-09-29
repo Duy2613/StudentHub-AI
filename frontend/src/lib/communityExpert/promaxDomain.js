@@ -254,14 +254,15 @@ function canonicalizeLocator(value) {
   if (!raw) return "";
   try {
     const parsed = new URL(raw);
+    if (!["https:", "http:"].includes(parsed.protocol) || parsed.username || parsed.password) return "";
     parsed.hash = "";
     parsed.hostname = parsed.hostname.toLowerCase();
     for (const key of [...parsed.searchParams.keys()]) {
-      if (/^(utm_|fbclid|gclid)/i.test(key)) parsed.searchParams.delete(key);
+      if (/^(utm_|fbclid|gclid|token$|access[_-]?token$|auth(orization)?$|signature$|sig$|session$|email$|phone$|student[_-]?id$|code$)/i.test(key)) parsed.searchParams.delete(key);
     }
     return parsed.toString().replace(/\/$/, "");
   } catch {
-    return raw.toLowerCase().replace(/\/$/, "");
+    return "";
   }
 }
 
@@ -652,13 +653,24 @@ export function buildAssessmentContract(input = {}) {
 }
 
 export function createPreview({ statement, metadata, ocrText, qrContent, source, caseId, caseRevision, claimId, contributionType, evidenceRefs, evidenceRevisionIds } = {}) {
-  const scanInput = [statement, ocrText, qrContent].filter((value) => typeof value === "string" && value.trim()).join("\n");
+  const scanInput = [statement, ocrText, qrContent, source?.url, source?.canonicalUrl].filter((value) => typeof value === "string" && value.trim()).join("\n");
   const boundedScanInput = scanInput.slice(0, 80_000);
   const scan = detectPII(boundedScanInput, { ...(metadata || {}), ...(source?.metadata || {}), ...(qrContent ? { qrData: qrContent } : {}) });
   const redactedStatement = redactText(statement);
   const validation = validateContributionInput({ statement, caseId, caseRevision, claimId, contributionType, evidenceRefs });
   const normalizedEvidenceRevisionIds = Array.isArray(evidenceRevisionIds) ? [...new Set(evidenceRevisionIds.map(text).filter(Boolean))].slice(0, 100) : [];
   const normalizedSource = source && typeof source === "object" ? canonicalizeSource(source) : null;
+  const sourceUrlProvided = Boolean(String(source?.url || source?.canonicalUrl || "").trim());
+  const invalidSourceUrl = sourceUrlProvided && !normalizedSource?.canonicalUrl;
+  const sourceUrlScan = detectPII([source?.url, source?.canonicalUrl].filter((value) => typeof value === "string").join("\n"));
+  if (sourceUrlScan.hasPII) {
+    scan.blocked = true;
+    scan.findings = [...scan.findings, { type: "SOURCE_URL_CONTAINS_PERSONAL_DATA", count: sourceUrlScan.findings.reduce((sum, item) => sum + item.count, 0) }];
+  }
+  if (invalidSourceUrl) {
+    scan.blocked = true;
+    scan.findings = [...scan.findings, { type: "SOURCE_URL_INVALID", count: 1 }];
+  }
   return {
     state: scan.blocked ? "BLOCKED" : "PREVIEW_READY",
     publicationState: scan.blocked ? "BLOCKED" : "PREVIEW_READY",

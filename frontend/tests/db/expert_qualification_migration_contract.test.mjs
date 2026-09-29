@@ -8,6 +8,7 @@ const repositoryRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..",
 const sql = readFileSync(join(repositoryRoot, "database", "migrations", "202609060001_expert_qualification.sql"), "utf8");
 const outboxSql = readFileSync(join(repositoryRoot, "database", "migrations", "202609060002_integration_outbox.sql"), "utf8");
 const trustRevisionSql = readFileSync(join(repositoryRoot, "database", "migrations", "202609060003_trust_runs_revisions.sql"), "utf8");
+const fourLayerStageSql = readFileSync(join(repositoryRoot, "database", "migrations", "20260927032100_trust_four_layer_stage_constraint.sql"), "utf8");
 
 test("expert qualification migration keeps the workflow server-owned", () => {
   for (const table of ["expert_applications", "expert_quiz_attempts", "expert_quiz_answers"]) {
@@ -40,4 +41,9 @@ test("Trust persistence separates case, run, stage run, and immutable revisions"
   assert.match(trustRevisionSql, /for select using \(auth\.uid\(\) = owner_id\)/i);
   assert.match(trustRevisionSql, /revoke all on public\.trust_runs, public\.trust_stage_runs/i);
   assert.match(trustRevisionSql, /grant select, insert on public\.trust_case_revisions, public\.trust_verdict_revisions to service_role/i);
+});
+
+test("Trust stage persistence accepts both V5 and four-layer stage identities", () => {
+  assert.match(fourLayerStageSql, /drop constraint if exists trust_stage_runs_stage_id_check/i);
+  assert.match(fourLayerStageSql, /add constraint trust_stage_runs_stage_id_check[\s\S]*?check\s*\(stage_id in\s*\('l1',\s*'l2',\s*'l2a',\s*'l2b',\s*'l2c',\s*'l3',\s*'l4',\s*'l5'\)\)/i);
 });

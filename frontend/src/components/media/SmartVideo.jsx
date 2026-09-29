@@ -39,12 +39,17 @@ export default function SmartVideo({
   const [isNearViewport, setIsNearViewport] = useState(priority);
   const [isInViewport, setIsInViewport] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
   const [isReducedMotion, setIsReducedMotion] = useState(() => (
     typeof window !== "undefined" && window.matchMedia
       ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
       : false
   ));
   const [hasError, setHasError] = useState(false);
+
+  // Video capability is client-only. Waiting one effect tick keeps the SSR
+  // tree deterministic and prevents poster/video hydration mismatches.
+  useEffect(() => setHasMounted(true), []);
 
   // Check prefers-reduced-motion
   useEffect(() => {
@@ -127,7 +132,7 @@ export default function SmartVideo({
     cinematicMediaCoordinator.releasePlayback(videoId);
   };
 
-  const shouldRenderVideoSource = isNearViewport && !isReducedMotion && !hasError && Boolean(src);
+  const shouldRenderVideoSource = hasMounted && isNearViewport && !isReducedMotion && !hasError && Boolean(src);
 
   return (
     <div
@@ -153,7 +158,7 @@ export default function SmartVideo({
       )}
 
       {/* 2. Video Element with intelligent deferred loading */}
-      {!isReducedMotion && !hasError && (
+      {hasMounted && !isReducedMotion && !hasError && (
         <video
           ref={videoRef}
           loop={loop}

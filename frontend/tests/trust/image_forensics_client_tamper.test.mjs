@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { runTrustContinuation } from "../../src/app/api/v1/trust/continue/route.js";
+import { runTrustContinuation } from "../../src/app/api/v1/trust/continue/continuation.js";
 
 test("Client Anti-Tamper — Continuation endpoint rejects client-supplied layer2 or layer3 payloads", async () => {
   const fakePrincipal = {

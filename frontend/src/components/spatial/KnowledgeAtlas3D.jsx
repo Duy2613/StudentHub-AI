@@ -9,7 +9,7 @@ const ATLAS_NODES = [
   { id: "community", label: "Cộng Đồng Trí Tuệ", x: 2.1, y: 1.2, z: -0.4, color: 0x65d8ff, weight: 1.0 },
   { id: "expert", label: "Hội đồng Chuyên Gia", x: 0.2, y: 2.0, z: 0.8, color: 0xffb66d, weight: 1.1 },
   { id: "policy", label: "Quy Chế Học Vụ", x: -1.4, y: -1.6, z: 0.5, color: 0x756bff, weight: 0.9 },
-  { id: "scholarship", label: "Radar Học Bổng", x: 1.8, y: -1.4, z: -0.2, color: 0x34e7c4, weight: 0.8 },
+  { id: "claims", label: "Mệnh Đề", x: 1.8, y: -1.4, z: -0.2, color: 0x34e7c4, weight: 0.8 },
   { id: "coi", label: "Kiểm Soát Xung Đột (COI)", x: -0.8, y: 0.2, z: -1.2, color: 0xff6377, weight: 0.85 },
   { id: "provenance", label: "Nguồn Độc Lập", x: 0.6, y: -0.4, z: 1.1, color: 0xf6f7fb, weight: 0.95 }
 ];
@@ -340,22 +340,22 @@ export default function KnowledgeAtlas3D({ className = "" }) {
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
           <span className="text-[11px] font-mono tracking-widest text-emerald-400 uppercase font-semibold">
-            LIVING KNOWLEDGE ATLAS // REALTIME TOPOLOGY
+            SƠ ĐỒ KHÁI NIỆM · KHÔNG PHẢI DỮ LIỆU TRỰC TIẾP
           </span>
         </div>
         <div className="p-3 rounded-xl bg-space-950/85 border border-white/10 backdrop-blur-md">
           <div className="text-xs font-mono font-bold text-white mb-0.5">
-            CỤM ĐANG CHỌN: {selectedNode.label.toUpperCase()}
+            KHÁI NIỆM ĐANG CHỌN: {selectedNode.label.toUpperCase()}
           </div>
           <p className="text-[11px] text-slate-400 font-serif italic">
-            Mỗi thông tin là một điểm nút được đối soát đa chiều với văn bản và cộng đồng.
+            Sơ đồ này không biểu diễn hồ sơ, số liệu hay quan hệ dữ liệu thực tế.
           </p>
         </div>
       </div>
 
       <div className="absolute top-6 right-6 pointer-events-none z-10 hidden sm:flex items-center gap-3 bg-space-900/80 border border-white/10 px-4 py-2 rounded-full backdrop-blur-md">
         <span className="text-[10px] font-mono text-cyan-300">
-          7 CLUSTERS ACTIVE · SHA-256 VERIFIED
+          MÔ HÌNH TĨNH · KHÔNG PHẢI TRẠNG THÁI TRỰC TIẾP
         </span>
       </div>
 

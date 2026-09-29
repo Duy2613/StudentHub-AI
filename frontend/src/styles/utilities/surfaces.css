@@ -1,0 +1,41 @@
+/**
+ * StudentHub AI — Surface System Utilities
+ *
+ * Governing Authority: MASTER FRONTEND CONSTITUTION v3.0 (M-27, M-28)
+ * Canonical surfaces: Canvas, Paper, Soft, Elevated, Liquid
+ * Glass is a control material, not default card background.
+ */
+
+.surface-canvas {
+  background-color: var(--canvas);
+}
+
+.surface-paper {
+  background-color: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+}
+
+.surface-soft {
+  background-color: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+}
+
+.surface-elevated {
+  background-color: var(--surface-3);
+  box-shadow: var(--elevation-2);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Glass Control Material (M-27: Navigation, command chrome, media controls only) */
+.surface-control-glass {
+  background-color: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+}
+
+/* Liquid Metal Accent (M-28: Rare premium accent for AI identity, credentials, Prism) */
+.accent-liquid-metal {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(121, 92, 255, 0.2) 50%, rgba(56, 232, 255, 0.25) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}

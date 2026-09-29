@@ -352,7 +352,7 @@ function providerObservation(providerResult, fallbackProvider = "StudentHub prov
   };
 }
 
-function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
+function combineLayer2({ layer2A, layer2B, layer2C, legacyLayer2 = null, input, requestId }) {
   const l2aProviders = boundedArray(layer2A?.providerResults, 20).map((item) => providerObservation(item, layer2A?.provider || "StudentHub Threat Intelligence"));
   if (!l2aProviders.length && layer2A?.providerStatus) {
     l2aProviders.push(providerObservation({
@@ -369,8 +369,24 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
   const semanticFallbackAvailable = layer2B?.details?.deterministicFallbackAvailable === true ||
     layer2B?.metrics?.deterministicFallbackAvailable === true;
   const domainStatus = statusText(layer2C?.modelStatus, "BASELINE_RULE_MODEL");
+  const legacyImageProviders = boundedArray(legacyLayer2?.providers || legacyLayer2?.providerResults, 20)
+    .map((item) => providerObservation(item, "legacy_verification_layer2_image"));
+  if (!legacyImageProviders.length && legacyLayer2?.providerStatus) {
+    legacyImageProviders.push(providerObservation({
+      provider: legacyLayer2.providerId || "legacy_verification_layer2_image",
+      providerId: legacyLayer2.providerId || "legacy_verification_layer2_image",
+      status: legacyLayer2.providerStatus,
+      verdict: legacyLayer2.rawVerdict || legacyLayer2.finding || "UNKNOWN",
+      finding: legacyLayer2.finding || legacyLayer2.rawVerdict,
+      confidence: legacyLayer2.providerConfidence ?? legacyLayer2.assessmentConfidence,
+      success: legacyLayer2.providerStatus === "SUCCESS",
+      message: legacyLayer2.reason || legacyLayer2.errorCode || "Legacy image provider returned no detail.",
+      executed: true,
+    }, "legacy_verification_layer2_image"));
+  }
   const observations = [
     ...l2aProviders,
+    ...legacyImageProviders,
     providerObservation({
       provider: layer2B?.details?.providerId || layer2B?.metrics?.modelUsed || "StudentHub Semantic Engine",
       providerId: layer2B?.details?.providerId || layer2B?.metrics?.modelUsed || "studenthub_semantic_engine",
@@ -428,6 +444,17 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     ...boundedArray(semanticPackage.verificationTasks, 40),
     ...boundedArray(domainPackage.verificationTasks, 40),
   ].slice(0, 80);
+  const mediaForensics = legacyLayer2?.mediaForensics
+    ? layer2B?.mediaForensics
+      ? {
+        ...layer2B.mediaForensics,
+        aiGeneration: legacyLayer2.mediaForensics.aiGeneration || layer2B.mediaForensics.aiGeneration || null,
+        deepfake: legacyLayer2.mediaForensics.deepfake || layer2B.mediaForensics.deepfake || null,
+        providerAgreement: legacyLayer2.mediaForensics.providerAgreement || layer2B.mediaForensics.providerAgreement || null,
+        legacyLayer2: legacyLayer2.mediaForensics,
+      }
+      : legacyLayer2.mediaForensics
+    : layer2B?.mediaForensics || null;
   const semanticBaselineCompleted = semanticFallbackAvailable ||
     layer2B?.status === "PASS" ||
     ["BENIGN", "INFORMATIVE"].includes(statusText(layer2B?.classification));
@@ -461,7 +488,8 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     semanticSignals: boundedArray(layer2B?.contextSignals, 30),
     contextSignals: boundedArray(layer2B?.contextSignals, 30),
     riskSignals: boundedArray(layer2C?.riskSignals, 30),
-    mediaForensics: layer2B?.mediaForensics || null,
+    mediaForensics,
+    legacyIntegration: legacyLayer2 || null,
     secondaryClassifications: boundedArray(layer2C?.secondaryClassifications, 12),
     limitations: [
       ...boundedArray(layer2B?.limitations, 8),
@@ -979,7 +1007,7 @@ export class OwnBackendTrustOrchestrator {
         async () => {
           const url = input.type === "url" ? input.content || input.metadata.url || "" : "";
           const reputationProvider = this.layer2AProvider || (
-            this.legacyVerificationEnabled && typeof this.legacyVerificationAdapter?.layer2Provider === "function"
+            input.type === "url" && this.legacyVerificationEnabled && typeof this.legacyVerificationAdapter?.layer2Provider === "function"
               ? this.legacyVerificationAdapter.layer2Provider()
               : null
           );
@@ -1007,8 +1035,38 @@ export class OwnBackendTrustOrchestrator {
             layer2BResult: layer2B,
             signal: controller.signal,
           })).catch(() => createUnknownLayer2C(requestId, "LAYER2C_PROVIDER_FAILURE"));
-          const combined = combineLayer2({ layer2A, layer2B, layer2C, input, requestId });
-          rawResults.l2Internal = { layer2A, layer2B, layer2C };
+          let legacyLayer2 = null;
+          if (["image", "qr", "text"].includes(input.type) && this.legacyVerificationEnabled && typeof this.legacyVerificationAdapter?.verifyLayer2 === "function") {
+            try {
+              legacyLayer2 = await this.legacyVerificationAdapter.verifyLayer2({ input, requestId, signal: controller.signal });
+            } catch (error) {
+              if (controller.signal.aborted) throw error;
+              const isText = input.type === "text";
+              legacyLayer2 = {
+                status: "UNAVAILABLE",
+                providerStatus: "UNAVAILABLE",
+                providerId: isText ? "legacy_verification_layer2" : "legacy_verification_layer2_image",
+                requestId,
+                rawVerdict: null,
+                finding: "UNKNOWN",
+                providerConfidence: null,
+                reason: boundedText(error?.code || error?.name || "LEGACY_IMAGE_LAYER2_FAILURE", 240),
+                providers: [],
+                providerResults: [],
+                mediaForensics: null,
+                sourceOrigin: isText ? "LAYER_2_TEXT_REPUTATION" : "LAYER_2_IMAGE_FORENSICS",
+                limitations: [isText ? "Legacy text Layer 2 advisory failed; canonical StudentHub checks were preserved." : "Legacy image Layer 2 advisory failed; canonical StudentHub checks were preserved."],
+                errorCode: boundedText(error?.code || error?.name || (isText ? "LEGACY_LAYER2_TEXT_FAILURE" : "LEGACY_IMAGE_LAYER2_FAILURE"), 160),
+              };
+            }
+          } else if (input.type === "url" && !this.layer2AProvider && this.legacyVerificationEnabled) {
+            // For URL inputs the existing reputation-provider path already
+            // called the friend Layer 2 endpoint. Preserve that normalized
+            // result so the exact Layer 2 object can be forwarded to Layers 3/4.
+            legacyLayer2 = layer2A;
+          }
+          const combined = combineLayer2({ layer2A, layer2B, layer2C, legacyLayer2, input, requestId });
+          rawResults.l2Internal = { layer2A, layer2B, layer2C, legacyLayer2 };
           return { ...combined, layer2A, layer2B, layer2C };
         },
         pipeline,
@@ -1018,6 +1076,11 @@ export class OwnBackendTrustOrchestrator {
         { input, fallback: () => ({ ...combineLayer2({ layer2A: createUnknownLayer2A(requestId), layer2B: createUnknownLayer2B(requestId), layer2C: createUnknownLayer2C(requestId), input, requestId }), layer2A: createUnknownLayer2A(requestId), layer2B: createUnknownLayer2B(requestId), layer2C: createUnknownLayer2C(requestId) }) },
       );
       rawResults.l2 = l2.raw;
+      // Preserve the validated legacy Layer 2 response before any canonical
+      // projection or supplemental pass can reshape the composite result.
+      // The friend's Layer 3/4 contracts must receive the provider verdict,
+      // not a later StudentHub-only fallback projection.
+      rawResults.legacyLayer2 = rawResults.l2Internal?.legacyLayer2 || rawResults.l2?.legacyIntegration || null;
       partial ||= l2.partial;
 
       const l3 = await this._executeLayer(
@@ -1030,6 +1093,7 @@ export class OwnBackendTrustOrchestrator {
             layer2Result: internal.layer2B || null,
             layer2CResult: internal.layer2C || null,
             layer2CVerificationPackage: internal.layer2C?.verificationPackage || null,
+            legacyLayer2Result: rawResults.legacyLayer2 || internal.legacyLayer2 || rawResults.l2?.legacyIntegration || null,
             input,
             requestId,
             signal: controller.signal,
@@ -1078,6 +1142,11 @@ export class OwnBackendTrustOrchestrator {
         { input, fallback: () => createUnknownLayer3(requestId) },
       );
       partial ||= l3.partial;
+      // Layer 4 may run a canonical supplemental evidence pass that replaces
+      // rawResults.l3. Keep the friend's validated Layer 3 advisory separate
+      // so its exact continuation contract and evidence can still be sent to
+      // the friend's Layer 4 endpoint.
+      rawResults.legacyLayer3 = rawResults.l3?.legacyIntegration || null;
 
       const l4 = await this._executeLayer(
         "l4",
@@ -1088,6 +1157,7 @@ export class OwnBackendTrustOrchestrator {
             layer2AResult: internal.layer2A || null,
             layer2Result: internal.layer2B || null,
             layer2CResult: internal.layer2C || null,
+            legacyLayer2Result: rawResults.legacyLayer2 || internal.legacyLayer2 || rawResults.l2?.legacyIntegration || null,
             layer3Result: rawResults.l3 || null,
             input,
             options: {
@@ -1135,20 +1205,27 @@ export class OwnBackendTrustOrchestrator {
                     ...(this.retriever ? { retriever: this.retriever } : {}),
                   },
                 });
-                rawResults.l3 = supplemental;
-                pipeline.layerResults.layer3 = supplemental;
+                // Supplemental evidence is canonical StudentHub data. Keep
+                // the already validated legacy advisory attached as a
+                // separate provenance field so the compatibility response
+                // and the legacy Layer 4 hand-off remain complete.
+                const supplementalWithLegacy = rawResults.legacyLayer3
+                  ? { ...supplemental, legacyIntegration: rawResults.legacyLayer3 }
+                  : supplemental;
+                rawResults.l3 = supplementalWithLegacy;
+                pipeline.layerResults.layer3 = supplementalWithLegacy;
                 const previousL3Stage = pipeline.stages.l3 || {};
                 pipeline.stages.l3 = makeCanonicalStage(
                   "l3",
-                  supplemental || {},
+                  supplementalWithLegacy || {},
                   requestId,
-                  stageOperationStatus("l3", supplemental || {}),
+                  stageOperationStatus("l3", supplementalWithLegacy || {}),
                   previousL3Stage.startedAt || nowIso(),
                   nowIso(),
                 );
-                partial ||= stageOperationStatus("l3", supplemental || {}) === OPERATION_STATUS.PARTIAL;
+                partial ||= stageOperationStatus("l3", supplementalWithLegacy || {}) === OPERATION_STATUS.PARTIAL;
                 return {
-                  layer3Result: supplemental,
+                  layer3Result: supplementalWithLegacy,
                   phaseSummary: supplemental?.retrievalPhases?.supplementalSearch || null,
                 };
               },
@@ -1156,7 +1233,7 @@ export class OwnBackendTrustOrchestrator {
           });
           if (!this.legacyVerificationEnabled || typeof this.legacyVerificationAdapter?.verifyLayer4 !== "function") return localResult;
 
-          const legacyLayer3 = rawResults.l3?.legacyIntegration;
+          const legacyLayer3 = rawResults.legacyLayer3 || rawResults.l3?.legacyIntegration;
           const canRunIndependentSynthesis = !legacyLayer3 || (
             legacyLayer3.status === "COMPLETED" &&
             legacyLayer3.stop !== true &&
@@ -1191,8 +1268,14 @@ export class OwnBackendTrustOrchestrator {
             layer2AResult: internal.layer2A || null,
             layer2Result: internal.layer2B || null,
             layer2CResult: internal.layer2C || null,
-            layer3Result: rawResults.l3 || null,
-            unresolvedSignals: rawResults.l3?.legacyIntegration?.unresolvedSignals || [],
+            legacyLayer2Result: rawResults.legacyLayer2 || internal.legacyLayer2 || rawResults.l2?.legacyIntegration || null,
+            // Preserve the canonical L3 result for StudentHub while making
+            // sure the legacy adapter reads the validated legacy L3 payload,
+            // not a later canonical supplemental result.
+            layer3Result: rawResults.l3
+              ? { ...rawResults.l3, legacyIntegration: legacyLayer3 }
+              : (legacyLayer3 ? { legacyIntegration: legacyLayer3 } : null),
+            unresolvedSignals: legacyLayer3?.unresolvedSignals || [],
             requestId,
             signal: controller.signal,
           });

@@ -198,7 +198,6 @@ export function CompetitionCaseStudio({ flows }) {
             <Link href="/trust" style={{ color: "#f1eee6" }}>Trust <ArrowRight size={14} /></Link>
             <Link href="/community" style={{ color: "#f1eee6" }}>Community <ArrowRight size={14} /></Link>
             <Link href="/expert" style={{ color: "#f1eee6" }}>Expert <ArrowRight size={14} /></Link>
-            <Link href="/dashboard" style={{ color: "#f1eee6" }}>Dashboard <ArrowRight size={14} /></Link>
           </nav>
         </footer>
       </motion.div>

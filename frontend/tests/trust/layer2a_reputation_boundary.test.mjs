@@ -35,18 +35,33 @@ function providerWith(fetchImpl, overrides = {}) {
 }
 
 describe("Layer 2A reputation boundary", () => {
-  it("returns UNKNOWN when the real adapter is not configured", async () => {
-    let calls = 0;
+  it("uses owner threat intelligence when the remote adapter is unconfigured and stays UNKNOWN on source outage", async () => {
+    let ownerCalls = 0;
+    let remoteCalls = 0;
     const provider = new RenderLayer2AProvider({
       env: {},
-      fetchImpl: async () => { calls += 1; },
+      fetchImpl: async () => { remoteCalls += 1; },
+      investigateThreatIntelligenceImpl: async ({ url }) => {
+        ownerCalls += 1;
+        assert.equal(url, TEST_TARGET);
+        return {
+          isThreatDetected: false,
+          sources: {
+            urlhaus: { status: "API_UNAVAILABLE", available: false },
+            ncsc: { status: "SUCCESS", available: true, isThreatDetected: false },
+            apwg: { status: "SUCCESS", available: true, hasHighRiskVector: false },
+            ftcSentinel: { status: "SUCCESS", available: true, hasSevereFinancialRisk: false },
+          },
+        };
+      },
     });
 
     const result = await provider.check({ url: TEST_TARGET, requestId: "l2a-not-configured" });
-    assert.equal(result.providerStatus, "NOT_CONFIGURED");
+    assert.equal(result.providerStatus, "UNAVAILABLE");
     assert.equal(result.finding, "UNKNOWN");
     assert.equal(result.securityClassification, "UNKNOWN");
-    assert.equal(calls, 0);
+    assert.equal(ownerCalls, 1);
+    assert.equal(remoteCalls, 0);
   });
 
   it("keeps a provider no-match bounded and cacheable without calling it safe", async () => {

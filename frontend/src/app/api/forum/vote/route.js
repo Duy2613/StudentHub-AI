@@ -1,15 +1,12 @@
 import { NextResponse } from "next/server";
 import { CommunityRepository, CommunityRepositoryError } from "@/lib/server/database/CommunityRepository.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { isCommunityDemoMode } from "@/lib/intelligence/community/communityStore.js";
 
 // Compatibility memory ledger is explicitly demo-only. Production reactions
 // are durable, claim/revision-bound, and never mutate author trust.
 const VOTES_LEDGER = new Map();
 const MAX_VOTE_KEYS = 50_000;
-
-function demoMode() {
-  return process.env.NODE_ENV !== "production" && (process.env.STUDENTHUB_PERSISTENCE_ADAPTER === "memory" || process.env.STUDENTHUB_COMMUNITY_DEMO === "true");
-}
 
 async function castForumVote(request, _routeParams, principal, securityContext) {
   const body = await request.json().catch(() => ({}));
@@ -20,7 +17,7 @@ async function castForumVote(request, _routeParams, principal, securityContext) 
   }
   const kind = type === "trust" || type === "helpful" ? "HELPFUL" : "CHALLENGE";
   const idempotencyKey = request.headers.get("idempotency-key") || body?.idempotencyKey;
-  if (demoMode()) {
+  if (isCommunityDemoMode()) {
     const key = `${postId}_${principal.subjectId}_${kind}`;
     const previous = VOTES_LEDGER.get(key);
     if (previous === type) VOTES_LEDGER.delete(key);

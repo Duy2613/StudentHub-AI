@@ -19,6 +19,10 @@ import { AIGatewayService } from "../../src/lib/ai-gateway/AIGatewayService.js";
 import { AI_CAPABILITY, PROVIDER_FAMILY, GATEWAY_ERROR_TYPE } from "../../src/lib/ai-gateway/types.js";
 import { IModelProvider } from "../../src/lib/ai-gateway/providers/IModelProvider.js";
 import { ModelHealthStore } from "../../src/lib/ai-gateway/ModelHealthStore.js";
+
+// This suite verifies ordered QA-extended fallback. Demo health prioritization
+// is covered independently by p26_result_priority_demo_routing.test.mjs.
+process.env.TRUST_L4_RESULT_PRIORITY = "NORMAL";
 import {
   GEMINI_PRODUCTION_MODEL_IDS,
   GEMINI_EXTENDED_QA_MODEL_IDS,

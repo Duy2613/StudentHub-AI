@@ -6,6 +6,7 @@ const requireFromFrontend = createRequire(new URL("../../package.json", import.m
 
 const candidateEmail = process.env.STUDENTHUB_LOCAL_CANDIDATE_EMAIL || "";
 const candidatePassword = process.env.STUDENTHUB_LOCAL_CANDIDATE_PASSWORD || "";
+const reviewerId = process.env.STUDENTHUB_LOCAL_REVIEWER_ID || "";
 const reviewerEmail = process.env.STUDENTHUB_LOCAL_REVIEWER_EMAIL || "";
 const reviewerPassword = process.env.STUDENTHUB_LOCAL_REVIEWER_PASSWORD || "";
 const reactorEmail = process.env.STUDENTHUB_LOCAL_REACTOR_EMAIL || "";
@@ -55,6 +56,19 @@ async function installBrowserNetworkGuard(context: import("@playwright/test").Br
 
 type ApiRecord = Record<string, unknown>;
 type ApiResult = { status: number; body: unknown };
+type RealtimeCaptureState = {
+  status: number | null;
+  contentType: string;
+  data: string;
+  connected: boolean;
+  ended: boolean;
+  error: string | null;
+  body: string;
+  controller?: AbortController;
+};
+type RealtimeCaptureWindow = Window & {
+  __communityRealtimeCaptures?: Record<string, RealtimeCaptureState>;
+};
 
 function asRecord(value: unknown): ApiRecord {
   return value && typeof value === "object" && !Array.isArray(value) ? value as ApiRecord : {};
@@ -81,6 +95,95 @@ async function api(page: import("@playwright/test").Page, path: string, options:
   }, { path, method: options.method || "GET", body: options.body, headers: options.headers || {} });
 }
 
+async function startRealtimeCapture(
+  page: import("@playwright/test").Page,
+  captureName: string,
+  channels: string,
+  cursor: number,
+) {
+  await page.evaluate(({ name, requestedChannels, afterSequence }) => {
+    const target = window as RealtimeCaptureWindow;
+    target.__communityRealtimeCaptures ||= {};
+    const controller = new AbortController();
+    const capture: RealtimeCaptureState = {
+      status: null,
+      contentType: "",
+      data: "",
+      connected: false,
+      ended: false,
+      error: null,
+      body: "",
+      controller,
+    };
+    target.__communityRealtimeCaptures[name] = capture;
+
+    void (async () => {
+      try {
+        const response = await fetch(
+          `/api/realtime/stream?channels=${encodeURIComponent(requestedChannels)}&cursor=${afterSequence}`,
+          { credentials: "include", headers: { accept: "text/event-stream" }, signal: controller.signal },
+        );
+        capture.status = response.status;
+        capture.contentType = response.headers.get("content-type") || "";
+        if (!response.ok) {
+          capture.body = (await response.text()).slice(0, 2_000);
+          capture.ended = true;
+          return;
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error("REALTIME_STREAM_BODY_UNAVAILABLE");
+        const decoder = new TextDecoder();
+        while (true) {
+          const next = await reader.read();
+          if (next.done) break;
+          capture.data = `${capture.data}${decoder.decode(next.value, { stream: true })}`.slice(-32_768);
+          if (capture.data.includes("event: system:connected")) capture.connected = true;
+        }
+        capture.ended = true;
+      } catch (error) {
+        const name = (error as Error)?.name || "UNKNOWN";
+        if (name !== "AbortError") capture.error = name;
+        capture.ended = true;
+      }
+    })();
+  }, { name: captureName, requestedChannels: channels, afterSequence: cursor });
+
+  await expect.poll(async () => (await getRealtimeCapture(page, captureName))?.connected, {
+    timeout: 15_000,
+    intervals: [100, 250, 500],
+  }).toBe(true);
+}
+
+async function getRealtimeCapture(page: import("@playwright/test").Page, captureName: string) {
+  return page.evaluate((name) => {
+    const capture = (window as RealtimeCaptureWindow).__communityRealtimeCaptures?.[name];
+    if (!capture) return null;
+    return {
+      status: capture.status,
+      contentType: capture.contentType,
+      data: capture.data,
+      connected: capture.connected,
+      ended: capture.ended,
+      error: capture.error,
+      body: capture.body,
+    };
+  }, captureName);
+}
+
+async function stopRealtimeCapture(page: import("@playwright/test").Page, captureName: string) {
+  await page.evaluate((name) => {
+    (window as RealtimeCaptureWindow).__communityRealtimeCaptures?.[name]?.controller?.abort();
+  }, captureName).catch(() => {});
+}
+
+function realtimeHandshake(data: string) {
+  const frame = data.split("\n\n").find((entry) => entry.startsWith("event: system:connected"));
+  const line = frame?.split("\n").find((entry) => entry.startsWith("data: "));
+  if (!line) return {};
+  try { return asRecord(JSON.parse(line.slice("data: ".length))); } catch { return {}; }
+}
+
 function errorCode(result: ApiResult) {
   const body = asRecord(result.body);
   const error = asRecord(body.error);
@@ -95,9 +198,11 @@ function assertApi(result: ApiResult, expectedStatus = 200) {
 
 async function login(page: import("@playwright/test").Page, email: string, password: string, next: string) {
   await page.goto(`/login?next=${encodeURIComponent(next)}`, { waitUntil: "domcontentloaded" });
-  // The production auth fields intentionally start readOnly until a real
-  // pointer/focus interaction enables them. Use the same interaction path a
-  // human user takes before asserting editability and filling the values.
+  // Login has no long-lived realtime stream. Wait for its client shell to
+  // hydrate before filling controlled inputs so a fast warm navigation cannot
+  // overwrite pre-hydration values with the initial empty React state.
+  await page.waitForLoadState("networkidle");
+  // Use labeled controls and real pointer/focus interactions for the auth form.
   const emailInput = page.getByLabel("Email", { exact: true });
   const passwordInput = page.getByLabel("Mật khẩu", { exact: true });
   await expect.poll(async () => {
@@ -112,22 +217,59 @@ async function login(page: import("@playwright/test").Page, email: string, passw
     return passwordInput.isEditable();
   }, { timeout: 30_000, intervals: [100, 250, 500] }).toBe(true);
   await passwordInput.fill(password);
-  const authRequestHosts = new Set<string>();
+  await expect(emailInput).toHaveValue(email);
+  await expect(passwordInput).toHaveValue(password);
+  const authRequestPaths = new Set<string>();
+  const failedRequestPaths = new Set<string>();
+  const pageErrorNames = new Set<string>();
   page.on("request", (request) => {
-    if (!request.url().includes("/auth/v1/token")) return;
-    try { authRequestHosts.add(new URL(request.url()).hostname.toLowerCase()); } catch {}
+    try {
+      const url = new URL(request.url());
+      if (url.pathname.endsWith("/auth/v1/token")) {
+        authRequestPaths.add(url.pathname);
+      }
+    } catch {}
   });
+  page.on("requestfailed", (request) => {
+    try { failedRequestPaths.add(new URL(request.url()).pathname); } catch {}
+  });
+  page.on("pageerror", (error) => pageErrorNames.add(error.name || "UnknownPageError"));
   const authResponsePromise = page.waitForResponse(
-    (response) => response.url().includes("/auth/v1/token"),
+    (response) => new URL(response.url()).pathname.endsWith("/auth/v1/token"),
     { timeout: 20_000 },
   ).catch(() => null);
   const exchangeResponsePromise = page.waitForResponse(
     (response) => response.url().endsWith("/api/auth/session/exchange"),
     { timeout: 20_000 },
   ).catch(() => null);
-  await page.getByRole("button", { name: "Đăng nhập", exact: true }).click();
+  const loginButton = page.getByRole("button", { name: "Đăng nhập", exact: true });
+  await expect(loginButton).toBeEnabled();
+  await loginButton.click();
   const authResponse = await authResponsePromise;
-  if (!authResponse) throw new Error(`LOCAL_AUTH_TOKEN_RESPONSE_MISSING:${[...authRequestHosts].join(",") || "NO_TOKEN_REQUEST"}`);
+  if (!authResponse) {
+    const exchangeResponse = await exchangeResponsePromise;
+    const formState = await page.evaluate(() => {
+      const form = document.querySelector("form");
+      const email = document.querySelector<HTMLInputElement>('input[type="email"]');
+      const password = document.querySelector<HTMLInputElement>('input[type="password"]');
+      const button = [...document.querySelectorAll("button")].find((item) => item.textContent?.trim() === "Đăng nhập");
+      return {
+        path: window.location.pathname,
+        formValid: form?.checkValidity() ?? false,
+        emailFilled: Boolean(email?.value),
+        passwordFilled: Boolean(password?.value),
+        buttonDisabled: Boolean(button?.disabled),
+        visibleAlertCount: [...document.querySelectorAll('[role="alert"]')].filter((item) => item.getClientRects().length > 0).length,
+      };
+    });
+    throw new Error(`LOCAL_AUTH_TOKEN_RESPONSE_MISSING:${JSON.stringify({
+      authRequestPaths: [...authRequestPaths],
+      requestFailed: [...failedRequestPaths],
+      pageErrorNames: [...pageErrorNames],
+      exchangeStatus: exchangeResponse?.status() || null,
+      formState,
+    })}`);
+  }
   const authBody = await authResponse.json().catch(() => ({}));
   if (!authResponse.ok()) {
     throw new Error(`LOCAL_AUTH_TOKEN_FAILED_${authResponse.status()}:${authBody.error_code || authBody.code || authBody.msg || "UNKNOWN"}`);
@@ -171,6 +313,7 @@ test.describe("authenticated Community → Expert → Trust local reality", () =
   test("persists the local authority lifecycle with real Auth and no Main Supabase traffic", async ({ browser }) => {
     requireFixture(candidateEmail, "candidate-email");
     requireFixture(candidatePassword, "candidate-password");
+    requireFixture(reviewerId, "reviewer-id");
     requireFixture(reviewerEmail, "reviewer-email");
     requireFixture(reviewerPassword, "reviewer-password");
     requireFixture(reactorEmail, "reactor-email");
@@ -188,19 +331,28 @@ test.describe("authenticated Community → Expert → Trust local reality", () =
     const reviewerPage = await reviewerContext.newPage();
     const reactorPage = await reactorContext.newPage();
     let candidateContributionId = "";
+    let requestContributionId = "";
+    let communityReviewRequestId = "";
+    let communityAssignmentId = "";
     let applicationId = "";
     let practiceId = "";
     let assessmentId = "";
+    const realtimeCaptureSessions: Array<{ page: import("@playwright/test").Page; name: string }> = [];
 
     try {
       await login(candidatePage, candidateEmail, candidatePassword, `/community?caseId=${primaryCaseId}&caseRevision=1`);
       // The public route now mounts CommunitySocialWorkspace. Its composer is
       // intentionally a lightweight social surface; case-bound authority
       // records still enter through the authenticated Promax API below.
-      await expect(candidatePage.getByRole("heading", { name: "Collective intelligence.", exact: true })).toBeVisible();
-      const composer = candidatePage.getByRole("form", { name: "Bạn muốn chia sẻ điều gì?" });
+      await expect(candidatePage.getByRole("heading", { name: "Community.", exact: true })).toBeVisible();
+      const composer = candidatePage.getByRole("region", { name: "Tạo bài viết cộng đồng" });
       await expect(composer).toBeVisible();
-      await expect(composer.getByLabel("Nội dung chia sẻ", { exact: true })).toBeVisible();
+      const composerPrompt = composer.getByRole("button", { name: "Bạn muốn chia sẻ hoặc kiểm chứng điều gì?", exact: true });
+      await expect(composerPrompt).toBeVisible();
+      await composerPrompt.click();
+      const composerDialog = candidatePage.getByRole("dialog", { name: "Bạn muốn chia sẻ điều gì?", exact: true });
+      await expect(composerDialog).toBeVisible();
+      await expect(composerDialog.getByLabel(/Bài viết/)).toBeVisible();
 
       const contributionStatement = "The local authenticated contributor observed a bounded case context that can be checked against the cited revision.";
       const contributionInput = {
@@ -253,8 +405,47 @@ test.describe("authenticated Community → Expert → Trust local reality", () =
       assertApi(independentReaction);
       expect(asRecord(independentReaction.body).trustMutation).toBe(false);
 
+      const requestContributionStatement = "A second synthetic Community member adds an independent bounded observation for authorized expert review.";
+      const requestContributionInput = {
+        caseId: primaryCaseId,
+        caseRevision: 1,
+        contributionType: "CONTEXT",
+        statement: requestContributionStatement,
+        evidenceRefs: [primaryEvidenceId],
+        evidenceRevisionIds: [primaryEvidenceId],
+      };
+      const requestContributionPreview = await api(reactorPage, "/api/intelligence/community/posts", {
+        method: "POST",
+        body: { ...requestContributionInput, phase: "PREVIEW" },
+      });
+      assertApi(requestContributionPreview);
+      const requestPreviewBody = asRecord(requestContributionPreview.body);
+      expect(requestPreviewBody.state).toBe("PREVIEW_READY");
+      const requestPreviewData = asRecord(requestPreviewBody.preview);
+      const requestContributionPublish = await api(reactorPage, "/api/intelligence/community/posts", {
+        method: "POST",
+        body: {
+          ...requestContributionInput,
+          phase: "PUBLISH",
+          privacyConfirmed: true,
+          previewDigest: requestPreviewData.previewDigest,
+        },
+        headers: { "Idempotency-Key": `local-peer-community-contribution-${primaryCaseId}` },
+      });
+      assertApi(requestContributionPublish, 201);
+      const communityReadback = await api(candidatePage, `/api/intelligence/community/posts?caseId=${encodeURIComponent(primaryCaseId)}&sort=recent`);
+      assertApi(communityReadback);
+      const requestContribution = asRecords(asRecord(communityReadback.body).posts)
+        .find((post) => post.statement === requestContributionStatement);
+      expect(requestContribution).toBeDefined();
+      if (!requestContribution) throw new Error("LOCAL_PEER_COMMUNITY_CONTRIBUTION_MISSING");
+      requestContributionId = String(requestContribution.contributionId || "");
+      expect(requestContribution.publicationState).toBe("PUBLISHED");
+      expect(requestContribution.authorId).toBeUndefined();
+      expect(requestContribution.email).toBeUndefined();
+      expect(requestContribution.rawInput).toBeUndefined();
+
       await candidatePage.goto("/expert/profile", { waitUntil: "domcontentloaded" });
-      await expect(candidatePage.getByRole("heading", { name: "Hồ sơ chuyên gia của bạn", exact: true })).toBeVisible({ timeout: 60_000 });
       await expect(candidatePage.getByRole("heading", { name: "Hồ sơ → quiz → review domain", exact: true })).toBeVisible();
       const beforeApplication = await qualification(candidatePage);
       expect(beforeApplication.state).toBe("NOT_APPLIED");
@@ -336,8 +527,163 @@ test.describe("authenticated Community → Expert → Trust local reality", () =
       assertApi(activation);
 
       await candidatePage.reload({ waitUntil: "domcontentloaded" });
-      await expect(candidatePage.getByText("ACTIVE EXPERT", { exact: true })).toBeVisible({ timeout: 60_000 });
+      await expect(candidatePage.getByText("ACTIVE / QUALIFIED", { exact: true })).toBeVisible({ timeout: 60_000 });
       await expect(candidatePage.getByRole("heading", { level: 1, name: "Local Evidence Reviewer Candidate", exact: true })).toBeVisible();
+
+      const { Pool: RealtimeCursorPool } = requireFromFrontend("pg");
+      const cursorPool = new RealtimeCursorPool({ connectionString: process.env.STUDENTHUB_RLS_TEST_DATABASE_URL, ssl: false, max: 1 });
+      let realtimeCursor = 0;
+      try {
+        const cursorResult = await cursorPool.query("select coalesce(max(sequence), 0)::text as cursor from private.realtime_events");
+        realtimeCursor = Number(cursorResult.rows[0]?.cursor || 0);
+        expect(Number.isSafeInteger(realtimeCursor)).toBe(true);
+      } finally {
+        await cursorPool.end();
+      }
+
+      await startRealtimeCapture(candidatePage, "trust-owner", "trust", realtimeCursor);
+      realtimeCaptureSessions.push({ page: candidatePage, name: "trust-owner" });
+      await startRealtimeCapture(reviewerPage, "assigned-expert", "expert", realtimeCursor);
+      realtimeCaptureSessions.push({ page: reviewerPage, name: "assigned-expert" });
+      await startRealtimeCapture(reactorPage, "normal-user", "system,trust,audit,community,expert", realtimeCursor);
+      realtimeCaptureSessions.push({ page: reactorPage, name: "normal-user" });
+
+      const communityReviewRequest = await api(candidatePage, "/api/expert/review-requests", {
+        method: "POST",
+        body: {
+          caseId: primaryCaseId,
+          caseRevision: 1,
+          domainCode: "AI_ML",
+          question: "Please independently assess this bounded Community observation against the immutable Trust revision.",
+          contextRefs: [primaryEvidenceId],
+          communityContributionId: requestContributionId,
+          idempotencyKey: `local-community-expert-request-${primaryCaseId}`,
+        },
+        headers: { "Idempotency-Key": `local-community-expert-request-${primaryCaseId}` },
+      });
+      assertApi(communityReviewRequest, 201);
+      const communityReviewRequestBody = asRecord(communityReviewRequest.body);
+      const communityReviewRequestData = asRecord(communityReviewRequestBody.data);
+      const communityMatching = asRecord(communityReviewRequestBody.matching);
+      communityReviewRequestId = String(communityReviewRequestData.id || "");
+      expect(communityReviewRequestData.communityContributionId).toBe(requestContributionId);
+      expect(communityReviewRequestData.caseId).toBe(primaryCaseId);
+      expect(communityReviewRequestData.caseRevision).toBe(1);
+      expect(communityMatching.status).toBe("ASSIGNED");
+      expect(communityMatching.assignmentsCount).toBe(1);
+      expect(communityReviewRequestBody.assignmentAuthority).toBe("SERVER_CONTROLLED");
+      expect(communityReviewRequestBody.expertSelection).toBe("NOT_REQUESTER_CONTROLLED");
+
+      await expect.poll(async () => (await getRealtimeCapture(reviewerPage, "assigned-expert"))?.data || "", {
+        timeout: 15_000,
+        intervals: [100, 250, 500],
+      }).toContain("event: expert:assignment");
+      await expect.poll(async () => (await getRealtimeCapture(candidatePage, "trust-owner"))?.data || "", {
+        timeout: 15_000,
+        intervals: [100, 250, 500],
+      }).toContain("event: trust:expert_review");
+      const assignedExpertStream = await getRealtimeCapture(reviewerPage, "assigned-expert");
+      const trustOwnerStream = await getRealtimeCapture(candidatePage, "trust-owner");
+      const normalUserStream = await getRealtimeCapture(reactorPage, "normal-user");
+      expect(assignedExpertStream?.status).toBe(200);
+      expect(trustOwnerStream?.status).toBe(200);
+      const normalHandshake = realtimeHandshake(normalUserStream?.data || "");
+      expect(Array.isArray(normalHandshake.channels)).toBe(true);
+      const normalHandshakeChannels = normalHandshake.channels as unknown[];
+      expect(normalHandshakeChannels).toContain("system");
+      expect(normalHandshakeChannels).toContain("community");
+      expect(trustOwnerStream?.data).toContain(communityReviewRequestId);
+      for (const stream of [assignedExpertStream, trustOwnerStream, normalUserStream]) {
+        expect(stream?.data).not.toContain(primaryEvidenceId);
+        expect(stream?.data).not.toContain(requestContributionStatement);
+      }
+      expect(normalUserStream?.data).not.toContain("event: expert:assignment");
+      expect(normalUserStream?.data).not.toContain("event: trust:expert_review");
+      expect(normalUserStream?.data).not.toContain(communityReviewRequestId);
+
+      const authorizedReviewList = await api(reviewerPage, "/api/expert/blind-reviews");
+      assertApi(authorizedReviewList);
+      const authorizedReview = asRecords(asRecord(authorizedReviewList.body).reviews)
+        .find((review) => review.reviewRequestId === communityReviewRequestId);
+      expect(authorizedReview).toBeDefined();
+      if (!authorizedReview) throw new Error("AUTHORIZED_EXPERT_CANNOT_DISCOVER_COMMUNITY_REQUEST");
+      communityAssignmentId = String(authorizedReview.assignmentId || "");
+      expect(assignedExpertStream?.data).toContain(communityAssignmentId);
+      const normalUserStreamAfterAssignment = await getRealtimeCapture(reactorPage, "normal-user");
+      expect(normalUserStreamAfterAssignment?.data).not.toContain("event: expert:assignment");
+      expect(normalUserStreamAfterAssignment?.data).not.toContain(communityAssignmentId);
+      expect(authorizedReview.claim).toBe(requestContributionStatement);
+      expect(asRecord(authorizedReview.boundedContext).communityContributionId).toBe(requestContributionId);
+      expect(JSON.stringify(authorizedReview)).not.toContain(primaryEvidenceId);
+      expect(authorizedReview).not.toHaveProperty("trustVerdict");
+      expect(authorizedReview).not.toHaveProperty("aiResult");
+
+      const authorizedDossier = await api(reviewerPage, `/api/expert/blind-reviews/${encodeURIComponent(communityAssignmentId)}`);
+      assertApi(authorizedDossier);
+      expect(asRecord(authorizedDossier.body).dossier).toMatchObject({
+        assignmentId: communityAssignmentId,
+        reviewRequestId: communityReviewRequestId,
+        claim: requestContributionStatement,
+      });
+      expect(JSON.stringify(authorizedDossier.body)).not.toContain(primaryEvidenceId);
+
+      const normalUserDenied = await api(reactorPage, `/api/expert/blind-reviews/${encodeURIComponent(communityAssignmentId)}`);
+      expect(normalUserDenied.status).toBe(403);
+      expect(errorCode(normalUserDenied)).toBe("FORBIDDEN_NOT_EXPERT");
+      const normalUserReviewList = await api(reactorPage, "/api/expert/blind-reviews");
+      expect(normalUserReviewList.status).toBe(403);
+      expect(errorCode(normalUserReviewList)).toBe("FORBIDDEN_NOT_EXPERT");
+      const unassignedExpertDenied = await api(candidatePage, `/api/expert/blind-reviews/${encodeURIComponent(communityAssignmentId)}`);
+      expect(unassignedExpertDenied.status).toBe(403);
+      expect(errorCode(unassignedExpertDenied)).toBe("FORBIDDEN_ASSIGNMENT");
+
+      const { Pool: ReadbackPool } = requireFromFrontend("pg");
+      const readbackPool = new ReadbackPool({ connectionString: process.env.STUDENTHUB_RLS_TEST_DATABASE_URL, ssl: false, max: 1 });
+      try {
+        const linkage = await readbackPool.query(
+          `select r.requester_id, r.case_id, r.case_revision, r.community_contribution_id, r.status,
+                  a.expert_id, a.status as assignment_status, c.publication_state, c.author_id
+             from private.expert_review_requests r
+             join private.expert_assignments a on a.review_request_id = r.id
+             join public.community_contributions c on c.id = r.community_contribution_id
+            where r.id = $1 and a.id = $2`,
+          [communityReviewRequestId, communityAssignmentId]
+        );
+        expect(linkage.rowCount).toBe(1);
+        expect(linkage.rows[0].requester_id).toBe(process.env.STUDENTHUB_LOCAL_CANDIDATE_ID);
+        expect(linkage.rows[0].case_id).toBe(primaryCaseId);
+        expect(Number(linkage.rows[0].case_revision)).toBe(1);
+        expect(linkage.rows[0].community_contribution_id).toBe(requestContributionId);
+        expect(linkage.rows[0].status).toBe("ASSIGNED");
+        expect(linkage.rows[0].expert_id).toBe(reviewerId);
+        expect(linkage.rows[0].assignment_status).toBe("ASSIGNED");
+        expect(linkage.rows[0].publication_state).toBe("PUBLISHED");
+        expect(linkage.rows[0].author_id).toBe(process.env.STUDENTHUB_LOCAL_REACTOR_ID);
+
+        await expect.poll(async () => {
+          const result = await readbackPool.query(
+            `select idempotency_key, channel, event_type, subject_id, classification, payload
+               from private.realtime_events
+              where idempotency_key = any($1::text[])`,
+            [[`community:expert-assignment:${communityAssignmentId}`, `trust:expert-review:${communityReviewRequestId}:assigned`]]
+          );
+          return result.rows.length;
+        }, { timeout: 10_000, intervals: [100, 250, 500] }).toBe(2);
+        const realtimeResult = await readbackPool.query(
+          `select idempotency_key, channel, event_type, subject_id, classification, payload
+             from private.realtime_events
+            where idempotency_key = any($1::text[])`,
+          [[`community:expert-assignment:${communityAssignmentId}`, `trust:expert-review:${communityReviewRequestId}:assigned`]]
+        );
+        const realtimeRows = realtimeResult.rows as Array<{ classification: string; channel: string; subject_id: string }>;
+        expect(realtimeRows.every((row) => row.classification === "RESTRICTED")).toBe(true);
+        expect(realtimeRows.some((row) => row.channel === "expert" && row.subject_id === reviewerId)).toBe(true);
+        expect(realtimeRows.some((row) => row.channel === "trust" && row.subject_id === process.env.STUDENTHUB_LOCAL_CANDIDATE_ID)).toBe(true);
+        expect(JSON.stringify(realtimeRows)).not.toContain(primaryEvidenceId);
+        expect(JSON.stringify(realtimeRows)).not.toContain(requestContributionStatement);
+      } finally {
+        await readbackPool.end();
+      }
 
       const wrongDomainAssignment = await api(reviewerPage, "/api/expert/assignments", {
         method: "POST",
@@ -490,6 +836,7 @@ test.describe("authenticated Community → Expert → Trust local reality", () =
       expect(reviewerNetworkViolations).toEqual([]);
       expect(reactorNetworkViolations).toEqual([]);
     } finally {
+      await Promise.all(realtimeCaptureSessions.map(({ page, name }) => stopRealtimeCapture(page, name)));
       await candidateContext.close();
       await reviewerContext.close();
       await reactorContext.close();

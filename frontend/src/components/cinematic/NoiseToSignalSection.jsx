@@ -3,7 +3,7 @@
 import React from "react";
 import V3_MEDIA from "@/lib/media/v3MediaRegistry";
 import SmartVideo from "@/components/media/SmartVideo";
-import { AlertTriangle, CheckCircle2, ArrowRight } from "lucide-react";
+import { AlertTriangle, FileText, ArrowRight } from "lucide-react";
 import HobroTiltCard from "@/components/cinematic/HobroTiltCard";
 
 export default function NoiseToSignalSection() {
@@ -30,7 +30,7 @@ export default function NoiseToSignalSection() {
             </h2>
           </div>
           <p className="text-slate-400 font-serif text-base sm:text-lg max-w-md leading-relaxed">
-            Khi tin đồn học vụ và học bổng lừa đảo lan truyền trên mạng xã hội, Evidence Prism bóc tách từng thực thể, truy xuất văn bản gốc và dập tắt nhiễu loạn trước khi rủi ro xảy ra.
+            Khi gặp thông tin chưa rõ, Trust giúp xem nội dung cùng căn cứ mà dịch vụ trả về. Kết luận phụ thuộc bằng chứng sẵn có; nội dung thiếu nguồn vẫn cần được xem là chưa đủ căn cứ.
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export default function NoiseToSignalSection() {
                 EVIDENCE PRISM REFRACTION PROCESS
               </span>
               <span className="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded border border-emerald-500/30">
-                STABLE SIGNAL
+                KẾT QUẢ THEO DỮ LIỆU
               </span>
             </div>
           </div>
@@ -74,12 +74,12 @@ export default function NoiseToSignalSection() {
                 </span>
               </div>
               <p className="text-sm text-slate-300 font-serif leading-relaxed mb-4">
-                &ldquo;Nghe bảo trường chuẩn bị tăng 30% học phí kỳ tới và hủy toàn bộ môn thực tập doanh nghiệp...&rdquo;
+                  Nội dung do người dùng gửi để xem xét; bài đăng tự thân chưa xác nhận tính đúng sai.
               </p>
               <div className="flex flex-wrap gap-2 text-[11px] font-mono text-rose-300/80">
-                <span className="px-2 py-0.5 rounded bg-rose-900/30 border border-rose-500/20">Ảnh chụp vô danh</span>
-                <span className="px-2 py-0.5 rounded bg-rose-900/30 border border-rose-500/20">Zero nguồn dẫn</span>
-                <span className="px-2 py-0.5 rounded bg-rose-900/30 border border-rose-500/20">Thời hạn mù</span>
+                <span className="px-2 py-0.5 rounded bg-rose-900/30 border border-rose-500/20">Nguồn chưa xác nhận</span>
+                <span className="px-2 py-0.5 rounded bg-rose-900/30 border border-rose-500/20">Thời điểm cần đối chiếu</span>
+                <span className="px-2 py-0.5 rounded bg-rose-900/30 border border-rose-500/20">Bối cảnh có thể thiếu</span>
               </div>
             </HobroTiltCard>
 
@@ -88,26 +88,26 @@ export default function NoiseToSignalSection() {
               <ArrowRight size={24} className="rotate-90 lg:rotate-0" />
             </div>
 
-            {/* Structured Verified Signal Card */}
+            {/* Evidence Result Boundaries Card */}
             <HobroTiltCard
               maxTilt={7}
               spotlightColor="rgba(16, 185, 129, 0.2)"
               className="p-6 bg-emerald-950/25 border-emerald-500/35"
-              cursorText="SIGNAL"
+              cursorText="EVIDENCE"
             >
               <div className="flex items-center gap-3 text-emerald-400 mb-3">
-                <CheckCircle2 size={20} />
+                <FileText size={20} />
                 <span className="text-xs font-mono font-bold tracking-wider uppercase">
-                  BẰNG CHỨNG HỘI TỤ (VERIFIED)
+                  ĐỌC KẾT QUẢ CÙNG CĂN CỨ
                 </span>
               </div>
               <p className="text-sm text-slate-200 font-serif leading-relaxed mb-4">
-                Đối soát Quyết định số 142/QĐ-ĐHQG: Học phí áp dụng lộ trình cố định không đổi cho khóa 2024-2028. Thông tin tăng 30% là giả mạo.
+                Trust có thể trả về kết luận, trích dẫn và giới hạn theo hồ sơ. Chỉ dùng những nguồn và chi tiết thực sự xuất hiện trong phản hồi.
               </p>
               <div className="flex flex-wrap gap-2 text-[11px] font-mono text-emerald-300">
-                <span className="px-2 py-0.5 rounded bg-emerald-900/30 border border-emerald-500/30">Văn bản gốc .PDF</span>
-                <span className="px-2 py-0.5 rounded bg-emerald-900/30 border border-emerald-500/30">3 Nguồn đối soát</span>
-                <span className="px-2 py-0.5 rounded bg-emerald-900/30 border border-emerald-500/30">Chuyên gia phê duyệt</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-900/30 border border-emerald-500/30">Trích dẫn khi được trả về</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-900/30 border border-emerald-500/30">Giới hạn được nêu rõ</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-900/30 border border-emerald-500/30">Không tự thêm phán quyết</span>
               </div>
             </HobroTiltCard>
           </div>

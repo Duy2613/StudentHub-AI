@@ -1,0 +1,110 @@
+/**
+ * StudentHub AI — Layout & Grid Foundation
+ *
+ * Governing Authority: MASTER FRONTEND CONSTITUTION v3.0 (M-22, M-23)
+ */
+
+/* App Container Max-Widths (M-22) */
+.container-app {
+  width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (min-width: 600px) {
+  .container-app {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+}
+
+@media (min-width: 900px) {
+  .container-app {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container-app {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .container-app {
+    padding-left: 56px;
+    padding-right: 56px;
+  }
+}
+
+/* Specialized Containers */
+.container-dashboard {
+  width: 100%;
+  max-width: 1320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container-reading {
+  width: 100%;
+  max-width: 740px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container-workspace {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Bento Grid System (M-29, M-31) */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .bento-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+}
+
+.bento-card {
+  border-radius: var(--radius-bento);
+  background-color: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  padding: var(--space-6);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bento-card:hover {
+  border-color: var(--border-default);
+}
+
+/* The root layout owns the single main landmark and the page scroll container. */
+.app-header {
+  background: var(--glass-bg);
+  border-bottom-color: var(--glass-border);
+}
+
+.app-shell {
+  background: var(--canvas);
+  color: var(--text-primary);
+}
+
+.app-sidebar {
+  background: var(--surface-1);
+  border-right-color: var(--border-subtle);
+}
+
+.app-main {
+  overflow: visible;
+  overflow-x: clip;
+}

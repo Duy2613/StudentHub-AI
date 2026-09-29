@@ -89,6 +89,9 @@ test("canonical v1 APIs expose honest public contracts and fail closed for perso
     assert.equal(trustBody.contractVersion, "trust.v1");
     assert.equal(trustBody.demo, false);
     assert.ok(trustBody.data.layer1);
+    assert.ok(Array.isArray(trustBody.data.layer1.metrics?.detectorsExecuted));
+    assert.ok(trustBody.data.layer1.metrics.detectorsExecuted.includes("TextDetector"));
+    assert.equal(trustBody.data.layer1.metrics.providerIndependent, true);
 
     const legacyReasoningResponse = await fetch(`${baseUrl}/api/ai-trust/reasoning`, {
       method: "POST",

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { Play, Pause, Maximize2, Radio, Volume2, VolumeX } from "lucide-react";
 import V3_MEDIA from "@/lib/media/v3MediaRegistry";
 
@@ -12,7 +12,6 @@ const VIDEO_CHANNELS = [
     subtitle: "Hero Overture · Căn phòng thẩm định",
     video: V3_MEDIA.landing.hero.video,
     poster: V3_MEDIA.landing.hero.poster,
-    telemetry: "LAT 10.7626° N // RES 3840x2160 // 60 FPS",
     tag: "TỔNG QUAN",
   },
   {
@@ -22,37 +21,33 @@ const VIDEO_CHANNELS = [
     subtitle: "Prism Refraction · Tách lọc nhiễu loạn",
     video: V3_MEDIA.landing.trustTransform.video,
     poster: V3_MEDIA.landing.prism,
-    telemetry: "SPECTRAL DENSITY 99.4% // 4 NGUỒN ĐỐI SOÁT",
     tag: "BÓC TÁCH MỆNH ĐỀ",
   },
   {
-    id: "gemini-verification",
+    id: "ai-assist",
     channel: "CH 03",
-    title: "Gemini Verification",
-    subtitle: "AI Verification · Gemini advisory evidence",
+    title: "AI hỗ trợ phân tích",
+    subtitle: "Video giới thiệu vai trò hỗ trợ; không phải kết quả hồ sơ",
     video: V3_MEDIA.trust.l4AiVerification.video,
     poster: V3_MEDIA.trust.l4AiVerification.poster,
-    telemetry: "GEMINI STRUCTURED OUTPUT // DETERMINISTIC POLICY AUTHORITY",
-    tag: "AI VERIFICATION",
+    tag: "AI HỖ TRỢ",
   },
   {
     id: "human",
     channel: "CH 04",
-    title: "Thẩm Định Chuyên Gia",
-    subtitle: "Human Forensic Review · Phê duyệt độc lập",
+    title: "Không gian Expert",
+    subtitle: "Thẩm định theo hồ sơ, quyền hạn và nhiệm vụ được giao",
     video: V3_MEDIA.trust.humanReview.video,
     poster: V3_MEDIA.trust.humanReview.poster,
-    telemetry: "1,240 VERIFIED EXPERTS // CHỮ KÝ SỐ MẬT MÃ",
     tag: "HỘI ĐỒNG PHẢN BIỆN",
   },
   {
     id: "community",
     channel: "CH 05",
-    title: "Trí Tuệ Cộng Đồng",
-    subtitle: "Collective Fellowship · Trao đổi văn minh",
+    title: "Không gian Community",
+    subtitle: "Trao đổi giữa thành viên; bài đăng không tự xác nhận sự thật",
     video: V3_MEDIA.community.hero.video,
     poster: V3_MEDIA.community.hero.poster,
-    telemetry: "28,500 PEER REPORTERS // MINH BẠCH HỌC VỤ",
     tag: "TRÍ TUỆ TẬP THỂ",
   },
 ];
@@ -61,24 +56,9 @@ export default function CinematicReelStage() {
   const [activeChannelIndex, setActiveChannelIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
-  const [timecode, setTimecode] = useState("00:00:00:00");
   const videoRef = useRef(null);
 
   const activeChannel = VIDEO_CHANNELS[activeChannelIndex];
-
-  // Realistic SMPTE Running Timecode generator
-  useEffect(() => {
-    let frame = 0;
-    const interval = setInterval(() => {
-      frame++;
-      const frames = String(frame % 30).padStart(2, "0");
-      const seconds = String(Math.floor((frame / 30) % 60)).padStart(2, "0");
-      const minutes = String(Math.floor((frame / 1800) % 60)).padStart(2, "0");
-      const hours = String(Math.floor(frame / 108000)).padStart(2, "0");
-      setTimecode(`${hours}:${minutes}:${seconds}:${frames}`);
-    }, 33.33);
-    return () => clearInterval(interval);
-  }, []);
 
   const togglePlay = () => {
     if (!videoRef.current) return;
@@ -114,20 +94,20 @@ export default function CinematicReelStage() {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-12">
           <div>
             <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-4">
-              <Radio size={14} className="text-emerald-400 animate-pulse" />
+              <Radio size={14} className="text-slate-300" />
               <span className="text-xs font-mono font-semibold tracking-widest text-slate-300 uppercase">
-                TRUYỀN PHÁT ĐA KÊNH BẰNG CHỨNG // 4K CINEMATIC REEL
+                VIDEO GIỚI THIỆU SẢN PHẨM
               </span>
             </div>
             <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white font-sans tracking-tight uppercase leading-none">
-              Kho Phim Bằng Chứng{" "}
+              Thước phim{" "}
               <span className="font-serif italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300 block sm:inline">
-                trực quan hóa.
+                giới thiệu.
               </span>
             </h2>
           </div>
           <p className="text-slate-400 font-serif text-base sm:text-lg max-w-md leading-relaxed">
-            Chuyển kênh để quan sát toàn diện cách StudentHub AI vận hành: từ lăng kính bóc tách mệnh đề đến Gemini advisory verification và chuyên gia bảo trợ.
+            Các video giới thiệu hình ảnh và không gian sản phẩm. Nội dung video không phản ánh trạng thái trực tiếp hay kết quả của một hồ sơ cụ thể.
           </p>
         </div>
 
@@ -136,18 +116,16 @@ export default function CinematicReelStage() {
           {/* Top Telemetry Ribbon */}
           <div className="flex items-center justify-between px-6 py-3 border-b border-white/10 bg-space-950/80 backdrop-blur-md text-xs font-mono text-slate-400">
             <div className="flex items-center gap-3">
-              <span className="inline-flex items-center gap-1.5 text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                <span>REC ● LIVE FEED</span>
+              <span className="inline-flex items-center gap-1.5 text-slate-300">
+                <span className="w-2 h-2 rounded-full bg-slate-400" />
+                <span>VIDEO GIỚI THIỆU · KHÔNG PHẢI TRẠNG THÁI HỒ SƠ</span>
               </span>
               <span className="text-white/20">|</span>
               <span className="text-slate-300 font-bold">{activeChannel.channel} : {activeChannel.title}</span>
             </div>
 
             <div className="hidden sm:flex items-center gap-4">
-              <span className="text-emerald-400 font-bold tracking-wider">{timecode}</span>
-              <span className="text-white/20">|</span>
-              <span className="text-[11px] text-slate-400">{activeChannel.telemetry}</span>
+              <span className="text-[11px] text-slate-400">{activeChannel.tag}</span>
             </div>
           </div>
 

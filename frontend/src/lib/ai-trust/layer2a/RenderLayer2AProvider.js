@@ -48,10 +48,11 @@ function extractThreatTypes(...values) {
   return [...result].slice(0, 20);
 }
 
-function normalizeProviderEntry(entry) {
+function normalizeProviderEntry(entry, { allowImplicitSuccess = false } = {}) {
   if (!isPlainObject(entry)) return { ok: false, code: "PROVIDER_CONTRACT_VIOLATION" };
   const provider = boundedText(entry.provider, 120);
-  if (!provider || typeof entry.success !== "boolean") {
+  const hasExplicitSuccess = typeof entry.success === "boolean";
+  if (!provider || (!hasExplicitSuccess && !allowImplicitSuccess) || (entry.success !== undefined && !hasExplicitSuccess)) {
     return { ok: false, code: "PROVIDER_CONTRACT_VIOLATION" };
   }
 
@@ -60,10 +61,11 @@ function normalizeProviderEntry(entry) {
     return { ok: false, code: "PROVIDER_CONTRACT_VIOLATION" };
   }
 
-  const message = entry.message === undefined || entry.message === null
+  const rawMessage = entry.message ?? entry.reason;
+  const message = rawMessage === undefined || rawMessage === null
     ? null
-    : boundedText(entry.message, 500);
-  if (entry.message !== undefined && entry.message !== null && message === null) {
+    : boundedText(rawMessage, 500);
+  if (rawMessage !== undefined && rawMessage !== null && message === null) {
     return { ok: false, code: "PROVIDER_CONTRACT_VIOLATION" };
   }
 
@@ -79,7 +81,7 @@ function normalizeProviderEntry(entry) {
     ok: true,
     value: {
       provider,
-      success: entry.success,
+      success: hasExplicitSuccess ? entry.success : true,
       verdict,
       confidence: typeof entry.confidence === "number" ? Number(entry.confidence.toFixed(4)) : null,
       message,
@@ -109,7 +111,9 @@ export function normalizeLayer2AProviderPayload(payload) {
     return { ok: false, code: "PROVIDER_CONTRACT_VIOLATION" };
   }
 
-  if (!Array.isArray(payload.providers) || payload.providers.length < 1 || payload.providers.length > LAYER_2A_CONFIG.MAX_PROVIDER_RESULTS) {
+  const providerEntries = Array.isArray(payload.providers) ? payload.providers : payload.results;
+  const allowImplicitSuccess = !Array.isArray(payload.providers) && Array.isArray(payload.results);
+  if (!Array.isArray(providerEntries) || providerEntries.length < 1 || providerEntries.length > LAYER_2A_CONFIG.MAX_PROVIDER_RESULTS) {
     // Keep an explicit top-level dangerous response as a hard negative even
     // when the provider omitted the nested diagnostic list.
     if (topVerdict === "DANGEROUS") {
@@ -131,8 +135,8 @@ export function normalizeLayer2AProviderPayload(payload) {
 
   const normalizedProviders = [];
   const providerNames = new Set();
-  for (const entry of payload.providers) {
-    const normalized = normalizeProviderEntry(entry);
+  for (const entry of providerEntries) {
+    const normalized = normalizeProviderEntry(entry, { allowImplicitSuccess });
     if (!normalized.ok) return normalized;
     const key = normalized.value.provider.toLowerCase();
     if (providerNames.has(key)) return { ok: false, code: "PROVIDER_CONTRACT_VIOLATION" };
@@ -238,12 +242,14 @@ export class RenderLayer2AProvider {
   constructor({
     env = process.env,
     fetchImpl = globalThis.fetch,
+    investigateThreatIntelligenceImpl = investigateThreatIntelligence,
     clock = () => Date.now(),
     random = Math.random,
     sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   } = {}) {
     this.env = env;
     this.fetchImpl = fetchImpl;
+    this.investigateThreatIntelligence = investigateThreatIntelligenceImpl;
     this.clock = clock;
     this.random = random;
     this.sleep = sleep;
@@ -505,7 +511,7 @@ export class RenderLayer2AProvider {
 
   async #executeOwnerThreatIntelligence(targetUrl, baseRequestId, targetFingerprint, startedAt) {
     try {
-      const report = await investigateThreatIntelligence({ url: targetUrl });
+      const report = await this.investigateThreatIntelligence({ url: targetUrl });
       const sourceEntries = Object.entries(report?.sources || {});
       const providerResults = sourceEntries.map(([sourceId, source]) => {
         const provider = sourceId === "urlhaus"

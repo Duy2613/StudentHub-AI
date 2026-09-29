@@ -17,7 +17,7 @@ const PILLARS = [
     bgAccent: "bg-emerald-500/10",
     borderColor: "border-emerald-500/30",
     iconColor: "text-emerald-400",
-    description: "Đừng tin vội. Dán một bài đăng mạng xã hội hoặc hình chụp công văn vào Trust Engine. Hệ thống đối chiếu hàng trăm trang quy chế để xác thực.",
+    description: "Gửi nội dung vào Trust để xem kết quả, trích dẫn và giới hạn khi các dữ liệu đó có trong phản hồi.",
     href: "/trust",
     image: V3_MEDIA.landing.prism
   },
@@ -31,13 +31,13 @@ const PILLARS = [
     bgAccent: "bg-cyan-500/10",
     borderColor: "border-cyan-500/30",
     iconColor: "text-cyan-400",
-    description: "Mạng lưới đối soát thông tin đám đông. Khi một tin đồn thất thiệt xuất hiện, cộng đồng sẽ khoanh vùng cảnh báo trước khi sự việc lan rộng.",
+    description: "Thành viên có thể chia sẻ bối cảnh và trao đổi. Bài đăng là nội dung cộng đồng, không tự xác nhận tính đúng sai.",
     href: "/community",
     image: V3_MEDIA.landing.atlas
   },
   {
     id: "expert",
-    title: "Quyết Định Của Chuyên Gia",
+    title: "Thẩm định theo hồ sơ",
     label: "THẨM ĐỊNH CON NGƯỜI",
     icon: Users2,
     color: "from-indigo-400 to-purple-400",
@@ -45,7 +45,7 @@ const PILLARS = [
     bgAccent: "bg-indigo-500/10",
     borderColor: "border-indigo-500/30",
     iconColor: "text-indigo-400",
-    description: "Với những quy chế mập mờ, hội đồng cố vấn học vụ sẽ can thiệp và cung cấp diễn giải chính thức cuối cùng, khép lại vòng lặp nghi vấn.",
+    description: "Quyền Expert đến từ hồ sơ máy chủ xác nhận và nhiệm vụ được giao; việc thẩm định không tự động áp dụng cho mọi nội dung.",
     href: "/expert",
     image: V3_MEDIA.landing.humanAi
   }

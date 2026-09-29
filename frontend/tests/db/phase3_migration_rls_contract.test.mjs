@@ -9,6 +9,7 @@ const repositoryRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..",
 const sql = readFileSync(join(repositoryRoot, "database", "migrations", "202608270001_v2_authority_foundation.sql"), "utf8");
 const rolesRlsSql = readFileSync(join(repositoryRoot, "database", "migrations", "202609160001_private_roles_service_rls.sql"), "utf8");
 const forumRoute = readFileSync(join(repositoryRoot, "frontend", "src", "app", "api", "forum", "posts", "route.js"), "utf8");
+const communityDemoMode = readFileSync(join(repositoryRoot, "frontend", "src", "lib", "intelligence", "community", "communityDemoMode.js"), "utf8");
 
 describe("PHASE 3 — migration and RLS contract", () => {
   it("defines durable sessions, audit, forum and V2 evidence foundations", () => {
@@ -56,10 +57,10 @@ describe("PHASE 3 — migration and RLS contract", () => {
     }
   });
 
-  it("permits memory forum persistence only through an explicit non-production adapter", () => {
-    assert.match(forumRoute, /process\.env\.NODE_ENV !== "production"/);
-    assert.match(forumRoute, /STUDENTHUB_PERSISTENCE_ADAPTER === "memory"/);
-    assert.match(forumRoute, /PERSISTENCE_WORKFLOW_NOT_MIGRATED/);
+  it("keeps in-memory forum persistence behind the shared Community demo gate", () => {
+    assert.match(forumRoute, /const memoryAdapter = isCommunityDemoMode\(\)/);
+    assert.match(forumRoute, /const persistedPost = memoryAdapter\s*\?\s*\(FORUM_POSTS\.unshift/);
     assert.match(forumRoute, /new PostgresForumRepository\(\)\.create/);
+    assert.match(communityDemoMode, /\(nodeEnv === "production" \|\| productionBuild\) && demoRequested/);
   });
 });
