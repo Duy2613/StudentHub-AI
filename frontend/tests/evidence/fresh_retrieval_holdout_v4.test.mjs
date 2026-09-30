@@ -9,6 +9,7 @@ import { EntityResolutionService } from "../../src/lib/server/trust/EntityResolu
 import { EvidenceCandidatePool } from "../../src/lib/server/trust/EvidenceCandidatePool.js";
 import { EvidenceDiscoveryService } from "../../src/lib/server/trust/EvidenceDiscoveryService.js";
 import { MetricForensics } from "./MetricForensics.js";
+import { expectedEntityResolved } from "./entity_resolution_holdout_metric.js";
 
 /**
  * StudentHub V5 — RC3 Retrieval Holdout V4.
@@ -110,18 +111,6 @@ function normalizedDomain(value) {
   return String(value || "").toLowerCase().replace(/^www\./, "");
 }
 
-function expectedEntityResolved(item, detailed) {
-  const expectedEntity = String(item.canonicalEntity || "");
-  const knownDomains = item.knownOfficialDomains || [];
-  const resolvedIds = detailed.matches.map((match) => match.entityId);
-  return resolvedIds.includes(expectedEntity) ||
-    (expectedEntity === "GOVERNMENT_VN" && resolvedIds.includes("GOV_VN")) ||
-    detailed.matches.some((match) => match.allowedDomains?.some((domain) => knownDomains.includes(domain))) ||
-    (expectedEntity.startsWith("AMBIGUOUS_") && detailed.status === "AMBIGUOUS") ||
-    (expectedEntity.startsWith("SCAM_ALERT_") && (detailed.status === "UNKNOWN" || detailed.matches.length === 0 || resolvedIds.includes("MPS_VN") || resolvedIds.includes("NCSC_VN"))) ||
-    (expectedEntity.startsWith("MULTI_") && resolvedIds.length >= 2);
-}
-
 function evaluateMode(modeName, queryCases, runtimeCandidates) {
   const metricLists = {
     recallAt1: [], recallAt3: [], recallAt5: [], mrr: [], ndcgAt5: [], precisionAt5: [],
@@ -153,14 +142,22 @@ function evaluateMode(modeName, queryCases, runtimeCandidates) {
     metricLists.officialTop3Rate.push(top5.slice(0, 3).some((source) => isTarget(source) && source.isPrimary) ? 1 : 0);
     metricLists.officialDiscoveryHitRate.push(top5.some((source) => isTarget(source) && source.discoveryOnly === true) ? 1 : 0);
     metricLists.irrelevantTop1Rate.push(top5.length > 0 && !isTarget(top5[0]) && !top5[0].isPrimary ? 1 : 0);
-    metricLists.entityResolutionAccuracy.push(expectedEntityResolved(item, detailed) ? 1 : 0);
+    const entityResolutionScore = expectedEntityResolved(item, detailed);
+    if (entityResolutionScore !== null) {
+      metricLists.entityResolutionAccuracy.push(entityResolutionScore ? 1 : 0);
+    }
   }
 
   const mean = (values) => values.length > 0 ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
-  return Object.fromEntries(Object.entries(metricLists).map(([key, values]) => [key, mean(values)]).concat([
-    ["modeName", modeName],
-    ["sampleSize", queryCases.length],
-  ]));
+  return Object.assign(
+    Object.fromEntries(Object.entries(metricLists).map(([key, values]) => [key, mean(values)])),
+    {
+      entityResolutionScoredCaseCount: metricLists.entityResolutionAccuracy.length,
+      entityResolutionCoverage: queryCases.length > 0 ? metricLists.entityResolutionAccuracy.length / queryCases.length : 0,
+      modeName,
+      sampleSize: queryCases.length,
+    },
+  );
 }
 
 test("FRESH RETRIEVAL HOLDOUT V4 — RC3 PUBLIC/OFFICIAL DISCOVERY PATH (N=150 QUERIES)", async () => {
@@ -196,7 +193,7 @@ test("FRESH RETRIEVAL HOLDOUT V4 — RC3 PUBLIC/OFFICIAL DISCOVERY PATH (N=150 Q
     ndcg: hybridRes.ndcgAt5 >= 0.88,
     official: hybridRes.officialHitRate >= 0.90,
     irrelevant: hybridRes.irrelevantTop1Rate <= 0.07,
-    entity: hybridRes.entityResolutionAccuracy >= 0.85,
+    entity: hybridRes.entityResolutionAccuracy >= 0.85 && hybridRes.entityResolutionCoverage >= 0.80,
   };
   const status = Object.values(targetGates).every(Boolean)
     ? "RETRIEVAL_HOLDOUT_V4_TARGETS_ESTABLISHED"
@@ -210,7 +207,8 @@ test("FRESH RETRIEVAL HOLDOUT V4 — RC3 PUBLIC/OFFICIAL DISCOVERY PATH (N=150 Q
   console.log(`  Official source hit (Top5)      : ${(hybridRes.officialHitRate * 100).toFixed(1)}% [Target >= 90.0%]`);
   console.log(`  Discovery-domain hit (Top5)     : ${(hybridRes.officialDiscoveryHitRate * 100).toFixed(1)}% [context only]`);
   console.log(`  Irrelevant Top-1 Rate           : ${(hybridRes.irrelevantTop1Rate * 100).toFixed(1)}% [Target <= 7.0%]`);
-  console.log(`  Entity Resolution Accuracy      : ${(hybridRes.entityResolutionAccuracy * 100).toFixed(1)}% [Target >= 85.0%]\n`);
+  console.log(`  Entity Resolution Accuracy      : ${(hybridRes.entityResolutionAccuracy * 100).toFixed(1)}% [Target >= 85.0%, scored ${hybridRes.entityResolutionScoredCaseCount}/${cases.length}]`);
+  console.log(`  Entity Resolution Coverage      : ${(hybridRes.entityResolutionCoverage * 100).toFixed(1)}% [Target >= 80.0%]\n`);
   console.log(`STATUS: ${status}`);
   console.log("============================================================\n");
 

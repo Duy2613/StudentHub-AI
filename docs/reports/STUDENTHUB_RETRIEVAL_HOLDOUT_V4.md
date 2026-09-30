@@ -22,6 +22,8 @@ Result artifact: `artifacts/retrieval/fresh_retrieval_holdout_v4_results.json`
 | LIVE_WEB | 6.7% | 0.057 | 6.4% | 3.9% | 92.7% | 6.7% | 75.3% |
 | HYBRID | 17.3% | 0.154 | 17.0% | 9.2% | 92.7% | 17.3% | 0.0% |
 
+The entity-resolution value above is a historical scorer result and is **superseded for acceptance**. The old scorer could credit an unrelated resolver match. V3/V4/V5 now use strict canonical-identity scoring with scored-case coverage; no fresh release holdout has been run under that correction.
+
 The Hybrid-minus-Live Recall@5 delta is `+10.7pp`, so the monotonic recall invariant passes. The candidate-pool integrity invariant also passes: `SAFE_DEDUP(STATIC ∪ LIVE ∪ OFFICIAL_DISCOVERY)`, UNKNOWN candidates retained, and zero live candidates deleted because of unresolved entities.
 
 ## Official discovery lane
@@ -34,7 +36,7 @@ The real `OfficialDiscoveryAdapter` fetched the allowlisted MOET sources success
 |---|---|
 | Recall@5 >= 92% | FAIL |
 | NDCG@5 >= 88% | FAIL |
-| Entity resolution >= 85% | PASS |
+| Entity resolution >= 85% | SUPERSEDED — corrected metric not rerun |
 | Official-source hit >= 90% | FAIL |
 | Irrelevant top-1 <= 7% | PASS |
 | Hybrid recall >= Live recall - 1pp | PASS |

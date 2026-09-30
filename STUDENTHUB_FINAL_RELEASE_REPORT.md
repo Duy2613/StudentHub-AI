@@ -35,11 +35,21 @@ No staging or production database connection, write, account mutation, main prom
 
 | Holdout | N | Recall@5 / NDCG@5 | Official source Top-5 | Irrelevant Top-1 | Entity resolution | Outcome |
 |---|---:|---:|---:|---:|---:|---|
-| V3 | 165 | 22.4% / 22.2% | 63.0% (target ≥90%) | 19.4% (target ≤7%) | 93.3% (target ≥85%) | Targets not established |
-| V4 | 150 | 18.7% / 18.7% | 18.7% (target ≥90%) | 38.0% (target ≤7%) | 92.7% (target ≥85%) | Targets not established |
-| V5 | 150 | Hybrid 34.0% / 32.3%; static Recall@5 12.7%; live Recall@5 0.0% | 12.7% (target ≥90%) | 27.3% (target ≤7%) | 80.0% (target ≥85%) | Targets not established |
+| V3 | 165 | 22.4% / 22.2% | 63.0% (target ≥90%) | 19.4% (target ≤7%) | Superseded: legacy scorer could credit unrelated matches | Targets not established |
+| V4 | 150 | 18.7% / 18.7% | 18.7% (target ≥90%) | 38.0% (target ≤7%) | Superseded: legacy scorer could credit unrelated matches | Targets not established |
+| V5 | 150 | Hybrid 34.0% / 32.3%; static Recall@5 12.7%; live Recall@5 0.0% | 12.7% (target ≥90%) | 27.3% (target ≤7%) | Superseded: legacy scorer could credit unrelated matches | Targets not established |
+
+The previous V3/V4/V5 entity-resolution percentages are not valid acceptance evidence. Their scorers could count an unrelated resolved entity, any ambiguous result, or some empty/unknown outcomes as a match. V3/V4/V5 now share an exact canonical-identity scorer; topical, policy, and scenario labels are excluded from entity accuracy and reported as unscored coverage. This corrected scorer has not been run as a fresh release holdout, so no new entity-resolution target is claimed. Retrieval targets remain failed independently of this correction.
 
 The earlier 84-query benchmark is not used to override these broader failing holdouts. Live public retrieval did return real Wikipedia candidates; the golden flow correctly left claim relation unknown and returned `INSUFFICIENT_EVIDENCE`. Retrieval must improve before any provider campaign.
+
+### Current continuation update — 2026-10-01
+
+- Added 12 canonical institution identities to the resolver and regressions for exact identity/domain selection: [EPU](https://epu.edu.vn), [HUNRE](https://hunre.edu.vn), [IUH](https://iuh.edu.vn), [DLU](https://dlu.edu.vn), [TDU](https://tdu.edu.vn), [VGU](https://vgu.edu.vn), [VHU](https://vhu.edu.vn), [LHU](https://lhu.edu.vn), [TDMU](https://tdmu.edu.vn), [BDU](https://bdu.edu.vn), [Dong Nai University](https://dongnaiuni.edu.vn) ([alternate school site](https://dnpu.edu.vn)), and [HANU](https://hanu.vn). The Dong Nai entry does not trust the dataset's unverified `dnu.edu.vn` label.
+- Corrected the V3/V4/V5 entity-resolution metric: unrelated entities, generic ambiguity, and topic/scenario labels cannot count as correct canonical identities. Each runner records scored-case count and coverage, with a minimum 80% coverage gate.
+- The previous V3/V4/V5 entity-resolution percentages are historical and superseded. No fresh release holdout was run with the corrected scorer, so that target remains unestablished.
+- Verification: targeted resolver/public API/Trust tests `29/29`; changed-file ESLint `0 errors / 0 warnings`; V3/V4/V5 syntax checks passed; `git diff --check` passed. No Tavily, staging, Supabase, database, Main, or production operation ran.
+- Remaining release blockers are unchanged: retrieval recall/official-source thresholds still fail, and the owner has not verified staging credential rotation and old-password invalidation.
 
 ## Six files previously excluded by the aggregate runner
 

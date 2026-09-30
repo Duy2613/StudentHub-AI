@@ -670,3 +670,12 @@
 - [ ] Live database/RLS/persistence/realtime, real eight-account authentication, provider/web/YouTube ingestion, deployment, and field performance remain `DEFERRED` or `IMPLEMENTED_UNVERIFIED_RUNTIME`; synthetic fixtures are not evidence of those runtime properties.
 - [ ] Route aliases previously classified `UNKNOWN` still need product-owner dispositions. Do not treat them as removed solely because first-class removed pages return 404.
 - [x] Preserved the existing branch and dirty worktree; no stage, commit, reset, stash, cleanup, Main access, remote migration, provider call, or deployment occurred. Stopped at the runbook's section 47 and did not execute its subsequent instruction.
+
+## 31. Retrieval entity-scoring correction — 2026-10-01
+
+- V3/V4/V5 entity-resolution evaluators now share strict canonical-identity scoring; unrelated resolved entities and unrelated ambiguous/empty outcomes no longer receive credit.
+- Topic/policy/scenario labels with no canonical organization are excluded from entity accuracy and reported through scored-case count and coverage; target gate requires at least 80% coverage and 85% accuracy.
+- Added 12 institution identities and precision regressions. Dong Nai University uses the verified school domains `dongnaiuni.edu.vn` and `dnpu.edu.vn`; the dataset's `dnu.edu.vn` label was not adopted as official.
+- Prior V3/V4/V5 entity percentages are marked historical/superseded in the release report and retrieval evidence notes. Corrected scoring has not been run as a fresh release holdout; retrieval targets remain unestablished and Tavily stays OFF.
+- Targeted resolver/public API/Trust regressions passed `29/29`; changed-file ESLint passed with `0 errors / 0 warnings`; V3/V4/V5 syntax checks passed.
+- No staging, Supabase, Tavily, database, or Main operation occurred. Staging credential rotation/invalidation evidence and a fresh retrieval target result remain open owner/environment gates.

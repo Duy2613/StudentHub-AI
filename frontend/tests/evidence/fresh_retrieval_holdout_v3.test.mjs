@@ -7,6 +7,7 @@ import { EvidenceDiscoveryService } from "../../src/lib/server/trust/EvidenceDis
 import { EvidenceCandidatePool } from "../../src/lib/server/trust/EvidenceCandidatePool.js";
 import { AuthorityLadderRanking } from "../../src/lib/server/trust/AuthorityLadderRanking.js";
 import { MetricForensics } from "./MetricForensics.js";
+import { expectedEntityResolved } from "./entity_resolution_holdout_metric.js";
 
 /**
  * StudentHub V5 — Fresh Retrieval Holdout V3 (N=165 Queries)
@@ -89,18 +90,6 @@ async function collectRuntimeCandidates() {
   });
 }
 
-function expectedEntityResolved(item, detailed) {
-  const expectedEntity = item.canonicalEntity;
-  const knownDomains = item.knownOfficialDomains || (item.knownOfficialDomain ? [item.knownOfficialDomain] : []);
-  const resolvedIds = detailed.matches.map((match) => match.entityId);
-  return resolvedIds.includes(expectedEntity) ||
-    (expectedEntity === "GOVERNMENT_VN" && resolvedIds.includes("GOV_VN")) ||
-    detailed.matches.some((match) => match.allowedDomains?.some((domain) => knownDomains.includes(domain))) ||
-    (expectedEntity.startsWith("AMBIGUOUS_") && detailed.status === "AMBIGUOUS") ||
-    (expectedEntity.startsWith("SCAM_ALERT_") && (detailed.status === "UNKNOWN" || detailed.matches.length === 0 || resolvedIds.includes("MPS_VN") || resolvedIds.includes("NCSC_VN"))) ||
-    ((expectedEntity.startsWith("MULTI_") || expectedEntity.startsWith("SIMILAR_")) && resolvedIds.length >= 2);
-}
-
 function evaluateMode(modeName, queryCases, runtimeCandidates) {
   const metricLists = {
     recallAt1: [], recallAt3: [], recallAt5: [], mrr: [], ndcgAt5: [], precisionAt5: [],
@@ -129,14 +118,22 @@ function evaluateMode(modeName, queryCases, runtimeCandidates) {
     metricLists.officialHitRate.push(top5.some((source) => source.isPrimary) ? 1 : 0);
     metricLists.officialTop3Rate.push(top5.slice(0, 3).some((source) => source.isPrimary) ? 1 : 0);
     metricLists.irrelevantTop1Rate.push(top5.length > 0 && !isTarget(top5[0]) && !top5[0].isPrimary ? 1 : 0);
-    metricLists.entityResolutionAccuracy.push(expectedEntityResolved(item, detailed) ? 1 : 0);
+    const entityResolutionScore = expectedEntityResolved(item, detailed);
+    if (entityResolutionScore !== null) {
+      metricLists.entityResolutionAccuracy.push(entityResolutionScore ? 1 : 0);
+    }
   }
 
   const mean = (values) => values.length > 0 ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
-  return Object.fromEntries(Object.entries(metricLists).map(([key, values]) => [key, mean(values)]).concat([
-    ["modeName", modeName],
-    ["sampleSize", queryCases.length],
-  ]));
+  return Object.assign(
+    Object.fromEntries(Object.entries(metricLists).map(([key, values]) => [key, mean(values)])),
+    {
+      entityResolutionScoredCaseCount: metricLists.entityResolutionAccuracy.length,
+      entityResolutionCoverage: queryCases.length > 0 ? metricLists.entityResolutionAccuracy.length / queryCases.length : 0,
+      modeName,
+      sampleSize: queryCases.length,
+    },
+  );
 }
 
 test("FRESH RETRIEVAL HOLDOUT V3 — REAL DISCOVERY PATH (N=165 QUERIES)", async () => {
@@ -170,14 +167,15 @@ test("FRESH RETRIEVAL HOLDOUT V3 — REAL DISCOVERY PATH (N=165 QUERIES)", async
   console.log(`  Monotonic recall (>= -1 pp)     : ${recallDelta >= -1 ? "PASS" : "FAIL"}`);
   console.log(`  Official Source Hit Rate (Top5): ${(hybridRes.officialHitRate * 100).toFixed(1)}% [Target >= 90.0%]`);
   console.log(`  Irrelevant Top-1 Rate           : ${(hybridRes.irrelevantTop1Rate * 100).toFixed(1)}% [Target <= 7.0%]`);
-  console.log(`  Entity Resolution Accuracy      : ${(hybridRes.entityResolutionAccuracy * 100).toFixed(1)}% [Target >= 85.0%]\n`);
+  console.log(`  Entity Resolution Accuracy      : ${(hybridRes.entityResolutionAccuracy * 100).toFixed(1)}% [Target >= 85.0%, scored ${hybridRes.entityResolutionScoredCaseCount}/${cases.length}]`);
+  console.log(`  Entity Resolution Coverage      : ${(hybridRes.entityResolutionCoverage * 100).toFixed(1)}% [Target >= 80.0%]\n`);
 
   const retrievalGates = {
     recall: hybridRes.recallAt5 >= 0.92,
     ndcg: hybridRes.ndcgAt5 >= 0.88,
     official: hybridRes.officialHitRate >= 0.90,
     irrelevant: hybridRes.irrelevantTop1Rate <= 0.07,
-    entity: hybridRes.entityResolutionAccuracy >= 0.85,
+    entity: hybridRes.entityResolutionAccuracy >= 0.85 && hybridRes.entityResolutionCoverage >= 0.80,
   };
   const allTargetGatesPass = Object.values(retrievalGates).every(Boolean);
   const status = allTargetGatesPass

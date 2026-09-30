@@ -256,3 +256,11 @@
 - [ ] Live DB/RLS/realtime, account matrix, providers/ingestion, deployment, and field performance assurance remain `DEFERRED`; fixture and local LAB results do not satisfy them.
 - [ ] Legacy route aliases still classified `UNKNOWN` need product dispositions.
 - [x] No commit, remote operation, staging/Main database access, provider call, or deployment. Stopped after runbook item 47.
+
+### Retrieval entity-scoring correction — 2026-10-01
+
+- [x] V3/V4/V5 holdout runners share strict canonical-identity scoring and report scored-case coverage; topical/scenario labels are not silently counted as entity matches.
+- [x] Added 12 verified institution identities, including official domains for Dong Nai University, and regression coverage for wrong-entity and generic-name false positives.
+- [x] Marked prior V3/V4/V5 entity-resolution percentages as superseded without rewriting holdout labels or old result artifacts.
+- [x] Targeted regression suite `29/29`, changed-file ESLint `0 errors / 0 warnings`, and V3/V4/V5 syntax checks passed.
+- [ ] A fresh eligible retrieval holdout is still required; retrieval targets remain unestablished, Tavily remains OFF, and staging secret rotation/invalidation remains owner-gated.

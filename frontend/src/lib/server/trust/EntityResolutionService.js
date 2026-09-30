@@ -42,13 +42,69 @@ export const CANONICAL_ENTITIES = {
     canonicalName: "Đại học Kinh tế TP.HCM",
     shortName: "UEH",
     aliases: [
-      "ueh", "đh kinh tế tp.hcm", "kinh tế tphcm", "đại học kinh tế", "university of economics hcmc", "ueh career fair"
+      "ueh", "đh kinh tế tp.hcm", "kinh tế tphcm", "university of economics hcmc", "ueh career fair"
     ],
     officialDomain: "ueh.edu.vn",
     allowedDomains: ["ueh.edu.vn"],
     parentOrg: "MOET_VN",
     jurisdiction: "VN",
     type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  UEL: {
+    entityId: "UEL",
+    canonicalName: "Trường Đại học Kinh tế - Luật, ĐHQG TP.HCM",
+    shortName: "UEL",
+    aliases: [
+      "uel", "đại học kinh tế luật", "đại học kinh tế - luật", "trường đại học kinh tế luật",
+      "kinh tế luật đhqg tp.hcm", "university of economics and law"
+    ],
+    officialDomain: "uel.edu.vn",
+    allowedDomains: ["uel.edu.vn", "vnuhcm.edu.vn"],
+    parentOrg: "VNUHCM",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  DUE: {
+    entityId: "DUE",
+    canonicalName: "Trường Đại học Kinh tế - Đại học Đà Nẵng",
+    shortName: "DUE",
+    aliases: [
+      "due", "đại học kinh tế đà nẵng", "trường đại học kinh tế đà nẵng",
+      "kinh tế đại học đà nẵng", "danang university of economics"
+    ],
+    officialDomain: "due.udn.vn",
+    allowedDomains: ["due.udn.vn", "udn.vn"],
+    parentOrg: "UDN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  UEF: {
+    entityId: "UEF",
+    canonicalName: "Trường Đại học Kinh tế - Tài chính TP.HCM",
+    shortName: "UEF",
+    aliases: [
+      "uef", "đại học kinh tế tài chính tphcm", "đại học kinh tế tài chính tp.hcm",
+      "trường đại học kinh tế tài chính tp.hcm", "university of economics and finance hcmc"
+    ],
+    officialDomain: "uef.edu.vn",
+    allowedDomains: ["uef.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  SIU: {
+    entityId: "SIU",
+    canonicalName: "Trường Đại học Quốc tế Sài Gòn",
+    shortName: "SIU",
+    aliases: [
+      "siu", "đại học quốc tế sài gòn", "trường đại học quốc tế sài gòn",
+      "saigon international university"
+    ],
+    officialDomain: "siu.edu.vn",
+    allowedDomains: ["siu.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "PRIVATE_UNIVERSITY"
   },
   VNUHCM: {
     entityId: "VNUHCM",
@@ -136,10 +192,10 @@ export const CANONICAL_ENTITIES = {
     canonicalName: "Bộ Công an",
     shortName: "Bộ Công an",
     aliases: [
-      "bocongan", "bộ công an", "công an", "cục an ninh mạng", "ministry of public security"
+      "bocongan", "mps", "bộ công an", "công an", "cục an ninh mạng", "ministry of public security"
     ],
     officialDomain: "bocongan.gov.vn",
-    allowedDomains: ["bocongan.gov.vn", "congan.com.vn"],
+    allowedDomains: ["bocongan.gov.vn", "mps.gov.vn", "congan.com.vn"],
     parentOrg: "GOVERNMENT_VN",
     jurisdiction: "VN",
     type: "LAW_ENFORCEMENT"
@@ -149,10 +205,11 @@ export const CANONICAL_ENTITIES = {
     canonicalName: "Trung tâm Giám sát an toàn không gian mạng quốc gia",
     shortName: "NCSC",
     aliases: [
-      "ncsc", "tín nhiệm mạng", "cục an toàn thông tin", "tinnhiemmang"
+      "ncsc", "tín nhiệm mạng", "cục an toàn thông tin", "tinnhiemmang",
+      "trung tâm giám sát an toàn không gian mạng quốc gia", "soc.gov.vn"
     ],
     officialDomain: "tinnhiemmang.vn",
-    allowedDomains: ["tinnhiemmang.vn", "ais.gov.vn", "khonggianmang.vn"],
+    allowedDomains: ["tinnhiemmang.vn", "ais.gov.vn", "khonggianmang.vn", "soc.gov.vn"],
     parentOrg: "MIC_VN",
     jurisdiction: "VN",
     type: "CYBER_SECURITY_AUTHORITY"
@@ -498,17 +555,6 @@ export const CANONICAL_ENTITIES = {
     jurisdiction: "VN",
     type: "AMBIGUOUS_ACADEMIC_SYSTEM"
   },
-  AMBIGUOUS_DHKT: {
-    entityId: "AMBIGUOUS_DHKT",
-    canonicalName: "Hệ thống các trường Đại học Kinh tế (NEU, UEH, DUE)",
-    shortName: "ĐHKT",
-    aliases: ["đhkt", "đại học kinh tế"],
-    officialDomain: "neu.edu.vn",
-    allowedDomains: ["neu.edu.vn", "ueh.edu.vn"],
-    parentOrg: "MOET_VN",
-    jurisdiction: "VN",
-    type: "AMBIGUOUS_ACADEMIC_SYSTEM"
-  },
   AMBIGUOUS_DHLUAT: {
     entityId: "AMBIGUOUS_DHLUAT",
     canonicalName: "Hệ thống các trường Đại học Luật (HLU, ULAW)",
@@ -777,7 +823,7 @@ export const CANONICAL_ENTITIES = {
     entityId: "SGU",
     canonicalName: "Trường Đại học Sài Gòn",
     shortName: "ĐH Sài Gòn",
-    aliases: ["sgu", "đại học sài gòn", "đh sài gòn", "sài gòn"],
+    aliases: ["sgu", "đại học sài gòn", "đh sài gòn"],
     officialDomain: "sgu.edu.vn",
     allowedDomains: ["sgu.edu.vn"],
     parentOrg: "HCMC_GOV",
@@ -1191,11 +1237,11 @@ export const CANONICAL_ENTITIES = {
   },
   AMBIGUOUS_DHKT: {
     entityId: "AMBIGUOUS_DHKT",
-    canonicalName: "Đại học Kinh tế (UEH / UEL / ĐHQG)",
+    canonicalName: "Hệ thống các trường Đại học Kinh tế (NEU, UEH, UEL, DUE, UEF)",
     shortName: "ĐH Kinh tế",
     aliases: ["đhkt", "đh kinh tế là ueh", "đh kinh tế", "đại học kinh tế", "kinh tế là ueh"],
     officialDomain: "ueh.edu.vn",
-    allowedDomains: ["ueh.edu.vn", "uel.edu.vn"],
+    allowedDomains: ["neu.edu.vn", "ueh.edu.vn", "uel.edu.vn", "due.udn.vn", "uef.edu.vn"],
     parentOrg: "MOET_VN",
     jurisdiction: "VN",
     type: "AMBIGUOUS_ACADEMIC_SYSTEM"
@@ -1237,12 +1283,159 @@ export const CANONICAL_ENTITIES = {
     entityId: "HCMIU_VNUHCM",
     canonicalName: "Trường Đại học Quốc tế - ĐHQG-HCM",
     shortName: "ĐH Quốc tế (IU)",
-    aliases: ["hcmiu", "đại học quốc tế iu", "đh quốc tế iu", "đại học quốc tế", "đh quốc tế", "quốc tế iu", "đh quốc tế đhqg"],
+    aliases: ["hcmiu", "đại học quốc tế iu", "đh quốc tế iu", "quốc tế iu", "đh quốc tế đhqg", "đại học quốc tế đhqg"],
     officialDomain: "hcmiu.edu.vn",
     allowedDomains: ["hcmiu.edu.vn", "vnuhcm.edu.vn"],
     parentOrg: "VNUHCM",
     jurisdiction: "VN",
     type: "NATIONAL_UNIVERSITY"
+  },
+  EPU: {
+    entityId: "EPU",
+    canonicalName: "Trường Đại học Điện lực",
+    shortName: "ĐH Điện lực",
+    aliases: ["epu", "đại học điện lực", "trường đại học điện lực", "electric power university"],
+    officialDomain: "epu.edu.vn",
+    allowedDomains: ["epu.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  HUNRE: {
+    entityId: "HUNRE",
+    canonicalName: "Trường Đại học Tài nguyên và Môi trường Hà Nội",
+    shortName: "HUNRE",
+    aliases: ["hunre", "đại học tài nguyên và môi trường hà nội", "trường đại học tài nguyên và môi trường hà nội", "hanoi university of natural resources and environment"],
+    officialDomain: "hunre.edu.vn",
+    allowedDomains: ["hunre.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  IUH: {
+    entityId: "IUH",
+    canonicalName: "Trường Đại học Công nghiệp TP.HCM",
+    shortName: "ĐH Công nghiệp TP.HCM",
+    aliases: ["iuh", "đại học công nghiệp tp.hcm", "đại học công nghiệp tphcm", "trường đại học công nghiệp tp.hcm", "industrial university of ho chi minh city"],
+    officialDomain: "iuh.edu.vn",
+    allowedDomains: ["iuh.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  DLU: {
+    entityId: "DLU",
+    canonicalName: "Trường Đại học Đà Lạt",
+    shortName: "ĐH Đà Lạt",
+    aliases: ["dlu", "đại học đà lạt", "trường đại học đà lạt", "dalat university"],
+    officialDomain: "dlu.edu.vn",
+    allowedDomains: ["dlu.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  TDU: {
+    entityId: "TDU",
+    canonicalName: "Trường Đại học Tây Đô",
+    shortName: "ĐH Tây Đô",
+    aliases: ["tdu", "đại học tây đô", "trường đại học tây đô", "tay do university"],
+    officialDomain: "tdu.edu.vn",
+    allowedDomains: ["tdu.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  VGU: {
+    entityId: "VGU",
+    canonicalName: "Trường Đại học Việt Đức",
+    shortName: "ĐH Việt Đức",
+    aliases: ["vgu", "đại học việt đức", "trường đại học việt đức", "vietnamese german university"],
+    officialDomain: "vgu.edu.vn",
+    allowedDomains: ["vgu.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  VHU: {
+    entityId: "VHU",
+    canonicalName: "Trường Đại học Văn Hiến",
+    shortName: "ĐH Văn Hiến",
+    aliases: ["vhu", "đại học văn hiến", "trường đại học văn hiến", "van hien university"],
+    officialDomain: "vhu.edu.vn",
+    allowedDomains: ["vhu.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  LHU: {
+    entityId: "LHU",
+    canonicalName: "Trường Đại học Lạc Hồng",
+    shortName: "ĐH Lạc Hồng",
+    aliases: ["lhu", "đại học lạc hồng", "trường đại học lạc hồng", "lac hong university"],
+    officialDomain: "lhu.edu.vn",
+    allowedDomains: ["lhu.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  TDMU: {
+    entityId: "TDMU",
+    canonicalName: "Trường Đại học Thủ Dầu Một",
+    shortName: "ĐH Thủ Dầu Một",
+    aliases: ["tdmu", "đại học thủ dầu một", "trường đại học thủ dầu một", "thu dau mot university"],
+    officialDomain: "tdmu.edu.vn",
+    allowedDomains: ["tdmu.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  BDU: {
+    entityId: "BDU",
+    canonicalName: "Trường Đại học Bình Dương",
+    shortName: "ĐH Bình Dương",
+    aliases: ["bdu", "đại học bình dương", "trường đại học bình dương", "binh duong university"],
+    officialDomain: "bdu.edu.vn",
+    allowedDomains: ["bdu.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  DNU: {
+    entityId: "DNU",
+    canonicalName: "Trường Đại học Đồng Nai",
+    shortName: "ĐH Đồng Nai",
+    aliases: ["dnu", "đại học đồng nai", "trường đại học đồng nai", "dong nai university"],
+    officialDomain: "dongnaiuni.edu.vn",
+    allowedDomains: ["dongnaiuni.edu.vn", "dnpu.edu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  HANU: {
+    entityId: "HANU",
+    canonicalName: "Trường Đại học Hà Nội",
+    shortName: "ĐH Hà Nội",
+    aliases: ["hanu", "đại học hà nội", "trường đại học hà nội", "hanoi university"],
+    officialDomain: "hanu.vn",
+    allowedDomains: ["hanu.vn"],
+    parentOrg: "MOET_VN",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
+  },
+  USSH_HANOI: {
+    entityId: "USSH_HANOI",
+    canonicalName: "Trường Đại học Khoa học Xã hội và Nhân văn, ĐHQG Hà Nội",
+    shortName: "USSH Hà Nội",
+    aliases: [
+      "ussh hà nội", "đại học khoa học xã hội và nhân văn đhqg hà nội",
+      "trường đại học khoa học xã hội và nhân văn đhqg hà nội",
+      "đại học khxh và nhân văn đhqg hà nội", "vnu ussh"
+    ],
+    officialDomain: "ussh.vnu.edu.vn",
+    allowedDomains: ["ussh.vnu.edu.vn", "vnu.edu.vn"],
+    parentOrg: "VNU",
+    jurisdiction: "VN",
+    type: "HIGHER_EDUCATION_INSTITUTION"
   },
   AMBIGUOUS_KHTN: {
     entityId: "AMBIGUOUS_KHTN",
@@ -3053,20 +3246,28 @@ export class EntityResolutionService {
         !m.entityId.startsWith("AMBIGUOUS_")
     );
 
-    if (specificMatches.length === 1 && specificMatches[0].confidence >= 0.90) {
+    const uniqueSpecificMatches = [...new Map(specificMatches.map((match) => [
+      `${match.canonicalName}::${match.officialDomain}`,
+      match,
+    ])).values()];
+    const mostSpecificMatches = uniqueSpecificMatches.filter((candidate) => (
+      !uniqueSpecificMatches.some((other) => CANONICAL_ENTITIES[other.entityId]?.parentOrg === candidate.entityId)
+    ));
+
+    if (mostSpecificMatches.length === 1 && mostSpecificMatches[0].confidence >= 0.90) {
       // Unambiguous specific institution identified
-      return { status: "RESOLVED", matches: [specificMatches[0]] };
+      return { status: "RESOLVED", matches: [mostSpecificMatches[0]] };
     }
 
-    if (specificMatches.length > 1) {
+    if (mostSpecificMatches.length > 1) {
       // Several competing institutions are not an unambiguous resolution.
       // Preserve every match for downstream soft ranking and force an explicit
       // ambiguity state instead of silently selecting one institution.
-      return { status: "AMBIGUOUS", matches: specificMatches };
+      return { status: "AMBIGUOUS", matches: mostSpecificMatches };
     }
 
-    if (specificMatches.length === 1 || matches[0].confidence >= 0.85) {
-      return { status: "RESOLVED", matches };
+    if (mostSpecificMatches.length === 1 || matches[0].confidence >= 0.85) {
+      return { status: "RESOLVED", matches: mostSpecificMatches.length > 0 ? mostSpecificMatches : matches };
     }
 
     return { status: "UNKNOWN", matches };

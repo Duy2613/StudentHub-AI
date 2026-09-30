@@ -17,6 +17,8 @@ The corrected N=165 run calls `EvidenceDiscoveryService` and uses gold domains o
 | LIVE_WEB | 9.1% | 8.3% | 5.7% | 0.078 | 93.3% |
 | HYBRID | 21.2% | 19.7% | 12.5% | 0.186 | 93.3% |
 
+The entity-resolution column above is a historical metric from a scorer that could credit unrelated resolved entities. It is superseded and must not be used for acceptance. V3/V4/V5 now share a strict canonical-identity scorer with explicit scored-case coverage; a fresh release holdout with that scorer remains pending.
+
 HYBRID official-source hit was 100.0% and irrelevant top-1 was 0.6%, but Recall@5 and NDCG@5 remain below the 92%/88% targets. The union/monotonic invariant passed: HYBRID improved over LIVE by 12.1 percentage points and deleted zero candidates because entity status was UNKNOWN.
 
 ## Root cause

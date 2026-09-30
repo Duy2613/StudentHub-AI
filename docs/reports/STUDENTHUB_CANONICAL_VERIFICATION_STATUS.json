@@ -46,6 +46,7 @@
         "irrelevantTop1": "0.6%",
         "hybridMinusLiveRecallDelta": "+12.1pp"
       },
+      "entityResolutionMetricStatus": "SUPERSEDED_LEGACY_SCORER; CORRECTED_FRESH_HOLDOUT_PENDING",
       "report": "docs/reports/STUDENTHUB_RETRIEVAL_HOLDOUT_V3.md",
       "rootCauseReport": "docs/reports/STUDENTHUB_HYBRID_RETRIEVAL_ROOT_CAUSE.md",
       "rc3HoldoutV4": {
@@ -54,6 +55,7 @@
         "hybridRecallAt5": "17.3%",
         "hybridNDCGAt5": "17.0%",
         "entityResolution": "92.7%",
+        "entityResolutionMetricStatus": "SUPERSEDED_LEGACY_SCORER; CORRECTED_FRESH_HOLDOUT_PENDING",
         "officialSourceHit": "17.3%",
         "hybridMinusLiveRecallDelta": "+10.7pp",
         "report": "docs/reports/STUDENTHUB_RETRIEVAL_HOLDOUT_V4.md"
@@ -64,6 +66,7 @@
         "hybridRecallAt5Diagnostic": "11.3%",
         "hybridNDCGAt5Diagnostic": "10.8%",
         "entityResolutionDiagnostic": "80.0%",
+        "entityResolutionMetricStatus": "SUPERSEDED_LEGACY_SCORER; CORRECTED_FRESH_HOLDOUT_PENDING",
         "publicApiCandidatesDiagnostic": 108,
         "publicApiTargetHitDiagnostic": "0.0%",
         "diagnosticCodeBoundary": "PRE_REFINEMENT_RESULT_NOT_CURRENT_CODE_EVIDENCE",

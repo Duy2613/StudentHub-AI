@@ -29,6 +29,8 @@ Artifact: `artifacts/retrieval/fresh_retrieval_holdout_v5_results.json`
 | LIVE_WEB | 0.0% | 0.000 | 0.0% | 0.0% | 80.0% | 0.0% |
 | HYBRID | 11.3% | 0.102 | 10.8% | 5.6% | 80.0% | 0.0% |
 
+The `80.0%` entity-resolution value is from the initial diagnostic's legacy scorer and is superseded; it could credit unrelated entities. The V3/V4/V5 evaluators now use strict canonical identity and expose scored-case coverage. A corrected fresh release holdout has not been run, so the entity-resolution target remains unestablished.
+
 OpenAlex returned 108 discovery candidates in this run. The target hit was
 zero because the old ranking still tied exact public-API discovery candidates
 with generic official discovery seeds, so this artifact must not be used to
