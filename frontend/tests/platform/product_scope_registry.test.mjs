@@ -88,6 +88,8 @@ test("canonical navigation and Omni source contain no removed feature routes", (
     "src/components/landing/LandingFooter.jsx",
     "src/components/landing/CoreFeaturesSection.jsx",
     "src/components/landing/LivingCampusAtlas.jsx",
+    // Onboarding renders this canvas directly; its project panels are user-facing links.
+    "src/components/canvas/RobinPayotRoadCanvas.jsx",
     "src/components/layout/CollapsibleSidebar.jsx",
     "src/components/ui/floating-dock.jsx",
   ];

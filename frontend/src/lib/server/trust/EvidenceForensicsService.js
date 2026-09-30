@@ -10,6 +10,65 @@
  * - Section 40: Evidence Sufficiency (SUFFICIENT, INSUFFICIENT, CONFLICTED, STALE)
  */
 
+const RELATION_STOP_WORDS = new Set([
+  "a", "an", "and", "are", "as", "at", "by", "for", "from", "in", "into", "is", "of", "on", "or", "the", "this", "to", "with",
+  "bao", "cac", "cho", "chung", "co", "cua", "da", "dai", "duoc", "la", "mot", "nam", "nhu", "o", "sau", "se", "tai", "theo", "thi", "trong", "tu", "va", "ve",
+  "sinh", "vien", "truong", "hoc", "thanh", "pho", "tp", "ky",
+]);
+
+function normalizeRelationText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/đ/g, "d")
+    .toLowerCase();
+}
+
+function getClaimEntityTokens(claim) {
+  const entities = Array.isArray(claim?.entities) ? claim.entities : [];
+  const entityText = entities.map((entity) => {
+    if (typeof entity === "string") return entity;
+    if (!entity || typeof entity !== "object") return "";
+    return `${entity.name || entity.canonicalName || ""} ${entity.entityId || entity.id || ""}`;
+  }).join(" ");
+  return new Set(normalizeRelationText(entityText).match(/[a-z0-9]+/g) || []);
+}
+
+function getRelationTokens(value, ignoredEntityTokens) {
+  return (normalizeRelationText(value).match(/[a-z0-9]+/g) || [])
+    .filter((token) => token.length > 1 && !RELATION_STOP_WORDS.has(token) && !ignoredEntityTokens.has(token));
+}
+
+function getNgrams(tokens, size) {
+  const ngrams = new Set();
+  for (let index = 0; index <= tokens.length - size; index += 1) {
+    ngrams.add(tokens.slice(index, index + size).join(" "));
+  }
+  return ngrams;
+}
+
+function hasDirectClaimAlignment(claim, source) {
+  const ignoredEntityTokens = getClaimEntityTokens(claim);
+  const claimText = String(claim?.text || "");
+  const sourceText = [source?.title, source?.relevantSnippet, source?.rawContentSnippet]
+    .filter(Boolean)
+    .join(" ");
+  const claimTokens = getRelationTokens(claimText, ignoredEntityTokens);
+  const sourceTokens = getRelationTokens(sourceText, ignoredEntityTokens);
+  const sourceTokenSet = new Set(sourceTokens);
+  const sharedTokens = new Set(claimTokens.filter((token) => sourceTokenSet.has(token)));
+  const sourceTrigrams = getNgrams(sourceTokens, 3);
+  const hasSharedPhrase = [...getNgrams(claimTokens, 3)].some((ngram) => sourceTrigrams.has(ngram));
+  const claimHosts = new Set((normalizeRelationText(claimText).match(/(?:[a-z0-9-]+\.)+[a-z]{2,}/g) || []));
+  const sourceHosts = new Set((normalizeRelationText(`${sourceText} ${source?.canonicalUrl || source?.url || ""}`).match(/(?:[a-z0-9-]+\.)+[a-z]{2,}/g) || []));
+  const hasExactClaimUrl = [...claimHosts].some((host) => sourceHosts.has(host));
+
+  return {
+    aligned: sharedTokens.size >= 2,
+    directlyMatched: (hasSharedPhrase && sharedTokens.size >= 4) || (hasExactClaimUrl && sharedTokens.size >= 2),
+  };
+}
+
 export class EvidenceForensicsService {
   /**
    * Helper: extract known news wire / government dispatch attribution from article body
@@ -191,7 +250,6 @@ export class EvidenceForensicsService {
 
     for (const claim of claims) {
       const claimText = (claim.text || "").toLowerCase();
-      const claimType = claim.type;
 
       for (const source of sources) {
         const sourceTitle = (source.title || "").toLowerCase();
@@ -200,7 +258,7 @@ export class EvidenceForensicsService {
 
         let relation = "UNKNOWN";
         let rationale = "Nội dung chưa đủ đối chiếu trực tiếp với tuyên bố.";
-        let confidence = 0.5;
+        const confidence = null;
 
         // 1. Explicit contradiction signals (debunking, hoax, superseded, warning, or negative qualifiers)
         const hasDirectNeg =
@@ -247,23 +305,24 @@ export class EvidenceForensicsService {
           combinedSourceText.includes("tạm thời") ||
           combinedSourceText.includes("chưa thống nhất") ||
           combinedSourceText.includes("tùy từng đợt");
+        const claimAlignment = hasDirectClaimAlignment(claim, source);
 
-        if (isContradiction) {
+        if (isContradiction && claimAlignment.aligned) {
           relation = "CONTRADICTS";
           rationale = "Nội dung nguồn thông tin phản bác hoặc cảnh báo trực tiếp về nhận định trên.";
-          confidence = 0.95;
-        } else if (isContext) {
+        } else if (isContext && claimAlignment.aligned) {
           relation = "CONTEXTUALIZES";
           rationale = "Tài liệu cung cấp bối cảnh quy định tạm thời hoặc có điều kiện kèm theo.";
-          confidence = 0.85;
+        } else if (claimAlignment.directlyMatched && !isContradiction) {
+          relation = "SUPPORTS";
+          rationale = "Nội dung nguồn có cụm thông tin trực tiếp khớp với các chi tiết trọng yếu của tuyên bố.";
         } else {
-          // Token overlap check between claim and snippet
-          const claimTokens = claimText.split(/[\s,()_.-]+/).filter((t) => t.length > 2);
-          const overlap = claimTokens.filter((t) => combinedSourceText.includes(t));
-          if (overlap.length >= 2 || (claimTokens.length > 0 && overlap.length / claimTokens.length >= 0.4)) {
-            relation = "SUPPORTS";
-            rationale = "Nội dung thông báo/quy chế chính thức phù hợp với nhận định trên.";
-            confidence = 0.90;
+          // Search/retrieval metadata and topical token overlap establish
+          // relevance, not entailment. Until a claim-level validator records
+          // a traceable direct comparison, keep the relation unresolved.
+          const suppliedRelation = source.claimRelations?.[claim.claimId];
+          if (suppliedRelation === "DISCOVERY_ONLY" || suppliedRelation === "SUPPORTS") {
+            rationale = "Nguồn được phát hiện cho truy vấn; chưa có đối chiếu trực tiếp đủ căn cứ để xác nhận quan hệ với tuyên bố.";
           }
         }
 
@@ -274,6 +333,7 @@ export class EvidenceForensicsService {
           relation,
           rationale,
           confidence,
+          confidenceKind: "NOT_CALCULATED",
         });
       }
     }
@@ -339,49 +399,71 @@ export class EvidenceForensicsService {
    * @returns {object} sufficiency
    */
   static evaluateSufficiency(claims = [], relationships = [], sources = []) {
+    const claimIds = claims.map((claim) => claim.claimId).filter(Boolean);
+    const directRelations = relationships.filter((relationship) =>
+      relationship.relation === "SUPPORTS" || relationship.relation === "CONTRADICTS"
+    );
+    const directlyAssessedClaimIds = new Set(directRelations.map((relationship) => relationship.claimId));
+    const claimCoverageRatio = claimIds.length > 0
+      ? claimIds.filter((claimId) => directlyAssessedClaimIds.has(claimId)).length / claimIds.length
+      : 0;
+
     if (sources.length === 0) {
       return {
         status: "INSUFFICIENT",
         reason: "CHƯA ĐỦ BẰNG CHỨNG: Không tìm thấy nguồn chính thức nào được lưu trữ đối chiếu.",
-        claimCoverageRatio: 0,
+        claimCoverageRatio,
       };
     }
 
     const officialSources = sources.filter((s) => (s.domain || "").endsWith(".edu.vn") || (s.domain || "").endsWith(".gov.vn"));
     const contradictoryRels = relationships.filter((r) => r.relation === "CONTRADICTS");
-    const supportingRels = relationships.filter((r) => r.relation === "SUPPORTS");
-    const contextualizingRels = relationships.filter((r) => r.relation === "CONTEXTUALIZES");
+    const relationsByClaim = new Map();
+    for (const relationship of relationships) {
+      const claimRelations = relationsByClaim.get(relationship.claimId) || new Set();
+      claimRelations.add(relationship.relation);
+      relationsByClaim.set(relationship.claimId, claimRelations);
+    }
+    const hasSameClaimConflict = [...relationsByClaim.values()].some((claimRelations) =>
+      claimRelations.has("CONTRADICTS") && claimRelations.has("SUPPORTS")
+    );
 
-    // 1. Conflicted: Has contradictory evidence alongside supporting or contextualizing evidence
-    if (contradictoryRels.length > 0 && (supportingRels.length > 0 || contextualizingRels.length > 0)) {
+    // A conflict must concern the same claim. Context alone is not opposition.
+    if (hasSameClaimConflict) {
       return {
         status: "CONFLICTED",
         reason: "BẰNG CHỨNG MÂU THUẪN: Tồn tại các nguồn thông tin đưa ra kết luận hoặc điều kiện áp dụng trái ngược nhau.",
-        claimCoverageRatio: 0.8,
+        claimCoverageRatio,
       };
     }
 
-    // 2. Direct contradiction from official source
-    if (contradictoryRels.length > 0 && officialSources.length > 0) {
-      return {
-        status: "SUFFICIENT",
-        reason: "ĐỦ BẰNG CHỨNG: Cổng thông tin chính thức đã đưa ra tài liệu phản bác trực tiếp tuyên bố mạo danh/thu phí.",
-        claimCoverageRatio: 1.0,
-      };
-    }
+    const officialSourceIds = new Set(officialSources.map((source) => source.sourceId));
+    const directlyAssessedByOfficialClaimIds = new Set(
+      directRelations
+        .filter((relationship) => officialSourceIds.has(relationship.sourceId))
+        .map((relationship) => relationship.claimId),
+    );
+    const allClaimsDirectlyAssessedByOfficialSources = claimIds.length > 0 && claimIds.every((claimId) =>
+      directlyAssessedByOfficialClaimIds.has(claimId)
+    );
 
-    if (officialSources.length > 0) {
+    // Official source presence alone is not evidence that it addresses the claim.
+    if (allClaimsDirectlyAssessedByOfficialSources && officialSources.length > 0) {
       return {
         status: "SUFFICIENT",
-        reason: "ĐỦ BẰNG CHỨNG: Đã có nguồn chính thức của cơ sở đào tạo/cơ quan có thẩm quyền.",
-        claimCoverageRatio: 0.9,
+        reason: contradictoryRels.length > 0
+          ? "ĐỦ BẰNG CHỨNG: Nguồn chính thức có quan hệ phản bác trực tiếp với các tuyên bố đã đối chiếu."
+          : "ĐỦ BẰNG CHỨNG: Nguồn chính thức có quan hệ hỗ trợ trực tiếp với các tuyên bố đã đối chiếu.",
+        claimCoverageRatio,
       };
     }
 
     return {
       status: "INSUFFICIENT",
-      reason: "CHƯA ĐỦ BẰNG CHỨNG: Chỉ có nguồn tin thứ cấp, chưa có thông cáo chính thức từ cơ quan chủ quản.",
-      claimCoverageRatio: 0.4,
+      reason: officialSources.length > 0
+        ? "CHƯA ĐỦ BẰNG CHỨNG: Có nguồn chính thức được phát hiện nhưng chưa có đối chiếu trực tiếp cho tất cả tuyên bố."
+        : "CHƯA ĐỦ BẰNG CHỨNG: Chưa có đối chiếu trực tiếp từ nguồn chính thức cho tất cả tuyên bố.",
+      claimCoverageRatio,
     };
   }
 }

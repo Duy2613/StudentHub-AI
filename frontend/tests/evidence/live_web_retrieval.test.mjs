@@ -67,7 +67,7 @@ test("REAL SEARCH 4: Multi-claim live evidence discovery attaches full provenanc
   assert.equal(source.allowedUse, "ACADEMIC_STUDENT_VERIFICATION");
 });
 
-test("REAL SEARCH 5: Critic Counter-Search triggers second retrieval cycle and enters graph", async () => {
+test("REAL SEARCH 5: Critic Counter-Search returns a discovery candidate, not a preassigned verdict", async () => {
   const claim = {
     claimId: "claim-scam-1",
     text: "Học bổng toàn phần yêu cầu nộp cọc 5 triệu qua ví điện tử"
@@ -84,7 +84,7 @@ test("REAL SEARCH 5: Critic Counter-Search triggers second retrieval cycle and e
   assert.ok(counterRes.newSources.length > 0, "Counter search must produce sources");
 
   const counterSrc = counterRes.newSources[0];
-  assert.equal(counterSrc.claimRelations[claim.claimId], "CONTRADICTS", "Counter source must contradict claim");
+  assert.equal(counterSrc.claimRelations[claim.claimId], "DISCOVERY_ONLY", "Counter-search candidates require claim-level review");
   assert.equal(counterSrc.retrievalMethod, "REAL_WEB_RETRIEVAL");
   assert.ok(counterSrc.contentDigest.length === 64);
 });

@@ -5,6 +5,7 @@ node_modules/
 # Next.js
 .next/
 **/.next/
+.next-hermetic-*/
 .next-v4-three-core-e2e/
 out/
 

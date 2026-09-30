@@ -1,0 +1,102 @@
+# StudentHub AI — Final Closure Report
+
+**Decision: `STUDENTHUB_PRODUCTION_RELEASE_PARTIAL`**
+**Promotion ready: NO**
+**Tavily: OFF; no calls**
+**Candidate:** `codex/studenthub-final-unified-20260930`, based on `af1953147ee5b89ea9d58acdfa67c7f1416ae469`
+**Run:** isolated browser run `2026-09-30T17-58-17-958Z-5428`
+
+## Summary
+
+The final source changes make Trust evidence relationships more conservative and topic-specific, keep discovery candidates unclassified until forensic assessment, prevent hermetic verification from reaching uncontrolled live search, and remove stale/fabricated onboarding carousel content. Tests and the isolated production build passed as recorded below. This is not production acceptance: broad retrieval quality targets failed, staging credential rotation is unverified, and live Expert V5/RLS/realtime/progression evidence is unavailable.
+
+No staging or production database connection, write, account mutation, main promotion, deployment, or production canary occurred in this continuation. The isolated browser run copied the frontend without environment files, used deterministic fixtures, blocked external origins, and blocked non-GET API requests.
+
+## Final candidate checks
+
+| Gate | Result | Evidence |
+|---|---|---|
+| Isolated production build | PASS | Next.js 16.3.7 webpack build; TypeScript phase passed; 139 static pages generated. |
+| TypeScript | PASS | `npx tsc --noEmit` passed. Generated `next-env.d.ts`/`tsconfig.json` changes were restored and excluded. |
+| Changed-file lint | PASS with one known warning | 0 errors; 1 existing React Three Fiber `useFrame` camera-position warning in `RobinPayotRoadCanvas.jsx`. No new actionable warning in changed critical logic. |
+| Hermetic discovered suite | PASS with explicit external gates | 383/389 discovered test files passed the runner gate; 6 are itemized below. Aggregated result: 1,479 tests, 1,443 pass, 0 fail, 36 skip. |
+| Changed Trust / G8 targeted tests | PASS | 9/9; G8 returned 20/20 truthful outcomes: 10 retained source candidates and 10 explicit insufficient-evidence cases. |
+| AI challenge | PASS (hermetic) | N=200; accuracy 100%, macro F1 100%, false reassurance 0, Brier 0.0051, ECE 0.0690, citation validity 100%. This does not prove live provider quality. |
+| Three-core E2E | PASS | 100 pass, 2 intentional screenshot-matrix skips, 0 fail across Chromium, Firefox, WebKit; elapsed 24.3 minutes. |
+| E2E production build | PASS | Built in isolated copied frontend; no env files; no live DB/provider assurance. |
+| Browser screenshots | CAPTURED | 239 files across Trust, Community, Expert, Omni, and release smoke; all manifest paths exist. Fixture evidence, not live account evidence. |
+| Accessibility / responsive | PASS for audited surfaces; overall PARTIAL | E2E includes keyboard, axe, focus, reduced motion, text spacing/200%-zoom-equivalent reflow, themes, and responsive checks. Omni, Trust, Expert exercised at 360–1920; Community screenshot matrix at 390/768/1440. Not every one of 25 screenshot-required pages has a full matrix. |
+| Secret scan | Changed/staged/client PASS; incident closure PARTIAL | Zero secret-pattern hits in staged additions; 269 isolated client bundle files scanned with 0 credential-pattern hits and no env files. A broad tracked-source heuristic produced 7 historical URL/test/local-development matches; all were triaged as false positives, placeholders, or local-only defaults. The old exposed staging DB password's rotation/invalidation remains unverified. |
+| Staging / RLS / live product | BLOCKED | No safe proof that the old staging DB credential was invalidated. Do not reconnect until owner rotation is verified. |
+| Main / production | NOT RUN | Critical gates are not satisfied, so promotion and canary are withheld. |
+
+## Retrieval holdout results (Tavily disabled)
+
+| Holdout | N | Recall@5 / NDCG@5 | Official source Top-5 | Irrelevant Top-1 | Entity resolution | Outcome |
+|---|---:|---:|---:|---:|---:|---|
+| V3 | 165 | 22.4% / 22.2% | 63.0% (target ≥90%) | 19.4% (target ≤7%) | 93.3% (target ≥85%) | Targets not established |
+| V4 | 150 | 18.7% / 18.7% | 18.7% (target ≥90%) | 38.0% (target ≤7%) | 92.7% (target ≥85%) | Targets not established |
+| V5 | 150 | Hybrid 34.0% / 32.3%; static Recall@5 12.7%; live Recall@5 0.0% | 12.7% (target ≥90%) | 27.3% (target ≤7%) | 80.0% (target ≥85%) | Targets not established |
+
+The earlier 84-query benchmark is not used to override these broader failing holdouts. Live public retrieval did return real Wikipedia candidates; the golden flow correctly left claim relation unknown and returned `INSUFFICIENT_EVIDENCE`. Retrieval must improve before any provider campaign.
+
+## Six files previously excluded by the aggregate runner
+
+| FILE | TEST AREA | WHY BLOCKED / LIMIT | REQUIRED ENVIRONMENT | REQUIRED DATABASE | REQUIRED USERS | SAFE STAGING STRATEGY | EXECUTED | RESULT |
+|---|---|---|---|---|---|---|---|---|
+| `frontend/tests/evidence/fresh_retrieval_holdout_v3.test.mjs` | 165-case production discovery holdout | Aggregate runner classifies broad retrieval evaluation separately; execution is local/read-only, but metric targets fail. | Node runtime and checked-in V3 dataset; no credential; Tavily OFF. | None. | None. | Run as local non-mutating evaluation; never seed candidates with scorer gold labels. | YES | Metrics computed; release targets not established. |
+| `frontend/tests/evidence/fresh_retrieval_holdout_v4.test.mjs` | 150-case RC3 retrieval holdout | Same separate metric gate; no DB dependency; target failure is not converted to test failure. | Node runtime and checked-in V4 dataset; Tavily OFF. | None. | None. | Local non-mutating evaluation with gold data used only by scorer. | YES | Metrics computed; release targets not established. |
+| `frontend/tests/evidence/fresh_retrieval_holdout_v5_public_api.test.mjs` | 150-case static/live/hybrid public API retrieval holdout | Separate provider/retrieval evaluation; metrics fail release thresholds. | Node runtime, V5 dataset, public network only for enabled public API path; Tavily OFF. | None. | None. | Read-only public discovery; no account or database access. | YES | Metrics computed; release targets not established. |
+| `frontend/tests/evidence/live_web_retrieval.test.mjs` | Real public search contract and SSRF boundary | External network test is separately classified by aggregate runner. | Node runtime and public Internet access to the configured Wikipedia live API; no secrets. | None. | None. | Read-only public retrieval plus local unsafe-URL assertions. | YES | 4/4 pass. |
+| `frontend/tests/evidence/real_world_live_search_golden_flow.test.mjs` | Public university claim through live Trust pipeline | External network test is separately classified by aggregate runner. | Node runtime and public Internet access; Tavily OFF. | None used in this run. | None; non-sensitive public claim. | Read-only public retrieval with no personal input; accept honest insufficient evidence. | YES | 3/3 pass; sources found, relation unknown, `INSUFFICIENT_EVIDENCE`. |
+| `frontend/tests/expert/expert_v5_live_readonly.test.mjs` | Expert V5 live database read-only table/state assurance | Staging credential exposure has no verified rotation/invalidation proof; current session/project identity also not established. | Rotated staging-only `DATABASE_URL`, matching Supabase URL/ref `bniwtkjtramqaozrrtrk`, owner-confirmed security state. | `StudentHub-AI-Staging`, read-only; no Main/production; guarded project/database identity. | No mutation persona; any API assertions require dedicated staging demo identities, not real users. | After owner rotation and identity proof, run only the read-only guarded suite; stop on identity mismatch. No service-role bypass/direct SQL mutation. | NO | UNSAFE_TO_RUN until credential rotation/invalidation is verified. |
+
+## Feature coverage (route/file inventory, not every control)
+
+`DISCOVERED_ACTIVE_FEATURES=208` route/file rows: 49 page entrypoints plus 159 API route handlers. The control-level census of every button, menu, tab, server action, and role-specific mutation remains partial.
+
+| Count | Classification |
+|---:|---|
+| 208 | Discovered route/file rows |
+| 198 | Rows with some test or browser evidence (11 removed-route assertions, 155 aggregate hermetic coverage rows, 32 selected current/prior responsive page rows) |
+| 11 | PASS: removed product routes return 404 under the current browser suite |
+| 187 | PARTIAL: aggregate, contract, or selected UI coverage without full live feature acceptance |
+| 0 | Confirmed route-level failures in the current candidate suites |
+| 4 | Unsafe/deferred: live mutation assurance blocked by staging credential incident |
+| 6 | Unverified owner role/scope disposition, included within unsafe/deferred rows above; route/caller authorization review remains required |
+| 25 | User-facing page routes marked screenshot-required in the inventory |
+| 239 | Current isolated screenshot files, across five evidence surfaces; not 239 distinct pages |
+| 1 / 1 | UI defect found / code fix made: stale onboarding carousel links and fabricated metrics |
+| 0 / 0 | Known P0 / P1 UI defects open after E2E |
+| 0 | Silently ignored route/file rows |
+
+The onboarding code fix has a static route-contract assertion but no dedicated before/after browser screenshot. It remains an evidence gap, not a known open visual defect. No unsupported feature was reported as live/pass.
+
+## Staging security, release gates, and promotion
+
+- `STAGING_DB_PASSWORD_ROTATED=UNVERIFIED`; `OLD_PASSWORD_INVALIDATED=UNVERIFIED`. This is the blocking security incident gate. No password was requested, printed, or reused.
+- `SOURCE_SECRET_SCAN=PASS` after triage; `STAGED_SECRET_SCAN=PASS` (0 added-line matches); `CLIENT_SECRET_SCAN=PASS` (269 files, 0 credential-pattern matches) for this candidate before push. The isolated bundle was built without environment files. These do not establish old-password invalidation.
+- `AUTH=PARTIAL`, `PROFILE=PARTIAL`, `TRUST=PARTIAL`, `COMMUNITY=PARTIAL`, `EXPERT=PARTIAL`.
+- `QUESTION_BANK=BLOCKED`, `QUIZ=BLOCKED`, `MISSIONS=BLOCKED`, `STAR_LEVEL=BLOCKED`, `REPUTATION=BLOCKED`, `LIVE_ROOM=BLOCKED`, `SUPERVISOR=BLOCKED`, `EXPERT_PRESENCE=BLOCKED`, `REALTIME=BLOCKED`, `RLS=BLOCKED` for live staging acceptance.
+- `OMNI=PASS` for deterministic isolated UI contract; live provider behavior remains partial/unproven.
+- `CSRF=PASS` and `SSRF=PASS` for the exercised hermetic/public tests; broader production security assurance remains partial.
+- `UI_UX=PARTIAL`, `MOBILE=PASS` for selected audited surfaces only, `ACCESSIBILITY=PASS` for audited surfaces, `CHROMIUM=PASS`, `FIREFOX=PASS`, `WEBKIT=PASS`, `BUILD=PASS`, `TYPE=PASS`, `SECRET_SCAN=PARTIAL` because the credential incident is unresolved.
+- `TAVILY_FINAL_LIVE=BLOCKED`; planned/attempted/success/failed/cache hits = 0; final mode OFF. `NON_TAVILY_IMPLEMENTATION_READY=NO` because retrieval targets fail.
+- `STAGING_ACCEPTANCE=PARTIAL`; `PRODUCTION_CANARY=BLOCKED`; `PROMOTION_READY=NO`.
+
+Do not push `main`, trigger production deployment, or run production canaries from this candidate. Re-open live assurance only after a legitimate owner workflow confirms staging password rotation and invalidation; then re-establish staging identity, run RLS/Expert V5/realtime and progression matrices, fix retrieval quality to threshold, and only then reconsider the one-shot Tavily gate.
+
+## Repository artifacts
+
+- `ACTIVE_FEATURE_INVENTORY.md`
+- `FINAL_ACCEPTANCE_MATRIX.md`
+- `TEST_ACCOUNT_MATRIX.md`
+- `QUESTION_PROVENANCE_REPORT.md`
+- `REALTIME_ASSURANCE_REPORT.md`
+- `TAVILY_CALL_LEDGER.md`
+- `UI_REGRESSION_LEDGER.md`
+- `SCREENSHOT_MANIFEST.json` (239 entries; files live in the local isolated run artifact directory)
+- `CLEANUP_INVENTORY.md`
+- `RELEASE_SHA_MANIFEST.md`
+
+The integration SHA and push result are appended to `RELEASE_SHA_MANIFEST.md` after the explicit-path commit/push. `origin/main` is intentionally not changed.

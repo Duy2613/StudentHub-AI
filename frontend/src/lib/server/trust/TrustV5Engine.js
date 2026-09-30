@@ -166,6 +166,7 @@ export class TrustV5Engine {
         claims,
         runId,
         revision,
+        mode: process.env.STUDENTHUB_HERMETIC_TEST_MODE === "1" ? "STATIC" : "HYBRID",
         officialDiscoverySources,
         officialDiscoveryAdapter,
         includeOfficialDiscovery,

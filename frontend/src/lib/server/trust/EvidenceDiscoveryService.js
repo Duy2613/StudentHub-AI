@@ -16,6 +16,83 @@ import { LiveWebRetrievalService } from "./LiveWebRetrievalService.js";
 import { EvidenceCandidatePool } from "./EvidenceCandidatePool.js";
 
 const BLOCKED_IP_REGEX = /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.|169\.254\.)/;
+const STATIC_SEARCH_STOP_WORDS = new Set([
+  "and", "are", "for", "from", "that", "the", "this", "with",
+  "bao", "cac", "cho", "chinh", "cua", "da", "dai", "dieu", "duoc",
+  "giao", "hang", "hoc", "ky", "la", "mot", "nam", "nhung", "o",
+  "sau", "so", "tai", "theo", "thanh", "thong", "thuc", "trong",
+  "truong", "va", "ve",
+]);
+const GENERIC_ENTITY_TERMS = new Set(["bach", "khoa", "university", "college", "dai", "hoc"]);
+
+function normalizeSearchText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/đ/g, "d")
+    .toLowerCase();
+}
+
+function getSearchTokens(value) {
+  return new Set(
+    (normalizeSearchText(value).match(/[a-z0-9]+/g) || [])
+      .filter((token) => token.length > 2 && !/^\d+$/.test(token) && !STATIC_SEARCH_STOP_WORDS.has(token)),
+  );
+}
+
+function getClaimEntityHints(claim) {
+  const entities = Array.isArray(claim?.entities) ? claim.entities : [];
+  return entities.map((entity) => {
+    if (typeof entity === "string") return { name: entity, domain: "", id: "" };
+    if (!entity || typeof entity !== "object") return null;
+    return {
+      name: String(entity.name || entity.canonicalName || ""),
+      domain: String(entity.domain || entity.officialDomain || "").toLowerCase().replace(/^www\./, ""),
+      id: String(entity.entityId || entity.id || ""),
+    };
+  }).filter(Boolean);
+}
+
+function matchesClaimEntity(doc, docText, docTokens, entityHints) {
+  if (entityHints.length === 0) return true;
+
+  const docDomain = String(doc?.domain || "").toLowerCase().replace(/^www\./, "");
+  return entityHints.some((entity) => {
+    if (entity.domain && docDomain === entity.domain) return true;
+
+    const normalizedName = normalizeSearchText(entity.name).replace(/[^a-z0-9]+/g, " ").trim();
+    if (normalizedName && docText.includes(normalizedName)) return true;
+
+    const distinctiveEntityTokens = [...getSearchTokens(`${entity.name} ${entity.id}`)]
+      .filter((token) => token.length >= 4 && !GENERIC_ENTITY_TERMS.has(token));
+    return distinctiveEntityTokens.some((token) => docTokens.has(token));
+  });
+}
+
+function isRelevantStaticDocument(doc, claim) {
+  const entityHints = getClaimEntityHints(claim);
+  const queryText = [
+    claim?.normalizedText || claim?.text || "",
+    ...entityHints.flatMap((entity) => [entity.name, entity.id]),
+  ].join(" ");
+  const queryTokens = getSearchTokens(queryText);
+  if (queryTokens.size === 0) return false;
+
+  const docText = normalizeSearchText(`${doc.title} ${doc.content} ${doc.domain} ${doc.keywords?.join(" ")}`);
+  const docTokens = getSearchTokens(docText);
+  if (!matchesClaimEntity(doc, docText, docTokens, entityHints)) return false;
+
+  const titleTokens = getSearchTokens(`${doc.title} ${doc.keywords?.join(" ")}`);
+  const fullTextMatches = [...queryTokens].filter((token) => docTokens.has(token)).length;
+  const titleMatches = [...queryTokens].filter((token) => titleTokens.has(token)).length;
+  const minimumMatches = queryTokens.size >= 4 ? 3 : Math.min(2, queryTokens.size);
+  const minimumRatio = queryTokens.size >= 8 ? 0.25 : 0.5;
+
+  return (
+    (titleMatches >= minimumMatches && titleMatches / queryTokens.size >= minimumRatio) ||
+    (fullTextMatches >= minimumMatches && fullTextMatches / queryTokens.size >= minimumRatio)
+  );
+}
 
 export class EvidenceDiscoveryService {
   /**
@@ -132,6 +209,7 @@ export class EvidenceDiscoveryService {
     const discoveredPublicApiSources = [];
     const searchTraces = [];
     let liveRetrievalActive = false;
+    let liveRetrievalStatus = "NOT_REQUESTED";
     let officialDiscoveryStatus = "NOT_REQUESTED";
     let publicApiDiscoveryStatus = "NOT_REQUESTED";
 
@@ -143,12 +221,14 @@ export class EvidenceDiscoveryService {
           runId,
           revision,
         });
+        liveRetrievalStatus = liveResult?.retrievalProviderStatus || (liveResult?.success === false ? "SEARCH_UNAVAILABLE" : "INSUFFICIENT_EVIDENCE");
+        searchTraces.push(...(liveResult?.searchTraces || []));
         if (liveResult?.sources?.length > 0) {
           liveSources.push(...liveResult.sources);
-          searchTraces.push(...(liveResult.searchTraces || []));
           liveRetrievalActive = true;
         }
       } catch (err) {
+        liveRetrievalStatus = "SEARCH_UNAVAILABLE";
         console.warn("[EvidenceDiscoveryService] Live retrieval warning:", err.message);
       }
     }
@@ -170,13 +250,10 @@ export class EvidenceDiscoveryService {
             provider: "INSTITUTIONAL_KNOWLEDGE_BASE",
           });
 
-          // Search matching verified documents in institutional KB
-          const normalizedQuery = strat.query.toLowerCase();
-          const matches = INSTITUTIONAL_KNOWLEDGE_BASE.filter((doc) => {
-            const docText = `${doc.title} ${doc.content} ${doc.domain} ${doc.keywords?.join(" ")}`.toLowerCase();
-            const queryTokens = normalizedQuery.split(/\s+/).filter((t) => t.length > 2);
-            return queryTokens.some((t) => docText.includes(t));
-          });
+          // Keep static candidates tied to the claim topic and resolved entity.
+          // A single common token (for example "đại học") must not turn the
+          // entire institutional corpus into apparent evidence for a claim.
+          const matches = INSTITUTIONAL_KNOWLEDGE_BASE.filter((doc) => isRelevantStaticDocument(doc, claim));
 
           for (const doc of matches) {
             const canonical = this.canonicalizeUrl(doc.url);
@@ -310,11 +387,15 @@ export class EvidenceDiscoveryService {
     });
     const dedupedSources = candidatePool.sources;
 
-    const providerStatus = liveRetrievalActive && dedupedSources.some(s => s.retrievalMethod === "REAL_WEB_RETRIEVAL")
+    const providerStatus = liveRetrievalActive && dedupedSources.some((source) => source.retrievalMethod === "REAL_WEB_RETRIEVAL")
       ? "REAL_WEB_RETRIEVAL_VERIFIED"
-      : mode === "LIVE"
-        ? (liveRetrievalActive ? "INSUFFICIENT_EVIDENCE" : "SEARCH_UNAVAILABLE")
-        : "STATIC_CORPUS_DISCOVERY";
+      : liveRetrievalStatus === "SEARCH_UNAVAILABLE" && dedupedSources.length === 0
+        ? "SEARCH_UNAVAILABLE"
+        : dedupedSources.length === 0
+          ? "INSUFFICIENT_EVIDENCE"
+          : mode === "LIVE"
+            ? "INSUFFICIENT_EVIDENCE"
+            : "STATIC_CORPUS_DISCOVERY";
 
     return {
       sources: dedupedSources,

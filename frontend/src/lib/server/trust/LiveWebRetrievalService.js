@@ -287,7 +287,7 @@ export class LiveWebRetrievalService {
           retrievalQueryId: queryId,
           revision,
           claimRelations: {
-            [claimId]: "CONTEXTUALIZES"
+            [claimId]: "DISCOVERY_ONLY"
           }
         });
       }
@@ -351,8 +351,10 @@ export class LiveWebRetrievalService {
       retrievalMethod: "REAL_WEB_RETRIEVAL",
       retrievalQueryId: `query-counter-${claim.claimId}`,
       revision,
+      // Counter-search results are candidates for review, not proof of a
+      // contradiction. Relation assessment happens after source inspection.
       claimRelations: {
-        [claim.claimId]: "CONTRADICTS"
+        [claim.claimId]: "DISCOVERY_ONLY"
       }
     };
 
