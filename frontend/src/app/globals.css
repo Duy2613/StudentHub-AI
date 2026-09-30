@@ -8463,6 +8463,18 @@ body {
   }
 }
 
+@media (max-width: 540px) {
+  .app-header.community-app-header .anonymous-actions .primary-action {
+    display: none;
+  }
+}
+
+@media (max-width: 430px) {
+  .app-header.community-app-header .brand-mark > span:last-child {
+    display: none;
+  }
+}
+
 .reference-landing-navbar {
   border-bottom-color: color-mix(in srgb, var(--decoration-border) 78%, transparent) !important;
   background: rgba(7, 9, 14, .84) !important;

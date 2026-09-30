@@ -66,7 +66,8 @@ async function harness(page:Page, options:Options={}) {
 }
 const dialog=(page:Page)=>page.getByRole('dialog',{name:'Omni',exact:true});
 const query=(page:Page)=>dialog(page).getByRole('combobox',{name:'Tìm trong StudentHub'});
-async function open(page:Page) { await page.getByRole('button',{name:/Mở AI \/ Omni/}).first().click(); await expect(query(page)).toBeFocused(); }
+const launcher=(page:Page)=>page.locator('button[aria-label^="Mở AI / Omni"]:visible').first();
+async function open(page:Page) { await launcher(page).click(); await expect(query(page)).toBeFocused(); }
 async function search(page:Page,value='nguồn') { await query(page).fill(value); await expect(dialog(page).getByText('Đang tìm nội dung phù hợp…')).toHaveCount(0); }
 async function mixed(page:Page) { await search(page); await expect(dialog(page).getByRole('option')).toHaveCount(4); }
 async function shot(page:Page,name:string) { await mkdir(DIR,{recursive:true});await page.screenshot({path:path.join(DIR,`${name}.png`)});captures.push({file:`${name}.png`,viewport:page.viewportSize(),classification:'ISOLATED CONTRACT FIXTURE — NOT LIVE',timestamp:new Date().toISOString()});await writeFile(path.join(DIR,'screenshots.json'),JSON.stringify(captures,null,2)); }
@@ -74,7 +75,7 @@ async function noOverflow(page:Page,checkDocument=true) { await page.evaluate(()
 async function axe(page:Page) { await dialog(page).evaluate(async element=>{await Promise.all(element.getAnimations().filter(animation=>animation.playState==='running').map(animation=>animation.finished.catch(()=>undefined)));});const result=await new AxeBuilder({page}).include('[data-testid="omni-v4"]').analyze();expect(result.violations.filter(v=>['serious','critical'].includes(v.impact||''))).toEqual([]); }
 
 test('one surface opens from shell, traps keyboard, restores focus and navigates commands',async({page})=>{
-  const h=await harness(page);const trigger=page.getByRole('button',{name:/Mở AI \/ Omni/}).first();await open(page);
+  const h=await harness(page);const trigger=launcher(page);await open(page);
   await expect(dialog(page).getByRole('option')).toHaveCount(6);await axe(page);await shot(page,'01-initial');
   await query(page).press('Shift+Tab');await expect(dialog(page).getByRole('button',{name:'Đóng Omni'})).toBeFocused();
   await page.keyboard.press('Shift+Tab');await expect(dialog(page).getByRole('button',{name:'Mở Kiểm chứng',exact:true})).toBeFocused();
@@ -158,7 +159,9 @@ test('five production LAB samples for open, local/mixed results, AI and contextu
     const mixedMs=await page.evaluate(start=>performance.now()-start,queryStart);
     await dialog(page).getByRole('option',{name:/Hướng dẫn/}).click();await expect(dialog(page).getByRole('link',{name:/Mở Hướng dẫn/})).toBeVisible();
     const actionMs=await page.evaluate(()=>performance.getEntriesByName('omni-v4:context-action').at(-1)!.startTime-performance.getEntriesByName('omni-v4:context-action-start').at(-1)!.startTime);
-    await dialog(page).getByRole('button',{name:'Hỏi AI',exact:true}).click();await expect(dialog(page).getByText('Gợi ý này chưa được kiểm chứng.',{exact:false})).toBeVisible();
+    const askButton=dialog(page).getByRole('button',{name:'Hỏi AI',exact:true});
+    await askButton.evaluate(element=>element.scrollIntoView({block:'center',behavior:'instant'}));
+    await askButton.click();await expect(dialog(page).getByText('Gợi ý này chưa được kiểm chứng.',{exact:false})).toBeVisible();
     const ai=await page.evaluate(()=>({rendererMs:performance.getEntriesByName('omni-v4:ai-renderer').at(-1)!.startTime-performance.getEntriesByName('omni-v4:ai-invoke').at(-1)!.startTime,answerMs:performance.getEntriesByName('omni-v4:ai-ready').at(-1)!.startTime-performance.getEntriesByName('omni-v4:ai-invoke').at(-1)!.startTime}));
     samples.push({sample:i,cold:i===0,...opening,mixedMs,actionMs,...ai});await page.keyboard.press('Escape');
   }

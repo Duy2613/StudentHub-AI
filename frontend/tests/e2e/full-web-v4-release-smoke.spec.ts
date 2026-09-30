@@ -105,3 +105,51 @@ test("active landing, auth and three-core routes render once with one main landm
     writeFileSync(join(process.env.FULL_WEB_V4_ARTIFACTS, "active-route-inventory.json"), JSON.stringify({ classification: "LOCAL_ISOLATED; same-origin APIs served by the credential-free app; request-only audit observed no writes; external origins blocked", visited, pageErrors }, null, 2));
   }
 });
+
+test("Community mobile header keeps navigation and auth actions inside the viewport", async ({ page }) => {
+  const origin = "http://127.0.0.1:3114";
+  const blockedWrites: string[] = [];
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+  await page.route("**/*", async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    if (url.origin !== origin) return route.abort();
+    if (url.pathname.startsWith("/api/") && !new Set(["GET", "HEAD", "OPTIONS"]).has(request.method())) {
+      blockedWrites.push(`${request.method()} ${url.pathname}`);
+      return route.fulfill({ status: 403, contentType: "application/json", body: JSON.stringify({ error: { code: "SMOKE_WRITE_BLOCKED" } }) });
+    }
+    return route.continue();
+  });
+
+  const widthsToCheck = [360, 390, 430, 500, 520, 540, 560];
+  await page.setViewportSize({ width: widthsToCheck[0], height: 900 });
+  await page.goto("/community", { waitUntil: "domcontentloaded" });
+  await expect(page.locator(".app-shell")).toHaveAttribute("data-auth-state", "ANONYMOUS");
+
+  for (const width of widthsToCheck) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect(page.getByRole("heading", { name: "Community.", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Chú giải" })).toBeVisible();
+
+    const widths = await page.evaluate(() => ({
+      viewport: window.innerWidth,
+      client: document.documentElement.clientWidth,
+      document: document.documentElement.scrollWidth,
+      header: (() => {
+        const element = document.querySelector(".community-app-header");
+        return { scroll: element?.scrollWidth ?? 0, client: element?.clientWidth ?? 0 };
+      })(),
+      registrationDisplay: getComputedStyle(document.querySelector(".anonymous-actions .primary-action")!).display,
+      wordmarkDisplay: getComputedStyle(document.querySelector(".community-app-header .brand-mark > span:last-child")!).display,
+    }));
+    expect(widths.document, `Community document overflow at ${width}px: ${JSON.stringify(widths)}`).toBeLessThanOrEqual(widths.client + 1);
+    expect(widths.header.scroll, `Community header overflow at ${width}px: ${JSON.stringify(widths)}`).toBeLessThanOrEqual(widths.header.client + 1);
+
+    expect(widths.registrationDisplay).toBe(widths.viewport <= 540 ? "none" : "flex");
+    expect(widths.wordmarkDisplay).toBe(widths.viewport <= 430 ? "none" : "block");
+  }
+
+  expect(blockedWrites).toEqual([]);
+  expect(pageErrors).toEqual([]);
+});
