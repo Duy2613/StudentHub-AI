@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -6,7 +7,13 @@ import test from "node:test";
 import { assertCommunityDemoModeAllowed, isCommunityDemoMode } from "../../src/lib/intelligence/community/communityDemoMode.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const gateScript = path.resolve(here, "../../../scripts/check-community-demo-gate.mjs");
+const gateScript = path.resolve(here, "../../scripts/check-community-demo-gate.mjs");
+const frontendPackage = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
+
+test("production build gate stays inside the Vercel frontend root", () => {
+  assert.match(frontendPackage.scripts.build, /^node scripts\/check-community-demo-gate\.mjs --production-build && next build$/);
+  assert.match(frontendPackage.scripts["check:community-demo-gate"], /^node scripts\/check-community-demo-gate\.mjs$/);
+});
 
 test("production configuration rejects the Community demo flag", () => {
   assert.throws(

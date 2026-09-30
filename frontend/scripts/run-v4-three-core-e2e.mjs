@@ -41,10 +41,11 @@ if (!existsSync(sourceNodeModules) || !existsSync(sourcePublic)) {
 }
 symlinkSync(sourceNodeModules, join(projectRoot, "node_modules"), "junction");
 symlinkSync(sourcePublic, join(projectRoot, "public"), "junction");
-const sourceDemoGate = join(repositoryRoot, "scripts", "check-community-demo-gate.mjs");
-const isolatedDemoGate = join(dirname(projectRoot), "scripts", "check-community-demo-gate.mjs");
-mkdirSync(dirname(isolatedDemoGate), { recursive: true });
-cpSync(sourceDemoGate, isolatedDemoGate);
+const sourceDemoGate = join(sourceProjectRoot, "scripts", "check-community-demo-gate.mjs");
+const isolatedDemoGate = join(projectRoot, "scripts", "check-community-demo-gate.mjs");
+if (!existsSync(sourceDemoGate) || !existsSync(isolatedDemoGate)) {
+  throw new Error("The Community production demo gate must be included inside the frontend project root.");
+}
 
 Object.assign(env, {
   NODE_ENV: "production",

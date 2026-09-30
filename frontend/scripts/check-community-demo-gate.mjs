@@ -1,4 +1,4 @@
-import { assertCommunityDemoModeAllowed } from "../frontend/src/lib/intelligence/community/communityDemoMode.js";
+import { assertCommunityDemoModeAllowed } from "../src/lib/intelligence/community/communityDemoMode.js";
 
 const productionBuild = process.argv.includes("--production-build");
 

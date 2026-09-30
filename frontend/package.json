@@ -9,9 +9,9 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "node ../scripts/check-community-demo-gate.mjs --production-build && next build",
-    "check:community-demo-gate": "node ../scripts/check-community-demo-gate.mjs",
-    "check:community-demo-gate:release": "node ../scripts/check-community-demo-gate.mjs --production-build",
+    "build": "node scripts/check-community-demo-gate.mjs --production-build && next build",
+    "check:community-demo-gate": "node scripts/check-community-demo-gate.mjs",
+    "check:community-demo-gate:release": "node scripts/check-community-demo-gate.mjs --production-build",
     "start": "next start",
     "lint": "eslint",
     "test:layer1": "node tests/layer1/layer1.test.mjs",
