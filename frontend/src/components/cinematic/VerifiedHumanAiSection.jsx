@@ -55,31 +55,31 @@ export default function VerifiedHumanAiSection() {
             </h2>
 
             <p className="text-slate-300 font-serif text-base sm:text-lg leading-relaxed mb-8">
-              Thay vì một câu trả lời ngắn gọn không rõ nguồn gốc, StudentHub phân tích từng câu hỏi theo cấu trúc khoa học: mệnh đề giả thuyết, dẫn chứng trang văn bản, công khai độ bất định và sẵn sàng chuyển tiếp tới chuyên gia.
+              Mỗi luồng hiển thị dữ liệu theo phản hồi mà dịch vụ thực sự trả về. Trust có thể cung cấp mệnh đề, trích dẫn có cấu trúc và giới hạn; Omni hiện trả lời dạng văn bản, chưa gắn trích dẫn có cấu trúc hoặc phiên bản nguồn.
             </p>
 
             {/* Research Desk Specimen Blueprint */}
             <div className="p-5 rounded-2xl bg-space-900/80 border border-white/10 backdrop-blur-md flex flex-col gap-3.5 mb-8">
               <div className="flex items-start justify-between gap-4 pb-3 border-b border-white/10">
                 <span className="text-xs font-mono text-cyan-300 uppercase font-semibold">
-                  1. GIẢ THUYẾT & DẪN CHỨNG
+                  KẾT QUẢ PHỤ THUỘC PHẢN HỒI
                 </span>
                 <span className="text-[11px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
-                  ĐỘ TIN CẬY 94%
+                  KHÔNG TỰ TẠO ĐIỂM
                 </span>
               </div>
 
               <div className="text-sm text-slate-300 font-serif leading-relaxed">
-                Trích lục Điều 8, Khoản 2 Quy chế Đào tạo ĐHQG: Sinh viên đạt GPA $\ge$ 3.6 được đăng ký tối đa 24 tín chỉ mà không cần phê duyệt ngoại lệ của Trưởng khoa.
+                Trust có thể trả về mệnh đề và trích dẫn theo hồ sơ. Omni hiện trả lời bằng văn bản; không hiển thị trích dẫn có cấu trúc hay phiên bản nguồn.
               </div>
 
               <div className="flex items-center justify-between pt-2 text-xs font-mono text-slate-400">
                 <span className="flex items-center gap-1.5 text-amber-300/90">
                   <ShieldAlert size={14} />
-                  <span>Điểm bất định: Chưa tính tín chỉ môn Giáo dục thể chất</span>
+                  <span>Khi thiếu căn cứ, kết quả cần nêu rõ giới hạn đó.</span>
                 </span>
                 <span className="text-indigo-400 hover:underline cursor-pointer">
-                  Mở công văn gốc .PDF
+                  Xem nguồn nếu được trả về
                 </span>
               </div>
             </div>

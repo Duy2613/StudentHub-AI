@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowLeft, Home, Bot, FileText, Sliders, LayoutDashboard, Sparkles } from "lucide-react";
+import { ArrowLeft, Home, Bot, Users, UserCheck, ShieldCheck, Sparkles } from "lucide-react";
 import { AmbientBackground, NoiseOverlay } from "@/components/auth/AuthUI";
 
 export default function NotFound() {
@@ -28,7 +28,7 @@ export default function NotFound() {
         </h2>
 
         <p className="text-sm text-gray-400 leading-relaxed mb-8 max-w-md mx-auto">
-          Đường dẫn có thể đã thay đổi. Hãy chọn một trong các không gian học thuật bên dưới để tiếp tục trải nghiệm StudentHub AI:
+          Đường dẫn có thể đã thay đổi. Hãy tiếp tục tại một trong ba trụ cột StudentHub AI hoặc quay về trang chủ:
         </p>
 
         {/* Quick Jump Grid */}
@@ -45,14 +45,14 @@ export default function NotFound() {
           </Link>
 
           <Link
-            href="/trust"
+            href="/ai"
             className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/40 hover:bg-white/10 transition-all flex flex-col gap-1 text-xs"
           >
             <div className="flex items-center gap-1.5 text-white font-semibold">
               <Bot className="w-3.5 h-3.5 text-purple-400" />
-              <span>AI Mentor</span>
+              <span>AI / Omni</span>
             </div>
-            <span className="text-[11px] text-gray-400">Hỏi đáp đa ngành 24/7</span>
+            <span className="text-[11px] text-gray-400">Tìm kiếm và điều hướng trong StudentHub AI</span>
           </Link>
 
           <Link
@@ -60,10 +60,10 @@ export default function NotFound() {
             className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/40 hover:bg-white/10 transition-all flex flex-col gap-1 text-xs"
           >
             <div className="flex items-center gap-1.5 text-white font-semibold">
-              <FileText className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Workspace</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Kiểm chứng</span>
             </div>
-            <span className="text-[11px] text-gray-400">Ghi chú & Soạn thảo</span>
+            <span className="text-[11px] text-gray-400">Đối chiếu phát biểu, nguồn và bằng chứng</span>
           </Link>
 
           <Link
@@ -71,21 +71,21 @@ export default function NotFound() {
             className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-amber-500/40 hover:bg-white/10 transition-all flex flex-col gap-1 text-xs"
           >
             <div className="flex items-center gap-1.5 text-white font-semibold">
-              <Sliders className="w-3.5 h-3.5 text-amber-400" />
-              <span>Whiteboard</span>
+              <Users className="w-3.5 h-3.5 text-amber-400" />
+              <span>Cộng đồng</span>
             </div>
-            <span className="text-[11px] text-gray-400">Bảng vẽ kỹ thuật số</span>
+            <span className="text-[11px] text-gray-400">Chia sẻ câu hỏi và thảo luận</span>
           </Link>
 
           <Link
-            href="/dashboard"
+            href="/expert"
             className="p-3 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/40 hover:bg-white/10 transition-all flex flex-col gap-1 text-xs"
           >
             <div className="flex items-center gap-1.5 text-white font-semibold">
-              <LayoutDashboard className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Dashboard</span>
+              <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Chuyên gia</span>
             </div>
-            <span className="text-[11px] text-gray-400">Bảng điều khiển cá nhân</span>
+            <span className="text-[11px] text-gray-400">Tìm chuyên gia theo lĩnh vực</span>
           </Link>
 
           <Link

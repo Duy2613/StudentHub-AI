@@ -262,8 +262,8 @@ function trustResultFromResponse(input: TrustInvestigationInput, raw: unknown): 
     requestedMode: "LIVE" as const,
     sourceMode: "LIVE" as const,
     kind: "LIVE_PROVIDER" as const,
-    label: "Approved same-origin live provider",
-    providerId: "trust-api",
+    label: "Friend backend authoritative live provider",
+    providerId: "friend-backend-authoritative",
   };
   const evidence = stageValues.flatMap((stage) => stage.evidenceRefs.map((sourceId, index) => ({
     evidenceId: `trust-ref:${stage.stageId}:${index}`,

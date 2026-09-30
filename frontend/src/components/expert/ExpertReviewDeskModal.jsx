@@ -36,6 +36,9 @@ export default function ExpertReviewDeskModal({
   if (!isOpen) return null;
 
   const claimText = caseDossier?.claim || caseDossier?.canonicalClaim || "";
+  const submittedInput = caseDossier?.boundedContext?.inputText
+    || caseDossier?.boundedContext?.snippet
+    || claimText;
   const caseId = caseDossier?.id || caseDossier?.caseId || "";
   const domain = caseDossier?.domain || caseDossier?.domainCode || "";
   const hasBoundAssignment = Boolean(caseDossier && caseId && claimText && caseDossier.assignmentId);
@@ -133,10 +136,17 @@ export default function ExpertReviewDeskModal({
                 {caseId ? `HỒ SƠ TRUST GỐC #${caseId}` : "CHƯA CÓ HỒ SƠ TRUST ĐƯỢC GÁN"}
               </span>
               <h4 className="text-sm font-semibold text-slate-100 font-serif">Mệnh đề cần thẩm định</h4>
-              {claimText ? (
-                <p className="text-xs text-slate-300 mt-1 italic p-2.5 rounded bg-[#0C0F14] border border-white/5">
-                  “{claimText}”
-                </p>
+              {submittedInput ? (
+                <label className="block mt-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500">Input user đã gửi · chỉ đọc</span>
+                  <textarea
+                    value={submittedInput}
+                    readOnly
+                    rows={5}
+                    aria-label="Input user đã gửi Trust Engine"
+                    className="w-full mt-1 text-xs text-slate-200 p-2.5 rounded bg-[#0C0F14] border border-emerald-500/20 outline-none resize-y leading-relaxed"
+                  />
+                </label>
               ) : (
                 <p className="text-xs text-amber-200 mt-1 p-2.5 rounded bg-amber-500/10 border border-amber-500/20" role="status">
                   Chưa có assignment thực tế. Không hiển thị mệnh đề mẫu.

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { ExpertRepository, ExpertRepositoryError } from "@/lib/server/database/ExpertRepository.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
+import { publishRealtimeEvent } from "@/lib/server/realtime/RealtimePublisher.js";
+import { ExpertBlindReviewDispatcher } from "@/lib/server/expert/ExpertBlindReviewDispatcher.js";
 
 const MIGRATION_CODES = new Set(["42P01", "42703", "3F000"]);
 
@@ -61,13 +63,36 @@ async function createRequest(request, _routeParams, principal, securityContext) 
       domainCode: body.domainCode || body.category,
       question: body.question,
       contextRefs: body.contextRefs || body.evidenceRefs || [],
+      communityContributionId: body.communityContributionId || null,
       idempotencyKey: request.headers.get("idempotency-key") || body.idempotencyKey,
       correlationId: securityContext.correlationId,
     });
+    const matching = result.communityContributionId
+      ? await ExpertBlindReviewDispatcher.matchReviewRequest({
+        reviewRequestId: result.id,
+        requesterId: principal.subjectId,
+        correlationId: securityContext.correlationId,
+      })
+      : { ok: true, status: result.status, assignmentsCount: 0, matching: "COORDINATOR_QUEUE" };
+    if (!result.idempotent) {
+      void publishRealtimeEvent({
+        channel: "trust",
+        eventType: "trust:expert_review",
+        subjectId: principal.subjectId,
+        classification: "RESTRICTED",
+        producer: "StudentHub-AI",
+        environment: process.env.NODE_ENV || "development",
+        correlationId: securityContext.correlationId,
+        causationId: result.id,
+        idempotencyKey: `trust:expert-review:${result.id}:requested`,
+        data: { caseId: result.caseId, caseRevision: result.caseRevision, requestId: result.id, status: matching.status || result.status, assignmentsCount: matching.assignmentsCount || 0 },
+      }).catch(() => {});
+    }
     return NextResponse.json({
       success: true,
       contractVersion: "expert-review-request.v1",
       data: result,
+      matching,
       assignmentAuthority: "SERVER_CONTROLLED",
       expertSelection: "NOT_REQUESTER_CONTROLLED",
       correlationId: securityContext.correlationId,

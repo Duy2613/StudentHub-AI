@@ -175,7 +175,7 @@ export default function AuthCallbackPage() {
         </div>
       </div>
       <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-3" />
-      <p className="text-sm sm:text-base text-gray-300 font-medium text-center">{statusMessage}</p>
+      <p role="status" aria-live="polite" className="text-sm sm:text-base text-gray-300 font-medium text-center">{statusMessage}</p>
     </div>
   );
 }

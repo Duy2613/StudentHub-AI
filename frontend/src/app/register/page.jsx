@@ -4,13 +4,13 @@
 //
 // Trang Đăng Ký StudentHub AI (Saffron Finance x Meer Mohsin x uAvionix):
 // - Vỏ bọc SaffronAuthContainer với Swiss Grid & Realtime Fluid Canvas (meermohsin.me)
-// - Bảng điều khiển SaffronAuthDeck với Radar phát hiện email trường .edu (+30 điểm uy tín)
+// - SaffronAuthDeck hiển thị gợi ý định dạng email tổ chức; không xác minh tư cách hoặc cấp điểm
 // - Xác thực 2 bước với Settigation Orbit OTP v3 (vòng quay thiên văn Saffron/Teal)
 // - Aerospace Avionics Telemetry HUD (usavionix.com)
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ShieldAlert, RefreshCw, LogIn } from "lucide-react";
+import { Loader2, ShieldAlert, RefreshCw } from "lucide-react";
 import SaffronAuthContainer from "@/components/auth/SaffronAuthContainer";
 import SaffronAuthDeck from "@/components/auth/SaffronAuthDeck";
 import { useAuth, PROFILE_STATUS } from "@/lib/auth/AuthContext";
@@ -66,10 +66,10 @@ export default function RegisterPage() {
               </button>
               <button
                 type="button"
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push("/")}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white text-xs hover:bg-white/20 transition-colors cursor-pointer"
               >
-                Vào Dashboard
+                Về trang chủ
               </button>
             </div>
           </div>

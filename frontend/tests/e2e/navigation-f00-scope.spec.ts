@@ -1,6 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 const BANNED_NAV_HREFS = [
+  '/dashboard',
+  '/learn',
+  '/scholarships',
+  '/tuition-radar',
+  '/safety-map',
+  '/sos',
   '/marketplace',
   '/cases',
   '/quests',
@@ -12,7 +18,7 @@ const BANNED_NAV_HREFS = [
 
 test.describe('F00 Scope Enforcement — Navigation Non-Exposure', () => {
   test('Primary desktop header must not expose banned F00 routes', async ({ page }) => {
-    await page.goto('/dashboard');
+    await page.goto('/');
     const nav = page.locator('header nav');
     await expect(nav).toBeVisible();
     for (const href of BANNED_NAV_HREFS) {
@@ -22,9 +28,10 @@ test.describe('F00 Scope Enforcement — Navigation Non-Exposure', () => {
   });
 
   test('Mobile navigation rail must not expose banned F00 routes', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('/dashboard');
-    const mobileNav = page.locator('nav[aria-label="Điều hướng di động"]');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Mở menu điều hướng' }).click();
+    const mobileNav = page.getByRole('dialog', { name: 'Menu điều hướng di động' });
     await expect(mobileNav).toBeVisible();
     for (const href of BANNED_NAV_HREFS) {
       const link = mobileNav.locator(`a[href="${href}"]`);
@@ -39,8 +46,11 @@ test.describe('F00 Scope Enforcement — Navigation Non-Exposure', () => {
     await page.goto('/forum');
     await expect(page).toHaveURL(/\/community/);
 
-    await page.goto('/prof-rating');
-    await expect(page).toHaveURL(/\/academic/);
+    const removedDashboard = await page.goto('/dashboard');
+    expect(removedDashboard?.status()).toBe(404);
+
+    const removedProfileAlias = await page.goto('/prof-rating');
+    expect(removedProfileAlias?.status()).toBe(404);
 
   });
 });

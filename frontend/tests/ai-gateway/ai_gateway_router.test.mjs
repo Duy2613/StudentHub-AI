@@ -14,6 +14,10 @@ import { AI_CAPABILITY, PROVIDER_FAMILY, GATEWAY_ERROR_TYPE } from "../../src/li
 import { IModelProvider } from "../../src/lib/ai-gateway/providers/IModelProvider.js";
 import { ModelHealthStore } from "../../src/lib/ai-gateway/ModelHealthStore.js";
 
+// This file asserts the normal three-model production chain. Demo-priority
+// routing has its own dedicated suite and must not inherit a developer .env.
+process.env.TRUST_L4_RESULT_PRIORITY = "NORMAL";
+
 const MODEL_3_8 = "gemini-3.8-flash";
 const MODEL_3_7 = "gemini-3.7-flash";
 const MODEL_3_6 = "gemini-3.6-flash";

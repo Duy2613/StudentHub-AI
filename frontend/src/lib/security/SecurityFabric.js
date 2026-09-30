@@ -76,14 +76,14 @@ export class SecurityFabric {
         }
 
         // 2. Authentication & Identity Resolution
+        const credentialSource = IdentityResolver.getCredentialSource(request);
         const principal = await IdentityResolver.resolvePrincipal(request, { allowAnonymous });
-        const usesBearer = request.headers.get("authorization")?.startsWith("Bearer ");
-        // Treat both the durable StudentHub session and the Supabase access
-        // cookie as browser credentials.  Mutations authenticated by either
-        // cookie must pass the same-origin CSRF check; bearer-only API calls
-        // remain stateless and are not subject to cookie CSRF.
-        const usesSessionCookie = /(?:^|;\s*)(?:studenthub_session|sb-access-token)=/.test(request.headers.get("cookie") || "");
-        CsrfGuard.assertRequestAllowed(request, { cookieAuthenticated: usesSessionCookie && !usesBearer });
+        // Derive CSRF policy from the same source selected by identity
+        // resolution. A Bearer header cannot downgrade a cookie-authenticated
+        // mutation to the stateless policy.
+        CsrfGuard.assertRequestAllowed(request, {
+          cookieAuthenticated: IdentityResolver.isCookieCredentialSource(credentialSource),
+        });
 
         // 3. Operational Risk Evaluation
         const riskResult = RiskEngine.evaluateRisk({

@@ -417,7 +417,13 @@ test("L2C_RISK_CAN_RAISE_SUSPICION", async () => {
     layer1Result: { layer: 1, status: "PASS", signals: [] },
     layer2AResult: trustedNoMatch(),
     layer2Result: { layer: 2, status: "PASS", classification: "BENIGN", claims: [], contextSignals: [] },
-    layer2CResult: { classification: "FAKE_SCHOLARSHIP", modelScore: 0.93, riskSignals: [{ code: "FAKE_SCHOLARSHIP", severity: "HIGH" }] },
+    layer2CResult: {
+      classification: "FAKE_SCHOLARSHIP",
+      modelScore: 0.93,
+      riskSignals: [{ code: "FAKE_SCHOLARSHIP", severity: "HIGH" }],
+      modelStatus: "BASELINE_RULE_MODEL",
+      modelVersion: STUDENT_DOMAIN_MODEL_VERSION,
+    },
     layer3Result: { layer: 3, status: "NOT_APPLICABLE", evidence: [], claims: [] },
   });
   assert.equal(result.securityClassification, "SUSPICIOUS");

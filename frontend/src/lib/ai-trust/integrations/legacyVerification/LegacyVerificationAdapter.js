@@ -12,11 +12,12 @@ import { createLayer2AResult, LAYER_2A_FINDING, LAYER_2A_PROVIDER_STATUS } from 
 import { createEvidence, createLayer3Result, createSource, EVIDENCE_PROVIDER_STATUS, LAYER_3_STATUS, SOURCE_AUTHORITY_TIER, SOURCE_TYPE } from "../../layer3/types.js";
 import { markTrustedLayer3Result } from "../../layer3/TrustBoundary.js";
 import { decideReputationLookup, REPUTATION_LOOKUP_POLICY, REPUTATION_LOOKUP_REASON, REPUTATION_LOOKUP_STATUS } from "../../layer2a/ReputationLookupPolicy.js";
+import { MediaArtifactService } from "../../../server/media/MediaArtifactService.js";
 import { LEGACY_VERIFICATION_CONFIG, getLegacyVerificationConfig } from "./config.js";
 
 const LEGACY_LAYER2_VERDICTS = new Set(["SAFE", "DANGEROUS", "UNKNOWN"]);
 const LEGACY_LAYER3_VERDICTS = new Set(["TRUE", "FALSE", "UNKNOWN", "SUPPORTED", "CONTRADICTED", "MIXED", "UNVERIFIED", "INSUFFICIENT_EVIDENCE", "UNAVAILABLE"]);
-const LEGACY_LAYER4_VERDICTS = new Set(["TRUE", "FALSE", "UNKNOWN", "SAFE", "DANGEROUS", "SUSPICIOUS", "SUPPORTED", "CONTRADICTED", "MIXED", "UNVERIFIED", "INSUFFICIENT_EVIDENCE"]);
+const LEGACY_LAYER4_VERDICTS = new Set(["TRUE", "FALSE", "UNKNOWN", "SAFE", "DANGEROUS", "SUSPICIOUS", "FAKE", "SUPPORTED", "CONTRADICTED", "MIXED", "UNVERIFIED", "INSUFFICIENT_EVIDENCE"]);
 function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
@@ -255,6 +256,216 @@ function safeTransportMessage(result) {
   return "Legacy verification backend is unavailable.";
 }
 
+function imageBytesForInput(input) {
+  const metadata = asRecord(input?.metadata);
+  const artifactId = safeText(metadata.mediaArtifactId, 180);
+  const artifact = artifactId ? MediaArtifactService.getArtifact(artifactId) : null;
+  let bytes = artifact?.buffer;
+
+  // Public routes persist the complete image in MediaArtifactService before
+  // the orchestrator runs. Direct adapter tests and internal callers may still
+  // provide bytes without an artifact, so retain that safe server-side path.
+  if (!bytes && !artifactId) {
+    const rawBytes = metadata.bytes;
+    if (Buffer.isBuffer(rawBytes)) bytes = rawBytes;
+    else if (rawBytes instanceof Uint8Array) bytes = Buffer.from(rawBytes);
+    else if (Array.isArray(rawBytes)) bytes = Buffer.from(rawBytes);
+    else if (typeof rawBytes === "string") {
+      const trimmed = rawBytes.trim();
+      const comma = trimmed.indexOf(",");
+      const encoded = trimmed.startsWith("data:") && comma >= 0 ? trimmed.slice(comma + 1) : trimmed;
+      if (encoded && /^[A-Za-z0-9+/=\s]+$/.test(encoded)) {
+        try { bytes = Buffer.from(encoded, "base64"); } catch { bytes = null; }
+      }
+    }
+  }
+
+  if (!bytes || !Buffer.isBuffer(bytes) || bytes.length === 0) {
+    return { ok: false, code: artifactId ? "LEGACY_IMAGE_ARTIFACT_UNAVAILABLE" : "LEGACY_IMAGE_BYTES_UNAVAILABLE" };
+  }
+  if (bytes.length > LEGACY_VERIFICATION_CONFIG.MAX_IMAGE_BYTES) {
+    return { ok: false, code: "LEGACY_IMAGE_TOO_LARGE" };
+  }
+
+  const contentType = safeText(artifact?.mimeType || metadata.mimeType, 80).toLowerCase();
+  if (!/^image\/(jpeg|png|webp)$/.test(contentType)) {
+    return { ok: false, code: "LEGACY_IMAGE_CONTENT_TYPE_UNSUPPORTED" };
+  }
+
+  return {
+    ok: true,
+    bytes,
+    base64: bytes.toString("base64"),
+    contentType,
+    fileName: safeText(artifact?.fileName || metadata.fileName, 240) || "image",
+  };
+}
+
+function imageProviderRecords(raw) {
+  const source = asRecord(raw);
+  const candidates = boundedArray(source.providers || source.results || source.providerResults, 20);
+  const allowImplicitSuccess = !Array.isArray(source.providers) && Array.isArray(source.results);
+  const records = candidates.length ? candidates : [source];
+  return records.map((item, index) => {
+    const record = asRecord(item);
+    const provider = safeText(record.provider || record.providerId, 160) || `legacy_image_provider_${index + 1}`;
+    const verdict = safeText(record.verdict || record.finding || record.status, 120).toUpperCase() || "UNKNOWN";
+    const providerScore = unit(record.providerScore ?? record.confidence ?? record.score);
+    const status = safeText(record.status, 80).toUpperCase() || (record.success === true || allowImplicitSuccess ? "SUCCESS" : "UNKNOWN");
+    return {
+      provider,
+      providerId: safeText(record.providerId, 160) || provider,
+      status,
+      success: record.success === true || (allowImplicitSuccess && record.success === undefined) || ["SUCCESS", "COMPLETED", "VERIFIED"].includes(status),
+      verdict,
+      confidence: providerScore,
+      providerScore,
+      message: optionalText(record.message || record.reason || record.details, 1_200),
+      threatTypes: boundedArray(record.threatTypes, 12).map((item) => safeText(item, 120)).filter(Boolean),
+      errorCode: optionalText(record.errorCode, 120),
+    };
+  });
+}
+
+function imageMediaForensics(raw, providers, confidence) {
+  const verdict = safeText(raw?.verdict, 120).toUpperCase() || "UNKNOWN";
+  const reason = optionalText(raw?.reason, 1_200);
+  const aiProviders = providers.filter((provider) => /ai|genai|synthetic|generation/i.test(`${provider.provider} ${provider.verdict}`));
+  const deepfakeProviders = providers.filter((provider) => /deepfake|face.?swap/i.test(`${provider.provider} ${provider.verdict}`));
+  const selectedAi = aiProviders[0] || null;
+  const selectedDeepfake = deepfakeProviders[0] || null;
+  const aiGeneration = selectedAi ? {
+    status: selectedAi.success ? "SUCCESS" : "UNAVAILABLE",
+    verdict,
+    score: confidence,
+    scoreKind: "PROVIDER_SCORE",
+    provider: selectedAi.provider,
+    providerScore: selectedAi.providerScore ?? confidence,
+    confidenceType: "PROVIDER_ASSESSMENT",
+    reason,
+    providers: aiProviders.length ? aiProviders : providers,
+  } : ["LIKELY_AI_GENERATED", "AI_GENERATED", "SYNTHETIC", "FAKE"].includes(verdict) ? {
+    status: "SUCCESS",
+    verdict,
+    score: confidence,
+    scoreKind: "PROVIDER_SCORE",
+    provider: "legacy_verification_layer2_image",
+    providerScore: confidence,
+    confidenceType: "PROVIDER_ASSESSMENT",
+    reason,
+    providers,
+  } : null;
+  const deepfake = selectedDeepfake ? {
+    status: selectedDeepfake.success ? "SUCCESS" : "UNAVAILABLE",
+    verdict: selectedDeepfake.verdict,
+    score: selectedDeepfake.providerScore,
+    scoreKind: "PROVIDER_SCORE",
+    provider: selectedDeepfake.provider,
+    providerScore: selectedDeepfake.providerScore,
+    confidenceType: "PROVIDER_ASSESSMENT",
+    reason: selectedDeepfake.message,
+    providers: deepfakeProviders,
+  } : null;
+  return {
+    version: "legacy-image-forensics-v1",
+    status: "COMPLETED",
+    summary: {
+      riskLevel: ["LIKELY_AI_GENERATED", "FAKE", "DEEPFAKE"].includes(verdict) ? "HIGH" : "UNKNOWN",
+      requiresHumanReview: true,
+      disclaimer: "Legacy image provider observation; it does not override StudentHub policy.",
+      primarySignals: [reason].filter(Boolean),
+    },
+    aiGeneration,
+    deepfake,
+    manipulation: null,
+    metadata: null,
+    provenance: null,
+    providerAgreement: { status: "PROVIDER_REPORTED" },
+  };
+}
+
+export function normalizeLegacyImageLayer2Payload(payload, { requestId, latencyMs = 0 } = {}) {
+  const raw = unwrapPayload(payload);
+  if (!raw) return { ok: false, code: "LEGACY_IMAGE_LAYER2_PAYLOAD_NOT_OBJECT" };
+  const verdict = safeText(raw.verdict, 120).toUpperCase();
+  if (!verdict) return { ok: false, code: "LEGACY_IMAGE_LAYER2_VERDICT_INVALID" };
+  const confidence = optionalUnit(raw, "confidence");
+  if (!confidence.ok) return confidence;
+  const providers = imageProviderRecords(raw);
+  return {
+    ok: true,
+    result: {
+      status: "COMPLETED",
+      providerStatus: "SUCCESS",
+      providerId: "legacy_verification_layer2_image",
+      requestId,
+      latencyMs,
+      rawVerdict: verdict,
+      finding: verdict,
+      assessmentConfidence: confidence.value,
+      providerConfidence: confidence.value,
+      reason: optionalText(raw.reason, 1_200),
+      providers,
+      providerResults: providers,
+      // Kept for the server-only Layer 3 -> Layer 4 hand-off. The public
+      // contract allowlist does not expose this internal provider payload.
+      rawResponse: raw,
+      mediaForensics: imageMediaForensics(raw, providers, confidence.value),
+      sourceOrigin: "LAYER_2_IMAGE_FORENSICS",
+      limitations: [
+        "Image provider output is an advisory observation and does not replace StudentHub deterministic policy.",
+        "Provider confidence is not a calibrated safety probability.",
+      ],
+    },
+  };
+}
+
+function unavailableImageLayer2Result(requestId, status, code, latencyMs = 0) {
+  return {
+    status: "UNAVAILABLE",
+    providerStatus: status,
+    providerId: "legacy_verification_layer2_image",
+    requestId,
+    latencyMs,
+    rawVerdict: null,
+    finding: "UNKNOWN",
+    assessmentConfidence: null,
+    providerConfidence: null,
+    reason: safeTransportMessage({ kind: status === "TIMEOUT" ? "timeout" : status === "NOT_CONFIGURED" ? "config" : "failure", code }),
+    providers: [],
+    providerResults: [],
+    mediaForensics: null,
+    sourceOrigin: "LAYER_2_IMAGE_FORENSICS",
+    limitations: ["Legacy image Layer 2 is unavailable; canonical StudentHub checks continue."],
+    errorCode: safeText(code, 160) || "LEGACY_IMAGE_LAYER2_UNAVAILABLE",
+  };
+}
+
+function legacyLayer2ForRequest(value) {
+  const result = asRecord(value);
+  const rawResponse = asRecord(result.rawResponse);
+  if (typeof rawResponse.verdict === "string") return rawResponse;
+  // Direct /api/verify callers pass the friend's JSON response exactly as
+  // returned by Layer 2. Preserve every field instead of rebuilding a
+  // reduced compatibility object for the next friend layer.
+  if (
+    typeof result.verdict === "string"
+    && !Object.hasOwn(result, "finding")
+    && !Object.hasOwn(result, "rawVerdict")
+    && !Object.hasOwn(result, "legacyIntegration")
+  ) return result;
+  const normalized = {
+    // Accept both the internal legacy DTO and the flattened compatibility
+    // projection. The orchestrator may retain either form after canonical
+    // supplemental processing; neither may silently degrade to UNKNOWN.
+    verdict: safeText(result.rawVerdict || result.finding || result.verdict, 120).toUpperCase() || "UNKNOWN",
+    confidence: unit(result.assessmentConfidence ?? result.providerConfidence ?? result.confidence) ?? 0,
+    reason: optionalText(result.reason || result.message, 1_200),
+    providers: boundedArray(result.providers || result.results || result.providerResults || rawResponse.providers || rawResponse.results, 20),
+  };
+  return normalized;
+}
+
 const LEGACY_LAYER4_MODES = new Set(["user", "pro", "expert"]);
 
 function legacyLayer4Mode(input) {
@@ -262,12 +473,25 @@ function legacyLayer4Mode(input) {
   return LEGACY_LAYER4_MODES.has(value) ? value : "user";
 }
 
-function legacyLayer3ForLayer4(layer3Result) {
+function legacyLayer3ForLayer4(layer3Result, { preserveRaw = true } = {}) {
   const integration = asRecord(layer3Result?.legacyIntegration);
+  // The friend's Layer 4 endpoint expects the exact Layer 3 response shape
+  // returned by its own endpoint. Use the validated server-only payload when
+  // available, while retaining the normalized projection for audit/UI use.
+  const rawResponse = asRecord(integration.rawResponse);
+  if (preserveRaw && typeof rawResponse.verdict === "string") return rawResponse;
+  // The direct compatibility route receives the friend's raw Layer 3 JSON,
+  // not the normalized internal DTO. Keep that exact payload for Layer 4.
+  if (
+    preserveRaw
+    && typeof layer3Result?.verdict === "string"
+    && !Object.hasOwn(layer3Result, "legacyIntegration")
+    && !Object.hasOwn(layer3Result, "status")
+  ) return layer3Result;
   const verdict = safeText(integration.rawVerdict || layer3Result?.verdict, 80).toUpperCase() || "UNKNOWN";
   const confidence = unit(integration.legacyAssessmentConfidence ?? layer3Result?.evidenceConfidence) ?? 0;
   const reason = optionalText(integration.reason, 1_200) || "Evidence requires further assessment.";
-  const evidence = boundedArray(layer3Result?.evidence, LEGACY_VERIFICATION_CONFIG.MAX_EVIDENCE)
+  const evidence = boundedArray(integration.evidence || layer3Result?.evidence, LEGACY_VERIFICATION_CONFIG.MAX_EVIDENCE)
     .map((item) => {
       const record = asRecord(item);
       const url = safeHttpUrl(record.sourceUrl || record.url);
@@ -279,7 +503,7 @@ function legacyLayer3ForLayer4(layer3Result) {
       };
     })
     .filter(Boolean);
-  const sources = boundedArray(layer3Result?.sources, LEGACY_VERIFICATION_CONFIG.MAX_SOURCES)
+  const sources = boundedArray(integration.sources || layer3Result?.sources, LEGACY_VERIFICATION_CONFIG.MAX_SOURCES)
     .map((item) => {
       const record = asRecord(item);
       const url = safeHttpUrl(record.url || record.sourceUrl || record.link);
@@ -290,7 +514,15 @@ function legacyLayer3ForLayer4(layer3Result) {
       };
     })
     .filter(Boolean);
-  return { verdict, confidence, reason, evidence, sources };
+  return {
+    verdict,
+    confidence,
+    reason,
+    stop: integration.stop === true,
+    canContinueToLayer4: integration.canContinueToLayer4 !== false,
+    evidence,
+    sources,
+  };
 }
 
 function missingLayer3Result(requestId, status, code, latencyMs = 0) {
@@ -426,6 +658,11 @@ export function normalizeLegacyLayer3Payload(payload, { claims = [], requestId, 
       sourceOrigin: "LAYER_3_WEB_EVIDENCE",
       sourceCount: sourceRecords.length,
       evidenceCount: evidenceRecords.length,
+      sources: sourceRecords,
+      evidence: evidenceRecords,
+      // Server-only exact provider payload for the friend's Layer 4 contract.
+      // The public projection allowlist intentionally omits this field.
+      rawResponse: raw,
     },
   };
   return { ok: true, result: markTrustedLayer3Result(enriched) };
@@ -473,9 +710,13 @@ export function normalizeLegacyLayer4Payload(payload, { requestId, latencyMs = 0
       contradictoryEvidence,
       sources: sourceRecords,
       sourceOrigin: "LAYER_4_INDEPENDENT_RESEARCH",
+      // Keep the exact friend-backend response for the authoritative adapter
+      // and the direct /api/verify compatibility route. This is server-side
+      // hand-off data; the public Trust contract exposes it through the
+      // friendBackend compatibility envelope, never as a policy substitute.
+      rawResponse: raw,
       limitations: [
-        "Independent synthesis is a candidate assessment and does not override StudentHub deterministic policy.",
-        "Model-reported confidence is assessment confidence, not safety probability or decision confidence.",
+        "Confidence is the friend backend's reported assessment score, not a calibrated probability.",
       ],
     },
   };
@@ -517,13 +758,13 @@ export class LegacyVerificationAdapter {
     return { providerId: "legacy_verification_layer2", check: (params) => this.verifyLayer2(params) };
   }
 
-  async #post(path, body, requestId, signal) {
+  async #post(path, body, requestId, signal, { maxRequestBytes = this.config.MAX_REQUEST_BYTES } = {}) {
     if (!this.config.enabled) return { kind: "config", code: this.config.configError || "LEGACY_BACKEND_NOT_CONFIGURED" };
     if (typeof this.fetchImpl !== "function") return { kind: "failure", code: "FETCH_UNAVAILABLE" };
 
     const bodyText = JSON.stringify(body);
     const bodyBytes = new TextEncoder().encode(bodyText).byteLength;
-    if (bodyBytes > this.config.MAX_REQUEST_BYTES) return { kind: "invalid", code: "LEGACY_REQUEST_TOO_LARGE" };
+    if (bodyBytes > maxRequestBytes) return { kind: "invalid", code: "LEGACY_REQUEST_TOO_LARGE" };
 
     const baseValidation = this.resolveDns
       ? await validateRemoteUrl(this.config.baseUrl, { resolveDns: true, dnsTimeoutMs: this.config.DNS_TIMEOUT_MS })
@@ -551,6 +792,66 @@ export class LegacyVerificationAdapter {
         },
         body: bodyText,
       });
+      if (!response?.ok) {
+        return { kind: "http", status: Number(response?.status) || 0, latencyMs: this.clock() - startedAt };
+      }
+      const contentType = safeText(response?.headers?.get?.("content-type"), 120).toLowerCase();
+      if (contentType && !contentType.includes("json")) return { kind: "invalid", code: "LEGACY_UNEXPECTED_CONTENT_TYPE", latencyMs: this.clock() - startedAt };
+      const contentLength = Number(response?.headers?.get?.("content-length") || 0);
+      if (Number.isFinite(contentLength) && contentLength > this.config.MAX_RESPONSE_BYTES) return { kind: "invalid", code: "LEGACY_RESPONSE_TOO_LARGE", latencyMs: this.clock() - startedAt };
+      const bytes = typeof response?.arrayBuffer === "function"
+        ? new Uint8Array(await response.arrayBuffer())
+        : new TextEncoder().encode(await response.text());
+      if (bytes.byteLength > this.config.MAX_RESPONSE_BYTES) return { kind: "invalid", code: "LEGACY_RESPONSE_TOO_LARGE", latencyMs: this.clock() - startedAt };
+      let payload;
+      try { payload = JSON.parse(new TextDecoder().decode(bytes)); } catch { return { kind: "invalid", code: "LEGACY_INVALID_JSON", latencyMs: this.clock() - startedAt }; }
+      return { kind: "ok", payload, latencyMs: Math.max(0, this.clock() - startedAt) };
+    } catch (error) {
+      if (signal?.aborted) {
+        const abortError = error instanceof Error ? error : new Error("Legacy request cancelled");
+        abortError.name = "AbortError";
+        throw abortError;
+      }
+      return { kind: timedOut ? "timeout" : "failure", code: timedOut ? "LEGACY_TIMEOUT" : "LEGACY_NETWORK_ERROR", latencyMs: Math.max(0, this.clock() - startedAt) };
+    } finally {
+      clearTimeout(timeoutId);
+      signal?.removeEventListener?.("abort", onAbort);
+    }
+  }
+
+  async #postMultipart(path, image, requestId, signal) {
+    if (!this.config.enabled) return { kind: "config", code: this.config.configError || "LEGACY_BACKEND_NOT_CONFIGURED" };
+    if (typeof this.fetchImpl !== "function") return { kind: "failure", code: "FETCH_UNAVAILABLE" };
+    if (typeof FormData !== "function" || typeof Blob !== "function") return { kind: "failure", code: "MULTIPART_UNAVAILABLE" };
+    if (!image?.bytes || image.bytes.length > this.config.MAX_IMAGE_BYTES) return { kind: "invalid", code: "LEGACY_IMAGE_TOO_LARGE" };
+
+    const baseValidation = this.resolveDns
+      ? await validateRemoteUrl(this.config.baseUrl, { resolveDns: true, dnsTimeoutMs: this.config.DNS_TIMEOUT_MS })
+      : validateRemoteUrlSync(this.config.baseUrl);
+    if (!baseValidation.ok) return { kind: "config", code: baseValidation.code };
+
+    const form = new FormData();
+    form.append("image", new Blob([image.bytes], { type: image.contentType }), image.fileName || "image");
+    const endpoint = `${this.config.baseUrl}${path}`;
+    const controller = new AbortController();
+    let timedOut = false;
+    const onAbort = () => controller.abort(signal?.reason || "caller-aborted");
+    if (signal?.aborted) onAbort();
+    else signal?.addEventListener?.("abort", onAbort, { once: true });
+    const timeoutId = setTimeout(() => { timedOut = true; controller.abort("legacy-timeout"); }, this.config.timeoutMs);
+    const startedAt = this.clock();
+
+    try {
+      const response = await this.fetchImpl(endpoint, {
+        method: "POST",
+        redirect: "error",
+        signal: controller.signal,
+        headers: {
+          Accept: "application/json",
+          "X-Request-ID": requestId,
+        },
+        body: form,
+      });
       if (!response?.ok) return { kind: "http", status: Number(response?.status) || 0, latencyMs: this.clock() - startedAt };
       const contentType = safeText(response?.headers?.get?.("content-type"), 120).toLowerCase();
       if (contentType && !contentType.includes("json")) return { kind: "invalid", code: "LEGACY_UNEXPECTED_CONTENT_TYPE", latencyMs: this.clock() - startedAt };
@@ -576,8 +877,77 @@ export class LegacyVerificationAdapter {
     }
   }
 
-  async verifyLayer2({ url = "", requestId = null, signal } = {}) {
+  async verifyLayer2({ url = "", input = null, requestId = null, signal, exactContract = false } = {}) {
     const id = requestIdFor(requestId);
+    const inputType = safeText(input?.type, 40).toLowerCase();
+    if (["image", "qr"].includes(inputType)) {
+      const image = imageBytesForInput(input);
+      if (!image.ok) return unavailableImageLayer2Result(id, "INVALID_INPUT", image.code);
+      const response = await this.#postMultipart(this.config.ENDPOINTS.layer2Image, image, id, signal);
+      if (response.kind !== "ok") return unavailableImageLayer2Result(id, statusForTransport(response), response.code || `LEGACY_IMAGE_LAYER2_HTTP_${response.status || 0}`, response.latencyMs || 0);
+      const normalized = normalizeLegacyImageLayer2Payload(response.payload, { requestId: id, latencyMs: response.latencyMs || 0 });
+      if (!normalized.ok) return unavailableImageLayer2Result(id, "INVALID_RESPONSE", normalized.code, response.latencyMs || 0);
+      return normalized.result;
+    }
+    if (input && inputType === "text") {
+      const content = safeText(input.content, this.config.MAX_CONTENT_CHARS);
+      if (!content) {
+        return createLayer2AResult({
+          provider: "legacy_verification_layer2",
+          providerStatus: LAYER_2A_PROVIDER_STATUS.INVALID_INPUT,
+          finding: LAYER_2A_FINDING.UNKNOWN,
+          requestId: id,
+          errorCode: "LEGACY_LAYER2_TEXT_INPUT_INVALID",
+        });
+      }
+      const response = await this.#post(
+        this.config.ENDPOINTS.layer2,
+        exactContract ? { type: "text", content } : { type: "text", content, requestId: id },
+        id,
+        signal,
+      );
+      if (response.kind !== "ok") {
+        const providerStatus = response.kind === "timeout"
+          ? LAYER_2A_PROVIDER_STATUS.TIMEOUT
+          : response.kind === "http" && response.status === 429
+            ? LAYER_2A_PROVIDER_STATUS.RATE_LIMITED
+            : response.kind === "invalid"
+              ? LAYER_2A_PROVIDER_STATUS.INVALID_RESPONSE
+              : response.kind === "config"
+                ? LAYER_2A_PROVIDER_STATUS.NOT_CONFIGURED
+                : LAYER_2A_PROVIDER_STATUS.UNAVAILABLE;
+        return createLayer2AResult({
+          provider: "legacy_verification_layer2",
+          providerStatus,
+          finding: LAYER_2A_FINDING.UNKNOWN,
+          requestId: id,
+          latencyMs: response.latencyMs || 0,
+          errorCode: response.code || `LEGACY_LAYER2_TEXT_HTTP_${response.status || 0}`,
+          message: "Legacy text Layer 2 is not available for this run.",
+        });
+      }
+      const rawPayload = unwrapPayload(response.payload);
+      const normalized = normalizeLayer2AProviderPayload(rawPayload);
+      if (!normalized.ok) return invalidLayer2Result(id, normalized.code, response.latencyMs || 0);
+      return {
+        ...createLayer2AResult({
+        provider: "legacy_verification_layer2",
+        providerStatus: normalized.providerStatus || LAYER_2A_PROVIDER_STATUS.INVALID_RESPONSE,
+        finding: normalized.finding || LAYER_2A_FINDING.UNKNOWN,
+        rawVerdict: normalized.rawVerdict,
+        providerConfidence: normalized.providerConfidence,
+        threatTypes: normalized.threatTypes,
+        providerResults: normalized.providerResults,
+        message: normalized.message,
+        errorCode: normalized.errorCode,
+        contractViolation: normalized.contractViolation,
+        requestId: id,
+        latencyMs: response.latencyMs || 0,
+        targetFingerprint: fingerprint(content),
+        }),
+        rawResponse: rawPayload,
+      };
+    }
     const normalizedUrl = safeText(url, 2048);
     const guard = validateRemoteUrlSync(normalizedUrl);
     if (!guard.ok) {
@@ -600,7 +970,12 @@ export class LegacyVerificationAdapter {
       });
     }
     const disclosedUrl = lookup.lookupUrl || guard.url;
-    const response = await this.#post(this.config.ENDPOINTS.layer2, { type: "url", content: disclosedUrl, requestId: id }, id, signal);
+    const response = await this.#post(
+      this.config.ENDPOINTS.layer2,
+      exactContract ? { type: "url", content: disclosedUrl } : { type: "url", content: disclosedUrl, requestId: id },
+      id,
+      signal,
+    );
     if (response.kind !== "ok") {
       const providerStatus = response.kind === "timeout"
         ? LAYER_2A_PROVIDER_STATUS.TIMEOUT
@@ -613,9 +988,11 @@ export class LegacyVerificationAdapter {
               : LAYER_2A_PROVIDER_STATUS.UNAVAILABLE;
       return createLayer2AResult({ provider: "legacy_verification_layer2", providerStatus, finding: LAYER_2A_FINDING.UNKNOWN, requestId: id, latencyMs: response.latencyMs || 0, errorCode: response.code || `LEGACY_LAYER2_HTTP_${response.status || 0}`, message: "Legacy Layer 2 is not available for this run." });
     }
-    const normalized = normalizeLayer2AProviderPayload(unwrapPayload(response.payload));
+    const rawPayload = unwrapPayload(response.payload);
+    const normalized = normalizeLayer2AProviderPayload(rawPayload);
     if (!normalized.ok) return invalidLayer2Result(id, normalized.code, response.latencyMs || 0);
-    return createLayer2AResult({
+    return {
+      ...createLayer2AResult({
       provider: "legacy_verification_layer2",
       providerStatus: normalized.providerStatus || LAYER_2A_PROVIDER_STATUS.INVALID_RESPONSE,
       finding: normalized.finding || LAYER_2A_FINDING.UNKNOWN,
@@ -636,34 +1013,155 @@ export class LegacyVerificationAdapter {
         : REPUTATION_LOOKUP_STATUS.LOOKUP_PERFORMED,
       reputationLookupTargetClass: lookup.targetClass,
       reputationLookupDisclosed: lookup.disclosed,
-    });
+      }),
+      rawResponse: rawPayload,
+    };
   }
 
-  async verifyLayer3({ input = {}, claims = [], candidateSources = [], layer2Result = null, layer2CResult = null, requestId = null, signal } = {}) {
+  async verifyLayer3({ input = {}, claims = [], candidateSources = [], layer2Result = null, layer2CResult = null, legacyLayer2Result = null, requestId = null, signal, exactContract = false } = {}) {
     const id = requestIdFor(requestId);
-    const payload = {
-      requestId: id,
-      type: safeText(input.type, 40) || "text",
-      content: safeText(input.content, this.config.MAX_CONTENT_CHARS),
-      claims: normalizeClaims(claims),
-      candidateSources: boundedArray(candidateSources, 40).map((item) => {
-        const record = asRecord(item);
-        return { id: safeText(record.id || record.sourceId, 160) || null, url: safeHttpUrl(record.url), title: safeText(record.title, 240) || null };
-      }),
-      layer2Result: { status: safeText(layer2Result?.status, 80) || null, finding: safeText(layer2Result?.finding, 80) || null },
-      layer2CResult: { classification: safeText(layer2CResult?.classification, 120) || null },
-    };
-    const response = await this.#post(this.config.ENDPOINTS.layer3, payload, id, signal);
+    const type = safeText(input.type, 40).toLowerCase() || "text";
+    if (["image", "qr"].includes(type)) {
+      const image = imageBytesForInput(input);
+      if (!image.ok) return missingLayer3Result(id, "INVALID_INPUT", image.code);
+      const payload = {
+        imageBase64: image.base64,
+        contentType: image.contentType,
+        layer2: legacyLayer2ForRequest(legacyLayer2Result),
+      };
+      const response = await this.#post(this.config.ENDPOINTS.layer3Image, payload, id, signal, { maxRequestBytes: this.config.MAX_IMAGE_REQUEST_BYTES });
+      if (response.kind !== "ok") return missingLayer3Result(id, statusForTransport(response), response.code || `LEGACY_IMAGE_LAYER3_HTTP_${response.status || 0}`, response.latencyMs || 0);
+      const normalized = normalizeLegacyLayer3Payload(response.payload, { claims, requestId: id, latencyMs: response.latencyMs || 0 });
+      if (!normalized.ok) return missingLayer3Result(id, "INVALID_RESPONSE", normalized.code, response.latencyMs || 0);
+      return normalized.result;
+    }
+    const payload = exactContract
+      ? {
+          type,
+          content: safeText(input.content, this.config.MAX_CONTENT_CHARS),
+          layer2: legacyLayer2ForRequest(legacyLayer2Result || layer2Result),
+        }
+      : {
+          requestId: id,
+          type,
+          content: safeText(input.content, this.config.MAX_CONTENT_CHARS),
+          layer2: legacyLayer2ForRequest(legacyLayer2Result || layer2Result),
+          claims: normalizeClaims(claims),
+          candidateSources: boundedArray(candidateSources, 40).map((item) => {
+            const record = asRecord(item);
+            return { id: safeText(record.id || record.sourceId, 160) || null, url: safeHttpUrl(record.url), title: safeText(record.title, 240) || null };
+          }),
+          layer2Result: { status: safeText(layer2Result?.status, 80) || null, finding: safeText(layer2Result?.finding, 80) || null },
+          layer2CResult: { classification: safeText(layer2CResult?.classification, 120) || null },
+        };
+    let response = await this.#post(this.config.ENDPOINTS.layer3, payload, id, signal);
+    // The supplied ASP.NET DTO version declares only Type + Content for the
+    // text Layer 3 request, while the deployed PowerShell contract forwards
+    // Layer 2 as well. Try the proven PowerShell shape first, then retry the
+    // DTO-minimal shape only when the friend backend rejects the extra field.
+    if (response.kind === "http" && response.status === 400 && exactContract && Object.hasOwn(payload, "layer2")) {
+      response = await this.#post(
+        this.config.ENDPOINTS.layer3,
+        { type: payload.type, content: payload.content },
+        id,
+        signal,
+      );
+    }
     if (response.kind !== "ok") return missingLayer3Result(id, statusForTransport(response), response.code || safeTransportMessage(response), response.latencyMs || 0);
     const normalized = normalizeLegacyLayer3Payload(response.payload, { claims, requestId: id, latencyMs: response.latencyMs || 0 });
     if (!normalized.ok) return missingLayer3Result(id, "INVALID_RESPONSE", normalized.code, response.latencyMs || 0);
     return normalized.result;
   }
 
-  async verifyLayer4({ input = {}, layer3Result = null, requestId = null, signal } = {}) {
+  async verifyLayer4({ input = {}, layer3Result = null, legacyLayer2Result = null, requestId = null, signal, exactContract = false } = {}) {
     const id = requestIdFor(requestId);
     const type = safeText(input.type, 40).toLowerCase() || "text";
     const content = safeText(input.content, this.config.MAX_CONTENT_CHARS);
+    if (["image", "qr"].includes(type)) {
+      const image = imageBytesForInput(input);
+      const layer3 = legacyLayer3ForLayer4(layer3Result);
+      if (!image.ok) {
+        return {
+          status: "UNAVAILABLE",
+          providerStatus: "INVALID_INPUT",
+          providerId: "legacy_verification_layer4",
+          requestId: id,
+          latencyMs: 0,
+          rawVerdict: null,
+          assessmentConfidence: null,
+          evidenceAgreement: null,
+          sourceQuality: null,
+          stop: true,
+          canContinueToLayer4: false,
+          reason: "Legacy image Layer 4 input did not match the approved contract.",
+          contradictoryEvidence: [],
+          sources: [],
+          sourceOrigin: "LAYER_4_INDEPENDENT_RESEARCH",
+          limitations: ["Invalid image input was discarded and did not affect the deterministic policy."],
+          errorCode: image.code,
+        };
+      }
+      const payload = {
+        imageBase64: image.base64,
+        contentType: image.contentType,
+        mode: legacyLayer4Mode(input),
+        layer2: legacyLayer2ForRequest(legacyLayer2Result),
+        layer3,
+      };
+      let response = await this.#post(this.config.ENDPOINTS.layer4Image, payload, id, signal, { maxRequestBytes: this.config.MAX_IMAGE_REQUEST_BYTES });
+      // A few deployed versions of the friend's image Layer 4 validator
+      // reject a provider response when it contains an optional field they do
+      // not recognize. Retry once with the validated compact contract; this
+      // keeps the provider result usable without substituting local/demo data.
+      if (response.kind === "http" && response.status === 400 && asRecord(layer3Result?.legacyIntegration).rawResponse) {
+        const compactLayer3 = legacyLayer3ForLayer4(layer3Result, { preserveRaw: false });
+        response = await this.#post(this.config.ENDPOINTS.layer4Image, { ...payload, layer3: compactLayer3 }, id, signal, { maxRequestBytes: this.config.MAX_IMAGE_REQUEST_BYTES });
+      }
+      if (response.kind !== "ok") {
+        return {
+          status: "UNAVAILABLE",
+          providerStatus: statusForTransport(response),
+          providerId: "legacy_verification_layer4",
+          requestId: id,
+          latencyMs: response.latencyMs || 0,
+          rawVerdict: null,
+          assessmentConfidence: null,
+          evidenceAgreement: null,
+          sourceQuality: null,
+          stop: true,
+          canContinueToLayer4: false,
+          reason: safeTransportMessage(response),
+          contradictoryEvidence: [],
+          sources: [],
+          sourceOrigin: "LAYER_4_INDEPENDENT_RESEARCH",
+          limitations: ["Legacy image Layer 4 synthesis is unavailable; deterministic StudentHub policy remains authoritative."],
+          errorCode: safeText(response.code || `LEGACY_IMAGE_LAYER4_HTTP_${response.status || 0}`, 120),
+        };
+      }
+      const normalized = normalizeLegacyLayer4Payload(response.payload, { requestId: id, latencyMs: response.latencyMs || 0 });
+      if (!normalized.ok) {
+        return {
+          status: "UNAVAILABLE",
+          providerStatus: "INVALID_RESPONSE",
+          providerId: "legacy_verification_layer4",
+          requestId: id,
+          latencyMs: response.latencyMs || 0,
+          rawVerdict: null,
+          assessmentConfidence: null,
+          evidenceAgreement: null,
+          sourceQuality: null,
+          stop: true,
+          canContinueToLayer4: false,
+          reason: "Legacy image Layer 4 response did not match the approved contract.",
+          contradictoryEvidence: [],
+          sources: [],
+          sourceOrigin: "LAYER_4_INDEPENDENT_RESEARCH",
+          limitations: ["Malformed legacy image synthesis was discarded and did not affect the deterministic policy."],
+          errorCode: normalized.code,
+        };
+      }
+      return normalized.result;
+    }
     if (this.config.enabled && !content) {
       return {
         status: "UNAVAILABLE",
@@ -686,13 +1184,20 @@ export class LegacyVerificationAdapter {
       };
     }
     const layer3 = legacyLayer3ForLayer4(layer3Result);
-    const payload = {
-      type,
-      content,
-      mode: legacyLayer4Mode(input),
-      layer3,
-    };
-    const response = await this.#post(this.config.ENDPOINTS.layer4, payload, id, signal);
+    const payload = exactContract
+      ? { type, content, mode: legacyLayer4Mode(input), layer3 }
+      : {
+          type,
+          content,
+          mode: legacyLayer4Mode(input),
+          layer2: legacyLayer2ForRequest(legacyLayer2Result),
+          layer3,
+        };
+    let response = await this.#post(this.config.ENDPOINTS.layer4, payload, id, signal);
+    if (response.kind === "http" && response.status === 400 && asRecord(layer3Result?.legacyIntegration).rawResponse) {
+      const compactLayer3 = legacyLayer3ForLayer4(layer3Result, { preserveRaw: false });
+      response = await this.#post(this.config.ENDPOINTS.layer4, { ...payload, layer3: compactLayer3 }, id, signal);
+    }
     if (response.kind !== "ok") {
       return {
         status: "UNAVAILABLE",

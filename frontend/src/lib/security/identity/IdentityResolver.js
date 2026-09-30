@@ -21,6 +21,28 @@ const tokenValidator = new TokenValidator();
 
 export class IdentityResolver {
   /**
+   * Selects the single credential source that both authentication and CSRF
+   * policy must honor. Cookie presence takes precedence over Bearer, including
+   * malformed or expired cookies, so a second credential cannot change the
+   * request's security classification.
+   */
+  static getCredentialSource(request) {
+    const headers = request?.headers;
+    if (!headers) return "anonymous";
+
+    const cookieHeader = headers.get("cookie") || "";
+    if (this.#hasCookie(cookieHeader, "studenthub_session")) return "studenthub_session";
+    if (this.#hasCookie(cookieHeader, "sb-access-token")) return "sb-access-token";
+
+    const authHeader = headers.get("authorization") || headers.get("Authorization");
+    return authHeader?.startsWith("Bearer ") ? "bearer" : "anonymous";
+  }
+
+  static isCookieCredentialSource(source) {
+    return source === "studenthub_session" || source === "sb-access-token";
+  }
+
+  /**
    * Resolves SecurityPrincipal from an incoming HTTP Request
    * @param {Request} request 
    * @param {object} [options]
@@ -36,19 +58,18 @@ export class IdentityResolver {
     const headers = request.headers;
     const authHeader = headers?.get("authorization") || headers?.get("Authorization");
     const cookieHeader = headers?.get("cookie") || "";
+    const credentialSource = this.getCredentialSource(request);
 
     // 1. The server-owned session cookie is authoritative whenever present.
     // Never let a second credential override a valid/revoked cookie, and never
     // fall back to a bearer token when the cookie is malformed or invalid.
-    const hasApplicationCookie = this.#hasCookie(cookieHeader, "studenthub_session");
-    const hasProviderCookie = this.#hasCookie(cookieHeader, "sb-access-token");
-    const sessionCookie = hasApplicationCookie
+    const sessionCookie = credentialSource === "studenthub_session"
       ? this.#extractCookie(cookieHeader, "studenthub_session")
-      : hasProviderCookie
+      : credentialSource === "sb-access-token"
         ? this.#extractCookie(cookieHeader, "sb-access-token")
         : null;
 
-    if (hasApplicationCookie || hasProviderCookie) {
+    if (this.isCookieCredentialSource(credentialSource)) {
       if (!sessionCookie) {
         throw SecurityError.unauthorized("Malformed session cookie.");
       }
@@ -73,7 +94,7 @@ export class IdentityResolver {
 
     // 2. Bearer remains a compatibility path for stateless integrations only
     // when no session cookie was supplied at all.
-    if (authHeader && authHeader.startsWith("Bearer ")) {
+    if (credentialSource === "bearer" && authHeader) {
       const rawToken = authHeader.slice(7).trim();
       return this.resolveFromToken(rawToken);
     }

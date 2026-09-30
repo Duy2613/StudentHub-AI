@@ -57,11 +57,6 @@ export default function LandingFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard" className="hover:text-teal-300 transition-colors igloo-magnetic inline-block">
-                  Bảng Điều Khiển &amp; Cảnh Báo
-                </Link>
-              </li>
-              <li>
                 <Link href="/profile" className="hover:text-teal-300 transition-colors igloo-magnetic inline-block">
                   Mạng lưới chuyên gia
                 </Link>

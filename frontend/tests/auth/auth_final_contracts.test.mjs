@@ -16,15 +16,20 @@ const read = (relative) => readFileSync(new URL(relative, root), "utf8");
 describe("Luna Max auth callback and persistence contracts", () => {
   it("allows only internal authenticated destinations", () => {
     assert.equal(normalizeAuthReturnPath("/community/post-1?reply=1"), "/community/post-1?reply=1");
-    assert.equal(normalizeAuthReturnPath("https://evil.example/steal"), "/dashboard");
-    assert.equal(normalizeAuthReturnPath("//evil.example/steal"), "/dashboard");
-    assert.equal(normalizeAuthReturnPath("/\\\\evil.example"), "/dashboard");
-    assert.equal(normalizeAuthReturnPath("/community/%2F%2Fevil"), "/dashboard");
-    assert.equal(normalizeAuthReturnPath("/login"), "/dashboard");
+    assert.equal(normalizeAuthReturnPath("https://evil.example/steal"), "/profile");
+    assert.equal(normalizeAuthReturnPath("//evil.example/steal"), "/profile");
+    assert.equal(normalizeAuthReturnPath("/\\\\evil.example"), "/profile");
+    assert.equal(normalizeAuthReturnPath("/community/%2F%2Fevil"), "/profile");
+    assert.equal(normalizeAuthReturnPath("/login"), "/profile");
+    assert.equal(normalizeAuthReturnPath("/dashboard"), "/profile");
+    assert.equal(normalizeAuthReturnPath("/"), "/");
+    assert.equal(buildAuthCallbackUrl("https://studenthub.example"), "https://studenthub.example/callback");
     assert.equal(buildAuthCallbackUrl("https://studenthub.example", "/community/post-1"), "https://studenthub.example/callback?next=%2Fcommunity%2Fpost-1");
     assert.equal(buildLoginErrorPath("oauth_failed", "https://evil.example"), "/login?error=oauth_failed");
     assert.equal(postAuthDestination({ next: "/community/post-1", onboarded: false }), "/community/post-1");
     assert.equal(postAuthDestination({ next: "/community/post-1", onboarded: true }), "/community/post-1");
+    assert.equal(postAuthDestination({ onboarded: false }), "/onboarding");
+    assert.equal(postAuthDestination({ onboarded: true }), "/profile");
   });
 
   it("keeps the PKCE verifier in tab session storage while auth tokens stay in memory", () => {
@@ -73,7 +78,8 @@ describe("Luna Max auth callback and persistence contracts", () => {
     assert.doesNotMatch(sessionRepository, /raw_user_meta_data->>'onboarded'/i);
     assert.match(profileRepository, /markOnboarded/);
     assert.match(profileRoute, /body\.onboardingCompleted === true/);
-    assert.match(dashboard, /\/login\?next=%2Fdashboard/);
+    assert.match(dashboard, /fetch\("\/api\/v1\/dashboard", \{ credentials: "include" \}\)/);
+    assert.doesNotMatch(read("frontend/src/lib/auth/authRedirects.js"), /"\/dashboard"/);
     assert.match(migration, /add column if not exists onboarded boolean not null default false/i);
     assert.match(migration, /insert into private\.user_roles/i);
     assert.match(migration, /for select to anon, authenticated/i);

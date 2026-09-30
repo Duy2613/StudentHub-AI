@@ -1,5 +1,8 @@
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { DatabaseUnavailableError, getPostgresPool } from "@/lib/server/database/PostgresPool.js";
+import { publishRealtimeEvent } from "@/lib/server/realtime/RealtimePublisher.js";
+import { createCommunitySocialRealtimeEvent } from "@/lib/community/communitySocialRealtime.js";
+import { detectPII } from "@/lib/communityExpert/promaxDomain.js";
 
 export const dynamic = "force-dynamic";
 
@@ -141,7 +144,17 @@ async function readFeed(request) {
   }
 }
 
-async function createPost(request, _routeParams, principal) {
+function publishSocialInvalidation({ action, postId, securityContext }) {
+  const event = createCommunitySocialRealtimeEvent({
+    postId,
+    action,
+    correlationId: securityContext?.correlationId,
+    environment: process.env.NODE_ENV || "development",
+  });
+  if (event) void publishRealtimeEvent(event).catch(() => {});
+}
+
+async function createPost(request, _routeParams, principal, securityContext) {
   try {
     if (!UUID_PATTERN.test(String(principal.subjectId || ""))) {
       return Response.json({ success: false, error: { code: "AUTHENTICATED_IDENTITY_REQUIRED", userMessage: "Cần phiên StudentHub hợp lệ để đăng bài." } }, { status: 403 });
@@ -155,6 +168,9 @@ async function createPost(request, _routeParams, principal) {
     if (title.length < 5 || content.length < 20) {
       return Response.json({ success: false, error: { code: "VALIDATION", userMessage: "Bài chia sẻ cần ít nhất 20 ký tự." } }, { status: 400 });
     }
+    if (detectPII(`${title}\n${content}`).blocked) {
+      return Response.json({ success: false, error: { code: "PRIVACY_SCAN_BLOCKED", userMessage: "Bài viết có thể chứa thông tin nhận diện cá nhân. Hãy chỉnh sửa nội dung rồi thử lại." } }, { status: 422 });
+    }
     const pool = getPostgresPool();
     const result = await pool.query(
       `insert into public.posts (author_id, title, content, category, location_tag, images, links, status, created_at, updated_at)
@@ -162,6 +178,7 @@ async function createPost(request, _routeParams, principal) {
        returning id`,
       [principal.subjectId, title, content, CATEGORY_VALUES.has(topic) ? topic : "GENERAL", imageUrl ? [imageUrl] : [], sourceUrl ? [sourceUrl] : []]
     );
+    publishSocialInvalidation({ postId: result.rows[0].id, action: "POST_CREATED", securityContext });
     const rows = await selectRows(pool, { postId: result.rows[0].id, limit: 1 });
     return Response.json({ success: true, post: publicPost(rows[0]), isAuthoritative: false }, { status: 201 });
   } catch (error) {
@@ -172,7 +189,7 @@ async function createPost(request, _routeParams, principal) {
   }
 }
 
-async function interact(request, _routeParams, principal) {
+async function interact(request, _routeParams, principal, securityContext) {
   try {
     if (!UUID_PATTERN.test(String(principal.subjectId || ""))) {
       return Response.json({ success: false, error: { code: "AUTHENTICATED_IDENTITY_REQUIRED", userMessage: "Cần phiên StudentHub hợp lệ để tương tác." } }, { status: 403 });
@@ -185,12 +202,17 @@ async function interact(request, _routeParams, principal) {
     if (action === "comment") {
       const text = cleanText(body?.text, 2000);
       if (text.length < 2) return Response.json({ success: false, error: { code: "VALIDATION", userMessage: "Bình luận cần ít nhất 2 ký tự." } }, { status: 400 });
-      await pool.query(
+      if (detectPII(text).blocked) {
+        return Response.json({ success: false, error: { code: "PRIVACY_SCAN_BLOCKED", userMessage: "Bình luận có thể chứa thông tin nhận diện cá nhân. Hãy chỉnh sửa nội dung rồi thử lại." } }, { status: 422 });
+      }
+      const inserted = await pool.query(
         `insert into public.comments (post_id, author_id, content, status, created_at, updated_at)
          select $1, $2, $3, 'PUBLISHED', now(), now()
-          where exists (select 1 from public.posts where id = $1 and status = 'PUBLISHED')`,
+          where exists (select 1 from public.posts where id = $1 and status = 'PUBLISHED')
+         returning id`,
         [postId, principal.subjectId, text]
       );
+      if (inserted.rows[0]?.id) publishSocialInvalidation({ postId, action: "COMMENT_CREATED", securityContext });
     } else if (action === "like") {
       await pool.query(
         `insert into public.votes (post_id, user_id, value, created_at, updated_at)
@@ -198,6 +220,7 @@ async function interact(request, _routeParams, principal) {
          on conflict (post_id, user_id) do update set value = 1, updated_at = now()`,
         [postId, principal.subjectId]
       );
+      publishSocialInvalidation({ postId, action: "LIKE_SET", securityContext });
     } else if (action === "perception") {
       const value = Number(body?.value) === -1 ? -1 : 1;
       await pool.query(
@@ -206,6 +229,7 @@ async function interact(request, _routeParams, principal) {
          on conflict (post_id, user_id) do update set value = excluded.value, updated_at = now()`,
         [postId, principal.subjectId, value]
       );
+      publishSocialInvalidation({ postId, action: "PERCEPTION_SET", securityContext });
     } else {
       return Response.json({ success: false, error: { code: "VALIDATION", userMessage: "Thao tác cộng đồng không hợp lệ." } }, { status: 400 });
     }

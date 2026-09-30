@@ -13,6 +13,7 @@ test("Expert review requests are durable, private, and separate from assignment 
   const route = read("frontend/src/app/api/expert/review-requests/route.js");
   const scope = read("frontend/src/lib/server/database/CommunityExpertScope.js");
   const ui = read("frontend/src/components/trust/PostResultGateways.jsx");
+  const requestSheet = read("frontend/src/components/expert/RequestExpertReviewSheet.jsx");
 
   assert.match(migration, /create table if not exists private\.expert_review_requests/i);
   assert.match(migration, /requester_id uuid/i);
@@ -40,9 +41,10 @@ test("Expert review requests are durable, private, and separate from assignment 
   assert.match(route, /expert-review-request\.v1/);
   assert.match(route, /NOT_REQUESTER_CONTROLLED/);
   assert.match(ui, /Yêu cầu chuyên gia xem xét/);
-  assert.match(ui, /matching\/assignment/);
-  assert.match(ui, /Idempotency-Key/);
-  assert.match(ui, /caseId/);
+  assert.match(ui, /RequestExpertReviewSheet/);
+  assert.match(requestSheet, /matching và phân công do server quyết định/i);
+  assert.match(requestSheet, /Idempotency-Key/);
+  assert.match(requestSheet, /caseId/);
 });
 
 test("Expert request permission is available to authenticated student and expert roles", () => {

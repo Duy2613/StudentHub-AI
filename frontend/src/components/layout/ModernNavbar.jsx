@@ -21,10 +21,7 @@ export default function ModernNavbar() {
     { label: "Trust Engine", href: "/trust", highlight: true, badge: "AI 4 Lớp" },
     { label: "Community", href: "/community" },
     { label: "Expert Network", href: "/expert" },
-    ...(session ? [
-      { label: "Command Center", href: "/dashboard" },
-      { label: "Hồ Sơ", href: "/profile" },
-    ] : []),
+    ...(session ? [{ label: "Hồ Sơ", href: "/profile" }] : []),
   ];
 
   return (

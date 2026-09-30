@@ -591,7 +591,13 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
         setOcr({ ...result, authority: "CLIENT_OCR_HINT" });
         if (!extracted) {
           if (mode === "qr") {
-            throw new ApiError("Không đọc được mã QR. Hãy dùng ảnh QR rõ hơn hoặc chuyển sang nhập URL/văn bản.", "VALIDATION", { status: 422 });
+            // Client-side jsQR/Tesseract is only an intake hint. The image
+            // itself is still authoritative input for the server pipeline;
+            // do not block the full backend (including its QR/image adapter)
+            // merely because the browser worker could not decode this file.
+            extracted = file?.name
+              ? `[Ảnh QR: ${file.name}] Yêu cầu backend đọc và thẩm định mã QR.`
+              : "Yêu cầu backend đọc và thẩm định mã QR.";
           } else {
             extracted = file?.name
               ? `[Tập tin ảnh: ${file.name}] Yêu cầu giám định độ tin cậy và phân tích rủi ro hình ảnh.`
@@ -653,8 +659,18 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
         });
       });
       if (scanId !== scanSequence.current) return;
-      if (!isTrustPresentationEventCurrent(response, activeBinding.current)) return;
-      captureTrustBinding(response);
+      const responsePipeline = response?.data && typeof response.data === "object"
+        ? response.data
+        : null;
+      const hasTerminalFinalPredict = Boolean(responsePipeline?.finalPredict || responsePipeline?.finalDecision);
+      // The request is already bound to the active scan and its AbortController.
+      // Some streaming adapters omit caseId/runId on the terminal envelope even
+      // though the nested V5 pipeline contains the authoritative finalPredict.
+      // Keep stale-event protection for ordinary updates, but do not discard a
+      // completed terminal result solely because that compatibility envelope is
+      // less populated than the stage events that preceded it.
+      if (!isTrustPresentationEventCurrent(response, activeBinding.current) && !hasTerminalFinalPredict) return;
+      if (isTrustPresentationEventCurrent(response, activeBinding.current)) captureTrustBinding(response);
       markAccepted(mode === "url" ? extracted : extracted.slice(0, 80));
       setProviderResult(response);
       updateSourceProvenance(response.provenance);
@@ -668,7 +684,12 @@ export function AiTrustStudioView({ initialMode = "image", initialContent = "", 
         setError({ message: "Trust Engine chưa trả về dữ liệu đủ để hiển thị.", code: "INVALID_RESPONSE", traceId: response.requestId || null });
         return;
       }
-      const displayPipeline = streamedPipeline || (response.data && response.data.layerResults ? response.data : null);
+      // Prefer the terminal response when it contains Final Predict. The last
+      // streamed stage snapshot can still be l4=RUNNING when the server emits
+      // the final event immediately before closing the connection.
+      const displayPipeline = hasTerminalFinalPredict
+        ? responsePipeline
+        : streamedPipeline || (responsePipeline?.layerResults ? responsePipeline : null);
       if (displayPipeline) setV5Pipeline(displayPipeline);
       const resultLayers = displayPipeline?.layerResults || {};
       const layer1 = resultLayers.layer1 || null;

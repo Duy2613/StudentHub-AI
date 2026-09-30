@@ -1,0 +1,61 @@
+/**
+ * StudentHub AI — Primitive Design Tokens
+ *
+ * Governing Authority: MASTER FRONTEND CONSTITUTION v3.0 (M-21, M-23, M-25, M-29, M-30)
+ * Primitive layer: Raw, un-themed values. Never consume directly in feature code.
+ */
+
+:root {
+  /* --- Spacing Scale (M-23) --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* --- Radius Scale (M-29) --- */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-bento: 22px; /* Bento signature radius */
+  --radius-lg: 28px;
+  --radius-full: 9999px;
+
+  /* --- Typography Scale (M-21) --- */
+  --font-size-display-xl: 4.25rem; /* 68px */
+  --font-size-display: 3.25rem;    /* 52px */
+  --font-size-h1: 2.375rem;        /* 38px */
+  --font-size-h2: 1.875rem;        /* 30px */
+  --font-size-h3: 1.5rem;          /* 24px */
+  --font-size-title-lg: 1.25rem;   /* 20px */
+  --font-size-title: 1.125rem;     /* 18px */
+  --font-size-body-lg: 1.125rem;    /* 18px */
+  --font-size-body: 1rem;          /* 16px */
+  --font-size-ui: 0.875rem;        /* 14px */
+  --font-size-caption: 0.8125rem;  /* 13px */
+  --font-size-tech: 0.8125rem;     /* 13px */
+
+  /* --- Canonical Font Families (M-20) --- */
+  --font-editorial: var(--font-lora), Lora, Georgia, serif;
+  --font-product: var(--font-be-vietnam-pro), "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-technical: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
+
+  /* --- Brand Primitives (M-25) --- */
+  --primitive-violet: #795CFF;
+  --primitive-cyan: #38E8FF;
+
+  /* --- Semantic Primitives --- */
+  --primitive-mint: #10B981;
+  --primitive-amber: #F59E0B;
+  --primitive-coral: #F97316;
+  --primitive-red: #EF4444;
+  --primitive-gold: #EAB308;
+}

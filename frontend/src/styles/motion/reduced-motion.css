@@ -1,0 +1,24 @@
+/**
+ * StudentHub AI — Reduced Motion Policy
+ *
+ * Governing Authority: MASTER FRONTEND CONSTITUTION v3.0 (C-28, M-45)
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable continuous ambient transforms */
+  .motion-ambient,
+  .animate-spin,
+  .animate-pulse {
+    animation: none !important;
+    transform: none !important;
+  }
+}

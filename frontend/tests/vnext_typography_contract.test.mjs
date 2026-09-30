@@ -17,10 +17,10 @@ test("VNext typography uses Vietnamese UI, selective editorial and technical fam
 
   assert.match(layout, /Be_Vietnam_Pro/);
   assert.match(layout, /subsets:\s*\["latin",\s*"vietnamese"\]/);
-  assert.match(layout, /weight:\s*\["400",\s*"500",\s*"600",\s*"700"\]/);
+  assert.match(layout, /weight:\s*\["400",\s*"500",\s*"600",\s*"700",\s*"800"\]/);
   assert.match(layout, /Lora/);
   assert.match(layout, /JetBrains_Mono/);
-  assert.match(css, /--font-ui:\s*var\(--font-be-vietnam\)/);
+  assert.match(css, /--font-ui:\s*var\(--font-be-vietnam-pro\)/);
   assert.match(css, /--type-technical:\s*0\.8125rem/);
   assert.match(css, /\.type-body-lg/);
   assert.match(css, /font-synthesis:\s*none/);

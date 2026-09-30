@@ -34,6 +34,15 @@ async function waitForServer(baseUrl, output) {
   throw new Error(`Canonical API smoke server did not become ready.\n${output()}`);
 }
 
+async function parseJsonResponse(response, label) {
+  const body = await response.text();
+  try {
+    return JSON.parse(body);
+  } catch {
+    throw new Error(`${label} returned non-JSON: status=${response.status}, content-type=${response.headers.get("content-type") || "missing"}, body=${body.slice(0, 240)}`);
+  }
+}
+
 test("canonical v1 APIs expose honest public contracts and fail closed for personal data", { timeout: 210_000 }, async () => {
   const port = await reservePort();
   const baseUrl = `http://127.0.0.1:${port}`;
@@ -56,20 +65,20 @@ test("canonical v1 APIs expose honest public contracts and fail closed for perso
     ];
     for (const [path, contractVersion] of publicCases) {
       const response = await fetch(`${baseUrl}${path}`);
-      const body = await response.json();
+      const body = await parseJsonResponse(response, path);
       assert.equal(response.status, 200, path);
       assert.equal(body.success, true, path);
       assert.equal(body.contractVersion, contractVersion, path);
     }
 
     const liveHealth = await fetch(baseUrl + "/api/health/live");
-    const liveHealthBody = await liveHealth.json();
+    const liveHealthBody = await parseJsonResponse(liveHealth, "/api/health/live");
     assert.equal(liveHealth.status, 200);
     assert.equal(liveHealthBody.status, "LIVE");
     assert.equal(liveHealth.headers.get("cache-control"), "no-store");
 
     const readyHealth = await fetch(baseUrl + "/api/health/ready");
-    const readyHealthBody = await readyHealth.json();
+    const readyHealthBody = await parseJsonResponse(readyHealth, "/api/health/ready");
     assert.ok([200, 503].includes(readyHealth.status));
     assert.equal(readyHealthBody.ready, readyHealth.status === 200);
     assert.equal(readyHealth.headers.get("cache-control"), "no-store");
@@ -84,11 +93,14 @@ test("canonical v1 APIs expose honest public contracts and fail closed for perso
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ type: "text", content: "Kiểm tra nội dung trước khi tin." }),
     });
-    const trustBody = await trustResponse.json();
+    const trustBody = await parseJsonResponse(trustResponse, "POST /api/v1/trust");
     assert.equal(trustResponse.status, 200);
     assert.equal(trustBody.contractVersion, "trust.v1");
     assert.equal(trustBody.demo, false);
     assert.ok(trustBody.data.layer1);
+    assert.ok(Array.isArray(trustBody.data.layer1.metrics?.detectorsExecuted));
+    assert.ok(trustBody.data.layer1.metrics.detectorsExecuted.includes("TextDetector"));
+    assert.equal(trustBody.data.layer1.metrics.providerIndependent, true);
 
     const legacyReasoningResponse = await fetch(`${baseUrl}/api/ai-trust/reasoning`, {
       method: "POST",
@@ -99,13 +111,13 @@ test("canonical v1 APIs expose honest public contracts and fail closed for perso
         layer3Result: { status: "VERIFIED", externalEvidence: true },
       }),
     });
-    const legacyReasoningBody = await legacyReasoningResponse.json();
+    const legacyReasoningBody = await parseJsonResponse(legacyReasoningResponse, "POST /api/ai-trust/reasoning");
     assert.equal(legacyReasoningResponse.status, 410);
     assert.equal(legacyReasoningBody.error?.code, "TRUST_REASONING_REQUIRES_CANONICAL_PIPELINE");
 
     for (const path of ["/api/v1/academic", "/api/v1/dashboard", "/api/v1/notifications"]) {
       const response = await fetch(`${baseUrl}${path}`);
-      const body = await response.json();
+      const body = await parseJsonResponse(response, path);
       assert.equal(response.status, 401, path);
       assert.equal(body.error?.code, "UNAUTHORIZED", path);
     }

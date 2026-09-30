@@ -8,6 +8,11 @@ export const LEGACY_VERIFICATION_CONFIG = Object.freeze({
   TIMEOUT_ENV: "STUDENTHUB_LEGACY_VERIFICATION_TIMEOUT_MS",
   RESOLVE_DNS_ENV: "STUDENTHUB_LEGACY_VERIFICATION_RESOLVE_DNS",
   MAX_REQUEST_BYTES: 512 * 1024,
+  // Image endpoints receive base64 JSON for Layers 3/4. Keep the normal
+  // text contract small while allowing the canonical 8 MB media artifact to
+  // cross the optional legacy adapter boundary.
+  MAX_IMAGE_BYTES: 8 * 1024 * 1024,
+  MAX_IMAGE_REQUEST_BYTES: 12 * 1024 * 1024,
   MAX_RESPONSE_BYTES: 384 * 1024,
   MAX_CONTENT_CHARS: 160_000,
   MAX_CLAIMS: 40,
@@ -17,8 +22,11 @@ export const LEGACY_VERIFICATION_CONFIG = Object.freeze({
   DNS_TIMEOUT_MS: 1_200,
   ENDPOINTS: Object.freeze({
     layer2: "/api/verify/layer2",
+    layer2Image: "/api/verify/layer2/image",
     layer3: "/api/verify/layer3",
+    layer3Image: "/api/verify/layer3/image",
     layer4: "/api/verify/layer4",
+    layer4Image: "/api/verify/layer4/image",
   }),
 });
 
@@ -29,7 +37,10 @@ function envString(env, key) {
 function boundedTimeout(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed)
-    ? Math.min(15_000, Math.max(300, Math.floor(parsed)))
+    // Render's image Layer 3 can legitimately take ~16s on a cold/warm
+    // deployment. Keep a bounded adapter timeout, but do not cut off the
+    // approved Layer 2 -> Layer 3 -> Layer 4 image contract at 15s.
+    ? Math.min(30_000, Math.max(300, Math.floor(parsed)))
     : LEGACY_VERIFICATION_CONFIG.TIMEOUT_MS;
 }
 

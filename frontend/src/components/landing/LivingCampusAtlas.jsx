@@ -188,7 +188,7 @@ function CampusOrbit() {
         <p className={styles.kicker}>The connected campus</p>
         <h3>Mọi nguồn.<br /><em>Đúng bối cảnh.</em></h3>
         <p>StudentHub đặt dữ liệu chính thống, trải nghiệm cộng đồng và chuyên môn học thuật vào cùng một hành trình có thể kiểm tra.</p>
-        <Link href="/dashboard" className={styles.orbitAction}>Mở không gian của bạn <ArrowRight aria-hidden="true" /></Link>
+        <Link href="/community" className={styles.orbitAction}>Mở Community <ArrowRight aria-hidden="true" /></Link>
       </div>
       <div className={styles.orbitStage} aria-label="Mô phỏng không gian điều hành StudentHub">
         <span className={`${styles.orbitRing} ${styles.orbitRingOne}`} aria-hidden="true" />
@@ -287,7 +287,6 @@ export default function LivingCampusAtlas() {
           <a href="#knowledge-core">Lăng kính quang học</a>
           <a href="#intelligence">Cộng đồng</a>
           <Link href="/expert">Chuyên gia</Link>
-          <Link href="/dashboard">Dashboard</Link>
         </nav>
         <div className={styles.headerActions}>
           <Link href="/login" className={styles.loginLink}>Đăng nhập</Link>
@@ -314,7 +313,6 @@ export default function LivingCampusAtlas() {
             <a href="#knowledge-core" onClick={() => setMenuOpen(false)}>Lăng kính quang học</a>
             <a href="#intelligence" onClick={() => setMenuOpen(false)}>Cộng đồng</a>
             <Link href="/expert">Chuyên gia</Link>
-            <Link href="/dashboard">Dashboard</Link>
             <Link href="/trust">Mở Trust Engine</Link>
           </motion.nav>
         )}

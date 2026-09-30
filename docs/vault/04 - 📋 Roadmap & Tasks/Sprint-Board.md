@@ -228,3 +228,31 @@
 - [x] Routed direct HTTP(S) URL fetches through the guarded web retriever when the configured search retriever is local/fallback; preserve contextual evidence without promoting it to claim proof.
 - [x] Added Gemini Layer 4 validated citation/support signals to Final Predict: cautious safe-target clearance and evidence-gated truth refinement only; hard negatives cannot be downgraded.
 - [x] Local verification: trust group `112/112`, build `142/142`, lint `0` errors; live Gemini availability remains quota/environment gated.
+
+### AI / Omni V4 implementation — 2026-09-29
+
+- [x] Unified shell/search and `/ai` entry; bounded Community/Expert/public-source discovery; exact owner-authorized Trust lookup; stale selection revalidation; deterministic safe navigation.
+- [x] Explicit bounded text-AI request, honest provider-unavailable state, safe Markdown rendering, keyboard/focus behavior, mobile visualViewport support, and responsive evidence at 360/390/768/1024/1280/1440/1920.
+- [x] Hermetic local pass: model 12/12, combined regressions 24/24, browser 12/12, production build 142/142, TypeScript pass, ESLint 0 errors / 2 inherited warnings.
+- [ ] Verdict `PARTIAL` until authorized revision-bound context and structured citation contracts exist; streaming/server cancellation remain unavailable and hidden.
+- [ ] Live database/provider assurance `DEFERRED`; no live request, migration, or database access in this pass.
+- [x] Closed the 360px Midnight Trust shell overflow for authenticated and anonymous header states; Omni modal remained within the viewport.
+
+### V4 Cross-Core closure — 2026-09-29
+
+- [x] Overall implementation verdict `PASS`; A `PARTIAL_CONTRACT_BOUND` because Omni `/api/chat` lacks structured citations and revision-bound product context.
+- [x] Trust L4 structured citation/source relation and persisted revision/run provenance are displayed without promoting AI links to evidence.
+- [x] Trust → Expert preserves selected case/revision/claim; inventory confirms eight enabled demo identities (4 USER + 4 EXPERT), and the historical account matrix records `8/8 PASS`.
+- [x] Chromium `9/9`, Firefox `9/9`, 21 widths/themes per browser with no overflow, and agent-browser anonymous Midnight 360px smoke pass.
+- [x] Focused lint `0/0`, contract/model tests `11/11`, isolated build `142/142` static pages.
+- [ ] Live database/provider assurance remains `DEFERRED`; no staging sign-in, migration, provider call, or deployment. No commit created.
+
+### V4 Full Web Functional Closure — 2026-09-29
+
+- [x] Isolated production browser matrix: Chromium `33/33`; Firefox and WebKit each `32 passed + 1 planned screenshot-only skip`; total `97 passed / 2 skipped / 0 failed`, no flaky retries.
+- [x] Safe contract/data-honesty suite `54/54`; standalone TypeScript pass; source-wide ESLint exit `0` with `0` errors and `533` warnings; isolated production build PASS.
+- [x] Preserved `244` local screenshot artifacts and all run evidence under `artifacts/lab/full-web-v4/2026-09-29T12-12-43-262Z-19340/`.
+- [ ] Full implementation verdict `PARTIAL`; release verdict `DO_NOT_RELEASE` until the unresolved historical Main write/readback incident is reconciled and API-bound gaps close.
+- [ ] Live DB/RLS/realtime, account matrix, providers/ingestion, deployment, and field performance assurance remain `DEFERRED`; fixture and local LAB results do not satisfy them.
+- [ ] Legacy route aliases still classified `UNKNOWN` need product dispositions.
+- [x] No commit, remote operation, staging/Main database access, provider call, or deployment. Stopped after runbook item 47.

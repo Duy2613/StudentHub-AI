@@ -48,6 +48,12 @@ describe("Final audit hardening boundaries", () => {
     assert.equal(allowed.ok, true);
     assert.equal(allowed.hostname, "example.com");
     assert.equal(isPrivateAddress("10.0.0.1"), true);
+    assert.equal(isPrivateAddress("192.0.0.255"), true);
+    assert.equal(isPrivateAddress("192.0.2.1"), true);
+    assert.equal(isPrivateAddress("192.0.66.108"), false);
+    assert.equal(isPrivateAddress("192.88.99.1"), true);
+    assert.equal(isPrivateAddress("198.51.100.1"), true);
+    assert.equal(isPrivateAddress("203.0.113.1"), true);
     assert.equal(isPrivateAddress("2001:db8::1"), false);
     assert.equal(isRedirectStatus(307), true);
     assert.equal(isRedirectStatus(200), false);

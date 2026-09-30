@@ -5,6 +5,7 @@ node_modules/
 # Next.js
 .next/
 **/.next/
+.next-v4-three-core-e2e/
 out/
 
 # Environment variables
@@ -65,3 +66,6 @@ artifacts/p24-reality-gate/
 artifacts/trust-assurance/
 artifacts/**/*.zip
 artifacts/visual/
+artifacts/lab/trust-v4/
+artifacts/lab/ai-omni-v4/
+artifacts/lab/full-web-v4/

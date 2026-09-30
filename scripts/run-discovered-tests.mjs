@@ -1,17 +1,10 @@
-import { readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join, relative } from "node:path";
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
-import { createRequire } from "node:module";
-
-const frontendDir = join(process.cwd(), "frontend");
-const frontendRequire = createRequire(join(frontendDir, "package.json"));
-try {
-  const { loadEnvConfig } = frontendRequire("@next/env");
-  loadEnvConfig(frontendDir);
-} catch {}
 
 const root = join(process.cwd(), "frontend", "tests");
+const classificationManifest = JSON.parse(readFileSync(join(root, "test-scope-classification.json"), "utf8"));
 
 function normalizePath(value) {
   return String(value || "").replaceAll("\\", "/").replace(/^\.\//, "");
@@ -26,7 +19,9 @@ function collect(dir) {
 }
 
 const allTests = collect(root).sort();
+const includeRemoved = process.argv.includes("--include-removed");
 const requestedPatterns = process.argv.slice(2)
+  .filter((argument) => argument !== "--include-removed")
   .filter((argument) => argument && !argument.startsWith("-"))
   .map(normalizePath);
 
@@ -48,39 +43,61 @@ if (!tests.length) {
   process.exit(1);
 }
 
+function classifyTest(testPath) {
+  const relativeTest = normalizePath(relative(root, testPath));
+  const explicit = classificationManifest.explicit?.[relativeTest];
+  if (explicit) return explicit;
+  const rule = classificationManifest.pathRules.find(({ prefix }) => relativeTest.startsWith(prefix));
+  return rule || {
+    classification: classificationManifest.defaultClassification,
+    reason: "No product-scope evidence has been recorded for this file.",
+  };
+}
+
+function printScopeCounts(label, testFiles) {
+  const counts = Object.fromEntries(classificationManifest.categories.map((category) => [category, 0]));
+  for (const testFile of testFiles) counts[classifyTest(testFile).classification] += 1;
+  console.log(`[QUALITY_GATE] TEST_SCOPE_COUNTS (${label}): ${classificationManifest.categories.map((category) => `${category}=${counts[category]}`).join(" ")}`);
+}
+
+printScopeCounts("discovered", allTests);
+if (requestedPatterns.length) printScopeCounts("selected", tests);
+
+const removedFeatureTests = tests.filter((testFile) => classifyTest(testFile).classification === "REMOVED_FEATURE_TEST");
+if (!includeRemoved) {
+  for (const testFile of removedFeatureTests) {
+    const classification = classifyTest(testFile);
+    console.log(`[QUALITY_GATE] SKIPPED_REMOVED_FEATURE_TEST: ${normalizePath(relative(root, testFile))} feature=${classification.featureId} reason=${classification.reason}`);
+  }
+}
+const runnableTests = includeRemoved
+  ? tests
+  : tests.filter((testFile) => classifyTest(testFile).classification !== "REMOVED_FEATURE_TEST");
+console.log(`[QUALITY_GATE] REMOVED_FEATURE_TESTS_SKIPPED=${includeRemoved ? 0 : removedFeatureTests.length}${includeRemoved ? " (included by --include-removed)" : ""}`);
+
 let passed = 0;
 let blockedByExternalGate = 0;
 const extensionLoader = pathToFileURL(join(root, "foundation", "ts-extension-loader.mjs")).href;
-const inheritedNodeOptions = process.env.NODE_OPTIONS || "";
-const childNodeOptions = inheritedNodeOptions.includes("ts-extension-loader.mjs")
-  ? inheritedNodeOptions
-  : `${inheritedNodeOptions} --loader ${extensionLoader}`.trim();
+const childNodeOptions = `--loader ${extensionLoader}`;
 
-// The discovered suite is a hermetic software/validation gate. It may load
-// `.env` to exercise local configuration parsing, but it must never inherit
-// live provider/database/remote-service credentials. Otherwise a synthetic
-// benchmark can turn into hundreds of external LLM requests, or a DB gate can
-// mutate a non-disposable environment. Provider behavior is covered by
-// injected fakes; explicitly-scoped live evidence uses a separate command and
-// report.
-const childEnv = { ...process.env, NODE_OPTIONS: childNodeOptions };
-for (const key of [
-  "OPENAI_API_KEY",
-  "OPENAI_BASE_URL",
-  "GEMINI_API_KEY",
-  "GOOGLE_GENERATIVE_AI_API_KEY",
-  "DATABASE_URL",
-  "STUDENTHUB_RLS_TEST_DATABASE_URL",
-  "STUDENTHUB_LABBE_TEST_DATABASE_URL",
-  "SUPABASE_URL",
-  "SUPABASE_SERVICE_ROLE_KEY",
-  "STUDENTHUB_LABBE_BASE_URL",
-  "STUDENTHUB_LABBE_TOKEN",
-  "STUDENTHUB_LABBE_SCOPE",
-  "TAVILY_API_KEY",
-]) {
-  delete childEnv[key];
-}
+// Pass only process/runtime settings. A denylist misses aliases such as
+// OPEN_AI_KEY_1, and deleting a credential from process.env is insufficient
+// when canonicalEnv can load it again from .env.local in the child.
+const RUNTIME_ENV_KEYS = new Set([
+  "path", "pathext", "systemroot", "windir", "comspec", "temp", "tmp",
+  "tmpdir", "userprofile", "home", "homedrive", "homepath", "appdata",
+  "localappdata", "programdata", "lang", "lc_all", "ci", "python",
+]);
+const childEnv = Object.fromEntries(
+  Object.entries(process.env).filter(([key]) => RUNTIME_ENV_KEYS.has(key.toLowerCase()))
+);
+childEnv.NODE_ENV = "test";
+childEnv.NODE_OPTIONS = childNodeOptions;
+childEnv.STUDENTHUB_HERMETIC_TEST_MODE = "1";
+childEnv.STUDENTHUB_NEXT_DIST_DIR = `.next-hermetic-${process.pid}`;
+childEnv.TAVILY_MODE = "OFF";
+childEnv.TAVILY_MAX_CALLS_PER_RUN = "0";
+childEnv.FRIEND_TRUST_MODE = "DISABLED";
 
 // These suites intentionally prove live public-web/provider behavior. They
 // must not be silently turned into synthetic PASS results when the external
@@ -91,10 +108,14 @@ for (const key of [
 const externalGateTests = new Set([
   "frontend/tests/evidence/live_web_retrieval.test.mjs",
   "frontend/tests/evidence/real_world_live_search_golden_flow.test.mjs",
+  "frontend/tests/evidence/fresh_retrieval_holdout_v3.test.mjs",
+  "frontend/tests/evidence/fresh_retrieval_holdout_v4.test.mjs",
+  "frontend/tests/evidence/fresh_retrieval_holdout_v5_public_api.test.mjs",
+  "frontend/tests/expert/expert_v5_live_readonly.test.mjs",
 ]);
 const allowExternalLiveTests = process.env.STUDENTHUB_ALLOW_EXTERNAL_LIVE_TESTS === "1";
 
-for (const test of tests) {
+for (const test of runnableTests) {
   const label = relative(process.cwd(), test);
   if (!allowExternalLiveTests && externalGateTests.has(normalizePath(label))) {
     console.error(`[QUALITY_GATE] BLOCKED_BY_EXTERNAL_GATE: ${label}`);
@@ -110,5 +131,5 @@ for (const test of tests) {
 }
 
 const scope = requestedPatterns.length ? "selected" : "discovered";
-console.log(`\n[QUALITY_GATE] PASS: ${passed}/${tests.length} ${scope} test files`);
+console.log(`\n[QUALITY_GATE] PASS: ${passed}/${runnableTests.length} ${scope} test files`);
 console.log(`[QUALITY_GATE] BLOCKED_BY_EXTERNAL_GATE: ${blockedByExternalGate} test files`);

@@ -44,6 +44,10 @@ import {
 const MAX_CLAIMS = 40;
 const MAX_TEXT_LENGTH = 1_000_000;
 const MAX_VERIFICATION_TASKS = 80;
+// Multimodal inputs can produce many candidate URLs. Keep network work
+// bounded while avoiding a serial fetch of every source, which can push the
+// complete four-layer request past the route SLA.
+const SOURCE_FETCH_CONCURRENCY = 8;
 
 const L2B_TASK_TYPES = new Set(Object.values(VERIFICATION_TASK_TYPES));
 const L2C_TASK_TYPES = new Set(Object.values(L2C_VERIFICATION_TASK_TYPES));
@@ -318,6 +322,38 @@ function safeRetrieverDiagnostics(retriever) {
     const diagnostics = retriever.getRuntimeDiagnostics();
     if (!diagnostics || typeof diagnostics !== "object" || Array.isArray(diagnostics)) return {};
     return {
+      mode: boundedString(diagnostics.mode, 40).toUpperCase() || null,
+      responseSource: boundedString(diagnostics.responseSource, 80).toUpperCase() || "NONE",
+      budget: diagnostics.budget && typeof diagnostics.budget === "object" ? {
+        budget: Number.isFinite(Number(diagnostics.budget.budget)) ? Math.max(0, Number(diagnostics.budget.budget)) : 0,
+        callsAttempted: Number.isFinite(Number(diagnostics.budget.callsAttempted)) ? Math.max(0, Number(diagnostics.budget.callsAttempted)) : 0,
+        callsSucceeded: Number.isFinite(Number(diagnostics.budget.callsSucceeded)) ? Math.max(0, Number(diagnostics.budget.callsSucceeded)) : 0,
+        callsFailed: Number.isFinite(Number(diagnostics.budget.callsFailed)) ? Math.max(0, Number(diagnostics.budget.callsFailed)) : 0,
+        callsSkippedByCache: Number.isFinite(Number(diagnostics.budget.callsSkippedByCache)) ? Math.max(0, Number(diagnostics.budget.callsSkippedByCache)) : 0,
+        callsBlockedByBudget: Number.isFinite(Number(diagnostics.budget.callsBlockedByBudget)) ? Math.max(0, Number(diagnostics.budget.callsBlockedByBudget)) : 0,
+        quotaErrorSeen: diagnostics.budget.quotaErrorSeen === true,
+        callRecords: asArray(diagnostics.budget.callRecords).slice(-20).map((record) => ({
+          queryHash: boundedString(record?.queryHash, 80) || null,
+          timestamp: boundedString(record?.timestamp, 80) || null,
+          httpStatus: Number.isInteger(Number(record?.httpStatus)) && Number(record?.httpStatus) >= 100 && Number(record?.httpStatus) <= 599
+            ? Number(record.httpStatus)
+            : null,
+          durationMs: Number.isFinite(Number(record?.durationMs)) ? Math.max(0, Math.min(Number(record.durationMs), 120_000)) : 0,
+          resultCount: Number.isFinite(Number(record?.resultCount)) ? Math.max(0, Number(record.resultCount)) : 0,
+          status: boundedString(record?.status, 80).toUpperCase() || "UNKNOWN",
+        })),
+      } : null,
+      providerAttempt: diagnostics.providerAttempt && typeof diagnostics.providerAttempt === "object" ? {
+        provider: "TAVILY",
+        status: boundedString(diagnostics.providerAttempt.status, 80).toUpperCase() || "UNKNOWN",
+        httpStatus: Number.isInteger(Number(diagnostics.providerAttempt.httpStatus)) && Number(diagnostics.providerAttempt.httpStatus) >= 100 && Number(diagnostics.providerAttempt.httpStatus) <= 599
+          ? Number(diagnostics.providerAttempt.httpStatus)
+          : null,
+        resultCount: Number.isFinite(Number(diagnostics.providerAttempt.resultCount)) ? Math.max(0, Number(diagnostics.providerAttempt.resultCount)) : 0,
+        durationMs: Number.isFinite(Number(diagnostics.providerAttempt.durationMs)) ? Math.max(0, Math.min(Number(diagnostics.providerAttempt.durationMs), 120_000)) : 0,
+        errorCategory: boundedString(diagnostics.providerAttempt.errorCategory, 80) || null,
+        retryable: diagnostics.providerAttempt.retryable === true,
+      } : null,
       callCount: Number.isFinite(Number(diagnostics.callCount)) ? Math.max(0, Number(diagnostics.callCount)) : 0,
       durationMs: Number.isFinite(Number(diagnostics.durationMs)) ? Math.max(0, Number(diagnostics.durationMs)) : 0,
       timeoutConfiguredMs: Number.isFinite(Number(diagnostics.timeoutConfiguredMs)) ? Math.max(0, Number(diagnostics.timeoutConfiguredMs)) : null,
@@ -369,9 +405,6 @@ export class Layer3EvidenceService {
     const startTime = nowMs();
     const safeOptions = options && typeof options === "object" ? options : {};
     const retrievalStage = safeOptions.retrievalStage === "SUPPLEMENTAL" ? "SUPPLEMENTAL" : "INITIAL";
-    const retrievalOrigin = retrievalStage === "SUPPLEMENTAL"
-      ? RETRIEVAL_ORIGIN.TAVILY_AI_REQUESTED_SUPPLEMENT
-      : RETRIEVAL_ORIGIN.TAVILY_INITIAL;
     const previousEvidencePackage = retrievalStage === "SUPPLEMENTAL"
       ? (safeOptions.previousEvidencePackage && typeof safeOptions.previousEvidencePackage === "object"
         ? safeOptions.previousEvidencePackage
@@ -391,6 +424,11 @@ export class Layer3EvidenceService {
       ? defaultTavilyRetriever
       : new KnowledgeBaseRetriever());
     const retrieverId = boundedString(retriever?.retrieverId, 160) || "unknown_retriever";
+    let retrievalOrigin = retrievalStage === "SUPPLEMENTAL"
+      ? RETRIEVAL_ORIGIN.TAVILY_AI_REQUESTED_SUPPLEMENT
+      : retrieverId.toLowerCase().includes("tavily")
+        ? RETRIEVAL_ORIGIN.TAVILY_INITIAL
+        : RETRIEVAL_ORIGIN.EXTERNAL_SEARCH;
     const auditEvents = [];
 
     const rawClaims = asArray(claims).length > 0
@@ -423,12 +461,25 @@ export class Layer3EvidenceService {
       // on transport timeout or provider policy, but this layer does not
       // silently drop queries before handing them to the retriever.
       const inputQueries = QueryGenerator.generateInputQueries(submittedInput);
+      const resolvedOfficialDomains = SourceAuthorityRegistry.resolveCanonicalDomains(inputContextText, { limit: 3 });
+      const canonicalAuthorityQueries = resolvedOfficialDomains.length > 0
+        ? [{
+          strategy: "CANONICAL_AUTHORITY_LOOKUP",
+          query: `${inputContextText.replace(/\s+/g, " ").trim().slice(0, 220)} official primary source`,
+          includeDomains: resolvedOfficialDomains,
+          purpose: "Tìm nguồn trên tên miền của thực thể chính thức đã phân giải",
+          sourceScope: "input_context",
+          origin: "OFFICIAL_SOURCE_RESOLUTION",
+          isCandidateOnly: true,
+        }]
+        : [];
       // Keep the two broad input queries first when extracted claims exist so
       // the provider always sees claim-independent context before claim
       // verification. The remaining input viewpoints/counter-context queries
       // are appended below; none are discarded.
       if (targetClaims.length > 0) allQueries.push(...inputQueries.slice(0, 2));
-      else allQueries.push(...inputQueries);
+      else allQueries.push(...inputQueries.slice(0, 1));
+      allQueries.push(...canonicalAuthorityQueries);
       for (const claim of targetClaims) {
         const claimQueries = QueryGenerator.generateQueries(claim, targetCandidates);
         allQueries.push(...claimQueries);
@@ -440,10 +491,16 @@ export class Layer3EvidenceService {
         allQueries.push(...taskQueries);
       }
       if (targetClaims.length > 0) allQueries.push(...inputQueries.slice(2));
+      else allQueries.push(...inputQueries.slice(1));
     }
-    const retrievalQueries = retrievalStage === "SUPPLEMENTAL" ? allQueries.slice(0, 2) : allQueries;
+    const generatedRetrievalQueries = retrievalStage === "SUPPLEMENTAL" ? allQueries.slice(0, 2) : allQueries;
+    const configuredQueryLimit = Number(safeOptions.maxRetrievalQueries);
+    const retrievalQueries = Number.isFinite(configuredQueryLimit) && configuredQueryLimit > 0
+      ? generatedRetrievalQueries.slice(0, Math.min(32, Math.max(1, Math.floor(configuredQueryLimit))))
+      : generatedRetrievalQueries;
 
     let retrievedSources = [];
+    let retrievalSourceLimit = null;
     let retrievalStatus = EVIDENCE_PROVIDER_STATUS.SUCCESS;
     let retrievalMode = retrievalStage === "SUPPLEMENTAL"
       ? "TAVILY_SUPPLEMENTAL"
@@ -457,9 +514,21 @@ export class Layer3EvidenceService {
     try {
       throwIfAborted(safeOptions.signal);
       if (typeof retriever.search !== "function") throw new Error("RETRIEVER_SEARCH_UNAVAILABLE");
-      const searchResult = await retriever.search(retrievalQueries, { requestId, signal: safeOptions.signal });
+      const searchOptions = { requestId, signal: safeOptions.signal };
+      if (Number.isFinite(Number(safeOptions.retrievalTimeoutMs))) {
+        searchOptions.timeoutMs = Math.max(500, Math.min(120_000, Number(safeOptions.retrievalTimeoutMs)));
+      }
+      if (Number.isFinite(Number(safeOptions.tavilyMaxResults))) {
+        searchOptions.maxResults = Math.max(1, Math.min(20, Math.floor(Number(safeOptions.tavilyMaxResults))));
+      }
+      const searchResult = await retriever.search(retrievalQueries, searchOptions);
       providerDiagnostics = safeRetrieverDiagnostics(retriever);
       throwIfAborted(safeOptions.signal);
+      const searchIsLocal = retrievalStage !== "SUPPLEMENTAL" && (
+        retriever.lastSearchStatus === EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY ||
+        asArray(searchResult).some((source) => source?.sourceType === SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE)
+      );
+      if (searchIsLocal) retrievalOrigin = RETRIEVAL_ORIGIN.LOCAL_KNOWLEDGE;
       const searchedSources = asArray(searchResult).map((source) => ({
         ...source,
         sourceId: retrievalStage === "SUPPLEMENTAL" && source?.sourceId
@@ -474,9 +543,10 @@ export class Layer3EvidenceService {
       if (Object.values(EVIDENCE_PROVIDER_STATUS).includes(retriever.lastSearchStatus) && retriever.lastSearchStatus !== EVIDENCE_PROVIDER_STATUS.SUCCESS) {
         retrievalStatus = retriever.lastSearchStatus;
       }
-      if (retrievalStage !== "SUPPLEMENTAL" && (retrieverId.includes("knowledge_base") || retrievedSources.some((src) => src.sourceType === SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE))) {
+      if (retrievalStage !== "SUPPLEMENTAL" && (retrieverId.includes("knowledge_base") || retrievalStatus === EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY || retrievedSources.some((src) => src.sourceType === SOURCE_TYPE.LOCAL_KNOWLEDGE_BASE))) {
         retrievalMode = "LOCAL_KNOWLEDGE_BASE";
         retrievalStatus = EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY;
+        retrievalOrigin = RETRIEVAL_ORIGIN.LOCAL_KNOWLEDGE;
       }
     } catch (err) {
       if (safeOptions.signal?.aborted || err?.name === "AbortError") throw err;
@@ -490,6 +560,7 @@ export class Layer3EvidenceService {
         try {
           const fallback = new KnowledgeBaseRetriever();
           fetchRetriever = fallback;
+          retrievalOrigin = RETRIEVAL_ORIGIN.LOCAL_KNOWLEDGE;
           retrievedSources = dedupeCandidates([...directInputSources, ...asArray(await fallback.search(retrievalQueries, { requestId, signal: safeOptions.signal }))], {
             defaultOrigin: RETRIEVAL_ORIGIN.LOCAL_KNOWLEDGE,
           });
@@ -501,34 +572,59 @@ export class Layer3EvidenceService {
       } else {
         // Canonical own-backend mode never relabels local corpus content as
         // external evidence after Tavily fails or is not configured.
-        retrievalMode = "TAVILY_UNAVAILABLE";
+        retrievalMode = retrieverId.toLowerCase().includes("tavily")
+          ? "TAVILY_UNAVAILABLE"
+          : "EXTERNAL_RETRIEVER_UNAVAILABLE";
         fetchRetriever = retriever;
         retrievedSources = retrievalStage === "SUPPLEMENTAL" ? previousSources : directInputSources;
       }
     }
 
+    const configuredSourceLimit = Number(safeOptions.maxRetrievedSources);
+    if (Number.isFinite(configuredSourceLimit) && configuredSourceLimit > 0 && retrievedSources.length > configuredSourceLimit) {
+      retrievalSourceLimit = Math.max(1, Math.floor(configuredSourceLimit));
+      retrievedSources = retrievedSources.slice(0, retrievalSourceLimit);
+      auditEvents.push({ type: "RETRIEVAL_SOURCE_BOUND_APPLIED", limit: retrievalSourceLimit, at: new Date().toISOString() });
+    }
+
     const evidenceItems = [];
     const processedSources = [];
+    const fetchedSourceRecords = [];
 
-    for (const src of retrievedSources) {
+    // Preserve retrievedSources order in the records below so evidence and
+    // audit output remain deterministic even though the network fetches are
+    // performed concurrently in bounded batches.
+    for (let offset = 0; offset < retrievedSources.length; offset += SOURCE_FETCH_CONCURRENCY) {
       throwIfAborted(safeOptions.signal);
-      const urlGuard = validateRemoteUrlSync(src.url);
-      if (!urlGuard.ok) {
-        auditEvents.push({ type: "RETRIEVAL_REJECTED", code: urlGuard.code, sourceId: src.sourceId || null, at: new Date().toISOString() });
+      const batch = retrievedSources.slice(offset, offset + SOURCE_FETCH_CONCURRENCY);
+      const batchRecords = await Promise.all(batch.map(async (src) => {
+        throwIfAborted(safeOptions.signal);
+        const urlGuard = validateRemoteUrlSync(src.url);
+        if (!urlGuard.ok) return { src, urlGuard: null, sourceFetcher: null, fetchResult: null, rejectionCode: urlGuard.code };
+
+        const sourceFetcher = src.retrievalOrigin === RETRIEVAL_ORIGIN.DIRECT_INPUT
+          ? (isNetworkGuardedRetriever(retriever) ? retriever : new WebSearchRetriever())
+          : fetchRetriever;
+        let fetchResult;
+        try {
+          if (typeof sourceFetcher.fetch !== "function") throw new Error("RETRIEVER_FETCH_UNAVAILABLE");
+          fetchResult = safeFetchResult(await sourceFetcher.fetch(urlGuard.url, { requestId, signal: safeOptions.signal }));
+        } catch (err) {
+          if (safeOptions.signal?.aborted || err?.name === "AbortError") throw err;
+          fetchResult = { html: "", textContent: "", status: 502, error: boundedString(err?.message, 120) || "FETCH_FAILURE" };
+        }
+        throwIfAborted(safeOptions.signal);
+        return { src, urlGuard, sourceFetcher, fetchResult, rejectionCode: null };
+      }));
+      fetchedSourceRecords.push(...batchRecords);
+    }
+
+    for (const { src, urlGuard, sourceFetcher, fetchResult, rejectionCode } of fetchedSourceRecords) {
+      if (!urlGuard) {
+        auditEvents.push({ type: "RETRIEVAL_REJECTED", code: rejectionCode || "INVALID_URL", sourceId: src.sourceId || null, at: new Date().toISOString() });
         continue;
       }
 
-      const sourceFetcher = src.retrievalOrigin === RETRIEVAL_ORIGIN.DIRECT_INPUT
-        ? (isNetworkGuardedRetriever(retriever) ? retriever : new WebSearchRetriever())
-        : fetchRetriever;
-      let fetchResult;
-      try {
-        if (typeof sourceFetcher.fetch !== "function") throw new Error("RETRIEVER_FETCH_UNAVAILABLE");
-        fetchResult = safeFetchResult(await sourceFetcher.fetch(urlGuard.url, { requestId, signal: safeOptions.signal }));
-      } catch (err) {
-        if (safeOptions.signal?.aborted || err?.name === "AbortError") throw err;
-        fetchResult = { html: "", textContent: "", status: 502, error: boundedString(err?.message, 120) || "FETCH_FAILURE" };
-      }
       throwIfAborted(safeOptions.signal);
 
       const fetchedSuccessfully = isSuccessfulFetch(fetchResult);
@@ -688,14 +784,21 @@ export class Layer3EvidenceService {
     const directInputSourceCount = sourceCountByOrigin(RETRIEVAL_ORIGIN.DIRECT_INPUT);
     const directInputEvidenceCount = evidenceCountByOrigin(RETRIEVAL_ORIGIN.DIRECT_INPUT);
     const directInputValidatedSourceCount = processedSources.filter((source) => source.retrievalOrigin === RETRIEVAL_ORIGIN.DIRECT_INPUT && source.liveEvidence === true).length;
+    const finalSourceOrigins = new Set(processedSources.map((source) => source.retrievalOrigin));
+    const finalSetRetrievalOrigin = finalSourceOrigins.size > 1
+      ? RETRIEVAL_ORIGIN.MIXED
+      : finalSourceOrigins.values().next().value || retrievalOrigin;
 
     const limitations = [
       ...asArray(decision.limitations),
       ...(inputContextText && targetClaims.length === 0
-        ? ["Input đã được Tavily tìm kiếm tự do và có thể có contextual evidence; vì chưa có factual claim nên chưa tạo verdict claim-specific."]
+        ? ["Đầu vào chưa có factual claim để đối soát; contextual evidence hoặc khả năng truy cập URL không tạo thành verdict claim-specific."]
         : []),
       ...(retrievalStatus === EVIDENCE_PROVIDER_STATUS.LOCAL_ONLY || retrievalMode === "LOCAL_FALLBACK"
         ? ["Bằng chứng cục bộ/fallback không được coi là xác minh trực tiếp từ nguồn bên ngoài."]
+        : []),
+      ...(retrievalSourceLimit
+        ? [`Đã giới hạn số source fetch ở ${retrievalSourceLimit} để giữ SLA; friend backend L4 vẫn là authority.`]
         : []),
       ...(!externalEvidence && evidenceItems.length > 0
         ? ["Không có bằng chứng live độc lập; trạng thái được hạ cấp để tránh false-safe."]
@@ -710,15 +813,15 @@ export class Layer3EvidenceService {
         : {
           status: retrievalStatus,
           queryCount: retrievalStage === "INITIAL" ? retrievalQueries.length : 0,
-          sourceCount: sourceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_INITIAL),
-          evidenceCount: evidenceCountByOrigin(RETRIEVAL_ORIGIN.TAVILY_INITIAL),
-          validatedSourceCount: processedSources.filter((source) => source.retrievalOrigin === RETRIEVAL_ORIGIN.TAVILY_INITIAL && source.liveEvidence === true).length,
+          sourceCount: sourceCountByOrigin(retrievalOrigin),
+          evidenceCount: evidenceCountByOrigin(retrievalOrigin),
+          validatedSourceCount: processedSources.filter((source) => source.retrievalOrigin === retrievalOrigin && source.liveEvidence === true).length,
           directInputSourceCount,
           directInputEvidenceCount,
           directInputValidatedSourceCount,
           provider: retrieverId,
           providerStatus: retrievalStage === "INITIAL" ? retrievalStatus : null,
-          retrievalOrigin: RETRIEVAL_ORIGIN.TAVILY_INITIAL,
+          retrievalOrigin,
         },
       supplementalSearch: retrievalStage === "SUPPLEMENTAL"
         ? {
@@ -752,7 +855,7 @@ export class Layer3EvidenceService {
         directInputValidatedSourceCount,
         provider: retrieverId,
         providerStatus: retrievalStatus,
-        retrievalOrigin,
+        retrievalOrigin: finalSetRetrievalOrigin,
       },
     };
 
@@ -821,7 +924,7 @@ export class Layer3EvidenceService {
         finalValidatedSourceCount: retrievalPhases.finalValidatedEvidenceSet.validatedSourceCount,
         geminiGeneratedUrlCount: 0,
         externalEvidence,
-        providerIndependent: retrieverId.includes("knowledge_base"),
+        providerIndependent: retrievalMode === "LOCAL_KNOWLEDGE_BASE" || retrieverId.includes("knowledge_base"),
         providerCallCount: providerDiagnostics.callCount || 0,
         providerDurationMs: providerDiagnostics.durationMs || 0,
         providerTimeoutConfiguredMs: providerDiagnostics.timeoutConfiguredMs,
@@ -838,6 +941,11 @@ export class Layer3EvidenceService {
         providerRetryExhausted: providerDiagnostics.retryExhausted === true,
         providerRetryable: providerDiagnostics.retryable,
         providerRequestTrace: providerDiagnostics.requestTrace || [],
+        providerMode: providerDiagnostics.mode || "OFF",
+        providerResponseSource: providerDiagnostics.responseSource || "NONE",
+        providerBudget: providerDiagnostics.budget,
+        providerAttempt: providerDiagnostics.providerAttempt,
+        providerQuotaErrorSeen: providerDiagnostics.budget?.quotaErrorSeen === true,
         independentHostCount,
         independentClusterCount: independence.independentSourcesCount || 0,
         verificationTasksCount: taskMerge.tasks.length,

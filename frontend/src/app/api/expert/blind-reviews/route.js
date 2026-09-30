@@ -59,8 +59,8 @@ async function listPendingBlindReviews(request, routeParams, principal, security
   } catch (err) {
     console.error("[BlindReviewsAPI] Error:", err.message);
     return NextResponse.json(
-      { success: false, error: { code: "INTERNAL_ERROR", message: "Không thể tải danh sách đánh giá độc lập." } },
-      { status: 500 }
+      { success: false, error: { code: err.code || "INTERNAL_ERROR", message: err.message || "Không thể tải danh sách đánh giá độc lập." } },
+      { status: err.statusCode || 500 }
     );
   }
 }

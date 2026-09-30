@@ -24,6 +24,10 @@ test("GOLDEN FLOW (LIVE SEARCH): End-to-end verification powered by real web ret
 
   // 1. Prove claims decomposed
   assert.ok(result.claims.length > 0, "Must extract at least 1 claim");
+  assert.ok(
+    typeof result.verification.retrievalStatus === "string" && result.verification.retrievalStatus.length > 0,
+    "Must project a truthful retrieval status into the Trust verification DTO"
+  );
   console.log(`Claim 1 Text:      "${result.claims[0].text}"`);
 
   // 2. Prove real reachable sources discovered

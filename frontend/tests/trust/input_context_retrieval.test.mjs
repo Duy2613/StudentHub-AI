@@ -76,6 +76,25 @@ test("URL-only input is searched independently and preserves direct provenance",
   assert.equal(result.evidence[0].sourceUrl, "https://vercel.com/");
 });
 
+test("explicit canonical entities add one domain-scoped source query without removing broad context search", async () => {
+  const calls = [];
+  await Layer3EvidenceService.verify({
+    input: { type: "text", content: "React official documentation for hooks" },
+    claims: [],
+    candidateSources: [],
+    options: { retriever: contextRetriever(calls), allowLocalFallback: false, requestId: "input-context-canonical-source" },
+  });
+
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].length, 5);
+  assert.equal(calls[0][0].strategy, "INPUT_EXACT");
+  assert.equal(calls[0][1].strategy, "CANONICAL_AUTHORITY_LOOKUP");
+  assert.deepEqual(calls[0][1].includeDomains, ["react.dev"]);
+  assert.equal(calls[0][1].isCandidateOnly, true);
+  assert.equal(calls[0][2].strategy, "INPUT_NEUTRAL_CONTEXT");
+  assert.ok(calls[0].some((item) => item.isContradictionSeeking === true));
+});
+
 test("input-context discovery shares the bounded Tavily budget with claim verification", async () => {
   const calls = [];
   await Layer3EvidenceService.verify({

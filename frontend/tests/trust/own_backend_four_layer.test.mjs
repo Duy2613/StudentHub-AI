@@ -369,6 +369,25 @@ test("own backend publishes exactly four stages and deterministic Final Predict"
   assert.equal(JSON.stringify(result).includes('"l5"'), false);
 });
 
+test("source quality remains unavailable when live validated sources have no authority score", async () => {
+  const calls = { l4: 0 };
+  const services = servicesWithLiveEvidence(calls);
+  const liveEvidence = services.l3;
+  services.l3 = async (...args) => {
+    const result = await liveEvidence(...args);
+    delete result.sources[0].authorityScore;
+    return result;
+  };
+
+  const result = await new OwnBackendTrustOrchestrator({ services }).run(
+    { type: "text", content: "A live source without an authority score." },
+    { requestId: "req_unscored_live_source" },
+  );
+
+  assert.equal(result.stages.l3.sourceQuality, null);
+  assert.equal(result.finalPredict.sourceQuality, null);
+});
+
 test("own backend completes Layer 2 while retaining provider outage details", async () => {
   const orchestrator = new OwnBackendTrustOrchestrator({ services: servicesWithPartialLayer2() });
 
@@ -619,4 +638,60 @@ test("own backend does not substitute local corpus when canonical retrieval is u
   assert.deepEqual(result.evidence, []);
   assert.equal(result.metrics.providerIndependent, false);
   assert.ok(result.auditEvents.some((event) => event.type === "RETRIEVER_FAILURE"));
+});
+
+test("Friend Trust TEXT observations stay shadow and cannot replace the StudentHub Final Predict", async () => {
+  const baselineCalls = {};
+  const baseline = await new OwnBackendTrustOrchestrator({ services: servicesWithLiveEvidence(baselineCalls) }).run({
+    type: "text",
+    content: "A fixture claim with canonical evidence.",
+  }, { requestId: "req_canonical_baseline" });
+
+  const friendCalls = [];
+  const adapter = {
+    enabled: true,
+    async verifyLayer2() {
+      friendCalls.push("L2");
+      return { status: "COMPLETED", providerStatus: "SUCCESS", finding: "THREAT_MATCH", rawVerdict: "DANGEROUS" };
+    },
+    async verifyLayer3() {
+      friendCalls.push("L3");
+      return {
+        status: "COMPLETED",
+        providerStatus: "SUCCESS",
+        legacyIntegration: {
+          status: "COMPLETED",
+          providerStatus: "SUCCESS",
+          rawVerdict: "CONTRADICTED",
+          canContinueToLayer4: true,
+          stop: false,
+          sources: [],
+          evidence: [],
+        },
+      };
+    },
+    async verifyLayer4() {
+      friendCalls.push("L4");
+      return { status: "COMPLETED", providerStatus: "SUCCESS", rawVerdict: "FAKE", assessmentConfidence: 1 };
+    },
+  };
+  const withFriend = await new OwnBackendTrustOrchestrator({
+    services: servicesWithLiveEvidence({}),
+    legacyVerificationAdapter: adapter,
+  }).run({ type: "text", content: "A fixture claim with canonical evidence." }, { requestId: "req_canonical_with_friend" });
+
+  assert.deepEqual(friendCalls, ["L2", "L3", "L4"]);
+  assert.equal(withFriend.capabilityRouting.canonicalProvider, "STUDENTHUB");
+  assert.equal(withFriend.capabilityRouting.friendTrust.mode, "SHADOW");
+  assert.equal(withFriend.layerResults.layer2.legacyIntegration.rawVerdict, "DANGEROUS");
+  assert.equal(withFriend.layerResults.layer3.legacyIntegration.rawVerdict, "CONTRADICTED");
+  assert.equal(withFriend.layerResults.layer4.legacyIntegration.rawVerdict, "FAKE");
+  assert.deepEqual(withFriend.finalPredict, baseline.finalPredict);
+
+  friendCalls.length = 0;
+  await new OwnBackendTrustOrchestrator({
+    services: servicesWithLiveEvidence({}),
+    legacyVerificationAdapter: adapter,
+  }).run({ type: "image", content: "image fixture" }, { requestId: "req_image_no_friend" });
+  assert.deepEqual(friendCalls, []);
 });

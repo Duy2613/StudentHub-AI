@@ -953,13 +953,76 @@ html {
 }
 
 ::selection {
-  background: rgba(52, 231, 196, 0.32);
-  color: #ffffff;
+  background: color-mix(in srgb, var(--action-accent, #38E8FF) 38%, transparent);
+  color: var(--canvas, #07101F);
+}
+
+/* Community utility glossary: contextual access to the existing annotation lexicon. */
+.community-glossary-trigger {
+  display:inline-flex;
+  min-height:38px;
+  align-items:center;
+  gap:.4rem;
+  border:1px solid var(--border-subtle);
+  border-radius:var(--radius-xs, .5rem);
+  padding:0 .7rem;
+  background:var(--surface-raised, rgba(17, 24, 39, .9));
+  color:var(--text-secondary);
+  font:500 .68rem/1 var(--font-ui, system-ui, sans-serif);
+  cursor:pointer;
+}
+.community-glossary-trigger:hover,
+.community-glossary-trigger[aria-expanded="true"] {
+  border-color:var(--border-strong);
+  color:var(--text-primary);
+}
+.community-glossary-layer {
+  position:fixed;
+  z-index:1200;
+  inset:0;
+  background:transparent;
+}
+.community-glossary-dialog {
+  position:absolute;
+  top:calc(var(--app-header-height, 4.25rem) + .45rem);
+  right:clamp(1rem, 9vw, 9rem);
+  width:min(390px, calc(100vw - 2rem));
+  max-height:min(76dvh, 680px);
+  overflow:auto;
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius-lg, 1rem);
+  padding:1rem;
+  background:var(--surface-overlay, #11162b);
+  color:var(--text-primary);
+  box-shadow:0 24px 70px rgba(0,0,0,.34);
+}
+.community-glossary-dialog > header {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:1rem;
+  margin-bottom:.5rem;
+}
+.community-glossary-dialog h2 {
+  margin:.2rem 0 0;
+  font:600 1.15rem/1.2 var(--font-display, Georgia, serif);
+}
+.community-glossary-dialog ul { display:grid; gap:.2rem; margin:0; padding:0; list-style:none; }
+.community-glossary-dialog li { display:flex; align-items:flex-start; gap:.75rem; border-top:1px solid var(--border-subtle); padding:.65rem .15rem; }
+.community-glossary-dialog li > span { display:grid; width:1.65rem; height:1.65rem; flex:none; place-items:center; border:1px solid var(--border-subtle); border-radius:.45rem; color:var(--accent-knowledge, #65d8ff); font:600 .68rem var(--font-technical, monospace); }
+.community-glossary-dialog li strong { font-size:.72rem; }
+.community-glossary-dialog li p { margin:.22rem 0 0; color:var(--text-secondary); font-size:.65rem; line-height:1.5; }
+.community-glossary-trigger:focus-visible,
+.community-glossary-dialog :focus-visible { outline:2px solid var(--border-focus, #65d8ff); outline-offset:2px; }
+@media (max-width:767px) {
+  .community-glossary-trigger { width:38px; justify-content:center; padding:0; }
+  .community-glossary-trigger > span { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+  .community-glossary-layer { display:flex; align-items:flex-end; background:rgba(3,7,14,.58); }
+  .community-glossary-dialog { position:relative; inset:auto; width:100%; max-height:78dvh; border-radius:18px 18px 0 0; padding:1rem 1rem calc(1rem + env(safe-area-inset-bottom)); }
 }
 
 .bg-app-canvas {
-  background: rgba(6, 8, 19, 0.65);
-  backdrop-filter: blur(8px);
+  background: var(--canvas, #07101F);
 }
 
 .text-app-primary {
@@ -1654,6 +1717,10 @@ html {
   color: var(--accent-primary);
   font-size: .75rem;
   font-weight: 700;
+}
+
+.expert-workspace-shortcuts .text-link {
+  color: #9b8eff;
 }
 
 .text-link.muted {
@@ -4201,7 +4268,12 @@ html {
 
 @media (max-width: 390px) {
   .app-header {
-    gap: .5rem;
+    gap: .25rem;
+    padding-inline: .5rem;
+  }
+
+  .app-header > div:last-of-type {
+    gap: .25rem;
   }
 
   .brand-name {
@@ -4209,7 +4281,17 @@ html {
   }
 
   .profile-chip {
-    padding-right: .35rem;
+    gap: .3rem;
+    padding-inline: .2rem;
+  }
+
+  .app-header .anonymous-actions {
+    gap: .25rem;
+  }
+
+  .app-header .anonymous-actions .primary-action,
+  .app-header .anonymous-actions .secondary-action {
+    padding-inline: .45rem;
   }
 
   .app-content {
@@ -8350,6 +8432,35 @@ body {
 .app-content {
   position: relative;
   z-index: var(--z-workspace);
+}
+
+/* Community dialogs need to cover the sticky shell chrome while they are modal. */
+.app-shell:has([data-community-overlay]) .app-content {
+  z-index: 60;
+}
+
+@media (max-width: 900px) {
+  .app-header.community-app-header {
+    gap: .6rem;
+  }
+
+  .app-header.community-app-header .brand-subtitle,
+  .app-header.community-app-header .trust-status {
+    display: none !important;
+  }
+
+  .app-header.community-app-header > .community-search-icon {
+    display: inline-flex !important;
+  }
+
+  .app-header.community-app-header > .community-command-search {
+    display: none !important;
+  }
+
+  .app-header.community-app-header > div:last-of-type {
+    flex: none;
+    gap: .4rem;
+  }
 }
 
 .reference-landing-navbar {
@@ -16602,3 +16713,7 @@ body {
   }
 }
 
+
+/* Trust V4: shared controls inherit the selected reading theme. */
+.app-shell[data-reference-route="trust"] :is(.command-search,.command-search:hover,.command-search kbd,.profile-chip){background:var(--surface-2);color:var(--text-secondary);box-shadow:none}
+.app-shell[data-reference-route="trust"] .profile-chip{color:var(--text-primary)}

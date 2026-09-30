@@ -225,6 +225,10 @@
   display: none;
 }
 
+.community-margin-rail .margin-rail-top { align-content:start; }
+.community-mobile-strip summary { min-height:2.9rem; }
+.community-mobile-strip summary strong { font-style:normal; }
+
 @media (max-width: 1023px) and (min-width: 768px) {
   .margin-rail {
     width: 200px !important;
@@ -252,6 +256,32 @@
     color: var(--text-primary);
     background: rgba(6, 8, 19, 0.96);
     backdrop-filter: blur(20px);
+  }
+
+  /* Community already has the global header menu button. Keep its second,
+     duplicate summary out of the initial viewport and expose the nav only
+     when that primary control opens it. */
+  .community-mobile-strip {
+    display: none;
+    position: fixed;
+    top: var(--app-header-height, 4.25rem);
+    right: 0;
+    left: 0;
+    z-index: 49;
+    min-height: 0;
+    border: 0;
+    background: transparent;
+    backdrop-filter: none;
+    pointer-events: none;
+  }
+
+  .community-mobile-strip[open] { display: block; }
+  .community-mobile-strip > summary { display: none; }
+  .community-mobile-strip[open] .margin-mobile-sheet {
+    max-height: calc(100dvh - var(--app-header-height, 4.25rem));
+    border-top: 0;
+    border-bottom: 1px solid var(--border-subtle);
+    pointer-events: auto;
   }
 
   .margin-mobile-strip summary {

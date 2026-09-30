@@ -1,54 +1,48 @@
-import {
-  LayoutDashboard,
-  Settings,
-  ShieldCheck,
-  UserRoundCheck,
-  Users,
-} from "lucide-react";
+import { Search, Settings, ShieldCheck, User, UserRoundCheck, Users } from "lucide-react";
+import { CANONICAL_NAVIGATION } from "@/config/navigation";
 
-/**
- * Canonical internal navigation. Route compatibility entries are deliberately
- * not included here; the frozen route map owns their redirects/deep-link
- * behavior, while this module owns the single visible navigation contract.
- */
+const ICONS = Object.freeze({
+  ShieldCheck,
+  Users,
+  UserCheck: UserRoundCheck,
+  Search,
+  User,
+  Settings,
+});
+
+function toShellItem(item) {
+  return Object.freeze({
+    id: item.id,
+    label: item.label,
+    href: item.route,
+    icon: ICONS[item.icon],
+    pillar: item.group.toUpperCase(),
+  });
+}
+
+const coreItems = CANONICAL_NAVIGATION.filter((item) => item.group === "core").map(toShellItem);
+const accountItems = CANONICAL_NAVIGATION.filter((item) => item.group === "account").map(toShellItem);
+
+/** Shell navigation adapts the canonical v4 destinations without redefining them. */
 export const CANONICAL_NAV_GROUPS = Object.freeze([
-  Object.freeze({
-    id: "pillars",
-    label: "Đối chiếu & Kết nối",
-    items: Object.freeze([
-      Object.freeze({ id: "trust", label: "Trust Engine", href: "/trust", icon: ShieldCheck, pillar: "TRUST" }),
-      Object.freeze({ id: "community", label: "Community", href: "/community", icon: Users, pillar: "COMMUNITY" }),
-      Object.freeze({ id: "expert", label: "Experts", href: "/expert", icon: UserRoundCheck, pillar: "EXPERT" }),
-    ]),
-  }),
-  Object.freeze({
-    id: "personal",
-    label: "Cá nhân",
-    items: Object.freeze([
-      Object.freeze({ id: "dashboard", label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, pillar: "PLATFORM" }),
-      Object.freeze({ id: "profile", label: "Hồ sơ", href: "/profile", icon: UserRoundCheck, pillar: "PLATFORM" }),
-      Object.freeze({ id: "settings", label: "Cài đặt", href: "/settings", icon: Settings, pillar: "PLATFORM" }),
-    ]),
-  }),
+  Object.freeze({ id: "pillars", label: "Trụ cột cốt lõi", items: Object.freeze(coreItems) }),
+  Object.freeze({ id: "account", label: "Tài khoản", items: Object.freeze(accountItems) }),
 ]);
 
-export const CANONICAL_NAV_ITEMS = Object.freeze(CANONICAL_NAV_GROUPS.flatMap((group) => group.items));
+export const CANONICAL_NAV_ITEMS = Object.freeze([...coreItems, ...accountItems]);
 
 export const ACCOUNT_NAV_ITEMS = Object.freeze([
-  Object.freeze({ id: "profile", label: "Hồ sơ", href: "/profile" }),
-  Object.freeze({ id: "settings", label: "Cài đặt", href: "/settings" }),
-  Object.freeze({ id: "privacy", label: "Privacy", href: "/settings/privacy" }),
+  ...accountItems,
 ]);
 
 export function isNavigationActive(pathname, href) {
   if (typeof pathname !== "string" || typeof href !== "string") return false;
-  return pathname === href || (href !== "/dashboard" && pathname.startsWith(`${href}/`));
+  return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 }
 
 export function chapterForPath(pathname = "") {
   if (pathname.startsWith("/trust")) return "I";
-  if (pathname.startsWith("/community") || pathname.startsWith("/forum")) return "II";
+  if (pathname.startsWith("/community")) return "II";
   if (pathname.startsWith("/expert")) return "III";
-  if (pathname.startsWith("/cases")) return "IV";
-  return "V";
+  return "IV";
 }

@@ -170,6 +170,36 @@ export class TrustPersistenceService {
         },
       }).catch(() => { });
 
+      // Public Community posts intentionally contain only a redacted statement
+      // and an opaque Trust scope. Tell public Community consumers to refresh
+      // that projection only when a public contribution is already linked to
+      // this case; never broadcast a Trust verdict or private case material.
+      try {
+        const linkedPublicContribution = await getPostgresPool().query(
+          `SELECT 1 FROM public.community_contributions
+            WHERE case_id = $1 AND publication_state = 'PUBLISHED'
+              AND case_revision < $2 LIMIT 1`,
+          [caseId, 1]
+        );
+        if (linkedPublicContribution.rows[0]) {
+          void publishRealtimeEvent({
+            channel: "community",
+            eventType: "community:trust_revision",
+            subjectId: null,
+            classification: "PUBLIC",
+            producer: "StudentHub-AI",
+            environment: process.env.NODE_ENV || "development",
+            correlationId: requestId || `trust-${caseId}`,
+            causationId: caseId,
+            idempotencyKey: `community:trust-revision:${caseId}:1`,
+            data: { caseId, caseRevision: 1, trustFreshness: "STALE", trustMutation: false },
+          }).catch(() => {});
+        }
+      } catch {
+        // Feed freshness is recomputed from canonical revisions on the next
+        // read; a missed hint cannot mutate the case or hide stale state.
+      }
+
       // 4. Bind to Living Evidence Passport
       let passportId = null;
       try {

@@ -12,6 +12,7 @@ import { WebSearchRetriever } from "./WebSearchRetriever.js";
 import { markNetworkGuardedRetriever } from "./NetworkGuard.js";
 import { SOURCE_TYPE, EVIDENCE_PROVIDER_STATUS } from "../types.js";
 import { validateRemoteUrlSync } from "../../../security/hardening/SafeRemoteUrl.js";
+import { createHash } from "node:crypto";
 
 const TAVILY_SEARCH_ENDPOINT = "https://api.tavily.com/search";
 // Tavily's public API accepts up to 20 results per request. Keep that provider
@@ -27,12 +28,171 @@ const RETRY_BACKOFF_MIN_MS = 100;
 const RETRY_BACKOFF_MAX_MS = 250;
 const RETRYABLE_HTTP_STATUSES = new Set([502, 503, 504]);
 const MAX_REQUEST_TRACES = 12;
-// Run every generated query, but keep a bounded number of in-flight requests
-// so a long OCR/QR input cannot exhaust sockets or the Tavily rate budget.
-const SEARCH_CONCURRENCY = 8;
+const MAX_LIVE_CALL_RECORDS = 100;
+const MAX_QUERY_CACHE_ENTRIES = 500;
+// Sequential requests let a quota/auth circuit open before a generated query
+// batch can spend more credits. Cross-request duplicate queries share cache.
+const SEARCH_CONCURRENCY = 1;
+const TAVILY_MODES = new Set(["OFF", "SMOKE", "FINAL_LIVE"]);
+const SMOKE_CALL_LIMIT = 3;
+const FINAL_LIVE_CALL_LIMIT = 100;
+const TAVILY_BUDGETS = new Map();
+const TAVILY_QUERY_CACHE = new Map();
+const TAVILY_CIRCUITS = new Map();
+const TAVILY_IN_FLIGHT = new Map();
 
 function defaultEnv() {
   return typeof process !== "undefined" ? process.env : {};
+}
+
+function digest(value) {
+  return createHash("sha256").update(String(value || ""), "utf8").digest("hex");
+}
+
+function modeFor(env) {
+  const raw = typeof env?.TAVILY_MODE === "string" ? env.TAVILY_MODE.trim().toUpperCase() : "OFF";
+  return TAVILY_MODES.has(raw) ? raw : "OFF";
+}
+
+function runIdFor(env) {
+  const raw = typeof env?.TAVILY_RUN_ID === "string" ? env.TAVILY_RUN_ID.trim() : "";
+  return raw.slice(0, 120) || "process-default";
+}
+
+function budgetLimitFor(env, mode = modeFor(env)) {
+  if (mode === "OFF") return 0;
+  const raw = env?.TAVILY_MAX_CALLS_PER_RUN;
+  if (mode === "SMOKE") {
+    if (raw === undefined || raw === null || raw === "") return SMOKE_CALL_LIMIT;
+    const parsed = Number(raw);
+    return Number.isInteger(parsed) && parsed >= 0 ? Math.min(SMOKE_CALL_LIMIT, parsed) : 0;
+  }
+  const parsed = Number(raw);
+  return Number.isInteger(parsed) && parsed > 0
+    ? Math.min(FINAL_LIVE_CALL_LIMIT, parsed)
+    : 0;
+}
+
+function budgetFor(env) {
+  const runId = runIdFor(env);
+  let ledger = TAVILY_BUDGETS.get(runId);
+  if (!ledger) {
+    ledger = {
+      attempted: 0,
+      succeeded: 0,
+      failed: 0,
+      skippedByCache: 0,
+      blockedByBudget: 0,
+      quotaErrorSeen: false,
+      callRecords: [],
+    };
+    TAVILY_BUDGETS.set(runId, ledger);
+  }
+  return { ledger, mode: modeFor(env), limit: budgetLimitFor(env), runId };
+}
+
+function budgetSnapshot(env) {
+  const { ledger, mode, limit } = budgetFor(env);
+  return {
+    mode,
+    budget: limit,
+    callsAttempted: ledger.attempted,
+    callsSucceeded: ledger.succeeded,
+    callsFailed: ledger.failed,
+    callsSkippedByCache: ledger.skippedByCache,
+    callsBlockedByBudget: ledger.blockedByBudget,
+    quotaErrorSeen: ledger.quotaErrorSeen,
+    callRecords: ledger.callRecords.map((record) => ({ ...record })),
+  };
+}
+
+function credentialFingerprint(apiKey) {
+  return digest(apiKey).slice(0, 24);
+}
+
+function circuitFor(apiKey) {
+  return TAVILY_CIRCUITS.get(credentialFingerprint(apiKey)) || null;
+}
+
+function openCircuit(apiKey, status, currentController = null) {
+  const fingerprint = credentialFingerprint(apiKey);
+  const existing = TAVILY_CIRCUITS.get(fingerprint);
+  if (!existing) {
+    TAVILY_CIRCUITS.set(fingerprint, {
+      state: "OPEN",
+      providerStatus: status,
+      openedAt: new Date().toISOString(),
+    });
+  }
+  const controllers = TAVILY_IN_FLIGHT.get(fingerprint);
+  for (const controller of controllers || []) {
+    if (controller !== currentController && !controller.signal.aborted) {
+      controller.abort("tavily-provider-circuit-open");
+    }
+  }
+}
+
+function registerInFlight(apiKey, controller) {
+  const fingerprint = credentialFingerprint(apiKey);
+  const controllers = TAVILY_IN_FLIGHT.get(fingerprint) || new Set();
+  controllers.add(controller);
+  TAVILY_IN_FLIGHT.set(fingerprint, controllers);
+  return () => {
+    controllers.delete(controller);
+    if (controllers.size === 0) TAVILY_IN_FLIGHT.delete(fingerprint);
+  };
+}
+
+function queryCacheKey({ apiKey, query, includeDomains, searchDepth, maxResults }) {
+  const normalizedQuery = query.normalize("NFKC").replace(/[\u0000-\u001F\u007F]/g, " ").trim().replace(/\s+/g, " ").toLocaleLowerCase("en-US");
+  return digest(JSON.stringify({
+    credential: credentialFingerprint(apiKey),
+    query: normalizedQuery,
+    includeDomains: [...includeDomains].sort(),
+    searchDepth,
+    maxResults,
+  }));
+}
+
+function recordLiveCall(env, record, outcome) {
+  const { ledger } = budgetFor(env);
+  if (outcome === "SUCCESS") ledger.succeeded += 1;
+  else {
+    ledger.failed += 1;
+    if (record.status === "QUOTA_EXHAUSTED") ledger.quotaErrorSeen = true;
+  }
+  ledger.callRecords = [...ledger.callRecords, {
+    queryHash: record.queryHash,
+    timestamp: record.timestamp,
+    httpStatus: safeHttpStatus(record.httpStatus),
+    durationMs: Math.max(0, Number(record.durationMs) || 0),
+    resultCount: Math.max(0, Number(record.resultCount) || 0),
+    status: record.status,
+  }].slice(-MAX_LIVE_CALL_RECORDS);
+}
+
+function circuitError(circuit) {
+  const status = circuit?.providerStatus || EVIDENCE_PROVIDER_STATUS.QUOTA_EXHAUSTED;
+  const code = status === EVIDENCE_PROVIDER_STATUS.AUTH_FAILED
+    ? "TAVILY_AUTH_CIRCUIT_OPEN"
+    : "TAVILY_QUOTA_CIRCUIT_OPEN";
+  return createProviderErrorWithMetadata(code, status, null, {
+    retryable: false,
+    errorCategory: status === EVIDENCE_PROVIDER_STATUS.AUTH_FAILED ? "AUTH_ERROR" : "PROVIDER_QUOTA",
+    circuitOpen: true,
+  });
+}
+
+export function resetTavilyCircuitForConfiguredKey({ env = defaultEnv() } = {}) {
+  const apiKey = typeof env?.TAVILY_API_KEY === "string" ? env.TAVILY_API_KEY.trim() : "";
+  return apiKey ? TAVILY_CIRCUITS.delete(credentialFingerprint(apiKey)) : false;
+}
+
+export function resetTavilyRuntimeForTests() {
+  TAVILY_BUDGETS.clear();
+  TAVILY_QUERY_CACHE.clear();
+  TAVILY_CIRCUITS.clear();
+  TAVILY_IN_FLIGHT.clear();
 }
 
 function boundedString(value, maxLength = 240) {
@@ -66,6 +226,8 @@ function providerStatusForHttp(status) {
   if (status === 401 || status === 403) return EVIDENCE_PROVIDER_STATUS.AUTH_FAILED;
   if (status === 408 || status === 504) return EVIDENCE_PROVIDER_STATUS.TIMEOUT;
   if (status === 429) return EVIDENCE_PROVIDER_STATUS.RATE_LIMITED;
+  // Tavily returns HTTP 432 when the plan's configured usage limit is reached.
+  if (status === 432) return EVIDENCE_PROVIDER_STATUS.QUOTA_EXHAUSTED;
   if (status !== null && status >= 500) return EVIDENCE_PROVIDER_STATUS.UNAVAILABLE;
   return EVIDENCE_PROVIDER_STATUS.INVALID_RESPONSE;
 }
@@ -116,6 +278,21 @@ function recordRejection(diagnostics, reason) {
 
 function isRetryableProviderError(error) {
   return error?.retryable === true;
+}
+
+function providerErrorCategory(error) {
+  if (error?.providerStatus === EVIDENCE_PROVIDER_STATUS.BUDGET_EXHAUSTED) return "CALL_BUDGET";
+  if (error?.providerStatus === EVIDENCE_PROVIDER_STATUS.QUOTA_EXHAUSTED) return "PROVIDER_QUOTA";
+  if (error?.providerStatus === EVIDENCE_PROVIDER_STATUS.AUTH_FAILED) return "AUTH_ERROR";
+  if (error?.providerStatus === EVIDENCE_PROVIDER_STATUS.RATE_LIMITED) return "RATE_LIMIT";
+  if (error?.providerStatus === EVIDENCE_PROVIDER_STATUS.TIMEOUT) return "TIMEOUT";
+  if (error?.providerStatus === EVIDENCE_PROVIDER_STATUS.INVALID_RESPONSE) return "MALFORMED_RESPONSE";
+  return error?.providerStatus ? "PROVIDER_ERROR" : "UNKNOWN";
+}
+
+function appendProviderAttempt(diagnostics, attempt) {
+  diagnostics.providerAttempts = [...diagnostics.providerAttempts, attempt].slice(-MAX_REQUEST_TRACES);
+  diagnostics.providerAttempt = { ...attempt };
 }
 
 function defaultSleep(ms) {
@@ -173,9 +350,10 @@ async function readJsonBounded(response) {
 function sourceFromResult(result, queryIndex, resultIndex) {
   const guard = validateRemoteUrlSync(result?.url);
   if (!guard.ok) return { rejected: guard.code };
+  const canonicalUrl = canonicalSearchUrl(guard.url);
   let parsed;
   try {
-    parsed = new URL(guard.url);
+    parsed = new URL(canonicalUrl);
   } catch {
     return { rejected: "INVALID_REMOTE_URL" };
   }
@@ -183,7 +361,7 @@ function sourceFromResult(result, queryIndex, resultIndex) {
   return {
     source: {
       sourceId,
-      url: guard.url,
+      url: canonicalUrl,
       domain: parsed.hostname.toLowerCase(),
       title: boundedString(result?.title, 240) || guard.url,
       publisher: boundedString(result?.publisher || parsed.hostname, 180),
@@ -193,8 +371,40 @@ function sourceFromResult(result, queryIndex, resultIndex) {
       liveEvidence: false,
       retrievalOutcome: "CANDIDATE",
       sourceFingerprint: `tavily:${sourceId}`,
+      providerScore: Number.isFinite(Number(result?.score)) && Number(result.score) >= 0 && Number(result.score) <= 1
+        ? Number(result.score)
+        : null,
+      retrievalQueryIndex: queryIndex,
+      retrievalResultIndex: resultIndex,
     },
   };
+}
+
+function canonicalSearchUrl(value) {
+  try {
+    const url = new URL(value);
+    url.hash = "";
+    url.hostname = url.hostname.toLowerCase();
+    for (const key of [...url.searchParams.keys()]) {
+      if (/^(?:utm_[a-z0-9_]+|gclid|fbclid|mc_cid|mc_eid|ref_src)$/i.test(key)) url.searchParams.delete(key);
+    }
+    url.searchParams.sort();
+    return url.toString();
+  } catch {
+    return String(value || "").toLowerCase();
+  }
+}
+
+function safeIncludeDomains(value) {
+  if (!Array.isArray(value)) return [];
+  const domains = value.map((item) => typeof item === "string" ? item.trim().toLowerCase().replace(/\.$/, "") : "")
+    .filter((domain) => domain.length <= 253 && /^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/.test(domain) && domain.includes("."));
+  return [...new Set(domains)].slice(0, 5);
+}
+
+function safeSearchDepth(value) {
+  const depth = typeof value === "string" ? value.trim().toLowerCase() : "";
+  return ["ultra-fast", "fast", "basic", "advanced"].includes(depth) ? depth : "basic";
 }
 
 export class TavilyRetriever extends IEvidenceRetriever {
@@ -209,6 +419,7 @@ export class TavilyRetriever extends IEvidenceRetriever {
     this.lastSearchStatus = EVIDENCE_PROVIDER_STATUS.NOT_CONFIGURED;
     this.lastSearchDiagnostics = {
       provider: "tavily",
+      mode: "OFF",
       envPresent: false,
       adapterConfigured: false,
       timeoutConfiguredMs: MAX_REQUEST_TIMEOUT_MS,
@@ -232,6 +443,8 @@ export class TavilyRetriever extends IEvidenceRetriever {
       lastAbortReason: null,
       lastTimeoutClassification: null,
       lastErrorCode: null,
+      providerAttempt: null,
+      providerAttempts: [],
       durationMs: 0,
     };
   }
@@ -244,18 +457,32 @@ export class TavilyRetriever extends IEvidenceRetriever {
     return Boolean(this.apiKey);
   }
 
+  get mode() {
+    return modeFor(this.env);
+  }
+
+  isEnabledByMode() {
+    return this.isConfigured() && this.mode !== "OFF" && budgetLimitFor(this.env, this.mode) > 0;
+  }
+
   getRuntimeDiagnostics() {
+    const budget = budgetSnapshot(this.env);
+    const circuit = circuitFor(this.apiKey);
     return {
       ...this.lastSearchDiagnostics,
       envPresent: this.isConfigured(),
       adapterConfigured: true,
+      mode: budget.mode,
+      budget,
+      circuit: circuit ? { state: circuit.state, providerStatus: circuit.providerStatus, openedAt: circuit.openedAt } : { state: "CLOSED" },
       rejectionReasons: [...this.lastSearchDiagnostics.rejectionReasons],
       httpStatuses: [...this.lastSearchDiagnostics.httpStatuses],
       requestTrace: this.lastSearchDiagnostics.requestTrace.map((trace) => ({ ...trace })),
+      providerAttempts: this.lastSearchDiagnostics.providerAttempts.map((attempt) => ({ ...attempt })),
     };
   }
 
-  async #searchOne(query, { signal, timeoutMs, attempt = 1 }) {
+  async #searchOne(query, { signal, timeoutMs, attempt = 1, maxResults = MAX_RESULTS_PER_QUERY, includeDomains = [], searchDepth = "basic" }) {
     throwIfAborted(signal);
     if (typeof this.fetchImpl !== "function") {
       throw createProviderErrorWithMetadata("TAVILY_FETCH_UNAVAILABLE", EVIDENCE_PROVIDER_STATUS.UNAVAILABLE, null, {
@@ -266,6 +493,7 @@ export class TavilyRetriever extends IEvidenceRetriever {
 
     const controller = new AbortController();
     const unbindAbort = bindAbortSignal(controller, signal);
+    const unbindInFlight = registerInFlight(this.apiKey, controller);
     const startedClock = Date.now();
     const startedAt = new Date(startedClock).toISOString();
     const requestTimeoutMs = Math.max(MIN_REQUEST_TIMEOUT_MS, Math.min(MAX_REQUEST_TIMEOUT_MS, Number(timeoutMs) || DEFAULT_SEARCH_BUDGET_MS));
@@ -292,8 +520,9 @@ export class TavilyRetriever extends IEvidenceRetriever {
         body: JSON.stringify({
           api_key: this.apiKey,
           query,
-          search_depth: "basic",
-          max_results: MAX_RESULTS_PER_QUERY,
+          search_depth: safeSearchDepth(searchDepth),
+          max_results: maxResults,
+          ...(includeDomains.length > 0 ? { include_domains: includeDomains, include_domains_mode: "restrict" } : {}),
           include_answer: false,
           include_raw_content: false,
         }),
@@ -339,12 +568,24 @@ export class TavilyRetriever extends IEvidenceRetriever {
           },
         );
       }
+      if (controller.signal.aborted && controller.signal.reason === "tavily-provider-circuit-open") {
+        throw circuitError(circuitFor(this.apiKey));
+      }
       responseStatus = safeHttpStatus(response?.status);
       if (!response?.ok) {
         const classification = responseStatus === 504 ? "UPSTREAM_TAVILY_504" : "OTHER";
-        throw createProviderErrorWithMetadata(`TAVILY_HTTP_${responseStatus || "ERROR"}`, providerStatusForHttp(responseStatus), responseStatus, {
+        const providerStatus = providerStatusForHttp(responseStatus);
+        if ([EVIDENCE_PROVIDER_STATUS.QUOTA_EXHAUSTED, EVIDENCE_PROVIDER_STATUS.AUTH_FAILED].includes(providerStatus)) {
+          openCircuit(this.apiKey, providerStatus, controller);
+        }
+        throw createProviderErrorWithMetadata(`TAVILY_HTTP_${responseStatus || "ERROR"}`, providerStatus, responseStatus, {
           timeoutClassification: classification,
-          retryable: RETRYABLE_HTTP_STATUSES.has(responseStatus),
+          errorCategory: providerStatus === EVIDENCE_PROVIDER_STATUS.QUOTA_EXHAUSTED
+            ? "PROVIDER_QUOTA"
+            : providerStatus === EVIDENCE_PROVIDER_STATUS.AUTH_FAILED ? "AUTH_ERROR" : "HTTP_ERROR",
+          retryable: providerStatus === EVIDENCE_PROVIDER_STATUS.QUOTA_EXHAUSTED || providerStatus === EVIDENCE_PROVIDER_STATUS.AUTH_FAILED
+            ? false
+            : RETRYABLE_HTTP_STATUSES.has(responseStatus),
         });
       }
       const payload = await readJsonBounded(response);
@@ -364,6 +605,9 @@ export class TavilyRetriever extends IEvidenceRetriever {
         }),
       };
     } catch (error) {
+      if (controller.signal.aborted && controller.signal.reason === "tavily-provider-circuit-open") {
+        throw circuitError(circuitFor(this.apiKey));
+      }
       if (signal?.aborted) {
         throw createProviderErrorWithMetadata("TAVILY_PARENT_ABORT", EVIDENCE_PROVIDER_STATUS.TIMEOUT, null, {
           timeoutClassification: "VERCEL_NETWORK_TIMEOUT",
@@ -407,6 +651,7 @@ export class TavilyRetriever extends IEvidenceRetriever {
     } finally {
       clearTimeout(timeoutId);
       unbindAbort();
+      unbindInFlight();
     }
   }
 
@@ -415,14 +660,25 @@ export class TavilyRetriever extends IEvidenceRetriever {
     const parentTimeoutMs = boundedParentTimeout(options.timeoutMs);
     const requestedQueries = Array.isArray(queries) ? queries.length : 0;
     const boundedQueries = (Array.isArray(queries) ? queries : [])
-      .map((item) => typeof item === "string" ? item : item?.query)
-      .filter((item) => typeof item === "string" && item.trim())
-      // Tavily recommends compact queries. This is a provider transport
-      // constraint, not a source-count limit: every generated query is kept
-      // and sent within the provider's accepted query size.
-      .map((item) => item.normalize("NFKC").replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, 380));
+      .map((item) => {
+        const record = typeof item === "string" ? { query: item } : item && typeof item === "object" && !Array.isArray(item) ? item : {};
+        const query = typeof record.query === "string"
+          ? record.query.normalize("NFKC").replace(/[\u0000-\u001F\u007F]/g, " ").trim().slice(0, 380)
+          : "";
+        return query ? {
+          query,
+          includeDomains: safeIncludeDomains(record.includeDomains),
+          searchDepth: safeSearchDepth(record.searchDepth),
+        } : null;
+      })
+      .filter(Boolean);
+    const requestedMaxResults = Number(options.maxResults);
+    const maxResults = Number.isFinite(requestedMaxResults)
+      ? Math.max(1, Math.min(MAX_RESULTS_PER_QUERY, Math.floor(requestedMaxResults)))
+      : MAX_RESULTS_PER_QUERY;
     const diagnostics = {
       provider: "tavily",
+      mode: this.mode,
       envPresent: this.isConfigured(),
       adapterConfigured: true,
       timeoutConfiguredMs: MAX_REQUEST_TIMEOUT_MS,
@@ -446,6 +702,11 @@ export class TavilyRetriever extends IEvidenceRetriever {
       lastAbortReason: null,
       lastTimeoutClassification: null,
       lastErrorCode: null,
+      providerAttempt: null,
+      providerAttempts: [],
+      queriesSkippedByCache: 0,
+      callsBlockedByBudget: 0,
+      quotaErrorSeen: false,
       durationMs: 0,
     };
     this.lastSearchDiagnostics = diagnostics;
@@ -454,12 +715,57 @@ export class TavilyRetriever extends IEvidenceRetriever {
       this.lastSearchStatus = EVIDENCE_PROVIDER_STATUS.NOT_CONFIGURED;
       diagnostics.lastErrorCode = "TAVILY_NOT_CONFIGURED";
       diagnostics.durationMs = Date.now() - startedAt;
+      diagnostics.budget = budgetSnapshot(this.env);
       throw createProviderError("TAVILY_NOT_CONFIGURED", EVIDENCE_PROVIDER_STATUS.NOT_CONFIGURED);
+    }
+
+    if (!TAVILY_MODES.has(String(this.env?.TAVILY_MODE || "OFF").trim().toUpperCase())) {
+      this.lastSearchStatus = EVIDENCE_PROVIDER_STATUS.DISABLED;
+      diagnostics.lastErrorCode = "TAVILY_MODE_INVALID";
+      diagnostics.durationMs = Date.now() - startedAt;
+      diagnostics.budget = budgetSnapshot(this.env);
+      throw createProviderErrorWithMetadata("TAVILY_MODE_INVALID", EVIDENCE_PROVIDER_STATUS.DISABLED, null, { retryable: false });
+    }
+    if (this.mode === "OFF") {
+      this.lastSearchStatus = EVIDENCE_PROVIDER_STATUS.DISABLED;
+      diagnostics.lastErrorCode = "TAVILY_DISABLED_BY_MODE";
+      diagnostics.durationMs = Date.now() - startedAt;
+      diagnostics.budget = budgetSnapshot(this.env);
+      throw createProviderErrorWithMetadata("TAVILY_DISABLED_BY_MODE", EVIDENCE_PROVIDER_STATUS.DISABLED, null, { retryable: false });
+    }
+    const budgetState = budgetFor(this.env);
+    if (budgetState.limit <= 0) {
+      this.lastSearchStatus = EVIDENCE_PROVIDER_STATUS.BUDGET_EXHAUSTED;
+      diagnostics.lastErrorCode = this.mode === "FINAL_LIVE" ? "TAVILY_FINAL_LIVE_BUDGET_REQUIRED" : "TAVILY_CALL_BUDGET_ZERO";
+      diagnostics.durationMs = Date.now() - startedAt;
+      diagnostics.budget = budgetSnapshot(this.env);
+      throw createProviderErrorWithMetadata(diagnostics.lastErrorCode, EVIDENCE_PROVIDER_STATUS.BUDGET_EXHAUSTED, null, {
+        retryable: false,
+        errorCategory: "CALL_BUDGET",
+      });
+    }
+    const openCircuit = circuitFor(this.apiKey);
+    if (openCircuit) {
+      this.lastSearchStatus = openCircuit.providerStatus;
+      const error = circuitError(openCircuit);
+      diagnostics.lastErrorCode = error.code;
+      diagnostics.providerRetryable = false;
+      diagnostics.durationMs = Date.now() - startedAt;
+      appendProviderAttempt(diagnostics, {
+        provider: "TAVILY",
+        status: openCircuit.providerStatus,
+        httpStatus: null,
+        resultCount: 0,
+        durationMs: 0,
+        errorCategory: error.errorCategory,
+        retryable: false,
+      });
+      throw error;
     }
 
     const deadline = Date.now() + parentTimeoutMs;
     const sources = [];
-    const seenUrls = new Set();
+    const seenUrls = new Map();
     let searchBudgetExhausted = false;
     const recordTrace = (trace) => {
       if (!trace || typeof trace !== "object") return;
@@ -470,7 +776,7 @@ export class TavilyRetriever extends IEvidenceRetriever {
       diagnostics.lastTimeoutClassification = trace.classification && trace.classification !== "NONE" ? trace.classification : null;
     };
     try {
-      const runQuery = async ([queryIndex, query]) => {
+      const runQuery = async ([queryIndex, querySpec]) => {
         throwIfAborted(options.signal);
         diagnostics.queriesExecuted += 1;
         let response = null;
@@ -495,13 +801,108 @@ export class TavilyRetriever extends IEvidenceRetriever {
               recordTrace(error.requestTrace);
               return { queryIndex, budgetExhausted: true, error };
             }
-            diagnostics.callCount += 1;
             try {
-              response = await this.#searchOne(query, {
+              const cacheKey = queryCacheKey({
+                apiKey: this.apiKey,
+                query: querySpec.query,
+                includeDomains: querySpec.includeDomains,
+                searchDepth: querySpec.searchDepth,
+                maxResults,
+              });
+              const cachedEntry = TAVILY_QUERY_CACHE.get(cacheKey);
+              if (cachedEntry) {
+                budgetState.ledger.skippedByCache += 1;
+                diagnostics.queriesSkippedByCache += 1;
+                const cachedResponse = cachedEntry.promise ? await cachedEntry.promise : cachedEntry.value;
+                response = {
+                  ...cachedResponse,
+                  cacheHit: true,
+                  requestTrace: requestTrace({
+                    startedAt: new Date().toISOString(),
+                    startedClock: Date.now(),
+                    classification: "NONE",
+                    outcome: "CACHE_HIT",
+                    timeoutMs: 0,
+                    attempt,
+                  }),
+                };
+                recordTrace(response.requestTrace);
+                break;
+              }
+
+              const currentCircuit = circuitFor(this.apiKey);
+              if (currentCircuit) throw circuitError(currentCircuit);
+              if (budgetState.ledger.attempted >= budgetState.limit) {
+                budgetState.ledger.blockedByBudget += 1;
+                diagnostics.callsBlockedByBudget += 1;
+                throw createProviderErrorWithMetadata("TAVILY_CALL_BUDGET_EXHAUSTED", EVIDENCE_PROVIDER_STATUS.BUDGET_EXHAUSTED, null, {
+                  retryable: false,
+                  errorCategory: "CALL_BUDGET",
+                });
+              }
+
+              budgetState.ledger.attempted += 1;
+              diagnostics.callCount += 1;
+              const callStartedAt = new Date().toISOString();
+              const callStartedClock = Date.now();
+              const queryHash = digest(querySpec.query.normalize("NFKC").replace(/\s+/g, " ").trim().toLocaleLowerCase("en-US"));
+              const pending = this.#searchOne(querySpec.query, {
                 signal: options.signal,
                 timeoutMs: remainingMs,
                 attempt,
+                maxResults,
+                includeDomains: querySpec.includeDomains,
+                searchDepth: querySpec.searchDepth,
               });
+              const entry = { promise: pending, value: null };
+              TAVILY_QUERY_CACHE.set(cacheKey, entry);
+              while (TAVILY_QUERY_CACHE.size > MAX_QUERY_CACHE_ENTRIES) {
+                const oldest = TAVILY_QUERY_CACHE.keys().next().value;
+                if (oldest === undefined) break;
+                TAVILY_QUERY_CACHE.delete(oldest);
+              }
+              try {
+                response = await pending;
+                entry.value = { results: response.results, httpStatus: response.httpStatus };
+                entry.promise = null;
+                recordLiveCall(this.env, {
+                  queryHash,
+                  timestamp: callStartedAt,
+                  httpStatus: response.httpStatus,
+                  durationMs: Date.now() - callStartedClock,
+                  resultCount: response.results.length,
+                  status: "SUCCESS",
+                }, "SUCCESS");
+                appendProviderAttempt(diagnostics, {
+                  provider: "TAVILY",
+                  status: "SUCCESS",
+                  httpStatus: response.httpStatus,
+                  resultCount: response.results.length,
+                  durationMs: Date.now() - callStartedClock,
+                  errorCategory: null,
+                  retryable: false,
+                });
+              } catch (error) {
+                if (TAVILY_QUERY_CACHE.get(cacheKey) === entry) TAVILY_QUERY_CACHE.delete(cacheKey);
+                recordLiveCall(this.env, {
+                  queryHash,
+                  timestamp: callStartedAt,
+                  httpStatus: error?.httpStatus,
+                  durationMs: Date.now() - callStartedClock,
+                  resultCount: 0,
+                  status: error?.providerStatus || "FAILED",
+                }, "FAILED");
+                appendProviderAttempt(diagnostics, {
+                  provider: "TAVILY",
+                  status: error?.providerStatus || "FAILED",
+                  httpStatus: safeHttpStatus(error?.httpStatus),
+                  resultCount: 0,
+                  durationMs: Date.now() - callStartedClock,
+                  errorCategory: providerErrorCategory(error),
+                  retryable: error?.retryable === true,
+                });
+                throw error;
+              }
               recordTrace(response.requestTrace);
               break;
             } catch (error) {
@@ -568,30 +969,74 @@ export class TavilyRetriever extends IEvidenceRetriever {
             recordRejection(diagnostics, candidate.rejected);
             continue;
           }
-          const canonicalUrl = candidate.source.url.toLowerCase();
+          const canonicalUrl = canonicalSearchUrl(candidate.source.url);
           if (seenUrls.has(canonicalUrl)) {
             recordRejection(diagnostics, "DUPLICATE_URL");
+            const priorIndex = seenUrls.get(canonicalUrl);
+            const prior = sources[priorIndex];
+            if (Number.isFinite(candidate.source.providerScore) && (!Number.isFinite(prior?.providerScore) || candidate.source.providerScore > prior.providerScore)) {
+              sources[priorIndex] = candidate.source;
+            }
             continue;
           }
-          seenUrls.add(canonicalUrl);
+          seenUrls.set(canonicalUrl, sources.length);
           sources.push(candidate.source);
           diagnostics.acceptedResults += 1;
         }
         diagnostics.acceptedHostCount = new Set(sources.map((source) => source.domain).filter(Boolean)).size;
       }
       if (successfulResponseCount === 0 && firstQueryError) throw firstQueryError;
-      this.lastSearchStatus = searchBudgetExhausted
+      const quotaErrorSeen = queryResults.some((item) => item.error?.providerStatus === EVIDENCE_PROVIDER_STATUS.QUOTA_EXHAUSTED);
+      const authErrorSeen = queryResults.some((item) => item.error?.providerStatus === EVIDENCE_PROVIDER_STATUS.AUTH_FAILED);
+      diagnostics.quotaErrorSeen = quotaErrorSeen || budgetState.ledger.quotaErrorSeen;
+      this.lastSearchStatus = quotaErrorSeen
+        ? EVIDENCE_PROVIDER_STATUS.QUOTA_EXHAUSTED
+        : authErrorSeen
+          ? EVIDENCE_PROVIDER_STATUS.AUTH_FAILED
+          : searchBudgetExhausted
         ? EVIDENCE_PROVIDER_STATUS.TIMEOUT
         : hadQueryFailure ? EVIDENCE_PROVIDER_STATUS.PARTIAL : EVIDENCE_PROVIDER_STATUS.SUCCESS;
       diagnostics.providerRetryable = null;
       diagnostics.providerRetryExhausted = hadQueryFailure ? diagnostics.providerRetryExhausted : false;
-      diagnostics.lastErrorCode = searchBudgetExhausted
+      diagnostics.lastErrorCode = quotaErrorSeen
+        ? "TAVILY_HTTP_432"
+        : authErrorSeen
+          ? "TAVILY_AUTH_CIRCUIT_OPEN"
+          : searchBudgetExhausted
         ? "TAVILY_SEARCH_BUDGET_EXHAUSTED"
         : hadQueryFailure ? boundedString(firstQueryError?.code || firstQueryError?.message, 120) || "TAVILY_PARTIAL_SEARCH" : null;
       diagnostics.lastTimeoutClassification = searchBudgetExhausted ? "LOCAL_ADAPTER_TIMEOUT" : diagnostics.lastTimeoutClassification;
       diagnostics.lastAbortReason = searchBudgetExhausted ? "search-budget-exhausted" : diagnostics.lastAbortReason;
       diagnostics.durationMs = Date.now() - startedAt;
-      return sources;
+      diagnostics.providerAttempt = diagnostics.callCount > 0 ? {
+        provider: "TAVILY",
+        status: this.lastSearchStatus,
+        httpStatus: diagnostics.lastHttpStatus,
+        resultCount: diagnostics.rawResultCount,
+        durationMs: diagnostics.durationMs,
+        errorCategory: quotaErrorSeen
+          ? "PROVIDER_QUOTA"
+          : authErrorSeen
+            ? "AUTH_ERROR"
+            : diagnostics.callsBlockedByBudget > 0 ? "CALL_BUDGET" : hadQueryFailure ? "PROVIDER_ERROR" : null,
+        retryable: false,
+      } : null;
+      diagnostics.responseSource = diagnostics.callCount > 0
+        ? "LIVE_PROVIDER_RESPONSE"
+        : diagnostics.queriesSkippedByCache > 0 ? "RUN_CACHE" : "NONE";
+      diagnostics.budget = budgetSnapshot(this.env);
+      if (successfulResponseCount === 0 && !firstQueryError && boundedQueries.length > 0) {
+        throw createProviderErrorWithMetadata("TAVILY_CALL_BUDGET_EXHAUSTED", EVIDENCE_PROVIDER_STATUS.BUDGET_EXHAUSTED, null, {
+          retryable: false,
+          errorCategory: "CALL_BUDGET",
+        });
+      }
+      return sources.sort((left, right) => {
+        const leftScore = Number.isFinite(left.providerScore) ? left.providerScore : -1;
+        const rightScore = Number.isFinite(right.providerScore) ? right.providerScore : -1;
+        if (leftScore !== rightScore) return rightScore - leftScore;
+        return left.retrievalQueryIndex - right.retrievalQueryIndex || left.retrievalResultIndex - right.retrievalResultIndex;
+      });
     } catch (error) {
       if (options.signal?.aborted || error?.name === "AbortError") throw error;
       this.lastSearchStatus = error?.providerStatus || EVIDENCE_PROVIDER_STATUS.UNAVAILABLE;
@@ -599,6 +1044,17 @@ export class TavilyRetriever extends IEvidenceRetriever {
       diagnostics.lastTimeoutClassification = error?.timeoutClassification || diagnostics.lastTimeoutClassification || null;
       diagnostics.lastAbortReason = error?.abortReason || diagnostics.lastAbortReason || null;
       diagnostics.durationMs = Date.now() - startedAt;
+      diagnostics.quotaErrorSeen = error?.providerStatus === EVIDENCE_PROVIDER_STATUS.QUOTA_EXHAUSTED || budgetState.ledger.quotaErrorSeen;
+      diagnostics.providerAttempt = diagnostics.providerAttempt || {
+        provider: "TAVILY",
+        status: error?.providerStatus || EVIDENCE_PROVIDER_STATUS.UNAVAILABLE,
+        httpStatus: safeHttpStatus(error?.httpStatus),
+        resultCount: 0,
+        durationMs: diagnostics.durationMs,
+        errorCategory: providerErrorCategory(error),
+        retryable: error?.retryable === true,
+      };
+      diagnostics.budget = budgetSnapshot(this.env);
       throw error;
     }
   }

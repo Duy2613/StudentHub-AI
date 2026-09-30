@@ -27,20 +27,24 @@ test("VNext public navigation does not promote the retired learning product", ()
   assert.doesNotMatch(home, /ContinueLearningBar|href=["']\/learn/);
 });
 
-test("CUT-2 retires legacy learning routes through redirects without deleting shared data", () => {
+test("CUT-2 applies each retired learning route's explicit not-found or replacement disposition", () => {
   const retiredRoutes = [
-    "src/app/learn/page.jsx",
-    "src/app/learn/[courseId]/[lessonId]/page.jsx",
-    "src/app/practice/page.jsx",
-    "src/app/projects/page.jsx",
-    "src/app/quests/page.jsx",
-    "src/app/roadmap/page.jsx",
+    ["src/app/learn/page.jsx", "notFound"],
+    ["src/app/learn/[courseId]/[lessonId]/page.jsx", "notFound"],
+    ["src/app/practice/page.jsx", "notFound"],
+    ["src/app/projects/page.jsx", "redirect"],
+    ["src/app/quests/page.jsx", "notFound"],
+    ["src/app/roadmap/page.jsx", "notFound"],
   ];
 
-  for (const route of retiredRoutes) {
+  for (const [route, disposition] of retiredRoutes) {
     const source = read(route);
     assert.match(source, /from ["']next\/navigation["']/);
-    assert.match(source, /redirect\(["'][^"']+["']\)/);
+    if (disposition === "redirect") {
+      assert.match(source, /\bredirect\(["'][^"']+["']\)/);
+    } else {
+      assert.match(source, /\bnotFound\(\)/);
+    }
     assert.doesNotMatch(source, /delete|drop|truncate|remove.*course|lesson.*delete/i);
   }
 });

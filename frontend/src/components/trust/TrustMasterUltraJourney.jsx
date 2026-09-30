@@ -3,11 +3,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
-  AlertTriangle,
   ArrowLeft,
   ArrowRight,
   Check,
-  ChevronRight,
   ClipboardPaste,
   ExternalLink,
   FileImage,
@@ -45,6 +43,7 @@ const INPUT_MODES = [
   { id: "text", label: "Văn bản", icon: ClipboardPaste },
   { id: "url", label: "URL", icon: Globe2 },
 ];
+const EMPTY_SOURCES = Object.freeze([]);
 
 const STATE_LABELS = {
   IDLE: "Sẵn sàng",
@@ -140,45 +139,6 @@ function TechnicalDetails({ data, title = "Technical Details" }) {
   );
 }
 
-function EvidenceSourceCard({ source, onSelect }) {
-  const relation = String(source.relationship || "context").toLowerCase();
-  const relationLabel = relation.includes("contrad") ? "Mâu thuẫn" : relation.includes("support") ? "Hỗ trợ" : "Bối cảnh";
-  return (
-    <article className={`master-ultra-source-card master-ultra-source-${relation.includes("contrad") ? "contradicting" : relation.includes("support") ? "supporting" : "context"}`}>
-      <button type="button" onClick={() => onSelect?.(source)} className="master-ultra-source-main text-left">
-        <span className="master-ultra-source-topline">
-          <span><LockKeyhole size={12} /> {safeText(source.domain, "domain chưa công bố")}</span>
-          <ChevronRight size={14} />
-        </span>
-        <strong className="block text-sm font-semibold my-1">
-          {source.url ? (
-            <a
-              href={source.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline text-cyan-200"
-              onClick={(event) => event.stopPropagation()}
-            >
-              {safeText(source.title)}
-            </a>
-          ) : safeText(source.title)}
-        </strong>
-        <span className="master-ultra-source-meta">{safeText(source.sourceType, "Chưa phân loại")} · {relationLabel}</span>
-        <p className="line-clamp-2 text-xs text-slate-300 mt-1">{safeText(source.snippet, "Evidence record không có đoạn trích được công bố.")}</p>
-      </button>
-      <div className="master-ultra-source-footer">
-        <span>{safeText(source.publishedAt, "Ngày chưa công bố")}</span>
-        {source.url ? (
-          <a href={source.url} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()} className="inline-flex items-center gap-1 hover:underline text-cyan-400 text-xs">
-            Mở URL <ExternalLink size={12} />
-          </a>
-        ) : <span className="master-ultra-muted">Không có URL</span>}
-      </div>
-    </article>
-  );
-}
-
-
 function ProgressRail({ normalized, activeIndex, processing, canInspect, onInspect }) {
   return (
     <nav className="master-ultra-rail" aria-label="Năm lớp Trust chính" data-primary-layer-count="5">
@@ -238,6 +198,7 @@ function InputComposer({
   processing,
   hasResult,
   demoEnabled,
+  hideHero,
   sourceProvenance,
   fileInputRef,
   onModeChange,
@@ -251,7 +212,7 @@ function InputComposer({
   const canSubmit = mode === "image" || mode === "qr" ? Boolean(file) : Boolean(content?.trim());
   return (
     <section className="master-ultra-composer" aria-labelledby="master-ultra-input-title">
-      <div className="master-ultra-composer-copy">
+      {!hideHero && <div className="master-ultra-composer-copy">
         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-semibold tracking-wider mb-1">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           TRUST ENGINE
@@ -262,7 +223,7 @@ function InputComposer({
         <p className="text-slate-300 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
           Đưa ảnh chụp, mã QR, văn bản hoặc URL vào luồng đối chiếu 5 tầng độc lập.
         </p>
-      </div>
+      </div>}
       <div className="master-ultra-composer-panel">
         <div className="master-ultra-mode-switch" role="tablist" aria-label="Loại đầu vào Trust">
           {INPUT_MODES.map(({ id, label, icon: Icon }) => (
@@ -282,6 +243,8 @@ function InputComposer({
             {preview ? (
               <>
                 <div className="master-ultra-upload-preview flex items-center justify-center p-2 bg-black/40 rounded-xl border border-white/10">
+                  {/* Local object URLs stay on-device and bypass Next's remote image optimizer. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={preview}
                     alt={mode === "qr" ? "Ảnh mã QR sẽ được phân tích" : "Ảnh sẽ được phân tích"}
@@ -327,8 +290,8 @@ function InputComposer({
               /^(javascript:|data:|file:|vbscript:)/i.test(ocr.qrContent) ||
               /(localhost|127\.0\.0\.1|169\.254\.169\.254|192\.168\.|10\.)/i.test(ocr.qrContent) ||
               /@/i.test(ocr.qrContent)
-                ? "BLOCKED"
-                : "SAFE"
+                ? "BLOCKED_BY_LOCAL_POLICY"
+                : "NOT_BLOCKED_BY_LOCAL_POLICY"
             }
           >
             <div className="flex items-center justify-between mb-1">
@@ -350,15 +313,15 @@ function InputComposer({
                 /(localhost|127\.0\.0\.1|169\.254\.169\.254|192\.168\.|10\.)/i.test(ocr.qrContent) ||
                 /@/i.test(ocr.qrContent)
                   ? "text-rose-400 font-bold"
-                  : "text-emerald-400 font-bold"
+                  : "text-slate-300 font-normal"
               }>
                 {/^(javascript:|data:|file:|vbscript:)/i.test(ocr.qrContent) ||
                 /(localhost|127\.0\.0\.1|169\.254\.169\.254|192\.168\.|10\.)/i.test(ocr.qrContent) ||
                 /@/i.test(ocr.qrContent)
-                  ? "BỊ CHẶN (SSRF / UNSAFE)"
-                  : "AN TOÀN"}
+                  ? "BỊ CHẶN BỞI KIỂM TRA ĐẦU VÀO"
+                  : "CHƯA BỊ CHẶN BỞI KIỂM TRA ĐẦU VÀO"}
               </strong></span>
-              <span>ĐIỀU HƯỚNG TỰ ĐỘNG: <strong className="text-slate-300">KHÔNG (AN TOÀN)</strong></span>
+              <span>ĐIỀU HƯỚNG TỰ ĐỘNG: <strong className="text-slate-300">KHÔNG</strong></span>
             </div>
             {ocr.qrCodes && ocr.qrCodes.length > 1 && (
               <div className="mt-2 pt-2 border-t border-white/5 space-y-1">
@@ -394,12 +357,13 @@ function ClaimLayer({ layer }) {
     <div className="master-ultra-layer-content space-y-4">
       {/* Visual Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start mb-2">
-        <div className="w-28 h-20 sm:w-36 sm:h-24 rounded border border-white/10 overflow-hidden flex-shrink-0 bg-black/40">
-          <img
+        <div className="relative w-28 h-20 sm:w-36 sm:h-24 rounded border border-white/10 overflow-hidden flex-shrink-0 bg-black/40">
+          <Image
             src="/media/v3/trust/l1-claim.webp"
             alt="Minh họa cấu trúc bóc tách mệnh đề Layer 1"
+            fill
+            sizes="(max-width: 640px) 112px, 144px"
             className="w-full h-full object-cover"
-            loading="lazy"
           />
         </div>
         <div className="master-ultra-claim-object flex-1">
@@ -419,20 +383,20 @@ function ClaimLayer({ layer }) {
         </div>
         <div>
           <span className="text-[11px] font-mono text-slate-400 block uppercase">Screen Result</span>
-          <strong className={`text-sm font-mono ${layer.screenResult === 'BLOCK' ? 'text-rose-400' : layer.screenResult === 'REVIEW' ? 'text-amber-400' : 'text-emerald-400'}`}>
-            {layer.screenResult || "PASS"}
+          <strong className={`text-sm font-mono ${layer.screenResult === 'BLOCK' ? 'text-rose-400' : layer.screenResult === 'REVIEW' ? 'text-amber-400' : layer.screenResult === 'PASS' ? 'text-emerald-400' : 'text-slate-300'}`}>
+            {layer.screenResult || "NOT_ASSESSED"}
           </strong>
         </div>
         <div>
           <span className="text-[11px] font-mono text-slate-400 block uppercase">Risk Level</span>
-          <strong className={`text-sm font-mono ${layer.risk === 'HIGH' || layer.risk === 'CRITICAL' ? 'text-rose-400' : layer.risk === 'MEDIUM' ? 'text-amber-400' : 'text-emerald-400'}`}>
-            {layer.risk || "LOW"}
+          <strong className={`text-sm font-mono ${layer.risk === 'HIGH' || layer.risk === 'CRITICAL' ? 'text-rose-400' : layer.risk === 'MEDIUM' ? 'text-amber-400' : layer.risk === 'LOW' ? 'text-emerald-400' : 'text-slate-300'}`}>
+            {layer.risk || "UNKNOWN"}
           </strong>
         </div>
         <div>
           <span className="text-[11px] font-mono text-slate-400 block uppercase">Confidence</span>
           <strong className="text-sm font-mono text-slate-200">
-            {layer.confidence !== null && layer.confidence !== undefined ? (typeof layer.confidence === "number" ? `${Math.round(layer.confidence * 100)}%` : String(layer.confidence)) : "null"}
+            {layer.confidence !== null && layer.confidence !== undefined ? (typeof layer.confidence === "number" ? `${Math.round(layer.confidence * 100)}%` : String(layer.confidence)) : "Chưa được định lượng"}
           </strong>
         </div>
       </div>
@@ -442,7 +406,7 @@ function ClaimLayer({ layer }) {
         <div className="p-3 rounded border border-white/10 bg-black/20">
           <span className="text-[11px] font-mono text-slate-400 block mb-1">QR DETECTED</span>
           <strong className={`text-sm font-mono ${layer.qrDetected ? 'text-emerald-400' : 'text-slate-400'}`}>
-            {layer.qrDetected ? "YES" : "NO"}
+            {layer.qrDetected === true ? "YES" : layer.qrDetected === false ? "NO" : "NOT_ASSESSED"}
           </strong>
           {layer.qrCount > 0 && <small className="block text-slate-500 text-[10px] mt-0.5">Số lượng: {layer.qrCount}</small>}
         </div>
@@ -522,7 +486,7 @@ function ClaimLayer({ layer }) {
   );
 }
 
-function DiscoveryLayer({ layer, onSelectSource }) {
+function DiscoveryLayer({ layer }) {
   const threat = layer.threatIntelligence || {};
   const semantic = layer.semanticIntelligence || {};
   const domain = layer.studentDomainRisk || {};
@@ -532,7 +496,7 @@ function DiscoveryLayer({ layer, onSelectSource }) {
     <div className="master-ultra-layer-content space-y-4">
       {/* Intro visual */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-2 items-center">
-        <div className="md:col-span-4 rounded overflow-hidden border border-white/10 aspect-video bg-black/40">
+        <div className="relative md:col-span-4 rounded overflow-hidden border border-white/10 aspect-video bg-black/40">
           <video
             autoPlay
             loop
@@ -542,9 +506,11 @@ function DiscoveryLayer({ layer, onSelectSource }) {
             src="/media/v3/trust/l2-discovery.mp4"
             className="w-full h-full object-cover"
           />
-          <img
+          <Image
             src="/media/v3/trust/l2-discovery-poster.webp"
             alt="Evidence discovery visual loop"
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
             className="video-fallback-poster hidden w-full h-full object-cover"
           />
         </div>
@@ -559,15 +525,15 @@ function DiscoveryLayer({ layer, onSelectSource }) {
       <div className="p-3.5 rounded-lg border border-white/10 bg-white/[0.02] space-y-2">
         <div className="flex items-center justify-between">
           <span className="font-mono text-xs font-semibold text-cyan-300 uppercase tracking-wider">A. Threat Intelligence</span>
-          <span className="font-mono text-[11px] text-slate-400">Provider: <strong className="text-slate-200">{threat.provider || (layer.inputType === "url" ? "URLhaus & SafeBrowsing" : "Owner Threat Intelligence")}</strong></span>
+          <span className="font-mono text-[11px] text-slate-400">Provider: <strong className="text-slate-200">{threat.provider || "Chưa ghi nhận"}</strong></span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-          <div><span className="text-slate-400 block text-[10px]">Lookup Status: </span><strong className={threat.status === 'THREAT_MATCH' ? 'text-rose-400' : 'text-emerald-400'}>{threat.status || (layer.inputType === "url" ? "NO_KNOWN_THREAT" : "NOT_APPLICABLE")}</strong></div>
+          <div><span className="text-slate-400 block text-[10px]">Lookup Status: </span><strong className={threat.status === 'THREAT_MATCH' ? 'text-rose-400' : threat.status === 'NO_KNOWN_THREAT' ? 'text-emerald-400' : 'text-slate-300'}>{threat.status || (layer.inputType === "url" ? "NOT_CHECKED" : "NOT_APPLICABLE")}</strong></div>
           <div><span className="text-slate-400 block text-[10px]">Confidence: </span><strong className="text-slate-200">{threat.confidence || "Not provided"}</strong></div>
-          <div><span className="text-slate-400 block text-[10px]">Categories: </span><strong className="text-slate-200">{threat.threatCategories?.length ? threat.threatCategories.join(", ") : "None"}</strong></div>
-          <div><span className="text-slate-400 block text-[10px]">DNS / Screening: </span><strong className="text-emerald-300">{threat.dnsScreening || "PRIVATE_SUBNETS_SAFE"}</strong></div>
+          <div><span className="text-slate-400 block text-[10px]">Categories: </span><strong className="text-slate-200">{threat.threatCategories?.length ? threat.threatCategories.join(", ") : "Not reported"}</strong></div>
+          <div><span className="text-slate-400 block text-[10px]">DNS / Screening: </span><strong className="text-slate-300">{threat.dnsScreening || "NOT_REPORTED"}</strong></div>
         </div>
-        <p className="text-xs text-slate-300 leading-relaxed font-sans">{threat.reason || (layer.inputType === "url" ? "Không phát hiện URL độc hại trong cơ sở dữ liệu IOC." : "Threat intelligence không áp dụng cho nội dung phi URL.")}</p>
+        <p className="text-xs text-slate-300 leading-relaxed font-sans">{threat.reason || (layer.inputType === "url" ? "Chưa có kết quả threat-intelligence được ghi nhận." : "Threat intelligence không áp dụng cho nội dung phi URL.")}</p>
         <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
           <span>Tham chiếu L2A:</span>
           {threat.referenceUrl && isSafePublicUrl(threat.referenceUrl) ? (
@@ -584,12 +550,12 @@ function DiscoveryLayer({ layer, onSelectSource }) {
       <div className="p-3.5 rounded-lg border border-white/10 bg-white/[0.02] space-y-2">
         <div className="flex items-center justify-between">
           <span className="font-mono text-xs font-semibold text-violet-300 uppercase tracking-wider">B. Semantic Intelligence</span>
-          <span className="font-mono text-[11px] text-slate-400">Intent: <strong className="text-slate-200">{semantic.intent || "Thông báo / Đối chiếu"}</strong></span>
+          <span className="font-mono text-[11px] text-slate-400">Intent: <strong className="text-slate-200">{semantic.intent || "NOT_CLASSIFIED"}</strong></span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-          <div><span className="text-slate-400 block text-[10px]">Urgency: </span><strong className={semantic.urgency === 'HIGH' ? 'text-rose-400' : 'text-slate-200'}>{semantic.urgency || "LOW"}</strong></div>
-          <div><span className="text-slate-400 block text-[10px]">Impersonation: </span><strong className={semantic.impersonation === 'YES' ? 'text-rose-400' : 'text-slate-200'}>{semantic.impersonation || "NO"}</strong></div>
-          <div className="col-span-2"><span className="text-slate-400 block text-[10px]">Entities: </span><span className="text-slate-300 truncate block">{semantic.entities?.length ? semantic.entities.map(e => objectLabel(e)).join(", ") : "None"}</span></div>
+          <div><span className="text-slate-400 block text-[10px]">Urgency: </span><strong className={semantic.urgency === 'HIGH' ? 'text-rose-400' : 'text-slate-200'}>{semantic.urgency || "NOT_ASSESSED"}</strong></div>
+          <div><span className="text-slate-400 block text-[10px]">Impersonation: </span><strong className={semantic.impersonation === 'YES' ? 'text-rose-400' : 'text-slate-200'}>{semantic.impersonation || "NOT_ASSESSED"}</strong></div>
+          <div className="col-span-2"><span className="text-slate-400 block text-[10px]">Entities: </span><span className="text-slate-300 truncate block">{semantic.entities?.length ? semantic.entities.map(e => objectLabel(e)).join(", ") : "Not reported"}</span></div>
         </div>
         {semantic.manipulationSignals?.length ? (
           <div className="mt-1">
@@ -607,18 +573,18 @@ function DiscoveryLayer({ layer, onSelectSource }) {
       <div className="p-3.5 rounded-lg border border-white/10 bg-white/[0.02] space-y-1.5">
         <div className="flex items-center justify-between">
           <span className="font-mono text-xs font-semibold text-amber-300 uppercase tracking-wider">C. Student Domain Risk</span>
-          <span className="font-mono text-[11px] text-slate-400">Pattern: <strong className="text-slate-200">{domain.matchedPattern || "NONE"}</strong></span>
+          <span className="font-mono text-[11px] text-slate-400">Pattern: <strong className="text-slate-200">{domain.matchedPattern || "NOT_ASSESSED"}</strong></span>
         </div>
         <div className="text-xs font-mono">
           <span className="text-slate-400">Domain Risk: </span>
-          <strong className={domain.domainRisk === 'HIGH' || domain.domainRisk === 'CRITICAL' ? 'text-rose-400' : domain.domainRisk === 'MEDIUM' ? 'text-amber-400' : 'text-emerald-400'}>
-            {domain.domainRisk || "LOW"}
+          <strong className={domain.domainRisk === 'HIGH' || domain.domainRisk === 'CRITICAL' ? 'text-rose-400' : domain.domainRisk === 'MEDIUM' ? 'text-amber-400' : domain.domainRisk === 'LOW' ? 'text-emerald-400' : 'text-slate-300'}>
+            {domain.domainRisk || "UNKNOWN"}
           </strong>
         </div>
-        <p className="text-xs text-slate-300 leading-relaxed font-sans">{domain.reason || "Chưa phát hiện rủi ro đặc thù sinh viên."}</p>
+        <p className="text-xs text-slate-300 leading-relaxed font-sans">{domain.reason || "Chưa có đánh giá rủi ro theo miền được ghi nhận."}</p>
         <div className="pt-1 text-[11px] font-mono text-slate-400">
           <span>Khuyến nghị phòng ngừa: </span>
-          <strong className="text-slate-300 font-normal">{domain.recommendedCaution || "Luôn xác minh qua website đuôi .edu.vn hoặc văn phòng nhà trường trước khi giao dịch tài chính."}</strong>
+          <strong className="text-slate-300 font-normal">{domain.recommendedCaution || "Chưa có khuyến nghị được ghi nhận."}</strong>
         </div>
       </div>
 
@@ -718,8 +684,7 @@ function DiscoveryLayer({ layer, onSelectSource }) {
 }
 
 function ForensicsLayer({ layer, onSelectSource }) {
-  const sources = layer.sources || [];
-  const tavilyStatus = layer.tavilyStatus || "COMPLETED";
+  const sources = Array.isArray(layer.sources) ? layer.sources : EMPTY_SOURCES;
 
   // Sort sources: primary/official -> independent high-quality -> contradicting -> context -> remaining secondary
   const sortedSources = useMemo(() => {
@@ -743,12 +708,13 @@ function ForensicsLayer({ layer, onSelectSource }) {
     <div className="master-ultra-layer-content space-y-4">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row gap-4 items-center mb-2">
-        <div className="w-full sm:w-44 h-24 rounded border border-white/10 overflow-hidden flex-shrink-0 bg-black/40">
-          <img
+        <div className="relative w-full sm:w-44 h-24 rounded border border-white/10 overflow-hidden flex-shrink-0 bg-black/40">
+          <Image
             src="/media/v3/trust/l3-forensics.webp"
             alt="Forensics comparison visual"
+            fill
+            sizes="(max-width: 640px) 100vw, 176px"
             className="w-full h-full object-cover"
-            loading="lazy"
           />
         </div>
         <div className="master-ultra-forensics-map flex-1 m-0" aria-hidden="true"><span>SUPPORTING</span><i /><b>CLAIM</b><i /><span>CONTRADICTING</span></div>
@@ -758,7 +724,7 @@ function ForensicsLayer({ layer, onSelectSource }) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3 rounded-lg border border-white/10 bg-white/[0.02] text-xs font-mono">
         <div>
           <span className="text-slate-400 block text-[11px] uppercase">Retrieval Provider</span>
-          <strong className="text-emerald-400">Tavily Web Search</strong>
+            <strong className="text-emerald-400">{safeText(layer.retrievalProvider, "Chưa ghi nhận")}</strong>
         </div>
         <div>
           <span className="text-slate-400 block text-[11px] uppercase">Evidence Collected</span>
@@ -767,12 +733,12 @@ function ForensicsLayer({ layer, onSelectSource }) {
         <div>
           <span className="text-slate-400 block text-[11px] uppercase">Evidence Status</span>
           <strong className={layer.evidenceStatus === 'CONFLICTED' ? 'text-amber-400' : 'text-slate-200'}>
-            {layer.evidenceStatus || "SUFFICIENT"}
+            {layer.evidenceStatus || "NOT_ASSESSED"}
           </strong>
         </div>
         <div>
           <span className="text-slate-400 block text-[11px] uppercase">Source Independence</span>
-          <strong className="text-slate-200">{layer.sourceIndependence || "HIGH"}</strong>
+          <strong className="text-slate-200">{layer.sourceIndependence || "NOT_ASSESSED"}</strong>
         </div>
       </div>
 
@@ -780,11 +746,11 @@ function ForensicsLayer({ layer, onSelectSource }) {
       <div className="p-2.5 rounded bg-black/30 border border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-400">
         <div>
           <span>Query đã rà soát: </span>
-          <strong className="text-slate-200 font-normal italic">"{layer.canonicalClaim || 'Mệnh đề xác thực thông tin'}"</strong>
+          <strong className="text-slate-200 font-normal italic">“{layer.canonicalClaim || "Chưa ghi nhận truy vấn"}”</strong>
         </div>
         <div>
           <span>Độ tươi (Freshness): </span>
-          <strong className="text-cyan-300">{layer.freshness || "Current (Thời gian thực)"}</strong>
+          <strong className="text-cyan-300">{layer.freshness || "NOT_ASSESSED"}</strong>
         </div>
       </div>
 
@@ -819,7 +785,7 @@ function ForensicsLayer({ layer, onSelectSource }) {
           <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
             {sortedSources.map((src, index) => (
               <TrustEvidenceCard
-                key={src.id || index}
+                key={`${src.id || src.url || "source"}-${index}`}
                 evidence={src}
                 onSelect={onSelectSource}
               />
@@ -855,36 +821,27 @@ function ForensicsLayer({ layer, onSelectSource }) {
 
 
 function AiVerificationLayer({ layer, onSelectSource }) {
-  const status = String(layer.aiVerificationStatus || "SUCCESS").toUpperCase();
+  const status = String(layer.aiVerificationStatus || "NOT_REPORTED").toUpperCase();
   const sources = layer.evidenceSources || layer.sources || [];
 
   const supportingCount = layer.supportingCount ?? sources.filter(s => String(s.relationship).toLowerCase().includes("support")).length;
   const contradictingCount = layer.contradictingCount ?? sources.filter(s => String(s.relationship).toLowerCase().includes("contrad")).length;
   const contextCount = layer.contextCount ?? (sources.length - supportingCount - contradictingCount);
-  const independentGroupsCount = layer.independentGroupsCount || (sources.length > 0 ? Math.min(sources.length, 3) : 0);
+  const independentGroupsCount = Number.isFinite(layer.independentGroupsCount)
+    ? layer.independentGroupsCount
+    : "Chưa xác định";
 
   const confidenceValue = layer.aiConfidence != null
     ? (typeof layer.aiConfidence === "number" ? `${Math.round(layer.aiConfidence * 100)}%` : String(layer.aiConfidence))
-    : (sources.length > 0 ? "88%" : "Không đủ dữ liệu để định lượng");
+    : "Chưa được định lượng";
 
   const conflicts = layer.conflicts || [];
-  const uncertainties = layer.uncertainties || layer.uncertainty || [
-    "Thời điểm ban hành chính xác của tài liệu chưa được định danh qua chứng chỉ số bảo mật.",
-    "Bằng chứng phụ thuộc vào tính sẵn sàng của hạ tầng máy chủ bên thứ ba tại thời điểm truy vấn.",
-  ];
+  const uncertainties = layer.uncertainties || layer.uncertainty || [];
 
-  const reasons = layer.reasons || [
-    "Nguồn thông tin đối soát trực tiếp từ cổng chính thức / trang công bố công khai.",
-    "Không có dấu hiệu giả mạo tên miền hoặc hạ tầng độc hại tại thời điểm quét.",
-    "Bằng chứng độc lập trùng khớp về nội dung và mốc thời gian công bố.",
-  ];
+  const reasons = layer.reasons || [];
 
   // 2-5 sentence AI synthesis
-  const synthesis = layer.aiSynthesis || layer.reasoningSummary || (
-    supportingCount > 0
-      ? `Dựa trên phân tích đối chiếu đa tầng, bằng chứng thu thập được từ ${sources.length} nguồn độc lập xác thực tính chính xác của thông tin. Các nguồn chính thống có sự đồng thuận cao về mặt nội dung và thời gian phát hành. Không phát hiện dấu hiệu can thiệp nhân tạo hay giả mạo danh tính tổ chức. Một số chi tiết kỹ thuật về chữ ký số thời gian thực vẫn cần sự thận trọng tiêu chuẩn từ phía người dùng.`
-      : `Dữ liệu đối chiếu cho thấy thông tin cần được rà soát kỹ lưỡng do số lượng nguồn độc lập còn giới hạn. Khuyến nghị người dùng chỉ thực hiện các thao tác khi đã xác thực qua kênh chính thức của đơn vị phụ trách.`
-  );
+  const synthesis = layer.aiSynthesis || layer.reasoningSummary || "Chưa có phần tổng hợp AI được ghi nhận trong phản hồi này.";
 
   return (
     <div className="master-ultra-layer-content space-y-4">
@@ -898,7 +855,7 @@ function AiVerificationLayer({ layer, onSelectSource }) {
           </div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold uppercase tracking-wide border border-violet-400/40 text-violet-200 bg-violet-500/20">
-              {layer.advisoryResult || "SUPPORTED"}
+              {layer.advisoryResult || "NEEDS_REVIEW"}
             </span>
             <span className="text-[10px] font-mono text-slate-400 border border-white/10 px-1.5 py-0.5 rounded bg-black/40">
               AI Advisory — NOT Final Authority
@@ -910,7 +867,7 @@ function AiVerificationLayer({ layer, onSelectSource }) {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-mono text-xs">
           <div>
             <span className="text-slate-400 block text-[11px]">AI Advisory Result</span>
-            <strong className="text-sm text-violet-300 font-bold">{layer.advisoryResult || "SUPPORTED"}</strong>
+            <strong className="text-sm text-violet-300 font-bold">{layer.advisoryResult || "NEEDS_REVIEW"}</strong>
           </div>
           <div>
             <span className="text-slate-400 block text-[11px]">Confidence</span>
@@ -918,11 +875,11 @@ function AiVerificationLayer({ layer, onSelectSource }) {
           </div>
           <div>
             <span className="text-slate-400 block text-[11px]">Evidence Agreement</span>
-            <strong className="text-sm text-emerald-300 font-bold">{layer.agreement || "0.88"}</strong>
+            <strong className="text-sm text-emerald-300 font-bold">{safeText(layer.agreement, "Chưa tính")}</strong>
           </div>
           <div>
             <span className="text-slate-400 block text-[11px]">Source Quality</span>
-            <strong className="text-sm text-cyan-300 font-bold">{layer.sourceQuality || "0.92"}</strong>
+            <strong className="text-sm text-cyan-300 font-bold">{safeText(layer.sourceQuality, "Chưa tính")}</strong>
           </div>
         </div>
       </div>
@@ -964,15 +921,15 @@ function AiVerificationLayer({ layer, onSelectSource }) {
         <div className="grid grid-cols-3 gap-2 pt-1 border-t border-white/5 text-xs font-mono text-center">
           <div>
             <span className="text-slate-400 block text-[10px]">Evidence Agreement</span>
-            <strong className="text-emerald-400">{layer.agreement || "0.88"}</strong>
+            <strong className="text-emerald-400">{safeText(layer.agreement, "Chưa tính")}</strong>
           </div>
           <div>
             <span className="text-slate-400 block text-[10px]">Source Quality</span>
-            <strong className="text-cyan-400">{layer.sourceQuality || "0.92"}</strong>
+            <strong className="text-cyan-400">{safeText(layer.sourceQuality, "Chưa tính")}</strong>
           </div>
           <div>
             <span className="text-slate-400 block text-[10px]">Evidence Sufficiency</span>
-            <strong className="text-slate-200">{layer.evidenceSufficiency || "SUFFICIENT"}</strong>
+            <strong className="text-slate-200">{safeText(layer.evidenceSufficiency, "Chưa đánh giá")}</strong>
           </div>
         </div>
       </div>
@@ -984,7 +941,7 @@ function AiVerificationLayer({ layer, onSelectSource }) {
             BẰNG CHỨNG AI ĐÃ ĐỐI CHIẾU ({sources.length})
           </span>
           <span className="text-[11px] font-mono text-slate-400">
-            Verified External Citations
+            Sources recorded in this response
           </span>
         </div>
 
@@ -992,14 +949,14 @@ function AiVerificationLayer({ layer, onSelectSource }) {
           <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
             {sources.map((src, idx) => (
               <TrustEvidenceCard
-                key={src.id || idx}
+                key={`${src.id || src.url || "source"}-${idx}`}
                 evidence={src}
                 onSelect={onSelectSource}
               />
             ))}
           </div>
         ) : (
-          <EmptyData>Chưa có nguồn bằng chứng hợp lệ được ghi nhận trong bundle.</EmptyData>
+          <EmptyData>Chưa có nguồn bằng chứng được ghi nhận trong phản hồi.</EmptyData>
         )}
       </div>
 
@@ -1019,7 +976,7 @@ function AiVerificationLayer({ layer, onSelectSource }) {
           </div>
         ) : (
           <p className="text-xs text-slate-400 italic font-sans">
-            Không ghi nhận mâu thuẫn đối kháng trực tiếp giữa các nguồn chính thống độc lập.
+            Chưa có đánh giá hoặc dữ liệu mâu thuẫn được ghi nhận.
           </p>
         )}
       </div>
@@ -1030,11 +987,11 @@ function AiVerificationLayer({ layer, onSelectSource }) {
           ĐIỀU AI CHƯA THỂ XÁC NHẬN (Explicit Uncertainties)
         </span>
         <ul className="space-y-1.5 text-xs text-slate-300 list-disc list-inside font-sans leading-relaxed">
-          {uncertainties.map((unc, idx) => (
+          {uncertainties.length ? uncertainties.map((unc, idx) => (
             <li key={idx}>
               {typeof unc === "string" ? unc : unc.text || unc.detail || "Chi tiết bổ sung chưa xác định."}
             </li>
-          ))}
+          )) : <li>Chưa có uncertainty được ghi nhận trong phản hồi.</li>}
         </ul>
       </div>
 
@@ -1044,18 +1001,18 @@ function AiVerificationLayer({ layer, onSelectSource }) {
           WHY THIS AI ADVISORY? (Căn cứ khuyến nghị)
         </span>
         <ol className="space-y-1.5 text-xs text-slate-200 list-decimal list-inside font-sans leading-relaxed">
-          {reasons.map((reason, idx) => (
+          {reasons.length ? reasons.map((reason, idx) => (
             <li key={idx} className="pl-1">
               {typeof reason === "string" ? reason : reason.text || reason.detail}
             </li>
-          ))}
+          )) : <li>Chưa có căn cứ tư vấn được ghi nhận.</li>}
         </ol>
       </div>
 
       {/* Next Stage */}
       <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-slate-400">
         <span>Next: <strong className="text-slate-200">{layer.nextStage || "Continue → Layer 5"}</strong></span>
-        <span className="text-[11px] font-mono text-violet-400/80">L4 AI Verification ✓</span>
+        <span className="text-[11px] font-mono text-violet-400/80">L4 AI Verification · {status}</span>
       </div>
 
     </div>
@@ -1063,7 +1020,6 @@ function AiVerificationLayer({ layer, onSelectSource }) {
 }
 
 function DecisionLayer({ layer, onSelectSource }) {
-  const review = layer.humanReview;
   const twin = layer.decisionTwin;
   const drivers = twin && Array.isArray(twin.decisionDrivers) ? twin.decisionDrivers : [];
   const reversal = twin && Array.isArray(twin.reversalConditions) ? twin.reversalConditions : [];
@@ -1074,21 +1030,22 @@ function DecisionLayer({ layer, onSelectSource }) {
     <div className="master-ultra-layer-content space-y-4">
       {/* Visual Seal & Verdict Banner */}
       <div className="flex flex-col sm:flex-row gap-4 items-start mb-2">
-        <div className="w-24 h-24 rounded border border-white/10 overflow-hidden flex-shrink-0 bg-black/40">
-          <img
+        <div className="relative w-24 h-24 rounded border border-white/10 overflow-hidden flex-shrink-0 bg-black/40">
+          <Image
             src="/media/v3/trust/l5-decision.webp"
             alt="Decision intelligence seal"
+            fill
+            sizes="96px"
             className="w-full h-full object-cover"
-            loading="lazy"
           />
         </div>
         <div className="master-ultra-decision-hero flex-1 m-0">
           <SectionLabel tone="gold">FINAL RESULT / L5 DECISION INTELLIGENCE</SectionLabel>
           <strong className="block text-2xl font-serif text-white mt-1 tracking-tight">
-            {safeText(layer.verdict, "SUPPORTED")}
+            {safeText(layer.verdict, "NEEDS_REVIEW")}
           </strong>
           <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-            {safeText(layer.nextAction, "Thông tin có cơ sở tin cậy. Tiếp tục tương tác với sự thận trọng thông thường.")}
+            {safeText(layer.nextAction, "Chưa có khuyến nghị được ghi nhận.")}
           </p>
         </div>
       </div>
@@ -1107,19 +1064,19 @@ function DecisionLayer({ layer, onSelectSource }) {
       <dl className="master-ultra-decision-metrics grid grid-cols-2 sm:grid-cols-4 gap-2">
         <div>
           <dt>Trust Confidence</dt>
-          <dd>{safeText(layer.confidence, "85%")}</dd>
+          <dd>{safeText(layer.confidence, "Chưa được định lượng")}</dd>
         </div>
         <div>
           <dt>Evidence Sufficiency</dt>
-          <dd>{safeText(layer.evidenceSufficiency, "HIGH")}</dd>
+          <dd>{safeText(layer.evidenceSufficiency, "Chưa đánh giá")}</dd>
         </div>
         <div>
           <dt>Security Risk</dt>
-          <dd>{safeText(layer.securityRisk, "SAFE")}</dd>
+          <dd>{safeText(layer.securityRisk, "Chưa đánh giá")}</dd>
         </div>
         <div>
           <dt>Human Expert Review</dt>
-          <dd>{safeText(layer.humanReviewState, "Available")}</dd>
+          <dd>{safeText(layer.humanReviewState, "Chưa ghi nhận")}</dd>
         </div>
       </dl>
 
@@ -1137,7 +1094,7 @@ function DecisionLayer({ layer, onSelectSource }) {
             ))}
           </ol>
         ) : (
-          <p className="text-xs text-slate-400 italic">Không có lý do bất thường được ghi nhận.</p>
+          <p className="text-xs text-slate-400 italic">Chưa có lý do đánh giá được ghi nhận.</p>
         )}
       </div>
 
@@ -1150,7 +1107,7 @@ function DecisionLayer({ layer, onSelectSource }) {
           <div className="space-y-2">
             {keyEvidence.map((src, index) => (
               <TrustEvidenceCard
-                key={src.id || index}
+                key={`${src.id || src.url || "source"}-${index}`}
                 evidence={src}
                 compact
                 onSelect={onSelectSource}
@@ -1165,7 +1122,7 @@ function DecisionLayer({ layer, onSelectSource }) {
         <strong className="text-emerald-300 font-mono block mb-1 uppercase tracking-wider text-[11px]">
           Khuyến nghị tiếp theo
         </strong>
-        {safeText(layer.nextAction, "Thông tin đã qua 5 tầng đối soát độc lập. Người dùng có thể tiếp tục với tâm lý thận trọng tiêu chuẩn.")}
+        {safeText(layer.nextAction, "Chưa có khuyến nghị được ghi nhận.")}
       </div>
 
       {/* Decision Twin if available */}
@@ -1189,7 +1146,7 @@ function DecisionLayer({ layer, onSelectSource }) {
 
 function LayerDetail({ layer, onSelectSource }) {
   if (layer.id === "l1") return <ClaimLayer layer={layer.data} />;
-  if (layer.id === "l2") return <DiscoveryLayer layer={layer.data} onSelectSource={onSelectSource} />;
+  if (layer.id === "l2") return <DiscoveryLayer layer={layer.data} />;
   if (layer.id === "l3") return <ForensicsLayer layer={layer.data} onSelectSource={onSelectSource} />;
   if (layer.id === "l4") return <AiVerificationLayer layer={layer.data} onSelectSource={onSelectSource} />;
   return <DecisionLayer layer={layer.data} onSelectSource={onSelectSource} />;
@@ -1295,6 +1252,8 @@ export default function TrustMasterUltraJourney({
   const transitionRef = useRef(null);
   const timersRef = useRef([]);
   const convergenceStartedRef = useRef(hasResult);
+  const visibleView = processing && !replaying ? "journey" : !hasResult && view !== "input" ? "input" : view;
+  const visibleJourneyState = !processing && !hasResult ? (error ? "ERROR_RECOVERABLE" : "IDLE") : journeyState;
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((timer) => window.clearTimeout(timer));
@@ -1308,6 +1267,13 @@ export default function TrustMasterUltraJourney({
   }, []);
 
   useEffect(() => () => clearTimers(), [clearTimers]);
+
+  useEffect(() => {
+    if (hasResult || processing || visibleView !== "input") return;
+    clearTimers();
+    activeIndexRef.current = null;
+    transitionRef.current = null;
+  }, [clearTimers, hasResult, processing, visibleView]);
 
   const motionDuration = useCallback(() => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? 0 : 760, []);
 
@@ -1324,7 +1290,6 @@ export default function TrustMasterUltraJourney({
     transitionRef.current = toIndex;
     const from = fromIndex + 1;
     const to = Math.min(fromIndex + 2, 5);
-    setView("journey");
     setJourneyState(`L${from}_COMPLETE`);
     schedule(() => {
       setTransitioning(true);
@@ -1341,7 +1306,6 @@ export default function TrustMasterUltraJourney({
 
   useEffect(() => {
     if (!processing || replaying) return;
-    setView("journey");
     const statusIndex = normalized.macroStages.findIndex((layer) => layer.status === "RUNNING" || layer.status === "PARTIAL" || layer.status === "FAILED");
     const firstPending = normalized.macroStages.findIndex((layer) => layer.status !== "COMPLETE");
     const targetIndex = statusIndex >= 0 ? statusIndex : firstPending >= 0 ? firstPending : 0;
@@ -1377,14 +1341,6 @@ export default function TrustMasterUltraJourney({
       schedule(() => setJourneyState("COMPLETE_OVERVIEW"), motionDuration() ? 540 : 0);
     }, motionDuration() ? 180 : 0);
   }, [processing, hasResult, replaying, clearTimers, motionDuration, schedule]);
-
-  useEffect(() => {
-    if (hasResult || processing || view !== "overview") return;
-    clearTimers();
-    activeIndexRef.current = null;
-    setView("input");
-    setJourneyState(error ? "ERROR_RECOVERABLE" : "IDLE");
-  }, [clearTimers, error, hasResult, processing, view]);
 
   const replayJourney = useCallback(() => {
     if (!hasResult) return;
@@ -1435,7 +1391,7 @@ export default function TrustMasterUltraJourney({
   }, []);
 
   useEffect(() => {
-    if (view !== "inspect") return undefined;
+    if (visibleView !== "inspect") return undefined;
     const onKeyDown = (event) => {
       const index = normalized.macroStages.findIndex((layer) => layer.id === selectedLayerId);
       if (event.key === "Escape" || event.key === "Home") { event.preventDefault(); backToOverview(); return; }
@@ -1445,26 +1401,26 @@ export default function TrustMasterUltraJourney({
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [backToOverview, navigateInspection, normalized.macroStages, selectedLayerId, view]);
+  }, [backToOverview, navigateInspection, normalized.macroStages, selectedLayerId, visibleView]);
 
   const activeLayer = normalized.macroStages[displayIndex] || normalized.macroStages[0];
   const inspectedLayer = normalized.macroStages.find((layer) => layer.id === selectedLayerId) || normalized.macroStages[0];
-  const isJourney = view === "journey" && !hasResult;
-  const showComposer = !processing && (view === "input" || (!hasResult && view !== "inspect"));
+  const isJourney = visibleView === "journey" && !hasResult;
+  const showComposer = !processing && (visibleView === "input" || (!hasResult && visibleView !== "inspect"));
 
   return (
-    <section className="master-ultra-trust" data-master-ultra-state={journeyState} data-state-known={MASTER_ULTRA_STATES.includes(journeyState) ? "true" : "false"} data-main-authority="MAIN_TRUST_V5" data-sequential-authority={normalized.authority.sequential} data-primary-layer-count="5" data-inspection-rerun="0">
+    <section className="master-ultra-trust" data-master-ultra-state={visibleJourneyState} data-state-known={MASTER_ULTRA_STATES.includes(visibleJourneyState) ? "true" : "false"} data-main-authority="MAIN_TRUST_V5" data-sequential-authority={normalized.authority.sequential} data-primary-layer-count="5" data-inspection-rerun="0">
       <div className="master-ultra-atmosphere" aria-hidden="true"><span /><span /><span /></div>
       {showComposer ? (
         <div className="master-ultra-workspace-stack space-y-4">
-          <InputComposer mode={mode} content={content} file={file} preview={preview} dragging={dragging} error={error} ocr={ocr} confirmedEntities={confirmedEntities} processing={processing} hasResult={hasResult} demoEnabled={demoEnabled} sourceProvenance={sourceProvenance} fileInputRef={fileInputRef} onModeChange={onModeChange} onContentChange={onContentChange} onFileSelect={onFileSelect} onDragStateChange={onDragStateChange} onClearFile={onClearFile} onAnalyze={onAnalyze} onReset={onReset} />
+          <InputComposer mode={mode} content={content} file={file} preview={preview} dragging={dragging} error={error} ocr={ocr} confirmedEntities={confirmedEntities} processing={processing} hasResult={hasResult} demoEnabled={demoEnabled} hideHero={hideHero} sourceProvenance={sourceProvenance} fileInputRef={fileInputRef} onModeChange={onModeChange} onContentChange={onContentChange} onFileSelect={onFileSelect} onDragStateChange={onDragStateChange} onClearFile={onClearFile} onAnalyze={onAnalyze} onReset={onReset} />
           <ProgressRail normalized={normalized} activeIndex={0} processing={false} canInspect={false} />
         </div>
       ) : null}
       {(processing || isJourney || replaying) && <div className="master-ultra-run-shell"><div className="master-ultra-run-heading"><div><SectionLabel tone="violet">Analytical journey / one layer at a time</SectionLabel><h2>{replaying ? "Replaying the saved journey" : "Information is travelling deeper."}</h2></div><div className="master-ultra-run-status"><LoaderCircle size={15} className={processing || replaying ? "animate-spin" : ""} /> {STATE_LABELS[journeyState] || journeyState}</div></div><ProgressRail normalized={normalized} activeIndex={displayIndex} processing={processing || replaying} canInspect={false} /><JourneyStage layer={activeLayer} normalized={normalized} journeyState={journeyState} transitioning={transitioning || replaying && journeyState.includes("TRANSITION")} transitionTo={transitionTo} onSelectSource={setInspectedSource} /></div>}
-      {hasResult && view === "overview" && !replaying ? <><ProgressRail normalized={normalized} activeIndex={4} processing={false} canInspect onInspect={inspectLayer} /><Overview normalized={normalized} onInspect={inspectLayer} onReplay={replayJourney} onNewAnalysis={onNewAnalysis} onPrint={onPrint} onSelectSource={setInspectedSource} /></> : null}
-      {hasResult && view === "inspect" ? <><ProgressRail normalized={normalized} activeIndex={normalized.macroStages.findIndex((layer) => layer.id === selectedLayerId)} processing={false} canInspect onInspect={inspectLayer} /><Inspection normalized={normalized} selectedLayerId={inspectedLayer.id} onBack={backToOverview} onNavigate={navigateInspection} onSelectSource={setInspectedSource} /></> : null}
-      {!processing && !hasResult && error && view !== "input" ? <div className="master-ultra-recoverable-error"><ShieldAlert size={17} /><span>{safeText(error.message, "Trust Engine chưa thể hoàn tất.")}</span><button type="button" onClick={onReset}>Về input</button></div> : null}
+      {hasResult && visibleView === "overview" && !replaying ? <><ProgressRail normalized={normalized} activeIndex={4} processing={false} canInspect onInspect={inspectLayer} /><Overview normalized={normalized} onInspect={inspectLayer} onReplay={replayJourney} onNewAnalysis={onNewAnalysis} onPrint={onPrint} onSelectSource={setInspectedSource} /></> : null}
+      {hasResult && visibleView === "inspect" ? <><ProgressRail normalized={normalized} activeIndex={normalized.macroStages.findIndex((layer) => layer.id === selectedLayerId)} processing={false} canInspect onInspect={inspectLayer} /><Inspection normalized={normalized} selectedLayerId={inspectedLayer.id} onBack={backToOverview} onNavigate={navigateInspection} onSelectSource={setInspectedSource} /></> : null}
+      {!processing && !hasResult && error && visibleView !== "input" ? <div className="master-ultra-recoverable-error"><ShieldAlert size={17} /><span>{safeText(error.message, "Trust Engine chưa thể hoàn tất.")}</span><button type="button" onClick={onReset}>Về input</button></div> : null}
       <SourceInspectorDrawer isOpen={Boolean(inspectedSource)} source={inspectedSource} onClose={() => setInspectedSource(null)} />
       {analysisSummary && (processing || hasResult) ? <div className="master-ultra-input-chip"><span className={processing ? "is-live" : "is-done"} /> <span>{processing ? "Đang phân tích" : "Phiên đã lưu"} · {analysisSummary.type}</span><strong>{analysisSummary.label}</strong></div> : null}
       <footer className="master-ultra-footer"><span><LockKeyhole size={13} /> No fake metrics. No hidden sources. No authority confusion.</span><span><Users size={13} /> Human review stays with Decision Intelligence, not a sixth layer.</span></footer>

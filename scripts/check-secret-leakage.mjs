@@ -15,7 +15,8 @@ import { resolve, join } from "node:path";
 
 const rootDir = process.cwd();
 const frontendDir = resolve(rootDir, "frontend");
-const staticDir = join(frontendDir, ".next", "static");
+const buildDir = process.env.STUDENTHUB_NEXT_DIST_DIR || ".next";
+const staticDir = join(frontendDir, buildDir, "static");
 const envLocalPath = join(frontendDir, ".env.local");
 
 if (!existsSync(staticDir)) {

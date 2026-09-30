@@ -1,18 +1,8 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { notFound } from "next/navigation";
 
 /**
- * StudentHub AI — retired compatibility route.
- * The former academic planning surface is outside the product scope.
+ * No canonical v4 destination has been approved for this legacy alias.
  */
 export default function CreditSchedulerRedirectPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace("/dashboard");
-  }, [router]);
-
-  return null;
+  notFound();
 }

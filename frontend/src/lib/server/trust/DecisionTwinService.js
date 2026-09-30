@@ -14,7 +14,6 @@
 export class DecisionTwinService {
   static buildDecisionTwin({
     verdict = "INSUFFICIENT_EVIDENCE",
-    claims = [],
     evidence = [],
     relationships = [],
     unknowns = [],
@@ -23,29 +22,36 @@ export class DecisionTwinService {
     const supportingRels = relationships.filter((r) => r.relation === "SUPPORTS");
     const contradictingRels = relationships.filter((r) => r.relation === "CONTRADICTS");
 
-    const findEvidence = (evId) => evidence.find((e) => e.evidenceId === evId || e.id === evId);
+    const findEvidence = (reference) => evidence.find((item) =>
+      item.evidenceId === reference || item.sourceId === reference || item.id === reference
+    );
 
     const strongestSupport = supportingRels.length > 0
-      ? findEvidence(supportingRels[0].evidenceId)
+      ? findEvidence(supportingRels[0].evidenceId || supportingRels[0].sourceId)
       : null;
 
     const strongestContradiction = contradictingRels.length > 0
-      ? findEvidence(contradictingRels[0].evidenceId)
+      ? findEvidence(contradictingRels[0].evidenceId || contradictingRels[0].sourceId)
       : null;
 
     // 2. Build decision drivers tracing back to evidence IDs
     const decisionDrivers = [];
+    const seenDrivers = new Set();
 
     for (const rel of relationships) {
-      const ev = findEvidence(rel.evidenceId);
+      const ev = findEvidence(rel.evidenceId || rel.sourceId);
       if (!ev) continue;
+      const evidenceId = ev.evidenceId || rel.evidenceId || ev.sourceId || rel.sourceId;
+      const driverKey = `${rel.claimId || ""}::${evidenceId || ""}::${rel.relation || ""}`;
+      if (seenDrivers.has(driverKey)) continue;
+      seenDrivers.add(driverKey);
       decisionDrivers.push({
-        evidenceId: rel.evidenceId,
+        evidenceId,
         sourceTitle: ev.title,
         publisher: ev.publisher,
         claimId: rel.claimId,
         impactDirection: rel.relation === "CONTRADICTS" ? "RISK_ELEVATION" : "CREDIBILITY_SUPPORT",
-        explanation: rel.reasoning,
+        explanation: rel.reasoning || rel.rationale || "",
         canonicalUrl: ev.canonicalUrl,
       });
     }
@@ -83,7 +89,7 @@ export class DecisionTwinService {
       decisionDrivers,
       strongestSupportingEvidence: strongestSupport
         ? {
-            evidenceId: strongestSupport.evidenceId,
+            evidenceId: strongestSupport.evidenceId || strongestSupport.sourceId,
             title: strongestSupport.title,
             publisher: strongestSupport.publisher,
             canonicalUrl: strongestSupport.canonicalUrl,
@@ -91,7 +97,7 @@ export class DecisionTwinService {
         : null,
       strongestContradiction: strongestContradiction
         ? {
-            evidenceId: strongestContradiction.evidenceId,
+            evidenceId: strongestContradiction.evidenceId || strongestContradiction.sourceId,
             title: strongestContradiction.title,
             publisher: strongestContradiction.publisher,
             canonicalUrl: strongestContradiction.canonicalUrl,

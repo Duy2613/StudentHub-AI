@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
+import { notFound } from 'next/navigation';
 
-/** CUT-2: deep lesson links resolve to the public product entrypoint. */
-export default function RetiredLessonRoute() {
-  redirect("/");
+export default function RemovedLessonRoute() {
+  notFound();
 }

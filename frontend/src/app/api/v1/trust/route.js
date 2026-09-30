@@ -1,10 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { Layer1ScreenService } from "@/lib/ai-trust/layer1/Layer1ScreenService.js";
-import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticService.js";
-import { Layer2AReputationService } from "@/lib/ai-trust/layer2a/Layer2AReputationService.js";
-import { Layer3EvidenceService } from "@/lib/ai-trust/layer3/Layer3EvidenceService.js";
-import { Layer4TrustService } from "@/lib/ai-trust/layer4/Layer4TrustService.js";
 import { TrustPipelineCancelledError } from "@/lib/ai-trust/v5/TrustPipelineOrchestrator.js";
 import { createTrustOrchestrator } from "@/lib/ai-trust/TrustOrchestrator.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
@@ -76,6 +72,12 @@ function wantsV5Stream(request, body) {
   return body?.stream === true || request.headers.get("accept")?.toLowerCase().includes("text/event-stream");
 }
 
+function friendTrustShadowEnabled() {
+  // Optional Friend Trust calls stay opt-in until its provider-side Tavily
+  // usage and full media DTO contracts have been verified independently.
+  return String(process.env.FRIEND_TRUST_MODE || "DISABLED").trim().toUpperCase() === "SHADOW";
+}
+
 function idempotencyKeyFor(request, principal, requestId) {
   const supplied = request.headers.get("Idempotency-Key");
   if (supplied !== null && !/^[A-Za-z0-9._:-]{1,160}$/.test(supplied.trim())) {
@@ -114,7 +116,7 @@ function streamV5Pipeline(request, input, requestId, principal, idempotencyKey) 
       input.scope.caseId = canonicalCaseId;
       input.scope.caseRevision = 1;
 
-      const orchestrator = createTrustOrchestrator();
+      const orchestrator = createTrustOrchestrator({ enableLegacyVerification: friendTrustShadowEnabled() });
       orchestrator.run(input, {
         requestId,
         signal: abortController.signal,
@@ -292,7 +294,7 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
     input.scope.caseId = canonicalCaseId;
     input.scope.caseRevision = 1;
 
-    const pipeline = await createTrustOrchestrator().run(input, {
+    const pipeline = await createTrustOrchestrator({ enableLegacyVerification: friendTrustShadowEnabled() }).run(input, {
       requestId,
       signal: request.signal,
       useAIGateway: true,
@@ -360,44 +362,19 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
       },
     });
   }
-  const layer1 = await Layer1ScreenService.screen({ ...input, options: { requestId } });
   const depth = body?.depth === "full" ? "full" : "screen";
   if (depth === "screen") {
+    const layer1 = await Layer1ScreenService.screen({ ...input, options: { requestId } });
     return NextResponse.json({ success: true, contractVersion: "trust.v1", requestId, depth, demo: false, data: { input: { type }, layer1 } });
   }
 
-  const useAIGateway = body?.useAIGateway === true;
-  const urlTarget = type === "url" ? (content || metadata.url || "") : "";
-  const layer2A = type === "url"
-    ? await Layer2AReputationService.verify({
-      // The Layer 2A service applies the disclosure policy independently.
-      // A local hard block must not blanket-suppress a valid public target,
-      // while private/metadata/SSRF targets are still skipped before any
-      // provider receives them.
-      url: urlTarget,
-      requestId,
-    })
-    : await Layer2AReputationService.verify({ url: "", requestId });
-  // Layer 2 is mandatory even after a Layer 1 hard block. It must complete
-  // semantic/multimodal/provider analysis; Layer 1 remains authoritative for
-  // the final security decision and downstream evidence gating.
-  const layer2 = await Layer2SemanticService.verify({
-    ...input,
-    layer1Result: layer1,
-    options: { requestId, useAIGateway },
+  // Compatibility callers use the same StudentHub-owned four-layer pipeline
+  // as V5. Friend Trust, when explicitly enabled, is advisory only.
+  const pipeline = await createTrustOrchestrator({ enableLegacyVerification: friendTrustShadowEnabled() }).run(input, {
+    requestId,
+    signal: request.signal,
   });
-  const layer3 = layer1.status === "BLOCK" || !layer2 ? null : await Layer3EvidenceService.verify({
-    claims: layer2.claims,
-    layer2Result: layer2,
-    options: { requestId },
-  });
-  const layer4 = await Layer4TrustService.evaluate({
-    layer1Result: layer1,
-    layer2Result: layer2,
-    layer2AResult: layer2A,
-    layer3Result: layer3,
-    options: { requestId, useAIGateway },
-  });
+  const studentHubLayers = pipeline?.layerResults || {};
 
   return NextResponse.json({
     success: true,
@@ -405,7 +382,15 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
     requestId,
     depth,
     demo: false,
-    data: { input: { type }, layer1, layer2A, layer2, layer3, layer4 },
+    data: {
+      input: { type },
+      layer1: studentHubLayers.layer1,
+      layer2: studentHubLayers.layer2,
+      layer3: studentHubLayers.layer3,
+      layer4: studentHubLayers.layer4,
+      capabilityRouting: pipeline.capabilityRouting,
+      finalPredict: pipeline.finalPredict,
+    },
   });
 }
 

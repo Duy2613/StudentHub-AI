@@ -175,7 +175,7 @@ export function stageFromL2B(raw, requestId, timing = {}) {
     "COOLDOWN", "BUDGET_EXHAUSTED", "MODEL_INCOMPATIBLE", "PERMISSION_DENIED", "INVALID_REQUEST",
     "SERVICE_UNAVAILABLE", "UPSTREAM_ERROR", "NETWORK_TIMEOUT",
   ]);
-  const operationStatus = timing.operationStatus || (deterministicFallbackAvailable || !transientStatuses.has(providerStatus) ? OPERATION_STATUS.COMPLETED : OPERATION_STATUS.PARTIAL);
+  const operationStatus = timing.operationStatus || (transientStatuses.has(providerStatus) ? OPERATION_STATUS.PARTIAL : OPERATION_STATUS.COMPLETED);
   return createStageEnvelope({
     ...stageBase("l2b", requestId, timing.startedAt || nowIso(), timing.completedAt || nowIso(), operationStatus),
     finding,
@@ -297,8 +297,13 @@ export function stageFromL3(raw, requestId, timing = {}) {
   };
   const l2cEvidenceCount = evidence.filter((item) => String(item?.claimId || "").startsWith("l2c-domain-")).length;
   const usableSources = sources.filter((source) => source?.liveEvidence === true && source?.retrievalOutcome === "SUCCESS" && source?.providerStatus === "SUCCESS" && typeof (source?.sourceUrl || source?.url) === "string");
-  const sourceQuality = usableSources.length
-    ? Number((usableSources.reduce((total, source) => total + (Number(source.authorityScore) || 0), 0) / usableSources.length).toFixed(4))
+  const authorityScores = usableSources
+    .map((source) => source.authorityScore)
+    .filter((value) => value !== null && value !== undefined && value !== "")
+    .map(Number)
+    .filter((score) => Number.isFinite(score) && score >= 0 && score <= 1);
+  const sourceQuality = authorityScores.length
+    ? Number((authorityScores.reduce((total, score) => total + score, 0) / authorityScores.length).toFixed(4))
     : null;
   const evidenceSummary = typeof raw?.evidenceSummary === "string" && raw.evidenceSummary.trim()
     ? raw.evidenceSummary

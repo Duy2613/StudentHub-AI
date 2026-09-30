@@ -38,10 +38,10 @@ test.describe("Academic Cinematic Closure & Runtime Evidence Suite", () => {
     await expect(evidenceChapter.getByText("Chưa rõ", { exact: true })).toBeVisible();
   });
 
-  test("Retired learning URLs resolve to the canonical public product", async ({ page }) => {
-    await page.goto("/learn/cs101/fullstack-intro");
-    await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByRole("heading", { level: 1, name: /Hiểu đúng\.\s*Đi xa\./i })).toBeVisible();
+  test("Retired learning URLs remain unavailable without restoring a hidden runtime", async ({ page }) => {
+    const response = await page.goto("/learn/cs101/fullstack-intro");
+    expect(response?.status()).toBe(404);
+    await expect(page).toHaveURL(/\/learn\/cs101\/fullstack-intro$/);
 
     // The retired route must not reintroduce a hidden interactive runtime.
     const canvasCount = await page.locator("canvas").count();
@@ -57,22 +57,23 @@ test.describe("Academic Cinematic Closure & Runtime Evidence Suite", () => {
       }
     });
 
-    const routes = [
-      "/",
-      "/learn",
-      "/learn/cs101/fullstack-intro",
-      "/roadmap",
-      "/practice",
-      "/projects",
-      "/trust",
-      "/community",
-      "/expert",
-      "/dashboard",
+    const routeExpectations: ReadonlyArray<[string, number, string]> = [
+      ["/", 200, "/"],
+      ["/learn", 404, "/learn"],
+      ["/learn/cs101/fullstack-intro", 404, "/learn/cs101/fullstack-intro"],
+      ["/roadmap", 404, "/roadmap"],
+      ["/practice", 404, "/practice"],
+      ["/projects", 200, "/cases"],
+      ["/trust", 200, "/trust"],
+      ["/community", 200, "/community"],
+      ["/expert", 200, "/expert"],
+      ["/dashboard", 404, "/dashboard"],
     ];
 
-    for (const route of routes) {
+    for (const [route, expectedStatus, expectedPath] of routeExpectations) {
       const response = await page.goto(route);
-      expect(response?.ok()).toBeTruthy();
+      expect(response?.status(), route).toBe(expectedStatus);
+      expect(new URL(page.url()).pathname, route).toBe(expectedPath);
       await page.waitForLoadState("domcontentloaded");
     }
 

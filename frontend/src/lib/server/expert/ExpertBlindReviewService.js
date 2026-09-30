@@ -13,7 +13,6 @@
 import { randomUUID } from "node:crypto";
 import { getPostgresPool } from "../database/PostgresPool.js";
 import { validateRemoteUrlSync } from "../../security/hardening/SafeRemoteUrl.js";
-import { ExpertReputationPolicy } from "./ExpertReputationPolicy.js";
 import { ExpertReviewResolutionService } from "./ExpertReviewResolutionService.js";
 
 export const BLIND_REVIEW_VOTE_ENUM = Object.freeze({
@@ -21,6 +20,10 @@ export const BLIND_REVIEW_VOTE_ENUM = Object.freeze({
   UNTRUSTWORTHY: "UNTRUSTWORTHY",
   INSUFFICIENT_EVIDENCE: "INSUFFICIENT_EVIDENCE",
 });
+
+export function isPublicExpertReviewCase(row) {
+  return String(row?.case_visibility || "").toUpperCase() === "PUBLIC";
+}
 
 export const BLIND_REVIEW_STATUS = Object.freeze({
   ASSIGNED: "ASSIGNED",
@@ -61,19 +64,26 @@ export class ExpertBlindReviewService {
     try {
       const res = await pool.query(
         `SELECT a.id AS assignment_id,
-                a.case_id,
-                a.case_revision,
-                a.domain_code,
-                a.status AS assignment_status,
-                a.expires_at,
+               a.case_id,
+               a.case_revision,
+               a.claim_id,
+               a.domain_code,
+               a.status AS assignment_status,
+               a.conflict_of_interest,
+               a.expires_at,
                 a.created_at AS assigned_at,
                 r.id AS review_request_id,
                 r.question,
                 r.context_refs,
-                c.state AS case_state,
-                c.created_at AS case_created_at
+                r.community_contribution_id,
+               cc.public_statement AS community_statement,
+               c.state AS case_state,
+               c.visibility AS case_visibility,
+               c.created_at AS case_created_at
            FROM private.expert_assignments a
            JOIN private.expert_review_requests r ON r.id = a.review_request_id
+           LEFT JOIN public.community_contributions cc
+             ON cc.id = r.community_contribution_id AND cc.publication_state = 'PUBLISHED'
            LEFT JOIN public.trust_cases c ON c.id = a.case_id
           WHERE a.expert_id = $1
             AND a.status IN ('ASSIGNED', 'IN_REVIEW', 'OPENED', 'DRAFT')
@@ -82,10 +92,15 @@ export class ExpertBlindReviewService {
         [expertId]
       );
 
-      return res.rows.map((row) => this._buildBlindSummaryDTO(row));
+      return res.rows
+        .filter(isPublicExpertReviewCase)
+        .map((row) => this._buildBlindSummaryDTO(row));
     } catch (err) {
-      console.warn("[ExpertBlindReviewService] getPendingReviews fallback:", err.message);
-      return [];
+      console.warn("[ExpertBlindReviewService] pending review storage unavailable:", err.message);
+      const unavailable = new Error("Assigned reviews are temporarily unavailable.");
+      unavailable.code = "BLIND_REVIEW_STORAGE_UNAVAILABLE";
+      unavailable.statusCode = 503;
+      throw unavailable;
     }
   }
 
@@ -94,24 +109,36 @@ export class ExpertBlindReviewService {
    */
   static _buildBlindSummaryDTO(row) {
     const contextRefs = Array.isArray(row.context_refs) ? row.context_refs : [];
-    const primaryContext = contextRefs[0] || {};
-    const claim = primaryContext.claim || row.question || "Mệnh đề đang chờ đánh giá";
+    const primaryContext = typeof contextRefs[0] === "object" && contextRefs[0] !== null ? contextRefs[0] : {};
+    const communityStatement = String(row.community_statement || "").trim();
+    const claimStatement = String(row.claim_statement || "").trim();
+    const evidenceRevisionIds = contextRefs.filter((value) => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
 
     return {
       assignmentId: row.assignment_id,
       reviewRequestId: row.review_request_id,
       caseId: row.case_id,
-      caseRevision: Number(row.case_revision || 1),
+      caseRevision: row.case_revision !== null && row.case_revision !== undefined && Number.isSafeInteger(Number(row.case_revision)) && Number(row.case_revision) >= 1
+        ? Number(row.case_revision)
+        : null,
+      claimId: row.claim_id || null,
       domain: row.domain_code,
-      claim: String(claim).slice(0, 1000),
+      claim: (claimStatement || communityStatement || null)?.slice(0, 1000) || null,
+      reviewQuestion: row.question ? String(row.question).slice(0, 2000) : null,
+      evidenceRevisionIds,
+      evidence: Array.isArray(row.evidence) ? row.evidence : [],
+      ...(Array.isArray(row.evidence) ? { missingEvidenceIds: evidenceRevisionIds.filter((id) => !row.evidence.some((item) => item.id === id)) } : {}),
       boundedContext: {
-        type: row.input_type || primaryContext.inputType || "TEXT",
-        snippet: primaryContext.snippet || null,
+        type: row.community_contribution_id ? "COMMUNITY_CONTRIBUTION" : row.input_type || primaryContext.inputType || "TEXT",
+        communityContributionId: row.community_contribution_id || null,
+        snippet: communityStatement ? communityStatement.slice(0, 500) : primaryContext.snippet || null,
         url: primaryContext.url || null,
         mediaArtifactId: primaryContext.mediaArtifactId || null,
         timestamp: row.assigned_at,
       },
       status: row.assignment_status,
+      caseVisibility: row.case_visibility || "UNKNOWN",
+      conflictOfInterest: typeof row.conflict_of_interest === "boolean" ? row.conflict_of_interest : null,
       deadline: row.expires_at,
       createdAt: row.assigned_at,
       // Invariant: No L2, L3, L4, L5, AI verdicts, or other expert data
@@ -128,22 +155,29 @@ export class ExpertBlindReviewService {
     }
     const pool = getPostgresPool();
 
-    const assignRes = await pool.query(
-      `SELECT a.id AS assignment_id,
-              a.expert_id,
-              a.case_id,
-              a.case_revision,
-              a.domain_code,
-              a.status AS assignment_status,
-              a.expires_at,
+      const assignRes = await pool.query(
+        `SELECT a.id AS assignment_id,
+               a.expert_id,
+               a.case_id,
+               a.case_revision,
+               a.claim_id,
+               a.domain_code,
+               a.status AS assignment_status,
+               a.conflict_of_interest,
+               a.expires_at,
               a.created_at AS assigned_at,
               r.id AS review_request_id,
               r.question,
               r.context_refs,
-              c.state AS case_state,
-              c.created_at AS case_created_at
+              r.community_contribution_id,
+               cc.public_statement AS community_statement,
+               c.state AS case_state,
+               c.visibility AS case_visibility,
+               c.created_at AS case_created_at
          FROM private.expert_assignments a
          JOIN private.expert_review_requests r ON r.id = a.review_request_id
+         LEFT JOIN public.community_contributions cc
+           ON cc.id = r.community_contribution_id AND cc.publication_state = 'PUBLISHED'
          LEFT JOIN public.trust_cases c ON c.id = a.case_id
         WHERE a.id = $1`,
       [assignmentId]
@@ -165,6 +199,46 @@ export class ExpertBlindReviewService {
       error.code = "FORBIDDEN_ASSIGNMENT";
       throw error;
     }
+
+    if (!isPublicExpertReviewCase(row)) {
+      const error = new Error("EXPERT_CASE_NOT_PUBLIC: Case content is not available for Expert review.");
+      error.statusCode = 404;
+      error.code = "EXPERT_CASE_NOT_PUBLIC";
+      throw error;
+    }
+
+    const claimResult = row.claim_id ? await pool.query(
+      `SELECT c.id, c.statement
+         FROM public.claims c
+        WHERE c.id = $1
+          AND EXISTS (
+            SELECT 1
+              FROM public.claim_sources cs
+              JOIN public.evidence e ON e.id = cs.evidence_id
+             WHERE cs.claim_id = c.id AND e.case_id = $2
+          )
+        LIMIT 1`,
+      [row.claim_id, row.case_id]
+    ) : { rows: [] };
+    row.claim_statement = claimResult.rows[0]?.statement || null;
+
+    const evidenceRevisionIds = Array.isArray(row.context_refs)
+      ? row.context_refs.filter((value) => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value))
+      : [];
+    const evidenceResult = evidenceRevisionIds.length ? await pool.query(
+      `SELECT id, source_type, source_identifier, observed_at, confidence
+         FROM public.evidence
+        WHERE case_id = $1 AND id = ANY($2::uuid[])
+        ORDER BY array_position($2::uuid[], id)`,
+      [row.case_id, evidenceRevisionIds]
+    ) : { rows: [] };
+    row.evidence = evidenceResult.rows.map((item) => ({
+      id: item.id,
+      sourceType: item.source_type,
+      sourceIdentifier: typeof item.source_identifier === "string" ? item.source_identifier.slice(0, 500) : null,
+      observedAt: item.observed_at,
+      confidence: Number.isFinite(Number(item.confidence)) ? Number(item.confidence) : null,
+    }));
 
     // Check if expert has an existing locked assessment
     const assessRes = await pool.query(

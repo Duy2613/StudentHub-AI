@@ -252,9 +252,16 @@ export default function ExpertBlindReviewWidget({
                 <span className="text-amber-400 font-semibold">{activeReview?.domain || "GENERAL"}</span>
                 <span>Case #{activeReview?.caseId?.slice(0, 8)}</span>
               </div>
-              <div className="p-3 rounded-xl bg-black/40 border border-white/10 text-slate-200 italic leading-relaxed">
-                "{activeReview?.claim}"
-              </div>
+              <label className="block">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500">Input user đã gửi · chỉ đọc</span>
+                <textarea
+                  value={activeReview?.claim || activeReview?.boundedContext?.snippet || ""}
+                  readOnly
+                  rows={5}
+                  aria-label="Input user đã gửi Trust Engine"
+                  className="w-full mt-1 p-3 rounded-xl bg-black/40 border border-amber-500/20 text-slate-200 leading-relaxed outline-none resize-y"
+                />
+              </label>
             </div>
 
             {/* AI HIDDEN NOTICE (ANTI-ANCHORING) */}

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { createTrustOrchestrator } from "@/lib/ai-trust/TrustOrchestrator.js";
-import { buildLegacyLayerResponse, buildLegacyPipelineResponse } from "@/lib/ai-trust/legacy/LegacyResponseProjector.js";
+import { runFriendBackendLayer } from "@/lib/ai-trust/FriendBackendTrustOrchestrator.js";
 import { MediaArtifactService } from "@/lib/server/media/MediaArtifactService.js";
 import { QrIntakeService } from "@/lib/ai-trust/layer1/qr/QrIntakeService.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
@@ -15,6 +14,10 @@ const STAGES = new Set(["layer2", "layer3", "layer4"]);
 
 function asRecord(value) {
   return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+}
+
+function isRecord(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 function boundedText(value, maxLength = MAX_CONTENT_CHARS) {
@@ -124,7 +127,13 @@ async function parseRequest(request, path) {
   }
   if (content.length > MAX_CONTENT_CHARS) return { error: errorResponse("CONTENT_TOO_LARGE", "Nội dung vượt quá giới hạn cho phép.", 413) };
 
-  return { input: { type, content, metadata } };
+  return {
+    input: { type, content, metadata },
+    // L3/L4 PowerShell calls forward the previous friend's JSON verbatim.
+    // Preserve those objects so the server can relay the same contract.
+    layer2: isRecord(source.layer2) ? source.layer2 : null,
+    layer3: isRecord(source.layer3) ? source.layer3 : null,
+  };
 }
 
 async function prepareMedia(input, principal) {
@@ -166,28 +175,29 @@ async function runLegacyVerification(request, routeParams, principal, securityCo
   }
 
   const requestId = securityContext.correlationId;
-  const pipeline = await createTrustOrchestrator().run(input, {
+  const verification = await runFriendBackendLayer({
+    stage,
+    input,
+    layer2: parsed.layer2,
+    layer3: parsed.layer3,
     requestId,
     signal: request.signal,
-    useAIGateway: true,
-    aiMode: "GEMINI_ONLY",
   });
-  const legacy = pipeline?.legacyResponse || buildLegacyPipelineResponse({
-    input,
-    layerResults: pipeline?.layerResults || {},
-    finalPredict: pipeline?.finalPredict || null,
-  });
-  const output = legacy[`layer${stage.slice(-1)}`] || buildLegacyLayerResponse(stage, {
-    input,
-    layerResults: pipeline?.layerResults || {},
-    finalPredict: pipeline?.finalPredict || null,
-  });
+  const output = verification.fallback?.applied
+    ? {
+        ...verification.raw,
+        friendBackendPrimary: verification.friendRaw || null,
+        fallback: verification.fallback,
+      }
+    : verification.raw;
   return NextResponse.json(output, {
     status: 200,
     headers: {
       "Cache-Control": "no-store, max-age=0",
       "X-Content-Type-Options": "nosniff",
-      "X-StudentHub-Response-Shape": "legacy-four-layer-v1",
+      "X-StudentHub-Response-Shape": "friend-backend-four-layer-v1",
+      "X-Trust-Authority": "FRIEND_BACKEND",
+      ...(verification.fallback?.applied ? { "X-Trust-Tavily-Fallback": "LOCAL_KEY_EVIDENCE_ONLY" } : {}),
       "X-StudentHub-Request-Id": requestId,
     },
   });

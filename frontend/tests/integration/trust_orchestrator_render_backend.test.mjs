@@ -26,19 +26,15 @@ function localLayer4() {
 function fixtureAdapter(calls) {
   return {
     enabled: true,
-    layer2Provider() {
-      return {
-        check: async ({ requestId }) => {
-          calls.push("layer2");
-          return createLayer2AResult({
-            providerStatus: "SUCCESS",
-            finding: "NO_KNOWN_THREAT",
-            rawVerdict: "SAFE",
-            providerConfidence: 0.95,
-            requestId,
-          });
-        },
-      };
+    async verifyLayer2({ requestId }) {
+      calls.push("layer2");
+      return createLayer2AResult({
+        providerStatus: "SUCCESS",
+        finding: "NO_KNOWN_THREAT",
+        rawVerdict: "SAFE",
+        providerConfidence: 0.95,
+        requestId,
+      });
     },
     async verifyLayer3({ claims, requestId }) {
       calls.push("layer3");
@@ -72,7 +68,7 @@ describe("Trust Render backend wiring", () => {
     assert.equal(config.baseUrl, "https://studenthub-api-8fqp.onrender.com");
   });
 
-  it("routes the four-layer pipeline through the configured adapter", async () => {
+  it("attaches configured Friend observations as shadow while StudentHub completes the four-layer pipeline", async () => {
     const calls = [];
     const orchestrator = new TrustOrchestrator({
       legacyVerificationAdapter: fixtureAdapter(calls),
@@ -101,6 +97,7 @@ describe("Trust Render backend wiring", () => {
 
     assert.deepEqual(calls, ["layer2", "layer3", "layer4"]);
     assert.equal(result.pipelineStatus, "COMPLETED");
+    assert.equal(result.layerResults.layer2.legacyIntegration.rawVerdict, "SAFE");
     assert.equal(result.layerResults.layer3.legacyIntegration.status, "COMPLETED");
     assert.equal(result.layerResults.layer4.legacyIntegration.rawVerdict, "UNKNOWN");
     assert.equal(result.finalDecision.action, "REVIEW");

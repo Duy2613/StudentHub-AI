@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/ai",
-        destination: "/trust",
+        destination: "/trust?omni=1",
         permanent: false,
       },
       {
@@ -49,11 +49,6 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
-        source: "/intelligence/knowledge",
-        destination: "/trust",
-        permanent: false,
-      },
-      {
         source: "/intelligence/trust",
         destination: "/trust",
         permanent: false,
@@ -64,11 +59,6 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
-        source: "/prof-rating",
-        destination: "/academic",
-        permanent: false,
-      },
-      {
         source: "/profile/:id",
         destination: "/profile?profileId=:id",
         permanent: false,
@@ -76,11 +66,6 @@ const nextConfig: NextConfig = {
       {
         source: "/marketplace",
         destination: "/community",
-        permanent: false,
-      },
-      {
-        source: "/quests",
-        destination: "/dashboard",
         permanent: false,
       },
       {

@@ -22,15 +22,21 @@ test("canonical v1 product façades expose versioned, Security Fabric-wrapped co
   }
 });
 
-test("canonical Trust accepts only server-composed evidence inputs", () => {
+test("canonical Trust screens inputs server-side and returns authoritative pipeline layers", () => {
   const source = route("trust");
   assert.match(source, /const INPUT_TYPES = new Set\(\["text", "url", "image", "file"\]\)/);
   assert.match(source, /safeMetadata/);
   assert.match(source, /Layer1ScreenService\.screen/);
-  assert.match(source, /Layer2SemanticService\.verify/);
-  assert.match(source, /const layer2 = await Layer2SemanticService\.verify/);
-  assert.doesNotMatch(source, /const layer2 = layer1\.status === "BLOCK" \? null/);
-  assert.match(source, /Layer3EvidenceService\.verify/);
-  assert.match(source, /Layer4TrustService\.evaluate/);
+  assert.match(source, /await Layer1ScreenService\.screen\(\{ \.\.\.input, options: \{ requestId \} \}\)/);
+  assert.doesNotMatch(source, /FRONTEND_VALIDATION/);
+  assert.match(source, /function friendTrustShadowEnabled\(\)/);
+  assert.match(source, /createTrustOrchestrator\(\{ enableLegacyVerification: friendTrustShadowEnabled\(\) \}\)\.run\(input/);
+  assert.match(source, /const studentHubLayers = pipeline\?\.layerResults \|\| \{\}/);
+  assert.match(source, /layer2: studentHubLayers\.layer2/);
+  assert.match(source, /layer3: studentHubLayers\.layer3/);
+  assert.match(source, /layer4: studentHubLayers\.layer4/);
+  assert.match(source, /capabilityRouting: pipeline\.capabilityRouting/);
+  assert.doesNotMatch(source, /authority:\s*["']FRIEND_BACKEND["']/);
+  assert.doesNotMatch(source, /friendBackend:\s*pipeline\.friendBackend/);
   assert.doesNotMatch(source, /body\?\.(evidence|candidates|sources)\b/, "browser must not provide candidate evidence authority");
 });

@@ -143,13 +143,16 @@ export class TrustV5Engine {
     // ──────────────────────────────────────────────────────────────────────────
     let sources = [];
     let candidatePoolTrace;
+    let retrievalProviderStatus = "NOT_RUN";
     if (Array.isArray(sourcesFixture)) {
       const fixturePool = EvidenceCandidatePool.safeDedup(
         EvidenceCandidatePool.sanitizeSources(sourcesFixture)
       );
       sources = fixturePool.sources;
+      retrievalProviderStatus = "RUNTIME_SOURCE_FIXTURE";
       candidatePoolTrace = {
         candidatePool: "SAFE_DEDUP(RUNTIME_SOURCE_FIXTURE)",
+        retrievalProviderStatus,
         inputCounts: { RUNTIME_SOURCE_FIXTURE: sourcesFixture.length },
         retainedCount: sources.length,
         duplicateCount: fixturePool.dropped.length,
@@ -172,8 +175,10 @@ export class TrustV5Engine {
         signal,
       });
       sources = discoveryResult.sources;
+      retrievalProviderStatus = discoveryResult.retrievalProviderStatus || "UNKNOWN";
       candidatePoolTrace = {
         ...discoveryResult.candidatePoolTrace,
+        retrievalProviderStatus,
         officialDiscovery: discoveryResult.officialDiscoveryTrace,
         publicApiDiscovery: discoveryResult.publicApiDiscoveryTrace,
       };
@@ -275,6 +280,7 @@ export class TrustV5Engine {
         independenceGroups,
       },
       verification: {
+        retrievalStatus: retrievalProviderStatus,
         sufficiency: sufficiency.status,
         sufficiencyReason: sufficiency.reason,
         freshness: sources.every((s) => s.publishedAt?.includes("2026")) ? "CURRENT_ACADEMIC_YEAR" : "RECENT",

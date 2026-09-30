@@ -1,0 +1,34 @@
+/**
+ * StudentHub AI — Semantic Design Tokens
+ *
+ * Governing Authority: MASTER FRONTEND CONSTITUTION v3.0 (M-25, M-26, M-27)
+ * Dependency Direction: Primitive -> Semantic -> Component.
+ */
+
+:root {
+  /* Brand Actions */
+  --action-primary: var(--primitive-violet);
+  --action-accent: var(--primitive-cyan);
+
+  /* Semantic Statuses (M-25) */
+  --status-mint: var(--primitive-mint);   /* verified / supporting / completed */
+  --status-amber: var(--primitive-amber); /* uncertainty / attention / caution */
+  --status-coral: var(--primitive-coral); /* risk / problem */
+  --status-red: var(--primitive-red);     /* critical / destructive */
+  --status-gold: var(--primitive-gold);   /* achievement */
+
+  /* Background tint for status indicators */
+  --status-mint-bg: rgba(16, 185, 129, 0.12);
+  --status-amber-bg: rgba(245, 158, 11, 0.12);
+  --status-coral-bg: rgba(249, 115, 22, 0.12);
+  --status-red-bg: rgba(239, 68, 68, 0.14);
+  --status-gold-bg: rgba(234, 179, 8, 0.14);
+
+  /* Semantic Surfaces (M-27) */
+  --surface-canvas: var(--canvas);
+  --surface-paper: var(--surface-1);
+  --surface-soft: var(--surface-2);
+  --surface-elevated: var(--surface-3);
+
+  /* Target balance (M-25): ~85% neutral, ~10% brand, ~5% semantic */
+}

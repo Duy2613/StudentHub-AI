@@ -195,8 +195,8 @@ export class ExpertBlindReviewDispatcher {
       // 4. Emit Realtime Notifications after commit (Minimal payload, no private claim leak)
       for (const item of assignedExpertIds) {
         void publishRealtimeEvent({
-          channel: `expert:${item.expertId}`,
-          eventType: "EXPERT_BLIND_REVIEW_AVAILABLE",
+          channel: "expert",
+          eventType: "expert:assignment",
           subjectId: item.expertId,
           classification: "RESTRICTED",
           producer: "StudentHub-Expert-Dispatcher",
@@ -225,5 +225,166 @@ export class ExpertBlindReviewDispatcher {
     } finally {
       client.release();
     }
+  }
+
+  /** Matches a user-owned Community-linked request to verified, independent experts. */
+  static async matchReviewRequest({ reviewRequestId, requesterId, correlationId = "community-expert-match" } = {}) {
+    if (!reviewRequestId || !requesterId) return { ok: false, status: "REQUESTED", assignmentsCount: 0, code: "REVIEW_REQUEST_SCOPE_REQUIRED" };
+    const pool = getPostgresPool();
+    const client = await pool.connect();
+    const assignments = [];
+    let request = null;
+    let outcome = "NO_ELIGIBLE_VERIFIED_EXPERT";
+    try {
+      await client.query("BEGIN");
+      const locked = await client.query(
+        `SELECT r.id, r.requester_id, r.case_id, r.case_revision, r.claim_id,
+                r.domain_code, r.status, r.community_contribution_id,
+                c.owner_id, cc.author_id AS community_author_id
+           FROM private.expert_review_requests r
+           JOIN public.trust_cases c ON c.id = r.case_id
+           LEFT JOIN public.community_contributions cc
+             ON cc.id = r.community_contribution_id AND cc.publication_state = 'PUBLISHED'
+          WHERE r.id = $1 AND r.requester_id = $2
+          FOR UPDATE OF r`,
+        [reviewRequestId, requesterId]
+      );
+      request = locked.rows[0] || null;
+      if (!request || String(request.owner_id).toLowerCase() !== String(requesterId).toLowerCase()) {
+        const error = new Error("REVIEW_REQUEST_OWNER_REQUIRED");
+        error.code = "REVIEW_REQUEST_OWNER_REQUIRED";
+        throw error;
+      }
+      if (!request.community_contribution_id) {
+        await client.query("COMMIT");
+        return { ok: true, status: request.status, assignmentsCount: 0, matching: "COORDINATOR_QUEUE" };
+      }
+      const latestRevision = await client.query(
+        `SELECT revision FROM public.trust_case_revisions
+          WHERE case_id = $1 ORDER BY revision DESC LIMIT 1`,
+        [request.case_id]
+      );
+      if (Number(latestRevision.rows[0]?.revision) !== Number(request.case_revision)) {
+        const error = new Error("STALE_CASE_REVISION");
+        error.code = "STALE_CASE_REVISION";
+        throw error;
+      }
+      if (["ASSIGNED", "IN_REVIEW", "COMPLETED"].includes(String(request.status).toUpperCase())) {
+        const existing = await client.query(
+          `SELECT id, expert_id FROM private.expert_assignments WHERE review_request_id = $1 AND status IN ('ASSIGNED', 'IN_REVIEW', 'COMPLETED')`,
+          [reviewRequestId]
+        );
+        await client.query("COMMIT");
+        return { ok: true, status: request.status, assignmentsCount: existing.rows.length, matching: "ALREADY_MATCHED" };
+      }
+
+      const candidates = await client.query(
+        `SELECT DISTINCT ev.user_id
+           FROM private.expert_verifications ev
+          WHERE ev.status = 'VERIFIED'
+            AND ev.qualification_state = 'DOMAIN_VERIFIED'
+            AND ev.suspended_at IS NULL
+            AND (ev.expires_at IS NULL OR ev.expires_at > now())
+            AND ev.domain_code = $1
+            AND ev.user_id <> $2::uuid
+            AND ev.user_id <> COALESCE($3::uuid, '00000000-0000-0000-0000-000000000000'::uuid)
+            AND NOT EXISTS (
+              SELECT 1 FROM public.expert_assessments ea
+               WHERE ea.expert_id = ev.user_id AND ea.case_id = $4
+            )
+          ORDER BY ev.user_id
+          LIMIT 3`,
+        [request.domain_code, requesterId, request.community_author_id, request.case_id]
+      );
+
+      for (const candidate of candidates.rows) {
+        const expertId = candidate.user_id;
+        const existingAssignment = await client.query(
+          `SELECT id FROM private.expert_assignments
+            WHERE expert_id = $1 AND case_id = $2 AND case_revision = $3
+              AND claim_id IS NOT DISTINCT FROM $4::uuid AND domain_code = $5
+              AND status IN ('ASSIGNED', 'IN_REVIEW')
+            LIMIT 1 FOR UPDATE`,
+          [expertId, request.case_id, request.case_revision, request.claim_id, request.domain_code]
+        );
+        if (existingAssignment.rows[0]) continue;
+        const assignmentId = randomUUID();
+        const idempotencyKey = `community_review:${reviewRequestId}:${expertId}`;
+        const requestDigest = createHash("sha256").update(JSON.stringify({
+          reviewRequestId, requesterId, expertId, caseId: request.case_id,
+          caseRevision: Number(request.case_revision), claimId: request.claim_id || null,
+          domainCode: request.domain_code,
+        })).digest();
+        const inserted = await client.query(
+          `INSERT INTO private.expert_assignments
+            (id, expert_id, case_id, case_revision, claim_id, domain_code,
+             status, assigned_by, expires_at, review_request_id, idempotency_key,
+             request_digest, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, $5, $6, 'ASSIGNED', $7,
+                   now() + interval '24 hours', $8, $9, $10, now(), now())
+           ON CONFLICT DO NOTHING
+           RETURNING id, expert_id`,
+          [assignmentId, expertId, request.case_id, request.case_revision, request.claim_id, request.domain_code, requesterId, reviewRequestId, idempotencyKey, requestDigest]
+        );
+        if (inserted.rows[0]) assignments.push(inserted.rows[0]);
+      }
+
+      if (assignments.length) {
+        await client.query(
+          `UPDATE private.expert_review_requests SET status = 'ASSIGNED', updated_at = now() WHERE id = $1`,
+          [reviewRequestId]
+        );
+        for (const assignment of assignments) {
+          await client.query(
+            `INSERT INTO private.expert_review_request_events (request_id, status, actor_id, metadata)
+             VALUES ($1, 'ASSIGNED', $2, $3::jsonb)`,
+            [reviewRequestId, requesterId, JSON.stringify({ assignmentId: assignment.id, policyVersion: "community-expert-match.v1" })]
+          );
+        }
+        outcome = "ASSIGNED";
+      }
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => {});
+      return { ok: false, status: request?.status || "REQUESTED", assignmentsCount: 0, code: error?.code || "EXPERT_MATCH_UNAVAILABLE" };
+    } finally {
+      client.release();
+    }
+
+    for (const assignment of assignments) {
+      void publishRealtimeEvent({
+        channel: "expert",
+        eventType: "expert:assignment",
+        subjectId: assignment.expert_id,
+        classification: "RESTRICTED",
+        producer: "StudentHub-Community-Expert-Matcher",
+        environment: process.env.NODE_ENV || "development",
+        correlationId,
+        causationId: assignment.id,
+        idempotencyKey: `community:expert-assignment:${assignment.id}`,
+        data: {
+          assignmentId: assignment.id,
+          reviewRequestId,
+          caseId: request.case_id,
+          caseRevision: Number(request.case_revision),
+          domain: request.domain_code,
+          communityContributionId: request.community_contribution_id,
+        },
+      }).catch(() => {});
+    }
+    const status = assignments.length ? "ASSIGNED" : "REQUESTED";
+    void publishRealtimeEvent({
+      channel: "trust",
+      eventType: "trust:expert_review",
+      subjectId: requesterId,
+      classification: "RESTRICTED",
+      producer: "StudentHub-Community-Expert-Matcher",
+      environment: process.env.NODE_ENV || "development",
+      correlationId,
+      causationId: reviewRequestId,
+      idempotencyKey: `trust:expert-review:${reviewRequestId}:${status.toLowerCase()}`,
+      data: { caseId: request.case_id, caseRevision: Number(request.case_revision), requestId: reviewRequestId, status, assignmentsCount: assignments.length },
+    }).catch(() => {});
+    return { ok: true, status, assignmentsCount: assignments.length, matching: outcome };
   }
 }

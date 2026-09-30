@@ -715,7 +715,7 @@ export async function signInWithPassword(email, password, rememberMe = false) {
 /**
  * Đăng nhập OAuth Google
  */
-export async function signInWithGoogle(next = "/dashboard") {
+export async function signInWithGoogle(next = "/profile") {
   logAuthInfo("signInWithGoogle", "Khởi tạo luồng Google OAuth.");
   const capabilities = getAuthCapabilities();
   if (capabilities.google !== AUTH_CAPABILITY_STATE.READY) {
@@ -753,7 +753,7 @@ export async function signInWithGoogle(next = "/dashboard") {
 /**
  * Đăng nhập OAuth GitHub
  */
-export async function signInWithGitHub(next = "/dashboard") {
+export async function signInWithGitHub(next = "/profile") {
   logAuthInfo("signInWithGitHub", "Khởi tạo luồng GitHub OAuth.");
   const capabilities = getAuthCapabilities();
   if (capabilities.github !== AUTH_CAPABILITY_STATE.READY) {

@@ -211,7 +211,11 @@ function layer3Evidence(layer) {
 function layer4Evidence(layer) {
   // Legacy/friend-backend output is advisory metadata only. It must not be
   // promoted into the canonical evidence graph or source-quality counts.
-  const sourceRecords = Array.isArray(layer?.independentResearchSources) ? layer.independentResearchSources : [];
+  const integration = asRecord(layer?.legacyIntegration);
+  const sourceRecords = [
+    ...(Array.isArray(layer?.independentResearchSources) ? layer.independentResearchSources : []),
+    ...(Array.isArray(integration.sources) ? integration.sources : []),
+  ];
   const records = sourceRecords.map((value, index) => {
     const source = asRecord(value);
     const rawReference = safeText(source.sourceId || source.id, 180);

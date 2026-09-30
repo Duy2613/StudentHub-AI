@@ -133,3 +133,69 @@ test("Master Ultra UI keeps inspection local and renders one dominant layer at a
   assert.match(journey, /MASTER_ULTRA_STATES\.includes/);
   assert.doesNotMatch(workspace, /TrustForensicPipelineVisualizer/);
 });
+
+test("Master Ultra preserves missing provider and evidence measurements as unavailable", () => {
+  const normalized = normalizeMasterUltraRun({
+    pipeline: {
+      pipelineStatus: "COMPLETED",
+      stages: {
+        l1: { operationStatus: "COMPLETED" },
+        l2a: { operationStatus: "COMPLETED" },
+        l2b: { operationStatus: "COMPLETED" },
+        l2c: { operationStatus: "COMPLETED" },
+        l3: { operationStatus: "COMPLETED" },
+        l4: { operationStatus: "COMPLETED" },
+        l5: { operationStatus: "COMPLETED" },
+      },
+    },
+    canonicalResult: {
+      input: { type: "URL", content: "https://example.test/claim" },
+      decision: { agreement: 0.88, evidenceAgreement: 0.88, sourceAgreement: 0.88 },
+    },
+    layers: {
+      layer4: { sourceQuality: 0.92 },
+    },
+  });
+
+  assert.equal(normalized.layers.l1.inputType, "url");
+  assert.equal(normalized.layers.l1.screenResult, "NOT_ASSESSED");
+  assert.equal(normalized.layers.l1.risk, "UNKNOWN");
+  assert.equal(normalized.layers.l2.threatIntelligence.status, "NOT_CHECKED");
+  assert.equal(normalized.layers.l2.semanticIntelligence.urgency, "LOW");
+  assert.equal(normalized.layers.l2.semanticIntelligence.impersonation, "NO");
+  assert.equal(normalized.layers.l2.studentDomainRisk.domainRisk, "UNKNOWN");
+  assert.equal(normalized.layers.l3.retrievalProvider, null);
+  assert.equal(normalized.layers.l3.tavilyStatus, "NOT_RUN");
+  assert.equal(normalized.layers.l3.sourceIndependence, null);
+  assert.equal(normalized.layers.l3.freshness, null);
+  assert.equal(normalized.layers.l4.agreement, null);
+  assert.equal(normalized.layers.l4.sourceQuality, null);
+  assert.equal(normalized.layers.l4.evidenceSufficiency, null);
+  assert.equal(normalized.layers.l4.reasoningSummary, null);
+  assert.equal(normalized.layers.l4.aiExecutedModel, null);
+  assert.equal(normalized.layers.l4.independentGroupsCount, null);
+  assert.equal(normalized.layers.l4.reasons.length, 0);
+  assert.equal(normalized.layers.l5.verdict, "NEEDS_REVIEW");
+  assert.equal(normalized.layers.l5.confidence, null);
+  assert.equal(normalized.layers.l5.sourceAgreement, null);
+  assert.equal(normalized.layers.l5.securityRisk, null);
+  assert.equal(normalized.layers.l5.claimReliability, null);
+  assert.equal(normalized.layers.l5.aiAdvisory, "NOT_ASSESSED");
+  assert.equal(normalized.layers.l5.humanReviewState, "NOT_RECORDED");
+
+  const imageInput = normalizeMasterUltraRun({
+    pipeline: { stages: { l1: { operationStatus: "COMPLETED" } } },
+    canonicalResult: { input: { type: "IMAGE", content: "receipt-photo" } },
+  }).layers.l1;
+  assert.equal(imageInput.ocrStatus, "NOT_REPORTED");
+  assert.equal(imageInput.qrDetected, null);
+  assert.equal(imageInput.qrCount, null);
+});
+
+test("Master Ultra UI has no hardcoded positive trust metrics for missing data", () => {
+  const journey = read("src/components/trust/TrustMasterUltraJourney.jsx");
+  const model = read("src/lib/ai-trust/v5/MasterUltraTrustModel.js");
+
+  assert.doesNotMatch(journey, /(?:0\.88|0\.92|85%|88%|PRIVATE_SUBNETS_SAFE|Tavily Web Search|AI Verification ✓)/);
+  assert.doesNotMatch(model, /(?:"0\.88"|"0\.92"|"85%"|"HIGH"\s*;|"SAFE"\s*;|"TRUE"\s*;|"SUPPORTED"\s*;|gemini-3\.8-flash)/);
+});

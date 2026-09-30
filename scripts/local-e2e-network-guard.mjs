@@ -57,5 +57,3 @@ if (process.env.STUDENTHUB_LOCAL_E2E === "1" && !globalThis.__studenthubLocalE2E
 export function getLocalE2ENetworkViolations() {
   return [...violations];
 }
-
-\n

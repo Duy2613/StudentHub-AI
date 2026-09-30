@@ -16,17 +16,13 @@ import { CommunityExperienceEngine } from "./communityExperienceEngine.js";
 import { CommunityFrictionEngine } from "./communityFrictionEngine.js";
 import { CommunityRealityGapEngine } from "./communityRealityGapEngine.js";
 import { createSecureId } from "../../security/secureId.js";
+import { isCommunityDemoMode } from "./communityDemoMode.js";
 
 const DEFAULT_STORE_DIR = path.resolve(process.cwd(), ".data");
 const DEFAULT_STORE_FILE = path.join(DEFAULT_STORE_DIR, "community_intelligence_store_v2.json");
 
-/** The file store is a fixture adapter, never a production authority. */
-export function isCommunityDemoMode() {
-  return process.env.NODE_ENV === "test" || (process.env.NODE_ENV !== "production" && (
-    process.env.STUDENTHUB_PERSISTENCE_ADAPTER === "memory" ||
-    process.env.STUDENTHUB_COMMUNITY_DEMO === "true"
-  ));
-}
+/** The fixture file store is available only through the canonical mode gate. */
+export { isCommunityDemoMode };
 
 export class CommunityStore {
   static #storageFilePath = DEFAULT_STORE_FILE;

@@ -15,10 +15,6 @@ import { redactText } from "@/lib/communityExpert/promaxDomain.js";
 import { publishRealtimeEvent } from "@/lib/server/realtime/RealtimePublisher.js";
 import { deriveIdentityTruth, DEMO_ENTITLEMENTS } from "@/lib/server/auth/demoAccountPolicy.js";
 
-function demoMode() {
-  return isCommunityDemoMode();
-}
-
 function errorResponse(error, correlationId) {
   if (error instanceof CommunityRepositoryError || (error?.code && Number(error.statusCode) >= 400 && Number(error.statusCode) < 500)) {
     return NextResponse.json({ success: false, error: { code: error.code, userMessage: error.message, correlationId } }, { status: error.statusCode });
@@ -45,10 +41,10 @@ function inputFromBody(body) {
   };
 }
 
-async function listCommunityPosts(request) {
+async function listCommunityPosts(request, _routeParams, principal) {
   const { searchParams } = new URL(request.url);
   const topic = (searchParams.get("topic") || "").slice(0, 80);
-  if (demoMode()) {
+  if (isCommunityDemoMode()) {
     const posts = topic ? CommunityStore.getPostsByTopic(topic, { redactPrivate: true }) : CommunityStore.getAllPosts({ redactPrivate: true });
     return Response.json({ success: true, total: posts.length, posts, sourceState: "DEMO_FIXTURE", isAuthoritative: false, dataNotice: "Demo fixture only; community signals are not official evidence." });
   }
@@ -58,6 +54,7 @@ async function listCommunityPosts(request) {
       claimId: searchParams.get("claimId") || null,
       sort: searchParams.get("sort") || "relevant",
       limit: Number(searchParams.get("limit") || 50),
+      viewerId: principal?.subjectId || null,
     });
     return Response.json({ success: true, total: posts.length, posts, sourceState: "COMMUNITY_SIGNAL", isAuthoritative: false, rankingPolicyVersion: "community-ranking-v1", dataNotice: "Community contributions are signals attached to a case revision; Trust remains authoritative." });
   } catch (error) {
@@ -84,7 +81,7 @@ async function createCommunityIntelligencePost(request, routeParams, principal, 
     if (!body.previewDigest || body.previewDigest !== preview.previewDigest) {
       return NextResponse.json({ success: false, error: { code: "PREVIEW_DIGEST_MISMATCH", userMessage: "The privacy preview changed; generate a new preview before publishing." } }, { status: 409 });
     }
-    if (demoMode()) {
+    if (isCommunityDemoMode()) {
       const identityTruth = deriveIdentityTruth({
         email: principal.email,
         emailVerified: principal.attributes?.emailVerified === true,
@@ -117,7 +114,7 @@ async function createCommunityIntelligencePost(request, routeParams, principal, 
     void publishRealtimeEvent({
       channel: "community",
       eventType: "community:contribution",
-      subjectId: principal.subjectId,
+      subjectId: null,
       classification: "PUBLIC",
       producer: "StudentHub-AI",
       environment: process.env.NODE_ENV || "development",

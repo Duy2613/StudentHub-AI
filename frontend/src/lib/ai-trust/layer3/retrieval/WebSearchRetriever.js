@@ -16,6 +16,78 @@ import { validateRemoteUrl, validateRemoteUrlSync, isRedirectStatus } from "../.
 const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const MAX_REDIRECT_HOPS = 4;
 
+const HTML_ENTITIES = {
+  amp: "&", apos: "'", copy: "©", gt: ">", hellip: "…", ldquo: "“", lsquo: "‘",
+  lt: "<", mdash: "—", nbsp: " ", ndash: "–", quot: '"', rdquo: "”", reg: "®", rsquo: "’", trade: "™",
+};
+
+function decodeHtmlEntities(value) {
+  return value.replace(/&(#x[\da-f]+|#\d+|[a-z][a-z\d]+);/gi, (entity, encoded) => {
+    if (encoded[0] !== "#") return HTML_ENTITIES[encoded.toLowerCase()] ?? entity;
+    const isHex = encoded[1]?.toLowerCase() === "x";
+    const codePoint = Number.parseInt(encoded.slice(isHex ? 2 : 1), isHex ? 16 : 10);
+    if (!Number.isInteger(codePoint) || codePoint < 0 || codePoint > 0x10ffff) return "�";
+    return String.fromCodePoint(codePoint);
+  });
+}
+
+function htmlFragmentToText(fragment, { removePageChrome = false } = {}) {
+  let content = String(fragment || "").replace(/<!--[\s\S]*?-->/g, "");
+  for (const tag of ["script", "style", "noscript", "svg", "canvas", "iframe", "object", "template", "nav", "footer", "aside", "form"]) {
+    content = content.replace(new RegExp(`<${tag}\\b[^>]*>[\\s\\S]*?<\\/${tag}\\s*>`, "gi"), " ");
+  }
+  content = content
+    .replace(/<([a-z][\w:-]*)\b(?=[^>]*\baria-hidden\s*=\s*(?:"true"|'true'|true))[^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
+    .replace(/<([a-z][\w:-]*)\b(?=[^>]*\shidden(?:\s|=|>))[^>]*>[\s\S]*?<\/\1\s*>/gi, " ");
+  if (removePageChrome) {
+    content = content
+      .replace(/<head\b[^>]*>[\s\S]*?<\/head\s*>/gi, " ")
+      .replace(/<header\b[^>]*>[\s\S]*?<\/header\s*>/gi, " ");
+  }
+
+  return decodeHtmlEntities(content
+    .replace(/<br\b[^>]*\/?\s*>/gi, "\n")
+    .replace(/<\/(?:p|div|section|article|h[1-6]|li|tr|blockquote|pre|main)\s*>/gi, "\n")
+    .replace(/<[^>]+>/g, " "))
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B-\u200D\u2060\uFEFF]/g, " ")
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .join("\n")
+    .trim();
+}
+
+function extractPageText(html, pageUrl) {
+  const source = String(html || "");
+  const candidates = [];
+  const collect = (pattern, groupIndex = 1) => {
+    for (const match of source.matchAll(pattern)) {
+      const text = htmlFragmentToText(match[groupIndex]);
+      if (text) candidates.push(text);
+    }
+  };
+  collect(/<main\b[^>]*>([\s\S]*?)<\/main\s*>/gi);
+  collect(/<([a-z][\w:-]*)\b(?=[^>]*\brole\s*=\s*(?:"main"|'main'|main))[^>]*>([\s\S]*?)<\/\1\s*>/gi, 2);
+  collect(/<article\b[^>]*>([\s\S]*?)<\/article\s*>/gi);
+  const fullBodyText = htmlFragmentToText(source, { removePageChrome: true });
+  if (fullBodyText) candidates.push(fullBodyText);
+
+  let topicKeywords = [];
+  try {
+    topicKeywords = decodeURIComponent(new URL(pageUrl).pathname)
+      .toLocaleLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, " ")
+      .split(/\s+/)
+      .filter((word) => word.length > 2 && !["and", "article", "detail", "from", "home", "index", "news", "page", "post", "resource", "story", "the", "view", "www"].includes(word));
+  } catch {
+    topicKeywords = [];
+  }
+  const uniqueCandidates = Array.from(new Set(candidates));
+  return uniqueCandidates
+    .map((text) => ({ text, topicMatches: topicKeywords.filter((word) => text.toLocaleLowerCase().includes(word)).length }))
+    .sort((left, right) => right.topicMatches - left.topicMatches || right.text.length - left.text.length)[0]?.text || "";
+}
+
 function createAbortError(reason) {
   const error = reason instanceof Error ? reason : new Error("Evidence retrieval cancelled");
   error.name = "AbortError";
@@ -159,12 +231,7 @@ export class WebSearchRetriever extends IEvidenceRetriever {
       if (html.includes("\uFFFD")) {
         return { html: "", textContent: "", status: 415, error: "BINARY_OR_MALFORMED_TEXT", sourceType: SOURCE_TYPE.SEARCH_RETRIEVAL, providerStatus: EVIDENCE_PROVIDER_STATUS.INVALID_RESPONSE, liveEvidence: false, retrievalOutcome: "FAILURE" };
       }
-      const textContent = html
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
-        .replace(/<[^>]+>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+      const textContent = /text\/plain/i.test(contentType) ? html.trim() : extractPageText(html, currentUrl);
 
       return {
         html,

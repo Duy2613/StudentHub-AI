@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import V3_MEDIA from "@/lib/media/v3MediaRegistry";
 import SmartVideo from "@/components/media/SmartVideo";
-import { Users, MessageSquare, ShieldCheck, ArrowRight } from "lucide-react";
+import { Users, MessageSquare, ArrowRight } from "lucide-react";
 
 export default function CollectiveCommunitySection() {
   return (
@@ -27,7 +27,7 @@ export default function CollectiveCommunitySection() {
             </h2>
           </div>
           <p className="text-slate-300 font-serif text-base sm:text-lg max-w-md">
-            Nơi mỗi câu hỏi đều được đối chiếu bằng kinh nghiệm thực tế, quy chế cập nhật và sự tham gia phản biện của cộng đồng sinh viên tinh hoa.
+            Không gian để chia sẻ bối cảnh, đặt câu hỏi và trao đổi. Bài viết cộng đồng là nội dung do thành viên tạo; bản thân bài viết không xác nhận một thông tin là đúng.
           </p>
         </div>
 
@@ -38,7 +38,7 @@ export default function CollectiveCommunitySection() {
             <SmartVideo
               src={V3_MEDIA.community.hero.video}
               poster={V3_MEDIA.community.hero.poster}
-              alt="Cộng đồng sinh viên tinh hoa - Đối thoại học vụ minh bạch"
+              alt="Không gian cộng đồng dành cho trao đổi học vụ"
               className="w-full aspect-[16/10]"
               videoClassName="aspect-[16/10] object-cover group-hover:scale-105 transition-transform duration-700"
               posterClassName="aspect-[16/10] object-cover"
@@ -48,10 +48,10 @@ export default function CollectiveCommunitySection() {
             <div className="absolute bottom-6 left-6 right-6 flex items-end justify-between">
               <div>
                 <span className="text-xs font-mono text-cyan-300 uppercase block mb-1">
-                  ĐỐI THOẠI HỌC VỤ MINH BẠCH
+                  KHÔNG GIAN THẢO LUẬN
                 </span>
                 <p className="text-base text-white font-serif font-medium">
-                  Hàng ngàn sinh viên cùng phân tích và bóc tách các vụ việc lừa đảo tuyển dụng.
+                  Chia sẻ góc nhìn và bối cảnh để cuộc trao đổi có thêm thông tin.
                 </p>
               </div>
             </div>
@@ -59,57 +59,50 @@ export default function CollectiveCommunitySection() {
 
           {/* Right Column: Stack of Staggered Evidence Cards */}
           <div className="lg:col-span-5 flex flex-col gap-6 lg:pt-8">
-            {/* Specimen 1: Evidence Post Card */}
+            {/* Community behavior card */}
             <div className="p-6 rounded-2xl bg-space-900/80 border border-white/10 backdrop-blur-xl hover:border-cyan-500/40 transition-all shadow-xl">
               <div className="flex items-center justify-between gap-4 mb-3">
                 <span className="text-xs font-mono text-cyan-400 font-semibold uppercase">
-                  BÀI PHẢN BIỆN NỔI BẬT
-                </span>
-                <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
-                  <ShieldCheck size={12} />
-                  <span>ĐÃ XÁC THỰC</span>
+                  BÀI ĐĂNG & TRAO ĐỔI
                 </span>
               </div>
               <h4 className="text-base font-bold text-white font-sans mb-2">
-                Cảnh giác chiêu trò &ldquo;Tuyển thực tập sinh dịch thuật có cọc tiền&rdquo;
+                Bắt đầu bằng câu hỏi rõ ràng
               </h4>
               <p className="text-xs text-slate-300 font-serif leading-relaxed mb-4">
-                3 sinh viên Bách Khoa và Ngoại Thương đã đối chiếu thông báo tuyển dụng, phát hiện điều khoản phạt vi phạm trái luật lao động.
+                Nêu điều bạn muốn tìm hiểu và bổ sung bối cảnh cần thiết cho cuộc thảo luận.
               </p>
               <div className="flex items-center gap-4 text-xs font-mono text-slate-400 pt-3 border-t border-white/10">
                 <span className="flex items-center gap-1">
                   <MessageSquare size={13} />
-                  <span>48 Phản biện</span>
+                  <span>Phản hồi theo bài đăng</span>
                 </span>
-                <span>3 Minh chứng tuyển dụng</span>
+                <span>Nội dung do thành viên tạo</span>
               </div>
             </div>
 
-            {/* Specimen 2: Expert Response Preview */}
+            {/* Source boundary card */}
             <div className="p-6 rounded-2xl bg-indigo-950/20 border border-indigo-500/30 backdrop-blur-xl hover:border-indigo-400 transition-all shadow-xl">
               <div className="flex items-center justify-between gap-4 mb-3">
                 <span className="text-xs font-mono text-indigo-300 font-semibold uppercase">
-                  PHẢN HỒI TỪ CỐ VẤN CHUYÊN TRÁCH
-                </span>
-                <span className="text-[11px] font-mono text-indigo-400">
-                  TS. Trần Hoài Nam
+                  NGUỒN & THẢO LUẬN
                 </span>
               </div>
               <p className="text-xs text-slate-200 font-serif leading-relaxed italic mb-3">
-                &ldquo;Các em lưu ý: Quy định nhà trường cấm tuyệt đối mọi hình thức thu tiền cọc khi giới thiệu việc làm. Hãy gửi thông báo qua cổng Trust để được đối chiếu nguồn miễn phí.&rdquo;
+                Thành viên có thể chia sẻ liên kết hoặc tài liệu liên quan. Hãy mở nguồn và kiểm tra bối cảnh trước khi dựa vào nội dung.
               </p>
               <span className="text-[10px] font-mono text-slate-400 block">
-                Phê duyệt vào hồ sơ án lệ #CASE-2026-089
+                Trao đổi cộng đồng không thay thế kết quả Trust hoặc quyết định Expert.
               </span>
             </div>
 
-            {/* Specimen 3: Live Verification Signal */}
+            {/* Expert boundary card */}
             <div className="p-5 rounded-2xl bg-space-900/60 border border-white/10 backdrop-blur-md flex items-center justify-between text-xs font-mono">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                <span className="text-slate-300">TÍN HIỆU ĐỒNG THUẬN: 14 BẰNG CHỨNG HỌC BỔNG ĐÃ NẠP</span>
+                <Users size={14} className="text-cyan-400" />
+                <span className="text-slate-300">THẨM ĐỊNH CHUYÊN MÔN THEO HỒ SƠ</span>
               </div>
-              <span className="text-cyan-400 font-bold">100% MINH BẠCH</span>
+              <span className="text-cyan-400 font-bold">EXPERT</span>
             </div>
           </div>
         </div>

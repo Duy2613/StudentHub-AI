@@ -4,7 +4,6 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import { createSecureId } from "@/lib/security/secureId";
 import { useAuth } from "@/lib/auth/AuthContext";
 
-const INITIAL_PRESENCE = Object.freeze({ connectedClients: null, studyPods: [] });
 const INITIAL_RUNTIME = Object.freeze({
   transport: null,
   authoritative: null,
@@ -17,11 +16,7 @@ const INITIAL_RUNTIME = Object.freeze({
 const RealtimeContext = createContext({
   connectionStatus: "CONNECTING",
   latency: null,
-  activeLearners: null,
-  auditsCompleted: null,
-  metrics: null,
   runtime: INITIAL_RUNTIME,
-  presence: INITIAL_PRESENCE,
   recentEvents: [],
   notifications: [],
   dismissNotification: () => {},
@@ -42,11 +37,7 @@ export function RealtimeProvider({ children }) {
   );
   const [connectionStatus, setConnectionStatus] = useState("CONNECTING");
   const [latency, setLatency] = useState(null);
-  const [activeLearners, setActiveLearners] = useState(null);
-  const [auditsCompleted, setAuditsCompleted] = useState(null);
-  const [metrics, setMetrics] = useState(null);
   const [runtime, setRuntime] = useState(INITIAL_RUNTIME);
-  const [presence, setPresence] = useState(INITIAL_PRESENCE);
   const [recentEvents, setRecentEvents] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
@@ -55,6 +46,7 @@ export function RealtimeProvider({ children }) {
   const reconnectTimeoutRef = useRef(null);
   const clientIdRef = useRef(null);
   const lastSequenceRef = useRef(0);
+  const seenEventIdsRef = useRef(new Set());
   const connectSSERef = useRef(null);
   const reconnectAttemptRef = useRef(0);
   const previousPrincipalIdRef = useRef(null);
@@ -76,6 +68,15 @@ export function RealtimeProvider({ children }) {
 
   const rememberEvent = useCallback((record) => {
     if (!record || typeof record !== "object") return;
+    const eventId = String(record.eventId || record.id || "");
+    if (eventId && seenEventIdsRef.current.has(eventId)) return;
+    if (eventId) {
+      seenEventIdsRef.current.add(eventId);
+      if (seenEventIdsRef.current.size > 1000) {
+        const oldest = seenEventIdsRef.current.values().next().value;
+        if (oldest) seenEventIdsRef.current.delete(oldest);
+      }
+    }
     const sequence = numericValue(record.sequence);
     if (sequence !== null && Number.isSafeInteger(sequence) && sequence > lastSequenceRef.current) {
       lastSequenceRef.current = sequence;
@@ -83,6 +84,14 @@ export function RealtimeProvider({ children }) {
     setRecentEvents((current) => [record, ...current.filter((item) => item.id !== record.id).slice(0, 49)]);
     if (record.channel && record.eventType) dispatchToSubscribers(record.channel, record.eventType, record);
   }, [dispatchToSubscribers]);
+
+  const handleDomainEvent = useCallback((event) => {
+    try {
+      rememberEvent(JSON.parse(event.data));
+    } catch (error) {
+      console.error("[Realtime] Error parsing domain event:", error);
+    }
+  }, [rememberEvent]);
 
   const handleAuditEvent = useCallback((record) => {
     const data = record.data || {};
@@ -105,13 +114,12 @@ export function RealtimeProvider({ children }) {
     eventSourceRef.current?.close();
     clientIdRef.current ||= createSecureId("client");
 
-    // Anonymous visitors may only subscribe to the public system channel. The
-    // stream endpoint intentionally rejects private scopes with 403; waiting
-    // for the server-owned application session prevents an EventSource page
-    // error and reconnect loop during the auth bootstrap window.
+    // Anonymous visitors may subscribe to public system and Community
+    // metadata. Trust, audit, and Expert channels remain session-scoped; wait
+    // for auth bootstrap before opening those scopes to avoid reconnect loops.
     const requestedChannels = hasApplicationSession
-      ? ["system", "presence", "trust", "audit", "telemetry", "community", "expert", "academic"].join(",")
-      : "system";
+      ? ["system", "trust", "audit", "community", "expert"].join(",")
+      : "system,community";
     const cursor = lastSequenceRef.current > 0 ? `&cursor=${encodeURIComponent(lastSequenceRef.current)}` : "";
     const url = `/api/realtime/stream?clientId=${encodeURIComponent(clientIdRef.current)}&channels=${encodeURIComponent(requestedChannels)}${cursor}`;
     const eventSource = new EventSource(url);
@@ -139,42 +147,12 @@ export function RealtimeProvider({ children }) {
       } catch (error) { console.error("[Realtime] Error parsing handshake:", error); }
     });
 
-    eventSource.addEventListener("telemetry:tick", (event) => {
-      try {
-        const record = JSON.parse(event.data);
-        const data = record.data || record;
-        if (data.metrics && typeof data.metrics === "object") {
-          setMetrics(data.metrics);
-          setActiveLearners(numericValue(data.metrics.activeLearners));
-          setAuditsCompleted(numericValue(data.metrics.auditsCompleted));
-          if (numericValue(data.metrics.avgLatencyMs) !== null) setLatency(data.metrics.avgLatencyMs);
-        }
-        rememberEvent(record);
-      } catch (error) { console.error("[Realtime] Error parsing telemetry:", error); }
-    });
-
-    eventSource.addEventListener("presence:update", (event) => {
-      try {
-        const record = JSON.parse(event.data);
-        const data = record.data || record;
-        setPresence((current) => ({ ...current, ...data, studyPods: Array.isArray(data.studyPods) ? data.studyPods : current.studyPods }));
-        rememberEvent(record);
-      } catch (error) { console.error("[Realtime] Error parsing presence:", error); }
-    });
-
     eventSource.addEventListener("audit:claim_evaluated", (event) => {
       try {
         const record = JSON.parse(event.data);
         handleAuditEvent(record);
         rememberEvent(record);
       } catch (error) { console.error("[Realtime] Error parsing audit event:", error); }
-    });
-
-    eventSource.addEventListener("academic:timetable.updated", (event) => {
-      try {
-        const record = JSON.parse(event.data);
-        rememberEvent(record);
-      } catch (error) { console.error("[Realtime] Error parsing academic timetable event:", error); }
     });
 
     eventSource.addEventListener("system:ping", (event) => {
@@ -187,7 +165,20 @@ export function RealtimeProvider({ children }) {
         rememberEvent(record);
       } catch (error) { console.error("[Realtime] Error parsing ping:", error); }
     });
-  }, [handleAuditEvent, rememberEvent, hasApplicationSession]);
+
+    [
+      "community:contribution",
+      "community:revision",
+      "community:comment",
+      "community:reaction",
+      "community:moderation",
+      "community:trust_revision",
+      "trust:revision",
+      "trust:expert_review",
+      "expert:assignment",
+      "expert:revision",
+    ].forEach((eventType) => eventSource.addEventListener(eventType, handleDomainEvent));
+  }, [handleAuditEvent, handleDomainEvent, rememberEvent, hasApplicationSession]);
 
   useEffect(() => { connectSSERef.current = connectSSE; }, [connectSSE]);
 
@@ -197,23 +188,18 @@ export function RealtimeProvider({ children }) {
       // logout. The next stream is authorized from the new cookie only.
       setRecentEvents([]);
       setNotifications([]);
-      setMetrics(null);
-      setActiveLearners(null);
-      setAuditsCompleted(null);
-      setPresence(INITIAL_PRESENCE);
       setRuntime(INITIAL_RUNTIME);
       lastSequenceRef.current = 0;
+      seenEventIdsRef.current.clear();
       previousPrincipalIdRef.current = principalId;
     }
 
-    if (!hasApplicationSession) {
+    const authPending = ["INITIALIZING", "AUTHENTICATING", "REFRESHING", "SIGNING_OUT"].includes(authState);
+    if (authPending) {
       eventSourceRef.current?.close();
       eventSourceRef.current = null;
       window.clearTimeout(reconnectTimeoutRef.current);
-      const statusTimer = window.setTimeout(() => {
-        const pending = ["INITIALIZING", "AUTHENTICATING", "REFRESHING", "SIGNING_OUT"].includes(authState);
-        setConnectionStatus(pending ? "CONNECTING" : "DISCONNECTED");
-      }, 0);
+      const statusTimer = window.setTimeout(() => setConnectionStatus("CONNECTING"), 0);
       return () => window.clearTimeout(statusTimer);
     }
 
@@ -251,7 +237,7 @@ export function RealtimeProvider({ children }) {
   }, []);
 
   return (
-    <RealtimeContext.Provider value={{ connectionStatus, latency, activeLearners, auditsCompleted, metrics, runtime, presence, recentEvents, notifications, dismissNotification, broadcastEvent, subscribe }}>
+    <RealtimeContext.Provider value={{ connectionStatus, latency, runtime, recentEvents, notifications, dismissNotification, broadcastEvent, subscribe }}>
       {children}
     </RealtimeContext.Provider>
   );

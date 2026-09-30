@@ -293,7 +293,7 @@ export default function SaffronAuthDeck({ initialMode = "register" }) {
                 <span className="text-[#ffd15c]">Chào mừng</span> <span>quay trở lại</span>
               </h1>
               <p className="mt-1.5 text-xs sm:text-sm text-[#ece7e0]/80 font-normal leading-relaxed">
-                Đăng nhập để tiếp tục tra cứu <span className="text-[#ffbc09] font-semibold">nguy cơ lừa đảo</span> và quản lý điểm uy tín.
+                Đăng nhập để tiếp tục tra cứu thông tin Trust và cập nhật hồ sơ tài khoản.
               </p>
             </div>
           )}

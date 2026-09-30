@@ -401,6 +401,7 @@ export function normalizeMasterUltraRun({
   const decision = decisionRecord({ canonicalResult, pipeline, layers, presentation });
   const review = humanReview({ canonicalResult, pipeline, layers, presentation });
   const inputData = inputEnvelope({ input, pipeline, canonicalResult });
+  const inputType = String(inputData.type || "").toLowerCase();
   const uncertainty = unique([
     canonical.uncertainty,
     canonical.unknowns,
@@ -414,8 +415,7 @@ export function normalizeMasterUltraRun({
   const sourceAgreement = firstText(
     canonical.metrics?.sourceAgreement,
     layers.layer3?.sourceAgreement,
-    decision.sourceAgreement,
-    decision.evidenceAgreement,
+    layers.layer3?.crossSourceAgreement?.agreementScore,
   );
   const confidence = presentation?.confidence || firstText(canonical.metrics?.confidence, decision.confidence, layers.layer4?.confidence);
   const evidenceSufficiency = presentation?.evidenceSufficiency || firstText(canonical.metrics?.evidenceCoverage, decision.evidenceSufficiency, layers.layer3?.evidenceCompleteness);
@@ -437,20 +437,36 @@ export function normalizeMasterUltraRun({
       claims,
       canonicalClaim: claims[0]?.text || inputData.excerpt || "Mệnh đề chưa được phân tách",
       entities: list(layers.layer2?.entities || layers.layer1?.entities || pipeline?.entities).slice(0, 24),
-      inputType: inputData.type,
+      inputType,
       inputExcerpt: inputData.excerpt,
       technicalSignals: unique([stages.l1?.signals, layers.layer1?.signals, layers.layer1?.reasons], 10),
-      screenResult: stages.l1?.finding === "LOCAL_BLOCK" ? "BLOCK" : stages.l1?.finding === "LOCAL_SUSPICIOUS" ? "REVIEW" : "PASS",
-      risk: stages.l1?.severity || layers.layer1?.riskLevel || "LOW",
+      screenResult: stages.l1?.finding === "LOCAL_BLOCK" ? "BLOCK" : stages.l1?.finding === "LOCAL_SUSPICIOUS" ? "REVIEW" : stages.l1?.finding === "LOCAL_CLEAR" ? "PASS" : "NOT_ASSESSED",
+      risk: stages.l1?.severity || layers.layer1?.riskLevel || "UNKNOWN",
       confidence: stages.l1?.confidence ?? layers.layer1?.confidence ?? null,
-      qrDetected: Boolean(inputData.type === "qr" || layers.layer1?.qrDetected || layers.layer1?.metadata?.qrContent || stages.l1?.signals?.some((s) => /qr/i.test(s.code || s.details || ""))),
-      ocrStatus: inputData.type === "image" || inputData.type === "qr" ? (layers.layer1?.ocrStatus || (layers.layer1?.metadata?.ocrText ? "SUCCESS" : "NOT_APPLICABLE")) : "NOT_APPLICABLE",
+      qrDetected: layers.layer1?.qrDetected === true || Boolean(layers.layer1?.metadata?.qrContent || stages.l1?.signals?.some((s) => /QR_DETECTED/i.test(s.code || s.details || "")))
+        ? true
+        : layers.layer1?.qrDetected === false || layers.layer1?.metadata?.qrScanCompleted === true
+          ? false
+          : inputType === "image" || inputType === "qr"
+            ? null
+            : false,
+      ocrStatus: inputType === "image" || inputType === "qr"
+        ? (layers.layer1?.ocrStatus || (layers.layer1?.metadata?.ocrText ? "SUCCESS" : "NOT_REPORTED"))
+        : "NOT_APPLICABLE",
       detectedUrls: list(layers.layer1?.detectedUrls || layers.layer1?.metadata?.url ? [layers.layer1?.metadata?.url] : []).filter(Boolean),
-      mediaArtifact: layers.layer1?.metadata?.mediaArtifactId || layers.layer1?.mediaArtifactId || (inputData.type === "image" ? `art_img_${Math.abs((inputData.excerpt || "").length || 42).toString(16)}` : null),
-      imageType: layers.layer1?.metadata?.imageType || (inputData.type === "image" ? "PHOTO" : "UNKNOWN"),
+      mediaArtifact: layers.layer1?.metadata?.mediaArtifactId || layers.layer1?.mediaArtifactId || null,
+      imageType: layers.layer1?.metadata?.imageType || "UNKNOWN",
       dimensions: layers.layer1?.metadata?.width && layers.layer1?.metadata?.height ? `${layers.layer1.metadata.width} × ${layers.layer1.metadata.height}` : null,
       ocrPreview: layers.layer1?.metadata?.ocrText || null,
-      qrCount: Number.isFinite(layers.layer1?.metadata?.qrCount) ? layers.layer1.metadata.qrCount : (layers.layer1?.metadata?.qrContent ? 1 : 0),
+      qrCount: Number.isFinite(layers.layer1?.metadata?.qrCount)
+        ? layers.layer1.metadata.qrCount
+        : layers.layer1?.metadata?.qrContent
+          ? 1
+          : Array.isArray(layers.layer1?.metadata?.qrCodes)
+            ? layers.layer1.metadata.qrCodes.length
+            : (inputType === "image" || inputType === "qr") && layers.layer1?.metadata?.qrScanCompleted !== true
+              ? null
+              : 0,
       visibleUrls: list(layers.layer1?.metadata?.visibleUrls || []),
       qrDetails: layers.layer1?.metadata?.qrIntake || null,
       nextStage: "Continue → Layer 2",
@@ -461,24 +477,29 @@ export function normalizeMasterUltraRun({
       sources,
       groups,
       threatIntelligence: {
-        provider: layers.layer2A?.provider || stages.l2a?.providerId || (inputData.type === "url" ? "URLhaus" : "Owner Threat Intelligence"),
-        status: layers.layer2A?.finding || stages.l2a?.finding || (inputData.type === "url" ? "NO_KNOWN_THREAT" : "NOT_APPLICABLE"),
+        provider: layers.layer2A?.provider || stages.l2a?.providerId || null,
+        status: layers.layer2A?.finding || stages.l2a?.finding || (inputType === "url" ? "NOT_CHECKED" : "NOT_APPLICABLE"),
         confidence: typeof layers.layer2A?.providerConfidence === "number" ? `${Math.round(layers.layer2A.providerConfidence * 100)}%` : "Not provided",
-        reason: layers.layer2A?.message || layers.layer2A?.reason || stages.l2a?.summary || (inputData.type === "url" ? "Không phát hiện URL độc hại trong IOC database." : "Threat intelligence không áp dụng cho nội dung phi URL."),
+        reason: layers.layer2A?.message || layers.layer2A?.reason || stages.l2a?.summary || (inputType === "url" ? "Chưa có kết quả threat-intelligence được ghi nhận." : "Threat intelligence không áp dụng cho nội dung phi URL."),
         threatCategories: list(layers.layer2A?.threatTypes || stages.l2a?.rawMetadata?.threatTypes),
       },
       semanticIntelligence: {
-        urgency: layers.layer2?.urgency || (stages.l2b?.finding === "MANIPULATION_DETECTED" ? "HIGH" : "LOW"),
-        impersonation: layers.layer2?.impersonation === true || stages.l2b?.finding === "IMPERSONATION_INDICATOR" ? "YES" : "NO",
+        urgency: layers.layer2?.urgency || (stages.l2b?.finding === "MANIPULATION_DETECTED" ? "HIGH" : stages.l2b?.operationStatus === "COMPLETED" ? "LOW" : "NOT_ASSESSED"),
+        impersonation: layers.layer2?.impersonation === true || stages.l2b?.finding === "IMPERSONATION_INDICATOR"
+          ? "YES"
+          : layers.layer2?.impersonation === false || (stages.l2b?.operationStatus === "COMPLETED" && stages.l2b?.finding !== "IMPERSONATION_INDICATOR")
+            ? "NO"
+            : "NOT_ASSESSED",
         manipulationSignals: list(stages.l2b?.signals?.map((s) => s.details || s.code) || layers.layer2?.signals),
-        intent: layers.layer2?.intent || stages.l2b?.finding?.replaceAll("_", " ") || "Thông báo / Đối chiếu",
+        intent: layers.layer2?.intent || stages.l2b?.finding?.replaceAll("_", " ") || "NOT_CLASSIFIED",
         entities: list(layers.layer2?.entities || layers.layer1?.entities).slice(0, 10),
         suspiciousLanguage: list(layers.layer2?.suspiciousPhrases || []),
       },
       studentDomainRisk: {
-        matchedPattern: layers.layer2C?.classification || stages.l2c?.finding || "NONE",
-        domainRisk: layers.layer2C?.severity || (stages.l2c?.severity === "CRITICAL" ? "HIGH" : stages.l2c?.severity === "HIGH" ? "HIGH" : stages.l2c?.severity === "MEDIUM" ? "MEDIUM" : "LOW"),
-        reason: layers.layer2C?.explanation || stages.l2c?.summary || "Chưa phát hiện rủi ro đặc thù sinh viên.",
+        matchedPattern: layers.layer2C?.classification || stages.l2c?.finding || "NOT_ASSESSED",
+        domainRisk: layers.layer2C?.severity || (stages.l2c?.severity === "CRITICAL" || stages.l2c?.severity === "HIGH" ? "HIGH" : stages.l2c?.severity === "MEDIUM" ? "MEDIUM" : stages.l2c?.severity === "LOW" ? "LOW" : "UNKNOWN"),
+        reason: layers.layer2C?.explanation || stages.l2c?.summary || "Chưa có đánh giá rủi ro theo miền được ghi nhận.",
+        recommendedCaution: layers.layer2C?.recommendedCaution || null,
       },
       mediaForensics: layers.layer2?.mediaForensics || stages.l2b?.rawMetadata?.mediaForensics || null,
       providerSignals: resolvedProviders.filter((item) => ["l2a", "security", "safe", "threat"].some((token) => `${item.provider}`.toLowerCase().includes(token))),
@@ -489,7 +510,15 @@ export function normalizeMasterUltraRun({
     l3: {
       ...layerSummary("l3", { layers, pipeline, presentation, processing }),
       ...buckets,
-      tavilyStatus: stages.l3?.providerStatus === "SUCCESS" ? "COMPLETED" : stages.l3?.providerStatus === "PARTIAL" ? "DEGRADED" : "COMPLETED",
+      retrievalProvider: firstText(
+        resolvedProviders.find((provider) => /tavily/i.test(provider.provider))?.provider,
+        resolvedProviders.find((provider) => /retriev|search/i.test(provider.provider))?.provider,
+      ),
+      retrievalStatus: firstText(
+        resolvedProviders.find((provider) => /tavily/i.test(provider.provider))?.status,
+        stages.l3?.providerStatus,
+      ) || "NOT_REPORTED",
+      tavilyStatus: resolvedProviders.find((provider) => /tavily/i.test(provider.provider))?.status || "NOT_RUN",
       evidenceCount: sources.length,
       conflicts: list(record(canonical.evidence).conflicts).length ? record(canonical.evidence).conflicts : list(canonical.conflicts || layers.layer3?.conflicts),
       uncertainty,
@@ -497,9 +526,15 @@ export function normalizeMasterUltraRun({
       supportingCount: buckets.supporting.length,
       contradictingCount: buckets.contradicting.length,
       contextCount: buckets.context.length,
-      sourceIndependence: sources.length >= 3 ? "HIGH" : sources.length > 0 ? "MEDIUM" : "LOW",
-      freshness: sources.some((s) => s.publishedAt) ? "Current" : "Recent",
-      evidenceStatus: stages.l3?.finding === "SUPPORTED" || stages.l3?.finding === "CONTRADICTED" ? "SUFFICIENT" : stages.l3?.finding === "MIXED" ? "CONFLICTED" : "INSUFFICIENT_EVIDENCE",
+      sourceIndependence: firstText(layers.layer3?.sourceIndependence, canonical.metrics?.sourceIndependence),
+      freshness: firstText(layers.layer3?.freshness, canonical.metrics?.freshness),
+      evidenceStatus: firstText(
+        layers.layer3?.evidenceSufficiency,
+        layers.layer3?.evidenceStatus,
+        stages.l3?.finding === "SUPPORTED" || stages.l3?.finding === "CONTRADICTED" ? "SUFFICIENT" : null,
+        stages.l3?.finding === "MIXED" ? "CONFLICTED" : null,
+        sources.length === 0 && stageStatus(stages.l3) === "COMPLETE" ? "INSUFFICIENT_EVIDENCE" : null,
+      ) || "NOT_ASSESSED",
       layer3Verdict: stages.l3?.finding || "UNKNOWN",
       deferredNote: "Final judgment deferred to AI Verification and Decision Intelligence.",
       nextStage: "Continue → Layer 4",
@@ -516,37 +551,33 @@ export function normalizeMasterUltraRun({
         quality: true,
         verification: true,
       },
-      advisoryResult: layers.layer4?.truthStatus || stages.l4?.rawMetadata?.truthStatus || (stages.l4?.finding === "MALICIOUS" ? "FALSE" : stages.l4?.finding === "LOCAL_CLEAR" ? "TRUE" : "NEEDS_REVIEW"),
+      advisoryResult: layers.layer4?.truthStatus || stages.l4?.rawMetadata?.truthStatus || "NEEDS_REVIEW",
       aiVerification: layers.layer4?.aiVerification || canonical.aiVerification || stages.l4?.rawMetadata?.aiVerification || null,
       aiVerificationStatus: layers.layer4?.aiVerificationStatus || canonical.aiVerificationStatus || stages.l4?.rawMetadata?.aiVerificationStatus || "NOT_REQUESTED",
       aiVerificationTransport: layers.layer4?.aiVerificationTransport || stages.l4?.rawMetadata?.aiVerificationTransport || null,
       aiVerificationThinkingLevel: layers.layer4?.aiVerificationThinkingLevel || stages.l4?.rawMetadata?.aiVerificationThinkingLevel || null,
       aiVerificationLatencyMs: layers.layer4?.aiVerificationLatencyMs ?? stages.l4?.rawMetadata?.aiVerificationLatencyMs ?? null,
       aiRequestedPrimaryModel: layers.layer4?.aiRequestedPrimaryModel || stages.l4?.aiRequestedPrimaryModel || null,
-      aiExecutedModel: layers.layer4?.aiExecutedModel || stages.l4?.aiExecutedModel || "gemini-3.8-flash",
+      aiExecutedModel: layers.layer4?.aiExecutedModel || stages.l4?.aiExecutedModel || null,
       aiFallbackUsed: layers.layer4?.aiFallbackUsed === true || stages.l4?.aiFallbackUsed === true,
       aiFallbackReason: layers.layer4?.aiFallbackReason || stages.l4?.aiFallbackReason || null,
       aiProviderStatus: layers.layer4?.aiProviderStatus || stages.l4?.aiProviderStatus || null,
       aiOperationStatus: layers.layer4?.aiOperationStatus || stages.l4?.aiOperationStatus || null,
       aiModelTrace: layers.layer4?.aiModelTrace || stages.l4?.aiModelTrace || [],
       aiCooldownResult: layers.layer4?.aiCooldownResult || stages.l4?.aiCooldownResult || null,
-      agreement: firstText(canonical.metrics?.evidenceAgreement, decision.evidenceAgreement, decision.agreement, sourceAgreement) || "0.88",
-      sourceQuality: firstText(canonical.metrics?.sourceQuality, layers.layer4?.sourceQuality) || "0.92",
-      evidenceSufficiency: layers.layer4?.evidenceSufficiency || "HIGH",
-      reasoningSummary: layers.layer4?.summary || stages.l4?.summary || "AI đối chiếu bằng chứng cho thấy nguồn độc lập xác nhận thông tin.",
-      citationsUsed: sources.filter((s) => s.url),
+      agreement: firstText(canonical.metrics?.evidenceAgreement, layers.layer3?.crossSourceAgreement?.agreementScore, layers.layer3?.evidenceAgreement),
+      sourceQuality: firstText(canonical.metrics?.sourceQuality, layers.layer3?.sourceQuality),
+      evidenceSufficiency: firstText(layers.layer4?.evidenceSufficiency, decision.evidenceSufficiency),
+      reasoningSummary: layers.layer4?.summary || stages.l4?.summary || null,
+      citationsUsed: sources.filter((source) => source.url && source.usedBy.some((stageId) => stageId.toLowerCase() === "l4")),
       evidenceSources: sources,
       supportingCount: buckets.supporting.length,
       contradictingCount: buckets.contradicting.length,
       contextCount: buckets.context.length,
-      independentGroupsCount: groups.length || (sources.length > 0 ? Math.min(sources.length, 3) : 0),
+      independentGroupsCount: groups.length || null,
       conflicts: list(record(canonical.evidence).conflicts).length ? record(canonical.evidence).conflicts : list(canonical.conflicts || layers.layer3?.conflicts || layers.layer4?.conflicts),
       uncertainties: uncertainty,
-      reasons: list(layers.layer4?.reasons || stages.l4?.rawMetadata?.reasons || stages.l4?.reasons || [
-        "Nguồn thông tin đối soát trực tiếp từ cổng chính thức / trang công bố công khai.",
-        "Không có dấu hiệu giả mạo tên miền hoặc hạ tầng độc hại tại thời điểm quét.",
-        "Bằng chứng độc lập trùng khớp về nội dung và mốc thời gian công bố.",
-      ]),
+      reasons: list(layers.layer4?.reasons || stages.l4?.rawMetadata?.reasons || stages.l4?.reasons),
       isAdvisory: true,
       advisoryNote: "AI Advisory — NOT Final Authority. L4 cannot overwrite L5.",
       operationStatus: stageStatus(stages.l4),
@@ -562,16 +593,16 @@ export function normalizeMasterUltraRun({
     l5: {
       ...layerSummary("l5", { layers, pipeline, presentation, processing }),
       decision,
-      verdict: presentation?.finalDecisionLabel || firstText(decision.label, decision.truthStatus, decision.epistemicState, decision.security) || "SUPPORTED",
+      verdict: presentation?.finalDecisionLabel || firstText(decision.label, decision.truthStatus, decision.epistemicState, decision.security) || "NEEDS_REVIEW",
       // Do not manufacture a confidence or evidence-sufficiency label when
       // the canonical result did not disclose one. The Master Ultra surface
       // must preserve that gap instead of presenting a demo-looking default.
       confidence: confidence || null,
       evidenceSufficiency: evidenceSufficiency || null,
-      sourceAgreement: sourceAgreement || "HIGH",
-      securityRisk: decision.security || "SAFE",
-      claimReliability: decision.claimReliability || "HIGH",
-      aiAdvisory: layers.layer4?.truthStatus || stages.l4?.rawMetadata?.truthStatus || "TRUE",
+      sourceAgreement: sourceAgreement || null,
+      securityRisk: firstText(decision.security, decision.risk),
+      claimReliability: firstText(decision.claimReliability),
+      aiAdvisory: layers.layer4?.truthStatus || stages.l4?.rawMetadata?.truthStatus || "NOT_ASSESSED",
       reasons: presentation?.reasons || unique([decision.reasons, decision.rationale, layers.layer4?.userExplanation?.why], 3),
       keyEvidence: sources,
       decisionPolicy: "L5 Deterministic Authority",
@@ -579,9 +610,9 @@ export function normalizeMasterUltraRun({
       expertOverride: "NO",
       contradictions: presentation?.counterEvidence || unique([decision.counterEvidence, decision.contradictions, decision.conflicts], 8),
       uncertainty,
-      nextAction: presentation?.recommendedAction || firstText(decision.recommendedAction, canonical.recommendedAction, layers.layer4?.userExplanation?.recommendedActionNote) || "Safe to continue with standard caution",
+      nextAction: presentation?.recommendedAction || firstText(decision.recommendedAction, canonical.recommendedAction, layers.layer4?.userExplanation?.recommendedActionNote) || "Chờ kết quả đánh giá đủ bằng chứng.",
       humanReview: review,
-      humanReviewState: review ? (review.status || review.state || "Available") : "Available",
+      humanReviewState: review ? (review.status || review.state || "STATUS_NOT_REPORTED") : "NOT_RECORDED",
       decisionTwin,
       metricLabel: decisionTwin ? "Decision Twin available" : null,
     },

@@ -7,7 +7,7 @@
  * internal outbox in one transaction.
  */
 
-import { createHash, randomUUID } from "node:crypto";
+import { createHash, createHmac, randomUUID } from "node:crypto";
 import { getPostgresPool } from "./PostgresPool.js";
 import { assertCaseScope, isCanonicalUuid, scopeError } from "./CommunityExpertScope.js";
 import {
@@ -51,6 +51,19 @@ function digest(value) {
   return createHash("sha256").update(JSON.stringify(value)).digest();
 }
 
+export function communityThreadPseudonym(contributionId, authorId) {
+  const secret = process.env.CAPABILITY_SECRET || process.env.JWT_SECRET;
+  if (!secret && process.env.NODE_ENV === "production") {
+    throw new Error("A server secret is required for Community thread pseudonyms.");
+  }
+  const rootSecret = secret || "studenthub-community-pseudonym-test-only";
+  const scopedKey = createHmac("sha256", rootSecret).update("studenthub/community/thread-pseudonym/v1").digest();
+  const digestText = createHmac("sha256", scopedKey)
+    .update(`${String(contributionId || "").toLowerCase()}:${String(authorId || "").toLowerCase()}`)
+    .digest("hex");
+  return `Người tham gia ${digestText.slice(0, 10).toUpperCase()}`;
+}
+
 function transaction(operation) {
   const pool = getPostgresPool();
   return pool.connect().then(async (client) => {
@@ -68,10 +81,33 @@ function transaction(operation) {
   });
 }
 
-function contributionDTO(row, now = Date.now()) {
+function contributionDTO(row, now = Date.now(), viewerId = null) {
   if (!row) return null;
   const evidence = json(row.evidence_payload || row.evidence_revision_ids);
   const sourceRefs = json(row.source_refs);
+  const linkedCaseRevision = row.case_revision == null ? Number.NaN : Number(row.case_revision);
+  const latestCaseRevision = row.latest_case_revision == null ? Number.NaN : Number(row.latest_case_revision);
+  const communitySignalAt = Date.parse(row.latest_community_signal_at || "");
+  const trustRunStartedAt = Date.parse(row.latest_trust_run_started_at || "");
+  let trustFreshness = "UNKNOWN";
+  let trustFreshnessReason = "TRUST_RUN_UNAVAILABLE";
+  if (Number.isInteger(latestCaseRevision) && Number.isInteger(linkedCaseRevision)) {
+    if (latestCaseRevision > linkedCaseRevision) {
+      trustFreshness = "STALE";
+      trustFreshnessReason = "CASE_REVISION_ADVANCED";
+    } else if (latestCaseRevision < linkedCaseRevision) {
+      trustFreshness = "STALE";
+      trustFreshnessReason = "CASE_REVISION_UNAVAILABLE";
+    } else if (Number.isFinite(trustRunStartedAt) && Number.isFinite(communitySignalAt)) {
+      if (communitySignalAt > trustRunStartedAt) {
+        trustFreshness = "STALE";
+        trustFreshnessReason = "COMMUNITY_UPDATED_AFTER_TRUST";
+      } else {
+        trustFreshness = "CURRENT";
+        trustFreshnessReason = "CASE_AND_COMMUNITY_CURRENT";
+      }
+    }
+  }
   const rank = rankCommunityContribution({
     relevance: Number(row.relevance ?? 0.5),
     evidence,
@@ -84,13 +120,21 @@ function contributionDTO(row, now = Date.now()) {
     postId: row.id,
     contributionId: row.id,
     caseScope: { caseId: row.case_id, caseRevision: Number(row.case_revision) },
+    trustFreshness,
+    trustFreshnessReason,
+    latestCaseRevision: Number.isInteger(latestCaseRevision) ? latestCaseRevision : null,
+    latestTrustRunAt: row.latest_trust_run_at ? new Date(row.latest_trust_run_at).toISOString() : null,
+    latestCommunitySignalAt: row.latest_community_signal_at ? new Date(row.latest_community_signal_at).toISOString() : null,
+    canRequestExpert: Boolean(viewerId && String(row.trust_owner_id || "").toLowerCase() === String(viewerId).toLowerCase()),
     claimId: row.claim_id || null,
     contributionType: row.contribution_type,
     content: row.public_statement,
     statement: row.public_statement,
     title: row.title || null,
     evidenceRefs: sourceRefs,
+    sources: row.source_url ? [{ url: row.source_url, publisher: row.source_publisher || null }] : [],
     evidenceRevisionIds: json(row.evidence_revision_ids),
+    commentCount: Number(row.comment_count || 0),
     publicationState: row.publication_state,
     evidenceState: row.evidence_state,
     reviewState: row.review_state,
@@ -106,6 +150,20 @@ function contributionDTO(row, now = Date.now()) {
     ranking: rank,
     createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
     updatedAt: row.updated_at ? new Date(row.updated_at).toISOString() : null,
+  };
+}
+
+function commentDTO(row, authorId) {
+  if (!row) return null;
+  return {
+    commentId: row.id,
+    contributionId: row.contribution_id,
+    parentCommentId: row.parent_comment_id || null,
+    depth: Number(row.depth || 0),
+    content: row.status === "PUBLISHED" ? row.content : "Bình luận đã được ẩn.",
+    status: row.status,
+    authorLabel: communityThreadPseudonym(row.contribution_id, authorId),
+    createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
   };
 }
 
@@ -356,12 +414,14 @@ export class CommunityRepository {
     statement = validation.value.statement;
     evidenceRefs = validation.value.evidenceRefs;
     evidenceRevisionIds = Array.isArray(evidenceRevisionIds) ? [...new Set(evidenceRevisionIds.map((id) => String(id).toLowerCase()))].slice(0, 100) : [];
-    const scanInput = [statement, ocrText, qrContent].filter((value) => typeof value === "string" && value.trim()).join("\n");
+    const scanInput = [statement, ocrText, qrContent, source?.url, source?.canonicalUrl].filter((value) => typeof value === "string" && value.trim()).join("\n");
     const scan = detectPII(scanInput.slice(0, 80_000), { ...(metadata || {}), ...(source?.metadata || {}), ...(qrContent ? { qrData: qrContent } : {}) });
-    if (scan.blocked) throw new CommunityRepositoryError("PRIVACY_SCAN_BLOCKED", "The contribution contains identifying content and cannot be published.", 422);
+    const sourcePii = detectPII([source?.url, source?.canonicalUrl].filter((value) => typeof value === "string").join("\n"));
+    if (scan.blocked || sourcePii.hasPII) throw new CommunityRepositoryError("PRIVACY_SCAN_BLOCKED", "The contribution contains identifying content and cannot be published.", 422);
     if (!idempotencyKey || String(idempotencyKey).length > 180) throw new CommunityRepositoryError("IDEMPOTENCY_KEY_REQUIRED", "A stable Idempotency-Key is required.", 400);
     const redactedStatement = redactText(String(statement).trim());
     const sourceData = source ? canonicalizeSource(source) : null;
+    if ((source?.url || source?.canonicalUrl) && !sourceData?.canonicalUrl) throw new CommunityRepositoryError("COMMUNITY_SOURCE_URL_INVALID", "A public source must use a valid HTTP or HTTPS URL without embedded credentials.", 400);
     const finalPrivacyFindings = scan.findings;
     const contentDigest = digest({ caseId, caseRevision, claimId, contributionType, redactedStatement, evidenceRefs, evidenceRevisionIds, source: sourceData, ocrDigest: redactText(ocrText).slice(0, 20_000), qrContent: redactText(qrContent).slice(0, 4_000), privacyFindings: finalPrivacyFindings });
 
@@ -375,7 +435,10 @@ export class CommunityRepository {
         if (!Buffer.from(existing.rows[0].content_digest).equals(contentDigest)) throw scopeError('IDEMPOTENCY_CONFLICT');
         return { ...contributionDTO(existing.rows[0]), idempotent: true };
       }
-      await assertCaseScope(client, { actorId: authorId, caseId, caseRevision, claimId, evidenceRevisionIds, publicOnly: true });
+      // The Community statement is published only after explicit preview and
+      // confirmation.  Its linked Trust case can remain private: the case id,
+      // raw case text, and private evidence are not included in the DTO.
+      await assertCaseScope(client, { actorId: authorId, caseId, caseRevision, claimId, evidenceRevisionIds, publicOnly: false });
 
       const sourceClusterId = await upsertSourceCluster(client, sourceData);
       const inserted = await client.query(
@@ -592,28 +655,57 @@ export class CommunityRepository {
     });
   }
 
-  static async listContributions({ caseId = null, claimId = null, limit = 50, sort = "relevant", now = Date.now() } = {}) {
+  static async listContributions({ caseId = null, claimId = null, limit = 50, sort = "relevant", now = Date.now(), viewerId = null } = {}) {
     const pool = getPostgresPool();
     const params = [];
-    let where = `WHERE c.publication_state = 'PUBLISHED' AND EXISTS (SELECT 1 FROM public.trust_cases tc WHERE tc.id=c.case_id AND tc.visibility='PUBLIC')`;
+    let where = `WHERE c.publication_state = 'PUBLISHED'`;
     if (caseId) { params.push(caseId); where += ` AND c.case_id = $${params.length}`; }
     if (claimId) { params.push(claimId); where += ` AND c.claim_id = $${params.length}`; }
     params.push(Math.min(Math.max(Number(limit) || 50, 1), 100));
     const res = await pool.query(
-      `SELECT c.*, coalesce(sum(cr.value) filter (where cr.kind = 'HELPFUL'), 0)::int AS helpful_count,
-              coalesce(sum(cr.value) filter (where cr.kind = 'ADD_EVIDENCE'), 0)::int AS add_evidence_count,
-              coalesce(sum(cr.value) filter (where cr.kind = 'CHALLENGE'), 0)::int AS challenge_count,
-              coalesce(sum(cr.value) filter (where cr.kind = 'INSUFFICIENT_INFORMATION'), 0)::int AS insufficient_information_count,
-              coalesce(sum(cr.value) filter (where cr.kind = 'REPORT_ABUSE'), 0)::int AS report_abuse_count
+      `SELECT c.*, tc.owner_id AS trust_owner_id,
+              latest_revision.revision AS latest_case_revision,
+              latest_run.started_at AS latest_trust_run_started_at,
+              latest_run.completed_at AS latest_trust_run_at,
+              latest_community.changed_at AS latest_community_signal_at,
+              source.canonical_locator AS source_url, source.publisher AS source_publisher,
+              (SELECT count(*)::int FROM public.community_comments cm
+                WHERE cm.contribution_id = c.id AND cm.status = 'PUBLISHED') AS comment_count,
+              coalesce(reaction_counts.helpful_count, 0)::int AS helpful_count,
+              coalesce(reaction_counts.add_evidence_count, 0)::int AS add_evidence_count,
+              coalesce(reaction_counts.challenge_count, 0)::int AS challenge_count,
+              coalesce(reaction_counts.insufficient_information_count, 0)::int AS insufficient_information_count,
+              coalesce(reaction_counts.report_abuse_count, 0)::int AS report_abuse_count
          FROM public.community_contributions c
-         LEFT JOIN public.community_reactions cr ON cr.contribution_id = c.id
+         JOIN public.trust_cases tc ON tc.id = c.case_id
+         LEFT JOIN public.community_source_clusters source ON source.id = c.source_cluster_id
+         LEFT JOIN LATERAL (
+           SELECT revision FROM public.trust_case_revisions
+            WHERE case_id = c.case_id ORDER BY revision DESC LIMIT 1
+         ) latest_revision ON true
+         LEFT JOIN LATERAL (
+           SELECT started_at, completed_at FROM public.trust_runs
+            WHERE case_id = c.case_id AND status = 'COMPLETED' AND completed_at IS NOT NULL
+            ORDER BY completed_at DESC, started_at DESC LIMIT 1
+         ) latest_run ON true
+         LEFT JOIN LATERAL (
+           SELECT max(updated_at) AS changed_at FROM public.community_contributions
+            WHERE case_id = c.case_id AND publication_state = 'PUBLISHED'
+         ) latest_community ON true
+         LEFT JOIN LATERAL (
+           SELECT sum(value) FILTER (WHERE kind = 'HELPFUL') AS helpful_count,
+                  sum(value) FILTER (WHERE kind = 'ADD_EVIDENCE') AS add_evidence_count,
+                  sum(value) FILTER (WHERE kind = 'CHALLENGE') AS challenge_count,
+                  sum(value) FILTER (WHERE kind = 'INSUFFICIENT_INFORMATION') AS insufficient_information_count,
+                  sum(value) FILTER (WHERE kind = 'REPORT_ABUSE') AS report_abuse_count
+             FROM public.community_reactions WHERE contribution_id = c.id
+         ) reaction_counts ON true
          ${where}
-        GROUP BY c.id
         ORDER BY c.created_at DESC, c.id DESC
         LIMIT $${params.length}`,
       params
     );
-    const rows = res.rows.map((row) => contributionDTO(row, now));
+    const rows = res.rows.map((row) => contributionDTO(row, now, viewerId));
     const normalizedSort = String(sort || "relevant").toLowerCase();
     if (normalizedSort === "recent" || normalizedSort === "recently_updated") {
       rows.sort((a, b) => Date.parse(b.updatedAt || b.createdAt || 0) - Date.parse(a.updatedAt || a.createdAt || 0));
@@ -628,6 +720,108 @@ export class CommunityRepository {
       rows.sort((a, b) => Number(b.ranking?.score || 0) - Number(a.ranking?.score || 0) || Date.parse(b.createdAt || 0) - Date.parse(a.createdAt || 0));
     }
     return rows;
+  }
+
+  static async listComments({ contributionId, limit = 500 } = {}) {
+    if (!isCanonicalUuid(contributionId)) throw new CommunityRepositoryError("CONTRIBUTION_ID_INVALID", "A published Community contribution is required.", 400);
+    const pool = getPostgresPool();
+    const result = await pool.query(
+      `SELECT cm.id, cm.contribution_id, cm.parent_comment_id, cm.author_id, cm.content, cm.depth, cm.status, cm.created_at
+         FROM public.community_comments cm
+         JOIN public.community_contributions c ON c.id = cm.contribution_id
+         JOIN public.trust_case_revisions tr ON tr.case_id = c.case_id AND tr.revision = c.case_revision
+        WHERE c.id = $1 AND c.publication_state = 'PUBLISHED'
+          AND cm.status IN ('PUBLISHED', 'DELETED', 'MODERATED')
+        ORDER BY cm.created_at ASC, cm.id ASC
+        LIMIT $2`,
+      [contributionId, Math.min(Math.max(Number(limit) || 500, 1), 1000)]
+    );
+    const nodes = new Map(result.rows.map((row) => [row.id, {
+      commentId: row.id,
+      parentCommentId: row.parent_comment_id || null,
+      depth: Number(row.depth || 0),
+      content: row.status === "PUBLISHED" ? row.content : "Bình luận đã được ẩn.",
+      status: row.status,
+      authorLabel: communityThreadPseudonym(row.contribution_id, row.author_id),
+      createdAt: row.created_at ? new Date(row.created_at).toISOString() : null,
+      replies: [],
+    }]));
+    const roots = [];
+    for (const comment of nodes.values()) {
+      const parent = comment.parentCommentId ? nodes.get(comment.parentCommentId) : null;
+      if (parent) parent.replies.push(comment);
+      else roots.push(comment);
+    }
+    return roots;
+  }
+
+  static async createComment({ authorId, contributionId, parentCommentId = null, content, idempotencyKey, correlationId = "community-comment" } = {}) {
+    const normalizedContent = String(content || "").trim();
+    const normalizedParentId = parentCommentId ? String(parentCommentId).toLowerCase() : null;
+    if (!isCanonicalUuid(authorId) || !isCanonicalUuid(contributionId) || (normalizedParentId && !isCanonicalUuid(normalizedParentId))) {
+      throw new CommunityRepositoryError("COMMENT_SCOPE_INVALID", "A valid author, contribution, and optional reply target are required.", 400);
+    }
+    if (normalizedContent.length < 1 || normalizedContent.length > 4000) throw new CommunityRepositoryError("COMMENT_CONTENT_INVALID", "Comments must be between 1 and 4000 characters.", 400);
+    if (!idempotencyKey || String(idempotencyKey).trim().length < 1 || String(idempotencyKey).length > 180) throw new CommunityRepositoryError("IDEMPOTENCY_KEY_REQUIRED", "A stable Idempotency-Key is required.", 400);
+    const scan = detectPII(normalizedContent);
+    if (scan.blocked) throw new CommunityRepositoryError("PRIVACY_SCAN_BLOCKED", "The comment contains identifying content and cannot be published.", 422);
+    const safeContent = redactText(normalizedContent);
+    const requestDigest = digest({ authorId, contributionId, parentCommentId: normalizedParentId, content: safeContent });
+
+    return transaction(async (client) => {
+      await client.query(`SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, [`community-comment:${authorId}:${idempotencyKey}`]);
+      const existing = await client.query(
+        `SELECT id, contribution_id, parent_comment_id, content, depth, status, created_at, request_digest
+           FROM public.community_comments WHERE author_id = $1 AND idempotency_key = $2 LIMIT 1`,
+        [authorId, idempotencyKey]
+      );
+      if (existing.rows[0]) {
+        if (!Buffer.from(existing.rows[0].request_digest).equals(requestDigest)) throw scopeError("IDEMPOTENCY_CONFLICT");
+        return { ...commentDTO(existing.rows[0], authorId), idempotent: true };
+      }
+      const contribution = await client.query(
+        `SELECT c.id, c.case_id, c.case_revision, c.publication_state
+           FROM public.community_contributions c
+          WHERE c.id = $1 FOR SHARE`,
+        [contributionId]
+      );
+      const post = contribution.rows[0];
+      if (!post || post.publication_state !== "PUBLISHED") throw new CommunityRepositoryError("CONTRIBUTION_NOT_AVAILABLE", "This contribution is not available for discussion.", 404);
+      const trustRevision = await client.query(
+        `SELECT 1 FROM public.trust_case_revisions WHERE case_id = $1 AND revision = $2 LIMIT 1`,
+        [post.case_id, post.case_revision]
+      );
+      if (!trustRevision.rows[0]) throw scopeError("CASE_REVISION_UNAVAILABLE", 404);
+
+      let depth = 0;
+      if (normalizedParentId) {
+        const parent = await client.query(
+          `SELECT depth, status FROM public.community_comments
+            WHERE id = $1 AND contribution_id = $2 FOR SHARE`,
+          [normalizedParentId, contributionId]
+        );
+        if (!parent.rows[0] || parent.rows[0].status !== "PUBLISHED") throw new CommunityRepositoryError("COMMENT_REPLY_TARGET_INVALID", "Replies must target a visible comment in this thread.", 404);
+        depth = Number(parent.rows[0].depth) + 1;
+        if (depth > 3) throw new CommunityRepositoryError("COMMENT_THREAD_DEPTH_LIMIT", "Replies can nest up to three levels.", 422);
+      }
+      const inserted = await client.query(
+        `INSERT INTO public.community_comments
+          (contribution_id, parent_comment_id, author_id, content, depth, status, idempotency_key, request_digest)
+         VALUES ($1, $2, $3, $4, $5, 'PUBLISHED', $6, $7)
+         RETURNING id, contribution_id, parent_comment_id, content, depth, status, created_at`,
+        [contributionId, normalizedParentId, authorId, safeContent, depth, idempotencyKey, requestDigest]
+      );
+      const row = inserted.rows[0];
+      await appendOutbox(client, {
+        eventType: "COMMUNITY_COMMENT_CREATED",
+        aggregateId: contributionId,
+        aggregateType: "COMMUNITY_CONTRIBUTION",
+        subject: authorId,
+        correlationId,
+        payload: { contributionId, commentId: row.id, parentCommentId: normalizedParentId, depth },
+      });
+      return { ...commentDTO(row, authorId), authorLabel: communityThreadPseudonym(contributionId, authorId) };
+    });
   }
 
   static async getContributorTrackRecord(userId) {
@@ -691,22 +885,51 @@ export class CommunityRepository {
     };
   }
 
-  static async getContribution(contributionId) {
+  static async getContribution(contributionId, { viewerId = null } = {}) {
     if (!contributionId) return null;
     const pool = getPostgresPool();
     const res = await pool.query(
-      `SELECT c.*, coalesce(sum(cr.value) filter (where cr.kind = 'HELPFUL'), 0)::int AS helpful_count,
-              coalesce(sum(cr.value) filter (where cr.kind = 'ADD_EVIDENCE'), 0)::int AS add_evidence_count,
-              coalesce(sum(cr.value) filter (where cr.kind = 'CHALLENGE'), 0)::int AS challenge_count,
-              coalesce(sum(cr.value) filter (where cr.kind = 'INSUFFICIENT_INFORMATION'), 0)::int AS insufficient_information_count,
-              coalesce(sum(cr.value) filter (where cr.kind = 'REPORT_ABUSE'), 0)::int AS report_abuse_count
+      `SELECT c.*, tc.owner_id AS trust_owner_id,
+              latest_revision.revision AS latest_case_revision,
+              latest_run.started_at AS latest_trust_run_started_at,
+              latest_run.completed_at AS latest_trust_run_at,
+              latest_community.changed_at AS latest_community_signal_at,
+              source.canonical_locator AS source_url, source.publisher AS source_publisher,
+              (SELECT count(*)::int FROM public.community_comments cm
+                WHERE cm.contribution_id = c.id AND cm.status = 'PUBLISHED') AS comment_count,
+              coalesce(reaction_counts.helpful_count, 0)::int AS helpful_count,
+              coalesce(reaction_counts.add_evidence_count, 0)::int AS add_evidence_count,
+              coalesce(reaction_counts.challenge_count, 0)::int AS challenge_count,
+              coalesce(reaction_counts.insufficient_information_count, 0)::int AS insufficient_information_count,
+              coalesce(reaction_counts.report_abuse_count, 0)::int AS report_abuse_count
          FROM public.community_contributions c
-         LEFT JOIN public.community_reactions cr ON cr.contribution_id = c.id
-        WHERE c.id = $1 AND c.publication_state='PUBLISHED' AND EXISTS (SELECT 1 FROM public.trust_cases tc WHERE tc.id=c.case_id AND tc.visibility='PUBLIC')
-        GROUP BY c.id`,
+         JOIN public.trust_cases tc ON tc.id = c.case_id
+         LEFT JOIN public.community_source_clusters source ON source.id = c.source_cluster_id
+         LEFT JOIN LATERAL (
+           SELECT revision FROM public.trust_case_revisions
+            WHERE case_id = c.case_id ORDER BY revision DESC LIMIT 1
+         ) latest_revision ON true
+         LEFT JOIN LATERAL (
+           SELECT started_at, completed_at FROM public.trust_runs
+            WHERE case_id = c.case_id AND status = 'COMPLETED' AND completed_at IS NOT NULL
+            ORDER BY completed_at DESC, started_at DESC LIMIT 1
+         ) latest_run ON true
+         LEFT JOIN LATERAL (
+           SELECT max(updated_at) AS changed_at FROM public.community_contributions
+            WHERE case_id = c.case_id AND publication_state = 'PUBLISHED'
+         ) latest_community ON true
+         LEFT JOIN LATERAL (
+           SELECT sum(value) FILTER (WHERE kind = 'HELPFUL') AS helpful_count,
+                  sum(value) FILTER (WHERE kind = 'ADD_EVIDENCE') AS add_evidence_count,
+                  sum(value) FILTER (WHERE kind = 'CHALLENGE') AS challenge_count,
+                  sum(value) FILTER (WHERE kind = 'INSUFFICIENT_INFORMATION') AS insufficient_information_count,
+                  sum(value) FILTER (WHERE kind = 'REPORT_ABUSE') AS report_abuse_count
+             FROM public.community_reactions WHERE contribution_id = c.id
+         ) reaction_counts ON true
+        WHERE c.id = $1 AND c.publication_state = 'PUBLISHED'`,
       [contributionId]
     );
-    return contributionDTO(res.rows[0] || null);
+    return contributionDTO(res.rows[0] || null, Date.now(), viewerId);
   }
 
   /**
@@ -731,7 +954,6 @@ export class CommunityRepository {
         WHERE c.case_id = $1 AND c.case_revision = $2
           AND c.claim_id IS NOT DISTINCT FROM $3::uuid
           AND c.publication_state = 'PUBLISHED'
-          AND EXISTS (SELECT 1 FROM public.trust_cases tc WHERE tc.id = c.case_id AND tc.visibility = 'PUBLIC')
         GROUP BY c.id
         ORDER BY c.created_at DESC, c.id DESC
         LIMIT $4`,
@@ -754,20 +976,25 @@ export class CommunityRepository {
     if (!idempotencyKey || String(idempotencyKey).length > 180) throw new CommunityRepositoryError("IDEMPOTENCY_KEY_REQUIRED", "A stable Idempotency-Key is required.", 400);
     return transaction(async (client) => {
       const contribution = await client.query(
-        `SELECT c.id, c.author_id, c.case_id, c.case_revision, c.claim_id, c.revision, c.publication_state,
-                tc.visibility
+        `SELECT c.id, c.author_id, c.case_id, c.case_revision, c.claim_id, c.revision, c.publication_state
            FROM public.community_contributions c
-           JOIN public.trust_cases tc ON tc.id = c.case_id
           WHERE c.id = $1
           FOR UPDATE OF c`,
         [contributionId]
       );
       const row = contribution.rows[0];
       if (!row) throw new CommunityRepositoryError("CONTRIBUTION_NOT_FOUND", "Contribution is not available.", 404);
-      if (row.publication_state !== "PUBLISHED" || row.visibility !== "PUBLIC") throw new CommunityRepositoryError("CONTRIBUTION_NOT_AVAILABLE", "Only a published contribution on a public case can receive reactions.", 404);
+      if (row.publication_state !== "PUBLISHED") throw new CommunityRepositoryError("CONTRIBUTION_NOT_AVAILABLE", "Only a published contribution can receive reactions.", 404);
       if (String(row.author_id).toLowerCase() === String(userId).toLowerCase()) throw new CommunityRepositoryError("SELF_REACTION_FORBIDDEN", "Authors cannot use their own reactions to change a contribution track record.", 403);
       if (Number(row.case_revision) !== caseRevision || (row.claim_id || null) !== claimId) throw scopeError('REACTION_SCOPE_MISMATCH');
-      await assertCaseScope(client, { actorId: userId, caseId: row.case_id, caseRevision, claimId, publicOnly: true });
+      // A published Community contribution is public independently of the
+      // source Trust case visibility. Verify that its bound revision exists,
+      // without disclosing the private case to the reacting participant.
+      const boundRevision = await client.query(
+        `SELECT 1 FROM public.trust_case_revisions WHERE case_id = $1 AND revision = $2 LIMIT 1`,
+        [row.case_id, caseRevision]
+      );
+      if (!boundRevision.rows[0]) throw scopeError("CASE_REVISION_UNAVAILABLE", 404);
       const normalizedKind = String(kind).toUpperCase();
       const requestDigest = digest({ userId, contributionId, claimId, caseRevision, kind: normalizedKind, value });
       // Serialize the bounded current reaction as well as the request key.

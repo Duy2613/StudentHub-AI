@@ -265,7 +265,7 @@ function mergeSourceRecords(...groups) {
 
 function providerRecords(layer2, fallbackProviders) {
   const layer = asRecord(layer2);
-  const records = layer.providerObservations || layer.providers || layer.providerResults;
+  const records = layer.providerObservations || layer.providers || layer.results || layer.providerResults;
   if (Array.isArray(records)) return records.map(asRecord);
   return Array.isArray(fallbackProviders) ? fallbackProviders.map(asRecord) : [];
 }
@@ -514,7 +514,7 @@ function ConflictList({ conflicts, empty = "Không có conflict được công b
   );
 }
 
-function AdvisoryPanel({ value, title = "Legacy advisory (separate provenance)" }) {
+function AdvisoryPanel({ value, title = "Backend provider response (separate provenance)" }) {
   const record = asRecord(value);
   if (!Object.keys(record).length) return null;
   const sources = sourceRecords(record);
@@ -524,8 +524,12 @@ function AdvisoryPanel({ value, title = "Legacy advisory (separate provenance)" 
       <div className={styles.phaseStats}>
         <Metric label="Status" value={record.status} />
         <Metric label="Stop" value={record.stop} />
+        <Metric label="Continue L3" value={record.canContinueToLayer3} />
         <Metric label="Continue L4" value={record.canContinueToLayer4} />
         <Metric label="Confidence" value={percentOrValue(record.assessmentConfidence)} />
+        <Metric label="Gemini model" value={record.geminiModel} />
+        <Metric label="Groq/OpenRouter model" value={record.groqModel} />
+        <Metric label="Provider" value={record.providerId} />
         <Metric label="Sources" value={sources.length} />
       </div>
       <p className={styles.evidenceExcerpt}>{identity(record.reason, "Advisory reason chưa công bố.")}</p>
@@ -943,7 +947,7 @@ function OwnTrustJourney({
             </div>
           ) : <div className={styles.empty}>Chưa có URL evidence đã validate để mở.</div>}
         </div>
-        <AdvisoryPanel value={raw.legacyIntegration} title="Layer 4 legacy advisory (separate provenance)" />
+        <AdvisoryPanel value={raw.legacyIntegration} title={pipeline?.friendBackend ? "Friend backend provider response" : "Layer 4 backend response (separate provenance)"} />
         <div className={styles.listGrid}>
           <div className={styles.subPanel}>
             <h3>AI verification boundary</h3>
@@ -1070,9 +1074,9 @@ function OwnTrustJourney({
       <div className={styles.finalHeader}>
         <div className={styles.finalSeal}>{finalReady ? <Sparkles size={22} /> : <LockKeyhole size={21} />}</div>
         <div>
-          <p className={styles.eyebrow}>FINAL PREDICT · {demoSafePresentation ? "DEMO SAFE" : "DETERMINISTIC"}</p>
+          <p className={styles.eyebrow}>FINAL PREDICT · {demoSafePresentation ? "DEMO SAFE" : "FRIEND BACKEND"}</p>
           <h2>{finalReady ? safeText(finalHeadline) : "Final Predict đang khóa"}</h2>
-          <p className={styles.finalCaption}>{finalReady ? (demoSafePresentation ? "SAFE chỉ là hiển thị demo; kết quả backend gốc vẫn được giữ nguyên." : "Kết quả được suy ra từ dữ liệu đã lưu của bốn lớp.") : "Chỉ mở khi backend công bố kết quả cuối cùng."}</p>
+          <p className={styles.finalCaption}>{finalReady ? (demoSafePresentation ? "SAFE chỉ là hiển thị demo; kết quả backend gốc vẫn được giữ nguyên." : "Kết quả và verdict được giữ nguyên từ friend backend qua bốn lớp.") : "Chỉ mở khi backend công bố kết quả cuối cùng."}</p>
         </div>
         <span className={styles.statusPill}>{finalReady ? <Check size={12} /> : <LockKeyhole size={12} />} {finalStatusText}</span>
       </div>
@@ -1101,7 +1105,7 @@ function OwnTrustJourney({
                   {finalKeySources.map((source, index) => {
                     const url = safeSourceUrl(source);
                     const label = publicSourceTitle(source, index);
-                    return <li key={source?.sourceId || source?.evidenceId || source?.url || index}>{url ? <a className={styles.reasonLink} href={url} target="_blank" rel="noreferrer">{label} <ExternalLink size={12} aria-hidden="true" /></a> : label}</li>;
+                    return <li key={`${source?.sourceId || source?.evidenceId || source?.url || "source"}-${index}`}>{url ? <a className={styles.reasonLink} href={url} target="_blank" rel="noreferrer">{label} <ExternalLink size={12} aria-hidden="true" /></a> : label}</li>;
                   })}
                 </ul>
               ) : <div className={styles.empty}>Final Predict không công bố key source.</div>}
@@ -1131,14 +1135,14 @@ function OwnTrustJourney({
   );
 
   return (
-    <main className={styles.root} data-pipeline-model={pipeline?.pipelineModel || "FOUR_LAYER"} data-processing={processing ? "true" : "false"} data-demo-safe-presentation={demoSafePresentation ? "true" : "false"}>
+    <div className={styles.root} data-pipeline-model={pipeline?.pipelineModel || "FOUR_LAYER"} data-processing={processing ? "true" : "false"} data-demo-safe-presentation={demoSafePresentation ? "true" : "false"}>
       {!hideHero && <header className={styles.hero}>
         <div>
-          <p className={styles.eyebrow}>TRUST ENGINE · EVIDENCE FIRST</p>
+          <p className={styles.eyebrow}>TRUST ENGINE · FRIEND BACKEND · EVIDENCE FIRST</p>
           <h1>Kiểm tra trước khi bạn tin.</h1>
-          <p>Luồng kiểm chứng thuộc StudentHub: deterministic screen, threat intelligence, evidence retrieval và synthesis. Final Predict chỉ đọc kết quả bốn lớp đã hoàn tất.</p>
+          <p>Luồng kiểm chứng chuyển tiếp nguyên vẹn tới friend backend: L1 intake, provider checks, evidence retrieval và final synthesis. Final Predict chỉ đọc kết quả bốn lớp đã trả về.</p>
         </div>
-        <div className={styles.heroSeal}><ShieldCheck size={18} /><span>OWN BACKEND</span><strong>4 LAYERS</strong></div>
+        <div className={styles.heroSeal}><ShieldCheck size={18} /><span>FRIEND BACKEND</span><strong>4 LAYERS</strong></div>
       </header>}
 
       <form className={styles.composer} onSubmit={(event) => { event.preventDefault(); if (canSubmit) onAnalyze?.(); }}>
@@ -1149,7 +1153,7 @@ function OwnTrustJourney({
           </div>
           {(mode === "image" || mode === "qr") ? (
             <div className={styles.uploadZone} data-dragging={dragging} onDragEnter={(event) => { event.preventDefault(); onDragStateChange?.(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={() => onDragStateChange?.(false)} onDrop={(event) => { event.preventDefault(); onDragStateChange?.(false); const nextFile = [...(event.dataTransfer?.files || [])][0]; if (nextFile) onFileSelect?.(nextFile); }}>
-              {preview ? <div className={styles.preview}><Image src={preview} alt="Xem trước input" fill sizes="(max-width: 640px) 100vw, 50vw" unoptimized /><button type="button" className={styles.removeFile} onClick={onClearFile} aria-label="Xóa file"><X size={15} /></button></div> : <button type="button" className={styles.uploadPrompt} onClick={() => fileInputRef?.current?.click()}><Upload size={20} /><strong>Chọn hoặc kéo thả {mode === "qr" ? "ảnh QR" : "ảnh"}</strong><small>File sẽ được gửi vào pipeline own-backend sau khi bạn xác nhận.</small></button>}
+          {preview ? <div className={styles.preview}><Image src={preview} alt="Xem trước input" fill sizes="(max-width: 640px) 100vw, 50vw" unoptimized /><button type="button" className={styles.removeFile} onClick={onClearFile} aria-label="Xóa file"><X size={15} /></button></div> : <button type="button" className={styles.uploadPrompt} onClick={() => fileInputRef?.current?.click()}><Upload size={20} /><strong>Chọn hoặc kéo thả {mode === "qr" ? "ảnh QR" : "ảnh"}</strong><small>File sẽ được gửi vào friend backend sau khi bạn xác nhận.</small></button>}
               <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={(event) => { const nextFile = event.target.files?.[0]; if (nextFile) onFileSelect?.(nextFile); event.target.value = ""; }} />
             </div>
           ) : <label className={styles.textField}><span>{mode === "url" ? "URL cần đối soát" : "Nội dung cần kiểm chứng"}</span><textarea value={content || ""} onChange={(event) => onContentChange?.(event.target.value)} rows={6} placeholder={mode === "url" ? "https://..." : "Dán nội dung khả nghi tại đây..."} /></label>}
@@ -1191,7 +1195,7 @@ function OwnTrustJourney({
         <span className={styles.statusNote}>{processing ? `Backend đang ở ${currentStage?.toUpperCase() || "pipeline"}.` : finalReady ? "Có thể mở lại các lớp đã hoàn tất mà không tạo run mới." : "L1 sẵn sàng; các lớp sau đang khóa."}</span>
         <div><button type="button" className={styles.navButton} disabled={selected === "l1"} onClick={() => navigate(-1)}><ArrowLeft size={14} /> Trước</button><button type="button" className={styles.navButton} disabled={selected === "final_predict" || !finalReady && selected === "l4"} onClick={() => navigate(1)}>Sau <ArrowRight size={14} /></button><button type="button" className={styles.secondaryButton} onClick={onNewAnalysis}>Phân tích mới</button><button type="button" className={styles.secondaryButton} onClick={onPrint}>In</button></div>
       </footer>
-    </main>
+    </div>
   );
 }
 

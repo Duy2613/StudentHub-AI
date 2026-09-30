@@ -14,7 +14,6 @@ import { Layer1ScreenService } from "./layer1/Layer1ScreenService.js";
 import { Layer2AReputationService } from "./layer2a/Layer2AReputationService.js";
 import { Layer2SemanticService } from "./layer2/Layer2SemanticService.js";
 import { Layer3EvidenceService } from "./layer3/Layer3EvidenceService.js";
-import { WebSearchRetriever } from "./layer3/retrieval/WebSearchRetriever.js";
 import { Layer4TrustService } from "./layer4/Layer4TrustService.js";
 import { createLayer4Result } from "./layer4/types.js";
 import { StudentDomainRiskModel } from "./v5/l2c/StudentDomainRiskModel.js";
@@ -42,6 +41,7 @@ import { MediaArtifactService } from "../server/media/MediaArtifactService.js";
 import { buildLegacyPipelineResponse } from "./legacy/LegacyResponseProjector.js";
 import { isTrustedLayer2AResult } from "./layer2a/TrustBoundary.js";
 import { isTrustedLayer3Result } from "./layer3/TrustBoundary.js";
+import { resolveTrustCapabilityPlan } from "./TrustCapabilityRouter.js";
 
 const TRANSIENT_L2_STATUS = new Set([
   "TIMEOUT", "RATE_LIMITED", "AUTH_FAILED", "MODEL_NOT_AVAILABLE", "NETWORK_ERROR",
@@ -352,7 +352,7 @@ function providerObservation(providerResult, fallbackProvider = "StudentHub prov
   };
 }
 
-function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
+function combineLayer2({ layer2A, layer2B, layer2C, legacyLayer2 = null, input, requestId }) {
   const l2aProviders = boundedArray(layer2A?.providerResults, 20).map((item) => providerObservation(item, layer2A?.provider || "StudentHub Threat Intelligence"));
   if (!l2aProviders.length && layer2A?.providerStatus) {
     l2aProviders.push(providerObservation({
@@ -369,8 +369,24 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
   const semanticFallbackAvailable = layer2B?.details?.deterministicFallbackAvailable === true ||
     layer2B?.metrics?.deterministicFallbackAvailable === true;
   const domainStatus = statusText(layer2C?.modelStatus, "BASELINE_RULE_MODEL");
+  const legacyImageProviders = boundedArray(legacyLayer2?.providers || legacyLayer2?.providerResults, 20)
+    .map((item) => providerObservation(item, "legacy_verification_layer2_image"));
+  if (!legacyImageProviders.length && legacyLayer2?.providerStatus) {
+    legacyImageProviders.push(providerObservation({
+      provider: legacyLayer2.providerId || "legacy_verification_layer2_image",
+      providerId: legacyLayer2.providerId || "legacy_verification_layer2_image",
+      status: legacyLayer2.providerStatus,
+      verdict: legacyLayer2.rawVerdict || legacyLayer2.finding || "UNKNOWN",
+      finding: legacyLayer2.finding || legacyLayer2.rawVerdict,
+      confidence: legacyLayer2.providerConfidence ?? legacyLayer2.assessmentConfidence,
+      success: legacyLayer2.providerStatus === "SUCCESS",
+      message: legacyLayer2.reason || legacyLayer2.errorCode || "Legacy image provider returned no detail.",
+      executed: true,
+    }, "legacy_verification_layer2_image"));
+  }
   const observations = [
     ...l2aProviders,
+    ...legacyImageProviders,
     providerObservation({
       provider: layer2B?.details?.providerId || layer2B?.metrics?.modelUsed || "StudentHub Semantic Engine",
       providerId: layer2B?.details?.providerId || layer2B?.metrics?.modelUsed || "studenthub_semantic_engine",
@@ -428,6 +444,17 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     ...boundedArray(semanticPackage.verificationTasks, 40),
     ...boundedArray(domainPackage.verificationTasks, 40),
   ].slice(0, 80);
+  const mediaForensics = legacyLayer2?.mediaForensics
+    ? layer2B?.mediaForensics
+      ? {
+        ...layer2B.mediaForensics,
+        aiGeneration: legacyLayer2.mediaForensics.aiGeneration || layer2B.mediaForensics.aiGeneration || null,
+        deepfake: legacyLayer2.mediaForensics.deepfake || layer2B.mediaForensics.deepfake || null,
+        providerAgreement: legacyLayer2.mediaForensics.providerAgreement || layer2B.mediaForensics.providerAgreement || null,
+        legacyLayer2: legacyLayer2.mediaForensics,
+      }
+      : legacyLayer2.mediaForensics
+    : layer2B?.mediaForensics || null;
   const semanticBaselineCompleted = semanticFallbackAvailable ||
     layer2B?.status === "PASS" ||
     ["BENIGN", "INFORMATIVE"].includes(statusText(layer2B?.classification));
@@ -461,7 +488,8 @@ function combineLayer2({ layer2A, layer2B, layer2C, input, requestId }) {
     semanticSignals: boundedArray(layer2B?.contextSignals, 30),
     contextSignals: boundedArray(layer2B?.contextSignals, 30),
     riskSignals: boundedArray(layer2C?.riskSignals, 30),
-    mediaForensics: layer2B?.mediaForensics || null,
+    mediaForensics,
+    legacyIntegration: legacyLayer2 || null,
     secondaryClassifications: boundedArray(layer2C?.secondaryClassifications, 12),
     limitations: [
       ...boundedArray(layer2B?.limitations, 8),
@@ -523,8 +551,13 @@ function makeCanonicalStage(stageId, raw, requestId, operationStatus, startedAt,
     const layer3Sources = Array.isArray(layer3.sources) ? layer3.sources : [];
     const layer3Evidence = Array.isArray(layer3.evidence) ? layer3.evidence : [];
     const validatedLayer3Sources = layer3Sources.filter((source) => source?.liveEvidence === true && source?.retrievalOutcome === "SUCCESS" && source?.providerStatus === "SUCCESS" && typeof (source?.sourceUrl || source?.url) === "string");
-    const layer3SourceQuality = validatedLayer3Sources.length
-      ? Number((validatedLayer3Sources.reduce((total, source) => total + (Number(source.authorityScore) || 0), 0) / validatedLayer3Sources.length).toFixed(4))
+    const validatedAuthorityScores = validatedLayer3Sources
+      .map((source) => source.authorityScore)
+      .filter((value) => value !== null && value !== undefined && value !== "")
+      .map(Number)
+      .filter((score) => Number.isFinite(score) && score >= 0 && score <= 1);
+    const layer3SourceQuality = validatedAuthorityScores.length
+      ? Number((validatedAuthorityScores.reduce((total, score) => total + score, 0) / validatedAuthorityScores.length).toFixed(4))
       : null;
     const supplementalSources = (Array.isArray(raw?.independentResearchSources) ? raw.independentResearchSources : []).map((source) => ({
       ...source,
@@ -539,8 +572,8 @@ function makeCanonicalStage(stageId, raw, requestId, operationStatus, startedAt,
       evidence: layer3Evidence,
       supportingEvidence,
       contradictoryEvidence,
-      sourceQuality: layer3SourceQuality ?? adapted.sourceQuality ?? null,
-      evidenceAgreement: layer3.crossSourceAgreement?.agreementScore ?? adapted.evidenceAgreement ?? null,
+      sourceQuality: layer3SourceQuality,
+      evidenceAgreement: layer3.crossSourceAgreement?.agreementScore ?? null,
       verificationCompleteness: layer3.verificationCompleteness ?? adapted.verificationCompleteness ?? null,
       evidenceSummary: layer3.evidenceSummary || `${layer3Evidence.length} evidence item(s) from ${layer3Sources.length} source(s); source quality is calculated only from validated live sources.`,
       crossSourceAgreement: layer3.crossSourceAgreement || null,
@@ -709,8 +742,13 @@ function finalPredict({ layer1, layer2, layer2A, layer3, layer4 }) {
       : Math.min(Number(layer4?.decisionConfidence) || 0, 0.35)
     : Number(layer4?.decisionConfidence) || 0;
   const evidenceAgreement = layer3?.crossSourceAgreement?.agreementScore ?? layer3?.crossSourceAgreement?.status ?? null;
-  const sourceQuality = usableSources.length
-    ? Number((usableSources.reduce((total, source) => total + (Number(source.authorityScore) || 0), 0) / usableSources.length).toFixed(4))
+  const scoredUsableSources = usableSources
+    .map((source) => source.authorityScore)
+    .filter((value) => value !== null && value !== undefined && value !== "")
+    .map(Number)
+    .filter((score) => Number.isFinite(score) && score >= 0 && score <= 1);
+  const sourceQuality = scoredUsableSources.length
+    ? Number((scoredUsableSources.reduce((total, score) => total + score, 0) / scoredUsableSources.length).toFixed(4))
     : null;
   const reasons = [
     ...(l1Blocked ? ["Layer 1 phát hiện hard block kỹ thuật."] : []),
@@ -954,6 +992,8 @@ export class OwnBackendTrustOrchestrator {
     pipeline.pipelineVersion = FOUR_LAYER_PIPELINE_VERSION;
     pipeline.pipelineStatus = PIPELINE_STATUS.RUNNING;
     pipeline.audit.inputFingerprint = inputFingerprint(input);
+    const capabilityPlan = resolveTrustCapabilityPlan(input, { friendEnabled: this.legacyVerificationEnabled });
+    pipeline.capabilityRouting = capabilityPlan;
     pipeline.layerResults = { layer1: null, layer2: null, layer3: null, layer4: null };
     const rawResults = {};
     let partial = false;
@@ -978,11 +1018,7 @@ export class OwnBackendTrustOrchestrator {
         "l2",
         async () => {
           const url = input.type === "url" ? input.content || input.metadata.url || "" : "";
-          const reputationProvider = this.layer2AProvider || (
-            this.legacyVerificationEnabled && typeof this.legacyVerificationAdapter?.layer2Provider === "function"
-              ? this.legacyVerificationAdapter.layer2Provider()
-              : null
-          );
+          const reputationProvider = this.layer2AProvider;
           const [l2aSettled, l2bSettled] = await Promise.allSettled([
             this.services.l2a({ url, requestId, options: { ...(reputationProvider ? { provider: reputationProvider } : {}), signal: controller.signal } }),
             this.services.l2b({
@@ -1007,9 +1043,35 @@ export class OwnBackendTrustOrchestrator {
             layer2BResult: layer2B,
             signal: controller.signal,
           })).catch(() => createUnknownLayer2C(requestId, "LAYER2C_PROVIDER_FAILURE"));
-          const combined = combineLayer2({ layer2A, layer2B, layer2C, input, requestId });
-          rawResults.l2Internal = { layer2A, layer2B, layer2C };
-          return { ...combined, layer2A, layer2B, layer2C };
+          let legacyLayer2 = null;
+          if (capabilityPlan.friendTrust.layer2 && typeof this.legacyVerificationAdapter?.verifyLayer2 === "function") {
+            try {
+              legacyLayer2 = await this.legacyVerificationAdapter.verifyLayer2({ input, requestId, signal: controller.signal });
+            } catch (error) {
+              if (controller.signal.aborted) throw error;
+              legacyLayer2 = {
+                status: "UNAVAILABLE",
+                providerStatus: "UNAVAILABLE",
+                providerId: "legacy_verification_layer2",
+                requestId,
+                rawVerdict: null,
+                finding: "UNKNOWN",
+                providerConfidence: null,
+                reason: boundedText(error?.code || error?.name || "LEGACY_IMAGE_LAYER2_FAILURE", 240),
+                providers: [],
+                providerResults: [],
+                mediaForensics: null,
+                sourceOrigin: "LAYER_2_FRIEND_ADVISORY",
+                limitations: ["Friend Trust Layer 2 advisory failed; canonical StudentHub checks were preserved."],
+                errorCode: boundedText(error?.code || error?.name || "LEGACY_LAYER2_FAILURE", 160),
+              };
+            }
+          }
+          // Friend observations remain attached as provenance only; the
+          // canonical L2 finding is derived exclusively from StudentHub.
+          const combined = combineLayer2({ layer2A, layer2B, layer2C, legacyLayer2: null, input, requestId });
+          rawResults.l2Internal = { layer2A, layer2B, layer2C, legacyLayer2 };
+          return { ...combined, layer2A, layer2B, layer2C, legacyIntegration: legacyLayer2 };
         },
         pipeline,
         rawResults,
@@ -1018,6 +1080,11 @@ export class OwnBackendTrustOrchestrator {
         { input, fallback: () => ({ ...combineLayer2({ layer2A: createUnknownLayer2A(requestId), layer2B: createUnknownLayer2B(requestId), layer2C: createUnknownLayer2C(requestId), input, requestId }), layer2A: createUnknownLayer2A(requestId), layer2B: createUnknownLayer2B(requestId), layer2C: createUnknownLayer2C(requestId) }) },
       );
       rawResults.l2 = l2.raw;
+      // Preserve the validated legacy Layer 2 response before any canonical
+      // projection or supplemental pass can reshape the composite result.
+      // The friend's Layer 3/4 contracts must receive the provider verdict,
+      // not a later StudentHub-only fallback projection.
+      rawResults.legacyLayer2 = rawResults.l2Internal?.legacyLayer2 || rawResults.l2?.legacyIntegration || null;
       partial ||= l2.partial;
 
       const l3 = await this._executeLayer(
@@ -1040,12 +1107,15 @@ export class OwnBackendTrustOrchestrator {
           // labelled advisory report, but it must never replace the
           // canonical source/evidence/provenance set.
           const canonicalLayer3 = await this.services.l3(layer3Params);
-          if (!this.legacyVerificationEnabled || typeof this.legacyVerificationAdapter?.verifyLayer3 !== "function") {
+          if (!capabilityPlan.friendTrust.layer3 || typeof this.legacyVerificationAdapter?.verifyLayer3 !== "function") {
             return canonicalLayer3;
           }
           let legacyIntegration;
           try {
-            legacyIntegration = await this.legacyVerificationAdapter.verifyLayer3(layer3Params);
+            legacyIntegration = await this.legacyVerificationAdapter.verifyLayer3({
+              ...layer3Params,
+              legacyLayer2Result: rawResults.legacyLayer2 || internal.legacyLayer2 || null,
+            });
           } catch (error) {
             legacyIntegration = {
               status: "UNAVAILABLE",
@@ -1078,6 +1148,11 @@ export class OwnBackendTrustOrchestrator {
         { input, fallback: () => createUnknownLayer3(requestId) },
       );
       partial ||= l3.partial;
+      // Layer 4 may run a canonical supplemental evidence pass that replaces
+      // rawResults.l3. Keep the friend's validated Layer 3 advisory separate
+      // so its exact continuation contract and evidence can still be sent to
+      // the friend's Layer 4 endpoint.
+      rawResults.legacyLayer3 = rawResults.l3?.legacyIntegration || null;
 
       const l4 = await this._executeLayer(
         "l4",
@@ -1135,28 +1210,35 @@ export class OwnBackendTrustOrchestrator {
                     ...(this.retriever ? { retriever: this.retriever } : {}),
                   },
                 });
-                rawResults.l3 = supplemental;
-                pipeline.layerResults.layer3 = supplemental;
+                // Supplemental evidence is canonical StudentHub data. Keep
+                // the already validated legacy advisory attached as a
+                // separate provenance field so the compatibility response
+                // and the legacy Layer 4 hand-off remain complete.
+                const supplementalWithLegacy = rawResults.legacyLayer3
+                  ? { ...supplemental, legacyIntegration: rawResults.legacyLayer3 }
+                  : supplemental;
+                rawResults.l3 = supplementalWithLegacy;
+                pipeline.layerResults.layer3 = supplementalWithLegacy;
                 const previousL3Stage = pipeline.stages.l3 || {};
                 pipeline.stages.l3 = makeCanonicalStage(
                   "l3",
-                  supplemental || {},
+                  supplementalWithLegacy || {},
                   requestId,
-                  stageOperationStatus("l3", supplemental || {}),
+                  stageOperationStatus("l3", supplementalWithLegacy || {}),
                   previousL3Stage.startedAt || nowIso(),
                   nowIso(),
                 );
-                partial ||= stageOperationStatus("l3", supplemental || {}) === OPERATION_STATUS.PARTIAL;
+                partial ||= stageOperationStatus("l3", supplementalWithLegacy || {}) === OPERATION_STATUS.PARTIAL;
                 return {
-                  layer3Result: supplemental,
+                  layer3Result: supplementalWithLegacy,
                   phaseSummary: supplemental?.retrievalPhases?.supplementalSearch || null,
                 };
               },
             },
           });
-          if (!this.legacyVerificationEnabled || typeof this.legacyVerificationAdapter?.verifyLayer4 !== "function") return localResult;
+          if (!capabilityPlan.friendTrust.layer4 || typeof this.legacyVerificationAdapter?.verifyLayer4 !== "function") return localResult;
 
-          const legacyLayer3 = rawResults.l3?.legacyIntegration;
+          const legacyLayer3 = rawResults.legacyLayer3 || rawResults.l3?.legacyIntegration;
           const canRunIndependentSynthesis = !legacyLayer3 || (
             legacyLayer3.status === "COMPLETED" &&
             legacyLayer3.stop !== true &&
@@ -1191,8 +1273,14 @@ export class OwnBackendTrustOrchestrator {
             layer2AResult: internal.layer2A || null,
             layer2Result: internal.layer2B || null,
             layer2CResult: internal.layer2C || null,
-            layer3Result: rawResults.l3 || null,
-            unresolvedSignals: rawResults.l3?.legacyIntegration?.unresolvedSignals || [],
+            legacyLayer2Result: rawResults.legacyLayer2 || internal.legacyLayer2 || null,
+            // Preserve the canonical L3 result for StudentHub while making
+            // sure the legacy adapter reads the validated legacy L3 payload,
+            // not a later canonical supplemental result.
+            layer3Result: rawResults.l3
+              ? { ...rawResults.l3, legacyIntegration: legacyLayer3 }
+              : (legacyLayer3 ? { legacyIntegration: legacyLayer3 } : null),
+            unresolvedSignals: legacyLayer3?.unresolvedSignals || [],
             requestId,
             signal: controller.signal,
           });

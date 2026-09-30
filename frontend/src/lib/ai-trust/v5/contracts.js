@@ -295,6 +295,7 @@ function publicMetrics(value) {
     "independentClusterCount", "verificationTasksCount", "l2cVerificationTasksCount", "initialQueryCount", "initialSourceCount",
     "initialEvidenceCount", "supplementalQueryCount", "supplementalSourceCount", "supplementalEvidenceCount", "finalValidatedSourceCount",
     "directInputSourceCount", "directInputEvidenceCount", "directInputValidatedSourceCount", "confidenceBasis",
+    "providerMode", "providerResponseSource", "providerQuotaErrorSeen",
   ];
   const output = {};
   for (const key of allowed) {
@@ -302,6 +303,14 @@ function publicMetrics(value) {
     if (typeof item === "string") output[key] = publicText(item, 180);
     else if (typeof item === "number" && Number.isFinite(item)) output[key] = item;
     else if (typeof item === "boolean") output[key] = item;
+    else if (key === "providerAttempt" && item && typeof item === "object" && !Array.isArray(item)) {
+      output.providerAttempt = publicRecord(item, ["provider", "status", "httpStatus", "resultCount", "durationMs", "errorCategory", "retryable"]);
+    } else if (key === "providerBudget" && item && typeof item === "object" && !Array.isArray(item)) {
+      output.providerBudget = publicRecord(item, ["budget", "callsAttempted", "callsSucceeded", "callsFailed", "callsSkippedByCache", "callsBlockedByBudget", "quotaErrorSeen"]);
+      if (output.providerBudget && Array.isArray(item.callRecords)) {
+        output.providerBudget.callRecords = item.callRecords.slice(-20).map((record) => publicRecord(record, ["queryHash", "timestamp", "httpStatus", "durationMs", "resultCount", "status"])).filter(Boolean);
+      }
+    }
     else if (key === "detectorsExecuted" && Array.isArray(item)) {
       output[key] = item.slice(0, 24).map((detector) => publicText(detector, 160)).filter(Boolean);
     }
@@ -713,7 +722,9 @@ function publicConflicts(value) {
 function publicProviders(value) {
   return Array.isArray(value) ? value.map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
-    return publicRecord(item, ["provider", "providerId", "success", "verdict", "confidence", "message", "threatTypes", "status", "latencyMs", "reference", "finding", "errorCode", "executed", "observedAt"]);
+    const output = publicRecord(item, ["provider", "providerId", "success", "verdict", "confidence", "message", "reason", "threatTypes", "status", "latencyMs", "reference", "finding", "errorCode", "executed", "observedAt"]);
+    if (output && output.message === undefined && output.reason !== undefined) output.message = output.reason;
+    return output;
   }).filter(Boolean) : [];
 }
 
@@ -721,7 +732,7 @@ function publicProviderObservations(value) {
   return Array.isArray(value) ? value.map((item) => {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
     const output = publicRecord(item, [
-      "provider", "providerId", "status", "finding", "verdict", "success", "confidence", "message",
+      "provider", "providerId", "status", "finding", "verdict", "success", "confidence", "message", "reason",
       "latencyMs", "errorCode", "source", "executed", "scope", "observedAt",
     ]);
     if (!output) return null;
@@ -735,12 +746,16 @@ function publicLegacyIntegration(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const output = publicRecord(value, [
     "status", "providerStatus", "providerId", "rawVerdict", "legacyAssessmentConfidence", "assessmentConfidence",
-    "evidenceAgreement", "sourceQuality", "stop", "canContinueToLayer4", "continuationDerived", "reason",
-    "sourceOrigin", "sourceCount", "evidenceCount", "errorCode", "latencyMs",
+    "evidenceAgreement", "sourceQuality", "stop", "canContinueToLayer3", "canContinueToLayer4", "continuationDerived", "reason",
+    "sourceOrigin", "sourceCount", "evidenceCount", "errorCode", "latencyMs", "mode", "geminiModel", "groqModel",
   ]);
   if (!output) return null;
   output.contradictoryEvidence = publicStringList(value.contradictoryEvidence, 20, 700);
+  output.evidence = publicSources(value.evidence);
   output.sources = publicSources(value.sources);
+  output.providers = publicProviderObservations(value.providers || value.results || value.providerResults);
+  output.providerResults = publicProviders(value.providerResults || value.providers || value.results);
+  output.mediaForensics = publicMediaForensics(value.mediaForensics);
   output.limitations = publicStringList(value.limitations, 8, 600);
   output.unresolvedSignals = publicStringList(value.unresolvedSignals, 20, 500);
   return output;
@@ -812,7 +827,7 @@ function publicLayerResult(value, layerId) {
   base.explanation = publicText(value.explanation || value.meaning || value.semanticSummary, 1000) || null;
   base.reason = publicText(value.reason || value.reasons?.[0] || value.keyReasons?.[0], 700) || null;
   base.provider = publicProviderSummary(value.provider);
-  base.providers = publicProviderObservations(value.providers || value.providerObservations || value.providerResults);
+  base.providers = publicProviderObservations(value.providers || value.results || value.providerObservations || value.providerResults);
   base.sources = publicSources(value.sources || value.verifiedSources);
   base.evidence = publicSources(value.evidence || value.evidenceItems);
   base.supportingEvidence = publicEvidenceCollection(value.supportingEvidence || value.supportingSources);
@@ -851,7 +866,7 @@ function publicLayerResult(value, layerId) {
     base.details = publicRecord(value.details, ["decisionRationale", "promptInjectionDetected", "hardBlock", "source"]);
   }
   if (layerId === "l2") {
-    base.providerObservations = publicProviderObservations(value.providerObservations || value.providers || value.providerResults);
+    base.providerObservations = publicProviderObservations(value.providerObservations || value.providers || value.results || value.providerResults);
     base.providers = base.providerObservations;
     base.semanticSignals = publicSignals(value.semanticSignals || value.contextSignals);
     base.entities = publicClaims(value.entities);
@@ -863,6 +878,7 @@ function publicLayerResult(value, layerId) {
     base.verificationTaskSummary = publicRecord(value.verificationTaskSummary, ["totalTasks", "l2bTaskCount", "l2cTaskCount"]);
     base.limitations = publicStringList(value.limitations, 16, 700);
     base.reasons = publicStringList(value.reasons, 16, 700);
+    base.legacyIntegration = publicLegacyIntegration(value.legacyIntegration);
     base.details = publicRecord(value.details, [
       "decisionRationale", "promptInjectionDetected", "providerStatus", "providerErrorType", "providerHttpStatus", "providerLatencyMs",
       "inputType", "threatFinding", "semanticProviderStatus", "studentContextModelStatus", "providerPartial",

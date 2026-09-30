@@ -55,9 +55,9 @@ export default function HeroCinematicPorch() {
           </span>
         </div>
         <div className="hidden sm:flex items-center gap-4 text-[11px] font-mono text-slate-400">
-          <span>BẢO MẬT DỮ LIỆU ĐẦU VÀO</span>
+          <span>XỬ LÝ THEO CHÍNH SÁCH</span>
           <span className="w-1 h-1 rounded-full bg-slate-600" />
-          <span>QUY TRÌNH THẨM ĐỊNH ĐA TẦNG</span>
+                <span>PHẠM VI THEO TỪNG LUỒNG</span>
         </div>
       </div>
 
@@ -97,7 +97,7 @@ export default function HeroCinematicPorch() {
           </div>
 
           <p className="text-lg sm:text-xl text-slate-300 font-serif leading-relaxed max-w-xl mb-8">
-            Thông tin không thiếu. Điều thiếu là bằng chứng đã được thẩm định độc lập. StudentHub bóc tách mệnh đề, đối chiếu quy chế gốc và kết nối hội đồng chuyên gia phản biện.
+            StudentHub giúp xem xét một nội dung cùng dữ liệu mà từng luồng trả về: mệnh đề, nguồn và giới hạn khi có. Community hỗ trợ thảo luận; Expert xử lý hồ sơ theo quyền và phạm vi được hệ thống xác nhận.
           </p>
 
           {/* Action CTAs */}
@@ -139,7 +139,7 @@ export default function HeroCinematicPorch() {
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[11px] font-mono text-emerald-300 font-semibold tracking-wide">
-                NGUỒN GỐC CHÍNH THỐNG
+                NGUỒN THEO KẾT QUẢ
               </span>
             </div>
           </div>
@@ -148,14 +148,14 @@ export default function HeroCinematicPorch() {
             <div className="flex items-center gap-2">
               <Sparkles size={13} className="text-cyan-400" />
               <span className="text-[11px] font-mono text-cyan-300 font-semibold tracking-wide">
-                ĐỐI CHIẾU NGUỒN ĐỘC LẬP
+                SO SÁNH KHI CÓ CĂN CỨ
               </span>
             </div>
           </div>
 
           <div className="absolute bottom-2 right-6 z-20 px-3 py-1.5 rounded-lg bg-space-900/85 border border-indigo-500/30 backdrop-blur-md shadow-lg">
             <span className="text-[10px] font-mono text-indigo-300">
-              [MINH HỌA DEMO] AI VERIFICATION — GEMINI
+              AI HỖ TRỢ · KẾT QUẢ THEO PHẢN HỒI
             </span>
           </div>
         </div>
@@ -169,15 +169,15 @@ export default function HeroCinematicPorch() {
         </div>
         <div>
           <span className="text-xs font-mono text-slate-400 uppercase block mb-1">Đối chiếu quy chế</span>
-          <span className="text-sm font-semibold text-white font-sans">Hệ thống quy định viện trường</span>
+          <span className="text-sm font-semibold text-white font-sans">Nguồn hiển thị theo phản hồi</span>
         </div>
         <div>
-          <span className="text-xs font-mono text-slate-400 uppercase block mb-1">AI VERIFICATION</span>
-          <span className="text-sm font-semibold text-emerald-400 font-sans">Gemini advisory · policy quyết định</span>
+          <span className="text-xs font-mono text-slate-400 uppercase block mb-1">AI HỖ TRỢ</span>
+          <span className="text-sm font-semibold text-emerald-400 font-sans">Không thay thế căn cứ hoặc policy</span>
         </div>
         <div>
           <span className="text-xs font-mono text-slate-400 uppercase block mb-1">Hội đồng chuyên gia</span>
-          <span className="text-sm font-semibold text-cyan-400 font-sans">Chuyển tiếp thẩm định khi cần</span>
+          <span className="text-sm font-semibold text-cyan-400 font-sans">Theo hồ sơ và quyền được xác nhận</span>
         </div>
       </div>
     </section>

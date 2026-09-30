@@ -20,24 +20,24 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import V3_MEDIA from "@/lib/media/v3MediaRegistry";
-import HobroTiltCard from "@/components/cinematic/HobroTiltCard";
 import AcademicSummaryWidget from "@/components/academic/AcademicSummaryWidget";
-
 function Stat({ label, value, detail, icon: Icon, tone = "teal" }) {
+  const toneClasses = {
+    teal: "text-[var(--status-mint)] bg-[var(--status-mint-bg)]",
+    indigo: "text-[var(--action-primary)] bg-purple-500/10",
+    amber: "text-[var(--status-amber)] bg-[var(--status-amber-bg)]",
+    rose: "text-[var(--status-coral)] bg-[var(--status-coral-bg)]",
+  };
+
   return (
-    <HobroTiltCard
-      maxTilt={5}
-      className="p-4"
-      spotlightColor="rgba(52, 211, 153, 0.12)"
-      cursorText="THỐNG KÊ"
-    >
+    <div className="bento-card p-5 rounded-[var(--radius-bento)] bg-[var(--surface-1)] border border-[var(--border-subtle)] hover:border-[var(--border-default)] transition-colors">
       <div className="flex items-start justify-between gap-3">
-        <span className="eyebrow">{label}</span>
-        <span className={`stat-icon ${tone}`}><Icon size={16} /></span>
+        <span className="type-caption text-[var(--text-secondary)] font-medium">{label}</span>
+        <span className={`p-2 rounded-lg ${toneClasses[tone] || toneClasses.teal}`}><Icon size={16} /></span>
       </div>
-      <strong className="mt-4 block text-2xl font-extrabold tracking-tight text-white">{value}</strong>
-      <span className="mt-1 block text-xs text-app-muted">{detail}</span>
-    </HobroTiltCard>
+      <strong className="mt-3 block text-2xl font-bold tracking-tight text-[var(--text-primary)]">{value}</strong>
+      <span className="mt-1 block text-xs text-[var(--text-tertiary)]">{detail}</span>
+    </div>
   );
 }
 
@@ -164,12 +164,6 @@ export default function CommandCenterDashboard() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-space-950 via-space-950/80 to-space-950/40" />
         </div>
-
-        {/* Precision Crosshairs (+) */}
-        <span className="absolute top-2 left-2 text-[10px] font-mono text-white/30 pointer-events-none">+</span>
-        <span className="absolute top-2 right-2 text-[10px] font-mono text-white/30 pointer-events-none">+</span>
-        <span className="absolute bottom-2 left-2 text-[10px] font-mono text-white/30 pointer-events-none">+</span>
-        <span className="absolute bottom-2 right-2 text-[10px] font-mono text-white/30 pointer-events-none">+</span>
 
         <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">

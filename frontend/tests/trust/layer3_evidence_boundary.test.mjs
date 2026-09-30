@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { Layer3EvidenceService } from "../../src/lib/ai-trust/layer3/Layer3EvidenceService.js";
 import { markNetworkGuardedRetriever } from "../../src/lib/ai-trust/layer3/retrieval/NetworkGuard.js";
+import { WebSearchRetriever } from "../../src/lib/ai-trust/layer3/retrieval/WebSearchRetriever.js";
 
 const TEST_URL = process.env.TRUST_ENGINE_TEST_TARGET || "https://example.invalid/resource";
 
@@ -117,6 +118,31 @@ describe("Layer 3 evidence and provenance boundary", () => {
     assert.equal(result.sources[0].requestedUrl, TEST_URL);
     assert.equal(result.sources[0].finalUrl, TEST_URL);
     assert.match(result.limitations.join(" "), /provenance|factual claim/i);
+  });
+
+  it("keeps a blocked direct URL unavailable and does not attribute local lookup to Tavily", async () => {
+    const retriever = new WebSearchRetriever({
+      fetchImpl: async () => new Response("", { status: 403, headers: { "content-type": "text/html" } }),
+    });
+    const result = await Layer3EvidenceService.verify({
+      input: { type: "url", content: "https://example.com/login-wall" },
+      claims: [],
+      candidateSources: [],
+      options: { retriever, allowLocalFallback: false, requestId: "l3-direct-url-blocked" },
+    });
+
+    const directSource = result.sources.find((source) => source.retrievalOrigin === "DIRECT_INPUT");
+    assert.equal(result.status, "NOT_APPLICABLE");
+    assert.equal(result.retrievalStatus, "LOCAL_ONLY");
+    assert.equal(result.retrievalMode, "LOCAL_KNOWLEDGE_BASE");
+    assert.equal(result.retrievalPhases.initialSearch.retrievalOrigin, "LOCAL_KNOWLEDGE");
+    assert.equal(result.retrievalPhases.finalValidatedEvidenceSet.retrievalOrigin, "DIRECT_INPUT");
+    assert.equal(directSource?.httpStatus, 403);
+    assert.equal(directSource?.liveEvidence, false);
+    assert.equal(directSource?.retrievalOutcome, "FAILURE");
+    assert.equal(result.evidence.length, 0);
+    assert.doesNotMatch(result.limitations.join(" "), /Tavily/i);
+    assert.match(result.limitations.join(" "), /chưa có factual claim|không tạo thành verdict/i);
   });
 
   it("falls back honestly when the configured retriever fails", async () => {

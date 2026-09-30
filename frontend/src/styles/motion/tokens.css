@@ -1,0 +1,20 @@
+/**
+ * StudentHub AI — Motion Tokens
+ *
+ * Governing Authority: MASTER FRONTEND CONSTITUTION v3.0 (M-45, C-11)
+ * Three layers: Functional, Structural, Expressive
+ */
+
+:root {
+  /* Functional (~100-200ms): buttons, tabs, focus, toggles */
+  --duration-functional: 150ms;
+  --ease-functional: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Structural (~180-350ms): sheets, dialogs, nav context changes */
+  --duration-structural: 260ms;
+  --ease-structural: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Expressive / Cinematic (~400-900ms): TC2 approved moments */
+  --duration-cinematic: 600ms;
+  --ease-cinematic: cubic-bezier(0.25, 1, 0.5, 1);
+}

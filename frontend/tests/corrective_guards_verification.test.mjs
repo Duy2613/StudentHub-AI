@@ -14,7 +14,6 @@ import {
 } from "../src/lib/ai-trust/v5/MasterUltraTrustModel.js";
 import {
   TRUST_MACRO_STAGES,
-  createTrustPresentationModel,
 } from "../src/lib/ai-trust/v5/TrustPresentationModel.js";
 import { stageFromL4 } from "../src/lib/ai-trust/v5/stageAdapters.js";
 import { TrustPipelineOrchestrator } from "../src/lib/ai-trust/v5/TrustPipelineOrchestrator.js";
@@ -186,9 +185,10 @@ test("Guard 5: Returning-user profile routing distinguishes all 4 profile states
   assert.equal(PROFILE_STATUS.NOT_FOUND, "PROFILE_NOT_FOUND");
   assert.equal(PROFILE_STATUS.ERROR, "PROFILE_ERROR");
 
-  // 1. Returning user with existing profile (onboarded: true) -> must go to /dashboard (or next)
-  const existingUserDest = postAuthDestination({ next: "/dashboard", onboarded: true });
-  assert.equal(existingUserDest, "/dashboard", "Onboarded user routes to /dashboard");
+  // 1. Returning user without an explicit return path uses the active profile route.
+  // /dashboard was removed from the product and must not return through auth redirects.
+  const existingUserDest = postAuthDestination({ onboarded: true });
+  assert.equal(existingUserDest, "/profile", "Onboarded user routes to the active profile destination");
 
   // 2. Returning user with custom next param -> must preserve returnPath
   const customNextDest = postAuthDestination({ next: "/expert", onboarded: true });

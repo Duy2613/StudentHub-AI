@@ -1,7 +1,7 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { createRequire } from "node:module";
 import { execFileSync, spawn } from "node:child_process";
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -18,6 +18,8 @@ import {
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const frontendRoot = resolve(repoRoot, "frontend");
+const tsconfigPath = resolve(frontendRoot, "tsconfig.json");
+const originalTsconfigBytes = existsSync(tsconfigPath) ? readFileSync(tsconfigPath) : null;
 const artifactPath = resolve(repoRoot, "artifacts", "local-authenticated-e2e-2026-09-10.json");
 const networkGuardPath = resolve(repoRoot, "scripts", "local-e2e-network-guard.mjs");
 const originalEnv = { ...process.env };
@@ -148,6 +150,32 @@ function removeDisposableNextDist() {
   nextDistDir = null;
 }
 
+function restoreDisposableTsconfig() {
+  if (!originalTsconfigBytes || !existsSync(tsconfigPath)) return;
+  const currentBytes = readFileSync(tsconfigPath);
+  if (currentBytes.equals(originalTsconfigBytes)) return;
+  let original;
+  let current;
+  try {
+    original = JSON.parse(originalTsconfigBytes.toString("utf8"));
+    current = JSON.parse(currentBytes.toString("utf8"));
+  } catch {
+    throw new Error("LOCAL_TSCONFIG_CHANGED_DURING_E2E");
+  }
+  const disposableIncludes = new Set([
+    `${nextDistDir}/types/**/*.ts`,
+    `${nextDistDir}/dev/types/**/*.ts`,
+  ]);
+  const normalizedCurrent = {
+    ...current,
+    include: Array.isArray(current.include) ? current.include.filter((entry) => !disposableIncludes.has(entry)) : current.include,
+  };
+  if (JSON.stringify(normalizedCurrent) !== JSON.stringify(original)) {
+    throw new Error("LOCAL_TSCONFIG_CHANGED_OUTSIDE_DISPOSABLE_NEXT_INCLUDE");
+  }
+  writeFileSync(tsconfigPath, originalTsconfigBytes);
+}
+
 async function createSyntheticUser(kind, index = "") {
   const email = `studenthub-local-${kind}-${runTag}-${index}@studenthub.local.test`;
   const password = `LocalE2E!${runTag}!${randomBytes(6).toString("hex")}`;
@@ -181,6 +209,24 @@ async function deleteForeignKeyRows(client, referencedTable, ids) {
   for (const edge of edges) {
     const table = `${quoteIdentifier(edge.schema_name)}.${quoteIdentifier(edge.table_name)}`;
     const column = quoteIdentifier(edge.column_name);
+    const privilege = await client.query(
+      `select has_table_privilege(current_user, to_regclass($1), 'DELETE') as can_delete,
+              has_table_privilege(current_user, to_regclass($1), 'SELECT') as can_select`,
+      [`${edge.schema_name}.${edge.table_name}`]
+    );
+    if (!privilege.rows[0]?.can_delete) {
+      if (!privilege.rows[0]?.can_select) {
+        throw new Error(`LOCAL_SYNTHETIC_CLEANUP_ACCESS_UNAVAILABLE:${edge.schema_name}.${edge.table_name}`);
+      }
+      const matchingRows = await client.query(
+        `select exists(select 1 from ${table} where ${column} = any($1::uuid[])) as exists`,
+        [ids]
+      );
+      if (matchingRows.rows[0]?.exists) {
+        throw new Error(`LOCAL_SYNTHETIC_CLEANUP_DELETE_PRIVILEGE_REQUIRED:${edge.schema_name}.${edge.table_name}`);
+      }
+      continue;
+    }
     await client.query(`delete from ${table} where ${column} = any($1::uuid[])`, [ids]);
   }
 }
@@ -464,6 +510,7 @@ async function main() {
       STUDENTHUB_LABBE_MODE: "DISABLED",
       STUDENTHUB_LABBE_BASE_URL: "",
       STUDENTHUB_LABBE_TOKEN: "",
+      TAVILY_API_KEY: "",
       NEXT_PUBLIC_STUDENTHUB_PROVIDER_MODE: "LIVE",
       STUDENTHUB_PERSISTENCE_ADAPTER: "postgres",
       STUDENTHUB_COMMUNITY_DEMO: "false",
@@ -493,6 +540,27 @@ async function main() {
        values($1, $2, $3, now(), null)
        on conflict (user_id, role_id) do update set granted_by=excluded.granted_by, granted_at=now(), revoked_at=null`,
       [reviewer.id, adminRole.rows[0].id, reviewer.id]
+    );
+    const expertRole = await localPool.query("select id from private.roles where code = 'EXPERT' limit 1");
+    if (!expertRole.rows[0]) throw new Error("LOCAL_EXPERT_ROLE_UNAVAILABLE");
+    await localPool.query(
+      `insert into private.user_roles(user_id, role_id, granted_by, granted_at, revoked_at)
+       values($1, $2, $3, now(), null)
+       on conflict (user_id, role_id) do update set granted_by=excluded.granted_by, granted_at=now(), revoked_at=null`,
+      [reviewer.id, expertRole.rows[0].id, reviewer.id]
+    );
+    // A separate synthetic, already-qualified peer is required to prove that
+    // Community-linked requests are server-matched to someone other than the
+    // case owner and contribution author. Candidate qualification itself is
+    // still exercised through the authenticated human review flow below.
+    await localPool.query(
+      `insert into private.expert_verifications
+         (user_id, domain_code, status, qualification_state, verified_by, verified_at, evidence_ref)
+       values($1, 'AI_ML', 'VERIFIED', 'DOMAIN_VERIFIED', $2, now(), 'synthetic-local-e2e-peer-reviewer')
+       on conflict (user_id, domain_code) do update
+         set status='VERIFIED', qualification_state='DOMAIN_VERIFIED', suspended_at=null,
+             verified_by=excluded.verified_by, verified_at=now(), evidence_ref=excluded.evidence_ref`,
+      [reviewer.id, reviewer.id]
     );
 
     const { createTrustOrchestrator } = await importRepo("frontend/src/lib/ai-trust/TrustOrchestrator.js");
@@ -650,6 +718,8 @@ async function main() {
     const browserEnv = {
       ...serverEnv,
       STUDENTHUB_LOCAL_CANDIDATE_ID: candidate.id,
+      STUDENTHUB_LOCAL_REVIEWER_ID: reviewer.id,
+      STUDENTHUB_LOCAL_REACTOR_ID: reactor.id,
       STUDENTHUB_LOCAL_CANDIDATE_EMAIL: candidate.email,
       STUDENTHUB_LOCAL_CANDIDATE_PASSWORD: candidate.password,
       STUDENTHUB_LOCAL_REVIEWER_EMAIL: reviewer.email,
@@ -673,7 +743,7 @@ async function main() {
       || runSummary.communityContributions < 6
       || runSummary.communityReactions < 8
       || runSummary.expertApplications !== 1
-      || runSummary.expertVerifications !== 1
+      || runSummary.expertVerifications !== 2
       || runSummary.expertPracticeSubmissions !== 1
       || runSummary.expertAssignments < 2
       || runSummary.expertAssessments !== 1
@@ -691,6 +761,9 @@ async function main() {
     failure = { code: error?.code || "LOCAL_E2E_FAILED", message: safeError(error) };
   } finally {
     await stopNextServer();
+    try { restoreDisposableTsconfig(); } catch (error) {
+      failure ||= { code: "LOCAL_TSCONFIG_RESTORE_FAILED", message: safeError(error) };
+    }
     removeDisposableNextDist();
     if (localPool) {
       try { await cleanupSyntheticLocalData(localPool); } catch (error) {

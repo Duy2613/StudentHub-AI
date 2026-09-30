@@ -414,8 +414,18 @@ export class DurableTrustRepository {
     const pool = getPostgresPool();
     const res = await pool.query(
       `SELECT c.id, c.state, c.visibility, c.created_at, c.updated_at,
+              latest_revision.revision AS case_revision,
+              latest_run.completed_at AS latest_run_completed_at,
               i.input_type, i.object_key, i.content_hash
        FROM public.trust_cases c
+       LEFT JOIN LATERAL (
+         SELECT revision FROM public.trust_case_revisions
+          WHERE case_id = c.id ORDER BY revision DESC LIMIT 1
+       ) latest_revision ON true
+       LEFT JOIN LATERAL (
+         SELECT completed_at FROM public.trust_runs
+          WHERE case_id = c.id ORDER BY created_at DESC LIMIT 1
+       ) latest_run ON true
        LEFT JOIN LATERAL (
          SELECT input_type, object_key, content_hash
          FROM public.case_inputs

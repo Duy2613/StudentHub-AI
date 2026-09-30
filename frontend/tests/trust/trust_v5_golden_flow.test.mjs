@@ -13,6 +13,8 @@ const { loadEnvConfig } = frontendRequire("@next/env");
 loadEnvConfig(frontendDir);
 
 import { TrustV5Engine } from "../../src/lib/server/trust/TrustV5Engine.js";
+import { DecisionTwinService } from "../../src/lib/server/trust/DecisionTwinService.js";
+import { SourceAuthorityRegistry } from "../../src/lib/ai-trust/layer3/registry/SourceAuthorityRegistry.js";
 import { CitationValidator } from "../../src/lib/server/trust/CitationValidator.js";
 import { EvidenceDiscoveryService } from "../../src/lib/server/trust/EvidenceDiscoveryService.js";
 import { EvidenceForensicsService } from "../../src/lib/server/trust/EvidenceForensicsService.js";
@@ -77,6 +79,48 @@ Sinh viên trúng tuyển vui lòng chuyển khoản trước 1.500.000 VNĐ ph�
   // 8. Evidence Passport
   assert.ok(result.passport.passportId, "Must issue Passport ID");
   assert.ok(result.passport.artifactHash, "Must compute cryptographic artifact hash");
+});
+
+test("Trust V5 projects retrieval provider status for an explicit source fixture", async () => {
+  const result = await TrustV5Engine.verify({
+    type: "text",
+    content: "A public claim that needs evidence and careful review.",
+    caseId: "case-retrieval-status-contract",
+    revision: 1,
+    sourcesFixture: [],
+  });
+
+  assert.equal(result.verification.retrievalStatus, "RUNTIME_SOURCE_FIXTURE");
+  assert.equal(result.verification.retrieval.retrievalProviderStatus, "RUNTIME_SOURCE_FIXTURE");
+});
+
+test("Decision Twin resolves sourceId relationships without duplicating a driver", () => {
+  const result = DecisionTwinService.buildDecisionTwin({
+    verdict: "SUPPORTED",
+    evidence: [
+      { sourceId: "source-a", evidenceId: "evidence-a", title: "Official source A", publisher: "A" },
+      { sourceId: "source-b", evidenceId: "evidence-b", title: "Official source B", publisher: "B" },
+    ],
+    relationships: [
+      { claimId: "claim-1", sourceId: "source-a", relation: "SUPPORTS", rationale: "A supports the claim" },
+      { claimId: "claim-1", sourceId: "source-b", relation: "SUPPORTS", rationale: "B supports the claim" },
+      { claimId: "claim-1", sourceId: "source-b", relation: "SUPPORTS", rationale: "Duplicate relationship" },
+    ],
+  });
+
+  assert.deepEqual(result.decisionDrivers.map((driver) => driver.evidenceId), ["evidence-a", "evidence-b"]);
+  assert.deepEqual(result.decisionDrivers.map((driver) => driver.sourceTitle), ["Official source A", "Official source B"]);
+  assert.equal(result.decisionDrivers[0].explanation, "A supports the claim");
+  assert.equal(result.strongestSupportingEvidence.evidenceId, "evidence-a");
+});
+
+test("Source authority recognizes curated university domains without trusting lookalikes", () => {
+  for (const domain of ["neu.edu.vn", "ftu.edu.vn", "ueh.edu.vn", "ctu.edu.vn"]) {
+    const authority = SourceAuthorityRegistry.evaluateAuthority(domain, "institutional");
+    assert.equal(authority.isOfficial, true, `${domain} should match a curated university domain`);
+    assert.ok(authority.score >= 0.90);
+  }
+  assert.equal(SourceAuthorityRegistry.evaluateAuthority("neu.edu.vn.attacker.example", "institutional").isOfficial, false);
 });
 
 test("FAILURE INJECTION: Citation validator rejects hallucinated evidence ID and invented URLs", () => {

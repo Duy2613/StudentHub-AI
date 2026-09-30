@@ -7,18 +7,9 @@ import {
   Home, 
   ShieldAlert, 
   MessageSquare, 
-  LayoutDashboard, 
   User, 
   Sparkles,
-  Compass,
-  CreditCard,
-  Scale,
-  AlertOctagon,
-  ShoppingBag,
-  Trophy,
-  Calendar,
   GraduationCap,
-  Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -42,11 +33,6 @@ const DEFAULT_ITEMS = [
     title: "Mạng Lưới Chuyên Gia",
     icon: <GraduationCap className="w-full h-full text-amber-400" />,
     href: "/expert",
-  },
-  {
-    title: "Bảng Điều Khiển",
-    icon: <LayoutDashboard className="w-full h-full text-sky-400" />,
-    href: "/dashboard",
   },
   {
     title: "Hồ Sơ & Bảo Mật",

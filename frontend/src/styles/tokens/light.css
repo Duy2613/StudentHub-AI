@@ -1,0 +1,60 @@
+/**
+ * StudentHub AI — Light Theme Tokens
+ *
+ * Governing Authority: MASTER FRONTEND CONSTITUTION v3.0 (M-25)
+ */
+
+[data-theme="light"], :root:not([data-theme="midnight"]) {
+  /* Canvas & Surfaces */
+  --canvas: #F7F9FD;
+  --canvas-soft: #F2F5FB;
+  --surface-1: #FFFFFF;
+  --surface-2: #FBFCFF;
+  --surface-3: #F4F7FC;
+
+  /* Typography / Text */
+  --text-primary: #0B1424;
+  --text-secondary: #586579;
+  --text-tertiary: #8490A3;
+
+  /* Borders (M-30) */
+  --border-subtle: rgba(11, 20, 36, 0.08);
+  --border-default: rgba(11, 20, 36, 0.14);
+  --border-interactive: rgba(121, 92, 255, 0.35);
+  --border-focus: #795CFF;
+  --border-critical: #EF4444;
+
+  /* Elevations (M-30) */
+  --elevation-0: none;
+  --elevation-1: 0 1px 3px rgba(11, 20, 36, 0.05);
+  --elevation-2: 0 4px 12px rgba(11, 20, 36, 0.08);
+  --elevation-3: 0 10px 24px rgba(11, 20, 36, 0.12);
+  --elevation-4: 0 20px 40px rgba(11, 20, 36, 0.16);
+  --elevation-5: 0 28px 64px rgba(11, 20, 36, 0.24);
+
+  /* Glass Material (M-27 Control Material) */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(11, 20, 36, 0.1);
+  --glass-blur: blur(16px);
+
+  /* Compatibility aliases keep the active shell and legacy surfaces on the selected theme. */
+  --bg-primary: var(--canvas);
+  --bg-secondary: var(--canvas-soft);
+  --surface-primary: var(--surface-1);
+  --surface-elevated: var(--surface-3);
+  --surface-quiet: var(--canvas-soft);
+  --surface-raised: var(--surface-1);
+  --surface-overlay: var(--surface-2);
+  --surface-interactive: var(--surface-3);
+  --surface-hover: #EAF0F8;
+  --surface-glass: var(--glass-bg);
+  --text-muted: var(--text-tertiary);
+  --accent-primary: var(--action-primary);
+  --accent-knowledge: #167C9A;
+  --accent-human: #965A17;
+  --accent-trust: var(--status-mint);
+  --status-success: var(--status-mint);
+  --status-warning: var(--status-amber);
+  --status-danger: var(--status-red);
+  --border-strong: var(--border-default);
+}

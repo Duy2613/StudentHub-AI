@@ -84,7 +84,7 @@ export default function AuthSurroundings({ children }) {
           <LiveStudioClock />
           <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-500/15 border border-teal-500/30 text-[11px] font-mono text-teal-200 backdrop-blur-md shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
-            <span>StudentHub AI • Verified Hub</span>
+            <span>StudentHub AI • Cổng tài khoản</span>
           </div>
         </div>
       </header>
@@ -109,9 +109,9 @@ export default function AuthSurroundings({ children }) {
         <CosmicAstrolabeRings />
 
         {/* Central Auth Form Card (Clean & Focused) */}
-        <main id="main-content" className="relative z-10 w-full flex justify-center">
+        <div className="relative z-10 w-full flex justify-center">
           {children}
-        </main>
+        </div>
       </div>
 
       {/* 3. Bottom Security Guarantee Bar */}
@@ -129,7 +129,7 @@ export default function AuthSurroundings({ children }) {
           <span className="hidden sm:inline text-white/20">•</span>
           <span className="flex items-center gap-1.5">
             <Zap className="w-3.5 h-3.5 text-amber-400" />
-            <span>Bảo vệ quyền riêng tư 100%</span>
+            <span>Quyền truy cập theo chính sách tài khoản</span>
           </span>
         </div>
       </footer>

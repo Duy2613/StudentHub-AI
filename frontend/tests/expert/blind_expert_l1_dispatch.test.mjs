@@ -1,24 +1,21 @@
 import "../../src/lib/server/env/canonicalEnv.js";
-import test, { after } from "node:test";
+import { after } from "node:test";
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
 import { ExpertBlindReviewDispatcher } from "../../src/lib/server/expert/ExpertBlindReviewDispatcher.js";
 import { getPostgresPool } from "../../src/lib/server/database/PostgresPool.js";
+import { closeExpertTestPool, getDemoAccounts, createTestTrustCase, cleanupTestCase, liveExpertTest as test } from "./test_helpers.mjs";
 
 after(async () => {
-  await getPostgresPool().end().catch(() => {});
+  await closeExpertTestPool();
 });
 
 test("Blind Expert L1 Dispatch — Dispatches assignments to eligible experts upon L1 claim ready", async () => {
-  const caseId = "11111111-2222-3333-4444-555555555555";
-  const ownerId = "8a9b3c93-8459-4072-b46c-95cfb71d0f66"; // U0
-
+  const caseId = randomUUID();
   const pool = getPostgresPool();
-  await pool.query(
-    `INSERT INTO public.trust_cases (id, owner_id, state, visibility)
-     VALUES ($1, $2, 'PASS', 'PRIVATE')
-     ON CONFLICT (id) DO NOTHING`,
-    [caseId, ownerId]
-  );
+  const { u0: ownerId } = await getDemoAccounts(pool);
+  assert.ok(ownerId, "The disposable database must contain the demo owner fixture");
+  await createTestTrustCase(pool, { caseId, ownerId, state: "PASS" });
 
   try {
     const result = await ExpertBlindReviewDispatcher.dispatchOnL1ClaimReady({
@@ -32,7 +29,7 @@ test("Blind Expert L1 Dispatch — Dispatches assignments to eligible experts up
         canonicalClaim: "Thông tin tuyển sinh đại học bất thường năm 2026.",
         domainCode: "GENERAL_EPISTEMICS",
       },
-      requestId: "test-l1-req-1",
+      requestId: `test-l1-req-${caseId}`,
     });
 
     assert.equal(result.ok, true);
@@ -60,10 +57,7 @@ test("Blind Expert L1 Dispatch — Dispatches assignments to eligible experts up
     const TRUST_BLOCKED_BY_EXPERT = "NO";
     assert.equal(TRUST_BLOCKED_BY_EXPERT, "NO");
 
-    // Cleanup test records
-    await pool.query(`DELETE FROM private.expert_assignments WHERE review_request_id = $1`, [result.reviewRequestId]);
-    await pool.query(`DELETE FROM private.expert_review_requests WHERE id = $1`, [result.reviewRequestId]);
   } finally {
-    await pool.query(`DELETE FROM public.trust_cases WHERE id = $1`, [caseId]);
+    await cleanupTestCase(pool, caseId);
   }
 });

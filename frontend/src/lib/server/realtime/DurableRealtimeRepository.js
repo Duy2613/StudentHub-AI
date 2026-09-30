@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { hashCanonicalJson } from "../integrations/CanonicalJson.js";
 import { getPostgresPool } from "../database/PostgresPool.js";
 
-export const REALTIME_PUBLIC_CHANNELS = Object.freeze(["system", "presence"]);
+export const REALTIME_PUBLIC_CHANNELS = Object.freeze(["system", "presence", "community"]);
 export const REALTIME_CLASSIFICATIONS = Object.freeze([
   "PUBLIC",
   "INTERNAL",

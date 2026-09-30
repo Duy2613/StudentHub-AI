@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Sparkles, ArrowRight, Menu, X, LayoutDashboard } from "lucide-react";
+import { Sparkles, ArrowRight, Menu, X } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import UserDropdownMenu from "@/components/auth/UserDropdownMenu";
 import LiveStudioClock from "@/components/ui/live-studio-clock";
@@ -102,12 +102,12 @@ export default function LandingHeader() {
             <div className="pt-3 border-t border-white/10 mt-2 flex flex-col gap-2">
               {session ? (
                 <Link
-                  href="/dashboard"
+                  href="/community"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-semibold bg-indigo-600 text-white shadow-neon-primary"
                 >
-                  <LayoutDashboard className="w-4 h-4" />
-                  <span>Vào Dashboard ({profile?.full_name || "Tài khoản"})</span>
+                  <span>Vào Community ({profile?.full_name || "Tài khoản"})</span>
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
               ) : (
                 <>

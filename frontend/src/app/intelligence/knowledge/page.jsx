@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
+import { notFound } from 'next/navigation';
 
-/** Compatibility entry: knowledge/evidence navigation is owned by Trust. */
-export default function KnowledgeIntelligenceCompatibilityRoute() {
-  redirect("/trust");
+export default function RemovedKnowledgeUniverseRoute() {
+  notFound();
 }

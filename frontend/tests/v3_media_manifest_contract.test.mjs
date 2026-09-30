@@ -6,17 +6,17 @@ import { fileURLToPath } from "node:url";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const frontendRoot = path.resolve(here, "..");
-const repoRoot = path.resolve(frontendRoot, "..");
 
 test("V3 Media Manifest Integrity Contract verifies all entries and physical assets", () => {
-  const manifestPath = path.join(repoRoot, "public/media/v3/media-manifest.json");
+  const publicRoot = path.join(frontendRoot, "public");
+  const manifestPath = path.join(publicRoot, "media/v3/media-manifest.json");
   assert.ok(fs.existsSync(manifestPath), "Canonical media-manifest.json must exist in public/media/v3");
 
   const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
   assert.equal(manifest.version, "3.0.0");
   assert.equal(manifest.canonicalRoot, "/media/v3");
 
-  const v3Dir = path.join(repoRoot, "public/media/v3");
+  const v3Dir = path.join(publicRoot, "media/v3");
   const integrityDiscrepancies = [];
   let totalEntriesVerified = 0;
 

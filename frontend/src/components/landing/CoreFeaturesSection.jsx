@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Calendar, FileCheck2, ShieldAlert, Navigation, Radar, ArrowRight, Layers, CheckCircle2, XCircle, Cpu, ChevronRight } from "lucide-react";
+import { Calendar, ShieldAlert, ArrowRight, Layers, CheckCircle2, XCircle, Cpu, ChevronRight } from "lucide-react";
 import TactileButton from "@/components/ui/TactileButton";
 import Interactive3DBlockCard from "@/components/ui/Interactive3DBlockCard";
 
@@ -92,23 +92,23 @@ export default function CoreFeaturesSection() {
       badge: "Deterministic DAG",
     },
     {
-      id: "command-center",
+      id: "trust-expert-handoff",
       num: "05",
-      name: "Personal Command Center",
-      tag: "Bảng điều khiển hành động & Bảo mật phân quyền",
-      tagColor: "bg-cyan-500/20 text-cyan-300 border-cyan-500/40",
-      icon: Cpu,
-      href: "/dashboard",
+      name: "Trust → Expert Review",
+      tag: "Chuyển hồ sơ có nguồn gốc sang đúng phạm vi chuyên môn",
+      tagColor: "bg-amber-500/20 text-amber-300 border-amber-500/40",
+      icon: CheckCircle2,
+      href: "/expert",
       glowColor: "rgba(6, 182, 212, 0.4)",
-      myth: "Bảng điều khiển phức tạp, tràn ngập biểu đồ trang trí",
-      reality: "Zero-noise priority briefing + Threat alerts + Actionable academic triggers + Security Fabric AAL2 gating",
+      myth: "Kết luận tự động có thể thay thế đánh giá chuyên môn",
+      reality: "Trust case + revision + claim + evidence lineage → scoped Expert review with conflict and freshness checks",
       steps: [
-        { label: "1. Tổng Hợp Tình Huống", desc: "Daily prioritized intelligence briefing" },
-        { label: "2. Cảnh Báo Chủ Động", desc: "Real-time threat and deadline alerts" },
-        { label: "3. Kích Hoạt Hành Động", desc: "Direct one-click safe resolution" },
-        { label: "4. Kiểm Soát Quyền Riêng Tư", desc: "Consent ledger & data minimization" },
+        { label: "1. Chọn mệnh đề", desc: "Giữ nguyên nội dung và revision của Trust case" },
+        { label: "2. Kiểm tra phạm vi", desc: "Chuyển tới Expert đủ phạm vi và không xung đột" },
+        { label: "3. Đánh giá có căn cứ", desc: "Expert xem evidence, nguồn và phần chưa rõ" },
+        { label: "4. Theo dõi phiên bản", desc: "Revision mới làm đánh giá cũ thành stale" },
       ],
-      badge: "Actionable Briefing",
+      badge: "Evidence Handoff",
     },
   ];
 
