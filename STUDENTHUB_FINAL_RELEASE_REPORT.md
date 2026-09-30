@@ -4,6 +4,7 @@
 **Promotion ready: NO**
 **Tavily: OFF; no calls**
 **Candidate:** `codex/studenthub-final-unified-20260930`, based on `af1953147ee5b89ea9d58acdfa67c7f1416ae469`
+**Integration source/audit commit:** `11bfc70945113bbe0f8ac0f25b4ba9e7f02a4067` (pushed to `origin`; fast-forward)
 **Run:** isolated browser run `2026-09-30T17-58-17-958Z-5428`
 
 ## Summary
@@ -99,4 +100,4 @@ Do not push `main`, trigger production deployment, or run production canaries fr
 - `CLEANUP_INVENTORY.md`
 - `RELEASE_SHA_MANIFEST.md`
 
-The integration SHA and push result are appended to `RELEASE_SHA_MANIFEST.md` after the explicit-path commit/push. `origin/main` is intentionally not changed.
+`11bfc70945113bbe0f8ac0f25b4ba9e7f02a4067` is the tested integration source/audit commit. A follow-up commit records this SHA in the manifest and changes release metadata only. The final branch tip is returned in the closure response. `origin/main` is intentionally not changed.
