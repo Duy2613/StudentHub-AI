@@ -1,0 +1,237 @@
+
+> frontend@0.1.0 build
+> node scripts/check-community-demo-gate.mjs --production-build && next build
+
+[DEMO_GATE_CHECK] PASS
+▲ Next.js 16.3.7 (Turbopack)
+✓ Running next.config.ts took 32ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 18.3s
+  Running TypeScript ...
+  Finished TypeScript in 3.0s ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/143) ...
+  Generating static pages using 15 workers (35/143) 
+  Generating static pages using 15 workers (71/143) 
+  Generating static pages using 15 workers (107/143) 
+✓ Generating static pages using 15 workers (143/143) in 2.9s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /academic-showcase
+├ ƒ /academic/[[...slug]]
+├ ○ /ai
+├ ƒ /api/[...path]
+├ ƒ /api/academic/command-center
+├ ƒ /api/academic/me/decision-studio
+├ ƒ /api/academic/me/decision-studio/adopt
+├ ƒ /api/academic/me/discrepancy-report
+├ ƒ /api/academic/me/execution
+├ ƒ /api/academic/me/execution/reconcile
+├ ƒ /api/academic/me/planner
+├ ƒ /api/academic/me/profile-360
+├ ƒ /api/academic/me/roadmap
+├ ƒ /api/academic/me/simulate
+├ ƒ /api/academic/notifications
+├ ƒ /api/academic/tasks/[taskId]
+├ ƒ /api/academic/timetable
+├ ƒ /api/academic/timetable/[timetableId]
+├ ƒ /api/academic/timetable/confirm
+├ ƒ /api/academic/timetable/entries/[entryId]
+├ ƒ /api/academic/timetable/import
+├ ƒ /api/academic/timetable/reminders
+├ ƒ /api/academic/timetable/reminders/[reminderId]
+├ ƒ /api/ai-trust/evidence
+├ ƒ /api/ai-trust/observatory
+├ ƒ /api/ai-trust/ocr
+├ ƒ /api/ai-trust/reasoning
+├ ƒ /api/ai-trust/reputation
+├ ƒ /api/ai-trust/screen
+├ ƒ /api/ai-trust/semantic
+├ ƒ /api/ai/trust/audit/[answerId]
+├ ƒ /api/ai/trust/claims/[claimId]
+├ ƒ /api/ai/trust/evaluate
+├ ƒ /api/ai/trust/evaluations/[evaluationId]
+├ ƒ /api/ai/trust/evidence/[evidenceId]
+├ ƒ /api/ai/trust/verify-claim
+├ ƒ /api/auth/session
+├ ƒ /api/auth/session/exchange
+├ ƒ /api/auth/session/logout
+├ ƒ /api/chat
+├ ƒ /api/community/experience/evaluate
+├ ƒ /api/community/experiences
+├ ƒ /api/community/social
+├ ƒ /api/expert/appeals
+├ ƒ /api/expert/appeals/review
+├ ƒ /api/expert/assessments
+├ ƒ /api/expert/assignments
+├ ƒ /api/expert/blind-reviews
+├ ƒ /api/expert/blind-reviews/[assignmentId]
+├ ƒ /api/expert/evaluate
+├ ƒ /api/expert/graph
+├ ƒ /api/expert/missions
+├ ƒ /api/expert/missions/[missionId]
+├ ƒ /api/expert/missions/history
+├ ƒ /api/expert/profile/[expertId]
+├ ƒ /api/expert/qualification
+├ ƒ /api/expert/qualification/practice
+├ ƒ /api/expert/qualification/practice/review
+├ ƒ /api/expert/qualification/quiz
+├ ƒ /api/expert/qualification/quiz/answers
+├ ƒ /api/expert/qualification/quiz/submit
+├ ƒ /api/expert/qualification/review
+├ ƒ /api/expert/quality
+├ ƒ /api/expert/review-requests
+├ ƒ /api/expert/reviews
+├ ƒ /api/expert/rooms
+├ ƒ /api/expert/rooms/[roomId]
+├ ƒ /api/expert/rooms/presence
+├ ƒ /api/expert/v5/questions
+├ ƒ /api/expert/v5/source-registry
+├ ƒ /api/expert/v5/sources
+├ ƒ /api/expert/v5/sources/ingest
+├ ƒ /api/experts/me
+├ ƒ /api/forum/posts
+├ ƒ /api/forum/vote
+├ ƒ /api/health/live
+├ ƒ /api/health/ready
+├ ƒ /api/intelligence/claims/[claimId]
+├ ƒ /api/intelligence/community/consensus
+├ ƒ /api/intelligence/community/contributions/[contributionId]
+├ ƒ /api/intelligence/community/contributions/preview
+├ ƒ /api/intelligence/community/corrections
+├ ƒ /api/intelligence/community/evaluate
+├ ƒ /api/intelligence/community/experiences/[experienceId]
+├ ƒ /api/intelligence/community/feedback
+├ ƒ /api/intelligence/community/friction
+├ ƒ /api/intelligence/community/posts
+├ ƒ /api/intelligence/community/posts/[contributionId]/comments
+├ ƒ /api/intelligence/community/posts/[contributionId]/reactions
+├ ƒ /api/intelligence/community/query
+├ ƒ /api/intelligence/community/reality-gaps
+├ ƒ /api/intelligence/community/search
+├ ƒ /api/intelligence/community/topics/[topicId]
+├ ƒ /api/intelligence/community/track-record
+├ ƒ /api/intelligence/contradictions/[claimId]
+├ ƒ /api/intelligence/experts
+├ ƒ /api/intelligence/experts/[expertId]
+├ ƒ /api/intelligence/experts/[expertId]/claims
+├ ƒ /api/intelligence/experts/[expertId]/evidence
+├ ƒ /api/intelligence/experts/disagreements
+├ ƒ /api/intelligence/experts/resolve
+├ ƒ /api/intelligence/experts/verify-claim
+├ ƒ /api/intelligence/fusion/evaluate
+├ ƒ /api/intelligence/fusion/objects/[knowledgeObjectId]
+├ ƒ /api/intelligence/fusion/objects/[knowledgeObjectId]/conflicts
+├ ƒ /api/intelligence/fusion/objects/[knowledgeObjectId]/evidence
+├ ƒ /api/intelligence/fusion/objects/[knowledgeObjectId]/history
+├ ƒ /api/intelligence/fusion/objects/[knowledgeObjectId]/unknowns
+├ ƒ /api/intelligence/health
+├ ƒ /api/intelligence/recommendations
+├ ƒ /api/intelligence/reputation/[subjectId]
+├ ƒ /api/intelligence/social/early-warnings
+├ ƒ /api/intelligence/social/signals
+├ ƒ /api/intelligence/social/sources
+├ ƒ /api/intelligence/social/sync
+├ ƒ /api/intelligence/trust/[subjectId]
+├ ƒ /api/personalization/briefing
+├ ƒ /api/personalization/command-center
+├ ƒ /api/personalization/devices
+├ ƒ /api/personalization/devices/revoke
+├ ƒ /api/personalization/digital-twin
+├ ƒ /api/personalization/goals
+├ ƒ /api/personalization/memory
+├ ƒ /api/personalization/preferences
+├ ƒ /api/personalization/reset
+├ ƒ /api/personalization/search
+├ ƒ /api/public/catalog
+├ ƒ /api/public/discovery
+├ ƒ /api/public/research
+├ ƒ /api/public/weather
+├ ƒ /api/realtime/broadcast
+├ ƒ /api/realtime/stream
+├ ƒ /api/safety-map/reports
+├ ƒ /api/scholarships/list
+├ ƒ /api/scholarships/match-profile
+├ ƒ /api/sos/bank-hotlines
+├ ƒ /api/sos/generate-complaint
+├ ƒ /api/student/identity
+├ ƒ /api/student/records
+├ ƒ /api/users/me
+├ ƒ /api/users/profile
+├ ƒ /api/users/verify-edu
+├ ƒ /api/v1/academic
+├ ƒ /api/v1/community
+├ ƒ /api/v1/dashboard
+├ ƒ /api/v1/decisions
+├ ƒ /api/v1/experts
+├ ƒ /api/v1/integrations/aidrive
+├ ƒ /api/v1/integrations/labbe
+├ ƒ /api/v1/notifications
+├ ƒ /api/v1/passports
+├ ƒ /api/v1/passports/[passportId]
+├ ƒ /api/v1/reports
+├ ƒ /api/v1/reports/[reportId]
+├ ƒ /api/v1/search
+├ ƒ /api/v1/trust
+├ ƒ /api/v1/trust/analyze
+├ ƒ /api/v1/trust/cases
+├ ƒ /api/v1/trust/cases/[caseId]
+├ ƒ /api/v1/trust/cases/[caseId]/community-signals
+├ ƒ /api/v1/trust/continue
+├ ƒ /api/verify/[...path]
+├ ○ /c9
+├ ○ /callback
+├ ○ /cases
+├ ○ /cinema
+├ ○ /community
+├ ƒ /community/[postId]
+├ ƒ /community/discussion/[postId]
+├ ○ /credit-scheduler
+├ ○ /dashboard
+├ ○ /expert
+├ ○ /expert/missions
+├ ƒ /expert/profile
+├ ƒ /expert/profile/[expertId]
+├ ƒ /expert/rooms
+├ ○ /forum
+├ ○ /intelligence
+├ ○ /intelligence/ai-trust
+├ ○ /intelligence/community
+├ ○ /intelligence/evidence
+├ ○ /intelligence/experts
+├ ○ /intelligence/knowledge
+├ ○ /intelligence/trust
+├ ○ /learn
+├ ƒ /learn/[courseId]/[lessonId]
+├ ○ /login
+├ ○ /marketplace
+├ ○ /onboarding
+├ ○ /practice
+├ ○ /prof-rating
+├ ○ /profile
+├ ƒ /profile/[id]
+├ ○ /projects
+├ ○ /quests
+├ ○ /register
+├ ○ /roadmap
+├ ○ /safety-map
+├ ○ /scam-check
+├ ○ /scholarships
+├ ○ /settings
+├ ○ /settings/privacy
+├ ○ /sos
+├ ○ /trust
+├ ○ /tuition-radar
+├ ○ /ultra
+└ ○ /verify
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -1,0 +1,204 @@
+{
+  "environment": "LOCAL_DISPOSABLE_SUPABASE_17_6",
+  "recordedAt": "2026-10-01T14:22:19.393Z",
+  "sourceSha": "cc2a31069dfab6dd4fa112335f930c3639719fe6",
+  "sourceWorkingTreeModified": false,
+  "apiHost": "127.0.0.1:56021",
+  "dbHost": "127.0.0.1:55432",
+  "providerCalls": 0,
+  "productionAcceptance": "NOT_RUN",
+  "trustL1L4Live": "NOT_RUN",
+  "evidencePackageInput": "SYNTHETIC_TERMINAL_RESPONSE_LOCAL_ONLY",
+  "migrations": [
+    {
+      "file": "202609010001_private_screenshot_storage.sql",
+      "sha256": "dbbf36ded1424145125458c2f3cc9df2576ad7043e71448f20bc3061fb96c96e",
+      "result": "PASS_LOCAL_REHEARSAL"
+    },
+    {
+      "file": "20260929135354_studenthub_expert_v5_missions_rooms.sql",
+      "sha256": "94baa4e08aed99dee8aa736d806d312cfa82840c9ae1ef0ea144853a71e6041e",
+      "result": "PASS_LOCAL_REHEARSAL"
+    },
+    {
+      "file": "20260929135553_expert_v5_trigger_path_and_fk_indexes.sql",
+      "sha256": "271cdf4793e1a344ec9cf3651abb585b11e453b886a18dcf31f97283347cee41",
+      "result": "PASS_LOCAL_REHEARSAL"
+    },
+    {
+      "file": "202610010003_expert_v5_event_sequence_permissions.sql",
+      "sha256": "9d22b873b4a3fbaeff5226b6eb74c0e21b1d3c947bec8ef2ac6beeabd349cccb",
+      "result": "PASS_LOCAL_REHEARSAL"
+    }
+  ],
+  "checks": [
+    {
+      "name": "private_bucket",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_create_room",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_canonical_reference",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_durable_object",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_idempotent_replay",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_host_readback",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_participant_readback",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_outsider_room_denied",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_signed_url_authorization",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_outsider_private_object_denied",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_anonymous_private_object_denied",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_disconnected_membership_readback",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_cold_process_hydration",
+      "pass": true,
+      "canonicalMediaArtifactId": "art_c7ca0796-2890-42b4-baef-c7c2ef252967",
+      "sha256": "39da2a1534268c9ed61fd85d7c231162848991f78cc6144c7c39c46f62b0ed9e"
+    },
+    {
+      "name": "IMAGE_synthetic_package_provenance",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_exact_case_linkage",
+      "pass": true
+    },
+    {
+      "name": "IMAGE_package_reload",
+      "pass": true
+    },
+    {
+      "name": "QR_create_room",
+      "pass": true
+    },
+    {
+      "name": "QR_canonical_reference",
+      "pass": true
+    },
+    {
+      "name": "QR_durable_object",
+      "pass": true
+    },
+    {
+      "name": "QR_idempotent_replay",
+      "pass": true
+    },
+    {
+      "name": "QR_host_readback",
+      "pass": true
+    },
+    {
+      "name": "QR_participant_readback",
+      "pass": true
+    },
+    {
+      "name": "QR_outsider_room_denied",
+      "pass": true
+    },
+    {
+      "name": "QR_signed_url_authorization",
+      "pass": true
+    },
+    {
+      "name": "QR_outsider_private_object_denied",
+      "pass": true
+    },
+    {
+      "name": "QR_anonymous_private_object_denied",
+      "pass": true
+    },
+    {
+      "name": "QR_disconnected_membership_readback",
+      "pass": true
+    },
+    {
+      "name": "QR_cold_process_hydration",
+      "pass": true,
+      "canonicalMediaArtifactId": "art_123e5f65-ded4-4487-ac22-23956515fcf7",
+      "sha256": "94c6f14beea7418f1adaa0643936e58c7f5d6aa2841075543dadeee9aa3e4e69"
+    },
+    {
+      "name": "QR_synthetic_package_provenance",
+      "pass": true
+    },
+    {
+      "name": "QR_exact_case_linkage",
+      "pass": true
+    },
+    {
+      "name": "QR_package_reload",
+      "pass": true
+    }
+  ],
+  "cleanup": [
+    {
+      "check": "exact_local_rooms",
+      "pass": true
+    },
+    {
+      "check": "exact_local_artifact",
+      "mediaArtifactId": "art_c7ca0796-2890-42b4-baef-c7c2ef252967",
+      "pass": true
+    },
+    {
+      "check": "exact_local_artifact",
+      "mediaArtifactId": "art_123e5f65-ded4-4487-ac22-23956515fcf7",
+      "pass": true
+    },
+    {
+      "check": "exact_local_synthetic_case",
+      "pass": true
+    },
+    {
+      "check": "exact_local_synthetic_case",
+      "pass": true
+    },
+    {
+      "check": "exact_local_auth_user",
+      "id": "ae5d5bd6-794e-4f12-9b91-409979a8f277",
+      "pass": true
+    },
+    {
+      "check": "exact_local_auth_user",
+      "id": "3e4e9dd3-8954-4fe7-93d1-0e36af5a54e2",
+      "pass": true
+    },
+    {
+      "check": "exact_local_auth_user",
+      "id": "66214f44-6d9d-4d59-a2e4-6298501932e2",
+      "pass": true
+    }
+  ],
+  "result": "PASS_LOCAL_ONLY"
+}

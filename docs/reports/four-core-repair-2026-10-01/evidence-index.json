@@ -1,182 +1,75 @@
 {
-  "schemaVersion": 1,
-  "createdAtUtc": "2026-10-01T12:10:05.9861898Z",
-  "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+  "schemaVersion": 2,
+  "updatedAtLocalDate": "2026-10-01",
+  "candidateSourceSha": "cc2a31069dfab6dd4fa112335f930c3639719fe6",
   "branch": "codex/studenthub-four-core-repair-20261001",
-  "sourceWorkingTreeChangedAfterCandidateCommit": false,
-  "packageStatus": "STAGING_VERIFIED_PRODUCTION_HOLD",
-  "productionExecutionStatus": "HOLD",
+  "packageStatus": "CANDIDATE_REPAIRED_AND_LOCALLY_VERIFIED_PRODUCTION_HOLD",
+  "verdict": "STUDENTHUB_PRODUCTION_RELEASE_PARTIAL",
+  "fullFixAccepted": false,
   "productionMutated": false,
   "production": {
-    "observedDeploymentSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
+    "vercelProject": "StudentHub-AI",
+    "vercelEnvironment": "Production",
     "deploymentId": "dpl_ED91sTmSbtDS3xTzhgCeeiJqeRh7",
-    "target": "PRODUCTION_READ_ONLY",
-    "runtimeDatabaseProjectRef": "NOT_VERIFIED",
-    "environmentInspection": "vercel env pull rejected before execution by automatic command review; not bypassed",
-    "backupRestore": "NOT_CREATED_RUNTIME_IDENTITY_UNVERIFIED"
-  },
-  "staging": {
-    "projectRef": "bniwtkjtramqaozrrtrk",
-    "integrationArtifact": "staging-integration.json",
-    "gates": "17 PASS / 1 PARTIAL / 0 FAIL; 109 API checks; 8 cleanup confirmations",
-    "integrationRunTag": "fourcore-1790856038049",
-    "harnessCommitAtRun": "0c9a4f3cc326209a5436b49e41041fdce1e1304e",
-    "harnessSha256AtRun": "940413163c5e87175072c2686f74113503a5ee0ea3185f4404da64a9e907c033",
-    "browserArtifact": "browser-candidate-staging-release.json",
-    "browserChecks": "48/48 PASS",
-    "migrationLedgerReconciliation": "8/8 planned staging migrations APPLIED_EXACT or APPLIED_EQUIVALENT; no cloud migration rerun",
-    "storageArtifact": "staging-storage.json; Trust image/QR PASS; avatar and room-media buckets absent",
-    "openAlexSmokeArtifact": "openalex-smoke.json; HTTP 200; OPENALEX and CROSSREF AVAILABLE; limit 3",
-    "profilePartialReason": "/profile/{studentId} returns 404 by privacy boundary"
+    "deploymentSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
+    "expectedSupabaseProjectRef": "kytdomflmjytzyaabogi",
+    "runtimeAuthProjectRef": "UNKNOWN",
+    "runtimeDatabaseProjectRef": "UNKNOWN",
+    "runtimeStorageProjectRef": "UNKNOWN",
+    "runtimeRealtimeProjectRef": "UNKNOWN",
+    "runtimeDurableSessionProjectRef": "UNKNOWN",
+    "runtimeDatabaseIdentityMatch": "UNKNOWN",
+    "runtimeAuthIdentityMatch": "UNKNOWN",
+    "backupRestore": "NOT_RUN",
+    "migrationUnknownCount": 15,
+    "migrationNotAppliedCount": 4,
+    "migrationHashMismatchCount": 0,
+    "migrationObservationBoundary": "Earlier read-only operator-ref snapshot, not proven Vercel runtime; must reconcile again after identity proof",
+    "deploymentOfCandidate": "NOT_DEPLOYED",
+    "tavilyMode": "OFF"
   },
   "verification": {
-    "build": {
-      "artifact": "build-final.log",
-      "result": "PASS",
-      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
-    },
-    "lint": {
-      "artifact": "lint-final.log",
-      "result": "PASS; 0 errors; 490 warnings",
-      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
-    },
-    "regression": {
-      "artifact": "regression-rerun.log",
-      "result": "390/396 PASS; 6 BLOCKED_EXTERNAL",
-      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
-    },
-    "migrationRehearsal": {
-      "artifact": "migration-rehearsal-final.json",
-      "result": "PASS on local disposable PostgreSQL 17.6",
-      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
-    },
-    "storageAssurance": {
-      "artifact": "staging-storage.json",
-      "result": "PARTIAL; TRUST_DIRECT_IMAGE_AND_QR_PASS; EXPERT_ROOM_MEDIA_ACCEPTANCE_FAIL_STATIC; AVATAR_UPLOAD_NOT_IN_PROFILE_CONTRACT",
-      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
-      "localArtifact": "storage-local.json"
-    },
-    "openAlexSmoke": {
-      "artifact": "openalex-smoke.json",
-      "result": "PASS; HTTP 200; NOT_AUTHORITATIVE",
-      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
-    },
-    "migrationLedgerReconciliation": {
-      "artifact": "migration-ledger-reconciliation.json",
-      "result": "READ_ONLY; STAGING_PLAN_ALREADY_APPLIED; PRODUCTION_RUNTIME_REF_UNKNOWN",
-      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
-    },
-    "freshRetrievalHoldout": {
-      "result": "BLOCKED_EXTERNAL; no unseen approved corpus or retrieval budget",
-      "tavilyMode": "OFF; no Tavily request made"
-    },
-    "roomMediaAcceptance": {
-      "artifact": "ROOM_MEDIA_STORAGE_ACCEPTANCE.md",
-      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
-      "targetProjectRef": "bniwtkjtramqaozrrtrk",
-      "result": "FAIL_STATIC_AT_R05; LIVE_ACCEPTANCE_NOT_RUN",
-      "requiredFields": {
-        "ROOM_IMAGE_UPLOAD": "NOT_RUN",
-        "ROOM_IMAGE_READBACK": "FAIL_STATIC",
-        "ROOM_IMAGE_TRUST_HANDOFF": "BLOCKED_BY_MISSING_CANONICAL_ASSET_REFERENCE",
-        "ROOM_QR_UPLOAD": "NOT_RUN",
-        "ROOM_QR_READBACK": "FAIL_STATIC",
-        "ROOM_QR_TRUST_HANDOFF": "BLOCKED_BY_MISSING_CANONICAL_ASSET_REFERENCE",
-        "ROOM_MEDIA_AUTHORIZATION": "NOT_RUN_LIVE",
-        "ROOM_MEDIA_RELOAD": "FAIL_ACCEPTANCE",
-        "ROOM_MEDIA_RECONNECT": "NOT_RUN_FOR_MEDIA",
-        "ROOM_MEDIA_CLEANUP": "NOT_RUN",
-        "ROOM_MEDIA_STORAGE": "FAIL"
-      }
-    },
-    "productionSnapshot": {
-      "artifact": "production-snapshot-final.json",
-      "result": "READ_ONLY; deployed SHA differs from candidate",
-      "candidateRunSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
-      "deployedSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6"
-    },
-    "productionBrowserBaseline": {
-      "artifact": "browser-production-final.json",
-      "harnessSha": "d92841b0b9af650d806d84b120f982d031f6bb42",
-      "deployedSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
-      "result": "42/48 PASS; six mobile Community overflow failures",
-      "candidateBound": false
-    },
-    "productionAuthDiagnostic": {
-      "artifact": "auth-production-canonical.json",
-      "harnessSha": "bb240430fbf1fe3996eecb3e8c0a6957150e7d23",
-      "result": "8/8 account session checks",
-      "candidateBound": false
-    }
+    "build": { "artifact": "build-room-media.log", "result": "PASS", "candidateSourceSha": "cc2a31069dfab6dd4fa112335f930c3639719fe6" },
+    "lint": { "artifact": "lint-room-media.log", "result": "PASS; 0 errors; 489 warnings", "candidateSourceSha": "cc2a31069dfab6dd4fa112335f930c3639719fe6" },
+    "regression": { "artifact": "regression-room-media.log", "result": "393/399 test files PASS; 6 BLOCKED_BY_EXTERNAL_GATE", "candidateSourceSha": "cc2a31069dfab6dd4fa112335f930c3639719fe6" },
+    "secretScan": { "artifact": "secret-scan-room-media.log", "result": "PASS; 91 static browser bundle files; zero detected leaks", "candidateSourceSha": "cc2a31069dfab6dd4fa112335f930c3639719fe6" },
+    "roomMediaLocal": { "artifact": "room-media-local-assurance.json", "result": "31/31 checks and 8/8 exact cleanup confirmations PASS; disposable local Supabase 17.6 only", "candidateSourceSha": "cc2a31069dfab6dd4fa112335f930c3639719fe6", "providerCalls": 0, "trustL1L4Live": "NOT_RUN", "packageInput": "SYNTHETIC_TERMINAL_RESPONSE_LOCAL_ONLY" },
+    "roomMediaAcceptance": { "artifact": "ROOM_MEDIA_STORAGE_ACCEPTANCE.md", "local": "PASS", "production": "NOT_ACCEPTED_PRODUCTION" },
+    "browserMatrix": { "chromium": "NOT_RUN", "firefox": "NOT_RUN", "webkit": "NOT_RUN", "accessibility": "NOT_RUN" },
+    "openAlex": "NOT_RUN_ON_CANDIDATE",
+    "freshRetrievalAndFinalPredict": "NOT_MEASURED_ON_CANDIDATE"
   },
-  "productContractDispositions": {
-    "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
-    "environment": "CANDIDATE_REVIEW_AND_STAGING",
-    "stagingProjectRef": "bniwtkjtramqaozrrtrk",
-    "AVATAR_STORAGE": {
-      "disposition": "NONCRITICAL_FOLLOWUP",
-      "result": "NOT_REQUIRED_BY_CURRENT_PROFILE_CONTRACT; NOT_A_PASS",
-      "evidence": ["frontend/src/app/profile/page.jsx", "frontend/tests/profile/profile_api_contract.test.mjs"]
-    },
-    "ROOM_MEDIA_STORAGE": {
-      "disposition": "RELEASE_REQUIRED",
-      "result": "NOT_VERIFIED_THROUGH_EXPERT_ROOM; DIRECT_TRUST_IMAGE_AND_QR_STORAGE_PASS_ONLY",
-      "evidence": ["frontend/src/components/expert/ExpertVerificationRooms.jsx", "frontend/src/lib/server/expert/ExpertVerificationRoomService.js", "staging-integration.json", "staging-storage.json"],
-      "dedicatedRoomBucketRequired": false,
-      "requiredProof": "Room IMAGE/QR intake to canonical Trust storage, authorized room readback, owner isolation, and cleanup"
-    },
-    "UNACCENTED_COMMUNITY_SEARCH": {
-      "disposition": "NONCRITICAL_FOLLOWUP",
-      "result": "UNSUPPORTED_BY_CURRENT_SEARCH_CONTRACT; NOT_A_PASS",
-      "evidence": ["staging-integration.json"]
-    },
-    "AUTHOR_FILTER": {
-      "disposition": "NONCRITICAL_FOLLOWUP",
-      "result": "NOT_EXPOSED_BY_CURRENT_ROUTE; NOT_A_PASS",
-      "evidence": ["staging-integration.json"]
-    }
-  },
-  "evidenceFiles": [
-    "FINAL_REPORT.md",
+  "currentReports": [
+    "CANONICAL_PRODUCTION_UNIFICATION_2026-10-01.md",
     "ROOM_MEDIA_STORAGE_ACCEPTANCE.md",
     "ROLLOUT_PLAN.md",
-    "MANIFEST.sha256",
-    "MIGRATION_LEDGER_RECONCILIATION.md",
-    "migration-ledger-reconciliation.json",
-    "staging-integration.json",
-    "staging-integration-attempt-profile-link-ordering.json",
-    "staging-storage.json",
-    "openalex-smoke.json",
-    "browser-candidate-staging-release.json",
-    "migration-rehearsal-final.json",
-    "schema-production.json",
-    "schema-staging.json",
-    "schema-drift-final.json",
-    "production-snapshot-final.json",
-    "storage-local.json",
-    "build-final.log",
-    "lint-final.log",
-    "regression-rerun.log",
-    "browser-production-final.json",
-    "auth-production-canonical.json",
-    "tools/schema-observations.mjs",
-    "tools/migration-ledger-reconciliation.mjs",
-    "../../../scripts/four-core-staging-integration.mjs",
-    "../../../scripts/four-core-staging-storage.mjs"
+    "build-room-media.log",
+    "lint-room-media.log",
+    "regression-room-media.log",
+    "secret-scan-room-media.log",
+    "room-media-local-assurance.json"
   ],
-  "caveat": "The rehearsal fixtures were synthesized from read-only observed catalogs; they are not production or staging database dumps. No production migration or deployment was run.",
-  "mainPromotionAcceptance": {
-    "observedAtUtc": "2026-10-01T13:06:31Z",
-    "artifact": "MAIN_PROMOTION_PRODUCTION_ACCEPTANCE_2026-10-01.md",
-    "verdict": "STUDENTHUB_PRODUCTION_RELEASE_PARTIAL",
-    "mainSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
-    "releaseShaAtFetch": "3d42b8cdb9d756d9ea04e44ad7420d25dfb0c5b9",
-    "productionDeploymentSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
-    "mainDeploymentMatch": true,
-    "runtimeDatabaseIdentity": "UNKNOWN",
-    "runtimeAuthIdentity": "UNKNOWN",
-    "hardGate": "BLOCKED_BEFORE_PRODUCTION_WRITES",
-    "roomMediaStorage": "FAIL_STATIC",
-    "tavily": "OFF"
+  "historicalEvidence": {
+    "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+    "scope": "Staging and read-only cloud observations from the prior source; does not establish current Vercel runtime identity or production acceptance",
+    "artifacts": [
+      "FINAL_REPORT.md",
+      "MAIN_PROMOTION_PRODUCTION_ACCEPTANCE_2026-10-01.md",
+      "IMPLEMENTATION_SPEC.md",
+      "MIGRATION_LEDGER_RECONCILIATION.md",
+      "migration-ledger-reconciliation.json",
+      "migration-rehearsal-final.json",
+      "schema-production.json",
+      "schema-staging.json",
+      "schema-drift-final.json",
+      "production-snapshot-final.json",
+      "staging-integration.json",
+      "staging-storage.json",
+      "openalex-smoke.json",
+      "browser-candidate-staging-release.json",
+      "browser-production-final.json",
+      "auth-production-canonical.json"
+    ],
+    "caveat": "Prior browser/auth/staging results are not candidate-bound production user acceptance. Older migration rehearsals used synthetic catalogs, not a production dump restore."
   }
 }

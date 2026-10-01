@@ -1,3 +1,7 @@
+# Báo cáo lịch sử — superseded for current candidate
+
+Báo cáo này ghi nhận source `eea55564ebaef4dc2edc7af14586fe8f04324114`. Kết luận Room media `FAIL_STATIC` và các số liệu bên dưới thuộc source cũ. Candidate hiện tại là `cc2a31069dfab6dd4fa112335f930c3639719fe6`; xem [CANONICAL_PRODUCTION_UNIFICATION_2026-10-01.md](CANONICAL_PRODUCTION_UNIFICATION_2026-10-01.md) và [ROOM_MEDIA_STORAGE_ACCEPTANCE.md](ROOM_MEDIA_STORAGE_ACCEPTANCE.md). Production vẫn chạy SHA `595a99110367aefb545b02dab4b9f9a5a6106ab6`, hard gate HOLD.
+
 # Báo cáo chốt sửa bốn lõi StudentHub
 
 - **Trạng thái gói:** STAGING_VERIFIED_PRODUCTION_HOLD

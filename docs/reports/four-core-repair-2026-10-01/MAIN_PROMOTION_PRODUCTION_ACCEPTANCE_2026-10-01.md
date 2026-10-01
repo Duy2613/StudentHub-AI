@@ -1,4 +1,6 @@
-# Main promotion and real production acceptance gate — 2026-10-01
+# Historical main promotion and real production acceptance gate — 2026-10-01
+
+This is a read-only observation of prior candidate `eea55564ebaef4dc2edc7af14586fe8f04324114`; it does not cover current candidate `cc2a31069dfab6dd4fa112335f930c3639719fe6`. See [CANONICAL_PRODUCTION_UNIFICATION_2026-10-01.md](CANONICAL_PRODUCTION_UNIFICATION_2026-10-01.md) for current source checks. Production main and deployment remain `595a99110367aefb545b02dab4b9f9a5a6106ab6`; the current candidate was not deployed.
 
 ## Frozen identifiers and race check
 
