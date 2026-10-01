@@ -1,0 +1,72 @@
+{
+  "recordedAt": "2026-10-01T11:33:30.853Z",
+  "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+  "harnessSha": "0c9a4f3cc326209a5436b49e41041fdce1e1304e",
+  "harnessWorkingTreeModified": true,
+  "target": "STAGING_SUPABASE_STORAGE",
+  "projectRef": "bniwtkjtramqaozrrtrk",
+  "bucket": "trust-screenshots-private",
+  "bucketPublic": false,
+  "bucketInventory": [
+    "trust-screenshots-private"
+  ],
+  "unsupportedBuckets": [],
+  "providerMode": "OFF",
+  "syntheticOnly": true,
+  "fixtureUsers": [
+    {
+      "id": "d0a08e02-158d-43bb-b820-42b518758d2e",
+      "identity": "SYNTHETIC",
+      "cleanup": "PASS_SESSION_REVOKED_IDENTITY_DISABLED"
+    },
+    {
+      "id": "49d58df7-fcc8-4ba4-9753-19db46a76f26",
+      "identity": "SYNTHETIC",
+      "cleanup": "PASS_SESSION_REVOKED_IDENTITY_DISABLED"
+    }
+  ],
+  "objects": [
+    {
+      "kind": "trust-image",
+      "fixture": "screenshot-text.png",
+      "path": "d0a08e02-158d-43bb-b820-42b518758d2e/storage-1790854410816-8fd064/screenshot-text.png",
+      "sha256": "39da2a1534268c9ed61fd85d7c231162848991f78cc6144c7c39c46f62b0ed9e",
+      "bytes": 33843,
+      "upload": "PASS",
+      "ownerRead": "PASS",
+      "signedUrl": "PASS",
+      "nonOwnerDenied": "PASS",
+      "anonymousDenied": "PASS",
+      "cleanup": "PASS_EXACT_OWNER_PATH"
+    },
+    {
+      "kind": "trust-qr",
+      "fixture": "01-https.png",
+      "path": "d0a08e02-158d-43bb-b820-42b518758d2e/storage-1790854410816-8fd064/01-https.png",
+      "sha256": "54d4466e48e100723438c429335f0b1f5d1ac72b592a3d1d825e97bfe0357072",
+      "bytes": 16061,
+      "upload": "PASS",
+      "ownerRead": "PASS",
+      "signedUrl": "PASS",
+      "nonOwnerDenied": "PASS",
+      "anonymousDenied": "PASS",
+      "cleanup": "PASS_EXACT_OWNER_PATH"
+    }
+  ],
+  "cleanup": [
+    {
+      "status": "PASS_EXACT_OWNER_PATHS_REMOVED",
+      "objectCount": 2
+    },
+    {
+      "userId": "d0a08e02-158d-43bb-b820-42b518758d2e",
+      "status": "PASS_SESSION_REVOKED_IDENTITY_DISABLED"
+    },
+    {
+      "userId": "49d58df7-fcc8-4ba4-9753-19db46a76f26",
+      "status": "PASS_SESSION_REVOKED_IDENTITY_DISABLED"
+    }
+  ],
+  "result": "PASS",
+  "finishedAt": "2026-10-01T11:33:49.593Z"
+}

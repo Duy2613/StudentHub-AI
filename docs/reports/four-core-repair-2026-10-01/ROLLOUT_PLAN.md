@@ -2,18 +2,18 @@
 
 - **Candidate:** eea55564ebaef4dc2edc7af14586fe8f04324114
 - **Current production SHA:** 595a99110367aefb545b02dab4b9f9a5a6106ab6
-- **Package state:** READY_FOR_PRODUCTION_ROLLOUT_PENDING_APPROVAL
-- **Execution state:** HOLD — preflight evidence incomplete; production was not mutated.
+- **Package state:** STAGING_VERIFIED_PRODUCTION_HOLD
+- **Execution state:** HOLD — runtime identity and backup/restore are unverified; production was not mutated.
 
 This plan is intentionally ordered around data recovery and environment identity. Do not start the production migration/deployment sequence until the gates below have evidence and the production action is explicitly approved.
 
 ## Gate 0 — required before scheduling production
 
-1. **Prove the actual runtime targets.** Through an operator-approved, secret-safe Vercel inspection, record only the Supabase project refs for production database, Auth and durable session backing. The health route does not expose these refs. The prior temporary Vercel env inspection was rejected before execution by automatic command review, so runtime target remains unknown.
-2. **Create and restore a database backup.** For the Supabase Free project, create an encrypted offsite pg_dump, record the SHA-256 and retention location without exposing credentials, and restore it to a disposable Supabase-compatible project. Prove schema, data counts, RLS and critical read paths after restore. Supabase database backups documentation notes scheduled daily backups are available on paid plans; Storage objects require a separate object backup.
-3. **Reconcile migration history.** Compare each repository file, migration version/name and statement hash with the production and staging ledgers. Resolve aliases from source/control-plane history. Never stamp or repair the ledger merely to suppress a mismatch.
+1. **Prove the actual runtime targets.** Through an operator-approved, secret-safe Vercel inspection, record only the Supabase project refs for production database, Auth and durable session backing. The health route does not expose these refs. The attempted `vercel env pull` was rejected before execution by automatic command review (`blocked by policy`); runtime target remains unknown and the block was not bypassed.
+2. **Create and restore a database backup.** Back up the proven production runtime DB to encrypted offsite storage, record SHA-256/retention metadata, and restore into a disposable Supabase-compatible project. Verify schema, data counts, RLS and critical read paths. This is not done: runtime identity is unknown, `pg_dump` is not installed on PATH, and no verified backup/restore target is available. Docker is installed but was not used to guess a production target. Storage objects need a separate backup.
+3. **Reconcile migration history.** Read-only comparison found on operator ref `kytdomflmjytzyaabogi`: 10 APPLIED_EQUIVALENT, 4 NOT_APPLIED, 15 UNKNOWN, 0 mismatched hashes and 0 APPLIED_EXACT across 29 files. Staging ref `bniwtkjtramqaozrrtrk`: 4 APPLIED_EXACT, 10 APPLIED_EQUIVALENT, 1 NOT_APPLIED, 14 UNKNOWN; all 8 staging-plan migrations have exact/equivalent ledger entries. This operator target is not proven to be the Vercel runtime DB. Resolve remaining aliases/provenance; never stamp or repair the ledger to suppress uncertainty.
 4. **Approve a maintenance window and operator.** Define the write freeze or acceptable write behavior, monitoring owner, abort threshold and decision maker. Preserve the old Vercel deployment for immediate application rollback.
-5. **Close staging gaps.** Apply/rehearse the exact migration set on staging only after backup and ledger reconciliation; run the post-migration catalog checks and the staging integration/browser suite again. Confirm storage, cloud grants/policies/functions/triggers, Expert request/assignment and search freshness.
+5. **Close residual staging gates.** The planned staging migrations are already represented in the ledger exactly or by equivalent stored SQL, so do not apply them again. Integration is 17 PASS/1 PARTIAL/0 FAIL; storage Trust image/QR is PASS; OpenAlex is AVAILABLE. Residual checks: live Trust provider/independent unseen holdout, configured avatar and room-media storage, Community unaccented search/author filter, and broader cloud grant/policy/function/trigger review.
 
 If any of these checks fails or remains unknown, stop before production.
 
@@ -43,7 +43,7 @@ Use the existing migration files selected by the observed-schema rehearsal. The 
 7. 202610010002_profile_presentation_check_reconciliation.sql
 8. 202610010003_expert_v5_event_sequence_permissions.sql
 
-These are ordered lists from migration-rehearsal-final.json, not instructions to run blindly. Staging and production ledgers differ; recalculate the pending set after ledger provenance review. After staging migration, verify migration ledger, constraints, indexes, functions/triggers, grants, policy definitions, RLS, preserved pre-existing rows and representative owner-scoped reads/writes. Then run candidate SHA eea55564ebaef4dc2edc7af14586fe8f04324114 against staging and re-export fresh evidence.
+These are ordered lists from migration-rehearsal-final.json, not instructions to run blindly. migration-ledger-reconciliation.json now shows all eight staging-plan files already applied exactly or equivalently; no staging migration was run or is needed. Verify the extant staging ledger, constraints, indexes, functions/triggers, grants, policy definitions, RLS and representative owner-scoped reads/writes from fresh evidence. Candidate SHA eea55564ebaef4dc2edc7af14586fe8f04324114 was run against staging and the evidence is in staging-integration.json, staging-storage.json and openalex-smoke.json.
 
 ## Gate 2 — production change sequence, after approval
 

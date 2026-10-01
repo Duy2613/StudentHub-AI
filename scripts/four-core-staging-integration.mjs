@@ -14,6 +14,7 @@ const { createClient } = require('@supabase/supabase-js');
 const { Pool } = require('pg');
 const { chromium } = require('playwright');
 const projectRef = 'bniwtkjtramqaozrrtrk';
+const candidateSourceSha = 'eea55564ebaef4dc2edc7af14586fe8f04324114';
 const envPath = process.env.STUDENTHUB_STAGING_ENV_PATH;
 if (!envPath || process.env.STUDENTHUB_STAGING_FIXTURE_ACK !== 'STAGING_SYNTHETIC_ONLY') throw new Error('STAGING_OPERATOR_ENV_REQUIRED');
 const env = parseEnv(readFileSync(envPath, 'utf8'));
@@ -26,12 +27,13 @@ const auth = createClient(authUrl, env.SUPABASE_SECRET_KEY, { auth: { persistSes
 const pool = new Pool({ connectionString: env.DATABASE_URL, ssl: { rejectUnauthorized: env.DATABASE_SSL_REJECT_UNAUTHORIZED !== 'false', ...(env.DATABASE_SSL_CA ? { ca: env.DATABASE_SSL_CA.replace(/\\n/g, '\n') } : {}) }, max: 3 });
 const runTag = `fourcore-${Date.now()}`;
 const domain = `REPAIR_QA_${Date.now()}`;
-const report = { recordedAt: new Date().toISOString(), candidateSha: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(), workingTreeChanges: Boolean(execFileSync('git', ['status', '--porcelain', '--', 'frontend/src', 'database/migrations', 'scripts/four-core-staging-integration.mjs'], { cwd: root, encoding: 'utf8' }).trim()), projectRef, origin, runTag, providerMode: 'OFF', providerBudget: 0, evidenceClass: 'REAL_STAGING_BUSINESS_PATH_WITH_LABELLED_SYNTHETIC_FIXTURES', gates: [], checks: [], fixtureUserIds: [], retainedImmutableFixtureIds: [], cleanup: [] };
+const report = { recordedAt: new Date().toISOString(), candidateSha: candidateSourceSha, candidateSourceSha, evidenceHarnessCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(), evidenceHarnessSha256: createHash('sha256').update(readFileSync(import.meta.filename)).digest('hex'), workingTreeChanges: Boolean(execFileSync('git', ['status', '--porcelain', '--', 'frontend/src', 'database/migrations'], { cwd: root, encoding: 'utf8' }).trim()), harnessWorkingTreeModified: true, projectRef, origin, runTag, providerMode: 'OFF', providerBudget: 0, evidenceClass: 'REAL_STAGING_BUSINESS_PATH_WITH_LABELLED_SYNTHETIC_FIXTURES', gates: [], checks: [], fixtureUserIds: [], retainedImmutableFixtureIds: [], cleanup: [] };
 const file = resolve(root, 'docs/reports/four-core-repair-2026-10-01/staging-integration.json');
 const previous = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null;
 report.sourceOriginOwnerIds = [...new Set([...(previous?.sourceOriginOwnerIds || []), ...(previous?.fixtureUserIds || [])])];
 const save = () => writeFileSync(file, JSON.stringify(report, null, 2) + '\n');
 const users = [];
+const sharedSyntheticCases = [];
 let browser;
 async function gate(name, work) {
   try { const result = await work(); report.gates.push({ name, status: result?.status || 'PASS', ...result }); }
@@ -74,13 +76,13 @@ async function login(user) {
   assert.equal((await api(user, '/api/auth/session', undefined, { expected: [200] })).authenticated, true);
 }
 
-async function stream(user, cursor) {
-  await user.page.evaluate(({ cursor }) => {
+async function stream(user, cursor, channels = 'expert') {
+  await user.page.evaluate(({ cursor, channels }) => {
     window.__repairStream?.controller.abort();
     const capture = { controller: new AbortController(), connected: false, events: [], status: null };
     window.__repairStream = capture;
     void (async () => {
-      const response = await fetch(`/api/realtime/stream?channels=expert&cursor=${cursor}`, { credentials: 'include', signal: capture.controller.signal });
+      const response = await fetch(`/api/realtime/stream?channels=${encodeURIComponent(channels)}&cursor=${cursor}`, { credentials: 'include', signal: capture.controller.signal });
       capture.status = response.status;
       if (!response.ok) return;
       const reader = response.body.getReader(); const decoder = new TextDecoder(); let pending = '';
@@ -92,11 +94,14 @@ async function stream(user, cursor) {
           if (frame.includes('event: system:connected')) capture.connected = true;
           const line = frame.split('\n').find(line => line.startsWith('data: '));
           if (!line) continue;
-          try { const event = JSON.parse(line.slice(6)); if (event.data?.roomId) capture.events.push({ roomId: event.data.roomId, revision: event.data.revision, sequence: event.sequence }); } catch {}
+          try {
+            const event = JSON.parse(line.slice(6));
+            capture.events.push({ channel: event.channel || null, eventType: event.eventType || null, sequence: event.sequence, correlationId: event.correlationId || null, causationId: event.causationId || null, roomId: event.data?.roomId || null, contributionId: event.data?.contributionId || null, commentId: event.data?.commentId || null, parentCommentId: event.data?.parentCommentId || null, requestId: event.data?.requestId || event.data?.reviewRequestId || null, assignmentId: event.data?.assignmentId || null, caseId: event.data?.caseId || null, revision: event.data?.revision ?? null });
+          } catch {}
         }
       }
     })().catch(() => {});
-  }, { cursor });
+  }, { cursor, channels });
   await user.page.waitForFunction(() => window.__repairStream?.connected, null, { timeout: 20000 });
 }
 
@@ -291,7 +296,17 @@ try {
   await gate('community-durable-publication-nested-comments-idempotency', async () => {
     const trustCase = report.gates.find(g => g.name === 'trust-canonical-text-persistence-owner-isolation' && g.status === 'PASS');
     assert.ok(trustCase?.caseId && trustCase.caseRevision, 'COMMUNITY_TRUST_CASE_FIXTURE_MISSING');
-    const statement = 'Synthetic staging fixture: HTTP cache directives control when a response may be reused by a cache.';
+    const caseRow = await pool.query('SELECT owner_id,visibility FROM public.trust_cases WHERE id=$1', [trustCase.caseId]);
+    assert.equal(caseRow.rows[0]?.owner_id, owner.id, 'SYNTHETIC_TRUST_CASE_OWNER_MISMATCH');
+    const originalVisibility = caseRow.rows[0].visibility;
+    if (originalVisibility !== 'PUBLIC') {
+      const shared = await pool.query("UPDATE public.trust_cases SET visibility='PUBLIC',updated_at=now() WHERE id=$1 AND owner_id=$2 AND visibility=$3 RETURNING id", [trustCase.caseId, owner.id, originalVisibility]);
+      assert.equal(shared.rowCount, 1, 'SYNTHETIC_TRUST_CASE_PUBLIC_SCOPE_SETUP_FAILED');
+      sharedSyntheticCases.push({ caseId: trustCase.caseId, ownerId: owner.id, visibility: originalVisibility });
+    }
+    const communityCursor = Number((await pool.query('SELECT COALESCE(max(sequence),0) AS cursor FROM private.realtime_events')).rows[0].cursor);
+    await stream(other, communityCursor, 'community');
+    const statement = `Synthetic ${runTag}: Sinh viên kiểm tra quy chế học bổng mới trước khi đăng ký.`;
     const preview = await api(owner, '/api/intelligence/community/posts', {
       caseId: trustCase.caseId,
       caseRevision: trustCase.caseRevision,
@@ -315,6 +330,28 @@ try {
     assert.equal(published.provenance, 'DURABLE_POSTGRES', 'COMMUNITY_FIXTURE_ORIGIN_NOT_DURABLE');
     const contributionId = published.post?.contributionId;
     assert.ok(contributionId, 'COMMUNITY_CONTRIBUTION_ID_MISSING');
+    report.retainedImmutableFixtureIds.push(contributionId);
+    await other.page.waitForFunction(id => window.__repairStream.events.some(event => event.eventType === 'community:contribution' && event.contributionId === id), contributionId, { timeout: 20000 });
+    const contributionEvents = await other.page.evaluate(id => window.__repairStream.events.filter(event => event.eventType === 'community:contribution' && event.contributionId === id), contributionId);
+    assert.equal(contributionEvents.length, 1, 'COMMUNITY_CONTRIBUTION_REALTIME_MISSING_OR_DUPLICATED');
+    assert.ok(contributionEvents[0].sequence > communityCursor, 'COMMUNITY_CONTRIBUTION_SEQUENCE_NOT_ADVANCED');
+
+    const searchTerms = [
+      { kind: 'exact', query: 'quy chế học bổng mới' },
+      { kind: 'partial', query: 'quy chế học bổng' },
+      { kind: 'keyword', query: 'học bổng' },
+      { kind: 'vietnamese-accented', query: 'sinh viên kiểm tra' },
+    ];
+    const searchResults = [];
+    for (const item of searchTerms) {
+      const found = await api(other, `/api/intelligence/community/search?q=${encodeURIComponent(item.query)}&limit=100`, undefined, { expected: [200] });
+      assert.ok(found.posts?.some(post => post.contributionId === contributionId), `COMMUNITY_SEARCH_FRESH_${item.kind.toUpperCase()}_MISS`);
+      searchResults.push({ kind: item.kind, status: 'PASS', matches: found.totalMatches });
+    }
+    const unaccented = await api(other, `/api/intelligence/community/search?q=${encodeURIComponent('quy che hoc bong')}&limit=100`, undefined, { expected: [200] });
+    const unaccentedSupported = Boolean(unaccented.posts?.some(post => post.contributionId === contributionId));
+    const recent = await api(other, '/api/intelligence/community/posts?sort=recent&limit=100', undefined, { expected: [200] });
+    assert.equal(recent.posts?.[0]?.contributionId, contributionId, 'COMMUNITY_RECENT_FEED_ORDER_MISMATCH');
     const linked = await pool.query(
       `SELECT case_id, case_revision, publication_state
          FROM public.community_contributions WHERE id = $1`,
@@ -326,10 +363,15 @@ try {
     assert.equal(linked.rows[0].publication_state, 'PUBLISHED', 'COMMUNITY_PUBLICATION_STATE_NOT_DURABLE');
 
     const threadPath = `/api/intelligence/community/posts/${contributionId}/comments`;
+    await stream(other, contributionEvents[0].sequence, 'community');
     const rootText = 'Synthetic staging comment checks durable thread persistence.';
     const rootKey = `${runTag}:community:comment-root`;
     const root = await api(other, threadPath, { content: rootText }, { headers: { 'Idempotency-Key': rootKey }, expected: [201] });
     assert.equal(root.comment?.depth, 0, 'COMMUNITY_ROOT_DEPTH_MISMATCH');
+    report.retainedImmutableFixtureIds.push(root.comment.commentId);
+    await other.page.waitForFunction(id => window.__repairStream.events.some(event => event.eventType === 'community:comment' && event.commentId === id), root.comment.commentId, { timeout: 20000 });
+    const rootEvent = await other.page.evaluate(id => window.__repairStream.events.find(event => event.eventType === 'community:comment' && event.commentId === id), root.comment.commentId);
+    await stream(other, rootEvent.sequence, 'community');
     const retry = await api(other, threadPath, { content: rootText }, { headers: { 'Idempotency-Key': rootKey }, expected: [200] });
     assert.equal(retry.comment?.commentId, root.comment.commentId, 'COMMUNITY_IDEMPOTENT_COMMENT_CHANGED');
     assert.equal(retry.comment?.idempotent, true, 'COMMUNITY_IDEMPOTENT_RETRY_NOT_RECOGNIZED');
@@ -338,6 +380,9 @@ try {
     });
     assert.equal(reply.comment?.depth, 1, 'COMMUNITY_REPLY_DEPTH_MISMATCH');
     assert.equal(reply.comment?.parentCommentId, root.comment.commentId, 'COMMUNITY_REPLY_PARENT_MISMATCH');
+    report.retainedImmutableFixtureIds.push(reply.comment.commentId);
+    await other.page.waitForFunction(id => window.__repairStream.events.some(event => event.eventType === 'community:comment' && event.commentId === id), reply.comment.commentId, { timeout: 20000 });
+    const replyEvent = await other.page.evaluate(id => window.__repairStream.events.find(event => event.eventType === 'community:comment' && event.commentId === id), reply.comment.commentId);
     const visible = await api(other, threadPath, undefined, { expected: [200] });
     assert.equal(visible.comments?.length, 1, 'COMMUNITY_PUBLIC_THREAD_ROOT_MISSING');
     assert.equal(visible.comments[0].commentId, root.comment.commentId, 'COMMUNITY_PUBLIC_ROOT_ID_MISMATCH');
@@ -351,11 +396,155 @@ try {
     assert.equal(rows.rows.length, 2, 'COMMUNITY_COMMENT_SQL_ROW_COUNT_MISMATCH');
     assert.deepEqual(rows.rows.map(row => Number(row.depth)), [0, 1], 'COMMUNITY_COMMENT_SQL_DEPTH_MISMATCH');
     assert.equal(rows.rows[1].parent_comment_id, root.comment.commentId, 'COMMUNITY_COMMENT_SQL_PARENT_MISMATCH');
-    return { previewConfirmed: true, publishedToPostgres: true, trustCaseRevisionLinked: true, publicReadback: true, nestedCommentDepths: [0, 1], idempotentRetry: true };
+    const realtimeRows = await pool.query("SELECT count(*)::int AS count FROM private.realtime_events WHERE channel='community' AND causation_id::text=ANY($1::text[])", [ [contributionId, root.comment.commentId, reply.comment.commentId] ]);
+    assert.equal(realtimeRows.rows[0].count, 3, 'COMMUNITY_REALTIME_DB_EVENT_COUNT_MISMATCH');
+    return { contributionId, caseId: trustCase.caseId, caseRevision: trustCase.caseRevision, syntheticTrustCaseTemporarilyPublic: originalVisibility !== 'PUBLIC', previewConfirmed: true, publishedToPostgres: true, trustCaseRevisionLinked: true, publicReadbackBySecondUser: true, nestedCommentDepths: [0, 1], idempotentRetry: true, freshSearch: searchResults, vietnameseUnaccented: unaccentedSupported ? 'PASS' : 'UNSUPPORTED_BY_CURRENT_SEARCH_CONTRACT', recentFeed: 'PASS', authorFilter: 'NOT_EXPOSED_BY_CURRENT_ROUTE', communityRealtime: { contributionSequence: contributionEvents[0].sequence, rootCommentSequence: rootEvent.sequence, replySequence: replyEvent.sequence, persistedEvents: realtimeRows.rows[0].count, reconnectBeforeRootAndReply: true } };
+  });
+  await gate('expert-request-matching-assignment-workbench-assessment-scope', async () => {
+    const community = report.gates.find(g => g.name === 'community-durable-publication-nested-comments-idempotency' && g.status === 'PASS');
+    assert.ok(community?.caseId && community?.contributionId, 'EXPERT_COMMUNITY_TRUST_FIXTURE_MISSING');
+    const contribution = await pool.query('SELECT case_id,case_revision,claim_id,author_id FROM public.community_contributions WHERE id=$1 AND publication_state=\'PUBLISHED\'', [community.contributionId]);
+    assert.equal(contribution.rowCount, 1, 'EXPERT_PUBLIC_CONTRIBUTION_UNAVAILABLE');
+    assert.equal(contribution.rows[0].case_id, community.caseId, 'EXPERT_CASE_LINK_MISMATCH');
+    const requestDomain = `${domain}_BLIND_REVIEW`;
+    await pool.query(`INSERT INTO private.expert_verifications(user_id,domain_code,status,qualification_state,verified_by,verified_at,evidence_ref)
+      VALUES($1,$2,'VERIFIED','DOMAIN_VERIFIED',$3,now(),$4)
+      ON CONFLICT(user_id,domain_code) DO UPDATE SET status='VERIFIED',qualification_state='DOMAIN_VERIFIED',verified_by=$3,verified_at=now(),evidence_ref=$4,suspended_at=NULL`,
+      [experts[0].id, requestDomain, admin.id, `SYNTHETIC-STAGING:${runTag}:BLIND_REVIEW`]);
+    const trustCursor = Number((await pool.query('SELECT COALESCE(max(sequence),0) AS cursor FROM private.realtime_events')).rows[0].cursor);
+    const expertCursor = trustCursor;
+    await stream(owner, trustCursor, 'trust');
+    await stream(experts[0], expertCursor, 'expert');
+    const requested = await api(owner, '/api/expert/review-requests', {
+      caseId: community.caseId,
+      caseRevision: community.caseRevision,
+      claimId: contribution.rows[0].claim_id,
+      domainCode: requestDomain,
+      question: `Synthetic staging expert review ${runTag}: assess the published Community signal within its Trust revision.`,
+      contextRefs: [],
+      communityContributionId: community.contributionId,
+    }, { headers: { 'Idempotency-Key': `${runTag}:expert:request` }, expected: [201] });
+    const requestId = requested.data?.id;
+    assert.ok(requestId, 'EXPERT_REVIEW_REQUEST_ID_MISSING');
+    assert.equal(requested.matching?.assignmentsCount, 1, 'EXPERT_MATCHING_DID_NOT_SELECT_EXACT_DOMAIN_EXPERT');
+    const assignments = await pool.query(`SELECT id,expert_id,case_id,case_revision,claim_id,domain_code,status,review_request_id
+      FROM private.expert_assignments WHERE review_request_id=$1 ORDER BY created_at,id`, [requestId]);
+    assert.equal(assignments.rowCount, 1, 'EXPERT_ASSIGNMENT_COUNT_MISMATCH');
+    const assignment = assignments.rows[0];
+    assert.equal(assignment.expert_id, experts[0].id, 'EXPERT_MATCHED_WRONG_USER');
+    assert.equal(assignment.status, 'ASSIGNED', 'EXPERT_ASSIGNMENT_STATE_MISMATCH');
+    const workbench = await api(experts[0], '/api/expert/blind-reviews', undefined, { expected: [200] });
+    assert.ok(workbench.reviews?.some(item => item.assignmentId === assignment.id), 'EXPERT_WORKBENCH_ASSIGNMENT_NOT_VISIBLE');
+    const dossier = await api(experts[0], `/api/expert/blind-reviews/${assignment.id}`, undefined, { expected: [200] });
+    assert.equal(dossier.dossier?.assignmentId, assignment.id, 'EXPERT_WORKBENCH_DOSSIER_SCOPE_MISMATCH');
+    assert.equal(dossier.dossier?.reviewRequestId, requestId, 'EXPERT_WORKBENCH_REQUEST_LINK_MISSING');
+    const wrongScopeDossier = await api(experts[3], `/api/expert/blind-reviews/${assignment.id}`, undefined, { expected: [403] });
+    assert.equal(wrongScopeDossier.error?.code, 'FORBIDDEN_ASSIGNMENT', 'EXPERT_WRONG_SCOPE_DOSSIER_NOT_DENIED');
+
+    const assessmentBody = {
+      caseId: community.caseId,
+      caseRevision: Number(assignment.case_revision),
+      claimId: assignment.claim_id,
+      domainCode: requestDomain,
+      assignmentId: assignment.id,
+      assessment: { analysis: `Synthetic staging assessment ${runTag}: the shared Community signal needs independent official confirmation.`, recommendedAction: 'MONITOR' },
+      confidence: 0.86,
+      evidenceRevisionIds: [],
+      reasoning: 'Assessment is bounded to the exact published Community contribution and Trust revision.',
+      uncertainty: 'No independent official source is attached to this synthetic fixture.',
+      missingEvidence: ['Independent official source confirmation'],
+      coiDeclared: true,
+      idempotencyKey: `${runTag}:expert:assessment`,
+    };
+    const wrongScopeAssessment = await api(experts[3], '/api/expert/assessments', assessmentBody, { method: 'POST', expected: [403] });
+    assert.equal(wrongScopeAssessment.error?.code, 'UNVERIFIED_EXPERT_DOMAIN', 'EXPERT_WRONG_SCOPE_ASSESSMENT_NOT_DENIED');
+    const submitted = await api(experts[0], '/api/expert/assessments', assessmentBody, { method: 'POST', expected: [201] });
+    const assessmentId = submitted.data?.id;
+    assert.ok(assessmentId, 'EXPERT_ASSESSMENT_ID_MISSING');
+    report.retainedImmutableFixtureIds.push(requestId, assignment.id, assessmentId);
+    const retry = await api(experts[0], '/api/expert/assessments', assessmentBody, { method: 'POST', expected: [201] });
+    assert.equal(retry.data?.id, assessmentId, 'EXPERT_ASSESSMENT_IDEMPOTENCY_CHANGED_ID');
+    assert.equal(retry.data?.idempotent, true, 'EXPERT_ASSESSMENT_IDEMPOTENT_REPLAY_NOT_RECOGNIZED');
+    const assessmentReadback = await pool.query(`SELECT id,expert_id,assignment_id,case_id,case_revision,claim_id,assessment_state,coi_state,authority_snapshot_version
+      FROM public.expert_assessments WHERE id=$1`, [assessmentId]);
+    assert.equal(assessmentReadback.rowCount, 1, 'EXPERT_ASSESSMENT_SQL_READBACK_MISSING');
+    assert.equal(assessmentReadback.rows[0].expert_id, experts[0].id, 'EXPERT_ASSESSMENT_EXPERT_MISMATCH');
+    assert.equal(assessmentReadback.rows[0].assignment_id, assignment.id, 'EXPERT_ASSESSMENT_ASSIGNMENT_MISMATCH');
+    assert.equal(assessmentReadback.rows[0].assessment_state, 'SUBMITTED', 'EXPERT_ASSESSMENT_STATE_MISMATCH');
+    assert.equal(assessmentReadback.rows[0].coi_state, 'DECLARED_NO_CONFLICT', 'EXPERT_COI_SNAPSHOT_MISSING');
+    assert.equal(Number(assessmentReadback.rows[0].authority_snapshot_version), 1, 'EXPERT_AUTHORITY_SNAPSHOT_MISSING');
+    const finalState = await pool.query(`SELECT a.status AS assignment_status,r.status AS request_status
+      FROM private.expert_assignments a JOIN private.expert_review_requests r ON r.id=a.review_request_id WHERE a.id=$1`, [assignment.id]);
+    assert.equal(finalState.rows[0]?.assignment_status, 'COMPLETED', 'EXPERT_ASSIGNMENT_NOT_COMPLETED');
+    assert.equal(finalState.rows[0]?.request_status, 'COMPLETED', 'EXPERT_REQUEST_NOT_COMPLETED');
+    const ownerRequestReadback = await api(owner, `/api/expert/review-requests?caseId=${encodeURIComponent(community.caseId)}`, undefined, { expected: [200] });
+    assert.ok(ownerRequestReadback.data?.some(item => item.id === requestId && item.status === 'COMPLETED'), 'EXPERT_REQUEST_API_READBACK_MISSING');
+    const expertAssessmentReadback = await api(experts[0], `/api/expert/assessments?caseId=${encodeURIComponent(community.caseId)}`, undefined, { expected: [200] });
+    assert.ok(expertAssessmentReadback.data?.some(item => item.id === assessmentId), 'EXPERT_ASSESSMENT_API_READBACK_MISSING');
+
+    await owner.page.waitForFunction(id => window.__repairStream.events.some(event => event.eventType === 'trust:expert_review' && event.requestId === id), requestId, { timeout: 20000 });
+    await experts[0].page.waitForFunction(id => window.__repairStream.events.some(event => event.eventType === 'expert:assignment' && event.assignmentId === id), assignment.id, { timeout: 20000 });
+    const ownerRequestEvent = await owner.page.evaluate(id => window.__repairStream.events.find(event => event.eventType === 'trust:expert_review' && event.requestId === id), requestId);
+    const expertAssignmentEvent = await experts[0].page.evaluate(id => window.__repairStream.events.find(event => event.eventType === 'expert:assignment' && event.assignmentId === id), assignment.id);
+    const realtimeReadback = await pool.query('SELECT sequence,channel,event_type FROM private.realtime_events WHERE sequence=ANY($1::bigint[])', [[ownerRequestEvent.sequence, expertAssignmentEvent.sequence]]);
+    assert.equal(realtimeReadback.rowCount, 2, 'EXPERT_REQUEST_ASSIGNMENT_REALTIME_DB_READBACK_MISSING');
+    const publicBio = `Synthetic public Expert profile ${runTag}`;
+    await api(experts[0], '/api/experts/me', { bio: publicBio, expertise: requestDomain }, { method: 'PATCH', expected: [200] });
+    const publicProfile = await api(other, `/api/expert/profile/${experts[0].id}`, undefined, { expected: [200] });
+    assert.equal(publicProfile.expert?.expertId, experts[0].id, 'EXPERT_PUBLIC_PROFILE_ID_MISMATCH');
+    assert.equal(publicProfile.expert?.bio, publicBio, 'EXPERT_PUBLIC_PROFILE_READBACK_MISMATCH');
+    assert.equal('email' in publicProfile.expert, false, 'EXPERT_PUBLIC_PROFILE_EXPOSED_EMAIL');
+    return { requestId, matching: 'PASS_EXACT_VERIFIED_DOMAIN', assignmentId: assignment.id, workbenchReadback: 'PASS', assessmentId, assessmentPersistence: 'PASS_API_AND_SQL', assessmentReplay: 'PASS_IDEMPOTENT', wrongScope: 'PASS_DOSSIER_AND_ASSESSMENT_DENIED', requestRealtimeSequence: ownerRequestEvent.sequence, assignmentRealtimeSequence: expertAssignmentEvent.sequence, realtimeDbRows: realtimeReadback.rowCount, expertPublicProfileById: 'PASS_REDACTED_DTO' };
+  });
+  await gate('profile-activity-status-trust-link-public-id-and-empty-state', async () => {
+    const community = report.gates.find(g => g.name === 'community-durable-publication-nested-comments-idempotency' && g.status === 'PASS');
+    const expert = report.gates.find(g => g.name === 'expert-request-matching-assignment-workbench-assessment-scope' && g.status === 'PASS');
+    const trustCases = report.gates.filter(g => g.name.startsWith('trust-canonical-') && g.status === 'PASS' && g.caseId);
+    assert.ok(community && trustCases.length > 0, 'PROFILE_CORE_ACTIVITY_FIXTURE_MISSING');
+    const self = await api(owner, '/api/users/me', undefined, { expected: [200] });
+    assert.equal(self.profile?.id, owner.id, 'PROFILE_SELF_ID_MISMATCH');
+    assert.equal(self.profile?.trustActivity?.dataStatus, 'AVAILABLE', 'PROFILE_TRUST_ACTIVITY_STATUS_NOT_AVAILABLE');
+    const linkedTrustCase = self.profile.trustActivity.recentCases?.find(item => trustCases.some(fixture => fixture.caseId === item.id));
+    assert.ok(linkedTrustCase?.id, 'PROFILE_NEW_TRUST_CASE_NOT_LINKED');
+    assert.ok(Number(linkedTrustCase.caseRevision) > 0, 'PROFILE_TRUST_CASE_REVISION_MISSING');
+    const linkedCaseReadback = await api(owner, `/api/v1/trust/cases/${linkedTrustCase.id}?revision=${linkedTrustCase.caseRevision}`, undefined, { expected: [200] });
+    assert.ok(linkedCaseReadback.case, 'PROFILE_TRUST_LINK_TARGET_NOT_READABLE_BY_OWNER');
+    assert.equal(self.profile?.communityActivity?.dataStatus, 'AVAILABLE', 'PROFILE_COMMUNITY_ACTIVITY_STATUS_NOT_AVAILABLE');
+    assert.ok(self.profile.communityActivity.recentActivity?.some(item => item.id === community.contributionId && item.caseId === community.caseId), 'PROFILE_COMMUNITY_STATISTICS_READBACK_MISSING');
+    if (expert) {
+      assert.equal(self.profile?.expertRequests?.dataStatus, 'AVAILABLE', 'PROFILE_EXPERT_ACTIVITY_STATUS_NOT_AVAILABLE');
+      assert.ok(self.profile.expertRequests.recentRequests?.some(item => item.id === expert.requestId && item.status === 'COMPLETED'), 'PROFILE_EXPERT_STATISTICS_READBACK_MISSING');
+    }
+    const empty = await api(other, '/api/users/me', undefined, { expected: [200] });
+    assert.equal(empty.profile?.id, other.id, 'PROFILE_OTHER_SESSION_ID_MISMATCH');
+    assert.equal(empty.profile?.trustActivity?.dataStatus, 'AVAILABLE', 'PROFILE_EMPTY_TRUST_CONFUSED_WITH_ERROR');
+    assert.equal(Number(empty.profile?.trustActivity?.count), 0, 'PROFILE_EMPTY_TRUST_COUNT_NOT_ZERO');
+    assert.equal(empty.profile?.communityActivity?.dataStatus, 'AVAILABLE', 'PROFILE_EMPTY_COMMUNITY_CONFUSED_WITH_ERROR');
+    assert.equal(Number(empty.profile?.communityActivity?.posts), 0, 'PROFILE_EMPTY_COMMUNITY_COUNT_NOT_ZERO');
+    assert.equal(empty.profile?.expertRequests?.dataStatus, 'AVAILABLE', 'PROFILE_EMPTY_EXPERT_CONFUSED_WITH_ERROR');
+    assert.equal(Number(empty.profile?.expertRequests?.total), 0, 'PROFILE_EMPTY_EXPERT_COUNT_NOT_ZERO');
+    const injectedId = await api(other, `/api/users/profile?userId=${encodeURIComponent(owner.id)}`, undefined, { expected: [200] });
+    assert.equal(injectedId.profile?.id, other.id, 'PROFILE_ROUTE_ID_CHANGED_AUTHENTICATED_OWNER');
+    await owner.page.goto(`${origin}/profile`, { waitUntil: 'domcontentloaded' });
+    await owner.page.waitForFunction(caseId => [...document.querySelectorAll('a[href]')].some(anchor => anchor.getAttribute('href')?.startsWith(`/trust?caseId=${caseId}`)), linkedTrustCase.id, { timeout: 20000 });
+    await owner.page.reload({ waitUntil: 'domcontentloaded' });
+    const trustLink = await owner.page.locator(`a[href^="/trust?caseId=${linkedTrustCase.id}"]`).first().getAttribute('href');
+    assert.ok(trustLink, 'PROFILE_TRUST_LINK_MISSING_AFTER_RELOAD');
+    const publicExpert = report.gates.find(g => g.name === 'expert-request-matching-assignment-workbench-assessment-scope' && g.status === 'PASS');
+    const studentIdResponse = await other.page.goto(`${origin}/profile/${encodeURIComponent(owner.id)}`, { waitUntil: 'domcontentloaded' });
+    assert.equal(studentIdResponse?.status(), 404, 'PRIVATE_STUDENT_PROFILE_ID_ROUTE_DID_NOT_FAIL_CLOSED');
+    return { status: 'PARTIAL', ownProfile: 'PASS', publicProfileById: publicExpert ? 'EXPERT_PUBLIC_ROUTE_PASS; /profile/{studentId} RETURNS_404_BY_PRIVACY_POLICY' : 'EXPERT_PUBLIC_ROUTE_NOT_VERIFIED; /profile/{studentId} RETURNS_404_BY_PRIVACY_POLICY', profileActivityStatus: 'PASS', profileTrustCaseOwnerReadback: 'PASS', trustLinkAfterReload: 'PASS', emptyVsUnavailable: 'PASS', routeIdInjection: 'PASS', studentIdRoute: '404_PRIVACY_BOUNDARY' };
   });
 } catch (e) {
   report.gates.push({ name: 'staging-setup', status: 'FAIL', code: /^[A-Z0-9_:-]{1,120}$/.test(e.message) ? e.message : e.name });
 } finally {
+  for (const fixture of sharedSyntheticCases) {
+    try {
+      const restored = await pool.query("UPDATE public.trust_cases SET visibility=$3,updated_at=now() WHERE id=$1 AND owner_id=$2 AND visibility='PUBLIC' RETURNING id", [fixture.caseId, fixture.ownerId, fixture.visibility]);
+      if (restored.rowCount !== 1) throw new Error('SYNTHETIC_TRUST_VISIBILITY_RESTORE_FAILED');
+      report.cleanup.push({ caseId: fixture.caseId, status: 'SYNTHETIC_TRUST_VISIBILITY_RESTORED' });
+    } catch (e) { report.cleanup.push({ status: 'FAIL', code: /^[A-Z0-9_:-]{1,120}$/.test(e.message) ? e.message : e.name }); }
+  }
   for (const user of users) {
     try {
       if (user.page) {

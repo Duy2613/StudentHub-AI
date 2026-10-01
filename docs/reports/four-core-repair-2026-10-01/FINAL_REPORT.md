@@ -1,6 +1,6 @@
 # Báo cáo chốt sửa bốn lõi StudentHub
 
-- **Trạng thái gói:** READY_FOR_PRODUCTION_ROLLOUT_PENDING_APPROVAL
+- **Trạng thái gói:** STAGING_VERIFIED_PRODUCTION_HOLD
 - **Chấp nhận toàn bộ production:** NO — FULL_FIX_ACCEPTED chưa đạt
 - **Candidate source SHA:** eea55564ebaef4dc2edc7af14586fe8f04324114
 - **Branch:** codex/studenthub-four-core-repair-20261001
@@ -9,22 +9,22 @@
 - **Production deployment quan sát được:** Vercel deployment dpl_ED91sTmSbtDS3xTzhgCeeiJqeRh7, SHA 595a99110367aefb545b02dab4b9f9a5a6106ab6; production không bị sửa trong lần này.
 - **Thư mục bằng chứng:** docs/reports/four-core-repair-2026-10-01/.
 
-Candidate được tạo trong worktree riêng để giữ nguyên repository người dùng. SHA nêu trên là SHA của code ứng dụng đã chạy build, regression, browser và staging integration. Các tài liệu báo cáo được thêm sau đó không đổi source SHA này.
+Candidate được tạo trong worktree riêng để giữ nguyên repository người dùng. SHA nêu trên là SHA của code ứng dụng đã chạy build, regression, browser và staging integration. Các tài liệu báo cáo và harness được thêm sau đó không đổi source SHA này. Lượt chốt staging ghi nhận 17 gate PASS và một gate PARTIAL, không có gate FAIL; phần PARTIAL là chính sách ẩn hồ sơ sinh viên theo ID. Migration rehearsal cục bộ PASS. Đối chiếu staging cho thấy các migration trong plan đã có trong ledger dưới tên/version tương đương hoặc chính xác, nên không chạy lại migration. Production vẫn ở trạng thái HOLD.
 
 ## Kết quả theo lõi
 
 | Lõi / luồng | Kết quả | Bằng chứng và giới hạn |
 | --- | --- | --- |
 | Auth/session | **PASS trên staging; production baseline kiểm tra riêng** | Bảy synthetic stage identities qua login/reload; quyền được thu hồi và identity bị disable sau test. Production diagnostic trước đó ghi nhận 8/8 tài khoản allowlist đăng nhập, session sống sau reload và logout làm session thành 401; auth-production-canonical.json dùng harness SHA bb240430... nên không dùng thay bằng chứng candidate release. |
-| Profile | **PARTIAL** | Năm trường hồ sơ được lưu, đọc lại từ DB và hiển thị sau reload trên staging. Candidate sửa /profile/[id], Trust case link và trạng thái activity/query; public-profile contract theo ID chưa được nghiệm thu đầy đủ qua staging. |
+| Profile | **PASS phần hồ sơ riêng tư; PARTIAL public student ID route** | Năm trường hồ sơ được lưu và đọc lại sau reload; activity status, Trust case owner readback/link sau reload, trạng thái rỗng khác trạng thái lỗi và chống route ID injection đều PASS. `/profile/{studentId}` trả 404 theo privacy boundary. Public Expert profile qua route riêng, DTO đã loại email. |
 | Community | **PASS trên staging; production FAIL trên bản đang deploy** | Đã kiểm tra preview → publish bền vững, linkage Trust revision, thread công khai, nested comments depth 0/1, retry idempotent. Production đang chạy SHA cũ: /api/v1/community trả 500 INTERNAL_SERVER_ERROR; /api/intelligence/community/posts trả 503 PROMAX_MIGRATION_REQUIRED. |
-| Expert V5 | **PARTIAL** | Staging kiểm tra nguồn canonical, mission đúng/sai 100/0, retry không cộng tiến trình hai lần, không tăng credential star; room timer 30 giây do server, answers riêng tư, adjudication/settlement/dispute, SSE replay và outsider deny. Request → matching/assignment → assessment đầy đủ chưa được nghiệm thu end-to-end. |
-| Trust | **PARTIAL** | Text/URL/image/QR đều persist và owner đọc lại; người khác nhận 404; L1–L4 hoàn tất trong staging. Provider ở chế độ OFF, budget 0: không chứng minh được live Gemini/Tavily availability, retrieval holdout hoặc provider SLO. |
-| Search / nguồn hợp nhất | **PARTIAL** | Candidate có thay đổi để lỗi một nguồn không làm mất nguồn còn hoạt động và giữ trạng thái partial/error. Freshness của search vừa ghi trên staging chưa có gate độc lập đủ để đóng toàn bộ search. Production baseline trước đó ghi /api/v1/search 503. |
+| Expert V5 | **PASS các luồng staging đã kiểm tra** | Nguồn canonical thật, mission đúng/sai 100/0, retry không cộng tiến trình hai lần, không tăng credential star; room timer 30 giây do server, answers riêng tư, adjudication/settlement/dispute, SSE replay và outsider deny. Request → exact-domain matching → assignment → Workbench → assessment/persistence/replay, sai scope bị chặn, và Expert public DTO không lộ email đều PASS. |
+| Trust | **PASS persistence/owner isolation; PARTIAL live AI** | Text/URL/image/QR persist, L1–L4 hoàn tất, owner đọc lại và người khác nhận 404. Provider mode OFF/budget 0: chưa chứng minh live Gemini/Tavily availability hoặc retrieval holdout/SLO. |
+| Search / nguồn hợp nhất | **PARTIAL** | Community search của bài synthetic mới đọc được ngay bởi user thứ hai ở exact/partial/keyword/tiếng Việt có dấu; recent feed và realtime event bền vững PASS. Query không dấu chưa được hỗ trợ và author-filter route chưa được expose. OpenAlex/Crossref trả metadata; production baseline trước đó ghi /api/v1/search 503. |
 | Realtime | **PASS trong staging cho room scope đã kiểm tra** | Hai browser, SSE reconnect/replay theo cursor, recipient scope, outsider denial và event readback đã kiểm tra; không đại diện cho mọi realtime channel. |
-| Storage/media | **PASS_LOCAL_ONLY** | Local disposable Supabase chứng minh owner upload/download/signed URL, non-owner và anonymous bị từ chối, exact-owner cleanup. Staging storage chưa chạy gate tương đương. |
+| Storage/media | **PASS cho Trust image/QR trên staging; PARTIAL coverage** | Bucket private `trust-screenshots-private`: owner upload/read/signed URL PASS; non-owner/anonymous deny; exact-path object và metadata cleanup PASS. Inventory chỉ có bucket này; avatar và room-media bucket chưa được cấu hình. |
 | Responsive UI | **PASS candidate; FAIL production baseline** | Candidate browser matrix: Chromium/Firefox/WebKit × 4 routes × 4 độ rộng = 48/48. Production baseline cũ: 42/48; sáu lỗi là overflow Community ở 360/390 px, scrollWidth 472–473 px. |
-| Database/migration | **PASS rehearsal local; production rollout BLOCKED** | Fresh chain 29 migrations, idempotency, observed-schema fixture upgrades và synthetic data preservation đều PASS trên local disposable PostgreSQL 17.6. Đây không phải production/staging clone và chưa chứng minh cloud grants, policies, triggers hay runtime DB target. |
+| Database/migration | **PASS rehearsal; staging migration plan reconciled; production rollout BLOCKED** | Fresh chain 29 migrations, idempotency, observed-schema fixture upgrades và synthetic data preservation PASS trên local disposable PostgreSQL 17.6. Read-only staging ledger reconciliation tìm đủ 8/8 planned migration là APPLIED_EXACT/APPLIED_EQUIVALENT; không duplicate/apply. Production operator DB có 4 migration chắc chắn NOT_APPLIED, 15 UNKNOWN và không có APPLIED_EXACT; runtime DB của Vercel chưa xác minh. |
 
 ## Những sửa đổi đã đưa vào candidate
 
@@ -36,15 +36,17 @@ Commit eea55564 xử lý overflow trạng thái session trong header ở viewpor
 
 ## Kiểm chứng gắn SHA và môi trường
 
-Các artifact có candidateSha ghi rõ SHA eea55564ebaef4dc2edc7af14586fe8f04324114. Build, lint và regression log được lập chỉ mục với cùng candidate SHA trong evidence-index.json. Storage là assurance riêng trên local disposable Supabase, không được dùng làm bằng chứng staging hoặc production.
+Các artifact có candidateSha ghi rõ SHA eea55564ebaef4dc2edc7af14586fe8f04324114. Build, lint và regression log được lập chỉ mục với cùng candidate SHA trong evidence-index.json. Storage có assurance riêng trên local và staging; không kết quả nào đại diện cho production.
 
-- **Staging integration:** staging-integration.json, project ref bniwtkjtramqaozrrtrk, 16/16 gates PASS; profile readback gồm năm trường; Trust owner readback; Community nested comments; Expert mission/room. Bảy identity synthetic bị disable, role bị thu hồi và session bị xóa; immutable test history giữ lại kèm run tag.
+- **Staging integration:** staging-integration.json, project ref bniwtkjtramqaozrrtrk, run `fourcore-1790856038049`, 18 gates: 17 PASS, 1 PARTIAL, 0 FAIL; 109 API checks. Profile activity/link/readback/empty-state PASS; public student-ID route trả 404 theo privacy policy. Trust owner readback, Community nested comments/search/realtime, Expert request/assignment/assessment và Expert V5 mission/room PASS. Bảy synthetic identity bị disable, roles thu hồi; Trust visibility được phục hồi; không cleanup lỗi. Harness SHA-256 `940413163c5e87175072c2686f74113503a5ee0ea3185f4404da64a9e907c033`, chạy trên evidence commit `0c9a4f3cc326209a5436b49e41041fdce1e1304e` với harness working-tree changes; candidate source SHA vẫn eea55564.... Lượt harness đầu chọn một Trust fixture cũ ngoài top-five và fail assertion; lưu ở staging-integration-attempt-profile-link-ordering.json. Sửa harness để chọn fixture thật sự được Profile hiển thị rồi chạy lại đạt các assertions.
+- **Staging storage:** staging-storage.json, private bucket `trust-screenshots-private`; owner upload/read/signed URL và non-owner/anonymous denial cho Trust image + QR PASS; exact-path cleanup và hai synthetic identity cleanup PASS. Không có avatar hoặc room-media bucket.
+- **OpenAlex smoke:** openalex-smoke.json; candidate local trỏ staging, một truy vấn works, limit 3, HTTP 200; OpenAlex và Crossref AVAILABLE, trả 3 records. Kết quả chỉ là metadata, `isAuthoritative=false`.
 - **Browser candidate:** browser-candidate-staging-release.json, 48/48 PASS, 3 engine × 4 route × 4 viewport.
 - **Build:** build-final.log, Next.js 16.3.7 compile và TypeScript pass, 143/143 static generation.
 - **Lint:** lint-final.log, exit 0, 0 errors và 490 repository warnings.
 - **Regression:** regression-rerun.log, 390/396 discovered test files PASS; sáu live gates BLOCKED_EXTERNAL: fresh_retrieval_holdout_v3, fresh_retrieval_holdout_v4, fresh_retrieval_holdout_v5_public_api, live_web_retrieval, real_world_live_search_golden_flow và expert_v5_live_readonly. 64 removed-feature tests được quality runner skip có ghi lý do. Lượt đầu có một lỗi thoáng qua ở canonical_api_runtime.test.mjs khi GET /trust trả 500; test đơn và full rerun đều pass, không tái hiện được.
 - **Migration rehearsal:** migration-rehearsal-final.json, PostgreSQL 17.6 local disposable, 29 migration chain; forward idempotency, production/staging observed-schema fixture upgrades, preservation dữ liệu synthetic, từ chối schema không tương thích và kiểm tra RLS/grants/append-only/nested FK đều PASS.
-- **Schema snapshot:** schema-production.json, schema-staging.json, schema-drift-final.json. Read-only catalog: production operator target ref kytdomflmjytzyaabogi có 65 tables/694 columns/10 ledger entries; staging ref bniwtkjtramqaozrrtrk có 107 tables/1,157 columns/16 ledger entries. Cả hai có 0 table thường trong hai schema quan sát bị tắt RLS. SHA-256 catalog lần lượt 88526eda878d18b8f4dd1e47f84279395cc9f3bff13316b91cc0d0545c0214d6 và 013e527c258bd17c29b6e4f7e30c0411bf8649118e82cc9ac8703457489b1f3e.
+- **Schema/migration reconciliation:** schema-production.json, schema-staging.json, schema-drift-final.json, migration-ledger-reconciliation.json và MIGRATION_LEDGER_RECONCILIATION.md. Operator read-only refs: production `kytdomflmjytzyaabogi` có 65 tables/694 columns/10 ledger entries; staging `bniwtkjtramqaozrrtrk` có 107 tables/1,157 columns/16 ledger entries. Production repository reconciliation: 10 APPLIED_EQUIVALENT, 4 NOT_APPLIED, 15 UNKNOWN, 0 hash mismatch, 0 APPLIED_EXACT. Staging: 4 APPLIED_EXACT, 10 APPLIED_EQUIVALENT, 1 NOT_APPLIED, 14 UNKNOWN; cả 8 migration thuộc plan staging là exact/equivalent. Không sửa ledger và không chạy migration cloud trong lượt này. SHA-256 catalog production `88526eda878d18b8f4dd1e47f84279395cc9f3bff13316b91cc0d0545c0214d6`, staging `013e527c258bd17c29b6e4f7e30c0411bf8649118e82cc9ac8703457489b1f3e`.
 - **Production read-only:** production-snapshot-final.json; deployment hiện tại vẫn SHA 595a991... Liveness/readiness trả 200 nhưng không công bố backend project ref; hai Community API nêu trên vẫn lỗi. Production browser baseline chi tiết nằm ở browser-production-final.json (harness SHA d92841b..., production deployment SHA 595a991...): 42/48 pass và sáu Community mobile overflow. Browser baseline và candidate release là hai artifact tách biệt.
 
 Production catalog snapshot chỉ chứng minh project ref của kết nối operator read-only, **không chứng minh Vercel runtime đang trỏ cùng database**. Lệnh pull environment Vercel được automatic command review chặn trước khi chạy; không thu được giá trị environment và không thử vòng qua cơ chế chặn.
@@ -73,15 +75,15 @@ Migration ledger có 10 version production và 16 version staging; tên/version 
 3. 202609180001_reputation_events_idempotency.sql
 4. Các migration mục 1, 3, 6, 7, 8 trong danh sách production.
 
-Plan là kết quả rehearsal trên fixture dựng từ catalog read-only và synthetic rows. Trước bất kỳ lần apply thật nào, operator phải đối chiếu chính xác version/name/statement hash với ledger từng môi trường; không suy ra migration “chưa chạy” chỉ từ tên khác và không dùng migration repair/stamp để làm ledger xanh.
+Plan là kết quả rehearsal trên fixture dựng từ catalog read-only và synthetic rows. Ledger reconciliation sau đó xác nhận tám migration staging trong plan đã có dưới version/name chính xác hoặc alias với stored SQL tương đương; vì vậy staging không cần apply lại. Production operator ref có 4 migration mục tiêu chắc chắn NOT_APPLIED, 4 UNKNOWN trong 8 mục tiêu; toàn catalog 15 UNKNOWN. Đây chỉ là operator DB ref, không phải Vercel runtime target đã xác minh. Không suy ra migration chưa chạy từ tên/version khác, không dùng repair/stamp và không apply cloud migration từ rehearsal một mình.
 
 ## Gates còn mở
 
-1. Tạo bản backup PostgreSQL ngoài Supabase, giữ checksum và chứng minh restore trên project disposable tương thích; hiện chưa có artifact backup/restore được xác minh. Supabase Free không có scheduled daily backup theo tài liệu nền tảng; object Storage cần backup riêng vì pg_dump không chứa file objects. [Supabase Database Backups](https://supabase.com/docs/guides/platform/backups).
-2. Xác minh project ref của Vercel production runtime DB, Auth và durable-session target qua kênh operator an toàn, chỉ ghi metadata không nhạy cảm.
-3. Chạy migration thực trên staging sau preflight và kiểm tra lại cloud policies, grants, functions, triggers, indexes, ownership, RLS và readback.
-4. Chạy Expert request/assignment/assessment end-to-end, staging Storage, và các gate Community search freshness còn thiếu.
-5. Chạy live Gemini/Tavily và các holdout chỉ khi quyền/budget được cấp; hiện sáu test files bị chặn external, không được tính PASS.
-6. Sau khi staging đạt, mới chốt lịch rollout production và post-deploy verification.
+1. Xác minh project ref của Vercel production runtime DB/Auth/session qua kênh operator được phép. `vercel env pull` bị automatic command review chặn trước thực thi; không thử bypass. Operator snapshot `kytdomflmjytzyaabogi` chưa đủ chứng minh runtime target.
+2. Tạo backup mã hóa của đúng production runtime DB, ghi checksum và chứng minh restore trên disposable Supabase-compatible project. Chưa tạo: runtime target chưa rõ, `pg_dump` không có trên PATH, chưa có đích backup/restore được xác minh; Docker có sẵn nhưng không dùng để đoán hoặc kết nối target. Backup Storage objects riêng cũng chưa có.
+3. Resolve 15 migration UNKNOWN và aliases production; bốn file mục tiêu rõ ràng NOT_APPLIED cần preflight trên đúng runtime DB. Không chạy migration khi identity, backup và ledger provenance còn mở.
+4. Hoàn tất maintenance window/operator, abort threshold và approval trước mọi production write/deploy.
+5. Residual product gates: Gemini/Tavily live và fresh unseen retrieval holdout (provider OFF; chưa có corpus/budget được duyệt), avatar/room-media buckets chưa có, unaccented Community search và author-filter route chưa được hỗ trợ. Tavily chưa được gọi.
+6. Sau khi tất cả non-Tavily gates, backup/restore, identity và production approval đạt, mới chạy một Tavily one-shot theo budget rồi chốt rollout/canary/post-deploy verification.
 
 Vì các gate trên chưa đóng, đây **không phải** FULL_FIX_ACCEPTED. Production hiện vẫn chạy deployment cũ và các API đang lỗi không được coi là đã sửa chỉ vì candidate/staging pass.

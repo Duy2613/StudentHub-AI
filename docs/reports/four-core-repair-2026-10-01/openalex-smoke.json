@@ -1,0 +1,31 @@
+{
+  "recordedAt": "2026-10-01T12:10:05.9861898Z",
+  "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+  "environment": "STAGING_LOCAL_CANDIDATE",
+  "projectRef": "bniwtkjtramqaozrrtrk",
+  "endpoint": "/api/public/research",
+  "query": "scholarship policy Vietnam",
+  "type": "works",
+  "limit": 3,
+  "httpStatus": 200,
+  "success": true,
+  "status": "AVAILABLE",
+  "openAlex": {
+    "ok": true,
+    "status": "AVAILABLE",
+    "code": "OK",
+    "total": 57643,
+    "fromCache": false
+  },
+  "crossref": {
+    "provider": "CROSSREF",
+    "ok": true,
+    "status": "AVAILABLE",
+    "code": "OK",
+    "total": 1702274,
+    "fromCache": false
+  },
+  "recordsReturned": 3,
+  "isAuthoritative": false,
+  "correlationId": "sec_edge_8e3522fb-a0c3-4822-9007-bb9a4c0d9a36"
+}

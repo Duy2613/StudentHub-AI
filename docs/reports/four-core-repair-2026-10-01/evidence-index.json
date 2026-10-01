@@ -1,24 +1,33 @@
 {
   "schemaVersion": 1,
-  "createdAtUtc": "2026-10-01T10:45:27.4246316Z",
+  "createdAtUtc": "2026-10-01T12:10:05.9861898Z",
   "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
   "branch": "codex/studenthub-four-core-repair-20261001",
   "sourceWorkingTreeChangedAfterCandidateCommit": false,
-  "packageStatus": "READY_FOR_PRODUCTION_ROLLOUT_PENDING_APPROVAL",
+  "packageStatus": "STAGING_VERIFIED_PRODUCTION_HOLD",
   "productionExecutionStatus": "HOLD",
   "productionMutated": false,
   "production": {
     "observedDeploymentSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
     "deploymentId": "dpl_ED91sTmSbtDS3xTzhgCeeiJqeRh7",
     "target": "PRODUCTION_READ_ONLY",
-    "runtimeDatabaseProjectRef": "NOT_VERIFIED"
+    "runtimeDatabaseProjectRef": "NOT_VERIFIED",
+    "environmentInspection": "vercel env pull rejected before execution by automatic command review; not bypassed",
+    "backupRestore": "NOT_CREATED_RUNTIME_IDENTITY_UNVERIFIED"
   },
   "staging": {
     "projectRef": "bniwtkjtramqaozrrtrk",
     "integrationArtifact": "staging-integration.json",
-    "gates": "16/16 PASS",
+    "gates": "17 PASS / 1 PARTIAL / 0 FAIL; 109 API checks; 8 cleanup confirmations",
+    "integrationRunTag": "fourcore-1790856038049",
+    "harnessCommitAtRun": "0c9a4f3cc326209a5436b49e41041fdce1e1304e",
+    "harnessSha256AtRun": "940413163c5e87175072c2686f74113503a5ee0ea3185f4404da64a9e907c033",
     "browserArtifact": "browser-candidate-staging-release.json",
-    "browserChecks": "48/48 PASS"
+    "browserChecks": "48/48 PASS",
+    "migrationLedgerReconciliation": "8/8 planned staging migrations APPLIED_EXACT or APPLIED_EQUIVALENT; no cloud migration rerun",
+    "storageArtifact": "staging-storage.json; Trust image/QR PASS; avatar and room-media buckets absent",
+    "openAlexSmokeArtifact": "openalex-smoke.json; HTTP 200; OPENALEX and CROSSREF AVAILABLE; limit 3",
+    "profilePartialReason": "/profile/{studentId} returns 404 by privacy boundary"
   },
   "verification": {
     "build": {
@@ -42,9 +51,24 @@
       "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
     },
     "storageAssurance": {
-      "artifact": "storage-local.json",
-      "result": "PASS_LOCAL_ONLY",
-      "candidateBound": false
+      "artifact": "staging-storage.json",
+      "result": "PASS_TRUST_IMAGE_AND_QR; AVATAR_AND_ROOM_MEDIA_UNCONFIGURED",
+      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+      "localArtifact": "storage-local.json"
+    },
+    "openAlexSmoke": {
+      "artifact": "openalex-smoke.json",
+      "result": "PASS; HTTP 200; NOT_AUTHORITATIVE",
+      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
+    },
+    "migrationLedgerReconciliation": {
+      "artifact": "migration-ledger-reconciliation.json",
+      "result": "READ_ONLY; STAGING_PLAN_ALREADY_APPLIED; PRODUCTION_RUNTIME_REF_UNKNOWN",
+      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
+    },
+    "freshRetrievalHoldout": {
+      "result": "BLOCKED_EXTERNAL; no unseen approved corpus or retrieval budget",
+      "tavilyMode": "OFF; no Tavily request made"
     },
     "productionSnapshot": {
       "artifact": "production-snapshot-final.json",
@@ -69,7 +93,13 @@
   "evidenceFiles": [
     "FINAL_REPORT.md",
     "ROLLOUT_PLAN.md",
+    "MANIFEST.sha256",
+    "MIGRATION_LEDGER_RECONCILIATION.md",
+    "migration-ledger-reconciliation.json",
     "staging-integration.json",
+    "staging-integration-attempt-profile-link-ordering.json",
+    "staging-storage.json",
+    "openalex-smoke.json",
     "browser-candidate-staging-release.json",
     "migration-rehearsal-final.json",
     "schema-production.json",
@@ -82,7 +112,10 @@
     "regression-rerun.log",
     "browser-production-final.json",
     "auth-production-canonical.json",
-    "tools/schema-observations.mjs"
+    "tools/schema-observations.mjs",
+    "tools/migration-ledger-reconciliation.mjs",
+    "../../../scripts/four-core-staging-integration.mjs",
+    "../../../scripts/four-core-staging-storage.mjs"
   ],
   "caveat": "The rehearsal fixtures were synthesized from read-only observed catalogs; they are not production or staging database dumps. No production migration or deployment was run."
 }

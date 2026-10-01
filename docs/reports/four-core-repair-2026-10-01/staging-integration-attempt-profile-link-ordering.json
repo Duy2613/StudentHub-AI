@@ -1,14 +1,14 @@
 {
-  "recordedAt": "2026-10-01T12:00:38.049Z",
+  "recordedAt": "2026-10-01T11:48:01.237Z",
   "candidateSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
   "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
   "evidenceHarnessCommit": "0c9a4f3cc326209a5436b49e41041fdce1e1304e",
-  "evidenceHarnessSha256": "940413163c5e87175072c2686f74113503a5ee0ea3185f4404da64a9e907c033",
+  "evidenceHarnessSha256": "71c1096f9bb3eb307f5d5ee16556f949f5f2ab28104b09939bd91fdcef987080",
   "workingTreeChanges": false,
   "harnessWorkingTreeModified": true,
   "projectRef": "bniwtkjtramqaozrrtrk",
   "origin": "http://127.0.0.1:3000",
-  "runTag": "fourcore-1790856038049",
+  "runTag": "fourcore-1790855281237",
   "providerMode": "OFF",
   "providerBudget": 0,
   "evidenceClass": "REAL_STAGING_BUSINESS_PATH_WITH_LABELLED_SYNTHETIC_FIXTURES",
@@ -84,7 +84,7 @@
     {
       "name": "trust-canonical-text-persistence-owner-isolation",
       "status": "PASS",
-      "caseId": "d2de4c04-9fe3-45fd-89b8-0ad4d6ab759d",
+      "caseId": "d8d1ecc4-6ba6-4eaf-8e36-a02b854cc30d",
       "caseRevision": 1,
       "persisted": true,
       "stages": [
@@ -111,7 +111,7 @@
     {
       "name": "trust-canonical-url-persistence-owner-isolation",
       "status": "PASS",
-      "caseId": "6cbacc73-e68b-4f80-9dcc-f5fc7a104fe8",
+      "caseId": "fe76ea18-4c77-4bf8-ae7a-ccbbe2f95aa1",
       "caseRevision": 1,
       "persisted": true,
       "stages": [
@@ -138,7 +138,7 @@
     {
       "name": "trust-canonical-image-persistence-owner-isolation",
       "status": "PASS",
-      "caseId": "4ac99ca2-ef65-4fbf-a3d5-ae4b373c2f39",
+      "caseId": "d217709e-2b70-4714-9f22-0c406788fab8",
       "caseRevision": 1,
       "persisted": true,
       "stages": [
@@ -165,7 +165,7 @@
     {
       "name": "trust-canonical-qr-persistence-owner-isolation",
       "status": "PASS",
-      "caseId": "c97dd8c0-3666-4a30-b249-1097b78fea83",
+      "caseId": "3779d8fa-329c-4cbe-896e-f4d937e75586",
       "caseRevision": 1,
       "persisted": true,
       "stages": [
@@ -192,8 +192,8 @@
     {
       "name": "community-durable-publication-nested-comments-idempotency",
       "status": "PASS",
-      "contributionId": "c2acb4ae-b709-4ef9-ad29-b5c53e7c5d9d",
-      "caseId": "d2de4c04-9fe3-45fd-89b8-0ad4d6ab759d",
+      "contributionId": "16818d99-f91e-472b-b824-264871223fab",
+      "caseId": "d8d1ecc4-6ba6-4eaf-8e36-a02b854cc30d",
       "caseRevision": 1,
       "syntheticTrustCaseTemporarilyPublic": true,
       "previewConfirmed": true,
@@ -209,31 +209,31 @@
         {
           "kind": "exact",
           "status": "PASS",
-          "matches": 2
+          "matches": 1
         },
         {
           "kind": "partial",
           "status": "PASS",
-          "matches": 2
+          "matches": 1
         },
         {
           "kind": "keyword",
           "status": "PASS",
-          "matches": 2
+          "matches": 1
         },
         {
           "kind": "vietnamese-accented",
           "status": "PASS",
-          "matches": 2
+          "matches": 1
         }
       ],
       "vietnameseUnaccented": "UNSUPPORTED_BY_CURRENT_SEARCH_CONTRACT",
       "recentFeed": "PASS",
       "authorFilter": "NOT_EXPOSED_BY_CURRENT_ROUTE",
       "communityRealtime": {
-        "contributionSequence": 629,
-        "rootCommentSequence": 630,
-        "replySequence": 631,
+        "contributionSequence": 552,
+        "rootCommentSequence": 553,
+        "replySequence": 554,
         "persistedEvents": 3,
         "reconnectBeforeRootAndReply": true
       }
@@ -241,30 +241,27 @@
     {
       "name": "expert-request-matching-assignment-workbench-assessment-scope",
       "status": "PASS",
-      "requestId": "99f8b2f7-8beb-47d4-8111-d872291c116a",
+      "requestId": "1846fbd0-cf5b-47d4-a0b3-140571242fd8",
       "matching": "PASS_EXACT_VERIFIED_DOMAIN",
-      "assignmentId": "a073e914-9078-4b06-ad11-2729f78bec43",
+      "assignmentId": "eaa6a1e6-3983-4eb2-899d-2610d491a430",
       "workbenchReadback": "PASS",
-      "assessmentId": "f0f54925-62ca-41bb-a01a-204155cf9ef3",
+      "assessmentId": "5682e8dd-cb8c-44c5-9614-f4ce8d194797",
       "assessmentPersistence": "PASS_API_AND_SQL",
       "assessmentReplay": "PASS_IDEMPOTENT",
       "wrongScope": "PASS_DOSSIER_AND_ASSESSMENT_DENIED",
-      "requestRealtimeSequence": 632,
-      "assignmentRealtimeSequence": 633,
+      "requestRealtimeSequence": 555,
+      "assignmentRealtimeSequence": 557,
       "realtimeDbRows": 2,
       "expertPublicProfileById": "PASS_REDACTED_DTO"
     },
     {
       "name": "profile-activity-status-trust-link-public-id-and-empty-state",
-      "status": "PARTIAL",
-      "ownProfile": "PASS",
-      "publicProfileById": "EXPERT_PUBLIC_ROUTE_PASS; /profile/{studentId} RETURNS_404_BY_PRIVACY_POLICY",
-      "profileActivityStatus": "PASS",
-      "profileTrustCaseOwnerReadback": "PASS",
-      "trustLinkAfterReload": "PASS",
-      "emptyVsUnavailable": "PASS",
-      "routeIdInjection": "PASS",
-      "studentIdRoute": "404_PRIVACY_BOUNDARY"
+      "status": "FAIL",
+      "code": "ERR_ASSERTION",
+      "assertion": "PROFILE_TRUST_CASE_NOT_LINKED",
+      "failureLine": 507,
+      "expected": true,
+      "actual": false
     }
   ],
   "checks": [
@@ -410,7 +407,7 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_abcfde21-e0c4-41e2-a4ac-23392cb11721"
+      "correlationId": "sec_edge_7b81e68a-941f-4fd9-b520-728a9c5585bd"
     },
     {
       "path": "/api/expert/missions",
@@ -419,25 +416,25 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_01298930-a324-44c4-882e-09725298c4b6"
+      "correlationId": "sec_edge_66fa1fbd-cdec-48f9-b1a4-63cba5e93fc9"
     },
     {
-      "path": "/api/expert/missions/9920b012-7253-4269-bd76-62dc701fb630",
+      "path": "/api/expert/missions/8b3f91a6-dbe0-48fd-814b-6b1119ea4704",
       "actor": "expert-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_e8026f96-91c1-46ac-8afc-38bb4e198407"
+      "correlationId": "sec_edge_86a1548b-79c7-4b39-8221-577f90494a99"
     },
     {
-      "path": "/api/expert/missions/9920b012-7253-4269-bd76-62dc701fb630",
+      "path": "/api/expert/missions/8b3f91a6-dbe0-48fd-814b-6b1119ea4704",
       "actor": "expert-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_29bfd51d-cdac-4ffa-b6de-14b44fb53261"
+      "correlationId": "sec_edge_4647599e-7ac9-4851-a3ee-a7ce180e6b3b"
     },
     {
       "path": "/api/expert/missions",
@@ -446,25 +443,25 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_2566abb2-9fab-4f40-bc0a-1c235170d073"
+      "correlationId": "sec_edge_0bb6509b-637f-4205-ac95-c1d2784f048c"
     },
     {
-      "path": "/api/expert/missions/87897d9f-98f5-48ac-a642-16e1e0b450c2",
+      "path": "/api/expert/missions/8c4433d9-1348-46c3-aee5-05994b774f9d",
       "actor": "expert-b",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_15adc5f0-60dd-4a6c-87a2-4dd10e48f18f"
+      "correlationId": "sec_edge_80894a14-b9fe-4cbc-b8c0-0a077e43249b"
     },
     {
-      "path": "/api/expert/missions/87897d9f-98f5-48ac-a642-16e1e0b450c2",
+      "path": "/api/expert/missions/8c4433d9-1348-46c3-aee5-05994b774f9d",
       "actor": "expert-b",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_6c77292f-ff7f-494c-8edb-5c16be9974b8"
+      "correlationId": "sec_edge_fedd78f8-065b-408e-b9c9-2629faf66bf6"
     },
     {
       "path": "/api/expert/v5/questions",
@@ -473,7 +470,7 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_09a63ad6-dd47-40c4-a974-021b63eb5339"
+      "correlationId": "sec_edge_bbe07ffc-5f87-450e-a532-8a92559a7466"
     },
     {
       "path": "/api/expert/v5/questions",
@@ -482,7 +479,7 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_934bbd05-e112-4748-8520-d5155a2bcbed"
+      "correlationId": "sec_edge_d9611f4c-b701-4ea9-9a70-27b81ee9fa81"
     },
     {
       "path": "/api/expert/v5/questions",
@@ -500,7 +497,7 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_2c517472-cc71-4ce7-a841-e6a5f5ec7883"
+      "correlationId": "sec_edge_cb213b04-c41d-407a-90dc-c2a28ffa4bd0"
     },
     {
       "path": "/api/expert/missions",
@@ -509,10 +506,10 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_dd85c745-1532-4c89-a584-cf307482e765"
+      "correlationId": "sec_edge_14037f21-43f5-4c74-8887-75db6d7d506f"
     },
     {
-      "path": "/api/expert/missions/f8ce7bbd-d819-4836-97fd-112e9de1acb9",
+      "path": "/api/expert/missions/e918e6f9-1d85-47f6-ab8e-f29b413b3f2e",
       "actor": "expert-c",
       "status": 404,
       "code": "EXPERT_MISSION_NOT_FOUND",
@@ -521,34 +518,34 @@
       "correlationId": null
     },
     {
-      "path": "/api/expert/missions/f8ce7bbd-d819-4836-97fd-112e9de1acb9",
+      "path": "/api/expert/missions/e918e6f9-1d85-47f6-ab8e-f29b413b3f2e",
       "actor": "expert-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_16d4a0f7-86b9-4ccf-9e37-08feba8d831d"
+      "correlationId": "sec_edge_a831895d-8ac1-4160-a8ae-7f9c378dfa5a"
     },
     {
-      "path": "/api/expert/missions/f8ce7bbd-d819-4836-97fd-112e9de1acb9",
+      "path": "/api/expert/missions/e918e6f9-1d85-47f6-ab8e-f29b413b3f2e",
       "actor": "expert-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_ac6f0527-90f5-4fe0-a420-cd43227e7c7f"
+      "correlationId": "sec_edge_4606f0e7-5a8b-458d-8c43-85352840beb5"
     },
     {
-      "path": "/api/expert/missions/f8ce7bbd-d819-4836-97fd-112e9de1acb9",
+      "path": "/api/expert/missions/e918e6f9-1d85-47f6-ab8e-f29b413b3f2e",
       "actor": "expert-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_3dd1baac-d63d-4ff7-a29e-7e4080c906fb"
+      "correlationId": "sec_edge_25b802d4-dc98-4c3c-870a-9f94fc1fe9de"
     },
     {
-      "path": "/api/expert/missions/f8ce7bbd-d819-4836-97fd-112e9de1acb9",
+      "path": "/api/expert/missions/e918e6f9-1d85-47f6-ab8e-f29b413b3f2e",
       "actor": "expert-a",
       "status": 409,
       "code": "EXPERT_MISSION_ANSWER_LOCKED",
@@ -563,10 +560,10 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_a744e768-561b-491b-8906-48f7bbb0c837"
+      "correlationId": "sec_edge_dbd18a91-30cf-4643-927f-5d9448d59c4e"
     },
     {
-      "path": "/api/expert/missions/99732214-985b-4e26-989a-079a23f04d20",
+      "path": "/api/expert/missions/96094bcd-0263-4f89-b0ad-0c1a05afed3f",
       "actor": "expert-c",
       "status": 404,
       "code": "EXPERT_MISSION_NOT_FOUND",
@@ -575,34 +572,34 @@
       "correlationId": null
     },
     {
-      "path": "/api/expert/missions/99732214-985b-4e26-989a-079a23f04d20",
+      "path": "/api/expert/missions/96094bcd-0263-4f89-b0ad-0c1a05afed3f",
       "actor": "expert-b",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_f17c4eb8-80ef-4916-b3bf-40a505adfcf6"
+      "correlationId": "sec_edge_481b13b3-e082-42da-a0c0-2644798daccf"
     },
     {
-      "path": "/api/expert/missions/99732214-985b-4e26-989a-079a23f04d20",
+      "path": "/api/expert/missions/96094bcd-0263-4f89-b0ad-0c1a05afed3f",
       "actor": "expert-b",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_217cd669-4068-4204-b310-560508ed0ca4"
+      "correlationId": "sec_edge_154b2afe-10c8-4b9c-b386-7d4bf7a21dcb"
     },
     {
-      "path": "/api/expert/missions/99732214-985b-4e26-989a-079a23f04d20",
+      "path": "/api/expert/missions/96094bcd-0263-4f89-b0ad-0c1a05afed3f",
       "actor": "expert-b",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_3d60d437-c2fe-47bf-b771-cbaaa251ef21"
+      "correlationId": "sec_edge_07fec5e6-4d1a-440b-a054-1b5b3ac0ab98"
     },
     {
-      "path": "/api/expert/missions/99732214-985b-4e26-989a-079a23f04d20",
+      "path": "/api/expert/missions/96094bcd-0263-4f89-b0ad-0c1a05afed3f",
       "actor": "expert-b",
       "status": 409,
       "code": "EXPERT_MISSION_ANSWER_LOCKED",
@@ -617,7 +614,7 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_c0485e38-f55a-43fc-b5f9-2f6830ecf708"
+      "correlationId": "sec_edge_ec2f1f6f-cae1-4222-9dad-15dd6ed9bdc9"
     },
     {
       "path": "/api/expert/rooms/presence",
@@ -626,7 +623,7 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_29bcb519-f3da-429b-8165-66ef332edf12"
+      "correlationId": "sec_edge_1b8cfd64-6664-4f99-a214-38ac451f8255"
     },
     {
       "path": "/api/expert/rooms/presence",
@@ -635,7 +632,7 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_2ca4d31a-91ec-419d-ad83-5690fabf0d1f"
+      "correlationId": "sec_edge_bbafe8f2-f490-4d5a-bc35-cb9bec932347"
     },
     {
       "path": "/api/expert/rooms",
@@ -644,7 +641,7 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_68460817-0b06-4cb0-b5c3-f53ea82f6dcd"
+      "correlationId": "sec_edge_6f3d1f2c-1a56-4e77-99de-7c6c34134272"
     },
     {
       "path": "/api/expert/rooms",
@@ -653,10 +650,10 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_61cfc58b-a571-47c8-8e70-d4271da37569"
+      "correlationId": "sec_edge_0a64e66e-d3f8-4b8a-9f9b-8348960d4d1d"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
       "actor": "student-b",
       "status": 403,
       "code": "EXPERT_ROOM_MEMBERSHIP_REQUIRED",
@@ -665,79 +662,79 @@
       "correlationId": null
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
+      "actor": "expert-c",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_3daafd74-d8db-4e87-bcf2-001f2dede9e8"
+    },
+    {
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_dc377f47-4e63-4116-af86-3299b764d9d8"
+    },
+    {
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
       "actor": "expert-b",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_b342288a-04ae-456d-bcb5-158727ad9524"
+      "correlationId": "sec_edge_ac9ddd3f-92ef-495e-a9eb-ba349b544bd7"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
-      "actor": "expert-a",
-      "status": 200,
-      "code": null,
-      "persistenceStatus": null,
-      "persistenceErrorCode": null,
-      "correlationId": "sec_edge_e4d96016-88a4-4ac0-986d-c6c539789db9"
-    },
-    {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
-      "actor": "expert-c",
-      "status": 200,
-      "code": null,
-      "persistenceStatus": null,
-      "persistenceErrorCode": null,
-      "correlationId": "sec_edge_627d5c1d-33f7-4eae-a825-759d1581717f"
-    },
-    {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
       "actor": "student-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_e4ac7d5c-10fe-4d9f-95e9-0bba4bb8939f"
+      "correlationId": "sec_edge_2e1bd8d6-7f23-467c-a400-9da57c116723"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
       "actor": "expert-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_8e557768-0b24-4a50-b1de-9bf0b7185127"
+      "correlationId": "sec_edge_906bc9f2-eead-4423-9565-6bcee49a5c6c"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
-      "actor": "expert-c",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
+      "actor": "expert-b",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_a0919b2d-8d55-4daf-8a02-3c80430fd657"
+      "correlationId": "sec_edge_4bbd5d81-78ee-4a01-9a3c-6bf1469b7b82"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
       "actor": "student-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_647e27c7-afa9-404c-af5c-5ab9ac92aebc"
+      "correlationId": "sec_edge_023d8ec0-d9c9-4e79-a87b-c8581ed6ee20"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
       "actor": "expert-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_87de49e1-3abd-407c-9151-613e418eec37"
+      "correlationId": "sec_edge_3f8365c5-907b-433c-b731-7873061a1fb9"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
       "actor": "expert-a",
       "status": 409,
       "code": "EXPERT_ROOM_ANSWER_LOCKED",
@@ -746,94 +743,94 @@
       "correlationId": null
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_a818929d-0c33-419d-9cba-b5c610d8ed7c"
+    },
+    {
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_115f174f-955a-458c-a008-9b486f358c0d"
+    },
+    {
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_c5b15570-9737-4b9f-bcf5-64ffc8b273b6"
+    },
+    {
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
       "actor": "expert-c",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_ce02c0fe-83c5-477b-b6ba-fc362b09d40d"
+      "correlationId": "sec_edge_df23fd22-23b4-4cfc-90fd-3030489042ea"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
+      "actor": "expert-c",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_d9c3f95e-bb76-49e3-9b85-d17272317de1"
+    },
+    {
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
       "actor": "student-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_63be3119-b2b0-4803-beef-3d55a1b85940"
+      "correlationId": "sec_edge_3ca15760-3079-4bab-beeb-352e1ba2a05c"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
       "actor": "student-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_eb1d7c1d-48f0-479e-97a5-55ff12a0548f"
+      "correlationId": "sec_edge_e8bef9bb-0e0c-499a-b224-9933bf59c404"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
-      "actor": "expert-b",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
+      "actor": "expert-c",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_6e22795c-05f6-4990-abc2-5879d36eb6cf"
+      "correlationId": "sec_edge_532073c8-a433-49ff-bad0-2a01095358ba"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
-      "actor": "expert-b",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
+      "actor": "expert-c",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_a94f96e6-59e6-4e71-ae60-fd46192f547d"
+      "correlationId": "sec_edge_7a13521a-125b-4f00-af7e-922cbf3f8015"
     },
     {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
+      "path": "/api/expert/rooms/dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
       "actor": "student-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_78e055e8-a47e-4b55-9537-338f7d0abd28"
-    },
-    {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
-      "actor": "student-a",
-      "status": 200,
-      "code": null,
-      "persistenceStatus": null,
-      "persistenceErrorCode": null,
-      "correlationId": "sec_edge_dbc518c7-7dfd-4c6e-bf3d-c73f44dea265"
-    },
-    {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
-      "actor": "expert-b",
-      "status": 200,
-      "code": null,
-      "persistenceStatus": null,
-      "persistenceErrorCode": null,
-      "correlationId": "sec_edge_d5fe1793-6fca-4785-afdd-92b3fffb9cf6"
-    },
-    {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
-      "actor": "expert-b",
-      "status": 200,
-      "code": null,
-      "persistenceStatus": null,
-      "persistenceErrorCode": null,
-      "correlationId": "sec_edge_b3feb79d-a85e-41a9-a9e8-a257491c309e"
-    },
-    {
-      "path": "/api/expert/rooms/50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
-      "actor": "student-a",
-      "status": 200,
-      "code": null,
-      "persistenceStatus": null,
-      "persistenceErrorCode": null,
-      "correlationId": "sec_edge_04ee6bd8-c037-4967-ae55-dd83c070a4e5"
+      "correlationId": "sec_edge_7ad18628-56e5-4a9c-a516-5524a1efc636"
     },
     {
       "path": "/api/v1/trust",
@@ -842,10 +839,10 @@
       "code": null,
       "persistenceStatus": "PERSISTED",
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_d1a138ae-9c0e-49af-aa06-ef899e329472"
+      "correlationId": "sec_edge_c17a0283-9f97-44df-adf2-a90944e5d4e0"
     },
     {
-      "path": "/api/v1/trust/cases/d2de4c04-9fe3-45fd-89b8-0ad4d6ab759d",
+      "path": "/api/v1/trust/cases/d8d1ecc4-6ba6-4eaf-8e36-a02b854cc30d",
       "actor": "student-a",
       "status": 200,
       "code": null,
@@ -854,7 +851,7 @@
       "correlationId": null
     },
     {
-      "path": "/api/v1/trust/cases/d2de4c04-9fe3-45fd-89b8-0ad4d6ab759d",
+      "path": "/api/v1/trust/cases/d8d1ecc4-6ba6-4eaf-8e36-a02b854cc30d",
       "actor": "student-b",
       "status": 404,
       "code": "NOT_FOUND",
@@ -869,10 +866,10 @@
       "code": null,
       "persistenceStatus": "PERSISTED",
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_f86b01ac-8839-4033-adaf-ff0ec836a8ff"
+      "correlationId": "sec_edge_9fc9cf8c-52dc-42ff-9a63-596175b59358"
     },
     {
-      "path": "/api/v1/trust/cases/6cbacc73-e68b-4f80-9dcc-f5fc7a104fe8",
+      "path": "/api/v1/trust/cases/fe76ea18-4c77-4bf8-ae7a-ccbbe2f95aa1",
       "actor": "student-a",
       "status": 200,
       "code": null,
@@ -881,7 +878,7 @@
       "correlationId": null
     },
     {
-      "path": "/api/v1/trust/cases/6cbacc73-e68b-4f80-9dcc-f5fc7a104fe8",
+      "path": "/api/v1/trust/cases/fe76ea18-4c77-4bf8-ae7a-ccbbe2f95aa1",
       "actor": "student-b",
       "status": 404,
       "code": "NOT_FOUND",
@@ -896,10 +893,10 @@
       "code": null,
       "persistenceStatus": "PERSISTED",
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_f027593b-e048-4411-ac7c-e4486528ab4f"
+      "correlationId": "sec_edge_a834bd0d-385d-4e18-8eed-912e3cd1feec"
     },
     {
-      "path": "/api/v1/trust/cases/4ac99ca2-ef65-4fbf-a3d5-ae4b373c2f39",
+      "path": "/api/v1/trust/cases/d217709e-2b70-4714-9f22-0c406788fab8",
       "actor": "student-a",
       "status": 200,
       "code": null,
@@ -908,7 +905,7 @@
       "correlationId": null
     },
     {
-      "path": "/api/v1/trust/cases/4ac99ca2-ef65-4fbf-a3d5-ae4b373c2f39",
+      "path": "/api/v1/trust/cases/d217709e-2b70-4714-9f22-0c406788fab8",
       "actor": "student-b",
       "status": 404,
       "code": "NOT_FOUND",
@@ -923,10 +920,10 @@
       "code": null,
       "persistenceStatus": "PERSISTED",
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_19946de5-c418-4d46-acbb-fd3c7bb56054"
+      "correlationId": "sec_edge_71bc9cad-018f-4f5b-9cb0-27a6e444e7d4"
     },
     {
-      "path": "/api/v1/trust/cases/c97dd8c0-3666-4a30-b249-1097b78fea83",
+      "path": "/api/v1/trust/cases/3779d8fa-329c-4cbe-896e-f4d937e75586",
       "actor": "student-a",
       "status": 200,
       "code": null,
@@ -935,7 +932,7 @@
       "correlationId": null
     },
     {
-      "path": "/api/v1/trust/cases/c97dd8c0-3666-4a30-b249-1097b78fea83",
+      "path": "/api/v1/trust/cases/3779d8fa-329c-4cbe-896e-f4d937e75586",
       "actor": "student-b",
       "status": 404,
       "code": "NOT_FOUND",
@@ -1016,7 +1013,7 @@
       "correlationId": null
     },
     {
-      "path": "/api/intelligence/community/posts/c2acb4ae-b709-4ef9-ad29-b5c53e7c5d9d/comments",
+      "path": "/api/intelligence/community/posts/16818d99-f91e-472b-b824-264871223fab/comments",
       "actor": "student-b",
       "status": 201,
       "code": null,
@@ -1025,7 +1022,7 @@
       "correlationId": null
     },
     {
-      "path": "/api/intelligence/community/posts/c2acb4ae-b709-4ef9-ad29-b5c53e7c5d9d/comments",
+      "path": "/api/intelligence/community/posts/16818d99-f91e-472b-b824-264871223fab/comments",
       "actor": "student-b",
       "status": 200,
       "code": null,
@@ -1034,7 +1031,7 @@
       "correlationId": null
     },
     {
-      "path": "/api/intelligence/community/posts/c2acb4ae-b709-4ef9-ad29-b5c53e7c5d9d/comments",
+      "path": "/api/intelligence/community/posts/16818d99-f91e-472b-b824-264871223fab/comments",
       "actor": "student-a",
       "status": 201,
       "code": null,
@@ -1043,7 +1040,7 @@
       "correlationId": null
     },
     {
-      "path": "/api/intelligence/community/posts/c2acb4ae-b709-4ef9-ad29-b5c53e7c5d9d/comments",
+      "path": "/api/intelligence/community/posts/16818d99-f91e-472b-b824-264871223fab/comments",
       "actor": "student-b",
       "status": 200,
       "code": null,
@@ -1067,19 +1064,19 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_ed2598db-336e-43f1-8a1d-f8deca206fc0"
+      "correlationId": "sec_edge_b75362b5-4f05-42bc-9df3-22a4122bc524"
     },
     {
-      "path": "/api/expert/blind-reviews/a073e914-9078-4b06-ad11-2729f78bec43",
+      "path": "/api/expert/blind-reviews/eaa6a1e6-3983-4eb2-899d-2610d491a430",
       "actor": "expert-a",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_1121ea12-94c9-4adb-9196-172978929949"
+      "correlationId": "sec_edge_152f547d-4c2f-4872-8fb8-ee65705986e1"
     },
     {
-      "path": "/api/expert/blind-reviews/a073e914-9078-4b06-ad11-2729f78bec43",
+      "path": "/api/expert/blind-reviews/eaa6a1e6-3983-4eb2-899d-2610d491a430",
       "actor": "expert-unscoped",
       "status": 403,
       "code": "FORBIDDEN_ASSIGNMENT",
@@ -1139,10 +1136,10 @@
       "code": null,
       "persistenceStatus": null,
       "persistenceErrorCode": null,
-      "correlationId": "sec_edge_f4fb19a4-b6a4-4a28-b971-d6e9f7ed6d71"
+      "correlationId": "sec_edge_093a6e50-0ac9-4959-a24e-30aca31d3b22"
     },
     {
-      "path": "/api/expert/profile/3da6df77-4df3-4fc8-8266-a82d0c772308",
+      "path": "/api/expert/profile/f63e3733-e27a-4b97-a93f-f1bad1f9399c",
       "actor": "student-b",
       "status": 200,
       "code": null,
@@ -1153,33 +1150,6 @@
     {
       "path": "/api/users/me",
       "actor": "student-a",
-      "status": 200,
-      "code": null,
-      "persistenceStatus": null,
-      "persistenceErrorCode": null,
-      "correlationId": null
-    },
-    {
-      "path": "/api/v1/trust/cases/c97dd8c0-3666-4a30-b249-1097b78fea83",
-      "actor": "student-a",
-      "status": 200,
-      "code": null,
-      "persistenceStatus": null,
-      "persistenceErrorCode": null,
-      "correlationId": null
-    },
-    {
-      "path": "/api/users/me",
-      "actor": "student-b",
-      "status": 200,
-      "code": null,
-      "persistenceStatus": null,
-      "persistenceErrorCode": null,
-      "correlationId": null
-    },
-    {
-      "path": "/api/users/profile",
-      "actor": "student-b",
       "status": 200,
       "code": null,
       "persistenceStatus": null,
@@ -1251,67 +1221,67 @@
     }
   ],
   "fixtureUserIds": [
-    "76b0d8d4-ceac-47a8-9e81-c452a5104071",
-    "6fd9acbc-9290-43ae-b0c6-061a871271c7",
-    "3a3e737a-dc74-4bd3-bc2a-843ef39fa119",
-    "3da6df77-4df3-4fc8-8266-a82d0c772308",
-    "4cc95fe3-1fce-489b-b2aa-de3f7511a7db",
-    "63347b0b-9fb4-48de-98f3-f3e65cc83305",
-    "eadec555-82a6-41c1-8592-8b9d9ceccf41"
+    "af68b10f-8e9c-4a6f-93d0-6efdc4f585d8",
+    "126d3047-5013-4f1f-b1e8-65f42e09b536",
+    "3356cbea-24b2-419f-a7d5-21bbce7d8052",
+    "f63e3733-e27a-4b97-a93f-f1bad1f9399c",
+    "8b4d677e-a0d6-45a4-a13a-6132e6edc759",
+    "ebf1a88c-4d67-4901-b4fe-a13d22909b10",
+    "75f0290f-aba5-4ff6-b795-655a8da689e0"
   ],
   "retainedImmutableFixtureIds": [
     "cad8c903-7933-4cca-b67d-416b8a3390a3",
-    "031c7191-1808-4101-afb3-ce332fd87c43",
-    "a414f101-95ea-4c63-af46-f63bd245b8ff",
-    "50e4ffc2-c3f2-4d5e-b8b8-49d519925770",
-    "d2de4c04-9fe3-45fd-89b8-0ad4d6ab759d",
-    "6cbacc73-e68b-4f80-9dcc-f5fc7a104fe8",
-    "4ac99ca2-ef65-4fbf-a3d5-ae4b373c2f39",
-    "c97dd8c0-3666-4a30-b249-1097b78fea83",
-    "c2acb4ae-b709-4ef9-ad29-b5c53e7c5d9d",
-    "24c586da-0a00-4f0c-b8cd-defc0d8564c9",
-    "f0b89abb-dd0b-4ca3-a42e-580dec9755e1",
-    "99f8b2f7-8beb-47d4-8111-d872291c116a",
-    "a073e914-9078-4b06-ad11-2729f78bec43",
-    "f0f54925-62ca-41bb-a01a-204155cf9ef3"
+    "43885877-fbf3-4b9c-83c8-f3bd0c6af015",
+    "7a58d59c-afd1-443f-adae-27109ef0a534",
+    "dfd63a83-a58c-4ceb-85ae-fdd8dd22615f",
+    "d8d1ecc4-6ba6-4eaf-8e36-a02b854cc30d",
+    "fe76ea18-4c77-4bf8-ae7a-ccbbe2f95aa1",
+    "d217709e-2b70-4714-9f22-0c406788fab8",
+    "3779d8fa-329c-4cbe-896e-f4d937e75586",
+    "16818d99-f91e-472b-b824-264871223fab",
+    "d7aa917d-5e53-4dba-a30b-2c8e754a3851",
+    "cc53de67-ff62-4b2d-b682-904edcfb4a5b",
+    "1846fbd0-cf5b-47d4-a0b3-140571242fd8",
+    "eaa6a1e6-3983-4eb2-899d-2610d491a430",
+    "5682e8dd-cb8c-44c5-9614-f4ce8d194797"
   ],
   "cleanup": [
     {
-      "caseId": "d2de4c04-9fe3-45fd-89b8-0ad4d6ab759d",
+      "caseId": "d8d1ecc4-6ba6-4eaf-8e36-a02b854cc30d",
       "status": "SYNTHETIC_TRUST_VISIBILITY_RESTORED"
     },
     {
-      "userId": "76b0d8d4-ceac-47a8-9e81-c452a5104071",
+      "userId": "af68b10f-8e9c-4a6f-93d0-6efdc4f585d8",
       "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
       "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
     },
     {
-      "userId": "6fd9acbc-9290-43ae-b0c6-061a871271c7",
+      "userId": "126d3047-5013-4f1f-b1e8-65f42e09b536",
       "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
       "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
     },
     {
-      "userId": "3a3e737a-dc74-4bd3-bc2a-843ef39fa119",
+      "userId": "3356cbea-24b2-419f-a7d5-21bbce7d8052",
       "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
       "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
     },
     {
-      "userId": "3da6df77-4df3-4fc8-8266-a82d0c772308",
+      "userId": "f63e3733-e27a-4b97-a93f-f1bad1f9399c",
       "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
       "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
     },
     {
-      "userId": "4cc95fe3-1fce-489b-b2aa-de3f7511a7db",
+      "userId": "8b4d677e-a0d6-45a4-a13a-6132e6edc759",
       "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
       "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
     },
     {
-      "userId": "63347b0b-9fb4-48de-98f3-f3e65cc83305",
+      "userId": "ebf1a88c-4d67-4901-b4fe-a13d22909b10",
       "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
       "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
     },
     {
-      "userId": "eadec555-82a6-41c1-8592-8b9d9ceccf41",
+      "userId": "75f0290f-aba5-4ff6-b795-655a8da689e0",
       "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
       "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
     }
@@ -1365,14 +1335,7 @@
     "4d0057da-1c30-4fc2-af80-7542ff2096c7",
     "dbd9a05b-0748-40ac-909c-88d9dab1005c",
     "21867bb2-ec52-4d2c-a85d-5b7e33be911c",
-    "24c4c7df-be9f-4183-94d6-dcc2695a3266",
-    "af68b10f-8e9c-4a6f-93d0-6efdc4f585d8",
-    "126d3047-5013-4f1f-b1e8-65f42e09b536",
-    "3356cbea-24b2-419f-a7d5-21bbce7d8052",
-    "f63e3733-e27a-4b97-a93f-f1bad1f9399c",
-    "8b4d677e-a0d6-45a4-a13a-6132e6edc759",
-    "ebf1a88c-4d67-4901-b4fe-a13d22909b10",
-    "75f0290f-aba5-4ff6-b795-655a8da689e0"
+    "24c4c7df-be9f-4183-94d6-dcc2695a3266"
   ],
   "readiness": {
     "readinessModelVersion": "readiness.v2",
@@ -1387,7 +1350,7 @@
     "ready": true,
     "liveness": {
       "status": "AVAILABLE",
-      "checkedAt": "2026-10-01T12:00:38.669Z"
+      "checkedAt": "2026-10-01T11:48:04.422Z"
     },
     "platformReadiness": {
       "status": "READY",
@@ -1527,7 +1490,7 @@
       "aiSynthesisConfigured": false
     },
     "runStatus": "IDLE",
-    "checkedAt": "2026-10-01T12:00:38.669Z",
+    "checkedAt": "2026-10-01T11:48:04.422Z",
     "checks": {
       "runtime": {
         "status": "AVAILABLE",
