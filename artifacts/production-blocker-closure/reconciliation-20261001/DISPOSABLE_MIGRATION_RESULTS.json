@@ -1,0 +1,462 @@
+{
+  "recordedAt": "2026-10-01T03:02:08.789Z",
+  "image": "postgres:17.6",
+  "network": "none",
+  "migrationCount": 29,
+  "migrations": [
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202608270001_v2_authority_foundation.sql",
+      "result": "PASS",
+      "durationMs": 251
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202608290001_feature_freeze_cross_system.sql",
+      "result": "PASS",
+      "durationMs": 217
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609010001_private_screenshot_storage.sql",
+      "result": "PASS",
+      "durationMs": 229
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609060001_expert_qualification.sql",
+      "result": "PASS",
+      "durationMs": 211
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609060002_integration_outbox.sql",
+      "result": "PASS",
+      "durationMs": 199
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609060003_trust_runs_revisions.sql",
+      "result": "PASS",
+      "durationMs": 220
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609060004_reports.sql",
+      "result": "PASS",
+      "durationMs": 205
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609070001_realtime_event_log.sql",
+      "result": "PASS",
+      "durationMs": 203
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609090001_community_expert_promax.sql",
+      "result": "PASS",
+      "durationMs": 259
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609100001_expert_authority_snapshot.sql",
+      "result": "PASS",
+      "durationMs": 229
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609150001_auth_profile_session_hardening.sql",
+      "result": "PASS",
+      "durationMs": 216
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609150002_auth_private_browser_boundary_hardening.sql",
+      "result": "PASS",
+      "durationMs": 213
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609150003_auth_public_trust_boundary_hardening.sql",
+      "result": "PASS",
+      "durationMs": 204
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609150004_expert_review_requests.sql",
+      "result": "PASS",
+      "durationMs": 219
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609160001_private_roles_service_rls.sql",
+      "result": "PASS",
+      "durationMs": 202
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609170001_durable_academic_workflows.sql",
+      "result": "PASS",
+      "durationMs": 223
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609170002_demo_entitlements.sql",
+      "result": "PASS",
+      "durationMs": 205
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609170003_profile_presentation_columns.sql",
+      "result": "PASS",
+      "durationMs": 196
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609170004_academic_timetables.sql",
+      "result": "PASS",
+      "durationMs": 216
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609180001_reputation_events_idempotency.sql",
+      "result": "PASS",
+      "durationMs": 215
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202609200001_profile_onboarding_fields.sql",
+      "result": "PASS",
+      "durationMs": 205
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "20260926111838_community_nested_comments.sql",
+      "result": "PASS",
+      "durationMs": 221
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "20260926112754_community_expert_request_linkage.sql",
+      "result": "PASS",
+      "durationMs": 206
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "20260927032100_trust_four_layer_stage_constraint.sql",
+      "result": "PASS",
+      "durationMs": 201
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "20260929135354_studenthub_expert_v5_missions_rooms.sql",
+      "result": "PASS",
+      "durationMs": 250
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "20260929135553_expert_v5_trigger_path_and_fk_indexes.sql",
+      "result": "PASS",
+      "durationMs": 205
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202610010001_integration_outbox_forward_reconciliation.sql",
+      "result": "PASS",
+      "durationMs": 200
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202610010002_profile_presentation_check_reconciliation.sql",
+      "result": "PASS",
+      "durationMs": 204
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202610010003_expert_v5_event_sequence_permissions.sql",
+      "result": "PASS",
+      "durationMs": 204
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202610010001_integration_outbox_forward_reconciliation.sql",
+      "result": "PASS",
+      "durationMs": 200
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202610010002_profile_presentation_check_reconciliation.sql",
+      "result": "PASS",
+      "durationMs": 207
+    },
+    {
+      "database": "studenthub_reconcile_fresh_20261001_r4",
+      "file": "202610010003_expert_v5_event_sequence_permissions.sql",
+      "result": "PASS",
+      "durationMs": 199
+    },
+    {
+      "database": "studenthub_reconcile_production_20261001_r4",
+      "file": "20260926111838_community_nested_comments.sql",
+      "result": "PASS",
+      "durationMs": 206
+    },
+    {
+      "database": "studenthub_reconcile_production_20261001_r4",
+      "file": "20260926112754_community_expert_request_linkage.sql",
+      "result": "PASS",
+      "durationMs": 205
+    },
+    {
+      "database": "studenthub_reconcile_production_20261001_r4",
+      "file": "20260927032100_trust_four_layer_stage_constraint.sql",
+      "result": "PASS",
+      "durationMs": 210
+    },
+    {
+      "database": "studenthub_reconcile_production_20261001_r4",
+      "file": "20260929135354_studenthub_expert_v5_missions_rooms.sql",
+      "result": "PASS",
+      "durationMs": 240
+    },
+    {
+      "database": "studenthub_reconcile_production_20261001_r4",
+      "file": "20260929135553_expert_v5_trigger_path_and_fk_indexes.sql",
+      "result": "PASS",
+      "durationMs": 224
+    },
+    {
+      "database": "studenthub_reconcile_production_20261001_r4",
+      "file": "202610010001_integration_outbox_forward_reconciliation.sql",
+      "result": "PASS",
+      "durationMs": 197
+    },
+    {
+      "database": "studenthub_reconcile_production_20261001_r4",
+      "file": "202610010002_profile_presentation_check_reconciliation.sql",
+      "result": "PASS",
+      "durationMs": 194
+    },
+    {
+      "database": "studenthub_reconcile_production_20261001_r4",
+      "file": "202610010003_expert_v5_event_sequence_permissions.sql",
+      "result": "PASS",
+      "durationMs": 194
+    },
+    {
+      "database": "studenthub_reconcile_staging_20261001_r4",
+      "file": "202609170001_durable_academic_workflows.sql",
+      "result": "PASS",
+      "durationMs": 205
+    },
+    {
+      "database": "studenthub_reconcile_staging_20261001_r4",
+      "file": "202609170002_demo_entitlements.sql",
+      "result": "PASS",
+      "durationMs": 203
+    },
+    {
+      "database": "studenthub_reconcile_staging_20261001_r4",
+      "file": "202609180001_reputation_events_idempotency.sql",
+      "result": "PASS",
+      "durationMs": 210
+    },
+    {
+      "database": "studenthub_reconcile_staging_20261001_r4",
+      "file": "20260926111838_community_nested_comments.sql",
+      "result": "PASS",
+      "durationMs": 216
+    },
+    {
+      "database": "studenthub_reconcile_staging_20261001_r4",
+      "file": "20260927032100_trust_four_layer_stage_constraint.sql",
+      "result": "PASS",
+      "durationMs": 204
+    },
+    {
+      "database": "studenthub_reconcile_staging_20261001_r4",
+      "file": "202610010001_integration_outbox_forward_reconciliation.sql",
+      "result": "PASS",
+      "durationMs": 200
+    },
+    {
+      "database": "studenthub_reconcile_staging_20261001_r4",
+      "file": "202610010002_profile_presentation_check_reconciliation.sql",
+      "result": "PASS",
+      "durationMs": 203
+    },
+    {
+      "database": "studenthub_reconcile_staging_20261001_r4",
+      "file": "202610010003_expert_v5_event_sequence_permissions.sql",
+      "result": "PASS",
+      "durationMs": 207
+    }
+  ],
+  "gates": {
+    "FRESH_DB_MIGRATION_CHAIN": "PASS",
+    "FORWARD_MIGRATION_IDEMPOTENCY": "PASS",
+    "PRODUCTION_UPGRADE_SIMULATION": "PASS_OBSERVED_SCHEMA_FIXTURE",
+    "STAGING_UPGRADE_SIMULATION": "PASS_OBSERVED_SCHEMA_FIXTURE",
+    "INCOMPATIBLE_SCHEMA_REJECTED": "PASS",
+    "UNREVIEWED_PROFILE_CHECK_REJECTED": "PASS",
+    "LOCAL_POSTGRES_RLS_GRANTS_APPEND_ONLY": "PASS",
+    "LOCAL_COMMUNITY_NESTED_FK_LINKAGE": "PASS"
+  },
+  "limitations": [
+    "Vanilla PostgreSQL17.6 with minimal Supabase Auth/Storage compatibility, not the full Supabase platform.",
+    "Upgrade fixtures reproduce read-only observed table/column/check drift and synthetic data; they are not production/staging dumps.",
+    "Cloud policies, grants, functions, triggers and indexes remain unverified where list_tables does not expose them."
+  ],
+  "canonicalFingerprintSha256": "3477e3471724fef032e5274a74564f9e97e3b523ecc3c4d0c1eb3b1f7d155246",
+  "production": {
+    "database": "studenthub_reconcile_production_20261001_r4",
+    "plan": [
+      "20260926111838_community_nested_comments.sql",
+      "20260926112754_community_expert_request_linkage.sql",
+      "20260927032100_trust_four_layer_stage_constraint.sql",
+      "20260929135354_studenthub_expert_v5_missions_rooms.sql",
+      "20260929135553_expert_v5_trigger_path_and_fk_indexes.sql",
+      "202610010001_integration_outbox_forward_reconciliation.sql",
+      "202610010002_profile_presentation_check_reconciliation.sql",
+      "202610010003_expert_v5_event_sequence_permissions.sql"
+    ],
+    "before": {
+      "public.profiles": {
+        "rows": 20,
+        "digest": "2a44d3a516d1005a522ed6b5aef37207"
+      },
+      "public.trust_cases": {
+        "rows": 1025,
+        "digest": "3717851bc08198789771fe0b8304599d"
+      },
+      "public.trust_runs": {
+        "rows": 1366,
+        "digest": "bb9d70430765422560957765650aef83"
+      },
+      "public.trust_stage_runs": {
+        "rows": 1366,
+        "digest": "0256a47daf73121a513b1833d6a8e8af"
+      },
+      "private.reputation_events": {
+        "rows": 328,
+        "digest": "2d432ba23adcc2a3b2c118e9b4c53637"
+      },
+      "private.integration_outbox": {
+        "rows": 372,
+        "digest": "e49ef5769db182fe271706da6a267515"
+      },
+      "private.expert_review_requests": {
+        "rows": 573,
+        "digest": "92b94fefaf7270dc360fd849586e5f38"
+      }
+    },
+    "after": {
+      "public.profiles": {
+        "rows": 20,
+        "digest": "2a44d3a516d1005a522ed6b5aef37207"
+      },
+      "public.trust_cases": {
+        "rows": 1025,
+        "digest": "3717851bc08198789771fe0b8304599d"
+      },
+      "public.trust_runs": {
+        "rows": 1366,
+        "digest": "bb9d70430765422560957765650aef83"
+      },
+      "public.trust_stage_runs": {
+        "rows": 1366,
+        "digest": "0256a47daf73121a513b1833d6a8e8af"
+      },
+      "private.reputation_events": {
+        "rows": 328,
+        "digest": "2d432ba23adcc2a3b2c118e9b4c53637"
+      },
+      "private.integration_outbox": {
+        "rows": 372,
+        "digest": "e49ef5769db182fe271706da6a267515"
+      },
+      "private.expert_review_requests": {
+        "rows": 573,
+        "digest": "92b94fefaf7270dc360fd849586e5f38"
+      }
+    },
+    "legacyInstitutionLabelPreserved": false,
+    "localCanonicalFingerprint": "MATCH"
+  },
+  "staging": {
+    "database": "studenthub_reconcile_staging_20261001_r4",
+    "plan": [
+      "202609170001_durable_academic_workflows.sql",
+      "202609170002_demo_entitlements.sql",
+      "202609180001_reputation_events_idempotency.sql",
+      "20260926111838_community_nested_comments.sql",
+      "20260927032100_trust_four_layer_stage_constraint.sql",
+      "202610010001_integration_outbox_forward_reconciliation.sql",
+      "202610010002_profile_presentation_check_reconciliation.sql",
+      "202610010003_expert_v5_event_sequence_permissions.sql"
+    ],
+    "before": {
+      "public.profiles": {
+        "rows": 20,
+        "digest": "28017a3f57d2d4563d43d65e32617ed0"
+      },
+      "public.trust_cases": {
+        "rows": 7,
+        "digest": "d1346115cd25d55bd896fa95f65167ed"
+      },
+      "public.trust_runs": {
+        "rows": 1,
+        "digest": "c09047950bcdd34d987a1f9914fcb7a7"
+      },
+      "public.trust_stage_runs": {
+        "rows": 0,
+        "digest": "a2e4822a98337283e39f7b60acf85ec9"
+      },
+      "private.reputation_events": {
+        "rows": 0,
+        "digest": "a2e4822a98337283e39f7b60acf85ec9"
+      },
+      "private.integration_outbox": {
+        "rows": 0,
+        "digest": "a2e4822a98337283e39f7b60acf85ec9"
+      },
+      "private.expert_review_requests": {
+        "rows": 7,
+        "digest": "2ba59e7833a4fbbafead012444f776ce"
+      }
+    },
+    "after": {
+      "public.profiles": {
+        "rows": 20,
+        "digest": "28017a3f57d2d4563d43d65e32617ed0"
+      },
+      "public.trust_cases": {
+        "rows": 7,
+        "digest": "d1346115cd25d55bd896fa95f65167ed"
+      },
+      "public.trust_runs": {
+        "rows": 1,
+        "digest": "c09047950bcdd34d987a1f9914fcb7a7"
+      },
+      "public.trust_stage_runs": {
+        "rows": 0,
+        "digest": "a2e4822a98337283e39f7b60acf85ec9"
+      },
+      "private.reputation_events": {
+        "rows": 0,
+        "digest": "a2e4822a98337283e39f7b60acf85ec9"
+      },
+      "private.integration_outbox": {
+        "rows": 0,
+        "digest": "a2e4822a98337283e39f7b60acf85ec9"
+      },
+      "private.expert_review_requests": {
+        "rows": 7,
+        "digest": "2ba59e7833a4fbbafead012444f776ce"
+      }
+    },
+    "legacyInstitutionLabelPreserved": true,
+    "localCanonicalFingerprint": "MATCH"
+  }
+}

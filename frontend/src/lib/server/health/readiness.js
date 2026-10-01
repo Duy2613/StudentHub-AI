@@ -15,6 +15,16 @@ function safeStatus(configured, available) {
   return "UNKNOWN";
 }
 
+export function classifyDatabaseFailure(error) {
+  const code = String(error?.code || "").trim().toUpperCase();
+  if (code === "28P01" || code === "28000") return "DATABASE_AUTH_FAILED";
+  if (code.startsWith("08") || ["ECONNREFUSED", "ECONNRESET", "ETIMEDOUT", "EHOSTUNREACH", "ENETUNREACH", "ENOTFOUND"].includes(code)) {
+    return "DATABASE_CONNECTION_FAILED";
+  }
+  if (/TLS|SSL|CERT/.test(code)) return "DATABASE_TLS_FAILED";
+  return "DATABASE_CHECK_FAILED";
+}
+
 export function getTrustProviderReadiness(env = process.env) {
   const tavily = new TavilyRetriever({ env });
   const gemini = new GeminiProvider({ env });
@@ -39,6 +49,7 @@ export function getTrustProviderReadiness(env = process.env) {
 export async function checkReadiness() {
   const databaseConfigured = hasValue(process.env.DATABASE_URL);
   let databaseAvailable = null;
+  let databaseFailureCode = null;
   let expertQualificationSchemaAvailable = null;
   let reportSchemaAvailable = null;
   let realtimeSchemaAvailable = null;
@@ -59,8 +70,9 @@ export async function checkReadiness() {
       expertQualificationSchemaAvailable = schemaResult.rows[0]?.expert_available === true;
       reportSchemaAvailable = schemaResult.rows[0]?.reports_available === true;
       realtimeSchemaAvailable = schemaResult.rows[0]?.realtime_available === true;
-    } catch {
+    } catch (error) {
       databaseAvailable = false;
+      databaseFailureCode = classifyDatabaseFailure(error);
       expertQualificationSchemaAvailable = false;
       reportSchemaAvailable = false;
       realtimeSchemaAvailable = false;
@@ -84,7 +96,11 @@ export async function checkReadiness() {
 
   const checks = {
     runtime: { status: "AVAILABLE", configured: true },
-    database: { status: safeStatus(databaseConfigured, databaseAvailable), configured: databaseConfigured },
+    database: {
+      status: safeStatus(databaseConfigured, databaseAvailable),
+      configured: databaseConfigured,
+      failureCode: databaseFailureCode,
+    },
     supabaseAuth: { status: supabaseAuthConfigured ? "AVAILABLE" : "NOT_CONFIGURED", configured: supabaseAuthConfigured },
     durableSession: { status: sessionConfigured ? "AVAILABLE" : "NOT_CONFIGURED", configured: sessionConfigured },
     liveProviders: {

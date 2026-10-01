@@ -116,9 +116,13 @@ function normalizeEntity(entity, recordType, index) {
 }
 
 export class OpenAlexAdapter {
-  constructor({ client = new PublicApiClient() } = {}) {
+  constructor({
+    client = new PublicApiClient(),
+    apiKey = process.env.OPENALEX_API_KEY || process.env.OPEN_ALEX_KEY || "",
+  } = {}) {
     this.client = client;
     this.apiId = PUBLIC_API_ID.OPENALEX;
+    this.apiKey = typeof apiKey === "string" ? apiKey.trim() : "";
   }
 
   async searchWorks({ query = "", institution = "", topic = "", fromYear, toYear, limit = 10, signal } = {}) {
@@ -135,7 +139,7 @@ export class OpenAlexAdapter {
       "per-page": boundedLimit(limit),
       select: OPENALEX_WORK_FIELDS,
       ...(filters.length ? { filter: filters.join(",") } : {}),
-    }, { signal });
+    }, { signal, apiKey: this.apiKey });
 
     return this._normalizeCollection(response, "RESEARCH_WORK", (entry, index) => normalizeWork(entry, index), search);
   }
@@ -147,7 +151,7 @@ export class OpenAlexAdapter {
       search,
       "per-page": boundedLimit(limit),
       select: "id,display_name,country_code,homepage_url,works_count,cited_by_count",
-    }, { signal });
+    }, { signal, apiKey: this.apiKey });
     return this._normalizeCollection(response, "RESEARCH_INSTITUTION", (entry, index) => normalizeEntity(entry, "RESEARCH_INSTITUTION", index), search);
   }
 
@@ -158,7 +162,7 @@ export class OpenAlexAdapter {
       search,
       "per-page": boundedLimit(limit),
       select: "id,display_name,subfield,field,domain,works_count",
-    }, { signal });
+    }, { signal, apiKey: this.apiKey });
     return this._normalizeCollection(response, "RESEARCH_TOPIC", (entry, index) => normalizeEntity(entry, "RESEARCH_TOPIC", index), search);
   }
 
@@ -201,6 +205,7 @@ export class OpenAlexAdapter {
       requestedUrl: response.requestedUrl || null,
       fetchedAt: response.fetchedAt || null,
       fromCache: response.fromCache === true,
+      authenticationMode: this.apiKey ? "BEARER_API_KEY" : "ANONYMOUS",
       isAuthoritative: false,
       dataNotice: "OpenAlex chỉ cung cấp metadata/chỉ mục học thuật; cần xác minh nguồn gốc tài liệu trước khi dùng trong Trust.",
     };

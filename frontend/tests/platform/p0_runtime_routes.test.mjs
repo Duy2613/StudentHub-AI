@@ -99,7 +99,13 @@ test("P0 runtime routes enforce auth and never regress to handler 500s", { timeo
       ["POST", "/api/intelligence/fusion/evaluate", 401],
       ["GET", "/api/not-allowlisted", 404],
       ["POST", "/api/not-allowlisted", 404],
-      ["POST", "/api/safety-map/reports", 401],
+      ["GET", "/api/v1/dashboard", 404],
+      ["GET", "/api/scholarships/list", 404],
+      ["POST", "/api/scholarships/match-profile", 404],
+      ["GET", "/api/safety-map/reports", 404],
+      ["POST", "/api/safety-map/reports", 404],
+      ["GET", "/api/sos/bank-hotlines", 404],
+      ["POST", "/api/sos/generate-complaint", 404],
       ["GET", "/api/users/profile?email=student.hust@sis.hust.edu.vn", 401],
       ["PUT", "/api/users/profile", 401],
       ["POST", "/api/users/verify-edu", 401]
@@ -216,13 +222,10 @@ test("P0 runtime routes enforce auth and never regress to handler 500s", { timeo
         authorTrustScore: 100
       })
     });
-    assert.strictEqual(safetyPost.status, 201);
+    assert.strictEqual(safetyPost.status, 404);
     const safetyBody = await safetyPost.json();
-    assert.strictEqual(safetyBody.report.authorId, "student:24110001");
-    assert.strictEqual(safetyBody.report.authorRole, "student");
-    assert.strictEqual(safetyBody.report.authorTrustScore, null);
-    assert.strictEqual(safetyBody.report.severity, "UNDER_REVIEW");
-    assert.strictEqual(safetyBody.report.status, "PENDING_REVIEW");
+    assert.strictEqual(safetyBody.error?.code, "LEGACY_PRODUCT_SURFACE_REMOVED");
+    assert.strictEqual(JSON.stringify(safetyBody).includes("Báo cáo kiểm thử authority"), false);
 
     const unverifiedEduToken = new TokenValidator().signToken({
       sub: "student:24110001",

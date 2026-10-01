@@ -20,6 +20,34 @@ function mark(name) {
   if (typeof window !== "undefined" && window.__trustV4Harness && !performance.getEntriesByName(`trust-v4:${name}`).length) performance.mark(`trust-v4:${name}`);
 }
 
+function projectSavedTrustResult(caseRecord) {
+  const saved = caseRecord?.savedResult;
+  if (saved?.schemaVersion !== "trust.case.snapshot.v2"
+    || !saved.pipeline || typeof saved.pipeline !== "object"
+    || !isUuid(caseRecord?.id) || !Number.isInteger(Number(saved.caseRevision))
+    || Number(saved.caseRevision) < 1 || typeof saved.runId !== "string") return null;
+  try {
+    const requestId = typeof saved.pipeline.requestId === "string" && saved.pipeline.requestId
+      ? saved.pipeline.requestId
+      : "saved-" + caseRecord.id + "-" + saved.caseRevision;
+    return projectTrust({
+      requestId,
+      data: saved.pipeline,
+      caseId: caseRecord.id,
+      caseRevision: Number(saved.caseRevision),
+      runId: saved.runId,
+      persistence: {
+        persisted: true,
+        caseId: caseRecord.id,
+        caseRevision: Number(saved.caseRevision),
+        runId: saved.runId,
+      },
+    });
+  } catch {
+    return null;
+  }
+}
+
 function SavedCases({ initialId, revision, onClose }) {
   const [state, setState] = useState({ status: "loading", rows: [], detail: null });
   const [selected, setSelected] = useState(initialId || "");
@@ -33,19 +61,27 @@ function SavedCases({ initialId, revision, onClose }) {
   useEffect(() => {
     if (!isUuid(selected)) return;
     const controller = new AbortController();
-    apiRequest(`/api/v1/trust/cases/${selected}`, { signal: controller.signal, cache: "no-store" })
+    const revisionParam = selected === initialId && /^\d+$/.test(String(revision || ""))
+      ? "?caseRevision=" + encodeURIComponent(revision)
+      : "";
+    apiRequest("/api/v1/trust/cases/" + encodeURIComponent(selected) + revisionParam, { signal: controller.signal, cache: "no-store" })
       .then((payload) => { if (!controller.signal.aborted) setState((s) => ({ ...s, detail: { id: selected, value: payload.case, failed: false } })); })
       .catch(() => { if (!controller.signal.aborted) setState((s) => ({ ...s, detail: { id: selected, value: null, failed: true } })); });
     return () => controller.abort();
-  }, [selected]);
+  }, [selected, initialId, revision]);
   const metadata = state.rows.find((r) => r.id === selected);
   const detail = state.detail?.id === selected ? state.detail : null;
+  const restoredModel = projectSavedTrustResult(detail?.value);
+  const restoredRevision = detail?.value?.savedResult?.caseRevision;
+  const restoredSnapshot = restoredModel ? {
+    label: (metadata?.input_type || "Hồ sơ kiểm chứng") + " · phiên bản " + restoredRevision,
+  } : null;
   return <section className={styles.section} aria-label="Hồ sơ kiểm chứng đã lưu"><div className={styles.sectionHeading}><h2>Hồ sơ đã lưu</h2><button type="button" className={styles.textButton} onClick={onClose}>Đóng hồ sơ</button></div>
     {state.status === "loading" && <p role="status">Đang đọc hồ sơ được phép xem…</p>}{state.status === "error" && <p role="alert">Không đọc được danh sách hồ sơ. Hãy kiểm tra phiên đăng nhập và quyền truy cập.</p>}
     {state.status === "ready" && !state.rows.length && <p>Chưa có hồ sơ trong danh sách được trả về.</p>}
     <div className={styles.caseList}>{state.rows.map((row) => <button key={row.id} type="button" aria-pressed={selected === row.id} onClick={() => setSelected(row.id)}>{row.input_type || "Hồ sơ kiểm chứng"} · Phiên bản {row.case_revision ?? "chưa rõ"}<TrustDate value={row.created_at} /></button>)}</div>
     {selected && !detail && <p role="status">Đang đọc chi tiết…</p>}{detail?.failed && <p role="alert">Hồ sơ không khả dụng hoặc bạn không có quyền xem.</p>}
-    {detail?.value && <div className={styles.evidence}>{revision && metadata?.case_revision && Number(revision) < metadata.case_revision && <p className={styles.caution}>Liên kết mở phiên bản {revision}; hồ sơ hiện có phiên bản {metadata.case_revision}. Kết luận cũ không được trình bày như kết quả mới nhất.</p>}<h3>Nội dung được phép xem</h3>{(detail.value.claims || []).map((c, i) => <p key={`${c.id}-${i}`}>{c.statement}</p>)}<p className={styles.note}>Hồ sơ này chưa cung cấp toàn bộ kết luận theo phiên bản. Không tái dựng kết luận từ danh sách bằng chứng.</p></div>}
+    {detail?.value && <div className={styles.evidence}>{revision && metadata?.case_revision && Number(revision) < metadata.case_revision && <p className={styles.caution}>Liên kết mở phiên bản {revision}; hồ sơ hiện có phiên bản {metadata.case_revision}. Kết luận cũ không được trình bày như kết quả mới nhất.</p>}<h3>Nội dung được phép xem</h3>{restoredModel ? <><p className={styles.note}>Phiên bản {restoredRevision} · lần chạy {detail.value.savedResult.runId}</p><TrustV4Result model={restoredModel} snapshot={restoredSnapshot} stale={false} previous={false} authenticated={false} onEdit={() => {}} readOnly /></> : <>{(detail.value.claims || []).map((c, i) => <p key={`${c.id}-${i}`}>{c.statement}</p>)}<p className={styles.note}>Không có kết quả công khai đã lưu cho phiên bản này. Không tái dựng kết luận từ danh sách bằng chứng.</p></>}</div>}
   </section>;
 }
 
@@ -173,7 +209,7 @@ function TrustSession({ authenticated }) {
   const stale = result && (result.snapshot.mode !== mode || result.snapshot.content !== content.trim() || result.snapshot.file !== ((mode === "image" || mode === "qr") ? fileData?.bytes || null : null));
   return <div id="trust-main" className={styles.workspace} data-testid="trust-v4">
     <header className={styles.header}><div><p className={styles.eyebrow}>StudentHub · Kiểm chứng</p><h1>Hiểu rõ trước khi tin.</h1><p>Đặt câu hỏi. Đối chiếu nguồn. Nhìn thấy điều còn chưa rõ.</p></div><button type="button" className={styles.historyButton} aria-expanded={history} onClick={() => setHistory(!history)}><History size={17} />Hồ sơ đã lưu</button></header>
-    {history && (authenticated ? <SavedCases initialId={routeCaseId || result?.model.caseId} revision={query.get("caseRevision")} onClose={() => setHistory(false)} /> : <p className={styles.caution}>Đăng nhập để xem hồ sơ kiểm chứng đã lưu.</p>)}
+    {history && (authenticated ? <SavedCases key={`${routeCaseId || result?.model.caseId || "latest"}:${query.get("caseRevision") || ""}`} initialId={routeCaseId || result?.model.caseId} revision={query.get("caseRevision")} onClose={() => setHistory(false)} /> : <p className={styles.caution}>Đăng nhập để xem hồ sơ kiểm chứng đã lưu.</p>)}
     {showInput && <div className={styles.entryGrid}><form className={styles.composer} onSubmit={submit} aria-labelledby="trust-input-title"><span className={styles.eyebrow}>Bắt đầu từ thông tin bạn có</span><h2 id="trust-input-title">Bạn muốn kiểm chứng điều gì?</h2><fieldset className={styles.modeField}><legend className={styles.srOnly}>Loại thông tin</legend>{MODES.map(([id, label, Icon]) => <label key={id} data-selected={mode === id}><input type="radio" name="trust-mode" value={id} checked={mode === id} disabled={pending} onChange={() => changeMode(id)} /><Icon size={17} aria-hidden="true" />{label}</label>)}</fieldset>
       {(mode === "image" || mode === "qr") && <div className={styles.upload}><label htmlFor="trust-file"><FileImage size={24} aria-hidden="true" /><strong>{mode === "qr" ? "Chọn ảnh chứa mã QR" : "Chọn ảnh cần kiểm chứng"}</strong><span>PNG, JPG, WebP · tối đa 8 MB</span></label><input id="trust-file" ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp" disabled={pending} onChange={(e) => void chooseFile(e.target.files?.[0])} />{filePending && <p role="status">Đang đọc tập tin…</p>}{fileData && <div className={styles.filePreview}>{/* Local data image; no remote request or optimizer. */}{
 /* eslint-disable-next-line @next/next/no-img-element */

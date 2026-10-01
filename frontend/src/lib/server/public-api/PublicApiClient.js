@@ -10,7 +10,7 @@
  */
 
 import { validateRemoteUrlSync } from "../../security/hardening/SafeRemoteUrl.js";
-import { getPublicApiDefinition } from "./PublicApiRegistry.js";
+import { getPublicApiDefinition, PUBLIC_API_ID } from "./PublicApiRegistry.js";
 
 const DEFAULT_TIMEOUT_MS = 6000;
 const DEFAULT_MAX_RESPONSE_BYTES = 512 * 1024;
@@ -35,6 +35,7 @@ function toSafeParams(params = {}) {
 }
 
 function classifyHttpFailure(status) {
+  if (status === 401 || status === 403) return { status: "AUTH_FAILED", code: "UPSTREAM_AUTH_FAILED" };
   if (status === 429) return { status: "RATE_LIMITED", code: "UPSTREAM_RATE_LIMITED" };
   if (status >= 500) return { status: "UNAVAILABLE", code: "UPSTREAM_UNAVAILABLE" };
   return { status: "ERROR", code: `UPSTREAM_HTTP_${status}` };
@@ -91,7 +92,7 @@ export class PublicApiClient {
     return { ok: true, url: target.toString(), definition };
   }
 
-  async get(apiId, pathname, params = {}, { signal, timeoutMs, cacheTtlMs } = {}) {
+  async get(apiId, pathname, params = {}, { signal, timeoutMs, cacheTtlMs, apiKey } = {}) {
     const built = this._buildUrl(apiId, pathname, params);
     const startedAt = this.now();
     if (!built.ok) {
@@ -107,7 +108,15 @@ export class PublicApiClient {
     }
 
     const ttl = Math.min(24 * 60 * 60 * 1000, Math.max(0, Number(cacheTtlMs ?? built.definition.defaultCacheTtlMs) || 0));
-    const cacheKey = `${apiId}:${built.url}`;
+    const bearerKey = apiId === PUBLIC_API_ID.OPENALEX
+      && built.definition.auth === "OPTIONAL_BEARER_API_KEY"
+      && typeof apiKey === "string"
+      ? apiKey.trim()
+      : "";
+    const cacheAuthScope = apiId === PUBLIC_API_ID.OPENALEX
+      ? (bearerKey ? "AUTHENTICATED" : "ANONYMOUS")
+      : "PUBLIC";
+    const cacheKey = `${apiId}:${cacheAuthScope}:${built.url}`;
     const cached = this.cache.get(cacheKey);
     if (cached && cached.expiresAt > this.now()) {
       return {
@@ -149,6 +158,7 @@ export class PublicApiClient {
         headers: {
           accept: "application/json",
           "user-agent": "StudentHub-PublicSourceHub/1.0 (+https://studenthub.vn)",
+          ...(bearerKey ? { authorization: `Bearer ${bearerKey}` } : {}),
         },
         redirect: "error",
         signal: controller.signal,

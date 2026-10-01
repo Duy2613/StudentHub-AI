@@ -26,6 +26,7 @@ test("v4 registry lists all six removed features with honest route disposition",
     assert.equal(feature.routeDisposition, "NOT_FOUND", feature.featureId);
     assert.equal(feature.replacementRoute, null, feature.featureId);
     assert.ok(feature.navigationExposure);
+    assert.ok(Array.isArray(feature.formerApiRoutes));
     assert.ok(feature.omniExposure);
     assert.ok(feature.sharedRuntimeExposure);
     assert.ok(feature.testOwnership);
@@ -62,6 +63,37 @@ test("removed page routes call Next notFound instead of rendering feature pages"
     assert.match(source, /import\s+\{\s*notFound\s*\}\s+from\s+["']next\/navigation["']/i, route);
     assert.match(source, /\bnotFound\s*\(\s*\)/, route);
     assert.doesNotMatch(source, /<\w+|router\.(?:push|replace)|redirect\(/, route);
+  }
+});
+
+test("retired API surfaces return body-agnostic no-store 404 responses", () => {
+  const apiRoutes = [
+    ["dashboard", "/api/v1/dashboard", "src/app/api/v1/dashboard/route.js", ["GET"]],
+    ["scholarships", "/api/scholarships/list", "src/app/api/scholarships/list/route.js", ["GET"]],
+    ["scholarships", "/api/scholarships/match-profile", "src/app/api/scholarships/match-profile/route.js", ["POST"]],
+    ["safety-map", "/api/safety-map/reports", "src/app/api/safety-map/reports/route.js", ["GET", "POST"]],
+    ["sos", "/api/sos/bank-hotlines", "src/app/api/sos/bank-hotlines/route.js", ["GET"]],
+    ["sos", "/api/sos/generate-complaint", "src/app/api/sos/generate-complaint/route.js", ["POST"]],
+  ];
+  const features = new Map(REMOVED_PRODUCT_FEATURES.map((feature) => [feature.featureId, feature]));
+  const helper = readFileSync(join(frontendRoot, "src/lib/server/removedProductSurface.js"), "utf8");
+
+  assert.match(helper, /LEGACY_PRODUCT_SURFACE_REMOVED/);
+  assert.match(helper, /status:\s*404/);
+  assert.match(helper, /Cache-Control.*no-store/);
+
+  for (const [featureId, route, file, methods] of apiRoutes) {
+    const source = readFileSync(join(frontendRoot, file), "utf8");
+    assert.ok(features.get(featureId).formerApiRoutes.includes(route), `${featureId} ${route}`);
+    assert.match(source, /removedProductSurfaceResponse/);
+    for (const method of methods) assert.match(source, new RegExp(`export function ${method}\\(\\)`), `${route} ${method}`);
+    assert.doesNotMatch(source, /request\.json|SecurityFabric|SAFETY_REPORTS|SCHOLARSHIP_REGISTRY|complaintDocument/);
+  }
+
+  for (const feature of REMOVED_PRODUCT_FEATURES) {
+    for (const route of feature.formerApiRoutes) {
+      assert.ok(apiRoutes.some((item) => item[1] === route), `Unaccounted removed API route ${route}`);
+    }
   }
 });
 

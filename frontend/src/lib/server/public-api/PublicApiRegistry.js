@@ -22,7 +22,7 @@ export const PUBLIC_API_REGISTRY = Object.freeze([
     name: "OpenAlex",
     category: "ACADEMIC_RESEARCH",
     baseUrl: "https://api.openalex.org",
-    auth: "NONE",
+    auth: "OPTIONAL_BEARER_API_KEY",
     role: "RESEARCH_WORK_INSTITUTION_TOPIC_DISCOVERY",
     evidenceClass: "ACADEMIC_METADATA",
     defaultCacheTtlMs: 6 * 60 * 60 * 1000,

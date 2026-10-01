@@ -10,7 +10,6 @@ test("canonical v1 product façades expose versioned, Security Fabric-wrapped co
     community: ["community.v1", "READ_CANONICAL_COMMUNITY", "QUERY_CANONICAL_COMMUNITY"],
     experts: ["experts.v1", "DISCOVER_CANONICAL_EXPERTS", "EXPERT.READ"],
     academic: ["academic.v1", "READ_CANONICAL_ACADEMIC", "allowAnonymous: false"],
-    dashboard: ["dashboard.v1", "READ_CANONICAL_DASHBOARD", "allowAnonymous: false"],
     search: ["search.v1", "SEARCH_CANONICAL_PRODUCT", "allowAnonymous: true"],
     notifications: ["notifications.v1", "READ_CANONICAL_NOTIFICATIONS", "UPDATE_CANONICAL_NOTIFICATION"],
   };
@@ -20,6 +19,24 @@ test("canonical v1 product façades expose versioned, Security Fabric-wrapped co
     assert.match(source, /SecurityFabric\.wrapHandler/);
     for (const marker of markers) assert.match(source, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `${name}: ${marker}`);
   }
+});
+
+test("removed Dashboard v1 route stays retired", () => {
+  const source = route("dashboard");
+  assert.match(source, /removedProductSurfaceResponse\(\)/);
+  assert.doesNotMatch(source, /SecurityFabric\.wrapHandler|READ_CANONICAL_DASHBOARD/);
+});
+
+test("Community does not convert durable database failures into a generic 500 or demo result", () => {
+  const source = route("community");
+  assert.match(source, /COMMUNITY_STORAGE_UNAVAILABLE/);
+  assert.match(source, /provenance:\s*"UNAVAILABLE"/);
+  assert.match(source, /sourceState:\s*"UNAVAILABLE"/);
+  assert.match(source, /data:\s*null/);
+  assert.match(source, /\{ status: 503/);
+  assert.equal((source.match(/if \(result === null\) return communityUnavailableResponse\(\)/g) || []).length, 2);
+  assert.match(source, /if \(isCommunityDemoMode\(\)\) return CommunityQueryEngine\.query\(query\)/);
+  assert.match(source, /if \(!storageFailure\) throw error/);
 });
 
 test("canonical Trust screens inputs server-side and returns authoritative pipeline layers", () => {

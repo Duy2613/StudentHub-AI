@@ -8,7 +8,9 @@ import { fileURLToPath } from "node:url";
 
 const EXPECTED_PROJECT_REF = "bniwtkjtramqaozrrtrk";
 const FRONTEND_ROOT = resolve(fileURLToPath(new URL("../..", import.meta.url)));
-const STAGING_ENV_PATH = resolve(FRONTEND_ROOT, ".env.staging.local");
+const STAGING_ENV_PATH = process.env.STUDENTHUB_STAGING_ENV_PATH
+  ? resolve(process.env.STUDENTHUB_STAGING_ENV_PATH)
+  : resolve(FRONTEND_ROOT, ".env.staging.local");
 const require = createRequire(import.meta.url);
 
 function stop(code) {
@@ -60,6 +62,7 @@ async function reserveLocalPort() {
 if (!existsSync(STAGING_ENV_PATH)) stop("STAGING_ENV_FILE_MISSING");
 
 const stagingEnv = parseEnv(readFileSync(STAGING_ENV_PATH, "utf8"));
+delete process.env.STUDENTHUB_STAGING_ENV_PATH;
 const stageIdentityKeys = Object.keys(stagingEnv).filter((name) =>
   /^(NEXT_PUBLIC_SUPABASE_URL|SUPABASE_URL|DATABASE_URL|NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY|SUPABASE_SECRET_KEY|STUDENTHUB_SESSION_PEPPER|DATABASE_SSL_CA|DATABASE_SSL_REJECT_UNAUTHORIZED)$/.test(name)
 );
@@ -144,6 +147,9 @@ try {
   stop("AUTH_CAPABILITY_PREFLIGHT_FAILED");
 }
 const authState = authCapabilities();
+const openAlexAuthMode = process.env.OPENALEX_API_KEY || process.env.OPEN_ALEX_KEY
+  ? "BEARER_API_KEY"
+  : "ANONYMOUS";
 
 console.log(`LOCAL_STAGING_PREFLIGHT=PASS`);
 console.log(`SUPABASE_PROJECT_REF=${EXPECTED_PROJECT_REF}`);
@@ -151,6 +157,7 @@ console.log(`SERVER_DATABASE_REF=${EXPECTED_PROJECT_REF}`);
 console.log(`SESSION_REPOSITORY=PostgresSessionRepository via staging DATABASE_URL`);
 console.log(`LEGACY_API_PROXY=DISABLED`);
 console.log(`TAVILY_MODE=OFF TAVILY_MAX_CALLS_PER_RUN=0`);
+console.log(`OPENALEX_AUTH_MODE=${openAlexAuthMode}`);
 console.log(`EMAIL_LOGIN_CAPABILITY=${authState.emailPassword}`);
 console.log(`GOOGLE_LOGIN_CAPABILITY=${authState.google}`);
 console.log(`LOCAL_STUDENTHUB_URL=${localOrigin}`);

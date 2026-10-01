@@ -144,6 +144,7 @@ test("public API catalog exposes bounded sources, topics and model roles", () =>
   assert.equal(catalog.topics.length, 13);
   assert.equal(catalog.models.some((model) => model.capability === "EMBEDDING" && model.status === "NOT_CONFIGURED"), true);
   assert.equal(catalog.officialDiscovery.every((source) => source.isAuthoritative === false && source.canAuthorizeTrustVerdict === false), true);
+  assert.equal(catalog.apis.find((api) => api.id === "OPENALEX")?.auth, "OPTIONAL_BEARER_API_KEY");
   assert.equal(getTopicDefinition("scam_phishing")?.label, "Lừa đảo và phishing");
 });
 
@@ -171,6 +172,112 @@ test("PublicApiClient enforces allowlist, cache, DOI paths, rate limit and body 
   const oversized = new PublicApiClient({ fetchImpl: async () => jsonResponse(200, { value: "x".repeat(2000) }), maxResponseBytes: 1024 });
   const oversizedResult = await oversized.get(PUBLIC_API_ID.OPENALEX, "/works", { search: "large" });
   assert.equal(oversizedResult.code, "UPSTREAM_BODY_TOO_LARGE");
+});
+
+test("OpenAlex authentication failures stay explicit and never expose response details", async () => {
+  for (const statusCode of [401, 403]) {
+    const client = new PublicApiClient({
+      fetchImpl: async () => jsonResponse(statusCode, { message: "private upstream detail" }),
+    });
+    const result = await client.get(PUBLIC_API_ID.OPENALEX, "/works", { search: "student safety" }, { apiKey: "fixture-secret" });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.status, "AUTH_FAILED");
+    assert.equal(result.code, "UPSTREAM_AUTH_FAILED");
+    assert.equal(JSON.stringify(result).includes("private upstream detail"), false);
+    assert.equal(JSON.stringify(result).includes("fixture-secret"), false);
+  }
+});
+
+test("OpenAlex cache separates anonymous and authenticated responses without keying on the secret", async () => {
+  const fixture = createFixtureFetch();
+  const client = new PublicApiClient({ fetchImpl: fixture.fetchImpl });
+  const secret = "openalex-cache-fixture-secret";
+  const anonymous = await client.get(PUBLIC_API_ID.OPENALEX, "/works", { search: "student safety" });
+  const authenticated = await client.get(PUBLIC_API_ID.OPENALEX, "/works", { search: "student safety" }, { apiKey: secret });
+  const authenticatedCached = await client.get(PUBLIC_API_ID.OPENALEX, "/works", { search: "student safety" }, { apiKey: secret });
+
+  assert.equal(anonymous.ok, true);
+  assert.equal(authenticated.ok, true);
+  assert.equal(authenticated.fromCache, false);
+  assert.equal(authenticatedCached.fromCache, true);
+  assert.equal(fixture.calls.length, 2);
+  assert.equal(fixture.calls[1].options.headers.authorization, `Bearer ${secret}`);
+  assert.equal([...client.cache.keys()].some((key) => key.includes(secret)), false);
+});
+
+test("OpenAlex API key uses a provider-scoped bearer header and is never placed in URLs", async () => {
+  const fixture = createFixtureFetch();
+  const client = new PublicApiClient({ fetchImpl: fixture.fetchImpl });
+  const secret = "openalex-fixture-secret";
+  const openAlexResult = await client.get(
+    PUBLIC_API_ID.OPENALEX,
+    "/institutions",
+    { search: "StudentHub University" },
+    { apiKey: secret },
+  );
+  const crossrefResult = await client.get(
+    PUBLIC_API_ID.CROSSREF,
+    "/works",
+    { query: "student systems" },
+    { apiKey: secret },
+  );
+
+  assert.equal(openAlexResult.ok, true);
+  assert.equal(fixture.calls[0].options.headers.authorization, `Bearer ${secret}`);
+  assert.equal(fixture.calls[0].parsed.searchParams.has("api_key"), false);
+  assert.equal(openAlexResult.requestedUrl.includes(secret), false);
+  assert.equal(JSON.stringify(openAlexResult).includes(secret), false);
+  assert.equal(fixture.calls[1].options.headers.authorization, undefined);
+  assert.equal(crossrefResult.ok, true);
+});
+
+test("OpenAlex adapter reads its server key from the environment without exposing it", async () => {
+  const fixture = createFixtureFetch();
+  const client = new PublicApiClient({ fetchImpl: fixture.fetchImpl });
+  const previousKey = process.env.OPENALEX_API_KEY;
+  const secret = "openalex-environment-fixture-secret";
+  process.env.OPENALEX_API_KEY = secret;
+
+  try {
+    const openAlex = new OpenAlexAdapter({ client });
+    const result = await openAlex.searchInstitutions({ query: "StudentHub University" });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.provenance.authenticationMode, "BEARER_API_KEY");
+    assert.equal(fixture.calls[0].options.headers.authorization, `Bearer ${secret}`);
+    assert.equal(fixture.calls[0].parsed.searchParams.has("api_key"), false);
+    assert.equal(JSON.stringify(result).includes(secret), false);
+  } finally {
+    if (previousKey === undefined) delete process.env.OPENALEX_API_KEY;
+    else process.env.OPENALEX_API_KEY = previousKey;
+  }
+});
+
+test("OpenAlex adapter accepts the existing OPEN_ALEX_KEY staging spelling", async () => {
+  const fixture = createFixtureFetch();
+  const client = new PublicApiClient({ fetchImpl: fixture.fetchImpl });
+  const previousKey = process.env.OPENALEX_API_KEY;
+  const previousAlias = process.env.OPEN_ALEX_KEY;
+  const secret = "openalex-staging-alias-fixture";
+  delete process.env.OPENALEX_API_KEY;
+  process.env.OPEN_ALEX_KEY = secret;
+
+  try {
+    const openAlex = new OpenAlexAdapter({ client });
+    const result = await openAlex.searchTopics({ query: "student safety" });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.provenance.authenticationMode, "BEARER_API_KEY");
+    assert.equal(fixture.calls[0].options.headers.authorization, `Bearer ${secret}`);
+    assert.equal(fixture.calls[0].parsed.searchParams.has("api_key"), false);
+    assert.equal(JSON.stringify(result).includes(secret), false);
+  } finally {
+    if (previousKey === undefined) delete process.env.OPENALEX_API_KEY;
+    else process.env.OPENALEX_API_KEY = previousKey;
+    if (previousAlias === undefined) delete process.env.OPEN_ALEX_KEY;
+    else process.env.OPEN_ALEX_KEY = previousAlias;
+  }
 });
 
 test("OpenAlex and Crossref adapters normalize research metadata without authority promotion", async () => {

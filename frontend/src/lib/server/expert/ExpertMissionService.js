@@ -262,6 +262,12 @@ export class ExpertMissionService {
       await client.query("SELECT pg_advisory_xact_lock(hashtextextended($1, 0))", [`expert-missions:${userId}:${date}`]);
       const domains = await activeVerifiedDomains(client, userId);
       if (!domains.length) throw missionError("EXPERT_V5_VERIFIED_SCOPE_REQUIRED", "An active verified Expert domain is required.", 403);
+      await client.query(
+        `UPDATE private.expert_daily_missions
+            SET status = 'EXPIRED'
+          WHERE user_id = $1 AND mission_date < $2::date
+            AND status IN ('AVAILABLE','IN_PROGRESS')`, [userId, date],
+      );
       const policy = await missionPolicy(client, userId);
       const current = await client.query(
         `SELECT domain_code FROM private.expert_daily_missions WHERE user_id = $1 AND mission_date = $2::date`,
@@ -330,12 +336,7 @@ export class ExpertMissionService {
     const userId = authenticatedUserId(principal);
     return withStorageErrors(() => transaction(async (client) => {
       const { timezone, date } = await missionDay(client);
-      await client.query(
-        `UPDATE private.expert_daily_missions
-            SET status = 'EXPIRED'
-          WHERE user_id = $1 AND mission_date < $2::date
-            AND status IN ('AVAILABLE','IN_PROGRESS')`, [userId, date],
-      );
+      const domains = await activeVerifiedDomains(client, userId);
       const policy = await missionPolicy(client, userId);
       const rows = await client.query(
         `SELECT m.id, m.mission_date, m.timezone, m.mission_type, m.domain_code,
@@ -354,7 +355,7 @@ export class ExpertMissionService {
       return {
         missionDate: String(date), timezone, missionLevel: policy.missionLevel,
         completedMissionCount: policy.completed,
-        bankState: rows.rows.length ? "READY" : "NO_VALIDATED_QUESTIONS",
+        bankState: rows.rows.length ? "READY" : domains.length ? "NO_VALIDATED_QUESTIONS" : "VERIFIED_SCOPE_REQUIRED",
         missions: rows.rows.map(dailyMissionDto),
       };
     }));

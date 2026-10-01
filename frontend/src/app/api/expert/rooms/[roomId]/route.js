@@ -7,15 +7,22 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
+async function readRoomId(routeContext) {
+  const params = routeContext && typeof routeContext === "object" && "params" in routeContext
+    ? await routeContext.params
+    : await routeContext;
+  return params?.roomId;
+}
+
 async function readRoom(_request, routeParams, principal, securityContext) {
-  const { roomId } = await routeParams;
+  const roomId = await readRoomId(routeParams);
   try {
     return NextResponse.json({ success: true, contractVersion: "expert-verification-room.v1", data: await ExpertVerificationRoomService.getRoom({ principal, roomId }), meta: { correlationId: securityContext.correlationId } }, { headers: { "Cache-Control": "no-store, max-age=0" } });
   } catch (caught) { return qualificationErrorResponse(caught, securityContext.correlationId); }
 }
 
 async function mutateRoom(request, routeParams, principal, securityContext) {
-  const { roomId } = await routeParams;
+  const roomId = await readRoomId(routeParams);
   let body;
   try { body = await request.json(); }
   catch { return NextResponse.json({ success: false, error: { code: "JSON_REQUIRED", message: "A room action is required." } }, { status: 400 }); }

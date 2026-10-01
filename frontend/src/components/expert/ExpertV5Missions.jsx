@@ -47,7 +47,7 @@ export default function ExpertV5Missions() {
     setBusy(true);
     setError(null);
     try {
-      const assigned = await api("/api/expert/missions", { method: "POST", body: "{}" });
+      const assigned = await api("/api/expert/missions", { method: "POST" });
       setData(assigned || EMPTY_DATA);
     } catch (caught) {
       setError(caught);
@@ -215,7 +215,10 @@ export default function ExpertV5Missions() {
             </article>
           ))}</div> : <div className={styles.empty}>
             <BookOpenCheck size={21} />
-            <div><h3>{data.bankState === "NO_VALIDATED_QUESTIONS" ? "Chưa có câu hỏi thực nguồn đã được duyệt" : "Chưa có nhiệm vụ khả dụng"}</h3><p>Nhiệm vụ chỉ xuất hiện sau khi nguồn công khai được truy xuất thành công, bằng chứng được gắn vào câu hỏi và người biên tập duyệt. Trang bị chặn đăng nhập, paywall hoặc anti-bot sẽ không tạo câu hỏi.</p></div>
+            <div>
+              <h3>{data.bankState === "VERIFIED_SCOPE_REQUIRED" ? "Cần miền chuyên gia đã xác minh" : data.bankState === "NO_VALIDATED_QUESTIONS" ? "Chưa có câu hỏi thực nguồn đã được duyệt" : "Chưa có nhiệm vụ khả dụng"}</h3>
+              <p>{data.bankState === "VERIFIED_SCOPE_REQUIRED" ? "Tài khoản cần có ít nhất một miền chuyên gia đang được xác minh trước khi hệ thống giao nhiệm vụ hằng ngày." : "Nhiệm vụ chỉ xuất hiện sau khi nguồn công khai được truy xuất thành công, bằng chứng được gắn vào câu hỏi và người biên tập duyệt. Trang bị chặn đăng nhập, paywall hoặc anti-bot sẽ không tạo câu hỏi."}</p>
+            </div>
           </div>}
         </section>
       )}

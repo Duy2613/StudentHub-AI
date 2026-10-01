@@ -13,6 +13,39 @@ function normalizeQuery(value) {
   };
 }
 
+function communityUnavailableResponse() {
+  return NextResponse.json({
+    success: false,
+    contractVersion: "community.v1",
+    provenance: "UNAVAILABLE",
+    sourceState: "UNAVAILABLE",
+    isAuthoritative: false,
+    data: null,
+    error: {
+      code: "COMMUNITY_STORAGE_UNAVAILABLE",
+      userMessage: "Dữ liệu Community hiện chưa khả dụng. Không có dữ liệu mẫu thay thế.",
+    },
+  }, { status: 503, headers: { "Cache-Control": "no-store" } });
+}
+
+async function queryCanonicalCommunity(query) {
+  if (isCommunityDemoMode()) return CommunityQueryEngine.query(query);
+  try {
+    const contributions = await CommunityRepository.listContributions({ limit: 100 });
+    return CommunityQueryEngine.queryFromPosts(query, contributions);
+  } catch (error) {
+    const code = typeof error?.code === "string" ? error.code : "";
+    const storageFailure = /^[0-9A-Z]{5}$/.test(code)
+      || /^(ECONN|ETIMEDOUT|ENOTFOUND)/.test(code)
+      || error?.statusCode === 503;
+    if (!storageFailure) throw error;
+    console.warn("[CommunityAPI] Durable community storage unavailable.", {
+      code: /^[0-9A-Z_]{1,24}$/.test(code) ? code : "UNKNOWN",
+    });
+    return null;
+  }
+}
+
 async function readCommunity(request) {
   const url = new URL(request.url);
   const query = normalizeQuery({
@@ -20,9 +53,8 @@ async function readCommunity(request) {
     queryType: url.searchParams.get("queryType"),
     cohort: url.searchParams.get("cohort"),
   });
-  const result = isCommunityDemoMode()
-    ? CommunityQueryEngine.query(query)
-    : CommunityQueryEngine.queryFromPosts(query, await CommunityRepository.listContributions({ limit: 100 }));
+  const result = await queryCanonicalCommunity(query);
+  if (result === null) return communityUnavailableResponse();
   return NextResponse.json({
     success: true,
     contractVersion: "community.v1",
@@ -37,9 +69,8 @@ async function queryCommunity(request) {
   let body;
   try { body = await request.json(); } catch { return NextResponse.json({ success: false, error: { code: "INVALID_JSON", userMessage: "Payload phải là JSON hợp lệ." } }, { status: 400 }); }
   const query = normalizeQuery(body);
-  const result = isCommunityDemoMode()
-    ? CommunityQueryEngine.query(query)
-    : CommunityQueryEngine.queryFromPosts(query, await CommunityRepository.listContributions({ limit: 100 }));
+  const result = await queryCanonicalCommunity(query);
+  if (result === null) return communityUnavailableResponse();
   return NextResponse.json({ success: true, contractVersion: "community.v1", provenance: isCommunityDemoMode() ? "DEMO_FIXTURE" : "DURABLE_POSTGRES", sourceState: isCommunityDemoMode() ? "DEMO_FIXTURE" : "DURABLE_POSTGRES", isAuthoritative: false, data: result });
 }
 

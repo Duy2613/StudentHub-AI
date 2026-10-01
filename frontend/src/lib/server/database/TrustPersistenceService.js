@@ -268,12 +268,35 @@ export class TrustPersistenceService {
    * Retrieves full case details ensuring ownership isolation.
    * Throws 403/404 if case does not belong to ownerId.
    */
-  static async getCaseForOwner(caseId, ownerId) {
+  static async getCaseForOwner(caseId, ownerId, requestedRevision = null) {
     if (!caseId || !ownerId) return null;
-    const record = await DurableTrustRepository.getCaseById(caseId);
+    const revision = requestedRevision === null ? null : Number(requestedRevision);
+    if (revision !== null && (!Number.isInteger(revision) || revision < 1)) return null;
+    const record = await DurableTrustRepository.getCaseById(caseId, { ownerId, revision });
     if (!record) return null;
     if (record.owner_id !== ownerId) return null; // IDOR defense
-    return record;
+    const selected = record.savedRevision;
+    if (revision !== null && Number(selected?.revision) !== revision) return null;
+    const { savedRevision, ...caseDetails } = record;
+    const snapshot = savedRevision?.snapshot && typeof savedRevision.snapshot === "object"
+      ? savedRevision.snapshot
+      : {};
+    const publicPipeline = snapshot.schemaVersion === "trust.case.snapshot.v2"
+      && snapshot.publicPipeline && typeof snapshot.publicPipeline === "object"
+      && !Array.isArray(snapshot.publicPipeline)
+      ? snapshot.publicPipeline
+      : null;
+    return {
+      ...caseDetails,
+      savedResult: publicPipeline ? {
+        schemaVersion: snapshot.schemaVersion,
+        caseRevision: Number(savedRevision.revision),
+        runId: savedRevision.run_id,
+        state: savedRevision.state,
+        createdAt: savedRevision.created_at,
+        pipeline: publicPipeline,
+      } : null,
+    };
   }
 
   /**

@@ -39,10 +39,27 @@ test("mission progression remains separate from credential/reputation mutations"
 test("mission page exposes source link, an honest empty bank state and no per-second live announcements", async () => {
   const page = await read("components/expert/ExpertV5Missions.jsx");
   assert.match(page, /NO_VALIDATED_QUESTIONS/);
+  assert.match(page, /VERIFIED_SCOPE_REQUIRED/);
   assert.match(page, /source\.canonicalUrl/);
   assert.match(page, /paywall|anti-bot/i);
   assert.match(page, /aria-live="polite"/);
   assert.doesNotMatch(page, /aria-live="assertive"/);
+});
+
+test("daily mission readback distinguishes missing verified scope from an empty validated bank", async () => {
+  const service = await read("lib/server/expert/ExpertMissionService.js");
+  const readDaily = service.slice(service.indexOf("static async getDailyMissions"), service.indexOf("static async startMission"));
+  const assignDaily = service.slice(service.indexOf("static async assignDailyMissions"), service.indexOf("static async getDailyMissions"));
+  assert.match(readDaily, /activeVerifiedDomains\(client, userId\)/);
+  assert.match(readDaily, /domains\.length\s*\?\s*"NO_VALIDATED_QUESTIONS"\s*:\s*"VERIFIED_SCOPE_REQUIRED"/);
+  assert.doesNotMatch(readDaily, /\b(?:INSERT|UPDATE|DELETE)\s+(?:INTO\s+)?private\.expert_daily_missions/i);
+  assert.match(assignDaily, /UPDATE private\.expert_daily_missions\s+SET status = 'EXPIRED'/i);
+});
+
+test("daily mission assignment sends no body to the zero-byte POST contract", async () => {
+  const page = await read("components/expert/ExpertV5Missions.jsx");
+  assert.match(page, /api\("\/api\/expert\/missions",\s*\{\s*method:\s*"POST"\s*\}\)/);
+  assert.doesNotMatch(page, /api\("\/api\/expert\/missions",\s*\{[^}]*body:/);
 });
 
 test("V5 audit event and config contracts match every server-side writer", async () => {

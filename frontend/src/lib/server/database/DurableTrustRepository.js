@@ -365,15 +365,15 @@ export class DurableTrustRepository {
    * @param {string} caseId 
    * @returns {Promise<object|null>}
    */
-  static async getCaseById(caseId) {
+  static async getCaseById(caseId, { ownerId = null, revision = null } = {}) {
     const pool = getPostgresPool();
     const caseRes = await pool.query(
-      `SELECT * FROM public.trust_cases WHERE id = $1`,
-      [caseId]
+      `SELECT * FROM public.trust_cases WHERE id = $1 AND ($2::uuid IS NULL OR owner_id = $2)`,
+      [caseId, ownerId]
     );
     if (caseRes.rows.length === 0) return null;
 
-    const [inputsRes, entitiesRes, evidenceRes, claimsRes] = await Promise.all([
+    const [inputsRes, entitiesRes, evidenceRes, claimsRes, revisionRes] = await Promise.all([
       pool.query(`SELECT * FROM public.case_inputs WHERE case_id = $1`, [caseId]),
       pool.query(
         `SELECT e.entity_type, e.normalized_value, ce.relation_type, ce.confidence
@@ -391,6 +391,12 @@ export class DurableTrustRepository {
          WHERE c.creator_id = $1`,
         [caseRes.rows[0].owner_id, caseId]
       ),
+      pool.query(
+        "SELECT revision, run_id, state, snapshot, created_at " +
+        "FROM public.trust_case_revisions WHERE case_id = $1 AND owner_id = $2 " +
+        "AND ($3::integer IS NULL OR revision = $3) ORDER BY revision DESC LIMIT 1",
+        [caseId, caseRes.rows[0].owner_id, revision]
+      ),
     ]);
 
     return {
@@ -399,6 +405,7 @@ export class DurableTrustRepository {
       entities: entitiesRes.rows,
       evidence: evidenceRes.rows,
       claims: claimsRes.rows,
+      savedRevision: revisionRes.rows[0] || null,
     };
   }
 

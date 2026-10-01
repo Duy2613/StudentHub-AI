@@ -1,7 +1,7 @@
 /**
  * StudentHub AI v4 product-scope registry.
- * Removed product routes are retired at the frontend boundary; backend
- * contracts remain available until a separately authorized API migration.
+ * Removed product routes and their former APIs fail closed at the product
+ * boundary. Trust, Community and Expert retain their own canonical contracts.
  */
 
 export const REMOVED_PRODUCT_FEATURES = Object.freeze([
@@ -10,6 +10,7 @@ export const REMOVED_PRODUCT_FEATURES = Object.freeze([
     name: "Dashboard",
     status: "REMOVED_FROM_PRODUCT_SCOPE",
     formerRoutes: ["/dashboard"],
+    formerApiRoutes: ["/api/v1/dashboard"],
     navigationExposure: "Removed from canonical, shell, mobile, landing, and legacy utility navigation; shell brand now points to /.",
     omniExposure: {
       entries: ["dash-1"],
@@ -40,13 +41,14 @@ export const REMOVED_PRODUCT_FEATURES = Object.freeze([
     },
     replacementRoute: null,
     routeDisposition: "NOT_FOUND",
-    notes: "No active v4 route represents the former personal academic dashboard. Dashboard API handlers are retained; no backend contract was changed.",
+    notes: "No active v4 route represents the former personal academic dashboard. Its orphaned API now returns a no-store 404.",
   }),
   Object.freeze({
     featureId: "learning",
     name: "Learning",
     status: "REMOVED_FROM_PRODUCT_SCOPE",
     formerRoutes: ["/learn", "/learn/[courseId]/[lessonId]", "/roadmap", "/quests", "/practice"],
+    formerApiRoutes: [],
     navigationExposure: "Removed from canonical desktop/mobile and shell navigation; landing surfaces use the three active core destinations.",
     omniExposure: {
       entries: ["learn-1", "learn-2", "ai-1"],
@@ -74,22 +76,24 @@ export const REMOVED_PRODUCT_FEATURES = Object.freeze([
     name: "Scholarships",
     status: "REMOVED_FROM_PRODUCT_SCOPE",
     formerRoutes: ["/scholarships"],
+    formerApiRoutes: ["/api/scholarships/list", "/api/scholarships/match-profile"],
     navigationExposure: "Removed from canonical navigation and active shell menus.",
     omniExposure: {
       entries: ["tool-1"],
       searchTerms: ["scholarship", "scholarships", "học bổng"],
     },
-    sharedRuntimeExposure: "No scholarship-specific provider is mounted globally. Scholarship API handlers remain unchanged.",
+    sharedRuntimeExposure: "No scholarship-specific provider is mounted globally. Former API routes return a no-store 404.",
     testOwnership: { classification: "NO_EXCLUSIVE_TESTS_IDENTIFIED", files: [], note: "Authorization coverage remains in shared route and security suites." },
     replacementRoute: null,
     routeDisposition: "NOT_FOUND",
-    notes: "Trust may verify scholarship claims, but it is not a replacement for a scholarship discovery product.",
+    notes: "Trust may verify scholarship claims, but it is not a replacement for a scholarship discovery product. Static discovery and profile matching APIs are retired.",
   }),
   Object.freeze({
     featureId: "tuition-radar",
     name: "Tuition Radar",
     status: "REMOVED_FROM_PRODUCT_SCOPE",
     formerRoutes: ["/tuition-radar"],
+    formerApiRoutes: [],
     navigationExposure: "Removed from canonical navigation and active shell menus.",
     omniExposure: {
       entries: ["tool-2"],
@@ -106,32 +110,34 @@ export const REMOVED_PRODUCT_FEATURES = Object.freeze([
     name: "Safety Map",
     status: "REMOVED_FROM_PRODUCT_SCOPE",
     formerRoutes: ["/safety-map"],
+    formerApiRoutes: ["/api/safety-map/reports"],
     navigationExposure: "Removed from legacy utility navigation and active shell menus.",
     omniExposure: {
       entries: ["tool-3"],
       searchTerms: ["safety map", "bản đồ an toàn", "an toàn khu vực"],
     },
-    sharedRuntimeExposure: "No geospatial or safety-map provider is mounted globally. Safety-report API handlers remain unchanged.",
+    sharedRuntimeExposure: "No geospatial or safety-map provider is mounted globally. Former safety-report API routes return a no-store 404.",
     testOwnership: { classification: "NO_EXCLUSIVE_TESTS_IDENTIFIED", files: [], note: "Geospatial test ownership remains UNKNOWN and is not excluded." },
     replacementRoute: null,
     routeDisposition: "NOT_FOUND",
-    notes: "Trust remains a valid place to verify safety claims; it is not a replacement for the former map product.",
+    notes: "Trust remains a valid place to verify safety claims; it is not a replacement for the former map product. Synthetic alerts and the in-memory report writer are removed.",
   }),
   Object.freeze({
     featureId: "sos",
     name: "SOS",
     status: "REMOVED_FROM_PRODUCT_SCOPE",
     formerRoutes: ["/sos"],
+    formerApiRoutes: ["/api/sos/bank-hotlines", "/api/sos/generate-complaint"],
     navigationExposure: "Removed from desktop legacy utilities and mobile quick actions.",
     omniExposure: {
       entries: ["tool-4"],
       searchTerms: ["sos", "emergency", "khẩn cấp", "hotline"],
     },
-    sharedRuntimeExposure: "No SOS handler or emergency geolocation workflow is mounted globally. SOS API handlers remain unchanged.",
+    sharedRuntimeExposure: "No SOS handler or emergency geolocation workflow is mounted globally. Former SOS APIs return a no-store 404 before reading payloads.",
     testOwnership: { classification: "NO_EXCLUSIVE_TESTS_IDENTIFIED", files: [], note: "Emergency API authorization tests remain visible in shared route coverage." },
     replacementRoute: null,
     routeDisposition: "NOT_FOUND",
-    notes: "No emergency-service replacement is implied by the active three-core product.",
+    notes: "No emergency-service replacement is implied by the active three-core product. The static hotline endpoint and personal-data complaint generator are retired.",
   }),
 ]);
 

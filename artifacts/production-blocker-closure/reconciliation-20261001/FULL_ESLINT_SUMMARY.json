@@ -1,0 +1,18 @@
+{
+  "recordedAt": "2026-10-01",
+  "scope": "frontend full source lint",
+  "files": 1578,
+  "errors": 0,
+  "warnings": 490,
+  "warningsByRule": {
+    "@typescript-eslint/no-unused-vars": 405,
+    "react-hooks/set-state-in-effect": 32,
+    "react-hooks/exhaustive-deps": 8,
+    "@next/next/no-img-element": 7,
+    "react-hooks/purity": 4,
+    "react-hooks/immutability": 2,
+    "react/no-unescaped-entities": 32
+  },
+  "status": "PASS_WITH_WARNINGS",
+  "rawOutputRetainedLocally": "FULL_ESLINT_RESULTS.json"
+}

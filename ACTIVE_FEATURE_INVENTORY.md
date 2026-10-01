@@ -1,6 +1,6 @@
 # Active Feature & Route Inventory
 
-Generated: 2026-10-01 | Branch: codex/studenthub-final-unified-20260930 | Inventory baseline: af1953147ee5b89ea9d58acdfa67c7f1416ae469
+Generated: 2026-10-01 | Branch: release/studenthub-full-sync-20261001 | Inventory baseline: 64634319fe0f744e37b1f0fa39fbe57262ae7798 (current release worktree source, before closure commit)
 
 This is a route/file census, not a control-level inventory of every button, tab, drawer, or form. It inventories every App Router page and API handler found in this worktree and assigns an explicit scope/test disposition. It does not claim that every endpoint has an individual test.
 

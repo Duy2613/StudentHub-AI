@@ -25,3 +25,15 @@ The commit is eligible for the integration remote only. Main promotion is blocke
 | `origin/main` after fresh fetch | `595a99110367aefb545b02dab4b9f9a5a6106ab6` (unchanged) |
 | Main promotion / deployment | Not run; release blockers remain open |
 | Final integration branch tip after this manifest follow-up | Returned in the closure response |
+
+## 2026-10-01 production-only full closure
+
+| Ref | SHA / status |
+|---|---|
+| Release branch | `release/studenthub-full-sync-20261001` |
+| Release branch base | `origin/main` at `595a99110367aefb545b02dab4b9f9a5a6106ab6` |
+| Integrated source head before closure follow-up | `64634319fe0f744e37b1f0fa39fbe57262ae7798` |
+| Production deployment | `dpl_ED91sTmSbtDS3xTzhgCeeiJqeRh7`, `READY`, SHA `595a99110367aefb545b02dab4b9f9a5a6106ab6` |
+| Production schema / recovery | MISMATCH: 22 tables and 6 existing-table columns missing; backup/PITR recovery evidence UNKNOWN |
+| Production migration / main promotion / canary | BLOCKED; not run |
+| Release branch final tip | Recorded by the pushed branch ref and closure response |

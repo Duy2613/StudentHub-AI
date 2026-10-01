@@ -115,12 +115,17 @@ test("canonical v1 APIs expose honest public contracts and fail closed for perso
     assert.equal(legacyReasoningResponse.status, 410);
     assert.equal(legacyReasoningBody.error?.code, "TRUST_REASONING_REQUIRES_CANONICAL_PIPELINE");
 
-    for (const path of ["/api/v1/academic", "/api/v1/dashboard", "/api/v1/notifications"]) {
+    for (const path of ["/api/v1/academic", "/api/v1/notifications"]) {
       const response = await fetch(`${baseUrl}${path}`);
       const body = await parseJsonResponse(response, path);
       assert.equal(response.status, 401, path);
       assert.equal(body.error?.code, "UNAUTHORIZED", path);
     }
+
+    const removedDashboard = await fetch(`${baseUrl}/api/v1/dashboard`);
+    const removedDashboardBody = await parseJsonResponse(removedDashboard, "GET /api/v1/dashboard");
+    assert.equal(removedDashboard.status, 404);
+    assert.equal(removedDashboardBody.error?.code, "LEGACY_PRODUCT_SURFACE_REMOVED");
   } finally {
     server.kill();
   }

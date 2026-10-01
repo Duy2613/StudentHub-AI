@@ -9,7 +9,7 @@
  */
 
 import crypto from "node:crypto";
-import { FOUR_LAYER_STAGE_IDS, STAGE_IDS } from "./contracts.js";
+import { FOUR_LAYER_STAGE_IDS, STAGE_IDS, toPublicPipelineResult } from "./contracts.js";
 import { computeTrustInputHash } from "../../server/database/TrustInputHash.js";
 
 function isValidUuid(str) {
@@ -137,10 +137,11 @@ export class TrustPersistenceMapper {
     }));
     const decision = pipelineResult.finalDecision || pipelineResult.decision || {};
     const snapshot = {
-      schemaVersion: "trust.case.snapshot.v1",
+      schemaVersion: "trust.case.snapshot.v2",
       runId,
       pipelineStatus,
       state: caseRecord.state,
+      publicPipeline: toPublicPipelineResult(pipelineResult),
       stageIds: stageEntries.map(([stageId]) => stageId).slice(0, 7),
       evidenceRefs: Array.isArray(pipelineResult.evidence) ? pipelineResult.evidence.map((entry) => entry?.evidenceId || entry?.id).filter(Boolean).slice(0, 80) : [],
       unknowns: Array.isArray(pipelineResult.assurance?.assuranceReasons) ? pipelineResult.assurance.assuranceReasons.map((value) => boundedText(value, 240)).filter(Boolean).slice(0, 40) : [],
