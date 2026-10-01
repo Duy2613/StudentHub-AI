@@ -144,7 +144,8 @@ for (const environment of ['production','staging']) {
       alter table public.profiles add constraint legacy_major_guard check(major is null or char_length(major)<=160);
       alter table public.profiles add constraint legacy_avatar_guard check(avatar_id is null or avatar_id ~ '^[a-z0-9-]{1,80}$'::text);
       alter table public.profiles add column institution_label text;`);
-    plan = ['202609170001_durable_academic_workflows.sql','202609170002_demo_entitlements.sql','202609180001_reputation_events_idempotency.sql','20260926111838_community_nested_comments.sql','20260927032100_trust_four_layer_stage_constraint.sql', ...forward];
+    plan = ['202609170001_durable_academic_workflows.sql','202609170002_demo_entitlements.sql','202609180001_reputation_events_idempotency.sql','20260926111838_community_nested_comments.sql','20260927032100_trust_four_layer_stage_constraint.sql', ...replaySafeForward];
+    report.stagingFixtureSkippedAlreadyAppliedMigrations = [...oneShotMigrations];
     seed(database, { cases: 7, stages: 0, reputation: 0, outbox: 0, reviews: 7 });
     sql(database, `update public.profiles set institution_label='Legacy field preservation fixture' where id='${userId}';
       insert into private.expert_verification_rooms(host_user_id,domain_code,input_type,challenge_payload,idempotency_key,request_hash)
