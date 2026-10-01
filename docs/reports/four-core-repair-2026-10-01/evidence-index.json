@@ -52,7 +52,7 @@
     },
     "storageAssurance": {
       "artifact": "staging-storage.json",
-      "result": "PASS_TRUST_IMAGE_AND_QR; AVATAR_AND_ROOM_MEDIA_UNCONFIGURED",
+      "result": "PARTIAL; TRUST_DIRECT_IMAGE_AND_QR_PASS; EXPERT_ROOM_IMAGE_AND_QR_FLOW_NOT_VERIFIED; AVATAR_UPLOAD_NOT_IN_PROFILE_CONTRACT",
       "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
       "localArtifact": "storage-local.json"
     },
@@ -88,6 +88,33 @@
       "harnessSha": "bb240430fbf1fe3996eecb3e8c0a6957150e7d23",
       "result": "8/8 account session checks",
       "candidateBound": false
+    }
+  },
+  "productContractDispositions": {
+    "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+    "environment": "CANDIDATE_REVIEW_AND_STAGING",
+    "stagingProjectRef": "bniwtkjtramqaozrrtrk",
+    "AVATAR_STORAGE": {
+      "disposition": "NONCRITICAL_FOLLOWUP",
+      "result": "NOT_REQUIRED_BY_CURRENT_PROFILE_CONTRACT; NOT_A_PASS",
+      "evidence": ["frontend/src/app/profile/page.jsx", "frontend/tests/profile/profile_api_contract.test.mjs"]
+    },
+    "ROOM_MEDIA_STORAGE": {
+      "disposition": "RELEASE_REQUIRED",
+      "result": "NOT_VERIFIED_THROUGH_EXPERT_ROOM; DIRECT_TRUST_IMAGE_AND_QR_STORAGE_PASS_ONLY",
+      "evidence": ["frontend/src/components/expert/ExpertVerificationRooms.jsx", "frontend/src/lib/server/expert/ExpertVerificationRoomService.js", "staging-integration.json", "staging-storage.json"],
+      "dedicatedRoomBucketRequired": false,
+      "requiredProof": "Room IMAGE/QR intake to canonical Trust storage, authorized room readback, owner isolation, and cleanup"
+    },
+    "UNACCENTED_COMMUNITY_SEARCH": {
+      "disposition": "NONCRITICAL_FOLLOWUP",
+      "result": "UNSUPPORTED_BY_CURRENT_SEARCH_CONTRACT; NOT_A_PASS",
+      "evidence": ["staging-integration.json"]
+    },
+    "AUTHOR_FILTER": {
+      "disposition": "NONCRITICAL_FOLLOWUP",
+      "result": "NOT_EXPOSED_BY_CURRENT_ROUTE; NOT_A_PASS",
+      "evidence": ["staging-integration.json"]
     }
   },
   "evidenceFiles": [

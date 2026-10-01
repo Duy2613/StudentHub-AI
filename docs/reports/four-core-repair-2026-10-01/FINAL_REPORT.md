@@ -22,9 +22,20 @@ Candidate được tạo trong worktree riêng để giữ nguyên repository ng
 | Trust | **PASS persistence/owner isolation; PARTIAL live AI** | Text/URL/image/QR persist, L1–L4 hoàn tất, owner đọc lại và người khác nhận 404. Provider mode OFF/budget 0: chưa chứng minh live Gemini/Tavily availability hoặc retrieval holdout/SLO. |
 | Search / nguồn hợp nhất | **PARTIAL** | Community search của bài synthetic mới đọc được ngay bởi user thứ hai ở exact/partial/keyword/tiếng Việt có dấu; recent feed và realtime event bền vững PASS. Query không dấu chưa được hỗ trợ và author-filter route chưa được expose. OpenAlex/Crossref trả metadata; production baseline trước đó ghi /api/v1/search 503. |
 | Realtime | **PASS trong staging cho room scope đã kiểm tra** | Hai browser, SSE reconnect/replay theo cursor, recipient scope, outsider denial và event readback đã kiểm tra; không đại diện cho mọi realtime channel. |
-| Storage/media | **PASS cho Trust image/QR trên staging; PARTIAL coverage** | Bucket private `trust-screenshots-private`: owner upload/read/signed URL PASS; non-owner/anonymous deny; exact-path object và metadata cleanup PASS. Inventory chỉ có bucket này; avatar và room-media bucket chưa được cấu hình. |
+| Storage/media | **PASS cho Trust image/QR trực tiếp trên staging; PARTIAL coverage** | Bucket private `trust-screenshots-private`: owner upload/read/signed URL PASS; non-owner/anonymous deny; exact-path object và metadata cleanup PASS. Evidence hiện chưa xác nhận upload/readback/cleanup cho IMAGE/QR đi qua Expert Room; disposition chi tiết ở mục phân loại contract bên dưới. |
 | Responsive UI | **PASS candidate; FAIL production baseline** | Candidate browser matrix: Chromium/Firefox/WebKit × 4 routes × 4 độ rộng = 48/48. Production baseline cũ: 42/48; sáu lỗi là overflow Community ở 360/390 px, scrollWidth 472–473 px. |
 | Database/migration | **PASS rehearsal; staging migration plan reconciled; production rollout BLOCKED** | Fresh chain 29 migrations, idempotency, observed-schema fixture upgrades và synthetic data preservation PASS trên local disposable PostgreSQL 17.6. Read-only staging ledger reconciliation tìm đủ 8/8 planned migration là APPLIED_EXACT/APPLIED_EQUIVALENT; không duplicate/apply. Production operator DB có 4 migration chắc chắn NOT_APPLIED, 15 UNKNOWN và không có APPLIED_EXACT; runtime DB của Vercel chưa xác minh. |
+
+## Phân loại các mục product-contract ở gate 13
+
+| Mục | Disposition | Trạng thái evidence và căn cứ |
+| --- | --- | --- |
+| `AVATAR_STORAGE` | **NONCRITICAL_FOLLOWUP** | Profile contract hiện nhận `AvatarUrl`; giao diện có ô `type="url"`, không có luồng chọn/tải file avatar. Profile API contract test xác nhận chỉ sửa `FullName/AvatarUrl`. Vì vậy bucket upload avatar riêng không phải gate của contract hiện tại; đây không phải PASS cho upload avatar. |
+| `ROOM_MEDIA_STORAGE` | **RELEASE_REQUIRED** | Expert Room có luồng tạo challenge `IMAGE/QR`, yêu cầu canonical Trust image intake và lưu challenge theo room. Staging chứng minh riêng Trust IMAGE/QR với bucket riêng tư, nhưng artifact hiện tại không chứng minh media được tạo từ room đã liên kết vào Trust artifact, đọc lại đúng quyền qua room và cleanup. Chưa có PASS cho luồng này. Contract không đòi bucket `room-media` riêng: dùng canonical Trust storage là đủ nếu integrated flow được kiểm chứng. |
+| `UNACCENTED_COMMUNITY_SEARCH` | **NONCRITICAL_FOLLOWUP** | Staging exact/partial/keyword và truy vấn tiếng Việt có dấu đều PASS; artifact `staging-integration.json` ghi rõ truy vấn không dấu chưa được hỗ trợ theo contract tìm kiếm hiện tại. Không gọi mục này là PASS. |
+| `AUTHOR_FILTER` | **NONCRITICAL_FOLLOWUP** | Artifact staging ghi `NOT_EXPOSED_BY_CURRENT_ROUTE`; contract hiện tại không yêu cầu bộ lọc theo tác giả. Không gọi mục này là PASS. |
+
+Các disposition này được khóa vào candidate source SHA eea55564ebaef4dc2edc7af14586fe8f04324114 và đối chiếu với staging ref bniwtkjtramqaozrrtrk. Xem `evidence-index.json` để biết file/code evidence cụ thể.
 
 ## Những sửa đổi đã đưa vào candidate
 
@@ -83,7 +94,7 @@ Plan là kết quả rehearsal trên fixture dựng từ catalog read-only và s
 2. Tạo backup mã hóa của đúng production runtime DB, ghi checksum và chứng minh restore trên disposable Supabase-compatible project. Chưa tạo: runtime target chưa rõ, `pg_dump` không có trên PATH, chưa có đích backup/restore được xác minh; Docker có sẵn nhưng không dùng để đoán hoặc kết nối target. Backup Storage objects riêng cũng chưa có.
 3. Resolve 15 migration UNKNOWN và aliases production; bốn file mục tiêu rõ ràng NOT_APPLIED cần preflight trên đúng runtime DB. Không chạy migration khi identity, backup và ledger provenance còn mở.
 4. Hoàn tất maintenance window/operator, abort threshold và approval trước mọi production write/deploy.
-5. Residual product gates: Gemini/Tavily live và fresh unseen retrieval holdout (provider OFF; chưa có corpus/budget được duyệt), avatar/room-media buckets chưa có, unaccented Community search và author-filter route chưa được hỗ trợ. Tavily chưa được gọi.
+5. Residual product gates: Gemini/Tavily live và fresh unseen retrieval holdout (provider OFF; chưa có corpus được duyệt); `ROOM_MEDIA_STORAGE` là RELEASE_REQUIRED nhưng chưa được kiểm chứng qua Expert Room. Avatar upload storage, unaccented Community search và author-filter route là NONCRITICAL_FOLLOWUP theo contract hiện tại. Tavily chưa được gọi.
 6. Sau khi tất cả non-Tavily gates, backup/restore, identity và production approval đạt, mới chạy một Tavily one-shot theo budget rồi chốt rollout/canary/post-deploy verification.
 
 Vì các gate trên chưa đóng, đây **không phải** FULL_FIX_ACCEPTED. Production hiện vẫn chạy deployment cũ và các API đang lỗi không được coi là đã sửa chỉ vì candidate/staging pass.
