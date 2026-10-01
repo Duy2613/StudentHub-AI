@@ -41,3 +41,16 @@ The commit is eligible for the integration remote only. Main promotion is blocke
 | Release branch push | PASS; `git ls-remote` matched this source commit at push time |
 | Vercel preview for closure source commit | QUEUED (`target=null`); not production deployment evidence |
 | GitHub Actions for release branch | No run returned at check time; not a CI pass |
+
+## 2026-10-01 canonical Trust UI continuation
+
+| Ref | SHA / status |
+|---|---|
+| Release branch | `release/studenthub-full-sync-20261001` |
+| Source and evidence commit | `7ac69f92d991dc1647b8254b2e863a9f84e8acb9` (`feat(trust): align journey with canonical four-layer contract`) |
+| Release branch push | PASS; `git ls-remote` matched `7ac69f92d991dc1647b8254b2e863a9f84e8acb9` |
+| `origin/main` | `595a99110367aefb545b02dab4b9f9a5a6106ab6`; unchanged |
+| Production promotion / deployment / canary | BLOCKED; schema drift and backup/PITR gate remain open |
+| Product verdict | `STUDENTHUB_PRODUCTION_RELEASE_PARTIAL` |
+
+This is a release-branch candidate push only. It does not represent Main promotion, a deployment, or production acceptance.

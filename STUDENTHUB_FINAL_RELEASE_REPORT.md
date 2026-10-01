@@ -133,3 +133,5 @@ Verification:
 - Three-core feature folders contain 239 fixture screenshot images (Trust 33, Community 35, Expert 85, Omni 85, release smoke 1). They and the Playwright report/traces are retained outside the repository; `SCREENSHOT_MANIFEST.json` links to the companion file manifest. They are not live-user screenshots.
 
 Release remains `STUDENTHUB_PRODUCTION_RELEASE_PARTIAL`. Production schema is still missing 22 canonical tables and 6 columns, backup/PITR is UNKNOWN, staging credential rotation/invalidation is not independently evidenced, and retrieval quality targets remain unestablished after scorer correction. No production migration, final Tavily campaign, Main promotion, deployment, or production canary was performed. Tavily remains OFF with budget 0.
+
+Candidate integration commit: `7ac69f92d991dc1647b8254b2e863a9f84e8acb9`. It was pushed fast-forward to `origin/release/studenthub-full-sync-20261001`; `git ls-remote` matched that SHA. `origin/main` remains `595a99110367aefb545b02dab4b9f9a5a6106ab6`; Main, deployment and production canary were not changed.
