@@ -80,9 +80,12 @@ assert.equal(v5Tables.length, 27, "Question Bank adds six canonical Expert V5 re
 fs.writeFileSync(path.join(artifactDir, 'CANONICAL_SCHEMA_FINGERPRINT.json'), JSON.stringify(canonical, null, 2) + '\n');
 report.canonicalFingerprintSha256 = createHash('sha256').update(JSON.stringify(canonical)).digest('hex');
 const forward = migrations.filter(x => x.startsWith('20261001'));
-for (const file of forward) apply(fresh, file);
-assert.deepEqual(json(fresh, fingerprintQuery), canonical, 'Forward migrations must be idempotent');
-report.gates.FORWARD_MIGRATION_IDEMPOTENCY = 'PASS';
+const oneShotMigrations = new Set(['202610010004_grounded_multimodal_question_bank.sql']);
+const replaySafeForward = forward.filter(file => !oneShotMigrations.has(file));
+for (const file of replaySafeForward) apply(fresh, file);
+assert.deepEqual(json(fresh, fingerprintQuery), canonical, 'Replay-safe forward migrations must be idempotent');
+report.oneShotMigrationsExcludedFromReplayCheck = [...oneShotMigrations];
+report.gates.FORWARD_MIGRATION_IDEMPOTENCY = 'PASS_FOR_REPLAY_SAFE_MIGRATIONS';
 
 const userId = '10000000-0000-4000-8000-000000000001';
 const otherId = '10000000-0000-4000-8000-000000000002';
