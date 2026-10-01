@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 
 const migration = await readFile(new URL("../../../database/migrations/20260929135354_studenthub_expert_v5_missions_rooms.sql", import.meta.url), "utf8");
 const hardeningMigration = await readFile(new URL("../../../database/migrations/20260929135553_expert_v5_trigger_path_and_fk_indexes.sql", import.meta.url), "utf8");
-const groundedQuestionMigration = await readFile(new URL("../../../database/migrations/20261001165138_grounded_multimodal_question_bank.sql", import.meta.url), "utf8");
+const groundedQuestionMigration = await readFile(new URL("../../../database/migrations/202610010004_grounded_multimodal_question_bank.sql", import.meta.url), "utf8");
 
 test("Expert V5 migration defines source, question, mission and room persistence without fake seed content", () => {
   for (const table of [
