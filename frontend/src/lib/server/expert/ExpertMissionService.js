@@ -88,6 +88,7 @@ function publicQuestion(row) {
     questionId: row.question_id,
     questionVersion: Number(row.question_version),
     questionType: row.question_type,
+    modality: row.modality || row.scenario_modality || "URL",
     prompt: row.prompt,
     choices: asArray(row.choices).map((choice) => ({ id: String(choice.id), label: String(choice.label) })),
     domainCode: row.domain_code,
@@ -98,6 +99,7 @@ function publicQuestion(row) {
       publisher: row.publisher || null,
       retrievedAt: row.retrieved_at ? new Date(row.retrieved_at).toISOString() : null,
       contentHash: row.source_content_hash,
+      scenarioId: row.scenario_id || null,
     },
   };
 }
@@ -116,7 +118,9 @@ function dailyMissionDto(row) {
     assignedAt: row.assigned_at ? new Date(row.assigned_at).toISOString() : null,
     startedAt: row.started_at ? new Date(row.started_at).toISOString() : null,
     completedAt: row.completed_at ? new Date(row.completed_at).toISOString() : null,
-    question: row.question_id ? publicQuestion(row) : null,
+    question: row.question_id && row.question_status === "ACTIVE" && row.retrieval_status === "SUCCESS"
+      && row.source_content_hash === row.current_source_hash
+      && (!row.valid_until || new Date(row.valid_until).getTime() > Date.now()) ? publicQuestion(row) : null,
   };
 }
 
@@ -176,26 +180,44 @@ async function missionPolicy(client, userId) {
 
 async function selectQuestion(client, { userId, missionDate, domainCode, difficulties }) {
   const result = await client.query(
-    `SELECT q.question_id, q.question_version, q.source_snapshot_id, q.domain_code,
+    `SELECT q.question_id, q.question_version, q.source_snapshot_id, q.scenario_id, q.modality, q.domain_code,
             q.question_type, q.difficulty, q.prompt, q.choices, q.answer_key,
-            q.explanation, q.evidence_refs, q.source_content_hash, q.status,
-            q.valid_until, s.canonical_url, s.title AS source_title, s.publisher,
-            s.retrieved_at, s.content_hash AS current_source_hash,
-            s.retrieval_status, s.evidence_items
+            q.explanation, q.evidence_refs, q.source_content_hash, q.status, q.valid_until,
+            coalesce(s.canonical_url, first_input.canonical_url) AS canonical_url,
+            coalesce(s.title, sc.title) AS source_title, s.publisher,
+            coalesce(s.retrieved_at, sc.retrieved_at) AS retrieved_at,
+            coalesce(s.content_hash, sc.input_fingerprint) AS current_source_hash,
+            CASE WHEN q.scenario_id IS NULL THEN s.retrieval_status
+                 WHEN private.expert_v5_scenario_is_current(sc.scenario_id) THEN 'SUCCESS' ELSE 'STALE' END AS retrieval_status,
+            s.evidence_items, sc.modality AS scenario_modality
        FROM private.expert_v5_questions q
-       JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
-       JOIN private.expert_v5_source_registry registry ON registry.id = s.source_id
+       LEFT JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+       LEFT JOIN private.expert_v5_source_registry registry ON registry.id = s.source_id
+       LEFT JOIN private.expert_v5_scenarios sc ON sc.scenario_id = q.scenario_id
+       LEFT JOIN LATERAL (
+         SELECT canonical_url FROM private.expert_v5_scenario_inputs
+          WHERE scenario_id = sc.scenario_id AND canonical_url IS NOT NULL ORDER BY input_index LIMIT 1
+       ) first_input ON true
       WHERE q.status = 'ACTIVE'
-        AND registry.enabled = true
-        AND s.retrieval_status = 'SUCCESS'
-        AND q.source_content_hash = s.content_hash
+        AND NOT EXISTS (
+          SELECT 1 FROM private.expert_v5_questions newer
+           WHERE newer.question_id = q.question_id AND newer.question_version > q.question_version
+             AND newer.status = 'ACTIVE'
+        )
+        AND (
+          (q.scenario_id IS NULL AND registry.enabled = true AND s.retrieval_status = 'SUCCESS'
+            AND q.source_content_hash = s.content_hash)
+          OR
+          (q.scenario_id IS NOT NULL AND private.expert_v5_scenario_is_current(sc.scenario_id)
+            AND q.source_content_hash = sc.input_fingerprint)
+        )
         AND q.domain_code = $3
         AND q.difficulty = ANY($4::text[])
         AND (q.valid_until IS NULL OR q.valid_until > now())
-        AND s.retrieved_at > now() - make_interval(days => (
+        AND (q.scenario_id IS NOT NULL OR s.retrieved_at > now() - make_interval(days => (
           SELECT COALESCE((config_value #>> '{}')::integer, 30)
             FROM private.expert_v5_config WHERE config_key = 'question_validity_days'
-        ))
+        )))
         AND NOT EXISTS (
           SELECT 1 FROM private.expert_daily_missions old
            WHERE old.user_id = $1 AND old.question_id = q.question_id
@@ -214,14 +236,24 @@ async function readMission(client, missionId, userId, { forUpdate = false } = {}
     `SELECT m.id, m.user_id, m.mission_date, m.timezone, m.mission_type,
             m.domain_code, m.mission_level, m.question_id, m.question_version,
             m.difficulty, m.status, m.assigned_at, m.started_at, m.completed_at,
-            q.question_type, q.prompt, q.choices, q.explanation, q.evidence_refs,
+            q.question_type, q.prompt, q.choices, q.explanation, q.evidence_refs, q.scenario_id, q.modality,
             q.answer_key, q.status AS question_status, q.source_content_hash,
-            q.valid_until, s.canonical_url, s.title AS source_title, s.publisher,
-            s.retrieved_at, s.content_hash AS current_source_hash, s.retrieval_status
+            q.valid_until, coalesce(s.canonical_url, first_input.canonical_url) AS canonical_url,
+            coalesce(s.title, sc.title) AS source_title, s.publisher,
+            coalesce(s.retrieved_at, sc.retrieved_at) AS retrieved_at,
+            coalesce(s.content_hash, sc.input_fingerprint) AS current_source_hash,
+            CASE WHEN q.scenario_id IS NULL THEN s.retrieval_status
+                 WHEN private.expert_v5_scenario_is_current(sc.scenario_id) THEN 'SUCCESS' ELSE 'STALE' END AS retrieval_status,
+            sc.modality AS scenario_modality
        FROM private.expert_daily_missions m
        LEFT JOIN private.expert_v5_questions q
          ON q.question_id = m.question_id AND q.question_version = m.question_version
        LEFT JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+       LEFT JOIN private.expert_v5_scenarios sc ON sc.scenario_id = q.scenario_id
+       LEFT JOIN LATERAL (
+         SELECT canonical_url FROM private.expert_v5_scenario_inputs
+          WHERE scenario_id = sc.scenario_id AND canonical_url IS NOT NULL ORDER BY input_index LIMIT 1
+       ) first_input ON true
       WHERE m.id = $1 AND m.user_id = $2${forUpdate ? " FOR UPDATE OF m" : ""}`,
     [missionId, userId],
   );
@@ -313,12 +345,23 @@ export class ExpertMissionService {
         `SELECT m.id, m.mission_date, m.timezone, m.mission_type, m.domain_code,
                 m.mission_level, m.question_id, m.question_version, m.difficulty,
                 m.status, m.assigned_at, m.started_at, m.completed_at,
-                q.question_type, q.prompt, q.choices, q.evidence_refs,
-                s.canonical_url, s.title AS source_title, s.publisher, s.retrieved_at,
-                q.source_content_hash
+                q.question_type, q.prompt, q.choices, q.evidence_refs, q.scenario_id, q.modality,
+                q.status AS question_status, q.valid_until,
+                coalesce(s.canonical_url, first_input.canonical_url) AS canonical_url,
+                coalesce(s.title, sc.title) AS source_title, s.publisher,
+                coalesce(s.retrieved_at, sc.retrieved_at) AS retrieved_at, q.source_content_hash,
+                coalesce(s.content_hash, sc.input_fingerprint) AS current_source_hash,
+                CASE WHEN q.scenario_id IS NULL THEN s.retrieval_status
+                     WHEN private.expert_v5_scenario_is_current(sc.scenario_id) THEN 'SUCCESS' ELSE 'STALE' END AS retrieval_status,
+                sc.modality AS scenario_modality
            FROM private.expert_daily_missions m
            JOIN private.expert_v5_questions q ON q.question_id = m.question_id AND q.question_version = m.question_version
-           JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+           LEFT JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+           LEFT JOIN private.expert_v5_scenarios sc ON sc.scenario_id = q.scenario_id
+           LEFT JOIN LATERAL (
+             SELECT canonical_url FROM private.expert_v5_scenario_inputs
+              WHERE scenario_id = sc.scenario_id AND canonical_url IS NOT NULL ORDER BY input_index LIMIT 1
+           ) first_input ON true
           WHERE m.user_id = $1 AND m.mission_date = $2::date
           ORDER BY m.assigned_at ASC`,
         [userId, date],
@@ -342,12 +385,23 @@ export class ExpertMissionService {
         `SELECT m.id, m.mission_date, m.timezone, m.mission_type, m.domain_code,
                 m.mission_level, m.question_id, m.question_version, m.difficulty,
                 m.status, m.assigned_at, m.started_at, m.completed_at,
-                q.question_type, q.prompt, q.choices, q.evidence_refs,
-                s.canonical_url, s.title AS source_title, s.publisher, s.retrieved_at,
-                q.source_content_hash
+                q.question_type, q.prompt, q.choices, q.evidence_refs, q.scenario_id, q.modality,
+                q.status AS question_status, q.valid_until,
+                coalesce(s.canonical_url, first_input.canonical_url) AS canonical_url,
+                coalesce(s.title, sc.title) AS source_title, s.publisher,
+                coalesce(s.retrieved_at, sc.retrieved_at) AS retrieved_at, q.source_content_hash,
+                coalesce(s.content_hash, sc.input_fingerprint) AS current_source_hash,
+                CASE WHEN q.scenario_id IS NULL THEN s.retrieval_status
+                     WHEN private.expert_v5_scenario_is_current(sc.scenario_id) THEN 'SUCCESS' ELSE 'STALE' END AS retrieval_status,
+                sc.modality AS scenario_modality
            FROM private.expert_daily_missions m
            JOIN private.expert_v5_questions q ON q.question_id = m.question_id AND q.question_version = m.question_version
-           JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+           LEFT JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+           LEFT JOIN private.expert_v5_scenarios sc ON sc.scenario_id = q.scenario_id
+           LEFT JOIN LATERAL (
+             SELECT canonical_url FROM private.expert_v5_scenario_inputs
+              WHERE scenario_id = sc.scenario_id AND canonical_url IS NOT NULL ORDER BY input_index LIMIT 1
+           ) first_input ON true
           WHERE m.user_id = $1 AND m.mission_date = $2::date
           ORDER BY m.assigned_at ASC`,
         [userId, date],
@@ -384,6 +438,9 @@ export class ExpertMissionService {
             WHERE question_id = $1 AND question_version = $2 AND status = 'ACTIVE'`,
           [mission.question_id, mission.question_version],
         );
+        if (mission.scenario_id) {
+          await client.query(`UPDATE private.expert_v5_scenarios SET status = 'STALE', updated_at = now() WHERE scenario_id = $1`, [mission.scenario_id]);
+        }
         await client.query(`UPDATE private.expert_daily_missions SET status = 'UNRESOLVED' WHERE id = $1`, [normalizedMissionId]);
         await addMissionEvent(client, {
           missionId: normalizedMissionId, userId, eventType: "SOURCE_REVALIDATION_REQUIRED",
@@ -436,23 +493,38 @@ export class ExpertMissionService {
     if (!(typeof answer === "string" || (Array.isArray(answer) && answer.length > 0 && answer.length <= 6))) {
       throw missionError("EXPERT_MISSION_ANSWER_INVALID", "Select a supported answer before submitting.", 400);
     }
-    const boundedAnswer = typeof answer === "string" ? answer.trim().slice(0, 120) : [...new Set(answer.map((value) => String(value).trim().slice(0, 120)))].sort();
     return withStorageErrors(() => transaction(async (client) => {
       const attemptResult = await client.query(
         `SELECT a.id, a.mission_id, a.user_id, a.question_id, a.question_version,
                 a.status, a.deadline_at, a.score, a.is_correct, a.result,
                 q.question_type, q.answer_key, q.explanation, q.evidence_refs,
-                q.status AS question_status, q.source_content_hash,
-                s.content_hash AS current_source_hash, s.retrieval_status
+                q.status AS question_status, q.source_content_hash, q.scenario_id,
+                coalesce(s.content_hash, sc.input_fingerprint) AS current_source_hash,
+                CASE WHEN q.scenario_id IS NULL THEN s.retrieval_status
+                     WHEN private.expert_v5_scenario_is_current(sc.scenario_id) THEN 'SUCCESS' ELSE 'STALE' END AS retrieval_status
            FROM private.expert_mission_attempts a
            JOIN private.expert_v5_questions q ON q.question_id = a.question_id AND q.question_version = a.question_version
-           JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+           LEFT JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+           LEFT JOIN private.expert_v5_scenarios sc ON sc.scenario_id = q.scenario_id
           WHERE a.mission_id = $1 AND a.user_id = $2
           FOR UPDATE OF a`,
         [normalizedMissionId, userId],
       );
       const attempt = attemptResult.rows[0];
       if (!attempt) throw missionError("EXPERT_MISSION_NOT_STARTED", "Start this mission before submitting an answer.", 409);
+      const arrayAnswerType = ["MULTIPLE_CHOICE", "MULTI_SELECT", "SOURCE_RANKING"].includes(attempt.question_type);
+      if (arrayAnswerType !== Array.isArray(answer)) {
+        throw missionError("EXPERT_MISSION_ANSWER_INVALID", arrayAnswerType
+          ? "Select one or more supported choices."
+          : "Submit one supported choice.", 400);
+      }
+      const boundedAnswer = typeof answer === "string"
+        ? answer.trim().slice(0, 120)
+        : [...new Set(answer.map((value) => String(value).trim().slice(0, 120)))];
+      if (attempt.question_type === "SOURCE_RANKING" && boundedAnswer.length !== answer.length) {
+        throw missionError("EXPERT_MISSION_ANSWER_INVALID", "A ranking answer cannot repeat a choice.", 400);
+      }
+      if (attempt.question_type !== "SOURCE_RANKING" && Array.isArray(boundedAnswer)) boundedAnswer.sort();
       if (attempt.status === "EVALUATED" || attempt.status === "REVIEW_REQUIRED") {
         const previousAnswer = await client.query(`SELECT answer FROM private.expert_mission_answers WHERE attempt_id = $1`, [attempt.id]);
         const oldValue = previousAnswer.rows[0]?.answer;
@@ -477,6 +549,7 @@ export class ExpertMissionService {
         || attempt.source_content_hash !== attempt.current_source_hash) {
         await client.query(`UPDATE private.expert_mission_attempts SET status = 'REVIEW_REQUIRED', submitted_at = now() WHERE id = $1`, [attempt.id]);
         await client.query(`UPDATE private.expert_v5_questions SET status = 'REVALIDATION_REQUIRED', updated_at = now() WHERE question_id = $1 AND question_version = $2`, [attempt.question_id, attempt.question_version]);
+        if (attempt.scenario_id) await client.query(`UPDATE private.expert_v5_scenarios SET status = 'STALE', updated_at = now() WHERE scenario_id = $1`, [attempt.scenario_id]);
         await client.query(`UPDATE private.expert_daily_missions SET status = 'UNRESOLVED' WHERE id = $1`, [normalizedMissionId]);
         return { attempt: { ...attemptDto(attempt), status: "REVIEW_REQUIRED" }, missionState: "UNRESOLVED", idempotent: false };
       }
@@ -554,12 +627,19 @@ export class ExpertMissionService {
                 m.mission_level, m.difficulty, m.status AS mission_status,
                 m.completed_at, a.id AS attempt_id, a.status AS attempt_status,
                 a.started_at, a.submitted_at, a.score, a.is_correct, a.result,
-                q.prompt, q.question_type, s.canonical_url, s.title AS source_title,
-                s.publisher, s.retrieved_at, q.source_content_hash
+                q.prompt, q.question_type, q.modality,
+                coalesce(s.canonical_url, first_input.canonical_url) AS canonical_url,
+                coalesce(s.title, sc.title) AS source_title,
+                s.publisher, coalesce(s.retrieved_at, sc.retrieved_at) AS retrieved_at, q.source_content_hash
            FROM private.expert_daily_missions m
            LEFT JOIN private.expert_mission_attempts a ON a.mission_id = m.id AND a.user_id = m.user_id
            JOIN private.expert_v5_questions q ON q.question_id = m.question_id AND q.question_version = m.question_version
-           JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+           LEFT JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+           LEFT JOIN private.expert_v5_scenarios sc ON sc.scenario_id = q.scenario_id
+           LEFT JOIN LATERAL (
+             SELECT canonical_url FROM private.expert_v5_scenario_inputs
+              WHERE scenario_id = sc.scenario_id AND canonical_url IS NOT NULL ORDER BY input_index LIMIT 1
+           ) first_input ON true
           WHERE m.user_id = $1
           ORDER BY m.mission_date DESC, m.assigned_at DESC LIMIT $2`, [userId, boundedLimit],
       );
@@ -581,7 +661,7 @@ export class ExpertMissionService {
           result: asObject(row.result),
         } : null,
         question: row.prompt ? {
-          prompt: row.prompt, questionType: row.question_type,
+          prompt: row.prompt, questionType: row.question_type, modality: row.modality,
           source: { canonicalUrl: row.canonical_url, title: row.source_title, publisher: row.publisher, retrievedAt: row.retrieved_at, contentHash: row.source_content_hash },
         } : null,
       }));

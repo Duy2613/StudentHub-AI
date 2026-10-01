@@ -6,9 +6,12 @@ import {
   canServeQuestion,
   classifyRemoteRetrieval,
   deriveQuestionDifficulty,
+  EXPERT_V5_DIFFICULTIES,
+  EXPERT_V5_MODALITIES,
   EXPERT_V5_QUESTION_TYPES,
   validateQuestionActivation,
 } from "./ExpertV5Domain.js";
+import { normalizeQuestionText } from "./ExpertQuestionPipeline.js";
 
 function error(code, message, statusCode = 400) {
   return new ExpertQualificationError(code, message, statusCode);
@@ -104,6 +107,7 @@ function snapshotDto(row) {
   return {
     snapshotId: row.id,
     sourceId: row.source_id,
+    trustCaseId: row.trust_case_id || null,
     requestedUrl: row.requested_url,
     canonicalUrl: row.canonical_url,
     title: row.title,
@@ -193,6 +197,7 @@ function toSnapshotResult({ requestedUrl, responsePayload, responseStatus, faile
     : retrievalStatus === "UNAVAILABLE" ? text(failedCode || responsePayload?.error?.code || "NO_LIVE_SOURCE_EVIDENCE", 120)
       : null;
   return {
+    trustCaseId: /^[0-9a-f-]{36}$/i.test(String(responsePayload?.caseId || "")) ? String(responsePayload.caseId).toLowerCase() : null,
     requestedUrl,
     canonicalUrl,
     title: successful ? text(source.title, 500) || null : null,
@@ -259,6 +264,17 @@ function normalizedChoices(value) {
 }
 
 export class ExpertQuestionBankService {
+  static async runTrustInput({ request, principal, securityContext, input, idempotencyKey }) {
+    const { runCanonicalTrust } = await import("@/app/api/v1/trust/route.js");
+    const trustRequest = new Request(new URL("/api/v1/trust", request.url), {
+      method: "POST",
+      headers: { "content-type": "application/json", "Idempotency-Key": idempotencyKey },
+      body: JSON.stringify({ ...input, version: "v5" }),
+      signal: request.signal,
+    });
+    return runCanonicalTrust(trustRequest, null, principal, securityContext);
+  }
+
   static async listSources() {
     return withStorageErrors(() => transaction(async (client) => {
       const result = await client.query(
@@ -276,7 +292,7 @@ export class ExpertQuestionBankService {
     const boundedLimit = Math.max(1, Math.min(200, Number(limit) || 100));
     return withStorageErrors(() => transaction(async (client) => {
       const result = await client.query(
-        `SELECT id, source_id, requested_url, canonical_url, title, publisher,
+        `SELECT id, source_id, trust_case_id, requested_url, canonical_url, title, publisher,
                 published_at, retrieved_at, source_type, content_hash, retrieval_status,
                 blocked_reason, evidence_items, provider_metadata
            FROM private.expert_v5_source_snapshots
@@ -440,13 +456,13 @@ export class ExpertQuestionBankService {
     return withStorageErrors(() => transaction(async (client) => {
       const result = await client.query(
         `INSERT INTO private.expert_v5_source_snapshots
-          (source_id, requested_url, canonical_url, title, publisher, published_at,
+          (source_id, trust_case_id, requested_url, canonical_url, title, publisher, published_at,
            source_type, content_hash, retrieval_status, blocked_reason, ingestion_key,
            evidence_items, provider_metadata)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12::jsonb,$13::jsonb)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb,$14::jsonb)
          ON CONFLICT DO NOTHING
          RETURNING *`,
-          [sourceId, snapshot.requestedUrl, snapshot.canonicalUrl, snapshot.title, snapshot.publisher,
+          [sourceId, snapshot.trustCaseId, snapshot.requestedUrl, snapshot.canonicalUrl, snapshot.title, snapshot.publisher,
           snapshot.publishedAt, snapshot.sourceType, snapshot.contentHash, snapshot.retrievalStatus,
           snapshot.blockedReason, durableIngestionKey,
           JSON.stringify(snapshot.evidenceItems), JSON.stringify(snapshot.providerMetadata)],
@@ -486,27 +502,45 @@ export class ExpertQuestionBankService {
     }));
   }
 
-  static async listQuestions({ status = null, limit = 100 } = {}) {
+  static async listQuestions({ status = null, limit = 100, scenarioId = null, questionId = null, questionVersion = null, questionType = null, modality = null } = {}) {
     const allowedStatus = new Set(["DRAFT", "ACTIVE", "REVALIDATION_REQUIRED", "RETIRED"]);
     const filter = allowedStatus.has(String(status || "").toUpperCase()) ? String(status).toUpperCase() : null;
     const boundedLimit = Math.max(1, Math.min(200, Number(limit) || 100));
+    const scenarioFilter = scenarioId ? normalizeUuid(scenarioId, "scenarioId") : null;
+    const questionFilter = questionId ? normalizeUuid(questionId, "questionId") : null;
+    const versionFilter = Number.isInteger(Number(questionVersion)) && Number(questionVersion) > 0 ? Number(questionVersion) : null;
+    const typeFilter = EXPERT_V5_QUESTION_TYPES.includes(String(questionType || "").toUpperCase()) ? String(questionType).toUpperCase() : null;
+    const modalityFilter = EXPERT_V5_MODALITIES.includes(String(modality || "").toUpperCase()) ? String(modality).toUpperCase() : null;
     return withStorageErrors(() => transaction(async (client) => {
       const result = await client.query(
-        `SELECT q.question_id, q.question_version, q.source_snapshot_id, q.domain_code,
+        `SELECT q.question_id, q.question_version, q.source_snapshot_id, q.scenario_id, q.modality,
+                q.domain_code,
                 q.question_type, q.difficulty, q.prompt, q.choices, q.answer_key,
-                q.explanation, q.evidence_refs, q.difficulty_features, q.source_content_hash,
+                q.explanation, q.evidence_refs, q.claim_refs, q.rubric, q.skills, q.limitations,
+                q.generation_provenance, q.validation_status, q.difficulty_features, q.source_content_hash,
                 q.status, q.valid_until, q.editorial_reviewer_id, q.reviewed_at,
                 q.created_by, q.created_at, s.canonical_url, s.title AS source_title,
-                s.publisher, s.retrieved_at, s.retrieval_status
+                s.publisher, s.retrieved_at, s.retrieval_status, sc.title AS scenario_title,
+                sc.status AS scenario_status, sc.input_fingerprint AS scenario_fingerprint
            FROM private.expert_v5_questions q
-           JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
-          WHERE ($1::text IS NULL OR q.status = $1)
-          ORDER BY q.created_at DESC LIMIT $2`, [filter, boundedLimit],
+           LEFT JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+           LEFT JOIN private.expert_v5_scenarios sc ON sc.scenario_id = q.scenario_id
+           WHERE ($1::text IS NULL OR q.status = $1)
+             AND ($2::uuid IS NULL OR q.scenario_id = $2)
+             AND ($3::uuid IS NULL OR q.question_id = $3)
+             AND ($4::integer IS NULL OR q.question_version = $4)
+             AND ($5::text IS NULL OR q.question_type = $5)
+             AND ($6::text IS NULL OR q.modality = $6)
+           ORDER BY q.created_at DESC, q.question_id, q.question_version DESC LIMIT $7`,
+        [filter, scenarioFilter, questionFilter, versionFilter, typeFilter, modalityFilter, boundedLimit],
       );
       return result.rows.map((row) => ({
         questionId: row.question_id,
         questionVersion: Number(row.question_version),
         sourceSnapshotId: row.source_snapshot_id,
+        scenarioId: row.scenario_id || null,
+        modality: row.modality || null,
+        scenario: row.scenario_id ? { title: row.scenario_title, status: row.scenario_status, inputFingerprint: row.scenario_fingerprint } : null,
         domainCode: row.domain_code,
         questionType: row.question_type,
         difficulty: row.difficulty,
@@ -515,6 +549,12 @@ export class ExpertQuestionBankService {
         answerKey: parseJson(row.answer_key, row.answer_key),
         explanation: row.explanation,
         evidenceRefs: parseJson(row.evidence_refs, []),
+        claimRefs: parseJson(row.claim_refs, []),
+        rubric: parseJson(row.rubric, {}),
+        skills: parseJson(row.skills, []),
+        limitations: parseJson(row.limitations, []),
+        generationProvenance: parseJson(row.generation_provenance, {}),
+        validationStatus: row.validation_status || "PENDING",
         difficultyFeatures: parseJson(row.difficulty_features, {}),
         sourceContentHash: row.source_content_hash,
         status: row.status,
@@ -536,8 +576,9 @@ export class ExpertQuestionBankService {
     if (!EXPERT_V5_QUESTION_TYPES.includes(questionType)) throw error("EXPERT_V5_QUESTION_TYPE_UNSUPPORTED", "This answer type has no deterministic evaluator.", 400);
     const prompt = text(question.prompt, 1200);
     const choices = normalizedChoices(question.choices);
-    const answerKey = questionType === "MULTIPLE_CHOICE"
-      ? [...new Set((Array.isArray(question.answerKey) ? question.answerKey : []).map((id) => text(id, 32)))].sort()
+    const answerValues = [...new Set((Array.isArray(question.answerKey) ? question.answerKey : []).map((id) => text(id, 32)))];
+    const answerKey = ["MULTIPLE_CHOICE", "MULTI_SELECT", "SOURCE_RANKING"].includes(questionType)
+      ? questionType === "SOURCE_RANKING" ? answerValues : answerValues.sort()
       : questionType === "TRUE_FALSE" ? text(question.answerKey, 32).toUpperCase() : text(question.answerKey, 32);
     const explanation = text(question.explanation, 2400);
     const evidenceIds = Array.isArray(question.evidenceIds) ? [...new Set(question.evidenceIds.map((id) => text(id, 160)).filter(Boolean))].slice(0, 10) : [];
@@ -587,20 +628,100 @@ export class ExpertQuestionBankService {
     }));
   }
 
+  static async createQuestionVersion({ principal, questionId, questionVersion = 1, changes = {} }) {
+    const actorId = authenticatedUserId(principal);
+    const id = normalizeUuid(questionId, "questionId");
+    const version = Math.max(1, Math.trunc(Number(questionVersion) || 1));
+    if (!changes || typeof changes !== "object" || Array.isArray(changes)) {
+      throw error("EXPERT_V5_QUESTION_VERSION_INVALID", "Version changes must be an object.", 400);
+    }
+    return withStorageErrors(() => transaction(async (client) => {
+      const selected = await client.query(
+        `SELECT * FROM private.expert_v5_questions WHERE question_id = $1 AND question_version = $2 FOR UPDATE`, [id, version],
+      );
+      const old = selected.rows[0];
+      if (!old) throw error("EXPERT_V5_QUESTION_NOT_FOUND", "Question version was not found.", 404);
+      if (old.status === "RETIRED") throw error("EXPERT_V5_QUESTION_VERSION_RETIRED", "A retired question version cannot be used as an edit base.", 409);
+      const questionType = text(changes.questionType ?? old.question_type, 40).toUpperCase();
+      if (!EXPERT_V5_QUESTION_TYPES.includes(questionType)) throw error("EXPERT_V5_QUESTION_TYPE_UNSUPPORTED", "This answer type has no deterministic evaluator.", 400);
+      const prompt = text(changes.prompt ?? old.prompt, 1200);
+      const choices = normalizedChoices(changes.choices ?? parseJson(old.choices, []));
+      const rawAnswer = changes.answerKey === undefined ? parseJson(old.answer_key, old.answer_key) : changes.answerKey;
+      const answerKey = ["MULTIPLE_CHOICE", "MULTI_SELECT", "SOURCE_RANKING"].includes(questionType)
+        ? [...new Set((Array.isArray(rawAnswer) ? rawAnswer : []).map((value) => text(value, 32)).filter(Boolean))]
+          .sort((left, right) => questionType === "SOURCE_RANKING" ? (Array.isArray(rawAnswer) ? rawAnswer.indexOf(left) - rawAnswer.indexOf(right) : 0) : left.localeCompare(right))
+        : questionType === "TRUE_FALSE" ? text(rawAnswer, 32).toUpperCase() : text(rawAnswer, 32);
+      const explanation = text(changes.explanation ?? old.explanation, 2400);
+      const evidenceRefs = changes.evidenceRefs === undefined ? parseJson(old.evidence_refs, []) : changes.evidenceRefs;
+      const claimRefs = changes.claimRefs === undefined ? parseJson(old.claim_refs, []) : changes.claimRefs;
+      const rubric = changes.rubric === undefined ? parseJson(old.rubric, {}) : changes.rubric;
+      const skills = changes.skills === undefined ? parseJson(old.skills, []) : changes.skills;
+      const limitations = changes.limitations === undefined ? parseJson(old.limitations, []) : changes.limitations;
+      const difficulty = text(changes.difficulty ?? old.difficulty, 16).toUpperCase();
+      if (!EXPERT_V5_DIFFICULTIES.includes(difficulty)) throw error("EXPERT_V5_DIFFICULTY_INVALID", "Difficulty must be EASY, MEDIUM, or HARD.", 400);
+      if (!Array.isArray(evidenceRefs) || !Array.isArray(claimRefs) || !Array.isArray(skills) || !Array.isArray(limitations)
+        || !rubric || typeof rubric !== "object" || Array.isArray(rubric)) {
+        throw error("EXPERT_V5_QUESTION_VERSION_INVALID", "Version evidence, claims, rubric, skills, and limitations must use their canonical shapes.", 400);
+      }
+      const versionResult = await client.query(`SELECT COALESCE(max(question_version), 0)::integer AS latest FROM private.expert_v5_questions WHERE question_id = $1`, [id]);
+      const nextVersion = Number(versionResult.rows[0]?.latest || 0) + 1;
+      const promptHash = createHash("sha256").update(normalizeQuestionText(prompt)).digest("hex");
+      const provenance = {
+        ...parseJson(old.generation_provenance, {}),
+        editedBy: actorId,
+        editedAt: new Date().toISOString(),
+        editedFromVersion: version,
+        generationIsNotEditorialApproval: true,
+      };
+      const inserted = await client.query(
+        `INSERT INTO private.expert_v5_questions
+          (question_id, question_version, source_snapshot_id, scenario_id, modality, domain_code,
+           question_type, difficulty, prompt, choices, answer_key, explanation, evidence_refs,
+           difficulty_features, source_content_hash, status, created_by, claim_refs, rubric,
+           skills, limitations, generation_provenance, validation_status, normalized_prompt_hash,
+           source_claim_fingerprint, semantic_fingerprint, generation_run_id)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11::jsonb,$12,$13::jsonb,$14::jsonb,$15,'DRAFT',$16,$17::jsonb,$18::jsonb,$19::jsonb,$20::jsonb,$21::jsonb,'PENDING',$22,$23,$24,$25)
+         RETURNING question_id, question_version, question_type, difficulty, status, created_at`,
+        [id, nextVersion, old.source_snapshot_id, old.scenario_id, old.modality, old.domain_code,
+          questionType, difficulty, prompt, JSON.stringify(choices), JSON.stringify(answerKey), explanation,
+          JSON.stringify(evidenceRefs), JSON.stringify(parseJson(old.difficulty_features, {})), old.source_content_hash,
+          actorId, JSON.stringify(claimRefs), JSON.stringify(rubric), JSON.stringify(skills), JSON.stringify(limitations),
+          JSON.stringify(provenance), promptHash, old.source_claim_fingerprint || null, old.semantic_fingerprint || null,
+          old.generation_run_id || null],
+      );
+      await client.query(
+        `INSERT INTO private.expert_v5_question_events(question_id, question_version, actor_id, event_type, payload, idempotency_key)
+         VALUES ($1,$2,$3,'VERSION_CREATED',$4::jsonb,$5) ON CONFLICT (idempotency_key) DO NOTHING`,
+        [id, nextVersion, actorId, JSON.stringify({ previousVersion: version, promptHash, sourceContentHash: old.source_content_hash }), `question-version:${id}:${nextVersion}`],
+      );
+      return {
+        questionId: inserted.rows[0].question_id,
+        questionVersion: Number(inserted.rows[0].question_version),
+        questionType: inserted.rows[0].question_type,
+        difficulty: inserted.rows[0].difficulty,
+        status: inserted.rows[0].status,
+        validationStatus: "PENDING",
+      };
+    }));
+  }
+
   static async activateQuestion({ principal, questionId, questionVersion = 1, reviewChecks }) {
     const actorId = authenticatedUserId(principal);
     const id = normalizeUuid(questionId, "questionId");
     const version = Math.max(1, Math.trunc(Number(questionVersion) || 1));
     return withStorageErrors(() => transaction(async (client) => {
       const result = await client.query(
-        `SELECT q.question_id, q.question_version, q.source_snapshot_id, q.domain_code,
+        `SELECT q.question_id, q.question_version, q.source_snapshot_id, q.scenario_id, q.modality,
+                q.domain_code,
                 q.question_type, q.difficulty, q.prompt, q.choices, q.answer_key,
                 q.explanation, q.evidence_refs, q.source_content_hash, q.status,
                 s.canonical_url, s.content_hash, s.retrieval_status, s.evidence_items, s.retrieved_at,
-                r.enabled AS registry_enabled
+                r.enabled AS registry_enabled,
+                sc.status AS scenario_status, sc.input_fingerprint AS scenario_fingerprint
            FROM private.expert_v5_questions q
-           JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
-           JOIN private.expert_v5_source_registry r ON r.id = s.source_id
+           LEFT JOIN private.expert_v5_source_snapshots s ON s.id = q.source_snapshot_id
+           LEFT JOIN private.expert_v5_source_registry r ON r.id = s.source_id
+           LEFT JOIN private.expert_v5_scenarios sc ON sc.scenario_id = q.scenario_id
           WHERE q.question_id = $1 AND q.question_version = $2 FOR UPDATE OF q`, [id, version],
       );
       const row = result.rows[0];
@@ -617,11 +738,68 @@ export class ExpertQuestionBankService {
         retrievedAt: row.retrieved_at,
         evidenceItems: sourceEvidence,
       };
+      if (row.scenario_id) {
+        const scenarioLinks = await client.query(
+          `SELECT sc.status, sc.input_fingerprint,
+                  private.expert_v5_scenario_is_current(sc.scenario_id) AS is_current,
+                  coalesce((SELECT array_agg(claim_id::text) FROM private.expert_v5_scenario_claims WHERE scenario_id = sc.scenario_id), '{}') AS claim_ids,
+                  coalesce((SELECT array_agg(evidence_id::text) FROM private.expert_v5_scenario_evidence WHERE scenario_id = sc.scenario_id), '{}') AS evidence_ids,
+                  coalesce((
+                    SELECT jsonb_object_agg(edges.claim_id::text, to_jsonb(edges.evidence_ids))
+                      FROM (
+                        SELECT claim_links.claim_id, array_agg(DISTINCT cs.evidence_id::text) AS evidence_ids
+                          FROM private.expert_v5_scenario_claims claim_links
+                          JOIN private.expert_v5_scenario_inputs inputs
+                            ON inputs.scenario_id = claim_links.scenario_id AND inputs.input_index = claim_links.input_index
+                          JOIN public.claim_sources cs ON cs.claim_id = claim_links.claim_id
+                          JOIN public.evidence ev ON ev.id = cs.evidence_id AND ev.case_id = inputs.trust_case_id
+                         WHERE claim_links.scenario_id = sc.scenario_id
+                         GROUP BY claim_links.claim_id
+                      ) edges
+                  ), '{}'::jsonb) AS claim_evidence_map,
+                  EXISTS (
+                    SELECT 1 FROM private.expert_v5_scenario_inputs si
+                    LEFT JOIN LATERAL (
+                      SELECT revision FROM public.trust_case_revisions WHERE case_id = si.trust_case_id ORDER BY revision DESC LIMIT 1
+                    ) latest ON true
+                    LEFT JOIN private.expert_v5_source_snapshots snap ON snap.id = si.source_snapshot_id
+                    LEFT JOIN private.expert_v5_source_registry registry ON registry.id = snap.source_id
+                    LEFT JOIN LATERAL (
+                      SELECT content_hash FROM private.expert_v5_source_snapshots current
+                       WHERE current.source_id = snap.source_id
+                       ORDER BY current.retrieved_at DESC LIMIT 1
+                    ) current_snapshot ON true
+                    WHERE si.scenario_id = sc.scenario_id AND (
+                      si.case_revision <> coalesce(latest.revision, 0)
+                      OR (si.source_snapshot_id IS NOT NULL AND (
+                        snap.retrieval_status <> 'SUCCESS' OR registry.enabled IS DISTINCT FROM true
+                        OR snap.content_hash <> current_snapshot.content_hash
+                      ))
+                    )
+                  ) AS stale
+             FROM private.expert_v5_scenarios sc WHERE sc.scenario_id = $1 FOR UPDATE`, [row.scenario_id],
+        );
+        const scenarioState = scenarioLinks.rows[0];
+        const scenarioNotCurrent = scenarioState?.is_current !== true || scenarioState?.stale === true;
+        if (scenarioNotCurrent) {
+          await client.query(`UPDATE private.expert_v5_scenarios SET status = 'STALE', updated_at = now() WHERE scenario_id = $1`, [row.scenario_id]);
+          await client.query(`UPDATE private.expert_v5_questions SET status = 'REVALIDATION_REQUIRED', updated_at = now() WHERE scenario_id = $1 AND status = 'ACTIVE'`, [row.scenario_id]);
+        }
+        sourceSnapshot.status = scenarioNotCurrent ? "STALE" : scenarioState?.status;
+        sourceSnapshot.packageDigest = scenarioState?.input_fingerprint;
+        sourceSnapshot.claimIds = Array.isArray(scenarioState?.claim_ids) ? scenarioState.claim_ids : [];
+        sourceSnapshot.evidenceItems = (Array.isArray(scenarioState?.evidence_ids) ? scenarioState.evidence_ids : []).map((id) => ({ id }));
+        sourceSnapshot.claimEvidenceMap = parseJson(scenarioState?.claim_evidence_map, {});
+      }
       const validity = await client.query(`SELECT COALESCE((config_value #>> '{}')::integer, 30) AS days FROM private.expert_v5_config WHERE config_key = 'question_validity_days'`);
-      const sourceFresh = canServeQuestion({ status: row.retrieval_status === "SUCCESS" ? "ACTIVE" : "BLOCKED", retrievedAt: row.retrieved_at, validityDays: Number(validity.rows[0]?.days || 30) });
-      const validation = row.registry_enabled && sourceFresh && row.source_content_hash === row.content_hash
+      const sourceFresh = row.scenario_id
+        ? sourceSnapshot.status === "READY" && row.source_content_hash === sourceSnapshot.packageDigest
+        : row.registry_enabled === true && canServeQuestion({ status: row.retrieval_status === "SUCCESS" ? "ACTIVE" : "BLOCKED", retrievedAt: row.retrieved_at, validityDays: Number(validity.rows[0]?.days || 30) }) && row.source_content_hash === row.content_hash;
+      const validation = sourceFresh
         ? validateQuestionActivation({
           question: {
+            scenarioId: row.scenario_id,
+            modality: row.modality,
             questionType: row.question_type,
             prompt: row.prompt,
             choices: parseJson(row.choices, []),
@@ -630,15 +808,20 @@ export class ExpertQuestionBankService {
             difficulty: row.difficulty,
             domainCode: row.domain_code,
             evidenceRefs: parseJson(row.evidence_refs, []),
+            claimRefs: parseJson(row.claim_refs, []),
+            correctAnswerEvidenceIds: parseJson(row.rubric, {}).correctChoiceEvidenceIds,
+            uncertaintyMode: parseJson(row.rubric, {}).uncertaintyMode || parseJson(row.generation_provenance, {}).uncertaintyMode,
           },
           sourceSnapshot,
           reviewerId: actorId,
           reviewChecks,
         })
-        : { valid: false, status: "REVALIDATION_REQUIRED", reasons: ["SOURCE_NOT_CURRENT_OR_DISABLED"] };
+        : { valid: false, status: "REVALIDATION_REQUIRED", reasons: [row.scenario_id ? "SCENARIO_NOT_CURRENT" : "SOURCE_NOT_CURRENT_OR_DISABLED"] };
       if (!validation.valid) {
         const needsRevalidation = validation.reasons.includes("SOURCE_NOT_RETRIEVED")
-          || validation.reasons.includes("SOURCE_NOT_CURRENT_OR_DISABLED");
+          || validation.reasons.includes("SOURCE_NOT_CURRENT_OR_DISABLED")
+          || validation.reasons.includes("SCENARIO_NOT_CURRENT")
+          || validation.reasons.includes("SCENARIO_NOT_READY");
         if (needsRevalidation) {
           await client.query(
             `UPDATE private.expert_v5_questions SET status = 'REVALIDATION_REQUIRED', updated_at = now()
@@ -657,6 +840,11 @@ export class ExpertQuestionBankService {
             SET status = 'ACTIVE', editorial_reviewer_id = $3, reviewed_at = now(), updated_at = now()
           WHERE question_id = $1 AND question_version = $2`, [id, version, actorId],
       );
+      if (row.scenario_id) {
+        await client.query(
+          `UPDATE private.expert_v5_scenarios SET status = 'READY', updated_at = now() WHERE scenario_id = $1`, [row.scenario_id],
+        );
+      }
       await logQuestionEvent(client, {
         questionId: id, questionVersion: version, actorId, eventType: "ACTIVATED",
         payload: {
@@ -668,6 +856,8 @@ export class ExpertQuestionBankService {
             distractorsReviewed: reviewChecks?.distractorsReviewed === true,
             domainFit: reviewChecks?.domainFit === true,
             difficultyConfirmed: reviewChecks?.difficultyConfirmed === true,
+            groundingConfirmed: reviewChecks?.groundingConfirmed === true,
+            ambiguityReviewed: reviewChecks?.ambiguityReviewed === true,
           },
         },
         idempotencyKey: `question-activated:${id}:${version}`,
@@ -680,18 +870,12 @@ export class ExpertQuestionBankService {
     const target = normalizeCanonicalUrl(url);
     const remoteGuard = await validateRemoteUrl(target, { resolveDns: true });
     if (!remoteGuard.ok) throw error("EXPERT_V5_REMOTE_RETRIEVAL_BLOCKED", "The URL failed safe public retrieval checks and was not fetched.", 422);
-    const { runCanonicalTrust } = await import("@/app/api/v1/trust/route.js");
     return this.ingestSource({
       principal, registryId, url: target, idempotencyKey,
-      trustRunner: async (input, trustKey) => {
-        const trustRequest = new Request(new URL("/api/v1/trust", request.url), {
-          method: "POST",
-          headers: { "content-type": "application/json", "Idempotency-Key": `expert-v5-source:${createHash("sha256").update(trustKey).digest("hex")}` },
-          body: JSON.stringify(input),
-          signal: request.signal,
-        });
-        return runCanonicalTrust(trustRequest, null, principal, securityContext);
-      },
+      trustRunner: (input, trustKey) => this.runTrustInput({
+        request, principal, securityContext, input,
+        idempotencyKey: `expert-v5-source:${createHash("sha256").update(trustKey).digest("hex")}`,
+      }),
     });
   }
 }

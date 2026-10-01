@@ -78,6 +78,47 @@ test("question activation requires fetched immutable source, evidence map and hu
   assert.ok(blocked.reasons.includes("SOURCE_NOT_RETRIEVED"));
 });
 
+test("scenario question activation requires current canonical claims, evidence links and explicit human grounding review", () => {
+  const question = {
+    scenarioId: "11111111-1111-4111-8111-111111111111",
+    modality: "TEXT_URL_IMAGE",
+    questionType: "SOURCE_RANKING",
+    prompt: "Rank the supplied sources by authority for the stated tuition policy.",
+    choices: [{ id: "official" }, { id: "news" }, { id: "social" }],
+    answerKey: ["official", "news", "social"],
+    explanation: "The official notice directly controls the policy and the other sources are secondary.",
+    difficulty: "HARD",
+    domainCode: "PUBLIC_POLICY",
+    claimRefs: [{ claimId: "claim-1" }],
+    evidenceRefs: [{ evidenceId: "evidence-1", claimIds: ["claim-1"] }],
+    correctAnswerEvidenceIds: ["evidence-1"],
+    uncertaintyMode: "CLEAR",
+  };
+  const sourceSnapshot = {
+    status: "READY",
+    packageDigest: "a".repeat(64),
+    claimIds: ["claim-1"],
+    evidenceItems: [{ id: "evidence-1" }],
+    claimEvidenceMap: { "claim-1": ["evidence-1"] },
+  };
+  const reviewChecks = {
+    sourceSupport: true, distractorsReviewed: true, domainFit: true,
+    difficultyConfirmed: true, groundingConfirmed: true, ambiguityReviewed: true,
+  };
+  const validation = validateQuestionActivation({
+    question, sourceSnapshot, reviewerId: "editor-id", reviewChecks,
+  });
+  assert.equal(validation.valid, true, validation.reasons.join(", "));
+  assert.equal(validateQuestionActivation({
+    question,
+    sourceSnapshot: { ...sourceSnapshot, claimEvidenceMap: { "claim-1": ["different-evidence"] } },
+    reviewerId: "editor-id", reviewChecks,
+  }).valid, false);
+  assert.ok(validateQuestionActivation({
+    question, sourceSnapshot, reviewerId: "editor-id", reviewChecks: { ...reviewChecks, ambiguityReviewed: false },
+  }).reasons.includes("AMBIGUITY_NOT_REVIEWED"));
+});
+
 test("objective evaluators are deterministic and unsupported item types fail closed", () => {
   assert.deepEqual(gradeExpertV5Question({ questionType: "SINGLE_CHOICE", answerKey: "b", answer: "b" }), {
     supported: true, correct: true, score: 100,

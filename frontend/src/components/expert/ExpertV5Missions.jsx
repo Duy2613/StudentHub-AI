@@ -88,7 +88,10 @@ export default function ExpertV5Missions() {
         return;
       }
       setActive(opened);
-      setAnswer(opened.mission?.question?.questionType === "MULTIPLE_CHOICE" ? [] : null);
+      const openedQuestion = opened.mission?.question;
+      setAnswer(["MULTIPLE_CHOICE", "MULTI_SELECT"].includes(openedQuestion?.questionType)
+        ? [] : openedQuestion?.questionType === "SOURCE_RANKING"
+          ? openedQuestion.choices.map((choice) => choice.id) : null);
     } catch (caught) { setError(caught); }
     finally { setBusy(false); }
   };
@@ -119,6 +122,18 @@ export default function ExpertV5Missions() {
 
   const question = active?.mission?.question;
   const result = active?.attempt?.result;
+  const multiAnswer = ["MULTIPLE_CHOICE", "MULTI_SELECT"].includes(question?.questionType);
+  const orderedAnswer = question?.questionType === "SOURCE_RANKING";
+  const moveRankedChoice = (choiceId, offset) => {
+    setAnswer((previous) => {
+      const ordered = Array.isArray(previous) ? [...previous] : [];
+      const from = ordered.indexOf(choiceId);
+      const to = from + offset;
+      if (from < 0 || to < 0 || to >= ordered.length) return ordered;
+      [ordered[from], ordered[to]] = [ordered[to], ordered[from]];
+      return ordered;
+    });
+  };
 
   return (
     <main className={styles.page}>
@@ -157,16 +172,28 @@ export default function ExpertV5Missions() {
           <p className={styles.questionKicker}>CÂU HỎI ĐÃ GẮN VỚI NGUỒN</p>
           <h2 id="v5-question-title">{question.prompt}</h2>
           <fieldset className={styles.choices}>
-            <legend>{question.questionType === "MULTIPLE_CHOICE" ? "Chọn tất cả phương án phù hợp" : "Chọn một phương án"}</legend>
-            {question.choices.map((choice) => (
+            <legend>{orderedAnswer ? "Sắp xếp theo thứ tự phù hợp nhất" : multiAnswer ? "Chọn tất cả phương án phù hợp" : "Chọn một phương án"}</legend>
+            {orderedAnswer ? (
+              <ol className={styles.rankingList}>
+                {(Array.isArray(answer) ? answer : []).map((choiceId, index) => {
+                  const choice = question.choices.find((entry) => entry.id === choiceId);
+                  if (!choice) return null;
+                  return <li key={choice.id} className={styles.rankingItem}>
+                    <span className={styles.rankNumber}>{index + 1}</span><span>{choice.label}</span>
+                    <button type="button" className={styles.rankMove} aria-label={`Đưa ${choice.label} lên`} disabled={busy || index === 0} onClick={() => moveRankedChoice(choice.id, -1)}>↑</button>
+                    <button type="button" className={styles.rankMove} aria-label={`Đưa ${choice.label} xuống`} disabled={busy || index === answer.length - 1} onClick={() => moveRankedChoice(choice.id, 1)}>↓</button>
+                  </li>;
+                })}
+              </ol>
+            ) : question.choices.map((choice) => (
               <label key={choice.id} className={`${styles.choice} ${answer === choice.id ? styles.choiceSelected : ""}`}>
                 <input
-                  type={question.questionType === "MULTIPLE_CHOICE" ? "checkbox" : "radio"}
+                  type={multiAnswer ? "checkbox" : "radio"}
                   name="expert-v5-answer"
                   value={choice.id}
-                  checked={question.questionType === "MULTIPLE_CHOICE" ? Array.isArray(answer) && answer.includes(choice.id) : answer === choice.id}
+                  checked={multiAnswer ? Array.isArray(answer) && answer.includes(choice.id) : answer === choice.id}
                   onChange={(event) => {
-                    if (question.questionType === "MULTIPLE_CHOICE") {
+                    if (multiAnswer) {
                       setAnswer((previous) => event.target.checked
                         ? [...new Set([...(Array.isArray(previous) ? previous : []), choice.id])]
                         : (Array.isArray(previous) ? previous : []).filter((id) => id !== choice.id));

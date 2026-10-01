@@ -1,7 +1,16 @@
 import { randomInt } from "node:crypto";
 
 export const EXPERT_V5_DIFFICULTIES = Object.freeze(["EASY", "MEDIUM", "HARD"]);
-export const EXPERT_V5_QUESTION_TYPES = Object.freeze(["SINGLE_CHOICE", "MULTIPLE_CHOICE", "TRUE_FALSE"]);
+export const EXPERT_V5_QUESTION_TYPES = Object.freeze([
+  "SINGLE_CHOICE", "MULTIPLE_CHOICE", "TRUE_FALSE", "MULTI_SELECT", "BEST_EVIDENCE",
+  "SOURCE_RANKING", "CLAIM_CLASSIFICATION", "CLAIM_EXTRACTION", "MISSING_CONTEXT",
+  "CONTRADICTION", "TIMELINE", "ENTITY_RESOLUTION", "NUMERICAL_REASONING",
+  "SOURCE_AUTHORITY", "IMAGE_CONTEXT", "QR_SAFETY", "URL_REDIRECT",
+  "EVIDENCE_MATCHING", "FINAL_VERDICT",
+]);
+export const EXPERT_V5_MODALITIES = Object.freeze([
+  "TEXT", "URL", "IMAGE", "QR", "TEXT_URL", "TEXT_IMAGE", "IMAGE_URL", "QR_URL", "TEXT_URL_IMAGE",
+]);
 export const EXPERT_V5_QUESTION_STATES = Object.freeze(["DRAFT", "ACTIVE", "REVALIDATION_REQUIRED", "RETIRED"]);
 export const EXPERT_V5_ROOM_STATES = Object.freeze([
   "WAITING_FOR_SUPERVISOR", "LOBBY", "QUESTION_ACTIVE", "ANSWER_LOCKED", "TRUST_ANALYZING",
@@ -67,11 +76,12 @@ export function resolveMissionLevel(completedMissions) {
 }
 
 /** Difficulty is deterministic and derived from explicit, reviewable evidence properties. */
-export function deriveQuestionDifficulty({ sourceCount = 1, evidenceCount = 1, ambiguity = 0, temporalReasoning = false } = {}) {
+export function deriveQuestionDifficulty({ sourceCount = 1, evidenceCount = 1, ambiguity = 0, temporalReasoning = false, reasoningComplexity = 0 } = {}) {
   const sources = Math.max(1, Math.trunc(Number(sourceCount) || 1));
   const evidence = Math.max(1, Math.trunc(Number(evidenceCount) || 1));
   const ambiguityScore = Math.max(0, Math.min(2, Math.trunc(Number(ambiguity) || 0)));
-  const score = (sources > 1 ? 2 : 0) + (evidence >= 3 ? 1 : 0) + ambiguityScore + (temporalReasoning ? 1 : 0);
+  const complexity = Math.max(0, Math.min(2, Math.trunc(Number(reasoningComplexity) || 0)));
+  const score = (sources > 1 ? 2 : 0) + (evidence >= 3 ? 1 : 0) + ambiguityScore + (temporalReasoning ? 1 : 0) + complexity;
   if (score >= 5) return "HARD";
   if (score >= 2) return "MEDIUM";
   return "EASY";
@@ -118,33 +128,75 @@ export function validateQuestionActivation({ question, sourceSnapshot, reviewerI
   if (normalizedText(q.prompt, 1_001).length < 20) reasons.push("QUESTION_TEXT_TOO_SHORT");
   if (!EXPERT_V5_DIFFICULTIES.includes(String(q.difficulty || "").toUpperCase())) reasons.push("DIFFICULTY_REQUIRED");
   if (!/^[A-Z][A-Z0-9_:-]{1,79}$/.test(String(q.domainCode || ""))) reasons.push("DOMAIN_REQUIRED");
-  if (source.retrievalStatus !== "SUCCESS" || source.remoteRetrieval !== "SUCCESS") reasons.push("SOURCE_NOT_RETRIEVED");
-  if (!/^https:\/\//i.test(String(source.canonicalUrl || ""))) reasons.push("CANONICAL_HTTPS_SOURCE_REQUIRED");
-  if (!/^[a-f0-9]{64}$/i.test(String(source.contentHash || ""))) reasons.push("SOURCE_HASH_REQUIRED");
-  if (!Array.isArray(source.evidenceItems) || source.evidenceItems.length === 0) reasons.push("SOURCE_EVIDENCE_REQUIRED");
+  const scenarioMode = Boolean(q.scenarioId);
+  if (scenarioMode) {
+    if (source.status !== "READY") reasons.push("SCENARIO_NOT_READY");
+    if (!/^[a-f0-9]{64}$/i.test(String(source.packageDigest || source.contentHash || ""))) reasons.push("SOURCE_HASH_REQUIRED");
+    if (!Array.isArray(source.claimIds) || source.claimIds.length === 0) reasons.push("SOURCE_CLAIMS_REQUIRED");
+    if (!Array.isArray(source.evidenceItems) || source.evidenceItems.length === 0) reasons.push("SOURCE_EVIDENCE_REQUIRED");
+    if (q.modality && !EXPERT_V5_MODALITIES.includes(String(q.modality).toUpperCase())) reasons.push("MODALITY_INVALID");
+  } else {
+    if (source.retrievalStatus !== "SUCCESS" || source.remoteRetrieval !== "SUCCESS") reasons.push("SOURCE_NOT_RETRIEVED");
+    if (!/^https:\/\//i.test(String(source.canonicalUrl || ""))) reasons.push("CANONICAL_HTTPS_SOURCE_REQUIRED");
+    if (!/^[a-f0-9]{64}$/i.test(String(source.contentHash || ""))) reasons.push("SOURCE_HASH_REQUIRED");
+    if (!Array.isArray(source.evidenceItems) || source.evidenceItems.length === 0) reasons.push("SOURCE_EVIDENCE_REQUIRED");
+  }
   if (!normalizedText(reviewerId, 120)) reasons.push("EDITORIAL_REVIEW_REQUIRED");
   const checks = reviewChecks && typeof reviewChecks === "object" ? reviewChecks : {};
   if (checks.sourceSupport !== true) reasons.push("SOURCE_SUPPORT_NOT_CONFIRMED");
   if (checks.distractorsReviewed !== true) reasons.push("DISTRACTORS_NOT_REVIEWED");
   if (checks.domainFit !== true) reasons.push("DOMAIN_FIT_NOT_CONFIRMED");
   if (checks.difficultyConfirmed !== true) reasons.push("DIFFICULTY_NOT_CONFIRMED");
+  if (scenarioMode && checks.groundingConfirmed !== true) reasons.push("GROUNDING_NOT_CONFIRMED");
+  if (scenarioMode && checks.ambiguityReviewed !== true) reasons.push("AMBIGUITY_NOT_REVIEWED");
 
   const choices = Array.isArray(q.choices) ? q.choices : [];
-  if (type === "SINGLE_CHOICE" || type === "MULTIPLE_CHOICE") {
+  if (type !== "TRUE_FALSE") {
     if (choices.length < 2 || choices.length > 6) reasons.push("CHOICES_INVALID");
     const ids = choices.map((choice) => normalizedText(choice?.id, 32));
     if (ids.some((id) => !id) || new Set(ids).size !== ids.length) reasons.push("CHOICE_IDS_INVALID");
-    const answerIds = type === "SINGLE_CHOICE"
-      ? [normalizedText(q.answerKey, 32)]
-      : Array.isArray(q.answerKey) ? q.answerKey.map((id) => normalizedText(id, 32)) : [];
-    if (!answerIds.length || answerIds.some((id) => !ids.includes(id))) reasons.push("ANSWER_KEY_INVALID");
-  } else if (type === "TRUE_FALSE" && !["TRUE", "FALSE"].includes(String(q.answerKey).toUpperCase())) {
+    const answerIds = Array.isArray(q.answerKey) ? q.answerKey.map((id) => normalizedText(id, 32)) : [normalizedText(q.answerKey, 32)];
+    if (!answerIds.length || answerIds.some((id) => !ids.includes(id)) || new Set(answerIds).size !== answerIds.length) reasons.push("ANSWER_KEY_INVALID");
+    if (["MULTIPLE_CHOICE", "MULTI_SELECT", "SOURCE_RANKING"].includes(type) && !Array.isArray(q.answerKey)) reasons.push("ANSWER_KEY_MULTIPLE_REQUIRED");
+    if (!(["MULTIPLE_CHOICE", "MULTI_SELECT", "SOURCE_RANKING"].includes(type)) && Array.isArray(q.answerKey)) reasons.push("ANSWER_KEY_SINGLE_REQUIRED");
+    if (type === "SOURCE_RANKING" && answerIds.length < 2) reasons.push("RANKING_ANSWER_INCOMPLETE");
+  } else if (!Array.isArray(q.choices) || choices.length !== 2
+    || !["TRUE", "FALSE"].every((answer) => choices.some((choice) => String(choice?.id).toUpperCase() === answer))
+    || !["TRUE", "FALSE"].includes(String(q.answerKey).toUpperCase())) {
     reasons.push("ANSWER_KEY_INVALID");
   }
 
-  const sourceEvidenceIds = new Set((source.evidenceItems || []).map((item) => String(item?.id || "")));
+  const sourceEvidenceIds = new Set((source.evidenceItems || []).map((item) => String(item?.id || item?.evidenceId || "")));
   const refs = Array.isArray(q.evidenceRefs) ? q.evidenceRefs : [];
   if (!refs.length || refs.some((ref) => !sourceEvidenceIds.has(String(ref?.evidenceId || "")))) reasons.push("EVIDENCE_MAPPING_INVALID");
+  if (scenarioMode) {
+    const modality = String(q.modality || "").toUpperCase();
+    if (type === "IMAGE_CONTEXT" && !modality.includes("IMAGE")) reasons.push("QUESTION_TYPE_MODALITY_MISMATCH");
+    if (type === "QR_SAFETY" && !modality.includes("QR")) reasons.push("QUESTION_TYPE_MODALITY_MISMATCH");
+    if (type === "URL_REDIRECT" && !modality.includes("URL") && !modality.includes("QR")) reasons.push("QUESTION_TYPE_MODALITY_MISMATCH");
+    const sourceClaimIds = new Set((source.claimIds || []).map(String));
+    const claimRefs = Array.isArray(q.claimRefs) ? q.claimRefs : [];
+    const claimIds = claimRefs.map((ref) => String(ref?.claimId || ref));
+    if (!claimIds.length || claimIds.some((claimId) => !sourceClaimIds.has(claimId))) reasons.push("CLAIM_MAPPING_INVALID");
+    const claimEvidenceMap = source.claimEvidenceMap && typeof source.claimEvidenceMap === "object" ? source.claimEvidenceMap : {};
+    const evidenceRefById = new Map(refs.map((ref) => [String(ref?.evidenceId || ""), ref]));
+    if (Object.keys(claimEvidenceMap).length) {
+      for (const ref of refs) {
+        const evidenceId = String(ref?.evidenceId || "");
+        const linkedClaims = Array.isArray(ref?.claimIds) ? ref.claimIds.map(String) : [];
+        if (!linkedClaims.length || linkedClaims.some((claimId) => !claimIds.includes(claimId)
+          || !Array.isArray(claimEvidenceMap[claimId]) || !claimEvidenceMap[claimId].map(String).includes(evidenceId))) {
+          reasons.push("CLAIM_EVIDENCE_MAPPING_INVALID");
+        }
+      }
+    }
+    const supportIds = Array.isArray(q.correctAnswerEvidenceIds) ? q.correctAnswerEvidenceIds.map(String) : [];
+    if (!supportIds.length || supportIds.some((id) => !sourceEvidenceIds.has(id))
+      || supportIds.some((id) => !evidenceRefById.has(id))) reasons.push("ANSWER_GROUNDING_INVALID");
+    if (Object.keys(claimEvidenceMap).length && supportIds.some((evidenceId) => !claimIds.some((claimId) =>
+      Array.isArray(claimEvidenceMap[claimId]) && claimEvidenceMap[claimId].map(String).includes(evidenceId)))) reasons.push("ANSWER_GROUNDING_INVALID");
+    if (!String(q.uncertaintyMode || "").match(/^(CLEAR|INSUFFICIENT_EVIDENCE|EXPLICIT_AMBIGUITY)$/)) reasons.push("AMBIGUITY_MODE_REQUIRED");
+  }
   if (normalizedText(q.explanation, 1_601).length < 20) reasons.push("EXPLANATION_REQUIRED");
   return { valid: reasons.length === 0, status: reasons.length ? "DRAFT" : "ACTIVE", reasons };
 }
@@ -152,9 +204,17 @@ export function validateQuestionActivation({ question, sourceSnapshot, reviewerI
 export function gradeExpertV5Question({ questionType, answerKey, answer } = {}) {
   const type = String(questionType || "").toUpperCase();
   if (!EXPERT_V5_QUESTION_TYPES.includes(type)) return { supported: false, correct: null, score: null };
-  const normalizeSet = (value) => [...new Set((Array.isArray(value) ? value : [value]).map((entry) => String(entry).trim()).filter(Boolean))].sort();
-  const expected = normalizeSet(type === "TRUE_FALSE" ? String(answerKey).toUpperCase() : answerKey);
-  const actual = normalizeSet(type === "TRUE_FALSE" ? String(answer).toUpperCase() : answer);
+  const unwrap = (value) => value && typeof value === "object" && !Array.isArray(value) && Object.hasOwn(value, "value") ? value.value : value;
+  const expectedRaw = unwrap(answerKey);
+  const actualRaw = unwrap(answer);
+  const isOrdered = type === "SOURCE_RANKING";
+  const normalizeValues = (value) => {
+    const source = Array.isArray(value) ? value : [value];
+    const values = source.map((entry) => String(entry).trim().toLocaleUpperCase()).filter(Boolean);
+    return type === "TRUE_FALSE" ? values : isOrdered ? values : [...new Set(values)].sort();
+  };
+  const expected = normalizeValues(type === "TRUE_FALSE" ? String(expectedRaw).toUpperCase() : expectedRaw);
+  const actual = normalizeValues(type === "TRUE_FALSE" ? String(actualRaw).toUpperCase() : actualRaw);
   const correct = expected.length > 0 && expected.length === actual.length && expected.every((value, index) => value === actual[index]);
   return { supported: true, correct, score: correct ? 100 : 0 };
 }

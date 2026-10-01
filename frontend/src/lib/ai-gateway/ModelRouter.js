@@ -234,6 +234,7 @@ export class ModelRouter {
     timeoutMs = AI_GATEWAY_CONFIG.SLA.DEFAULT_TIMEOUT_MS,
     perModelTimeoutMs = null,
     totalBudgetMs = AI_GATEWAY_CONFIG.BUDGET.DEFAULT_TOTAL_MS,
+    maxModelAttempts = null,
     maxOutputTokens = AI_GATEWAY_CONFIG.LIMITS.MAX_OUTPUT_TOKENS,
     signal,
     parseResponse = null,
@@ -243,7 +244,10 @@ export class ModelRouter {
   } = {}) {
     const isDemoMode = resultPriority === "DEMO" || isL4DemoPriorityEnabled();
     const qaExtendedActive = isDemoMode ? true : (typeof allowQaExtended === "boolean" ? allowQaExtended : isQaExtendedFallbackEnabled());
-    let configuredChain = resolveCapabilityRoute(capability, { allowQaExtended: qaExtendedActive }).slice(0, AI_GATEWAY_CONFIG.LIMITS.MAX_ROUTER_ATTEMPTS);
+    const routeAttemptLimit = Number.isInteger(Number(maxModelAttempts)) && Number(maxModelAttempts) > 0
+      ? Math.min(AI_GATEWAY_CONFIG.LIMITS.MAX_ROUTER_ATTEMPTS, Math.max(1, Number(maxModelAttempts)))
+      : AI_GATEWAY_CONFIG.LIMITS.MAX_ROUTER_ATTEMPTS;
+    let configuredChain = resolveCapabilityRoute(capability, { allowQaExtended: qaExtendedActive }).slice(0, routeAttemptLimit);
 
     if (isDemoMode) {
       // Dynamic candidate prioritization by current health for demo mode

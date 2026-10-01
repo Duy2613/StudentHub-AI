@@ -69,3 +69,10 @@ test("MODEL ROUTER: Capability-based route returns configured candidates in prio
     "gemini-3.6-flash",
   ]);
 });
+
+test("QUESTION GENERATION: Uses the approved server-side Gemini chain without Tavily or OpenAI", () => {
+  const route = new ModelRouter().describeRoute(AI_CAPABILITY.QUESTION_GENERATION);
+  assert.deepEqual(route.map((entry) => entry.provider), ["gemini", "gemini", "gemini"]);
+  assert.deepEqual(route.map((entry) => entry.model), ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.6-flash"]);
+  assert.equal(route.some((entry) => /openai|tavily/i.test(`${entry.provider}/${entry.model}`)), false);
+});

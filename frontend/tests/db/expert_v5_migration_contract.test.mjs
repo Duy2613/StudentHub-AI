@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 
 const migration = await readFile(new URL("../../../database/migrations/20260929135354_studenthub_expert_v5_missions_rooms.sql", import.meta.url), "utf8");
 const hardeningMigration = await readFile(new URL("../../../database/migrations/20260929135553_expert_v5_trigger_path_and_fk_indexes.sql", import.meta.url), "utf8");
+const groundedQuestionMigration = await readFile(new URL("../../../database/migrations/202610010004_grounded_multimodal_question_bank.sql", import.meta.url), "utf8");
 
 test("Expert V5 migration defines source, question, mission and room persistence without fake seed content", () => {
   for (const table of [
@@ -42,4 +43,40 @@ test("V5 staging advisor hardening pins trigger search path and covers reported 
   assert.match(hardeningMigration, /expert_v5_config_updated_by_idx/);
   assert.match(hardeningMigration, /expert_room_answers_expert_idx/);
   assert.match(hardeningMigration, /expert_room_adjudications_host_ack_idx/);
+});
+
+test("grounded Question Bank stores provenance by referencing canonical Trust data and the existing URL snapshot", () => {
+  for (const table of [
+    "expert_v5_scenarios", "expert_v5_scenario_intakes", "expert_v5_scenario_inputs",
+    "expert_v5_scenario_claims", "expert_v5_scenario_evidence", "expert_v5_question_generation_runs",
+  ]) assert.match(groundedQuestionMigration, new RegExp(`create table if not exists private\\.${table}\\b`, "i"));
+  assert.match(groundedQuestionMigration, /trust_case_id uuid not null references public\.trust_cases\(id\)/i);
+  assert.match(groundedQuestionMigration, /claim_id uuid not null references public\.claims\(id\)/i);
+  assert.match(groundedQuestionMigration, /evidence_id uuid not null references public\.evidence\(id\)/i);
+  assert.match(groundedQuestionMigration, /source_snapshot_id uuid references private\.expert_v5_source_snapshots\(id\)/i);
+  assert.match(groundedQuestionMigration, /expert_v5_scenario_is_current\(p_scenario_id uuid\)/i);
+  assert.match(groundedQuestionMigration, /latest_source\.retrieval_status is distinct from 'SUCCESS'/i);
+  assert.match(groundedQuestionMigration, /snapshot\.content_hash is distinct from latest_source\.content_hash/i);
+  assert.match(groundedQuestionMigration, /alter column source_snapshot_id drop not null/i);
+  assert.match(groundedQuestionMigration, /check \(source_snapshot_id is not null or scenario_id is not null\)/i);
+  assert.doesNotMatch(groundedQuestionMigration, /insert\s+into\s+private\.expert_v5_(?:scenarios|scenario_inputs|questions)/i);
+  assert.doesNotMatch(groundedQuestionMigration, /(?:repair|stamp|update)\s+(?:table\s+)?(?:supabase_migrations|schema_migrations)/i);
+});
+
+test("grounded Question Bank bounds Gemini runs and protects scenario, answer and provenance tables", () => {
+  for (const modality of ["TEXT", "URL", "IMAGE", "QR", "TEXT_URL", "TEXT_IMAGE", "IMAGE_URL", "QR_URL", "TEXT_URL_IMAGE"]) {
+    assert.match(groundedQuestionMigration, new RegExp(`'${modality}'`));
+  }
+  for (const type of [
+    "TRUE_FALSE", "MULTIPLE_CHOICE", "MULTI_SELECT", "BEST_EVIDENCE", "SOURCE_RANKING",
+    "CLAIM_CLASSIFICATION", "CLAIM_EXTRACTION", "MISSING_CONTEXT", "CONTRADICTION", "TIMELINE",
+    "ENTITY_RESOLUTION", "NUMERICAL_REASONING", "SOURCE_AUTHORITY", "IMAGE_CONTEXT", "QR_SAFETY",
+    "URL_REDIRECT", "EVIDENCE_MATCHING", "FINAL_VERDICT",
+  ]) assert.match(groundedQuestionMigration, new RegExp(`'${type}'`));
+  assert.match(groundedQuestionMigration, /batch_size between 1 and 5/i);
+  assert.match(groundedQuestionMigration, /max_calls between 1 and 15/i);
+  assert.match(groundedQuestionMigration, /retry_limit between 0 and 1/i);
+  assert.match(groundedQuestionMigration, /timeout_ms between 1000 and 60000/i);
+  assert.match(groundedQuestionMigration, /alter table private\.%I enable row level security/i);
+  assert.match(groundedQuestionMigration, /grant select, insert, update, delete on private\.%I to service_role/i);
 });
