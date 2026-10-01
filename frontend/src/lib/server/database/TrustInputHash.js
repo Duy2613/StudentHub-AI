@@ -19,6 +19,7 @@ const IDENTITY_METADATA_KEYS = new Set([
   "fileSize",
   "extractionAuthority",
   "institutionContext",
+  "imageHash",
 ]);
 
 /**

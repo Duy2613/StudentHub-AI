@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Activity, ArrowLeft, Check, Clock3, ExternalLink, FileCheck2, ImagePlus, LockKeyhole, RefreshCw, ShieldAlert, Users, Video } from "lucide-react";
 import { useRealtime } from "@/components/providers/RealtimeContext";
 import { createSecureId } from "@/lib/security/secureId";
@@ -98,6 +99,19 @@ export default function ExpertVerificationRooms() {
     const request = window.setTimeout(() => { void refreshAll(); }, 0);
     return () => window.clearTimeout(request);
   }, [refreshAll]);
+
+  useEffect(() => {
+    const resync = () => { void refreshAll(); };
+    window.addEventListener("online", resync);
+    return () => window.removeEventListener("online", resync);
+  }, [refreshAll]);
+
+  useEffect(() => {
+    const media = active?.room?.challenge?.metadata;
+    if (!selectedRoom || !media?.mediaUrl || !media.mediaUrlExpiresIn) return undefined;
+    const timer = window.setTimeout(() => { void refreshRoom(selectedRoom).catch(setError); }, Math.max(30, media.mediaUrlExpiresIn - 30) * 1000);
+    return () => window.clearTimeout(timer);
+  }, [active?.room?.challenge?.metadata, refreshRoom, selectedRoom]);
 
   useEffect(() => {
     const onRoomRevision = (record) => {
@@ -260,7 +274,17 @@ export default function ExpertVerificationRooms() {
           {!room ? <div className={styles.workspaceEmpty}><Video size={28} /><p className={styles.eyebrow}>SERVER-OWNED ROOM STATE</p><h2>Chọn phòng hoặc tạo một thử thách mới</h2><p>Người ngoài phòng không thể đọc nội dung challenge, câu trả lời hoặc gói bằng chứng.</p></div> : <>
             <div className={styles.roomHeader}><div><p className={styles.eyebrow}>ROOM · {room.inputType}</p><h2>{room.domainCode.replaceAll("_", " ")}</h2><p><span className={styles.statusDot} />{room.status.replaceAll("_", " ")}</p></div><div className={styles.roomHeaderActions}>{active.viewerRole === "HOST" && room.status === "WAITING_FOR_SUPERVISOR" && <button type="button" className={styles.secondaryButton} onClick={() => void mutate("RETRY_SUPERVISOR")} disabled={busy}>Tìm Supervisor khác</button>}{active.viewerRole === "HOST" && room.status === "LOBBY" && <button type="button" className={styles.primaryButton} onClick={() => void mutate("START_ROUND")} disabled={busy}>Bắt đầu vòng 30 giây</button>}<button type="button" className={styles.closeButton} onClick={() => void mutate("CLOSE")} disabled={busy || room.status === "CLOSED"}>Đóng phòng</button></div></div>
 
-            <div className={styles.challenge}><div className={styles.challengeIcon}><LockKeyhole size={17} /></div><div><p className={styles.eyebrow}>NỘI DUNG ĐƯỢC GỬI ĐẾN TRUST SAU KHI KHÓA</p>{room.challenge.type === "url" ? <a href={room.challenge.metadata?.url || room.challenge.content} target="_blank" rel="noreferrer">{room.challenge.metadata?.url || room.challenge.content}<ExternalLink size={13} /></a> : room.challenge.type === "text" ? <p>{room.challenge.content}</p> : <p>{room.challenge.type === "qr" ? "Ảnh QR đã lưu an toàn trong hồ sơ Trust của phòng." : "Hình ảnh đã lưu an toàn trong hồ sơ Trust của phòng."}</p>}</div></div>
+            <div className={styles.challenge}>
+              <div className={styles.challengeIcon}><LockKeyhole size={17} /></div>
+              <div>
+                <p className={styles.eyebrow}>NỘI DUNG ĐƯỢC GỬI ĐẾN TRUST SAU KHI KHÓA</p>
+                {room.challenge.type === "url" ? <a href={room.challenge.metadata?.url || room.challenge.content} target="_blank" rel="noreferrer">{room.challenge.metadata?.url || room.challenge.content}<ExternalLink size={13} /></a> : room.challenge.type === "text" ? <p>{room.challenge.content}</p> : <p>{room.challenge.type === "qr" ? "Ảnh QR đã lưu riêng tư trong phòng." : "Hình ảnh đã lưu riêng tư trong phòng."}</p>}
+                {room.challenge.metadata?.mediaUrl && <div className={styles.mediaPreview}>
+                  <Image src={room.challenge.metadata.mediaUrl} alt={room.challenge.type === "qr" ? "Mã QR của thử thách" : "Hình ảnh của thử thách"} width={room.challenge.metadata.width || 560} height={room.challenge.metadata.height || 320} unoptimized referrerPolicy="no-referrer" loading="lazy" />
+                  <small>Ảnh riêng tư · liên kết đọc có hiệu lực 5 phút</small>
+                </div>}
+              </div>
+            </div>
 
             <div className={styles.participants}><div className={styles.subhead}><Users size={16} /><strong>Người tham gia</strong><span>{active.participants?.length || 0}</span></div><div className={styles.participantList}>{(active.participants || []).map((person) => <span key={person.userId} className={styles.participantChip}>{person.role.replaceAll("_", " ")}{person.role === "SUPERVISOR_EXPERT" && person.conflictDeclaration === "NO_KNOWN_CONFLICT" && <Check size={12} aria-label="Đã khai báo không biết xung đột" />}</span>)}</div></div>
 

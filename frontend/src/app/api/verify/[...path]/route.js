@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { runFriendBackendLayer } from "@/lib/ai-trust/FriendBackendTrustOrchestrator.js";
-import { MediaArtifactService } from "@/lib/server/media/MediaArtifactService.js";
+import { prepareCanonicalMediaInput } from "@/lib/server/media/CanonicalMediaIntake.js";
 import { QrIntakeService } from "@/lib/ai-trust/layer1/qr/QrIntakeService.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 
@@ -129,6 +129,7 @@ async function parseRequest(request, path) {
 
   return {
     input: { type, content, metadata },
+    roomId: typeof source.roomId === "string" ? source.roomId : null,
     // L3/L4 PowerShell calls forward the previous friend's JSON verbatim.
     // Preserve those objects so the server can relay the same contract.
     layer2: isRecord(source.layer2) ? source.layer2 : null,
@@ -136,26 +137,10 @@ async function parseRequest(request, path) {
   };
 }
 
-async function prepareMedia(input, principal) {
-  if (!input || !["image", "qr"].includes(input.type) || input.metadata?.mediaArtifactId || !input.metadata?.bytes) return { input };
-  const result = await MediaArtifactService.ingestImage({
-    bytes: input.metadata.bytes,
-    claimedMimeType: input.metadata.mimeType || "",
-    ownerUserId: principal?.subjectId ? String(principal.subjectId).replace(/^(student|expert|user):/, "") : null,
-  });
-  if (!result.ok) return { error: errorResponse(result.error?.code || "IMAGE_INTAKE_FAILED", result.error?.message || "Tệp hình ảnh không hợp lệ.") };
-  const metadata = { ...input.metadata,
-    mediaArtifactId: result.artifact.mediaArtifactId,
-    imageHash: result.artifact.sha256,
-    mimeType: result.artifact.mimeType,
-    width: result.artifact.width,
-    height: result.artifact.height,
-  };
-  // The artifact store owns the complete validated bytes. Keep only a magic
-  // byte prefix in the pipeline input so the response never echoes base64.
-  if (result.artifact.buffer) metadata.bytes = Array.from(result.artifact.buffer.subarray(0, 32));
-  else delete metadata.bytes;
-  return { input: { ...input, metadata } };
+async function prepareMedia(input, principal, roomId) {
+  const result = await prepareCanonicalMediaInput(input, { principal, roomId });
+  if (!result.ok) return { error: errorResponse(result.error.code, result.error.message, result.error.statusCode) };
+  return { input: result.input };
 }
 
 async function runLegacyVerification(request, routeParams, principal, securityContext) {
@@ -165,7 +150,7 @@ async function runLegacyVerification(request, routeParams, principal, securityCo
 
   const parsed = await parseRequest(request, path);
   if (parsed.error) return parsed.error;
-  const prepared = await prepareMedia(parsed.input, principal);
+  const prepared = await prepareMedia(parsed.input, principal, parsed.roomId);
   if (prepared.error) return prepared.error;
   const input = prepared.input;
 

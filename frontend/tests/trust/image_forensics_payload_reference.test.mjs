@@ -11,7 +11,6 @@ test("Payload Reference — MediaArtifactService validates magic bytes and regis
 
   const res = await MediaArtifactService.ingestImage({
     bytes: validPng,
-    ownerUserId: "user_test_456",
   });
 
   assert.equal(res.ok, true);

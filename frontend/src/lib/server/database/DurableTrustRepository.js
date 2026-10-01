@@ -99,7 +99,7 @@ export class DurableTrustRepository {
       const contentHash = input.content || Object.keys(input.metadata || {}).length > 0
         ? computeTrustInputHash(input)
         : null;
-      const objectKey = input.metadata?.objectKey || input.metadata?.url || (inputType.toUpperCase() === "URL" ? input.content : null);
+      const objectKey = input.metadata?.mediaArtifactId || input.metadata?.objectKey || input.metadata?.url || (inputType.toUpperCase() === "URL" ? input.content : null);
 
       const inputWrite = await client.query(
         `INSERT INTO public.case_inputs (id, case_id, input_type, object_key, content_hash, created_at)

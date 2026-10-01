@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { getPostgresPool } from "../database/PostgresPool.js";
+import { MediaArtifactService } from "../media/MediaArtifactService.js";
 import { publishRealtimeEvent } from "../realtime/RealtimePublisher.js";
 import { authenticatedUserId, ExpertQualificationError } from "./ExpertQualificationService.js";
 import { validateRemoteUrl, validateRemoteUrlSync } from "../../security/hardening/SafeRemoteUrl.js";
@@ -338,7 +339,56 @@ export class ExpertVerificationRoomService {
     const key = boundedText(idempotencyKey, 160);
     if (!/^[A-Za-z0-9._:-]{1,160}$/.test(key)) throw roomError("EXPERT_ROOM_IDEMPOTENCY_REQUIRED", "A valid Idempotency-Key is required to create a room.", 400);
     const requestHash = digest({ domain, challenge });
-    const created = await withStorageErrors(() => transaction(async (client) => {
+    const existing = await withStorageErrors(() => transaction(async (client) => {
+      const replay = await client.query(
+        `SELECT id, host_user_id, request_hash FROM private.expert_verification_rooms WHERE idempotency_key = $1`, [key],
+      );
+      if (replay.rows[0]) {
+        if (String(replay.rows[0].host_user_id) !== hostId || replay.rows[0].request_hash !== requestHash) {
+          throw roomError("EXPERT_ROOM_IDEMPOTENCY_CONFLICT", "This Idempotency-Key is already bound to a different room request.", 409);
+        }
+        return replay.rows[0].id;
+      }
+      return null;
+    }));
+    if (existing) return { ...(await this.getRoom({ principal, roomId: existing })), idempotent: true };
+
+    let uploadedArtifact = null;
+    const hasImageBytes = Boolean(challenge.metadata.bytes || challenge.content.startsWith("data:image/"));
+    if (["image", "qr"].includes(challenge.type) && hasImageBytes) {
+      if (challenge.metadata.mediaArtifactId) throw roomError("EXPERT_ROOM_MEDIA_REFERENCE_UNTRUSTED", "A room must ingest selected media through the canonical upload path.", 422);
+      const rawBytes = challenge.metadata.bytes || challenge.content;
+      const upload = await MediaArtifactService.ingestImage({
+        bytes: Array.isArray(rawBytes) ? Uint8Array.from(rawBytes) : rawBytes,
+        claimedMimeType: challenge.metadata.mimeType || "",
+        ownerUserId: hostId,
+        requireDurableStorage: true,
+      });
+      if (!upload.ok) {
+        const status = upload.error?.statusCode || (upload.error?.code === "FILE_OVERSIZED" ? 413 : 422);
+        throw roomError(upload.error?.code || "EXPERT_ROOM_MEDIA_UPLOAD_FAILED", upload.error?.message || "Room media could not be stored.", status);
+      }
+      uploadedArtifact = upload.artifact;
+      challenge.metadata.mediaArtifactId = upload.artifact.mediaArtifactId;
+      challenge.metadata.imageHash = upload.artifact.sha256;
+      challenge.metadata.mimeType = upload.artifact.mimeType;
+      challenge.metadata.width = upload.artifact.width;
+      challenge.metadata.height = upload.artifact.height;
+      challenge.metadata.fileSize = upload.artifact.byteSize;
+      delete challenge.metadata.bytes;
+      if (challenge.type === "qr") {
+        delete challenge.metadata.qrContent;
+        delete challenge.metadata.qrPayload;
+      }
+      challenge.content = "";
+    } else if (["image", "qr"].includes(challenge.type) && challenge.metadata.mediaArtifactId) {
+      throw roomError("EXPERT_ROOM_MEDIA_REFERENCE_UNTRUSTED", "A room must ingest selected media through the canonical upload path.", 422);
+    }
+
+    let created;
+    try {
+      created = await withStorageErrors(() => transaction(async (client) => {
+      await client.query(`SELECT pg_advisory_xact_lock(hashtextextended($1, 0))`, [key]);
       const replay = await client.query(
         `SELECT id, host_user_id, request_hash FROM private.expert_verification_rooms WHERE idempotency_key = $1`, [key],
       );
@@ -348,6 +398,12 @@ export class ExpertVerificationRoomService {
         }
         return { roomId: replay.rows[0].id, replay: true, recipients: [hostId] };
       }
+      if (uploadedArtifact) await MediaArtifactService.lockRoomArtifact({
+        mediaArtifactId: uploadedArtifact.mediaArtifactId,
+        ownerUserId: hostId,
+        expectedSha256: uploadedArtifact.sha256,
+        client,
+      });
       const roomId = randomUUID();
       await client.query(
         `INSERT INTO private.expert_verification_rooms
@@ -375,7 +431,22 @@ export class ExpertVerificationRoomService {
         payload: { inputType: challenge.type.toUpperCase(), domainCode: domain }, idempotencyKey: `room-created:${roomId}`,
       });
       return { roomId, replay: false, revision: supervisor ? 2 : 1, recipients: [hostId, ...(supervisor ? [supervisor.userId] : [])] };
-    }));
+      }));
+    } catch (error) {
+      if (uploadedArtifact) {
+        try {
+          const cleanup = await MediaArtifactService.cleanupUnreferencedArtifact({ mediaArtifactId: uploadedArtifact.mediaArtifactId, ownerUserId: hostId });
+          if (!cleanup.ok) throw new Error("cleanup rejected");
+        } catch {
+          throw roomError("EXPERT_ROOM_MEDIA_CLEANUP_FAILED", "The room request failed and its unreferenced media could not be safely cleaned up.", 503);
+        }
+      }
+      throw error;
+    }
+    if (created.replay && uploadedArtifact) {
+      const cleanup = await MediaArtifactService.cleanupUnreferencedArtifact({ mediaArtifactId: uploadedArtifact.mediaArtifactId, ownerUserId: hostId });
+      if (!cleanup.ok) throw roomError("EXPERT_ROOM_MEDIA_CLEANUP_FAILED", "A duplicate room upload could not be safely cleaned up.", 503);
+    }
     if (!created.replay) await publishRoomRevision(created.roomId, created.revision, "WAITING_FOR_SUPERVISOR", created.recipients);
     return { ...(await this.getRoom({ principal, roomId: created.roomId })), idempotent: created.replay };
   }
@@ -461,7 +532,7 @@ export class ExpertVerificationRoomService {
   static async getRoom({ principal, roomId }) {
     const userId = authenticatedUserId(principal);
     const id = normalizeUuid(roomId, "roomId");
-    return withStorageErrors(() => transaction(async (client) => {
+    const response = await withStorageErrors(() => transaction(async (client) => {
       const room = await getRoomRow(client, id);
       const member = await memberFor(client, id, userId);
       const participants = await client.query(
@@ -499,13 +570,17 @@ export class ExpertVerificationRoomService {
                   evidence_ids, proposed_score, reason, proposal_hash, state
              FROM private.expert_room_adjudications WHERE round_id = $1 ORDER BY created_at`, [round.id],
         ) : { rows: [] };
+      const challenge = parseJson(room.challenge_payload, {});
+      const safeChallenge = { ...challenge, metadata: { ...(challenge.metadata || {}) } };
+      delete safeChallenge.metadata.bytes;
+      if (typeof safeChallenge.content === "string" && safeChallenge.content.startsWith("data:image/")) safeChallenge.content = "";
       return {
         room: {
           roomId: room.id,
           hostId: String(room.host_user_id),
           domainCode: room.domain_code,
           inputType: room.input_type,
-          challenge: parseJson(room.challenge_payload, {}),
+          challenge: safeChallenge,
           status: room.status,
           revision: Number(room.revision),
           supervisorId: room.supervisor_user_id ? String(room.supervisor_user_id) : null,
@@ -538,6 +613,14 @@ export class ExpertVerificationRoomService {
         })),
       };
     }));
+    const mediaArtifactId = response.room.challenge?.metadata?.mediaArtifactId;
+    if (mediaArtifactId) {
+      const signed = await MediaArtifactService.createSignedReadUrl(mediaArtifactId, { requesterUserId: userId, roomId: id });
+      if (!signed.ok) throw roomError(signed.error?.code || "EXPERT_ROOM_MEDIA_READ_UNAVAILABLE", signed.error?.message || "Room media could not be resolved.", signed.error?.statusCode || 503);
+      response.room.challenge.metadata.mediaUrl = signed.url;
+      response.room.challenge.metadata.mediaUrlExpiresIn = signed.expiresIn;
+    }
+    return response;
   }
 
   static async acceptSupervisor({ principal, roomId, accept = true, conflictFree = false }) {
@@ -749,7 +832,7 @@ export class ExpertVerificationRoomService {
       const trustRequest = new Request(new URL("/api/v1/trust", request.url), {
         method: "POST",
         headers: { "content-type": "application/json", "Idempotency-Key": `expert-v5-room:${id}:${challenge.round.id}` },
-        body: JSON.stringify({ ...challenge.challenge, version: "v5" }),
+        body: JSON.stringify({ ...challenge.challenge, roomId: id, version: "v5" }),
         signal: request.signal,
       });
       const response = await runCanonicalTrust(trustRequest, null, principal, securityContext);
@@ -776,6 +859,34 @@ export class ExpertVerificationRoomService {
       const remote = trustRemoteStatus(payload, challenge);
       const persisted = payload?.persistence?.persisted === true && Boolean(payload?.caseId);
       const packageBody = dataPackageFromTrust(payload, challenge, { ...remote, persisted });
+      const mediaArtifactId = boundedText(challenge.metadata?.mediaArtifactId, 80);
+      const mediaSha256 = boundedText(challenge.metadata?.imageHash, 64).toLowerCase();
+      if (mediaArtifactId) {
+        if (!/^[a-f0-9]{64}$/.test(mediaSha256)) throw roomError("EXPERT_ROOM_MEDIA_PROVENANCE_INVALID", "The room media digest is missing or invalid.", 409);
+        let linkedToTrustCase = false;
+        if (persisted) {
+          try {
+            await MediaArtifactService.linkToTrustCase({
+              mediaArtifactId,
+              ownerUserId: String(room.host_user_id),
+              caseId: String(payload.caseId),
+              expectedSha256: mediaSha256,
+              client,
+            });
+            linkedToTrustCase = true;
+          } catch {
+            throw roomError("EXPERT_ROOM_MEDIA_PROVENANCE_CONFLICT", "The stored Room media does not match the persisted Trust case.", 409);
+          }
+        }
+        packageBody.inputProvenance = {
+          mediaArtifactId,
+          sha256: mediaSha256,
+          mimeType: boundedText(challenge.metadata?.mimeType, 80),
+          byteSize: Number.isFinite(Number(challenge.metadata?.fileSize)) ? Number(challenge.metadata.fileSize) : null,
+          trustCaseId: persisted ? String(payload.caseId) : null,
+          storageLink: linkedToTrustCase ? "LINKED" : "UNLINKED",
+        };
+      }
       const hasEvidence = packageBody.evidenceIds.length > 0;
       const blocked = remote.remoteRetrieval === "BLOCKED";
       const urlRetrievalUnavailable = challenge.type === "url" && remote.remoteRetrieval !== "SUCCESS";

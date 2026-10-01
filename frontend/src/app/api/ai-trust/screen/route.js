@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Layer1ScreenService } from "@/lib/ai-trust/layer1/Layer1ScreenService";
 import { SecurityFabric } from "@/lib/security/SecurityFabric";
 import { createSecureId } from "@/lib/security/secureId.js";
+import { prepareCanonicalMediaInput } from "@/lib/server/media/CanonicalMediaIntake.js";
 
 /**
  * POST /api/ai-trust/screen
@@ -9,7 +10,7 @@ import { createSecureId } from "@/lib/security/secureId.js";
  * Authoritative Layer 1 Fast & Deterministic Screening Endpoint
  * Zero-Trust Backend Enforcement. Execution latency target: < 15ms
  */
-async function screenTrustInput(request) {
+async function screenTrustInput(request, routeParams, principal) {
   try {
     let body;
     try {
@@ -32,7 +33,7 @@ async function screenTrustInput(request) {
       return NextResponse.json({ error: { code: "SCREEN_INPUT_INVALID", userMessage: "Dữ liệu sàng lọc không hợp lệ hoặc vượt giới hạn." }, status: "BAD_REQUEST" }, { status: 400 });
     }
 
-    if (!content && !metadata?.bytes && !metadata?.ocrText && !metadata?.qrContent) {
+    if (!content && !metadata?.bytes && !metadata?.ocrText && !metadata?.qrContent && !metadata?.mediaArtifactId) {
       return NextResponse.json(
         {
           error: "Nội dung đầu vào không được để trống.",
@@ -43,11 +44,14 @@ async function screenTrustInput(request) {
     }
 
     const requestId = createSecureId("req");
-
+    let screenedInput = { type: type || "text", content: content || "", metadata: metadata || {} };
+    if (metadata?.mediaArtifactId) {
+      const media = await prepareCanonicalMediaInput(screenedInput, { principal, roomId: body?.roomId || null });
+      if (!media.ok) return NextResponse.json({ error: { code: media.error.code, userMessage: media.error.message } }, { status: media.error.statusCode });
+      screenedInput = media.input;
+    }
     const result = await Layer1ScreenService.screen({
-      type: type || "text",
-      content: content || "",
-      metadata: metadata || {},
+      ...screenedInput,
       options: { requestId },
     });
 

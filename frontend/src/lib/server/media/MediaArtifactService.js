@@ -11,11 +11,129 @@
  */
 
 import crypto from "node:crypto";
+import { createClient } from "@supabase/supabase-js";
 import { getPostgresPool } from "../database/PostgresPool.js";
+import { canonicalEnv } from "../env/canonicalEnv.js";
 
 const MAX_BYTE_SIZE = 8 * 1024 * 1024; // 8 MB
 const MAX_DIMENSION = 8192; // 8192 pixels
 const MAX_MEGAPIXELS = 40; // 40 MP
+const PRIVATE_MEDIA_BUCKET = "trust-screenshots-private";
+const SIGNED_MEDIA_URL_TTL_SECONDS = 300;
+const CANONICAL_PRODUCTION_PROJECT_REF = "kytdomflmjytzyaabogi";
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+let cachedStorageClient = null;
+let cachedStorageConfig = null;
+
+function artifactUuid(mediaArtifactId) {
+  const match = typeof mediaArtifactId === "string" && mediaArtifactId.match(/^art_([0-9a-f-]{36})$/i);
+  return match && UUID_PATTERN.test(match[1]) ? match[1].toLowerCase() : null;
+}
+
+function projectRefFromSupabaseUrl(value) {
+  try {
+    const hostname = new URL(value).hostname.toLowerCase();
+    const match = hostname.match(/^([a-z0-9]{20})\.supabase\.co$/);
+    return match?.[1] || null;
+  } catch { return null; }
+}
+
+function projectRefFromDatabaseUrl(value) {
+  try {
+    const url = new URL(value);
+    const direct = url.hostname.toLowerCase().match(/^db\.([a-z0-9]{20})\.supabase\.co$/);
+    if (direct) return direct[1];
+    if (url.hostname.toLowerCase().endsWith(".pooler.supabase.com")) {
+      const pooled = decodeURIComponent(url.username).match(/^postgres\.([a-z0-9]{20})$/i);
+      return pooled?.[1]?.toLowerCase() || null;
+    }
+  } catch { /* an opaque/custom connection string needs an explicit safe project ref */ }
+  return null;
+}
+
+function storageConfiguration() {
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || canonicalEnv.SUPABASE_URL || "";
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || canonicalEnv.SUPABASE_SERVICE_ROLE_KEY || "";
+  if (!url || !serviceRoleKey) {
+    const error = new Error("Private media Storage is not configured.");
+    error.code = "MEDIA_STORAGE_NOT_CONFIGURED";
+    throw error;
+  }
+
+  const publicUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || canonicalEnv.NEXT_PUBLIC_SUPABASE_URL || "";
+  const expectedRef = (process.env.SUPABASE_PROJECT_REF || "").trim().toLowerCase() || null;
+  const explicitDatabaseRef = (process.env.SUPABASE_DATABASE_PROJECT_REF || "").trim().toLowerCase() || null;
+  const refs = [
+    projectRefFromSupabaseUrl(url),
+    projectRefFromSupabaseUrl(publicUrl),
+    expectedRef,
+    projectRefFromDatabaseUrl(process.env.DATABASE_URL || canonicalEnv.DATABASE_URL || ""),
+    explicitDatabaseRef,
+  ].filter(Boolean);
+  if (new Set(refs).size > 1) {
+    const error = new Error("Supabase Auth, Storage, and database project references do not match.");
+    error.code = "MEDIA_STORAGE_PROJECT_MISMATCH";
+    throw error;
+  }
+  const databaseRef = projectRefFromDatabaseUrl(process.env.DATABASE_URL || canonicalEnv.DATABASE_URL || "") || explicitDatabaseRef;
+  const storageRef = projectRefFromSupabaseUrl(url) || expectedRef;
+  if (process.env.NODE_ENV === "production" && (!storageRef || !databaseRef)) {
+    const error = new Error("Production Supabase project identity could not be verified from non-sensitive configuration metadata.");
+    error.code = "MEDIA_STORAGE_IDENTITY_UNVERIFIED";
+    throw error;
+  }
+  if (process.env.VERCEL_ENV === "production" && (storageRef !== CANONICAL_PRODUCTION_PROJECT_REF || databaseRef !== CANONICAL_PRODUCTION_PROJECT_REF)) {
+    const error = new Error("Vercel production must use the canonical StudentHub Supabase project.");
+    error.code = "MEDIA_STORAGE_PROJECT_MISMATCH";
+    throw error;
+  }
+  return { url, serviceRoleKey };
+}
+
+function getSupabaseStorageClient() {
+  const config = storageConfiguration();
+  if (!cachedStorageClient || cachedStorageConfig?.url !== config.url || cachedStorageConfig?.serviceRoleKey !== config.serviceRoleKey) {
+    cachedStorageClient = createClient(config.url, config.serviceRoleKey, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    });
+    cachedStorageConfig = config;
+  }
+  return cachedStorageClient;
+}
+
+function safeMediaError(error, fallbackCode = "MEDIA_STORAGE_UNAVAILABLE") {
+  const code = ["MEDIA_STORAGE_NOT_CONFIGURED", "MEDIA_STORAGE_PROJECT_MISMATCH", "MEDIA_STORAGE_IDENTITY_UNVERIFIED", "MEDIA_STORAGE_SCHEMA_REQUIRED", "MEDIA_STORAGE_CLEANUP_FAILED", "MEDIA_ARTIFACT_ACCESS_DENIED", "MEDIA_ARTIFACT_NOT_FOUND", "MEDIA_ARTIFACT_HASH_MISMATCH", "MEDIA_ARTIFACT_CONFLICT", "MEDIA_MIME_MISMATCH"].includes(error?.code)
+    ? error.code
+    : fallbackCode;
+  const messages = {
+    MEDIA_STORAGE_NOT_CONFIGURED: "Private media storage is not configured.",
+    MEDIA_STORAGE_PROJECT_MISMATCH: "Auth, Storage and database must use the same Supabase project.",
+    MEDIA_STORAGE_IDENTITY_UNVERIFIED: "Production Supabase project identity is not verifiable from runtime metadata.",
+    MEDIA_STORAGE_SCHEMA_REQUIRED: "Private media metadata storage is not initialized.",
+    MEDIA_STORAGE_CLEANUP_FAILED: "The incomplete media upload could not be safely rolled back.",
+    MEDIA_ARTIFACT_ACCESS_DENIED: "You are not authorized to access this media artifact.",
+    MEDIA_ARTIFACT_NOT_FOUND: "The media artifact is unavailable.",
+    MEDIA_ARTIFACT_HASH_MISMATCH: "The stored media artifact failed integrity verification.",
+    MEDIA_ARTIFACT_CONFLICT: "The media artifact is already linked to different Trust evidence.",
+    MEDIA_MIME_MISMATCH: "The uploaded file does not match its declared image type.",
+  };
+  const statusCode = code === "MEDIA_ARTIFACT_ACCESS_DENIED" ? 403 : code === "MEDIA_ARTIFACT_NOT_FOUND" ? 404 : code === "MEDIA_ARTIFACT_HASH_MISMATCH" || code === "MEDIA_ARTIFACT_CONFLICT" || code === "MEDIA_MIME_MISMATCH" ? 422 : 503;
+  return { code, message: messages[code] || "Private media storage is temporarily unavailable.", statusCode };
+}
+
+function validateMetadataRow(row, id) {
+  const extension = { "image/png": "png", "image/jpeg": "jpeg", "image/webp": "webp" }[row.mime_type];
+  const expectedKeys = extension === "jpeg"
+    ? ["jpg", "jpeg"].map((ext) => `${String(row.owner_id).toLowerCase()}/${id}.${ext}`)
+    : [`${String(row.owner_id).toLowerCase()}/${id}.${extension}`];
+  if (String(row.id).toLowerCase() !== id || row.bucket_id !== PRIVATE_MEDIA_BUCKET
+      || !extension || !expectedKeys.includes(row.object_key)
+      || !/^[a-f0-9]{64}$/i.test(String(row.sha256 || ""))
+      || Number(row.byte_size) < 1 || Number(row.byte_size) > MAX_BYTE_SIZE) {
+    throw Object.assign(new Error("Canonical media metadata is inconsistent."), { code: "MEDIA_ARTIFACT_HASH_MISMATCH" });
+  }
+}
 
 const MAGIC_BYTES = {
   JPEG: [0xFF, 0xD8, 0xFF],
@@ -153,6 +271,9 @@ export class MediaArtifactService {
     claimedMimeType = "",
     ownerUserId = null,
     caseId = null,
+    requireDurableStorage = false,
+    storageClient = null,
+    pool = null,
   }) {
     this.cleanExpired();
 
@@ -201,6 +322,9 @@ export class MediaArtifactService {
         },
       };
     }
+    if (claimedMimeType && String(claimedMimeType).toLowerCase() !== detected.mimeType) {
+      return { ok: false, error: { code: "MEDIA_MIME_MISMATCH", message: "Loại tệp không khớp với nội dung hình ảnh." } };
+    }
 
     // 3. Decompression bomb protection: dimension bounds
     const { width, height } = extractImageDimensions(buffer, detected.format);
@@ -227,14 +351,20 @@ export class MediaArtifactService {
 
     // 4. Compute SHA-256 fingerprint
     const sha256 = crypto.createHash("sha256").update(buffer).digest("hex");
-    const mediaArtifactId = `art_${crypto.randomUUID()}`;
+    const artifactId = crypto.randomUUID();
+    const mediaArtifactId = `art_${artifactId}`;
     const nowIso = new Date().toISOString();
-    const objectKey = `${ownerUserId || "anon"}/${mediaArtifactId}.${detected.format}`;
+    const durable = Boolean(requireDurableStorage || ownerUserId);
+    if (durable && !UUID_PATTERN.test(String(ownerUserId || ""))) {
+      return { ok: false, error: { code: "MEDIA_OWNER_INVALID", message: "Tài khoản tải media không hợp lệ." } };
+    }
+    const objectKey = durable ? `${String(ownerUserId).toLowerCase()}/${artifactId}.${detected.format}` : null;
     const privateStoragePath = `trust-screenshots-private/${objectKey}`;
 
     // Internal representation
     const internalArtifact = {
       id: mediaArtifactId,
+      mediaArtifactId,
       ownerUserId,
       caseId,
       sha256,
@@ -246,36 +376,49 @@ export class MediaArtifactService {
       privateStoragePath,
       createdAt: nowIso,
       createdAtTime: Date.now(),
-      retentionState: ownerUserId ? "ACTIVE" : "EPHEMERAL",
+      retentionState: durable ? "ACTIVE" : "EPHEMERAL",
       buffer, // bounded in-memory buffer for the pipeline execution
     };
 
-    // Store in ephemeral cache
-    ephemeralArtifactStore.set(mediaArtifactId, internalArtifact);
-
-    // If authenticated and database pool is live, optionally persist to public.screenshot_objects
-    if (ownerUserId) {
+    if (durable) {
+      let storage = storageClient;
+      let uploaded = false;
       try {
-        const pool = getPostgresPool();
-        await pool.query(
-          `INSERT INTO public.screenshot_objects 
-            (id, owner_id, case_id, bucket_id, object_key, mime_type, byte_size, sha256, created_at)
-           VALUES ($1, $2, $3, 'trust-screenshots-private', $4, $5, $6, $7, now())
-           ON CONFLICT (id) DO NOTHING`,
-          [
-            crypto.randomUUID(),
-            ownerUserId,
-            caseId || null,
-            objectKey,
-            detected.mimeType,
-            buffer.length,
-            Buffer.from(sha256, "hex"),
-          ]
+        storage ||= getSupabaseStorageClient();
+        const database = pool || getPostgresPool();
+        const upload = await storage.storage.from(PRIVATE_MEDIA_BUCKET).upload(objectKey, buffer, {
+          contentType: detected.mimeType,
+          cacheControl: "3600",
+          upsert: false,
+        });
+        if (upload?.error) throw upload.error;
+        uploaded = true;
+        const inserted = await database.query(
+          `INSERT INTO public.screenshot_objects
+             (id, owner_id, case_id, bucket_id, object_key, mime_type, byte_size, sha256, created_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now())
+           RETURNING id`,
+          [artifactId, String(ownerUserId).toLowerCase(), caseId || null, PRIVATE_MEDIA_BUCKET, objectKey, detected.mimeType, buffer.length, Buffer.from(sha256, "hex")],
         );
-      } catch {
-        // Non-blocking: ephemeral cache ensures processing continues cleanly
+        if (String(inserted.rows?.[0]?.id || "").toLowerCase() !== artifactId.toLowerCase()) {
+          throw Object.assign(new Error("Private media metadata row was not created."), { code: "MEDIA_STORAGE_SCHEMA_REQUIRED" });
+        }
+      } catch (caught) {
+        if (uploaded && storage) {
+          try {
+            const removed = await storage.storage.from(PRIVATE_MEDIA_BUCKET).remove([objectKey]);
+            if (removed?.error) throw removed.error;
+          } catch {
+            return { ok: false, error: safeMediaError(Object.assign(new Error("Upload compensation failed."), { code: "MEDIA_STORAGE_CLEANUP_FAILED" })) };
+          }
+        }
+        const code = ["42P01", "42703", "3F000"].includes(caught?.code) ? "MEDIA_STORAGE_SCHEMA_REQUIRED" : caught?.code;
+        return { ok: false, error: safeMediaError(Object.assign(new Error("Durable media ingestion failed."), { code })) };
       }
     }
+
+    // Cache only after durable Storage and metadata both commit successfully.
+    ephemeralArtifactStore.set(mediaArtifactId, internalArtifact);
 
     // 5. Safe Client/Downstream Reference (NO raw bytes, NO private path)
     const publicArtifact = {
@@ -294,6 +437,174 @@ export class MediaArtifactService {
       artifact: publicArtifact,
       internal: internalArtifact,
     };
+  }
+
+  static async #authorizedRow(mediaArtifactId, { requesterUserId, roomId = null, pool = null } = {}) {
+    const artifactId = artifactUuid(mediaArtifactId);
+    if (!artifactId) throw Object.assign(new Error("Invalid media artifact id."), { code: "MEDIA_ARTIFACT_NOT_FOUND" });
+    if (!UUID_PATTERN.test(String(requesterUserId || ""))) throw Object.assign(new Error("Authenticated media owner is required."), { code: "MEDIA_ARTIFACT_ACCESS_DENIED" });
+    const database = pool || getPostgresPool();
+    const result = await database.query(
+      `SELECT so.id, so.owner_id, so.case_id, so.bucket_id, so.object_key, so.mime_type,
+              so.byte_size, encode(so.sha256, 'hex') AS sha256, so.created_at, so.expires_at
+         FROM public.screenshot_objects so
+        WHERE so.id = $1::uuid AND so.bucket_id = $4 AND so.deleted_at IS NULL
+          AND (so.expires_at IS NULL OR so.expires_at > now())
+          AND (
+            so.owner_id = $2::uuid
+            OR (
+              $3::uuid IS NOT NULL
+              AND EXISTS (
+                SELECT 1
+                  FROM private.expert_verification_rooms r
+                  JOIN private.expert_room_participants p ON p.room_id = r.id
+                 WHERE r.id = $3::uuid AND r.host_user_id = so.owner_id
+                   AND p.user_id = $2::uuid AND p.state <> 'LEFT'
+                   AND r.challenge_payload #>> '{metadata,mediaArtifactId}' = 'art_' || so.id::text
+                   AND r.challenge_payload #>> '{metadata,imageHash}' = encode(so.sha256, 'hex')
+              )
+            )
+          )`,
+      [artifactId, String(requesterUserId).toLowerCase(), roomId && UUID_PATTERN.test(String(roomId)) ? String(roomId).toLowerCase() : null, PRIVATE_MEDIA_BUCKET],
+    );
+    const row = result.rows?.[0];
+    if (!row) throw Object.assign(new Error("Media artifact not found for this principal."), { code: "MEDIA_ARTIFACT_ACCESS_DENIED" });
+    validateMetadataRow(row, artifactId);
+    return row;
+  }
+
+  static async hydrateArtifact(mediaArtifactId, { requesterUserId, roomId = null, expectedSha256 = null, storageClient = null, pool = null } = {}) {
+    try {
+      const row = await this.#authorizedRow(mediaArtifactId, { requesterUserId, roomId, pool });
+      const expected = String(expectedSha256 || row.sha256 || "").toLowerCase();
+      if (!/^[a-f0-9]{64}$/.test(expected) || expected !== String(row.sha256).toLowerCase()) {
+        throw Object.assign(new Error("Media digest does not match the canonical metadata."), { code: "MEDIA_ARTIFACT_HASH_MISMATCH" });
+      }
+      const storage = storageClient || getSupabaseStorageClient();
+      const downloaded = await storage.storage.from(PRIVATE_MEDIA_BUCKET).download(row.object_key);
+      if (downloaded?.error || !downloaded?.data) throw downloaded?.error || new Error("Stored media object is missing.");
+      const buffer = Buffer.from(await downloaded.data.arrayBuffer());
+      const detected = detectMimeAndFormat(buffer);
+      const actualHash = crypto.createHash("sha256").update(buffer).digest("hex");
+      if (!detected || detected.mimeType !== row.mime_type || buffer.length !== Number(row.byte_size) || actualHash !== expected) {
+        throw Object.assign(new Error("Stored media failed integrity verification."), { code: "MEDIA_ARTIFACT_HASH_MISMATCH" });
+      }
+      const { width, height } = extractImageDimensions(buffer, detected.format);
+      const artifact = {
+        id: mediaArtifactId,
+        mediaArtifactId,
+        ownerUserId: String(row.owner_id),
+        caseId: row.case_id || null,
+        sha256: actualHash,
+        mimeType: detected.mimeType,
+        format: detected.format,
+        width,
+        height,
+        byteSize: buffer.length,
+        privateStoragePath: `${PRIVATE_MEDIA_BUCKET}/${row.object_key}`,
+        createdAt: new Date(row.created_at).toISOString(),
+        createdAtTime: Date.now(),
+        retentionState: "ACTIVE",
+        buffer,
+      };
+      ephemeralArtifactStore.set(mediaArtifactId, artifact);
+      return { ok: true, artifact: { mediaArtifactId, sha256: actualHash, mimeType: detected.mimeType, width, height, byteSize: buffer.length, createdAt: artifact.createdAt, retentionState: "ACTIVE" } };
+    } catch (error) {
+      return { ok: false, error: safeMediaError(error, error?.code === "MEDIA_ARTIFACT_ACCESS_DENIED" ? "MEDIA_ARTIFACT_ACCESS_DENIED" : "MEDIA_STORAGE_UNAVAILABLE") };
+    }
+  }
+
+  static async createSignedReadUrl(mediaArtifactId, { requesterUserId, roomId = null, storageClient = null, pool = null, expiresIn = SIGNED_MEDIA_URL_TTL_SECONDS } = {}) {
+    try {
+      const row = await this.#authorizedRow(mediaArtifactId, { requesterUserId, roomId, pool });
+      const storage = storageClient || getSupabaseStorageClient();
+      const signed = await storage.storage.from(PRIVATE_MEDIA_BUCKET).createSignedUrl(row.object_key, Math.max(60, Math.min(600, Number(expiresIn) || SIGNED_MEDIA_URL_TTL_SECONDS)));
+      if (signed?.error || !(signed?.data?.signedUrl || signed?.data?.signedURL)) throw signed?.error || new Error("Signed media URL was not created.");
+      return { ok: true, url: signed.data.signedUrl || signed.data.signedURL, expiresIn: Math.max(60, Math.min(600, Number(expiresIn) || SIGNED_MEDIA_URL_TTL_SECONDS)) };
+    } catch (error) {
+      return { ok: false, error: safeMediaError(error, error?.code === "MEDIA_ARTIFACT_ACCESS_DENIED" ? "MEDIA_ARTIFACT_ACCESS_DENIED" : "MEDIA_STORAGE_UNAVAILABLE") };
+    }
+  }
+
+  static async linkToTrustCase({ mediaArtifactId, ownerUserId, caseId, expectedSha256, client }) {
+    const artifactId = artifactUuid(mediaArtifactId);
+    if (!artifactId || !UUID_PATTERN.test(String(ownerUserId || "")) || !UUID_PATTERN.test(String(caseId || ""))) {
+      throw Object.assign(new Error("Invalid media case linkage."), { code: "MEDIA_ARTIFACT_CONFLICT" });
+    }
+    const result = await client.query(
+      `UPDATE public.screenshot_objects SET case_id = $3::uuid
+        WHERE id = $1::uuid AND owner_id = $2::uuid AND bucket_id = $4
+          AND deleted_at IS NULL AND (expires_at IS NULL OR expires_at > now()) AND encode(sha256, 'hex') = $5
+          AND (case_id IS NULL OR case_id = $3::uuid)
+        RETURNING id`,
+      [artifactId, String(ownerUserId).toLowerCase(), String(caseId).toLowerCase(), PRIVATE_MEDIA_BUCKET, String(expectedSha256 || "").toLowerCase()],
+    );
+    if (result.rowCount !== 1) throw Object.assign(new Error("Media artifact does not match the Trust case provenance."), { code: "MEDIA_ARTIFACT_CONFLICT" });
+  }
+
+  static async lockRoomArtifact({ mediaArtifactId, ownerUserId, expectedSha256, client }) {
+    const id = artifactUuid(mediaArtifactId);
+    if (!id || !UUID_PATTERN.test(String(ownerUserId || ""))) throw Object.assign(new Error("Invalid room media linkage."), { code: "MEDIA_ARTIFACT_CONFLICT" });
+    const result = await client.query(
+      `SELECT id FROM public.screenshot_objects
+        WHERE id = $1::uuid AND owner_id = $2::uuid AND bucket_id = $3
+          AND encode(sha256, 'hex') = $4 AND deleted_at IS NULL
+          AND (expires_at IS NULL OR expires_at > now()) FOR UPDATE`,
+      [id, String(ownerUserId).toLowerCase(), PRIVATE_MEDIA_BUCKET, String(expectedSha256 || "").toLowerCase()],
+    );
+    if (result.rowCount !== 1) throw Object.assign(new Error("Room media is no longer available."), { code: "MEDIA_ARTIFACT_CONFLICT" });
+  }
+
+  static async cleanupUnreferencedArtifact({ mediaArtifactId, ownerUserId, storageClient = null, pool = null }) {
+    const artifactId = artifactUuid(mediaArtifactId);
+    if (!artifactId || !UUID_PATTERN.test(String(ownerUserId || ""))) return { ok: false, error: safeMediaError({ code: "MEDIA_ARTIFACT_ACCESS_DENIED" }, "MEDIA_ARTIFACT_ACCESS_DENIED") };
+    let client;
+    try {
+      const database = pool || getPostgresPool();
+      client = await database.connect();
+      await client.query("BEGIN");
+      const rowResult = await client.query(
+        `SELECT object_key FROM public.screenshot_objects
+          WHERE id = $1::uuid AND owner_id = $2::uuid AND bucket_id = $3
+            AND case_id IS NULL AND deleted_at IS NULL FOR UPDATE`,
+        [artifactId, String(ownerUserId).toLowerCase(), PRIVATE_MEDIA_BUCKET],
+      );
+      if (!rowResult.rows?.[0]) {
+        await client.query("COMMIT");
+        return { ok: true, removed: false };
+      }
+      // Room creation locks the same metadata row before publishing a reference.
+      // Recheck on a fresh statement after obtaining the lock to observe any
+      // Room creation that committed while this transaction was waiting.
+      const referenced = await client.query(
+        `SELECT (EXISTS (SELECT 1 FROM private.expert_verification_rooms
+          WHERE challenge_payload #>> '{metadata,mediaArtifactId}' = $1)
+          OR EXISTS (SELECT 1 FROM public.case_inputs WHERE object_key = $1)) AS referenced`, [mediaArtifactId],
+      );
+      if (referenced.rows?.[0]?.referenced !== false) {
+        await client.query("COMMIT");
+        return { ok: true, removed: false };
+      }
+      const objectKey = rowResult.rows[0].object_key;
+      const allowedKeys = ["png", "jpg", "jpeg", "webp"].map((ext) => `${String(ownerUserId).toLowerCase()}/${artifactId}.${ext}`);
+      if (!allowedKeys.includes(objectKey)) throw new Error("Cleanup object ownership is inconsistent.");
+      const storage = storageClient || getSupabaseStorageClient();
+      const removed = await storage.storage.from(PRIVATE_MEDIA_BUCKET).remove([objectKey]);
+      if (removed?.error) throw removed.error;
+      const deleted = await client.query(
+        `DELETE FROM public.screenshot_objects WHERE id = $1::uuid AND owner_id = $2::uuid
+          AND case_id IS NULL AND object_key = $3`, [artifactId, String(ownerUserId).toLowerCase(), objectKey],
+      );
+      if (deleted.rowCount !== 1) throw new Error("Exact media metadata cleanup failed.");
+      await client.query("COMMIT");
+      ephemeralArtifactStore.delete(mediaArtifactId);
+      return { ok: true, removed: true };
+    } catch {
+      if (client) await client.query("ROLLBACK").catch(() => {});
+      return { ok: false, error: safeMediaError({ code: "MEDIA_STORAGE_CLEANUP_FAILED" }) };
+    } finally {
+      client?.release();
+    }
   }
 
   /**

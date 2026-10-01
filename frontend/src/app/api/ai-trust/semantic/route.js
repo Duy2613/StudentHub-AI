@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Layer2SemanticService } from "@/lib/ai-trust/layer2/Layer2SemanticService";
 import { SecurityFabric } from "@/lib/security/SecurityFabric";
+import { prepareCanonicalMediaInput } from "@/lib/server/media/CanonicalMediaIntake.js";
 
 /**
  * POST /api/ai-trust/semantic
@@ -8,7 +9,7 @@ import { SecurityFabric } from "@/lib/security/SecurityFabric";
  * Authoritative Layer 2: Semantic & Contextual Verification Endpoint
  * Analyzes meaning, intent, consistency, extracts claims & packages Layer 3 tasks.
  */
-async function analyzeSemantics(request) {
+async function analyzeSemantics(request, routeParams, principal, securityContext) {
   try {
     let body;
     try {
@@ -32,7 +33,7 @@ async function analyzeSemantics(request) {
       return NextResponse.json({ error: { code: "SEMANTIC_INPUT_INVALID", userMessage: "Dữ liệu phân tích ngữ nghĩa không hợp lệ hoặc vượt giới hạn." }, status: "BAD_REQUEST" }, { status: 400 });
     }
 
-    if (!content && !metadata?.ocrText && !metadata?.qrContent && !metadata?.url) {
+    if (!content && !metadata?.ocrText && !metadata?.qrContent && !metadata?.url && !metadata?.mediaArtifactId && !metadata?.bytes) {
       return NextResponse.json(
         {
           error: "Nội dung đầu vào không được để trống.",
@@ -42,12 +43,12 @@ async function analyzeSemantics(request) {
       );
     }
 
+    const media = await prepareCanonicalMediaInput({ type, content, metadata }, { principal, roomId: body?.roomId || null });
+    if (!media.ok) return NextResponse.json({ error: { code: media.error.code, userMessage: media.error.message } }, { status: media.error.statusCode });
     const result = await Layer2SemanticService.verify({
-      type,
-      content,
-      metadata,
+      ...media.input,
       layer1Result,
-      options,
+      options: { ...options, ownerUserId: principal?.isAuthenticated ? String(principal.subjectId).replace(/^(student|expert|user):/i, "") : null, caseId: null, requestId: securityContext.correlationId, signal: request.signal },
     });
 
     return NextResponse.json(result, {

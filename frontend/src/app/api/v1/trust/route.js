@@ -5,7 +5,7 @@ import { TrustPipelineCancelledError } from "@/lib/ai-trust/v5/TrustPipelineOrch
 import { createTrustOrchestrator } from "@/lib/ai-trust/TrustOrchestrator.js";
 import { SecurityFabric } from "@/lib/security/SecurityFabric.js";
 import { TrustPersistenceService } from "@/lib/server/database/TrustPersistenceService.js";
-import { MediaArtifactService } from "@/lib/server/media/MediaArtifactService.js";
+import { prepareCanonicalMediaInput } from "@/lib/server/media/CanonicalMediaIntake.js";
 import { QrIntakeService } from "@/lib/ai-trust/layer1/qr/QrIntakeService.js";
 import { ExpertBlindReviewDispatcher } from "@/lib/server/expert/ExpertBlindReviewDispatcher.js";
 import { TRUST_RICH_RESPONSE_CONTRACT_VERSION } from "@/lib/ai-trust/v5/contracts.js";
@@ -233,8 +233,8 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
   }
 
   const type = String(body?.type || "text").toLowerCase();
-  const content = typeof body?.content === "string" ? body.content.trim() : "";
-  const metadata = safeMetadata(body?.metadata);
+  let content = typeof body?.content === "string" ? body.content.trim() : "";
+  let metadata = safeMetadata(body?.metadata);
   if (!ACCEPTED_INPUT_TYPES.has(type)) {
     return NextResponse.json({ success: false, error: { code: "UNSUPPORTED_INPUT_TYPE", userMessage: "Loại dữ liệu này chưa được hỗ trợ." } }, { status: 422 });
   }
@@ -245,32 +245,10 @@ export async function runCanonicalTrust(request, routeParams, principal, securit
     return NextResponse.json({ success: false, error: { code: "CONTENT_TOO_LARGE", userMessage: "Nội dung vượt quá giới hạn cho phép." } }, { status: 413 });
   }
 
-  // Authoritative Server-Side Image Intake & Media Artifact Management
-  if ((type === "image" || type === "qr") && (metadata.bytes || (typeof content === "string" && content.startsWith("data:image/"))) && !metadata.mediaArtifactId) {
-    const rawBytes = metadata.bytes || content;
-    const ingestRes = await MediaArtifactService.ingestImage({
-      bytes: rawBytes,
-      claimedMimeType: metadata.mimeType || "",
-      ownerUserId: principal?.subjectId ? String(principal.subjectId).replace(/^(student|expert|user):/, "") : null,
-    });
-    if (!ingestRes.ok) {
-      return NextResponse.json({
-        success: false,
-        error: { code: ingestRes.error?.code || "IMAGE_INTAKE_FAILED", userMessage: ingestRes.error?.message || "Tệp hình ảnh không hợp lệ." },
-      }, { status: 422 });
-    }
-    metadata.mediaArtifactId = ingestRes.artifact.mediaArtifactId;
-    metadata.imageHash = ingestRes.artifact.sha256;
-    metadata.mimeType = ingestRes.artifact.mimeType;
-    metadata.width = ingestRes.artifact.width;
-    metadata.height = ingestRes.artifact.height;
-    // Retain magic byte prefix (32 bytes) so Layer 1 FileDetector / NormalizationService validates successfully
-    if (ingestRes.artifact.buffer) {
-      metadata.bytes = Array.from(ingestRes.artifact.buffer.subarray(0, 32));
-    } else {
-      delete metadata.bytes;
-    }
-  }
+  const media = await prepareCanonicalMediaInput({ type, content, metadata }, { principal, roomId: body?.roomId || null });
+  if (!media.ok) return NextResponse.json({ success: false, error: { code: media.error.code, userMessage: media.error.message } }, { status: media.error.statusCode });
+  content = media.input.content;
+  metadata = media.input.metadata;
 
   // Authoritative Server-Side QR Intake Screening
   if (type === "qr" || metadata.qrContent || metadata.qrPayload) {
