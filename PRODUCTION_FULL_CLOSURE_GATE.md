@@ -28,7 +28,9 @@ acceptance pass.
 | Production Vercel deployment | `dpl_ED91sTmSbtDS3xTzhgCeeiJqeRh7` | READY |
 | Production deployment SHA | `595a99110367aefb545b02dab4b9f9a5a6106ab6` | Matches current main; not the release candidate |
 | Release branch | `release/studenthub-full-sync-20261001` | Candidate work |
-| Release branch push | Pending final source review and commit | Not yet PASS |
+| Release branch push | PASS for source/migration commit `1d02394aabb135f8c25f58eb447751a242f4a610`; remote equality verified at push |
+| Vercel preview for source commit | QUEUED; target is preview, not production |
+| GitHub Actions | No run was returned for this branch at check time; not a CI pass |
 
 Production `/api/health/live` reports `LIVE` and the exact deployment metadata.
 `/api/health/ready` reports `READY`; runtime, database, Supabase Auth and

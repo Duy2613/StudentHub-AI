@@ -37,3 +37,7 @@ The commit is eligible for the integration remote only. Main promotion is blocke
 | Production schema / recovery | MISMATCH: 22 tables and 6 existing-table columns missing; backup/PITR recovery evidence UNKNOWN |
 | Production migration / main promotion / canary | BLOCKED; not run |
 | Release branch final tip | Recorded by the pushed branch ref and closure response |
+| Closure code/schema/report commit | `1d02394aabb135f8c25f58eb447751a242f4a610` |
+| Release branch push | PASS; `git ls-remote` matched this source commit at push time |
+| Vercel preview for closure source commit | QUEUED (`target=null`); not production deployment evidence |
+| GitHub Actions for release branch | No run returned at check time; not a CI pass |
