@@ -264,3 +264,14 @@
 - [x] Marked prior V3/V4/V5 entity-resolution percentages as superseded without rewriting holdout labels or old result artifacts.
 - [x] Targeted regression suite `29/29`, changed-file ESLint `0 errors / 0 warnings`, and V3/V4/V5 syntax checks passed.
 - [ ] A fresh eligible retrieval holdout is still required; retrieval targets remain unestablished, Tavily remains OFF, and staging secret rotation/invalidation remains owner-gated.
+
+### Four-core repair candidate — 2026-10-01
+
+- [x] Isolated candidate source repair for Auth/Profile/Community/Expert/Trust integration, readiness diagnostics and mobile header overflow; source SHA eea55564ebaef4dc2edc7af14586fe8f04324114.
+- [x] Candidate staging integration 16/16; synthetic identities disabled and roles/sessions revoked after run; fixture history remains explicitly labeled.
+- [x] Candidate browser matrix 48/48 across Chromium, Firefox, WebKit; route set: Trust, Community, Expert, Profile at 360/390/768/1440.
+- [x] Build + TypeScript pass; ESLint exit 0 / 0 errors / 490 warnings; regression rerun 390/396 pass, six live external gates blocked; 64 removed-feature tests skipped by the quality runner.
+- [x] Local disposable PostgreSQL 17.6 rehearsal passed fresh chain, idempotency and production/staging observed-schema fixtures with synthetic data preservation.
+- [ ] Apply no production migration or deploy until offsite backup restore is proven, Vercel runtime DB/Auth/session targets are verified, and migration ledger aliases are reconciled.
+- [ ] Close Expert request/matching/assessment, staging Storage, live retrieval/provider gates and production post-deploy checks. Do not claim FULL_FIX_ACCEPTED while these remain open.
+- [x] Final report and rollout plan: docs/reports/four-core-repair-2026-10-01/FINAL_REPORT.md and ROLLOUT_PLAN.md; production remains unchanged at SHA 595a99110367aefb545b02dab4b9f9a5a6106ab6.

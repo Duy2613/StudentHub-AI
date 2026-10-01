@@ -1,0 +1,2376 @@
+{
+  "recordedAt": "2026-10-01T10:06:46.077Z",
+  "candidateSha": "d92841b0b9af650d806d84b120f982d031f6bb42",
+  "workingTreeChanges": false,
+  "origin": "https://student-hub-ai-topaz.vercel.app",
+  "label": "production-final",
+  "routes": [
+    {
+      "browser": "chromium",
+      "route": "/trust",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/community",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "FAIL",
+      "viewport": 360,
+      "scrollWidth": 472,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "DIV",
+          "className": "flex items-center gap-2",
+          "left": 238,
+          "right": 472,
+          "width": 234,
+          "parent": "app-header community-app-header"
+        },
+        {
+          "tag": "DIV",
+          "className": "anonymous-actions",
+          "left": 289,
+          "right": 428,
+          "width": 139,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "A",
+          "className": "secondary-action",
+          "left": 289,
+          "right": 364,
+          "width": 76,
+          "parent": "anonymous-actions"
+        },
+        {
+          "tag": "A",
+          "className": "primary-action",
+          "left": 368,
+          "right": 428,
+          "width": 60,
+          "parent": "anonymous-actions"
+        },
+        {
+          "tag": "BUTTON",
+          "className": "community-glossary-trigger",
+          "left": 434,
+          "right": 472,
+          "width": 38,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "svg",
+          "className": "[object SVGAnimatedString]",
+          "left": 446,
+          "right": 461,
+          "width": 15,
+          "parent": "community-glossary-trigger"
+        },
+        {
+          "tag": "path",
+          "className": "[object SVGAnimatedString]",
+          "left": 447,
+          "right": 460,
+          "width": 13,
+          "parent": "[object SVGAnimatedString]"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 453,
+          "right": 454,
+          "width": 1,
+          "parent": "community-glossary-trigger"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        },
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 503 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/intelligence/community/posts",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/expert",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/profile",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/trust",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/community",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "FAIL",
+      "viewport": 390,
+      "scrollWidth": 472,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "DIV",
+          "className": "flex items-center gap-2",
+          "left": 238,
+          "right": 472,
+          "width": 234,
+          "parent": "app-header community-app-header"
+        },
+        {
+          "tag": "DIV",
+          "className": "anonymous-actions",
+          "left": 289,
+          "right": 428,
+          "width": 139,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "A",
+          "className": "primary-action",
+          "left": 368,
+          "right": 428,
+          "width": 60,
+          "parent": "anonymous-actions"
+        },
+        {
+          "tag": "BUTTON",
+          "className": "community-glossary-trigger",
+          "left": 434,
+          "right": 472,
+          "width": 38,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "svg",
+          "className": "[object SVGAnimatedString]",
+          "left": 446,
+          "right": 461,
+          "width": 15,
+          "parent": "community-glossary-trigger"
+        },
+        {
+          "tag": "path",
+          "className": "[object SVGAnimatedString]",
+          "left": 447,
+          "right": 460,
+          "width": 13,
+          "parent": "[object SVGAnimatedString]"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 453,
+          "right": 454,
+          "width": 1,
+          "parent": "community-glossary-trigger"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        },
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 503 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/intelligence/community/posts",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/expert",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/profile",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/trust",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/community",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        },
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 503 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/intelligence/community/posts",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/expert",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/profile",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/trust",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/community",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        },
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 503 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/intelligence/community/posts",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/expert",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1710,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/profile",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "firefox",
+      "route": "/trust",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "[JavaScript Error: \"Content-Security-Policy: The page’s settings blocked a JavaScript eval (script-src) from being executed because it violates the following directive: “script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net” (Missing 'unsafe-eval')\" {file: \"https://student-hub-ai-topaz.vercel.app/_next/static/immutable/chunks/3soy6ngfbhj2i.js\" line: 1}]",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/_next/static/immutable/chunks/3soy6ngfbhj2i.js",
+            "line": 1
+          }
+        }
+      ]
+    },
+    {
+      "browser": "firefox",
+      "route": "/community",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "FAIL",
+      "viewport": 360,
+      "scrollWidth": 473,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "DIV",
+          "className": "flex items-center gap-2",
+          "left": 238,
+          "right": 473,
+          "width": 234,
+          "parent": "app-header community-app-header"
+        },
+        {
+          "tag": "DIV",
+          "className": "anonymous-actions",
+          "left": 289,
+          "right": 428,
+          "width": 140,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "A",
+          "className": "secondary-action",
+          "left": 289,
+          "right": 365,
+          "width": 76,
+          "parent": "anonymous-actions"
+        },
+        {
+          "tag": "A",
+          "className": "primary-action",
+          "left": 369,
+          "right": 428,
+          "width": 60,
+          "parent": "anonymous-actions"
+        },
+        {
+          "tag": "BUTTON",
+          "className": "community-glossary-trigger",
+          "left": 435,
+          "right": 473,
+          "width": 38,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "svg",
+          "className": "[object SVGAnimatedString]",
+          "left": 446,
+          "right": 461,
+          "width": 15,
+          "parent": "community-glossary-trigger"
+        },
+        {
+          "tag": "path",
+          "className": "[object SVGAnimatedString]",
+          "left": 453,
+          "right": 454,
+          "width": 2,
+          "parent": "[object SVGAnimatedString]"
+        },
+        {
+          "tag": "path",
+          "className": "[object SVGAnimatedString]",
+          "left": 446,
+          "right": 461,
+          "width": 14,
+          "parent": "[object SVGAnimatedString]"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 453,
+          "right": 454,
+          "width": 1,
+          "parent": "community-glossary-trigger"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/expert",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/profile",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/trust",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "[JavaScript Error: \"Content-Security-Policy: The page’s settings blocked a JavaScript eval (script-src) from being executed because it violates the following directive: “script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net” (Missing 'unsafe-eval')\" {file: \"https://student-hub-ai-topaz.vercel.app/_next/static/immutable/chunks/3soy6ngfbhj2i.js\" line: 1}]",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/_next/static/immutable/chunks/3soy6ngfbhj2i.js",
+            "line": 1
+          }
+        }
+      ]
+    },
+    {
+      "browser": "firefox",
+      "route": "/community",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "FAIL",
+      "viewport": 390,
+      "scrollWidth": 473,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "DIV",
+          "className": "flex items-center gap-2",
+          "left": 238,
+          "right": 473,
+          "width": 234,
+          "parent": "app-header community-app-header"
+        },
+        {
+          "tag": "DIV",
+          "className": "anonymous-actions",
+          "left": 289,
+          "right": 428,
+          "width": 140,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "A",
+          "className": "primary-action",
+          "left": 369,
+          "right": 428,
+          "width": 60,
+          "parent": "anonymous-actions"
+        },
+        {
+          "tag": "BUTTON",
+          "className": "community-glossary-trigger",
+          "left": 435,
+          "right": 473,
+          "width": 38,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "svg",
+          "className": "[object SVGAnimatedString]",
+          "left": 446,
+          "right": 461,
+          "width": 15,
+          "parent": "community-glossary-trigger"
+        },
+        {
+          "tag": "path",
+          "className": "[object SVGAnimatedString]",
+          "left": 453,
+          "right": 454,
+          "width": 2,
+          "parent": "[object SVGAnimatedString]"
+        },
+        {
+          "tag": "path",
+          "className": "[object SVGAnimatedString]",
+          "left": 446,
+          "right": 461,
+          "width": 14,
+          "parent": "[object SVGAnimatedString]"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 453,
+          "right": 454,
+          "width": 1,
+          "parent": "community-glossary-trigger"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/expert",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/profile",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/trust",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "[JavaScript Error: \"Content-Security-Policy: The page’s settings blocked a JavaScript eval (script-src) from being executed because it violates the following directive: “script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net” (Missing 'unsafe-eval')\" {file: \"https://student-hub-ai-topaz.vercel.app/_next/static/immutable/chunks/3soy6ngfbhj2i.js\" line: 1}]",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/_next/static/immutable/chunks/3soy6ngfbhj2i.js",
+            "line": 1
+          }
+        }
+      ]
+    },
+    {
+      "browser": "firefox",
+      "route": "/community",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/expert",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/profile",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/trust",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "[JavaScript Error: \"Content-Security-Policy: The page’s settings blocked a JavaScript eval (script-src) from being executed because it violates the following directive: “script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net” (Missing 'unsafe-eval')\" {file: \"https://student-hub-ai-topaz.vercel.app/_next/static/immutable/chunks/3soy6ngfbhj2i.js\" line: 1}]",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/_next/static/immutable/chunks/3soy6ngfbhj2i.js",
+            "line": 1
+          }
+        }
+      ]
+    },
+    {
+      "browser": "firefox",
+      "route": "/community",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/expert",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/profile",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "/trust",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 352,
+      "scrollWidth": 352,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 24,
+          "right": 645,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/community",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "FAIL",
+      "viewport": 352,
+      "scrollWidth": 472,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 24,
+          "right": 645,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "DIV",
+          "className": "flex items-center gap-2",
+          "left": 238,
+          "right": 472,
+          "width": 234,
+          "parent": "app-header community-app-header"
+        },
+        {
+          "tag": "DIV",
+          "className": "anonymous-actions",
+          "left": 289,
+          "right": 428,
+          "width": 139,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "A",
+          "className": "secondary-action",
+          "left": 289,
+          "right": 364,
+          "width": 76,
+          "parent": "anonymous-actions"
+        },
+        {
+          "tag": "A",
+          "className": "primary-action",
+          "left": 368,
+          "right": 428,
+          "width": 60,
+          "parent": "anonymous-actions"
+        },
+        {
+          "tag": "BUTTON",
+          "className": "community-glossary-trigger",
+          "left": 434,
+          "right": 472,
+          "width": 38,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "svg",
+          "className": "[object SVGAnimatedString]",
+          "left": 446,
+          "right": 461,
+          "width": 15,
+          "parent": "community-glossary-trigger"
+        },
+        {
+          "tag": "path",
+          "className": "[object SVGAnimatedString]",
+          "left": 447,
+          "right": 460,
+          "width": 13,
+          "parent": "[object SVGAnimatedString]"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 453,
+          "right": 454,
+          "width": 1,
+          "parent": "community-glossary-trigger"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        },
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 503 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/intelligence/community/posts",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/expert",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 352,
+      "scrollWidth": 352,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 24,
+          "right": 645,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/profile",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 352,
+      "scrollWidth": 352,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 24,
+          "right": 645,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/trust",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 382,
+      "scrollWidth": 382,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 54,
+          "right": 675,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/community",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "FAIL",
+      "viewport": 382,
+      "scrollWidth": 472,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 54,
+          "right": 675,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "DIV",
+          "className": "flex items-center gap-2",
+          "left": 238,
+          "right": 472,
+          "width": 234,
+          "parent": "app-header community-app-header"
+        },
+        {
+          "tag": "DIV",
+          "className": "anonymous-actions",
+          "left": 289,
+          "right": 428,
+          "width": 139,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "A",
+          "className": "primary-action",
+          "left": 368,
+          "right": 428,
+          "width": 60,
+          "parent": "anonymous-actions"
+        },
+        {
+          "tag": "BUTTON",
+          "className": "community-glossary-trigger",
+          "left": 434,
+          "right": 472,
+          "width": 38,
+          "parent": "flex items-center gap-2"
+        },
+        {
+          "tag": "svg",
+          "className": "[object SVGAnimatedString]",
+          "left": 446,
+          "right": 461,
+          "width": 15,
+          "parent": "community-glossary-trigger"
+        },
+        {
+          "tag": "path",
+          "className": "[object SVGAnimatedString]",
+          "left": 447,
+          "right": 460,
+          "width": 13,
+          "parent": "[object SVGAnimatedString]"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 453,
+          "right": 454,
+          "width": 1,
+          "parent": "community-glossary-trigger"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        },
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 503 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/intelligence/community/posts",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/expert",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 382,
+      "scrollWidth": 382,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 54,
+          "right": 675,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/profile",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 382,
+      "scrollWidth": 382,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 54,
+          "right": 675,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/trust",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 760,
+      "scrollWidth": 760,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 432,
+          "right": 1053,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/community",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 760,
+      "scrollWidth": 760,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 432,
+          "right": 1053,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        },
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 503 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/intelligence/community/posts",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/expert",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 760,
+      "scrollWidth": 760,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 432,
+          "right": 1053,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/profile",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 760,
+      "scrollWidth": 760,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 432,
+          "right": 1053,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/trust",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1432,
+      "scrollWidth": 1432,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 683,
+          "right": 1702,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 852,
+          "right": 1554,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/community",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1432,
+      "scrollWidth": 1432,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 683,
+          "right": 1701,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 852,
+          "right": 1554,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        },
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 503 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/intelligence/community/posts",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/expert",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1432,
+      "scrollWidth": 1432,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 683,
+          "right": 1702,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 852,
+          "right": 1554,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/profile",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1432,
+      "scrollWidth": 1432,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 683,
+          "right": 1702,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 852,
+          "right": 1554,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 ()",
+          "location": {
+            "url": "https://student-hub-ai-topaz.vercel.app/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    }
+  ],
+  "logins": [
+    {
+      "slot": 0,
+      "network": [
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/auth/v1/token",
+          "projectRef": "kytdomflmjytzyaabogi",
+          "status": 200,
+          "code": null
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/api/auth/session/exchange",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        }
+      ],
+      "session": {
+        "status": 200,
+        "authenticated": true
+      },
+      "reload": {
+        "status": 200,
+        "authenticated": true
+      },
+      "applicationSession": {
+        "status": 200,
+        "authenticatedAfterReload": true,
+        "serverOwned": true,
+        "providerSessionPersisted": false,
+        "providerRefreshTokenPersisted": false
+      },
+      "logout": {
+        "status": 200,
+        "afterStatus": 401
+      },
+      "finalRoute": "/profile",
+      "cause": "APPLICATION_SESSION_VERIFIED"
+    },
+    {
+      "slot": 1,
+      "network": [
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/auth/v1/token",
+          "projectRef": "kytdomflmjytzyaabogi",
+          "status": 200,
+          "code": null
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/api/auth/session/exchange",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        }
+      ],
+      "session": {
+        "status": 200,
+        "authenticated": true
+      },
+      "reload": {
+        "status": 200,
+        "authenticated": true
+      },
+      "applicationSession": {
+        "status": 200,
+        "authenticatedAfterReload": true,
+        "serverOwned": true,
+        "providerSessionPersisted": false,
+        "providerRefreshTokenPersisted": false
+      },
+      "logout": {
+        "status": 200,
+        "afterStatus": 401
+      },
+      "finalRoute": "/profile",
+      "cause": "APPLICATION_SESSION_VERIFIED"
+    },
+    {
+      "slot": 2,
+      "network": [
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/auth/v1/token",
+          "projectRef": "kytdomflmjytzyaabogi",
+          "status": 200,
+          "code": null
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/api/auth/session/exchange",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        }
+      ],
+      "session": {
+        "status": 200,
+        "authenticated": true
+      },
+      "reload": {
+        "status": 200,
+        "authenticated": true
+      },
+      "applicationSession": {
+        "status": 200,
+        "authenticatedAfterReload": true,
+        "serverOwned": true,
+        "providerSessionPersisted": false,
+        "providerRefreshTokenPersisted": false
+      },
+      "logout": {
+        "status": 200,
+        "afterStatus": 401
+      },
+      "finalRoute": "/profile",
+      "cause": "APPLICATION_SESSION_VERIFIED"
+    },
+    {
+      "slot": 3,
+      "network": [
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/auth/v1/token",
+          "projectRef": "kytdomflmjytzyaabogi",
+          "status": 200,
+          "code": null
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/api/auth/session/exchange",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        }
+      ],
+      "session": {
+        "status": 200,
+        "authenticated": true
+      },
+      "reload": {
+        "status": 200,
+        "authenticated": true
+      },
+      "applicationSession": {
+        "status": 200,
+        "authenticatedAfterReload": true,
+        "serverOwned": true,
+        "providerSessionPersisted": false,
+        "providerRefreshTokenPersisted": false
+      },
+      "logout": {
+        "status": 200,
+        "afterStatus": 401
+      },
+      "finalRoute": "/profile",
+      "cause": "APPLICATION_SESSION_VERIFIED"
+    },
+    {
+      "slot": 4,
+      "network": [
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/auth/v1/token",
+          "projectRef": "kytdomflmjytzyaabogi",
+          "status": 200,
+          "code": null
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/api/auth/session/exchange",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        }
+      ],
+      "session": {
+        "status": 200,
+        "authenticated": true
+      },
+      "reload": {
+        "status": 200,
+        "authenticated": true
+      },
+      "applicationSession": {
+        "status": 200,
+        "authenticatedAfterReload": true,
+        "serverOwned": true,
+        "providerSessionPersisted": false,
+        "providerRefreshTokenPersisted": false
+      },
+      "logout": {
+        "status": 200,
+        "afterStatus": 401
+      },
+      "finalRoute": "/profile",
+      "cause": "APPLICATION_SESSION_VERIFIED"
+    },
+    {
+      "slot": 5,
+      "network": [
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/auth/v1/token",
+          "projectRef": "kytdomflmjytzyaabogi",
+          "status": 200,
+          "code": null
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/api/auth/session/exchange",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        }
+      ],
+      "session": {
+        "status": 200,
+        "authenticated": true
+      },
+      "reload": {
+        "status": 200,
+        "authenticated": true
+      },
+      "applicationSession": {
+        "status": 200,
+        "authenticatedAfterReload": true,
+        "serverOwned": true,
+        "providerSessionPersisted": false,
+        "providerRefreshTokenPersisted": false
+      },
+      "logout": {
+        "status": 200,
+        "afterStatus": 401
+      },
+      "finalRoute": "/profile",
+      "cause": "APPLICATION_SESSION_VERIFIED"
+    },
+    {
+      "slot": 6,
+      "network": [
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/auth/v1/token",
+          "projectRef": "kytdomflmjytzyaabogi",
+          "status": 200,
+          "code": null
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/api/auth/session/exchange",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        }
+      ],
+      "session": {
+        "status": 200,
+        "authenticated": true
+      },
+      "reload": {
+        "status": 200,
+        "authenticated": true
+      },
+      "applicationSession": {
+        "status": 200,
+        "authenticatedAfterReload": true,
+        "serverOwned": true,
+        "providerSessionPersisted": false,
+        "providerRefreshTokenPersisted": false
+      },
+      "logout": {
+        "status": 200,
+        "afterStatus": 401
+      },
+      "finalRoute": "/profile",
+      "cause": "APPLICATION_SESSION_VERIFIED"
+    },
+    {
+      "slot": 7,
+      "network": [
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/auth/v1/token",
+          "projectRef": "kytdomflmjytzyaabogi",
+          "status": 200,
+          "code": null
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        },
+        {
+          "path": "/api/auth/session/exchange",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 200
+        },
+        {
+          "path": "/api/auth/session",
+          "status": 401
+        }
+      ],
+      "session": {
+        "status": 200,
+        "authenticated": true
+      },
+      "reload": {
+        "status": 200,
+        "authenticated": true
+      },
+      "applicationSession": {
+        "status": 200,
+        "authenticatedAfterReload": true,
+        "serverOwned": true,
+        "providerSessionPersisted": false,
+        "providerRefreshTokenPersisted": false
+      },
+      "logout": {
+        "status": 200,
+        "afterStatus": 401
+      },
+      "finalRoute": "/profile",
+      "cause": "APPLICATION_SESSION_VERIFIED"
+    }
+  ],
+  "identitySource": "CANONICAL_SERVER_POLICY_INVENTORY"
+}

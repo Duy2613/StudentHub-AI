@@ -1,0 +1,1434 @@
+{
+  "recordedAt": "2026-10-01T10:31:58.425Z",
+  "candidateSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+  "workingTreeChanges": false,
+  "origin": "http://127.0.0.1:3000",
+  "label": "candidate-staging-release",
+  "routes": [
+    {
+      "browser": "chromium",
+      "route": "/trust",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 266,
+          "right": 361,
+          "width": 96,
+          "parent": "master-ultra-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/community",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/expert",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/profile",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/trust",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 291,
+          "right": 394,
+          "width": 104,
+          "parent": "master-ultra-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/community",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/expert",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/profile",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/trust",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/community",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/expert",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/profile",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/trust",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1710,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 1118,
+          "right": 1458,
+          "width": 340,
+          "parent": "master-ultra-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/community",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1710,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/expert",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "chromium",
+      "route": "/profile",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1710,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "firefox",
+      "route": "/trust",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 652,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 266,
+          "right": 361,
+          "width": 96,
+          "parent": "master-ultra-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/community",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 652,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/expert",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/profile",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 360,
+      "scrollWidth": 360,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 32,
+          "right": 653,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/trust",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 291,
+          "right": 394,
+          "width": 104,
+          "parent": "master-ultra-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/community",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/expert",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/profile",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 62,
+          "right": 683,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/trust",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/community",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/expert",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1060,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/profile",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 768,
+      "scrollWidth": 768,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 440,
+          "right": 1061,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/trust",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 690,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 1118,
+          "right": 1458,
+          "width": 340,
+          "parent": "master-ultra-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/community",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/expert",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "firefox",
+      "route": "/profile",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1440,
+      "scrollWidth": 1440,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 691,
+          "right": 1709,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 860,
+          "right": 1562,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "browser": "webkit",
+      "route": "/trust",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 352,
+      "scrollWidth": 352,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 24,
+          "right": 645,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/community",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 352,
+      "scrollWidth": 352,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 24,
+          "right": 645,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/expert",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 352,
+      "scrollWidth": 352,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 24,
+          "right": 645,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/profile",
+      "width": 360,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 352,
+      "scrollWidth": 352,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 24,
+          "right": 645,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/trust",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 382,
+      "scrollWidth": 382,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 54,
+          "right": 675,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 282,
+          "right": 385,
+          "width": 104,
+          "parent": "master-ultra-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/community",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 382,
+      "scrollWidth": 382,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 54,
+          "right": 675,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/expert",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 382,
+      "scrollWidth": 382,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 54,
+          "right": 675,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/profile",
+      "width": 390,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 382,
+      "scrollWidth": 382,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 54,
+          "right": 675,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/trust",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 760,
+      "scrollWidth": 760,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 432,
+          "right": 1053,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 584,
+          "right": 788,
+          "width": 204,
+          "parent": "master-ultra-atmosphere"
+        },
+        {
+          "tag": "DIV",
+          "className": "master-ultra-stage-aura",
+          "left": 512,
+          "right": 789,
+          "width": 277,
+          "parent": "master-ultra-journey-stage master-ultra-tone-ice"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/community",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 760,
+      "scrollWidth": 760,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 432,
+          "right": 1053,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/expert",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 760,
+      "scrollWidth": 760,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 432,
+          "right": 1053,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/profile",
+      "width": 768,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 760,
+      "scrollWidth": 760,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 432,
+          "right": 1053,
+          "width": 621,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/trust",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1432,
+      "scrollWidth": 1432,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 683,
+          "right": 1702,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 852,
+          "right": 1554,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "",
+          "left": 1108,
+          "right": 1449,
+          "width": 340,
+          "parent": "master-ultra-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/community",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1432,
+      "scrollWidth": 1432,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 683,
+          "right": 1702,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 852,
+          "right": 1554,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/expert",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1432,
+      "scrollWidth": 1432,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 683,
+          "right": 1702,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 852,
+          "right": 1554,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    },
+    {
+      "browser": "webkit",
+      "route": "/profile",
+      "width": 1440,
+      "httpStatus": 200,
+      "status": "PASS",
+      "viewport": 1432,
+      "scrollWidth": 1432,
+      "overflowing": [
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-one",
+          "left": 683,
+          "right": 1701,
+          "width": 1019,
+          "parent": "reference-atmosphere"
+        },
+        {
+          "tag": "SPAN",
+          "className": "reference-atmosphere-orbit reference-atmosphere-orbit-two",
+          "left": 852,
+          "right": 1554,
+          "width": 702,
+          "parent": "reference-atmosphere"
+        }
+      ],
+      "errors": [
+        {
+          "type": "console",
+          "message": "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+          "location": {
+            "url": "http://127.0.0.1:3000/api/auth/session",
+            "line": 0
+          }
+        }
+      ]
+    }
+  ],
+  "logins": []
+}

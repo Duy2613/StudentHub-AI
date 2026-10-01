@@ -1,0 +1,110 @@
+{
+  "recordedAt": "2026-10-01T10:27:09.235Z",
+  "candidateSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+  "environment": "PRODUCTION_READ_ONLY",
+  "deployment": {
+    "project": "student-hub-ai",
+    "deploymentId": "dpl_ED91sTmSbtDS3xTzhgCeeiJqeRh7",
+    "deploymentSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
+    "target": "production",
+    "status": "READY",
+    "alias": "https://student-hub-ai-topaz.vercel.app"
+  },
+  "routes": [
+    {
+      "path": "/api/health/live",
+      "httpStatus": 200,
+      "state": "LIVE",
+      "ready": null,
+      "errorCode": null,
+      "backendIdentityExposed": false
+    },
+    {
+      "path": "/api/health/ready",
+      "httpStatus": 200,
+      "state": "READY",
+      "ready": true,
+      "errorCode": null,
+      "backendIdentityExposed": false
+    },
+    {
+      "path": "/api/v1/community",
+      "httpStatus": 500,
+      "state": null,
+      "ready": null,
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "backendIdentityExposed": false
+    },
+    {
+      "path": "/api/intelligence/community/posts",
+      "httpStatus": 503,
+      "state": null,
+      "ready": null,
+      "errorCode": "PROMAX_MIGRATION_REQUIRED",
+      "backendIdentityExposed": false
+    }
+  ],
+  "browserAssurance": {
+    "harnessCandidateSha": "d92841b0b9af650d806d84b120f982d031f6bb42",
+    "routeVisits": 48,
+    "passed": 42,
+    "failed": 6,
+    "loginChecks": 8,
+    "allLoginSessionsRestoredAfterReload": true,
+    "allLoginsEndedWithUnauthorizedSession": true,
+    "mobileCommunityFailures": [
+      {
+        "browser": "chromium",
+        "route": "/community",
+        "width": 360,
+        "scrollWidth": 472
+      },
+      {
+        "browser": "chromium",
+        "route": "/community",
+        "width": 390,
+        "scrollWidth": 472
+      },
+      {
+        "browser": "firefox",
+        "route": "/community",
+        "width": 360,
+        "scrollWidth": 473
+      },
+      {
+        "browser": "firefox",
+        "route": "/community",
+        "width": 390,
+        "scrollWidth": 473
+      },
+      {
+        "browser": "webkit",
+        "route": "/community",
+        "width": 360,
+        "scrollWidth": 472
+      },
+      {
+        "browser": "webkit",
+        "route": "/community",
+        "width": 390,
+        "scrollWidth": 472
+      }
+    ]
+  },
+  "databaseCatalog": {
+    "projectRef": "kytdomflmjytzyaabogi",
+    "schemaSha256": "88526eda878d18b8f4dd1e47f84279395cc9f3bff13316b91cc0d0545c0214d6",
+    "tableCount": 65,
+    "migrationLedgerCount": 10,
+    "rlsDisabledTables": 0
+  },
+  "backupRecovery": {
+    "organizationPlan": "free",
+    "scheduledDailyBackupPolicy": "not-included-on-free-plan",
+    "manualOffsiteBackupArtifact": "NOT_VERIFIED",
+    "restoreRehearsal": "NOT_VERIFIED",
+    "documentation": "https://supabase.com/docs/guides/platform/backups"
+  },
+  "runtimeDatabaseTarget": "NOT_VERIFIED_BY_HEALTH_ROUTE; VERCEL_ENV_PULL_BLOCKED_BY_POLICY",
+  "productionMutated": false
+}

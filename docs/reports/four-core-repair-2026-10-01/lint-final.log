@@ -1,0 +1,1516 @@
+
+> frontend@0.1.0 lint
+> eslint
+
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\scripts\generate_fresh_holdouts_v3_v4.mjs
+   13:8  warning  'path' is defined but never used                 @typescript-eslint/no-unused-vars
+   14:8  warning  'crypto' is defined but never used               @typescript-eslint/no-unused-vars
+  289:7  warning  'modalities' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\scripts\visual-director-audit.mjs
+  4:10  warning  'spawn' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\api\academic\me\decision-studio\adopt\route.js
+  55:12  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\api\academic\me\decision-studio\route.js
+  47:12  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\api\academic\me\execution\reconcile\route.js
+  48:12  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\api\academic\me\execution\route.js
+  55:12  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\api\academic\me\planner\route.js
+  64:12  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\api\academic\me\simulate\route.js
+  60:12  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\api\expert\evaluate\route.js
+  49:12  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\api\intelligence\community\contributions\preview\route.js
+  101:12  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\api\v1\notifications\route.js
+  75:9  warning  'notificationService' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\api\v1\trust\continue\continuation.js
+  13:10  warning  'DurableTrustRepository' is defined but never used  @typescript-eslint/no-unused-vars
+  22:77  warning  'securityContext' is defined but never used         @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\cinema\page.jsx
+  3:17  warning  'useState' is defined but never used  @typescript-eslint/no-unused-vars
+  8:27  warning  'Shield' is defined but never used    @typescript-eslint/no-unused-vars
+  8:35  warning  'Sparkles' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\global-error.jsx
+  7:39  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\login\page.jsx
+   36:67  warning  'refreshProfile' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+   62:7   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  60 |       router.replace("/onboarding");
+  61 |     } else if (profileStatus === PROFILE_STATUS.ERROR) {
+> 62 |       setError("Không thể tải thông tin hồ sơ của bạn từ máy chủ. Vui lòng làm mới trang để thử lại.");
+     |       ^^^^^^^^ Avoid calling setState() directly within an effect
+  63 |     }
+  64 |   }, [isAuthenticated, profile?.onboarded, profileStatus, ready, router, status]);
+  65 |                                 react-hooks/set-state-in-effect
+   72:9   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  70 |       const urlError = params.get("error");
+  71 |       if (urlError === "auth_misconfigured") {
+> 72 |         setError(capabilities.emailPasswordMessage);
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  73 |       } else if (urlError === "google_unsupported_provider") {
+  74 |         setError(capabilities.googleMessage);
+  75 |       } else if (urlError === "github_unsupported_provider") {  react-hooks/set-state-in-effect
+   87:6   warning  React Hook useEffect has missing dependencies: 'capabilities.emailPasswordMessage' and 'capabilities.githubMessage'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/exhaustive-deps
+  141:6   warning  React Hook useCallback has an unnecessary dependency: 'capabilities.github'. Either exclude it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/exhaustive-deps
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\onboarding\page.jsx
+  15:94  warning  'Star' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+  55:10  warning  'mousePos' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+  69:24  warning  'setAcademicYear' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  74:10  warning  'experienceYears' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  74:27  warning  'setExperienceYears' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  86:37  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  84 |       const meta = session.user.user_metadata || {};
+  85 |       const initialName = meta.full_name || meta.name || session.user.email?.split("@")[0] || "";
+> 86 |       if (initialName && !fullName) setFullName(initialName);
+     |                                     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  87 |     }
+  88 |     if (profile) {
+  89 |       if (profile.fullName && !fullName) setFullName(profile.fullName);  react-hooks/set-state-in-effect
+  94:6   warning  React Hook useEffect has missing dependencies: 'bio' and 'fullName'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\app\profile\page.jsx
+   10:3  warning  'Calendar' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+   12:3  warning  'Clock' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   16:3  warning  'HelpCircle' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   23:3  warning  'Sparkles' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+   37:7  warning  'ALL_EDITABLE_FIELDS' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  106:7  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  104 |   useEffect(() => {
+  105 |     if (!isAuthenticated) {
+> 106 |       setViewLoading(false);
+      |       ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  107 |       return;
+  108 |     }
+  109 |     let isMounted = true;  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\academic-showcase\AcademicCinemaTheater.jsx
+    4:23  warning  'RotateCcw' is defined but never used                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+    4:34  warning  'Maximize2' is defined but never used                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+    4:45  warning  'Sparkles' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+    4:55  warning  'Layers' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  247:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\academic\AcademicExecutionCenterView.jsx
+  53:5  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  51 |
+  52 |   useEffect(() => {
+> 53 |     fetchExecution(targetTerm);
+     |     ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  54 |   }, [targetTerm, fetchExecution]);
+  55 |
+  56 |   const hasAdoptedPlan = executionData && executionData.adoptedPlanId !== "NONE";  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\academic\AcademicWhatIfPlannerView.jsx
+   68:10  warning  'isDecisionLoading' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+   69:10  warning  'decisionError' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  132:7   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  130 |   useEffect(() => {
+  131 |     if (activeTab === "PLANNER") {
+> 132 |       fetchPlannerData(targetTerm);
+      |       ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  133 |     } else if (activeTab === "DECISION") {
+  134 |       fetchDecisionData(targetTerm, studentPreference);
+  135 |     }  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\academic\NotificationCenterDrawer.jsx
+  14:3  warning  'onDismiss' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\academic\Profile360View.jsx
+  25:140  warning  'freshness' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\auth\AuthUI.jsx
+  13:10  warning  'Meteors' is defined but never used                       @typescript-eslint/no-unused-vars
+  14:8   warning  'GeometricConstellationCanvas' is defined but never used  @typescript-eslint/no-unused-vars
+  15:8   warning  'SparklingStardustCanvas' is defined but never used       @typescript-eslint/no-unused-vars
+  29:37  warning  'mode' is assigned a value but never used                 @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\auth\SaffronAuthDeck.jsx
+   82:9  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  80 |       const urlError = params.get("error");
+  81 |       if (urlError === "auth_misconfigured") {
+> 82 |         setError(capabilities.emailPasswordMessage);
+     |         ^^^^^^^^ Avoid calling setState() directly within an effect
+  83 |       } else if (urlError === "google_unsupported_provider") {
+  84 |         setError(capabilities.googleMessage);
+  85 |       } else if (urlError === "github_unsupported_provider") {  react-hooks/set-state-in-effect
+   97:6  warning  React Hook useEffect has missing dependencies: 'capabilities.emailPasswordMessage' and 'capabilities.githubMessage'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/exhaustive-deps
+  250:6  warning  React Hook useCallback has an unnecessary dependency: 'capabilities.github'. Either exclude it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        react-hooks/exhaustive-deps
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\auth\UAvionixTelemetryHUD.jsx
+  30:5  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  28 |
+  29 |   useEffect(() => {
+> 30 |     setIsMuted(saffronAudio.getMutedState());
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  31 |
+  32 |     // Cycle through telemetry stream items
+  33 |     const interval = setInterval(() => {  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\canvas\Hero3DCanvas.jsx
+   29:18  warning  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  27 |
+  28 |     for (let i = 0; i < count; i++) {
+> 29 |       const x = (Math.random() - 0.5) * 14;
+     |                  ^^^^^^^^^^^^^ Cannot call impure function
+  30 |       const z = (Math.random() - 0.5) * 14;
+  31 |       const y = (Math.random() - 0.5) * 2.8;
+  32 |                                                                                                                                                                                                                                                                                            react-hooks/purity
+   30:18  warning  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  28 |     for (let i = 0; i < count; i++) {
+  29 |       const x = (Math.random() - 0.5) * 14;
+> 30 |       const z = (Math.random() - 0.5) * 14;
+     |                  ^^^^^^^^^^^^^ Cannot call impure function
+  31 |       const y = (Math.random() - 0.5) * 2.8;
+  32 |
+  33 |       pos[i * 3] = x;                                                                                                                                                                                                                                                                      react-hooks/purity
+   31:18  warning  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  29 |       const x = (Math.random() - 0.5) * 14;
+  30 |       const z = (Math.random() - 0.5) * 14;
+> 31 |       const y = (Math.random() - 0.5) * 2.8;
+     |                  ^^^^^^^^^^^^^ Cannot call impure function
+  32 |
+  33 |       pos[i * 3] = x;
+  34 |       pos[i * 3 + 1] = y;                                                                                                                                                                                                                                                                                  react-hooks/purity
+  108:37  warning  'hoverPin' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+  263:5   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  261 |
+  262 |   useEffect(() => {
+> 263 |     setMounted(true);
+      |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  264 |   }, []);
+  265 |
+  266 |   if (!mounted) {  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\canvas\RobinPayotRoadCanvas.jsx
+  365:5  warning  Error: This value cannot be modified
+
+Modifying a value returned from a hook is not allowed. Consider moving the modification into the hook where the value is constructed.
+
+  363 |     const targetY = 1.2 + mouse.y * 1.5;
+  364 |
+> 365 |     camera.position.z += (targetZ - camera.position.z) * 0.08;
+      |     ^^^^^^^^^^^^^^^ `camera` cannot be modified
+  366 |     camera.position.x += (curveX - camera.position.x) * 0.08;
+  367 |     camera.position.y += (targetY - camera.position.y) * 0.08;
+  368 |  react-hooks/immutability
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\community\CommunityContextSignalRail.jsx
+  5:35  warning  'BookOpen' is defined but never used  @typescript-eslint/no-unused-vars
+  5:58  warning  'Sparkles' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\community\CommunityEditorialStory.jsx
+  173:9  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\community\CommunityEvidenceLegendBar.jsx
+  4:10  warning  'HelpCircle' is defined but never used     @typescript-eslint/no-unused-vars
+  4:22  warning  'AlertTriangle' is defined but never used  @typescript-eslint/no-unused-vars
+  4:37  warning  'ShieldCheck' is defined but never used    @typescript-eslint/no-unused-vars
+  4:50  warning  'Check' is defined but never used          @typescript-eslint/no-unused-vars
+  4:57  warning  'Sparkles' is defined but never used       @typescript-eslint/no-unused-vars
+  4:67  warning  'ExternalLink' is defined but never used   @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\community\CommunityEvidenceWorld.jsx
+  74:9  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\community\CommunityExperienceStudio.jsx
+  5:10  warning  'motion' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\community\CommunityFeed.jsx
+  4:21  warning  'Users' is defined but never used     @typescript-eslint/no-unused-vars
+  4:41  warning  'Sparkles' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\community\CommunityIntelligenceStudioV2.jsx
+  11:3  warning  'initialPosts' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  12:3  warning  'initialConsensus' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\community\CommunityPostCard.jsx
+  12:3  warning  'UserRound' is defined but never used                   @typescript-eslint/no-unused-vars
+  62:3  warning  'activeExpert' is assigned a value but never used       @typescript-eslint/no-unused-vars
+  63:3  warning  'moderatorEligible' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  65:3  warning  'onModerate' is defined but never used                  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\community\ConversationalExpertResponse.jsx
+  4:10  warning  'Award' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\competition\CompetitionCaseStudio.jsx
+  72:7  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  70 |     const requestedId = new URLSearchParams(window.location.search).get("id");
+  71 |     if (requestedId && flows.some((flow) => flow.id === requestedId)) {
+> 72 |       setActiveId(requestedId);
+     |       ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  73 |     }
+  74 |   }, [flows]);
+  75 |  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\domain\index.tsx
+  83:47  warning  'size' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\expert\ExpertAuthorityNetwork.jsx
+  65:68  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\expert\ExpertBlindReviewWidget.jsx
+   5:3   warning  'ShieldAlert' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+  10:3   warning  'X' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  11:3   warning  'ExternalLink' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+  17:3   warning  'Sparkles' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+  28:29  warning  'setActiveReviewIndex' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+  30:10  warning  'loading' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+  75:5   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  73 |
+  74 |   useEffect(() => {
+> 75 |     fetchReviews();
+     |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  76 |     const interval = setInterval(fetchReviews, 30_000); // 30s background poll
+  77 |     return () => clearInterval(interval);
+  78 |   }, [fetchReviews]);                                                                                                                                                                                          react-hooks/set-state-in-effect
+  83:5   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  81 |   useEffect(() => {
+  82 |     if (!activeReview) return;
+> 83 |     setVote(activeReview.ownDraft?.vote || "");
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  84 |     setConfidence(activeReview.ownDraft?.confidence ? Math.round(activeReview.ownDraft.confidence * 100) : 75);
+  85 |     setReasoning(activeReview.ownDraft?.reasoning || "");
+  86 |     if (Array.isArray(activeReview.ownDraft?.evidence) && activeReview.ownDraft.evidence.length > 0) {  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\expert\ExpertIntelligenceStudioV2.jsx
+    7:19  warning  'setExperts' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+   22:10  warning  'loadingDisagreements' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   32:5   warning  Error: Cannot access variable before it is declared
+
+`fetchDisagreements` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  30 |
+  31 |   useEffect(() => {
+> 32 |     fetchDisagreements();
+     |     ^^^^^^^^^^^^^^^^^^ `fetchDisagreements` accessed before it is declared
+  33 |   }, []);
+  34 |
+  35 |   const fetchDisagreements = async () => {
+
+  33 |   }, []);
+  34 |
+> 35 |   const fetchDisagreements = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 36 |     setLoadingDisagreements(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 37 |     try {
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 47 |     }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 48 |   };
+     | ^^^^^ `fetchDisagreements` is declared here
+  49 |
+  50 |   const handleResolveEntity = async () => {
+  51 |     try {  react-hooks/immutability
+  510:68  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  510:92  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  524:68  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  524:92  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\expert\ExpertKnowledgeGraphView.jsx
+  7:19  warning  'setExperts' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\expert\ExpertOperationalWorkspace.jsx
+  28:48  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  26 |   const name = profile?.fullName || "Chuyên gia StudentHub";
+  27 |   useEffect(() => {
+> 28 |     if (EXPERT_TAB_IDS.includes(requestedTab)) setTab(requestedTab);
+     |                                                ^^^^^^ Avoid calling setState() directly within an effect
+  29 |   }, [requestedTab]);
+  30 |   return (
+  31 |     <section className="expert-operational-workspace" aria-labelledby="expert-operational-title">  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\expert\ExpertProfileWorkspace.jsx
+   8:3   warning  'Award' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  13:3   warning  'ExternalLink' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+  20:3   warning  'Sparkles' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+  22:3   warning  'UserCheck' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  24:3   warning  'X' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+  93:21  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  91 |
+  92 |   useEffect(() => {
+> 93 |     const cleanup = fetchExpertProfile();
+     |                     ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  94 |     return cleanup;
+  95 |   }, [isAuthenticated]);
+  96 |  react-hooks/set-state-in-effect
+  95:6   warning  React Hook useEffect has a missing dependency: 'fetchExpertProfile'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-hooks/exhaustive-deps
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\expert\FormalExpertAssessmentCard.jsx
+  99:49  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  99:65  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\expert\MultiExpertDisagreementStack.jsx
+   4:10  warning  'AlertTriangle' is defined but never used                        @typescript-eslint/no-unused-vars
+   4:25  warning  'CheckCircle2' is defined but never used                         @typescript-eslint/no-unused-vars
+   4:39  warning  'FileQuestion' is defined but never used                         @typescript-eslint/no-unused-vars
+   4:53  warning  'HelpCircle' is defined but never used                           @typescript-eslint/no-unused-vars
+   4:72  warning  'ShieldAlert' is defined but never used                          @typescript-eslint/no-unused-vars
+   4:85  warning  'UserCheck' is defined but never used                            @typescript-eslint/no-unused-vars
+  40:33  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  40:41  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\expert\ReputationMatrixCard.jsx
+   4:10  warning  'CheckCircle2' is defined but never used                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+   4:24  warning  'FileCheck' is defined but never used                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+   4:41  warning  'Shield' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   4:62  warning  'Star' is defined but never used                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  22:9   warning  'activeDomains' is assigned a value but never used                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  53:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\home\CommandCenterDashboard.jsx
+  80:7  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  78 |
+  79 |     if (!session) {
+> 80 |       setData(null);
+     |       ^^^^^^^ Avoid calling setState() directly within an effect
+  81 |       setState("unauthenticated");
+  82 |       return undefined;
+  83 |     }  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\home\Hero3DCanvas.jsx
+   13:25  warning  'hoverPin' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+   20:20  warning  'delta' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  193:5   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  191 |
+  192 |   useEffect(() => {
+> 193 |     setMounted(true);
+      |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  194 |   }, []);
+  195 |
+  196 |   if (!mounted) {  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\intelligence\GroundedRecommendationStudio.jsx
+  51:87   warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  51:137  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\intelligence\UnifiedIntelligenceWorkspace.jsx
+  13:10  warning  'expertSearch' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  13:24  warning  'setExpertSearch' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\AcademicAiVerificationSection.jsx
+    5:3   warning  'BrainCircuit' is defined but never used                         @typescript-eslint/no-unused-vars
+    7:3   warning  'AlertCircle' is defined but never used                          @typescript-eslint/no-unused-vars
+    8:3   warning  'FileText' is defined but never used                             @typescript-eslint/no-unused-vars
+    9:3   warning  'Quote' is defined but never used                                @typescript-eslint/no-unused-vars
+   12:3   warning  'Shield' is defined but never used                               @typescript-eslint/no-unused-vars
+   13:3   warning  'HelpCircle' is defined but never used                           @typescript-eslint/no-unused-vars
+  131:19  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  131:41  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  184:23  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  184:38  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\AcademicHeroSection.jsx
+   9:3  warning  'ShieldCheck' is defined but never used  @typescript-eslint/no-unused-vars
+  10:3  warning  'FileCheck' is defined but never used    @typescript-eslint/no-unused-vars
+  11:3  warning  'Building2' is defined but never used    @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\AiTutorSection.jsx
+  11:3  warning  'ShieldCheck' is defined but never used  @typescript-eslint/no-unused-vars
+  13:3  warning  'Users' is defined but never used        @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\CommunityExpertCouncilSection.jsx
+   7:3  warning  'Award' is defined but never used               @typescript-eslint/no-unused-vars
+  10:3  warning  'Sparkles' is defined but never used            @typescript-eslint/no-unused-vars
+  11:3  warning  'MessageSquareCheck' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\CommunityExpertsSection.jsx
+  7:3  warning  'CheckCircle2' is defined but never used   @typescript-eslint/no-unused-vars
+  8:3  warning  'FileCheck2' is defined but never used     @typescript-eslint/no-unused-vars
+  9:3  warning  'MessageSquare' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\CommunityShowcaseSection.jsx
+  114:21  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  114:41  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\ContinueLearningBar.jsx
+  5:22  warning  'BookOpen' is defined but never used          @typescript-eslint/no-unused-vars
+  5:32  warning  'Clock' is defined but never used             @typescript-eslint/no-unused-vars
+  9:20  warning  'profile' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\FeaturedCoursesSection.jsx
+   9:3  warning  'Clock' is defined but never used         @typescript-eslint/no-unused-vars
+  10:3  warning  'FolderKanban' is defined but never used  @typescript-eslint/no-unused-vars
+  11:3  warning  'Layers' is defined but never used        @typescript-eslint/no-unused-vars
+  13:3  warning  'Star' is defined but never used          @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\FinalCtaSection.jsx
+  5:22  warning  'Compass' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\FullStackLayersSection.jsx
+  256:19  warning  'Icon' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\HeroSection.jsx
+   8:8   warning  'IglooSoundAmbiencePill' is defined but never used    @typescript-eslint/no-unused-vars
+  13:11  warning  'activeWallpaper' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\IglooEcosystemShowcase.jsx
+   10:10   warning  'activeTab' is assigned a value but never used                   @typescript-eslint/no-unused-vars
+   10:21   warning  'setActiveTab' is assigned a value but never used                @typescript-eslint/no-unused-vars
+  268:122  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  268:134  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  268:139  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  268:152  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\InteractiveScamDemo.jsx
+  107:17  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  107:38  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  155:17  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  155:44  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\LearningDomainsSection.jsx
+  13:3  warning  'ShieldCheck' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\OutcomesSection.jsx
+   5:3  warning  'Award' is defined but never used          @typescript-eslint/no-unused-vars
+   6:3  warning  'CheckCircle2' is defined but never used   @typescript-eslint/no-unused-vars
+   7:3  warning  'FileCheck' is defined but never used      @typescript-eslint/no-unused-vars
+   8:3  warning  'GraduationCap' is defined but never used  @typescript-eslint/no-unused-vars
+   9:3  warning  'LineChart' is defined but never used      @typescript-eslint/no-unused-vars
+  10:3  warning  'ShieldCheck' is defined but never used    @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\PracticeProjectLabSection.jsx
+  10:3  warning  'ShieldCheck' is defined but never used  @typescript-eslint/no-unused-vars
+  11:3  warning  'Sparkles' is defined but never used     @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\StudentDilemmaChatCarousel.jsx
+  134:17  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  134:42  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\landing\TrustEngineShowcase.jsx
+   9:3  warning  'ShieldCheck' is defined but never used   @typescript-eslint/no-unused-vars
+  10:3  warning  'Search' is defined but never used        @typescript-eslint/no-unused-vars
+  13:3  warning  'Sparkles' is defined but never used      @typescript-eslint/no-unused-vars
+  14:3  warning  'ExternalLink' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\media\SmartVideo.jsx
+  52:19  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  50 |   // Video capability is client-only. Waiting one effect tick keeps the SSR
+  51 |   // tree deterministic and prevents poster/video hydration mismatches.
+> 52 |   useEffect(() => setHasMounted(true), []);
+     |                   ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  53 |
+  54 |   // Check prefers-reduced-motion
+  55 |   useEffect(() => {  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\providers\AdaptiveQualityContext.jsx
+  93:5  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  91 |
+  92 |   useEffect(() => {
+> 93 |     setQuality(detectInitialQuality());
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  94 |   }, []);
+  95 |
+  96 |   // Listen to prefers-reduced-motion dynamic changes  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\settings\ConnectedSourcesManager.jsx
+  28:5   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  26 |
+  27 |   useEffect(() => {
+> 28 |     loadSources();
+     |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |   }, []);
+  30 |
+  31 |   const handleSync = async (connectorId) => {  react-hooks/set-state-in-effect
+  47:14  warning  'err' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\settings\PersonalizationControls.jsx
+   9:10  warning  'loading' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  10:19  warning  'setMessage' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  32:5   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  30 |
+  31 |   useEffect(() => {
+> 32 |     loadSettings();
+     |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  33 |   }, []);
+  34 |
+  35 |   return (  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\settings\PrivacyAccessCenter.jsx
+  72:5  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  70 |   useEffect(() => {
+  71 |     const controller = new AbortController();
+> 72 |     loadDevices(controller.signal);
+     |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  73 |     return () => controller.abort("privacy-view-unmounted");
+  74 |   }, [loadDevices]);
+  75 |  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\social\SocialSignalRadar.jsx
+  33:5  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  31 |
+  32 |   useEffect(() => {
+> 33 |     loadData();
+     |     ^^^^^^^^ Avoid calling setState() directly within an effect
+  34 |   }, []);
+  35 |
+  36 |   const handlePostSignal = async (e) => {  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\AiTrustStudioView.jsx
+  397:7  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  395 |   useEffect(() => {
+  396 |     if (initialMode && ["image", "qr", "text", "url"].includes(initialMode.toLowerCase())) {
+> 397 |       setMode(initialMode.toLowerCase());
+      |       ^^^^^^^ Avoid calling setState() directly within an effect
+  398 |     }
+  399 |   }, [initialMode]);
+  400 |   const [inspectedSource, setInspectedSource] = useState(null);  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\AskExpertGatewayCard.jsx
+  43:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  74:42  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  74:50  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\ImageForensicsHUD.jsx
+   8:3  warning  'HelpCircle' is defined but never used  @typescript-eslint/no-unused-vars
+  13:3  warning  'Link2' is defined but never used       @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\InlineCitation.jsx
+  54:13  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  54:84  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\Layer1LivePrechecker.jsx
+  56:7  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  54 |     const effectiveContent = inputMode === "image" ? (ocrText || inputValue) : inputValue;
+  55 |     if (!effectiveContent.trim() && !fileMeta) {
+> 56 |       setInstantResult(null);
+     |       ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  57 |       return;
+  58 |     }
+  59 |  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\Layer1TelemetryHUD.jsx
+  36:9  warning  'isSuspicious' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  37:9  warning  'isPass' is assigned a value but never used        @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\Layer2SemanticHUD.jsx
+   9:10  warning  'showAllClaims' is assigned a value but never used     @typescript-eslint/no-unused-vars
+   9:25  warning  'setShowAllClaims' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  21:5   warning  'claims' is assigned a value but never used            @typescript-eslint/no-unused-vars
+  22:5   warning  'contextSignals' is assigned a value but never used    @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\Layer3EvidenceHUD.jsx
+  20:5  warning  'temporalAssessment' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  23:5  warning  'limitations' is assigned a value but never used         @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\Layer4TrustVerdictHUD.jsx
+  10:10  warning  'expandedClaim' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  10:25  warning  'setExpandedClaim' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  11:10  warning  'activeView' is assigned a value but never used         @typescript-eslint/no-unused-vars
+  11:22  warning  'setActiveView' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  23:5   warning  'keyReasons' is assigned a value but never used         @typescript-eslint/no-unused-vars
+  24:5   warning  'conflicts' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  25:5   warning  'limitations' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  26:5   warning  'recommendedAction' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  29:5   warning  'metrics' is assigned a value but never used            @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\NeuralModelTelemetryHUD.jsx
+  84:10  warning  'activeTab' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  84:21  warning  'setActiveTab' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  89:9   warning  'singleRes' is assigned a value but never used     @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\RiskMeterSplitVerdict.jsx
+  17:74  warning  'signals' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\TrustEvidenceCard.jsx
+    4:73  warning  'Lock' is defined but never used                                 @typescript-eslint/no-unused-vars
+   25:72  warning  'onSelect' is assigned a value but never used                    @typescript-eslint/no-unused-vars
+   41:5   warning  'retrievedAt' is assigned a value but never used                 @typescript-eslint/no-unused-vars
+   42:5   warning  'provider' is assigned a value but never used                    @typescript-eslint/no-unused-vars
+  129:11  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  129:21  warning  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\TrustPipelineTimeline.jsx
+  88:7  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  86 |   useEffect(() => {
+  87 |     if (followingCurrent) {
+> 88 |       setSelectedStageId(currentStageId(pipeline, processing));
+     |       ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  89 |     }
+  90 |   }, [pipeline, processing, followingCurrent]);
+  91 |              react-hooks/set-state-in-effect
+  95:7  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  93 |   useEffect(() => {
+  94 |     if (STAGE_IDS.includes(requestedStageId)) {
+> 95 |       setSelectedStageId(requestedStageId);
+     |       ^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  96 |       setFollowingCurrent(false);
+  97 |     }
+  98 |   }, [requestedStageId]);  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\trust\TrustVsExpertComparisonMatrix.jsx
+  4:10  warning  'AlertCircle' is defined but never used   @typescript-eslint/no-unused-vars
+  4:23  warning  'CheckCircle2' is defined but never used  @typescript-eslint/no-unused-vars
+  4:51  warning  'HelpCircle' is defined but never used    @typescript-eslint/no-unused-vars
+  4:71  warning  'ShieldAlert' is defined but never used   @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\3d-card.jsx
+  133:6  warning  React Hook useEffect has a missing dependency: 'handleAnimations'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\BackgroundsAndEffectsStudio.jsx
+   70:10  warning  'hoveredEffect' is assigned a value but never used                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   70:25  warning  'setHoveredEffect' is assigned a value but never used                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+  148:27  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\IglooSoundAmbiencePill.jsx
+  108:5  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  106 |
+  107 |   useEffect(() => {
+> 108 |     setMounted(true);
+      |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  109 |     return () => {
+  110 |       stopAmbience();
+  111 |     };  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\Interactive3DWaveMonolithCapsule.jsx
+  22:10  warning  'isHovered' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\MohsinCurtainTransition.jsx
+  15:3  warning  'onTransitionComplete' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\MohsinFluidCanvas.jsx
+  168:13  warning  'delta' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\animated-beam.jsx
+  14:14  warning  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  12 |   curvature = 0,
+  13 |   reverse = false,
+> 14 |   duration = Math.random() * 3 + 4,
+     |              ^^^^^^^^^^^^^ Cannot call impure function
+  15 |   delay = 0,
+  16 |   pathColor = "rgba(255, 255, 255, 0.15)",
+  17 |   pathWidth = 2,  react-hooks/purity
+  62:6   warning  React Hook useEffect has a missing dependency: 'updatePath'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                               react-hooks/exhaustive-deps
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\button.jsx
+  24:56  warning  'asChild' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\custom-morphing-cursor.jsx
+  31:5  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  29 |     if (!isFinePointer) return;
+  30 |
+> 31 |     setEnabled(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  32 |
+  33 |     const handleMouseMove = (e) => {
+  34 |       mouseX.set(e.clientX);  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\meteors.jsx
+  16:5  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  14 |       animationDuration: Math.floor(Math.random() * (10 - 2) + 2) + "s",
+  15 |     }));
+> 16 |     setMeteorStyles(styles);
+     |     ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  17 |   }, [number]);
+  18 |
+  19 |   return (  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\otp-verification-orbit.jsx
+  22:3  warning  'email' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\ui\page-transition-wrapper.jsx
+  12:10  warning  'isLoaded' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-unused-vars
+  15:5   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  13 |
+  14 |   useEffect(() => {
+> 15 |     setIsLoaded(true);
+     |     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  16 |   }, []);
+  17 |
+  18 |   return (  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\components\visual\ReducedMotionBoundary.jsx
+  16:5  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  14 |   useEffect(() => {
+  15 |     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+> 16 |     setPrefersReducedMotion(mediaQuery.matches);
+     |     ^^^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  17 |
+  18 |     const onChange = (event) => setPrefersReducedMotion(event.matches);
+  19 |     mediaQuery.addEventListener("change", onChange);  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-gateway\providers\GeminiProvider.js
+  13:3  warning  'GEMINI_EXTENDED_QA_MODEL_IDS' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-gateway\types.js
+  168:49  warning  '_errorMessage' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\engine\GlobalIntelligenceEngine.js
+  39:11  warning  'complianceNotes' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\forensics\deterministic\ExifForensicsAnalyzer.js
+  56:9  warning  'rawGpsCoordinates' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\forensics\policy\ImageForensicsPolicyV1.js
+  17:3  warning  'FORENSIC_DETECTOR_TYPES' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer1\Layer1ScreenService.js
+  21:10  warning  'FileDetector' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer1\detectors\FileDetector.js
+  47:48  warning  'mimeType' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer1\detectors\RecoveryScamDetector.js
+  75:70  warning  'conversationContext' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer1\models\ITrustSignalModel.js
+  29:23  warning  'text' is defined but never used              @typescript-eslint/no-unused-vars
+  29:29  warning  'context' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  40:22  warning  'url' is defined but never used               @typescript-eslint/no-unused-vars
+  40:27  warning  'context' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer1\qr\QrIntakeService.js
+  19:10  warning  'validateRemoteUrlSync' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer2\analyzers\AttackStageAnalyzer.js
+  205:71  warning  'priorResult' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer2\analyzers\ClaimExtractor.js
+  18:39  warning  'context' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  29:13  warning  'lower' is assigned a value but never used    @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer2\analyzers\ContextAnalyzer.js
+  27:11  warning  'lower' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer2\analyzers\CrossModalAnalyzer.js
+  125:5   warning  'documentClassification' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  128:11  warning  'combinedText' is assigned a value but never used            @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer2\analyzers\IntentAnalyzer.js
+  35:24  warning  'context' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer2\analyzers\ManipulationAnalyzer.js
+  452:17  warning  'key' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer2\guards\SemanticBoundary.js
+   46:7   warning  'CONTEXT_TYPE_VALUES' is assigned a value but never used      @typescript-eslint/no-unused-vars
+   47:7   warning  'CROSS_MODAL_TYPE_VALUES' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  195:10  warning  'normalizeKnownType' is defined but never used                @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer2\providers\DeterministicSemanticProvider.js
+  29:98  warning  'options' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer2\providers\ISemanticVerificationProvider.js
+  27:28  warning  'text' is defined but never used          @typescript-eslint/no-unused-vars
+  27:34  warning  'url' is defined but never used           @typescript-eslint/no-unused-vars
+  27:39  warning  'ocrText' is defined but never used       @typescript-eslint/no-unused-vars
+  27:48  warning  'qrPayload' is defined but never used     @typescript-eslint/no-unused-vars
+  27:59  warning  'layer1Result' is defined but never used  @typescript-eslint/no-unused-vars
+  27:73  warning  'options' is defined but never used       @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer3\extractors\SourceIndependenceAnalyzer.js
+  50:17  warning  'id' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer3\extractors\TemporalEvaluator.js
+  20:53  warning  'claimType' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer3\retrieval\IEvidenceRetriever.js
+  19:25  warning  'options' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  28:15  warning  'url' is defined but never used               @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer3\retrieval\KnowledgeBaseRetriever.js
+  151:25  warning  'options' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer4\explainer\AuditExplanationEngine.js
+  28:11  warning  'truthAssessment' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer4\fusion\ContradictionReconciler.js
+  16:56  warning  'sources' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer4\providers\GeminiTrustVerificationDTO.js
+  167:3  warning  'provider' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\layer4\providers\ITrustReasoningModel.js
+  17:16  warning  'fusedGraph' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\normalization\UnicodeGuard.js
+  108:7  warning  'CONFUSABLE_SCRIPT_RANGES' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\threat-intel\apwgTaxonomy.js
+  95:15  warning  'key' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\vision\CrossFieldValidator.js
+  105:40  warning  'options' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\ai-trust\vision\DocumentClassifier.js
+  228:56  warning  'ocrBlocks' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  228:89  warning  'magicBytes' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\audio\saffronAudio.js
+   35:16  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+   45:16  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+   72:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  100:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  126:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  152:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  180:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  206:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  232:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+  258:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\auth\AuthContext.jsx
+  567:7  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  565 |   useEffect(() => {
+  566 |     if (!hasCanonicalSession(session)) {
+> 567 |       setExpertLifecycleState(EXPERT_LIFECYCLE_STATE.NONE);
+      |       ^^^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  568 |       setExpertApplication(null);
+  569 |       setVerifiedDomains([]);
+  570 |       return undefined;  react-hooks/set-state-in-effect
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\SchoolIngestionWorker.js
+  11:39  warning  'SOURCE_HEALTH' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\academicDecisionEngine.js
+  215:40  warning  'preference' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\academicDigitalTwin.js
+  40:7  warning  'cgpa' is assigned a value but never used              @typescript-eslint/no-unused-vars
+  41:7  warning  'completedCourses' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\academicDocumentNormalizer.js
+  30:42  warning  'metadata' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\academicNotificationOrchestrator.js
+  149:5   warning  'clock' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  153:11  warning  'dedupeKey' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\academicRadarEngine.js
+  16:58  warning  'completedCourses' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\academicReasoningEngine.js
+  13:57  warning  'completedCourses' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\academicRoadmapEngine.js
+  68:5  warning  'activeDeadlines' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\academicRuleEngine.js
+  78:11  warning  'overloadRule' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  79:11  warning  'probationRule' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\academicTaskStore.js
+   89:14  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+  162:14  warning  'err' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\academicWorkflowReconciliationEngine.js
+  23:79  warning  'activeRules' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\studentProfile360Model.js
+  187:76  warning  'validatedIdentity' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\academic\whatIfEngine.js
+  18:44  warning  'currentCompletedCourses' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\community\communityExperienceEngine.js
+  99:59  warning  'queryContext' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\community\communityFrictionEngine.js
+  120:55  warning  'context' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\copilot\studentCopilotEngine.js
+  31:76  warning  'context' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\expert\expertConflictEngine.js
+  51:41  warning  'expert' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\expert\expertQueryEngine.js
+  23:49  warning  'options' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\fraud\psychologicalManipulationEngine.js
+  68:15  warning  'key' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\fusion\ConfidenceCalibrationEngine.js
+  25:5  warning  'expertSignals' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\fusion\evidenceFusionIndependenceEngine.js
+  15:44  warning  'sources' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\safety\geospatialSafetyEngine.js
+  46:56  warning  'recentReports' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\social\ISourceConnector.js
+  116:27  warning  'cursor' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  116:42  warning  'limit' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  128:18  warning  'query' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  128:25  warning  'limit' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\social\IncrementalSyncEngine.js
+  141:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  160:47  warning  'limit' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\trust\aiTrustEngine.js
+  319:46  warning  'claims' is defined but never used            @typescript-eslint/no-unused-vars
+  319:87  warning  'abstentionReason' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\trust\citationEntailmentEngine.js
+  78:11  warning  'matchedAnyValidCitation' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\trust\counterEvidenceEngine.js
+  96:45  warning  'currentEvidence' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\intelligence\trust\toolUseFirewall.js
+  15:29  warning  'toolName' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\scholarship\scholarshipRegistry.js
+  111:67  warning  'targetYear' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\security\ai\AiDelegationEngine.js
+  81:11  warning  'delegatorId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\security\authorization\ABACPolicy.js
+  22:50  warning  'environment' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\security\authorization\AuthorizationEngine.js
+   56:5   warning  'purpose' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  188:61  warning  'resource' is defined but never used          @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\security\risk\RiskEngine.js
+  33:5  warning  'resource' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  34:5  warning  'context' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\env\canonicalEnv.js
+  17:10  warning  'pathToFileURL' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\expert\ExpertQualificationService.js
+  16:7  warning  'APPLICATION_STATUSES' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\expert\ExpertReviewResolutionService.js
+  81:53  warning  'primarySourceCount' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\media\MediaArtifactService.js
+  153:5  warning  'claimedMimeType' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\providers\ProviderGateway.js
+  20:3  warning  'ProviderError' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\providers\adapters\AIGatewayAdapter.js
+  32:24  warning  'payload' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\providers\adapters\ReputationGatewayAdapter.js
+  48:24  warning  'payload' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\providers\adapters\SearchGatewayAdapter.js
+  46:24  warning  'payload' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\reports\ReportService.js
+  58:25  warning  '_artifactHash' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\resilience\PlatformResilienceService.js
+   73:11  warning  'sanitizedMeta' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  101:14  warning  'dbErr' is defined but never used                   @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\trust\MultiModelVerifier.js
+  46:5  warning  'sufficiency' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  47:5  warning  'runId' is assigned a value but never used        @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\src\lib\server\trust\NextActionEngine.js
+  21:5  warning  'claims' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\academic\academic_command_center_ui.test.mjs
+  14:42  warning  'IMPACT_BADGE_MAP' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\academic\academic_execution_center.test.mjs
+  5:33  warning  'ADOPTION_STATUS' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\academic\academic_profile_workflow_e2e.test.mjs
+  5:10  warning  'StudentProfile360Service' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\academic\academic_roadmap_generation.test.mjs
+  8:33  warning  'ROADMAP_FRESHNESS' is defined but never used  @typescript-eslint/no-unused-vars
+  9:10  warning  'MILESTONE_STATES' is defined but never used   @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\academic\academic_roadmap_mutation.test.mjs
+  14:10  warning  'AcademicMilestoneModel' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\academic\academic_simulation_engine.test.mjs
+  9:10  warning  'AcademicSimulationModel' is defined but never used  @typescript-eslint/no-unused-vars
+  9:56  warning  'DELTA_TYPES' is defined but never used              @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\academic\academic_simulation_side_effects.test.mjs
+  10:10  warning  'StudentProfile360Store' is defined but never used   @typescript-eslint/no-unused-vars
+  11:10  warning  'StudentDigitalTwinStore' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\academic\academic_source_deadline_reminder.test.mjs
+  19:3   warning  'REMINDER_THRESHOLDS' is defined but never used  @typescript-eslint/no-unused-vars
+  66:15  warning  'h' is defined but never used                    @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\academic\academic_source_watcher.test.mjs
+  15:34  warning  'CANONICAL_HCMUTE_SOURCES' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\academic\student_identity_model.test.mjs
+  3:51  warning  'EDUCATION_LEVELS' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\ai-eval\tevv_ai_evaluation.test.mjs
+    7:10  warning  'AuthorityLadderRanking' is defined but never used       @typescript-eslint/no-unused-vars
+   21:9   warning  'isHighRisk' is assigned a value but never used          @typescript-eslint/no-unused-vars
+   25:9   warning  'resolvedEntities' is assigned a value but never used    @typescript-eslint/no-unused-vars
+   39:5   warning  'independentOrigins' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  119:9   warning  'fn' is assigned a value but never used                  @typescript-eslint/no-unused-vars
+  120:9   warning  'tn' is assigned a value but never used                  @typescript-eslint/no-unused-vars
+  166:9   warning  'fp' is assigned a value but never used                  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\ai-gateway\extended_qa_fallback_chain.test.mjs
+  21:10  warning  'ModelHealthStore' is defined but never used                 @typescript-eslint/no-unused-vars
+  30:3   warning  'isQaExtendedFallbackEnabled' is defined but never used      @typescript-eslint/no-unused-vars
+  31:3   warning  'isQaExtendedGeminiModel' is defined but never used          @typescript-eslint/no-unused-vars
+  32:3   warning  'isApprovedGeminiProductionModel' is defined but never used  @typescript-eslint/no-unused-vars
+  34:3   warning  'validateGeminiProductionRoute' is defined but never used    @typescript-eslint/no-unused-vars
+  35:3   warning  'validateGeminiExtendedQaRoute' is defined but never used    @typescript-eslint/no-unused-vars
+  42:3   warning  'validateCatalogModelEntry' is defined but never used        @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\community\community_procedure_duration.test.mjs
+  7:3  warning  'CONSENSUS_SIGNAL' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\community\community_sockpuppet_clustering.test.mjs
+  8:11  warning  'posts' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\community\community_v2_friction_graph.test.mjs
+  6:3  warning  'FRICTION_STATE' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\community\community_v2_property.test.mjs
+  8:3  warning  'CONSENSUS_STATE' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\community\community_v2_redteam.test.mjs
+  9:3  warning  'CONSENSUS_STATE' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\community_expert\promax_domain_contract.test.mjs
+  5:3  warning  'CONTRIBUTION_TYPES' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\db\report_live_gate.test.mjs
+  12:7  warning  'liveUrl' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\db\repository_persistence.test.mjs
+  11:10  warning  'DatabaseAdapter' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\e2e\preview-qa.spec.ts
+  19:22  warning  'titleRegex' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\evaluation\tevv_scientific_benchmarks.test.mjs
+  22:10  warning  'StudentHubMultiLabelNeuralModel' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\evidence\case_replay_multicase.test.mjs
+    3:8   warning  'fs' is defined but never used                    @typescript-eslint/no-unused-vars
+    4:8   warning  'path' is defined but never used                  @typescript-eslint/no-unused-vars
+    8:31  warning  'TRUST_FINAL_VERDICTS' is defined but never used  @typescript-eslint/no-unused-vars
+  125:11  warning  'entities' is assigned a value but never used     @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\evidence\fresh_retrieval_holdout_v2.test.mjs
+  72:9  warning  'n' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\evidence\fresh_source_independence_holdout_v2.test.mjs
+  7:10  warning  'MetricForensics' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\evidence\source_independence_benchmark.test.mjs
+  93:9  warning  'totalDistinctPairs' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\expert\expert_claims.test.mjs
+  5:3  warning  'CLAIM_TYPE' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\expert\expert_intelligence_e2e.test.mjs
+  7:3  warning  'EXPERTISE_LEVEL' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\expert\expert_v2_e2e_scenarios.test.mjs
+  7:10  warning  'ExpertContextEngine' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\expert\expert_v2_metamorphic.test.mjs
+  7:3  warning  'EXPERT_CLAIM_STATUS' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\fusion\evidence_fusion_e2e.test.mjs
+  8:3  warning  'EvidenceFusionModel' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\fusion\evidence_fusion_model.test.mjs
+  7:3  warning  'CLAIM_RELATION_TYPE' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\fusion\evidence_fusion_mutation.test.mjs
+  8:3  warning  'AUTHORITY_CLASS' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\fusion\evidence_fusion_supersession.test.mjs
+  3:10  warning  'EvidenceFusionTemporalEngine' is defined but never used  @typescript-eslint/no-unused-vars
+  5:10  warning  'KNOWLEDGE_LAYER' is defined but never used               @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\fusion\evidence_fusion_temporal.test.mjs
+  5:3  warning  'TEMPORAL_ALIGNMENT_STATE' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\intelligence\fraud_risk_audit_v5_final.test.mjs
+  24:32  warning  'SECURITY_RISK_LEVEL' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\intelligence\fraud_risk_integration_audit_v4.test.mjs
+  21:10  warning  'Layer2SemanticService' is defined but never used    @typescript-eslint/no-unused-vars
+  22:10  warning  'LAYER_2_STATUS' is defined but never used           @typescript-eslint/no-unused-vars
+  22:26  warning  'SEMANTIC_CLASSIFICATION' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\intelligence\fraud_risk_intelligence.test.mjs
+  20:29  warning  'SOURCE_TRUST_TIERS' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\intelligence\fraud_risk_mutation.test.mjs
+  16:24  warning  'after' is defined but never used       @typescript-eslint/no-unused-vars
+  18:51  warning  'existsSync' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\intelligence\intelligence_domains.test.mjs
+  21:10  warning  'SOURCE_TIERS' is defined but never used               @typescript-eslint/no-unused-vars
+  22:10  warning  'HCMUTE_UNIVERSITY_PROFILE' is defined but never used  @typescript-eslint/no-unused-vars
+  25:30  warning  'calculateEvidenceStrength' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\intelligence\intelligence_expert_discovery.test.mjs
+  10:10  warning  'EXPERT_STATUS' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\intelligence\intelligence_fabric_e2e.test.mjs
+  10:23  warning  'CLAIM_STATUS' is defined but never used             @typescript-eslint/no-unused-vars
+  11:41  warning  'EVIDENCE_DIRECTNESS' is defined but never used      @typescript-eslint/no-unused-vars
+  14:27  warning  'REPUTATION_ACTION' is defined but never used        @typescript-eslint/no-unused-vars
+  15:10  warning  'TrustIntelligenceEngine' is defined but never used  @typescript-eslint/no-unused-vars
+  16:10  warning  'ExpertDiscoveryEngine' is defined but never used    @typescript-eslint/no-unused-vars
+  19:10  warning  'ContradictionEngine' is defined but never used      @typescript-eslint/no-unused-vars
+  19:31  warning  'CONTRADICTION_TYPE' is defined but never used       @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\intelligence\social_source_connectors.test.mjs
+  13:3  warning  'CONNECTOR_HEALTH' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\layer1\full_multimodal_evaluation.test.mjs
+  369:9  warning  'suiteFailed' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\layer2\layer2.test.mjs
+  159:11  warning  'startTime' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\layer3\layer3.test.mjs
+  17:26  warning  'CLAIM_EVIDENCE_RELATION' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\passport\phase5_live_gate.test.mjs
+  4:10  warning  'TrustCasePassportBinder' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\passport\trust_case_passport_binding.test.mjs
+  5:10  warning  'PostgresCrossSystemRepository' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\privacy\adversarial_privacy_benchmark.test.mjs
+   5:34  warning  'PII_CATEGORIES' is defined but never used           @typescript-eslint/no-unused-vars
+  74:9   warning  'samplePostLeak' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\privacy\fresh_privacy_holdout_v2.test.mjs
+  111:9  warning  'postRedactionLeaks' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  141:9  warning  'totalTN' is assigned a value but never used             @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\privacy\pii_benchmark.test.mjs
+  53:7  warning  'totalCriticalTokens' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\product\product_cross_device_sync.test.mjs
+  8:45  warning  'DEVICE_SECURITY_STATUS' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\providers\phase4_live_gate.test.mjs
+  56:26  warning  'prompt' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\providers\provider_gateway_contract.test.mjs
+   13:10  warning  'CostBudgetTracker' is defined but never used     @typescript-eslint/no-unused-vars
+   15:3   warning  'ProviderError' is defined but never used         @typescript-eslint/no-unused-vars
+   16:3   warning  'ProviderTimeoutError' is defined but never used  @typescript-eslint/no-unused-vars
+   19:3   warning  'BudgetExceededError' is defined but never used   @typescript-eslint/no-unused-vars
+   26:21  warning  'payload' is defined but never used               @typescript-eslint/no-unused-vars
+  137:28  warning  'payload' is defined but never used               @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\security\expanded_security_redteam.test.mjs
+  4:8  warning  'path' is defined but never used    @typescript-eslint/no-unused-vars
+  5:8  warning  'crypto' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\security\fresh_security_holdout_v2.test.mjs
+   9:45  warning  'AUTH_ASSURANCE_LEVEL' is defined but never used  @typescript-eslint/no-unused-vars
+  47:47  warning  'payload' is defined but never used               @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\security\phase6_live_gate.test.mjs
+  89:11  warning  'casesForB' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\security\postgres_session_repository.test.mjs
+  1:16  warning  'after' is defined but never used                           @typescript-eslint/no-unused-vars
+  3:8   warning  'crypto' is defined but never used                          @typescript-eslint/no-unused-vars
+  9:7   warning  'disposableDatabaseUrl' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\security\security_ai_tool_firewall.test.mjs
+   8:25  warning  'AGENT_TYPE' is defined but never used      @typescript-eslint/no-unused-vars
+  11:29  warning  'PRINCIPAL_TYPE' is defined but never used  @typescript-eslint/no-unused-vars
+  13:10  warning  'SecurityError' is defined but never used   @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\security\security_fabric_attack_simulation.test.mjs
+   9:45  warning  'AUTH_ASSURANCE_LEVEL' is defined but never used  @typescript-eslint/no-unused-vars
+  15:25  warning  'AGENT_TYPE' is defined but never used            @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\storage\storage_g5_e2e.test.mjs
+  38:17  warning  'uploadData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  73:17  warning  'delData' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  81:39  warning  'postDelErr' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\trust\ai_trust_claim_decomposition.test.mjs
+  4:22  warning  'STAKE_LEVEL' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\trust\operational_corpus_g8.test.mjs
+  16:10  warning  'VerdictPolicyEngine' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\trust\stage_presenter_contract.test.mjs
+  6:3  warning  'STAGE_ROUTE_DECISIONS' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\university\academic_intelligence.test.mjs
+  17:10  warning  'HCMUTE_UNIVERSITY_PROFILE' is defined but never used   @typescript-eslint/no-unused-vars
+  18:35  warning  'HCMUTE_VERSIONED_CURRICULA' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\university\academic_live_sync.test.mjs
+  18:29  warning  'SOURCE_SLA_TIERS' is defined but never used              @typescript-eslint/no-unused-vars
+  19:33  warning  'IMMUTABLE_DOCUMENT_SNAPSHOTS' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\StudentHub-CodexRuns\FULL_REPAIR_20261001\candidate\frontend\tests\university\academic_production_drill.test.mjs
+  20:29  warning  'SOURCE_HEALTH_STATES' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 490 problems (0 errors, 490 warnings)
+

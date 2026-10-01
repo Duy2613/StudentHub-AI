@@ -1,0 +1,57 @@
+{
+  "recordedAt": "2026-10-01T10:29:14.822Z",
+  "candidateSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+  "readOnlyCloudObservation": true,
+  "production": {
+    "projectRef": "kytdomflmjytzyaabogi",
+    "catalogSha256": "88526eda878d18b8f4dd1e47f84279395cc9f3bff13316b91cc0d0545c0214d6",
+    "tables": 65,
+    "columns": 694,
+    "rlsDisabledTables": 0,
+    "migrationLedgerEntries": 10
+  },
+  "staging": {
+    "projectRef": "bniwtkjtramqaozrrtrk",
+    "catalogSha256": "013e527c258bd17c29b6e4f7e30c0411bf8649118e82cc9ac8703457489b1f3e",
+    "tables": 107,
+    "columns": 1157,
+    "rlsDisabledTables": 0,
+    "migrationLedgerEntries": 16
+  },
+  "totalStageOnlyTables": 42,
+  "repairScopeMissingTables": [
+    "private.expert_daily_missions",
+    "private.expert_mission_answers",
+    "private.expert_mission_attempts",
+    "private.expert_mission_events",
+    "private.expert_mission_level_policy",
+    "private.expert_mission_progression",
+    "private.expert_room_adjudications",
+    "private.expert_room_answers",
+    "private.expert_room_events",
+    "private.expert_room_evidence_packages",
+    "private.expert_room_participants",
+    "private.expert_room_presence",
+    "private.expert_room_rounds",
+    "private.expert_v5_config",
+    "private.expert_v5_ingestion_requests",
+    "private.expert_v5_question_events",
+    "private.expert_v5_questions",
+    "private.expert_v5_source_events",
+    "private.expert_v5_source_registry",
+    "private.expert_v5_source_snapshots",
+    "private.expert_verification_rooms",
+    "public.community_comments"
+  ],
+  "outOfScopeStageOnlyTableCount": 20,
+  "requiredSharedTableColumnsMissingFromProduction": [
+    "private.expert_review_requests.community_contribution_id",
+    "private.integration_outbox.lease_token",
+    "private.integration_outbox.lease_count",
+    "private.integration_outbox.shadow_count",
+    "private.integration_outbox.shadowed_at",
+    "private.reputation_events.context"
+  ],
+  "unrelatedStageOnlyLegacyColumn": "public.profiles.institution_label",
+  "cloudMutations": 0
+}

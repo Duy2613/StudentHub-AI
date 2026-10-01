@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "createdAtUtc": "2026-10-01T10:45:27.4246316Z",
+  "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+  "branch": "codex/studenthub-four-core-repair-20261001",
+  "sourceWorkingTreeChangedAfterCandidateCommit": false,
+  "packageStatus": "READY_FOR_PRODUCTION_ROLLOUT_PENDING_APPROVAL",
+  "productionExecutionStatus": "HOLD",
+  "productionMutated": false,
+  "production": {
+    "observedDeploymentSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
+    "deploymentId": "dpl_ED91sTmSbtDS3xTzhgCeeiJqeRh7",
+    "target": "PRODUCTION_READ_ONLY",
+    "runtimeDatabaseProjectRef": "NOT_VERIFIED"
+  },
+  "staging": {
+    "projectRef": "bniwtkjtramqaozrrtrk",
+    "integrationArtifact": "staging-integration.json",
+    "gates": "16/16 PASS",
+    "browserArtifact": "browser-candidate-staging-release.json",
+    "browserChecks": "48/48 PASS"
+  },
+  "verification": {
+    "build": {
+      "artifact": "build-final.log",
+      "result": "PASS",
+      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
+    },
+    "lint": {
+      "artifact": "lint-final.log",
+      "result": "PASS; 0 errors; 490 warnings",
+      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
+    },
+    "regression": {
+      "artifact": "regression-rerun.log",
+      "result": "390/396 PASS; 6 BLOCKED_EXTERNAL",
+      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
+    },
+    "migrationRehearsal": {
+      "artifact": "migration-rehearsal-final.json",
+      "result": "PASS on local disposable PostgreSQL 17.6",
+      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114"
+    },
+    "storageAssurance": {
+      "artifact": "storage-local.json",
+      "result": "PASS_LOCAL_ONLY",
+      "candidateBound": false
+    },
+    "productionSnapshot": {
+      "artifact": "production-snapshot-final.json",
+      "result": "READ_ONLY; deployed SHA differs from candidate",
+      "candidateRunSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+      "deployedSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6"
+    },
+    "productionBrowserBaseline": {
+      "artifact": "browser-production-final.json",
+      "harnessSha": "d92841b0b9af650d806d84b120f982d031f6bb42",
+      "deployedSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
+      "result": "42/48 PASS; six mobile Community overflow failures",
+      "candidateBound": false
+    },
+    "productionAuthDiagnostic": {
+      "artifact": "auth-production-canonical.json",
+      "harnessSha": "bb240430fbf1fe3996eecb3e8c0a6957150e7d23",
+      "result": "8/8 account session checks",
+      "candidateBound": false
+    }
+  },
+  "evidenceFiles": [
+    "FINAL_REPORT.md",
+    "ROLLOUT_PLAN.md",
+    "staging-integration.json",
+    "browser-candidate-staging-release.json",
+    "migration-rehearsal-final.json",
+    "schema-production.json",
+    "schema-staging.json",
+    "schema-drift-final.json",
+    "production-snapshot-final.json",
+    "storage-local.json",
+    "build-final.log",
+    "lint-final.log",
+    "regression-rerun.log",
+    "browser-production-final.json",
+    "auth-production-canonical.json",
+    "tools/schema-observations.mjs"
+  ],
+  "caveat": "The rehearsal fixtures were synthesized from read-only observed catalogs; they are not production or staging database dumps. No production migration or deployment was run."
+}

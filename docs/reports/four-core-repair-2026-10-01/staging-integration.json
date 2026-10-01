@@ -1,0 +1,1311 @@
+{
+  "recordedAt": "2026-10-01T10:24:52.555Z",
+  "candidateSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+  "workingTreeChanges": false,
+  "projectRef": "bniwtkjtramqaozrrtrk",
+  "origin": "http://127.0.0.1:3000",
+  "runTag": "fourcore-1790850292555",
+  "providerMode": "OFF",
+  "providerBudget": 0,
+  "evidenceClass": "REAL_STAGING_BUSINESS_PATH_WITH_LABELLED_SYNTHETIC_FIXTURES",
+  "gates": [
+    {
+      "name": "login-reload-student-a",
+      "status": "PASS"
+    },
+    {
+      "name": "login-reload-student-b",
+      "status": "PASS"
+    },
+    {
+      "name": "login-reload-admin",
+      "status": "PASS"
+    },
+    {
+      "name": "login-reload-expert-a",
+      "status": "PASS"
+    },
+    {
+      "name": "login-reload-expert-b",
+      "status": "PASS"
+    },
+    {
+      "name": "login-reload-expert-c",
+      "status": "PASS"
+    },
+    {
+      "name": "login-reload-expert-unscoped",
+      "status": "PASS"
+    },
+    {
+      "name": "profile-five-fields-reload",
+      "status": "PASS",
+      "ownerReadback": "SQL_AND_RELOADED_APPLICATION"
+    },
+    {
+      "name": "v5-source-real-canonical-ingestion",
+      "status": "PASS",
+      "retrievalStatus": "SUCCESS",
+      "blockedReason": null,
+      "evidenceCount": 1,
+      "contentHash": "46aaec3674d2f2608b3e0a191357de60dd1b0b1dc0f431c08575c3108017ed47",
+      "provenance": "READBACK_PRIOR_SAME_HARNESS_CANONICAL_TRUST_DIRECT_URL",
+      "realSourceReviewedAndGraded": true
+    },
+    {
+      "name": "v5-mission-correct-incorrect-idempotency-scope",
+      "status": "PASS",
+      "fixtureClass": "EXPLICIT_SYNTHETIC_SOURCE_REAL_STAGING_API",
+      "correctScore": 100,
+      "incorrectScore": 0,
+      "duplicateProgression": false,
+      "credentialStarsMutated": false
+    },
+    {
+      "name": "v5-room-presence-timer-private-answer-reconnect",
+      "status": "PASS",
+      "serverDurationSeconds": 30,
+      "immutableAnswers": true,
+      "privateAnswers": true,
+      "reloadReadback": true,
+      "trustState": "ADJUDICATION",
+      "scoringGate": "PASS_SETTLEMENT_RETRY_AND_DISPUTE",
+      "recipientEventCount": 11,
+      "secondBrowserSse": true,
+      "outsiderEventDenied": true,
+      "replayAfterCursor": true,
+      "receivedEvents": 11,
+      "replayedEvents": 10
+    },
+    {
+      "name": "trust-canonical-text-persistence-owner-isolation",
+      "status": "PASS",
+      "caseId": "066abcce-5f16-403f-b19e-e15cbb14e188",
+      "caseRevision": 1,
+      "persisted": true,
+      "stages": [
+        {
+          "stage_id": "l1",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l2",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l3",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l4",
+          "status": "COMPLETED"
+        }
+      ],
+      "providerMode": "OFF",
+      "liveAiVerdictGate": "BLOCKED_EXTERNAL_GEMINI_NOT_CONFIGURED"
+    },
+    {
+      "name": "trust-canonical-url-persistence-owner-isolation",
+      "status": "PASS",
+      "caseId": "590a18ab-e431-4e06-a12a-e884afa788fb",
+      "caseRevision": 1,
+      "persisted": true,
+      "stages": [
+        {
+          "stage_id": "l1",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l2",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l3",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l4",
+          "status": "COMPLETED"
+        }
+      ],
+      "providerMode": "OFF",
+      "liveAiVerdictGate": "BLOCKED_EXTERNAL_GEMINI_NOT_CONFIGURED"
+    },
+    {
+      "name": "trust-canonical-image-persistence-owner-isolation",
+      "status": "PASS",
+      "caseId": "5b564918-92bd-43dc-ac3b-46d566cb5927",
+      "caseRevision": 1,
+      "persisted": true,
+      "stages": [
+        {
+          "stage_id": "l1",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l2",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l3",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l4",
+          "status": "COMPLETED"
+        }
+      ],
+      "providerMode": "OFF",
+      "liveAiVerdictGate": "BLOCKED_EXTERNAL_GEMINI_NOT_CONFIGURED"
+    },
+    {
+      "name": "trust-canonical-qr-persistence-owner-isolation",
+      "status": "PASS",
+      "caseId": "6fefaed3-3af4-4222-b163-193bad19ad47",
+      "caseRevision": 1,
+      "persisted": true,
+      "stages": [
+        {
+          "stage_id": "l1",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l2",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l3",
+          "status": "COMPLETED"
+        },
+        {
+          "stage_id": "l4",
+          "status": "COMPLETED"
+        }
+      ],
+      "providerMode": "OFF",
+      "liveAiVerdictGate": "BLOCKED_EXTERNAL_GEMINI_NOT_CONFIGURED"
+    },
+    {
+      "name": "community-durable-publication-nested-comments-idempotency",
+      "status": "PASS",
+      "previewConfirmed": true,
+      "publishedToPostgres": true,
+      "trustCaseRevisionLinked": true,
+      "publicReadback": true,
+      "nestedCommentDepths": [
+        0,
+        1
+      ],
+      "idempotentRetry": true
+    }
+  ],
+  "checks": [
+    {
+      "path": "/api/auth/session",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "student-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "student-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "admin",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "admin",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "expert-c",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "expert-c",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "expert-unscoped",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session",
+      "actor": "expert-unscoped",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/users/me",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/expert/v5/sources",
+      "actor": "admin",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_0374d2ed-3117-4f93-9d0c-a4a189b3efa6"
+    },
+    {
+      "path": "/api/expert/missions",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_159d59ac-e351-4d84-bc80-3d7f1abca650"
+    },
+    {
+      "path": "/api/expert/missions/1f748c34-4559-4128-a503-d0f2f454a8a6",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_34936dff-a1e1-44f5-88bb-0611b4f58af5"
+    },
+    {
+      "path": "/api/expert/missions/1f748c34-4559-4128-a503-d0f2f454a8a6",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_698df0dd-c38d-4fc6-94af-10b1d5e516c7"
+    },
+    {
+      "path": "/api/expert/missions",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_2cb4005c-c368-4c53-94e8-1a2f1bbf3bfb"
+    },
+    {
+      "path": "/api/expert/missions/f7149cb7-9d47-4742-aa1e-8d2158853049",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_a6b46e32-39cb-42f6-8a4a-f53e10d73056"
+    },
+    {
+      "path": "/api/expert/missions/f7149cb7-9d47-4742-aa1e-8d2158853049",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_77900fbc-36ed-4d53-a09c-79b1b2db136c"
+    },
+    {
+      "path": "/api/expert/v5/questions",
+      "actor": "admin",
+      "status": 201,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_26c56bcc-f89e-438a-9e6d-ad4d3e648214"
+    },
+    {
+      "path": "/api/expert/v5/questions",
+      "actor": "admin",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_7f76752f-ecd9-4140-b62d-c2442e43260e"
+    },
+    {
+      "path": "/api/expert/v5/questions",
+      "actor": "student-a",
+      "status": 403,
+      "code": "FORBIDDEN",
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/expert/missions",
+      "actor": "expert-unscoped",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_ba0f09a9-37f5-404a-ab34-dbd47ae8ee75"
+    },
+    {
+      "path": "/api/expert/missions",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_2caca4f8-c2e0-4fc3-90f0-6674b7657ec9"
+    },
+    {
+      "path": "/api/expert/missions/83cd942e-bfff-4bd9-9bb7-718d1a5076f9",
+      "actor": "expert-c",
+      "status": 404,
+      "code": "EXPERT_MISSION_NOT_FOUND",
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/expert/missions/83cd942e-bfff-4bd9-9bb7-718d1a5076f9",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_aff9fb1a-a4de-4fdc-aad0-bae46d2b5bb8"
+    },
+    {
+      "path": "/api/expert/missions/83cd942e-bfff-4bd9-9bb7-718d1a5076f9",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_10894c70-db0f-4c30-ba25-4d6d38b19b28"
+    },
+    {
+      "path": "/api/expert/missions/83cd942e-bfff-4bd9-9bb7-718d1a5076f9",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_5f41ca08-64dc-4f02-9c9f-0e78323e5009"
+    },
+    {
+      "path": "/api/expert/missions/83cd942e-bfff-4bd9-9bb7-718d1a5076f9",
+      "actor": "expert-a",
+      "status": 409,
+      "code": "EXPERT_MISSION_ANSWER_LOCKED",
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/expert/missions",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_cb195314-aeb9-4e98-9f15-71620496fc9b"
+    },
+    {
+      "path": "/api/expert/missions/43cc55ed-2b34-4935-88da-e0825962ad19",
+      "actor": "expert-c",
+      "status": 404,
+      "code": "EXPERT_MISSION_NOT_FOUND",
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/expert/missions/43cc55ed-2b34-4935-88da-e0825962ad19",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_b096a51f-7ebf-437e-adec-c1fd0deb46fb"
+    },
+    {
+      "path": "/api/expert/missions/43cc55ed-2b34-4935-88da-e0825962ad19",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_e7c203ec-0166-42b5-811f-161a642e06dc"
+    },
+    {
+      "path": "/api/expert/missions/43cc55ed-2b34-4935-88da-e0825962ad19",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_3d5e6481-2f7a-4c61-8042-ae72b2181dd4"
+    },
+    {
+      "path": "/api/expert/missions/43cc55ed-2b34-4935-88da-e0825962ad19",
+      "actor": "expert-b",
+      "status": 409,
+      "code": "EXPERT_MISSION_ANSWER_LOCKED",
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/expert/rooms/presence",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_6d739256-5bdd-4486-953b-781aebf2d5a9"
+    },
+    {
+      "path": "/api/expert/rooms/presence",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_699f389b-1420-4816-8db6-63dca8f461d7"
+    },
+    {
+      "path": "/api/expert/rooms/presence",
+      "actor": "expert-c",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_ec9502d7-3b90-4cfe-bdb3-b1bebfd8fd1c"
+    },
+    {
+      "path": "/api/expert/rooms",
+      "actor": "student-a",
+      "status": 201,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_8246098d-f7ca-4827-b861-d4e3ff09d813"
+    },
+    {
+      "path": "/api/expert/rooms",
+      "actor": "student-a",
+      "status": 201,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_d520c867-2e53-4cd8-a951-fd35d99ab632"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "student-b",
+      "status": 403,
+      "code": "EXPERT_ROOM_MEMBERSHIP_REQUIRED",
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-c",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_60a710e1-3c8c-426c-adb1-d79f5a630797"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_fee9e24d-cf1b-461c-b9a0-5797eb8a577f"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_0f93988b-4713-4740-9f31-12702356db49"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_8adfd21c-43c4-403d-a107-7c211c65f582"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_56d4fc9c-e7b8-4300-a5b7-24f5c3b626e0"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_c0691307-7555-4189-a370-b85c6d2c5902"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_1578bf3e-c8d3-4094-8dc9-5676c24bf086"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_4bf02192-791e-4b52-ad57-b75a7aa58ba7"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-a",
+      "status": 409,
+      "code": "EXPERT_ROOM_ANSWER_LOCKED",
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_cf2c9114-b881-48a8-a955-d9bb5fb3ecaf"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_0a588562-ef33-4480-aaeb-22dcd9dfbaf8"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_34794242-b07f-4cd2-a46d-161228553e1a"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-c",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_2b2f628d-e973-4c78-9055-836069883b37"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-c",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_eeade43d-570f-4dd2-9112-0fe34ef80756"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_54d39abf-1db9-47c7-80a7-cf18f3d6c19f"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_860d8457-5072-44c1-9685-386f5c5d1c27"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-c",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_fa8a5f2a-ae47-4314-8c69-0ef84c8b8a85"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "expert-c",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_dbbc0f63-4f2a-4b52-9c7d-cb702b1741bf"
+    },
+    {
+      "path": "/api/expert/rooms/30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_67a02de1-cf65-4213-98c0-27d7b3c6bca2"
+    },
+    {
+      "path": "/api/v1/trust",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": "PERSISTED",
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_82d85394-3b6a-4c87-a637-0ae70cd92bed"
+    },
+    {
+      "path": "/api/v1/trust/cases/066abcce-5f16-403f-b19e-e15cbb14e188",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/v1/trust/cases/066abcce-5f16-403f-b19e-e15cbb14e188",
+      "actor": "student-b",
+      "status": 404,
+      "code": "NOT_FOUND",
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/v1/trust",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": "PERSISTED",
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_f6f78230-7387-4f20-bf5f-300280f40581"
+    },
+    {
+      "path": "/api/v1/trust/cases/590a18ab-e431-4e06-a12a-e884afa788fb",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/v1/trust/cases/590a18ab-e431-4e06-a12a-e884afa788fb",
+      "actor": "student-b",
+      "status": 404,
+      "code": "NOT_FOUND",
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/v1/trust",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": "PERSISTED",
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_784a04aa-7c4c-48ba-ac46-f8269cea9ddc"
+    },
+    {
+      "path": "/api/v1/trust/cases/5b564918-92bd-43dc-ac3b-46d566cb5927",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/v1/trust/cases/5b564918-92bd-43dc-ac3b-46d566cb5927",
+      "actor": "student-b",
+      "status": 404,
+      "code": "NOT_FOUND",
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/v1/trust",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": "PERSISTED",
+      "persistenceErrorCode": null,
+      "correlationId": "sec_edge_c7e50d27-e64c-4910-ab20-34427bae146f"
+    },
+    {
+      "path": "/api/v1/trust/cases/6fefaed3-3af4-4222-b163-193bad19ad47",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/v1/trust/cases/6fefaed3-3af4-4222-b163-193bad19ad47",
+      "actor": "student-b",
+      "status": 404,
+      "code": "NOT_FOUND",
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/intelligence/community/posts",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/intelligence/community/posts",
+      "actor": "student-a",
+      "status": 201,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/intelligence/community/posts/737bc48d-9218-4d80-863e-c897482f3cd9/comments",
+      "actor": "student-b",
+      "status": 201,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/intelligence/community/posts/737bc48d-9218-4d80-863e-c897482f3cd9/comments",
+      "actor": "student-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/intelligence/community/posts/737bc48d-9218-4d80-863e-c897482f3cd9/comments",
+      "actor": "student-a",
+      "status": 201,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/intelligence/community/posts/737bc48d-9218-4d80-863e-c897482f3cd9/comments",
+      "actor": "student-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session/logout",
+      "actor": "student-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session/logout",
+      "actor": "student-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session/logout",
+      "actor": "admin",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session/logout",
+      "actor": "expert-a",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session/logout",
+      "actor": "expert-b",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session/logout",
+      "actor": "expert-c",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    },
+    {
+      "path": "/api/auth/session/logout",
+      "actor": "expert-unscoped",
+      "status": 200,
+      "code": null,
+      "persistenceStatus": null,
+      "persistenceErrorCode": null,
+      "correlationId": null
+    }
+  ],
+  "fixtureUserIds": [
+    "acf2e86c-ab19-480c-91fa-c5d5f5c63d61",
+    "4ffedd98-c9a9-4674-83d2-4cf0ba21ad69",
+    "29514ed8-faf0-44ef-8673-3c17badb35c5",
+    "4d0057da-1c30-4fc2-af80-7542ff2096c7",
+    "dbd9a05b-0748-40ac-909c-88d9dab1005c",
+    "21867bb2-ec52-4d2c-a85d-5b7e33be911c",
+    "24c4c7df-be9f-4183-94d6-dcc2695a3266"
+  ],
+  "retainedImmutableFixtureIds": [
+    "cad8c903-7933-4cca-b67d-416b8a3390a3",
+    "0de52451-b654-405e-94a3-df442563af23",
+    "f084faac-00f2-4760-95b5-67829a93ebc2",
+    "30a0a827-edc6-46f4-b19a-46a8140c3eb8",
+    "066abcce-5f16-403f-b19e-e15cbb14e188",
+    "590a18ab-e431-4e06-a12a-e884afa788fb",
+    "5b564918-92bd-43dc-ac3b-46d566cb5927",
+    "6fefaed3-3af4-4222-b163-193bad19ad47"
+  ],
+  "cleanup": [
+    {
+      "userId": "acf2e86c-ab19-480c-91fa-c5d5f5c63d61",
+      "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
+      "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
+    },
+    {
+      "userId": "4ffedd98-c9a9-4674-83d2-4cf0ba21ad69",
+      "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
+      "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
+    },
+    {
+      "userId": "29514ed8-faf0-44ef-8673-3c17badb35c5",
+      "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
+      "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
+    },
+    {
+      "userId": "4d0057da-1c30-4fc2-af80-7542ff2096c7",
+      "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
+      "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
+    },
+    {
+      "userId": "dbd9a05b-0748-40ac-909c-88d9dab1005c",
+      "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
+      "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
+    },
+    {
+      "userId": "21867bb2-ec52-4d2c-a85d-5b7e33be911c",
+      "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
+      "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
+    },
+    {
+      "userId": "24c4c7df-be9f-4183-94d6-dcc2695a3266",
+      "status": "SYNTHETIC_IDENTITY_DISABLED_ROLES_REVOKED",
+      "history": "IMMUTABLE_HISTORY_RETAINED_WITH_RUN_LABEL"
+    }
+  ],
+  "sourceOriginOwnerIds": [
+    "ee42b64f-211d-442b-994e-6cfe526b1cc5",
+    "f0fbd77c-1bba-4722-adaa-1c2748d6cafd",
+    "4417fa54-b697-4045-9b9b-1a8af9618f85",
+    "e45ebc41-542e-42b5-b816-fd5b8ad48d5e",
+    "21039e39-0d3e-45d5-9a42-eb128cb3d523",
+    "f2a7f10a-20a4-4ecf-aa5d-77cfa4005e9a",
+    "3b2ae125-b617-456f-9f95-a99d1dd6c06d",
+    "60206cdf-ee15-4e11-99e0-56f19d5c6211",
+    "639bdaea-fd8c-438e-975f-2be0000b96e3",
+    "8fb1de08-a8e0-4629-82c1-2ba7312ad523",
+    "22aa6586-e32a-42a5-8c2d-638dcdc5b66a",
+    "406727da-5a9b-4277-83dd-0a45ab1a7e16",
+    "3554490a-4b17-4cd3-81e9-1525a5c39ae9",
+    "aebc49c9-aa38-47ae-95d9-57c7fbee525b",
+    "28e94006-10a6-4bac-9155-2223d869951e",
+    "473189d9-adaf-42a0-b8f0-0248b93c0735",
+    "9d409d7d-a391-4412-9579-c6aaec49e826",
+    "faead3bd-835f-4b82-ae16-1ab53b7ddd81",
+    "7c9c3589-1142-4cc6-9a1f-03875a6ecf83",
+    "b87df346-b328-4b87-a60c-09bb81ec7e95",
+    "4b6e4945-2469-4846-93d2-967815725c7d",
+    "5df55854-fb07-4dd0-8b54-eb99b4c9e1cc",
+    "0af8b199-383e-4b53-9abb-25c1dac0901d",
+    "000ddf8b-f29b-4adc-8a92-a9bb3f70d143",
+    "f7646767-82ed-486d-ae6d-2881be0d884a",
+    "f7d79d9d-368d-4126-8d52-4def4f8d8872",
+    "59a0ead8-c811-4658-b5fb-62215a7616fb",
+    "a42d1269-beaf-4d15-99e0-a2c6344d5758",
+    "59056a14-7f7d-464e-b1de-9eed296a72c4",
+    "b2f1c0f1-63be-4a5a-8377-8d14f470e5c6",
+    "b5bcb818-e770-465a-846d-7a0ff293c8f3",
+    "15147fac-5616-4ea8-a656-af1371280fc6",
+    "586060d7-74f5-44d1-a219-b32968eb1449",
+    "a72cbf09-81a7-4c22-bacb-1e76dd458f84",
+    "f7bc9c64-27c1-4828-a834-32cf795b8a36",
+    "3cd54127-7bc0-4e72-9756-3e813d5f0d49",
+    "2ba9b54c-9dba-4518-a1c6-735640293ca0",
+    "536cf2ea-2534-4f6d-af6b-3fb942e1c54a",
+    "1413050f-6295-4390-83c5-fad67d1b209b",
+    "ac132eef-4230-4398-9d0b-3b23cd3d4a43",
+    "02ed4c15-6998-49a0-acca-802657b35c83",
+    "79d66d47-d440-43fb-9398-a2d611fa8337"
+  ],
+  "readiness": {
+    "readinessModelVersion": "readiness.v2",
+    "backendIdentity": {
+      "authProjectRef": "bniwtkjtramqaozrrtrk",
+      "browserAuthProjectRef": "bniwtkjtramqaozrrtrk",
+      "databaseProjectRef": "bniwtkjtramqaozrrtrk",
+      "alignment": "MATCH",
+      "durableSessionBacking": "DATABASE_URL"
+    },
+    "status": "READY",
+    "ready": true,
+    "liveness": {
+      "status": "AVAILABLE",
+      "checkedAt": "2026-10-01T10:24:53.279Z"
+    },
+    "platformReadiness": {
+      "status": "READY",
+      "ready": true,
+      "checks": {
+        "runtime": {
+          "status": "AVAILABLE",
+          "configured": true
+        },
+        "database": {
+          "status": "AVAILABLE",
+          "configured": true,
+          "failureCode": null
+        },
+        "durableSession": {
+          "status": "AVAILABLE",
+          "configured": true
+        }
+      }
+    },
+    "capabilityReadiness": {
+      "status": "PARTIAL",
+      "ready": false,
+      "requiredReady": true,
+      "capabilities": {
+        "trustLocal": {
+          "status": "AVAILABLE",
+          "source": "StudentHub deterministic local pipeline",
+          "verification": "SCHEMA_CHECK_ONLY"
+        },
+        "trustLiveProviders": {
+          "status": "NOT_CONFIGURED",
+          "required": false,
+          "configured": false,
+          "tavilyConfigured": true,
+          "geminiConfigured": false,
+          "geminiModelConfigured": true,
+          "geminiModels": [
+            "gemini-3.8-flash",
+            "gemini-3.7-flash",
+            "gemini-3.6-flash"
+          ],
+          "geminiModelRouteValid": true,
+          "geminiModelValidation": [
+            {
+              "valid": true,
+              "entryId": "GEMINI_3_8_FLASH",
+              "model": "gemini-3.8-flash",
+              "code": "MODEL_ENTRY_VALID"
+            },
+            {
+              "valid": true,
+              "entryId": "GEMINI_3_7_FLASH",
+              "model": "gemini-3.7-flash",
+              "code": "MODEL_ENTRY_VALID"
+            },
+            {
+              "valid": true,
+              "entryId": "GEMINI_3_6_FLASH",
+              "model": "gemini-3.6-flash",
+              "code": "MODEL_ENTRY_VALID"
+            }
+          ],
+          "liveEvidenceConfigured": true,
+          "aiSynthesisConfigured": false
+        },
+        "screenshotEvidence": {
+          "status": "NOT_CONFIGURED",
+          "required": false,
+          "configured": false
+        },
+        "realtime": {
+          "status": "AVAILABLE",
+          "transport": "POSTGRES_EVENT_LOG_SSE",
+          "authoritative": true,
+          "sourceOfTruth": "PostgreSQL realtime event log and durable domain snapshots",
+          "schema": "AVAILABLE"
+        },
+        "experts": {
+          "status": "AVAILABLE",
+          "profile": "EXISTING_RUNTIME_ADAPTER",
+          "quiz": "AVAILABLE",
+          "missions": "AVAILABLE",
+          "rooms": "AVAILABLE",
+          "verification": "SCHEMA_CHECK_ONLY"
+        },
+        "community": {
+          "status": "AVAILABLE",
+          "verification": "SCHEMA_CHECK_ONLY"
+        },
+        "reports": {
+          "status": "AVAILABLE",
+          "template": "trust-case.report.v1",
+          "storage": "PRIVATE_POSTGRES",
+          "immutableSnapshot": true
+        },
+        "labbe": {
+          "status": "DISABLED",
+          "mode": "DISABLED",
+          "delivery": "NONE",
+          "configured": false,
+          "writeback": "DISABLED"
+        }
+      }
+    },
+    "providerReadiness": {
+      "tavilyConfigured": true,
+      "geminiConfigured": false,
+      "geminiModelConfigured": true,
+      "geminiModels": [
+        "gemini-3.8-flash",
+        "gemini-3.7-flash",
+        "gemini-3.6-flash"
+      ],
+      "geminiModelRouteValid": true,
+      "geminiModelValidation": [
+        {
+          "valid": true,
+          "entryId": "GEMINI_3_8_FLASH",
+          "model": "gemini-3.8-flash",
+          "code": "MODEL_ENTRY_VALID"
+        },
+        {
+          "valid": true,
+          "entryId": "GEMINI_3_7_FLASH",
+          "model": "gemini-3.7-flash",
+          "code": "MODEL_ENTRY_VALID"
+        },
+        {
+          "valid": true,
+          "entryId": "GEMINI_3_6_FLASH",
+          "model": "gemini-3.6-flash",
+          "code": "MODEL_ENTRY_VALID"
+        }
+      ],
+      "liveEvidenceConfigured": true,
+      "aiSynthesisConfigured": false
+    },
+    "runStatus": "IDLE",
+    "checkedAt": "2026-10-01T10:24:53.279Z",
+    "checks": {
+      "runtime": {
+        "status": "AVAILABLE",
+        "configured": true
+      },
+      "database": {
+        "status": "AVAILABLE",
+        "configured": true,
+        "failureCode": null
+      },
+      "supabaseAuth": {
+        "status": "AVAILABLE",
+        "configured": true
+      },
+      "durableSession": {
+        "status": "AVAILABLE",
+        "configured": true
+      },
+      "liveProviders": {
+        "status": "NOT_REQUIRED",
+        "configured": false,
+        "required": false,
+        "tavilyConfigured": true,
+        "geminiConfigured": false,
+        "geminiModelConfigured": true,
+        "geminiModels": [
+          "gemini-3.8-flash",
+          "gemini-3.7-flash",
+          "gemini-3.6-flash"
+        ],
+        "geminiModelRouteValid": true,
+        "geminiModelValidation": [
+          {
+            "valid": true,
+            "entryId": "GEMINI_3_8_FLASH",
+            "model": "gemini-3.8-flash",
+            "code": "MODEL_ENTRY_VALID"
+          },
+          {
+            "valid": true,
+            "entryId": "GEMINI_3_7_FLASH",
+            "model": "gemini-3.7-flash",
+            "code": "MODEL_ENTRY_VALID"
+          },
+          {
+            "valid": true,
+            "entryId": "GEMINI_3_6_FLASH",
+            "model": "gemini-3.6-flash",
+            "code": "MODEL_ENTRY_VALID"
+          }
+        ],
+        "liveEvidenceConfigured": true,
+        "aiSynthesisConfigured": false
+      },
+      "screenshotStorage": {
+        "status": "NOT_REQUIRED",
+        "configured": false,
+        "required": false
+      }
+    }
+  }
+}

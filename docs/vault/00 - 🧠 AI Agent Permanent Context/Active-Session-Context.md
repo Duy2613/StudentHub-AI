@@ -679,3 +679,11 @@
 - Prior V3/V4/V5 entity percentages are marked historical/superseded in the release report and retrieval evidence notes. Corrected scoring has not been run as a fresh release holdout; retrieval targets remain unestablished and Tavily stays OFF.
 - Targeted resolver/public API/Trust regressions passed `29/29`; changed-file ESLint passed with `0 errors / 0 warnings`; V3/V4/V5 syntax checks passed.
 - No staging, Supabase, Tavily, database, or Main operation occurred. Staging credential rotation/invalidation evidence and a fresh retrieval target result remain open owner/environment gates.
+
+## 32. Four-core repair candidate — 2026-10-01
+
+- Candidate code SHA: eea55564ebaef4dc2edc7af14586fe8f04324114, isolated branch codex/studenthub-four-core-repair-20261001; production is still deployment SHA 595a99110367aefb545b02dab4b9f9a5a6106ab6.
+- Source repairs cover API/repository contracts for Community, Expert, Trust and Profile; owner/revision privacy; session-aware readiness; and the 360px session-status overflow. No migration source file changed because the required additive migrations already exist; rehearsal selected pending files without applying them to cloud DBs.
+- Candidate verification: staging business-path gates 16/16, browser 48/48 across Chromium/Firefox/WebKit, build/TypeScript and lint pass, regression 390/396 discovered files pass with six external gates blocked, migration fixture rehearsal pass on disposable PostgreSQL 17.6.
+- Production is unchanged. Community endpoints remain 500/503 on the old deployment. Runtime Vercel DB project ref and offsite backup/restore are not verified; do not claim FULL_FIX_ACCEPTED.
+- Reports and candidate-bound evidence: docs/reports/four-core-repair-2026-10-01/FINAL_REPORT.md, ROLLOUT_PLAN.md, MANIFEST.sha256. Release package state is READY_FOR_PRODUCTION_ROLLOUT_PENDING_APPROVAL; actual execution remains HOLD until preflight gates and approval.

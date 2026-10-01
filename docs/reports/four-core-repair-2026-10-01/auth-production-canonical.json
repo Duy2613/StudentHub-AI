@@ -1,0 +1,108 @@
+{
+  "recordedAt": "2026-10-01T09:05:55.237Z",
+  "candidateSha": "bb240430fbf1fe3996eecb3e8c0a6957150e7d23",
+  "workingTreeChanges": true,
+  "target": "production",
+  "projectRef": "kytdomflmjytzyaabogi",
+  "identitySource": "CANONICAL_SERVER_ALLOWLIST",
+  "inventoryCanonicalMatches": 0,
+  "mode": "EXISTING_IDENTITY_DIAGNOSTIC_NO_ACCOUNT_MUTATION",
+  "accounts": [
+    {
+      "slot": 0,
+      "exists": true,
+      "confirmed": true,
+      "password_configured": true,
+      "banned": false,
+      "email_identity": true,
+      "status": 200,
+      "providerCode": null,
+      "authenticated": true,
+      "syntheticDiagnosticSessionRevoked": true
+    },
+    {
+      "slot": 1,
+      "exists": true,
+      "confirmed": true,
+      "password_configured": true,
+      "banned": false,
+      "email_identity": true,
+      "status": 200,
+      "providerCode": null,
+      "authenticated": true,
+      "syntheticDiagnosticSessionRevoked": true
+    },
+    {
+      "slot": 2,
+      "exists": true,
+      "confirmed": true,
+      "password_configured": true,
+      "banned": false,
+      "email_identity": true,
+      "status": 200,
+      "providerCode": null,
+      "authenticated": true,
+      "syntheticDiagnosticSessionRevoked": true
+    },
+    {
+      "slot": 3,
+      "exists": true,
+      "confirmed": true,
+      "password_configured": true,
+      "banned": false,
+      "email_identity": true,
+      "status": 200,
+      "providerCode": null,
+      "authenticated": true,
+      "syntheticDiagnosticSessionRevoked": true
+    },
+    {
+      "slot": 4,
+      "exists": true,
+      "confirmed": true,
+      "password_configured": true,
+      "banned": false,
+      "email_identity": true,
+      "status": 200,
+      "providerCode": null,
+      "authenticated": true,
+      "syntheticDiagnosticSessionRevoked": true
+    },
+    {
+      "slot": 5,
+      "exists": true,
+      "confirmed": true,
+      "password_configured": true,
+      "banned": false,
+      "email_identity": true,
+      "status": 200,
+      "providerCode": null,
+      "authenticated": true,
+      "syntheticDiagnosticSessionRevoked": true
+    },
+    {
+      "slot": 6,
+      "exists": true,
+      "confirmed": true,
+      "password_configured": true,
+      "banned": false,
+      "email_identity": true,
+      "status": 200,
+      "providerCode": null,
+      "authenticated": true,
+      "syntheticDiagnosticSessionRevoked": true
+    },
+    {
+      "slot": 7,
+      "exists": true,
+      "confirmed": true,
+      "password_configured": true,
+      "banned": false,
+      "email_identity": true,
+      "status": 200,
+      "providerCode": null,
+      "authenticated": true,
+      "syntheticDiagnosticSessionRevoked": true
+    }
+  ]
+}

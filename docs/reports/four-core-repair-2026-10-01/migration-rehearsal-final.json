@@ -1,0 +1,58 @@
+{
+  "recordedAt": "2026-10-01T10:29:14.823Z",
+  "candidateSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+  "environment": "LOCAL_DISPOSABLE_POSTGRES_17_6_NETWORK_NONE",
+  "freshMigrationChain": {
+    "status": "PASS",
+    "count": 29
+  },
+  "forwardIdempotency": "PASS",
+  "productionObservedSchemaFixture": {
+    "status": "PASS_OBSERVED_SCHEMA_FIXTURE",
+    "plan": [
+      "20260926111838_community_nested_comments.sql",
+      "20260926112754_community_expert_request_linkage.sql",
+      "20260927032100_trust_four_layer_stage_constraint.sql",
+      "20260929135354_studenthub_expert_v5_missions_rooms.sql",
+      "20260929135553_expert_v5_trigger_path_and_fk_indexes.sql",
+      "202610010001_integration_outbox_forward_reconciliation.sql",
+      "202610010002_profile_presentation_check_reconciliation.sql",
+      "202610010003_expert_v5_event_sequence_permissions.sql"
+    ],
+    "syntheticExistingDataPreserved": true,
+    "canonicalFingerprint": "MATCH",
+    "legacyInstitutionLabelAssertion": "NOT_APPLICABLE_TO_PRODUCTION_FIXTURE"
+  },
+  "stagingObservedSchemaFixture": {
+    "status": "PASS_OBSERVED_SCHEMA_FIXTURE",
+    "plan": [
+      "202609170001_durable_academic_workflows.sql",
+      "202609170002_demo_entitlements.sql",
+      "202609180001_reputation_events_idempotency.sql",
+      "20260926111838_community_nested_comments.sql",
+      "20260927032100_trust_four_layer_stage_constraint.sql",
+      "202610010001_integration_outbox_forward_reconciliation.sql",
+      "202610010002_profile_presentation_check_reconciliation.sql",
+      "202610010003_expert_v5_event_sequence_permissions.sql"
+    ],
+    "syntheticExistingDataPreserved": true,
+    "legacyInstitutionLabelPreserved": true,
+    "canonicalFingerprint": "MATCH"
+  },
+  "additionalGates": {
+    "FRESH_DB_MIGRATION_CHAIN": "PASS",
+    "FORWARD_MIGRATION_IDEMPOTENCY": "PASS",
+    "PRODUCTION_UPGRADE_SIMULATION": "PASS_OBSERVED_SCHEMA_FIXTURE",
+    "STAGING_UPGRADE_SIMULATION": "PASS_OBSERVED_SCHEMA_FIXTURE",
+    "INCOMPATIBLE_SCHEMA_REJECTED": "PASS",
+    "UNREVIEWED_PROFILE_CHECK_REJECTED": "PASS",
+    "LOCAL_POSTGRES_RLS_GRANTS_APPEND_ONLY": "PASS",
+    "LOCAL_COMMUNITY_NESTED_FK_LINKAGE": "PASS"
+  },
+  "limitations": [
+    "Vanilla PostgreSQL17.6 with minimal Supabase Auth/Storage compatibility, not the full Supabase platform.",
+    "Upgrade fixtures reproduce read-only observed table/column/check drift and synthetic data; they are not production/staging dumps.",
+    "Cloud policies, grants, functions, triggers and indexes remain unverified where list_tables does not expose them."
+  ],
+  "cloudDatabaseMutations": 0
+}
