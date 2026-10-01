@@ -164,5 +164,19 @@
     "../../../scripts/four-core-staging-integration.mjs",
     "../../../scripts/four-core-staging-storage.mjs"
   ],
-  "caveat": "The rehearsal fixtures were synthesized from read-only observed catalogs; they are not production or staging database dumps. No production migration or deployment was run."
+  "caveat": "The rehearsal fixtures were synthesized from read-only observed catalogs; they are not production or staging database dumps. No production migration or deployment was run.",
+  "mainPromotionAcceptance": {
+    "observedAtUtc": "2026-10-01T13:06:31Z",
+    "artifact": "MAIN_PROMOTION_PRODUCTION_ACCEPTANCE_2026-10-01.md",
+    "verdict": "STUDENTHUB_PRODUCTION_RELEASE_PARTIAL",
+    "mainSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
+    "releaseShaAtFetch": "3d42b8cdb9d756d9ea04e44ad7420d25dfb0c5b9",
+    "productionDeploymentSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
+    "mainDeploymentMatch": true,
+    "runtimeDatabaseIdentity": "UNKNOWN",
+    "runtimeAuthIdentity": "UNKNOWN",
+    "hardGate": "BLOCKED_BEFORE_PRODUCTION_WRITES",
+    "roomMediaStorage": "FAIL_STATIC",
+    "tavily": "OFF"
+  }
 }
