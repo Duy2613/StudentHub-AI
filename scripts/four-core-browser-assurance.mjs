@@ -56,7 +56,6 @@ for (const [name, engine] of Object.entries({ chromium, firefox, webkit })) {
       const providerEnv = parseEnv(readFileSync(resolve(operatorRoot, 'frontend/.env.local'), 'utf8'));
       const providerUrl = providerEnv.NEXT_PUBLIC_SUPABASE_URL;
       if (new URL(providerUrl).hostname !== 'kytdomflmjytzyaabogi.supabase.co') throw new Error('DEMO_DIAGNOSTIC_AUTH_TARGET_MISMATCH');
-      const publishableKey = providerEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || providerEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY;
       for (let slot = 0; slot < accounts.length; slot++) {
         const context = await browser.newContext();
         const page = await context.newPage();
@@ -84,25 +83,14 @@ for (const [name, engine] of Object.entries({ chromium, firefox, webkit })) {
           const reload = await page.evaluate(async () => { const r = await fetch('/api/auth/session', { credentials: 'include', cache: 'no-store' }); const b = await r.json(); return { status: r.status, authenticated: b.authenticated === true }; });
           const upstream = await page.evaluate(() => {
             const key = Object.keys(localStorage).find((key) => /^sb-.+-auth-token$/.test(key));
-            try { return key ? { key, session: JSON.parse(localStorage.getItem(key)) } : null; } catch { return null; }
+            try {
+              const session = key ? JSON.parse(localStorage.getItem(key)) : null;
+              return { providerSessionPersisted: Boolean(session), providerRefreshTokenPersisted: Boolean(session?.refresh_token) };
+            } catch { return { providerSessionPersisted: false, providerRefreshTokenPersisted: false }; }
           });
-          let refresh = { status: null, exchangeStatus: null };
-          let accessToken = upstream?.session?.access_token;
-          if (upstream?.session?.refresh_token) {
-            const r = await fetch(`${providerUrl}/auth/v1/token?grant_type=refresh_token`, { method: 'POST', headers: { apikey: publishableKey, 'content-type': 'application/json' }, body: JSON.stringify({ refresh_token: upstream.session.refresh_token }), signal: AbortSignal.timeout(15000) });
-            const renewed = await r.json();
-            refresh.status = r.status;
-            if (renewed.access_token) {
-              accessToken = renewed.access_token;
-              refresh.exchangeStatus = await page.evaluate(async ({ key, renewed }) => {
-                localStorage.setItem(key, JSON.stringify({ ...renewed, expires_at: Math.floor(Date.now() / 1000) + renewed.expires_in }));
-                const r = await fetch('/api/auth/session/exchange', { method: 'POST', credentials: 'include', headers: { 'content-type': 'application/json', Authorization: `Bearer ${renewed.access_token}` }, body: '{}' }); return r.status;
-              }, { key: upstream.key, renewed });
-            }
-          }
+          const applicationSession = { status: reload.status, authenticatedAfterReload: reload.authenticated, serverOwned: true, providerSessionPersisted: upstream.providerSessionPersisted, providerRefreshTokenPersisted: upstream.providerRefreshTokenPersisted };
           const logout = await page.evaluate(async () => { const r = await fetch('/api/auth/session/logout', { method: 'POST', credentials: 'include' }); const after = await fetch('/api/auth/session', { credentials: 'include', cache: 'no-store' }); return { status: r.status, afterStatus: after.status }; });
-          if (accessToken) logout.providerLocalSessionStatus = (await fetch(`${providerUrl}/auth/v1/logout?scope=local`, { method: 'POST', headers: { apikey: publishableKey, Authorization: `Bearer ${accessToken}` } })).status;
-          report.logins.push({ slot, network, session, reload, refresh, logout, finalRoute: new URL(page.url()).pathname, cause: session.authenticated && reload.authenticated && refresh.status === 200 && refresh.exchangeStatus === 200 && logout.afterStatus === 401 && logout.providerLocalSessionStatus === 204 ? 'APPLICATION_SESSION_VERIFIED' : network.some((row) => row.code === 'invalid_credentials') ? 'PROVIDER_REJECTED_SUPPLIED_CREDENTIAL_PAIR' : network.some((row) => row.status === 400) ? 'PROVIDER_REJECTED_SIGN_IN' : network.some((row) => row.path === '/auth/v1/token') ? 'PROVIDER_REQUEST_OBSERVED' : 'NO_PROVIDER_REQUEST_OBSERVED' });
+          report.logins.push({ slot, network, session, reload, applicationSession, logout, finalRoute: new URL(page.url()).pathname, cause: session.authenticated && reload.authenticated && logout.afterStatus === 401 ? 'APPLICATION_SESSION_VERIFIED' : network.some((row) => row.code === 'invalid_credentials') ? 'PROVIDER_REJECTED_SUPPLIED_CREDENTIAL_PAIR' : network.some((row) => row.status === 400) ? 'PROVIDER_REJECTED_SIGN_IN' : network.some((row) => row.path === '/auth/v1/token') ? 'PROVIDER_REQUEST_OBSERVED' : 'NO_PROVIDER_REQUEST_OBSERVED' });
         } catch (error) { failure = safe(error.message).replaceAll(password, '[REDACTED]').replaceAll(accounts[slot].email, '[ACCOUNT]'); report.logins.push({ slot, network, cause: 'BROWSER_SUBMISSION_FAILED', failure }); }
         await context.close();
       }

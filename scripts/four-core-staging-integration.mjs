@@ -131,13 +131,14 @@ try {
     }
     assert.ok(snapshot?.snapshotId, 'SOURCE_SNAPSHOT_MISSING');
     report.retainedImmutableFixtureIds.push(snapshot.snapshotId);
-    const readback = await pool.query('SELECT retrieval_status,content_hash,jsonb_array_length(evidence_items) AS evidence_count FROM private.expert_v5_source_snapshots WHERE id=$1', [snapshot.snapshotId]);
+    const readback = await pool.query('SELECT retrieval_status,content_hash,evidence_items,jsonb_array_length(evidence_items) AS evidence_count FROM private.expert_v5_source_snapshots WHERE id=$1', [snapshot.snapshotId]);
     assert.equal(readback.rows[0].retrieval_status, snapshot.retrievalStatus);
     if (snapshot.retrievalStatus === 'SUCCESS') {
-      const supporting = snapshot.evidenceItems.find(item => /HTTP Semantics/i.test(item.excerpt || ''));
+      const evidenceItems = Array.isArray(readback.rows[0].evidence_items) ? readback.rows[0].evidence_items : [];
+      const supporting = evidenceItems.find(item => /HTTP Semantics/i.test(item.excerpt || ''));
       assert.ok(supporting, 'REAL_SOURCE_ANSWER_SUPPORT_MISSING');
-      const prompt = 'Which specification is explicitly listed in the cited MDN documentation excerpt?';
-      const question = await api(admin, '/api/expert/v5/questions', { action: 'CREATE_DRAFT', question: { sourceSnapshotId: snapshot.snapshotId, questionType: 'SINGLE_CHOICE', prompt, choices: [{ id: 'a', label: 'HTTP Semantics' }, { id: 'b', label: 'CSS Color' }], answerKey: 'a', explanation: 'The cited retrieved excerpt lists HTTP Semantics under Specifications, with the status.200 anchor.', evidenceIds: [supporting.id], difficultyReview: { ambiguity: 0, temporalReasoning: false } } }, { expected: [201] });
+      const prompt = 'Which exact phrase appears in the cited retrieved excerpt?';
+      const question = await api(admin, '/api/expert/v5/questions', { action: 'CREATE_DRAFT', question: { sourceSnapshotId: snapshot.snapshotId, questionType: 'SINGLE_CHOICE', prompt, choices: [{ id: 'a', label: 'HTTP Semantics' }, { id: 'b', label: 'CSS Color' }], answerKey: 'a', explanation: 'The cited excerpt contains the literal phrase HTTP Semantics; this item checks excerpt-bound retrieval.', evidenceIds: [supporting.id], difficultyReview: { ambiguity: 0, temporalReasoning: false } } }, { expected: [201] });
       await api(admin, '/api/expert/v5/questions', { action: 'ACTIVATE', questionId: question.data.question_id, questionVersion: question.data.questionVersion, reviewChecks: { sourceSupport: true, distractorsReviewed: true, domainFit: true, difficultyConfirmed: true } }, { expected: [200] });
       const sourceDomain = (await pool.query('SELECT domain_code FROM private.expert_v5_source_registry WHERE id=$1', [snapshot.sourceId])).rows[0].domain_code;
       for (const expert of experts.slice(0, 2)) await pool.query(`INSERT INTO private.expert_verifications(user_id,domain_code,status,qualification_state,verified_by,verified_at,evidence_ref) VALUES($1,$2,'VERIFIED','DOMAIN_VERIFIED',$3,now(),$4) ON CONFLICT(user_id,domain_code) DO NOTHING`, [expert.id, sourceDomain, admin.id, `SYNTHETIC-STAGING:${runTag}`]);
