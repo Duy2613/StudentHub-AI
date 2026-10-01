@@ -137,17 +137,33 @@ try {
       const evidenceItems = Array.isArray(readback.rows[0].evidence_items) ? readback.rows[0].evidence_items : [];
       const supporting = evidenceItems.find(item => /HTTP Semantics/i.test(item.excerpt || ''));
       assert.ok(supporting, 'REAL_SOURCE_ANSWER_SUPPORT_MISSING');
-      const prompt = `Which exact phrase appears in the cited retrieved excerpt for QA run ${runTag}?`;
-      const question = await api(admin, '/api/expert/v5/questions', { action: 'CREATE_DRAFT', question: { sourceSnapshotId: snapshot.snapshotId, questionType: 'SINGLE_CHOICE', prompt, choices: [{ id: 'a', label: 'HTTP Semantics' }, { id: 'b', label: 'CSS Color' }], answerKey: 'a', explanation: 'The cited excerpt contains the literal phrase HTTP Semantics; this item checks excerpt-bound retrieval.', evidenceIds: [supporting.id], difficultyReview: { ambiguity: 0, temporalReasoning: false } } }, { expected: [201] });
-      await api(admin, '/api/expert/v5/questions', { action: 'ACTIVATE', questionId: question.data.question_id, questionVersion: question.data.questionVersion, reviewChecks: { sourceSupport: true, distractorsReviewed: true, domainFit: true, difficultyConfirmed: true } }, { expected: [200] });
+      const prompt = 'Which exact phrase appears in the cited retrieved excerpt?';
+      const activeQuestion = async () => (await pool.query(`SELECT question_id,question_version,answer_key FROM private.expert_v5_questions
+        WHERE source_snapshot_id=$1 AND prompt=$2 AND status='ACTIVE' ORDER BY created_at DESC LIMIT 1`, [snapshot.snapshotId, prompt])).rows[0];
+      let questionRow = await activeQuestion();
+      if (!questionRow) {
+        const question = await api(admin, '/api/expert/v5/questions', { action: 'CREATE_DRAFT', question: { sourceSnapshotId: snapshot.snapshotId, questionType: 'SINGLE_CHOICE', prompt, choices: [{ id: 'a', label: 'HTTP Semantics' }, { id: 'b', label: 'CSS Color' }], answerKey: 'a', explanation: 'The cited excerpt contains the literal phrase HTTP Semantics; this item checks excerpt-bound retrieval.', evidenceIds: [supporting.id], difficultyReview: { ambiguity: 0, temporalReasoning: false } } }, { expected: [201] });
+        await api(admin, '/api/expert/v5/questions', { action: 'ACTIVATE', questionId: question.data.question_id, questionVersion: question.data.questionVersion, reviewChecks: { sourceSupport: true, distractorsReviewed: true, domainFit: true, difficultyConfirmed: true } }, { expected: [200] });
+        questionRow = await activeQuestion();
+      }
+      assert.ok(questionRow, 'REAL_SOURCE_QUESTION_ACTIVATION_FAILED');
+      assert.equal(typeof questionRow.answer_key === 'string' ? questionRow.answer_key : questionRow.answer_key?.[0], 'a', 'REAL_SOURCE_QUESTION_KEY_NOT_GROUNDED');
       const sourceDomain = (await pool.query('SELECT domain_code FROM private.expert_v5_source_registry WHERE id=$1', [snapshot.sourceId])).rows[0].domain_code;
+      const activeSourceQuestions = await pool.query(`SELECT q.prompt,q.answer_key,q.source_content_hash,s.content_hash,s.canonical_url
+        FROM private.expert_v5_questions q JOIN private.expert_v5_source_snapshots s ON s.id=q.source_snapshot_id
+        WHERE q.source_snapshot_id=$1 AND q.domain_code=$2 AND q.status='ACTIVE'`, [snapshot.snapshotId, sourceDomain]);
+      assert.ok(activeSourceQuestions.rows.length, 'REAL_SOURCE_ACTIVE_QUESTION_MISSING');
+      assert.ok(activeSourceQuestions.rows.every(row => (typeof row.answer_key === 'string' ? row.answer_key : row.answer_key?.[0]) === 'a' && row.source_content_hash === row.content_hash), 'REAL_SOURCE_QA_BANK_NOT_ISOLATED');
       for (const expert of experts.slice(0, 2)) await pool.query(`INSERT INTO private.expert_verifications(user_id,domain_code,status,qualification_state,verified_by,verified_at,evidence_ref) VALUES($1,$2,'VERIFIED','DOMAIN_VERIFIED',$3,now(),$4) ON CONFLICT(user_id,domain_code) DO NOTHING`, [expert.id, sourceDomain, admin.id, `SYNTHETIC-STAGING:${runTag}`]);
       for (const [index, expert] of experts.slice(0, 2).entries()) {
         const assigned = await api(expert, '/api/expert/missions', undefined, { method: 'POST', expected: [200] });
-        const mission = assigned.data.missions.find(item => item.domainCode === sourceDomain && item.question.prompt === prompt); assert.ok(mission, 'REAL_SOURCE_QUESTION_NOT_ASSIGNED');
+        const mission = assigned.data.missions.find(item => item.domainCode === sourceDomain && item.question?.source?.canonicalUrl === snapshot.canonicalUrl); assert.ok(mission, 'REAL_SOURCE_QUESTION_NOT_ASSIGNED');
         assert.equal('answerKey' in mission.question, false);
+        const assignedQuestion = activeSourceQuestions.rows.find(row => row.prompt === mission.question.prompt && row.canonical_url === mission.question.source.canonicalUrl);
+        assert.ok(assignedQuestion, 'REAL_SOURCE_MISSION_QUESTION_NOT_IN_SNAPSHOT');
         await api(expert, `/api/expert/missions/${mission.missionId}`, { action: 'START' }, { expected: [200] });
-        const result = await api(expert, `/api/expert/missions/${mission.missionId}`, { action: 'SUBMIT', answer: index === 0 ? 'a' : 'b' }, { expected: [200] }); assert.equal(result.data.attempt.score, index === 0 ? 100 : 0);
+        const correctAnswer = typeof assignedQuestion.answer_key === 'string' ? assignedQuestion.answer_key : assignedQuestion.answer_key?.[0];
+        const result = await api(expert, `/api/expert/missions/${mission.missionId}`, { action: 'SUBMIT', answer: index === 0 ? correctAnswer : correctAnswer === 'a' ? 'b' : 'a' }, { expected: [200] }); assert.equal(result.data.attempt.score, index === 0 ? 100 : 0);
       }
     }
     return { status: snapshot.retrievalStatus === 'SUCCESS' ? 'PASS' : 'BLOCKED_EXTERNAL', retrievalStatus: snapshot.retrievalStatus, blockedReason: snapshot.blockedReason, evidenceCount: readback.rows[0].evidence_count, contentHash: readback.rows[0].content_hash, provenance, realSourceReviewedAndGraded: snapshot.retrievalStatus === 'SUCCESS' };
@@ -252,7 +268,8 @@ try {
     assert.ok(result.caseId && result.caseRevision, 'DURABLE_CASE_REVISION_MISSING');
     report.retainedImmutableFixtureIds.push(result.caseId);
     const saved = await api(owner, `/api/v1/trust/cases/${result.caseId}?revision=${result.caseRevision}`, undefined, { expected: [200] });
-    assert.ok(saved.data, 'OWNER_SNAPSHOT_READBACK_MISSING');
+    assert.ok(saved.case?.savedResult, 'OWNER_SNAPSHOT_READBACK_MISSING');
+    assert.equal(Number(saved.case.savedResult.caseRevision), Number(result.caseRevision), 'OWNER_SNAPSHOT_REVISION_MISMATCH');
     await api(other, `/api/v1/trust/cases/${result.caseId}?revision=${result.caseRevision}`, undefined, { expected: [404] });
     const stages = await pool.query('SELECT stage_id,status FROM public.trust_stage_runs WHERE case_id=$1 ORDER BY stage_id', [result.caseId]);
     const revisions = await pool.query('SELECT count(*)::int AS count FROM public.trust_case_revisions WHERE case_id=$1', [result.caseId]);
