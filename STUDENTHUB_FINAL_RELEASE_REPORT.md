@@ -109,5 +109,27 @@ Do not push `main`, trigger production deployment, or run production canaries fr
 - `SCREENSHOT_MANIFEST.json` (239 entries; files live in the local isolated run artifact directory)
 - `CLEANUP_INVENTORY.md`
 - `RELEASE_SHA_MANIFEST.md`
+- `SECURITY_ASSURANCE_REPORT.md`
+- `SCREENSHOT_MANIFEST_20261001.json` (current 239-image continuation)
 
 `11bfc70945113bbe0f8ac0f25b4ba9e7f02a4067` is the tested integration source/audit commit. A follow-up commit records this SHA in the manifest and changes release metadata only. The final branch tip is returned in the closure response. `origin/main` is intentionally not changed.
+
+## Trust reference and full local verification continuation — 2026-10-01
+
+The user identified four existing Trust commits as the desired canonical structure: `3d52e6c` render-backend wiring, `4bfd4e9` Layer 2 provider settlement, `554e8e7` safe L4 classification, and `80351be` gated demo presentation. This continuation keeps `OwnBackendTrustOrchestrator` and its four public `l1/l2/l3/l4` response stages as the authority, maps the active Trust UI to those four layers, and renders deterministic Final Predict separately only after it is published. No competing pipeline or persistence contract was added.
+
+Implemented Trust UI fixes:
+
+- Replaced the five-stage public journey with the four canonical backend stages and separate Final Predict; completed `l2/l4` public statuses now render correctly.
+- Kept sources distinct from evidence, removed fabricated live provider defaults, kept missing provider status unavailable, corrected compact/mobile input layout, and disabled IMAGE/QR submission until a supported file is selected.
+- Fixed result/provenance panel text contrast and preserved case/revision-bound Community and Expert handoffs.
+
+Verification:
+
+- Trust targeted contracts: 28/28; isolated Trust Playwright: 9/9; changed-file ESLint and TypeScript/build passed.
+- Full isolated V4 three-core browser suite: 100 passed, 2 intentional screenshot-only skips, 0 failed/flaky across Chromium, Firefox and WebKit. Production build was rebuilt in an isolated copy; no env files, live account, database or provider assurance. Run manifest: `D:\StudentHub-CodexRuns\FULL_V4_THREE_CORE_20261001\2026-10-01T06-59-17-209Z-36960\run-manifest.json`.
+- `npm run test:all`: PASS with `TAVILY_MODE=OFF`, call budget `0`, and the Tavily/OpenAlex/OpenAI/Gemini, Supabase service/session, and database environment variables explicitly unset in the test process. Expert V4/V5, database guards and Trust/Omni/Community root-run contracts: 86/86. Security/product-scope/Trust render contracts: 30/30. Full ESLint `--quiet`: exit 0.
+- The package threat-intelligence tests exercised URLhaus's offline/timeout path with a synthetic example URL. Tavily was not called; no Tavily key was read or exposed.
+- Three-core feature folders contain 239 fixture screenshot images (Trust 33, Community 35, Expert 85, Omni 85, release smoke 1). They and the Playwright report/traces are retained outside the repository; `SCREENSHOT_MANIFEST.json` links to the companion file manifest. They are not live-user screenshots.
+
+Release remains `STUDENTHUB_PRODUCTION_RELEASE_PARTIAL`. Production schema is still missing 22 canonical tables and 6 columns, backup/PITR is UNKNOWN, staging credential rotation/invalidation is not independently evidenced, and retrieval quality targets remain unestablished after scorer correction. No production migration, final Tavily campaign, Main promotion, deployment, or production canary was performed. Tavily remains OFF with budget 0.

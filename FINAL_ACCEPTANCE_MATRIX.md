@@ -32,3 +32,19 @@ Candidate base: `af1953147ee5b89ea9d58acdfa67c7f1416ae469` on `codex/studenthub-
 | `frontend/tests/expert/expert_v5_live_readonly.test.mjs` | No | Unsafe until staging DB credential rotation/invalidation and project identity are independently verified. |
 
 `SILENTLY_IGNORED=0` for the 208 route/file inventory rows. This is not an exhaustive control-level UI inventory; see `ACTIVE_FEATURE_INVENTORY.md`.
+
+## 2026-10-01 Trust reference unification continuation
+
+| Area | Result | Evidence / boundary |
+|---|---|---|
+| Trust structure | PASS | Four visible backend-driven layers `l1/l2/l3/l4` plus separately published deterministic Final Predict. Preserves canonical `OwnBackendTrustOrchestrator` and the user's four reference commits; no second persistence/runtime pipeline. |
+| Trust UI defects found and fixed | PASS | Five-stage/waiting-state mismatch; compact composer; unproven `LIVE` provider badge; upload submit before file select; light-panel text contrast. Covered by targeted contracts and screenshots. |
+| Targeted Trust | PASS | 28/28 contracts, changed-file ESLint, isolated Trust Playwright 9/9, production build and TypeScript pass. |
+| Full three-core browsers | PASS | 100 passed, 2 intentional screenshot-only skips, 0 failed/flaky across Chromium/Firefox/WebKit; 33.1 minutes. Rebuilt isolated production candidate, fixture-only. 239 feature screenshots; artifacts external to checkout. |
+| Package unit/domain suite | PASS | `npm run test:all` exited 0 with Tavily mode OFF and call budget 0. |
+| Expert V4/V5, DB guards, Trust/Omni/Community targeted set | PASS | 86/86 Node tests from the correct repository root. |
+| Security contracts | PASS | 30/30; full ESLint `--quiet` 0 errors; 91 client bundles had none of 16 server-only identifiers. No configured secret values were present in the isolated worktree for value comparison. |
+| Live identities, persistence, Realtime, providers | BLOCKED / NOT RUN | No demo auth, staging role/scope or persistence readback, live RLS, multi-client Realtime, retrieval holdout rerun, or final provider gate in this continuation. Existing release report records the known staging and retrieval blockers. |
+| Production readiness | PARTIAL | 22 active tables and 6 columns absent in production; backup/PITR UNKNOWN. No production DDL, Main promotion, deployment or canary. Tavily remains OFF, budget 0. |
+
+Current whole-product verdict remains `STUDENTHUB_PRODUCTION_RELEASE_PARTIAL`; the local UI and contract tests do not close live database, persona, retrieval, or recovery gates.

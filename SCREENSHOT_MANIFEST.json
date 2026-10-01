@@ -4070,5 +4070,21 @@
       "BUILD_SHA": "Isolated build based on af1953147ee5b89ea9d58acdfa67c7f1416ae469 plus the uncommitted candidate source diff at run time.",
       "FILE": "D:\\StudentHub-CodexRuns\\MASTER_INTEGRATION_20260930\\run-artifacts\\full-web-v4\\2026-09-30T17-58-17-958Z-5428\\release-smoke\\landing-390.png"
     }
-  ]
+  ],
+  "continuations": [
+    {
+      "runId": "2026-10-01T06-59-17-209Z-36960",
+      "result": "PASS",
+      "passed": 100,
+      "skipped": 2,
+      "failed": 0,
+      "flaky": 0,
+      "imageCount": 239,
+      "companionManifest": "SCREENSHOT_MANIFEST_20261001.json",
+      "artifactRoot": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960",
+      "classification": "LOCAL_ISOLATED copied production build; deterministic browser fixtures; no live database/provider assurance"
+    }
+  ],
+  "primaryRunScreenshotCount": 239,
+  "totalScreenshotCountAcrossRuns": 478
 }

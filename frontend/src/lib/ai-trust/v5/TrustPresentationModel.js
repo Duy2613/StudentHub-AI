@@ -4,50 +4,47 @@ import { STAGE_IDS } from "./contracts.js";
  * Presentation contract for the ordinary Trust workspace.
  *
  * The Trust engine remains authoritative for the seven internal stages. This
- * adapter only groups those stages into a readable five-stage journey and
- * keeps the raw stage payload out of the default product surface.
+ * adapter only groups those stages into four product layers and a separately
+ * published final prediction, keeping raw stage payload out of the default product surface.
  */
-export const TRUST_PRIMARY_PIPELINE_COUNT = 5;
+export const TRUST_PRIMARY_PIPELINE_COUNT = 4;
 export const STALE_RUN_EVENT_RENDER = 0;
 
 export const TRUST_MACRO_STAGE_IDS = Object.freeze([
-  "claim-intelligence",
-  "evidence-discovery",
-  "evidence-forensics",
-  "ai-verification",
-  "decision-intelligence",
+  "deterministic-screen",
+  "threat-semantic-intelligence",
+  "evidence-retrieval",
+  "synthesis-reasoning",
 ]);
 
 export const TRUST_MACRO_STAGES = Object.freeze([
   Object.freeze({
-    id: "claim-intelligence",
-    name: "Claim Intelligence",
-    description: "Đọc nội dung và xác định các luận điểm cần kiểm tra.",
+    id: "deterministic-screen",
+    publicStageId: "l1",
+    name: "Deterministic Screen",
+    description: "Chuẩn hóa đầu vào và kiểm tra tín hiệu kỹ thuật tất định.",
     internalStageIds: Object.freeze(["l1"]),
   }),
   Object.freeze({
-    id: "evidence-discovery",
-    name: "Evidence Discovery",
-    description: "Tìm các tín hiệu nguồn và ngữ cảnh liên quan.",
+    id: "threat-semantic-intelligence",
+    publicStageId: "l2",
+    name: "Threat & Semantic Intelligence",
+    description: "Đối chiếu rủi ro, ngữ nghĩa và các mệnh đề cần xác minh.",
     internalStageIds: Object.freeze(["l2a", "l2b", "l2c"]),
   }),
   Object.freeze({
-    id: "evidence-forensics",
-    name: "Evidence Forensics",
-    description: "Đối chiếu độ tươi, tính độc lập và mâu thuẫn của nguồn.",
+    id: "evidence-retrieval",
+    publicStageId: "l3",
+    name: "Evidence Retrieval",
+    description: "Tìm nguồn và evidence, giữ provenance, quan hệ và trạng thái retrieval.",
     internalStageIds: Object.freeze(["l3"]),
   }),
   Object.freeze({
-    id: "ai-verification",
-    name: "AI Verification",
-    description: "Gemini đối chiếu và giải thích evidence theo policy bảo vệ.",
-    internalStageIds: Object.freeze(["l4"]),
-  }),
-  Object.freeze({
-    id: "decision-intelligence",
-    name: "Decision Intelligence",
-    description: "Kiểm tra chất lượng kết luận và hành động tiếp theo.",
-    internalStageIds: Object.freeze(["l5"]),
+    id: "synthesis-reasoning",
+    publicStageId: "l4",
+    name: "Synthesis & Reasoning",
+    description: "Tổng hợp evidence và kiểm tra kết luận theo policy tất định.",
+    internalStageIds: Object.freeze(["l4", "l5"]),
   }),
 ]);
 
@@ -151,7 +148,7 @@ function normalizeStatus(status) {
   return "WAITING";
 }
 
-function macroStatus(internalStages, pipelineStatus, processing) {
+function macroStatus(internalStages, pipelineStatus) {
   const statuses = internalStages.map((stage) => normalizeStatus(stage?.operationStatus));
   if (statuses.some((status) => status === "FAILED")) {
     return statuses.some((status) => status === "COMPLETE" || status === "PARTIAL") ? "PARTIAL" : "FAILED";
@@ -159,7 +156,6 @@ function macroStatus(internalStages, pipelineStatus, processing) {
   if (statuses.some((status) => status === "PARTIAL")) return "PARTIAL";
   if (statuses.some((status) => status === "RUNNING")) return "RUNNING";
   if (statuses.length && statuses.every((status) => status === "COMPLETE")) return "COMPLETE";
-  if (processing && statuses.some((status) => status !== "WAITING")) return "RUNNING";
   if (["FAILED", "ERROR"].includes(String(pipelineStatus || "").toUpperCase())) return "FAILED";
   if (String(pipelineStatus || "").toUpperCase() === "PARTIAL") return "PARTIAL";
   return "WAITING";
@@ -177,10 +173,12 @@ function statusLabel(status) {
 
 function rawStageMap(pipeline) {
   const stages = asRecord(pipeline?.stages);
-  return STAGE_IDS.reduce((result, stageId) => {
-    result[stageId] = stages[stageId] || null;
-    return result;
+  const result = STAGE_IDS.reduce((current, stageId) => {
+    current[stageId] = stages[stageId] || null;
+    return current;
   }, {});
+  result.l2 = stages.l2 || null;
+  return result;
 }
 
 function extractList(...values) {
@@ -189,9 +187,18 @@ function extractList(...values) {
 
 function extractDecision(canonicalResult, pipeline) {
   const canonical = asRecord(canonicalResult);
-  const pipelineDecision = asRecord(pipeline?.finalDecision);
-  const decision = asRecord(canonical.decision);
-  return Object.keys(decision).length ? decision : pipelineDecision;
+  const candidates = [
+    pipeline?.finalPredict?.decision,
+    pipeline?.finalPredict?.result,
+    pipeline?.finalPredict,
+    canonical.finalPredict?.decision,
+    canonical.finalPredict?.result,
+    canonical.finalPredict,
+    pipeline?.finalDecision,
+    canonical.finalDecision,
+    canonical.decision,
+  ];
+  return candidates.map(asRecord).find(hasPublishedDecision) || {};
 }
 
 function scoreLabel(value) {
@@ -206,6 +213,7 @@ function scoreLabel(value) {
 function decisionLabel(decision) {
   const epistemicState = String(decision?.epistemicState || "").toUpperCase();
   const security = String(decision?.security || "").toUpperCase();
+  const truthVerdict = String(decision?.truthVerdict || decision?.verdict || decision?.truthStatus || "").toUpperCase();
   const labels = {
     DANGEROUS: "Nguy hiểm · Không nên tiếp tục",
     MALICIOUS: "Nguy hiểm · Đã chặn",
@@ -214,13 +222,36 @@ function decisionLabel(decision) {
     DISPUTED: "Đang tranh chấp · Chưa thể kết luận",
     CONFLICTING_EVIDENCE: "Các nguồn xung đột · Chưa an toàn",
     SUPPORTED: "Có cơ sở hỗ trợ · Không đồng nghĩa an toàn",
+    CONTRADICTED: "Bằng chứng hiện có phản bác nội dung",
+    INSUFFICIENT: "Chưa đủ bằng chứng",
     INSUFFICIENT_EVIDENCE: "Chưa đủ bằng chứng",
     UNKNOWN: "Chưa thể kết luận",
     SAFE: "An toàn · Đã xác minh target",
     NO_KNOWN_THREAT: "Chưa thấy mối đe dọa đã biết",
     NOT_APPLICABLE: "Không áp dụng",
   };
-  return labels[epistemicState] || labels[security] || "Chưa có kết luận";
+  return labels[epistemicState] || labels[security] || labels[truthVerdict] || "Chưa công bố";
+}
+
+function hasPublishedDecision(decision) {
+  const fields = [
+    "verdict",
+    "truthVerdict",
+    "truthStatus",
+    "epistemicState",
+    "classification",
+    "label",
+    "conclusion",
+    "security",
+    "risk",
+    "action",
+    "recommendedAction",
+  ];
+  return fields.some((field) => {
+    const value = decision?.[field];
+    return (typeof value === "string" && value.trim().length > 0)
+      || (typeof value === "number" && Number.isFinite(value));
+  });
 }
 
 function evidenceSufficiency(canonicalResult, layers, decision) {
@@ -252,7 +283,9 @@ export function createTrustPresentationModel({
   const stale = Boolean(mergedBindings.conflict || (activeBinding && binding && !isCurrentTrustBinding(binding, activeBinding)));
   const macroStages = TRUST_MACRO_STAGES.map((definition) => {
     const internalStages = definition.internalStageIds.map((stageId) => stageMap[stageId]).filter(Boolean);
-    const status = stale ? "WAITING" : macroStatus(internalStages, pipeline?.pipelineStatus, processing);
+    const internalStatus = macroStatus(internalStages, pipeline?.pipelineStatus);
+    const publicStatus = normalizeStatus(stageMap[definition.publicStageId]?.operationStatus);
+    const status = stale ? "WAITING" : internalStatus === "WAITING" && publicStatus !== "WAITING" ? publicStatus : internalStatus;
     return {
       ...definition,
       status,
@@ -264,7 +297,8 @@ export function createTrustPresentationModel({
   const decision = stale ? {} : extractDecision(canonicalResult, pipeline);
   const canonical = asRecord(canonicalResult);
   const layer4 = asRecord(layers.layer4);
-  const finalDecision = Object.keys(decision).length ? decision : asRecord(layer4.decision);
+  const finalDecision = decision;
+  const finalDecisionPublished = hasPublishedDecision(finalDecision);
   const reasons = extractList(
     finalDecision.reasons,
     finalDecision.explanation,
@@ -273,8 +307,29 @@ export function createTrustPresentationModel({
     layer4.userExplanation?.riskSummary,
     canonical.reasons,
   );
-  const evidence = Array.isArray(canonical.evidence) ? canonical.evidence : Array.isArray(layers.layer3?.evidence) ? layers.layer3.evidence : [];
-  const sources = Array.isArray(canonical.sources) ? canonical.sources : Array.isArray(layers.layer3?.sources) ? layers.layer3.sources : evidence;
+  const canonicalEvidence = asRecord(canonical.evidence);
+  const evidence = Array.isArray(canonical.evidence)
+    ? canonical.evidence
+      : Array.isArray(canonicalEvidence.items)
+        ? canonicalEvidence.items
+        : Array.isArray(canonical.evidenceItems)
+          ? canonical.evidenceItems
+          : Array.isArray(pipeline?.evidence?.items)
+            ? pipeline.evidence.items
+            : Array.isArray(layers.layer3?.evidence)
+              ? layers.layer3.evidence
+              : Array.isArray(layers.layer3?.evidenceItems) ? layers.layer3.evidenceItems : [];
+  const sources = Array.isArray(canonical.sources)
+    ? canonical.sources
+    : Array.isArray(canonicalEvidence.sources)
+      ? canonicalEvidence.sources
+      : Array.isArray(pipeline?.sources)
+        ? pipeline.sources
+        : Array.isArray(pipeline?.evidence?.sources)
+          ? pipeline.evidence.sources
+          : Array.isArray(layers.layer3?.sources)
+            ? layers.layer3.sources
+            : Array.isArray(layers.layer3?.verifiedSources) ? layers.layer3.verifiedSources : [];
   const counterEvidence = extractList(
     canonical.counterEvidence,
     canonical.contradictions,
@@ -296,6 +351,8 @@ export function createTrustPresentationModel({
       finding: stageMap[stageId]?.finding || null,
     })),
     finalDecision,
+    finalDecisionPublished,
+    finalPredictStatus: finalDecisionPublished ? "PUBLISHED" : "LOCKED",
     finalDecisionLabel: decisionLabel(finalDecision),
     confidence: scoreLabel(confidenceValue),
     evidenceSufficiency: evidenceSufficiency(canonicalResult, layers, finalDecision),

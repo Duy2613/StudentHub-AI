@@ -89,20 +89,31 @@ async function harness(page: Page, options: { outcome?: string; theme?: string; 
     }, { template });
   }
   await page.goto('/trust');
-  await expect(page.getByTestId('trust-v4')).toBeVisible();
+  const workspace = page.locator('#main-content').getByTestId('trust-v4');
+  await expect(workspace.first()).toBeVisible();
   await expect(page.getByRole('button', { name: options.anonymous ? 'Hồ sơ đã lưu' : 'Hồ sơ đã lưu', exact: true })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-theme', options.theme === 'midnight' ? 'midnight' : 'light');
+  await expect(page.locator('.source-disclosure')).toHaveAttribute('data-source-mode', 'UNAVAILABLE');
   // Let the canonical session remount finish before editing a private draft.
   await expect(page.getByText('Đang xác minh phiên…')).toHaveCount(0);
+  await expect(workspace).toHaveCount(1);
   return errors;
 }
 async function submit(page: Page) { await page.getByLabel('Nội dung cần kiểm chứng', { exact: true }).fill(DRAFT); await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click(); }
 async function selectMode(page: Page, label: string) {
-  await page.getByText(label, { exact: true }).click();
-  await expect(page.getByLabel(label, { exact: true })).toBeChecked();
+  const tab = page.getByRole('tab', { name: label, exact: true });
+  await tab.click();
+  await expect(tab).toHaveAttribute('aria-selected', 'true');
 }
 async function shot(page: Page, name: string) {
   await mkdir(DIR, { recursive: true });
+  if (!name.includes('sheet')) await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await page.evaluate(async () => {
+    const animations = [...document.querySelectorAll('.master-ultra-journey-stage')]
+      .flatMap((element) => element.getAnimations())
+      .filter((animation) => animation.playState === 'running' && animation.effect?.getTiming().iterations === 1);
+    await Promise.all(animations.map((animation) => animation.finished.catch(() => undefined)));
+  });
   await page.screenshot({ path: path.join(DIR, `${name}.png`), fullPage: !name.includes('sheet') });
   manifest.push({ file: `${name}.png`, classification: 'ISOLATED CONTRACT FIXTURE — NOT LIVE', viewport: page.viewportSize(), timestamp: new Date().toISOString() });
   await writeFile(path.join(DIR, 'screenshots.json'), JSON.stringify(manifest, null, 2));
@@ -112,9 +123,11 @@ test('seven groups: entry, processing, result, evidence, integration and mobile 
   const errors = await harness(page, { stream: true });
   await shot(page, '01-entry-light');
   await submit(page);
-  await expect(page.getByText('Mệnh đề đã được trích xuất', { exact: true })).toBeVisible();
+  await expect(page.locator('[data-testid="trust-active-layer"][data-layer-id="l3"]')).toBeVisible();
   await shot(page, '02-claims-processing');
   await expect(page.getByTestId('trust-conclusion')).toBeVisible();
+  await expect(page.locator('.master-ultra-trust')).toHaveAttribute('data-master-ultra-state', 'COMPLETE_OVERVIEW');
+  for (const index of [1, 2, 3, 4]) await expect(page.getByTestId(`rail-layer${index}`)).toHaveAttribute('data-status', 'COMPLETE');
   await expect(page.getByTestId('trust-ai-provenance')).toContainText('phiên bản 3');
   await expect(page.getByTestId('trust-ai-provenance')).toContainText('1 URL đã được kiểm tra');
   await expect(page.locator('#trust-ai-provenance').getByRole('link', { name: /Quy định về hỗ trợ học tập/ })).toHaveAttribute('href', 'https://example.org/policy');
@@ -138,7 +151,6 @@ test('seven groups: entry, processing, result, evidence, integration and mobile 
   await expect(community.getByRole('heading', { name: 'Xem trước phạm vi công khai' })).toBeVisible();
   await shot(page, '06-community-preview');
   await community.getByRole('button', { name: 'Đóng composer' }).click();
-  await page.getByRole('button', { name: /Điều kiện nhận hỗ trợ học tập/ }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: 'Yêu cầu chuyên gia', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -166,11 +178,12 @@ for (const outcome of ['INSUFFICIENT', 'CONTRADICTED', 'PARTIAL']) test(`difficu
   await harness(page, { outcome }); await submit(page);
   await expect(page.getByTestId('trust-conclusion')).toBeVisible();
   await shot(page, `05-${outcome.toLowerCase()}`);
-  if (outcome === 'INSUFFICIENT') await expect(page.locator('#trust-evidence')).toContainText('Chưa có bằng chứng');
+  if (outcome === 'INSUFFICIENT') await expect(page.locator('#trust-evidence')).toContainText('Không có evidence item được công bố');
 });
 
 test('responsive themes, keyboard, contrast and zero horizontal overflow', async ({ page }) => {
   await harness(page);
+  const workspace = page.locator('#main-content').getByTestId('trust-v4');
   await expect(page.locator('.profile-chip img')).toBeVisible();
   await expect.poll(() => page.locator('.profile-chip img').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth === 1)).toBe(true);
   const findings: object[] = [];
@@ -178,8 +191,9 @@ test('responsive themes, keyboard, contrast and zero horizontal overflow', async
     await page.setViewportSize({ width, height: 960 });
     await page.evaluate((theme) => localStorage.setItem('studenthub-theme-mode', theme), theme);
     await page.reload();
-    await expect(page.getByTestId('trust-v4')).toBeVisible();
     await expect(page.getByText('Đang xác minh phiên…')).toHaveCount(0);
+    await expect(workspace.first()).toBeVisible();
+    await expect(workspace).toHaveCount(1);
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme === 'midnight' ? 'midnight' : 'light');
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
     expect(overflow, `${theme}/${width}`).toBe(false);
@@ -206,7 +220,7 @@ test('validation, retained draft on error, anonymous actions and private history
   await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
   await expect(page.locator('#trust-main [role=alert]')).toContainText('Nhập nội dung');
   await selectMode(page, 'Đường dẫn');
-  await page.getByLabel('Đường dẫn cần đối chiếu').fill('javascript:alert(1)');
+  await page.getByLabel('Đường dẫn cần đối chiếu', { exact: true }).fill('javascript:alert(1)');
   await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
   await expect(page.locator('#trust-main [role=alert]')).toContainText('HTTP');
   await selectMode(page, 'Văn bản'); await submit(page);
@@ -221,22 +235,22 @@ test('image and QR upload previews use the selected supported mode', async ({ pa
   await selectMode(page, 'Hình ảnh');
   await input.setInputFiles({ name: 'local-check.png', mimeType: 'image/png', buffer: fixturePng });
   await expect(page.getByRole('img', { name: 'Ảnh bạn đã chọn để kiểm chứng' })).toBeVisible();
-  await expect(page.getByText('local-check.png')).toBeVisible();
+  await expect(page.getByText('local-check.png', { exact: true })).toBeVisible();
   await shot(page, '01-entry-image-upload');
   await page.getByRole('button', { name: 'Bỏ ảnh đã chọn' }).click();
   await input.setInputFiles({ name: 'local-check.png', mimeType: 'image/png', buffer: fixturePng });
-  await expect(page.getByText('local-check.png')).toBeVisible();
+  await expect(page.getByText('local-check.png', { exact: true })).toBeVisible();
   await selectMode(page, 'Mã QR');
-  await expect(page.getByText('local-check.png')).toHaveCount(0);
+  await expect(page.getByText('local-check.png', { exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Kiểm chứng', exact: true })).toBeDisabled();
   await input.setInputFiles({ name: 'qr-check.png', mimeType: 'image/png', buffer: fixturePng });
-  await expect(page.getByText('qr-check.png')).toBeVisible();
+  await expect(page.getByText('qr-check.png', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Bỏ ảnh đã chọn' }).click();
   await expect(page.getByRole('button', { name: 'Kiểm chứng', exact: true })).toBeDisabled();
   expect(errors).toEqual([]);
 });
 
-test('five production LAB performance samples', async ({ browser }) => {
+test('five isolated UI interaction performance samples', async ({ browser }) => {
   const samples: object[] = [];
   for (let i = 0; i < 5; i++) {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -244,12 +258,12 @@ test('five production LAB performance samples', async ({ browser }) => {
     const sample = await page.evaluate(() => {
       const resource = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
       return { inputCommitMs: performance.getEntriesByName('trust-v4:input-commit')[0]?.startTime, resultReadyMs: performance.getEntriesByName('trust-v4:result-ready')[0]?.startTime,
-        encodedScriptBytes: resource.filter((r) => r.name.includes('.js')).reduce((n, r) => n + r.encodedBodySize, 0), classification: 'PRODUCTION LAB: UI commit proxy, not CPU hydration or field INP' };
+        encodedScriptBytes: resource.filter((r) => r.name.includes('.js')).reduce((n, r) => n + r.encodedBodySize, 0), classification: 'ISOLATED FIXTURE UI measurement; not production, CPU hydration or field INP' };
     });
     const start = performance.now();
-    await page.getByRole('button', { name: /Thời hạn đăng ký/ }).click();
-    await expect(page.locator('#trust-evidence')).toContainText('Chưa có bằng chứng');
-    samples.push({ ...sample, claimInteractionAutomationMs: performance.now() - start });
+    await page.getByTestId('rail-layer1').click();
+    await expect(page.getByRole('heading', { name: 'Deterministic Screen' })).toBeVisible();
+    samples.push({ ...sample, savedLayerInspectionAutomationMs: performance.now() - start });
     await page.close();
   }
   await mkdir(DIR, { recursive: true });

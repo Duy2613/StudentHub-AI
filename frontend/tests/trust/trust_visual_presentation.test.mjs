@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { normalizeMasterUltraRun } from "../../src/lib/ai-trust/v5/MasterUltraTrustModel.js";
+import { createTrustPresentationModel } from "../../src/lib/ai-trust/v5/TrustPresentationModel.js";
 import { FOUR_LAYER_STAGE_IDS } from "../../src/lib/ai-trust/v5/contracts.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -22,6 +23,17 @@ test("1. Own-backend visual rendering is complete and canonical", () => {
   assert.match(journeySource, /Final Validated Evidence Set/);
   assert.match(journeySource, /Validated evidence & Gemini links/);
   assert.match(journeySource, /Final Predict/);
+});
+
+test("FOUR_LAYER public response maps its L2 and L4 state into the canonical presentation", () => {
+  const presentation = createTrustPresentationModel({
+    pipeline: {
+      pipelineStatus: "COMPLETED",
+      stages: Object.fromEntries(["l1", "l2", "l3", "l4"].map((id) => [id, { operationStatus: "COMPLETED" }])),
+    },
+  });
+
+  assert.deepEqual(presentation.macroStages.map((stage) => stage.status), ["COMPLETE", "COMPLETE", "COMPLETE", "COMPLETE"]);
 });
 
 test("2. L4 renders validated Gemini citations without exposing engine UI", () => {
@@ -55,7 +67,7 @@ test("3. L4 degraded state remains evidence-bound and truthful", () => {
   assert.match(journeySource, /Chưa có URL evidence đã validate để mở/);
 });
 
-test("6. L5 still renders after degraded L4", () => {
+test("6. Final Predict remains separate and published after degraded synthesis", () => {
   const normalizedWithDegradedL4 = normalizeMasterUltraRun({
     pipeline: {
       pipelineStatus: "COMPLETED",
@@ -87,9 +99,9 @@ test("6. L5 still renders after degraded L4", () => {
     }
   });
 
-  // L5 remains populated and canonical
-  assert.equal(normalizedWithDegradedL4.layers.l5.verdict, "Cần thận trọng");
-  assert.ok(normalizedWithDegradedL4.macroStages.find((s) => s.id === "l5"));
+  assert.equal(normalizedWithDegradedL4.finalPredict.status, "PUBLISHED");
+  assert.equal(normalizedWithDegradedL4.finalPredict.verdict, "Cần thận trọng");
+  assert.equal(normalizedWithDegradedL4.macroStages.length, 4);
 });
 
 test("6a. Macro status keeps degraded L2B/L4 visible after pipeline completion", () => {
@@ -114,7 +126,7 @@ test("6a. Macro status keeps degraded L2B/L4 visible after pipeline completion",
   assert.equal(statusById.l2, "PARTIAL");
   assert.equal(statusById.l3, "COMPLETE");
   assert.equal(statusById.l4, "PARTIAL");
-  assert.equal(statusById.l5, "COMPLETE");
+  assert.deepEqual(Object.keys(statusById), ["l1", "l2", "l3", "l4"]);
 });
 
 test("7. No infinite loading state when stages fail or complete", () => {

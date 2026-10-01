@@ -103,15 +103,46 @@ function ExpertAssessments({ model, onClose }) {
   </section>;
 }
 
+export function TrustCaseActions({ model, authenticated, readOnly = false }) {
+  const [sheet, setSheet] = useState(null);
+  const [publication, setPublication] = useState(false);
+  const expertTriggerRef = useRef(null);
+  const scopeReady = model.persisted && isUuid(model.caseId) && Number.isInteger(model.caseRevision);
+  const [claimId, setClaimId] = useState(model.claims?.[0]?.id || "");
+
+  return <>
+    <section id="trust-next" className={styles.next} aria-labelledby="trust-next-title">
+      <span className={styles.eyebrow}>{readOnly ? "Bản lưu bất biến" : "Từ hiểu rõ đến hành động"}</span>
+      <h2 id="trust-next-title">{readOnly ? "Phiên bản kết quả này" : "Bạn có thể làm gì tiếp theo?"}</h2>
+      {model.action && <p>{model.action}</p>}
+      {readOnly ? <p className={styles.note}>Đây là kết quả đã lưu của đúng phiên bản và lần chạy được ghi trong nguồn gốc. Các hành động tạo dữ liệu mới đã tắt.</p> : <>
+        {model.claims?.length > 0 && <label className={styles.note}>Mệnh đề gửi kèm yêu cầu chuyên gia
+          <select value={claimId} onChange={(event) => setClaimId(event.target.value)}>
+            <option value="">Không chọn mệnh đề riêng</option>
+            {model.claims.map((claim) => <option key={claim.key} value={claim.id || ""}>{claim.statement}</option>)}
+          </select>
+        </label>}
+        <div className={styles.actions}>
+          <button ref={expertTriggerRef} type="button" className={styles.secondary} disabled={!scopeReady || !authenticated} onClick={(event) => { expertTriggerRef.current = event.currentTarget; setSheet("expert"); }}><GraduationCap size={17} />Yêu cầu chuyên gia</button>
+          <button type="button" className={styles.secondary} disabled={!scopeReady || !authenticated} onClick={() => setSheet("community")}><Users size={17} />Thảo luận trong Cộng đồng</button>
+          {scopeReady && authenticated && <button type="button" className={styles.textButton} onClick={() => setSheet("assessments")}>Xem đánh giá chuyên gia</button>}
+        </div>
+        {!scopeReady && <p className={styles.note}>Kết quả chưa có xác nhận lưu hồ sơ và phiên bản. Chưa thể liên kết yêu cầu chuyên gia hoặc bài viết.</p>}
+        {!authenticated && <p className={styles.note}>Đăng nhập để sử dụng hồ sơ và các hành động liên kết.</p>}
+        {publication && <p role="status">Đóng góp đã được công bố qua Cộng đồng.</p>}
+      </>}
+    </section>
+    {!readOnly && sheet === "expert" && <RequestExpertReviewSheet caseId={model.caseId} caseRevision={model.caseRevision} claimId={claimId || null} defaultDomainCode={model.domain} restoreFocusRef={expertTriggerRef} onClose={() => setSheet(null)} />}
+    {!readOnly && sheet === "community" && <CommunityComposer initialMode="VERIFY" initialCaseId={model.caseId} initialCaseRevision={model.caseRevision} onClose={() => setSheet(null)} onPublished={() => { setSheet(null); setPublication(true); }} />}
+    {!readOnly && sheet === "assessments" && <ExpertAssessments model={model} onClose={() => setSheet(null)} />}
+  </>;
+}
+
 export default function TrustV4Result({ model, snapshot, stale, previous, authenticated, onEdit, readOnly = false }) {
   const [claimKey, setClaimKey] = useState("all");
-  const [sheet, setSheet] = useState(null);
-  const expertTriggerRef = useRef(null);
   const [explorer, setExplorer] = useState(false);
-  const [publication, setPublication] = useState(false);
   const selected = model.claims.find((c) => c.key === claimKey);
   const evidence = selected ? model.evidence.filter((e) => selected.id && e.claimId === selected.id) : model.evidence;
-  const scopeReady = model.persisted && isUuid(model.caseId) && Number.isInteger(model.caseRevision);
   return <div className={styles.result}>
     <div className={styles.subject}><div><span className={styles.eyebrow}>{readOnly ? "Kết quả đã lưu · chỉ đọc" : "Nội dung đã kiểm chứng"}</span><p>{snapshot.label}</p></div>{!readOnly && <button className={styles.textButton} type="button" onClick={onEdit}>Sửa đầu vào</button>}</div>
     <TrustConclusion model={model} stale={stale} previous={previous} />
@@ -121,10 +152,7 @@ export default function TrustV4Result({ model, snapshot, stale, previous, authen
     <TrustAiProvenance provenance={model.aiProvenance} />
     {model.evidence.some((e) => e.claimId && e.source && e.relation) && <section className={styles.section} aria-labelledby="trust-comparison-title"><div className={styles.sectionHeading}><h2 id="trust-comparison-title">Đối chiếu từng mệnh đề</h2><GitCompareArrows size={22} aria-hidden="true" /></div><p className={styles.note}>Các quan hệ do hệ thống trả về; số lượng nguồn không tạo ra đồng thuận.</p><ul className={styles.comparison}>{evidence.filter((e) => e.source && e.claimId).map((e) => <li key={e.key}><strong>{model.claims.find((c) => c.id === e.claimId)?.statement || "Mệnh đề chưa có nội dung"}</strong><span>{e.source.title}</span><span>{relationLabel(e.relation)}</span></li>)}</ul></section>}
     <section id="trust-sources" className={styles.section} aria-labelledby="trust-sources-title"><div className={styles.sectionHeading}><div><span className={styles.eyebrow}>Có thể truy vết</span><h2 id="trust-sources-title">Nguồn đối chiếu</h2></div><span className={styles.note}>{model.sources.length} nguồn được trả về</span></div>{model.sources.length ? model.sources.map((source) => <SourceReference key={source.key} source={source} />) : <p className={styles.empty}>Chưa có bản ghi nguồn trong phản hồi.</p>}</section>
-    <section id="trust-next" className={styles.next} aria-labelledby="trust-next-title"><span className={styles.eyebrow}>{readOnly ? "Bản lưu bất biến" : "Từ hiểu rõ đến hành động"}</span><h2 id="trust-next-title">{readOnly ? "Phiên bản kết quả này" : "Bạn có thể làm gì tiếp theo?"}</h2>{model.action && <p>{model.action}</p>}{readOnly ? <p className={styles.note}>Đây là kết quả đã lưu của đúng phiên bản và lần chạy được ghi trong nguồn gốc. Các hành động tạo dữ liệu mới đã tắt.</p> : <><div className={styles.actions}><button ref={expertTriggerRef} type="button" className={styles.secondary} disabled={!scopeReady || !authenticated} onClick={(event) => { expertTriggerRef.current = event.currentTarget; setSheet("expert"); }}><GraduationCap size={17} />Yêu cầu chuyên gia</button><button type="button" className={styles.secondary} disabled={!scopeReady || !authenticated} onClick={() => setSheet("community")}><Users size={17} />Thảo luận trong Cộng đồng</button>{scopeReady && authenticated && <button type="button" className={styles.textButton} onClick={() => setSheet("assessments")}>Xem đánh giá chuyên gia</button>}</div>{!scopeReady && <p className={styles.note}>Kết quả chưa có xác nhận lưu hồ sơ và phiên bản. Chưa thể liên kết yêu cầu chuyên gia hoặc bài viết.</p>}{!authenticated && <p className={styles.note}>Đăng nhập để sử dụng hồ sơ và các hành động liên kết.</p>}{publication && <p role="status">Đóng góp đã được công bố qua Cộng đồng.</p>}</>}</section>
+    <TrustCaseActions model={model} authenticated={authenticated} readOnly={readOnly} />
     {model.evidence.some((e) => e.claimId && e.source) && <section className={styles.section}><button className={styles.textButton} type="button" aria-expanded={explorer} onClick={() => setExplorer(!explorer)}>Khám phá quan hệ mệnh đề · bằng chứng · nguồn</button>{explorer && <TrustV4Explorer model={model} />}</section>}
-    {!readOnly && sheet === "expert" && <RequestExpertReviewSheet caseId={model.caseId} caseRevision={model.caseRevision} claimId={selected?.id || null} defaultDomainCode={model.domain} restoreFocusRef={expertTriggerRef} onClose={() => setSheet(null)} />}
-    {!readOnly && sheet === "community" && <CommunityComposer initialMode="VERIFY" initialCaseId={model.caseId} initialCaseRevision={model.caseRevision} onClose={() => setSheet(null)} onPublished={() => { setSheet(null); setPublication(true); }} />}
-    {!readOnly && sheet === "assessments" && <ExpertAssessments model={model} onClose={() => setSheet(null)} />}
   </div>;
 }

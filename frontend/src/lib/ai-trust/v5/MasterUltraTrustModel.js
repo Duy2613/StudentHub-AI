@@ -2,13 +2,14 @@ import { TRUST_MACRO_STAGES } from "./TrustPresentationModel.js";
 
 /**
  * Public presentation state names. The seven internal V5 stages remain an
- * implementation detail; the Master Ultra surface only exposes these five
- * macro layers.
+ * implementation detail; the product exposes four analysis layers and a
+ * separately gated Final Predict result.
  */
 export const MASTER_ULTRA_STATES = Object.freeze([
   "IDLE",
   "INPUT_READY",
   "SUBMITTING",
+  "L1_READY",
   "L1_ENTER",
   "L1_RUNNING",
   "L1_COMPLETE",
@@ -24,11 +25,8 @@ export const MASTER_ULTRA_STATES = Object.freeze([
   "L4_ENTER",
   "L4_RUNNING",
   "L4_COMPLETE",
-  "TRANSITION_4_5",
-  "L5_ENTER",
-  "L5_RUNNING",
-  "L5_COMPLETE",
-  "CONVERGENCE",
+  "FINAL_PREDICT_LOCKED",
+  "FINAL_PREDICT_PUBLISHED",
   "COMPLETE_OVERVIEW",
   "INSPECT_LAYER",
   "ERROR_RECOVERABLE",
@@ -38,53 +36,47 @@ export const MASTER_ULTRA_STATES = Object.freeze([
 export const MASTER_ULTRA_LAYERS = Object.freeze([
   Object.freeze({
     id: "l1",
+    presentationId: "deterministic-screen",
     code: "01",
-    shortName: "Claim",
-    name: "Claim Intelligence",
-    question: "What exactly is being claimed?",
-    questionVi: "Điều gì thực sự đang được khẳng định?",
+    shortName: "Screen",
+    name: "Deterministic Screen",
+    question: "What can be established deterministically from this input?",
+    questionVi: "Đầu vào này cho phép xác lập điều gì bằng kiểm tra tất định?",
     internalStageIds: Object.freeze(["l1"]),
     tone: "ice",
   }),
   Object.freeze({
     id: "l2",
+    presentationId: "threat-semantic-intelligence",
     code: "02",
-    shortName: "Discovery",
-    name: "Evidence Discovery",
-    question: "What evidence exists around this claim?",
-    questionVi: "Xung quanh mệnh đề này đang có bằng chứng nào?",
+    shortName: "Intelligence",
+    name: "Threat & Semantic Intelligence",
+    question: "What risks, claims, and meanings need to be examined?",
+    questionVi: "Rủi ro, mệnh đề và ngữ nghĩa nào cần được xem xét?",
     internalStageIds: Object.freeze(["l2a", "l2b", "l2c"]),
     tone: "cyan",
   }),
   Object.freeze({
     id: "l3",
+    presentationId: "evidence-retrieval",
     code: "03",
-    shortName: "Forensics",
-    name: "Evidence Forensics",
-    question: "Does the evidence support or contradict the claim?",
-    questionVi: "Bằng chứng ủng hộ hay mâu thuẫn với mệnh đề?",
+    shortName: "Retrieval",
+    name: "Evidence Retrieval",
+    question: "Which sources and evidence items were actually retrieved?",
+    questionVi: "Nguồn và evidence nào thực sự đã được truy xuất?",
     internalStageIds: Object.freeze(["l3"]),
     tone: "tension",
   }),
   Object.freeze({
     id: "l4",
+    presentationId: "synthesis-reasoning",
     code: "04",
-    shortName: "AI",
-    name: "AI Verification",
-    question: "How does Gemini interpret the evidence without owning the decision?",
-    questionVi: "Gemini đọc bằng chứng ra sao mà không nắm quyền quyết định?",
-    internalStageIds: Object.freeze(["l4"]),
+    shortName: "Synthesis",
+    name: "Synthesis & Reasoning",
+    question: "How do the evidence and policy support a conclusion?",
+    questionVi: "Evidence và policy hiện có nâng đỡ kết luận nào?",
+    internalStageIds: Object.freeze(["l4", "l5"]),
     tone: "violet",
-  }),
-  Object.freeze({
-    id: "l5",
-    code: "05",
-    shortName: "Decision",
-    name: "Decision Intelligence",
-    question: "What is the best supported conclusion?",
-    questionVi: "Kết luận nào được bằng chứng hiện có nâng đỡ tốt nhất?",
-    internalStageIds: Object.freeze(["l5"]),
-    tone: "gold",
   }),
 ]);
 
@@ -116,6 +108,14 @@ function stageMap(pipeline) {
   return record(pipeline?.stages);
 }
 
+function macroStageIds(id, pipeline) {
+  const stages = stageMap(pipeline);
+  const internalStageIds = MASTER_ULTRA_LAYERS.find((layer) => layer.id === id)?.internalStageIds || [];
+  if (id === "l2" && stages.l2 && !stages.l2a && !stages.l2b && !stages.l2c) return ["l2"];
+  if (id === "l4" && stages.l4 && !stages.l5) return ["l4"];
+  return internalStageIds;
+}
+
 function stageStatus(stage) {
   const value = String(stage?.operationStatus || "NOT_STARTED").toUpperCase();
   if (COMPLETE_STATES.has(value)) return "COMPLETE";
@@ -125,18 +125,26 @@ function stageStatus(stage) {
   return "WAITING";
 }
 
-function macroStatus(id, presentation, pipeline, processing) {
-  const presented = presentation?.macroStages?.find((stage) => stage.id === id);
+function macroStatus(id, presentation, pipeline) {
   const definition = MASTER_ULTRA_LAYERS.find((layer) => layer.id === id);
+  const presented = presentation?.macroStages?.find((stage) => stage.id === definition?.presentationId);
   const stages = stageMap(pipeline);
-  const statuses = definition?.internalStageIds.map((stageId) => stageStatus(stages[stageId])) || [];
+  const statuses = macroStageIds(id, pipeline).map((stageId) => stageStatus(stages[stageId]));
   if (presented?.status && presented.status !== "WAITING") return presented.status;
   if (statuses.includes("FAILED")) return statuses.includes("COMPLETE") ? "PARTIAL" : "FAILED";
   if (statuses.includes("PARTIAL")) return "PARTIAL";
   if (statuses.includes("RUNNING")) return "RUNNING";
   if (statuses.length && statuses.every((value) => value === "COMPLETE")) return "COMPLETE";
-  if (processing && id === "l1" && !["COMPLETE", "PARTIAL", "FAILED"].includes(stageStatus(stages.l1))) return "RUNNING";
   return "WAITING";
+}
+
+function layerPayloadPublished(id, { layers, pipeline, sources, evidenceItems, claims }) {
+  const stages = stageMap(pipeline);
+  if (macroStageIds(id, pipeline).some((stageId) => stageStatus(stages[stageId]) !== "WAITING")) return true;
+  if (id === "l2") return claims.length > 0 || Boolean(layers.layer2?.summary);
+  if (id === "l3") return sources.length > 0 || evidenceItems.length > 0 || Boolean(layers.layer3?.summary);
+  if (id === "l4") return Boolean(layers.layer4?.summary || layers.layer4?.aiVerification || layers.layer4?.reasoning || layers.layer4?.truthStatus);
+  return false;
 }
 
 function firstText(...values) {
@@ -169,22 +177,19 @@ function rawClaims({ layers, canonicalResult, pipeline }) {
     .slice(0, 16);
 }
 
-function rawEvidence({ layers, canonicalResult, pipeline }) {
+function rawSources({ layers, canonicalResult, pipeline }) {
   const canonical = record(canonicalResult);
   const evidence = record(canonical.evidence);
   const layer3 = record(layers?.layer3);
   const pipelineEvidence = record(pipeline?.evidence);
   const values = [
-    ...list(canonical.evidence),
     ...list(canonical.sources),
-    ...list(evidence.items),
     ...list(evidence.sources),
-    ...list(pipelineEvidence.items),
+    ...list(canonical.sourceRecords),
+    ...list(pipeline?.sources),
     ...list(pipelineEvidence.sources),
-    ...list(layer3.evidence),
     ...list(layer3.sources),
     ...list(layer3.verifiedSources),
-    ...list(layer3.evidenceItems),
   ];
   return values
     .map((value, index) => {
@@ -193,7 +198,7 @@ function rawEvidence({ layers, canonicalResult, pipeline }) {
       const title = firstText(item.title, item.sourceName, item.publisher, item.domain, url);
       if (!title) return null;
       return {
-        id: text(item.id || item.sourceId || item.evidenceId, url || `source-${index + 1}`),
+        id: text(item.sourceId || item.id, url || `source-${index + 1}`),
         title,
         publisher: firstText(item.publisher, item.sourceName, item.provider),
         domain: firstText(item.domain, url ? (() => { try { return new URL(url).hostname; } catch { return null; } })() : null),
@@ -201,15 +206,58 @@ function rawEvidence({ layers, canonicalResult, pipeline }) {
         publishedAt: firstText(item.publishedAt, item.issuedAt, item.date),
         retrievedAt: firstText(item.retrievedAt, item.observedAt),
         sourceType: firstText(item.sourceType, item.type, item.authority, item.status),
+        provider: firstText(item.provider, item.providerId),
+        language: firstText(item.language, item.locale),
+        httpStatus: (item.httpStatus ?? item.statusCode) != null && Number.isFinite(Number(item.httpStatus ?? item.statusCode)) ? Number(item.httpStatus ?? item.statusCode) : null,
         independenceGroup: firstText(item.independenceGroup, item.independenceGroupId, item.clusterId, item.groupId),
-        relationship: text(item.relationship || item.relation || item.claimRelation, "context").toLowerCase(),
         usedBy: list(item.usedBy || item.usedByLayers || item.layersUsed).map((value) => text(value)).filter(Boolean).slice(0, 8),
-        snippet: firstText(item.snippet, item.summary, item.description, item.quality),
+        snippet: firstText(item.summary, item.description),
         contentHash: firstText(item.contentHash, item.contentDigest, item.sha256),
       };
     })
     .filter(Boolean)
     .filter((source, index, all) => all.findIndex((item) => item.id === source.id || (item.url && item.url === source.url)) === index);
+}
+
+function rawEvidenceItems({ layers, canonicalResult, pipeline }) {
+  const canonical = record(canonicalResult);
+  const canonicalEvidence = record(canonical.evidence);
+  const layer3 = record(layers?.layer3);
+  const pipelineEvidence = record(pipeline?.evidence);
+  const values = [
+    ...(Array.isArray(canonical.evidence) ? canonical.evidence : []),
+    ...list(canonicalEvidence.items),
+    ...list(canonical.evidenceItems),
+    ...(Array.isArray(pipelineEvidence) ? pipelineEvidence : []),
+    ...list(pipelineEvidence.items),
+    ...list(layer3.evidence),
+    ...list(layer3.evidenceItems),
+  ];
+
+  return values
+    .map((value, index) => {
+      const item = record(value);
+      const embeddedSource = record(item.source);
+      const id = firstText(item.evidenceId, item.id, item.idempotencyKey);
+      const sourceId = firstText(item.sourceId, embeddedSource.sourceId, embeddedSource.id);
+      const excerpt = firstText(item.excerpt, item.quote, item.text, item.snippet, item.summary);
+      if (!id && !sourceId && !excerpt) return null;
+      return {
+        id: id || `evidence-${index + 1}`,
+        sourceId,
+        claimIds: list(item.claimIds || (item.claimId ? [item.claimId] : [])).map((claimId) => text(claimId)).filter(Boolean).slice(0, 20),
+        type: firstText(item.type, item.evidenceType, item.kind),
+        relationship: firstText(item.relationship, item.relation, item.claimRelation, item.classification)?.toLowerCase() || null,
+        temporalRelevance: firstText(item.temporalRelevance, item.temporalStatus, item.freshness),
+        provider: firstText(item.provider, item.providerId),
+        excerpt,
+        locator: firstText(item.locator, item.sourceSpan, item.page, item.timestamp),
+        observedAt: firstText(item.observedAt, item.retrievedAt),
+        contentHash: firstText(item.contentHash, item.contentDigest, item.sha256),
+      };
+    })
+    .filter(Boolean)
+    .filter((item, index, all) => all.findIndex((candidate) => candidate.id === item.id) === index);
 }
 
 function sourceRelationship(source) {
@@ -219,7 +267,7 @@ function sourceRelationship(source) {
   return "context";
 }
 
-function evidenceBuckets(sources, canonicalResult, layers, pipeline) {
+function evidenceBuckets(evidenceItems, canonicalResult, layers, pipeline) {
   const canonical = record(canonicalResult);
   const evidence = record(canonical.evidence);
   const layer3 = record(layers?.layer3);
@@ -230,13 +278,14 @@ function evidenceBuckets(sources, canonicalResult, layers, pipeline) {
     ...list(layer3.relationships),
     ...list(pipelineEvidence.relationships),
   ];
-  const relationById = new Map(relationships.map((item) => {
+  const relationById = new Map(relationships.flatMap((item) => {
     const value = record(item);
-    return [text(value.sourceId || value.evidenceId || value.id), text(value.relationship || value.relation || value.type, "context").toLowerCase()];
+    const relation = text(value.relationship || value.relation || value.type, "context").toLowerCase();
+    return [value.evidenceId, value.id, value.sourceId].filter(Boolean).map((key) => [text(key), relation]);
   }).filter(([key]) => key));
-  const normalized = sources.map((source) => ({
-    ...source,
-    relationship: relationById.get(source.id) || source.relationship,
+  const normalized = evidenceItems.map((item) => ({
+    ...item,
+    relationship: relationById.get(item.id) || relationById.get(item.sourceId) || item.relationship || "context",
   }));
   const supporting = normalized.filter((source) => sourceRelationship(source) === "supporting");
   const contradicting = normalized.filter((source) => sourceRelationship(source) === "contradicting");
@@ -260,7 +309,7 @@ function independenceGroups({ canonicalResult, layers, pipeline, sources }) {
     return {
       id: text(value.id || value.groupId, `group-${index + 1}`),
       label: firstText(value.label, value.origin, value.rootSource, `Group ${index + 1}`),
-      memberCount: Number.isFinite(Number(value.memberCount)) ? Number(value.memberCount) : list(value.members).length || null,
+      memberCount: Number.isFinite(Number(value.memberCount)) ? Number(value.memberCount) : Array.isArray(value.members) ? value.members.length : null,
       independentWeight: Number.isFinite(Number(value.effectiveIndependentWeight)) ? Number(value.effectiveIndependentWeight) : null,
     };
   });
@@ -340,17 +389,37 @@ function streams({ layers, canonicalResult, pipeline, providers }) {
   }));
 }
 
-function decisionRecord({ canonicalResult, pipeline, layers, presentation }) {
+function decisionRecord({ canonicalResult, pipeline, presentation }) {
   const canonical = record(canonicalResult);
-  const layer4 = record(layers?.layer4);
-  return record(presentation?.finalDecision && Object.keys(presentation.finalDecision).length
-    ? presentation.finalDecision
-    : canonical.decision || pipeline?.finalDecision || layer4.decision);
+  const candidates = [
+    presentation?.finalDecisionPublished ? presentation.finalDecision : null,
+    pipeline?.finalPredict?.decision,
+    pipeline?.finalPredict?.result,
+    pipeline?.finalPredict,
+    canonical.finalPredict?.decision,
+    canonical.finalPredict?.result,
+    canonical.finalPredict,
+    pipeline?.finalDecision,
+    canonical.finalDecision,
+    canonical.decision,
+  ];
+  return candidates.map(record).find(hasPublishedDecision) || {};
+}
+
+function hasPublishedDecision(decision) {
+  return [
+    "verdict", "truthVerdict", "truthStatus", "epistemicState", "classification", "label",
+    "conclusion", "security", "risk", "recommendedAction", "action",
+  ].some((key) => {
+    const value = decision?.[key];
+    return (typeof value === "string" && value.trim().length > 0)
+      || (typeof value === "number" && Number.isFinite(value));
+  });
 }
 
 function humanReview({ canonicalResult, pipeline, layers, presentation }) {
   const canonical = record(canonicalResult);
-  const decision = decisionRecord({ canonicalResult, pipeline, layers, presentation });
+  const decision = decisionRecord({ canonicalResult, pipeline, presentation });
   const review = record(canonical.humanReview || decision.humanReview || layers?.layer4?.humanReview || presentation?.humanReview);
   return Object.keys(review).length ? review : null;
 }
@@ -364,13 +433,12 @@ function inputEnvelope({ input, pipeline, canonicalResult }) {
   };
 }
 
-function layerSummary(id, { layers, pipeline, presentation, processing = false }) {
+function layerSummary(id, { layers, pipeline, presentation }) {
   const stages = stageMap(pipeline);
-  const internal = MASTER_ULTRA_LAYERS.find((layer) => layer.id === id)?.internalStageIds || [];
-  const raw = internal.map((stageId) => stages[stageId]).find((stage) => text(stage?.summary) || text(stage?.finding));
-  const layerData = id === "l1" ? layers?.layer1 : id === "l2" ? layers?.layer2 : id === "l3" ? layers?.layer3 : id === "l4" ? layers?.layer4 : pipeline?.finalDecision;
+  const raw = macroStageIds(id, pipeline).map((stageId) => stages[stageId]).find((stage) => text(stage?.summary) || text(stage?.finding));
+  const layerData = id === "l1" ? layers?.layer1 : id === "l2" ? layers?.layer2 : id === "l3" ? layers?.layer3 : layers?.layer4;
   return {
-    status: macroStatus(id, presentation, pipeline, processing),
+    status: macroStatus(id, presentation, pipeline),
     summary: firstText(layerData?.summary, layerData?.userExplanation?.why, raw?.summary, raw?.finding, "Chưa có dữ liệu công bố."),
   };
 }
@@ -393,8 +461,9 @@ export function normalizeMasterUltraRun({
   const canonical = record(canonicalResult);
   const stages = stageMap(pipeline);
   const claims = rawClaims({ layers, canonicalResult, pipeline });
-  const sources = rawEvidence({ layers, canonicalResult, pipeline });
-  const buckets = evidenceBuckets(sources, canonicalResult, layers, pipeline);
+  const sources = rawSources({ layers, canonicalResult, pipeline });
+  const evidenceItems = rawEvidenceItems({ layers, canonicalResult, pipeline });
+  const buckets = evidenceBuckets(evidenceItems, canonicalResult, layers, pipeline);
   const groups = independenceGroups({ canonicalResult, layers, pipeline, sources });
   const resolvedProviders = providers.length ? providers : providerRecords({ layers, canonicalResult, pipeline });
   const analysisStreams = streams({ layers, canonicalResult, pipeline, providers: resolvedProviders });
@@ -431,12 +500,23 @@ export function normalizeMasterUltraRun({
     status: text(value.status || value.providerStatus, "OBSERVED").toUpperCase(),
   }));
   const decisionTwin = canonical.decisionTwin || pipeline?.decisionTwin || decision.decisionTwin || null;
+  const finalPredictPublished = hasPublishedDecision(decision);
+  const evidenceReported = Array.isArray(canonical.evidence)
+    || Array.isArray(canonical.evidence?.items)
+    || Array.isArray(pipeline?.evidence?.items)
+    || Array.isArray(layers.layer3?.evidence)
+    || Array.isArray(layers.layer3?.evidenceItems)
+    || stageStatus(stages.l3) !== "WAITING";
+  const sourcesReported = Array.isArray(canonical.sources)
+    || Array.isArray(canonical.evidence?.sources)
+    || Array.isArray(pipeline?.sources)
+    || Array.isArray(pipeline?.evidence?.sources)
+    || Array.isArray(layers.layer3?.sources)
+    || Array.isArray(layers.layer3?.verifiedSources)
+    || stageStatus(stages.l3) !== "WAITING";
   const layerData = {
     l1: {
       ...layerSummary("l1", { layers, pipeline, presentation, processing }),
-      claims,
-      canonicalClaim: claims[0]?.text || inputData.excerpt || "Mệnh đề chưa được phân tách",
-      entities: list(layers.layer2?.entities || layers.layer1?.entities || pipeline?.entities).slice(0, 24),
       inputType,
       inputExcerpt: inputData.excerpt,
       technicalSignals: unique([stages.l1?.signals, layers.layer1?.signals, layers.layer1?.reasons], 10),
@@ -447,15 +527,13 @@ export function normalizeMasterUltraRun({
         ? true
         : layers.layer1?.qrDetected === false || layers.layer1?.metadata?.qrScanCompleted === true
           ? false
-          : inputType === "image" || inputType === "qr"
-            ? null
-            : false,
+          : null,
       ocrStatus: inputType === "image" || inputType === "qr"
         ? (layers.layer1?.ocrStatus || (layers.layer1?.metadata?.ocrText ? "SUCCESS" : "NOT_REPORTED"))
         : "NOT_APPLICABLE",
-      detectedUrls: list(layers.layer1?.detectedUrls || layers.layer1?.metadata?.url ? [layers.layer1?.metadata?.url] : []).filter(Boolean),
+      detectedUrls: [...list(layers.layer1?.detectedUrls), layers.layer1?.metadata?.url].filter((value) => typeof value === "string" && value.trim()),
       mediaArtifact: layers.layer1?.metadata?.mediaArtifactId || layers.layer1?.mediaArtifactId || null,
-      imageType: layers.layer1?.metadata?.imageType || "UNKNOWN",
+      imageType: layers.layer1?.metadata?.imageType || null,
       dimensions: layers.layer1?.metadata?.width && layers.layer1?.metadata?.height ? `${layers.layer1.metadata.width} × ${layers.layer1.metadata.height}` : null,
       ocrPreview: layers.layer1?.metadata?.ocrText || null,
       qrCount: Number.isFinite(layers.layer1?.metadata?.qrCount)
@@ -464,17 +542,17 @@ export function normalizeMasterUltraRun({
           ? 1
           : Array.isArray(layers.layer1?.metadata?.qrCodes)
             ? layers.layer1.metadata.qrCodes.length
-            : (inputType === "image" || inputType === "qr") && layers.layer1?.metadata?.qrScanCompleted !== true
-              ? null
-              : 0,
+            : layers.layer1?.metadata?.qrScanCompleted === true ? 0 : null,
       visibleUrls: list(layers.layer1?.metadata?.visibleUrls || []),
       qrDetails: layers.layer1?.metadata?.qrIntake || null,
-      nextStage: "Continue → Layer 2",
-      metricLabel: claims.length ? `${claims.length} claim${claims.length === 1 ? "" : "s"} extracted` : null,
+      nextStage: "Threat & Semantic Intelligence",
+      metricLabel: stages.l1?.operationStatus ? `${stageStatus(stages.l1)} · deterministic checks` : null,
     },
     l2: {
       ...layerSummary("l2", { layers, pipeline, presentation, processing }),
-      sources,
+      claims,
+      canonicalClaim: claims[0]?.text || null,
+      entities: list(layers.layer2?.entities || layers.layer1?.entities || pipeline?.entities).slice(0, 24),
       groups,
       threatIntelligence: {
         provider: layers.layer2A?.provider || stages.l2a?.providerId || null,
@@ -484,10 +562,10 @@ export function normalizeMasterUltraRun({
         threatCategories: list(layers.layer2A?.threatTypes || stages.l2a?.rawMetadata?.threatTypes),
       },
       semanticIntelligence: {
-        urgency: layers.layer2?.urgency || (stages.l2b?.finding === "MANIPULATION_DETECTED" ? "HIGH" : stages.l2b?.operationStatus === "COMPLETED" ? "LOW" : "NOT_ASSESSED"),
+        urgency: layers.layer2?.urgency || (stages.l2b?.finding === "MANIPULATION_DETECTED" ? "HIGH" : "NOT_ASSESSED"),
         impersonation: layers.layer2?.impersonation === true || stages.l2b?.finding === "IMPERSONATION_INDICATOR"
           ? "YES"
-          : layers.layer2?.impersonation === false || (stages.l2b?.operationStatus === "COMPLETED" && stages.l2b?.finding !== "IMPERSONATION_INDICATOR")
+          : layers.layer2?.impersonation === false
             ? "NO"
             : "NOT_ASSESSED",
         manipulationSignals: list(stages.l2b?.signals?.map((s) => s.details || s.code) || layers.layer2?.signals),
@@ -503,13 +581,15 @@ export function normalizeMasterUltraRun({
       },
       mediaForensics: layers.layer2?.mediaForensics || stages.l2b?.rawMetadata?.mediaForensics || null,
       providerSignals: resolvedProviders.filter((item) => ["l2a", "security", "safe", "threat"].some((token) => `${item.provider}`.toLowerCase().includes(token))),
-      officialCount: sources.length ? sources.filter((source) => `${source.sourceType}`.toLowerCase().includes("official") || `${source.sourceType}`.toLowerCase().includes("primary")).length : null,
-      nextStage: "Continue → Layer 3",
-      metricLabel: sources.length ? `${sources.length} source${sources.length === 1 ? "" : "s"} discovered` : null,
+      officialCount: null,
+      nextStage: "Evidence Retrieval",
+      metricLabel: claims.length ? `${claims.length} claim${claims.length === 1 ? "" : "s"} extracted` : null,
     },
     l3: {
       ...layerSummary("l3", { layers, pipeline, presentation, processing }),
       ...buckets,
+      sources,
+      evidenceItems,
       retrievalProvider: firstText(
         resolvedProviders.find((provider) => /tavily/i.test(provider.provider))?.provider,
         resolvedProviders.find((provider) => /retriev|search/i.test(provider.provider))?.provider,
@@ -519,13 +599,14 @@ export function normalizeMasterUltraRun({
         stages.l3?.providerStatus,
       ) || "NOT_REPORTED",
       tavilyStatus: resolvedProviders.find((provider) => /tavily/i.test(provider.provider))?.status || "NOT_RUN",
-      evidenceCount: sources.length,
+      sourceCount: sourcesReported ? sources.length : null,
+      evidenceCount: evidenceReported ? evidenceItems.length : null,
       conflicts: list(record(canonical.evidence).conflicts).length ? record(canonical.evidence).conflicts : list(canonical.conflicts || layers.layer3?.conflicts),
       uncertainty,
       sourceAgreement,
-      supportingCount: buckets.supporting.length,
-      contradictingCount: buckets.contradicting.length,
-      contextCount: buckets.context.length,
+      supportingCount: evidenceReported ? buckets.supporting.length : null,
+      contradictingCount: evidenceReported ? buckets.contradicting.length : null,
+      contextCount: evidenceReported ? buckets.context.length : null,
       sourceIndependence: firstText(layers.layer3?.sourceIndependence, canonical.metrics?.sourceIndependence),
       freshness: firstText(layers.layer3?.freshness, canonical.metrics?.freshness),
       evidenceStatus: firstText(
@@ -533,12 +614,12 @@ export function normalizeMasterUltraRun({
         layers.layer3?.evidenceStatus,
         stages.l3?.finding === "SUPPORTED" || stages.l3?.finding === "CONTRADICTED" ? "SUFFICIENT" : null,
         stages.l3?.finding === "MIXED" ? "CONFLICTED" : null,
-        sources.length === 0 && stageStatus(stages.l3) === "COMPLETE" ? "INSUFFICIENT_EVIDENCE" : null,
+        evidenceItems.length === 0 && stageStatus(stages.l3) === "COMPLETE" ? "INSUFFICIENT_EVIDENCE" : null,
       ) || "NOT_ASSESSED",
       layer3Verdict: stages.l3?.finding || "UNKNOWN",
-      deferredNote: "Final judgment deferred to AI Verification and Decision Intelligence.",
-      nextStage: "Continue → Layer 4",
-      metricLabel: sources.length ? `${buckets.supporting.length} support · ${buckets.contradicting.length} contradict · ${buckets.context.length} context` : null,
+      deferredNote: "Retrieval records sources and evidence. The final assessment is published separately by Final Predict.",
+      nextStage: "Synthesis & Reasoning",
+      metricLabel: sources.length || evidenceItems.length ? `${sources.length} source${sources.length === 1 ? "" : "s"} · ${evidenceItems.length} evidence item${evidenceItems.length === 1 ? "" : "s"}` : null,
     },
     l4: {
       ...layerSummary("l4", { layers, pipeline, presentation, processing }),
@@ -546,12 +627,12 @@ export function normalizeMasterUltraRun({
       providers: resolvedProviders,
       sequentialSignals,
       checklist: {
-        research: true,
-        comparison: true,
-        quality: true,
-        verification: true,
+        research: Boolean(sources.length || canonical.additionalResearch || layers.layer4?.additionalResearch),
+        comparison: Boolean(evidenceItems.length || buckets.relationships.length || canonical.evidenceComparison),
+        quality: Boolean(sources.some((source) => source.sourceType || source.contentHash) || canonical.sourceQuality),
+        verification: Boolean(layers.layer4?.aiVerification || canonical.aiVerification || analysisStreams.length || stageStatus(stages.l4) === "COMPLETE"),
       },
-      advisoryResult: layers.layer4?.truthStatus || stages.l4?.rawMetadata?.truthStatus || "NEEDS_REVIEW",
+      advisoryResult: layers.layer4?.truthStatus || stages.l4?.rawMetadata?.truthStatus || "Chưa công bố",
       aiVerification: layers.layer4?.aiVerification || canonical.aiVerification || stages.l4?.rawMetadata?.aiVerification || null,
       aiVerificationStatus: layers.layer4?.aiVerificationStatus || canonical.aiVerificationStatus || stages.l4?.rawMetadata?.aiVerificationStatus || "NOT_REQUESTED",
       aiVerificationTransport: layers.layer4?.aiVerificationTransport || stages.l4?.rawMetadata?.aiVerificationTransport || null,
@@ -569,65 +650,62 @@ export function normalizeMasterUltraRun({
       sourceQuality: firstText(canonical.metrics?.sourceQuality, layers.layer3?.sourceQuality),
       evidenceSufficiency: firstText(layers.layer4?.evidenceSufficiency, decision.evidenceSufficiency),
       reasoningSummary: layers.layer4?.summary || stages.l4?.summary || null,
-      citationsUsed: sources.filter((source) => source.url && source.usedBy.some((stageId) => stageId.toLowerCase() === "l4")),
-      evidenceSources: sources,
-      supportingCount: buckets.supporting.length,
-      contradictingCount: buckets.contradicting.length,
-      contextCount: buckets.context.length,
+      citationsUsed: evidenceItems.filter((item) => item.sourceId && sources.some((source) => source.id === item.sourceId)),
+      sources,
+      evidenceItems,
+      supportingCount: evidenceReported ? buckets.supporting.length : null,
+      contradictingCount: evidenceReported ? buckets.contradicting.length : null,
+      contextCount: evidenceReported ? buckets.context.length : null,
       independentGroupsCount: groups.length || null,
       conflicts: list(record(canonical.evidence).conflicts).length ? record(canonical.evidence).conflicts : list(canonical.conflicts || layers.layer3?.conflicts || layers.layer4?.conflicts),
       uncertainties: uncertainty,
       reasons: list(layers.layer4?.reasons || stages.l4?.rawMetadata?.reasons || stages.l4?.reasons),
       isAdvisory: true,
-      advisoryNote: "AI Advisory — NOT Final Authority. L4 cannot overwrite L5.",
-      operationStatus: stageStatus(stages.l4),
+      advisoryNote: "AI and provider statements are advisory; Final Predict is published separately by the deterministic policy path.",
+      operationStatus: macroStatus("l4", presentation, pipeline),
       operations: [
         { id: "research", label: "Additional research", available: Boolean(sources.length || canonical.additionalResearch || layers.layer4?.additionalResearch) },
-        { id: "comparison", label: "Evidence comparison", available: Boolean(sources.length || buckets.relationships.length || canonical.evidenceComparison) },
+        { id: "comparison", label: "Evidence comparison", available: Boolean(evidenceItems.length || buckets.relationships.length || canonical.evidenceComparison) },
         { id: "quality", label: "Source quality evaluation", available: Boolean(sources.some((source) => source.sourceType || source.contentHash) || canonical.sourceQuality) },
         { id: "ai", label: "Gemini verification", available: Boolean(layers.layer4?.aiVerification || canonical.aiVerification || analysisStreams.length || stageStatus(stages.l4) === "COMPLETE") },
       ],
-      nextStage: "Continue → Layer 5",
+      nextStage: "Final Predict · Deterministic",
       metricLabel: layers.layer4?.aiVerificationStatus === "UNAVAILABLE" ? "AI verification unavailable" : analysisStreams.length ? `${analysisStreams.length} analysis stream${analysisStreams.length === 1 ? "" : "s"}` : null,
     },
-    l5: {
-      ...layerSummary("l5", { layers, pipeline, presentation, processing }),
-      decision,
-      verdict: presentation?.finalDecisionLabel || firstText(decision.label, decision.truthStatus, decision.epistemicState, decision.security) || "NEEDS_REVIEW",
-      // Do not manufacture a confidence or evidence-sufficiency label when
-      // the canonical result did not disclose one. The Master Ultra surface
-      // must preserve that gap instead of presenting a demo-looking default.
-      confidence: confidence || null,
-      evidenceSufficiency: evidenceSufficiency || null,
-      sourceAgreement: sourceAgreement || null,
-      securityRisk: firstText(decision.security, decision.risk),
-      claimReliability: firstText(decision.claimReliability),
-      aiAdvisory: layers.layer4?.truthStatus || stages.l4?.rawMetadata?.truthStatus || "NOT_ASSESSED",
-      reasons: presentation?.reasons || unique([decision.reasons, decision.rationale, layers.layer4?.userExplanation?.why], 3),
-      keyEvidence: sources,
-      decisionPolicy: "L5 Deterministic Authority",
-      aiOverride: "NO",
-      expertOverride: "NO",
-      contradictions: presentation?.counterEvidence || unique([decision.counterEvidence, decision.contradictions, decision.conflicts], 8),
-      uncertainty,
-      nextAction: presentation?.recommendedAction || firstText(decision.recommendedAction, canonical.recommendedAction, layers.layer4?.userExplanation?.recommendedActionNote) || "Chờ kết quả đánh giá đủ bằng chứng.",
-      humanReview: review,
-      humanReviewState: review ? (review.status || review.state || "STATUS_NOT_REPORTED") : "NOT_RECORDED",
-      decisionTwin,
-      metricLabel: decisionTwin ? "Decision Twin available" : null,
-    },
   };
-  const completedRun = !processing && Boolean(canonical.decision || canonical.finalDecision || pipeline?.finalDecision || pipeline?.decision || pipeline?.pipelineStatus === "COMPLETED");
   const macroStages = MASTER_ULTRA_LAYERS.map((definition) => {
     const source = layerData[definition.id];
-    const status = source.status === "WAITING" && completedRun ? definition.id === "l5" ? "COMPLETE" : "PARTIAL" : source.status;
+    const status = source.status;
+    const locked = definition.id !== "l1" && !layerPayloadPublished(definition.id, { layers, pipeline, sources, evidenceItems, claims });
     return {
       ...definition,
       status,
+      locked,
       summary: source.summary,
       data: { ...source, status },
     };
   });
+
+  const finalPredict = {
+    status: finalPredictPublished ? "PUBLISHED" : "LOCKED",
+    authority: "MAIN_TRUST_V5",
+    decision: finalPredictPublished ? decision : null,
+    verdict: finalPredictPublished
+      ? firstText(presentation?.finalDecisionLabel, decision.label, decision.verdict, decision.truthVerdict, decision.truthStatus, decision.epistemicState, decision.security)
+      : null,
+    confidence: finalPredictPublished ? confidence || null : null,
+    evidenceSufficiency: finalPredictPublished ? evidenceSufficiency || null : null,
+    sourceAgreement: finalPredictPublished ? sourceAgreement || null : null,
+    reasons: finalPredictPublished ? presentation?.reasons || unique([decision.reasons, decision.rationale], 3) : [],
+    nextAction: finalPredictPublished ? presentation?.recommendedAction || firstText(decision.recommendedAction, canonical.recommendedAction) : null,
+    humanReview: finalPredictPublished ? review : null,
+    humanReviewState: finalPredictPublished ? (review ? review.status || review.state || "STATUS_NOT_REPORTED" : "NOT_RECORDED") : "LOCKED",
+    keyEvidence: finalPredictPublished ? evidenceItems : [],
+    sources: finalPredictPublished ? sources : [],
+    securityRisk: finalPredictPublished ? firstText(decision.security, decision.risk) : null,
+    contradictions: finalPredictPublished ? presentation?.counterEvidence || unique([decision.counterEvidence, decision.contradictions, decision.conflicts], 8) : [],
+    decisionTwin: finalPredictPublished ? decisionTwin : null,
+  };
 
   return {
     schemaVersion: "trust.master-ultra.v1",
@@ -642,6 +720,8 @@ export function normalizeMasterUltraRun({
     layers: layerData,
     macroStages,
     sources,
+    evidence: evidenceItems,
+    finalPredict,
     providers: resolvedProviders,
     noRerunOnInspect: true,
   };

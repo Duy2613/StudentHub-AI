@@ -23,42 +23,32 @@ import { PROFILE_STATUS } from "../src/lib/auth/presentationState.js";
 // ============================================================================
 // GUARD 1 & 2: Trust Macro Mapping & Immediate Monotonic Progression
 // ============================================================================
-test("Guard 2: Canonical macro mapping inspection and verification", () => {
+test("Guard 2: Canonical four-layer product mapping inspection and verification", () => {
   // 1. Inspect MasterUltraTrustModel layers
-  assert.equal(MASTER_ULTRA_LAYERS.length, 5, "Must have exactly 5 macro layers");
+  assert.equal(MASTER_ULTRA_LAYERS.length, 4, "Must have exactly 4 product layers");
   assert.deepEqual(
     MASTER_ULTRA_LAYERS[0].internalStageIds,
     ["l1"],
-    "Claim Intelligence must map exclusively to L1"
+    "Deterministic Screen must map exclusively to L1"
   );
   assert.deepEqual(
     MASTER_ULTRA_LAYERS[1].internalStageIds,
     ["l2a", "l2b", "l2c"],
-    "Evidence Discovery must map to L2A, L2B, L2C"
+    "Threat & Semantic Intelligence must map to L2A, L2B, L2C"
   );
   assert.deepEqual(
     MASTER_ULTRA_LAYERS[2].internalStageIds,
     ["l3"],
-    "Evidence Forensics must map to L3"
+    "Evidence Retrieval must map to L3"
   );
-  assert.deepEqual(
-    MASTER_ULTRA_LAYERS[3].internalStageIds,
-    ["l4"],
-    "AI Verification must map to L4"
-  );
-  assert.deepEqual(
-    MASTER_ULTRA_LAYERS[4].internalStageIds,
-    ["l5"],
-    "Decision Intelligence must map to L5"
-  );
+  assert.deepEqual(MASTER_ULTRA_LAYERS[3].internalStageIds, ["l4", "l5"], "Synthesis & Reasoning groups internal L4 and L5");
 
   // 2. Inspect TrustPresentationModel stages
-  assert.equal(TRUST_MACRO_STAGES.length, 5, "Must have exactly 5 presentation macro stages");
+  assert.equal(TRUST_MACRO_STAGES.length, 4, "Must have exactly 4 presentation macro stages");
   assert.deepEqual(TRUST_MACRO_STAGES[0].internalStageIds, ["l1"]);
   assert.deepEqual(TRUST_MACRO_STAGES[1].internalStageIds, ["l2a", "l2b", "l2c"]);
   assert.deepEqual(TRUST_MACRO_STAGES[2].internalStageIds, ["l3"]);
-  assert.deepEqual(TRUST_MACRO_STAGES[3].internalStageIds, ["l4"]);
-  assert.deepEqual(TRUST_MACRO_STAGES[4].internalStageIds, ["l5"]);
+  assert.deepEqual(TRUST_MACRO_STAGES[3].internalStageIds, ["l4", "l5"]);
 });
 
 test("Guard 2: Monotonic progress: When L1 completes (3ms) and L2A is running, Macro 1 is COMPLETE and Macro 2 is RUNNING", () => {

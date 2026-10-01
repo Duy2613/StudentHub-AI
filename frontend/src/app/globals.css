@@ -13779,7 +13779,7 @@ body {
 /* --------------------------------------------------------------------------
    Trust Engine Master Ultra
    Presentation-only layer: the V5 runtime and its authority boundary stay
-   unchanged. These styles make the five macro layers feel like one journey.
+   unchanged. These styles make the four analysis stages feel like one journey.
    -------------------------------------------------------------------------- */
 
 .master-ultra-trust {
@@ -13920,6 +13920,7 @@ body {
   align-items: start;
   padding: clamp(1.3rem, 3vw, 3rem) 0 2.6rem;
 }
+.master-ultra-composer.is-compact { grid-template-columns: minmax(0, 1fr); }
 
 .master-ultra-composer-copy { padding-top: .7rem; }
 .master-ultra-composer-copy h2 { max-width: 16ch; margin: .85rem 0 .9rem; font-size: clamp(1.7rem, 3vw, 3.2rem); letter-spacing: -.06em; line-height: .98; }
@@ -14017,12 +14018,14 @@ body {
 .master-ultra-run-status { display: inline-flex; align-items: center; gap: .45rem; color: var(--mu-accent); font: 700 .64rem/1.2 var(--font-machine, ui-monospace); letter-spacing: .1em; text-align: right; text-transform: uppercase; }
 .master-ultra-run-status svg.is-spinning { animation: master-ultra-spin 1.2s linear infinite; }
 
-.master-ultra-rail { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .4rem; min-width: 0; max-width: 100%; margin: 0 0 1.2rem; padding: .4rem; border: 1px solid rgba(176, 207, 224, .13); border-radius: 1.1rem; background: rgba(3, 8, 14, .62); }
+.master-ultra-rail { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .4rem; min-width: 0; max-width: 100%; margin: 0 0 1.2rem; padding: .4rem; border: 1px solid rgba(176, 207, 224, .13); border-radius: 1.1rem; background: rgba(3, 8, 14, .62); }
 .master-ultra-rail-item { position: relative; display: flex; align-items: center; gap: .65rem; min-width: 0; min-height: 4.2rem; padding: .7rem .75rem; border: 1px solid transparent; border-radius: .75rem; background: transparent; color: var(--mu-muted); text-align: left; }
 .master-ultra-rail-item:not(:disabled):hover { border-color: rgba(135, 223, 212, .24); background: rgba(135, 223, 212, .06); color: var(--mu-text); }
 .master-ultra-rail-item.is-active { border-color: rgba(135, 223, 212, .42); background: rgba(82, 178, 178, .13); color: var(--mu-text); box-shadow: inset 0 1px rgba(255, 255, 255, .06); }
 .master-ultra-rail-item.is-complete { color: #a9e4d4; }
 .master-ultra-rail-item.is-attention { color: var(--mu-amber); }
+.master-ultra-rail-item.is-locked { color: var(--mu-muted); opacity: .58; }
+.master-ultra-rail-item.is-ready { border-color: rgba(135, 223, 212, .24); background: rgba(135, 223, 212, .055); color: var(--mu-text); }
 .master-ultra-rail-symbol { display: grid; place-items: center; flex: none; width: 1.75rem; height: 1.75rem; border: 1px solid currentColor; border-radius: 50%; font: 700 .64rem/1 var(--font-machine, ui-monospace); }
 .master-ultra-rail-item.is-complete .master-ultra-rail-symbol { background: rgba(102, 209, 184, .12); }
 .master-ultra-rail-dot { width: .42rem; height: .42rem; border-radius: 50%; background: currentColor; box-shadow: 0 0 .75rem currentColor; }
@@ -14181,7 +14184,9 @@ body {
 .master-ultra-verdict-side span { color: var(--mu-muted); font: .62rem/1.2 var(--font-machine, ui-monospace); text-transform: uppercase; }
 .master-ultra-verdict-side strong { margin: 0; font-size: .9rem; letter-spacing: 0; }
 .master-ultra-verdict-side small { color: var(--mu-muted); font-size: .68rem; line-height: 1.4; }
-.master-ultra-overview-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .65rem; margin-top: .8rem; }
+.master-ultra-overview-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .65rem; margin-top: .8rem; }
+.master-ultra-overview-card.is-locked { cursor: not-allowed; opacity: .58; }
+.master-ultra-overview-card:disabled { cursor: not-allowed; }
 .master-ultra-overview-card { display: flex; flex-direction: column; min-width: 0; min-height: 13.5rem; padding: 1rem; border: 1px solid var(--mu-line); border-radius: 1rem; background: rgba(5, 9, 17, .58); color: var(--mu-text); text-align: left; transition: transform .3s var(--ease-premium), border-color .3s var(--ease-premium), background .3s var(--ease-premium); }
 .master-ultra-overview-card:hover { border-color: color-mix(in srgb, var(--mu-stage-accent, var(--mu-accent)) 65%, transparent); background: var(--mu-stage-glow, rgba(255, 255, 255, .06)); transform: translateY(-4px); }
 .master-ultra-overview-card-top { display: flex; align-items: center; justify-content: space-between; color: var(--mu-stage-accent, var(--mu-accent)); font: 700 .64rem/1 var(--font-machine, ui-monospace); }
@@ -14253,6 +14258,8 @@ body {
   .master-ultra-hero { min-height: 0; gap: 1.5rem; }
   .master-ultra-hero-seal { justify-self: start; }
   .master-ultra-composer { gap: 1rem; padding-top: 1.3rem; }
+  .master-ultra-mode-switch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
+  .master-ultra-mode-switch button { justify-content: center; min-width: 0; padding-inline: .45rem; font-size: .68rem; }
   .master-ultra-composer-copy h2 { max-width: 22ch; }
   .master-ultra-composer-footer,
   .master-ultra-run-heading,

@@ -2,19 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { ArrowRight, FileImage, Globe2, History, ScanLine, Search, Type, X } from "lucide-react";
+import { History } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useRealtime } from "@/components/providers/RealtimeContext";
 import { trustApi } from "@/lib/api/trust";
 import { trustV5ResponseSchema } from "@/lib/api/schemas/trust";
 import { apiRequest } from "@/lib/api/runtimeClient";
 import { createSecureId } from "@/lib/security/secureId";
-import { advancesTrustSnapshot, hasFixtureMarker, isUuid, projectTrust, safeTrustUrl, sameTrustIdentity, STATUS_LABEL, trustFailure } from "@/lib/trust/trustV4Model";
+import { advancesTrustSnapshot, hasFixtureMarker, isUuid, projectTrust, safeTrustUrl, sameTrustIdentity, trustFailure } from "@/lib/trust/trustV4Model";
 import TrustV4Result, { TrustDate } from "./TrustV4Result";
+import TrustMasterUltraJourney from "./TrustMasterUltraJourney";
 import styles from "./trust-v4.module.css";
 
-const MODES = [["text", "Văn bản", Type], ["url", "Đường dẫn", Globe2], ["image", "Hình ảnh", FileImage], ["qr", "Mã QR", ScanLine]];
 const LIMIT = 20000;
+const MODES = ["text", "url", "image", "qr"];
 
 function mark(name) {
   if (typeof window !== "undefined" && window.__trustV4Harness && !performance.getEntriesByName(`trust-v4:${name}`).length) performance.mark(`trust-v4:${name}`);
@@ -87,7 +88,7 @@ function SavedCases({ initialId, revision, onClose }) {
 
 function TrustSession({ authenticated }) {
   const query = useSearchParams();
-  const initialMode = MODES.some(([id]) => id === query.get("mode")) ? query.get("mode") : "text";
+  const initialMode = MODES.includes(query.get("mode")) ? query.get("mode") : "text";
   const routeCaseId = isUuid(query.get("caseId")) ? query.get("caseId") : null;
   const [mode, setMode] = useState(initialMode);
   const [content, setContent] = useState("");
@@ -95,10 +96,10 @@ function TrustSession({ authenticated }) {
   const [filePending, setFilePending] = useState(false);
   const [error, setError] = useState(null);
   const [pending, setPending] = useState(false);
-  const [generation, setGeneration] = useState(0);
-  const [stream, setStream] = useState(null);
+  const [streamPayload, setStreamPayload] = useState(null);
   const [result, setResult] = useState(null);
-  const [showInput, setShowInput] = useState(true);
+  const [activeSnapshot, setActiveSnapshot] = useState(null);
+  const [dragging, setDragging] = useState(false);
   const [history, setHistory] = useState(Boolean(routeCaseId));
   const [freshness, setFreshness] = useState(null);
   const [cooldown, setCooldown] = useState(0);
@@ -107,7 +108,6 @@ function TrustSession({ authenticated }) {
   const fileSequence = useRef(0);
   const fileInputRef = useRef(null);
   const retryIdentity = useRef(null);
-  const inputRef = useRef(null);
   const resultRef = useRef(null);
   const { subscribe, connectionStatus } = useRealtime();
 
@@ -159,8 +159,8 @@ function TrustSession({ authenticated }) {
     if (controller.current || filePending || cooldown) return;
     const imageMode = mode === "image" || mode === "qr";
     const draft = content.trim();
-    if ((!imageMode && !draft) || draft.length > LIMIT || (imageMode && !fileData)) { setError({ message: imageMode ? "Chọn một ảnh trước khi kiểm chứng." : `Nhập nội dung từ 1 đến ${LIMIT.toLocaleString("vi-VN")} ký tự.` }); inputRef.current?.focus(); return; }
-    if (mode === "url" && !safeTrustUrl(draft)) { setError({ message: "Nhập đường dẫn HTTP hoặc HTTPS, không chứa thông tin đăng nhập hay mã bí mật." }); inputRef.current?.focus(); return; }
+    if ((!imageMode && !draft) || draft.length > LIMIT || (imageMode && !fileData)) { setError({ message: imageMode ? "Chọn một ảnh trước khi kiểm chứng." : `Nhập nội dung từ 1 đến ${LIMIT.toLocaleString("vi-VN")} ký tự.` }); return; }
+    if (mode === "url" && !safeTrustUrl(draft)) { setError({ message: "Nhập đường dẫn HTTP hoặc HTTPS, không chứa thông tin đăng nhập hay mã bí mật." }); return; }
     const identityKey = `${mode}:${draft}:${imageMode ? fileData.bytes : ""}`;
     const idempotencyKey = retryIdentity.current?.key === identityKey ? retryIdentity.current.id : createSecureId("trust-v4");
     retryIdentity.current = { key: identityKey, id: idempotencyKey };
@@ -169,7 +169,7 @@ function TrustSession({ authenticated }) {
     const abort = new AbortController(); controller.current = abort;
     const current = ++sequence.current;
     const snapshot = { mode, content: draft, file: imageMode ? fileData.bytes : null, label: imageMode ? fileData.name : draft };
-    setPending(true); setGeneration(current); setError(null); setStream(null);
+    setPending(true); setError(null); setStreamPayload(null); setActiveSnapshot(snapshot);
     let last = null;
     try {
       const response = await trustApi.sequential({ type: mode, content: draft, metadata: imageMode ? { inputKind: mode === "qr" ? "QR" : "IMAGE", bytes: fileData.bytes, mimeType: fileData.type, fileName: fileData.name, fileSize: fileData.size } : { inputKind: mode.toUpperCase() } }, abort.signal, (incoming) => {
@@ -179,13 +179,13 @@ function TrustSession({ authenticated }) {
         if (!parsed.success || !advancesTrustSnapshot(parsed.data.data, last)) return;
         for (const key of ["caseId", "caseRevision", "runId"]) if (parsed.data[key] != null) active[key] = parsed.data[key];
         last = parsed.data.data;
-        setStream(projectTrust(parsed.data)); mark("processing-commit");
+        setStreamPayload(parsed.data.data); mark("processing-commit");
       }, requestId, idempotencyKey);
       if (current !== sequence.current || abort.signal.aborted) return;
       if (!sameTrustIdentity(response, active) || !advancesTrustSnapshot(response.data, last)) throw new Error("IDENTITY_MISMATCH");
       const model = projectTrust(response);
       if (["FAILED", "CANCELLED"].includes(model.state)) throw new Error("SERVER_ERROR");
-      setResult({ model, snapshot, generation: current }); setShowInput(false); setFreshness(null);
+      setResult({ model, payload: response.data, snapshot }); setFreshness(null);
       retryIdentity.current = null; mark("result-ready");
       requestAnimationFrame(() => resultRef.current?.focus());
     } catch (caught) {
@@ -195,7 +195,6 @@ function TrustSession({ authenticated }) {
       if (caught.retryAfter > 0) setCooldown(Math.min(caught.retryAfter, 3600));
     } finally { if (current === sequence.current) { controller.current = null; setPending(false); } }
   };
-  const edit = () => { setShowInput(true); requestAnimationFrame(() => inputRef.current?.focus()); };
   const changeMode = (nextMode) => {
     if (mode !== nextMode && (mode === "image" || mode === "qr" || nextMode === "image" || nextMode === "qr")) {
       fileSequence.current += 1;
@@ -204,22 +203,80 @@ function TrustSession({ authenticated }) {
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
     setMode(nextMode);
+    setDragging(false);
     setError(null);
   };
-  const stale = result && (result.snapshot.mode !== mode || result.snapshot.content !== content.trim() || result.snapshot.file !== ((mode === "image" || mode === "qr") ? fileData?.bytes || null : null));
+  const clearSelectedFile = () => {
+    fileSequence.current += 1;
+    setFileData(null);
+    setFilePending(false);
+    setDragging(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+  const startNewAnalysis = () => {
+    setResult(null);
+    setStreamPayload(null);
+    setActiveSnapshot(null);
+    setError(null);
+    setFreshness(null);
+  };
+  const resetDraft = () => {
+    if (pending) return;
+    setContent("");
+    clearSelectedFile();
+    setError(null);
+  };
+  const runAnalysis = () => { void submit({ preventDefault() {} }); };
+  const payload = result?.payload || streamPayload;
+  const layers = payload?.layerResults || payload?.layers || {};
+  const observedInput = result?.snapshot || activeSnapshot || {
+    mode,
+    content: mode === "image" || mode === "qr" ? fileData?.name || "" : content,
+    label: mode === "image" || mode === "qr" ? fileData?.name || "" : content,
+  };
+  const summaryInput = result?.snapshot || activeSnapshot;
+  const stale = Boolean(result && (result.snapshot.mode !== mode
+    || result.snapshot.content !== content.trim()
+    || result.snapshot.file !== ((mode === "image" || mode === "qr") ? fileData?.bytes || null : null)));
   return <div id="trust-main" className={styles.workspace} data-testid="trust-v4">
     <header className={styles.header}><div><p className={styles.eyebrow}>StudentHub · Kiểm chứng</p><h1>Hiểu rõ trước khi tin.</h1><p>Đặt câu hỏi. Đối chiếu nguồn. Nhìn thấy điều còn chưa rõ.</p></div><button type="button" className={styles.historyButton} aria-expanded={history} onClick={() => setHistory(!history)}><History size={17} />Hồ sơ đã lưu</button></header>
     {history && (authenticated ? <SavedCases key={`${routeCaseId || result?.model.caseId || "latest"}:${query.get("caseRevision") || ""}`} initialId={routeCaseId || result?.model.caseId} revision={query.get("caseRevision")} onClose={() => setHistory(false)} /> : <p className={styles.caution}>Đăng nhập để xem hồ sơ kiểm chứng đã lưu.</p>)}
-    {showInput && <div className={styles.entryGrid}><form className={styles.composer} onSubmit={submit} aria-labelledby="trust-input-title"><span className={styles.eyebrow}>Bắt đầu từ thông tin bạn có</span><h2 id="trust-input-title">Bạn muốn kiểm chứng điều gì?</h2><fieldset className={styles.modeField}><legend className={styles.srOnly}>Loại thông tin</legend>{MODES.map(([id, label, Icon]) => <label key={id} data-selected={mode === id}><input type="radio" name="trust-mode" value={id} checked={mode === id} disabled={pending} onChange={() => changeMode(id)} /><Icon size={17} aria-hidden="true" />{label}</label>)}</fieldset>
-      {(mode === "image" || mode === "qr") && <div className={styles.upload}><label htmlFor="trust-file"><FileImage size={24} aria-hidden="true" /><strong>{mode === "qr" ? "Chọn ảnh chứa mã QR" : "Chọn ảnh cần kiểm chứng"}</strong><span>PNG, JPG, WebP · tối đa 8 MB</span></label><input id="trust-file" ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp" disabled={pending} onChange={(e) => void chooseFile(e.target.files?.[0])} />{filePending && <p role="status">Đang đọc tập tin…</p>}{fileData && <div className={styles.filePreview}>{/* Local data image; no remote request or optimizer. */}{
-/* eslint-disable-next-line @next/next/no-img-element */
-}<img src={fileData.bytes} alt="Ảnh bạn đã chọn để kiểm chứng" /><span>{fileData.name}</span><button type="button" aria-label="Bỏ ảnh đã chọn" disabled={pending} onClick={() => { fileSequence.current += 1; setFileData(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}><X size={16} /></button></div>}</div>}
-      <label className={styles.inputLabel} htmlFor="trust-content">{mode === "url" ? "Đường dẫn cần đối chiếu" : mode === "text" ? "Nội dung cần kiểm chứng" : "Bối cảnh bổ sung (không bắt buộc)"}</label><textarea id="trust-content" ref={inputRef} value={content} maxLength={LIMIT} rows={mode === "text" ? 6 : 3} aria-invalid={Boolean(error)} aria-describedby="trust-input-help" onChange={(e) => setContent(e.target.value)} placeholder={mode === "url" ? "https://…" : "Dán thông báo, một nhận định hoặc nội dung bạn chưa chắc chắn…"} />
-      <p id="trust-input-help" className={styles.note}>{mode === "url" ? "Đường dẫn bạn cung cấp là đầu vào; các nguồn đối chứng sẽ được phân biệt rõ." : "Bạn có thể gửi nội dung chứa nhiều mệnh đề. Hệ thống sẽ hiển thị phần được trích xuất."}</p><div className={styles.submitRow}><span className={styles.note}>Nội dung được gửi đến hệ thống xử lý.<br />Hãy loại bỏ thông tin riêng tư không cần thiết.</span><button className={styles.primary} type="submit" disabled={pending || filePending || cooldown > 0 || ((mode === "image" || mode === "qr") && !fileData)}><Search size={17} />{pending ? "Đang kiểm chứng…" : cooldown ? "Vui lòng chờ" : "Kiểm chứng"}<ArrowRight size={17} /></button></div></form><aside className={styles.entryAside} aria-label="Cách đọc kết quả"><span className={styles.eyebrow}>Một kết quả có thể kiểm tra lại</span><h2>Bằng chứng trước.<br />Kết luận sau.</h2><ol><li><span>01</span><div><strong>Nhận diện mệnh đề</strong><p>Biết chính xác nội dung đang được kiểm chứng.</p></div></li><li><span>02</span><div><strong>Đọc bằng chứng và nguồn</strong><p>Phân biệt điều ủng hộ, phản bác và chưa rõ.</p></div></li><li><span>03</span><div><strong>Hiểu giới hạn kết luận</strong><p>Có cơ sở để chọn bước tiếp theo.</p></div></li></ol><p className={styles.asideFoot}>Không phải mọi thông tin đều có đủ bằng chứng để kết luận.</p></aside></div>}
-    {error && <div className={styles.error} role="alert"><strong>Chưa có kết quả mới</strong><p>{error.message}</p>{!showInput && <button type="button" className={styles.textButton} onClick={edit}>Xem lại đầu vào</button>}</div>}
-    {pending && <section className={styles.processing} aria-labelledby="trust-processing-title"><span className={styles.eyebrow}>Đang đối chiếu</span><h2 id="trust-processing-title">Từng bước làm rõ thông tin</h2><p role="status">{stream?.stages.find((s) => s.status === "RUNNING")?.name || "Đang chờ phản hồi từ hệ thống."}</p>{stream && <ol className={styles.stageList}>{stream.stages.map((s) => <li key={s.id}><strong>{s.name}</strong><span>{STATUS_LABEL[s.status] || "Chưa xác định"}</span></li>)}</ol>}{stream?.claims.length > 0 && <div><h3>Mệnh đề đã được trích xuất</h3>{stream.claims.map((c) => <p key={c.key}>{c.statement}</p>)}</div>}<p className={styles.note}>Các bước chỉ cập nhật khi hệ thống gửi trạng thái. Bạn có thể sửa bản nháp; kết quả vẫn gắn với nội dung đã gửi.</p></section>}
     {freshness?.caseId === result?.model.caseId && freshness?.revision > result?.model.caseRevision && <p className={styles.caution}>Hồ sơ đã có phiên bản {freshness.revision}. Kết quả đang xem thuộc phiên bản {result.model.caseRevision}. <button type="button" className={styles.textButton} onClick={() => setHistory(true)}>Xem hồ sơ</button></p>}
-    <div ref={resultRef} tabIndex={-1}>{result && <TrustV4Result key={result.model.requestId} model={result.model} snapshot={result.snapshot} stale={stale} previous={result.generation !== generation} authenticated={authenticated} onEdit={edit} />}</div>
+    <div ref={resultRef} tabIndex={-1}>
+      <TrustMasterUltraJourney
+        key={result?.model.requestId || "trust-current-input"}
+        mode={mode}
+        content={content}
+        file={fileData}
+        preview={fileData?.bytes || null}
+        dragging={dragging}
+        processing={pending}
+        error={error}
+        ocr={layers.layer1?.metadata || layers.layer1 || null}
+        hasResult={Boolean(result)}
+        analysisSummary={summaryInput ? { type: String(summaryInput.mode || mode).toUpperCase(), label: summaryInput.label || summaryInput.content } : null}
+        pipeline={payload}
+        canonicalResult={payload?.canonicalResult || null}
+        layers={layers}
+        presentation={payload?.presentation || null}
+        sourceProvenance={payload?.sourceProvenance || payload?.provenance || null}
+        providers={payload?.providerObservations || []}
+        input={{ type: String(observedInput.mode || mode).toUpperCase(), content: observedInput.label || observedInput.content || "" }}
+        fileInputRef={fileInputRef}
+        onModeChange={changeMode}
+        onContentChange={setContent}
+        onFileSelect={(file) => { void chooseFile(file); }}
+        onDragStateChange={setDragging}
+        onClearFile={clearSelectedFile}
+        onAnalyze={runAnalysis}
+        onReset={resetDraft}
+        onNewAnalysis={startNewAnalysis}
+        onPrint={() => window.print()}
+        resultModel={result?.model || null}
+        authenticated={authenticated}
+        stale={stale}
+      />
+    </div>
   </div>;
 }
 

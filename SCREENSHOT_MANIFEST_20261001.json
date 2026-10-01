@@ -1,0 +1,3007 @@
+{
+  "runId": "2026-10-01T06-59-17-209Z-36960",
+  "candidateBranch": "release/studenthub-full-sync-20261001",
+  "baseSha": "70e0927f4fe2ce4c726227d84aae85f6dcb595de",
+  "classification": "LOCAL_ISOLATED copied production build; deterministic browser fixtures; no live database/provider assurance",
+  "testSummary": {
+    "expected": 100,
+    "passed": 100,
+    "intentionalSkipped": 2,
+    "failed": 0,
+    "flaky": 0,
+    "durationMs": 1987658.8539999998,
+    "engines": [
+      "Chromium",
+      "Firefox",
+      "WebKit"
+    ]
+  },
+  "artifactRoot": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960",
+  "imageCount": 239,
+  "featureImageCounts": {
+    "trust": 33,
+    "community": 35,
+    "expert": 85,
+    "omni": 85,
+    "release-smoke": 1
+  },
+  "screenshots": [
+    {
+      "id": "trust/01-entry-image-upload.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "01-entry-image-upload",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:31:56.704Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\01-entry-image-upload.png"
+    },
+    {
+      "id": "trust/01-entry-light.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "01-entry-light",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:26:43.721Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\01-entry-light.png"
+    },
+    {
+      "id": "trust/02-claims-processing.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "02-claims-processing",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:26:58.139Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\02-claims-processing.png"
+    },
+    {
+      "id": "trust/03-standard-result.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "03-standard-result",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:27:03.724Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\03-standard-result.png"
+    },
+    {
+      "id": "trust/04-evidence-sources-comparison.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "04-evidence-sources-comparison",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:27:09.109Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\04-evidence-sources-comparison.png"
+    },
+    {
+      "id": "trust/05-contradicted.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "05-contradicted",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:29:10.566Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\05-contradicted.png"
+    },
+    {
+      "id": "trust/05-insufficient.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "05-insufficient",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:28:55.355Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\05-insufficient.png"
+    },
+    {
+      "id": "trust/05-partial.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "05-partial",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:29:25.732Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\05-partial.png"
+    },
+    {
+      "id": "trust/06-community-preview.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "06-community-preview",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:28:19.178Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\06-community-preview.png"
+    },
+    {
+      "id": "trust/06-revision-assessment.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "06-revision-assessment",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:27:42.595Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\06-revision-assessment.png"
+    },
+    {
+      "id": "trust/07-mobile390-expert-sheet.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "07-mobile390-expert-sheet",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "capturedAt": "2026-10-01T07:28:38.47Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\07-mobile390-expert-sheet.png"
+    },
+    {
+      "id": "trust/responsive-anonymous-midnight-360.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-anonymous-midnight-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 844
+      },
+      "capturedAt": "2026-10-01T07:31:09.913Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-anonymous-midnight-360.png"
+    },
+    {
+      "id": "trust/responsive-light-1024.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-light-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:29:44.066Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-light-1024.png"
+    },
+    {
+      "id": "trust/responsive-light-1280.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-light-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:29:48.692Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-light-1280.png"
+    },
+    {
+      "id": "trust/responsive-light-1440.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-light-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:29:53.81Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-light-1440.png"
+    },
+    {
+      "id": "trust/responsive-light-1920.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-light-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:01.013Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-light-1920.png"
+    },
+    {
+      "id": "trust/responsive-light-360.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-light-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:29:32.639Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-light-360.png"
+    },
+    {
+      "id": "trust/responsive-light-390.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-light-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:29:35.338Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-light-390.png"
+    },
+    {
+      "id": "trust/responsive-light-768.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-light-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:29:40.221Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-light-768.png"
+    },
+    {
+      "id": "trust/responsive-midnight-1024.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-midnight-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:14.947Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-midnight-1024.png"
+    },
+    {
+      "id": "trust/responsive-midnight-1280.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-midnight-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:19.69Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-midnight-1280.png"
+    },
+    {
+      "id": "trust/responsive-midnight-1440.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-midnight-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:24.953Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-midnight-1440.png"
+    },
+    {
+      "id": "trust/responsive-midnight-1920.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-midnight-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:32.354Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-midnight-1920.png"
+    },
+    {
+      "id": "trust/responsive-midnight-360.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-midnight-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:04.243Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-midnight-360.png"
+    },
+    {
+      "id": "trust/responsive-midnight-390.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-midnight-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:06.64Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-midnight-390.png"
+    },
+    {
+      "id": "trust/responsive-midnight-768.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-midnight-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:10.991Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-midnight-768.png"
+    },
+    {
+      "id": "trust/responsive-system-1024.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-system-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:46.097Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-system-1024.png"
+    },
+    {
+      "id": "trust/responsive-system-1280.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-system-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:50.763Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-system-1280.png"
+    },
+    {
+      "id": "trust/responsive-system-1440.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-system-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:55.961Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-system-1440.png"
+    },
+    {
+      "id": "trust/responsive-system-1920.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-system-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:31:03.292Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-system-1920.png"
+    },
+    {
+      "id": "trust/responsive-system-360.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-system-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:35.5Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-system-360.png"
+    },
+    {
+      "id": "trust/responsive-system-390.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-system-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:37.885Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-system-390.png"
+    },
+    {
+      "id": "trust/responsive-system-768.png",
+      "feature": "TRUST",
+      "route": "/trust",
+      "state": "responsive-system-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:30:42.218Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\trust\\responsive-system-768.png"
+    },
+    {
+      "id": "community/1440-01-home.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-01-home",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-01-home.png"
+    },
+    {
+      "id": "community/1440-02-composer-collapsed.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-02-composer-collapsed",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-02-composer-collapsed.png"
+    },
+    {
+      "id": "community/1440-03-general-composer.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-03-general-composer",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-03-general-composer.png"
+    },
+    {
+      "id": "community/1440-04-verify-composer.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-04-verify-composer",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-04-verify-composer.png"
+    },
+    {
+      "id": "community/1440-05-post-normal.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-05-post-normal",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-05-post-normal.png"
+    },
+    {
+      "id": "community/1440-06-post-trust.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-06-post-trust",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-06-post-trust.png"
+    },
+    {
+      "id": "community/1440-07-right-rail-populated.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-07-right-rail-populated",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-07-right-rail-populated.png"
+    },
+    {
+      "id": "community/1440-08-thread.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-08-thread",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-08-thread.png"
+    },
+    {
+      "id": "community/1440-09-expert-sheet.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-09-expert-sheet",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-09-expert-sheet.png"
+    },
+    {
+      "id": "community/1440-10-glossary.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-10-glossary",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-10-glossary.png"
+    },
+    {
+      "id": "community/1440-11-right-rail-absent.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-11-right-rail-absent",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-11-right-rail-absent.png"
+    },
+    {
+      "id": "community/1440-13-expert-detail-sheet.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "1440-13-expert-detail-sheet",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\1440-13-expert-detail-sheet.png"
+    },
+    {
+      "id": "community/390-01-home.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-01-home",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-01-home.png"
+    },
+    {
+      "id": "community/390-02-composer-collapsed.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-02-composer-collapsed",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-02-composer-collapsed.png"
+    },
+    {
+      "id": "community/390-03-general-composer.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-03-general-composer",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-03-general-composer.png"
+    },
+    {
+      "id": "community/390-04-verify-composer.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-04-verify-composer",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-04-verify-composer.png"
+    },
+    {
+      "id": "community/390-05-post-normal.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-05-post-normal",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-05-post-normal.png"
+    },
+    {
+      "id": "community/390-06-post-trust.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-06-post-trust",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-06-post-trust.png"
+    },
+    {
+      "id": "community/390-07-right-rail-populated.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-07-right-rail-populated",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-07-right-rail-populated.png"
+    },
+    {
+      "id": "community/390-08-thread.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-08-thread",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-08-thread.png"
+    },
+    {
+      "id": "community/390-09-expert-sheet.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-09-expert-sheet",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-09-expert-sheet.png"
+    },
+    {
+      "id": "community/390-10-glossary.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-10-glossary",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-10-glossary.png"
+    },
+    {
+      "id": "community/390-11-right-rail-absent.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-11-right-rail-absent",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-11-right-rail-absent.png"
+    },
+    {
+      "id": "community/390-12-mobile-chrome.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "390-12-mobile-chrome",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\390-12-mobile-chrome.png"
+    },
+    {
+      "id": "community/768-01-home.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "768-01-home",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\768-01-home.png"
+    },
+    {
+      "id": "community/768-02-composer-collapsed.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "768-02-composer-collapsed",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\768-02-composer-collapsed.png"
+    },
+    {
+      "id": "community/768-03-general-composer.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "768-03-general-composer",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\768-03-general-composer.png"
+    },
+    {
+      "id": "community/768-04-verify-composer.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "768-04-verify-composer",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\768-04-verify-composer.png"
+    },
+    {
+      "id": "community/768-05-post-normal.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "768-05-post-normal",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\768-05-post-normal.png"
+    },
+    {
+      "id": "community/768-06-post-trust.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "768-06-post-trust",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\768-06-post-trust.png"
+    },
+    {
+      "id": "community/768-07-right-rail-populated.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "768-07-right-rail-populated",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\768-07-right-rail-populated.png"
+    },
+    {
+      "id": "community/768-08-thread.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "768-08-thread",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\768-08-thread.png"
+    },
+    {
+      "id": "community/768-09-expert-sheet.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "768-09-expert-sheet",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\768-09-expert-sheet.png"
+    },
+    {
+      "id": "community/768-10-glossary.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "768-10-glossary",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\768-10-glossary.png"
+    },
+    {
+      "id": "community/768-11-right-rail-absent.png",
+      "feature": "COMMUNITY",
+      "route": "/community",
+      "state": "768-11-right-rail-absent",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\community\\768-11-right-rail-absent.png"
+    },
+    {
+      "id": "expert/assessment-1024.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "assessment-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\assessment-1024.png"
+    },
+    {
+      "id": "expert/assessment-1280.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "assessment-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\assessment-1280.png"
+    },
+    {
+      "id": "expert/assessment-1440.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "assessment-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\assessment-1440.png"
+    },
+    {
+      "id": "expert/assessment-1920.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "assessment-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\assessment-1920.png"
+    },
+    {
+      "id": "expert/assessment-360.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "assessment-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\assessment-360.png"
+    },
+    {
+      "id": "expert/assessment-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "assessment-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\assessment-390.png"
+    },
+    {
+      "id": "expert/assessment-768.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "assessment-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\assessment-768.png"
+    },
+    {
+      "id": "expert/assessment-text-spacing-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "assessment-text-spacing-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\assessment-text-spacing-390.png"
+    },
+    {
+      "id": "expert/case-detail-1024.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "case-detail-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\case-detail-1024.png"
+    },
+    {
+      "id": "expert/case-detail-1280.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "case-detail-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\case-detail-1280.png"
+    },
+    {
+      "id": "expert/case-detail-1440.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "case-detail-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\case-detail-1440.png"
+    },
+    {
+      "id": "expert/case-detail-1920.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "case-detail-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\case-detail-1920.png"
+    },
+    {
+      "id": "expert/case-detail-360.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "case-detail-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\case-detail-360.png"
+    },
+    {
+      "id": "expert/case-detail-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "case-detail-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\case-detail-390.png"
+    },
+    {
+      "id": "expert/case-detail-768.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "case-detail-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\case-detail-768.png"
+    },
+    {
+      "id": "expert/community-expert-result-1024.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "community-expert-result-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\community-expert-result-1024.png"
+    },
+    {
+      "id": "expert/community-expert-result-1280.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "community-expert-result-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\community-expert-result-1280.png"
+    },
+    {
+      "id": "expert/community-expert-result-1440.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "community-expert-result-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\community-expert-result-1440.png"
+    },
+    {
+      "id": "expert/community-expert-result-1920.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "community-expert-result-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\community-expert-result-1920.png"
+    },
+    {
+      "id": "expert/community-expert-result-360.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "community-expert-result-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\community-expert-result-360.png"
+    },
+    {
+      "id": "expert/community-expert-result-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "community-expert-result-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\community-expert-result-390.png"
+    },
+    {
+      "id": "expert/community-expert-result-768.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "community-expert-result-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\community-expert-result-768.png"
+    },
+    {
+      "id": "expert/community-fixture-loaded.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "community-fixture-loaded",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\community-fixture-loaded.png"
+    },
+    {
+      "id": "expert/completed-review-fixture-1024.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "completed-review-fixture-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\completed-review-fixture-1024.png"
+    },
+    {
+      "id": "expert/completed-review-fixture-1280.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "completed-review-fixture-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\completed-review-fixture-1280.png"
+    },
+    {
+      "id": "expert/completed-review-fixture-1440.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "completed-review-fixture-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\completed-review-fixture-1440.png"
+    },
+    {
+      "id": "expert/completed-review-fixture-1920.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "completed-review-fixture-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\completed-review-fixture-1920.png"
+    },
+    {
+      "id": "expert/completed-review-fixture-360.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "completed-review-fixture-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\completed-review-fixture-360.png"
+    },
+    {
+      "id": "expert/completed-review-fixture-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "completed-review-fixture-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\completed-review-fixture-390.png"
+    },
+    {
+      "id": "expert/completed-review-fixture-768.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "completed-review-fixture-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\completed-review-fixture-768.png"
+    },
+    {
+      "id": "expert/directory-1024.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "directory-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\directory-1024.png"
+    },
+    {
+      "id": "expert/directory-1280.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "directory-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\directory-1280.png"
+    },
+    {
+      "id": "expert/directory-1440.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "directory-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\directory-1440.png"
+    },
+    {
+      "id": "expert/directory-1920.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "directory-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\directory-1920.png"
+    },
+    {
+      "id": "expert/directory-360.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "directory-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\directory-360.png"
+    },
+    {
+      "id": "expert/directory-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "directory-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\directory-390.png"
+    },
+    {
+      "id": "expert/directory-768.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "directory-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\directory-768.png"
+    },
+    {
+      "id": "expert/evidence-1024.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "evidence-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\evidence-1024.png"
+    },
+    {
+      "id": "expert/evidence-1280.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "evidence-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\evidence-1280.png"
+    },
+    {
+      "id": "expert/evidence-1440.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "evidence-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\evidence-1440.png"
+    },
+    {
+      "id": "expert/evidence-1920.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "evidence-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\evidence-1920.png"
+    },
+    {
+      "id": "expert/evidence-360.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "evidence-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\evidence-360.png"
+    },
+    {
+      "id": "expert/evidence-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "evidence-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\evidence-390.png"
+    },
+    {
+      "id": "expert/evidence-768.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "evidence-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\evidence-768.png"
+    },
+    {
+      "id": "expert/outside-scope-1024.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "outside-scope-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\outside-scope-1024.png"
+    },
+    {
+      "id": "expert/outside-scope-1280.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "outside-scope-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\outside-scope-1280.png"
+    },
+    {
+      "id": "expert/outside-scope-1440.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "outside-scope-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\outside-scope-1440.png"
+    },
+    {
+      "id": "expert/outside-scope-1920.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "outside-scope-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\outside-scope-1920.png"
+    },
+    {
+      "id": "expert/outside-scope-360.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "outside-scope-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\outside-scope-360.png"
+    },
+    {
+      "id": "expert/outside-scope-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "outside-scope-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\outside-scope-390.png"
+    },
+    {
+      "id": "expert/outside-scope-768.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "outside-scope-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\outside-scope-768.png"
+    },
+    {
+      "id": "expert/profile-1024.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-1024.png"
+    },
+    {
+      "id": "expert/profile-1280.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-1280.png"
+    },
+    {
+      "id": "expert/profile-1440.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-1440.png"
+    },
+    {
+      "id": "expert/profile-1920.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-1920.png"
+    },
+    {
+      "id": "expert/profile-360.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-360.png"
+    },
+    {
+      "id": "expert/profile-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-390.png"
+    },
+    {
+      "id": "expert/profile-768.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-768.png"
+    },
+    {
+      "id": "expert/profile-missing-1024.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-missing-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-missing-1024.png"
+    },
+    {
+      "id": "expert/profile-missing-1280.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-missing-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-missing-1280.png"
+    },
+    {
+      "id": "expert/profile-missing-1440.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-missing-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-missing-1440.png"
+    },
+    {
+      "id": "expert/profile-missing-1920.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-missing-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-missing-1920.png"
+    },
+    {
+      "id": "expert/profile-missing-360.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-missing-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-missing-360.png"
+    },
+    {
+      "id": "expert/profile-missing-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-missing-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-missing-390.png"
+    },
+    {
+      "id": "expert/profile-missing-768.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "profile-missing-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\profile-missing-768.png"
+    },
+    {
+      "id": "expert/queue-1024.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "queue-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\queue-1024.png"
+    },
+    {
+      "id": "expert/queue-1280.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "queue-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\queue-1280.png"
+    },
+    {
+      "id": "expert/queue-1440.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "queue-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\queue-1440.png"
+    },
+    {
+      "id": "expert/queue-1920.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "queue-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\queue-1920.png"
+    },
+    {
+      "id": "expert/queue-360.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "queue-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\queue-360.png"
+    },
+    {
+      "id": "expert/queue-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "queue-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\queue-390.png"
+    },
+    {
+      "id": "expert/queue-768.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "queue-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\queue-768.png"
+    },
+    {
+      "id": "expert/request-sheet-1024.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "request-sheet-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\request-sheet-1024.png"
+    },
+    {
+      "id": "expert/request-sheet-1280.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "request-sheet-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\request-sheet-1280.png"
+    },
+    {
+      "id": "expert/request-sheet-1440.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "request-sheet-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\request-sheet-1440.png"
+    },
+    {
+      "id": "expert/request-sheet-1920.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "request-sheet-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\request-sheet-1920.png"
+    },
+    {
+      "id": "expert/request-sheet-360.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "request-sheet-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\request-sheet-360.png"
+    },
+    {
+      "id": "expert/request-sheet-390.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "request-sheet-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\request-sheet-390.png"
+    },
+    {
+      "id": "expert/request-sheet-768.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "request-sheet-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\request-sheet-768.png"
+    },
+    {
+      "id": "expert/zoom-200-assessment-640.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "zoom-200-assessment-640",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\zoom-200-assessment-640.png"
+    },
+    {
+      "id": "expert/zoom-200-case-640.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "zoom-200-case-640",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\zoom-200-case-640.png"
+    },
+    {
+      "id": "expert/zoom-200-directory-640.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "zoom-200-directory-640",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\zoom-200-directory-640.png"
+    },
+    {
+      "id": "expert/zoom-200-profile-640.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "zoom-200-profile-640",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\zoom-200-profile-640.png"
+    },
+    {
+      "id": "expert/zoom-200-queue-640.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "zoom-200-queue-640",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\zoom-200-queue-640.png"
+    },
+    {
+      "id": "expert/zoom-200-request-sheet-640.png",
+      "feature": "EXPERT",
+      "route": "/expert",
+      "state": "zoom-200-request-sheet-640",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\expert\\zoom-200-request-sheet-640.png"
+    },
+    {
+      "id": "omni/01-initial.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "01-initial",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:11:03.312Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\01-initial.png"
+    },
+    {
+      "id": "omni/02-mixed.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "02-mixed",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:11:14.715Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\02-mixed.png"
+    },
+    {
+      "id": "omni/03-expert-detail.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "03-expert-detail",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:11:26.54Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\03-expert-detail.png"
+    },
+    {
+      "id": "omni/04-source-context.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "04-source-context",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:11:35.787Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\04-source-context.png"
+    },
+    {
+      "id": "omni/05-owned-trust.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "05-owned-trust",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:11:54.091Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\05-owned-trust.png"
+    },
+    {
+      "id": "omni/06-stale-result.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "06-stale-result",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:12:20.199Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\06-stale-result.png"
+    },
+    {
+      "id": "omni/07-ai-safe-output.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "07-ai-safe-output",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:13:02.823Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\07-ai-safe-output.png"
+    },
+    {
+      "id": "omni/08-ai-unavailable.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "08-ai-unavailable",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:13:22.244Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\08-ai-unavailable.png"
+    },
+    {
+      "id": "omni/09-command-query-chromium.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "09-command-query-chromium",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\09-command-query-chromium.png"
+    },
+    {
+      "id": "omni/09-command-query-firefox.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "09-command-query-firefox",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\09-command-query-firefox.png"
+    },
+    {
+      "id": "omni/09-command-query-webkit.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "09-command-query-webkit",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:12:35.177Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\09-command-query-webkit.png"
+    },
+    {
+      "id": "omni/accessibility-text-spacing.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "accessibility-text-spacing",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:19:44.854Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\accessibility-text-spacing.png"
+    },
+    {
+      "id": "omni/accessibility-zoom200.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "accessibility-zoom200",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "capturedAt": "2026-10-01T07:19:39.838Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\accessibility-zoom200.png"
+    },
+    {
+      "id": "omni/midnight-1024.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "midnight-1024",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:19:16.194Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\midnight-1024.png"
+    },
+    {
+      "id": "omni/midnight-1280.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "midnight-1280",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:19:21.281Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\midnight-1280.png"
+    },
+    {
+      "id": "omni/midnight-1440.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "midnight-1440",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:19:26.916Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\midnight-1440.png"
+    },
+    {
+      "id": "omni/midnight-1920.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "midnight-1920",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:19:34.371Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\midnight-1920.png"
+    },
+    {
+      "id": "omni/midnight-360.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "midnight-360",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:19:05.291Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\midnight-360.png"
+    },
+    {
+      "id": "omni/midnight-390.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "midnight-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:19:07.572Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\midnight-390.png"
+    },
+    {
+      "id": "omni/midnight-768.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "midnight-768",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:19:11.447Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\midnight-768.png"
+    },
+    {
+      "id": "omni/responsive-1024-ai.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1024-ai",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:15:38.369Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1024-ai.png"
+    },
+    {
+      "id": "omni/responsive-1024-community.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1024-community",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:15:12.432Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1024-community.png"
+    },
+    {
+      "id": "omni/responsive-1024-context-action.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1024-context-action",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:15:26.535Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1024-context-action.png"
+    },
+    {
+      "id": "omni/responsive-1024-empty.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1024-empty",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:15:29.954Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1024-empty.png"
+    },
+    {
+      "id": "omni/responsive-1024-error.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1024-error",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:15:31.685Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1024-error.png"
+    },
+    {
+      "id": "omni/responsive-1024-expert.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1024-expert",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:15:19.864Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1024-expert.png"
+    },
+    {
+      "id": "omni/responsive-1024-initial.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1024-initial",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:15:01.505Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1024-initial.png"
+    },
+    {
+      "id": "omni/responsive-1024-mixed.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1024-mixed",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:15:04.939Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1024-mixed.png"
+    },
+    {
+      "id": "omni/responsive-1024-trust.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1024-trust",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1024,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:15:28.255Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1024-trust.png"
+    },
+    {
+      "id": "omni/responsive-1280-ai.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1280-ai",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:16:32.315Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1280-ai.png"
+    },
+    {
+      "id": "omni/responsive-1280-community.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1280-community",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:16:01.434Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1280-community.png"
+    },
+    {
+      "id": "omni/responsive-1280-context-action.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1280-context-action",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:16:18.05Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1280-context-action.png"
+    },
+    {
+      "id": "omni/responsive-1280-empty.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1280-empty",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:16:22.229Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1280-empty.png"
+    },
+    {
+      "id": "omni/responsive-1280-error.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1280-error",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:16:24.364Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1280-error.png"
+    },
+    {
+      "id": "omni/responsive-1280-expert.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1280-expert",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:16:10.264Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1280-expert.png"
+    },
+    {
+      "id": "omni/responsive-1280-initial.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1280-initial",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:15:48.617Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1280-initial.png"
+    },
+    {
+      "id": "omni/responsive-1280-mixed.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1280-mixed",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:15:52.679Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1280-mixed.png"
+    },
+    {
+      "id": "omni/responsive-1280-trust.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1280-trust",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1280,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:16:20.151Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1280-trust.png"
+    },
+    {
+      "id": "omni/responsive-1440-ai.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1440-ai",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:17:33.023Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1440-ai.png"
+    },
+    {
+      "id": "omni/responsive-1440-community.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1440-community",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:16:58.319Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1440-community.png"
+    },
+    {
+      "id": "omni/responsive-1440-context-action.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1440-context-action",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:17:17.099Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1440-context-action.png"
+    },
+    {
+      "id": "omni/responsive-1440-empty.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1440-empty",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:17:21.762Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1440-empty.png"
+    },
+    {
+      "id": "omni/responsive-1440-error.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1440-error",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:17:24.133Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1440-error.png"
+    },
+    {
+      "id": "omni/responsive-1440-expert.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1440-expert",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:17:08.208Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1440-expert.png"
+    },
+    {
+      "id": "omni/responsive-1440-initial.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1440-initial",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:16:43.898Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1440-initial.png"
+    },
+    {
+      "id": "omni/responsive-1440-mixed.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1440-mixed",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:16:48.409Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1440-mixed.png"
+    },
+    {
+      "id": "omni/responsive-1440-trust.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1440-trust",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:17:19.438Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1440-trust.png"
+    },
+    {
+      "id": "omni/responsive-1920-ai.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1920-ai",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:18:49.954Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1920-ai.png"
+    },
+    {
+      "id": "omni/responsive-1920-community.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1920-community",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:18:04.168Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1920-community.png"
+    },
+    {
+      "id": "omni/responsive-1920-context-action.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1920-context-action",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:18:27.808Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1920-context-action.png"
+    },
+    {
+      "id": "omni/responsive-1920-empty.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1920-empty",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:18:34.327Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1920-empty.png"
+    },
+    {
+      "id": "omni/responsive-1920-error.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1920-error",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:18:37.742Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1920-error.png"
+    },
+    {
+      "id": "omni/responsive-1920-expert.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1920-expert",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:18:16.254Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1920-expert.png"
+    },
+    {
+      "id": "omni/responsive-1920-initial.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1920-initial",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:17:46.59Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1920-initial.png"
+    },
+    {
+      "id": "omni/responsive-1920-mixed.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1920-mixed",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:17:52.05Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1920-mixed.png"
+    },
+    {
+      "id": "omni/responsive-1920-trust.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-1920-trust",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 1920,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:18:31.025Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-1920-trust.png"
+    },
+    {
+      "id": "omni/responsive-360-ai.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-360-ai",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:00.567Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-360-ai.png"
+    },
+    {
+      "id": "omni/responsive-360-community.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-360-community",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:13:49.887Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-360-community.png"
+    },
+    {
+      "id": "omni/responsive-360-context-action.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-360-context-action",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:13:54.675Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-360-context-action.png"
+    },
+    {
+      "id": "omni/responsive-360-empty.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-360-empty",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:13:56.385Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-360-empty.png"
+    },
+    {
+      "id": "omni/responsive-360-error.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-360-error",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:13:57.259Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-360-error.png"
+    },
+    {
+      "id": "omni/responsive-360-expert.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-360-expert",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:13:52.435Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-360-expert.png"
+    },
+    {
+      "id": "omni/responsive-360-initial.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-360-initial",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:13:45.926Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-360-initial.png"
+    },
+    {
+      "id": "omni/responsive-360-keyboard-viewport-proxy.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-360-keyboard-viewport-proxy",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 480
+      },
+      "capturedAt": "2026-10-01T07:14:01.637Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-360-keyboard-viewport-proxy.png"
+    },
+    {
+      "id": "omni/responsive-360-mixed.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-360-mixed",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:13:47.338Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-360-mixed.png"
+    },
+    {
+      "id": "omni/responsive-360-trust.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-360-trust",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 360,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:13:55.528Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-360-trust.png"
+    },
+    {
+      "id": "omni/responsive-390-ai.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-390-ai",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:19.731Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-390-ai.png"
+    },
+    {
+      "id": "omni/responsive-390-community.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-390-community",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:08.839Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-390-community.png"
+    },
+    {
+      "id": "omni/responsive-390-context-action.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-390-context-action",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:14.12Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-390-context-action.png"
+    },
+    {
+      "id": "omni/responsive-390-empty.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-390-empty",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:16.013Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-390-empty.png"
+    },
+    {
+      "id": "omni/responsive-390-error.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-390-error",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:16.964Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-390-error.png"
+    },
+    {
+      "id": "omni/responsive-390-expert.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-390-expert",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:11.584Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-390-expert.png"
+    },
+    {
+      "id": "omni/responsive-390-initial.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-390-initial",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:04.581Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-390-initial.png"
+    },
+    {
+      "id": "omni/responsive-390-keyboard-viewport-proxy.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-390-keyboard-viewport-proxy",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 480
+      },
+      "capturedAt": "2026-10-01T07:14:20.881Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-390-keyboard-viewport-proxy.png"
+    },
+    {
+      "id": "omni/responsive-390-mixed.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-390-mixed",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:06.122Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-390-mixed.png"
+    },
+    {
+      "id": "omni/responsive-390-trust.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-390-trust",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 390,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:15.086Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-390-trust.png"
+    },
+    {
+      "id": "omni/responsive-768-ai.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-768-ai",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:53.162Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-768-ai.png"
+    },
+    {
+      "id": "omni/responsive-768-community.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-768-community",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:33.65Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-768-community.png"
+    },
+    {
+      "id": "omni/responsive-768-context-action.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-768-context-action",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:44.31Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-768-context-action.png"
+    },
+    {
+      "id": "omni/responsive-768-empty.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-768-empty",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:46.905Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-768-empty.png"
+    },
+    {
+      "id": "omni/responsive-768-error.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-768-error",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:48.209Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-768-error.png"
+    },
+    {
+      "id": "omni/responsive-768-expert.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-768-expert",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:39.252Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-768-expert.png"
+    },
+    {
+      "id": "omni/responsive-768-initial.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-768-initial",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:26.123Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-768-initial.png"
+    },
+    {
+      "id": "omni/responsive-768-mixed.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-768-mixed",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:28.04Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-768-mixed.png"
+    },
+    {
+      "id": "omni/responsive-768-trust.png",
+      "feature": "OMNI",
+      "route": "/ai",
+      "state": "responsive-768-trust",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": {
+        "width": 768,
+        "height": 960
+      },
+      "capturedAt": "2026-10-01T07:14:45.619Z",
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\omni\\responsive-768-trust.png"
+    },
+    {
+      "id": "release-smoke/landing-390.png",
+      "feature": "RELEASE-SMOKE",
+      "route": "/",
+      "state": "landing-390",
+      "classification": "ISOLATED CONTRACT FIXTURE — NOT LIVE",
+      "browser": "Not recorded for each artifact; suite configured Chromium, Firefox, WebKit",
+      "viewport": null,
+      "capturedAt": null,
+      "file": "D:\\StudentHub-CodexRuns\\FULL_V4_THREE_CORE_20261001\\2026-10-01T06-59-17-209Z-36960\\release-smoke\\landing-390.png"
+    }
+  ]
+}
