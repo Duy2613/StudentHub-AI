@@ -111,10 +111,15 @@ async function appendOutbox(client, { eventType, aggregateType = "EXPERT_ASSESSM
 }
 
 export class ExpertRepository {
-  static async listPublicProfiles({ limit = 50, domainCode = null } = {}) {
+  static async listPublicProfiles({ limit = 50, domainCode = null, query = null, userId = null } = {}) {
     const pool = getPostgresPool();
     const params = [];
-    const domainPredicate = domainCode ? `WHERE ev.domain_code = $${params.push(String(domainCode).toUpperCase())} AND ev.status = 'VERIFIED' AND ev.qualification_state = 'DOMAIN_VERIFIED'` : "";
+    const predicates = [];
+    if (domainCode) predicates.push(`ev.domain_code = $${params.push(String(domainCode).toUpperCase())}`);
+    if (userId) predicates.push(`ep.user_id = $${params.push(userId)}::uuid`);
+    const domainPredicate = predicates.length ? `WHERE ${predicates.join(" AND ")}` : "";
+    const needle = String(query || "").trim().slice(0, 160);
+    const searchPredicate = needle ? `HAVING strpos(lower(coalesce(ep.public_title, '') || ' ' || coalesce(ep.public_bio, '') || ' ' || string_agg(ev.domain_code, ' ')), lower($${params.push(needle)})) > 0` : "";
     params.push(Math.min(Math.max(Number(limit) || 50, 1), 100));
     let res;
     try {
@@ -125,6 +130,7 @@ export class ExpertRepository {
            JOIN private.expert_verifications ev ON ev.user_id = ep.user_id AND ev.suspended_at IS NULL AND ev.status = 'VERIFIED' AND ev.qualification_state = 'DOMAIN_VERIFIED' AND (ev.expires_at IS NULL OR ev.expires_at > now())
            ${domainPredicate}
           GROUP BY ep.user_id, ep.public_title, ep.public_bio
+          ${searchPredicate}
           ORDER BY ep.updated_at DESC, ep.user_id
           LIMIT $${params.length}`,
         params
@@ -135,19 +141,17 @@ export class ExpertRepository {
       // status is VERIFIED; no qualification, assignment, or assessment is
       // inferred from this compatibility branch.
       if (error?.code !== "42703") throw error;
-      const legacyParams = [];
-      const legacyPredicate = domainCode ? `WHERE ev.domain_code = $${legacyParams.push(String(domainCode).toUpperCase())} AND ev.status = 'VERIFIED'` : "";
-      legacyParams.push(Math.min(Math.max(Number(limit) || 50, 1), 100));
       res = await pool.query(
         `SELECT ep.user_id AS expert_id, ep.public_title, ep.public_bio,
                 coalesce(array_agg(distinct ev.domain_code) filter (where ev.status = 'VERIFIED'), '{}') AS verified_domains
            FROM public.expert_profiles ep
            JOIN private.expert_verifications ev ON ev.user_id = ep.user_id AND ev.status = 'VERIFIED'
-           ${legacyPredicate}
+           ${domainPredicate}
           GROUP BY ep.user_id, ep.public_title, ep.public_bio
+          ${searchPredicate}
           ORDER BY ep.updated_at DESC, ep.user_id
-          LIMIT $${legacyParams.length}`,
-        legacyParams
+          LIMIT $${params.length}`,
+        params
       );
     }
     return res.rows.map((row) => ({
@@ -166,8 +170,8 @@ export class ExpertRepository {
   }
 
   static async getPublicProfile(userId) {
-    const profiles = await this.listPublicProfiles({ limit: 100 });
-    return profiles.find((profile) => String(profile.expertId) === String(userId)) || null;
+    const profiles = await this.listPublicProfiles({ limit: 1, userId });
+    return profiles[0] || null;
   }
 
   static async upsertProfile({ userId, publicTitle, publicBio }) {

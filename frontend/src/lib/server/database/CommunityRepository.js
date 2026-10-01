@@ -655,13 +655,17 @@ export class CommunityRepository {
     });
   }
 
-  static async listContributions({ caseId = null, claimId = null, limit = 50, sort = "relevant", now = Date.now(), viewerId = null } = {}) {
+  static async listContributions({ caseId = null, claimId = null, limit = 50, offset = 0, query = null, sort = "relevant", now = Date.now(), viewerId = null } = {}) {
     const pool = getPostgresPool();
     const params = [];
     let where = `WHERE c.publication_state = 'PUBLISHED'`;
     if (caseId) { params.push(caseId); where += ` AND c.case_id = $${params.length}`; }
     if (claimId) { params.push(claimId); where += ` AND c.claim_id = $${params.length}`; }
+    const needle = String(query || "").trim().slice(0, 160);
+    if (needle) where += ` AND strpos(lower(c.public_statement || ' ' || c.contribution_type), lower($${params.push(needle)})) > 0`;
     params.push(Math.min(Math.max(Number(limit) || 50, 1), 100));
+    const limitParameter = params.length;
+    params.push(Math.min(Math.max(Math.trunc(Number(offset)) || 0, 0), 10000));
     const res = await pool.query(
       `SELECT c.*, tc.owner_id AS trust_owner_id,
               latest_revision.revision AS latest_case_revision,
@@ -702,7 +706,7 @@ export class CommunityRepository {
          ) reaction_counts ON true
          ${where}
         ORDER BY c.created_at DESC, c.id DESC
-        LIMIT $${params.length}`,
+        LIMIT $${limitParameter} OFFSET $${params.length}`,
       params
     );
     const rows = res.rows.map((row) => contributionDTO(row, now, viewerId));

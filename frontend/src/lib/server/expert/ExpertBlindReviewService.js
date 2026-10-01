@@ -112,7 +112,11 @@ export class ExpertBlindReviewService {
     const primaryContext = typeof contextRefs[0] === "object" && contextRefs[0] !== null ? contextRefs[0] : {};
     const communityStatement = String(row.community_statement || "").trim();
     const claimStatement = String(row.claim_statement || "").trim();
-    const evidenceRevisionIds = contextRefs.filter((value) => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
+    // Community review shares its published statement, not the source case's
+    // private evidence references or intake metadata.
+    const communityBound = Boolean(row.community_contribution_id);
+    const evidenceRevisionIds = communityBound ? [] : contextRefs.filter((value) => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
+    const evidence = communityBound ? [] : Array.isArray(row.evidence) ? row.evidence : [];
 
     return {
       assignmentId: row.assignment_id,
@@ -123,17 +127,17 @@ export class ExpertBlindReviewService {
         : null,
       claimId: row.claim_id || null,
       domain: row.domain_code,
-      claim: (claimStatement || communityStatement || null)?.slice(0, 1000) || null,
+      claim: (communityBound ? communityStatement : claimStatement || communityStatement)?.slice(0, 1000) || null,
       reviewQuestion: row.question ? String(row.question).slice(0, 2000) : null,
       evidenceRevisionIds,
-      evidence: Array.isArray(row.evidence) ? row.evidence : [],
-      ...(Array.isArray(row.evidence) ? { missingEvidenceIds: evidenceRevisionIds.filter((id) => !row.evidence.some((item) => item.id === id)) } : {}),
+      evidence,
+      ...(Array.isArray(row.evidence) ? { missingEvidenceIds: evidenceRevisionIds.filter((id) => !evidence.some((item) => item.id === id)) } : {}),
       boundedContext: {
         type: row.community_contribution_id ? "COMMUNITY_CONTRIBUTION" : row.input_type || primaryContext.inputType || "TEXT",
         communityContributionId: row.community_contribution_id || null,
-        snippet: communityStatement ? communityStatement.slice(0, 500) : primaryContext.snippet || null,
-        url: primaryContext.url || null,
-        mediaArtifactId: primaryContext.mediaArtifactId || null,
+        snippet: communityStatement ? communityStatement.slice(0, 500) : communityBound ? null : primaryContext.snippet || null,
+        url: communityBound ? null : primaryContext.url || null,
+        mediaArtifactId: communityBound ? null : primaryContext.mediaArtifactId || null,
         timestamp: row.assigned_at,
       },
       status: row.assignment_status,
@@ -207,7 +211,7 @@ export class ExpertBlindReviewService {
       throw error;
     }
 
-    const claimResult = row.claim_id ? await pool.query(
+    const claimResult = !row.community_contribution_id && row.claim_id ? await pool.query(
       `SELECT c.id, c.statement
          FROM public.claims c
         WHERE c.id = $1
@@ -222,7 +226,7 @@ export class ExpertBlindReviewService {
     ) : { rows: [] };
     row.claim_statement = claimResult.rows[0]?.statement || null;
 
-    const evidenceRevisionIds = Array.isArray(row.context_refs)
+    const evidenceRevisionIds = !row.community_contribution_id && Array.isArray(row.context_refs)
       ? row.context_refs.filter((value) => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value))
       : [];
     const evidenceResult = evidenceRevisionIds.length ? await pool.query(

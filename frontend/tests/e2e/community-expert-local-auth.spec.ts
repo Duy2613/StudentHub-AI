@@ -405,6 +405,45 @@ test.describe("authenticated Community → Expert → Trust local reality", () =
       assertApi(independentReaction);
       expect(asRecord(independentReaction.body).trustMutation).toBe(false);
 
+      // Read real owner activity and follow the exact saved revision from Profile.
+      const ownerProfile = await api(candidatePage, "/api/users/me");
+      assertApi(ownerProfile);
+      const ownerView = asRecord(asRecord(ownerProfile.body).profile);
+      expect(asRecord(ownerView.communityActivity).dataStatus).toBe("AVAILABLE");
+      expect(Number(asRecord(ownerView.communityActivity).posts)).toBeGreaterThan(0);
+      expect(asRecords(asRecord(ownerView.communityActivity).recentActivity).some((row) => row.type === "TRUST_CONTRIBUTION")).toBe(true);
+      const freshSearch = await api(candidatePage, "/api/v1/search?q=authenticated%20contributor%20observed");
+      assertApi(freshSearch);
+      expect(asRecord(freshSearch.body).status).toBe("COMPLETE");
+      expect(asRecords(asRecord(asRecord(freshSearch.body).data).results).some((row) => row.id === candidateContributionId)).toBe(true);
+      await candidatePage.goto("/profile", { waitUntil: "domcontentloaded" });
+      await expect(candidatePage.getByRole("button", { name: "Chỉnh sửa hồ sơ", exact: true })).toBeVisible();
+      await candidatePage.getByRole("button", { name: "Chỉnh sửa hồ sơ", exact: true }).click();
+      await candidatePage.getByLabel("FullName (Họ và tên) *", { exact: true }).fill("Local Repair Student");
+      await candidatePage.getByLabel("University (Trường đại học)", { exact: true }).fill("Local Assurance University");
+      await candidatePage.getByLabel("Major (Ngành học)", { exact: true }).fill("Computer Science");
+      await candidatePage.getByLabel("Bio (Giới thiệu bản thân)", { exact: true }).fill("Synthetic owner profile assurance.");
+      await candidatePage.getByRole("button", { name: "Lưu thay đổi", exact: true }).click();
+      await expect(candidatePage.getByText("Đã cập nhật thành công các trường hồ sơ cá nhân.")).toBeVisible();
+      await candidatePage.reload({ waitUntil: "domcontentloaded" });
+      await expect(candidatePage.getByRole("heading", { name: "Local Repair Student", exact: true })).toBeVisible();
+      const savedProfile = asRecord(asRecord((await api(candidatePage, "/api/users/me")).body).profile);
+      expect(asRecord(savedProfile.education).university).toBe("Local Assurance University");
+      expect(asRecord(savedProfile.education).major).toBe("Computer Science");
+      expect(savedProfile.bio).toBe("Synthetic owner profile assurance.");
+      const savedCaseLink = candidatePage.locator(`a[href="/trust?caseId=${primaryCaseId}&caseRevision=1"]`);
+      await expect(savedCaseLink).toHaveCount(1);
+      await savedCaseLink.click();
+      await expect(candidatePage).toHaveURL(new RegExp(`/trust\\?caseId=${primaryCaseId}&caseRevision=1$`));
+      await expect(candidatePage.getByText("Nội dung được phép xem", { exact: true })).toBeVisible();
+      const ownedCase = await api(candidatePage, `/api/v1/trust/cases/${primaryCaseId}?caseRevision=1`);
+      assertApi(ownedCase);
+      const crossOwnerCase = await api(reactorPage, `/api/v1/trust/cases/${primaryCaseId}`);
+      expect([403, 404]).toContain(crossOwnerCase.status);
+      await candidatePage.goto(`/profile/${process.env.STUDENTHUB_LOCAL_REACTOR_ID}`, { waitUntil: "domcontentloaded" });
+      await expect(candidatePage.getByRole("heading", { name: "Hồ sơ công khai chưa khả dụng", exact: true })).toBeVisible();
+      await candidatePage.goto("/community", { waitUntil: "domcontentloaded" });
+
       const requestContributionStatement = "A second synthetic Community member adds an independent bounded observation for authorized expert review.";
       const requestContributionInput = {
         caseId: primaryCaseId,

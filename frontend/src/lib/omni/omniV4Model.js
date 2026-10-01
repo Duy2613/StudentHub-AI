@@ -55,6 +55,11 @@ export function navigationResults(items, query, authenticated) {
 export function projectGlobal(payload, query) {
   liveEnvelope(payload, 'search.v1');
   if (payload.communitySource !== 'DURABLE_POSTGRES' || normalizeQuery(payload.query) !== query || !Array.isArray(payload.data?.results)) throw new Error('INVALID_RESPONSE');
+  if (payload.sources?.community?.status === 'UNAVAILABLE') {
+    const error = new Error('Đóng góp cộng đồng tạm thời chưa khả dụng.');
+    error.code = 'COMMUNITY_STORAGE_UNAVAILABLE';
+    throw error;
+  }
   return payload.data.results.filter((row) => row.kind === 'COMMUNITY' && isUuid(row.id) && publiclyVisible(row) && clean(row.title))
     .map((row) => ({ key: `contribution:${row.id}`, id: row.id, kind: 'COMMUNITY', channel: 'contribution', title: clean(row.title, 180), summary: clean(row.summary, 350), href: `/community/${row.id}`, match: 'Khớp văn bản trong đóng góp công khai', action: 'Mở đóng góp và bối cảnh', publication: 'Đóng góp công khai' }));
 }

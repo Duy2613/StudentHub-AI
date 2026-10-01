@@ -54,6 +54,18 @@ export class ProfileServiceError extends Error {
   }
 }
 
+function unavailableActivity(kind) {
+  const unavailable = { dataStatus: "UNAVAILABLE", errorCode: "PROFILE_ACTIVITY_UNAVAILABLE" };
+  if (kind === "trust") return { ...unavailable, count: null, recentCases: [], pendingExpertRequests: null };
+  if (kind === "community") return { ...unavailable, posts: null, comments: null, recentActivity: [], sources: {} };
+  return { ...unavailable, total: null, pending: null, inReview: null, completed: null, recentRequests: [] };
+}
+
+function recordActivityFailure(source, error) {
+  const code = /^[A-Z0-9_]{1,80}$/.test(String(error?.code || "")) ? error.code : "STORAGE_UNAVAILABLE";
+  console.error("[OwnerProfileActivity] read unavailable", { source, code });
+}
+
 export class UserProfileService {
   /**
    * Retrieves the comprehensive, normalized UserProfileDTO for an authenticated student.
@@ -95,25 +107,11 @@ export class UserProfileService {
     }
     const baseProfile = baseProfileResult.value;
 
-    const trustActivity = trustActivityResult.status === "fulfilled" ? trustActivityResult.value : {
-      count: 0,
-      recentCases: [],
-      pendingExpertRequests: 0,
-    };
+    const trustActivity = trustActivityResult.status === "fulfilled" ? trustActivityResult.value : unavailableActivity("trust");
 
-    const communityActivity = communityActivityResult.status === "fulfilled" ? communityActivityResult.value : {
-      posts: 0,
-      comments: 0,
-      recentActivity: [],
-    };
+    const communityActivity = communityActivityResult.status === "fulfilled" ? communityActivityResult.value : unavailableActivity("community");
 
-    const expertRequests = expertRequestsResult.status === "fulfilled" ? expertRequestsResult.value : {
-      total: 0,
-      pending: 0,
-      inReview: 0,
-      completed: 0,
-      recentRequests: [],
-    };
+    const expertRequests = expertRequestsResult.status === "fulfilled" ? expertRequestsResult.value : unavailableActivity("expert");
 
     const email = principal.email || null;
     const emailVerified = principal.attributes?.emailVerified === true;
@@ -233,78 +231,104 @@ export class UserProfileService {
         [userId]
       );
       const recentRes = await pool.query(
-        `SELECT id, state, visibility, created_at, updated_at
-           FROM public.trust_cases
-          WHERE owner_id = $1
-          ORDER BY created_at DESC
+        `SELECT tc.id, tc.state, tc.visibility, tc.created_at, tc.updated_at,
+                (SELECT max(revision) FROM public.trust_case_revisions
+                  WHERE case_id = tc.id AND owner_id = $1) AS case_revision
+           FROM public.trust_cases tc
+          WHERE tc.owner_id = $1
+          ORDER BY tc.created_at DESC, tc.id DESC
           LIMIT 5`,
         [userId]
       );
-      const pendingRequestsRes = await pool.query(
+      const pendingRequestsResult = await Promise.allSettled([pool.query(
         `SELECT count(*)::int AS pending_count
            FROM private.expert_review_requests
           WHERE requester_id = $1 AND status IN ('REQUESTED', 'MATCHING', 'ASSIGNED', 'IN_REVIEW')`,
         [userId]
-      ).catch(() => ({ rows: [{ pending_count: 0 }] }));
+      )]);
+      const pendingRequests = pendingRequestsResult[0];
+      if (pendingRequests.status === "rejected") recordActivityFailure("trust-expert-requests", pendingRequests.reason);
 
       return {
+        dataStatus: pendingRequests.status === "fulfilled" ? "AVAILABLE" : "PARTIAL",
         count: Number(countRes.rows[0]?.count || 0),
         recentCases: recentRes.rows.map((row) => ({
           id: row.id,
           state: row.state,
           visibility: row.visibility,
+          caseRevision: row.case_revision == null ? null : Number(row.case_revision),
           createdAt: row.created_at,
           updatedAt: row.updated_at,
         })),
-        pendingExpertRequests: Number(pendingRequestsRes.rows[0]?.pending_count || 0),
+        pendingExpertRequests: pendingRequests.status === "fulfilled" ? Number(pendingRequests.value.rows[0]?.pending_count || 0) : null,
       };
-    } catch {
-      return {
-        count: 0,
-        recentCases: [],
-        pendingExpertRequests: 0,
-      };
+    } catch (error) {
+      recordActivityFailure("trust", error);
+      return unavailableActivity("trust");
     }
   }
 
   static async readCommunityActivity(userId) {
     try {
       const pool = getPostgresPool();
-      const postsRes = await pool.query(
-        `SELECT count(*)::int AS count FROM public.posts WHERE author_id = $1`,
-        [userId]
-      );
-      const commentsRes = await pool.query(
-        `SELECT count(*)::int AS count FROM public.comments WHERE author_id = $1`,
-        [userId]
-      );
-      const recentPosts = await pool.query(
-        `SELECT id, title, category, status, created_at
-           FROM public.posts
-          WHERE author_id = $1
-          ORDER BY created_at DESC
-          LIMIT 5`,
-        [userId]
-      );
-
+      const results = await Promise.allSettled([
+        pool.query(
+          `SELECT (SELECT count(*)::int FROM public.posts WHERE author_id = $1) AS posts,
+                  (SELECT count(*)::int FROM public.comments WHERE author_id = $1) AS comments,
+                  coalesce((SELECT jsonb_agg(recent ORDER BY recent.created_at DESC, recent.id DESC)
+                    FROM (SELECT id, title, category, status, created_at FROM public.posts
+                          WHERE author_id = $1 ORDER BY created_at DESC, id DESC LIMIT 5) recent), '[]'::jsonb) AS recent_activity`,
+          [userId]
+        ),
+        pool.query(
+          `SELECT (SELECT count(*)::int FROM public.community_contributions WHERE author_id = $1) AS posts,
+                  (SELECT count(*)::int FROM public.community_comments WHERE author_id = $1) AS comments,
+                  coalesce((SELECT jsonb_agg(recent ORDER BY recent.created_at DESC, recent.id DESC)
+                    FROM (SELECT id, left(public_statement, 160) AS title, contribution_type AS category,
+                                 publication_state AS status, created_at, case_id, case_revision
+                            FROM public.community_contributions WHERE author_id = $1
+                            ORDER BY created_at DESC, id DESC LIMIT 5) recent), '[]'::jsonb) AS recent_activity`,
+          [userId]
+        ),
+      ]);
+      const sourceNames = ["discussions", "contributions"];
+      const sources = {};
+      const recentActivity = [];
+      for (let index = 0; index < results.length; index++) {
+        const result = results[index];
+        const name = sourceNames[index];
+        if (result.status === "rejected") {
+          recordActivityFailure(`community-${name}`, result.reason);
+          sources[name] = { dataStatus: "UNAVAILABLE", posts: null, comments: null };
+          continue;
+        }
+        const row = result.value.rows[0];
+        sources[name] = { dataStatus: "AVAILABLE", posts: Number(row.posts), comments: Number(row.comments) };
+        for (const activity of row.recent_activity || []) {
+          recentActivity.push({
+            type: name === "discussions" ? "POST" : "TRUST_CONTRIBUTION",
+            source: name,
+            id: activity.id,
+            title: activity.title,
+            category: activity.category,
+            status: activity.status,
+            createdAt: activity.created_at,
+            ...(name === "contributions" ? { caseId: activity.case_id, caseRevision: Number(activity.case_revision) } : {}),
+          });
+        }
+      }
+      const available = Object.values(sources).filter((source) => source.dataStatus === "AVAILABLE");
+      const complete = available.length === sourceNames.length;
       return {
-        posts: Number(postsRes.rows[0]?.count || 0),
-        comments: Number(commentsRes.rows[0]?.count || 0),
-        recentActivity: recentPosts.rows.map((post) => ({
-          type: "POST",
-          id: post.id,
-          title: post.title,
-          category: post.category,
-          status: post.status,
-          createdAt: post.created_at,
-        })),
+        dataStatus: complete ? "AVAILABLE" : available.length ? "PARTIAL" : "UNAVAILABLE",
+        posts: complete ? available.reduce((sum, source) => sum + source.posts, 0) : null,
+        comments: complete ? available.reduce((sum, source) => sum + source.comments, 0) : null,
+        sources,
+        recentActivity: recentActivity.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt) || String(b.id).localeCompare(String(a.id))).slice(0, 5),
       };
-    } catch {
-      return {
-        posts: 0,
-        comments: 0,
-        recentActivity: [],
-      };
+    } catch (error) {
+      recordActivityFailure("community", error);
+      return unavailableActivity("community");
     }
   }
 
@@ -331,6 +355,7 @@ export class UserProfileService {
       );
       const counts = countsRes.rows[0] || {};
       return {
+        dataStatus: "AVAILABLE",
         total: Number(counts.total || 0),
         pending: Number(counts.pending || 0),
         inReview: Number(counts.in_review || 0),
@@ -347,14 +372,9 @@ export class UserProfileService {
           updatedAt: r.updated_at,
         })),
       };
-    } catch {
-      return {
-        total: 0,
-        pending: 0,
-        inReview: 0,
-        completed: 0,
-        recentRequests: [],
-      };
+    } catch (error) {
+      recordActivityFailure("expert", error);
+      return unavailableActivity("expert");
     }
   }
 }

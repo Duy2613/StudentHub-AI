@@ -59,11 +59,6 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
-        source: "/profile/:id",
-        destination: "/profile?profileId=:id",
-        permanent: false,
-      },
-      {
         source: "/marketplace",
         destination: "/community",
         permanent: false,

@@ -16,9 +16,8 @@ async function discoverExperts(request, routeParams, principal, securityContext)
   const limit = limitValue(searchParams.get("limit"));
   if (!isExpertDemoMode()) {
     try {
-      const experts = await ExpertRepository.listPublicProfiles({ limit, domainCode: domain });
-      const filtered = topic ? experts.filter((expert) => `${expert.name} ${expert.title || ""} ${(expert.scopes || []).map((scope) => scope.domain).join(" ")}`.toLocaleLowerCase("vi").includes(topic.toLocaleLowerCase("vi"))) : experts;
-      return Response.json({ success: true, contractVersion: "experts.v1", data: { total: filtered.length, experts: ExpertPublicDTO.toPublicList(filtered.slice(0, limit)), sourceState: "DURABLE_POSTGRES", historyConfidence: "INSUFFICIENT_DATA" }, meta: { correlationId: securityContext.correlationId } });
+      const experts = await ExpertRepository.listPublicProfiles({ limit, domainCode: domain, query: topic });
+      return Response.json({ success: true, contractVersion: "experts.v1", data: { total: experts.length, experts: ExpertPublicDTO.toPublicList(experts), sourceState: "DURABLE_POSTGRES", historyConfidence: "INSUFFICIENT_DATA" }, meta: { correlationId: securityContext.correlationId } });
     } catch {
       return Response.json({ success: false, error: { code: "EXPERT_STORAGE_UNAVAILABLE", userMessage: "Expert profiles are temporarily unavailable.", correlationId: securityContext.correlationId } }, { status: 503 });
     }

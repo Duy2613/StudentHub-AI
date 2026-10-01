@@ -15,6 +15,20 @@ function safeStatus(configured, available) {
   return "UNKNOWN";
 }
 
+export function getBackendIdentity(env = process.env) {
+  const parse = (value) => { try { return new URL(value); } catch { return null; } };
+  const auth = parse(env.SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL);
+  const browserAuth = parse(env.NEXT_PUBLIC_SUPABASE_URL);
+  const database = parse(env.DATABASE_URL);
+  const ref = (url) => url?.hostname.match(/^(?:db\.)?([a-z0-9]{20})\.supabase\.co$/)?.[1] || null;
+  const authProjectRef = ref(auth);
+  const browserAuthProjectRef = ref(browserAuth);
+  const databaseProjectRef = ref(database) || database?.username.match(/^postgres\.([a-z0-9]{20})$/)?.[1] || null;
+  const refs = [authProjectRef, browserAuthProjectRef, databaseProjectRef].filter(Boolean);
+  const alignment = new Set(refs).size > 1 ? "MISMATCH" : refs.length === 3 ? "MATCH" : "UNVERIFIED";
+  return { authProjectRef, browserAuthProjectRef, databaseProjectRef, alignment, durableSessionBacking: "DATABASE_URL" };
+}
+
 export function classifyDatabaseFailure(error) {
   const code = String(error?.code || "").trim().toUpperCase();
   if (code === "28P01" || code === "28000") return "DATABASE_AUTH_FAILED";
@@ -47,12 +61,16 @@ export function getTrustProviderReadiness(env = process.env) {
 }
 
 export async function checkReadiness() {
+  const backendIdentity = getBackendIdentity();
   const databaseConfigured = hasValue(process.env.DATABASE_URL);
   let databaseAvailable = null;
   let databaseFailureCode = null;
   let expertQualificationSchemaAvailable = null;
   let reportSchemaAvailable = null;
   let realtimeSchemaAvailable = null;
+  let communitySchemaAvailable = null;
+  let expertV5SchemaAvailable = null;
+  let trustSchemaAvailable = null;
   if (databaseConfigured) {
     try {
       const pool = getPostgresPool();
@@ -66,16 +84,45 @@ export async function checkReadiness() {
           to_regclass('private.report_jobs') is not null
           and to_regclass('private.report_artifacts') is not null
           and to_regclass('private.report_job_events') is not null as reports_available,
-          to_regclass('private.realtime_events') is not null as realtime_available`);
+          to_regclass('private.realtime_events') is not null as realtime_available,
+          not exists (select 1 from unnest(array[
+            'public.posts', 'public.comments', 'public.community_contributions',
+            'public.community_comments', 'public.community_contribution_revisions',
+            'public.community_reactions', 'public.community_source_clusters'
+          ]) required(name) where to_regclass(required.name) is null) as community_available,
+          not exists (select 1 from unnest(array[
+            'private.expert_v5_config', 'private.expert_mission_level_policy',
+            'private.expert_v5_source_registry', 'private.expert_v5_source_events',
+            'private.expert_v5_source_snapshots', 'private.expert_v5_ingestion_requests',
+            'private.expert_v5_questions', 'private.expert_v5_question_events',
+            'private.expert_mission_progression', 'private.expert_daily_missions',
+            'private.expert_mission_attempts', 'private.expert_mission_answers',
+            'private.expert_mission_events', 'private.expert_room_presence',
+            'private.expert_verification_rooms', 'private.expert_room_participants',
+            'private.expert_room_rounds', 'private.expert_room_answers',
+            'private.expert_room_evidence_packages', 'private.expert_room_adjudications',
+            'private.expert_room_events'
+          ]) required(name) where to_regclass(required.name) is null) as expert_v5_available,
+          not exists (select 1 from unnest(array[
+            'public.trust_cases', 'public.trust_case_revisions', 'public.trust_runs',
+            'public.trust_stage_runs', 'public.trust_verdict_revisions',
+            'public.case_inputs', 'public.evidence'
+          ]) required(name) where to_regclass(required.name) is null) as trust_available`);
       expertQualificationSchemaAvailable = schemaResult.rows[0]?.expert_available === true;
       reportSchemaAvailable = schemaResult.rows[0]?.reports_available === true;
       realtimeSchemaAvailable = schemaResult.rows[0]?.realtime_available === true;
+      communitySchemaAvailable = schemaResult.rows[0]?.community_available === true;
+      expertV5SchemaAvailable = schemaResult.rows[0]?.expert_v5_available === true;
+      trustSchemaAvailable = schemaResult.rows[0]?.trust_available === true;
     } catch (error) {
       databaseAvailable = false;
       databaseFailureCode = classifyDatabaseFailure(error);
       expertQualificationSchemaAvailable = false;
       reportSchemaAvailable = false;
       realtimeSchemaAvailable = false;
+      communitySchemaAvailable = false;
+      expertV5SchemaAvailable = false;
+      trustSchemaAvailable = false;
     }
   }
 
@@ -122,7 +169,8 @@ export async function checkReadiness() {
 
   const platformReady = checks.runtime.status === "AVAILABLE"
     && checks.database.status === "AVAILABLE"
-    && checks.durableSession.status === "AVAILABLE";
+    && checks.durableSession.status === "AVAILABLE"
+    && backendIdentity.alignment !== "MISMATCH";
 
   const requiredCapabilitiesReady = platformReady
     && (!liveProvidersRequired || providersConfigured)
@@ -130,8 +178,9 @@ export async function checkReadiness() {
 
   const capabilityStatuses = {
     trustLocal: {
-      status: checks.database.status === "AVAILABLE" ? "AVAILABLE" : "UNAVAILABLE",
-      source: "StudentHub deterministic local pipeline"
+      status: trustSchemaAvailable === true ? "AVAILABLE" : databaseAvailable === true ? "MIGRATION_REQUIRED" : "DATABASE_REQUIRED",
+      source: "StudentHub deterministic local pipeline",
+      verification: "SCHEMA_CHECK_ONLY"
     },
     trustLiveProviders: {
       status: providersConfigured ? "AVAILABLE" : liveProvidersRequired ? "NOT_READY" : "NOT_CONFIGURED",
@@ -158,9 +207,16 @@ export async function checkReadiness() {
       schema: realtimeSchemaAvailable === true ? "AVAILABLE" : "NOT_VERIFIED"
     },
     experts: {
-      status: "PARTIAL",
+      status: expertQualificationSchemaAvailable === true && expertV5SchemaAvailable === true ? "AVAILABLE" : databaseAvailable === true ? "MIGRATION_REQUIRED" : "DATABASE_REQUIRED",
       profile: "EXISTING_RUNTIME_ADAPTER",
-      quiz: expertQualificationSchemaAvailable === true ? "AVAILABLE" : databaseAvailable === true ? "MIGRATION_REQUIRED" : "DATABASE_REQUIRED"
+      quiz: expertQualificationSchemaAvailable === true ? "AVAILABLE" : databaseAvailable === true ? "MIGRATION_REQUIRED" : "DATABASE_REQUIRED",
+      missions: expertV5SchemaAvailable === true ? "AVAILABLE" : databaseAvailable === true ? "MIGRATION_REQUIRED" : "DATABASE_REQUIRED",
+      rooms: expertV5SchemaAvailable === true ? "AVAILABLE" : databaseAvailable === true ? "MIGRATION_REQUIRED" : "DATABASE_REQUIRED",
+      verification: "SCHEMA_CHECK_ONLY"
+    },
+    community: {
+      status: communitySchemaAvailable === true ? "AVAILABLE" : databaseAvailable === true ? "MIGRATION_REQUIRED" : "DATABASE_REQUIRED",
+      verification: "SCHEMA_CHECK_ONLY"
     },
     reports: {
       status: reportSchemaAvailable === true ? "AVAILABLE" : databaseAvailable === true ? "MIGRATION_REQUIRED" : "DATABASE_REQUIRED",
@@ -181,6 +237,7 @@ export async function checkReadiness() {
 
   return {
     readinessModelVersion: "readiness.v2",
+    backendIdentity,
     status: ready ? "READY" : "NOT_READY",
     ready,
     liveness: { status: checks.runtime.status, checkedAt: new Date().toISOString() },

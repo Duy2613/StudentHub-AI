@@ -1,8 +1,7 @@
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
-export default async function PublicProfileCompatibilityRoute({ params }) {
-  const resolvedParams = await params;
-  const id = typeof resolvedParams?.id === "object" ? resolvedParams.id?.id : resolvedParams?.id;
-
-  redirect(id ? `/profile?profileId=${encodeURIComponent(id)}` : "/profile");
+export default function PublicProfileCompatibilityRoute() {
+  // Student profiles are owner-only. Expert public profiles have their own
+  // redacted route; a legacy student ID must never resolve to the viewer's DTO.
+  notFound();
 }

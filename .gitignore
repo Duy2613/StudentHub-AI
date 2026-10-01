@@ -39,6 +39,7 @@ Thumbs.db
 frontend/playwright-report/
 frontend/playwright-report-staging/
 frontend/test-results/
+frontend/.next-*/
 frontend/.lighthouseci/
 frontend/.lhci-chrome-profile/
 frontend/.lhci-temp/

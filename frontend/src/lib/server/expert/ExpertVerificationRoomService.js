@@ -132,7 +132,9 @@ async function publishRoomRevision(roomId, revision, status, recipientIds, round
     producer: "studenthub-expert-v5-room",
     correlationId: `expert-room:${roomId}`,
     idempotencyKey: `room-revision:${roomId}:${revision}:${subjectId}`,
-    data: { roomId, roundId, revision, state: status, changedAt: new Date().toISOString() },
+    // The durable revision is the event identity. A retry must carry the same
+    // payload rather than a new wall-clock timestamp under the old key.
+    data: { roomId, roundId, revision, state: status },
   })));
 }
 
@@ -233,6 +235,14 @@ async function updateRoomState(client, room, nextState) {
       WHERE id = $1 RETURNING revision`, [room.id, state],
   );
   return { status: state, revision: Number(result.rows[0]?.revision || Number(room.revision) + 1) };
+}
+
+async function bumpRoomRevision(client, room) {
+  const result = await client.query(
+    `UPDATE private.expert_verification_rooms SET revision = revision + 1, updated_at = now()
+      WHERE id = $1 RETURNING revision`, [room.id],
+  );
+  return { status: room.status, revision: Number(result.rows[0].revision) };
 }
 
 function dataPackageFromTrust(payload, challenge, { remoteRetrieval, trustAnalysis, persisted }) {
@@ -364,9 +374,9 @@ export class ExpertVerificationRoomService {
         roomId, actorId: hostId, eventType: "ROOM_CREATED",
         payload: { inputType: challenge.type.toUpperCase(), domainCode: domain }, idempotencyKey: `room-created:${roomId}`,
       });
-      return { roomId, replay: false, recipients: [hostId, ...(supervisor ? [supervisor.userId] : [])] };
+      return { roomId, replay: false, revision: supervisor ? 2 : 1, recipients: [hostId, ...(supervisor ? [supervisor.userId] : [])] };
     }));
-    if (!created.replay) await publishRoomRevision(created.roomId, 1, "WAITING_FOR_SUPERVISOR", created.recipients);
+    if (!created.replay) await publishRoomRevision(created.roomId, created.revision, "WAITING_FOR_SUPERVISOR", created.recipients);
     return { ...(await this.getRoom({ principal, roomId: created.roomId })), idempotent: created.replay };
   }
 
@@ -601,8 +611,9 @@ export class ExpertVerificationRoomService {
       if (!wasMember && Number(count.rows[0]?.count || 0) >= participantLimit) throw roomError("EXPERT_ROOM_PARTICIPANT_LIMIT", "This room has reached its participant limit.", 409);
       await addParticipant(client, { roomId: id, userId, role: "PARTICIPANT_EXPERT" });
       await appendRoomEvent(client, { roomId: id, actorId: userId, eventType: "PARTICIPANT_JOINED", payload: { participantRole: "PARTICIPANT_EXPERT" }, idempotencyKey: `room-joined:${id}:${userId}` });
+      const revision = wasMember ? Number(room.revision) : (await bumpRoomRevision(client, room)).revision;
       const recipients = await roomRecipients(client, id);
-      return { revision: Number(room.revision), status: room.status, recipients };
+      return { revision, status: room.status, recipients };
     }));
     await publishRoomRevision(id, result.revision, result.status, result.recipients);
     return this.getRoom({ principal, roomId: id });
@@ -687,7 +698,8 @@ export class ExpertVerificationRoomService {
         await appendRoomEvent(client, { roomId: id, roundId: round.id, actorId: userId, eventType: "ANSWERS_LOCKED", payload: { reason: "ALL_ANSWERS_SUBMITTED" }, idempotencyKey: `room-answers-locked:${round.id}` });
         return { late: false, shouldAnalyze: true, roundId: round.id, allSubmitted, state: updated.status, revision: updated.revision, recipients: await roomRecipients(client, id) };
       }
-      return { late: false, shouldAnalyze: false, roundId: round.id, allSubmitted: false, revision: Number(room.revision), state: room.status, recipients: await roomRecipients(client, id) };
+      const revision = saved.rows[0] ? (await bumpRoomRevision(client, room)).revision : Number(room.revision);
+      return { late: false, shouldAnalyze: false, roundId: round.id, allSubmitted: false, revision, state: room.status, recipients: await roomRecipients(client, id) };
     }));
     await publishRoomRevision(id, result.revision, result.state, result.recipients, result.roundId);
     return { ...result, room: await this.getRoom({ principal, roomId: id }) };
@@ -843,7 +855,7 @@ export class ExpertVerificationRoomService {
         [id, round.id, scoredExpertId, supervisorId, proposal.rubricVersion, JSON.stringify(ratings), JSON.stringify(proposal.evidenceIds), proposal.score, justification, proposalHash],
       );
       if (!saved.rows[0]) throw roomError("EXPERT_ROOM_SCORE_ALREADY_PROPOSED", "A score proposal already exists for this Expert and round.", 409);
-      const updated = room.status === "ADJUDICATION" ? await updateRoomState(client, room, "SUPERVISOR_CONFIRMATION") : { status: room.status, revision: Number(room.revision) };
+      const updated = room.status === "ADJUDICATION" ? await updateRoomState(client, room, "SUPERVISOR_CONFIRMATION") : await bumpRoomRevision(client, room);
       if (room.status === "ADJUDICATION") await client.query(`UPDATE private.expert_room_rounds SET status = 'SUPERVISOR_CONFIRMATION' WHERE id = $1`, [round.id]);
       await appendRoomEvent(client, {
         roomId: id, roundId: round.id, actorId: supervisorId, eventType: "ADJUDICATION_PROPOSED",
@@ -874,13 +886,13 @@ export class ExpertVerificationRoomService {
       }
       if (proposal.proposal_hash !== suppliedHash || proposal.state !== "PROPOSED") {
         await client.query(`UPDATE private.expert_room_adjudications SET state = 'DISPUTED' WHERE id = $1`, [proposal.id]);
-        const updated = room.status === "SUPERVISOR_CONFIRMATION" ? await updateRoomState(client, room, "DISPUTED") : { status: room.status, revision: Number(room.revision) };
+        const updated = ["SUPERVISOR_CONFIRMATION", "HOST_ACKNOWLEDGEMENT"].includes(room.status) ? await updateRoomState(client, room, "DISPUTED") : await bumpRoomRevision(client, room);
         await client.query(`UPDATE private.expert_room_rounds SET status = 'DISPUTED' WHERE id = $1`, [round.id]);
         await appendRoomEvent(client, { roomId: id, roundId: round.id, actorId: supervisorId, eventType: "ROUND_DISPUTED", payload: { expertId: scoredExpertId, reason: "SUPERVISOR_PROPOSAL_HASH_MISMATCH" }, idempotencyKey: `room-dispute:${round.id}:${scoredExpertId}` });
         return { state: updated.status, revision: updated.revision, recipients: await roomRecipients(client, id), disputed: true };
       }
       await client.query(`UPDATE private.expert_room_adjudications SET state = 'SUPERVISOR_CONFIRMED', supervisor_confirmed_at = now() WHERE id = $1`, [proposal.id]);
-      const updated = room.status === "SUPERVISOR_CONFIRMATION" ? await updateRoomState(client, room, "HOST_ACKNOWLEDGEMENT") : { status: room.status, revision: Number(room.revision) };
+      const updated = room.status === "SUPERVISOR_CONFIRMATION" ? await updateRoomState(client, room, "HOST_ACKNOWLEDGEMENT") : await bumpRoomRevision(client, room);
       await client.query(`UPDATE private.expert_room_rounds SET status = 'HOST_ACKNOWLEDGEMENT' WHERE id = $1`, [round.id]);
       await appendRoomEvent(client, { roomId: id, roundId: round.id, actorId: supervisorId, eventType: "SUPERVISOR_CONFIRMED", payload: { expertId: scoredExpertId, proposalHash: suppliedHash }, idempotencyKey: `room-supervisor-confirmed:${round.id}:${scoredExpertId}` });
       return { state: updated.status, revision: updated.revision, recipients: await roomRecipients(client, id), idempotent: false };
@@ -972,14 +984,14 @@ export class ExpertVerificationRoomService {
       const answered = await client.query(`SELECT count(*)::int AS count FROM private.expert_room_answers WHERE round_id = $1`, [round.id]);
       const settled = await client.query(`SELECT count(*)::int AS count FROM private.expert_room_adjudications WHERE round_id = $1 AND state = 'SETTLED'`, [round.id]);
       let roomState = room.status;
-      let revision = Number(room.revision);
+      let revision;
       if (Number(answered.rows[0]?.count || 0) > 0 && Number(answered.rows[0]?.count) === Number(settled.rows[0]?.count)) {
         const nextRoom = await updateRoomState(client, room, "SETTLED");
         roomState = nextRoom.status;
         revision = nextRoom.revision;
         await client.query(`UPDATE private.expert_room_rounds SET status = 'SETTLED' WHERE id = $1`, [round.id]);
         await appendRoomEvent(client, { roomId: id, roundId: round.id, actorId: hostId, eventType: "ROOM_SETTLED", payload: { scoreCount: Number(settled.rows[0]?.count) }, idempotencyKey: `room-settled:${round.id}` });
-      }
+      } else revision = (await bumpRoomRevision(client, room)).revision;
       return { state: roomState, revision, score, requestedDelta, reputationDelta: delta, recipients: await roomRecipients(client, id), idempotent: reputationInsert.rows.length === 0 };
     }));
     await publishRoomRevision(id, result.revision, result.state, result.recipients);

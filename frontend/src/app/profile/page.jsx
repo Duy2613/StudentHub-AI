@@ -62,6 +62,19 @@ function formatRelativeAge(isoString) {
   }
 }
 
+function activityCount(value) {
+  return Number.isFinite(value) ? value : "—";
+}
+
+function ActivityNotice({ activity }) {
+  if (activity.dataStatus === "AVAILABLE") return null;
+  return <p className="text-xs text-amber-300" role="status">
+    {activity.dataStatus === "PARTIAL"
+      ? "Một phần hoạt động chưa tải được. Tổng số sẽ được cập nhật khi tải đủ dữ liệu."
+      : "Chưa tải được hoạt động. Vui lòng thử tải lại trang."}
+  </p>;
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const { profile, session, isLoading, isAuthenticated, status, refreshProfile, expertLifecycleState } = useAuth();
@@ -245,9 +258,9 @@ export default function ProfilePage() {
 
   const identity = profileView?.identity || profileView || {};
   const education = profileView?.education || {};
-  const trustActivity = profileView?.trustActivity || { count: 0, recentCases: [], pendingExpertRequests: 0 };
-  const communityActivity = profileView?.communityActivity || { posts: 0, comments: 0, recentActivity: [] };
-  const expertRequests = profileView?.expertRequests || { total: 0, pending: 0, inReview: 0, completed: 0, recentRequests: [] };
+  const trustActivity = profileView?.trustActivity || { dataStatus: "UNAVAILABLE", count: null, recentCases: [], pendingExpertRequests: null };
+  const communityActivity = profileView?.communityActivity || { dataStatus: "UNAVAILABLE", posts: null, comments: null, recentActivity: [] };
+  const expertRequests = profileView?.expertRequests || { dataStatus: "UNAVAILABLE", total: null, pending: null, inReview: null, completed: null, recentRequests: [] };
   const account = profileView?.account || {};
 
   const fullName = identity.fullName || profile?.fullName || "Thành viên StudentHub";
@@ -349,27 +362,27 @@ export default function ProfilePage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             <div className="rounded-lg border border-white/5 bg-[#0e131d] p-3.5 space-y-1">
               <span className="text-[11px] font-medium text-slate-400 block">Hồ sơ Trust</span>
-              <strong className="text-xl font-bold text-slate-100">{trustActivity.count}</strong>
+              <strong className="text-xl font-bold text-slate-100">{activityCount(trustActivity.count)}</strong>
               <small className="text-[10px] text-slate-500 block">Ca kiểm chứng</small>
             </div>
             <div className="rounded-lg border border-white/5 bg-[#0e131d] p-3.5 space-y-1">
               <span className="text-[11px] font-medium text-slate-400 block">Bài viết</span>
-              <strong className="text-xl font-bold text-slate-100">{communityActivity.posts}</strong>
+              <strong className="text-xl font-bold text-slate-100">{activityCount(communityActivity.posts)}</strong>
               <small className="text-[10px] text-slate-500 block">Cộng đồng</small>
             </div>
             <div className="rounded-lg border border-white/5 bg-[#0e131d] p-3.5 space-y-1">
               <span className="text-[11px] font-medium text-slate-400 block">Bình luận</span>
-              <strong className="text-xl font-bold text-slate-100">{communityActivity.comments}</strong>
+              <strong className="text-xl font-bold text-slate-100">{activityCount(communityActivity.comments)}</strong>
               <small className="text-[10px] text-slate-500 block">Đóng góp</small>
             </div>
             <div className="rounded-lg border border-white/5 bg-[#0e131d] p-3.5 space-y-1">
               <span className="text-[11px] font-medium text-slate-400 block">Hỏi chuyên gia</span>
-              <strong className="text-xl font-bold text-slate-100">{expertRequests.total}</strong>
+              <strong className="text-xl font-bold text-slate-100">{activityCount(expertRequests.total)}</strong>
               <small className="text-[10px] text-slate-500 block">Yêu cầu giám định</small>
             </div>
             <div className="rounded-lg border border-white/5 bg-[#0e131d] p-3.5 space-y-1">
               <span className="text-[11px] font-medium text-slate-400 block">Chờ giám định</span>
-              <strong className="text-xl font-bold text-slate-100">{expertRequests.pending + expertRequests.inReview}</strong>
+              <strong className="text-xl font-bold text-slate-100">{activityCount(Number.isFinite(expertRequests.pending) && Number.isFinite(expertRequests.inReview) ? expertRequests.pending + expertRequests.inReview : null)}</strong>
               <small className="text-[10px] text-slate-500 block">Đang xử lý</small>
             </div>
             <div className="rounded-lg border border-white/5 bg-[#0e131d] p-3.5 space-y-1">
@@ -396,6 +409,7 @@ export default function ProfilePage() {
               </Link>
             </div>
 
+            <ActivityNotice activity={trustActivity} />
             {trustActivity.recentCases && trustActivity.recentCases.length > 0 ? (
               <ul className="space-y-2.5" role="list">
                 {trustActivity.recentCases.map((tc) => (
@@ -414,7 +428,7 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
                       <span>{tc.visibility}</span>
-                      <Link href={`/trust/${tc.id}`} className="text-indigo-400 hover:underline inline-flex items-center gap-0.5">
+                      <Link href={`/trust?caseId=${encodeURIComponent(tc.id)}${Number.isInteger(tc.caseRevision) ? `&caseRevision=${tc.caseRevision}` : ""}`} className="text-indigo-400 hover:underline inline-flex items-center gap-0.5">
                         Chi tiết <ExternalLink size={10} />
                       </Link>
                     </div>
@@ -423,7 +437,7 @@ export default function ProfilePage() {
               </ul>
             ) : (
               <div className="text-center py-6 text-slate-500 text-xs space-y-2">
-                <p>Chưa có hồ sơ Trust nào.</p>
+                <p>{trustActivity.dataStatus === "UNAVAILABLE" ? "Lịch sử kiểm chứng hiện chưa khả dụng." : "Chưa có hồ sơ Trust nào."}</p>
                 <Link href="/trust" className="inline-block px-3 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 text-xs">
                   Bắt đầu kiểm chứng đầu tiên
                 </Link>
@@ -445,11 +459,16 @@ export default function ProfilePage() {
               </Link>
             </div>
 
+            <ActivityNotice activity={communityActivity} />
             {communityActivity.recentActivity && communityActivity.recentActivity.length > 0 ? (
               <ul className="space-y-2.5" role="list">
                 {communityActivity.recentActivity.map((item) => (
                   <li key={item.id} className="p-3 rounded-lg border border-white/5 bg-black/20 hover:bg-black/30 transition-colors">
-                    <div className="text-xs font-medium text-slate-200 truncate">{item.title}</div>
+                    <div className="text-xs font-medium text-slate-200 truncate">
+                      {item.status === "PUBLISHED"
+                        ? <Link href={item.type === "TRUST_CONTRIBUTION" ? `/community/${encodeURIComponent(item.id)}` : `/community/discussion/${encodeURIComponent(item.id)}`} className="hover:underline">{item.title}</Link>
+                        : item.title}
+                    </div>
                     <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1">
                       <span className="capitalize">{item.category?.toLowerCase()}</span>
                       <span>{formatDate(item.createdAt)}</span>
@@ -459,7 +478,7 @@ export default function ProfilePage() {
               </ul>
             ) : (
               <div className="text-center py-6 text-slate-500 text-xs space-y-2">
-                <p>Chưa có bài đăng nào.</p>
+                <p>{communityActivity.dataStatus === "AVAILABLE" ? "Chưa có bài đăng nào." : "Hoạt động cộng đồng hiện chưa tải đầy đủ."}</p>
                 <Link href="/community" className="inline-block px-3 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 text-xs">
                   Khám phá diễn đàn sinh viên
                 </Link>
@@ -477,10 +496,11 @@ export default function ProfilePage() {
                 </h2>
               </div>
               <span className="text-[11px] font-mono text-slate-400">
-                {expertRequests.total} yêu cầu
+                {activityCount(expertRequests.total)} yêu cầu
               </span>
             </div>
 
+            <ActivityNotice activity={expertRequests} />
             {expertRequests.recentRequests && expertRequests.recentRequests.length > 0 ? (
               <ul className="space-y-2.5" role="list">
                 {expertRequests.recentRequests.map((req) => (
@@ -499,7 +519,7 @@ export default function ProfilePage() {
               </ul>
             ) : (
               <div className="text-center py-6 text-slate-500 text-xs space-y-2">
-                <p>Chưa có yêu cầu gửi chuyên gia.</p>
+                <p>{expertRequests.dataStatus === "UNAVAILABLE" ? "Chưa tải được yêu cầu chuyên gia." : "Chưa có yêu cầu gửi chuyên gia."}</p>
                 <p className="text-[11px] text-slate-600">Khi kiểm chứng Trust, bạn có thể nhấn &quot;Hỏi chuyên gia&quot; để nhận thẩm định chính thức.</p>
               </div>
             )}

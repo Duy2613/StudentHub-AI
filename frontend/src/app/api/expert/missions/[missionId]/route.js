@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 async function mutateMission(request, routeParams, principal, securityContext) {
-  const { missionId } = await routeParams;
+  const { missionId } = await (routeParams?.params || routeParams || {});
   let body;
   try { body = await request.json(); }
   catch { return NextResponse.json({ success: false, error: { code: "JSON_REQUIRED", message: "A JSON action is required." } }, { status: 400 }); }

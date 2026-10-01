@@ -680,7 +680,10 @@ export async function signInWithPassword(email, password, rememberMe = false) {
 
     if (error) {
       logAuthError("signInWithPassword", error);
-      throw new Error(translateAuthError(error));
+      const signInError = new Error(translateAuthError(error));
+      signInError.code = /^[a-z0-9_]{1,80}$/i.test(String(error.code || "")) ? error.code : "IDENTITY_PROVIDER_SIGN_IN_FAILED";
+      signInError.status = Number.isInteger(error.status) ? error.status : null;
+      throw signInError;
     }
 
     if (data?.session?.access_token) {

@@ -18,7 +18,8 @@ async function handleGetCase(request, routeParams, principal) {
     );
   }
 
-  const caseId = routeParams?.caseId;
+  const params = await (routeParams?.params || routeParams || {});
+  const caseId = params?.caseId;
   if (!caseId) {
     return NextResponse.json(
       { success: false, error: { code: "BAD_REQUEST", message: "caseId is required." } },
@@ -50,7 +51,7 @@ async function handleGetCase(request, routeParams, principal) {
       case: caseRecord,
     }, { headers: { "Cache-Control": "private, no-store" } });
   } catch (err) {
-    console.error("[TrustCaseDetailAPI] Error retrieving case:", err.message);
+    console.error("[TrustCaseDetailAPI] Error retrieving case:", { code: /^[A-Z0-9_]{1,80}$/.test(String(err?.code || "")) ? err.code : "STORAGE_UNAVAILABLE" });
     return NextResponse.json(
       { success: false, error: { code: "INTERNAL_ERROR", message: "Could not retrieve trust case." } },
       { status: 500, headers: { "Cache-Control": "private, no-store" } }

@@ -85,7 +85,8 @@ async function createUser(index) {
   if (!signedIn.response.ok || !signedIn.body?.access_token) {
     throw new Error(`LOCAL_AUTH_SIGN_IN_FAILED:${signedIn.response.status}`);
   }
-  return { id: created.body.id, token: signedIn.body.access_token };
+  users[users.length - 1].token = signedIn.body.access_token;
+  return users[users.length - 1];
 }
 
 try {
@@ -122,6 +123,15 @@ try {
   results.push({ check: "anonymous_denied", status: anonymousRead.response.status, pass: anonymousDenied });
   if (!anonymousDenied) throw new Error(`LOCAL_STORAGE_ANONYMOUS_ALLOWED:${anonymousRead.response.status}`);
 
+  const signed = await request(`/storage/v1/object/sign/${BUCKET}/${objectPath}`, {
+    method: "POST",
+    headers: { ...authHeaders(anonKey, owner.token), "content-type": "application/json" },
+    body: JSON.stringify({ expiresIn: 60 })
+  });
+  if (!signed.response.ok || !signed.body?.signedURL) throw new Error("LOCAL_STORAGE_SIGNED_READ_UNAVAILABLE");
+  const signedRead = await request(`/storage/v1${signed.body.signedURL}`);
+  results.push({ check: "owner_authorized_signed_url_read", status: signedRead.response.status, pass: signedRead.response.ok && signedRead.body === bytes.toString("utf8") });
+
   const metadata = await request(`/rest/v1/screenshot_objects`, {
     method: "POST",
     headers: { ...authHeaders(serviceKey), "content-type": "application/json", Prefer: "return=representation" },
@@ -153,19 +163,24 @@ try {
 } finally {
   // All cleanup is scoped to the local Kong endpoint and disposable users.
   if (users[0] && objectPath) {
-    await request(`/storage/v1/object/${BUCKET}/${objectPath}`, {
+    const deleted = await request(`/storage/v1/object/${BUCKET}/${objectPath}`, {
       method: "DELETE",
       headers: authHeaders(anonKey, users[0].token)
-    }).catch(() => {});
+    }).catch(() => null);
+    results.push({ check: "exact_owner_object_cleanup", status: deleted?.response.status || null, pass: deleted?.response.ok === true });
   }
   await request(`/rest/v1/screenshot_objects?object_key=eq.${encodeURIComponent(objectPath)}`, {
     method: "DELETE",
     headers: authHeaders(serviceKey)
   }).catch(() => {});
   for (const user of users.reverse()) {
-    await request(`/auth/v1/admin/users/${user.id}`, {
+    const deleted = await request(`/auth/v1/admin/users/${user.id}`, {
       method: "DELETE",
       headers: authHeaders(serviceKey)
-    }).catch(() => {});
+    }).catch(() => null);
+    results.push({ check: "exact_fixture_auth_cleanup", status: deleted?.response.status || null, pass: deleted?.response.ok === true });
   }
+  const cleanupReport = { target: "LOCAL_DISPOSABLE_SUPABASE", apiBase: LOCAL_API, bucket: BUCKET, bucketPublic: false, objectPath, bytes: bytes.length, sha256, results };
+  await writeFile("artifacts/local-storage-assurance-2026-09-10.json", `${JSON.stringify(cleanupReport, null, 2)}\n`, "utf8");
+  if (results.some((result) => !result.pass)) process.exitCode = 1;
 }
