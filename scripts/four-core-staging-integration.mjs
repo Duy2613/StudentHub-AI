@@ -35,7 +35,19 @@ const users = [];
 let browser;
 async function gate(name, work) {
   try { const result = await work(); report.gates.push({ name, status: result?.status || 'PASS', ...result }); }
-  catch (e) { report.gates.push({ name, status: 'FAIL', code: /^[A-Z0-9_:-]{1,120}$/.test(e.code || e.message) ? e.code || e.message : e.name, assertion: e instanceof assert.AssertionError ? String(e.message).split('\n')[0].slice(0, 160) : null }); }
+  catch (e) {
+    const location = String(e.stack || '').match(/four-core-staging-integration\.mjs:(\d+):(\d+)/);
+    const safeScalar = value => typeof value === 'boolean' || (typeof value === 'number' && Number.isFinite(value)) || (typeof value === 'string' && /^[A-Z_]{1,64}$/.test(value)) ? value : undefined;
+    report.gates.push({
+      name,
+      status: 'FAIL',
+      code: /^[A-Z0-9_:-]{1,120}$/.test(e.code || e.message) ? e.code || e.message : e.name,
+      assertion: e instanceof assert.AssertionError ? String(e.message).split('\n')[0].slice(0, 160) : null,
+      failureLine: location ? Number(location[1]) : null,
+      expected: safeScalar(e.expected),
+      actual: safeScalar(e.actual),
+    });
+  }
   save();
 }
 async function api(user, path, body, options = {}) {
@@ -284,16 +296,17 @@ try {
       caseId: trustCase.caseId,
       caseRevision: trustCase.caseRevision,
       statement,
-      contributionType: 'DIRECT_EXPERIENCE',
+      contributionType: 'CONTEXT',
       phase: 'PREVIEW',
     }, { expected: [200] });
     assert.equal(preview.state, 'PREVIEW_READY', 'COMMUNITY_PRIVACY_PREVIEW_NOT_READY');
+    assert.equal(preview.preview?.validation?.ok, true, `COMMUNITY_PREVIEW_VALIDATION_${(preview.preview?.validation?.errors || []).join('_') || 'FAILED'}`);
     assert.ok(preview.preview?.previewDigest, 'COMMUNITY_PREVIEW_DIGEST_MISSING');
     const published = await api(owner, '/api/intelligence/community/posts', {
       caseId: trustCase.caseId,
       caseRevision: trustCase.caseRevision,
       statement,
-      contributionType: 'DIRECT_EXPERIENCE',
+      contributionType: 'CONTEXT',
       phase: 'PUBLISH',
       privacyConfirmed: true,
       previewDigest: preview.preview.previewDigest,
