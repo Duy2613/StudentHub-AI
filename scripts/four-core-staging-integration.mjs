@@ -276,6 +276,70 @@ try {
     assert.equal(revisions.rows[0].count, 1);
     return { caseId: result.caseId, caseRevision: result.caseRevision, persisted: true, stages: stages.rows, providerMode: 'OFF', liveAiVerdictGate: 'BLOCKED_EXTERNAL_GEMINI_NOT_CONFIGURED' };
   });
+  await gate('community-durable-publication-nested-comments-idempotency', async () => {
+    const trustCase = report.gates.find(g => g.name === 'trust-canonical-text-persistence-owner-isolation' && g.status === 'PASS');
+    assert.ok(trustCase?.caseId && trustCase.caseRevision, 'COMMUNITY_TRUST_CASE_FIXTURE_MISSING');
+    const statement = 'Synthetic staging fixture: HTTP cache directives control when a response may be reused by a cache.';
+    const preview = await api(owner, '/api/intelligence/community/posts', {
+      caseId: trustCase.caseId,
+      caseRevision: trustCase.caseRevision,
+      statement,
+      contributionType: 'DIRECT_EXPERIENCE',
+      phase: 'PREVIEW',
+    }, { expected: [200] });
+    assert.equal(preview.state, 'PREVIEW_READY', 'COMMUNITY_PRIVACY_PREVIEW_NOT_READY');
+    assert.ok(preview.preview?.previewDigest, 'COMMUNITY_PREVIEW_DIGEST_MISSING');
+    const published = await api(owner, '/api/intelligence/community/posts', {
+      caseId: trustCase.caseId,
+      caseRevision: trustCase.caseRevision,
+      statement,
+      contributionType: 'DIRECT_EXPERIENCE',
+      phase: 'PUBLISH',
+      privacyConfirmed: true,
+      previewDigest: preview.preview.previewDigest,
+    }, { headers: { 'Idempotency-Key': `${runTag}:community:publish` }, expected: [201] });
+    assert.equal(published.state, 'PUBLISHED', 'COMMUNITY_CONTRIBUTION_NOT_PUBLISHED');
+    assert.equal(published.provenance, 'DURABLE_POSTGRES', 'COMMUNITY_FIXTURE_ORIGIN_NOT_DURABLE');
+    const contributionId = published.post?.contributionId;
+    assert.ok(contributionId, 'COMMUNITY_CONTRIBUTION_ID_MISSING');
+    const linked = await pool.query(
+      `SELECT case_id, case_revision, publication_state
+         FROM public.community_contributions WHERE id = $1`,
+      [contributionId]
+    );
+    assert.equal(linked.rows.length, 1, 'COMMUNITY_CONTRIBUTION_SQL_READBACK_MISSING');
+    assert.equal(linked.rows[0].case_id, trustCase.caseId, 'COMMUNITY_TRUST_CASE_LINK_MISMATCH');
+    assert.equal(Number(linked.rows[0].case_revision), Number(trustCase.caseRevision), 'COMMUNITY_TRUST_REVISION_LINK_MISMATCH');
+    assert.equal(linked.rows[0].publication_state, 'PUBLISHED', 'COMMUNITY_PUBLICATION_STATE_NOT_DURABLE');
+
+    const threadPath = `/api/intelligence/community/posts/${contributionId}/comments`;
+    const rootText = 'Synthetic staging comment checks durable thread persistence.';
+    const rootKey = `${runTag}:community:comment-root`;
+    const root = await api(other, threadPath, { content: rootText }, { headers: { 'Idempotency-Key': rootKey }, expected: [201] });
+    assert.equal(root.comment?.depth, 0, 'COMMUNITY_ROOT_DEPTH_MISMATCH');
+    const retry = await api(other, threadPath, { content: rootText }, { headers: { 'Idempotency-Key': rootKey }, expected: [200] });
+    assert.equal(retry.comment?.commentId, root.comment.commentId, 'COMMUNITY_IDEMPOTENT_COMMENT_CHANGED');
+    assert.equal(retry.comment?.idempotent, true, 'COMMUNITY_IDEMPOTENT_RETRY_NOT_RECOGNIZED');
+    const reply = await api(owner, threadPath, { content: 'Synthetic nested reply confirms parent linkage.', parentCommentId: root.comment.commentId }, {
+      headers: { 'Idempotency-Key': `${runTag}:community:comment-reply` }, expected: [201],
+    });
+    assert.equal(reply.comment?.depth, 1, 'COMMUNITY_REPLY_DEPTH_MISMATCH');
+    assert.equal(reply.comment?.parentCommentId, root.comment.commentId, 'COMMUNITY_REPLY_PARENT_MISMATCH');
+    const visible = await api(other, threadPath, undefined, { expected: [200] });
+    assert.equal(visible.comments?.length, 1, 'COMMUNITY_PUBLIC_THREAD_ROOT_MISSING');
+    assert.equal(visible.comments[0].commentId, root.comment.commentId, 'COMMUNITY_PUBLIC_ROOT_ID_MISMATCH');
+    assert.equal(visible.comments[0].replies?.length, 1, 'COMMUNITY_NESTED_REPLY_READBACK_MISSING');
+    assert.equal(visible.comments[0].replies[0].commentId, reply.comment.commentId, 'COMMUNITY_NESTED_REPLY_ID_MISMATCH');
+    const rows = await pool.query(
+      `SELECT depth, parent_comment_id FROM public.community_comments
+        WHERE contribution_id = $1 ORDER BY depth, created_at, id`,
+      [contributionId]
+    );
+    assert.equal(rows.rows.length, 2, 'COMMUNITY_COMMENT_SQL_ROW_COUNT_MISMATCH');
+    assert.deepEqual(rows.rows.map(row => Number(row.depth)), [0, 1], 'COMMUNITY_COMMENT_SQL_DEPTH_MISMATCH');
+    assert.equal(rows.rows[1].parent_comment_id, root.comment.commentId, 'COMMUNITY_COMMENT_SQL_PARENT_MISMATCH');
+    return { previewConfirmed: true, publishedToPostgres: true, trustCaseRevisionLinked: true, publicReadback: true, nestedCommentDepths: [0, 1], idempotentRetry: true };
+  });
 } catch (e) {
   report.gates.push({ name: 'staging-setup', status: 'FAIL', code: /^[A-Z0-9_:-]{1,120}$/.test(e.message) ? e.message : e.name });
 } finally {
