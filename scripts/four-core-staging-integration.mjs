@@ -43,7 +43,7 @@ async function api(user, path, body, options = {}) {
     const response = await fetch(path, { credentials: 'include', cache: 'no-store', signal: AbortSignal.timeout(180000), method: options.method || (body === undefined ? 'GET' : 'POST'), headers: { ...(body === undefined ? {} : { 'content-type': 'application/json' }), ...options.headers }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
     return { status: response.status, body: await response.json().catch(() => null) };
   }, { path, body, options });
-  report.checks.push({ path: path.split('?')[0], actor: user.kind, status: result.status, code: result.body?.error?.code || null, correlationId: result.body?.meta?.correlationId || null });
+  report.checks.push({ path: path.split('?')[0], actor: user.kind, status: result.status, code: result.body?.error?.code || result.body?.persistence?.errorCode || null, persistenceStatus: result.body?.persistence?.status || null, persistenceErrorCode: result.body?.persistence?.errorCode || null, correlationId: result.body?.meta?.correlationId || result.body?.requestId || null });
   if (options.expected) assert.ok(options.expected.includes(result.status), `HTTP_STATUS_${result.status}_${result.body?.error?.code || 'UNKNOWN'}`);
   return result.body;
 }
@@ -137,7 +137,7 @@ try {
       const evidenceItems = Array.isArray(readback.rows[0].evidence_items) ? readback.rows[0].evidence_items : [];
       const supporting = evidenceItems.find(item => /HTTP Semantics/i.test(item.excerpt || ''));
       assert.ok(supporting, 'REAL_SOURCE_ANSWER_SUPPORT_MISSING');
-      const prompt = 'Which exact phrase appears in the cited retrieved excerpt?';
+      const prompt = `Which exact phrase appears in the cited retrieved excerpt for QA run ${runTag}?`;
       const question = await api(admin, '/api/expert/v5/questions', { action: 'CREATE_DRAFT', question: { sourceSnapshotId: snapshot.snapshotId, questionType: 'SINGLE_CHOICE', prompt, choices: [{ id: 'a', label: 'HTTP Semantics' }, { id: 'b', label: 'CSS Color' }], answerKey: 'a', explanation: 'The cited excerpt contains the literal phrase HTTP Semantics; this item checks excerpt-bound retrieval.', evidenceIds: [supporting.id], difficultyReview: { ambiguity: 0, temporalReasoning: false } } }, { expected: [201] });
       await api(admin, '/api/expert/v5/questions', { action: 'ACTIVATE', questionId: question.data.question_id, questionVersion: question.data.questionVersion, reviewChecks: { sourceSupport: true, distractorsReviewed: true, domainFit: true, difficultyConfirmed: true } }, { expected: [200] });
       const sourceDomain = (await pool.query('SELECT domain_code FROM private.expert_v5_source_registry WHERE id=$1', [snapshot.sourceId])).rows[0].domain_code;
@@ -247,7 +247,7 @@ try {
     { type: 'image', content: '', metadata: { bytes: readFileSync(resolve(root, 'fixtures/trust-multimodal/screenshot-text.png')).toString('base64'), mimeType: 'image/png', fileName: 'synthetic-screenshot.png' } },
     { type: 'qr', content: '', metadata: { bytes: readFileSync(resolve(root, 'fixtures/trust-multimodal/01-https.png')).toString('base64'), mimeType: 'image/png', fileName: 'synthetic-qr.png' } },
   ]) await gate(`trust-canonical-${input.type}-persistence-owner-isolation`, async () => {
-    const result = await api(owner, '/api/v1/trust', { ...input, depth: 'full' }, { headers: { 'Idempotency-Key': `${runTag}:trust:${input.type}` }, expected: [200] });
+    const result = await api(owner, '/api/v1/trust', { ...input, depth: 'full', version: 'v5' }, { headers: { 'Idempotency-Key': `${runTag}:trust:${input.type}` }, expected: [200] });
     assert.equal(result.persistence?.persisted, true, 'AUTHENTICATED_CANONICAL_CASE_NOT_PERSISTED');
     assert.ok(result.caseId && result.caseRevision, 'DURABLE_CASE_REVISION_MISSING');
     report.retainedImmutableFixtureIds.push(result.caseId);
