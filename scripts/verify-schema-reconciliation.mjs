@@ -76,7 +76,7 @@ const fingerprintQuery = `select json_build_object(
 );`;
 const canonical = json(fresh, fingerprintQuery);
 const v5Tables = canonical.tables.filter(x => /^private\.expert_(v5_|mission_|daily_missions$|room_|verification_rooms$)/.test(x.name)).map(x => x.name);
-assert.equal(v5Tables.length, 21);
+assert.equal(v5Tables.length, 27, "Question Bank adds six canonical Expert V5 relations");
 fs.writeFileSync(path.join(artifactDir, 'CANONICAL_SCHEMA_FINGERPRINT.json'), JSON.stringify(canonical, null, 2) + '\n');
 report.canonicalFingerprintSha256 = createHash('sha256').update(JSON.stringify(canonical)).digest('hex');
 const forward = migrations.filter(x => x.startsWith('20261001'));
