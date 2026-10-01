@@ -52,7 +52,7 @@
     },
     "storageAssurance": {
       "artifact": "staging-storage.json",
-      "result": "PARTIAL; TRUST_DIRECT_IMAGE_AND_QR_PASS; EXPERT_ROOM_IMAGE_AND_QR_FLOW_NOT_VERIFIED; AVATAR_UPLOAD_NOT_IN_PROFILE_CONTRACT",
+      "result": "PARTIAL; TRUST_DIRECT_IMAGE_AND_QR_PASS; EXPERT_ROOM_MEDIA_ACCEPTANCE_FAIL_STATIC; AVATAR_UPLOAD_NOT_IN_PROFILE_CONTRACT",
       "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
       "localArtifact": "storage-local.json"
     },
@@ -69,6 +69,25 @@
     "freshRetrievalHoldout": {
       "result": "BLOCKED_EXTERNAL; no unseen approved corpus or retrieval budget",
       "tavilyMode": "OFF; no Tavily request made"
+    },
+    "roomMediaAcceptance": {
+      "artifact": "ROOM_MEDIA_STORAGE_ACCEPTANCE.md",
+      "candidateSourceSha": "eea55564ebaef4dc2edc7af14586fe8f04324114",
+      "targetProjectRef": "bniwtkjtramqaozrrtrk",
+      "result": "FAIL_STATIC_AT_R05; LIVE_ACCEPTANCE_NOT_RUN",
+      "requiredFields": {
+        "ROOM_IMAGE_UPLOAD": "NOT_RUN",
+        "ROOM_IMAGE_READBACK": "FAIL_STATIC",
+        "ROOM_IMAGE_TRUST_HANDOFF": "BLOCKED_BY_MISSING_CANONICAL_ASSET_REFERENCE",
+        "ROOM_QR_UPLOAD": "NOT_RUN",
+        "ROOM_QR_READBACK": "FAIL_STATIC",
+        "ROOM_QR_TRUST_HANDOFF": "BLOCKED_BY_MISSING_CANONICAL_ASSET_REFERENCE",
+        "ROOM_MEDIA_AUTHORIZATION": "NOT_RUN_LIVE",
+        "ROOM_MEDIA_RELOAD": "FAIL_ACCEPTANCE",
+        "ROOM_MEDIA_RECONNECT": "NOT_RUN_FOR_MEDIA",
+        "ROOM_MEDIA_CLEANUP": "NOT_RUN",
+        "ROOM_MEDIA_STORAGE": "FAIL"
+      }
     },
     "productionSnapshot": {
       "artifact": "production-snapshot-final.json",
@@ -119,6 +138,7 @@
   },
   "evidenceFiles": [
     "FINAL_REPORT.md",
+    "ROOM_MEDIA_STORAGE_ACCEPTANCE.md",
     "ROLLOUT_PLAN.md",
     "MANIFEST.sha256",
     "MIGRATION_LEDGER_RECONCILIATION.md",
