@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "publishedAtUtc": "2026-10-01T14:34:39Z",
+  "candidateSourceSha": "cc2a31069dfab6dd4fa112335f930c3639719fe6",
+  "releaseBranch": "codex/studenthub-four-core-repair-20261001",
+  "localReleaseSha": "cc2a31069dfab6dd4fa112335f930c3639719fe6",
+  "remoteReleaseSha": "cc2a31069dfab6dd4fa112335f930c3639719fe6",
+  "localMatchesRemote": true,
+  "evidenceBranch": "codex/studenthub-four-core-repair-evidence-20261001",
+  "evidencePackageCommit": "5fbfb5958e46eb7b8ee01c50088fe5fa05766a23",
+  "remoteMainShaAtVerification": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
+  "productionDeploymentId": "dpl_ED91sTmSbtDS3xTzhgCeeiJqeRh7",
+  "productionDeploymentSha": "595a99110367aefb545b02dab4b9f9a5a6106ab6",
+  "mainPromoted": false,
+  "candidateDeployedToProduction": false,
+  "productionMutated": false,
+  "verdict": "STUDENTHUB_PRODUCTION_RELEASE_PARTIAL"
+}
