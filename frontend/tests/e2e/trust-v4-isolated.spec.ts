@@ -296,6 +296,51 @@ test('all four modalities preserve the submitted input contract without leaking 
   expect(requests).toHaveLength(4);
 });
 
+test('TEXT and URL drafts stay isolated and switching to or from media drops the other modality payload', async ({ page }) => {
+  await harness(page);
+  const requests: Record<string, unknown>[] = [];
+  page.on('request', (request) => { if (new URL(request.url()).pathname === '/api/v1/trust') requests.push(request.postDataJSON()); });
+  const image = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNgAAAAAgABSK+kcQAAAABJRU5ErkJggg==', 'base64');
+
+  await selectMode(page, 'Văn bản');
+  await page.getByLabel('Nội dung cần kiểm chứng', { exact: true }).fill(DRAFT);
+  await selectMode(page, 'Đường dẫn');
+  await expect(page.getByLabel('Đường dẫn cần đối chiếu', { exact: true })).toHaveValue('');
+  const urlDraft = 'https://example.org/policy';
+  await page.getByLabel('Đường dẫn cần đối chiếu', { exact: true }).fill(urlDraft);
+  await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
+  await expect(page.getByTestId('trust-conclusion')).toBeVisible();
+  expect(requests.at(-1)?.content).toBe(urlDraft);
+  await page.getByRole('button', { name: 'Phân tích mới', exact: true }).click();
+
+  await selectMode(page, 'Văn bản');
+  await expect(page.getByLabel('Nội dung cần kiểm chứng', { exact: true })).toHaveValue(DRAFT);
+  await selectMode(page, 'Hình ảnh');
+  await page.locator('#trust-file').setInputFiles({ name: 'transition.png', mimeType: 'image/png', buffer: image });
+  await selectMode(page, 'Văn bản');
+  await expect(page.getByLabel('Nội dung cần kiểm chứng', { exact: true })).toHaveValue(DRAFT);
+  await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
+  await expect(page.getByTestId('trust-conclusion')).toBeVisible();
+  expect(requests.at(-1)).toMatchObject({ type: 'text', content: DRAFT, metadata: { inputKind: 'TEXT' } });
+  expect(requests.at(-1)?.metadata).not.toHaveProperty('bytes');
+  await page.getByRole('button', { name: 'Phân tích mới', exact: true }).click();
+
+  await selectMode(page, 'Mã QR');
+  await page.locator('#trust-file').setInputFiles({ name: 'transition-qr.png', mimeType: 'image/png', buffer: image });
+  await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
+  await expect(page.getByTestId('trust-conclusion')).toBeVisible();
+  expect(requests.at(-1)).toMatchObject({ type: 'qr', content: '', metadata: { inputKind: 'QR', fileName: 'transition-qr.png' } });
+  await page.getByRole('button', { name: 'Phân tích mới', exact: true }).click();
+  await selectMode(page, 'Hình ảnh');
+  await expect(page.getByText('transition-qr.png', { exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Kiểm chứng', exact: true })).toBeDisabled();
+  await page.locator('#trust-file').setInputFiles({ name: 'transition-image-after-qr.png', mimeType: 'image/png', buffer: image });
+  await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
+  await expect(page.getByTestId('trust-conclusion')).toBeVisible();
+  expect(requests.at(-1)).toMatchObject({ type: 'image', content: '', metadata: { inputKind: 'IMAGE', fileName: 'transition-image-after-qr.png' } });
+  expect(requests).toHaveLength(4);
+});
+
 test('completed layer wrappers keep an unpublished Final Predict locked; inspection never starts another run', async ({ page }) => {
   await harness(page, { outcome: 'UNPUBLISHED' });
   const calls: string[] = [];

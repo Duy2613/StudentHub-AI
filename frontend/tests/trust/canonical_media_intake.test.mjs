@@ -32,6 +32,25 @@ test("authenticated media intake uses the principal and replaces client bytes/ha
   assert.equal(result.input.metadata.bytes, undefined);
 });
 
+test("artifact-backed IMAGE intake clears a retained TEXT draft before the canonical hash is computed", async () => {
+  const staleDraft = await prepareCanonicalMediaInput({
+    type: "image",
+    content: "A text draft from the previous input mode",
+    metadata: { bytes: Buffer.from("same-image"), mimeType: "image/png", fileName: "same.png", fileSize: 24 },
+  }, { principal, mediaService: serviceFake() });
+  const freshImage = await prepareCanonicalMediaInput({
+    type: "image",
+    content: "",
+    metadata: { bytes: Buffer.from("same-image"), mimeType: "image/png", fileName: "same.png", fileSize: 24 },
+  }, { principal, mediaService: serviceFake() });
+
+  assert.equal(staleDraft.ok, true);
+  assert.equal(freshImage.ok, true);
+  assert.equal(staleDraft.input.content, "");
+  assert.deepEqual(staleDraft.input.metadata.imageHash, freshImage.input.metadata.imageHash);
+  assert.deepEqual(computeTrustInputHash(staleDraft.input), computeTrustInputHash(freshImage.input));
+});
+
 test("anonymous references, non-image references and mixed bytes/reference payloads never reach the artifact cache", async () => {
   const mediaService = serviceFake();
   const reference = { type: "image", metadata: { mediaArtifactId: artifact.mediaArtifactId } };
@@ -73,6 +92,24 @@ test("Trust input fingerprint includes image digest and excludes allocation-spec
   const differentBytes = computeTrustInputHash({ ...input, metadata: { ...input.metadata, imageHash: "b".repeat(64) } });
   assert.deepEqual(original, sameBytes);
   assert.notDeepEqual(original, differentBytes);
+});
+
+test("artifact-backed IMAGE and QR hashes ignore stale cross-mode content but retain artifact identity", () => {
+  for (const type of ["image", "qr"]) {
+    const input = { type, content: "stale text draft", metadata: { mediaArtifactId: "artifact-a", imageHash: "a".repeat(64), qrContent: type === "qr" ? "https://example.org/canonical" : undefined } };
+    const clean = { ...input, content: "" };
+    assert.deepEqual(computeTrustInputHash(input), computeTrustInputHash(clean), `${type} ignores stale draft`);
+    assert.notDeepEqual(
+      computeTrustInputHash(input),
+      computeTrustInputHash({ ...clean, metadata: { ...clean.metadata, imageHash: "b".repeat(64) } }),
+      `${type} remains bound to image bytes`,
+    );
+  }
+  assert.notDeepEqual(
+    computeTrustInputHash({ type: "text", content: "draft A" }),
+    computeTrustInputHash({ type: "text", content: "draft B" }),
+    "TEXT content remains part of its input identity",
+  );
 });
 
 test("every API entry point consuming stored image references uses the shared authorization intake", async () => {

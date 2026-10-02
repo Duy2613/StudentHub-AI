@@ -28,13 +28,20 @@ const IDENTITY_METADATA_KEYS = new Set([
  * same durable case without weakening URL/path/query identity.
  */
 export function computeTrustInputHash(input = {}) {
+  const inputType = String(input.type || "text").toLowerCase();
   const sourceMetadata = input.metadata && typeof input.metadata === "object" && !Array.isArray(input.metadata)
     ? Object.fromEntries(Object.entries(input.metadata).filter(([key]) => IDENTITY_METADATA_KEYS.has(key)))
     : {};
+  const hasCanonicalMediaArtifact = ["image", "qr"].includes(inputType)
+    && Boolean(input.metadata?.mediaArtifactId)
+    && typeof sourceMetadata.imageHash === "string"
+    && /^[0-9a-f]{64}$/i.test(sourceMetadata.imageHash);
   return crypto.createHash("sha256")
     .update(JSON.stringify(canonicalValue({
-      type: String(input.type || "text").toLowerCase(),
-      content: String(input.content || "").trim(),
+      type: inputType,
+      // Artifact-backed media is identified by the server-verified artifact
+      // digest and decoded metadata. A stale editor draft is not part of it.
+      content: hasCanonicalMediaArtifact ? "" : String(input.content || "").trim(),
       metadata: sourceMetadata,
     })))
     .digest();

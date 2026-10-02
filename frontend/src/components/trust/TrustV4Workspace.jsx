@@ -91,7 +91,8 @@ function TrustSession({ authenticated }) {
   const initialMode = MODES.includes(query.get("mode")) ? query.get("mode") : "text";
   const routeCaseId = isUuid(query.get("caseId")) ? query.get("caseId") : null;
   const [mode, setMode] = useState(initialMode);
-  const [content, setContent] = useState("");
+  const [contentDrafts, setContentDrafts] = useState({ text: "", url: "" });
+  const content = contentDrafts[mode] || "";
   const [fileData, setFileData] = useState(null);
   const [filePending, setFilePending] = useState(false);
   const [error, setError] = useState(null);
@@ -206,6 +207,9 @@ function TrustSession({ authenticated }) {
     setDragging(false);
     setError(null);
   };
+  const updateContent = (value) => {
+    setContentDrafts((current) => ({ ...current, [mode]: value }));
+  };
   const clearSelectedFile = () => {
     fileSequence.current += 1;
     setFileData(null);
@@ -222,7 +226,7 @@ function TrustSession({ authenticated }) {
   };
   const resetDraft = () => {
     if (pending) return;
-    setContent("");
+    setContentDrafts((current) => ({ ...current, [mode]: "" }));
     clearSelectedFile();
     setError(null);
   };
@@ -264,7 +268,7 @@ function TrustSession({ authenticated }) {
         input={{ type: String(observedInput.mode || mode).toUpperCase(), content: observedInput.label || observedInput.content || "" }}
         fileInputRef={fileInputRef}
         onModeChange={changeMode}
-        onContentChange={setContent}
+        onContentChange={updateContent}
         onFileSelect={(file) => { void chooseFile(file); }}
         onDragStateChange={setDragging}
         onClearFile={clearSelectedFile}

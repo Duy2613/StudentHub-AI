@@ -32,7 +32,11 @@ export async function prepareCanonicalMediaInput(input, { principal, roomId = nu
   const artifact = result.artifact;
   Object.assign(metadata, { mediaArtifactId: artifact.mediaArtifactId, imageHash: artifact.sha256, mimeType: artifact.mimeType, width: artifact.width, height: artifact.height, fileSize: artifact.byteSize });
   delete metadata.bytes;
-  if (content.startsWith("data:image/")) content = "";
+  if (type === "image") {
+    // The active IMAGE payload is the verified artifact. Do not carry a TEXT
+    // draft retained by the client editor into canonical persistence.
+    content = "";
+  }
   if (type === "qr") {
     const decoded = await decodeQr(mediaService.getArtifactBytes(artifact.mediaArtifactId));
     if (!decoded.ok) {
