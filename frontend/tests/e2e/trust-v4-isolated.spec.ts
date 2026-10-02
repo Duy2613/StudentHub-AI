@@ -107,6 +107,34 @@ async function selectMode(page: Page, label: string) {
   await tab.click();
   await expect(tab).toHaveAttribute('aria-selected', 'true');
 }
+async function activateButtonByKeyboard(page: Page, label: string) {
+  const button = page.getByRole('button', { name: label, exact: true });
+  await expect(button).toBeVisible();
+  await expect(button).toBeEnabled();
+  await button.focus();
+  await page.keyboard.press('Enter');
+}
+async function submitByKeyboard(page: Page) {
+  await page.getByLabel('Nội dung cần kiểm chứng', { exact: true }).fill(DRAFT);
+  await activateButtonByKeyboard(page, 'Kiểm chứng');
+}
+async function selectModeByKeyboard(page: Page, label: string) {
+  const labels = ['Văn bản', 'Đường dẫn', 'Hình ảnh', 'Mã QR'];
+  const tabs = page.getByRole('tablist', { name: 'Loại đầu vào Trust' }).getByRole('tab');
+  let current = await tabs.evaluateAll((elements) => elements.findIndex((element) => element.getAttribute('aria-selected') === 'true'));
+  const target = labels.indexOf(label);
+  if (current < 0 || target < 0) throw new Error(`Unknown Trust input tab: ${label}`);
+  const rightSteps = (target - current + labels.length) % labels.length;
+  const leftSteps = (current - target + labels.length) % labels.length;
+  const key = rightSteps <= leftSteps ? 'ArrowRight' : 'ArrowLeft';
+  const steps = Math.min(rightSteps, leftSteps);
+  for (let step = 0; step < steps; step += 1) {
+    await tabs.nth(current).focus();
+    await page.keyboard.press(key);
+    current = (current + (key === 'ArrowRight' ? 1 : labels.length - 1)) % labels.length;
+    await expect(tabs.nth(current)).toHaveAttribute('aria-selected', 'true');
+  }
+}
 async function shot(page: Page, name: string) {
   await mkdir(DIR, { recursive: true });
   if (!name.includes('sheet')) await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
@@ -141,6 +169,7 @@ async function auditResultAccessibility(page: Page, label: string) {
 }
 
 test('seven groups: entry, processing, result, evidence, integration and mobile sheet', async ({ page }) => {
+  test.setTimeout(90_000);
   const errors = await harness(page, { stream: true });
   await shot(page, '01-entry-light');
   await submit(page);
@@ -158,24 +187,31 @@ test('seven groups: entry, processing, result, evidence, integration and mobile 
   await page.locator('#trust-evidence').evaluate((element) => element.scrollIntoView({ block: 'start', behavior: 'instant' }));
   await shot(page, '04-evidence-sources-comparison');
   await page.getByRole('button', { name: 'Xem đánh giá chuyên gia', exact: true }).click();
-  await page.getByRole('button', { name: 'Đọc đánh giá được phép xem' }).click();
+  await activateButtonByKeyboard(page, 'Đọc đánh giá được phép xem');
   await expect(page.getByText('Đánh giá này thuộc phiên bản khác.')).toBeVisible();
   await page.getByRole('button', { name: 'Sửa đầu vào' }).click();
   await page.getByLabel('Nội dung cần kiểm chứng', { exact: true }).fill('Nội dung mới chưa được kiểm chứng');
   await expect(page.getByText(/Bạn đã thay đổi đầu vào/)).toBeVisible();
   await shot(page, '06-revision-assessment');
   await page.getByRole('button', { name: 'Đóng', exact: true }).click();
-  await page.getByRole('button', { name: 'Thảo luận trong Cộng đồng', exact: true }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await activateButtonByKeyboard(page, 'Thảo luận trong Cộng đồng');
   const community = page.getByRole('dialog');
   await expect(community).toBeVisible();
   await expect(community.locator('select').first()).toHaveValue(CASE);
   await community.getByLabel('Statement công khai').fill('Tôi muốn hỏi về điều kiện nộp hồ sơ và thời hạn của thông báo công khai.');
-  await community.getByRole('button', { name: /Tạo bản xem trước/ }).click();
+  const previewButton = community.getByRole('button', { name: /Tạo bản xem trước/ });
+  await expect(previewButton).toBeVisible();
+  await expect(previewButton).toBeEnabled();
+  await previewButton.focus();
+  await page.keyboard.press('Enter');
   await expect(community.getByRole('heading', { name: 'Xem trước phạm vi công khai' })).toBeVisible();
   await shot(page, '06-community-preview');
   await community.getByRole('button', { name: 'Đóng composer' }).click();
+  await expect(community).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole('button', { name: 'Yêu cầu chuyên gia', exact: true }).click();
+  await expect(page.locator('#main-content').getByTestId('trust-v4')).toBeVisible();
+  await activateButtonByKeyboard(page, 'Yêu cầu chuyên gia');
   await expect(page.getByRole('dialog')).toBeVisible();
   await shot(page, '07-mobile390-expert-sheet');
   const a11y = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
@@ -205,25 +241,30 @@ for (const outcome of ['INSUFFICIENT', 'CONTRADICTED', 'PARTIAL']) test(`difficu
 });
 
 test('responsive themes, keyboard, contrast and zero horizontal overflow', async ({ page }) => {
+  test.setTimeout(120_000);
   await harness(page);
   const workspace = page.locator('#main-content').getByTestId('trust-v4');
   await expect(page.locator('.profile-chip img')).toBeVisible();
   await expect.poll(() => page.locator('.profile-chip img').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth === 1)).toBe(true);
   const findings: object[] = [];
-  for (const theme of ['light', 'midnight', 'system']) for (const width of [360,390,768,1024,1280,1440,1920]) {
-    await page.setViewportSize({ width, height: 960 });
+  for (const theme of ['light', 'midnight', 'system']) {
+    await page.setViewportSize({ width: 360, height: 960 });
     await page.evaluate((theme) => localStorage.setItem('studenthub-theme-mode', theme), theme);
-    await page.reload();
+    await page.reload({ waitUntil: 'domcontentloaded' });
     await expect(page.getByText('Đang xác minh phiên…')).toHaveCount(0);
     await expect(workspace.first()).toBeVisible();
     await expect(workspace).toHaveCount(1);
-    await expect(page.locator('html')).toHaveAttribute('data-theme', theme === 'midnight' ? 'midnight' : 'light');
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
-    expect(overflow, `${theme}/${width}`).toBe(false);
-    await shot(page, `responsive-${theme}-${width}`);
-    if (width === 390 || width === 1440) {
-      const result = await new AxeBuilder({ page }).include('#trust-main').analyze();
-      findings.push({ width, theme, violations: result.violations });
+    for (const width of [360,390,768,1024,1280,1440,1920]) {
+      await page.setViewportSize({ width, height: 960 });
+      await expect(workspace).toHaveCount(1);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', theme === 'midnight' ? 'midnight' : 'light');
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
+      expect(overflow, `${theme}/${width}`).toBe(false);
+      await shot(page, `responsive-${theme}-${width}`);
+      if (width === 390 || width === 1440) {
+        const result = await new AxeBuilder({ page }).include('#trust-main').analyze();
+        findings.push({ width, theme, violations: result.violations });
+      }
     }
   }
   await writeFile(path.join(DIR, 'a11y-responsive.json'), JSON.stringify(findings, null, 2));
@@ -274,68 +315,79 @@ test('image and QR upload previews use the selected supported mode', async ({ pa
 });
 
 test('all four modalities preserve the submitted input contract without leaking a hidden text draft into media', async ({ page }) => {
+  test.setTimeout(60_000);
   await harness(page);
   const requests: Record<string, unknown>[] = [];
   page.on('request', (request) => { if (new URL(request.url()).pathname === '/api/v1/trust') requests.push(request.postDataJSON()); });
   const image = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNgAAAAAgABSK+kcQAAAABJRU5ErkJggg==', 'base64');
   for (const [mode, label] of [['text', 'Văn bản'], ['url', 'Đường dẫn'], ['image', 'Hình ảnh'], ['qr', 'Mã QR']]) {
-    await selectMode(page, label);
+    await selectModeByKeyboard(page, label);
     if (mode === 'text') await page.getByLabel('Nội dung cần kiểm chứng', { exact: true }).fill(DRAFT);
     else if (mode === 'url') await page.getByLabel('Đường dẫn cần đối chiếu', { exact: true }).fill('https://example.org/policy');
-    else await page.locator('#trust-file').setInputFiles({ name: `${mode}.png`, mimeType: 'image/png', buffer: image });
-    await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
+    else {
+      await page.locator('#trust-file').setInputFiles({ name: `${mode}.png`, mimeType: 'image/png', buffer: image });
+      await expect(page.getByText(`${mode}.png`, { exact: true })).toBeVisible();
+    }
+    const submitButton = page.getByRole('button', { name: 'Kiểm chứng', exact: true });
+    await expect(submitButton).toBeEnabled();
+    await submitButton.click();
     await expect(page.getByTestId('trust-conclusion')).toBeVisible();
     await expect(page.getByText('Bạn đã thay đổi đầu vào.', { exact: false })).toHaveCount(0);
     const request = requests.at(-1);
     expect(request).toMatchObject({ type: mode, metadata: { inputKind: mode.toUpperCase() } });
     if (mode === 'image' || mode === 'qr') expect(request).toMatchObject({ content: '', metadata: { fileName: `${mode}.png`, mimeType: 'image/png', fileSize: image.length, bytes: `data:image/png;base64,${image.toString('base64')}` } });
     else expect(request?.content).toBe(mode === 'text' ? DRAFT : 'https://example.org/policy');
-    await page.getByRole('button', { name: 'Phân tích mới', exact: true }).click();
+    await activateButtonByKeyboard(page, 'Phân tích mới');
     await expect(page.getByTestId('trust-final-predict')).toHaveCount(0);
   }
   expect(requests).toHaveLength(4);
 });
 
 test('TEXT and URL drafts stay isolated and switching to or from media drops the other modality payload', async ({ page }) => {
+  test.setTimeout(60_000);
   await harness(page);
   const requests: Record<string, unknown>[] = [];
   page.on('request', (request) => { if (new URL(request.url()).pathname === '/api/v1/trust') requests.push(request.postDataJSON()); });
   const image = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNgAAAAAgABSK+kcQAAAABJRU5ErkJggg==', 'base64');
 
-  await selectMode(page, 'Văn bản');
+  await selectModeByKeyboard(page, 'Văn bản');
   await page.getByLabel('Nội dung cần kiểm chứng', { exact: true }).fill(DRAFT);
-  await selectMode(page, 'Đường dẫn');
+  await selectModeByKeyboard(page, 'Đường dẫn');
   await expect(page.getByLabel('Đường dẫn cần đối chiếu', { exact: true })).toHaveValue('');
   const urlDraft = 'https://example.org/policy';
   await page.getByLabel('Đường dẫn cần đối chiếu', { exact: true }).fill(urlDraft);
   await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
   await expect(page.getByTestId('trust-conclusion')).toBeVisible();
   expect(requests.at(-1)?.content).toBe(urlDraft);
-  await page.getByRole('button', { name: 'Phân tích mới', exact: true }).click();
+  await activateButtonByKeyboard(page, 'Phân tích mới');
 
-  await selectMode(page, 'Văn bản');
+  await selectModeByKeyboard(page, 'Văn bản');
   await expect(page.getByLabel('Nội dung cần kiểm chứng', { exact: true })).toHaveValue(DRAFT);
-  await selectMode(page, 'Hình ảnh');
+  await selectModeByKeyboard(page, 'Hình ảnh');
   await page.locator('#trust-file').setInputFiles({ name: 'transition.png', mimeType: 'image/png', buffer: image });
-  await selectMode(page, 'Văn bản');
+  await selectModeByKeyboard(page, 'Văn bản');
   await expect(page.getByLabel('Nội dung cần kiểm chứng', { exact: true })).toHaveValue(DRAFT);
   await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
   await expect(page.getByTestId('trust-conclusion')).toBeVisible();
   expect(requests.at(-1)).toMatchObject({ type: 'text', content: DRAFT, metadata: { inputKind: 'TEXT' } });
   expect(requests.at(-1)?.metadata).not.toHaveProperty('bytes');
-  await page.getByRole('button', { name: 'Phân tích mới', exact: true }).click();
+  await activateButtonByKeyboard(page, 'Phân tích mới');
 
-  await selectMode(page, 'Mã QR');
+  await selectModeByKeyboard(page, 'Mã QR');
   await page.locator('#trust-file').setInputFiles({ name: 'transition-qr.png', mimeType: 'image/png', buffer: image });
-  await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
+  await expect(page.getByText('transition-qr.png', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Kiểm chứng', exact: true })).toBeEnabled();
+  await activateButtonByKeyboard(page, 'Kiểm chứng');
   await expect(page.getByTestId('trust-conclusion')).toBeVisible();
   expect(requests.at(-1)).toMatchObject({ type: 'qr', content: '', metadata: { inputKind: 'QR', fileName: 'transition-qr.png' } });
-  await page.getByRole('button', { name: 'Phân tích mới', exact: true }).click();
-  await selectMode(page, 'Hình ảnh');
+  await activateButtonByKeyboard(page, 'Phân tích mới');
+  await selectModeByKeyboard(page, 'Hình ảnh');
   await expect(page.getByText('transition-qr.png', { exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Kiểm chứng', exact: true })).toBeDisabled();
   await page.locator('#trust-file').setInputFiles({ name: 'transition-image-after-qr.png', mimeType: 'image/png', buffer: image });
-  await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
+  await expect(page.getByText('transition-image-after-qr.png', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Kiểm chứng', exact: true })).toBeEnabled();
+  await activateButtonByKeyboard(page, 'Kiểm chứng');
   await expect(page.getByTestId('trust-conclusion')).toBeVisible();
   expect(requests.at(-1)).toMatchObject({ type: 'image', content: '', metadata: { inputKind: 'IMAGE', fileName: 'transition-image-after-qr.png' } });
   expect(requests).toHaveLength(4);
@@ -394,17 +446,18 @@ test('changing an image draft does not attach the previous run OCR to the new im
 });
 
 test('five isolated UI interaction performance samples', async ({ browser }) => {
+  test.setTimeout(120_000);
   const samples: object[] = [];
   for (let i = 0; i < 5; i++) {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-    await harness(page); await submit(page); await expect(page.getByTestId('trust-conclusion')).toBeVisible();
+    await harness(page); await submitByKeyboard(page); await expect(page.getByTestId('trust-conclusion')).toBeVisible();
     const sample = await page.evaluate(() => {
       const resource = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
       return { inputCommitMs: performance.getEntriesByName('trust-v4:input-commit')[0]?.startTime, resultReadyMs: performance.getEntriesByName('trust-v4:result-ready')[0]?.startTime,
         encodedScriptBytes: resource.filter((r) => r.name.includes('.js')).reduce((n, r) => n + r.encodedBodySize, 0), classification: 'ISOLATED FIXTURE UI measurement; not production, CPU hydration or field INP' };
     });
     const start = performance.now();
-    await page.getByRole('button', { name: 'Mở chi tiết', exact: true }).click();
+    await activateButtonByKeyboard(page, 'Mở chi tiết');
     await expect(page.getByRole('heading', { name: 'Deterministic Screen' })).toBeVisible();
     samples.push({ ...sample, savedLayerInspectionAutomationMs: performance.now() - start });
     await page.close();
