@@ -443,6 +443,33 @@ function layerSummary(id, { layers, pipeline, presentation }) {
   };
 }
 
+function openAlexDiscovery(value) {
+  const source = record(value);
+  const records = (items, extraFields = []) => list(items).slice(0, 8).map((item) => {
+    const candidate = record(item);
+    return {
+      sourceId: text(candidate.sourceId, ""),
+      title: text(candidate.title, "OpenAlex metadata record"),
+      url: text(candidate.url, ""),
+      ...Object.fromEntries(extraFields.filter((key) => candidate[key] != null).map((key) => [key, candidate[key]])),
+    };
+  }).filter((item) => item.url);
+  if (!source.provider) return null;
+  return {
+    provider: text(source.provider, "OPENALEX"),
+    status: text(source.status, "UNAVAILABLE").toUpperCase(),
+    role: text(source.role, "ACADEMIC_METADATA_DISCOVERY"),
+    isAuthoritative: false,
+    allowedUse: text(source.allowedUse, "CONTEXT_ONLY"),
+    notice: text(source.notice, "OpenAlex chỉ cung cấp metadata học thuật, không phải evidence đã xác minh."),
+    queryCount: Number.isFinite(Number(source.queryCount)) ? Math.min(4, Math.max(0, Number(source.queryCount))) : 0,
+    endpoints: list(source.endpoints).slice(0, 4).map((item) => ({ endpoint: text(item?.endpoint), status: text(item?.status), code: text(item?.code, "") })).filter((item) => item.endpoint),
+    works: records(source.works, ["publishedAt", "doi", "authors", "institutions", "topics", "citedByCount", "openAccess"]),
+    institutions: records(source.institutions, ["countryCode", "worksCount", "citedByCount"]),
+    topics: records(source.topics, ["field", "subfield", "domain", "worksCount"]),
+  };
+}
+
 /**
  * Normalize the engine response once. Rendering code consumes this DTO and
  * never needs to know whether a value came from V5, a compatibility response,
@@ -587,6 +614,7 @@ export function normalizeMasterUltraRun({
     },
     l3: {
       ...layerSummary("l3", { layers, pipeline, presentation, processing }),
+      openAlexDiscovery: openAlexDiscovery(layers?.layer3?.openAlexDiscovery),
       ...buckets,
       sources,
       evidenceItems,

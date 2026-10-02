@@ -110,6 +110,11 @@ function normalizeEntity(entity, recordType, index) {
       citedByCount: Number.isFinite(Number(entity?.cited_by_count)) ? Number(entity.cited_by_count) : null,
       countryCode: boundedText(entity?.country_code, 8) || null,
       homepage,
+      ...(recordType === "RESEARCH_TOPIC" ? {
+        subfield: boundedText(entity?.subfield?.display_name || entity?.subfield, 120) || null,
+        field: boundedText(entity?.field?.display_name || entity?.field, 120) || null,
+        domain: boundedText(entity?.domain?.display_name || entity?.domain, 120) || null,
+      } : {}),
       sourceProvider: "OPENALEX",
     },
   };

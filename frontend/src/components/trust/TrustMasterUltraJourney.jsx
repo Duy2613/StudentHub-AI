@@ -798,6 +798,22 @@ function ForensicsLayer({ layer, onSelectSource }) {
         </div>
       </div>
 
+      {layer.openAlexDiscovery ? <section className="rounded-lg border border-indigo-400/20 bg-indigo-400/[0.04] p-3" data-testid="trust-openalex-context">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div><SectionLabel tone="violet">OpenAlex · academic metadata</SectionLabel><h3 className="mt-1 text-sm font-semibold text-slate-100">Bối cảnh học thuật để mở rộng tra cứu</h3></div>
+          <span className="rounded border border-indigo-300/20 px-2 py-1 font-mono text-[10px] text-indigo-200">{safeText(layer.openAlexDiscovery.status)}</span>
+        </div>
+        <p className="mt-2 text-xs leading-relaxed text-slate-400">{safeText(layer.openAlexDiscovery.notice)}</p>
+        {[['Nghiên cứu', layer.openAlexDiscovery.works], ['Tổ chức', layer.openAlexDiscovery.institutions], ['Chủ đề', layer.openAlexDiscovery.topics]].map(([label, records]) => records?.length ? <div key={label} className="mt-3">
+          <strong className="text-[11px] uppercase tracking-wide text-slate-300">{label}</strong>
+          <ul className="mt-1 space-y-1.5">{records.map((record, index) => <li key={record.sourceId || `${label}-${index}`} className="rounded border border-white/5 bg-black/20 px-2.5 py-2 text-xs">
+            {isSafePublicUrl(record.url) ? <a className="font-medium text-indigo-200 hover:underline" href={record.url} target="_blank" rel="noreferrer">{safeText(record.title)} <ExternalLink size={11} className="inline" /></a> : <strong className="text-slate-200">{safeText(record.title)}</strong>}
+            <div className="mt-1 text-[10px] text-slate-500">{[record.publishedAt, record.countryCode, record.field, record.subfield, record.doi, Number.isFinite(record.citedByCount) ? `${record.citedByCount} citations` : null].filter(Boolean).join(" · ")}</div>
+          </li>)}</ul>
+        </div> : null)}
+        {!layer.openAlexDiscovery.works?.length && !layer.openAlexDiscovery.institutions?.length && !layer.openAlexDiscovery.topics?.length ? <p className="mt-2 text-xs text-slate-500">Lần tra cứu này chưa trả metadata học thuật dùng được.</p> : null}
+      </section> : null}
+
       {/* Source Distribution: Supporting / Contradicting / Context */}
       <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
         <div className="p-2 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">

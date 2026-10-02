@@ -14,6 +14,7 @@ import { Layer1ScreenService } from "./layer1/Layer1ScreenService.js";
 import { Layer2AReputationService } from "./layer2a/Layer2AReputationService.js";
 import { Layer2SemanticService } from "./layer2/Layer2SemanticService.js";
 import { Layer3EvidenceService } from "./layer3/Layer3EvidenceService.js";
+import { OpenAlexTrustContextService } from "../server/public-api/OpenAlexTrustContextService.js";
 import { Layer4TrustService } from "./layer4/Layer4TrustService.js";
 import { createLayer4Result } from "./layer4/types.js";
 import { StudentDomainRiskModel } from "./v5/l2c/StudentDomainRiskModel.js";
@@ -1106,7 +1107,15 @@ export class OwnBackendTrustOrchestrator {
           // optional legacy adapter may still contribute an explicitly
           // labelled advisory report, but it must never replace the
           // canonical source/evidence/provenance set.
+          const openAlexDiscoveryPromise = OpenAlexTrustContextService.discover({
+            claims: layer3Params.claims,
+            signal: controller.signal,
+          }).catch(() => null);
           const canonicalLayer3 = await this.services.l3(layer3Params);
+          const openAlexDiscovery = await openAlexDiscoveryPromise;
+          if (canonicalLayer3 && typeof canonicalLayer3 === "object" && openAlexDiscovery) {
+            canonicalLayer3.openAlexDiscovery = openAlexDiscovery;
+          }
           if (!capabilityPlan.friendTrust.layer3 || typeof this.legacyVerificationAdapter?.verifyLayer3 !== "function") {
             return canonicalLayer3;
           }

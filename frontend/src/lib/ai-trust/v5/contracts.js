@@ -907,6 +907,37 @@ function publicLayerResult(value, layerId) {
     base.verificationPackage = publicVerificationPackage(value.verificationPackage);
   }
   if (layerId === "l3") {
+    const openAlex = value.openAlexDiscovery && typeof value.openAlexDiscovery === "object" && !Array.isArray(value.openAlexDiscovery)
+      ? value.openAlexDiscovery
+      : null;
+    if (openAlex) {
+      const publicMetadata = (records, fields) => Array.isArray(records) ? records.slice(0, 8).map((record) => {
+        if (!record || typeof record !== "object" || Array.isArray(record)) return null;
+        const output = publicRecord(record, fields);
+        if (!output) return null;
+        output.url = safeHttpUrl(record.url);
+        if (!output.url) return null;
+        if (Array.isArray(record.authors)) output.authors = publicStringList(record.authors, 5, 120);
+        if (Array.isArray(record.institutions)) output.institutions = publicStringList(record.institutions, 5, 160);
+        if (Array.isArray(record.topics)) output.topics = publicStringList(record.topics, 5, 120);
+        return output;
+      }).filter(Boolean) : [];
+      base.openAlexDiscovery = {
+        provider: "OPENALEX",
+        status: ["AVAILABLE", "PARTIAL", "RATE_LIMITED", "UNAVAILABLE", "NOT_CONFIGURED", "NOT_REQUESTED"].includes(openAlex.status) ? openAlex.status : "UNAVAILABLE",
+        role: "ACADEMIC_METADATA_DISCOVERY",
+        isAuthoritative: false,
+        allowedUse: "CONTEXT_ONLY",
+        notice: publicText(openAlex.notice, 500) || "OpenAlex metadata không phải evidence đã xác minh và không tham gia quyết định cuối.",
+        queryCount: Math.min(4, Math.max(0, Number(openAlex.queryCount) || 0)),
+        endpoints: Array.isArray(openAlex.endpoints) ? openAlex.endpoints.slice(0, 4).map((item) => publicRecord(item, ["endpoint", "status", "code", "fromCache"])).filter(Boolean) : [],
+        works: publicMetadata(openAlex.works, ["sourceId", "title", "url", "publishedAt", "doi", "authors", "institutions", "topics", "citedByCount", "openAccess"]),
+        institutions: publicMetadata(openAlex.institutions, ["sourceId", "title", "url", "countryCode", "worksCount", "citedByCount"]),
+        topics: publicMetadata(openAlex.topics, ["sourceId", "title", "url", "field", "subfield", "domain", "worksCount"]),
+      };
+    } else {
+      base.openAlexDiscovery = null;
+    }
     base.metrics = publicRecord(value.metrics, [
       "executionTimeMs", "queriesExecutedCount", "sourcesRetrievedCount", "evidenceItemsCount", "retrievalProvider",
       "retrievalStatus", "retrievalMode", "externalEvidence", "providerIndependent", "providerCallCount", "providerDurationMs",
