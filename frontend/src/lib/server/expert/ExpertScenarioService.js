@@ -156,7 +156,7 @@ async function canonicalCasePackage(client, caseId, ownerId) {
   const caseResult = await client.query(
     `SELECT c.id, c.owner_id, c.state, c.visibility,
             latest.revision AS case_revision,
-            inputs.input_type, inputs.content_hash AS input_fingerprint,
+            inputs.input_type, encode(inputs.content_hash, 'hex') AS input_fingerprint,
             asset.media_artifact_id, asset.media_sha256
        FROM public.trust_cases c
        LEFT JOIN LATERAL (
