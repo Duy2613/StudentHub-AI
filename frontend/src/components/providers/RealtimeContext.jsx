@@ -29,6 +29,23 @@ function numericValue(value) {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function roomStateMessage(state) {
+  return ({
+    LOBBY: "Phòng đã sẵn sàng hoặc có thành viên mới.",
+    QUESTION_ACTIVE: "Có cập nhật mới trong lượt trả lời.",
+    ANSWER_LOCKED: "Câu trả lời đã được khóa trong phòng.",
+    TRUST_ANALYZING: "Trust đang xử lý bằng chứng của phòng.",
+    ADJUDICATION: "Trust đã hoàn tất; phòng đang chờ đối chiếu.",
+    SUPERVISOR_CONFIRMATION: "Phòng đang chờ Supervisor xác nhận.",
+    HOST_ACKNOWLEDGEMENT: "Phòng đang chờ Host xác nhận.",
+    DISPUTED: "Phòng có kết quả đang cần đối chiếu.",
+    SETTLED: "Phòng đã hoàn tất đối chiếu.",
+    CLOSED: "Phòng xác minh đã đóng.",
+    TRUST_UNAVAILABLE: "Trust chưa thể hoàn tất xử lý phòng.",
+    ADJUDICATION_BLOCKED: "Bước đối chiếu đang bị chặn; hãy mở phòng để xem chi tiết.",
+  })[state] || "Phòng xác minh có cập nhật mới.";
+}
+
 export function RealtimeProvider({ children }) {
   const { session, authState } = useAuth();
   const principalId = session?.authority === "APPLICATION_SESSION" ? session.user?.id || null : null;
@@ -55,6 +72,7 @@ export function RealtimeProvider({ children }) {
   const previousPrincipalIdRef = useRef(null);
   const roomInviteSnapshotsRef = useRef(new Map());
   const roomStateSnapshotsRef = useRef(new Map());
+  const roomNotificationIdsRef = useRef(new Set());
 
   const dispatchToSubscribers = useCallback((channel, eventType, data) => {
     const key = `${channel}:${eventType}`;
@@ -69,6 +87,18 @@ export function RealtimeProvider({ children }) {
 
   const dismissNotification = useCallback((id) => {
     setNotifications((current) => current.filter((item) => item.id !== id));
+  }, []);
+
+  const notifyRoom = useCallback((notification) => {
+    const seen = roomNotificationIdsRef.current;
+    if (seen.has(notification.id)) return;
+    seen.add(notification.id);
+    if (seen.size > 1000) {
+      const oldest = seen.values().next().value;
+      if (oldest) seen.delete(oldest);
+    }
+    setNotifications((items) => [notification, ...items.filter((item) => item.id !== notification.id).slice(0, 5)]);
+    window.setTimeout(() => setNotifications((items) => items.filter((item) => item.id !== notification.id)), 15_000);
   }, []);
 
   const rememberEvent = useCallback((record) => {
@@ -197,6 +227,7 @@ export function RealtimeProvider({ children }) {
       roomPresenceLeaseRef.current = 45;
       roomInviteSnapshotsRef.current.clear();
       roomStateSnapshotsRef.current.clear();
+      roomNotificationIdsRef.current.clear();
       setRuntime(INITIAL_RUNTIME);
       lastSequenceRef.current = 0;
       seenEventIdsRef.current.clear();
@@ -261,8 +292,6 @@ export function RealtimeProvider({ children }) {
     let timer = null;
     let lastHeartbeatAt = 0;
     const abortController = new AbortController();
-    const previous = roomInviteSnapshotsRef.current;
-    const notificationsForSession = new Map();
 
     const refresh = async () => {
       if (stopped || document.visibilityState === "hidden") return;
@@ -280,37 +309,33 @@ export function RealtimeProvider({ children }) {
         const openRooms = Array.isArray(next.openRooms) ? next.openRooms : [];
         const domains = Array.isArray(next.domains) ? next.domains : [];
         const now = Date.now();
+        const previous = roomInviteSnapshotsRef.current;
         const current = new Map();
         const currentRoomStates = new Map();
         for (const room of myRooms) {
           if (!/^[0-9a-f-]{36}$/i.test(String(room?.roomId || ""))) continue;
           if (room.role !== "SUPERVISOR_INVITEE") {
-            currentRoomStates.set(room.roomId, { status: room.status, revision: room.revision });
+            const revision = Number(room.revision);
+            currentRoomStates.set(room.roomId, { status: room.status, revision });
             const prior = roomStateSnapshotsRef.current.get(room.roomId);
-            const stateLabel = {
-              LOBBY: "Supervisor đã nhận phòng; phòng sẵn sàng.",
-              QUESTION_ACTIVE: "Vòng trả lời trong phòng đã bắt đầu.",
-              ANSWER_LOCKED: "Câu trả lời đã được khóa trong phòng.",
-              DISPUTED: "Phòng có kết quả đang cần đối chiếu.",
-              SETTLED: "Phòng đã hoàn tất đối chiếu.",
-              CLOSED: "Phòng xác minh đã đóng.",
-            }[room.status];
-            if (((prior?.status && prior.status !== room.status) || (!prior && room.status === "LOBBY")) && stateLabel) {
+            const priorRevision = Number(prior?.revision);
+            const revisionChanged = Boolean(prior)
+              && Number.isSafeInteger(revision)
+              && Number.isSafeInteger(priorRevision)
+              && revision > priorRevision;
+            const stateChanged = Boolean(prior?.status && prior.status !== room.status);
+            if (revisionChanged || stateChanged || (!prior && room.status === "LOBBY")) {
               const notification = {
-                id: `room-state:${room.roomId}:${room.revision}`,
+                id: `room-state:${room.roomId}:${revision}:${room.status}`,
                 kind: "EXPERT_ROOM_UPDATE",
                 roomId: room.roomId,
                 href: `/expert/rooms?room=${encodeURIComponent(room.roomId)}`,
                 title: "Cập nhật phòng xác minh",
-                message: `${String(room.domainCode || "").replaceAll("_", " ")}: ${stateLabel}`,
+                message: `${String(room.domainCode || "").replaceAll("_", " ")}: ${roomStateMessage(room.status)}`,
                 domain: room.domainCode || null,
                 timestamp: now,
               };
-              if (!notificationsForSession.has(notification.id)) {
-                notificationsForSession.set(notification.id, notification.id);
-                setNotifications((items) => [notification, ...items.filter((item) => item.id !== notification.id)].slice(0, 6));
-                window.setTimeout(() => setNotifications((items) => items.filter((item) => item.id !== notification.id)), 15_000);
-              }
+              notifyRoom(notification);
             }
             continue;
           }
@@ -318,7 +343,7 @@ export function RealtimeProvider({ children }) {
           if (!Number.isFinite(expiresAt) || expiresAt <= now) continue;
           const invitationKey = `${room.roomId}:${expiresAt}`;
           current.set(invitationKey, room);
-          if (!previous.has(invitationKey) && !notificationsForSession.has(invitationKey)) {
+          if (!previous.has(invitationKey)) {
             const notification = {
               id: `room-invite:${invitationKey}`,
               kind: "EXPERT_ROOM_INVITE",
@@ -329,9 +354,7 @@ export function RealtimeProvider({ children }) {
               domain: room.domainCode || null,
               timestamp: now,
             };
-            notificationsForSession.set(invitationKey, notification.id);
-            setNotifications((items) => [notification, ...items.filter((item) => item.id !== notification.id)].slice(0, 6));
-            window.setTimeout(() => setNotifications((items) => items.filter((item) => item.id !== notification.id)), 15_000);
+            notifyRoom(notification);
           }
         }
         roomInviteSnapshotsRef.current = current;
@@ -367,7 +390,29 @@ export function RealtimeProvider({ children }) {
     };
 
     const unsubscribe = subscribe("expert", "expert:revision", (record) => {
-      if (record?.data?.roomId) void refresh();
+      const data = record?.data || {};
+      const roomId = String(data.roomId || "");
+      const revision = Number(data.revision);
+      if (/^[0-9a-f-]{36}$/i.test(roomId) && Number.isSafeInteger(revision) && revision > 0) {
+        // One toast per committed revision means later answers/proposals in
+        // the same room state are visible instead of being collapsed into the
+        // first status transition. Supervisor offers are announced by inbox
+        // reconciliation below so invitees do not receive duplicate toasts.
+        if (data.state !== "WAITING_FOR_SUPERVISOR") {
+          const changedAt = Date.parse(data.changedAt || record.timestamp || "");
+          notifyRoom({
+            id: `room-state:${roomId}:${revision}:${data.state || "UNKNOWN"}`,
+            kind: "EXPERT_ROOM_UPDATE",
+            roomId,
+            href: `/expert/rooms?room=${encodeURIComponent(roomId)}`,
+            title: "Cập nhật phòng xác minh",
+            message: `${String(data.domainCode || "").replaceAll("_", " ")}${data.domainCode ? ": " : ""}${roomStateMessage(data.state)}`,
+            domain: data.domainCode || null,
+            timestamp: Number.isFinite(changedAt) ? changedAt : Date.now(),
+          });
+        }
+        void refresh();
+      }
     });
     const onVisible = () => { if (document.visibilityState === "visible") void refresh(); };
     const onOnline = () => void refresh();
@@ -382,7 +427,7 @@ export function RealtimeProvider({ children }) {
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("online", onOnline);
     };
-  }, [hasApplicationSession, principalId, subscribe]);
+  }, [hasApplicationSession, principalId, subscribe, notifyRoom]);
 
   return (
     <RealtimeContext.Provider value={{ connectionStatus, latency, runtime, recentEvents, notifications, roomInbox, dismissNotification, broadcastEvent, subscribe }}>
