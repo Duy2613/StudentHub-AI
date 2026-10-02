@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { useRealtime } from "@/components/providers/RealtimeContext";
 import { ShieldCheck, AlertTriangle, X, Radio } from "lucide-react";
 
@@ -34,7 +35,7 @@ export default function RealtimeNotificationToasts() {
                 </span>
                 <span className="text-[10px] font-mono tracking-widest uppercase font-bold text-zinc-400 flex items-center gap-1">
                   <Radio className="w-3 h-3 text-teal-400" />
-                  REALTIME EVENT
+                  {notif.kind === "EXPERT_ROOM_INVITE" ? "LỜI MỜI PHÒNG" : "REALTIME EVENT"}
                 </span>
               </div>
 
@@ -62,13 +63,14 @@ export default function RealtimeNotificationToasts() {
                 <div className="text-xs text-zinc-300 line-clamp-2 mt-0.5 font-light">
                   {notif.message}
                 </div>
+                {notif.href && <Link href={notif.href} onClick={() => dismissNotification(notif.id)} className="mt-2 inline-flex text-xs font-bold text-teal-300 hover:text-teal-200">{notif.kind === "EXPERT_ROOM_INVITE" ? "Mở lời mời Supervisor →" : "Mở phòng xác minh →"}</Link>}
 
                 <div className="mt-2 flex items-center gap-2 text-[10px] font-mono">
-                  <span className={`px-2 py-0.5 rounded-full font-bold ${
+                  {notif.verdict && <span className={`px-2 py-0.5 rounded-full font-bold ${
                     isAlert ? "bg-rose-500/20 text-rose-300 border border-rose-500/30" : "bg-teal-500/20 text-teal-300 border border-teal-500/30"
                   }`}>
                     {notif.verdict}
-                  </span>
+                  </span>}
                   {notif.score && (
                     <span className="text-zinc-400">
                       Score: <span className="text-white font-bold">{notif.score}</span>

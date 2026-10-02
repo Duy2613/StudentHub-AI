@@ -158,7 +158,7 @@ async function addParticipant(client, { roomId, userId, role, conflictDeclaratio
   );
 }
 
-async function findOnlineSupervisors(client, { domainCode, hostId, excludedIds = [] }) {
+async function findOnlineSupervisors(client, { domainCode, hostId, roomId, excludedIds = [] }) {
   const result = await client.query(
     `SELECT DISTINCT ev.user_id, upper(ev.domain_code) AS domain_code,
             presence.heartbeat_at AS last_seen_at,
@@ -172,7 +172,12 @@ async function findOnlineSupervisors(client, { domainCode, hostId, excludedIds =
         AND (ev.expires_at IS NULL OR ev.expires_at > now())
         AND presence.expires_at > now()
         AND presence.user_id <> $2
-      ORDER BY presence.heartbeat_at DESC`, [domainCode, hostId],
+        AND NOT EXISTS (
+          SELECT 1 FROM private.expert_room_events e
+           WHERE e.room_id = $3 AND e.actor_id = presence.user_id AND e.event_type = 'SUPERVISOR_OFFERED'
+             AND (e.payload->>'declined' = 'true' OR e.payload->>'conflictDeclared' = 'true')
+        )
+      ORDER BY presence.heartbeat_at DESC`, [domainCode, hostId, roomId],
   );
   const exclude = new Set(excludedIds.map((id) => String(id).toLowerCase()));
   return result.rows.filter((row) => !exclude.has(String(row.user_id).toLowerCase())).map((row) => ({
@@ -188,7 +193,7 @@ async function selectSupervisor(client, { domainCode, hostId, roomId, excludedId
   const participants = await client.query(
     `SELECT user_id FROM private.expert_room_participants WHERE room_id = $1 AND state = 'JOINED'`, [roomId],
   );
-  const candidates = await findOnlineSupervisors(client, { domainCode, hostId, excludedIds });
+  const candidates = await findOnlineSupervisors(client, { domainCode, hostId, roomId, excludedIds });
   return selectIndependentSupervisor({
     candidates,
     hostId,
@@ -451,6 +456,56 @@ export class ExpertVerificationRoomService {
     return { ...(await this.getRoom({ principal, roomId: created.roomId })), idempotent: created.replay };
   }
 
+  // Presence renewal also discovers rooms created before any eligible Expert
+  // was online. Lock the durable room, never manufacture a participant or COI.
+  static async offerWaitingSupervisors({ principal }) {
+    const userId = authenticatedUserId(principal);
+    const offers = await withStorageErrors(() => transaction(async (client) => {
+      const waiting = await client.query(
+        `SELECT r.id, r.host_user_id, r.domain_code, r.revision, r.status
+           FROM private.expert_verification_rooms r
+          WHERE r.status = 'WAITING_FOR_SUPERVISOR' AND r.host_user_id <> $1
+            AND (r.supervisor_user_id IS NULL OR r.supervisor_offer_expires_at IS NULL OR r.supervisor_offer_expires_at <= now())
+            AND EXISTS (
+              SELECT 1 FROM private.expert_room_presence p
+              JOIN private.expert_verifications v ON v.user_id = p.user_id
+               WHERE p.user_id = $1 AND p.expires_at > now() AND upper(v.domain_code) = upper(r.domain_code)
+                 AND v.status = 'VERIFIED' AND v.qualification_state = 'DOMAIN_VERIFIED'
+                 AND v.suspended_at IS NULL AND (v.expires_at IS NULL OR v.expires_at > now())
+            )
+            AND NOT EXISTS (SELECT 1 FROM private.expert_room_participants p WHERE p.room_id = r.id AND p.user_id = $1 AND p.state = 'JOINED')
+            AND NOT EXISTS (
+              SELECT 1 FROM private.expert_room_events e
+               WHERE e.room_id = r.id AND e.actor_id = $1 AND e.event_type = 'SUPERVISOR_OFFERED'
+                 AND (e.payload->>'declined' = 'true' OR e.payload->>'conflictDeclared' = 'true')
+            )
+          ORDER BY r.created_at ASC LIMIT 5 FOR UPDATE OF r SKIP LOCKED`, [userId],
+      );
+      const result = [];
+      for (const room of waiting.rows) {
+        const selected = await selectSupervisor(client, { domainCode: room.domain_code, hostId: String(room.host_user_id), roomId: room.id });
+        if (!selected) continue;
+        const offerSeconds = await roomSetting(client, "room_supervisor_offer_seconds", 90, 30, 600);
+        const updated = await client.query(
+          `UPDATE private.expert_verification_rooms
+              SET supervisor_user_id = $2, supervisor_offer_expires_at = now() + ($3::text || ' seconds')::interval,
+                  revision = revision + 1, updated_at = now()
+            WHERE id = $1 RETURNING revision`, [room.id, selected.userId, offerSeconds],
+        );
+        const revision = Number(updated.rows[0].revision);
+        await appendRoomEvent(client, {
+          roomId: room.id, actorId: userId, eventType: "SUPERVISOR_OFFERED",
+          payload: { domainCode: room.domain_code, offered: true, presenceRenewal: true },
+          idempotencyKey: `room-supervisor-online:${room.id}:${revision}`,
+        });
+        result.push({ roomId: room.id, revision, recipients: await roomRecipients(client, room.id, [selected.userId]) });
+      }
+      return result;
+    }));
+    await Promise.all(offers.map((offer) => publishRoomRevision(offer.roomId, offer.revision, "WAITING_FOR_SUPERVISOR", offer.recipients)));
+    return { offered: offers.length };
+  }
+
   static async listRooms({ principal }) {
     const userId = authenticatedUserId(principal);
     return withStorageErrors(() => transaction(async (client) => {
@@ -465,6 +520,10 @@ export class ExpertVerificationRoomService {
                 r.supervisor_user_id, r.supervisor_offer_expires_at, 'SUPERVISOR_INVITEE' AS role
            FROM private.expert_verification_rooms r
           WHERE r.supervisor_user_id = $1 AND r.status = 'WAITING_FOR_SUPERVISOR'
+            AND r.supervisor_offer_expires_at > now()
+            AND EXISTS (SELECT 1 FROM private.expert_verifications v WHERE v.user_id = $1
+              AND upper(v.domain_code) = upper(r.domain_code) AND v.status = 'VERIFIED' AND v.qualification_state = 'DOMAIN_VERIFIED'
+              AND v.suspended_at IS NULL AND (v.expires_at IS NULL OR v.expires_at > now()))
             AND NOT EXISTS (SELECT 1 FROM private.expert_room_participants p WHERE p.room_id = r.id AND p.user_id = $1 AND p.role = 'SUPERVISOR_EXPERT')
           ORDER BY created_at DESC LIMIT 50`, [userId],
       );
@@ -649,7 +708,7 @@ export class ExpertVerificationRoomService {
       );
       if (!eligible.rows[0]) throw roomError("EXPERT_ROOM_SUPERVISOR_NO_LONGER_ELIGIBLE", "This supervisor offer expired or the Expert is no longer online and verified.", 409);
       if (!accept || conflictFree !== true) {
-        const candidates = await findOnlineSupervisors(client, { domainCode: room.domain_code, hostId: room.host_user_id, excludedIds: [userId] });
+        const candidates = await findOnlineSupervisors(client, { domainCode: room.domain_code, hostId: room.host_user_id, roomId: id, excludedIds: [userId] });
         const next = selectIndependentSupervisor({ candidates, hostId: room.host_user_id, participantIds: [userId], domainCode: room.domain_code });
         const offerSeconds = await roomSetting(client, "room_supervisor_offer_seconds", 90, 30, 600);
         await client.query(

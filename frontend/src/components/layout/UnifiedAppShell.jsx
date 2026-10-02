@@ -15,6 +15,7 @@ import { getReferenceRouteProfile } from "./referenceRouteConfig";
 import { markAssurance } from "@/lib/performance/assurance";
 import { getAccountNavItems, getUtilityNavItems } from "@/config/navigation";
 import OmniRouteTrigger from "@/components/omni/OmniRouteTrigger";
+import ExpertRoomNotificationBell from "@/components/expert/ExpertRoomNotificationBell";
 
 const THEME_STORAGE_KEY = "studenthub-theme-mode";
 const THEME_MODE_EVENT = "studenthub:theme-mode-change";
@@ -254,6 +255,8 @@ export default function UnifiedAppShell({ children }) {
           ) : status === "ERROR" ? (
             <span className="trust-status" role="status">Phiên chưa khả dụng</span>
           ) : signedInForHeader ? (
+            <>
+            {isExpert && <ExpertRoomNotificationBell />}
             <div className="relative">
               <button
                 type="button"
@@ -287,6 +290,7 @@ export default function UnifiedAppShell({ children }) {
                 </div>
               )}
             </div>
+            </>
           ) : (
             <div className="anonymous-actions">
               <Link href="/login" prefetch={false} className="secondary-action">Đăng nhập</Link>

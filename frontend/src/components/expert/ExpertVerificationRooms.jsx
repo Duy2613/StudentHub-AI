@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Activity, ArrowLeft, Check, Clock3, ExternalLink, FileCheck2, ImagePlus, LockKeyhole, RefreshCw, ShieldAlert, Users, Video } from "lucide-react";
 import { useRealtime } from "@/components/providers/RealtimeContext";
 import { createSecureId } from "@/lib/security/secureId";
 import styles from "./expert-v5-rooms.module.css";
+import ExpertRoomNotificationBell from "./ExpertRoomNotificationBell";
 
 const EMPTY = { myRooms: [], openRooms: [], domains: [], supportedDomains: [], presenceLeaseSeconds: 45 };
 const DIMENSIONS = [
@@ -72,6 +73,7 @@ export default function ExpertVerificationRooms() {
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState("");
   const [now, setNow] = useState(null);
+  const deepLinkedRoom = useRef("");
 
   const refreshIndex = useCallback(async () => {
     const next = await api("/api/expert/rooms", { method: "GET" });
@@ -123,14 +125,6 @@ export default function ExpertVerificationRooms() {
   }, [refreshIndex, refreshRoom, selectedRoom, subscribe]);
 
   useEffect(() => {
-    if (!(index.domains || []).length) return undefined;
-    const heartbeat = () => { void api("/api/expert/rooms/presence", { method: "POST" }).catch(() => {}); };
-    heartbeat();
-    const timer = window.setInterval(heartbeat, Math.max(10, Math.floor((index.presenceLeaseSeconds || 45) / 3)) * 1000);
-    return () => window.clearInterval(timer);
-  }, [index.domains, index.presenceLeaseSeconds]);
-
-  useEffect(() => {
     if (!active?.round?.deadlineAt || active.round.status !== "QUESTION_ACTIVE") return undefined;
     const timer = window.setInterval(() => setNow(Date.now()), 500);
     return () => window.clearInterval(timer);
@@ -159,6 +153,7 @@ export default function ExpertVerificationRooms() {
       if (result?.room?.room?.roomId) setActive(result.room);
       else if (active?.room?.roomId === roomId && result?.room?.roomId) setActive(result);
       else if (result?.room?.roomId && result?.viewerRole) setActive(result);
+      if (action === "ACCEPT_SUPERVISOR" && result?.viewerRole === "SUPERVISOR_EXPERT") setSelectedRoom(roomId);
       if (action === "DECLINE_SUPERVISOR") {
         setActive(null);
         setSelectedRoom("");
@@ -203,6 +198,15 @@ export default function ExpertVerificationRooms() {
     finally { setBusy(false); }
   };
 
+  useEffect(() => {
+    const requestedRoom = new URLSearchParams(window.location.search).get("room");
+    if (!requestedRoom || !allRooms.some((item) => item.roomId === requestedRoom) || deepLinkedRoom.current === requestedRoom) return;
+    deepLinkedRoom.current = requestedRoom;
+    const invitation = allRooms.some((item) => item.roomId === requestedRoom && item.role === "SUPERVISOR_INVITEE");
+    if (!invitation) void openRoom(requestedRoom);
+    window.requestAnimationFrame(() => document.getElementById(`expert-room-${requestedRoom}`)?.scrollIntoView({ block: "center", behavior: "smooth" }));
+  }, [allRooms, openRoom]);
+
   const joinOpenRoom = async (roomId) => {
     const result = await mutate("JOIN", {}, roomId);
     if (result?.room?.room?.roomId || result?.room?.roomId) {
@@ -227,7 +231,7 @@ export default function ExpertVerificationRooms() {
 
   return (
     <main className={styles.page}>
-      <div className={styles.topline}><Link href="/expert" className={styles.back}><ArrowLeft size={16} /> Expert Network</Link><span className={styles.liveTag}><Activity size={13} /> {connectionStatus === "connected" ? "Kết nối thời gian thực" : "Đang khôi phục kết nối"}</span></div>
+      <div className={styles.topline}><Link href="/expert" className={styles.back}><ArrowLeft size={16} /> Expert Network</Link><div className="flex items-center gap-3"><span className={styles.liveTag}><Activity size={13} /> {connectionStatus === "CONNECTED" ? "Kết nối thời gian thực" : "Đang khôi phục kết nối"}</span><ExpertRoomNotificationBell /></div></div>
       <header className={styles.header}><div><p className={styles.eyebrow}>EXPERT · LIVE EVIDENCE REVIEW</p><h1>Phòng xác minh trực tiếp</h1><p>Host gửi nội dung đến Trust sau khi khóa câu trả lời. Supervisor độc lập chấm theo rubric, dẫn chiếu evidence và xác nhận riêng.</p></div><button type="button" className={styles.ghostButton} onClick={() => void refreshAll()} disabled={busy}><RefreshCw size={15} /> Làm mới</button></header>
 
       {error && <div className={styles.error} role="alert"><ShieldAlert size={17} /><div><strong>{error.status === 403 ? "Tài khoản chưa đủ quyền cho thao tác này" : "Chưa thể cập nhật phòng"}</strong><p>{error.message}</p><small>{error.code}</small></div></div>}
@@ -260,7 +264,7 @@ export default function ExpertVerificationRooms() {
 
           <section className={styles.roomList}>
             <div className={styles.listHeading}><div><p className={styles.eyebrow}>PHÒNG THEO QUYỀN TRUY CẬP</p><h2>Phòng của bạn</h2></div><span>{allRooms.length}</span></div>
-            {allRooms.length ? allRooms.map((item) => <article key={`${item.listType}:${item.roomId}`} className={`${styles.roomListItem} ${selectedRoom === item.roomId ? styles.roomListSelected : ""}`}>
+            {allRooms.length ? allRooms.map((item) => <article id={`expert-room-${item.roomId}`} key={`${item.listType}:${item.roomId}`} className={`${styles.roomListItem} ${selectedRoom === item.roomId ? styles.roomListSelected : ""}`}>
               <button type="button" className={styles.roomListOpen} onClick={() => void openRoom(item.roomId)} disabled={busy || item.role === "SUPERVISOR_INVITEE"}>
                 <strong>{item.domainCode.replaceAll("_", " ")}</strong><span>{item.inputType} · {item.status.replaceAll("_", " ")}</span><small>{timeLabel(item.createdAt)}{item.role ? ` · ${item.role.replaceAll("_", " ")}` : ""}</small>
               </button>

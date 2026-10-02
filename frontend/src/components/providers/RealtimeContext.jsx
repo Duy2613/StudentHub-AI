@@ -19,6 +19,7 @@ const RealtimeContext = createContext({
   runtime: INITIAL_RUNTIME,
   recentEvents: [],
   notifications: [],
+  roomInbox: { myRooms: [], openRooms: [], domains: [], supportedDomains: [], presenceLeaseSeconds: 45 },
   dismissNotification: () => {},
   broadcastEvent: async () => ({ success: false, error: "Realtime is unavailable." }),
   subscribe: () => () => {},
@@ -40,6 +41,8 @@ export function RealtimeProvider({ children }) {
   const [runtime, setRuntime] = useState(INITIAL_RUNTIME);
   const [recentEvents, setRecentEvents] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [roomInbox, setRoomInbox] = useState({ myRooms: [], openRooms: [], domains: [], supportedDomains: [], presenceLeaseSeconds: 45 });
+  const roomPresenceLeaseRef = useRef(45);
 
   const eventSourceRef = useRef(null);
   const subscribersRef = useRef(new Map());
@@ -50,6 +53,8 @@ export function RealtimeProvider({ children }) {
   const connectSSERef = useRef(null);
   const reconnectAttemptRef = useRef(0);
   const previousPrincipalIdRef = useRef(null);
+  const roomInviteSnapshotsRef = useRef(new Map());
+  const roomStateSnapshotsRef = useRef(new Map());
 
   const dispatchToSubscribers = useCallback((channel, eventType, data) => {
     const key = `${channel}:${eventType}`;
@@ -188,6 +193,10 @@ export function RealtimeProvider({ children }) {
       // logout. The next stream is authorized from the new cookie only.
       setRecentEvents([]);
       setNotifications([]);
+      setRoomInbox({ myRooms: [], openRooms: [], domains: [], supportedDomains: [], presenceLeaseSeconds: 45 });
+      roomPresenceLeaseRef.current = 45;
+      roomInviteSnapshotsRef.current.clear();
+      roomStateSnapshotsRef.current.clear();
       setRuntime(INITIAL_RUNTIME);
       lastSequenceRef.current = 0;
       seenEventIdsRef.current.clear();
@@ -236,8 +245,147 @@ export function RealtimeProvider({ children }) {
     };
   }, []);
 
+  // Room state is durable in PostgreSQL; this refresh is also the reconnect
+  // path when a browser misses an SSE event while offline or on another page.
+  useEffect(() => {
+    if (!hasApplicationSession || !principalId) {
+      setRoomInbox({ myRooms: [], openRooms: [], domains: [], supportedDomains: [], presenceLeaseSeconds: 45 });
+      roomInviteSnapshotsRef.current.clear();
+      roomStateSnapshotsRef.current.clear();
+      return undefined;
+    }
+
+    let stopped = false;
+    let inFlight = false;
+    let refreshPending = false;
+    let timer = null;
+    let lastHeartbeatAt = 0;
+    const abortController = new AbortController();
+    const previous = roomInviteSnapshotsRef.current;
+    const notificationsForSession = new Map();
+
+    const refresh = async () => {
+      if (stopped || document.visibilityState === "hidden") return;
+      if (inFlight) { refreshPending = true; return; }
+      inFlight = true;
+      refreshPending = false;
+      try {
+        const response = await fetch("/api/expert/rooms", {
+          method: "GET", credentials: "include", cache: "no-store", signal: abortController.signal,
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || payload.success === false) throw new Error(payload.error?.code || "ROOM_INBOX_UNAVAILABLE");
+        const next = payload.data || {};
+        const myRooms = Array.isArray(next.myRooms) ? next.myRooms : [];
+        const openRooms = Array.isArray(next.openRooms) ? next.openRooms : [];
+        const domains = Array.isArray(next.domains) ? next.domains : [];
+        const now = Date.now();
+        const current = new Map();
+        const currentRoomStates = new Map();
+        for (const room of myRooms) {
+          if (!/^[0-9a-f-]{36}$/i.test(String(room?.roomId || ""))) continue;
+          if (room.role !== "SUPERVISOR_INVITEE") {
+            currentRoomStates.set(room.roomId, { status: room.status, revision: room.revision });
+            const prior = roomStateSnapshotsRef.current.get(room.roomId);
+            const stateLabel = {
+              LOBBY: "Supervisor đã nhận phòng; phòng sẵn sàng.",
+              QUESTION_ACTIVE: "Vòng trả lời trong phòng đã bắt đầu.",
+              ANSWER_LOCKED: "Câu trả lời đã được khóa trong phòng.",
+              DISPUTED: "Phòng có kết quả đang cần đối chiếu.",
+              SETTLED: "Phòng đã hoàn tất đối chiếu.",
+              CLOSED: "Phòng xác minh đã đóng.",
+            }[room.status];
+            if (((prior?.status && prior.status !== room.status) || (!prior && room.status === "LOBBY")) && stateLabel) {
+              const notification = {
+                id: `room-state:${room.roomId}:${room.revision}`,
+                kind: "EXPERT_ROOM_UPDATE",
+                roomId: room.roomId,
+                href: `/expert/rooms?room=${encodeURIComponent(room.roomId)}`,
+                title: "Cập nhật phòng xác minh",
+                message: `${String(room.domainCode || "").replaceAll("_", " ")}: ${stateLabel}`,
+                domain: room.domainCode || null,
+                timestamp: now,
+              };
+              if (!notificationsForSession.has(notification.id)) {
+                notificationsForSession.set(notification.id, notification.id);
+                setNotifications((items) => [notification, ...items.filter((item) => item.id !== notification.id)].slice(0, 6));
+                window.setTimeout(() => setNotifications((items) => items.filter((item) => item.id !== notification.id)), 15_000);
+              }
+            }
+            continue;
+          }
+          const expiresAt = Date.parse(room.supervisorOfferExpiresAt || "");
+          if (!Number.isFinite(expiresAt) || expiresAt <= now) continue;
+          const invitationKey = `${room.roomId}:${expiresAt}`;
+          current.set(invitationKey, room);
+          if (!previous.has(invitationKey) && !notificationsForSession.has(invitationKey)) {
+            const notification = {
+              id: `room-invite:${invitationKey}`,
+              kind: "EXPERT_ROOM_INVITE",
+              roomId: room.roomId,
+              href: `/expert/rooms?room=${encodeURIComponent(room.roomId)}`,
+              title: "Lời mời Supervisor độc lập",
+              message: `Có phòng ${String(room.domainCode || "").replaceAll("_", " ")} cần chuyên gia xem xét. Hãy mở lời mời và khai báo xung đột lợi ích trước khi nhận.`,
+              domain: room.domainCode || null,
+              timestamp: now,
+            };
+            notificationsForSession.set(invitationKey, notification.id);
+            setNotifications((items) => [notification, ...items.filter((item) => item.id !== notification.id)].slice(0, 6));
+            window.setTimeout(() => setNotifications((items) => items.filter((item) => item.id !== notification.id)), 15_000);
+          }
+        }
+        roomInviteSnapshotsRef.current = current;
+        roomStateSnapshotsRef.current = currentRoomStates;
+        roomPresenceLeaseRef.current = Number(next.presenceLeaseSeconds || 45);
+        if (!stopped) setRoomInbox({ ...next, myRooms, openRooms, domains, supportedDomains: Array.isArray(next.supportedDomains) ? next.supportedDomains : [] });
+
+        const renewalMs = Math.max(10_000, Math.min(30_000, Number(next.presenceLeaseSeconds || 45) * 1000 / 3));
+        if (domains.length && now - lastHeartbeatAt >= renewalMs - 1_000) {
+          lastHeartbeatAt = now;
+          const heartbeat = await fetch("/api/expert/rooms/presence", {
+            method: "POST", credentials: "include", cache: "no-store", signal: abortController.signal,
+          });
+          if (heartbeat.ok) {
+            const heartbeatPayload = await heartbeat.json().catch(() => ({}));
+            if (heartbeatPayload.success !== false) refreshPending = true;
+          }
+        }
+      } catch (error) {
+        if (!stopped && error?.name !== "AbortError") {
+          setRoomInbox((current) => ({ ...current, status: "UNAVAILABLE" }));
+        }
+      } finally {
+        inFlight = false;
+        if (!stopped) {
+          if (refreshPending) timer = window.setTimeout(() => void refresh(), 150);
+          else {
+            const cadence = Math.max(10_000, Math.min(30_000, roomPresenceLeaseRef.current * 1000 / 3));
+            timer = window.setTimeout(() => void refresh(), cadence);
+          }
+        }
+      }
+    };
+
+    const unsubscribe = subscribe("expert", "expert:revision", (record) => {
+      if (record?.data?.roomId) void refresh();
+    });
+    const onVisible = () => { if (document.visibilityState === "visible") void refresh(); };
+    const onOnline = () => void refresh();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("online", onOnline);
+    void refresh();
+    return () => {
+      stopped = true;
+      abortController.abort("room-inbox-session-changed");
+      window.clearTimeout(timer);
+      unsubscribe();
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("online", onOnline);
+    };
+  }, [hasApplicationSession, principalId, subscribe]);
+
   return (
-    <RealtimeContext.Provider value={{ connectionStatus, latency, runtime, recentEvents, notifications, dismissNotification, broadcastEvent, subscribe }}>
+    <RealtimeContext.Provider value={{ connectionStatus, latency, runtime, recentEvents, notifications, roomInbox, dismissNotification, broadcastEvent, subscribe }}>
       {children}
     </RealtimeContext.Provider>
   );
