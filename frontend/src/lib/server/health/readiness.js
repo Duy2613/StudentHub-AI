@@ -50,6 +50,11 @@ export function getTrustProviderReadiness(env = process.env) {
 
   return {
     tavilyConfigured,
+    tavilyEnabled: tavily.isEnabledByMode(),
+    tavilyMode: ["OFF", "SMOKE", "FINAL_LIVE"].includes(String(env.TAVILY_MODE || "OFF").trim().toUpperCase())
+      ? String(env.TAVILY_MODE || "OFF").trim().toUpperCase()
+      : "OFF",
+    openAlexConfigured: hasValue(env.OPEN_ALEX_KEY) || hasValue(env.OPENALEX_API_KEY),
     geminiConfigured,
     geminiModelConfigured,
     geminiModels,
