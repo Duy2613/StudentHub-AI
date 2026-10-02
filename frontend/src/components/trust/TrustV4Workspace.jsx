@@ -158,7 +158,7 @@ function TrustSession({ authenticated }) {
     event.preventDefault();
     if (controller.current || filePending || cooldown) return;
     const imageMode = mode === "image" || mode === "qr";
-    const draft = content.trim();
+    const draft = imageMode ? "" : content.trim();
     if ((!imageMode && !draft) || draft.length > LIMIT || (imageMode && !fileData)) { setError({ message: imageMode ? "Chọn một ảnh trước khi kiểm chứng." : `Nhập nội dung từ 1 đến ${LIMIT.toLocaleString("vi-VN")} ký tự.` }); return; }
     if (mode === "url" && !safeTrustUrl(draft)) { setError({ message: "Nhập đường dẫn HTTP hoặc HTTPS, không chứa thông tin đăng nhập hay mã bí mật." }); return; }
     const identityKey = `${mode}:${draft}:${imageMode ? fileData.bytes : ""}`;
@@ -227,16 +227,16 @@ function TrustSession({ authenticated }) {
     setError(null);
   };
   const runAnalysis = () => { void submit({ preventDefault() {} }); };
-  const payload = result?.payload || streamPayload;
+  const payload = pending ? streamPayload : result?.payload || streamPayload;
   const layers = payload?.layerResults || payload?.layers || {};
-  const observedInput = result?.snapshot || activeSnapshot || {
+  const observedInput = (pending ? activeSnapshot : result?.snapshot || activeSnapshot) || {
     mode,
     content: mode === "image" || mode === "qr" ? fileData?.name || "" : content,
     label: mode === "image" || mode === "qr" ? fileData?.name || "" : content,
   };
-  const summaryInput = result?.snapshot || activeSnapshot;
+  const summaryInput = pending ? activeSnapshot : result?.snapshot || activeSnapshot;
   const stale = Boolean(result && (result.snapshot.mode !== mode
-    || result.snapshot.content !== content.trim()
+    || result.snapshot.content !== ((mode === "image" || mode === "qr") ? "" : content.trim())
     || result.snapshot.file !== ((mode === "image" || mode === "qr") ? fileData?.bytes || null : null)));
   return <div id="trust-main" className={styles.workspace} data-testid="trust-v4">
     <header className={styles.header}><div><p className={styles.eyebrow}>StudentHub · Kiểm chứng</p><h1>Hiểu rõ trước khi tin.</h1><p>Đặt câu hỏi. Đối chiếu nguồn. Nhìn thấy điều còn chưa rõ.</p></div><button type="button" className={styles.historyButton} aria-expanded={history} onClick={() => setHistory(!history)}><History size={17} />Hồ sơ đã lưu</button></header>
@@ -252,7 +252,7 @@ function TrustSession({ authenticated }) {
         dragging={dragging}
         processing={pending}
         error={error}
-        ocr={layers.layer1?.metadata || layers.layer1 || null}
+        ocr={stale && !pending ? null : layers.layer1?.metadata || layers.layer1 || null}
         hasResult={Boolean(result)}
         analysisSummary={summaryInput ? { type: String(summaryInput.mode || mode).toUpperCase(), label: summaryInput.label || summaryInput.content } : null}
         pipeline={payload}

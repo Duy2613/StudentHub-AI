@@ -2,10 +2,12 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Activity,
   ArrowLeft,
   ArrowRight,
+  Brain,
   Check,
+  ChevronDown,
+  ChevronUp,
   ClipboardPaste,
   ExternalLink,
   FileImage,
@@ -17,30 +19,30 @@ import {
   Network,
   PanelTopOpen,
   ScanSearch,
+  Search,
   ShieldAlert,
   ShieldCheck,
+  Sparkles,
   Upload,
-  Users,
   X,
 } from "lucide-react";
 import Image from "next/image";
 import SourceDisclosure from "@/components/ui/SourceDisclosure";
 import SourceInspectorDrawer from "./SourceInspectorDrawer";
-import AskExpertGatewayCard from "./AskExpertGatewayCard";
 import TrustVsExpertComparisonMatrix from "./TrustVsExpertComparisonMatrix";
 import { TrustAiProvenance, TrustCaseActions } from "./TrustV4Result";
 import TrustEvidenceCard, { isSafePublicUrl } from "./TrustEvidenceCard";
 import {
   MASTER_ULTRA_STATES,
-  layerDefinition,
   normalizeMasterUltraRun,
 } from "@/lib/ai-trust/v5/MasterUltraTrustModel.js";
+import styles from "./TrustCanonicalLayout.module.css";
 
 const INPUT_MODES = [
-  { id: "image", label: "Hình ảnh", icon: ImageIcon },
-  { id: "qr", label: "Mã QR", icon: ScanSearch },
   { id: "text", label: "Văn bản", icon: ClipboardPaste },
   { id: "url", label: "Đường dẫn", icon: Globe2 },
+  { id: "image", label: "Hình ảnh", icon: ImageIcon },
+  { id: "qr", label: "Mã QR", icon: ScanSearch },
 ];
 const EMPTY_SOURCES = Object.freeze([]);
 
@@ -210,30 +212,34 @@ function InputComposer({
   onReset,
 }) {
   return (
-    <section className={`master-ultra-composer ${hideHero ? "is-compact" : ""}`} aria-labelledby="master-ultra-input-title">
-      {!hideHero && <div className="master-ultra-composer-copy">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-semibold tracking-wider mb-1">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          TRUST ENGINE
-        </div>
-        <h1 id="master-ultra-input-title" className="text-2xl sm:text-3xl font-serif text-white tracking-tight">
-          Kiểm tra thông tin
-        </h1>
-        <p className="text-slate-300 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-          Đưa ảnh chụp, mã QR, văn bản hoặc URL vào bốn lớp phân tích. Final Predict chỉ mở khi backend công bố kết quả.
-        </p>
-      </div>}
+    <form className={`master-ultra-composer ${hideHero ? "is-compact" : ""} ${styles.entry}`} aria-labelledby="master-ultra-input-title" onSubmit={(event) => { event.preventDefault(); if (!processing) onAnalyze?.(); }}>
       <div className="master-ultra-composer-panel">
+        <div className={styles.composerHeading}>
+          <p className={styles.eyebrow}>Bắt đầu từ thông tin bạn có</p>
+          <h2 id="master-ultra-input-title">Bạn muốn kiểm chứng điều gì?</h2>
+        </div>
         <div className="master-ultra-mode-switch" role="tablist" aria-label="Loại đầu vào Trust">
           {INPUT_MODES.map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" role="tab" aria-selected={mode === id} disabled={processing} onClick={() => onModeChange?.(id)}>
+            <button key={id} id={`trust-mode-${id}`} type="button" role="tab" aria-selected={mode === id} aria-controls="trust-input-panel" tabIndex={mode === id ? 0 : -1} disabled={processing} onClick={() => onModeChange?.(id)} onKeyDown={(event) => {
+              const index = INPUT_MODES.findIndex((item) => item.id === id);
+              const target = event.key === "ArrowRight" ? (index + 1) % INPUT_MODES.length : event.key === "ArrowLeft" ? (index + INPUT_MODES.length - 1) % INPUT_MODES.length : event.key === "Home" ? 0 : event.key === "End" ? INPUT_MODES.length - 1 : null;
+              if (target === null) return;
+              event.preventDefault();
+              onModeChange?.(INPUT_MODES[target].id);
+              event.currentTarget.parentElement?.querySelectorAll('[role="tab"]')[target]?.focus();
+            }}>
               <Icon size={14} /> {label}
             </button>
           ))}
         </div>
+        <div id="trust-input-panel" role="tabpanel" aria-labelledby={`trust-mode-${mode}`}>
         {mode === "image" || mode === "qr" ? (
           <div
             className={`master-ultra-upload ${dragging ? "is-dragging" : ""} ${preview ? "has-preview" : ""}`}
+            tabIndex={0}
+            role="group"
+            aria-label={mode === "qr" ? "Chọn, thả hoặc dán ảnh mã QR" : "Chọn, thả hoặc dán hình ảnh"}
+            onPaste={(event) => { const pastedFile = event.clipboardData.files?.[0]; if (pastedFile) { event.preventDefault(); onFileSelect?.(pastedFile); } }}
             onDragEnter={(event) => { event.preventDefault(); onDragStateChange?.(true); }}
             onDragOver={(event) => event.preventDefault()}
             onDragLeave={(event) => { event.preventDefault(); onDragStateChange?.(false); }}
@@ -267,12 +273,14 @@ function InputComposer({
         ) : (
           <label className="master-ultra-text-field">
             <span>{mode === "url" ? "Đường dẫn cần đối chiếu" : "Nội dung cần kiểm chứng"}</span>
-            <textarea aria-label={mode === "url" ? "Đường dẫn cần đối chiếu" : "Nội dung cần kiểm chứng"} value={content} onChange={(event) => onContentChange?.(event.target.value)} rows={6} disabled={processing} placeholder={mode === "url" ? "https://..." : "Dán nội dung cần đối soát tại đây..."} />
+            <textarea aria-label={mode === "url" ? "Đường dẫn cần đối chiếu" : "Nội dung cần kiểm chứng"} value={content} onChange={(event) => onContentChange?.(event.target.value)} rows={6} disabled={processing} placeholder={mode === "url" ? "https://..." : "Dán thông báo, một nhận định hoặc nội dung bạn chưa chắc chắn…"} />
           </label>
         )}
+        </div>
+        <p className={styles.inputHelper}>{mode === "text" ? "Bạn có thể gửi nội dung chứa nhiều mệnh đề. Hệ thống sẽ hiển thị phần được trích xuất." : mode === "url" ? "Dán đường dẫn nguồn gốc. Nội dung nguồn sẽ được đối chiếu với mệnh đề cần kiểm chứng." : "Chọn ảnh PNG, JPG hoặc WebP, tối đa 8 MB. Nội dung trích xuất từ ảnh chưa tự trở thành bằng chứng."}</p>
         <div className="master-ultra-composer-footer">
-          <span className="master-ultra-quiet-note"><Info size={14} /> OCR ảnh là gợi ý cục bộ, không phải bằng chứng máy chủ.</span>
-          <button type="button" className="master-ultra-submit" disabled={processing || ((mode === "image" || mode === "qr") && !file)} onClick={onAnalyze}>
+          <span className="master-ultra-quiet-note">Nội dung được gửi đến hệ thống xử lý.<br />Hãy loại bỏ thông tin riêng tư không cần thiết.</span>
+          <button type="submit" className="master-ultra-submit" disabled={processing || ((mode === "image" || mode === "qr") && !file)}>
             {processing ? <LoaderCircle className="animate-spin" size={16} /> : <ScanSearch size={16} />}
             {hasResult ? "Kiểm chứng nội dung mới" : "Kiểm chứng"} <ArrowRight size={15} />
           </button>
@@ -343,10 +351,20 @@ function InputComposer({
             {confirmedEntities.length ? <small>{confirmedEntities.length} entity đã được người dùng xác nhận kèm theo</small> : null}
           </div>
         )}
-        <SourceDisclosure provenance={sourceProvenance} sourceMode={sourceProvenance?.sourceMode || (demoEnabled ? "DEMO" : "UNAVAILABLE")} />
+        {sourceProvenance || demoEnabled ? <SourceDisclosure provenance={sourceProvenance} sourceMode={sourceProvenance?.sourceMode || "DEMO"} /> : null}
         {(file || content) && <button type="button" className="master-ultra-reset" disabled={processing} onClick={onReset}>Làm mới đầu vào</button>}
       </div>
-    </section>
+      <aside className={styles.guide} aria-labelledby="trust-guide-title">
+        <p className={styles.eyebrow}>Một kết quả có thể kiểm tra lại</p>
+        <h2 id="trust-guide-title">Bằng chứng trước.<br />Kết luận sau.</h2>
+        <ol>
+          <li><span>01</span><div><strong>Nhận diện mệnh đề</strong><p>Biết chính xác nội dung đang được kiểm chứng.</p></div></li>
+          <li><span>02</span><div><strong>Đọc bằng chứng và nguồn</strong><p>Phân biệt điều ủng hộ, phản bác và chưa rõ.</p></div></li>
+          <li><span>03</span><div><strong>Hiểu giới hạn kết luận</strong><p>Có cơ sở để chọn bước tiếp theo.</p></div></li>
+        </ol>
+        <p className={styles.guideFoot}>Không phải mọi thông tin đều có đủ bằng chứng để kết luận.</p>
+      </aside>
+    </form>
   );
 }
 
@@ -1191,50 +1209,74 @@ function LayerDetail({ layer, onSelectSource }) {
   return null;
 }
 
-function JourneyStage({ layer, journeyState, onSelectSource }) {
-  const definition = layerDefinition(layer.id);
-  return (
-    <section className={`master-ultra-journey-stage master-ultra-tone-${definition.tone}`} data-layer-id={layer.id} data-journey-state={journeyState} data-testid="trust-active-layer" aria-live="polite">
-      <div className="master-ultra-stage-aura" aria-hidden="true" />
-      <div className="master-ultra-stage-header">
-        <div><SectionLabel tone={definition.tone}>{definition.code} / Product layer</SectionLabel><h2>{definition.name}</h2><p>{definition.questionVi}</p></div>
-        <div className="master-ultra-stage-state"><Activity size={14} className={journeyState.includes("RUNNING") ? "is-spinning" : ""} /><span>{STATE_LABELS[journeyState] || journeyState}</span></div>
-      </div>
-      <div className="master-ultra-stage-summary"><p>{safeText(layer.summary, "Chưa có summary được công bố.")}</p><span>{safeText(layer.metricLabel, "Signal chưa công bố")}</span></div>
-      <LayerDetail layer={layer} onSelectSource={onSelectSource} />
-    </section>
-  );
-}
-
 function FinalPredictPanel({ normalized, onSelectSource }) {
   const result = normalized.finalPredict;
-  if (result.status !== "PUBLISHED") {
-    return (
-      <section className="master-ultra-final-predict rounded-xl border border-amber-400/20 bg-amber-400/[0.04] p-5" data-testid="trust-final-predict" data-status="LOCKED" aria-labelledby="trust-final-predict-title">
-        <div className="flex items-start gap-3"><span className="rounded-lg border border-amber-300/20 bg-amber-300/10 p-2 text-amber-200"><LockKeyhole size={18} /></span><div><SectionLabel tone="gold">Separate output · not a fifth layer</SectionLabel><h2 id="trust-final-predict-title" className="mt-1 text-lg font-semibold text-white">Final Predict · Deterministic</h2><p className="mt-1 max-w-3xl text-sm leading-relaxed text-slate-300">Kết quả đang khóa vì chưa có verdict cuối được backend công bố. Trạng thái hoàn tất của wrapper hoặc nội dung advisory không tự mở kết quả này.</p><span className="mt-3 inline-flex rounded-full border border-amber-300/20 px-2.5 py-1 text-[10px] font-mono uppercase tracking-wide text-amber-200">LOCKED · Chưa công bố</span></div></div>
-      </section>
-    );
-  }
+  const published = result.status === "PUBLISHED";
   return (
-    <section className="master-ultra-final-predict rounded-xl border border-emerald-400/20 bg-emerald-400/[0.035] p-4" data-testid="trust-final-predict" data-status="PUBLISHED" aria-labelledby="trust-final-predict-title">
-      <div className="mb-3"><SectionLabel tone="gold">Separate deterministic output</SectionLabel><h2 id="trust-final-predict-title" className="mt-1 text-lg font-semibold text-white">Final Predict</h2><p className="text-xs text-slate-400">Backend đã công bố kết quả có verdict. Đây là output riêng sau bốn lớp phân tích.</p></div>
-      <div data-testid="trust-conclusion"><DecisionLayer layer={result} onSelectSource={onSelectSource} /></div>
+    <section id="trust-final-predict" tabIndex={-1} className={`master-ultra-final-predict ${styles.final}`} data-testid="trust-final-predict" data-status={published ? "PUBLISHED" : "LOCKED"} aria-labelledby="trust-final-predict-title">
+      <div className={styles.finalHeader}>
+        <span className={styles.finalIcon}>{published ? <ShieldCheck size={24} /> : <LockKeyhole size={24} />}</span>
+        <div><p className={styles.finalEyebrow}>Final Predict · Deterministic</p><h2 id="trust-final-predict-title">{published ? "Kết luận kiểm chứng" : "Final Predict đang khóa"}</h2><p className={styles.finalCaption}>{published ? "Kết luận từ bốn lớp phân tích. Đọc cùng bằng chứng và giới hạn bên dưới." : "Chỉ mở khi backend công bố kết quả cuối cùng."}</p></div>
+        <span className={styles.status}>{published ? <Check size={12} /> : <LockKeyhole size={12} />}{published ? "Đã công bố" : "Đang khóa"}</span>
+      </div>
+      {published ? <div className={styles.finalBody} data-testid="trust-conclusion"><DecisionLayer layer={result} onSelectSource={onSelectSource} /></div> : null}
     </section>
   );
 }
 
-function Overview({ normalized, onInspect, onEdit, onNewAnalysis, onPrint, onSelectSource, resultModel, authenticated, stale }) {
+const LAYER_ICONS = { l1: ShieldCheck, l2: Brain, l3: Search, l4: Sparkles };
+
+function PipelineLayers({ normalized, selectedLayerId, onSelectLayer, onInspect, onSelectSource, journeyState }) {
+  return <section className={styles.layers} aria-label="Chi tiết bốn lớp kiểm chứng">
+    {normalized.macroStages.map((layer, index) => {
+      const expanded = !layer.locked && selectedLayerId === layer.id;
+      const Icon = LAYER_ICONS[layer.id];
+      return <article className={styles.layer} key={layer.id} data-status={layer.status} data-locked={layer.locked}>
+        <button id={`trust-stage-${layer.id}`} type="button" className={styles.layerButton} data-testid={`rail-layer${index + 1}`} data-status={layer.status} disabled={layer.locked} aria-expanded={expanded} aria-controls={`trust-stage-body-${layer.id}`} onClick={() => onSelectLayer?.(expanded ? null : layer.id)}>
+          <span className={styles.layerIcon}><Icon size={20} /></span>
+          <span className={styles.layerHeading}><strong>{layer.code} · {layer.name}</strong><small>{layer.locked ? "Đang chờ lớp trước." : safeText(layer.summary, layer.questionVi)}</small></span>
+          <span className={styles.status}>{layer.locked ? <LockKeyhole size={12} /> : layer.status === "COMPLETE" ? <Check size={12} /> : layer.status === "RUNNING" ? <LoaderCircle size={12} className="animate-spin" /> : null}{layer.locked ? "Đang khóa" : statusLabel(layer.status)}</span>
+          {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        </button>
+        <div id={`trust-stage-body-${layer.id}`} hidden={!expanded} className={styles.layerBody} data-testid={expanded ? "trust-active-layer" : undefined} data-layer-id={layer.id} data-journey-state={journeyState}>{expanded ? <>
+          <div className={styles.layerDetailHeading}><h3>{layer.name}</h3>{onInspect ? <button type="button" onClick={() => onInspect(layer.id)}>Mở chi tiết <PanelTopOpen size={14} /></button> : null}</div>
+          <LayerDetail layer={layer} onSelectSource={onSelectSource} />
+        </> : null}</div>
+      </article>;
+    })}
+  </section>;
+}
+
+function Overview({ normalized, onInspect, onEdit, onNewAnalysis, onPrint, onSelectSource, resultModel, authenticated, stale, analysisSummary, selectedLayerId, onSelectLayer }) {
   const finalPredict = normalized.finalPredict;
+  const availableIds = normalized.macroStages.filter((layer) => !layer.locked).map((layer) => layer.id);
+  if (finalPredict.status === "PUBLISHED") availableIds.push("final_predict");
+  const selectedIndex = availableIds.indexOf(selectedLayerId);
+  const navigate = (offset) => {
+    const target = availableIds[selectedIndex + offset];
+    if (!target) return;
+    onSelectLayer(target);
+    requestAnimationFrame(() => {
+      const element = document.getElementById(target === "final_predict" ? "trust-final-predict" : `trust-stage-${target}`);
+      element?.focus({ preventScroll: true });
+      element?.scrollIntoView({ block: "nearest", behavior: "instant" });
+    });
+  };
   return (
-    <section className="master-ultra-overview" aria-labelledby="master-ultra-overview-title">
-      <div className="master-ultra-overview-heading"><div><SectionLabel tone="gold">Trust case / backend-published state</SectionLabel><h2 id="master-ultra-overview-title">Trust analysis · 4 lớp</h2><p>Mỗi lớp hiển thị stage data backend đã công bố. Kiểm tra lại lớp đã lưu không chạy phân tích mới.</p></div><div className="master-ultra-overview-actions"><button type="button" onClick={onEdit}>Sửa đầu vào</button><button type="button" onClick={onNewAnalysis}>Phiên mới</button><button type="button" onClick={onPrint}>In</button></div></div>
+    <section className={`master-ultra-overview ${styles.overview}`} aria-labelledby="master-ultra-overview-title">
+      <header className={styles.caseSummary}>
+        <div><p className={styles.eyebrow}>{analysisSummary?.type || inputTypeLabel(normalized.input?.type)}{resultModel?.caseRevision ? ` · Phiên bản ${resultModel.caseRevision}` : ""}</p><h2 id="master-ultra-overview-title">Thông tin đang kiểm chứng</h2><p>{safeText(analysisSummary?.label || normalized.input?.excerpt, "Nội dung đầu vào chưa được công bố.")}</p></div>
+        <button type="button" onClick={onEdit}>Sửa đầu vào</button>
+      </header>
       {stale ? <p className="master-ultra-integrity-note" role="status">Bạn đã thay đổi đầu vào. Kết quả bên dưới vẫn gắn với nội dung và phiên bản đã gửi trước đó.</p> : null}
-      <div className="master-ultra-verdict-banner"><div><SectionLabel tone="cyan">Run state</SectionLabel><strong>{safeText(normalized.state, "Chưa công bố")}</strong><p>Source mode: {safeText(normalized.provenance?.sourceMode, "Chưa công bố")}</p></div><div className="master-ultra-verdict-side"><span>Final Predict</span><strong>{finalPredict.status === "PUBLISHED" ? "Đã công bố" : "Đang khóa"}</strong><small>Không suy ra verdict từ wrapper status hoặc provider prose.</small></div></div>
-      <div className="master-ultra-overview-grid">{normalized.macroStages.map((layer) => <button key={layer.id} type="button" disabled={layer.locked} className={`master-ultra-overview-card master-ultra-tone-${layer.tone} ${layer.locked ? "is-locked" : ""}`} onClick={() => onInspect(layer.id)}><div className="master-ultra-overview-card-top"><span>{layer.code}</span>{layer.locked ? <LockKeyhole size={14} /> : layer.status === "COMPLETE" ? <Check size={14} /> : layer.status === "PARTIAL" || layer.status === "FAILED" ? <ShieldAlert size={14} /> : <span aria-hidden="true">○</span>}</div><strong>{layer.name}</strong><small>{layer.locked ? "Khóa · chờ backend" : statusLabel(layer.status)}</small><p>{safeText(layer.summary)}</p>{!layer.locked ? <span className="master-ultra-inspect-link">Mở dữ liệu đã lưu <ArrowRight size={13} /></span> : null}</button>)}</div>
-      <div className="master-ultra-trace-grid"><section id="trust-sources"><div className="master-ultra-subheading"><div><SectionLabel>Source records</SectionLabel><h3>Nguồn truy xuất</h3></div><PanelTopOpen size={18} /></div>{normalized.sources.length ? <div className="master-ultra-trace-list">{normalized.sources.map((source) => <button key={source.id} type="button" onClick={() => onSelectSource?.(source)}><span>{safeText(source.domain, "domain chưa công bố")}</span><strong>{safeText(source.title)}</strong><small>{safeText(source.sourceType)} · retrieved {safeText(source.retrievedAt)}</small></button>)}</div> : <EmptyData>Không có source record được công bố.</EmptyData>}</section><section id="trust-evidence"><div className="master-ultra-subheading"><div><SectionLabel tone="cyan">Evidence records</SectionLabel><h3>Evidence gắn với mệnh đề</h3></div><Network size={18} /></div>{normalized.evidence.length ? <ul className="space-y-2">{normalized.evidence.map((item) => <li key={item.id} className="rounded-lg border border-white/10 bg-black/20 p-3 text-xs"><div className="flex flex-wrap items-center gap-2"><strong className="font-mono text-cyan-200">{item.id}</strong><span className="text-slate-400">{safeText(item.relationship)}</span></div><p className="mt-1 text-slate-200">{safeText(item.excerpt, "Excerpt chưa công bố.")}</p><small className="text-slate-500">Source: {safeText(item.sourceId)} · Claims: {item.claimIds.length ? item.claimIds.join(", ") : "Chưa liên kết"}</small></li>)}</ul> : <EmptyData>Không có evidence item được công bố. Source record không tự trở thành evidence.</EmptyData>}</section></div>
+      <PipelineLayers normalized={normalized} selectedLayerId={selectedLayerId} onSelectLayer={onSelectLayer} onInspect={onInspect} onSelectSource={onSelectSource} />
       <FinalPredictPanel normalized={normalized} onSelectSource={onSelectSource} />
+      <nav className={styles.resultActions} aria-label="Điều hướng phân tích đã lưu">
+        <p>Mở lại từng lớp để đọc kết quả và giới hạn.</p><div><button type="button" disabled={selectedIndex <= 0} onClick={() => navigate(-1)}><ArrowLeft size={14} />Trước</button><button type="button" disabled={selectedIndex < 0 || selectedIndex >= availableIds.length - 1} onClick={() => navigate(1)}>Sau<ArrowRight size={14} /></button><button type="button" onClick={onNewAnalysis}>Phân tích mới</button><button type="button" onClick={onPrint}>In</button></div>
+      </nav>
+      <div className="master-ultra-trace-grid"><section id="trust-sources"><div className="master-ultra-subheading"><div><SectionLabel>Source records</SectionLabel><h3>Nguồn truy xuất</h3></div><PanelTopOpen size={18} /></div>{normalized.sources.length ? <div className="master-ultra-trace-list">{normalized.sources.map((source) => <button key={source.id} type="button" onClick={() => onSelectSource?.(source)}><span>{safeText(source.domain, "domain chưa công bố")}</span><strong>{safeText(source.title)}</strong><small>{safeText(source.sourceType)} · retrieved {safeText(source.retrievedAt)}</small></button>)}</div> : <EmptyData>Không có source record được công bố.</EmptyData>}</section><section id="trust-evidence"><div className="master-ultra-subheading"><div><SectionLabel tone="cyan">Evidence records</SectionLabel><h3>Evidence gắn với mệnh đề</h3></div><Network size={18} /></div>{normalized.evidence.length ? <ul className="space-y-2">{normalized.evidence.map((item) => <li key={item.id} className="rounded-lg border border-white/10 bg-black/20 p-3 text-xs"><div className="flex flex-wrap items-center gap-2"><strong className="font-mono text-cyan-200">{item.id}</strong><span className="text-slate-400">{safeText(item.relationship)}</span></div><p className="mt-1 text-slate-200">{safeText(item.excerpt, "Excerpt chưa công bố.")}</p><small className="text-slate-500">Source: {safeText(item.sourceId)} · Claims: {item.claimIds.length ? item.claimIds.join(", ") : "Chưa liên kết"}</small></li>)}</ul> : <EmptyData>Không có evidence item được công bố. Source record không tự trở thành evidence.</EmptyData>}</section></div>
       {resultModel ? <TrustAiProvenance provenance={resultModel.aiProvenance} /> : null}
-      {finalPredict.status === "PUBLISHED" ? <><AskExpertGatewayCard claim={normalized.layers.l2?.claims?.[0]?.text || normalized.input?.excerpt || ""} trustVerdict={finalPredict.verdict} /><TrustVsExpertComparisonMatrix trustResult={finalPredict} expertAssessment={finalPredict.decision?.expertAssessment || null} /></> : null}
+      {finalPredict.status === "PUBLISHED" ? <TrustVsExpertComparisonMatrix trustResult={finalPredict} expertAssessment={finalPredict.decision?.expertAssessment || null} /> : null}
       {resultModel ? <TrustCaseActions model={resultModel} authenticated={authenticated} /> : null}
       <p className="master-ultra-integrity-note"><ShieldCheck size={15} /> Main Trust V5 giữ quyền kết luận. Final Predict là output riêng sau bốn lớp; inspection không tạo API call mới.</p>
     </section>
@@ -1293,11 +1335,13 @@ export default function TrustMasterUltraJourney({
   const normalized = useMemo(() => normalizeMasterUltraRun({ pipeline, canonicalResult, layers, presentation, input: input || { type: mode, content }, sourceProvenance, providers, processing }), [pipeline, canonicalResult, layers, presentation, input, mode, content, sourceProvenance, providers, processing]);
   const [view, setView] = useState("overview");
   const [selectedLayerId, setSelectedLayerId] = useState("l1");
+  const [runSelection, setRunSelection] = useState({ stageId: null, selectedId: null });
   const [inspectedSource, setInspectedSource] = useState(null);
   const visibleView = processing ? "journey" : hasResult ? view : "input";
   const activeIndex = Math.max(0, normalized.macroStages.findIndex((layer) => layer.status === "RUNNING" || layer.status === "PARTIAL" || layer.status === "FAILED"));
   const activeLayer = normalized.macroStages[activeIndex] || normalized.macroStages[0];
   const activeStatus = normalized.macroStages[activeIndex]?.status || "WAITING";
+  const selectedRunLayerId = runSelection.stageId === activeLayer.id ? runSelection.selectedId : activeLayer.id;
   const journeyState = processing
     ? activeStatus === "RUNNING" ? `L${activeIndex + 1}_RUNNING` : "SUBMITTING"
     : hasResult
@@ -1351,25 +1395,18 @@ export default function TrustMasterUltraJourney({
   const showComposer = !processing && (!hasResult || view === "input");
 
   return (
-    <section className="master-ultra-trust" data-master-ultra-state={visibleJourneyState} data-state-known={MASTER_ULTRA_STATES.includes(visibleJourneyState) ? "true" : "false"} data-main-authority="MAIN_TRUST_V5" data-sequential-authority={normalized.authority.sequential} data-primary-layer-count="4" data-final-predict-status={normalized.finalPredict.status} data-inspection-rerun="0">
-      <div className="master-ultra-atmosphere" aria-hidden="true"><span /><span /><span /></div>
+    <section className={`master-ultra-trust ${styles.root}`} data-master-ultra-state={visibleJourneyState} data-state-known={MASTER_ULTRA_STATES.includes(visibleJourneyState) ? "true" : "false"} data-main-authority="MAIN_TRUST_V5" data-sequential-authority={normalized.authority.sequential} data-primary-layer-count="4" data-final-predict-status={normalized.finalPredict.status} data-inspection-rerun="0">
       {showComposer ? (
         <div className="master-ultra-workspace-stack space-y-4">
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-            <InputComposer mode={mode} content={content} file={file} preview={preview} dragging={dragging} error={error} ocr={ocr} confirmedEntities={confirmedEntities} processing={processing} hasResult={hasResult} demoEnabled={demoEnabled} hideHero={hideHero} sourceProvenance={sourceProvenance} fileInputRef={fileInputRef} onModeChange={onModeChange} onContentChange={onContentChange} onFileSelect={onFileSelect} onDragStateChange={onDragStateChange} onClearFile={onClearFile} onAnalyze={onAnalyze} onReset={onReset} />
-            <ObservedInputPanel mode={mode} content={content} file={file} preview={preview} ocr={ocr} />
+          <div>
+            <InputComposer mode={mode} content={content} file={file} preview={preview} dragging={dragging} error={error} ocr={ocr} confirmedEntities={confirmedEntities} processing={processing} hasResult={hasResult} demoEnabled={demoEnabled} hideHero={hideHero} sourceProvenance={hasResult && stale ? null : sourceProvenance} fileInputRef={fileInputRef} onModeChange={onModeChange} onContentChange={onContentChange} onFileSelect={onFileSelect} onDragStateChange={onDragStateChange} onClearFile={onClearFile} onAnalyze={onAnalyze} onReset={onReset} />
           </div>
-          <ProgressRail normalized={normalized} activeIndex={0} initialReady canInspect={false} />
-          <JourneyStage layer={normalized.macroStages[0]} journeyState={journeyState} onSelectSource={setInspectedSource} />
-          <FinalPredictPanel normalized={normalized} onSelectSource={setInspectedSource} />
         </div>
       ) : null}
-      {processing ? <div className="master-ultra-run-shell"><div className="master-ultra-run-heading"><div><SectionLabel tone="violet">Backend-published journey state</SectionLabel><h2>{activeStatus === "RUNNING" ? activeLayer.name : "Đang chờ stage status từ backend."}</h2></div><div className="master-ultra-run-status"><LoaderCircle size={15} className={processing ? "animate-spin" : ""} /> {STATE_LABELS[journeyState] || journeyState}</div></div><ProgressRail normalized={normalized} activeIndex={activeIndex} canInspect={false} /><JourneyStage layer={activeLayer} journeyState={journeyState} onSelectSource={setInspectedSource} /></div> : null}
-      {hasResult && (visibleView === "overview" || visibleView === "input") ? <><ProgressRail normalized={normalized} activeIndex={activeIndex} canInspect onInspect={inspectLayer} /><Overview normalized={normalized} onInspect={inspectLayer} onEdit={() => setView("input")} onNewAnalysis={startNewAnalysis} onPrint={onPrint} onSelectSource={setInspectedSource} resultModel={resultModel} authenticated={authenticated} stale={stale} /></> : null}
+      {processing || (!hasResult && pipeline) ? <div className={styles.runShell}><ObservedInputPanel mode={input?.type || mode} content={input?.content || content} file={file} preview={preview} ocr={ocr} /><p className={styles.runStatus} role="status">{processing ? <LoaderCircle size={15} className="animate-spin" /> : <ShieldAlert size={15} />}{processing ? (STATE_LABELS[journeyState] || journeyState) : "Phân tích chưa hoàn tất. Dữ liệu đã nhận được giữ bên dưới."}</p><PipelineLayers normalized={normalized} selectedLayerId={processing ? selectedRunLayerId : selectedLayerId} onSelectLayer={processing ? (id) => setRunSelection({ stageId: activeLayer.id, selectedId: id }) : setSelectedLayerId} onSelectSource={setInspectedSource} journeyState={journeyState} /><FinalPredictPanel normalized={normalized} onSelectSource={setInspectedSource} /></div> : null}
+      {hasResult && (visibleView === "overview" || visibleView === "input") ? <Overview normalized={normalized} onInspect={inspectLayer} onEdit={() => setView("input")} onNewAnalysis={startNewAnalysis} onPrint={onPrint} onSelectSource={setInspectedSource} resultModel={resultModel} authenticated={authenticated} stale={stale} analysisSummary={analysisSummary} selectedLayerId={selectedLayerId} onSelectLayer={setSelectedLayerId} /> : null}
       {hasResult && visibleView === "inspect" ? <><ProgressRail normalized={normalized} activeIndex={normalized.macroStages.findIndex((layer) => layer.id === selectedLayerId)} canInspect onInspect={inspectLayer} /><Inspection normalized={normalized} selectedLayerId={inspectedLayer.id} onBack={backToOverview} onNavigate={navigateInspection} onSelectSource={setInspectedSource} /></> : null}
       <SourceInspectorDrawer isOpen={Boolean(inspectedSource)} source={inspectedSource} onClose={() => setInspectedSource(null)} />
-      {analysisSummary && (processing || hasResult) ? <div className="master-ultra-input-chip"><span className={processing ? "is-live" : "is-done"} /> <span>{processing ? "Đang phân tích" : "Phiên đã lưu"} · {analysisSummary.type}</span><strong>{analysisSummary.label}</strong></div> : null}
-      <footer className="master-ultra-footer"><span><LockKeyhole size={13} /> No fake metrics. No hidden sources. No authority confusion.</span><span><Users size={13} /> Final Predict stays separate from the four analysis layers.</span></footer>
     </section>
   );
 }

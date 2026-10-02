@@ -12,7 +12,7 @@ const DRAFT = 'Điều kiện nhận hỗ trợ học tập có áp dụng cho t
 const BASE_URL = process.env.TRUST_V4_BASE_URL || 'http://127.0.0.1:3112';
 const manifest: object[] = [];
 
-function response(requestId: string, outcome = 'SUPPORTED') {
+function response(requestId: string, outcome = 'SUPPORTED', ocrText?: string) {
   const stages = Object.fromEntries(['l1', 'l2', 'l3', 'l4'].map((stageId) => [stageId, {
     schemaVersion: 'trust.v5', requestId, stageId, architecturalLayer: stageId, stageName: stageId,
     role: 'Contract test', checking: 'Synthetic policy input', operationStatus: 'COMPLETED', finding: null,
@@ -26,13 +26,13 @@ function response(requestId: string, outcome = 'SUPPORTED') {
     caseId: CASE, caseRevision: 3, runId: 'isolated-run', persistence: { persisted: true, idempotent: false },
     data: { schemaVersion: 'trust.v5', pipelineVersion: 'contract-test', pipelineModel: 'FOUR_LAYER', publicLayerCount: 4,
       requestId, pipelineStatus: outcome === 'PARTIAL' ? 'PARTIAL' : 'COMPLETED', currentStage: null, stages,
-      finalDecision: null, finalPredict: { truthVerdict: outcome === 'PARTIAL' ? 'INSUFFICIENT' : outcome,
+      finalDecision: null, finalPredict: outcome === 'UNPUBLISHED' ? null : { truthVerdict: outcome === 'PARTIAL' ? 'INSUFFICIENT' : outcome,
         keyReasons: ['Quy định được đối chiếu có nêu điều kiện về đối tượng và thời hạn đăng ký.'],
         remainingUncertainty: ['Chưa có thông báo áp dụng cho học kỳ kế tiếp. Cần xác nhận với đơn vị phụ trách.'],
         recommendedAction: 'Đọc văn bản gốc và xác nhận điều kiện của bạn trước khi đăng ký.',
       }, assurance: null, startedAt: null, completedAt: '2026-09-28T08:00:00.000Z',
       audit: { requestId, stageSequence: ['l1','l2','l3','l4'], stageAttempts: [], hardNegativePropagation: [], policyVersion: 'test', assuranceVersion: null },
-      layerResults: { layer1: null, layer2: { domainCode: 'PUBLIC_POLICY', claims: [{ claimId: CLAIM, text: DRAFT }, { claimId: 'claim-second', text: 'Thời hạn đăng ký được giữ nguyên ở học kỳ kế tiếp.' }] },
+      layerResults: { layer1: ocrText ? { metadata: { text: ocrText } } : null, layer2: { domainCode: 'PUBLIC_POLICY', claims: [{ claimId: CLAIM, text: DRAFT }, { claimId: 'claim-second', text: 'Thời hạn đăng ký được giữ nguyên ở học kỳ kế tiếp.' }] },
         layer3: { sources: [{ sourceId: 'source-a', url: 'https://example.org/policy', title: 'Quy định về hỗ trợ học tập · tài liệu thử nghiệm', publisher: 'Đơn vị học vụ minh họa', sourceType: 'PUBLIC_DOCUMENT', retrievalOrigin: 'RETRIEVED', validationStatus: 'AVAILABLE', publishedAt: '2026-09-01T00:00:00Z', retrievedAt: '2026-09-28T08:00:00Z' },
           { sourceId: 'source-b', url: 'https://example.org/notice', title: 'Thông báo bổ sung · tài liệu thử nghiệm', retrievalOrigin: 'USER_SUPPLIED', validationStatus: 'AVAILABLE' }],
         evidence: outcome === 'INSUFFICIENT' ? [] : [{ evidenceId: 'ev-a', claimId: CLAIM, sourceId: 'source-a', relation: 'SUPPORTS', excerpt: 'Sinh viên thuộc nhóm đủ điều kiện cần hoàn tất hồ sơ trong thời hạn công bố.', revision: 3 }, { evidenceId: 'ev-b', claimId: CLAIM, sourceId: 'source-b', relation: 'CONTRADICTS', excerpt: 'Thông báo khác nêu phạm vi đối tượng hẹp hơn; cần đối chiếu hiệu lực văn bản.', revision: 3 }] },
@@ -45,7 +45,7 @@ function response(requestId: string, outcome = 'SUPPORTED') {
     } });
 }
 
-async function harness(page: Page, options: { outcome?: string; theme?: string; stream?: boolean; status?: number; anonymous?: boolean } = {}) {
+async function harness(page: Page, options: { outcome?: string; theme?: string; stream?: boolean; status?: number; anonymous?: boolean; ocrText?: string } = {}) {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.addInitScript(({ theme }) => { if (!localStorage.getItem('studenthub-theme-mode')) localStorage.setItem('studenthub-theme-mode', theme); Object.assign(window, { __trustV4Harness: true }); }, { theme: options.theme || 'light' });
@@ -63,7 +63,7 @@ async function harness(page: Page, options: { outcome?: string; theme?: string; 
     if (url.pathname === '/api/expert/review-requests' && route.request().method() === 'POST') body = { success: true, data: { id: 'review-request-fixture', status: 'REQUESTED', caseId: CASE, caseRevision: 3, claimId: CLAIM, domainCode: 'PUBLIC_POLICY' }, matching: { status: 'REQUESTED' } };
     if (url.pathname === '/api/v1/trust') {
       if (options.status) return route.fulfill({ status: options.status, json: { success: false, error: { code: 'SERVICE_UNAVAILABLE' } } });
-      body = response(route.request().headers()['x-request-id'], options.outcome);
+      body = response(route.request().headers()['x-request-id'], options.outcome, options.ocrText);
     }
     if (url.pathname.includes('realtime')) return route.fulfill({ status: 503, json: { success: false } });
     return route.fulfill({ json: body });
@@ -93,7 +93,9 @@ async function harness(page: Page, options: { outcome?: string; theme?: string; 
   await expect(workspace.first()).toBeVisible();
   await expect(page.getByRole('button', { name: options.anonymous ? 'Hồ sơ đã lưu' : 'Hồ sơ đã lưu', exact: true })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('data-theme', options.theme === 'midnight' ? 'midnight' : 'light');
-  await expect(page.locator('.source-disclosure')).toHaveAttribute('data-source-mode', 'UNAVAILABLE');
+  await expect(page.getByRole('heading', { name: 'Bạn muốn kiểm chứng điều gì?' })).toBeVisible();
+  await expect(page.getByTestId('trust-final-predict')).toHaveCount(0);
+  await expect(page.getByTestId('rail-layer1')).toHaveCount(0);
   // Let the canonical session remount finish before editing a private draft.
   await expect(page.getByText('Đang xác minh phiên…')).toHaveCount(0);
   await expect(workspace).toHaveCount(1);
@@ -119,6 +121,25 @@ async function shot(page: Page, name: string) {
   await writeFile(path.join(DIR, 'screenshots.json'), JSON.stringify(manifest, null, 2));
 }
 
+async function auditResultAccessibility(page: Page, label: string) {
+  const initialTheme = await page.locator('html').getAttribute('data-theme');
+  const initialViewport = page.viewportSize();
+  try {
+    for (const theme of ['light', 'midnight']) for (const width of [390, 1440]) {
+      // Change only CSS tokens so this audit keeps the same case/run identity.
+      await page.evaluate((theme) => document.documentElement.setAttribute('data-theme', theme), theme);
+      await page.setViewportSize({ width, height: 960 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(false);
+      const findings = await new AxeBuilder({ page }).include('#trust-main').analyze();
+      await writeFile(path.join(DIR, `a11y-${label}-${theme}-${width}.json`), JSON.stringify(findings.violations, null, 2));
+      expect(findings.violations.filter((violation) => ['critical', 'serious'].includes(violation.impact || ''))).toEqual([]);
+    }
+  } finally {
+    if (initialTheme) await page.evaluate((theme) => document.documentElement.setAttribute('data-theme', theme), initialTheme);
+    if (initialViewport) await page.setViewportSize(initialViewport);
+  }
+}
+
 test('seven groups: entry, processing, result, evidence, integration and mobile sheet', async ({ page }) => {
   const errors = await harness(page, { stream: true });
   await shot(page, '01-entry-light');
@@ -132,6 +153,8 @@ test('seven groups: entry, processing, result, evidence, integration and mobile 
   await expect(page.getByTestId('trust-ai-provenance')).toContainText('1 URL đã được kiểm tra');
   await expect(page.locator('#trust-ai-provenance').getByRole('link', { name: /Quy định về hỗ trợ học tập/ })).toHaveAttribute('href', 'https://example.org/policy');
   await shot(page, '03-standard-result');
+  await expect(page.getByRole('button', { name: 'Gửi yêu cầu thẩm định', exact: true })).toHaveCount(0);
+  await auditResultAccessibility(page, 'published-result');
   await page.locator('#trust-evidence').evaluate((element) => element.scrollIntoView({ block: 'start', behavior: 'instant' }));
   await shot(page, '04-evidence-sources-comparison');
   await page.getByRole('button', { name: 'Xem đánh giá chuyên gia', exact: true }).click();
@@ -250,6 +273,81 @@ test('image and QR upload previews use the selected supported mode', async ({ pa
   expect(errors).toEqual([]);
 });
 
+test('all four modalities preserve the submitted input contract without leaking a hidden text draft into media', async ({ page }) => {
+  await harness(page);
+  const requests: Record<string, unknown>[] = [];
+  page.on('request', (request) => { if (new URL(request.url()).pathname === '/api/v1/trust') requests.push(request.postDataJSON()); });
+  const image = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNgAAAAAgABSK+kcQAAAABJRU5ErkJggg==', 'base64');
+  for (const [mode, label] of [['text', 'Văn bản'], ['url', 'Đường dẫn'], ['image', 'Hình ảnh'], ['qr', 'Mã QR']]) {
+    await selectMode(page, label);
+    if (mode === 'text') await page.getByLabel('Nội dung cần kiểm chứng', { exact: true }).fill(DRAFT);
+    else if (mode === 'url') await page.getByLabel('Đường dẫn cần đối chiếu', { exact: true }).fill('https://example.org/policy');
+    else await page.locator('#trust-file').setInputFiles({ name: `${mode}.png`, mimeType: 'image/png', buffer: image });
+    await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
+    await expect(page.getByTestId('trust-conclusion')).toBeVisible();
+    await expect(page.getByText('Bạn đã thay đổi đầu vào.', { exact: false })).toHaveCount(0);
+    const request = requests.at(-1);
+    expect(request).toMatchObject({ type: mode, metadata: { inputKind: mode.toUpperCase() } });
+    if (mode === 'image' || mode === 'qr') expect(request).toMatchObject({ content: '', metadata: { fileName: `${mode}.png`, mimeType: 'image/png', fileSize: image.length, bytes: `data:image/png;base64,${image.toString('base64')}` } });
+    else expect(request?.content).toBe(mode === 'text' ? DRAFT : 'https://example.org/policy');
+    await page.getByRole('button', { name: 'Phân tích mới', exact: true }).click();
+    await expect(page.getByTestId('trust-final-predict')).toHaveCount(0);
+  }
+  expect(requests).toHaveLength(4);
+});
+
+test('completed layer wrappers keep an unpublished Final Predict locked; inspection never starts another run', async ({ page }) => {
+  await harness(page, { outcome: 'UNPUBLISHED' });
+  const calls: string[] = [];
+  page.on('request', (request) => { if (new URL(request.url()).pathname === '/api/v1/trust') calls.push(request.method()); });
+  await submit(page);
+  await expect(page.getByTestId('trust-final-predict')).toHaveAttribute('data-status', 'LOCKED');
+  await expect(page.getByTestId('trust-conclusion')).toHaveCount(0);
+  for (const index of [1, 2, 3, 4]) {
+    await expect(page.getByTestId(`rail-layer${index}`)).toHaveAttribute('data-status', 'COMPLETE');
+  }
+  await page.getByTestId('rail-layer2').click();
+  await expect(page.getByTestId('rail-layer2')).toHaveAttribute('aria-expanded', 'true');
+  await page.getByRole('button', { name: 'Mở chi tiết', exact: true }).click();
+  await expect(page.locator('.master-ultra-trust')).toHaveAttribute('data-master-ultra-state', 'INSPECT_LAYER');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.master-ultra-trust')).toHaveAttribute('data-master-ultra-state', 'COMPLETE_OVERVIEW');
+  expect(calls).toEqual(['POST']);
+  await auditResultAccessibility(page, 'unpublished-result');
+});
+
+test('reanalyzing an edited case shows the new input and current stream instead of the previous completed run', async ({ page }) => {
+  await harness(page, { stream: true });
+  await submit(page);
+  await expect(page.getByTestId('trust-conclusion')).toBeVisible();
+  await page.getByRole('button', { name: 'Sửa đầu vào', exact: true }).click();
+  const newDraft = 'Thông báo mới cần được kiểm tra độc lập với phiên trước.';
+  await page.getByLabel('Nội dung cần kiểm chứng', { exact: true }).fill(newDraft);
+  await page.getByRole('button', { name: 'Kiểm chứng nội dung mới', exact: true }).click();
+  await expect(page.getByTestId('trust-observed-input')).toContainText(newDraft);
+  await expect(page.getByTestId('rail-layer3')).toHaveAttribute('data-status', 'RUNNING');
+  await expect(page.getByTestId('trust-final-predict')).toHaveAttribute('data-status', 'LOCKED');
+  await expect(page.getByTestId('trust-conclusion')).toHaveCount(0);
+  await expect(page.getByTestId('trust-conclusion')).toBeVisible();
+});
+
+test('changing an image draft does not attach the previous run OCR to the new image', async ({ page }) => {
+  const oldOcr = 'Văn bản trích xuất từ ảnh của lần chạy trước.';
+  await harness(page, { ocrText: oldOcr });
+  const image = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGNgAAAAAgABSK+kcQAAAABJRU5ErkJggg==', 'base64');
+  await selectMode(page, 'Hình ảnh');
+  await page.locator('#trust-file').setInputFiles({ name: 'previous.png', mimeType: 'image/png', buffer: image });
+  await page.getByRole('button', { name: 'Kiểm chứng', exact: true }).click();
+  await expect(page.getByTestId('trust-conclusion')).toBeVisible();
+  await page.getByRole('button', { name: 'Sửa đầu vào', exact: true }).click();
+  const composer = page.locator('.master-ultra-composer');
+  await expect(composer).toContainText(oldOcr);
+  await page.locator('#trust-file').setInputFiles({ name: 'new-draft.png', mimeType: 'image/png', buffer: Buffer.concat([image, Buffer.from([0])]) });
+  await expect(composer).toContainText('new-draft.png');
+  await expect(composer).not.toContainText(oldOcr);
+  await expect(page.getByText(/Bạn đã thay đổi đầu vào/)).toBeVisible();
+});
+
 test('five isolated UI interaction performance samples', async ({ browser }) => {
   const samples: object[] = [];
   for (let i = 0; i < 5; i++) {
@@ -261,7 +359,7 @@ test('five isolated UI interaction performance samples', async ({ browser }) => 
         encodedScriptBytes: resource.filter((r) => r.name.includes('.js')).reduce((n, r) => n + r.encodedBodySize, 0), classification: 'ISOLATED FIXTURE UI measurement; not production, CPU hydration or field INP' };
     });
     const start = performance.now();
-    await page.getByTestId('rail-layer1').click();
+    await page.getByRole('button', { name: 'Mở chi tiết', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Deterministic Screen' })).toBeVisible();
     samples.push({ ...sample, savedLayerInspectionAutomationMs: performance.now() - start });
     await page.close();

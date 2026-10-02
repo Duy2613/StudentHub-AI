@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AlertCircle, CheckCircle2, FileQuestion, HelpCircle, Shield, ShieldAlert, ShieldCheck, UserCheck } from "lucide-react";
+import { FileQuestion, Shield, ShieldCheck, UserCheck } from "lucide-react";
 
 /**
  * TrustVsExpertComparisonMatrix — Dedicated Dialectic Comparison State.
@@ -85,7 +85,7 @@ export default function TrustVsExpertComparisonMatrix({
           <div className="pt-2 border-t border-white/5 text-[11px] text-slate-400">
             <span className="font-mono">Cơ sở: </span>
             {trustResult?.sources?.length
-              ? `Đối soát qua ${trustResult.sources.length} nguồn tài liệu độc lập.`
+              ? `Backend tham chiếu ${trustResult.sources.length} nguồn tài liệu. Số nguồn không tự chứng minh tính độc lập.`
               : "Dữ liệu đối chiếu theo bộ quy tắc tất định V5."}
           </div>
         </div>

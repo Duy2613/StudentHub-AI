@@ -69,6 +69,7 @@ artifacts/trust-assurance/
 artifacts/**/*.zip
 artifacts/visual/
 artifacts/lab/trust-v4/
+artifacts/lab/trust-canonical/
 artifacts/lab/ai-omni-v4/
 artifacts/lab/full-web-v4/
 artifacts/lab/staging-demo-sessions-20261001/

@@ -26,9 +26,9 @@ test("Trust route delegates to the current workspace and keeps evidence limits e
   assert.match(routeClient, /return <TrustV4Workspace\s*\/>/);
   assert.match(workspace, /<h1>Hiểu rõ trước khi tin\.<\/h1>/);
   assert.match(workspace, /<TrustMasterUltraJourney/);
-  assert.match(journey, /Final Predict chỉ mở khi backend công bố kết quả/);
+  assert.match(journey, /Chỉ mở khi backend công bố kết quả cuối cùng/);
   assert.match(journey, /data-primary-layer-count="4"/);
-  assert.match(journey, /id: "image", label: "Hình ảnh"[\s\S]*id: "qr", label: "Mã QR"[\s\S]*id: "text", label: "Văn bản"[\s\S]*id: "url", label: "Đường dẫn"/);
+  assert.match(journey, /id: "text", label: "Văn bản"[\s\S]*id: "url", label: "Đường dẫn"[\s\S]*id: "image", label: "Hình ảnh"[\s\S]*id: "qr", label: "Mã QR"/);
   assert.match(journey, /master-ultra-composer \$\{hideHero \? "is-compact"/);
   assert.match(globalCss, /\.master-ultra-composer\.is-compact\s*\{\s*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
   assert.match(globalCss, /\.master-ultra-mode-switch\s*\{\s*display:\s*grid;\s*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/);
