@@ -286,6 +286,9 @@ function dataPackageFromTrust(payload, challenge, { remoteRetrieval, trustAnalys
     sourceScope: boundedText(claim.sourceScope, 100),
   }));
   const finalPredict = pipeline.finalPredict && typeof pipeline.finalPredict === "object" ? pipeline.finalPredict : {};
+  const decision = finalPredict.decision && typeof finalPredict.decision === "object" ? finalPredict.decision : {};
+  const uncertainty = [finalPredict.uncertainty, ...(Array.isArray(finalPredict.remainingUncertainty) ? finalPredict.remainingUncertainty : []), ...(Array.isArray(finalPredict.uncertainties) ? finalPredict.uncertainties : [])]
+    .find((value) => typeof value === "string" && value.trim());
   return {
     contractVersion: "expert-room-evidence-package.v1",
     trustCaseId: payload?.caseId || payload?.caseID || null,
@@ -293,8 +296,9 @@ function dataPackageFromTrust(payload, challenge, { remoteRetrieval, trustAnalys
     inputType: challenge.type.toUpperCase(),
     remoteRetrieval,
     trustAnalysis,
-    trustConclusion: boundedText(finalPredict.label || finalPredict.status || finalPredict.classification || pipeline.finalAssessment?.status, 180) || null,
-    uncertainty: boundedText(finalPredict.uncertainty || layer3.verificationCompleteness, 120) || null,
+    trustPredictionStatus: boundedText(finalPredict.status, 80) || null,
+    trustConclusion: boundedText(finalPredict.verdict || finalPredict.label || finalPredict.classification || finalPredict.truthVerdict || finalPredict.truthStatus || (typeof finalPredict.decision === "string" ? finalPredict.decision : null) || decision.label || decision.verdict || decision.truthVerdict || decision.truthStatus || decision.status || pipeline.finalAssessment?.label || pipeline.finalAssessment?.status, 180) || null,
+    uncertainty: boundedText(uncertainty, 120) || null,
     claims,
     evidence,
     sources,
@@ -876,6 +880,17 @@ export class ExpertVerificationRoomService {
       return { room: { ...room, status: updated.status, revision: updated.revision }, round: { ...round, status: "TRUST_ANALYZING" }, challenge: parseJson(room.challenge_payload, {}) };
     }));
     if (challenge.room.status !== "TRUST_ANALYZING") throw roomError("EXPERT_ROOM_TRUST_STATE_INVALID", "Trust processing could not start from the committed room state.", 409);
+
+    // Publish the committed in-progress state before the canonical Trust call.
+    // This lets the Host and assigned Supervisor see the same running phase,
+    // even when the analysis outlasts their initiating HTTP request.
+    await publishRoomRevision(
+      id,
+      challenge.room.revision,
+      "TRUST_ANALYZING",
+      await this.#recipients(id),
+      challenge.round.id,
+    );
 
     let trustPayload = null;
     let trustHttpStatus = 503;

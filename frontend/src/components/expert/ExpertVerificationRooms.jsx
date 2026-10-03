@@ -72,6 +72,7 @@ export default function ExpertVerificationRooms() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [notice, setNotice] = useState("");
+  const [roomSyncWarning, setRoomSyncWarning] = useState(false);
   const [now, setNow] = useState(null);
   const deepLinkedRoom = useRef("");
 
@@ -111,9 +112,15 @@ export default function ExpertVerificationRooms() {
   }, [refreshAll]);
 
   useEffect(() => {
-    const resync = () => { void refreshAll(); };
+    const resync = () => {
+      if (document.visibilityState !== "hidden") void refreshAll();
+    };
     window.addEventListener("online", resync);
-    return () => window.removeEventListener("online", resync);
+    document.addEventListener("visibilitychange", resync);
+    return () => {
+      window.removeEventListener("online", resync);
+      document.removeEventListener("visibilitychange", resync);
+    };
   }, [refreshAll]);
 
   useEffect(() => {
@@ -138,6 +145,35 @@ export default function ExpertVerificationRooms() {
     return () => window.clearInterval(timer);
   }, [active?.round?.deadlineAt, active?.round?.status]);
 
+  useEffect(() => {
+    const roomStatus = active?.room?.status;
+    const viewerRole = active?.viewerRole;
+    if (!selectedRoom
+      || !["HOST", "SUPERVISOR_EXPERT"].includes(viewerRole)
+      || !["ANSWER_LOCKED", "TRUST_ANALYZING"].includes(roomStatus)) return undefined;
+
+    let stopped = false;
+    let timer = null;
+    const refreshTransition = async () => {
+      if (stopped) return;
+      if (document.visibilityState !== "hidden") {
+        try {
+          await refreshRoom(selectedRoom);
+          if (!stopped) setRoomSyncWarning(false);
+        } catch {
+          if (!stopped) setRoomSyncWarning(true);
+        }
+      }
+      if (!stopped) timer = window.setTimeout(refreshTransition, document.visibilityState === "hidden" ? 6000 : 3000);
+    };
+
+    timer = window.setTimeout(refreshTransition, 1500);
+    return () => {
+      stopped = true;
+      if (timer !== null) window.clearTimeout(timer);
+    };
+  }, [active?.room?.status, active?.viewerRole, refreshRoom, selectedRoom]);
+
   const seconds = timeLeft(active?.round?.deadlineAt, now);
   const allRooms = useMemo(() => [
     ...(index.myRooms || []).map((room) => ({ ...room, listType: "MINE" })),
@@ -151,6 +187,7 @@ export default function ExpertVerificationRooms() {
 
   const mutate = async (action, payload = {}, roomId = room?.roomId) => {
     if (!roomId) return null;
+    if (action === "LOCK_AND_ANALYZE") setRoomSyncWarning(false);
     setBusy(true);
     setError(null);
     setNotice("");
@@ -312,9 +349,34 @@ export default function ExpertVerificationRooms() {
 
             {room.status === "ANSWER_LOCKED" && ["HOST", "SUPERVISOR_EXPERT"].includes(active.viewerRole) && <div className={styles.nextAction}><strong>Câu trả lời đã khóa trên máy chủ.</strong><p>Giờ đây mọi thành viên trong phòng có thể xem phản hồi đã nộp.</p><button type="button" className={styles.primaryButton} onClick={() => void mutate("LOCK_AND_ANALYZE")} disabled={busy}>{busy ? "Đang chạy Trust…" : "Chuyển hồ sơ đến Trust"}</button></div>}
 
+            {room.status === "TRUST_ANALYZING" && ["HOST", "SUPERVISOR_EXPERT"].includes(active.viewerRole) && <section className={styles.trustRunning} role="status" aria-live="polite" aria-busy="true" data-testid="room-trust-running">
+              <RefreshCw size={18} aria-hidden="true" />
+              <div><p className={styles.eyebrow}>TRUST · CANONICAL RUN</p><strong>Trust đang phân tích nội dung đã khóa</strong><p>Chủ phòng và Supervisor đang theo dõi cùng trạng thái máy chủ. Kết luận, nguồn và bằng chứng sẽ hiện trong hồ sơ bên dưới khi backend lưu xong.</p><small>{roomSyncWarning ? "Chưa đồng bộ được trạng thái mới nhất. Hệ thống sẽ thử lại; có thể dùng nút Làm mới." : "Trạng thái xác nhận: TRUST_ANALYZING · trang tự đồng bộ nếu lỡ sự kiện realtime."}</small></div>
+              <span className={styles.trustRunningState}>ĐANG CHẠY</span>
+            </section>}
+
             {active.round?.answers?.length > 0 && <section className={styles.answers}><div className={styles.subhead}><FileCheck2 size={16} /><strong>Câu trả lời đã khóa</strong></div>{active.round.answers.map((answer) => <article key={answer.expertId} className={styles.answerCard}><div><strong>Expert …{answer.expertId.slice(-8)}</strong><small>Hash {answer.answerHash?.slice(0, 12)}… · {timeLabel(answer.submittedAt)}</small></div><p>{answer.response?.text || "Không có nội dung phản hồi."}</p></article>)}</section>}
 
-            {active.evidencePackage && <section className={styles.trustPackage}><div className={styles.subhead}><ShieldAlert size={16} /><strong>Hồ sơ bằng chứng Trust</strong><span>{active.evidencePackage.retrievalState} · {active.evidencePackage.trustAnalysisState}</span></div>{blockedTrust && <div className={styles.blocked}><strong>Trust không có bằng chứng phân tích khả dụng</strong><p>REMOTE_RETRIEVAL = {active.evidencePackage.retrievalState}<br />TRUST_ANALYSIS = {active.evidencePackage.trustAnalysisState}<br />Không tạo câu trả lời đúng/sai hoặc reputation từ trạng thái này.</p></div>}{!blockedTrust && <><p className={styles.trustCaveat}>Trust cung cấp nguồn và bằng chứng để xem xét. Trust không tự quyết định đáp án hoặc điểm của Expert.</p>{active.evidencePackage.trustCaseId && <p className={styles.caseLink}>Trust case {active.evidencePackage.trustCaseId} · revision {active.evidencePackage.trustRevision ?? "—"}</p>}{(active.evidencePackage.sources || []).map((source, index) => <div className={styles.sourceRow} key={`${source.sourceId || source.url}:${index}`}><div><strong>{source.title || source.publisher || "Nguồn truy xuất"}</strong><small>{source.providerStatus || source.retrievalOutcome || "Trạng thái nguồn chưa rõ"}</small></div>{source.url && <a href={source.url} target="_blank" rel="noreferrer" aria-label="Mở nguồn gốc"><ExternalLink size={14} /></a>}</div>)}{packageEvidence.map((item) => <blockquote className={styles.evidenceQuote} key={item.evidenceId}><p>{item.excerpt}</p><small>{item.evidenceId} · {item.relation || "Evidence"} · {item.liveEvidence ? "retrieval trực tiếp" : "trạng thái live chưa xác nhận"}</small></blockquote>)}{active.evidencePackage.limitations?.map((limitation, index) => <p className={styles.limitation} key={index}>{limitation}</p>)}</>}</section>}
+            {active.evidencePackage && <section className={styles.trustPackage} data-testid="room-trust-result">
+              <div className={styles.subhead}><ShieldAlert size={16} /><strong>Hồ sơ bằng chứng Trust</strong><span>{active.evidencePackage.retrievalState} · {active.evidencePackage.trustAnalysisState}</span></div>
+              {blockedTrust && <div className={styles.blocked}><strong>Trust chưa cung cấp bằng chứng phân tích khả dụng</strong><p>REMOTE_RETRIEVAL = {active.evidencePackage.retrievalState}<br />TRUST_ANALYSIS = {active.evidencePackage.trustAnalysisState}<br />Không dùng trạng thái này để kết luận đáp án hoặc cộng reputation.</p></div>}
+              {!blockedTrust && <p className={styles.trustCaveat}>Trust cung cấp nguồn và bằng chứng để xem xét. Trust không tự quyết định đáp án hoặc điểm của Expert.</p>}
+              <div className={styles.trustResultSummary}>
+                <div>
+                  <span className={styles.trustResultLabel}>FINAL PREDICT · TRUST</span>
+                  <strong className={styles.trustResultConclusion}>{active.evidencePackage.persistence === "PERSISTED" ? active.evidencePackage.trustConclusion || "Chưa có kết luận Trust được lưu" : "Không có kết luận Trust được lưu"}</strong>
+                  {active.evidencePackage.trustPredictionStatus && <small>Trạng thái dự đoán: {active.evidencePackage.trustPredictionStatus}</small>}
+                  {active.evidencePackage.uncertainty && <small>Bất định được ghi nhận: {active.evidencePackage.uncertainty}</small>}
+                </div>
+                <div><span className={styles.trustResultLabel}>TRẠNG THÁI LƯU</span><strong>{active.evidencePackage.persistence || "UNKNOWN"}</strong></div>
+              </div>
+              {active.evidencePackage.trustCaseId && <p className={styles.caseLink}>Trust case {active.evidencePackage.trustCaseId} · revision {active.evidencePackage.trustRevision ?? "—"}</p>}
+              {!blockedTrust && <>
+                {(active.evidencePackage.sources || []).map((source, index) => <div className={styles.sourceRow} key={`${source.sourceId || source.url}:${index}`}><div><strong>{source.title || source.publisher || "Nguồn truy xuất"}</strong><small>{source.providerStatus || source.retrievalOutcome || "Trạng thái nguồn chưa rõ"}</small></div>{source.url && <a href={source.url} target="_blank" rel="noreferrer" aria-label="Mở nguồn gốc"><ExternalLink size={14} /></a>}</div>)}
+                {packageEvidence.map((item) => <blockquote className={styles.evidenceQuote} key={item.evidenceId}><p>{item.excerpt}</p><small>{item.evidenceId} · {item.relation || "Evidence"} · {item.liveEvidence ? "retrieval trực tiếp" : "trạng thái live chưa xác nhận"}</small></blockquote>)}
+                {active.evidencePackage.limitations?.map((limitation, index) => <p className={styles.limitation} key={index}>{limitation}</p>)}
+              </>}
+            </section>}
 
             {active.round?.status === "ADJUDICATION" && active.viewerRole === "SUPERVISOR_EXPERT" && <section className={styles.adjudication}><div><p className={styles.eyebrow}>HUMAN REVIEW · RUBRIC v1</p><h3>Đánh giá câu trả lời theo bằng chứng</h3></div>{active.round.answers.map((answer) => {
               const existing = adjudicationByExpert.get(answer.expertId);

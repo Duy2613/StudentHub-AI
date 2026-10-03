@@ -174,6 +174,34 @@ test("source snapshot readback exposes stored provider outcome metadata", async 
   assert.match(service, /directInputSourceFound:\s*Boolean\(source\)/);
 });
 
+test("Room publishes the committed Trust-running revision to Host and Supervisor before canonical analysis", async () => {
+  const service = await read("lib/server/expert/ExpertVerificationRoomService.js");
+  const analyze = service.slice(service.indexOf("static async lockAndAnalyze"), service.indexOf("static async completeTrust"));
+  const transition = analyze.indexOf('updateRoomState(client, room, "TRUST_ANALYZING")');
+  const progressEvent = analyze.indexOf('"TRUST_ANALYZING",\n      await this.#recipients(id)');
+  const canonicalTrust = analyze.indexOf("const { runCanonicalTrust }");
+  assert.ok(transition >= 0, "the durable room transition must be committed first");
+  assert.ok(progressEvent > transition, "the shared revision must follow the committed transition");
+  assert.ok(canonicalTrust > progressEvent, "the Supervisor must receive the progress event before Trust runs");
+  assert.match(analyze, /challenge\.room\.revision/);
+  assert.match(analyze, /challenge\.round\.id/);
+});
+
+test("Room Trust result stores the model verdict instead of status and renders only persisted output", async () => {
+  const service = await read("lib/server/expert/ExpertVerificationRoomService.js");
+  const component = await read("components/expert/ExpertVerificationRooms.jsx");
+  assert.match(service, /trustPredictionStatus:\s*boundedText\(finalPredict\.status/);
+  assert.match(service, /finalPredict\.verdict\s*\|\|\s*finalPredict\.label/);
+  assert.match(service, /remainingUncertainty/);
+  assert.match(component, /data-testid="room-trust-running"/);
+  assert.match(component, /\["HOST", "SUPERVISOR_EXPERT"\]\.includes\(active\.viewerRole\)/);
+  assert.match(component, /data-testid="room-trust-result"/);
+  assert.match(component, /persistence\s*===\s*"PERSISTED"/);
+  assert.match(component, /trustPredictionStatus/);
+  assert.match(component, /visibilitychange/);
+  assert.match(component, /setTimeout\(refreshTransition/);
+});
+
 test("grounded question draft insert uses the source snapshot selected inside its transaction", async () => {
   const service = await read("lib/server/expert/ExpertQuestionBankService.js");
   const createDraft = service.slice(
