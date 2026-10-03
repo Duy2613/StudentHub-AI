@@ -205,10 +205,9 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
       try { event = JSON.parse(dataLines.join("\n")) as TrustV5Event; } catch { throw new ApiError("Streaming response contained malformed event data.", "INVALID_RESPONSE", { requestId }); }
       onEvent?.(event);
       if (event.type === "error") throw new ApiError("Trust pipeline failed.", "SERVER_ERROR", { requestId: event.requestId || requestId });
-      // FINAL_PREDICT_READY is the authoritative four-layer result. Do not
-      // keep the UI waiting for persistence/stream teardown after L4 has
-      // already produced the final decision. This prevents a slow tail from
-      // turning a completed analysis into a client timeout.
+      // The decision is ready before the terminal persistence envelope. Keep
+      // rendering it through onEvent, but retain the stream until that envelope
+      // binds the result to its saved case/revision/run and enables follow-ups.
       if ((event.event === "FINAL_PREDICT_READY" || event.type === "final_predict") && event.data?.finalPredict) {
         finalPredictReady = parseV5Response({
           success: true,
@@ -245,17 +244,16 @@ async function sequentialRequest(input: TrustInput, callerSignal: AbortSignal | 
         buffer = buffer.slice(separator + 2);
         separator = buffer.indexOf("\n\n");
       }
-      if (finalPredictReady) {
+      if (completed) {
         try { await reader.cancel(); } catch { /* stream tail is no longer needed */ }
-        controller.abort("final-predict-ready");
-        return finalPredictReady;
+        return completed;
       }
       if (done) break;
     }
     if (buffer.trim()) dispatch(buffer);
+    if (completed) return completed;
     if (finalPredictReady) return finalPredictReady;
-    if (!completed) throw new ApiError("Streaming response ended without a completed V5 result.", "INVALID_RESPONSE", { requestId });
-    return completed;
+    throw new ApiError("Streaming response ended without a completed V5 result.", "INVALID_RESPONSE", { requestId });
   } catch (error) {
     if (error instanceof ApiError) throw error;
     if (controller.signal.aborted) {
