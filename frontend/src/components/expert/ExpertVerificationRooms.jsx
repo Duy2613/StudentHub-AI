@@ -15,6 +15,15 @@ const DIMENSIONS = [
   { id: "EVIDENCE_USE", label: "Dùng bằng chứng", weight: "30%" },
   { id: "UNCERTAINTY_CALIBRATION", label: "Định chuẩn bất định", weight: "20%" },
 ];
+const TRUST_LAYER_STATUS_LABELS = Object.freeze({
+  COMPLETE: "HOÀN TẤT",
+  PARTIAL: "MỘT PHẦN",
+  RUNNING: "ĐANG CHẠY",
+  WAITING: "ĐANG CHỜ",
+  FAILED: "THẤT BẠI",
+  SKIPPED: "ĐÃ BỎ QUA",
+  NOT_REPORTED: "CHƯA CÓ BÁO CÁO",
+});
 
 async function api(path, options = {}) {
   const response = await fetch(path, {
@@ -371,6 +380,26 @@ export default function ExpertVerificationRooms() {
                 <div><span className={styles.trustResultLabel}>TRẠNG THÁI LƯU</span><strong>{active.evidencePackage.persistence || "UNKNOWN"}</strong></div>
               </div>
               {active.evidencePackage.trustCaseId && <p className={styles.caseLink}>Trust case {active.evidencePackage.trustCaseId} · revision {active.evidencePackage.trustRevision ?? "—"}</p>}
+              <section className={styles.trustLayersSection} aria-label="Bốn lớp phân tích Trust" data-testid="room-trust-layers">
+                <div className={styles.trustLayersHeading}><strong>TIẾN TRÌNH TRUST · 4 LỚP</strong><span>Trạng thái do pipeline công bố</span></div>
+                <div className={styles.trustLayersGrid}>
+                  {(active.evidencePackage.layers || []).map((layer) => <article className={styles.trustLayerCard} data-status={layer.status} key={layer.id}>
+                    <div className={styles.trustLayerMeta}><span>{layer.id}</span><span className={styles.trustLayerStatus}>{TRUST_LAYER_STATUS_LABELS[layer.status] || layer.statusLabel || "CHƯA CÓ BÁO CÁO"}</span></div>
+                    <h4>{layer.name}</h4>
+                    <p className={styles.trustLayerDescription}>{layer.description}</p>
+                    {layer.finding && <p className={styles.trustLayerFinding}><span>Phát hiện</span><strong>{layer.finding}</strong></p>}
+                    <p className={styles.trustLayerSummary}>{layer.summary || "Pipeline không công bố phần tóm tắt cho lớp này."}</p>
+                    {layer.subStages?.length > 0 && <ul className={styles.trustLayerSubStages} aria-label={`Trạng thái các bước ${layer.id}`}>
+                      {layer.subStages.map((stage) => <li key={stage.id}><span>{stage.id}</span><strong>{TRUST_LAYER_STATUS_LABELS[stage.status] || stage.statusLabel}</strong></li>)}
+                    </ul>}
+                  </article>)}
+                  {(!active.evidencePackage.layers || active.evidencePackage.layers.length === 0) && ["L1", "L2", "L3", "L4"].map((layerId) => <article className={styles.trustLayerCard} data-status="NOT_REPORTED" key={layerId}>
+                    <div className={styles.trustLayerMeta}><span>{layerId}</span><span className={styles.trustLayerStatus}>CHƯA CÓ BÁO CÁO</span></div>
+                    <h4>{layerId === "L1" ? "Deterministic Screen" : layerId === "L2" ? "Threat & Semantic Intelligence" : layerId === "L3" ? "Evidence Retrieval" : "Synthesis & Reasoning"}</h4>
+                    <p className={styles.trustLayerSummary}>Bản Trust này chưa lưu chi tiết trạng thái của lớp.</p>
+                  </article>)}
+                </div>
+              </section>
               {!blockedTrust && <>
                 {(active.evidencePackage.sources || []).map((source, index) => <div className={styles.sourceRow} key={`${source.sourceId || source.url}:${index}`}><div><strong>{source.title || source.publisher || "Nguồn truy xuất"}</strong><small>{source.providerStatus || source.retrievalOutcome || "Trạng thái nguồn chưa rõ"}</small></div>{source.url && <a href={source.url} target="_blank" rel="noreferrer" aria-label="Mở nguồn gốc"><ExternalLink size={14} /></a>}</div>)}
                 {packageEvidence.map((item) => <blockquote className={styles.evidenceQuote} key={item.evidenceId}><p>{item.excerpt}</p><small>{item.evidenceId} · {item.relation || "Evidence"} · {item.liveEvidence ? "retrieval trực tiếp" : "trạng thái live chưa xác nhận"}</small></blockquote>)}

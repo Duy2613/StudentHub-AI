@@ -37,6 +37,7 @@ test("Expert Reputation Projection: Structure conforms to ExpertProfileViewDTO a
   // 4. Reputation projection
   assert.ok(typeof view.reputation === "object");
   assert.ok(typeof view.reputation.reputation === "number");
+  assert.ok(typeof view.reputation.lifetimeReputation === "number");
   assert.ok(typeof view.reputation.completedReviews === "number");
   assert.ok(view.reputation.policyNotice.includes("Reputation reflects platform contribution"));
 

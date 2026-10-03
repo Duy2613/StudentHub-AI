@@ -19,6 +19,7 @@ test("ExpertReputationPolicy exports canonical constants and thresholds", () => 
   assert.equal(REPUTATION_DELTAS.EXPERT_REVIEW_ACCEPTED, 0);
   assert.equal(MAX_REPUTATION_SCORE, 100);
   assert.equal(clampReputationScore(470), 100);
+  assert.equal(clampReputationScore(250), 100, "the compact profile score is capped while the server keeps the lifetime total for StarLevel");
   assert.equal(clampReputationScore(-10), 0);
   assert.equal(clampReputationScore(72.5), 72.5);
 

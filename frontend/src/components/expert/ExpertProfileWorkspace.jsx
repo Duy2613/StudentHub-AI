@@ -210,8 +210,11 @@ export default function ExpertProfileWorkspace() {
   const publicName = expert.title || profileData?.fullName || profile?.fullName || "Chuyên gia StudentHub";
   const publicBio = expert.bio || "Chưa có tiểu sử chuyên gia.";
   const publicExpertise = expert.expertise || "Chưa có tóm tắt chuyên môn.";
-  const starLevel = reputation.starLevel ?? null;
+  const starLevel = Number.isInteger(reputation.starLevel) && reputation.starLevel >= 1 && reputation.starLevel <= 5
+    ? reputation.starLevel
+    : null;
   const repPoints = clampReputationScore(reputation.reputation ?? 0);
+  const lifetimeReputation = Number.isFinite(reputation.lifetimeReputation) ? reputation.lifetimeReputation : null;
   const completedReviews = reputation.completedReviews ?? work.completed ?? 0;
 
   return (
@@ -246,18 +249,30 @@ export default function ExpertProfileWorkspace() {
                 <span className="inline-flex items-center gap-1">
                   <Mail size={13} /> {profileData?.identity?.email || profile?.email || "Email nội bộ"}
                 </span>
-                {starLevel !== null && (
-                  <span className="inline-flex items-center gap-1 text-amber-300 font-mono">
-                    <Star size={13} className="fill-amber-400 text-amber-400" /> StarLevel: {starLevel}
+                <span
+                  className="inline-flex items-center gap-1 text-amber-300 font-mono"
+                  data-testid="expert-star-level"
+                  aria-label={starLevel === null ? "StarLevel chưa xếp hạng" : `StarLevel ${starLevel} trên 5`}
+                  title="StarLevel xét tổng điểm uy tín tích lũy và số lượt giám định hoàn thành."
+                >
+                  <span className="inline-flex items-center gap-0.5" aria-hidden="true">
+                    {Array.from({ length: 5 }, (_, index) => <Star key={index} size={13} className={index < (starLevel || 0) ? "fill-amber-400 text-amber-400" : "text-slate-600"} />)}
                   </span>
-                )}
+                  <span>StarLevel: {starLevel === null ? "Chưa xếp hạng" : `${starLevel}/5`}</span>
+                </span>
                 <span className="inline-flex items-center gap-1 font-mono text-slate-300">
                   <Scale size={13} /> Uy tín: {repPoints}/{MAX_REPUTATION_SCORE} pts
                 </span>
+                {lifetimeReputation !== null && <span className="inline-flex items-center gap-1 font-mono text-slate-300" data-testid="expert-lifetime-reputation">
+                  <Award size={13} /> Tích lũy: {lifetimeReputation} pts
+                </span>}
                 <span className="inline-flex items-center gap-1 font-mono text-slate-300">
                   <FileCheck size={13} /> Giám định hoàn thành: {completedReviews}
                 </span>
               </div>
+              <p className="mt-1 text-[10px] leading-relaxed text-slate-500" data-testid="expert-star-level-explanation">
+                StarLevel dựa trên tổng điểm tích lũy và lượt giám định; điểm Uy tín hiển thị có trần {MAX_REPUTATION_SCORE}.
+              </p>
             </div>
           </div>
 

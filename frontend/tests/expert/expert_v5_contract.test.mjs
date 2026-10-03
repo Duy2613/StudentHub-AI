@@ -196,6 +196,9 @@ test("Room Trust result stores the model verdict instead of status and renders o
   assert.match(component, /data-testid="room-trust-running"/);
   assert.match(component, /\["HOST", "SUPERVISOR_EXPERT"\]\.includes\(active\.viewerRole\)/);
   assert.match(component, /data-testid="room-trust-result"/);
+  assert.match(component, /data-testid="room-trust-layers"/);
+  assert.match(component, /active\.evidencePackage\.layers\s*\|\|\s*\[\]/);
+  assert.match(service, /layers:\s*projectRoomTrustLayers\(pipeline\)/);
   assert.match(component, /persistence\s*===\s*"PERSISTED"/);
   assert.match(component, /trustPredictionStatus/);
   assert.match(component, /visibilitychange/);

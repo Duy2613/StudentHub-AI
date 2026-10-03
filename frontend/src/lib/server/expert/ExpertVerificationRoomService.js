@@ -5,6 +5,7 @@ import { publishRealtimeEvent } from "../realtime/RealtimePublisher.js";
 import { authenticatedUserId, ExpertQualificationError } from "./ExpertQualificationService.js";
 import { roomRoundEligibility } from "./ExpertRoomEligibility.js";
 import { validateRemoteUrl, validateRemoteUrlSync } from "../../security/hardening/SafeRemoteUrl.js";
+import { projectRoomTrustLayers } from "../../expert/roomTrustLayerProjection.js";
 import {
   assertRoomTransition,
   capReputationDelta,
@@ -296,6 +297,7 @@ function dataPackageFromTrust(payload, challenge, { remoteRetrieval, trustAnalys
     inputType: challenge.type.toUpperCase(),
     remoteRetrieval,
     trustAnalysis,
+    layers: projectRoomTrustLayers(pipeline),
     trustPredictionStatus: boundedText(finalPredict.status, 80) || null,
     trustConclusion: boundedText(finalPredict.verdict || finalPredict.label || finalPredict.classification || finalPredict.truthVerdict || finalPredict.truthStatus || (typeof finalPredict.decision === "string" ? finalPredict.decision : null) || decision.label || decision.verdict || decision.truthVerdict || decision.truthStatus || decision.status || pipeline.finalAssessment?.label || pipeline.finalAssessment?.status, 180) || null,
     uncertainty: boundedText(uncertainty, 120) || null,

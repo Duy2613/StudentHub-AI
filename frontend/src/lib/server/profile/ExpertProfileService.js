@@ -241,6 +241,7 @@ export class ExpertProfileService {
       reputation: {
         starLevel,
         reputation: reputationScore,
+        lifetimeReputation: reputationTotal,
         maxScore: MAX_REPUTATION_SCORE,
         completedReviews: completedCount,
         policyNotice: `Reputation reflects platform contribution under server-owned policy on a 0-${MAX_REPUTATION_SCORE} scale. It is not truth probability.`,
