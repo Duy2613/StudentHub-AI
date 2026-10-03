@@ -76,11 +76,19 @@ export function advancesTrustSnapshot(incoming, previous) {
 
 export function isTrustTerminalResponse(response, active) {
   const pipeline = record(response?.data);
-  if (!sameTrustIdentity(response, active)
-    || response?.requestId !== active?.requestId
+  if (!active?.requestId
+    || response?.requestId !== active.requestId
     || pipeline.requestId !== active?.requestId
     || !["COMPLETED", "PARTIAL"].includes(text(pipeline.pipelineStatus).toUpperCase())
     || !(pipeline.finalPredict || pipeline.finalDecision)) return false;
+
+  // The pipeline's nested caseId can identify its verification record, while
+  // the terminal envelope's caseId identifies the durable Trust case. Keep
+  // those namespaces separate; only compare persisted identity fields with
+  // the corresponding values already bound to this active request.
+  for (const key of ["caseId", "caseRevision", "runId"]) {
+    if (active[key] != null && response[key] !== active[key]) return false;
+  }
 
   if (response.persistence?.persisted !== true) return true;
   return isUuid(response.caseId)

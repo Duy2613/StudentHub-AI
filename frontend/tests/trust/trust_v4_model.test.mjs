@@ -41,13 +41,15 @@ test('identical final and terminal snapshots retain their durable result identit
     caseRevision: 7,
     runId: 'run-current',
     persistence: { persisted: true },
-    data: { requestId, pipelineStatus: 'COMPLETED', finalPredict: { status: 'READY' } },
+    data: { requestId, caseId: 'verification-record-id', pipelineStatus: 'COMPLETED', finalPredict: { status: 'READY' } },
   };
   const finalReadySnapshot = structuredClone(response.data);
   assert.equal(advancesTrustSnapshot(response.data, finalReadySnapshot), true);
   assert.equal(isTrustTerminalResponse(response, active), true);
   assert.equal(isTrustTerminalResponse({ ...response, requestId: 'older-request' }, active), false);
+  assert.equal(isTrustTerminalResponse({ ...response, data: { ...response.data, requestId: 'older-request' } }, active), false);
   assert.equal(isTrustTerminalResponse({ ...response, caseRevision: null }, active), false);
+  assert.equal(isTrustTerminalResponse({ ...response, caseId: '7d850daf-a5b3-4c9f-9fb0-c692fb1298d2' }, { ...active, caseId: response.caseId }), false);
   assert.equal(isTrustTerminalResponse({ ...response, data: { ...response.data, pipelineStatus: 'RUNNING' } }, active), false);
 });
 test('missing and malformed metrics remain absent; unknown statuses never become positive', () => {
