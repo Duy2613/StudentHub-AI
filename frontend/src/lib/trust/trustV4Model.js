@@ -74,6 +74,22 @@ export function advancesTrustSnapshot(incoming, previous) {
   return true;
 }
 
+export function isTrustTerminalResponse(response, active) {
+  const pipeline = record(response?.data);
+  if (!sameTrustIdentity(response, active)
+    || response?.requestId !== active?.requestId
+    || pipeline.requestId !== active?.requestId
+    || !["COMPLETED", "PARTIAL"].includes(text(pipeline.pipelineStatus).toUpperCase())
+    || !(pipeline.finalPredict || pipeline.finalDecision)) return false;
+
+  if (response.persistence?.persisted !== true) return true;
+  return isUuid(response.caseId)
+    && Number.isSafeInteger(response.caseRevision)
+    && response.caseRevision >= 1
+    && typeof response.runId === "string"
+    && Boolean(response.runId.trim());
+}
+
 export function projectTrust(response) {
   if (hasFixtureMarker(response)) throw new Error("FIXTURE_REJECTED");
   const pipeline = record(response?.data);

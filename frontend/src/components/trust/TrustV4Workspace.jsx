@@ -9,7 +9,7 @@ import { trustApi } from "@/lib/api/trust";
 import { trustV5ResponseSchema } from "@/lib/api/schemas/trust";
 import { apiRequest } from "@/lib/api/runtimeClient";
 import { createSecureId } from "@/lib/security/secureId";
-import { advancesTrustSnapshot, hasFixtureMarker, isUuid, projectTrust, safeTrustUrl, sameTrustIdentity, trustFailure } from "@/lib/trust/trustV4Model";
+import { advancesTrustSnapshot, hasFixtureMarker, isTrustTerminalResponse, isUuid, projectTrust, safeTrustUrl, sameTrustIdentity, trustFailure } from "@/lib/trust/trustV4Model";
 import TrustV4Result, { TrustDate } from "./TrustV4Result";
 import TrustMasterUltraJourney from "./TrustMasterUltraJourney";
 import styles from "./trust-v4.module.css";
@@ -183,7 +183,11 @@ function TrustSession({ authenticated }) {
         setStreamPayload(parsed.data.data); mark("processing-commit");
       }, requestId, idempotencyKey);
       if (current !== sequence.current || abort.signal.aborted) return;
-      if (!sameTrustIdentity(response, active) || !advancesTrustSnapshot(response.data, last)) throw new Error("IDENTITY_MISMATCH");
+      // Progress snapshots are monotonic, but PIPELINE_COMPLETED can repeat
+      // the exact FINAL_PREDICT_READY data while adding the durable case/revision/run
+      // envelope. Validate that terminal identity and envelope directly; an
+      // identical final snapshot is not a regression.
+      if (!isTrustTerminalResponse(response, active)) throw new Error("IDENTITY_MISMATCH");
       const model = projectTrust(response);
       if (["FAILED", "CANCELLED"].includes(model.state)) throw new Error("SERVER_ERROR");
       setResult({ model, payload: response.data, snapshot }); setFreshness(null);

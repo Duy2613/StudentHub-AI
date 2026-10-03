@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { projectTrust, safeTrustUrl, sameTrustIdentity, advancesTrustSnapshot, hasFixtureMarker, truthLabel } from '../../src/lib/trust/trustV4Model.js';
+import { projectTrust, safeTrustUrl, sameTrustIdentity, advancesTrustSnapshot, hasFixtureMarker, isTrustTerminalResponse, truthLabel } from '../../src/lib/trust/trustV4Model.js';
 
 test('source-only response never manufactures evidence or conclusion', () => {
   const model = projectTrust({ requestId: 'a', data: { layerResults: { layer3: { sources: [{ sourceId: 's', url: 'https://example.org', retrievalOrigin: 'USER_SUPPLIED' }] } } } });
@@ -30,6 +30,25 @@ test('late running snapshots cannot undo terminal pipeline or stage', () => {
   assert.equal(advancesTrustSnapshot({ pipelineStatus: 'RUNNING' }, { pipelineStatus: 'PARTIAL' }), false);
   assert.equal(advancesTrustSnapshot({ stages: { l1: { operationStatus: 'RUNNING' } } }, { stages: { l1: { operationStatus: 'COMPLETED' } } }), false);
   assert.equal(advancesTrustSnapshot({ stages: { l1: { operationStatus: 'RUNNING' } } }, { stages: { l1: { operationStatus: 'PARTIAL' } } }), false);
+});
+
+test('identical final and terminal snapshots retain their durable result identity', () => {
+  const requestId = 'trust-request-current';
+  const active = { requestId };
+  const response = {
+    requestId,
+    caseId: 'e7338472-6392-4ca0-9d63-63028558713a',
+    caseRevision: 7,
+    runId: 'run-current',
+    persistence: { persisted: true },
+    data: { requestId, pipelineStatus: 'COMPLETED', finalPredict: { status: 'READY' } },
+  };
+  const finalReadySnapshot = structuredClone(response.data);
+  assert.equal(advancesTrustSnapshot(response.data, finalReadySnapshot), true);
+  assert.equal(isTrustTerminalResponse(response, active), true);
+  assert.equal(isTrustTerminalResponse({ ...response, requestId: 'older-request' }, active), false);
+  assert.equal(isTrustTerminalResponse({ ...response, caseRevision: null }, active), false);
+  assert.equal(isTrustTerminalResponse({ ...response, data: { ...response.data, pipelineStatus: 'RUNNING' } }, active), false);
 });
 test('missing and malformed metrics remain absent; unknown statuses never become positive', () => {
   const model = projectTrust({ data: { finalPredict: { sourceQuality: {}, evidenceAgreement: null, truthVerdict: 'SAFE' } } });
