@@ -20,6 +20,7 @@ const RealtimeContext = createContext({
   recentEvents: [],
   notifications: [],
   roomInbox: { myRooms: [], openRooms: [], domains: [], supportedDomains: [], presenceLeaseSeconds: 45 },
+  refreshRoomInbox: async () => {},
   dismissNotification: () => {},
   broadcastEvent: async () => ({ success: false, error: "Realtime is unavailable." }),
   subscribe: () => () => {},
@@ -60,6 +61,8 @@ export function RealtimeProvider({ children }) {
   const [notifications, setNotifications] = useState([]);
   const [roomInbox, setRoomInbox] = useState({ myRooms: [], openRooms: [], domains: [], supportedDomains: [], presenceLeaseSeconds: 45 });
   const roomPresenceLeaseRef = useRef(45);
+  const roomInboxRefreshRef = useRef(null);
+  const refreshRoomInbox = useCallback(() => roomInboxRefreshRef.current?.(), []);
 
   const eventSourceRef = useRef(null);
   const subscribersRef = useRef(new Map());
@@ -389,6 +392,7 @@ export function RealtimeProvider({ children }) {
       }
     };
 
+    roomInboxRefreshRef.current = refresh;
     const unsubscribe = subscribe("expert", "expert:revision", (record) => {
       const data = record?.data || {};
       const roomId = String(data.roomId || "");
@@ -421,6 +425,7 @@ export function RealtimeProvider({ children }) {
     void refresh();
     return () => {
       stopped = true;
+      if (roomInboxRefreshRef.current === refresh) roomInboxRefreshRef.current = null;
       abortController.abort("room-inbox-session-changed");
       window.clearTimeout(timer);
       unsubscribe();
@@ -430,7 +435,7 @@ export function RealtimeProvider({ children }) {
   }, [hasApplicationSession, principalId, subscribe, notifyRoom]);
 
   return (
-    <RealtimeContext.Provider value={{ connectionStatus, latency, runtime, recentEvents, notifications, roomInbox, dismissNotification, broadcastEvent, subscribe }}>
+    <RealtimeContext.Provider value={{ connectionStatus, latency, runtime, recentEvents, notifications, roomInbox, refreshRoomInbox, dismissNotification, broadcastEvent, subscribe }}>
       {children}
     </RealtimeContext.Provider>
   );

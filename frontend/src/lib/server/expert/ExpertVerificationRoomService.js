@@ -3,6 +3,7 @@ import { getPostgresPool } from "../database/PostgresPool.js";
 import { MediaArtifactService } from "../media/MediaArtifactService.js";
 import { publishRealtimeEvent } from "../realtime/RealtimePublisher.js";
 import { authenticatedUserId, ExpertQualificationError } from "./ExpertQualificationService.js";
+import { roomRoundEligibility } from "./ExpertRoomEligibility.js";
 import { validateRemoteUrl, validateRemoteUrlSync } from "../../security/hardening/SafeRemoteUrl.js";
 import {
   assertRoomTransition,
@@ -646,6 +647,7 @@ export class ExpertVerificationRoomService {
           supervisorOfferExpiresAt: room.supervisor_offer_expires_at ? new Date(room.supervisor_offer_expires_at).toISOString() : null,
           createdAt: new Date(room.created_at).toISOString(),
         },
+        roundEligibility: room.status === "LOBBY" ? (await roomRoundEligibility(client, room)).eligibility : null,
         viewerRole: member.role,
         participants: participants.rows.map((row) => ({ userId: String(row.user_id), role: row.role, state: row.state, conflictDeclaration: row.conflict_declaration, conflictDeclaredAt: row.conflict_declared_at ? new Date(row.conflict_declared_at).toISOString() : null, joinedAt: new Date(row.joined_at).toISOString() })),
         round: round ? {
@@ -768,18 +770,9 @@ export class ExpertVerificationRoomService {
       const room = await getRoomRow(client, id, { forUpdate: true });
       if (String(room.host_user_id) !== userId) throw roomError("EXPERT_ROOM_HOST_REQUIRED", "Only this room's Host can start a round.", 403);
       if (room.status !== "LOBBY") throw roomError("EXPERT_ROOM_NOT_READY", "The room is not ready for a question round.", 409);
-      const members = await client.query(
-        `SELECT p.user_id, p.role, p.conflict_declaration FROM private.expert_room_participants p
-          LEFT JOIN private.expert_room_presence presence ON presence.user_id = p.user_id
-         WHERE p.room_id = $1 AND p.state = 'JOINED'
-           AND p.role IN ('PARTICIPANT_EXPERT','SUPERVISOR_EXPERT')
-           AND presence.expires_at > now()
-         ORDER BY p.role, p.joined_at`, [id],
-      );
-      const supervisor = members.rows.find((row) => row.role === "SUPERVISOR_EXPERT");
-      const experts = members.rows.filter((row) => row.role === "PARTICIPANT_EXPERT").map((row) => String(row.user_id));
-      if (!supervisor || supervisor.conflict_declaration !== "NO_KNOWN_CONFLICT") throw roomError("EXPERT_ROOM_SUPERVISOR_REQUIRED", "An online independent supervisor without a declared conflict must accept before the round starts.", 409);
-      if (!experts.length) throw roomError("EXPERT_ROOM_EXPERT_REQUIRED", "At least one eligible Expert must join before the round starts.", 409);
+      const { eligibility, answerExpertIds: experts } = await roomRoundEligibility(client, room);
+      if (!eligibility.supervisorEligible) throw roomError("EXPERT_ROOM_SUPERVISOR_REQUIRED", "Supervisor cần online, có scope đã xác minh và khai báo không có xung đột trước khi bắt đầu.", 409);
+      if (!experts.length) throw roomError("EXPERT_ROOM_EXPERT_REQUIRED", "Supervisor đã nhận vai trò giám sát. Cần thêm một Expert đúng scope tham gia để trả lời độc lập.", 409);
       const previous = await client.query(`SELECT COALESCE(max(round_number),0)::int AS last_round FROM private.expert_room_rounds WHERE room_id = $1`, [id]);
       if (Number(previous.rows[0]?.last_round || 0) > 0) throw roomError("EXPERT_ROOM_ROUND_ALREADY_USED", "V5 rooms currently accept one scored round; create a new room for another challenge.", 409);
       const answerSeconds = await roomSetting(client, "room_answer_seconds", 30, 10, 300);
@@ -1175,12 +1168,14 @@ export class ExpertVerificationRoomService {
       const room = await getRoomRow(client, id, { forUpdate: true });
       const member = await memberFor(client, id, userId);
       if (member.role !== "HOST") throw roomError("EXPERT_ROOM_HOST_REQUIRED", "Only the Host can close this room.", 403);
-      if (room.status === "CLOSED") return { state: "CLOSED", revision: Number(room.revision), recipients: await roomRecipients(client, id) };
+      if (room.status === "CLOSED") return { state: "CLOSED", revision: Number(room.revision), recipients: await roomRecipients(client, id, [room.supervisor_user_id].filter(Boolean)) };
       const updated = await updateRoomState(client, room, "CLOSED");
       const round = await currentRound(client, room);
       if (round && round.status !== "SETTLED" && round.status !== "DISPUTED") await client.query(`UPDATE private.expert_room_rounds SET status = 'CLOSED' WHERE id = $1`, [round.id]);
       await appendRoomEvent(client, { roomId: id, roundId: round?.id || null, actorId: userId, eventType: "ROOM_CLOSED", payload: {}, idempotencyKey: `room-closed:${id}` });
-      return { state: updated.status, revision: updated.revision, recipients: await roomRecipients(client, id) };
+      // A pending invitee has no membership yet but must receive closure so
+      // its durable inbox/list removes the cancelled invitation immediately.
+      return { state: updated.status, revision: updated.revision, recipients: await roomRecipients(client, id, [room.supervisor_user_id].filter(Boolean)) };
     }));
     await publishRoomRevision(id, result.revision, result.state, result.recipients);
     return result;

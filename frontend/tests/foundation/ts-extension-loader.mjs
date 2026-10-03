@@ -1,4 +1,9 @@
 export async function resolve(specifier, context, nextResolve) {
+  // Next.js enforces this compile-time server boundary. Hermetic Node tests
+  // have no Next compiler and cannot import the deliberately throwing marker.
+  if (specifier === "server-only" && process.env.STUDENTHUB_HERMETIC_TEST_MODE === "1" && process.env.NODE_ENV === "test") {
+    return { url: "data:text/javascript,export {};", shortCircuit: true };
+  }
   if (specifier.startsWith(".")) {
     try {
       return await nextResolve(specifier, context);

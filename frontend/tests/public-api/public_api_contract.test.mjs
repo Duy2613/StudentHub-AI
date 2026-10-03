@@ -28,6 +28,17 @@ function jsonResponse(status, payload, headers = {}) {
   };
 }
 
+test('OpenAlex DOI lookup uses an exact filter and rejects filter injection', async () => {
+  const calls=[];
+  const adapter = new OpenAlexAdapter({apiKey:'fixture',client:{get:async(...args)=>{calls.push(args);return {ok:true,data:{results:[]}};}}});
+  await adapter.searchWorks({query:'paper title',doi:'10.1038/nature14539'});
+  assert.equal(calls[0][2].filter,'doi:https://doi.org/10.1038/nature14539');
+  assert.equal(calls[0][2].search,undefined);
+  const invalid=await adapter.searchWorks({query:'paper',doi:'10.1038/nature14539,from_publication_date:2026'});
+  assert.equal(invalid.ok,false);
+  assert.equal(calls.length,1);
+});
+
 function createFixtureFetch({ crossrefStatus = 200 } = {}) {
   const calls = [];
   const fetchImpl = async (url, options = {}) => {

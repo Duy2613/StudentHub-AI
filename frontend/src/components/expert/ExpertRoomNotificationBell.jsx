@@ -14,7 +14,7 @@ function roomStateLabel(value) {
 }
 
 export default function ExpertRoomNotificationBell() {
-  const { roomInbox } = useRealtime();
+  const { roomInbox, refreshRoomInbox } = useRealtime();
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const now = Date.now();
@@ -47,7 +47,7 @@ export default function ExpertRoomNotificationBell() {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls="expert-room-notifications"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => { if (!open) void refreshRoomInbox(); setOpen((value) => !value); }}
       >
         <Bell size={17} aria-hidden="true" />
         {invitations.length > 0 && <span className="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-[var(--action-primary)] px-1 text-[10px] font-bold text-white">{invitations.length > 9 ? "9+" : invitations.length}</span>}

@@ -130,17 +130,22 @@ export class OpenAlexAdapter {
     this.apiKey = typeof apiKey === "string" ? apiKey.trim() : "";
   }
 
-  async searchWorks({ query = "", institution = "", topic = "", fromYear, toYear, limit = 10, signal } = {}) {
+  async searchWorks({ query = "", doi = "", institution = "", topic = "", fromYear, toYear, limit = 10, signal } = {}) {
     const search = [query, institution, topic].map((value) => boundedText(value, 160)).filter(Boolean).join(" ");
-    if (search.length < 2) return this._invalid("RESEARCH_QUERY_REQUIRED");
+    if (search.length < 2 && !doi) return this._invalid("RESEARCH_QUERY_REQUIRED");
 
     const from = safeYear(fromYear);
     const to = safeYear(toYear);
     const filters = [];
+    const normalizedDoi = boundedText(doi, 240).replace(/^https?:\/\/(?:dx\.)?doi\.org\//i, "");
+    if (normalizedDoi) {
+      if (!/^10\.\d{4,9}\/[^\s,<>"']+$/i.test(normalizedDoi)) return this._invalid("DOI_INVALID");
+      filters.push(`doi:https://doi.org/${normalizedDoi}`);
+    }
     if (from) filters.push(`from_publication_date:${from}-01-01`);
     if (to) filters.push(`to_publication_date:${to}-12-31`);
     const response = await this.client.get(this.apiId, "/works", {
-      search,
+      ...(!normalizedDoi ? { search } : {}),
       "per-page": boundedLimit(limit),
       select: OPENALEX_WORK_FIELDS,
       ...(filters.length ? { filter: filters.join(",") } : {}),

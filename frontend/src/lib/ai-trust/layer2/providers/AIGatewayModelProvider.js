@@ -161,6 +161,7 @@ export class AIGatewayModelProvider extends ISemanticVerificationProvider {
         options: {
           requestId: safeParams.options?.requestId,
           signal: safeParams.options?.signal,
+          allowQaExtended: safeParams.options?.allowQaExtended,
         },
       });
     } catch (error) {

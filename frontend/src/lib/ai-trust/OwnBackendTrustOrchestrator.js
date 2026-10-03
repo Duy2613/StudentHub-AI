@@ -508,6 +508,11 @@ function combineLayer2({ layer2A, layer2B, layer2C, legacyLayer2 = null, input, 
     modelStatus: layer2B?.modelStatus || layer2B?.details?.providerStatus || layer2B?.metrics?.providerStatus || "UNKNOWN",
     modelType: layer2B?.modelType || layer2B?.details?.modelProvider || "SEMANTIC_PROVIDER",
     modelVersion: layer2B?.modelVersion || layer2B?.details?.modelUsed || layer2B?.metrics?.modelUsed || null,
+    aiModelTrace: layer2B?.details?.gatewayAttempts || [],
+    aiExecutedModel: layer2B?.details?.gatewayAttempts?.findLast((attempt) => attempt.ok === true)?.model || null,
+    aiProviderStatus: semanticStatus,
+    aiVerificationErrorType: layer2B?.details?.providerErrorType || null,
+    aiVerificationLatencyMs: layer2B?.details?.providerLatencyMs ?? null,
     confidenceKind: layer2B?.details?.confidenceKind || layer2B?.metrics?.confidenceKind || "NOT_DISCLOSED",
     classificationSource: layer2B?.details?.confidenceSource || layer2B?.details?.providerId || null,
     inputLength: layer2B?.inputLength || null,
@@ -1030,6 +1035,7 @@ export class OwnBackendTrustOrchestrator {
                 signal: controller.signal,
                 useAIGateway: true,
                 aiMode: "GEMINI_ONLY",
+                allowQaExtended: true,
                 ...(this.semanticProvider ? { provider: this.semanticProvider } : {}),
               },
             }),
@@ -1109,6 +1115,7 @@ export class OwnBackendTrustOrchestrator {
           // canonical source/evidence/provenance set.
           const openAlexDiscoveryPromise = OpenAlexTrustContextService.discover({
             claims: layer3Params.claims,
+            input,
             signal: controller.signal,
           }).catch(() => null);
           const canonicalLayer3 = await this.services.l3(layer3Params);
@@ -1223,9 +1230,11 @@ export class OwnBackendTrustOrchestrator {
                 // the already validated legacy advisory attached as a
                 // separate provenance field so the compatibility response
                 // and the legacy Layer 4 hand-off remain complete.
-                const supplementalWithLegacy = rawResults.legacyLayer3
-                  ? { ...supplemental, legacyIntegration: rawResults.legacyLayer3 }
-                  : supplemental;
+                const supplementalWithLegacy = {
+                  ...supplemental,
+                  ...(currentLayer3?.openAlexDiscovery ? { openAlexDiscovery: currentLayer3.openAlexDiscovery } : {}),
+                  ...(rawResults.legacyLayer3 ? { legacyIntegration: rawResults.legacyLayer3 } : {}),
+                };
                 rawResults.l3 = supplementalWithLegacy;
                 pipeline.layerResults.layer3 = supplementalWithLegacy;
                 const previousL3Stage = pipeline.stages.l3 || {};

@@ -18,7 +18,7 @@ function claimQuery(claim) {
   ].filter(Boolean).join(" ").replace(/\s+/g, " "), 180);
 }
 
-function uniqueTasks(claims) {
+function uniqueTasks(claims, input = {}) {
   const seen = new Set();
   const uniqueClaims = claims.slice(0, MAX_CLAIMS).map((claim, index) => ({
     claimId: boundedText(claim?.claimId, 160) || `claim-${index + 1}`,
@@ -30,10 +30,19 @@ function uniqueTasks(claims) {
     return true;
   });
 
-  const tasks = uniqueClaims.slice(0, 2).map((claim) => ({ endpoint: "works", ...claim }));
+  // Academic discovery remains useful when the semantic provider is down or
+  // the input is a DOI without a factual claim. This is a discovery query,
+  // never a fabricated claim or verified evidence item.
+  const context = [input.content, input.metadata?.url, input.metadata?.ocrText, input.metadata?.qrContent, input.metadata?.qrPayload]
+    .filter((value) => typeof value === "string").join(" ").slice(0, 12_000);
+  const doi = context.match(/\b10\.\d{4,9}\/[^\s<>"']+/i)?.[0]?.replace(/[.,;)]+$/, "");
+  const academicInput = doi || /\b(?:paper|research|scholarly|journal|arxiv|openalex)\b|nghiên cứu|bài báo khoa học/i.test(context);
+  const fallback = academicInput ? [{ claimId: "input-academic-discovery", query: boundedText(doi || context, 160), ...(doi ? { doi } : {}) }] : [];
+  const queries = doi ? [...fallback, ...uniqueClaims] : uniqueClaims.length ? uniqueClaims : fallback;
+  const tasks = queries.slice(0, 2).map((claim) => ({ endpoint: "works", ...claim }));
   const institution = uniqueClaims.find((claim) => INSTITUTION_SIGNAL.test(claim.query));
   if (institution) tasks.push({ endpoint: "institutions", ...institution });
-  const topic = uniqueClaims[0];
+  const topic = queries.find((claim) => !claim.doi);
   if (topic) tasks.push({ endpoint: "topics", ...topic });
   return tasks;
 }
@@ -78,7 +87,7 @@ async function runTask(task, signal) {
   try {
     const adapter = publicSourceHub.openAlex;
     const result = task.endpoint === "works"
-      ? await adapter.searchWorks({ query: task.query, limit: MAX_RECORDS_PER_ENDPOINT, signal })
+      ? await adapter.searchWorks({ query: task.query, doi: task.doi, limit: MAX_RECORDS_PER_ENDPOINT, signal })
       : task.endpoint === "institutions"
         ? await adapter.searchInstitutions({ query: task.query, limit: MAX_RECORDS_PER_ENDPOINT, signal })
         : await adapter.searchTopics({ query: task.query, limit: MAX_RECORDS_PER_ENDPOINT, signal });
@@ -96,13 +105,13 @@ async function runTask(task, signal) {
 }
 
 export class OpenAlexTrustContextService {
-  static async discover({ claims = [], signal } = {}) {
+  static async discover({ claims = [], input = {}, signal } = {}) {
     const adapter = publicSourceHub.openAlex;
     if (!adapter?.apiKey) {
       return { provider: "OPENALEX", status: "NOT_CONFIGURED", role: "ACADEMIC_METADATA_DISCOVERY", isAuthoritative: false, allowedUse: "CONTEXT_ONLY", queryCount: 0, endpoints: [], works: [], institutions: [], topics: [] };
     }
 
-    const tasks = uniqueTasks(Array.isArray(claims) ? claims : []);
+    const tasks = uniqueTasks(Array.isArray(claims) ? claims : [], input);
     if (tasks.length === 0) {
       return { provider: "OPENALEX", status: "NOT_REQUESTED", role: "ACADEMIC_METADATA_DISCOVERY", isAuthoritative: false, allowedUse: "CONTEXT_ONLY", queryCount: 0, endpoints: [], works: [], institutions: [], topics: [] };
     }

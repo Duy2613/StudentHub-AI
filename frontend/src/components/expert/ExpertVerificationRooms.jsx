@@ -57,7 +57,7 @@ function scoreRatingsDefaults() {
 }
 
 export default function ExpertVerificationRooms() {
-  const { subscribe, connectionStatus } = useRealtime();
+  const { subscribe, connectionStatus, roomInbox, refreshRoomInbox } = useRealtime();
   const [index, setIndex] = useState(EMPTY);
   const [active, setActive] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState("");
@@ -74,6 +74,14 @@ export default function ExpertVerificationRooms() {
   const [notice, setNotice] = useState("");
   const [now, setNow] = useState(null);
   const deepLinkedRoom = useRef("");
+
+  useEffect(() => {
+    // The shared durable inbox also reconciles polling, visibility and
+    // reconnect. Keep the room list in step even when an SSE event is missed.
+    if (!roomInbox || roomInbox.status === "UNAVAILABLE") return undefined;
+    const request = window.setTimeout(() => setIndex(roomInbox), 0);
+    return () => window.clearTimeout(request);
+  }, [roomInbox]);
 
   const refreshIndex = useCallback(async () => {
     const next = await api("/api/expert/rooms", { method: "GET" });
@@ -92,10 +100,10 @@ export default function ExpertVerificationRooms() {
   const refreshAll = useCallback(async () => {
     setError(null);
     try {
-      await refreshIndex();
+      await Promise.all([refreshIndex(), refreshRoomInbox()]);
       if (selectedRoom) await refreshRoom(selectedRoom);
     } catch (caught) { setError(caught); }
-  }, [refreshIndex, refreshRoom, selectedRoom]);
+  }, [refreshIndex, refreshRoom, selectedRoom, refreshRoomInbox]);
 
   useEffect(() => {
     const request = window.setTimeout(() => { void refreshAll(); }, 0);
@@ -276,7 +284,7 @@ export default function ExpertVerificationRooms() {
 
         <section className={styles.workspace} aria-live="polite">
           {!room ? <div className={styles.workspaceEmpty}><Video size={28} /><p className={styles.eyebrow}>SERVER-OWNED ROOM STATE</p><h2>Chọn phòng hoặc tạo một thử thách mới</h2><p>Người ngoài phòng không thể đọc nội dung challenge, câu trả lời hoặc gói bằng chứng.</p></div> : <>
-            <div className={styles.roomHeader}><div><p className={styles.eyebrow}>ROOM · {room.inputType}</p><h2>{room.domainCode.replaceAll("_", " ")}</h2><p><span className={styles.statusDot} />{room.status.replaceAll("_", " ")}</p></div><div className={styles.roomHeaderActions}>{active.viewerRole === "HOST" && room.status === "WAITING_FOR_SUPERVISOR" && <button type="button" className={styles.secondaryButton} onClick={() => void mutate("RETRY_SUPERVISOR")} disabled={busy}>Tìm Supervisor khác</button>}{active.viewerRole === "HOST" && room.status === "LOBBY" && <button type="button" className={styles.primaryButton} onClick={() => void mutate("START_ROUND")} disabled={busy}>Bắt đầu vòng 30 giây</button>}<button type="button" className={styles.closeButton} onClick={() => void mutate("CLOSE")} disabled={busy || room.status === "CLOSED"}>Đóng phòng</button></div></div>
+            <div className={styles.roomHeader}><div><p className={styles.eyebrow}>ROOM · {room.inputType}</p><h2>{room.domainCode.replaceAll("_", " ")}</h2><p><span className={styles.statusDot} />{room.status.replaceAll("_", " ")}</p></div><div className={styles.roomHeaderActions}>{active.viewerRole === "HOST" && room.status === "WAITING_FOR_SUPERVISOR" && <button type="button" className={styles.secondaryButton} onClick={() => void mutate("RETRY_SUPERVISOR")} disabled={busy}>Tìm Supervisor khác</button>}{active.viewerRole === "HOST" && room.status === "LOBBY" && <button type="button" className={styles.primaryButton} onClick={() => void mutate("START_ROUND")} disabled={busy || active.roundEligibility?.canStart !== true}>Bắt đầu vòng 30 giây</button>}<button type="button" className={styles.closeButton} onClick={() => void mutate("CLOSE")} disabled={busy || room.status === "CLOSED"}>Đóng phòng</button></div></div>
 
             <div className={styles.challenge}>
               <div className={styles.challengeIcon}><LockKeyhole size={17} /></div>
@@ -294,7 +302,7 @@ export default function ExpertVerificationRooms() {
 
             {active.viewerRole === "SUPERVISOR_INVITEE" && <div className={styles.inviteeNotice}><strong>Lời mời Supervisor độc lập</strong><p>Chỉ chấp nhận nếu bạn không biết có xung đột lợi ích với Host hoặc nội dung đang được xem xét. Lời khai được lưu trong lịch sử phòng.</p><button type="button" className={styles.primaryButton} onClick={() => void mutate("ACCEPT_SUPERVISOR", { conflictFree: true })} disabled={busy}>Xác nhận không có xung đột</button><button type="button" className={styles.secondaryButton} onClick={() => void mutate("DECLINE_SUPERVISOR")} disabled={busy}>Từ chối lời mời</button></div>}
 
-            {room.status === "LOBBY" && active.viewerRole !== "HOST" && active.viewerRole !== "SUPERVISOR_EXPERT" && <div className={styles.lobbyNotice}>Vòng chưa bắt đầu. Câu trả lời chỉ mở sau khi Host khởi chạy đồng hồ máy chủ.</div>}
+            {room.status === "LOBBY" && <div className={styles.lobbyNotice}>{active.roundEligibility?.canStart ? `Supervisor và ${active.roundEligibility.answerExpertCount} Expert trả lời đã đủ điều kiện. Host có thể bắt đầu đồng hồ máy chủ.` : active.roundEligibility?.supervisorEligible ? "Supervisor đã đủ điều kiện giám sát. Đang chờ một Expert khác đúng miền chuyên môn vào phòng để trả lời độc lập." : "Đang chờ Supervisor online, có chuyên môn đã xác minh và khai báo không có xung đột."}</div>}
 
             {active.round?.status === "QUESTION_ACTIVE" && <section className={styles.round}>
               <div className={styles.roundTimer}><Clock3 size={16} /><span>Hạn máy chủ</span><strong>{seconds === null ? "—" : `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`}</strong><small>{timeLabel(active.round.deadlineAt)}</small></div>

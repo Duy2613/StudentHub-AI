@@ -6,6 +6,27 @@ import { Layer4TrustService } from "../../src/lib/ai-trust/layer4/Layer4TrustSer
 import { Layer3EvidenceService } from "../../src/lib/ai-trust/layer3/Layer3EvidenceService.js";
 import { markTrustedLayer2AResult } from "../../src/lib/ai-trust/layer2a/TrustBoundary.js";
 import { markTrustedLayer3Result } from "../../src/lib/ai-trust/layer3/TrustBoundary.js";
+import { OpenAlexTrustContextService } from "../../src/lib/server/public-api/OpenAlexTrustContextService.js";
+
+test('supplemental retrieval preserves the original academic provider observation', async () => {
+  const original = OpenAlexTrustContextService.discover;
+  const observation={provider:'OPENALEX',status:'AVAILABLE',queryCount:1,works:[{sourceId:'academic-metadata',title:'Research context',url:'https://doi.org/10.1038/nature14539'}],endpoints:[{endpoint:'works',status:'AVAILABLE'}],isAuthoritative:false,allowedUse:'CONTEXT_ONLY'};
+  OpenAlexTrustContextService.discover=async()=>observation;
+  const calls={l4:0};
+  const services=servicesWithLiveEvidence(calls);
+  services.l4=async(params)=>{
+    await params.options.retrieveSupplementalEvidence({gaps:['a missing source']});
+    return {securityClassification:'UNKNOWN',truthStatus:'INSUFFICIENT_EVIDENCE',recommendedAction:'REVIEW'};
+  };
+  try {
+    const result=await new OwnBackendTrustOrchestrator({services}).run({type:'text',content:'Scholarly paper test'});
+    assert.equal(result.layerResults.layer3.openAlexDiscovery.status,'AVAILABLE');
+    assert.equal(result.layerResults.layer3.openAlexDiscovery.queryCount,1);
+    assert.equal(result.layerResults.layer3.openAlexDiscovery.works[0].sourceId,'academic-metadata');
+    assert.equal(calls.l2bOptions.allowQaExtended,true);
+    assert.equal(result.finalPredict.recommendedAction,'REVIEW');
+  } finally {OpenAlexTrustContextService.discover=original;}
+});
 
 function servicesWithLiveEvidence(calls) {
   return {

@@ -120,7 +120,7 @@ export class Layer2SemanticService {
       ocrText: boundedString(metadata.ocrText, SEMANTIC_BOUNDARY_LIMITS.OCR),
       qrPayload: boundedString(metadata.qrContent || metadata.qrPayload, SEMANTIC_BOUNDARY_LIMITS.QR),
       layer1Result,
-      options: { requestId, signal: options.signal },
+      options: { requestId, signal: options.signal, allowQaExtended: options.allowQaExtended },
     };
 
     // Layer 2 Media Forensics Orchestration for Image Inputs
